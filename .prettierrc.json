@@ -3,5 +3,6 @@
   "tabWidth": 2,
   "semi": true,
   "bracketSameLine": true,
-  "jsxSingleQuote": true
+  "jsxSingleQuote": true,
+  "tailwindConfig": "./tailwind.config.js"
 }
