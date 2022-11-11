@@ -17,5 +17,5 @@ module.exports = {
       sans: ["Teko"],
     },
   },
-  plugins: [],
+  plugins: [require('prettier-plugin-tailwindcss')],
 };
