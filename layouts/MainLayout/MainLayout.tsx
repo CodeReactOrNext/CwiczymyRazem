@@ -30,7 +30,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
           <div className='absolute bottom-0 left-0 hidden h-[120%] w-fit rotate-0  lg:right-0 lg:block'>
             <Lightning className='h-full w-full' />
           </div>
-          <section className='absolute bottom-0 right-0 flex h-[70%] w-full items-center justify-center lg:h-[82%]'>
+          <section className='absolute bottom-0 right-0 z-50 flex h-[70%] w-full items-center justify-center lg:h-[82%]'>
             {children}
           </section>
         </div>
