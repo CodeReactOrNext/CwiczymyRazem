@@ -16,9 +16,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
         <meta name='keywords' content='ćwiczenie, gitara' />
       </Head>
-      <main className='font-sans'>
-        <Component {...pageProps} />
-      </main>
+      <Component {...pageProps} />
     </Provider>
   );
 }
