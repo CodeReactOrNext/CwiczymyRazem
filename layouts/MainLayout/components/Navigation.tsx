@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-export default function MainNavigation() {
+export default function Navigation() {
   return (
     <nav className='right-0 top-0 z-50'>
-      <ul className='hidden gap-8 text-3xl md:flex'>
+      <ul className='hidden gap-8 text-3xl lg:flex xl:gap-32'>
         <li>
           <Link href='/leaderboard'>Leaderboard</Link>
         </li>
@@ -14,7 +14,8 @@ export default function MainNavigation() {
           <Link href='/faq'>FAQ</Link>
         </li>
       </ul>
-      <button className='md:hidden'>
+      {/* PLACEHOLDER */}
+      <button className='lg:hidden'>
         <ul className='flex flex-col gap-1'>
           <HamburgerBar />
           <HamburgerBar />
@@ -23,6 +24,7 @@ export default function MainNavigation() {
           <HamburgerBar />
         </ul>
       </button>
+      {/* PLACEHOLDER */}
     </nav>
   );
 }
