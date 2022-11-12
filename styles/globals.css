@@ -32,6 +32,9 @@ a {
 
 @layer utilities {
   .clip-bg {
-    clip-path: polygon(45vh 0, 100% 0, 100% 100%, 0% 100%);
+    clip-path: polygon(min(46vh, 700px) 0, 100% 0, 100% 100%, 0% 100%);
+  }
+  .clip-bg-mobile {
+    clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 10%);
   }
 }
