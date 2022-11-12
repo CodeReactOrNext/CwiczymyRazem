@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import MainLayout from "../layouts/MainLayout/MainLayout";
+import Button from "../components/Button";
 
 const Home: NextPage = () => {
   return (
@@ -7,6 +8,7 @@ const Home: NextPage = () => {
       variant={"primary"}
       subtitle='Ćwicz, raportuj, zdobywaj punkty!'>
       <h1>Home Page</h1>
+      <Button>Ćwiczymy Razem!</Button>
     </MainLayout>
   );
 };
