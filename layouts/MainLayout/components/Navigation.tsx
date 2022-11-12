@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FaBars } from "react-icons/fa";
 
 export default function Navigation() {
   return (
@@ -17,11 +18,7 @@ export default function Navigation() {
       {/* PLACEHOLDER */}
       <button className='lg:hidden'>
         <ul className='flex flex-col gap-1'>
-          <HamburgerBar />
-          <HamburgerBar />
-          <HamburgerBar />
-          <HamburgerBar />
-          <HamburgerBar />
+          <FaBars />
         </ul>
       </button>
       {/* PLACEHOLDER */}
