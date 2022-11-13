@@ -1,4 +1,7 @@
 /** @type {import('tailwindcss').Config} */
+
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -8,6 +11,10 @@ module.exports = {
   ],
 
   theme: {
+    screens: {
+      xs: "350px",
+      ...defaultTheme.screens,
+    },
     extend: {
       backgroundImage: {
         "old-effect": "url('/static/images/old_effect.webp')",
