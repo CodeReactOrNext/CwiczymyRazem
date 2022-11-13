@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       backgroundImage: {
         "old-effect": "url('/static/images/old_effect.webp')",
+        "old-effect-hr": "url('/static/images/old_effect_hr.png')",
       },
       colors: {
         main: {

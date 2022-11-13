@@ -6,12 +6,7 @@ import { useAppSelector } from "../../store/hooks";
 
 const LoginPage: NextPage = () => {
   const isLoggedIn = useAppSelector(selectUserAuth);
-  return (
-    <div>
-      <h1>LoginPage</h1>
-      {isLoggedIn ? <LogoutView /> : <LoginView />}
-    </div>
-  );
+  return <LoginView />;
 };
 
 export default LoginPage;
