@@ -5,7 +5,7 @@ import LogoutView from "../../feature/user/view/LogoutView/LogoutView";
 import { useAppSelector } from "../../store/hooks";
 
 const LoginPage: NextPage = () => {
-  const isLoggedIn = useAppSelector(selectUserAuth);
+  // const isLoggedIn = useAppSelector(selectUserAuth);
   return <LoginView />;
 };
 
