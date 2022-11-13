@@ -1,10 +1,7 @@
 import type { NextPage } from "next";
+import SingupView from "../../feature/user/view/SingupView/SingupView";
 const SignUpPage: NextPage = () => {
-  return (
-    <div>
-      <h1>SignUp Page</h1>
-    </div>
-  );
+  return <SingupView />;
 };
 
 export default SignUpPage;
