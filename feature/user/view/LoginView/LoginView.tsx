@@ -8,8 +8,8 @@ import {
 } from "../../../../utils/firebase/firebase.utils";
 import { addUserAuth, addUserName } from "../../store/userSlice";
 import { FaUserAlt, FaLock } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-import Slogan from "../../../../components/Slogan";
+import GoogleButton from "../../../../components/GoogleButton";
+import LoginLayout from "../../../../layouts/LoginLayout";
 
 const LoginView = () => {
   const dispatch = useDispatch();
@@ -22,20 +22,19 @@ const LoginView = () => {
 
   return (
     <MainLayout subtitle='Ćwicz, raportuj, zdobywaj punkty!' variant='primary'>
-      <div className=' flex w-[230px] flex-col items-center  justify-center space-y-4 xs:w-[320px] sm:w-[400px]'>
-        <Slogan />
-        <Input Icon={FaUserAlt} placeholder={"Login"} />
-        <Input Icon={FaLock} placeholder={"Hasło"} />
-        <div className='flex space-x-1 '>
-          <Button>Loguj</Button>
-          <Button variant='secondary'>Rejestracja</Button>
-        </div>
-        <button
-          onClick={logGoogleUser}
-          className='flex flex-row gap-3 bg-white p-3 font-medium tracking-wide text-[#555555]'>
-          <FcGoogle size='24' /> Zaloguj się z Google
-        </button>
-      </div>
+      <LoginLayout>
+        <>
+          <Input Icon={FaUserAlt} placeholder={"Login"} />
+          <Input Icon={FaLock} placeholder={"Hasło"} />
+          <div className='flex space-x-1 '>
+            <Button>Loguj</Button>
+            <Button variant='secondary'>Rejestracja</Button>
+          </div>
+          <GoogleButton onClick={logGoogleUser}>
+            Zaloguj się z Google
+          </GoogleButton>
+        </>
+      </LoginLayout>
     </MainLayout>
   );
 };
