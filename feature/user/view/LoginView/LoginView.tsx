@@ -22,7 +22,7 @@ const LoginView = () => {
 
   return (
     <MainLayout subtitle='Ćwicz, raportuj, zdobywaj punkty!' variant='primary'>
-      <div className=' flex flex-col items-center  justify-center space-y-4 '>
+      <div className=' flex w-[230px] flex-col items-center  justify-center space-y-4 xs:w-[320px] sm:w-[400px]'>
         <Slogan />
         <Input Icon={FaUserAlt} placeholder={"Login"} />
         <Input Icon={FaLock} placeholder={"Hasło"} />
