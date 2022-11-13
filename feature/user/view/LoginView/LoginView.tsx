@@ -25,7 +25,7 @@ const LoginView = () => {
         <Input Icon={FaLock} placeholder={"Hasło"} />
         <div className='p-8'>
           <Button onClick={logGoogleUser}>Loguj</Button>
-          <Button>Rejestracja</Button>
+          <Button variant='secondary'>Rejestracja</Button>
         </div>
       </div>
     </MainLayout>
