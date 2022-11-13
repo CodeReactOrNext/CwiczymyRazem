@@ -9,7 +9,7 @@ import {
 import { addUserAuth, addUserName } from "../../store/userSlice";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import GoogleButton from "../../../../components/GoogleButton";
-import LoginLayout from "../../../../layouts/LoginLayout";
+import FormLayout from "../../../../layouts/FormLayout";
 
 const LoginView = () => {
   const dispatch = useDispatch();
@@ -22,7 +22,7 @@ const LoginView = () => {
 
   return (
     <MainLayout subtitle='Ćwicz, raportuj, zdobywaj punkty!' variant='primary'>
-      <LoginLayout>
+      <FormLayout>
         <>
           <Input Icon={FaUserAlt} placeholder={"Login"} />
           <Input Icon={FaLock} placeholder={"Hasło"} />
@@ -34,7 +34,7 @@ const LoginView = () => {
             Zaloguj się z Google
           </GoogleButton>
         </>
-      </LoginLayout>
+      </FormLayout>
     </MainLayout>
   );
 };
