@@ -26,6 +26,3 @@ export default function Navigation() {
   );
 }
 
-function HamburgerBar() {
-  return <li className='h-1 w-10 bg-white'></li>;
-}
