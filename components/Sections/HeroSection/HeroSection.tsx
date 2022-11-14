@@ -34,8 +34,8 @@ export default function HeroSection() {
           </p>
         </span>
       </div>
-      <div className='z-10 flex flex-col items-center justify-center gap-6 sm:flex-row lg:-mb-24 lg:flex-col lg:pr-8'>
-        <span className='text-left text-[6vw] text-tertiary-500 md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
+      <div className='z-10 flex flex-col items-center justify-center gap-6 xsm:flex-row lg:-mb-24 lg:flex-col xl:pr-8'>
+        <span className='text-left text-[2.5vh] text-tertiary-500 xxs:text-[2.7vh] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
           <p>Pnij się po szczeblach rankingu.</p>
           <p>Gromadź statystyki swoich ćwiczeń.</p>
           <p>Otrzymuj punkty za swoje codzinne ćwiczenia</p>

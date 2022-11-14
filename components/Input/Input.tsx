@@ -7,14 +7,14 @@ export interface InputProps {
 
 const Input = ({ Icon, placeholder }: InputProps) => {
   return (
-    <div className='flex flex-row items-center justify-center'>
+    <div className='flex w-full flex-row items-center justify-center'>
       {Icon && (
-        <div className='flex h-[60px] w-[60px] items-center justify-center bg-main-opposed'>
+        <div className='flex h-[50px] w-[50px] items-center justify-center bg-main-opposed xs:h-[60px] xs:w-[60px]'>
           <Icon size='24' />
         </div>
       )}
       <input
-        className='bg-tertiary p-2 text-xl text-main-opposed focus:outline-none focus:ring focus:ring-main-opposed'
+        className='w-full bg-tertiary p-1 pl-3 text-xl text-main-opposed focus:outline-none focus:ring focus:ring-main-opposed xs:p-2'
         type='text'
         placeholder={placeholder}
       />

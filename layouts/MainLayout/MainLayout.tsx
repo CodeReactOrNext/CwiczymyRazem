@@ -25,15 +25,13 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
           </section>
           <div className='absolute top-[10%] right-0 z-50 flex h-1/5 w-full items-center justify-end lg:top-20 lg:h-20'>
             <LightningRev
-              className={`absolute top-0 -right-10 bottom-0 m-auto min-h-full w-[130%] fill-tertiary-500 md:rotate-x-50  lg:hidden ${
-                variant === "landing" ? "top-[40vh] md:top-[42vh]" : ""
+              className={`absolute top-0 -right-10 bottom-0 m-auto min-h-full w-[130%] fill-tertiary-500 sm:rotate-x-50  lg:hidden ${
+                variant === "landing" ? "top-[40vh] sm:top-[42vh] " : ""
               }`}
             />
             <span
-              className={`absolute top-[40%] h-full w-full p-6 text-right text-[5vw] font-medium text-second-500 lg:top-0 lg:w-9/12 lg:bg-tertiary-500 lg:text-left lg:text-4xl ${
-                variant === "landing"
-                  ? "top-[38vh] md:top-[39vh] lg:w-5/12"
-                  : ""
+              className={`absolute top-[40%] h-full w-full p-6 text-right text-[5vw] font-medium text-second-500 lg:top-0 lg:w-9/12 lg:bg-tertiary-500 lg:text-left lg:text-3xl xl:text-4xl ${
+                variant === "landing" ? "top-[39vh] lg:w-5/12" : ""
               }`}>
               {subtitle}
             </span>
@@ -53,7 +51,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
             <Lightning className='z-50 h-full w-auto fill-tertiary-500' />
           </div>
         </div>
-        <div className='absolute h-full w-full bg-old-effect bg-cover bg-no-repeat lg:bg-old-effect-hr'></div>
+        <div className='absolute h-full max-h-[1080px] w-full max-w-[1920px] bg-old-effect bg-cover bg-no-repeat lg:bg-old-effect-hr'></div>
       </div>
     </main>
   );
