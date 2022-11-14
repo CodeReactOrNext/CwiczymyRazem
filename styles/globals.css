@@ -30,11 +30,38 @@ a {
 @tailwind components;
 @tailwind utilities;
 
+@keyframes hover-effect {
+  from {
+    transform: translateY(-30px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes shadow-effect {
+  from {
+    transform: scale(0.7) rotateX(80deg);
+    background-color: #00000077;
+  }
+  to {
+    transform: scale(1) rotateX(80deg);
+    background-color: #000000a3;
+  }
+}
+
 @layer utilities {
   .clip-bg {
     clip-path: polygon(min(46vh, 700px) 0, 100% 0, 100% 100%, 0% 100%);
   }
   .clip-bg-mobile {
     clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 10%);
+  }
+  .hover-animation {
+    animation: hover-effect 3s infinite alternate
+      cubic-bezier(0.5, 0.05, 1, 0.57);
+  }
+  .shadow-animation {
+    animation: shadow-effect 3s infinite alternate
+      cubic-bezier(0.5, 0.05, 1, 0.57);
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Image from "next/image";
 import FireDouble from "../../../public/static/images/Fire_double";
 import guitar from "../../../public/static/images/guitar_red.png";
@@ -16,14 +17,12 @@ export default function HeroSection() {
             <Lightning className='absolute bottom-0 right-[20%] w-[10vw] rotate-[110deg] fill-tertiary-500 sm:right-[35%] sm:w-[5vw] lg:right-[30%] lg:w-[5vw]' />
             <LightningRev className='absolute bottom-[5%] left-[15%] w-[20vw] rotate-[140deg] fill-tertiary-500 sm:left-[30%] sm:w-[15vw]  lg:left-[15%] lg:w-[8vw]' />
           </div>
-          <div className='absolute left-[50%] bottom-0 z-40 h-fit w-[25%] max-w-[100px] -translate-x-[50%] lg:bottom-[15%] lg:left-[47%] lg:max-w-max xl:left-[43%]'>
-            <div className='absolute -bottom-[15%] aspect-square w-full rounded-full bg-black rotate-x-80'></div>
-            <Image
-              className='h-full w-full after:h-full after:w-full after:bg-black'
-              src={guitar}
+          <div className='absolute left-[50%]  bottom-0 z-40 h-fit w-[25%] max-w-[100px] -translate-x-[50%] lg:bottom-[15%] lg:left-[47%] lg:max-w-max xl:left-[43%]'>
+            <div className='shadow-animation absolute -bottom-[15%] aspect-square w-full rounded-full'></div>
+            <img
+              className='hover-animation h-full w-full'
+              src='/static/images/guitar_red.png'
               alt='red guitar'
-              height={1091}
-              width={366}
             />
           </div>
         </div>
@@ -35,7 +34,7 @@ export default function HeroSection() {
         </span>
       </div>
       <div className='z-10 flex flex-col items-center justify-center gap-6 xsm:flex-row lg:-mb-24 lg:flex-col xl:pr-8'>
-        <span className='text-left text-[2.5vh] text-tertiary-500 xxs:text-[2.7vh] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
+        <span className='text-left text-[2.5vh] text-tertiary-500 xxs:text-[2.7vh] xsm:text-[2vh] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
           <p>Pnij się po szczeblach rankingu.</p>
           <p>Gromadź statystyki swoich ćwiczeń.</p>
           <p>Otrzymuj punkty za swoje codzinne ćwiczenia</p>
