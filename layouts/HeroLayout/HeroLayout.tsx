@@ -1,10 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
-import FireDouble from "../../../public/static/images/Fire_double";
-import Lightning from "../../../public/static/images/Lightning";
-import LightningRev from "../../../public/static/images/LightningRev";
-import Button from "../../Button";
+import FireDouble from "../../public/static/images/Fire_double";
+import Lightning from "../../public/static/images/Lightning";
+import LightningRev from "../../public/static/images/LightningRev";
+import Button from "../../components/Button";
+import React from "react";
 
-export default function HeroSection() {
+export default function HeroLayout({
+  children,
+  buttonOnClick,
+}: {
+  children: React.ReactElement;
+  buttonOnClick?: React.MouseEventHandler<HTMLButtonElement>;
+}) {
   return (
     <div className='grid h-full w-full grid-cols-1 grid-rows-2 gap-[20vh] lg:grid-cols-2 lg:grid-rows-1'>
       <div className='relative h-full w-full'>
@@ -35,12 +42,9 @@ export default function HeroSection() {
       </div>
       <div className='z-10 flex flex-col items-center justify-center gap-6 xsm:flex-row lg:-mb-24 lg:flex-col xl:pr-8'>
         <span className='text-left text-[2.5vh] text-tertiary-500 xxs:text-[2.7vh] xsm:text-[2vh] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
-          <p>Pnij się po szczeblach rankingu.</p>
-          <p>Gromadź statystyki swoich ćwiczeń.</p>
-          <p>Otrzymuj punkty za swoje codzinne ćwiczenia</p>
-          <p>Dołącz do nas i zmotywuj się do grania na gitarze!</p>
+          {children}
         </span>
-        <Button>ĆWICZ Z NAMI!</Button>
+        <Button onClick={buttonOnClick}>ĆWICZ Z NAMI!</Button>
       </div>
     </div>
   );
