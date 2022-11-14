@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
-import FireDouble from "../../public/static/images/Fire_double";
-import Lightning from "../../public/static/images/Lightning";
-import LightningRev from "../../public/static/images/LightningRev";
-import Button from "../../components/Button";
+import FireDouble from "public/static/images/Fire_double";
+import Lightning from "public/static/images/Lightning";
+import Button from "components/Button";
 import React from "react";
+import LightningRev from "public/static/images/LightningRev";
 
 export default function HeroLayout({
   children,

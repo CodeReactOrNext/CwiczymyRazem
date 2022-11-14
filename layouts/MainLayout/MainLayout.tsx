@@ -1,6 +1,7 @@
 import Header from "./components/Header";
-import Lightning from "../../public/static/images/Lightning";
-import LightningRev from "../../public/static/images/LightningRev";
+import Lightning from "public/static/images/Lightning";
+import LightningRev from "public/static/images/LightningRev";
+
 
 interface LayoutProps {
   children: React.ReactNode;
