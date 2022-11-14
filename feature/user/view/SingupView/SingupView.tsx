@@ -1,9 +1,9 @@
 import { useDispatch } from "react-redux";
-import Button from "../../../../components/Button";
-import Input from "../../../../components/Input";
-import MainLayout from "../../../../layouts/MainLayout";
+import Button from "components/Button";
+import Input from "components/Input";
+import MainLayout from "\layouts/MainLayout";
 import { FaUserAlt, FaLock, FaAt } from "react-icons/fa";
-import FormLayout from "../../../../layouts/FormLayout";
+import FormLayout from "layouts/FormLayout";
 
 const SingupView = () => {
   return (

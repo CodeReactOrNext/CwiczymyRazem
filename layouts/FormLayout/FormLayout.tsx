@@ -1,4 +1,4 @@
-import Slogan from "../../components/Slogan";
+import Slogan from "components/Slogan";
 
 const FormLayout = ({ children }: { children: React.ReactElement }) => {
   return (
