@@ -34,7 +34,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
             {children}
           </section>
         </div>
-        <div className='absolute h-full w-full bg-old-effect bg-cover bg-no-repeat lg:bg-old-effect-hr'></div>
+        <div className='absolute h-full max-h-[1080px] w-full max-w-[1920px] bg-old-effect bg-cover bg-no-repeat lg:bg-old-effect-hr'></div>
       </div>
     </main>
   );
