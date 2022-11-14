@@ -1,17 +1,23 @@
 import type { NextPage } from "next";
 import MainLayout from "../layouts/MainLayout";
-import Button from "../components/Button";
-import Input from "../components/Input";
-import { FaUserAlt } from "react-icons/fa";
+import HeroLayout from "../layouts/HeroLayout";
 
 const Home: NextPage = () => {
   return (
     <MainLayout
-      variant={"primary"}
+      variant={"landing"}
       subtitle='Ćwicz, raportuj, zdobywaj punkty!'>
-      <h1>Home Page</h1>
-      <Button>Ćwiczymy Razem!</Button>
-      <Input Icon={FaUserAlt} />
+      <HeroLayout
+        buttonOnClick={() => {
+          console.log("Here should be onclick");
+        }}>
+        <>
+          <p>Pnij się po szczeblach rankingu.</p>
+          <p>Gromadź statystyki swoich ćwiczeń.</p>
+          <p>Otrzymuj punkty za swoje codzinne ćwiczenia</p>
+          <p>Dołącz do nas i zmotywuj się do grania na gitarze!</p>
+        </>
+      </HeroLayout>
     </MainLayout>
   );
 };
