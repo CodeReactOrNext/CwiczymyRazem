@@ -4,7 +4,7 @@ import { FaBars } from "react-icons/fa";
 export default function Navigation() {
   return (
     <nav className='right-0 top-0 z-50'>
-      <ul className='hidden gap-8 text-3xl lg:flex xl:gap-32'>
+      <ul className='hidden gap-8 text-3xl lg:flex 2xl:gap-32'>
         <li>
           <Link href='/leaderboard'>Leaderboard</Link>
         </li>
@@ -25,4 +25,3 @@ export default function Navigation() {
     </nav>
   );
 }
-
