@@ -1,7 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import Image from "next/image";
 import FireDouble from "../../../public/static/images/Fire_double";
-import guitar from "../../../public/static/images/guitar_red.png";
 import Lightning from "../../../public/static/images/Lightning";
 import LightningRev from "../../../public/static/images/LightningRev";
 import Button from "../../Button";
@@ -26,9 +24,11 @@ export default function HeroSection() {
             />
           </div>
         </div>
-        <span className='relative z-50 flex h-[50%] flex-col px-8 text-[20vw] font-medium leading-[0.7] sm:px-28 sm:text-[14vw] lg:px-12 lg:text-[8em]'>
-          <p className='self-start text-left text-tertiary-500'>ĆWICZYMY</p>
-          <p className='self-end text-[0.8em] font-bold text-second-500 '>
+        <span className='relative z-50 flex h-[50%] flex-col text-[20vw] font-medium leading-[0.7]  sm:text-[14vw]   lg:text-[8em]'>
+          <p className='self-start pl-[10%] text-left text-tertiary-500'>
+            ĆWICZYMY
+          </p>
+          <p className='self-end pr-[10%] text-[0.8em] font-bold text-second-500 '>
             RAZEM
           </p>
         </span>

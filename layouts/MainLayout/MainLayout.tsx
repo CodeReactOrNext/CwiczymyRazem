@@ -31,7 +31,9 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
             />
             <span
               className={`absolute top-[40%] h-full w-full p-6 text-right text-[5vw] font-medium text-second-500 lg:top-0 lg:w-9/12 lg:bg-tertiary-500 lg:text-left lg:text-3xl xl:text-4xl ${
-                variant === "landing" ? "top-[39vh] lg:w-5/12" : ""
+                variant === "landing"
+                  ? "top-[37vh] xxs:top-[38vh] xsm:top-[39vh] sm:top-[39.5vh] lg:w-5/12"
+                  : ""
               }`}>
               {subtitle}
             </span>
