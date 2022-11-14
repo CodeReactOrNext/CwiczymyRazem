@@ -1,15 +1,15 @@
 import { useDispatch } from "react-redux";
-import Button from "../../../../components/Button";
-import Input from "../../../../components/Input";
-import MainLayout from "../../../../layouts/MainLayout";
+import Button from "components/Button";
+import Input from "components/Input";
+import MainLayout from "layouts/MainLayout";
 import {
   createUserDocumentFromAuth,
   signInWithGooglePopup,
-} from "../../../../utils/firebase/firebase.utils";
+} from "utils/firebase/firebase.utils";
 import { addUserAuth, addUserName } from "../../store/userSlice";
 import { FaUserAlt, FaLock } from "react-icons/fa";
-import GoogleButton from "../../../../components/GoogleButton";
-import FormLayout from "../../../../layouts/FormLayout";
+import GoogleButton from "components/GoogleButton";
+import FormLayout from "layouts/FormLayout";
 
 const LoginView = () => {
   const dispatch = useDispatch();
