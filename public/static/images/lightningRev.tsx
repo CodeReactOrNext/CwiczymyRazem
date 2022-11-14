@@ -9,7 +9,6 @@ const LightningRev = (props: Props) => (
     {...props}>
     <path
       style={{
-        fill: props.fill || "#f5d898",
         fillOpacity: 1,
         stroke: "none",
         strokeWidth: 0.79375,
