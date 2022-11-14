@@ -1,3 +1,4 @@
+const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
 /** @type {import('tailwindcss').Config} */
 // Rotate X utilities
@@ -40,10 +41,18 @@ const rotateY = plugin(function ({ addUtilities }) {
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
+    "./feature/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
     "./layouts/**/*.{js,ts,jsx,tsx}",
   ],
+
   theme: {
+    screens: {
+      xxs: "285px",
+      xs: "350px",
+      xsm: "500px",
+      ...defaultTheme.screens,
+    },
     extend: {
       backgroundImage: {
         "old-effect": "url('/static/images/old_effect.webp')",
