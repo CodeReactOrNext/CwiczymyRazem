@@ -56,6 +56,10 @@ a {
   .clip-bg-mobile {
     clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 10%);
   }
+  .clip-nav {
+    clip-path: polygon(4rem 0, 100% 0, 100% 100%, 0% 100%);
+  }
+
   .hover-animation {
     animation: hover-effect 3s infinite alternate
       cubic-bezier(0.5, 0.05, 1, 0.57);

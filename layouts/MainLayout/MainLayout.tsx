@@ -16,7 +16,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
           className={`relative h-full max-h-[1080px] w-full max-w-[1920px] overflow-hidden ${
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
-          <Header />
+          <Header variant={variant} />
           <div
             className={`clip-bg-mobile lg:clip-bg mt-[15vh] h-full pt-[20%] lg:mt-0 ${
               variant === "secondary" ? "bg-main-opposed-500" : "bg-second-500"
@@ -46,12 +46,12 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
           </div>
 
           <div
-            className={`absolute bottom-0 left-0 hidden h-[120%] w-fit rotate-0 lg:right-0 lg:block ${
+            className={`pointer-events-none absolute bottom-0 left-0 hidden h-[120%] w-fit rotate-0 lg:right-0 lg:block ${
               variant === "landing"
                 ? "left-[55%] h-full w-auto -translate-x-[50%]"
                 : "left-0"
             }`}>
-            <Lightning className='pointer-events-none h-full w-auto fill-tertiary-500' />
+            <Lightning className='h-full w-auto fill-tertiary-500' />
           </div>
         </div>
         <div
