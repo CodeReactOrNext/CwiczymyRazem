@@ -17,9 +17,15 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
           <Header />
+          <div
+            className={`clip-bg-mobile lg:clip-bg mt-[15vh] h-full pt-[20%] lg:mt-0 ${
+              variant === "secondary" ? "bg-main-opposed-500" : "bg-second-500"
+            } ${
+              variant === "landing" ? "mt-[46vh]  lg:ml-[32.5%]" : ""
+            }`}></div>
           <section
-            className={`absolute bottom-0 right-0 z-50 flex h-[70%] w-full items-center justify-center lg:h-[82%] lg:pl-[20%]  xl:pl-[10%] 2xl:pl-0 ${
-              variant === "landing" ? "h-[90%]" : ""
+            className={`absolute bottom-0 right-0 z-50 flex h-[70%] w-full items-center justify-center  lg:h-[82%]  2xl:w-full 2xl:justify-center  ${
+              variant === "landing" ? "z-0 h-[90%]" : "lg:w-4/6 xl:w-5/6"
             }`}>
             {children}
           </section>
@@ -38,22 +44,20 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
               {subtitle}
             </span>
           </div>
-          <div
-            className={`clip-bg-mobile lg:clip-bg mt-[15vh] h-full pt-[20%] lg:mt-0 ${
-              variant === "secondary" ? "bg-main-opposed-500" : "bg-second-500"
-            } ${
-              variant === "landing" ? "mt-[46vh]  lg:ml-[32.5%]" : ""
-            }`}></div>
+
           <div
             className={`absolute bottom-0 left-0 hidden h-[120%] w-fit rotate-0 lg:right-0 lg:block ${
               variant === "landing"
                 ? "left-[55%] h-full w-auto -translate-x-[50%]"
                 : "left-0"
             }`}>
-            <Lightning className='z-50 h-full w-auto fill-tertiary-500' />
+            <Lightning className='pointer-events-none h-full w-auto fill-tertiary-500' />
           </div>
         </div>
-        <div className='absolute h-full max-h-[1080px] w-full max-w-[1920px] bg-old-effect bg-cover bg-no-repeat lg:bg-old-effect-hr'></div>
+        <div
+          className={`absolute h-full max-h-[1080px] w-full max-w-[1920px] bg-old-effect bg-cover bg-no-repeat lg:bg-old-effect-hr ${
+            variant === "landing" ? "hidden" : ""
+          }`}></div>
       </div>
     </main>
   );
