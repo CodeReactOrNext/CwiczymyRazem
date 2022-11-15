@@ -18,7 +18,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
           }`}>
           <Header />
           <section
-            className={`absolute bottom-0 right-0 flex h-[70%] w-full items-center justify-center lg:h-[82%]  ${
+            className={`absolute bottom-0 right-0 z-50 flex h-[70%] w-full items-center justify-center lg:h-[82%] lg:pl-[20%]  xl:pl-[10%] 2xl:pl-0 ${
               variant === "landing" ? "h-[90%]" : ""
             }`}>
             {children}
