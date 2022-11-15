@@ -1,11 +1,15 @@
 import Logo from "components/Logo";
 import Navigation from "./Navigation";
 
-export default function Header() {
+export default function Header({
+  variant,
+}: {
+  variant: "primary" | "secondary" | "landing";
+}) {
   return (
-    <div className='absolute flex h-20 w-full items-center justify-between px-8'>
+    <div className='absolute flex h-20 w-full items-center justify-between pl-8'>
       <Logo />
-      <Navigation />
+      <Navigation variant={variant} />
     </div>
   );
 }

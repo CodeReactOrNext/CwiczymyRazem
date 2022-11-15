@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
+import Link from "next/link";
 import FireDouble from "public/static/images/svg/Fire_double";
 import Lightning from "public/static/images/svg/Lightning";
 import Button from "components/Button";
-import React from "react";
 import LightningRev from "public/static/images/svg/LightningRev";
 
 export default function HeroLayout({
@@ -46,7 +46,9 @@ export default function HeroLayout({
         <span className='text-left text-[2.5vh] text-tertiary-500 xxs:text-[2.7vh] xsm:text-[2vh] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
           {children}
         </span>
-        <Button onClick={buttonOnClick}>ĆWICZ Z NAMI!</Button>
+        <Link href='/login'>
+          <Button onClick={buttonOnClick}>ĆWICZ Z NAMI!</Button>
+        </Link>
       </div>
     </div>
   );
