@@ -3,9 +3,10 @@ import { IconType } from "react-icons/lib";
 export interface InputProps {
   Icon?: IconType;
   placeholder?: string;
+  id?: string;
 }
 
-const Input = ({ Icon, placeholder }: InputProps) => {
+const Input = ({ Icon, placeholder, id }: InputProps) => {
   return (
     <div className='flex w-full flex-row items-center justify-center'>
       {Icon && (
@@ -14,6 +15,7 @@ const Input = ({ Icon, placeholder }: InputProps) => {
         </div>
       )}
       <input
+        id={id}
         className='w-full bg-tertiary p-1 pl-3 text-xl text-main-opposed focus:outline-none focus:ring focus:ring-main-opposed xs:p-2'
         type='text'
         placeholder={placeholder}

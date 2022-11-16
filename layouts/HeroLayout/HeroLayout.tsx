@@ -47,7 +47,9 @@ export default function HeroLayout({
           {children}
         </span>
         <Link href='/login'>
-          <Button onClick={buttonOnClick}>ĆWICZ Z NAMI!</Button>
+          <a>
+            <Button onClick={buttonOnClick}>ĆWICZ Z NAMI!</Button>
+          </a>
         </Link>
       </div>
     </div>
