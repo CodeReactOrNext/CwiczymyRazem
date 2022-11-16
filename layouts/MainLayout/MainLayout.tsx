@@ -13,7 +13,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
     <main className='min-h-screen p-4 font-sans lg:p-8'>
       <div className='relative flex h-full w-full items-center justify-center'>
         <div
-          className={`relative h-full max-h-[1080px] w-full max-w-[1920px] overflow-hidden ${
+          className={`relative h-full max-h-[1080px] w-full max-w-[1920px]  overflow-y-scroll md:overflow-hidden ${
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
           <Header variant={variant} />
