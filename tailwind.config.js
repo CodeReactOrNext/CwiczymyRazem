@@ -38,6 +38,39 @@ const rotateY = plugin(function ({ addUtilities }) {
   });
 });
 
+const scrollbarHide = plugin(function ({ addUtilities }) {
+  addUtilities(
+    {
+      ".scrollbar-hide": {
+        /* IE and Edge */
+        "-ms-overflow-style": "none",
+
+        /* Firefox */
+        "scrollbar-width": "none",
+
+        /* Safari and Chrome */
+        "&::-webkit-scrollbar": {
+          display: "none",
+        },
+      },
+
+      ".scrollbar-default": {
+        /* IE and Edge */
+        "-ms-overflow-style": "auto",
+
+        /* Firefox */
+        "scrollbar-width": "auto",
+
+        /* Safari and Chrome */
+        "&::-webkit-scrollbar": {
+          display: "block",
+        },
+      },
+    },
+    ["responsive"]
+  );
+});
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -117,5 +150,10 @@ module.exports = {
       sans: ["Teko"],
     },
   },
-  plugins: [require("prettier-plugin-tailwindcss"), rotateX, rotateY],
+  plugins: [
+    require("prettier-plugin-tailwindcss"),
+    rotateX,
+    rotateY,
+    scrollbarHide,
+  ],
 };
