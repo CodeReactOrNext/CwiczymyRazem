@@ -1,6 +1,6 @@
 import Header from "./components/Header";
-import Lightning from "public/static/images/svg/Lightning";
-import LightningRev from "public/static/images/svg/LightningRev";
+import LightningSVG from "public/static/images/svg/Lightning";
+import LightningRevSVG from "public/static/images/svg/LightningRev";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,7 +16,6 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
           className={`relative h-full max-h-[1080px] w-full max-w-[1920px]  overflow-y-scroll scrollbar-hide md:overflow-hidden ${
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
-          <Header variant={variant} />
           <div
             className={`clip-bg-mobile lg:clip-bg mt-[15vh] h-full pt-[20%] lg:mt-0 ${
               variant === "secondary" ? "bg-main-opposed-500" : "bg-second-500"
@@ -30,7 +29,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
             {children}
           </section>
           <div className='absolute top-[10%] right-0 z-50 flex h-1/5 w-full items-center justify-end lg:top-20 lg:h-20'>
-            <LightningRev
+            <LightningRevSVG
               className={`absolute top-0 -right-10 bottom-0 m-auto min-h-full w-[130%] fill-tertiary-500 sm:rotate-x-50  lg:hidden ${
                 variant === "landing" ? "top-[40vh] sm:top-[42vh] " : ""
               }`}
@@ -51,8 +50,9 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
                 ? "left-[55%] h-full w-auto -translate-x-[50%]"
                 : "left-0"
             }`}>
-            <Lightning className='h-full w-auto fill-tertiary-500' />
+            <LightningSVG className='h-full w-auto fill-tertiary-500' />
           </div>
+          <Header variant={variant} />
         </div>
         <div
           className={`absolute h-full max-h-[1080px] w-full max-w-[1920px] bg-old-effect bg-cover bg-no-repeat lg:bg-old-effect-hr ${

@@ -2,7 +2,7 @@ interface Props {
   className?: string;
 }
 
-const SvgComponent = (props: Props) => (
+const FireSvg = (props: Props) => (
   <svg
     viewBox='0 0 252.95 249.16'
     xmlns='http://www.w3.org/2000/svg'
@@ -21,4 +21,4 @@ const SvgComponent = (props: Props) => (
   </svg>
 );
 
-export default SvgComponent;
+export default FireSvg;
