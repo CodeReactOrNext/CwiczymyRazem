@@ -8,7 +8,7 @@ export default function LightningDesktopDivider({
 }) {
   return (
     <div
-      className={`pointer-events-none absolute bottom-0 left-0 hidden h-[120%] w-fit rotate-0 lg:right-0 lg:block ${
+      className={`pointer-events-none hidden h-full origin-bottom-left rotate-0 scale-[1.3] lg:right-0 lg:block ${
         variant === "landing"
           ? "left-[55%] h-full w-auto -translate-x-[50%]"
           : "left-0"

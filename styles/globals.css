@@ -7,6 +7,9 @@ body {
   color: white;
   @apply bg-tertiary-500;
 }
+/* * {
+  outline: 1px solid red;
+} */
 
 body {
   min-height: 100vh;
@@ -51,10 +54,10 @@ a {
 
 @layer utilities {
   .clip-bg {
-    clip-path: polygon(min(46vh, 700px) 0, 100% 0, 100% 100%, 0% 100%);
+    clip-path: polygon(min(40vh, 700px) 0, 100% 0, 100% 100%, 0% 100%);
   }
   .clip-bg-mobile {
-    clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 10%);
+    clip-path: polygon(50% 50%, 100% -7%, 100% 100%, 0 100%, 0% 90%);
   }
   .clip-nav {
     clip-path: polygon(4rem 0, 100% 0, 100% 100%, 0% 100%);
