@@ -14,11 +14,11 @@ const TimerLayout = () => {
           <FaPlay size={40} />
           <FaPause size={40} />
         </div>
-        <div className='mb-14 flex flex-row'>
-          <CategoryBox title='Technika' />
+        <div className='mb-14  flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full   '>
+          <CategoryBox title='Technika' chosen />
           <CategoryBox title='Teoria' />
           <CategoryBox title='Słuch' />
-          <CategoryBox title='Praca Kreatywna' />
+          <CategoryBox title='Kreatywność' />
         </div>
         <Button>Zakończ</Button>
       </div>
