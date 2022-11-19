@@ -1,7 +1,12 @@
 import Header from "./components/Header";
+<<<<<<< HEAD
 import Lightning from "public/static/images/svg/Lightning";
 import LightningRev from "public/static/images/svg/LightningRev";
 import OldEffect from "components/OldEffect";
+=======
+import LightningSVG from "public/static/images/svg/Lightning";
+import LightningRevSVG from "public/static/images/svg/LightningRev";
+>>>>>>> 6c63724 (feat: added Hamburger menu layout with open/close logic)
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -34,8 +39,8 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
             {children}
           </section>
           <div className='absolute top-[10%] right-0 z-50 flex h-1/5 w-full items-center justify-end lg:top-20 lg:h-20'>
-            <LightningRev
-              className={`absolute top-0 -right-10 bottom-0 m-auto min-h-full w-[130%] fill-tertiary-500 sm:rotate-x-50 lg:hidden ${
+            <LightningRevSVG
+              className={`absolute top-0 -right-10 bottom-0 m-auto min-h-full w-[130%] fill-tertiary-500 sm:rotate-x-50  lg:hidden ${
                 variant === "landing" ? "top-[40vh] sm:top-[42vh] " : ""
               }`}
             />
@@ -54,8 +59,9 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
                 ? "left-[55%] h-full w-auto -translate-x-[50%]"
                 : "left-0"
             }`}>
-            <Lightning className='h-full w-auto fill-tertiary-500' />
+            <LightningSVG className='h-full w-auto fill-tertiary-500' />
           </div>
+          <Header variant={variant} />
         </div>
 
         {/* <div

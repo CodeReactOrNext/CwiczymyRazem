@@ -2,7 +2,7 @@ interface Props {
   className?: string;
   fill?: string;
 }
-const LightningRev = (props: Props) => (
+const LightningRevSVG = (props: Props) => (
   <svg
     viewBox='0 0 236.951 86.383'
     xmlns='http://www.w3.org/2000/svg'
@@ -22,4 +22,4 @@ const LightningRev = (props: Props) => (
   </svg>
 );
 
-export default LightningRev;
+export default LightningRevSVG;
