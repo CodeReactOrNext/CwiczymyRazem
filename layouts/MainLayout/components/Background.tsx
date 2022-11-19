@@ -7,7 +7,7 @@ export default function Background({
 }) {
   return (
     <div
-      className={`clip-bg-mobile lg:clip-bg mt-[15vh] h-full pt-[20%] lg:mt-0 ${
+      className={`lg:clip-bg absolute left-0 top-0 bottom-0 h-[100%] w-full lg:mt-0 ${
         variant === "secondary" ? "bg-main-opposed-500" : "bg-second-500"
       } ${
         variant === "landing"

@@ -1,6 +1,4 @@
 import LightningRevSVG from "public/static/images/svg/LightningRev";
-import React, { ReactNode } from "react";
-
 interface Props {
   variant: "primary" | "secondary" | "landing";
   children: React.ReactNode;
@@ -8,19 +6,21 @@ interface Props {
 
 export default function SubtitleBar({ variant, children }: Props) {
   return (
-    <div className='absolute top-[10%] right-0 z-50 flex h-1/5 w-full items-center justify-end lg:top-20 lg:h-20'>
+    <div className='relative z-50 flex min-h-fit w-[120%] -translate-x-[10%] items-center justify-end lg:h-20'>
+      <div
+        className={`clip-bg-mobile absolute -z-10 h-full  w-full translate-y-[1px] lg:hidden ${
+          variant === "secondary" ? "bg-main-opposed-500" : "bg-second-500"
+        }`}></div>
       <LightningRevSVG
-        className={`absolute top-0 -right-10 bottom-0 m-auto min-h-full w-[130%] fill-tertiary-500 sm:rotate-x-50 lg:hidden ${
+        className={`min-h-full w-full fill-tertiary-500 lg:hidden ${
           variant === "landing" ? "top-[40vh] sm:top-[42vh] " : ""
         }`}
       />
       <span
-        className={`absolute top-[40%] h-full w-full p-6 text-right text-[5vw] font-medium text-second-500 lg:top-0 lg:w-9/12 lg:bg-tertiary-500 lg:text-left lg:text-3xl xl:text-4xl ${
-          variant === "landing"
-            ? "top-[37vh] xxs:top-[38vh] xsm:top-[39vh] sm:top-[39.5vh] lg:w-5/12"
-            : ""
+        className={`absolute top-0 bottom-0 right-[10%] my-auto flex h-fit translate-y-[60%] items-center text-right text-[5vw] font-medium text-second-500 lg:relative lg:right-0 lg:top-0 lg:h-full lg:w-8/12 lg:translate-y-0 lg:bg-tertiary-500 lg:text-left lg:text-3xl xl:text-4xl ${
+          variant === "landing" ? " lg:w-5/12" : ""
         }`}>
-        {children}
+        <p>{children}</p>
       </span>
     </div>
   );

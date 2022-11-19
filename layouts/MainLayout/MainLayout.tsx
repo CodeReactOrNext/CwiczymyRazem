@@ -16,15 +16,17 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
     <main className='min-h-screen p-4 font-sans lg:p-8'>
       <div className='relative flex h-full w-full items-center justify-center'>
         <div
-          className={`relative h-full max-h-[1080px] w-full max-w-[1920px] overflow-x-hidden scrollbar-hide md:overflow-hidden ${
+          className={`relative flex h-full max-h-[1080px] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
-          <Background variant={variant} />
-          {variant !== "landing" && <OldEffect />}
-          <ContentBox variant={variant}>{children}</ContentBox>
-          <SubtitleBar variant={variant}>{subtitle}</SubtitleBar>
           <Header variant={variant} />
-          <LightningDesktopDivider variant={variant} />
+          {/* {variant !== "landing" && <OldEffect />} */}
+          <SubtitleBar variant={variant}>{subtitle}</SubtitleBar>
+          <div className='relative flex h-full w-full items-center justify-center'>
+            <Background variant={variant} />
+            <LightningDesktopDivider variant={variant} />
+            <ContentBox variant={variant}>{children}</ContentBox>
+          </div>
         </div>
       </div>
     </main>
