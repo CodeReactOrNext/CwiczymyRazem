@@ -1,6 +1,7 @@
 import Header from "./components/Header";
 import LightningSVG from "public/static/images/svg/Lightning";
 import LightningRevSVG from "public/static/images/svg/LightningRev";
+import OldEffect from "components/OldEffect";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
           className={`relative h-full max-h-[1080px] w-full max-w-[1920px] overflow-x-hidden scrollbar-hide md:overflow-hidden ${
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
+          <Header variant={variant} />
           <div
             className={`clip-bg-mobile lg:clip-bg mt-[15vh] h-full pt-[20%] lg:mt-0 ${
               variant === "secondary" ? "bg-main-opposed-500" : "bg-second-500"
@@ -34,7 +36,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
           </section>
           <div className='absolute top-[10%] right-0 z-50 flex h-1/5 w-full items-center justify-end lg:top-20 lg:h-20'>
             <LightningRevSVG
-              className={`absolute top-0 -right-10 bottom-0 m-auto min-h-full w-[130%] fill-tertiary-500 sm:rotate-x-50  lg:hidden ${
+              className={`absolute top-0 -right-10 bottom-0 m-auto min-h-full w-[130%] fill-tertiary-500 sm:rotate-x-50 lg:hidden ${
                 variant === "landing" ? "top-[40vh] sm:top-[42vh] " : ""
               }`}
             />

@@ -4,6 +4,7 @@ import FireDoubleSVG from "public/static/images/svg/Fire_double";
 import LightningSVG from "public/static/images/svg/Lightning";
 import Button from "components/Button";
 import LightningRevSVG from "public/static/images/svg/LightningRev";
+import OldEffect from "components/OldEffect";
 
 export default function HeroLayout({
   children,
