@@ -5,7 +5,7 @@ import OldEffect from "components/OldEffect";
 
 interface LayoutProps {
   children: React.ReactNode;
-  subtitle: string;
+  subtitle: React.ReactNode;
   variant: "primary" | "secondary" | "landing";
 }
 
