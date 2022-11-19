@@ -16,7 +16,7 @@ export default function Navigation({
 
   return (
     <nav
-      className={`lg:clip-nav right-0 top-0 z-50 flex h-full items-center justify-center pr-8 lg:w-2/5 ${
+      className={`lg:clip-nav right-0 top-0 z-50 flex h-full items-center justify-center pr-8 lg:w-8/12 xl:w-9/12 ${
         variant === "landing" ? "xl:w-1/3" : ""
       }  ${
         variant === "secondary" ? "lg:bg-main-opposed-500" : "lg:bg-second-500"
