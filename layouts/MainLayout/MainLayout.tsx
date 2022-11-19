@@ -1,12 +1,6 @@
 import Header from "./components/Header";
-<<<<<<< HEAD
-import Lightning from "public/static/images/svg/Lightning";
-import LightningRev from "public/static/images/svg/LightningRev";
-import OldEffect from "components/OldEffect";
-=======
 import LightningSVG from "public/static/images/svg/Lightning";
 import LightningRevSVG from "public/static/images/svg/LightningRev";
->>>>>>> 6c63724 (feat: added Hamburger menu layout with open/close logic)
 
 interface LayoutProps {
   children: React.ReactNode;
