@@ -14,7 +14,7 @@ export default function HeroLayout({
   buttonOnClick?: React.MouseEventHandler<HTMLButtonElement>;
 }) {
   return (
-    <div className='grid h-full w-full grid-cols-1 grid-rows-2 gap-[20vh] lg:grid-cols-2 lg:grid-rows-1'>
+    <div className='grid h-full w-full grid-cols-1 grid-rows-2 gap-[20%] lg:grid-cols-2 lg:grid-rows-1'>
       <div className='relative h-full w-full'>
         <div className='absolute bottom-0 h-full w-full'>
           <div className='relative h-full w-full'>
