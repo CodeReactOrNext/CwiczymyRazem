@@ -9,11 +9,9 @@ export default function LightningDesktopDivider({
   return (
     <div
       className={`pointer-events-none hidden h-full origin-bottom-left rotate-0 scale-[1.3] lg:right-0 lg:block ${
-        variant === "landing"
-          ? "left-[55%] h-full w-auto -translate-x-[50%]"
-          : "left-0"
+        variant === "landing" ? "absolute left-[32%] z-40 hidden" : ""
       }`}>
-      <LightningSVG className='h-full w-auto fill-tertiary-500' />
+      <LightningSVG className={`h-full w-auto fill-tertiary-500`} />
     </div>
   );
 }
