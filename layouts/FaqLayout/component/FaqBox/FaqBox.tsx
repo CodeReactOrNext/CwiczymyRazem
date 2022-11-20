@@ -2,12 +2,11 @@ import { useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
 
 interface FaqBoxProps {
-  opened?: boolean;
   title: string;
   message: string;
 }
 
-const FaqBox = ({ opened, title, message }: FaqBoxProps) => {
+const FaqBox = ({ title, message }: FaqBoxProps) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className='cursor-pointer' onClick={() => setIsOpen(!isOpen)}>
