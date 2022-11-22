@@ -22,7 +22,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
           <Header variant={variant} />
           {/* {variant !== "landing" && <OldEffect />} */}
           <SubtitleBar variant={variant}>{subtitle}</SubtitleBar>
-          <div className='relative -mt-[5%] flex h-full w-full items-center justify-center lg:m-0'>
+          <div className='relative -mt-[5.5%] flex h-full w-full items-center justify-center lg:m-0'>
             <Background variant={variant} />
             <LightningDesktopDivider variant={variant} />
             <ContentBox variant={variant}>{children}</ContentBox>
