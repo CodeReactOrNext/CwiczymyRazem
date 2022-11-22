@@ -13,7 +13,7 @@ interface LayoutProps {
 
 export default function Layout({ children, subtitle, variant }: LayoutProps) {
   return (
-    <main className='h-screen p-4 font-sans md:min-h-[900px] lg:p-8'>
+    <main className='h-screen min-h-[600px] p-4 font-sans md:min-h-[900px] lg:p-8'>
       <div className='relative flex h-full w-full items-center justify-center'>
         <div
           className={`relative  flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
