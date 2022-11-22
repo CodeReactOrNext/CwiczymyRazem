@@ -46,7 +46,7 @@ export default function HeroLayout({
         </div>
       </div>
       <div className='z-10 flex flex-col items-center justify-center gap-6 xsm:flex-row lg:-mb-24 lg:flex-col xl:pr-8'>
-        <span className='text-left text-[2.5vh] text-tertiary-500 xxs:text-[2.7vh] xsm:text-[2vh] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
+        <span className='text-left text-[min(5vw,2vh)] text-tertiary-500 xxs:text-[min(4vw,2vh)] xsm:text-[min(3vw,2vh)] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
           {children}
         </span>
         <Link href='/login'>
