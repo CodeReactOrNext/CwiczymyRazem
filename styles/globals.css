@@ -63,7 +63,7 @@ a {
     );
   }
   .clip-bg-mobile {
-    clip-path: polygon(50% 50%, 100% -7%, 100% 100%, 0 100%, 0% 90%);
+    clip-path: polygon(50% 50%, 100% 7%, 100% 100%, 0 100%, 0% 80%);
   }
   .clip-nav {
     clip-path: polygon(4rem 0, 100% 0, 100% 100%, 0% 100%);

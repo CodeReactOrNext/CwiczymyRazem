@@ -16,7 +16,7 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
     <main className='h-screen p-4 font-sans lg:p-8'>
       <div className='relative flex h-full w-full items-center justify-center'>
         <div
-          className={`relative flex h-full max-h-[1080px] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
+          className={`relative flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
           <Header variant={variant} />
