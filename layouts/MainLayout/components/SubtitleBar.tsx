@@ -14,7 +14,7 @@ export default function SubtitleBar({ variant, children }: Props) {
         : "relative"
     }`}>
       <div
-        className={`clip-bg-mobile absolute -z-10 h-full w-full translate-y-[1px] rotate-x-40 lg:hidden ${
+        className={`clip-bg-mobile absolute -z-10 h-full w-full rotate-x-40 lg:hidden ${
           variant === "secondary" ? "bg-main-opposed-500" : "bg-second-500"
         } ${variant === "landing" ? "bg-transparent" : ""}`}></div>
       <LightningRevSVG
