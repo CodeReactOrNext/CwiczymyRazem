@@ -7,7 +7,7 @@ interface Props {
 export default function SubtitleBar({ variant, children }: Props) {
   return (
     <div
-      className={`z-50 flex h-auto w-[120%] -translate-x-[10%] items-center justify-end lg:h-20
+      className={`z-50  flex h-20 w-[120%] -translate-x-[10%] items-center justify-end lg:h-20
     ${
       variant === "landing"
         ? "absolute top-[50%] -translate-y-[50%] lg:relative lg:top-0 lg:translate-y-0"
