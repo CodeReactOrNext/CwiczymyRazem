@@ -13,16 +13,16 @@ interface LayoutProps {
 
 export default function Layout({ children, subtitle, variant }: LayoutProps) {
   return (
-    <main className='min-h-screen p-4 font-sans lg:p-8'>
+    <main className='h-screen min-h-[600px] p-4 font-sans md:min-h-[900px] lg:p-8'>
       <div className='relative flex h-full w-full items-center justify-center'>
         <div
-          className={`relative flex h-full max-h-[1080px] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
+          className={`relative  flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
           <Header variant={variant} />
           {/* {variant !== "landing" && <OldEffect />} */}
           <SubtitleBar variant={variant}>{subtitle}</SubtitleBar>
-          <div className='relative flex h-full w-full items-center justify-center'>
+          <div className='relative -mt-[5.5%] flex h-full w-full items-center justify-center lg:m-0'>
             <Background variant={variant} />
             <LightningDesktopDivider variant={variant} />
             <ContentBox variant={variant}>{children}</ContentBox>
