@@ -12,7 +12,6 @@ const LeadboardLayout = () => {
         </div>
 
         <LeadboardColumn place={1} />
-
         <LeadboardColumn place={2} />
         <LeadboardColumn place={3} />
         <LeadboardColumn place={4} />
