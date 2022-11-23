@@ -7,7 +7,7 @@ export default function Header({
   variant: "primary" | "secondary" | "landing";
 }) {
   return (
-    <div className='top-0 left-0 z-50 flex h-20 min-h-[5rem] w-full items-center justify-between pl-8'>
+    <div className='top-0 left-0 z-30 flex h-20 min-h-[5rem] w-full items-center justify-between pl-8'>
       <Logo />
       <Navigation variant={variant} />
     </div>
