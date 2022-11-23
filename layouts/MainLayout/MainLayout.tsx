@@ -20,13 +20,13 @@ export default function Layout({ children, subtitle, variant }: LayoutProps) {
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
           <Header variant={variant} />
-          {/* {variant !== "landing" && <OldEffect />} */}
           <SubtitleBar variant={variant}>{subtitle}</SubtitleBar>
           <div className='relative -mt-[5.5%] flex h-full w-full items-center justify-center lg:m-0'>
             <Background variant={variant} />
             <LightningDesktopDivider variant={variant} />
             <ContentBox variant={variant}>{children}</ContentBox>
           </div>
+          {variant !== "landing" && <OldEffect />}
         </div>
       </div>
     </main>
