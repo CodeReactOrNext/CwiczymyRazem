@@ -6,7 +6,7 @@ import ReportFormLayout from "layouts/ReportFormLayout";
 import ReportCategoryLayout from "layouts/ReportFormLayout/ReportCategoryLayout";
 import Exercise from "./components/Exercise";
 
-const LoginView = () => {
+const ReportView = () => {
   return (
     <>
       <MainLayout subtitle='Raportuj' variant='primary'>
@@ -52,4 +52,4 @@ const LoginView = () => {
   );
 };
 
-export default LoginView;
+export default ReportView;
