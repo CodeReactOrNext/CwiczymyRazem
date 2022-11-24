@@ -45,8 +45,8 @@ const LoginView = () => {
           </div>
         </ReportFormLayout>
       </MainLayout>
-      <Backdrop>
-        <RatingPopUp />
+      <Backdrop selector='overlays'>
+        <RatingPopUp basePoints={34} />
       </Backdrop>
     </>
   );

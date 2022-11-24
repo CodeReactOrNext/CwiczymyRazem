@@ -18,8 +18,8 @@ class MyDocument extends Document {
         </Head>
         <body>
           <Main />
-          <NextScript />
           <div id='overlays'></div>
+          <NextScript />
         </body>
       </Html>
     );
