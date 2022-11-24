@@ -2,7 +2,7 @@ export default function LevelIndicator({
   children,
   position,
 }: {
-  children: string;
+  children: number;
   position: "left" | "right";
 }) {
   return (

@@ -4,9 +4,12 @@ import RatingPopUp from "components/RatingPopUp";
 import MainLayout from "layouts/MainLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import ReportCategoryLayout from "layouts/ReportFormLayout/ReportCategoryLayout";
+import { useState } from "react";
 import Exercise from "./components/Exercise";
 
 const ReportView = () => {
+  const [ratingSummaryVisible, setRatingSummaryVisible] = useState(true);
+
   return (
     <>
       <MainLayout subtitle='Raportuj' variant='primary'>
@@ -45,9 +48,31 @@ const ReportView = () => {
           </div>
         </ReportFormLayout>
       </MainLayout>
-      <Backdrop selector='overlays'>
-        <RatingPopUp basePoints={34} />
-      </Backdrop>
+      {ratingSummaryVisible && (
+        <Backdrop selector='overlays'>
+          <RatingPopUp
+            onClick={setRatingSummaryVisible}
+            ratingData={{
+              basePoints: 34,
+              currentLevel: 20,
+              bonusPoints: [
+                {
+                  streak: 4,
+                  multiplier: 4,
+                },
+                {
+                  habitsCount: 7,
+                  additionalPoints: 5,
+                },
+                {
+                  time: "4:30",
+                  multiplier: 4,
+                },
+              ],
+            }}
+          />
+        </Backdrop>
+      )}
     </>
   );
 };
