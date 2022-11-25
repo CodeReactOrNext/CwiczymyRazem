@@ -1,4 +1,5 @@
 import LightningSVG from "public/static/images/svg/Lightning";
+import LightningThinSVG from "public/static/images/svg/Lightning_thin";
 import React from "react";
 
 export default function LightningDesktopDivider({
@@ -8,10 +9,10 @@ export default function LightningDesktopDivider({
 }) {
   return (
     <div
-      className={`pointer-events-none z-20 hidden h-full origin-bottom-left rotate-0 scale-[1.4] lg:right-0 lg:block ${
+      className={`pointer-events-none z-20 hidden h-full origin-bottom-left rotate-0 scale-[1.5] lg:right-0 lg:block ${
         variant === "landing" ? "absolute left-[33%] z-30 hidden" : ""
       }`}>
-      <LightningSVG className={`h-full w-auto fill-tertiary-500`} />
+      <LightningThinSVG className={`h-full w-auto fill-tertiary-500`} />
     </div>
   );
 }
