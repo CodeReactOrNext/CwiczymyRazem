@@ -14,12 +14,12 @@ export default function HeroLayout({
   buttonOnClick?: React.MouseEventHandler<HTMLButtonElement>;
 }) {
   return (
-    <div className='grid h-full w-full grid-cols-1 grid-rows-2 gap-[20%] lg:grid-cols-2 lg:grid-rows-1'>
+    <div className='grid h-full w-full grid-cols-1 grid-rows-2 gap-[20%] lg:grid-cols-[4fr_5fr] lg:grid-rows-1'>
       <div className='relative h-full w-full'>
         <div className='absolute top-0 bottom-0 h-full w-full'>
           <FireDoubleSVG className='absolute top-[60%] left-0 right-0 w-[110%] -translate-x-[7%] fill-second-500 sm:top-[50%] md:top-[50%] lg:-bottom-[45%] lg:top-auto lg:h-full xl:-bottom-[50%]' />
         </div>
-        <div className='relative z-50 mx-auto mt-14 flex h-fit w-fit flex-col text-[20vw] font-medium leading-[0.7] xs:text-[4.5rem] xsm:text-[5.5rem] md:mr-[15%] lg:mx-auto  lg:text-[7rem] xl:text-[9rem]'>
+        <div className='relative z-50 mx-auto mt-14 flex h-fit w-fit flex-col text-[20vw] font-medium leading-[0.7] xs:text-[4.5rem] xsm:text-[5.5rem] md:mr-[15%] lg:mx-auto  lg:text-[7rem] 2xl:text-[9rem]'>
           <LightningSVG className='shake-animation absolute -bottom-[50%] -top-[25%] right-[0%] w-[45%] fill-tertiary-500' />
           <p className='self-start text-left text-white drop-shadow-lg'>
             ĆWICZYMY
