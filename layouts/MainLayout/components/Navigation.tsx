@@ -19,7 +19,7 @@ export default function Navigation({
       className={`lg:clip-nav right-0 top-0 z-50 flex h-full items-center justify-center pr-8 ${
         variant === "landing"
           ? "lg:!w-1/2 xl:!w-[55%]"
-          : "lg:w-[76%] xl:w-[83%]"
+          : "lg:w-[76%] xl:w-[85%]"
       }  ${
         variant === "secondary" ? "lg:bg-main-opposed-500" : "lg:bg-second-500"
       }  lg:pl-16`}>
