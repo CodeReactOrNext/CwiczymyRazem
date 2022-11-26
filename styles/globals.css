@@ -8,9 +8,9 @@ body {
   @apply bg-tertiary-500;
 }
 
-* {
+/* * {
   outline: 1px solid red;
-}
+} */
 body {
   min-height: 100vh;
   position: relative;
