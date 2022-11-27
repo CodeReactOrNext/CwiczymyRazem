@@ -1,15 +1,19 @@
 import Avatar from "components/Avatar";
+import Logo from "components/Logo";
 
-export default function UserHeader() {
+export default function UserHeaderMobile() {
   return (
-    <div className='z-10 grid   w-full grid-cols-2 grid-rows-2 justify-between  bg-second p-3 text-xl text-tertiary'>
-      <div className='space-x-2 space-y-2 text-white'>
+    <div className='z-30 grid w-full grid-cols-2 grid-rows-2 items-center justify-between bg-second  p-3 text-xl text-tertiary sm:text-2xl md:hidden'>
+      <div className='flex flex-col items-start space-x-2 space-y-2 text-lg text-white'>
+        <Logo />
         <Avatar />
         <button>Edytuj</button>
         <button>Wyloguj </button>
       </div>
-      <div className=' text-lg'>
-        <p>Cześć user!</p>
+      <div className=' text-lg sm:text-2xl'>
+        <p className=' text-2xl  sm:text-4xl'>
+          Cześć <span className='text-white'>User!</span>
+        </p>
         <p>
           Miejsce w rankingu <span className='text-white'>6</span>
         </p>
