@@ -1,5 +1,5 @@
 import MainLayout from "layouts/MainLayout";
-import FaqBox from "./component/FaqBox";
+import FaqBox from "./components/FaqBox";
 
 export interface faqQuestionType {
   title: string;
