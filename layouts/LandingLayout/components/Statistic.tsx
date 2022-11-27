@@ -1,14 +1,24 @@
-import { FaClock } from "react-icons/fa";
+import { IconType } from "react-icons/lib";
 
-export default function Statistic() {
+export interface StatisticProps {
+  Icon: IconType;
+  description: string;
+  value: string;
+}
+
+export default function Statistic({
+  Icon,
+  description,
+  value,
+}: StatisticProps) {
   return (
-    <div className='relative right-2 flex flex-row'>
-      <div className='flex h-8  w-8 shrink-0  items-center justify-center bg-main text-white'>
-        <FaClock />
+    <div className='relative right-2 flex flex-row sm:text-lg'>
+      <div className='flex h-8  w-8 shrink-0 items-center justify-center  bg-main text-white sm:h-10 sm:w-10'>
+        <Icon />
       </div>
       <p className='mx-2 self-center text-main-opposed'>
-        Łącznie spędziłeś na ćwiczeniach:
-        <span className='text-white'> 21:32h</span>
+        {description}
+        <span className='text-white'>{value}</span>
       </p>
     </div>
   );
