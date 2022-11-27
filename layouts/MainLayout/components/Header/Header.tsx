@@ -1,5 +1,5 @@
 import Logo from "components/Logo";
-import Navigation from "./Navigation";
+import Navigation from "../Navigation/Navigation";
 
 export default function Header({
   variant,
