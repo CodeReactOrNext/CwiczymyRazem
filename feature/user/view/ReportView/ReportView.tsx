@@ -3,7 +3,7 @@ import Button from "components/Button";
 import RatingPopUp from "components/RatingPopUp";
 import MainLayout from "layouts/MainLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
-import ReportCategoryLayout from "layouts/ReportFormLayout/ReportCategoryLayout";
+import ReportCategoryLayout from "layouts/ReportFormLayout/components/ReportCategoryLayout";
 import { useState } from "react";
 import Exercise from "./components/Exercise";
 

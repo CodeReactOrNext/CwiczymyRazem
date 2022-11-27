@@ -1,4 +1,3 @@
-import LightningSVG from "public/static/images/svg/Lightning";
 import LightningThinSVG from "public/static/images/svg/Lightning_thin";
 import React from "react";
 
