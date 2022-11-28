@@ -1,5 +1,6 @@
 import Avatar from "components/Avatar";
 import Logo from "components/Logo";
+import Link from "next/link";
 import Lightning from "public/static/images/svg/Lightning";
 
 export default function UserHeaderDesktop() {
@@ -11,7 +12,9 @@ export default function UserHeaderDesktop() {
             <Logo />
             <Avatar />
             <div className='mt-3 text-base text-mainText'>
-              <button>Edytuj</button>
+              <Link href='/settings'>
+                <button>Edytuj</button>
+              </Link>
               <button className='ml-3'>Wyloguj </button>
             </div>
           </div>

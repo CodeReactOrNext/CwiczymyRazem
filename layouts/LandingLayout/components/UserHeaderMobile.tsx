@@ -1,5 +1,6 @@
 import Avatar from "components/Avatar";
 import Logo from "components/Logo";
+import Link from "next/link";
 
 export default function UserHeaderMobile() {
   return (
@@ -7,7 +8,9 @@ export default function UserHeaderMobile() {
       <div className='flex flex-col items-start space-x-2 space-y-2 text-lg text-mainText'>
         <Logo />
         <Avatar />
-        <button>Edytuj</button>
+        <Link href='/settings'>
+          <button>Edytuj</button>
+        </Link>
         <button>Wyloguj </button>
       </div>
       <div className=' text-lg sm:text-2xl'>

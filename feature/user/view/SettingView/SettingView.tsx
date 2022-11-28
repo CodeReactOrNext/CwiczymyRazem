@@ -1,12 +1,9 @@
 import Avatar from "components/Avatar";
-import Button from "components/Button";
-import Input from "components/Input";
 import MainLayout from "layouts/MainLayout";
-import { FaUserAlt, FaPencilAlt } from "react-icons/fa";
 
-const EditView = () => {
+const SettingView = () => {
   return (
-    <MainLayout subtitle='Edytuj Profil' variant='secondary'>
+    <MainLayout subtitle='Edytuj Profil' variant='primary'>
       <div className='flex max-w-[800px] flex-col p-6'>
         <div className='flex flex-row gap-2 p-4  text-2xl'>
           <Avatar />
@@ -51,4 +48,4 @@ const EditView = () => {
   );
 };
 
-export default EditView;
+export default SettingView;

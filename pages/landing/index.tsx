@@ -1,4 +1,5 @@
 import LandingLayout from "layouts/LandingLayout";
+import { LandingNavProps } from "layouts/LandingLayout/components/LandingNav";
 import { StatisticProps } from "layouts/LandingLayout/components/Statistic";
 import type { NextPage } from "next";
 import {
@@ -55,7 +56,31 @@ const Landing: NextPage = () => {
       value: "4",
     },
   ];
-  return <LandingLayout statistics={statistics} />;
+
+  const navigation: LandingNavProps = {
+    leftSideLinks: [
+      {
+        name: "Raportuj",
+        href: "/report",
+      },
+      {
+        name: "Ćwicz",
+        href: "/timer",
+      },
+    ],
+    rightSideLinks: [
+      {
+        name: "Leadboard",
+        href: "/leaderboard",
+      },
+      {
+        name: "FAQ",
+        href: "/faq",
+      },
+    ],
+  };
+
+  return <LandingLayout statistics={statistics} navigation={navigation} />;
 };
 
 export default Landing;
