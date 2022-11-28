@@ -11,7 +11,11 @@ interface LayoutProps {
   variant: "primary" | "secondary" | "landing";
 }
 
-export default function Layout({ children, subtitle, variant }: LayoutProps) {
+export default function MainLayout({
+  children,
+  subtitle,
+  variant,
+}: LayoutProps) {
   return (
     <main className='h-screen min-h-[600px] p-4 font-sans md:min-h-[900px] lg:p-8'>
       <div className='relative flex h-full w-full items-center justify-center'>

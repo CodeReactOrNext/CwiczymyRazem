@@ -10,20 +10,20 @@ export default function UserHeaderDesktop() {
           <div className=' lg:mr-4'>
             <Logo />
             <Avatar />
-            <div className='mt-3 text-base text-white'>
+            <div className='mt-3 text-base text-mainText'>
               <button>Edytuj</button>
               <button className='ml-3'>Wyloguj </button>
             </div>
           </div>
           <div className='text-base  lg:text-xl xl:text-2xl'>
             <p className='text-lg lg:text-xl  xl:text-xl  '>
-              Cześć <span className='text-white'>User!</span>
+              Cześć <span className='text-mainText'>User!</span>
             </p>
             <p>
-              Miejsce w rankingu <span className='text-white'>6</span>
+              Miejsce w rankingu <span className='text-mainText'>6</span>
             </p>
             <p>
-              Zdobyłeś punktów <span className='text-white'>360000000</span>
+              Zdobyłeś punktów <span className='text-mainText'>360000000</span>
             </p>
           </div>
         </div>
@@ -38,19 +38,19 @@ export default function UserHeaderDesktop() {
       </div>
       <div className=' flex w-64 flex-col items-center justify-self-end xl:w-80'>
         <p>
-          Twój poziom <span className='text-4xl text-white'>35</span>
+          Twój poziom <span className='text-4xl text-mainText'>35</span>
         </p>
         <div className=' flex w-full'>
           <p className=' relative left-3 z-10 text-sm'>
             lvl
-            <span className='text-xl text-white'>35</span>
+            <span className='text-xl text-mainText'>35</span>
           </p>
           <div className='relative flex h-4 w-full items-center bg-main-opposed'>
             <div className='relative h-5 w-[20%] bg-main'></div>
           </div>
           <p className='relative right-3 text-sm'>
             lvl
-            <span className='text-xl  text-white'>36</span>
+            <span className='text-xl  text-mainText'>36</span>
           </p>
         </div>
         <p>340/550pkt</p>
