@@ -4,7 +4,8 @@ interface Props {
 
 const FireSvg = (props: Props) => (
   <svg
-    viewBox='0 0 252.95 249.16'
+    viewBox='-10 -10 252.95 249.16'
+    preserveAspectRatio='none'
     xmlns='http://www.w3.org/2000/svg'
     className={props?.className}>
     <path
