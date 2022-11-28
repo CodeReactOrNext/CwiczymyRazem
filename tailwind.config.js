@@ -92,6 +92,7 @@ module.exports = {
         "old-effect-hr": "url('/static/images/old_effect_hr.png')",
       },
       colors: {
+        mainText: { DEFAULT: "#ffff" },
         main: {
           DEFAULT: "#FF2A37",
           50: "#ff5c69",
