@@ -1,7 +1,7 @@
 import OldEffect from "components/OldEffect";
 import Wrapper from "./components/Wrapper";
 import Statistic, { StatisticProps } from "./components/Statistic";
-import LandingNav from "./components/LandingNav";
+import LandingNav, { LandingNavProps } from "./components/LandingNav";
 import StatisticBar from "./components/StatisticBar";
 import UserHeaderMobile from "./components/UserHeaderMobile";
 import Achivment from "./components/Achivment";
@@ -10,9 +10,13 @@ import Decoration from "./components/Decoration";
 
 interface LandingLayoutProps {
   statistics: StatisticProps[];
+  navigation: LandingNavProps;
 }
 
-export default function LandingLayout({ statistics }: LandingLayoutProps) {
+export default function LandingLayout({
+  statistics,
+  navigation,
+}: LandingLayoutProps) {
   return (
     <main className='h-screen min-h-[600px] p-4 font-sans md:min-h-[900px] lg:p-8 '>
       <div className='relative flex h-full w-full items-center justify-center'>
@@ -22,7 +26,10 @@ export default function LandingLayout({ statistics }: LandingLayoutProps) {
           <Wrapper>
             <UserHeaderDesktop />
             <UserHeaderMobile />
-            <LandingNav />
+            <LandingNav
+              leftSideLinks={navigation.leftSideLinks}
+              rightSideLinks={navigation.rightSideLinks}
+            />
             <div className=' relative z-40   m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
               <Decoration />
               <div className='grid-cols-2 grid-rows-2 items-center md:grid'>
