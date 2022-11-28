@@ -10,9 +10,11 @@ import { addUserAuth, addUserName } from "../../store/userSlice";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import GoogleButton from "components/GoogleButton";
 import FormLayout from "layouts/FormLayout";
+import Link from "next/link";
 
 const LoginView = () => {
   const dispatch = useDispatch();
+
   const logGoogleUser = async () => {
     const { user } = await signInWithGooglePopup();
     dispatch(addUserName(user.displayName));
@@ -28,7 +30,9 @@ const LoginView = () => {
           <Input Icon={FaLock} placeholder={"Hasło"} />
           <div className='flex space-x-1 '>
             <Button>Loguj</Button>
-            <Button variant='secondary'>Rejestracja</Button>
+            <Link href='/signup'>
+              <Button variant='secondary'>Rejestracja</Button>
+            </Link>
           </div>
           <GoogleButton onClick={logGoogleUser}>
             Zaloguj się z Google
