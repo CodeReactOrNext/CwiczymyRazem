@@ -42,13 +42,13 @@ const LeadboardColumn = ({ place }: LeadboardColumnProps) => {
           </div>
           <div className=' col-span-3 flex h-full w-full flex-col items-center justify-center  md:col-span-1  md:w-fit md:justify-end '>
             <div className='flex text-2xl'>
-              <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-white' />
+              <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-mainText' />
               <div className='flex w-[100px] justify-around text-xl xs:w-[150px] '>
                 <FaEvernote />
                 <FaEvernote />
                 <FaEvernote />
               </div>
-              <FaAngleRight className='cursor-pointer text-main-opposed hover:text-white' />
+              <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText' />
             </div>
             <p className=' text-tertiary'>Osiągnięcia 4/16 </p>
           </div>

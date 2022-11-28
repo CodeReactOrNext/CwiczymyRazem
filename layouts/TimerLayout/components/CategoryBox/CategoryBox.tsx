@@ -20,7 +20,7 @@ const CategoryBox = ({ title, chosen }: CategoryBox) => {
       {!chosen && (
         <button
           className={
-            "uppercas  border-2 border-transparent bg-main p-1 px-3 text-center text-sm font-bold text-white hover:bg-main-100 "
+            "uppercas  border-2 border-transparent bg-main p-1 px-3 text-center text-sm font-bold text-mainText hover:bg-main-100 "
           }>
           Wybierz
         </button>
