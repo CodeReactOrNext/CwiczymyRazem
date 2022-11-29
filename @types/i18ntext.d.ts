@@ -9,10 +9,14 @@ import "i18next";
 
 import type common from "../public/locales/en/common.json";
 import type landing from "../public/locales/en/landing.json";
+import type login from "../public/locales/en/login.json";
+import type footer from "../public/locales/en/footer.json";
 
 interface I18nNamespaces {
   common: typeof common;
   landing: typeof landing;
+  login: typeof login;
+  footer: typeof footer;
 }
 
 declare module "i18next" {

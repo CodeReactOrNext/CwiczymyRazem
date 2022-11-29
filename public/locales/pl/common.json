@@ -1,0 +1,17 @@
+{
+  "button": {
+    "sign_in": "Loguj",
+    "sign_up": "Rejestracja"
+  },
+  "google_button": {
+    "sign_in": " Zaloguj Się Z Google"
+  },
+  "input": {
+    "login": "Login",
+    "password": "Hasło"
+  },
+  "slogan": {
+    "line_1": "Ćwiczymy",
+    "line_2": "Razem"
+  }
+}
