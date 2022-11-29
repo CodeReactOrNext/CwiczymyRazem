@@ -1,0 +1,20 @@
+{
+  "subtitlebar_text": "Raportuj",
+  "exercise_type_title": "Wpisz czas spędzony na ćwiczeniach",
+  "technique": "Technika:",
+  "theory": "Teoria:",
+  "hearing": "Słuch:",
+  "creative": "Praca kreatywna:",
+  "healthy_habits_title": "Zdrowe nawyki",
+  "exercise_plan": "Zrealizowałeś swój plan ćwiczeń?",
+  "new_things": "Ćwiczyłeś nowe rzeczy?",
+  "warmup": "Wykonałeś rozgrzewkę?",
+  "metronome": "Używałeś metronom?",
+  "recording": "Nagrywałeś się?",
+  "report_button": "Raportuj",
+  "rating_popup": {
+    "title": "ZDOBYŁEŚ",
+    "points": "pkt",
+    "back": "Wróć"
+  }
+}

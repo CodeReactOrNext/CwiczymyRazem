@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import FireDoubleSVG from "public/static/images/svg/Fire_double";
 import Button from "components/Button";
@@ -13,6 +14,8 @@ export default function HeroLayout({
   children: React.ReactElement;
   buttonOnClick?: React.MouseEventHandler<HTMLButtonElement>;
 }) {
+  const { t } = useTranslation("landing");
+
   return (
     <div className='grid h-full w-full grid-cols-1 grid-rows-2 gap-[20%] lg:grid-cols-[4fr_5fr] lg:grid-rows-1'>
       <div className='relative h-full w-full'>
@@ -29,7 +32,7 @@ export default function HeroLayout({
         </span>
         <Link href='/login'>
           <a>
-            <Button onClick={buttonOnClick}>ĆWICZ Z NAMI!</Button>
+            <Button onClick={buttonOnClick}>{t("cta_button")}</Button>
           </a>
         </Link>
       </div>

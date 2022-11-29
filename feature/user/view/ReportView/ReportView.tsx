@@ -5,46 +5,36 @@ import MainLayout from "layouts/MainLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import ReportCategoryLayout from "layouts/ReportFormLayout/components/ReportCategoryLayout";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Exercise from "./components/Exercise";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(true);
+  const { t } = useTranslation("report");
 
   return (
     <>
-      <MainLayout subtitle='Raportuj' variant='primary'>
+      <MainLayout subtitle={t("subtitlebar_text")} variant='primary'>
         <ReportFormLayout>
-          <ReportCategoryLayout title='Wpisz czas spędzony na ćwiczeniach'>
-            <Exercise inputId='technic' title='Technika:' />
-            <Exercise inputId='theory' title='Teoria:' />
-            <Exercise inputId='hearing' title='Słuch:' />
-            <Exercise inputId='creative' title='Praca kreatywna:' />
+          <ReportCategoryLayout title={t("exercise_type_title")}>
+            <Exercise inputId='technic' title={t("technique")} />
+            <Exercise inputId='theory' title={t("theory")} />
+            <Exercise inputId='hearing' title={t("hearing")} />
+            <Exercise inputId='creative' title={t("creative")} />
           </ReportCategoryLayout>
-          <ReportCategoryLayout title='Zdrowe nawyki'>
+          <ReportCategoryLayout title={t("healthy_habits_title")}>
             <Exercise
               isCheckbox
               inputId='exercise_plan'
-              title='Zrealizowałeś swój plan ćwiczeń?'
+              title={t("exercise_plan")}
             />
-            <Exercise
-              isCheckbox
-              inputId='new_things'
-              title='Ćwiczyłeś nowe rzeczy?'
-            />
-            <Exercise
-              isCheckbox
-              inputId='warmup'
-              title='Wykonałeś rozgrzewkę?'
-            />
-            <Exercise
-              isCheckbox
-              inputId='metronome'
-              title='Używałeś metronom?'
-            />
-            <Exercise isCheckbox inputId='recording' title='Nagrywałeś się?' />
+            <Exercise isCheckbox inputId='new_things' title={t("new_things")} />
+            <Exercise isCheckbox inputId='warmup' title={t("warmup")} />
+            <Exercise isCheckbox inputId='metronome' title={t("metronome")} />
+            <Exercise isCheckbox inputId='recording' title={t("recording")} />
           </ReportCategoryLayout>
           <div className='justify-self-center md:col-span-2 lg:col-span-1 xl:col-span-2'>
-            <Button>Raportuj</Button>
+            <Button>{t("report_button")}</Button>
           </div>
         </ReportFormLayout>
       </MainLayout>
