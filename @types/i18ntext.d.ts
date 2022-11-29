@@ -10,14 +10,30 @@ import "i18next";
 import type common from "../public/locales/en/common.json";
 import type landing from "../public/locales/en/landing.json";
 import type login from "../public/locales/en/login.json";
+import type signup from "../public/locales/en/signup.json";
 import type footer from "../public/locales/en/footer.json";
+import type faq from "../public/locales/en/faq.json";
+import type report from "../public/locales/en/report.json";
 
 interface I18nNamespaces {
   common: typeof common;
   landing: typeof landing;
   login: typeof login;
+  signup: typeof signup;
   footer: typeof footer;
+  faq: typeof faq;
+  report: typeof report;
 }
+// interface I18nNamespaces
+//   extends common,
+//     landing,
+//     login,
+//     signup,
+//     footer,
+//     faq,
+//     report {
+//   report: typeof report;
+// }
 
 declare module "i18next" {
   interface CustomTypeOptions {

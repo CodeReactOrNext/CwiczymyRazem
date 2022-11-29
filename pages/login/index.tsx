@@ -15,7 +15,7 @@ export default LoginPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "en", ["common", "login"])),
+      ...(await serverSideTranslations(locale ?? "pl", ["common", "login"])),
     },
   };
 }

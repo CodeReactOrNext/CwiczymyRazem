@@ -8,7 +8,9 @@
   },
   "input": {
     "login": "Login",
-    "password": "Password"
+    "password": "Password",
+    "repeat_password": "Repeat password",
+    "email": "Email"
   },
   "slogan": {
     "line_1": "Practice",

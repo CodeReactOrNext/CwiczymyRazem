@@ -1,14 +1,16 @@
 {
   "button": {
     "sign_in": "Loguj",
-    "sign_up": "Rejestracja"
+    "sign_up": "Zarejestruj się"
   },
   "google_button": {
     "sign_in": " Zaloguj Się Z Google"
   },
   "input": {
     "login": "Login",
-    "password": "Hasło"
+    "password": "Hasło",
+    "repeat_password": "Powtórz hasło",
+    "email": "Email"
   },
   "slogan": {
     "line_1": "Ćwiczymy",
