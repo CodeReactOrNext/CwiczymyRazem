@@ -1,4 +1,5 @@
 import { useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 import Button from "components/Button";
 import Input from "components/Input";
 import MainLayout from "layouts/MainLayout";
@@ -12,6 +13,7 @@ import GoogleButton from "components/GoogleButton";
 import FormLayout from "layouts/FormLayout";
 
 const LoginView = () => {
+  const { t } = useTranslation(["common", "login"]);
   const dispatch = useDispatch();
   const logGoogleUser = async () => {
     const { user } = await signInWithGooglePopup();
@@ -21,17 +23,17 @@ const LoginView = () => {
   };
 
   return (
-    <MainLayout subtitle='Ćwicz, raportuj, zdobywaj punkty!' variant='primary'>
+    <MainLayout subtitle={t("login:subtitlebar_text")} variant='primary'>
       <FormLayout>
         <>
-          <Input Icon={FaUserAlt} placeholder={"Login"} />
-          <Input Icon={FaLock} placeholder={"Hasło"} />
+          <Input Icon={FaUserAlt} placeholder={t("common:input.login")} />
+          <Input Icon={FaLock} placeholder={t("common:input.password")} />
           <div className='flex space-x-1 '>
-            <Button>Loguj</Button>
-            <Button variant='secondary'>Rejestracja</Button>
+            <Button>{t("common:button.sign_in")}</Button>
+            <Button variant='secondary'>{t("common:button.sign_up")}</Button>
           </div>
           <GoogleButton onClick={logGoogleUser}>
-            Zaloguj się z Google
+            {t("common:google_button.sign_in")}
           </GoogleButton>
         </>
       </FormLayout>
