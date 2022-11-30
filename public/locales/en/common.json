@@ -1,0 +1,19 @@
+{
+  "button": {
+    "sign_in": "Log in",
+    "sign_up": "Sign Up"
+  },
+  "google_button": {
+    "sign_in": "Sign In With Google"
+  },
+  "input": {
+    "login": "Login",
+    "password": "Password",
+    "repeat_password": "Repeat password",
+    "email": "Email"
+  },
+  "slogan": {
+    "line_1": "Practice",
+    "line_2": "Together"
+  }
+}

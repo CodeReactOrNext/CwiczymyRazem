@@ -1,6 +1,7 @@
 import FaqLayout from "layouts/FaqLayout";
 import { faqQuestionType } from "layouts/FaqLayout/FaqLayout";
 import type { NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 const FaqPage: NextPage = () => {
   const faqQuestion: faqQuestionType[] = [
     {
@@ -24,3 +25,11 @@ const FaqPage: NextPage = () => {
 };
 
 export default FaqPage;
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "pl", ["common", "faq"])),
+    },
+  };
+}
