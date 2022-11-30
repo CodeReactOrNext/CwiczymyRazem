@@ -10,7 +10,7 @@ export default function UserHeaderDesktop() {
         <div className='flex flex-row items-center gap-10'>
           <div className=' lg:mr-4'>
             <Logo />
-            <Avatar />
+            <Avatar user={{ name: "blalba" }} />
             <div className='mt-3 text-base text-mainText'>
               <Link href='/settings'>
                 <button>Edytuj</button>
