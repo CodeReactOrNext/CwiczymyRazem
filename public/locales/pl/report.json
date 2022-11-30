@@ -15,6 +15,15 @@
   "rating_popup": {
     "title": "ZDOBYŁEŚ",
     "points": "pkt",
-    "back": "Wróć"
+    "back": "Wróć",
+    "regularity": "za systematyczność",
+    "streak": "dni ćwiczeń pod rząd",
+    "habits": "za zdrowe nawyki",
+    "habitsWithCount_one": "zastosowałeś {{count}} zdrowy nawyk",
+    "habitsWithCount_other": "zastosowałeś {{count}} zdrowych nawyków",
+    "habitsWithCount_few": "zastosowałeś {{count}} zdrowych nawyki",
+    "habitsWithCount_many": "zastosowałeś {{count}} zdrowych nawyków",
+    "time": "za ilość czasu",
+    "time_amount": "ćwiczyłeś łącznie"
   }
 }
