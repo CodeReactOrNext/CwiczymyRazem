@@ -1,7 +1,7 @@
 import Avatar from "components/Avatar";
 import MainLayout from "layouts/MainLayout";
 
-const SettingView = () => {
+const SettingsView = () => {
   return (
     <MainLayout subtitle='Edytuj Profil' variant='primary'>
       <div className='flex max-w-[800px] flex-col p-6'>
@@ -48,4 +48,4 @@ const SettingView = () => {
   );
 };
 
-export default SettingView;
+export default SettingsView;

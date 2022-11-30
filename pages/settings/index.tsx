@@ -1,8 +1,8 @@
-import SettingView from "feature/user/view/SettingView";
+import SettingsView from "feature/user/view/SettingsView";
 import type { NextPage } from "next";
 
 const Settings: NextPage = () => {
-  return <SettingView />;
+  return <SettingsView />;
 };
 
 export default Settings;
