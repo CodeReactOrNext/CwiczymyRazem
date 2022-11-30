@@ -153,6 +153,7 @@ module.exports = {
   },
   plugins: [
     require("prettier-plugin-tailwindcss"),
+    require('tailwind-scrollbar'),
     rotateX,
     rotateY,
     scrollbarHide,
