@@ -6,7 +6,7 @@ const SettingsView = () => {
     <MainLayout subtitle='Edytuj Profil' variant='primary'>
       <div className='flex max-w-[800px] flex-col p-6'>
         <div className='flex flex-row gap-2 p-4  text-2xl'>
-          <Avatar />
+          <Avatar user={{ name: "d", avatar: undefined }} />
           <button className='text-lg text-main'>Edytuj</button>
         </div>
         <hr className='border-main-opposed-400' />

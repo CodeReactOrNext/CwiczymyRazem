@@ -7,7 +7,7 @@ export default function UserHeaderMobile() {
     <div className='z-30 grid w-full grid-cols-2 grid-rows-[1fr_0.5fr] items-center justify-between bg-second  p-3 text-xl text-tertiary sm:text-2xl md:hidden'>
       <div className='flex flex-col items-start space-x-2 space-y-2 text-lg text-mainText'>
         <Logo />
-        <Avatar />
+        <Avatar user={{ name: "blabla", avatar: undefined }} />
         <Link href='/settings'>
           <button>Edytuj</button>
         </Link>
