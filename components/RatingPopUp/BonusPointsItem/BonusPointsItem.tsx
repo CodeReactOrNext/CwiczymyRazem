@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 interface Props {
   exerciseData: {
     multiplier?: number;
@@ -11,6 +13,7 @@ interface Props {
 export default function BonusPointsItem({
   exerciseData: { multiplier, additionalPoints, streak, habitsCount, time },
 }: Props) {
+  const { t } = useTranslation(["common", "report"]);
   return (
     <li className='flex items-center gap-3 md:first:-translate-x-[5%] md:last:translate-x-[5%]'>
       {multiplier && (
@@ -23,22 +26,32 @@ export default function BonusPointsItem({
       )}
       {streak && (
         <>
-          <p className='xs:text-xl md:text-2xl'>za systematyczność</p>
-          <p className='text-base md:text-lg'>{streak} dni ćwiczeń pod rząd</p>
+          <p className='xs:text-xl md:text-2xl'>
+            {t("report:rating_popup.regularity")}
+          </p>
+          <p className='text-base md:text-lg'>
+            {streak} {t("report:rating_popup.streak")}
+          </p>
         </>
       )}
       {habitsCount && (
         <>
-          <p className='xs:text-xl md:text-2xl'>za zdrowe nawyki</p>
+          <p className='xs:text-xl md:text-2xl'>
+            {t("report:rating_popup.habits")}
+          </p>
           <p className='text-base md:text-lg'>
-            zastosowałeś {habitsCount} zdrowe nawyki
+            {t("report:rating_popup.habitsWithCount", { count: habitsCount })}
           </p>
         </>
       )}
       {time && (
         <>
-          <p className='xs:text-xl md:text-2xl'>za ilość czasu</p>
-          <p className='text-base md:text-lg'>ćwiczyłeś łącznie {time}</p>
+          <p className='xs:text-xl md:text-2xl'>
+            {t("report:rating_popup.time")}
+          </p>
+          <p className='text-base md:text-lg'>
+            {t("report:rating_popup.time_amount")} {time}
+          </p>
         </>
       )}
     </li>

@@ -55,7 +55,7 @@ const ReportView = () => {
                   additionalPoints: 5,
                 },
                 {
-                  time: "4:30",
+                  time: "4h:30m",
                   multiplier: 4,
                 },
               ],

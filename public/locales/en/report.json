@@ -15,6 +15,13 @@
   "rating_popup": {
     "title": "YOU GOT",
     "points": "pts",
-    "back": "Back"
+    "back": "Back",
+    "regularity": "for regularity",
+    "streak": "days in a row",
+    "habits": "for healthy habits",
+    "habitsWithCount_one": "you have adopted {{count}} healthy habit",
+    "habitsWithCount_other": "you have adopted {{count}} healthy habits",
+    "time": "for the amount of time",
+    "time_amount": "you practiced for"
   }
 }
