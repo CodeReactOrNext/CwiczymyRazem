@@ -1,3 +1,4 @@
+
 const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
 /** @type {import('tailwindcss').Config} */
@@ -92,6 +93,11 @@ module.exports = {
         "old-effect-hr": "url('/static/images/old_effect_hr.png')",
       },
       colors: {
+        achievements: {
+          common: "#fff",
+          rare: "#b1f9ff",
+          veryRare: "#ffe54c"
+        },
         mainText: { DEFAULT: "#ffff" },
         main: {
           DEFAULT: "#FF2A37",

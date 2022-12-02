@@ -4,7 +4,7 @@ import Statistic, { StatisticProps } from "./components/Statistic";
 import LandingNav, { LandingNavProps } from "./components/LandingNav";
 import StatisticBar from "./components/StatisticBar";
 import UserHeaderMobile from "./components/UserHeaderMobile";
-import Achivment from "./components/Achivment";
+import AchivmentBox from "./components/AchivmentBox";
 import UserHeaderDesktop from "./components/UserHeaderDesktop";
 import Decoration from "./components/Decoration";
 
@@ -48,9 +48,9 @@ export default function LandingLayout({
                   ))}
                 </div>
                 <div className=' row-cols-1 order-2 '>
-                  <Achivment />
-                  <Achivment />
-                  <Achivment />
+                  <AchivmentBox rarity='common' />
+                  <AchivmentBox rarity='rare' />
+                  <AchivmentBox rarity='veryRare' />
                 </div>
               </div>
             </div>

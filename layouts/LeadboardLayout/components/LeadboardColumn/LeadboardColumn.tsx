@@ -1,5 +1,12 @@
+import Achievement from "components/Achievement";
 import Avatar from "components/Avatar";
-import { FaAngleLeft, FaAngleRight, FaEvernote } from "react-icons/fa";
+import {
+  FaAngleLeft,
+  FaAngleRight,
+  FaBed,
+  FaEvernote,
+  FaGuitar,
+} from "react-icons/fa";
 import ReactTooltip from "react-tooltip";
 interface LeadboardColumnProps {
   place: number;
@@ -49,9 +56,21 @@ const LeadboardColumn = ({ place, nick }: LeadboardColumnProps) => {
               <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-mainText' />
               <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
                 <ReactTooltip />
-                <FaEvernote data-tip='hello world' />
-                <FaEvernote />
-                <FaEvernote />
+                <Achievement
+                  Icon={FaEvernote}
+                  description='Super Achivment'
+                  rarity='common'
+                />
+                <Achievement
+                  Icon={FaGuitar}
+                  description='Super Achivment nr.2'
+                  rarity='rare'
+                />
+                <Achievement
+                  Icon={FaBed}
+                  description='Super Achivment ne.3'
+                  rarity='veryRare'
+                />
               </div>
               <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText' />
             </div>

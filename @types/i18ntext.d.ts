@@ -14,6 +14,7 @@ import type signup from "../public/locales/en/signup.json";
 import type footer from "../public/locales/en/footer.json";
 import type faq from "../public/locales/en/faq.json";
 import type report from "../public/locales/en/report.json";
+import type achievements from "../public/locales/en/achievements.json";
 
 interface I18nNamespaces {
   common: typeof common;
@@ -23,6 +24,7 @@ interface I18nNamespaces {
   footer: typeof footer;
   faq: typeof faq;
   report: typeof report;
+  achievements: typeof achievements;
 }
 // interface I18nNamespaces
 //   extends common,
