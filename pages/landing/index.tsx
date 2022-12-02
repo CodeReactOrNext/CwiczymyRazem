@@ -2,6 +2,7 @@ import LandingLayout from "layouts/LandingLayout";
 import { LandingNavProps } from "layouts/LandingLayout/components/LandingNav";
 import { StatisticProps } from "layouts/LandingLayout/components/Statistic";
 import type { NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
   FaCalendarDay,
   FaClock,
@@ -84,3 +85,11 @@ const Landing: NextPage = () => {
 };
 
 export default Landing;
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "pl", ["achievements"])),
+    },
+  };
+}
