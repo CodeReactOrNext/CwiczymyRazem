@@ -14,7 +14,11 @@ import type signup from "../public/locales/en/signup.json";
 import type footer from "../public/locales/en/footer.json";
 import type faq from "../public/locales/en/faq.json";
 import type report from "../public/locales/en/report.json";
+<<<<<<< HEAD
 import type achievements from "../public/locales/en/achievements.json";
+=======
+import type not_found from "../public/locales/en/404.json";
+>>>>>>> e2abee3ea526a516ac0ada0b299ec1e8e88f59e3
 
 interface I18nNamespaces {
   common: typeof common;
@@ -24,7 +28,11 @@ interface I18nNamespaces {
   footer: typeof footer;
   faq: typeof faq;
   report: typeof report;
+<<<<<<< HEAD
   achievements: typeof achievements;
+=======
+  "404": typeof not_found;
+>>>>>>> e2abee3ea526a516ac0ada0b299ec1e8e88f59e3
 }
 // interface I18nNamespaces
 //   extends common,
