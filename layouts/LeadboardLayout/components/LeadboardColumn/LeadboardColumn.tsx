@@ -1,5 +1,6 @@
 import Avatar from "components/Avatar";
 import { FaAngleLeft, FaAngleRight, FaEvernote } from "react-icons/fa";
+import ReactTooltip from "react-tooltip";
 interface LeadboardColumnProps {
   place: number;
   nick: string;
@@ -47,7 +48,8 @@ const LeadboardColumn = ({ place, nick }: LeadboardColumnProps) => {
             <div className='flex  text-base xxs:text-2xl lg:text-xl xl:text-2xl '>
               <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-mainText' />
               <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
-                <FaEvernote />
+                <ReactTooltip />
+                <FaEvernote data-tip='hello world' />
                 <FaEvernote />
                 <FaEvernote />
               </div>
