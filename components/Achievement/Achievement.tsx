@@ -1,10 +1,9 @@
+import ToolTip from "components/ToolTip";
 import {
   achievementsRarityType,
   achievementsRarity,
 } from "constants/achievementsRarity";
-
 import { IconType } from "react-icons/lib";
-import ReactTooltip from "react-tooltip";
 
 interface AchievementProps extends achievementsRarityType {
   Icon: IconType;
@@ -13,7 +12,7 @@ interface AchievementProps extends achievementsRarityType {
 const Achievement = ({ Icon, rarity, description }: AchievementProps) => {
   return (
     <>
-      <ReactTooltip />
+      <ToolTip />
       <Icon color={achievementsRarity[rarity].color} data-tip={description} />
     </>
   );
