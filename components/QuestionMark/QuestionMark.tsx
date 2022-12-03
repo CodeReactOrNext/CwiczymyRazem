@@ -1,15 +1,18 @@
-import { FaQuestionCircle } from "react-icons/fa";
-import ReactTooltip from "react-tooltip";
+import ToolTip from "components/ToolTip";
+import { RiQuestionnaireFill } from "react-icons/ri";
 
-interface QuestionMarkProps {
+export interface QuestionMarkProps {
   description: string;
 }
 
 const QuestionMark = ({ description }: QuestionMarkProps) => {
   return (
     <>
-      <ReactTooltip />
-      <FaQuestionCircle className='fill-tertiary-500' data-tip={description} />
+      <ToolTip />
+      <RiQuestionnaireFill
+        className='fill-mainText text-sm'
+        data-tip={description}
+      />
     </>
   );
 };

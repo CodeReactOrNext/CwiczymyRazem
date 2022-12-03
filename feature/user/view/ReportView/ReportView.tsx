@@ -21,10 +21,29 @@ const ReportView = () => {
         <ReportFormLayout>
           <ReportCategoryLayout title={t("exercise_type_title")}>
             <div className='m-5 flex flex-col gap-14 sm:flex-row sm:gap-10  2xl:gap-20'>
-              <TimeInputBox title={t("technique")} Icon={IoMdHand} />
-              <TimeInputBox title={t("theory")} Icon={MdSchool} />
-              <TimeInputBox title={t("hearing")} Icon={FaMusic} />
-              <TimeInputBox title={t("creative")} Icon={FaBrain} />
+              <TimeInputBox
+                title={t("technique")}
+                questionMarkProps={{
+                  description:
+                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's.",
+                }}
+                Icon={IoMdHand}
+              />
+              <TimeInputBox
+                title={t("theory")}
+                questionMarkProps={{ description: "Teoria" }}
+                Icon={MdSchool}
+              />
+              <TimeInputBox
+                title={t("hearing")}
+                questionMarkProps={{ description: "Słuch" }}
+                Icon={FaMusic}
+              />
+              <TimeInputBox
+                title={t("creative")}
+                questionMarkProps={{ description: "Kreatywność" }}
+                Icon={FaBrain}
+              />
             </div>
           </ReportCategoryLayout>
           <ReportCategoryLayout title={t("healthy_habits_title")}>
