@@ -1,13 +1,13 @@
 import LightningRevSVG from "public/static/images/svg/LightningRev";
-interface Props {
+interface LightningRevProps {
   variant: "primary" | "secondary" | "landing";
   children: React.ReactNode;
 }
 
-export default function SubtitleBar({ variant, children }: Props) {
+export default function SubtitleBar({ variant, children }: LightningRevProps) {
   return (
     <div
-      className={`z-40 flex w-[120%] -translate-x-[10%] items-center justify-end lg:h-20
+      className={`z-30 flex w-[120%] -translate-x-[10%] items-center justify-end lg:h-20
     ${
       variant === "landing"
         ? "absolute top-[55%] -translate-y-[50%] lg:relative lg:top-0 lg:translate-y-0"
