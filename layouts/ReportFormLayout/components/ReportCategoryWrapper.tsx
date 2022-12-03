@@ -8,7 +8,7 @@ export default function ReportCategoryWrapper({
   title,
 }: ReportCategoryWrapperProps) {
   return (
-    <div className='text-xlsm:gap-2 flex flex-col gap-1 justify-self-center md:gap-4 lg:text-2xl  '>
+    <div className='flex flex-col gap-1 justify-self-center text-xl sm:gap-2 md:gap-4 lg:text-2xl  '>
       <p className='text-center text-xl text-mainText sm:text-2xl md:text-3xl'>
         {title}
       </p>
