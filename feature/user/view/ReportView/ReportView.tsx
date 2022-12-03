@@ -20,18 +20,19 @@ const ReportView = () => {
       <MainLayout subtitle={t("subtitlebar_text")} variant='primary'>
         <ReportFormLayout>
           <ReportCategoryLayout title={t("exercise_type_title")}>
-            <div className='m-5 flex flex-col gap-14 sm:flex-row sm:gap-10  2xl:gap-20'>
+            <div className='m-5 flex flex-row flex-wrap justify-center gap-14  2xl:gap-20'>
               <TimeInputBox
                 title={t("technique")}
                 questionMarkProps={{
-                  description:
-                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's.",
+                  description: "Technika",
                 }}
                 Icon={IoMdHand}
               />
               <TimeInputBox
                 title={t("theory")}
-                questionMarkProps={{ description: "Teoria" }}
+                questionMarkProps={{
+                  description: "Teoria",
+                }}
                 Icon={MdSchool}
               />
               <TimeInputBox
@@ -47,11 +48,41 @@ const ReportView = () => {
             </div>
           </ReportCategoryLayout>
           <ReportCategoryLayout title={t("healthy_habits_title")}>
-            <Checkbox inputId='exercise_plan' title={t("exercise_plan")} />
-            <Checkbox inputId='new_things' title={t("new_things")} />
-            <Checkbox inputId='warmup' title={t("warmup")} />
-            <Checkbox inputId='metronome' title={t("metronome")} />
-            <Checkbox inputId='recording' title={t("recording")} />
+            <Checkbox
+              inputId='exercise_plan'
+              questionMarkProps={{
+                description: "...",
+              }}
+              title={t("exercise_plan")}
+            />
+            <Checkbox
+              inputId='new_things'
+              questionMarkProps={{
+                description: "...",
+              }}
+              title={t("new_things")}
+            />
+            <Checkbox
+              inputId='warmup'
+              questionMarkProps={{
+                description: "...",
+              }}
+              title={t("warmup")}
+            />
+            <Checkbox
+              inputId='metronome'
+              questionMarkProps={{
+                description: "...",
+              }}
+              title={t("metronome")}
+            />
+            <Checkbox
+              inputId='recording'
+              questionMarkProps={{
+                description: "...",
+              }}
+              title={t("recording")}
+            />
           </ReportCategoryLayout>
           <div className='justify-self-center md:col-span-2 lg:col-span-1 xl:col-span-2'>
             <Button>{t("report_button")}</Button>
