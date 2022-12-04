@@ -15,7 +15,7 @@ const TimerLayout = () => {
           <FaPlay size={40} />
           <FaPause size={40} />
         </div>
-        <div className='flex flex-row gap-5 text-2xl'>
+        <div className='flex flex-row gap-5 text-center text-2xl'>
           <p>
             Czas łącznie: <span className='text-tertiary'>4:50</span>
           </p>
