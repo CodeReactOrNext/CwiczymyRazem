@@ -7,21 +7,24 @@ import {
   createUserDocumentFromAuth,
   signInWithGooglePopup,
 } from "utils/firebase/firebase.utils";
-import { addUserAuth, addUserName } from "../../store/userSlice";
+import { addUserAuth, addUserData } from "../../store/userSlice";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import GoogleButton from "components/GoogleButton";
 import FormLayout from "layouts/FormLayout";
 import Link from "next/link";
+import Router from "next/router";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const LoginView = () => {
   const { t } = useTranslation(["common", "login"]);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const logGoogleUser = async () => {
     const { user } = await signInWithGooglePopup();
-    dispatch(addUserName(user.displayName));
+    dispatch(addUserData(user));
     const userAuth = await createUserDocumentFromAuth(user);
     dispatch(addUserAuth(userAuth));
+    Router.push("/landing");
   };
 
   return (
