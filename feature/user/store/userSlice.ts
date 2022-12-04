@@ -3,7 +3,7 @@ import { RootState } from "../../../store/store";
 
 const initialState = {
   userAuth: null,
-  userName: null,
+  userData: null,
 };
 
 export const userSlice = createSlice({
@@ -16,14 +16,14 @@ export const userSlice = createSlice({
     addUserAuth: (state, action) => {
       state.userAuth = action.payload;
     },
-    addUserName: (state, action) => {
-      state.userName = action.payload;
+    addUserData: (state, action) => {
+      state.userData = action.payload;
     },
   },
 });
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
-export const selectUserName = (state: RootState) => state.user.userName;
-export const { logOut, addUserAuth, addUserName } = userSlice.actions;
+export const selectUserData = (state: RootState) => state.user.userData;
+export const { logOut, addUserAuth, addUserData } = userSlice.actions;
 
 export default userSlice.reducer;
