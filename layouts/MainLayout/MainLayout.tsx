@@ -17,7 +17,7 @@ export default function MainLayout({
   variant,
 }: LayoutProps) {
   return (
-    <main className='h-screen min-h-[650px] p-4 font-sans sm:min-h-[950px] lg:p-8'>
+    <main className='h-screen min-h-[650px] p-4 font-sans xs:min-h-[950px] lg:p-8'>
       <div className='relative flex h-full w-full items-center justify-center'>
         <div
           className={`relative  flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
