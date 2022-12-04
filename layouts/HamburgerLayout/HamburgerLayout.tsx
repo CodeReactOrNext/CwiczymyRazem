@@ -3,14 +3,17 @@ import Logo from "components/Logo";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 
-interface Props {
+interface HamburgerProps {
   buttonOnClick: () => void;
   children: React.ReactNode;
 }
 
-export default function HamburgerLayout({ buttonOnClick, children }: Props) {
+export default function HamburgerLayout({
+  buttonOnClick,
+  children,
+}: HamburgerProps) {
   return (
-    <div className='absolute top-0 bottom-0 left-0 z-50 h-[100vh] w-full'>
+    <div className='absolute top-0 bottom-0 left-0 z-50 h-full min-h-full w-full overflow-hidden'>
       <div className='h-full w-full bg-second-500'>
         <header className='flex items-center justify-between py-4 px-8'>
           <Logo />
