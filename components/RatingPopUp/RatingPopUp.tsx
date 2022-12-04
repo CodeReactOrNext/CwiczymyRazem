@@ -52,7 +52,7 @@ export default function RatingPopUp({
             }}>
             {t("rating_popup.back")}
           </Button>
-          <div className='absolute -top-[170%] my-auto flex h-7 w-2/3 items-center md:-top-[130%] md:w-5/12'>
+          <div className='absolute -top-[170%] z-40 my-auto flex h-7 w-2/3 items-center md:-top-[130%] md:w-5/12'>
             <div className='h-4/5 w-full bg-second-500'></div>
             <div className={`absolute left-0 top-0 h-full w-[50%] bg-main-500`}>
               <p className='absolute -right-[18%] -top-[80%]  text-lg font-medium text-main-500 md:text-xl'>
@@ -69,7 +69,7 @@ export default function RatingPopUp({
           <BonusPointsItem exerciseData={data} key={i} />
         ))}
       </ul>
-      <div className='absolute -bottom-[10%] -left-[25%] z-10 w-[50%] sm:-left-[15%] md:-bottom-[5%] md:-left-[10%] md:w-auto'>
+      <div className='absolute -bottom-[10%] -left-[25%] z-40 w-[50%] sm:-left-[15%] md:-bottom-[5%] md:-left-[10%] md:w-auto'>
         <Image
           src={blackGuitar}
           height={705}

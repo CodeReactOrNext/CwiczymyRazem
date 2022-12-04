@@ -7,13 +7,12 @@ import OldEffect from "components/OldEffect";
 import HeroSlogan from "./components/HeroSlogan";
 import Guitar from "./components/Guitar";
 
-export default function HeroLayout({
-  children,
-  buttonOnClick,
-}: {
+interface HeroProps {
   children: React.ReactElement;
   buttonOnClick?: React.MouseEventHandler<HTMLButtonElement>;
-}) {
+}
+
+export default function HeroLayout({ children, buttonOnClick }: HeroProps) {
   const { t } = useTranslation("landing");
 
   return (
@@ -27,7 +26,7 @@ export default function HeroLayout({
         <Guitar />
       </div>
       <div className='z-30 flex flex-col items-center justify-center gap-6 xsm:flex-row lg:-mb-24 lg:flex-col xl:pr-8 '>
-        <span className='text-left text-[min(5vw,2vh)] text-tertiary-500 xxs:text-[min(4vw,2vh)] xsm:text-[min(3vw,2vh)] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
+        <span className='text-left text-[min(5vw,2vh)] text-tertiary-500 xxs:text-[min(5vw,2vh)] xsm:text-[min(3vw,1rem)] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
           {children}
         </span>
         <Link href='/login'>
