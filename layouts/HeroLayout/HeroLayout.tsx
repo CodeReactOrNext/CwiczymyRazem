@@ -7,13 +7,12 @@ import OldEffect from "components/OldEffect";
 import HeroSlogan from "./components/HeroSlogan";
 import Guitar from "./components/Guitar";
 
-export default function HeroLayout({
-  children,
-  buttonOnClick,
-}: {
+interface HeroProps {
   children: React.ReactElement;
   buttonOnClick?: React.MouseEventHandler<HTMLButtonElement>;
-}) {
+}
+
+export default function HeroLayout({ children, buttonOnClick }: HeroProps) {
   const { t } = useTranslation("landing");
 
   return (

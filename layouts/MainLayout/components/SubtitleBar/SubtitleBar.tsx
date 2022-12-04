@@ -1,10 +1,10 @@
 import LightningRevSVG from "public/static/images/svg/LightningRev";
-interface LightningRevProps {
+interface SubtitleBarProps {
   variant: "primary" | "secondary" | "landing";
   children: React.ReactNode;
 }
 
-export default function SubtitleBar({ variant, children }: LightningRevProps) {
+export default function SubtitleBar({ variant, children }: SubtitleBarProps) {
   return (
     <div
       className={`z-30 flex w-[120%] -translate-x-[10%] items-center justify-end lg:h-20
