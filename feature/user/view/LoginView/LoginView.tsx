@@ -1,27 +1,22 @@
-import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import Button from "components/Button";
 import Input from "components/Input";
 import MainLayout from "layouts/MainLayout";
-import {
-  createUserDocumentFromAuth,
-  signInWithGooglePopup,
-} from "utils/firebase/firebase.utils";
-import { addUserAuth, addUserName } from "../../store/userSlice";
+import { logInViaGoogle } from "../../store/userSlice";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import GoogleButton from "components/GoogleButton";
 import FormLayout from "layouts/FormLayout";
 import Link from "next/link";
+import Router from "next/router";
+import { useAppDispatch } from "store/hooks";
 
 const LoginView = () => {
   const { t } = useTranslation(["common", "login"]);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const logGoogleUser = async () => {
-    const { user } = await signInWithGooglePopup();
-    dispatch(addUserName(user.displayName));
-    const userAuth = await createUserDocumentFromAuth(user);
-    dispatch(addUserAuth(userAuth));
+  const googleLogInHandler = () => {
+    dispatch(logInViaGoogle());
+   
   };
 
   return (
@@ -40,7 +35,7 @@ const LoginView = () => {
               </a>
             </Link>
           </div>
-          <GoogleButton onClick={logGoogleUser}>
+          <GoogleButton onClick={googleLogInHandler}>
             {t("common:google_button.sign_in")}
           </GoogleButton>
         </>

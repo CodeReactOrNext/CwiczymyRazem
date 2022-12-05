@@ -6,10 +6,16 @@ import { appWithTranslation } from "next-i18next";
 import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  
   return (
+
     <Provider store={store}>
       <Head>
         <meta name='viewport' content='initial-scale=1.0, width=device-width' />
+         <meta
+          name='google-signin-client_id'
+          content={process.env.NEXT_PUBLIC_GOOGLE_QAUTH}
+        />
         <title>Ćwiczymy Razem</title>
         <meta
           name='description'
