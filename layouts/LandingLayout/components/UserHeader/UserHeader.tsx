@@ -12,7 +12,7 @@ export default function UserHeader() {
         <div className='flex flex-row items-center gap-10'>
           <div className=' lg:mr-4'>
             <Logo />
-            <Avatar user={{ name: "blalba" }} />
+            <Avatar name={name} lvl={lvl} />
             <UserNav />
           </div>
           <WelcomeMessage userName='d' place={1} points={35253} />
