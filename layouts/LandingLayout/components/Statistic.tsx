@@ -3,7 +3,7 @@ import { IconType } from "react-icons/lib";
 export interface StatisticProps {
   Icon: IconType;
   description: string;
-  value: string;
+  value: string | number;
 }
 
 export default function Statistic({

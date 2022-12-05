@@ -8,6 +8,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { User } from "firebase/auth";
+import { statistics } from "./userStatisticsInitialData";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
@@ -37,48 +38,23 @@ export const createUserDocumentFromAuth = async (userAuth: User) => {
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
+    const statisticsData = JSON.stringify(statistics);
     try {
       await setDoc(userDocRef, {
         displayName,
         email,
         createdAt,
-        statistics: {
-          time: {
-            technique: 0,
-            theory: 0,
-            hearing: 0,
-            creativity: 0,
-            longestSession: 0,
-          },
-          lvl: 0,
-          points: 0,
-          sesionCount: 0,
-          habitsCount: 0,
-          dayWithoutBreak: 0,
-          achivments: [],
-        },
+        statisticsData,
       });
     } catch (error) {
       console.log(error);
     }
   }
-
   return userAuth.uid;
 };
 
-export const getUserData = async (userAuth: User) => {
+export const getUserData = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
-  return JSON.parse(userSnapshot.data().statistics);
+  return userSnapshot.data()!.statistics;
 };
-
-// export const setUserDataSkills = async (userAuth, data) => {
-//   console.log(data);
-
-//   const userDocRef = doc(db, "users", userAuth);
-//   const skillsData = JSON.stringify(data);
-
-//   await updateDoc(userDocRef, {
-//     skillsData,
-//   });
-// };

@@ -6,7 +6,9 @@ import { appWithTranslation } from "next-i18next";
 import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  
   return (
+
     <Provider store={store}>
       <Head>
         <meta name='viewport' content='initial-scale=1.0, width=device-width' />
