@@ -1,7 +1,9 @@
 {
   "button": {
     "sign_in": "Loguj",
-    "sign_up": "Zarejestruj się"
+    "sign_up": "Zarejestruj się",
+    "edit": "Edytuj",
+    "logout": "Wyloguj"
   },
   "google_button": {
     "sign_in": " Zaloguj Się Z Google"
