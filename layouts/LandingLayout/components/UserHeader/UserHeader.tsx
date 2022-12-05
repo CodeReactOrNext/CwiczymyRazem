@@ -1,25 +1,32 @@
 import Avatar from "components/Avatar";
 import Logo from "components/Logo";
 import UserNav from "components/UserNav";
+import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { Level } from "./components/Level";
 import { NavDecoration } from "./components/NavDecoration";
 import { WelcomeMessage } from "./components/WelcomMessage";
 
-export default function UserHeader() {
+interface UserHeaderProps {
+  userStats: statisticsDataInterface;
+  userName: string;
+}
+
+export default function UserHeader({ userStats, userName }: UserHeaderProps) {
+  const { points, lvl } = userStats;
   return (
     <>
       <div className='flex flex-col items-start space-x-2 space-y-2 text-lg '>
-        <div className='flex flex-row items-center gap-10'>
+        <div className='flex flex-row items-center gap-5 sm:gap-10'>
           <div className=' lg:mr-4'>
             <Logo />
-            <Avatar name={name} lvl={lvl} />
+            <Avatar name={userName} lvl={lvl} />
             <UserNav />
           </div>
-          <WelcomeMessage userName='d' place={1} points={35253} />
+          <WelcomeMessage userName={userName} place={1} points={points} />
         </div>
       </div>
       <NavDecoration />
-      <Level />
+      <Level points={points} lvl={lvl} />
     </>
   );
 }
