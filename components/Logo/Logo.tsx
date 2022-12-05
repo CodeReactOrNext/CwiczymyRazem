@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const Logo = () => {
+  
   return (
     <Link href='/'>
       <div className='z-50 flex cursor-pointer'>

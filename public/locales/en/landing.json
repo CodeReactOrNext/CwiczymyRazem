@@ -10,5 +10,8 @@
   "technique": "Technique",
   "theory": "Theory",
   "hearing": "Hearing",
-  "creative": "Creative work"
+  "creative": "Creative work",
+  "earned_points": "You heve got points",
+  "ranking_place": "Place in the ranking",
+  "hey": "Hey"
 }
