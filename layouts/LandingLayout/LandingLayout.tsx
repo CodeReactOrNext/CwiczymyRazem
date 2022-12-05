@@ -3,12 +3,14 @@ import Wrapper from "./components/Wrapper";
 import Statistic, { StatisticProps } from "./components/Statistic";
 import LandingNav, { LandingNavProps } from "./components/LandingNav";
 import StatisticBar from "./components/StatisticBar";
-import UserHeaderMobile from "./components/UserHeaderMobile";
+import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
+import MobileHeaderWrapper from "./components/UserHeader/MobileHeaderWrapper";
 import AchievementBox from "./components/AchievementBox";
-import UserHeaderDesktop from "./components/UserHeaderDesktop";
+
 import Decoration from "./components/Decoration";
 import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
+import UserHeader from "./components/UserHeader/UserHeader";
 
 interface LandingLayoutProps {
   statistics: StatisticProps[];
@@ -38,8 +40,12 @@ export default function LandingLayout({
           className={`bg-main-opposed-500"  relative flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-y-auto
           overflow-x-hidden scrollbar-hide`}>
           <Wrapper>
-            <UserHeaderDesktop />
-            <UserHeaderMobile />
+            <DesktopHeaderWrapper>
+              <MobileHeaderWrapper>
+                <UserHeader />
+              </MobileHeaderWrapper>
+            </DesktopHeaderWrapper>
+    
             <LandingNav
               leftSideLinks={navigation.leftSideLinks}
               rightSideLinks={navigation.rightSideLinks}
