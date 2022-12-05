@@ -1,4 +1,4 @@
-import { selectUserData } from "feature/user/store/userSlice";
+import { selectUserData, selectUserName } from "feature/user/store/userSlice";
 import LandingLayout from "layouts/LandingLayout";
 import { LandingNavProps } from "layouts/LandingLayout/components/LandingNav";
 import { StatisticProps } from "layouts/LandingLayout/components/Statistic";
@@ -16,6 +16,7 @@ import { useAppSelector } from "store/hooks";
 
 const LandingView = () => {
   const userStats = useAppSelector(selectUserData);
+  const userName = useAppSelector(selectUserName);
   const {
     points,
     sessionCount,
@@ -96,6 +97,7 @@ const LandingView = () => {
       statistics={statistics}
       navigation={navigation}
       userStats={userStats!}
+      userName={userName!}
     />
   );
 };

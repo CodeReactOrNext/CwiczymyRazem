@@ -12,10 +12,9 @@ export const WelcomeMessage = ({
 }: WelocmeMessageProps) => {
   const { t } = useTranslation("landing");
   return (
-    <div className='text-lg sm:text-2xl lg:text-xl xl:text-2xl'>
-      <p className='text-2xl sm:text-4xl lg:text-xl  xl:text-xl  '>
-        {t("hey")}
-        <span className='text-mainText'>{userName}!</span>
+    <div className='text:xs xxs:text-base sm:text-2xl md:text-base lg:text-xl xl:text-2xl'>
+      <p className=' xs:text-lg md:text-xl lg:text-2xl xl:text-3xl  '>
+        {t("hey")} <span className='text-mainText'>{userName}!</span>
       </p>
       <p>
         {t("ranking_place")} <span className='text-mainText'>{place}</span>

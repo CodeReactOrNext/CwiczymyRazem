@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 export const Level = ({ points, lvl }: { points: number; lvl: number }) => {
   const { t } = useTranslation("landing");
   return (
-    <div className=' flex flex-col items-center lg:w-64 lg:justify-self-end xl:w-80'>
+    <div className='col-span-2 flex flex-col items-center md:col-auto lg:w-64 lg:justify-self-end xl:w-80'>
       <p>
         {t("your_level")} <span className='text-4xl text-mainText'>{lvl}</span>
       </p>
