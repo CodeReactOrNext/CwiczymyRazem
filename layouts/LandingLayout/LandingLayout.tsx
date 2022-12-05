@@ -7,16 +7,30 @@ import UserHeaderMobile from "./components/UserHeaderMobile";
 import AchievementBox from "./components/AchievementBox";
 import UserHeaderDesktop from "./components/UserHeaderDesktop";
 import Decoration from "./components/Decoration";
+import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { useTranslation } from "react-i18next";
 
 interface LandingLayoutProps {
   statistics: StatisticProps[];
   navigation: LandingNavProps;
+  userStats: statisticsDataInterface;
 }
 
 export default function LandingLayout({
   statistics,
   navigation,
+  userStats,
 }: LandingLayoutProps) {
+  const { t } = useTranslation("landing");
+  const {
+    points,
+    sessionCount,
+    habitsCount,
+    achivments,
+    time,
+    dayWithoutBreak,
+    maxPoints,
+  } = userStats;
   return (
     <main className='h-screen min-h-[600px] p-4 font-sans md:min-h-[900px] lg:p-8 '>
       <div className='relative flex h-full w-full items-center justify-center'>
@@ -34,8 +48,10 @@ export default function LandingLayout({
               <Decoration />
               <div className='grid-cols-2 grid-rows-2 items-center md:grid'>
                 <div className=' order-2 row-span-2 my-5 flex justify-center '>
-                  <StatisticBar /> <StatisticBar /> <StatisticBar />
-                  <StatisticBar />
+                  <StatisticBar title={t("technique")} value={time.technique} />
+                  <StatisticBar title={t("theory")} value={time.theory} />
+                  <StatisticBar title={t("hearing")} value={time.hearing} />
+                  <StatisticBar title={t("creative")} value={time.creativity} />
                 </div>
                 <div className=' row-cols-1  order-1'>
                   {statistics.map(({ Icon, description, value }, index) => (

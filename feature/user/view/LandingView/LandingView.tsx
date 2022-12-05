@@ -1,4 +1,3 @@
-
 import { selectUserData } from "feature/user/store/userSlice";
 import LandingLayout from "layouts/LandingLayout";
 import { LandingNavProps } from "layouts/LandingLayout/components/LandingNav";
@@ -15,7 +14,6 @@ import {
 } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
-
 const LandingView = () => {
   const userStats = useAppSelector(selectUserData);
   const {
@@ -31,17 +29,17 @@ const LandingView = () => {
   const statistics: StatisticProps[] = [
     {
       Icon: FaClock,
-      description: "Łącznie spędziłeś na ćwiczeniach:",
-      value: "21:32h",
+      description: "Łącznie spędziłeś na ćwiczeniach: ",
+      value: time.technique + time.theory + time.creativity + time.hearing,
     },
     {
       Icon: FaGuitar,
-      description: "Liczba sesji",
+      description: "Liczba sesji: ",
       value: sessionCount,
     },
     {
       Icon: FaStar,
-      description: "Punktów",
+      description: "Punktów: ",
       value: points,
     },
     {
@@ -93,7 +91,13 @@ const LandingView = () => {
       },
     ],
   };
-  return <LandingLayout statistics={statistics} navigation={navigation} />;
+  return (
+    <LandingLayout
+      statistics={statistics}
+      navigation={navigation}
+      userStats={userStats!}
+    />
+  );
 };
 
 export default LandingView;
