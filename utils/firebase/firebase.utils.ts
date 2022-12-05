@@ -38,13 +38,12 @@ export const createUserDocumentFromAuth = async (userAuth: User) => {
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
-    const statisticsData = JSON.stringify(statistics);
     try {
       await setDoc(userDocRef, {
         displayName,
         email,
         createdAt,
-        statisticsData,
+        statistics,
       });
     } catch (error) {
       console.log(error);
