@@ -1,13 +1,16 @@
 import Avatar from "components/Avatar";
 import Logo from "components/Logo";
-import { selectUserAuth, selectUserData } from "feature/user/store/userSlice";
+import {
+  logOut,
+  selectUserAuth,
+  selectUserData,
+} from "feature/user/store/userSlice";
 import Link from "next/link";
 import Lightning from "public/static/images/svg/Lightning";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 export default function UserHeaderDesktop() {
-  const userData = useAppSelector(selectUserData);
-  console.log(userData);
+  const dispatch = useAppDispatch();
   return (
     <div className='z-30  mb-4  hidden h-48 w-full  grid-cols-3 grid-rows-1 items-center justify-between bg-second p-4 text-xl text-tertiary md:grid lg:px-8 '>
       <div className='flex flex-col items-start space-x-2 space-y-2 text-lg '>
@@ -19,7 +22,9 @@ export default function UserHeaderDesktop() {
               <Link href='/settings'>
                 <button>Edytuj</button>
               </Link>
-              <button className='ml-3'>Wyloguj </button>
+              <button onClick={() => dispatch(logOut())} className='ml-3'>
+                Wyloguj
+              </button>
             </div>
           </div>
           <div className='text-base  lg:text-xl xl:text-2xl'>
