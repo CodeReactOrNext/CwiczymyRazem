@@ -8,6 +8,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { User } from "firebase/auth";
+import { statistics } from "./userStatisticsInitialData";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
@@ -28,7 +29,6 @@ provider.setCustomParameters({
 
 export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
 export const auth = getAuth();
-
 export const db = getFirestore();
 
 export const createUserDocumentFromAuth = async (userAuth: User) => {
@@ -43,11 +43,17 @@ export const createUserDocumentFromAuth = async (userAuth: User) => {
         displayName,
         email,
         createdAt,
+        statistics,
       });
     } catch (error) {
       console.log(error);
     }
   }
-
   return userAuth.uid;
+};
+
+export const getUserData = async (userAuth: string) => {
+  const userDocRef = doc(db, "users", userAuth);
+  const userSnapshot = await getDoc(userDocRef);
+  return userSnapshot.data()!.statistics;
 };

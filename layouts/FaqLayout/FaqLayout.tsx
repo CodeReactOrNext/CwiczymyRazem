@@ -2,13 +2,13 @@ import MainLayout from "layouts/MainLayout";
 import { useTranslation } from "react-i18next";
 import FaqBox from "./components/FaqBox";
 
-export interface faqQuestionType {
+export interface faqQuestionInterface {
   title: string;
   message: string;
 }
 
 interface FaqLayoutProps {
-  faqQuestion: faqQuestionType[];
+  faqQuestion: faqQuestionInterface[];
 }
 
 const FaqLayout = ({ faqQuestion }: FaqLayoutProps) => {
