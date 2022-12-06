@@ -1,14 +1,17 @@
-import { useTranslation } from "react-i18next";
-import Button from "components/Button";
-import Input from "components/Input";
-import MainLayout from "layouts/MainLayout";
-import { logInViaGoogle } from "../../store/userSlice";
-import { FaUserAlt, FaLock } from "react-icons/fa";
-import GoogleButton from "components/GoogleButton";
-import FormLayout from "layouts/FormLayout";
 import Link from "next/link";
 import Router from "next/router";
+import { useTranslation } from "react-i18next";
+import { logInViaGoogle } from "../../store/userSlice";
 import { useAppDispatch } from "store/hooks";
+import { FaUserAlt, FaLock } from "react-icons/fa";
+import MainLayout from "layouts/MainLayout";
+import FormLayout from "layouts/FormLayout";
+import Button from "components/Button";
+import GoogleButton from "components/GoogleButton";
+import Input from "components/Input";
+
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 const LoginView = () => {
   const { t } = useTranslation(["common", "login"]);
@@ -16,7 +19,6 @@ const LoginView = () => {
 
   const googleLogInHandler = () => {
     dispatch(logInViaGoogle());
-   
   };
 
   return (
