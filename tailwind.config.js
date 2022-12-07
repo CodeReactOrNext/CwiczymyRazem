@@ -1,4 +1,3 @@
-
 const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
 /** @type {import('tailwindcss').Config} */
@@ -96,7 +95,7 @@ module.exports = {
         achievements: {
           common: "#fff",
           rare: "#b1f9ff",
-          veryRare: "#ffe54c"
+          veryRare: "#ffe54c",
         },
         mainText: { DEFAULT: "#ffff" },
         main: {
@@ -151,6 +150,19 @@ module.exports = {
           800: "#d7ba7a",
           900: "#cdb070",
         },
+        error: {
+          DEFAULT: "#d1002e",
+          50: "#e88097",
+          100: "#e36682",
+          200: "#df4d6d",
+          300: "#da3358",
+          400: "#d61a43",
+          500: "#d1002e",
+          600: "#bc0029",
+          700: "#a70025",
+          800: "#920020",
+          900: "#7d001c",
+        },
       },
     },
     fontFamily: {
@@ -159,7 +171,7 @@ module.exports = {
   },
   plugins: [
     require("prettier-plugin-tailwindcss"),
-    require('tailwind-scrollbar'),
+    require("tailwind-scrollbar"),
     rotateX,
     rotateY,
     scrollbarHide,
