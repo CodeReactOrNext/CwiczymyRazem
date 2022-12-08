@@ -22,11 +22,11 @@ const LeadboardColumn = ({ place, nick }: LeadboardColumnProps) => {
       </p>
       <div className=' ml-2 flex w-full max-w-[800px] items-center md:h-16 xl:ml-5 '>
         <div className='hidden md:block'>
-          <Avatar user={{ name: nick, avatar: undefined }} />
+        <Avatar name='Dummy name' lvl={28} />
         </div>
         <div className=' mr-5 grid w-full grid-cols-3 grid-rows-3 justify-items-center  bg-second bg-opacity-75 px-2 md:h-16 md:grid-rows-1'>
           <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
-            <Avatar user={{ name: nick, avatar: undefined }} />
+          <Avatar name='Dummy name' lvl={28} />
             <div className='absolute top-[5px] right-[-60px] flex  items-center gap-x-1 '>
               <p className='text-xl uppercase text-tertiary'>Lvl </p>
               <p className='text-3xl text-main '>34</p>
