@@ -10,7 +10,11 @@ export default SignUpPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", ["common", "signup"])),
+      ...(await serverSideTranslations(locale ?? "pl", [
+        "common",
+        "signup",
+        "yup_errors",
+      ])),
     },
   };
 }
