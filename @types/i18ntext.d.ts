@@ -16,6 +16,7 @@ import type faq from "../public/locales/en/faq.json";
 import type report from "../public/locales/en/report.json";
 import type achievements from "../public/locales/en/achievements.json";
 import type not_found from "../public/locales/en/404.json";
+import type yup_errors from "../public/locales/en/yup_errors.json";
 
 interface I18nNamespaces {
   common: typeof common;
@@ -27,6 +28,7 @@ interface I18nNamespaces {
   report: typeof report;
   achievements: typeof achievements;
   "404": typeof not_found;
+  yup_errors: typeof yup_errors;
 }
 // interface I18nNamespaces
 //   extends common,

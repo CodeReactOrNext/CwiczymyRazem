@@ -1,5 +1,7 @@
 import { useField } from "formik";
+import { useTranslation } from "react-i18next";
 import { IconType } from "react-icons/lib";
+import { TFuncKey } from "i18next";
 
 export interface InputProps {
   Icon?: IconType;
@@ -7,6 +9,11 @@ export interface InputProps {
   id?: string;
   name: string;
   type?: string;
+}
+
+function ErrorWrapper({ error }: { error: TFuncKey }) {
+  const { t } = useTranslation();
+  return <>{t(error)}</>;
 }
 
 const Input = ({ Icon, placeholder, id, name, type = "text" }: InputProps) => {
@@ -32,7 +39,7 @@ const Input = ({ Icon, placeholder, id, name, type = "text" }: InputProps) => {
       />
       {meta.touched && meta.error ? (
         <div className='error absolute  right-0 -bottom-5 font-medium'>
-          {meta.error}
+          <ErrorWrapper error={meta.error as TFuncKey} />
         </div>
       ) : null}
     </div>

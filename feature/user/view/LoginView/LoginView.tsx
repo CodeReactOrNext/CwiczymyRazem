@@ -5,7 +5,7 @@ import { loginSchema } from "schemas/login";
 import { useTranslation } from "react-i18next";
 import { logInViaGoogle } from "../../store/userSlice";
 import { useAppDispatch } from "store/hooks";
-import { FaUserAlt, FaLock } from "react-icons/fa";
+import { FaAt, FaLock } from "react-icons/fa";
 import MainLayout from "layouts/MainLayout";
 import FormLayout from "layouts/FormLayout";
 import Button from "components/Button";
@@ -40,8 +40,8 @@ const LoginView = () => {
             <>
               <Input
                 name='email'
-                Icon={FaUserAlt}
-                placeholder={t("common:input.login")}
+                Icon={FaAt}
+                placeholder={t("common:input.email")}
               />
               <Input
                 name='password'
