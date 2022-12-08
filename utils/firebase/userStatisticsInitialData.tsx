@@ -23,7 +23,7 @@ export const statistics: statisticsDataInterface = {
     creativity: 0,
     longestSession: 0,
   },
-  lvl: 0,
+  lvl: 1,
   points: 0,
   sessionCount: 0,
   habitsCount: 0,
