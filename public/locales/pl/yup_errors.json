@@ -1,0 +1,7 @@
+{
+  "valid_email": "Podaj poprawny email",
+  "stronger_password": "Podaj silniejsze hasło",
+  "password_char_number": "Hasło musi mieć conajmniej 8 znaków",
+  "required": "Wymagane",
+  "same_passwords": "Hasła muszą być takie same"
+}
