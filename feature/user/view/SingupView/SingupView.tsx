@@ -42,11 +42,13 @@ const SingupView = () => {
                 name={"email"}
               />
               <Input
+                type='password'
                 Icon={FaLock}
                 placeholder={t("common:input.password")}
                 name={"password"}
               />
               <Input
+                type='password'
                 Icon={FaLock}
                 placeholder={t("common:input.repeat_password")}
                 name={"repeat_password"}
