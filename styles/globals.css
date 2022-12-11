@@ -106,3 +106,7 @@ a {
     animation: shake 3s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.57);
   }
 }
+
+.toastify-custom {
+  border-radius: 0 !important;
+}
