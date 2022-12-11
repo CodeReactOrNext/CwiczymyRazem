@@ -1,14 +1,22 @@
-import { ButtonHTMLAttributes } from "react";
+import React, { ButtonHTMLAttributes } from "react";
 
 interface ButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  children: string;
+  children: React.ReactNode;
   variant?: "primary" | "secondary";
   style?: string;
   type?: "submit" | "reset" | "button";
+  otherProps?: React.ReactNode;
 }
 
-const Button = ({ onClick, variant, children, style, type }: ButtonProps) => {
+const Button = ({
+  onClick,
+  variant,
+  children,
+  style,
+  type,
+  ...otherProps
+}: ButtonProps) => {
   return (
     <button
       type={type}
@@ -19,7 +27,8 @@ const Button = ({ onClick, variant, children, style, type }: ButtonProps) => {
           ? "bg-main-opposed hover:bg-main-opposed-100"
           : "bg-main hover:bg-main-100") +
         (style ? style : "")
-      }>
+      }
+      {...otherProps}>
       {children}
     </button>
   );
