@@ -3,7 +3,7 @@ import Router from "next/router";
 import { Formik, Form } from "formik";
 import { loginSchema } from "schemas/login";
 import { useTranslation } from "react-i18next";
-import { logInViaGoogle } from "../../store/userSlice";
+import { logInViaEmail, logInViaGoogle } from "../../store/userSlice";
 import { useAppDispatch } from "store/hooks";
 import { FaAt, FaLock } from "react-icons/fa";
 import MainLayout from "layouts/MainLayout";
@@ -20,8 +20,8 @@ const LoginView = () => {
     dispatch(logInViaGoogle());
   };
 
-  function onSubmit() {
-    console.log("submitted");
+  function onSubmit({ email, password }: { email: string; password: string }) {
+    dispatch(logInViaEmail({ email, password }));
   }
 
   const formikInitialValues = {
@@ -50,7 +50,7 @@ const LoginView = () => {
                 placeholder={t("common:input.password")}
               />
               <div className='flex space-x-1 '>
-                <Button>{t("common:button.sign_in")}</Button>
+                <Button type='submit'>{t("common:button.sign_in")}</Button>
                 <Link href='/signup'>
                   <a>
                     <Button variant='secondary'>
