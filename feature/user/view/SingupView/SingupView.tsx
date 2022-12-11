@@ -11,8 +11,15 @@ import Input from "components/Input";
 const SingupView = () => {
   const { t } = useTranslation(["common", "signup"]);
 
-  function onSubmit() {
-    console.log("submitted");
+  const dispatch = useDispatch();
+
+  function onSubmit(formData: {
+    login: string;
+    email: string;
+    password: string;
+    repeat_password: string;
+  }) {
+    console.log(formData);
   }
 
   const formikInitialValues = {
@@ -54,7 +61,7 @@ const SingupView = () => {
                 name={"repeat_password"}
               />
               <div className='flex space-x-1 '>
-                <Button>{t("common:button.sign_up")}</Button>
+                <Button type='submit'>{t("common:button.sign_up")}</Button>
               </div>
             </>
           </FormLayout>
