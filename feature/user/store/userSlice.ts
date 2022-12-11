@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import Router from "next/router";
+import { toast } from "react-toastify";
 import {
   createUserDocumentFromAuth,
   getUserData,
@@ -13,10 +14,12 @@ const initialState: {
   userAuth: string | null;
   userInfo: User | null;
   userData: statisticsDataInterface | null;
+  error: string | null;
 } = {
   userInfo: null,
   userAuth: null,
   userData: null,
+  error: null,
 };
 
 export const logInViaGoogle = createAsyncThunk(
@@ -54,9 +57,16 @@ export const userSlice = createSlice({
         state.userAuth = action.payload.userAuth;
         Router.push("/");
       })
-      .addCase(logInViaGoogle.rejected, (state, action) => {
-        //errorr handling
-        console.log(action.payload);
+      .addCase(logInViaGoogle.rejected, (state, { error }) => {
+        if (error.code === "auth/popup-closed-by-user") {
+          toast.error("Nie udało się zalogować - zamknięto okno logowania ");
+          return;
+        }
+        if (error.code === "auth/timeout") {
+          toast.error("Nie udało się zalogować - błąd połączenia");
+          return;
+        }
+        toast.error("Nie udało się zalogować");
       });
   },
 });
