@@ -1,4 +1,5 @@
 import { selectUserData, selectUserName } from "feature/user/store/userSlice";
+import { convertMsToHM } from "helpers/timeConverter";
 import LandingLayout from "layouts/LandingLayout";
 import { LandingNavProps } from "layouts/LandingLayout/components/LandingNav";
 import { StatisticProps } from "layouts/LandingLayout/components/Statistic";
@@ -31,7 +32,9 @@ const LandingView = () => {
     {
       Icon: FaClock,
       description: "Łącznie spędziłeś na ćwiczeniach: ",
-      value: time.technique + time.theory + time.creativity + time.hearing,
+      value: convertMsToHM(
+        time.technique + time.theory + time.creativity + time.hearing
+      ),
     },
     {
       Icon: FaGuitar,
@@ -56,7 +59,7 @@ const LandingView = () => {
     {
       Icon: FaDumbbell,
       description: "Najdłuższa sesja: ",
-      value: time.longestSession,
+      value: convertMsToHM(time.longestSession),
     },
     {
       Icon: FaCalendarDay,
