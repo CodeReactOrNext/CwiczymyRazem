@@ -14,11 +14,13 @@ const initialState: {
   userAuth: string | null;
   userInfo: User | null;
   userData: statisticsDataInterface | null;
+  isFetching: boolean;
   error: string | null;
 } = {
   userInfo: null,
   userAuth: null,
   userData: null,
+  isFetching: false,
   error: null,
 };
 
@@ -49,15 +51,18 @@ export const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(logInViaGoogle.pending, (state) => {
-        //Loadgin Screen
+        state.isFetching = true;
       })
       .addCase(logInViaGoogle.fulfilled, (state, action) => {
+        state.isFetching = false;
         state.userInfo = action.payload.user;
         state.userData = action.payload.userData;
         state.userAuth = action.payload.userAuth;
         Router.push("/");
+        
       })
       .addCase(logInViaGoogle.rejected, (state, { error }) => {
+        state.isFetching = false;
         if (error.code === "auth/popup-closed-by-user") {
           toast.error("Nie udało się zalogować - zamknięto okno logowania ");
           return;
@@ -73,6 +78,7 @@ export const userSlice = createSlice({
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
 export const selectUserData = (state: RootState) => state.user.userData;
+export const selectIsFetching = (state: RootState) => state.user.isFetching;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo!.displayName;
 export const { logOut, addUserAuth, addUserData } = userSlice.actions;
