@@ -1,9 +1,11 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import Router from "next/router";
 import {
   createUserDocumentFromAuth,
   getUserData,
+  getUserName,
+  signInWithEmail,
   signInWithGooglePopup,
 } from "utils/firebase/firebase.utils";
 import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
@@ -29,6 +31,17 @@ export const logInViaGoogle = createAsyncThunk(
   }
 );
 
+export const logInViaEmail = createAsyncThunk(
+  "user/loginViaEmail",
+  async ({ email, password }: { email: string; password: string }) => {
+    const { user } = await signInWithEmail(email, password);
+    const userAuth = await createUserDocumentFromAuth(user);
+    const userName = await getUserName(userAuth);
+    const userData = await getUserData(userAuth);
+    return { user: { ...user, displayName: userName }, userAuth, userData };
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -45,26 +58,35 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(logInViaGoogle.pending, (state) => {
-        //Loadgin Screen
-      })
-      .addCase(logInViaGoogle.fulfilled, (state, action) => {
-        state.userInfo = action.payload.user;
-        state.userData = action.payload.userData;
-        state.userAuth = action.payload.userAuth;
-        Router.push("/");
-      })
-      .addCase(logInViaGoogle.rejected, (state, action) => {
-        //errorr handling
-        console.log(action.payload);
-      });
+      .addMatcher(
+        isAnyOf(logInViaGoogle.pending, logInViaEmail.pending),
+        (state) => {
+          //Loadgin Screen
+        }
+      )
+      .addMatcher(
+        isAnyOf(logInViaGoogle.fulfilled, logInViaEmail.fulfilled),
+        (state, action) => {
+          state.userInfo = action.payload.user;
+          state.userData = action.payload.userData;
+          state.userAuth = action.payload.userAuth;
+          Router.push("/");
+        }
+      )
+      .addMatcher(
+        isAnyOf(logInViaGoogle.fulfilled, logInViaEmail.fulfilled),
+        (state, action) => {
+          //errorr handling
+          console.log(action.payload);
+        }
+      );
   },
 });
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
 export const selectUserData = (state: RootState) => state.user.userData;
 export const selectUserName = (state: RootState) =>
-  state.user.userInfo!.displayName;
+  state.user.userInfo?.displayName;
 export const { logOut, addUserAuth, addUserData } = userSlice.actions;
 
 export default userSlice.reducer;
