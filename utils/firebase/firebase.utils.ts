@@ -42,7 +42,6 @@ export const signInWithEmail = (email: string, password: string) =>
 export const createUserDocumentFromAuth = async (userAuth: User) => {
   const userDocRef = doc(db, "users", userAuth.uid);
   const userSnapshot = await getDoc(userDocRef);
-
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
