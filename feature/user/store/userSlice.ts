@@ -72,6 +72,10 @@ export const userSlice = createSlice({
         }
         toast.error("Nie udało się zalogować");
       })
+      .addCase(logInViaEmail.rejected, (state, { error }) => {
+        //errorr handling
+        console.log(error);
+      })
       .addMatcher(
         isAnyOf(logInViaGoogle.pending, logInViaEmail.pending),
         (state) => {
@@ -85,13 +89,6 @@ export const userSlice = createSlice({
           state.userData = action.payload.userData;
           state.userAuth = action.payload.userAuth;
           Router.push("/");
-        }
-      )
-      .addMatcher(
-        isAnyOf(logInViaGoogle.fulfilled, logInViaEmail.fulfilled),
-        (state, action) => {
-          //errorr handling
-          console.log(action.payload);
         }
       );
   },
