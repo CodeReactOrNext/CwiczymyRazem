@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
-import { error } from "console";
 import { User } from "firebase/auth";
 import Router from "next/router";
 import { toast } from "react-toastify";
@@ -71,8 +70,20 @@ export const userSlice = createSlice({
         state.isFetching = "email";
       })
       .addCase(logInViaEmail.rejected, (state, { error }) => {
-        //errorr handling
-        console.log(error);
+        state.isFetching = null;
+        if (error.code === "auth/wrong-password") {
+          toast.error("Błędne hasło");
+          return;
+        }
+        if (error.code === "auth/user-not-found") {
+          toast.error("Błędny adres e-mail");
+          return;
+        }
+        if (error.code === "auth/timeout") {
+          toast.error("Nie udało się zalogować - błąd połączenia");
+          return;
+        }
+        toast.error("Nie udało się zalogować");
       })
       .addCase(logInViaGoogle.rejected, (state, { error }) => {
         state.isFetching = null;
