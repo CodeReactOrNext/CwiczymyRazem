@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
+import { error } from "console";
 import { User } from "firebase/auth";
 import Router from "next/router";
 import { toast } from "react-toastify";
@@ -16,13 +17,13 @@ const initialState: {
   userAuth: string | null;
   userInfo: User | null;
   userData: statisticsDataInterface | null;
-  isFetching: boolean;
+  isFetching: "google" | "email" | null;
   error: string | null;
 } = {
   userInfo: null,
   userAuth: null,
   userData: null,
-  isFetching: false,
+  isFetching: null,
   error: null,
 };
 
@@ -63,8 +64,18 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(logInViaGoogle.pending, (state) => {
+        state.isFetching = "google";
+      })
+      .addCase(logInViaEmail.pending, (state) => {
+        state.isFetching = "email";
+      })
+      .addCase(logInViaEmail.rejected, (state, { error }) => {
+        //errorr handling
+        console.log(error);
+      })
       .addCase(logInViaGoogle.rejected, (state, { error }) => {
-        state.isFetching = false;
+        state.isFetching = null;
         if (error.code === "auth/popup-closed-by-user") {
           toast.error("Nie udało się zalogować - zamknięto okno logowania ");
           return;
@@ -75,19 +86,10 @@ export const userSlice = createSlice({
         }
         toast.error("Nie udało się zalogować");
       })
-      .addCase(logInViaEmail.rejected, (state, { error }) => {
-        //errorr handling
-        console.log(error);
-      })
-      .addMatcher(
-        isAnyOf(logInViaGoogle.pending, logInViaEmail.pending),
-        (state) => {
-          //Loadgin Screen
-        }
-      )
       .addMatcher(
         isAnyOf(logInViaGoogle.fulfilled, logInViaEmail.fulfilled),
         (state, action) => {
+          state.isFetching = null;
           state.userInfo = action.payload.user;
           state.userData = action.payload.userData;
           state.userAuth = action.payload.userAuth;
