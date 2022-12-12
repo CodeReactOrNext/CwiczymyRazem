@@ -3,14 +3,19 @@ import Router from "next/router";
 import { Formik, Form } from "formik";
 import { loginSchema } from "schemas/login";
 import { useTranslation } from "react-i18next";
-import { logInViaEmail, logInViaGoogle } from "../../store/userSlice";
-import { useAppDispatch } from "store/hooks";
+import {
+  logInViaEmail,
+  logInViaGoogle,
+  selectIsFetching,
+} from "../../store/userSlice";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 import { FaAt, FaLock } from "react-icons/fa";
 import MainLayout from "layouts/MainLayout";
 import FormLayout from "layouts/FormLayout";
 import Button from "components/Button";
 import GoogleButton from "components/GoogleButton";
 import Input from "components/Input";
+import { CircleSpinner } from "react-spinners-kit";
 
 const LoginView = () => {
   const { t } = useTranslation(["common", "login"]);
@@ -19,6 +24,8 @@ const LoginView = () => {
   const googleLogInHandler = () => {
     dispatch(logInViaGoogle());
   };
+
+  const isFetching = useAppSelector(selectIsFetching) === "email";
 
   function onSubmit({ email, password }: { email: string; password: string }) {
     dispatch(logInViaEmail({ email, password }));
@@ -50,7 +57,15 @@ const LoginView = () => {
                 placeholder={t("common:input.password")}
               />
               <div className='flex space-x-1 '>
-                <Button type='submit'>{t("common:button.sign_in")}</Button>
+                <Button type='submit'>
+                  {isFetching ? (
+                    <div className='px-3'>
+                      <CircleSpinner size='24' />
+                    </div>
+                  ) : (
+                    t("common:button.sign_in")
+                  )}
+                </Button>
                 <Link href='/signup'>
                   <a>
                     <Button variant='secondary'>

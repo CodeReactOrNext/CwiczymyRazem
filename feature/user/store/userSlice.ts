@@ -16,13 +16,13 @@ const initialState: {
   userAuth: string | null;
   userInfo: User | null;
   userData: statisticsDataInterface | null;
-  isFetching: boolean;
+  isFetching: "google" | "email" | null;
   error: string | null;
 } = {
   userInfo: null,
   userAuth: null,
   userData: null,
-  isFetching: false,
+  isFetching: null,
   error: null,
 };
 
@@ -63,8 +63,30 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(logInViaGoogle.pending, (state) => {
+        state.isFetching = "google";
+      })
+      .addCase(logInViaEmail.pending, (state) => {
+        state.isFetching = "email";
+      })
+      .addCase(logInViaEmail.rejected, (state, { error }) => {
+        state.isFetching = null;
+        if (error.code === "auth/wrong-password") {
+          toast.error("Błędne hasło");
+          return;
+        }
+        if (error.code === "auth/user-not-found") {
+          toast.error("Błędny adres e-mail");
+          return;
+        }
+        if (error.code === "auth/timeout") {
+          toast.error("Nie udało się zalogować - błąd połączenia");
+          return;
+        }
+        toast.error("Nie udało się zalogować");
+      })
       .addCase(logInViaGoogle.rejected, (state, { error }) => {
-        state.isFetching = false;
+        state.isFetching = null;
         if (error.code === "auth/popup-closed-by-user") {
           toast.error("Nie udało się zalogować - zamknięto okno logowania ");
           return;
@@ -75,19 +97,10 @@ export const userSlice = createSlice({
         }
         toast.error("Nie udało się zalogować");
       })
-      .addCase(logInViaEmail.rejected, (state, { error }) => {
-        //errorr handling
-        console.log(error);
-      })
-      .addMatcher(
-        isAnyOf(logInViaGoogle.pending, logInViaEmail.pending),
-        (state) => {
-          //Loadgin Screen
-        }
-      )
       .addMatcher(
         isAnyOf(logInViaGoogle.fulfilled, logInViaEmail.fulfilled),
         (state, action) => {
+          state.isFetching = null;
           state.userInfo = action.payload.user;
           state.userData = action.payload.userData;
           state.userAuth = action.payload.userAuth;

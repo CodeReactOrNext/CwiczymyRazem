@@ -10,7 +10,7 @@ interface GoogleButtonProps {
 }
 
 const GoogleButton = ({ onClick, children }: GoogleButtonProps) => {
-  const isFetching = useAppSelector(selectIsFetching);
+  const isFetching = useAppSelector(selectIsFetching) === "google";
   return (
     <button
       onClick={onClick}
