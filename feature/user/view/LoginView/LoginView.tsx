@@ -4,6 +4,7 @@ import { Formik, Form } from "formik";
 import { loginSchema } from "schemas/login";
 import { useTranslation } from "react-i18next";
 import {
+  logInCredentials,
   logInViaEmail,
   logInViaGoogle,
   selectIsFetching,
@@ -27,8 +28,8 @@ const LoginView = () => {
 
   const isFetching = useAppSelector(selectIsFetching) === "email";
 
-  function onSubmit({ email, password }: { email: string; password: string }) {
-    dispatch(logInViaEmail({ email, password }));
+  function onSubmit(credentials: logInCredentials) {
+    dispatch(logInViaEmail(credentials));
   }
 
   const formikInitialValues = {
