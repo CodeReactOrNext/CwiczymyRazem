@@ -12,13 +12,21 @@ import {
 } from "utils/firebase/firebase.utils";
 import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
-import { loginViaEmailErrorHandler, loginViaGoogleErrorHandler } from "./userErrorsHadling";
+import {
+  createAccountErrorHandler,
+  loginViaEmailErrorHandler,
+  loginViaGoogleErrorHandler,
+} from "./userErrorsHandling";
 
+export interface logInCredentials {
+  email: string;
+  password: string;
+}
 const initialState: {
   userAuth: string | null;
   userInfo: User | null;
   userData: statisticsDataInterface | null;
-  isFetching: "google" | "email" | null;
+  isFetching: "google" | "email" | "createAccount" | null;
   error: string | null;
 } = {
   userInfo: null,
@@ -37,11 +45,6 @@ export const logInViaGoogle = createAsyncThunk(
     return { user, userAuth, userData };
   }
 );
-
-export interface logInCredentials {
-  email: string;
-  password: string;
-}
 
 export const logInViaEmail = createAsyncThunk(
   "user/loginViaEmail",
@@ -94,6 +97,9 @@ export const userSlice = createSlice({
       .addCase(logInViaEmail.pending, (state) => {
         state.isFetching = "email";
       })
+      .addCase(createAccount.pending, (state) => {
+        state.isFetching = "createAccount";
+      })
       .addCase(logInViaEmail.rejected, (state, { error }) => {
         state.isFetching = null;
         loginViaEmailErrorHandler(error);
@@ -101,6 +107,10 @@ export const userSlice = createSlice({
       .addCase(logInViaGoogle.rejected, (state, { error }) => {
         state.isFetching = null;
         loginViaGoogleErrorHandler(error);
+      })
+      .addCase(createAccount.rejected, (state, { error }) => {
+        state.isFetching = null;
+        createAccountErrorHandler(error);
       })
       .addMatcher(
         isAnyOf(
