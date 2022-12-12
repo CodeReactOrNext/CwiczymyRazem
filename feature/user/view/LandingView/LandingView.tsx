@@ -22,7 +22,7 @@ const LandingView = () => {
     points,
     sessionCount,
     habitsCount,
-    achivments,
+    achievments,
     time,
     dayWithoutBreak,
     maxPoints,
@@ -54,7 +54,7 @@ const LandingView = () => {
     {
       Icon: FaMedal,
       description: "Odznaki: ",
-      value: achivments.length,
+      value: achievments.length,
     },
     {
       Icon: FaDumbbell,

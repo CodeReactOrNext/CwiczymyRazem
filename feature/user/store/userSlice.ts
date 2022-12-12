@@ -3,6 +3,7 @@ import { User } from "firebase/auth";
 import Router from "next/router";
 import { toast } from "react-toastify";
 import {
+  createAccountWithEmail,
   createUserDocumentFromAuth,
   getUserData,
   getUserName,
@@ -36,6 +37,11 @@ export const logInViaGoogle = createAsyncThunk(
   }
 );
 
+export interface logInCredentials {
+  email: string;
+  password: string;
+}
+
 export const logInViaEmail = createAsyncThunk(
   "user/loginViaEmail",
   async ({ email, password }: { email: string; password: string }) => {
@@ -44,6 +50,24 @@ export const logInViaEmail = createAsyncThunk(
     const userName = await getUserName(userAuth);
     const userData = await getUserData(userAuth);
     return { user: { ...user, displayName: userName }, userAuth, userData };
+  }
+);
+
+export interface signUpCredentials {
+  login: string;
+  email: string;
+  password: string;
+  repeat_password: string;
+}
+
+export const createAccount = createAsyncThunk(
+  "user/createAccount",
+  async ({ login, email, password, repeat_password }: signUpCredentials) => {
+    const { user } = await createAccountWithEmail(email, password);
+    const userWithDisplayName = { ...user, displayName: login };
+    const userAuth = await createUserDocumentFromAuth(userWithDisplayName);
+    const userData = await getUserData(userAuth);
+    return { user: userWithDisplayName, userAuth, userData };
   }
 );
 
@@ -98,7 +122,11 @@ export const userSlice = createSlice({
         toast.error("Nie udało się zalogować");
       })
       .addMatcher(
-        isAnyOf(logInViaGoogle.fulfilled, logInViaEmail.fulfilled),
+        isAnyOf(
+          logInViaGoogle.fulfilled,
+          logInViaEmail.fulfilled,
+          createAccount.fulfilled
+        ),
         (state, action) => {
           state.isFetching = null;
           state.userInfo = action.payload.user;
