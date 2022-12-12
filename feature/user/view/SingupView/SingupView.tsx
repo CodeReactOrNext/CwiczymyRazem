@@ -1,4 +1,3 @@
-import { useDispatch } from "react-redux";
 import Button from "components/Button";
 import { Form, Formik } from "formik";
 import { useTranslation } from "react-i18next";
@@ -7,19 +6,16 @@ import { FaUserAlt, FaLock, FaAt } from "react-icons/fa";
 import MainLayout from "layouts/MainLayout";
 import FormLayout from "layouts/FormLayout";
 import Input from "components/Input";
+import { createAccount, signUpCredentials } from "feature/user/store/userSlice";
+import { useAppDispatch } from "store/hooks";
 
 const SingupView = () => {
   const { t } = useTranslation(["common", "signup"]);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  function onSubmit(formData: {
-    login: string;
-    email: string;
-    password: string;
-    repeat_password: string;
-  }) {
-    console.log(formData);
+  function onSubmit(credentials: signUpCredentials) {
+    dispatch(createAccount(credentials));
   }
 
   const formikInitialValues = {

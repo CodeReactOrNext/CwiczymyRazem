@@ -12,7 +12,7 @@ export interface statisticsDataInterface {
   habitsCount: number;
   dayWithoutBreak: number;
   maxPoints: number;
-  achivments: [];
+  achievments: [];
 }
 
 export const statistics: statisticsDataInterface = {
@@ -29,5 +29,5 @@ export const statistics: statisticsDataInterface = {
   habitsCount: 0,
   dayWithoutBreak: 0,
   maxPoints: 0,
-  achivments: [],
+  achievments: [],
 };

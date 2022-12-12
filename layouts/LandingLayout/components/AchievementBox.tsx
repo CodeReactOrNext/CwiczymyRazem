@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { FaMedal, FaMarker } from "react-icons/fa";
 
 export interface AchievementBoxProps extends achievementsRarityType {
-  achivment?: string;
+  achievment?: string;
 }
 //Its placeholder. This need to be full dynamic.
 export default function AchievementBox({ rarity }: AchievementBoxProps) {
