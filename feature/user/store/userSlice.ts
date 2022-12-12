@@ -12,6 +12,7 @@ import {
 } from "utils/firebase/firebase.utils";
 import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
+import { loginViaEmailErrorHandler, loginViaGoogleErrorHandler } from "./userErrorsHadling";
 
 const initialState: {
   userAuth: string | null;
@@ -95,31 +96,11 @@ export const userSlice = createSlice({
       })
       .addCase(logInViaEmail.rejected, (state, { error }) => {
         state.isFetching = null;
-        if (error.code === "auth/wrong-password") {
-          toast.error("Błędne hasło");
-          return;
-        }
-        if (error.code === "auth/user-not-found") {
-          toast.error("Błędny adres e-mail");
-          return;
-        }
-        if (error.code === "auth/timeout") {
-          toast.error("Nie udało się zalogować - błąd połączenia");
-          return;
-        }
-        toast.error("Nie udało się zalogować");
+        loginViaEmailErrorHandler(error);
       })
       .addCase(logInViaGoogle.rejected, (state, { error }) => {
         state.isFetching = null;
-        if (error.code === "auth/popup-closed-by-user") {
-          toast.error("Nie udało się zalogować - zamknięto okno logowania ");
-          return;
-        }
-        if (error.code === "auth/timeout") {
-          toast.error("Nie udało się zalogować - błąd połączenia");
-          return;
-        }
-        toast.error("Nie udało się zalogować");
+        loginViaGoogleErrorHandler(error);
       })
       .addMatcher(
         isAnyOf(
