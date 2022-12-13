@@ -1,25 +1,29 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
-import { User } from "firebase/auth";
 import Router from "next/router";
-import { toast } from "react-toastify";
 import {
   createAccountWithEmail,
   createUserDocumentFromAuth,
   getUserData,
-  getUserName,
   signInWithEmail,
   signInWithGooglePopup,
 } from "utils/firebase/firebase.utils";
 import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
+import { signUpCredentials } from "../view/SingupView/SingupView";
+import {
+  createAccountErrorHandler,
+  loginViaEmailErrorHandler,
+  loginViaGoogleErrorHandler,
+} from "./userErrorsHandling";
 
-const initialState: {
+export interface userSliceInitialState {
   userAuth: string | null;
-  userInfo: User | null;
+  userInfo: { displayName: string } | null;
   userData: statisticsDataInterface | null;
-  isFetching: "google" | "email" | null;
+  isFetching: "google" | "email" | "createAccount" | null;
   error: string | null;
-} = {
+}
+const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
   userData: null,
@@ -33,41 +37,31 @@ export const logInViaGoogle = createAsyncThunk(
     const { user } = await signInWithGooglePopup();
     const userAuth = await createUserDocumentFromAuth(user);
     const userData = await getUserData(userAuth);
-    return { user, userAuth, userData };
+    const userName = user.displayName!;
+    return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
-
-export interface logInCredentials {
-  email: string;
-  password: string;
-}
 
 export const logInViaEmail = createAsyncThunk(
   "user/loginViaEmail",
   async ({ email, password }: { email: string; password: string }) => {
     const { user } = await signInWithEmail(email, password);
     const userAuth = await createUserDocumentFromAuth(user);
-    const userName = await getUserName(userAuth);
     const userData = await getUserData(userAuth);
-    return { user: { ...user, displayName: userName }, userAuth, userData };
+    const userName = user.displayName!;
+    return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
 
-export interface signUpCredentials {
-  login: string;
-  email: string;
-  password: string;
-  repeat_password: string;
-}
-
 export const createAccount = createAsyncThunk(
   "user/createAccount",
-  async ({ login, email, password, repeat_password }: signUpCredentials) => {
+  async ({ login, email, password }: signUpCredentials) => {
     const { user } = await createAccountWithEmail(email, password);
     const userWithDisplayName = { ...user, displayName: login };
     const userAuth = await createUserDocumentFromAuth(userWithDisplayName);
     const userData = await getUserData(userAuth);
-    return { user: userWithDisplayName, userAuth, userData };
+    const userName = userWithDisplayName.displayName;
+    return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
 
@@ -93,33 +87,20 @@ export const userSlice = createSlice({
       .addCase(logInViaEmail.pending, (state) => {
         state.isFetching = "email";
       })
+      .addCase(createAccount.pending, (state) => {
+        state.isFetching = "createAccount";
+      })
       .addCase(logInViaEmail.rejected, (state, { error }) => {
         state.isFetching = null;
-        if (error.code === "auth/wrong-password") {
-          toast.error("Błędne hasło");
-          return;
-        }
-        if (error.code === "auth/user-not-found") {
-          toast.error("Błędny adres e-mail");
-          return;
-        }
-        if (error.code === "auth/timeout") {
-          toast.error("Nie udało się zalogować - błąd połączenia");
-          return;
-        }
-        toast.error("Nie udało się zalogować");
+        loginViaEmailErrorHandler(error);
       })
       .addCase(logInViaGoogle.rejected, (state, { error }) => {
         state.isFetching = null;
-        if (error.code === "auth/popup-closed-by-user") {
-          toast.error("Nie udało się zalogować - zamknięto okno logowania ");
-          return;
-        }
-        if (error.code === "auth/timeout") {
-          toast.error("Nie udało się zalogować - błąd połączenia");
-          return;
-        }
-        toast.error("Nie udało się zalogować");
+        loginViaGoogleErrorHandler(error);
+      })
+      .addCase(createAccount.rejected, (state, { error }) => {
+        state.isFetching = null;
+        createAccountErrorHandler(error);
       })
       .addMatcher(
         isAnyOf(
@@ -129,7 +110,7 @@ export const userSlice = createSlice({
         ),
         (state, action) => {
           state.isFetching = null;
-          state.userInfo = action.payload.user;
+          state.userInfo = action.payload.userInfo;
           state.userData = action.payload.userData;
           state.userAuth = action.payload.userAuth;
           Router.push("/");
