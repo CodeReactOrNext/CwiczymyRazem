@@ -1,34 +1,29 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
-import { User } from "firebase/auth";
 import Router from "next/router";
-import { toast } from "react-toastify";
 import {
   createAccountWithEmail,
   createUserDocumentFromAuth,
   getUserData,
-  getUserName,
   signInWithEmail,
   signInWithGooglePopup,
 } from "utils/firebase/firebase.utils";
 import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
+import { signUpCredentials } from "../view/SingupView/SingupView";
 import {
   createAccountErrorHandler,
   loginViaEmailErrorHandler,
   loginViaGoogleErrorHandler,
 } from "./userErrorsHandling";
 
-export interface logInCredentials {
-  email: string;
-  password: string;
-}
-const initialState: {
+export interface userSliceInitialState {
   userAuth: string | null;
-  userInfo: User | null;
+  userInfo: { displayName: string } | null;
   userData: statisticsDataInterface | null;
   isFetching: "google" | "email" | "createAccount" | null;
   error: string | null;
-} = {
+}
+const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
   userData: null,
@@ -42,7 +37,8 @@ export const logInViaGoogle = createAsyncThunk(
     const { user } = await signInWithGooglePopup();
     const userAuth = await createUserDocumentFromAuth(user);
     const userData = await getUserData(userAuth);
-    return { user, userAuth, userData };
+    const userName = user.displayName!;
+    return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
 
@@ -51,27 +47,21 @@ export const logInViaEmail = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }) => {
     const { user } = await signInWithEmail(email, password);
     const userAuth = await createUserDocumentFromAuth(user);
-    const userName = await getUserName(userAuth);
     const userData = await getUserData(userAuth);
-    return { user: { ...user, displayName: userName }, userAuth, userData };
+    const userName = user.displayName!;
+    return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
 
-export interface signUpCredentials {
-  login: string;
-  email: string;
-  password: string;
-  repeat_password: string;
-}
-
 export const createAccount = createAsyncThunk(
   "user/createAccount",
-  async ({ login, email, password, repeat_password }: signUpCredentials) => {
+  async ({ login, email, password }: signUpCredentials) => {
     const { user } = await createAccountWithEmail(email, password);
     const userWithDisplayName = { ...user, displayName: login };
     const userAuth = await createUserDocumentFromAuth(userWithDisplayName);
     const userData = await getUserData(userAuth);
-    return { user: userWithDisplayName, userAuth, userData };
+    const userName = userWithDisplayName.displayName;
+    return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
 
@@ -120,7 +110,7 @@ export const userSlice = createSlice({
         ),
         (state, action) => {
           state.isFetching = null;
-          state.userInfo = action.payload.user;
+          state.userInfo = action.payload.userInfo;
           state.userData = action.payload.userData;
           state.userAuth = action.payload.userAuth;
           Router.push("/");
