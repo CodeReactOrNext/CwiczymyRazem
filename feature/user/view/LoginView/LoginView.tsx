@@ -4,7 +4,6 @@ import { Formik, Form } from "formik";
 import { loginSchema } from "schemas/login";
 import { useTranslation } from "react-i18next";
 import {
-  logInCredentials,
   logInViaEmail,
   logInViaGoogle,
   selectIsFetching,
@@ -17,6 +16,11 @@ import Button from "components/Button";
 import GoogleButton from "components/GoogleButton";
 import Input from "components/Input";
 import { CircleSpinner } from "react-spinners-kit";
+
+export interface logInCredentials {
+  email: string;
+  password: string;
+}
 
 const LoginView = () => {
   const { t } = useTranslation(["common", "login"]);
@@ -61,7 +65,7 @@ const LoginView = () => {
                 <Button type='submit'>
                   {isFetching ? (
                     <div className='px-3'>
-                      <CircleSpinner size='24' />
+                      <CircleSpinner size={24} />
                     </div>
                   ) : (
                     t("common:button.sign_in")

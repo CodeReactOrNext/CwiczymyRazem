@@ -6,13 +6,16 @@ import { FaUserAlt, FaLock, FaAt } from "react-icons/fa";
 import MainLayout from "layouts/MainLayout";
 import FormLayout from "layouts/FormLayout";
 import Input from "components/Input";
-import {
-  createAccount,
-  selectIsFetching,
-  signUpCredentials,
-} from "feature/user/store/userSlice";
+import { createAccount, selectIsFetching } from "feature/user/store/userSlice";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { CircleSpinner } from "react-spinners-kit";
+
+export interface signUpCredentials {
+  login: string ;
+  email: string;
+  password: string;
+  repeat_password: string;
+}
 
 const SingupView = () => {
   const { t } = useTranslation(["common", "signup"]);
@@ -66,7 +69,7 @@ const SingupView = () => {
                 <Button type='submit'>
                   {isFetching ? (
                     <div className='px-3'>
-                      <CircleSpinner size='24' />
+                      <CircleSpinner size={24} />
                     </div>
                   ) : (
                     t("common:button.sign_up")
