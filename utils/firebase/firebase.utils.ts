@@ -5,6 +5,8 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  User,
+  signOut,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -13,7 +15,6 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { User } from "firebase/auth";
 import { statistics } from "./userStatisticsInitialData";
 
 const firebaseConfig = {
@@ -33,17 +34,20 @@ provider.setCustomParameters({
   prompt: "select_account",
 });
 
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const firebaseSignInWithGooglePopup = () =>
+  signInWithPopup(auth, provider);
 export const auth = getAuth();
 export const db = getFirestore();
 
-export const signInWithEmail = (email: string, password: string) =>
+export const firebaseSignInWithEmail = (email: string, password: string) =>
   signInWithEmailAndPassword(auth, email, password);
 
-export const createAccountWithEmail = (email: string, password: string) =>
-  createUserWithEmailAndPassword(auth, email, password);
+export const firebaseCreateAccountWithEmail = (
+  email: string,
+  password: string
+) => createUserWithEmailAndPassword(auth, email, password);
 
-export const createUserDocumentFromAuth = async (userAuth: User) => {
+export const firebaseCreateUserDocumentFromAuth = async (userAuth: User) => {
   const userDocRef = doc(db, "users", userAuth.uid);
   const userSnapshot = await getDoc(userDocRef);
   if (!userSnapshot.exists()) {
@@ -63,13 +67,17 @@ export const createUserDocumentFromAuth = async (userAuth: User) => {
   return userAuth.uid;
 };
 
-export const getUserData = async (userAuth: string) => {
+export const firebaseLogUserOut = async () => {
+  return await signOut(auth);
+};
+
+export const firebaseGetUserData = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.statistics;
 };
 
-export const getUserName = async (userAuth: string) => {
+export const firebaseGetUserName = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.displayName;
