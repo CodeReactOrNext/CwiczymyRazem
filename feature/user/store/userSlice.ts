@@ -1,11 +1,14 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
+import { User } from "firebase/auth";
 import Router from "next/router";
 import {
-  createAccountWithEmail,
-  createUserDocumentFromAuth,
-  getUserData,
-  signInWithEmail,
-  signInWithGooglePopup,
+  firebaseCreateAccountWithEmail,
+  firebaseCreateUserDocumentFromAuth,
+  firebaseGetUserData,
+  firebaseGetUserName,
+  firebaseLogUserOut,
+  firebaseSignInWithEmail,
+  firebaseSignInWithGooglePopup,
 } from "utils/firebase/firebase.utils";
 import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
@@ -34,9 +37,9 @@ const initialState: userSliceInitialState = {
 export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
   async (parameters, thunkAPI) => {
-    const { user } = await signInWithGooglePopup();
-    const userAuth = await createUserDocumentFromAuth(user);
-    const userData = await getUserData(userAuth);
+    const { user } = await firebaseSignInWithGooglePopup();
+    const userAuth = await firebaseCreateUserDocumentFromAuth(user);
+    const userData = await firebaseGetUserData(userAuth);
     const userName = user.displayName!;
     return { userInfo: { displayName: userName }, userAuth, userData };
   }
@@ -45,10 +48,24 @@ export const logInViaGoogle = createAsyncThunk(
 export const logInViaEmail = createAsyncThunk(
   "user/loginViaEmail",
   async ({ email, password }: { email: string; password: string }) => {
-    const { user } = await signInWithEmail(email, password);
-    const userAuth = await createUserDocumentFromAuth(user);
-    const userData = await getUserData(userAuth);
+    const { user } = await firebaseSignInWithEmail(email, password);
+    const userAuth = await firebaseCreateUserDocumentFromAuth(user);
+    const userData = await firebaseGetUserData(userAuth);
     const userName = user.displayName!;
+    return { userInfo: { displayName: userName }, userAuth, userData };
+  }
+);
+
+export const autoLogIn = createAsyncThunk(
+  "user/autoLogin",
+  async (user: User) => {
+    const userAuth = await firebaseCreateUserDocumentFromAuth(user);
+    const userWithDisplayName = {
+      ...user,
+      displayName: await firebaseGetUserName(userAuth),
+    };
+    const userData = await firebaseGetUserData(userAuth);
+    const userName = userWithDisplayName.displayName;
     return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
@@ -56,22 +73,26 @@ export const logInViaEmail = createAsyncThunk(
 export const createAccount = createAsyncThunk(
   "user/createAccount",
   async ({ login, email, password }: signUpCredentials) => {
-    const { user } = await createAccountWithEmail(email, password);
+    const { user } = await firebaseCreateAccountWithEmail(email, password);
     const userWithDisplayName = { ...user, displayName: login };
-    const userAuth = await createUserDocumentFromAuth(userWithDisplayName);
-    const userData = await getUserData(userAuth);
+    const userAuth = await firebaseCreateUserDocumentFromAuth(
+      userWithDisplayName
+    );
+    const userData = await firebaseGetUserData(userAuth);
     const userName = userWithDisplayName.displayName;
     return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
 
+export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
+  await firebaseLogUserOut();
+  return null;
+});
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    logOut: (state) => {
-      state.userAuth = null;
-    },
     addUserAuth: (state, action) => {
       state.userAuth = action.payload;
     },
@@ -102,11 +123,15 @@ export const userSlice = createSlice({
         state.isFetching = null;
         createAccountErrorHandler(error);
       })
+      .addCase(logUserOff.fulfilled, (state) => {
+        state.userAuth = null;
+      })
       .addMatcher(
         isAnyOf(
           logInViaGoogle.fulfilled,
           logInViaEmail.fulfilled,
-          createAccount.fulfilled
+          createAccount.fulfilled,
+          autoLogIn.fulfilled
         ),
         (state, action) => {
           state.isFetching = null;
@@ -124,6 +149,6 @@ export const selectUserData = (state: RootState) => state.user.userData;
 export const selectIsFetching = (state: RootState) => state.user.isFetching;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
-export const { logOut, addUserAuth, addUserData } = userSlice.actions;
+export const { addUserAuth, addUserData } = userSlice.actions;
 
 export default userSlice.reducer;
