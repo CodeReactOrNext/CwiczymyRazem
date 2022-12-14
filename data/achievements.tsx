@@ -8,12 +8,12 @@ import {
   FaHeart,
 } from "react-icons/fa";
 import { IconType } from "react-icons/lib";
+import { AchievementsRarityType } from "./achievementsRarity";
 
-export interface AchievementsInterface {
+export interface AchievementsInterface extends AchievementsRarityType{
   id: string;
   name: string;
   Icon: IconType;
-  rarity: "common" | "rare" | "veryRare";
   description: string;
 }
 

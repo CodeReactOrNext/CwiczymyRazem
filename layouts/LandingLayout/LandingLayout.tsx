@@ -5,13 +5,14 @@ import LandingNav, { LandingNavProps } from "./components/LandingNav";
 import StatisticBar from "./components/StatisticBar";
 import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
 import MobileHeaderWrapper from "./components/UserHeader/MobileHeaderWrapper";
-import AchievementBox from "./components/AchievementBox";
-
+import AchievementBox from "./components/Achievement/AchievementBox";
 import Decoration from "./components/Decoration";
 import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
 import UserHeader from "./components/UserHeader/UserHeader";
 import { convertMsToHM } from "helpers/timeConverter";
+import { achievements, AchievementsInterface } from "data/achievements";
+import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 interface LandingLayoutProps {
   statistics: StatisticProps[];
@@ -27,7 +28,7 @@ export default function LandingLayout({
   userName,
 }: LandingLayoutProps) {
   const { t } = useTranslation("landing");
-  const { time } = userStats;
+  const { time, achievements } = userStats;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
   return (
@@ -83,11 +84,7 @@ export default function LandingLayout({
                     />
                   ))}
                 </div>
-                <div className=' row-cols-1 order-2 '>
-                  <AchievementBox rarity='common' />
-                  <AchievementBox rarity='rare' />
-                  <AchievementBox rarity='veryRare' />
-                </div>
+                <AchievementWrapper userAchievements={achievements} />
               </div>
             </div>
           </Wrapper>
