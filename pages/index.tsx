@@ -19,6 +19,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
         "common",
         "landing",
         "footer",
+        "achievements",
       ])),
     },
   };

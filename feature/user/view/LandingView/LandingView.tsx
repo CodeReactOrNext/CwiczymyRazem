@@ -3,6 +3,7 @@ import { convertMsToHM } from "helpers/timeConverter";
 import LandingLayout from "layouts/LandingLayout";
 import { LandingNavProps } from "layouts/LandingLayout/components/LandingNav";
 import { StatisticProps } from "layouts/LandingLayout/components/Statistic";
+import { achievements as achievementsData } from "data/achievements";
 import {
   FaCalendarDay,
   FaClock,
@@ -22,7 +23,7 @@ const LandingView = () => {
     points,
     sessionCount,
     habitsCount,
-    achievments,
+    achievements,
     time,
     dayWithoutBreak,
     maxPoints,
@@ -54,7 +55,7 @@ const LandingView = () => {
     {
       Icon: FaMedal,
       description: "Odznaki: ",
-      value: achievments.length,
+      value: achievements.length + "/" + achievementsData.length,
     },
     {
       Icon: FaDumbbell,
