@@ -1,11 +1,11 @@
 import ToolTip from "components/ToolTip";
 import {
-  achievementsRarityType,
+  AchievementsRarityType,
   achievementsRarity,
-} from "constants/achievementsRarity";
+} from "data/achievementsRarity";
 import { IconType } from "react-icons/lib";
 
-interface AchievementProps extends achievementsRarityType {
+interface AchievementProps extends AchievementsRarityType {
   Icon: IconType;
   description: string;
 }
