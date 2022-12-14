@@ -1,13 +1,12 @@
 import LandingView from "feature/user/view/LandingView/LandingView";
-import { selectUserAuth } from "feature/user/store/userSlice";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useAppSelector } from "store/hooks";
 import HeroView from "views/HeroView";
+import useAutoLogIn from "hooks/useAutoLogIn";
 
 const Home: NextPage = () => {
-  const isUserLoggedIn = useAppSelector(selectUserAuth);
-  return isUserLoggedIn ? <LandingView /> : <HeroView />;
+  const { isLoggedIn } = useAutoLogIn();
+  return isLoggedIn ? <LandingView /> : <HeroView />;
 };
 
 export default Home;

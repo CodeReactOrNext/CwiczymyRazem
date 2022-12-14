@@ -1,4 +1,4 @@
-import { logOut } from "feature/user/store/userSlice";
+import { logUserOff } from "feature/user/store/userSlice";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "store/hooks";
@@ -12,7 +12,7 @@ const UserNav = () => {
       <Link href='/settings'>
         <button>{t("button.edit")}</button>
       </Link>
-      <button onClick={() => dispatch(logOut())} className='ml-3'>
+      <button onClick={() => dispatch(logUserOff())} className='ml-3'>
         {t("button.logout")}
       </button>
     </div>
