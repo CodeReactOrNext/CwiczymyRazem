@@ -9,14 +9,14 @@ import BonusPointsItem from "./BonusPointsItem";
 import { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 
-interface BonusPoints {
-  multiplier?: number;
+export interface BonusPoints {
+  timePoints?: number;
   additionalPoints?: number;
   streak?: number;
   habitsCount?: number;
   time?: string;
 }
-interface Props {
+interface RatingPopUpProps {
   ratingData: {
     basePoints: number;
     currentLevel: number;
@@ -28,7 +28,7 @@ interface Props {
 export default function RatingPopUp({
   ratingData: { basePoints, currentLevel, bonusPoints },
   onClick,
-}: Props) {
+}: RatingPopUpProps) {
   const { t } = useTranslation("report");
   return (
     <div className='relative flex h-5/6 max-h-[1020px] w-[95%] translate-y-[10%] items-center justify-center bg-main-opposed-500 font-sans md:min-h-[700px] lg:aspect-square lg:w-auto'>
@@ -56,7 +56,7 @@ export default function RatingPopUp({
             <div className='h-4/5 w-full bg-second-500'></div>
             <div className={`absolute left-0 top-0 h-full w-[50%] bg-main-500`}>
               <p className='absolute -right-[18%] -top-[80%]  text-lg font-medium text-main-500 md:text-xl'>
-                +{3000} {t("rating_popup.points")}
+                +{basePoints} {t("rating_popup.points")}
               </p>
             </div>
             <LevelIndicator position='left'>{currentLevel}</LevelIndicator>
@@ -65,8 +65,8 @@ export default function RatingPopUp({
         </div>
       </div>
       <ul className='relative -mt-[10%] md:-ml-[20%]'>
-        {bonusPoints?.map((data, i) => (
-          <BonusPointsItem exerciseData={data} key={i} />
+        {bonusPoints?.map((data, index) => (
+          <BonusPointsItem exerciseData={data} key={index} />
         ))}
       </ul>
       <div className='absolute -bottom-[10%] -left-[25%] z-40 w-[50%] sm:-left-[15%] md:-bottom-[5%] md:-left-[10%] md:w-auto'>
