@@ -6,12 +6,16 @@ interface TimeInputBoxProps {
   title: string;
   Icon: IconType;
   questionMarkProps: QuestionMarkProps;
+  hours: string;
+  minutes: string;
 }
 
 export default function TimeInputBox({
   title,
   Icon,
   questionMarkProps,
+  hours,
+  minutes,
 }: TimeInputBoxProps) {
   return (
     <div
@@ -22,9 +26,9 @@ export default function TimeInputBox({
         <QuestionMark description={questionMarkProps.description} />
       </label>
       <div className='xL:gap-3 flex items-center justify-center gap-2 text-xl'>
-        <InputTime />
+        <InputTime name={hours} />
         <p className='text-3xl'>:</p>
-        <InputTime />
+        <InputTime name={minutes} />
       </div>
     </div>
   );

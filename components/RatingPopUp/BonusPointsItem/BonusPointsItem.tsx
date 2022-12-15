@@ -1,23 +1,19 @@
 import { useTranslation } from "react-i18next";
+import { BonusPoints } from "../RatingPopUp";
 
-interface Props {
-  exerciseData: {
-    multiplier?: number;
-    additionalPoints?: number;
-    streak?: number;
-    habitsCount?: number;
-    time?: string;
-  };
+interface BonusPointsItemProps {
+  exerciseData: BonusPoints;
 }
 
 export default function BonusPointsItem({
-  exerciseData: { multiplier, additionalPoints, streak, habitsCount, time },
-}: Props) {
+  exerciseData: { timePoints, additionalPoints, streak, habitsCount, time },
+}: BonusPointsItemProps) {
+  console.log(timePoints, additionalPoints, streak, habitsCount, time);
   const { t } = useTranslation(["common", "report"]);
   return (
     <li className='flex items-center gap-3 md:first:-translate-x-[5%] md:last:translate-x-[5%]'>
-      {multiplier && (
-        <p className='text-2xl text-main-500 sm:text-4xl'>x{multiplier}</p>
+      {timePoints && (
+        <p className='text-2xl text-main-500 sm:text-4xl'>+{timePoints}</p>
       )}
       {additionalPoints && (
         <p className='text-2xl text-main-500 sm:text-4xl'>
