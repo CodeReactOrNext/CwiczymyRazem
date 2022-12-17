@@ -7,12 +7,9 @@ interface CheckboxProps {
   questionMarkProps: QuestionMarkProps;
 }
 
-export default function Exercise({
-  title,
-  questionMarkProps,
-  name,
-}: CheckboxProps) {
+const Exercise = ({ title, questionMarkProps, name }: CheckboxProps) => {
   const [field] = useField("habbits");
+
   return (
     <div className={`grid grid-cols-[3fr_1fr] items-center gap-2`}>
       <div className='flex flex-row gap-2 justify-self-end'>
@@ -22,4 +19,5 @@ export default function Exercise({
       <input type='checkbox' className='h-8' {...field} value={name} />
     </div>
   );
-}
+};
+export default Exercise;
