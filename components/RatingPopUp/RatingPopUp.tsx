@@ -8,19 +8,20 @@ import OldEffect from "components/OldEffect";
 import BonusPointsItem from "./BonusPointsItem";
 import { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
-
-export interface BonusPoints {
-  timePoints?: number;
-  additionalPoints?: number;
-  streak?: number;
-  habitsCount?: number;
-  time?: string;
+import Router from "next/router";
+export interface BonusPointsInterface {
+  timePoints: number;
+  additionalPoints: number;
+  streak: number;
+  habitsCount: number;
+  time: number;
+  multiplier: number;
 }
 interface RatingPopUpProps {
   ratingData: {
     basePoints: number;
     currentLevel: number;
-    bonusPoints?: BonusPoints[];
+    bonusPoints: BonusPointsInterface;
   };
   onClick: Dispatch<SetStateAction<boolean>>;
 }
@@ -49,6 +50,7 @@ export default function RatingPopUp({
           <Button
             onClick={() => {
               onClick(false);
+              Router.push("/");
             }}>
             {t("rating_popup.back")}
           </Button>
@@ -64,11 +66,9 @@ export default function RatingPopUp({
           </div>
         </div>
       </div>
-      <ul className='relative -mt-[10%] md:-ml-[20%]'>
-        {bonusPoints?.map((data, index) => (
-          <BonusPointsItem exerciseData={data} key={index} />
-        ))}
-      </ul>
+
+      <BonusPointsItem bonusPoints={bonusPoints} />
+
       <div className='absolute -bottom-[10%] -left-[25%] z-40 w-[50%] sm:-left-[15%] md:-bottom-[5%] md:-left-[10%] md:w-auto'>
         <Image
           src={blackGuitar}

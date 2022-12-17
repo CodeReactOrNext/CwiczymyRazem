@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import Router from "next/router";
 import {
@@ -99,6 +99,12 @@ export const userSlice = createSlice({
     addUserData: (state, action) => {
       state.userData = action.payload;
     },
+    updateUserData: (
+      state,
+      { payload }: PayloadAction<statisticsDataInterface>
+    ) => {
+      state.userData = payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -149,6 +155,6 @@ export const selectUserData = (state: RootState) => state.user.userData;
 export const selectIsFetching = (state: RootState) => state.user.isFetching;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
-export const { addUserAuth, addUserData } = userSlice.actions;
+export const { addUserAuth, addUserData, updateUserData } = userSlice.actions;
 
 export default userSlice.reducer;

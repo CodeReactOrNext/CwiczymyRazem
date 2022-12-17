@@ -1,4 +1,4 @@
-import { AchievementsInterface } from "data/achievements";
+import { ReportInterface } from "feature/user/view/ReportView/ReportView";
 
 export interface statisticsDataInterface {
   time: {
@@ -15,6 +15,8 @@ export interface statisticsDataInterface {
   dayWithoutBreak: number;
   maxPoints: number;
   achievements: string[];
+  actualdayWithoutBreak: number;
+  lastReport?: ReportInterface;
 }
 
 export const statistics: statisticsDataInterface = {
@@ -32,4 +34,5 @@ export const statistics: statisticsDataInterface = {
   dayWithoutBreak: 0,
   maxPoints: 0,
   achievements: [],
+  actualdayWithoutBreak: 0,
 };
