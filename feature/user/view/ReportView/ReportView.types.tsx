@@ -8,13 +8,11 @@ export interface ReportFormikInterface {
   creativeHours: string;
   creativeMinutes: string;
   habbits: string[];
-  raportData: Date;
 }
 export interface ReportDataInterface {
+  reportDate: Date;
   basePoints: number;
-  currentLevel: number;
   bonusPoints: {
-    streak: number;
     multiplier: number;
     habitsCount: number;
     additionalPoints: number;

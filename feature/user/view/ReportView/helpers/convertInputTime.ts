@@ -1,9 +1,9 @@
-import { ReportInterface } from "../ReportView";
+import { ReportFormikInterface } from "../ReportView.types";
 
 const hoursToMs = (hours: number) => hours * 3600000;
 const minutesToMs = (minutes: number) => minutes * 60000;
 
-export const convertInputTime = (data: ReportInterface) => {
+export const convertInputTime = (data: ReportFormikInterface) => {
   const techniqueTime =
     hoursToMs(+data.techniqueHours) + minutesToMs(+data.techniqueMinutes);
   const theoryTime =

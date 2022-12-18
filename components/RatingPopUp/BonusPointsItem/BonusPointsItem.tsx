@@ -8,18 +8,14 @@ interface BonusPointsItemProps {
 
 const BonusPointsItem = ({
   bonusPoints,
+  actualDayWithoutBreak,
 }: {
   bonusPoints: BonusPointsInterface;
+  actualDayWithoutBreak: number;
 }) => {
   const { t } = useTranslation(["common", "report"]);
-  const {
-    timePoints,
-    additionalPoints,
-    streak,
-    habitsCount,
-    time,
-    multiplier,
-  } = bonusPoints;
+  const { timePoints, additionalPoints, habitsCount, time, multiplier } =
+    bonusPoints;
   return (
     <ul className='relative -mt-[10%] md:-ml-[20%]'>
       <li className='flex items-center gap-3 md:first:-translate-x-[5%] md:last:translate-x-[5%]'>
@@ -28,7 +24,7 @@ const BonusPointsItem = ({
           {t("report:rating_popup.regularity")}
         </p>
         <p className='text-base md:text-lg'>
-          {streak} {t("report:rating_popup.streak")}
+          {actualDayWithoutBreak} {t("report:rating_popup.streak")}
         </p>
       </li>
       <li className='flex items-center gap-3 md:first:-translate-x-[5%] md:last:translate-x-[5%]'>

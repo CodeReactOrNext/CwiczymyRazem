@@ -9,25 +9,25 @@ import BonusPointsItem from "./BonusPointsItem";
 import { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import Router from "next/router";
+import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 export interface BonusPointsInterface {
   timePoints: number;
   additionalPoints: number;
-  streak: number;
   habitsCount: number;
   time: number;
   multiplier: number;
 }
 interface RatingPopUpProps {
-  ratingData: {
-    basePoints: number;
-    currentLevel: number;
-    bonusPoints: BonusPointsInterface;
-  };
+  ratingData: ReportDataInterface;
+  currentLevel: number;
+  actualDayWithoutBreak: number;
   onClick: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function RatingPopUp({
-  ratingData: { basePoints, currentLevel, bonusPoints },
+  ratingData: { basePoints, bonusPoints },
+  currentLevel,
+  actualDayWithoutBreak,
   onClick,
 }: RatingPopUpProps) {
   const { t } = useTranslation("report");
@@ -67,7 +67,10 @@ export default function RatingPopUp({
         </div>
       </div>
 
-      <BonusPointsItem bonusPoints={bonusPoints} />
+      <BonusPointsItem
+        bonusPoints={bonusPoints}
+        actualDayWithoutBreak={actualDayWithoutBreak}
+      />
 
       <div className='absolute -bottom-[10%] -left-[25%] z-40 w-[50%] sm:-left-[15%] md:-bottom-[5%] md:-left-[10%] md:w-auto'>
         <Image
