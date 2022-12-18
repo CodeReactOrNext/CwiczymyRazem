@@ -49,8 +49,9 @@ const ReportView = () => {
     habbits: [],
   };
 
-  const onSubmit = (inputData: ReportFormikInterface) => {
+  const reportOnSubmit = (inputData: ReportFormikInterface) => {
     const { sumTime } = convertInputTime(inputData);
+
     if (sumTime >= 86400000) {
       toast.error("Nie da się ćwiczyć więcej niż 24 godziny dziennie");
       return;
@@ -77,7 +78,7 @@ const ReportView = () => {
           initialValues={formikInitialValues}
           validationSchema={RaportSchema}
           validateOnBlur={false}
-          onSubmit={onSubmit}>
+          onSubmit={reportOnSubmit}>
           {({ errors }) => (
             <>
               <ReportFormLayout>

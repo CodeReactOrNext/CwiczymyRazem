@@ -1,21 +1,33 @@
 import FaqLayout, { faqQuestionInterface } from "layouts/FaqLayout/FaqLayout";
+import { title } from "process";
+import { useTranslation } from "react-i18next";
 
 const FaqView = () => {
+  const { t } = useTranslation("faq");
   const faqQuestion: faqQuestionInterface[] = [
     {
-      title: "O co chodzi?",
-      message:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis fermentum lorem non nulla accumsan convallis. Vestibulum sed iaculis neque. Praesent quis magna eu tortor fermentum placerat ac quis risus. Aenean faucibus luctus lectus sit amet mattis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Quisque a auctor risus. Donec ut tellus lacinia, congue ipsum ac, vehicula magna.Vestibulum eu congue urna. Mauris eu posuere nunc. Cras pulvinar metus ac diam molestie, et tincidunt neque pretium. Nunc nec arcu nunc. Fusce euismod dignissim pulvinar. Pellentesque nec dictum lectus. Etiam enim ipsum, ultricies sit amet dui eu, maximus cursus dolor. Mauris tortor massa, dictum sit amet bibendum interdum, faucibus interdum quam. Phasellus consectetur nisi quis purus porta, vel bibendum libero vehicula. Sed non aliquet libero. Proin sit amet nulla metus.",
+      title: t("about_title"),
+      message: t("about_description"),
     },
     {
-      title: "O co chodzi?",
-      message:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis fermentum lorem non nulla accumsan convallis. Vestibulum sed iaculis neque. Praesent quis magna eu tortor fermentum placerat ac quis risus. Aenean faucibus luctus lectus sit amet mattis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Quisque a auctor risus. Donec ut tellus lacinia, congue ipsum ac, vehicula magna.Vestibulum eu congue urna. Mauris eu posuere nunc. Cras pulvinar metus ac diam molestie, et tincidunt neque pretium. Nunc nec arcu nunc. Fusce euismod dignissim pulvinar. Pellentesque nec dictum lectus. Etiam enim ipsum, ultricies sit amet dui eu, maximus cursus dolor. Mauris tortor massa, dictum sit amet bibendum interdum, faucibus interdum quam. Phasellus consectetur nisi quis purus porta, vel bibendum libero vehicula. Sed non aliquet libero. Proin sit amet nulla metus.",
+      title: t("how_its_work_title"),
+      message: t("how_its_work_description"),
     },
     {
-      title: "O co chodzi?",
-      message:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis fermentum lorem non nulla accumsan convallis. Vestibulum sed iaculis neque. Praesent quis magna eu tortor fermentum placerat ac quis risus. Aenean faucibus luctus lectus sit amet mattis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Quisque a auctor risus. Donec ut tellus lacinia, congue ipsum ac, vehicula magna.Vestibulum eu congue urna. Mauris eu posuere nunc. Cras pulvinar metus ac diam molestie, et tincidunt neque pretium. Nunc nec arcu nunc. Fusce euismod dignissim pulvinar. Pellentesque nec dictum lectus. Etiam enim ipsum, ultricies sit amet dui eu, maximus cursus dolor. Mauris tortor massa, dictum sit amet bibendum interdum, faucibus interdum quam. Phasellus consectetur nisi quis purus porta, vel bibendum libero vehicula. Sed non aliquet libero. Proin sit amet nulla metus.",
+      title: t("about_points_title"),
+      message: t("about_points_description"),
+    },
+    {
+      title: t("several_times_repotr_title"),
+      message: t("several_times_repotr_description"),
+    },
+    {
+      title: t("several_times_repotr_title"),
+      message: t("several_times_repotr_description"),
+    },
+    {
+      title: t("about_excerise_title"),
+      message: t("about_excerise_description"),
     },
   ];
 

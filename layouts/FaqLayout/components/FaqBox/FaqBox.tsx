@@ -10,14 +10,14 @@ const FaqBox = ({ title, message }: FaqBoxProps) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className='cursor-pointer' onClick={() => setIsOpen(!isOpen)}>
-      <div className='flex  h-20 w-full flex-row items-center gap-4 bg-second p-4 text-4xl text-tertiary hover:bg-second-100'>
+      <div className='min-h-20  flex w-full flex-row items-center gap-4 bg-second p-4 text-4xl text-tertiary hover:bg-second-100'>
         <div className='text-main-opposed'>
           {isOpen ? <FaMinus /> : <FaPlus />}
         </div>
         <p>{title}</p>
       </div>
       {isOpen && (
-        <div className='mt-1 flex w-full flex-row items-center bg-second p-4 text-xl text-tertiary'>
+        <div className='mt-1 flex w-full flex-row items-center bg-second p-4 px-8 text-xl tracking-wide text-mainText'>
           <p> {message}</p>
         </div>
       )}
