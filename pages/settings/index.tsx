@@ -1,11 +1,15 @@
 import SettingsView from "feature/user/view/SettingsView";
 import type { NextPage } from "next";
-import useProtectRoute from "hooks/useProtectRoute";
 import PageLoadingSpinner from "components/PageLoadingSpinner";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import useAutoLogIn from "hooks/useAutoLogIn";
 
 const Settings: NextPage = () => {
-  const { isLoggedIn } = useProtectRoute("/login");
+  const { isLoggedIn } = useAutoLogIn({
+    redirects: {
+      loggedOut: "/login",
+    },
+  });
 
   return !isLoggedIn ? (
     <PageLoadingSpinner layoutVariant='primary' />
