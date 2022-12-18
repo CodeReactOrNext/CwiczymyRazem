@@ -11,10 +11,10 @@ function PageLoadingSpinner({
   const { t } = useTranslation("common");
   return (
     <MainLayout subtitle={t("loading.subtitle")} variant={layoutVariant}>
-      <div className='relative flex h-full w-full justify-center'>
-        <div className='relative flex w-full -translate-y-[40%] items-start justify-center lg:w-1/2 lg:translate-y-0'>
+      <div className='relative flex h-1/2 w-full items-start justify-center lg:items-center'>
+        <div className='relative flex aspect-square  w-2/5 max-w-[150px] -translate-y-[40%] items-start justify-center lg:w-1/5 lg:translate-y-0'>
           <Guitar />
-          <p className='absolute bottom-[20%] left-[50%] z-50 -translate-x-[50%] text-center text-8xl lg:bottom-[50%]'>
+          <p className='absolute bottom-[50%] left-[50%] z-50 -translate-x-[50%] text-center text-xl lg:bottom-[60%] lg:text-3xl'>
             {t("loading.loading_text")}
           </p>
         </div>
