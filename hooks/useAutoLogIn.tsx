@@ -21,14 +21,11 @@ function useAutoLogIn(props: useAutoLogInProps) {
       dispatch(autoLogIn(user));
     }
     if (user && isUserLoggedIn && !loading && props?.redirects?.loggedIn) {
-      console.log("logged in");
       Router.push(props?.redirects?.loggedIn);
     }
     if (!user && !isUserLoggedIn && !loading && props?.redirects?.loggedOut) {
-      console.log("logged out");
       Router.push(props?.redirects?.loggedOut);
     }
-    console.log(user, isUserLoggedIn);
   }, [
     user,
     dispatch,
