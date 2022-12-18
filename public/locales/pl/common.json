@@ -17,5 +17,9 @@
   "slogan": {
     "line_1": "Ćwiczymy",
     "line_2": "Razem"
+  },
+  "loading": {
+    "subtitle": "Ładowanie...",
+    "loading_text": "Ładowanie..."
   }
 }

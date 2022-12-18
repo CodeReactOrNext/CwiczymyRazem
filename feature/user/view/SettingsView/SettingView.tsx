@@ -1,7 +1,9 @@
 import Avatar from "components/Avatar";
 import MainLayout from "layouts/MainLayout";
+import { useTranslation } from "react-i18next";
 
 const SettingsView = () => {
+  const { t } = useTranslation(["common", "settings"]);
   return (
     <MainLayout subtitle='Edytuj Profil' variant='primary'>
       <div className='flex max-w-[800px] flex-col p-6'>
