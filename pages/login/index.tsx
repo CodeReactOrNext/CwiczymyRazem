@@ -1,13 +1,16 @@
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { selectUserAuth } from "../../feature/user/store/userSlice";
 import LoginView from "../../feature/user/view/LoginView/LoginView";
-import { useTranslation } from "react-i18next";
-import { useAppSelector } from "../../store/hooks";
+import PageLoadingSpinner from "components/PageLoadingSpinner";
+import useAutoLogIn from "hooks/useAutoLogIn";
 
 const LoginPage: NextPage = (props) => {
-  // const isLoggedIn = useAppSelector(selectUserAuth);
-  return <LoginView />;
+  const { isLoggedIn, isLoading } = useAutoLogIn({
+    redirects: { loggedIn: "/" },
+  });
+  if (isLoggedIn || isLoading)
+    return <PageLoadingSpinner layoutVariant='primary' />;
+  else return <LoginView />;
 };
 
 export default LoginPage;

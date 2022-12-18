@@ -5,7 +5,7 @@ import LightningRevSVG from "public/static/images/svg/LightningRev";
 export default function Guitar() {
   return (
     <div className='h-full w-full'>
-      <div className='absolute left-[50%] -bottom-[10%] z-40 h-fit w-[20%] max-w-[100px] -translate-x-[50%] lg:bottom-[15%] lg:left-[47%] lg:w-[35%] lg:max-w-max xl:left-[43%] xl:w-[25%]'>
+      <div className='absolute left-[50%] -bottom-[10%] z-40 h-fit w-[20%] max-w-[100px] -translate-x-[50%] lg:bottom-[15%] lg:w-[35%] lg:max-w-max xl:w-[25%]'>
         <div className='shadow-animation absolute -bottom-[15%] aspect-square w-full rounded-full'></div>
         <img
           className='hover-animation h-full w-full'

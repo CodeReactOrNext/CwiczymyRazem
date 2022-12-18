@@ -5,10 +5,12 @@ import ContentBox from "./components/ContentBox";
 import SubtitleBar from "./components/SubtitleBar";
 import LightningDesktopDivider from "./components/LightningDesktopDivider";
 
+export type layoutVariant = "primary" | "secondary" | "landing";
+
 interface LayoutProps {
   children: React.ReactNode;
   subtitle: string;
-  variant: "primary" | "secondary" | "landing";
+  variant: layoutVariant;
 }
 
 export default function MainLayout({
