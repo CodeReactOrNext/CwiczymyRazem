@@ -1,1 +1,15 @@
-{ "faq": "Często zadawane pytania" }
+{
+  "faq": "Często zadawane pytania",
+  "about_title": "Co to Ćwiczymy Razem?",
+  "about_description": "Ćwiczymy Razem to strona, która pozwala na zbieranie statystyk dotyczących Twoich ćwiczeń na gitarze. Wystarczy, że pokażesz nam co i jak długo ćwiczyłeś, a my nagradzamy Cię punktami, osiągnięciami i miejscem w rankingu wśród innych graczy. Celem naszej strony jest motywowanie Cię do częstszej i regularnej gry na instrumencie oraz zapisywanie wysiłku, jaki wkładasz w doskonalenie swoich umiejętności. Dzięki nam możesz śledzić swoje postępy i cieszyć się nimi na swojej gitarowej drodze.",
+  "how_its_work_title": "Jak ćwiczyć?",
+  "how_its_work_description": "Z 'Ćwiczymy Razem' można ćwiczyć na dwa sposoby. Możesz skorzystać z naszego stopera, dostępnego pod zakładką 'Ćwicz'. Stoper będzie rejestrował czas, jaki poświęcasz na poszczególne umiejętności, co pomoże Ci się skupić podczas ćwiczeń. Po zakończonym sesji zostaniesz przeniesiony do sekcji 'Raportuj', gdzie będziesz mógł zaznaczyć swoje dobre nawyki i edytować swój czas. Jeśli nie chcesz korzystać ze stopera, możesz po prostu wybrać opcję 'Raportuj', wpisać czas i zaznaczyć 'dobre nawyki', które stosowałeś podczas treningu. Po zatwierdzeniu otrzymasz podsumowanie swojego treningu.",
+  "about_points_title": "Za co przydzielane są punkty?",
+  "about_points_description": "Punkty przydzielane są za czas i zdrowe nawyki, które mnożone są przez ilość dni pod rząd. Po każdym raporcie dostajesz podsumowanie swojej punktacji. ",
+  "several_times_repotr_title": "Czy mogę złożyć raport więcej niż raz dziennie?",
+  "several_times_repotr_description": "Tak. Nie wliczają się one wtedy do ilości sesji i Ilość dni bez przerwy  ",
+  "get_achievement_title": "Jak zdobyć odznakę?",
+  "get_achievement_description": "Odznaki przyznawane są po spełnieniu określonych warunków, takich jak np: przekroczenie konkretnej ilości punktów za jeden raport lub przekroczenie łącznego czasu spędzonego na ćwiczeniu na gitarze. Odznaki i wymagania do ich zdobycia są ukryte, ale możesz je podejrzeć w rankingu i profilach innych graczy. ",
+  "about_excerise_title": "Jak mam rozróżnić co aktualnie ćwiczę?",
+  "about_excerise_description": "Proponujemy podział na technikę, teorię, słuch i praca kreatywną. Przy podpowiedziach w raporcie możesz zobaczyć propozycje ćwiczeń dla każdego z tych filarów. Ostateczny wybór ćwiczeń należy do Ciebie i zależy od Twoich indywidualnych celów i potrzeb. Ważne, aby znaleźć równowagę między tymi różnymi obszarami i nie zaniedbywać żadnego z nich. "
+}
