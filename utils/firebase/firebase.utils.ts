@@ -1,3 +1,4 @@
+import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -14,8 +15,13 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  getDocs,
+  collection,
 } from "firebase/firestore";
-import { statistics } from "./userStatisticsInitialData";
+import {
+  statistics,
+  StatisticsDataInterface,
+} from "./userStatisticsInitialData";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
@@ -37,7 +43,7 @@ provider.setCustomParameters({
 export const firebaseSignInWithGooglePopup = () =>
   signInWithPopup(auth, provider);
 export const auth = getAuth();
-export const db = getFirestore();
+export const db = getFirestore(firebaseApp);
 
 export const firebaseSignInWithEmail = (email: string, password: string) =>
   signInWithEmailAndPassword(auth, email, password);
@@ -59,6 +65,7 @@ export const firebaseCreateUserDocumentFromAuth = async (userAuth: User) => {
         email,
         createdAt,
         statistics,
+        exercisesData: [],
       });
     } catch (error) {
       console.log(error);
@@ -81,4 +88,31 @@ export const firebaseGetUserName = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.displayName;
+};
+
+export const firebaseSetUserExceriseRaprot = async (
+  userAuth: string,
+  raport: ReportDataInterface,
+  date: Date
+) => {
+  const dateString = date.toISOString();
+  const userDocRef = doc(db, "users", userAuth, "exerciseData", dateString);
+  await setDoc(userDocRef, raport);
+};
+
+export const firebaseUpdateUserStats = async (
+  userAuth: string,
+  statistics: StatisticsDataInterface
+) => {
+  const userDocRef = doc(db, "users", userAuth);
+  const userSnapshot = await getDoc(userDocRef);
+  await updateDoc(userDocRef, { statistics });
+};
+export const firebaseGetUserExceriseRaprot = async (userAuth: string) => {
+  const userDocRef = await getDocs(
+    collection(db, "users", userAuth, "exerciseData")
+  );
+  userDocRef.forEach((doc) => {
+    console.log(doc.data().reportDate.toDate());
+  });
 };

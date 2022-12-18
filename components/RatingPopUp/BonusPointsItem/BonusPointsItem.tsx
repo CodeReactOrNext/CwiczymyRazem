@@ -1,59 +1,54 @@
+import { convertMsToHM } from "helpers/timeConverter";
 import { useTranslation } from "react-i18next";
+import { BonusPointsInterface } from "../RatingPopUp";
 
-interface Props {
-  exerciseData: {
-    multiplier?: number;
-    additionalPoints?: number;
-    streak?: number;
-    habitsCount?: number;
-    time?: string;
-  };
+interface BonusPointsItemProps {
+  bonusPoints: BonusPointsInterface;
 }
 
-export default function BonusPointsItem({
-  exerciseData: { multiplier, additionalPoints, streak, habitsCount, time },
-}: Props) {
+const BonusPointsItem = ({
+  bonusPoints,
+  actualDayWithoutBreak,
+}: {
+  bonusPoints: BonusPointsInterface;
+  actualDayWithoutBreak: number;
+}) => {
   const { t } = useTranslation(["common", "report"]);
+  const { timePoints, additionalPoints, habitsCount, time, multiplier } =
+    bonusPoints;
   return (
-    <li className='flex items-center gap-3 md:first:-translate-x-[5%] md:last:translate-x-[5%]'>
-      {multiplier && (
+    <ul className='relative -mt-[10%] md:-ml-[20%]'>
+      <li className='flex items-center gap-3 md:first:-translate-x-[5%] md:last:translate-x-[5%]'>
         <p className='text-2xl text-main-500 sm:text-4xl'>x{multiplier}</p>
-      )}
-      {additionalPoints && (
+        <p className='xs:text-xl md:text-2xl'>
+          {t("report:rating_popup.regularity")}
+        </p>
+        <p className='text-base md:text-lg'>
+          {actualDayWithoutBreak} {t("report:rating_popup.streak")}
+        </p>
+      </li>
+      <li className='flex items-center gap-3 md:first:-translate-x-[5%] md:last:translate-x-[5%]'>
         <p className='text-2xl text-main-500 sm:text-4xl'>
           +{additionalPoints}
         </p>
-      )}
-      {streak && (
-        <>
-          <p className='xs:text-xl md:text-2xl'>
-            {t("report:rating_popup.regularity")}
-          </p>
-          <p className='text-base md:text-lg'>
-            {streak} {t("report:rating_popup.streak")}
-          </p>
-        </>
-      )}
-      {habitsCount && (
-        <>
-          <p className='xs:text-xl md:text-2xl'>
-            {t("report:rating_popup.habits")}
-          </p>
-          <p className='text-base md:text-lg'>
-            {t("report:rating_popup.habitsWithCount", { count: habitsCount })}
-          </p>
-        </>
-      )}
-      {time && (
-        <>
-          <p className='xs:text-xl md:text-2xl'>
-            {t("report:rating_popup.time")}
-          </p>
-          <p className='text-base md:text-lg'>
-            {t("report:rating_popup.time_amount")} {time}
-          </p>
-        </>
-      )}
-    </li>
+        <p className='xs:text-xl md:text-2xl'>
+          {t("report:rating_popup.habits")}
+        </p>
+        <p className='text-base md:text-lg'>
+          {t("report:rating_popup.habitsWithCount", { count: habitsCount })}
+        </p>
+      </li>
+      <li className='flex items-center gap-3 md:first:-translate-x-[5%] md:last:translate-x-[5%]'>
+        <p className='text-2xl text-main-500 sm:text-4xl'>+{timePoints}</p>
+        <p className='xs:text-xl md:text-2xl'>
+          {t("report:rating_popup.time")}
+        </p>
+        <p className='text-base md:text-lg'>
+          {t("report:rating_popup.time_amount")} {convertMsToHM(time)}
+        </p>
+      </li>
+    </ul>
   );
-}
+};
+
+export default BonusPointsItem;

@@ -1,6 +1,4 @@
-import { AchievementsInterface } from "data/achievements";
-
-export interface statisticsDataInterface {
+export interface StatisticsDataInterface {
   time: {
     technique: number;
     theory: number;
@@ -15,9 +13,11 @@ export interface statisticsDataInterface {
   dayWithoutBreak: number;
   maxPoints: number;
   achievements: string[];
+  actualDayWithoutBreak: number;
+  lastReportDate?: string;
 }
 
-export const statistics: statisticsDataInterface = {
+export const statistics: StatisticsDataInterface = {
   time: {
     technique: 0,
     theory: 0,
@@ -32,4 +32,5 @@ export const statistics: statisticsDataInterface = {
   dayWithoutBreak: 0,
   maxPoints: 0,
   achievements: [],
+  actualDayWithoutBreak: 0,
 };
