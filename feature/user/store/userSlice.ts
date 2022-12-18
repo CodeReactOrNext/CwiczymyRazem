@@ -1,4 +1,9 @@
-import { createAsyncThunk, createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  isAnyOf,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import Router from "next/router";
 import {
@@ -10,8 +15,9 @@ import {
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
 } from "utils/firebase/firebase.utils";
-import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
+import { ReportDataInterface } from "../view/ReportView/ReportView.types";
 import { signUpCredentials } from "../view/SingupView/SingupView";
 import {
   createAccountErrorHandler,
@@ -22,16 +28,14 @@ import {
 export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName: string } | null;
-  userData: statisticsDataInterface | null;
+  userData: StatisticsDataInterface | null;
   isFetching: "google" | "email" | "createAccount" | null;
-  error: string | null;
 }
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
   userData: null,
   isFetching: null,
-  error: null,
 };
 
 export const logInViaGoogle = createAsyncThunk(
@@ -83,7 +87,6 @@ export const createAccount = createAsyncThunk(
     return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
-
 export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   await firebaseLogUserOut();
   return null;
@@ -99,9 +102,12 @@ export const userSlice = createSlice({
     addUserData: (state, action) => {
       state.userData = action.payload;
     },
+    addPracticeData: (state, action) => {
+      state.userData = action.payload;
+    },
     updateUserData: (
       state,
-      { payload }: PayloadAction<statisticsDataInterface>
+      { payload }: PayloadAction<StatisticsDataInterface>
     ) => {
       state.userData = payload;
     },

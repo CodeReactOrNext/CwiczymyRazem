@@ -1,8 +1,11 @@
 import { HABBITS_POINTS_VALUE, TIME_POINTS_VALUE } from "constants/ratingValue";
-import { ReportInterface } from "../ReportView";
+import { ReportFormikInterface } from "../ReportView.types";
 import { getMultiplerValue } from "./getMulitplerValue";
 
-export const makeRatingData = (data: ReportInterface, totalTime: number) => {
+export const makeRatingData = (
+  data: ReportFormikInterface,
+  totalTime: number
+) => {
   const streak = 5;
   const multipler = getMultiplerValue(streak);
   const habbitsCount = data.habbits.length;
@@ -14,9 +17,9 @@ export const makeRatingData = (data: ReportInterface, totalTime: number) => {
     Math.floor((additionalPoints + timePoints) * multipler);
   return {
     basePoints: basePoints,
-    currentLevel: 20,
+    reportDate: new Date(),
     bonusPoints: {
-      streak: +streak,
+      streak: streak,
       multiplier: multipler,
       habitsCount: habbitsCount,
       additionalPoints: additionalPoints,

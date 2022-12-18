@@ -10,16 +10,25 @@ import { FaBrain, FaMusic, FaTimesCircle } from "react-icons/fa";
 import { MdSchool } from "react-icons/md";
 import { IoMdHand } from "react-icons/io";
 import { Checkbox, TimeInputBox } from "layouts/ReportFormLayout/components";
-import {  Formik } from "formik";
+import { Formik } from "formik";
 import { makeRatingData } from "./helpers/makeRatingData";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { selectUserData, updateUserData } from "feature/user/store/userSlice";
+import {
+  selectUserAuth,
+  selectUserData,
+  updateUserData,
+} from "feature/user/store/userSlice";
 import { convertInputTime } from "./helpers/convertInputTime";
 import { toast } from "react-toastify";
 import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
 import { ReportDataInterface, ReportFormikInterface } from "./ReportView.types";
-
+import { checkIsPracticeToday } from "./helpers/checkIsPracticeToday";
+import {
+  firebaseSetUserExceriseRaprot,
+  firebaseUpdateUserStats,
+} from "utils/firebase/firebase.utils";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
@@ -29,6 +38,7 @@ const ReportView = () => {
   const { t } = useTranslation("report");
   const dispatch = useAppDispatch();
   const userData = useAppSelector(selectUserData);
+  const useAuth = useAppSelector(selectUserAuth);
 
   const formikInitialValues: ReportFormikInterface = {
     techniqueHours: "",
@@ -40,14 +50,25 @@ const ReportView = () => {
     creativeHours: "",
     creativeMinutes: "",
     habbits: [],
-    raportData: new Date(),
   };
 
-  const onSubmit = (data: ReportFormikInterface) => {
-    const { time, habitsCount, maxPoints, sessionCount, points } = userData!;
+  const onSubmit = (inputData: ReportFormikInterface) => {
+    const {
+      time,
+      habitsCount,
+      maxPoints,
+      sessionCount,
+      points,
+      lastReportDate,
+      actualDayWithoutBreak,
+      dayWithoutBreak,
+    } = userData!;
     const { techniqueTime, theoryTime, hearingTime, creativeTime, sumTime } =
-      convertInputTime(data);
-    const raiting = makeRatingData(data, sumTime);
+      convertInputTime(inputData);
+    const raiting = makeRatingData(inputData, sumTime);
+    const todayDate = new Date();
+    const userLastReportDate = new Date(lastReportDate!);
+    const didPracticeToday = checkIsPracticeToday(userLastReportDate);
     if (sumTime >= 86400000) {
       toast.error("Nie da się ćwiczyć więcej niż 24 godziny dziennie");
       return;
@@ -56,8 +77,10 @@ const ReportView = () => {
       toast.error("Wpisz czas");
       return;
     }
-    setRatingSummaryVisible(true);
-    setRatingSummaryData(raiting);
+
+    const updatedActualDayWithoutBreak = didPracticeToday
+      ? actualDayWithoutBreak
+      : actualDayWithoutBreak + 1;
 
     const updatedUserData = {
       time: {
@@ -70,15 +93,23 @@ const ReportView = () => {
       },
       lvl: 1,
       points: points + raiting.basePoints,
-      sessionCount: sessionCount + 1,
+      sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
       habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
-      dayWithoutBreak: 0,
+      dayWithoutBreak:
+        dayWithoutBreak < updatedActualDayWithoutBreak
+          ? updatedActualDayWithoutBreak
+          : dayWithoutBreak,
       maxPoints:
         maxPoints < raiting.basePoints ? raiting.basePoints : maxPoints,
       achievements: [],
-      actualdayWithoutBreak: 0,
+      actualDayWithoutBreak: updatedActualDayWithoutBreak,
+      lastReportDate: todayDate.toISOString(),
     };
     dispatch(updateUserData(updatedUserData));
+    firebaseSetUserExceriseRaprot(useAuth!, raiting, todayDate);
+    firebaseUpdateUserStats(useAuth!, updatedUserData);
+    setRatingSummaryVisible(true);
+    setRatingSummaryData(raiting);
   };
 
   return (
@@ -185,6 +216,8 @@ const ReportView = () => {
           <RatingPopUp
             onClick={setRatingSummaryVisible}
             ratingData={ratingSummaryData!}
+            currentLevel={userData!.lvl}
+            actualDayWithoutBreak={userData!.actualDayWithoutBreak}
           />
         </Backdrop>
       )}

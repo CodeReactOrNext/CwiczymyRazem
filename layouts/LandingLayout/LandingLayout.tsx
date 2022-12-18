@@ -7,7 +7,7 @@ import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
 import MobileHeaderWrapper from "./components/UserHeader/MobileHeaderWrapper";
 import AchievementBox from "./components/Achievement/AchievementBox";
 import Decoration from "./components/Decoration";
-import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
 import UserHeader from "./components/UserHeader/UserHeader";
 import { convertMsToHM } from "helpers/timeConverter";
@@ -17,7 +17,7 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 interface LandingLayoutProps {
   statistics: StatisticProps[];
   navigation: LandingNavProps;
-  userStats: statisticsDataInterface;
+  userStats: StatisticsDataInterface;
   userName: string;
 }
 
