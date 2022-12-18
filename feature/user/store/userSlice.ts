@@ -1,23 +1,30 @@
 import {
   createAsyncThunk,
   createSlice,
-  isAnyOf,
-  PayloadAction,
+  isAnyOf
 } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import Router from "next/router";
+import { toast } from "react-toastify";
 import {
   firebaseCreateAccountWithEmail,
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
   firebaseGetUserName,
   firebaseLogUserOut,
+  firebaseSetUserExceriseRaprot,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
+  firebaseUpdateUserStats,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
-import { ReportDataInterface } from "../view/ReportView/ReportView.types";
+import { checkIsPracticeToday } from "../view/ReportView/helpers/checkIsPracticeToday";
+import { convertInputTime } from "../view/ReportView/helpers/convertInputTime";
+import {
+  ReportDataInterface,
+  ReportFormikInterface,
+} from "../view/ReportView/ReportView.types";
 import { signUpCredentials } from "../view/SingupView/SingupView";
 import {
   createAccountErrorHandler,
@@ -29,7 +36,7 @@ export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName: string } | null;
   userData: StatisticsDataInterface | null;
-  isFetching: "google" | "email" | "createAccount" | null;
+  isFetching: "google" | "email" | "createAccount" | "updateData" | null;
 }
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -92,6 +99,68 @@ export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   return null;
 });
 
+interface updateUserDataViaReportProps {
+  userAuth: string;
+  inputData: ReportFormikInterface;
+  raiting: ReportDataInterface;
+}
+
+export const updateUserDataViaReport = createAsyncThunk(
+  "user/updateUserDataViaReport",
+  async ({ userAuth, inputData, raiting }: updateUserDataViaReportProps) => {
+    const userData = await firebaseGetUserData(userAuth);
+
+    const { techniqueTime, theoryTime, hearingTime, creativeTime, sumTime } =
+      convertInputTime(inputData);
+
+    const {
+      time,
+      habitsCount,
+      maxPoints,
+      sessionCount,
+      points,
+      lastReportDate,
+      actualDayWithoutBreak,
+      dayWithoutBreak,
+    } = userData;
+
+    const userLastReportDate = new Date(lastReportDate);
+    const didPracticeToday = checkIsPracticeToday(userLastReportDate);
+
+    const updatedActualDayWithoutBreak = didPracticeToday
+      ? actualDayWithoutBreak
+      : actualDayWithoutBreak + 1;
+
+    const updatedUserData = {
+      time: {
+        technique: time.technique + techniqueTime,
+        theory: time.theory + theoryTime,
+        hearing: time.hearing + hearingTime,
+        creativity: time.creativity + creativeTime,
+        longestSession:
+          time.longestSession < sumTime ? sumTime : time.longestSession,
+      },
+      lvl: 1,
+      points: points + raiting.basePoints,
+      sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
+      habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
+      dayWithoutBreak:
+        dayWithoutBreak < updatedActualDayWithoutBreak
+          ? updatedActualDayWithoutBreak
+          : dayWithoutBreak,
+      maxPoints:
+        maxPoints < raiting.basePoints ? raiting.basePoints : maxPoints,
+      achievements: [],
+      actualDayWithoutBreak: updatedActualDayWithoutBreak,
+      lastReportDate: new Date().toISOString(),
+    };
+
+    firebaseSetUserExceriseRaprot(userAuth, raiting, new Date());
+    firebaseUpdateUserStats(userAuth, updatedUserData);
+    return updatedUserData;
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -105,12 +174,6 @@ export const userSlice = createSlice({
     addPracticeData: (state, action) => {
       state.userData = action.payload;
     },
-    updateUserData: (
-      state,
-      { payload }: PayloadAction<StatisticsDataInterface>
-    ) => {
-      state.userData = payload;
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -123,6 +186,13 @@ export const userSlice = createSlice({
       .addCase(createAccount.pending, (state) => {
         state.isFetching = "createAccount";
       })
+      .addCase(updateUserDataViaReport.pending, (state) => {
+        state.isFetching = "updateData";
+      })
+      .addCase(updateUserDataViaReport.rejected, (state) => {
+        state.isFetching = null;
+        toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+      })
       .addCase(logInViaEmail.rejected, (state, { error }) => {
         state.isFetching = null;
         loginViaEmailErrorHandler(error);
@@ -134,6 +204,10 @@ export const userSlice = createSlice({
       .addCase(createAccount.rejected, (state, { error }) => {
         state.isFetching = null;
         createAccountErrorHandler(error);
+      })
+      .addCase(updateUserDataViaReport.fulfilled, (state, { payload }) => {
+        state.isFetching = null;
+        state.userData = payload;
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
@@ -161,6 +235,6 @@ export const selectUserData = (state: RootState) => state.user.userData;
 export const selectIsFetching = (state: RootState) => state.user.isFetching;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
-export const { addUserAuth, addUserData, updateUserData } = userSlice.actions;
+export const { addUserAuth, addUserData } = userSlice.actions;
 
 export default userSlice.reducer;
