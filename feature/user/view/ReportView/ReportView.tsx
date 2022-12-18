@@ -14,21 +14,17 @@ import { Formik } from "formik";
 import { makeRatingData } from "./helpers/makeRatingData";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
+  selectIsFetching,
   selectUserAuth,
   selectUserData,
-  updateUserData,
+  updateUserDataViaReport,
 } from "feature/user/store/userSlice";
 import { convertInputTime } from "./helpers/convertInputTime";
 import { toast } from "react-toastify";
 import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
 import { ReportDataInterface, ReportFormikInterface } from "./ReportView.types";
-import { checkIsPracticeToday } from "./helpers/checkIsPracticeToday";
-import {
-  firebaseSetUserExceriseRaprot,
-  firebaseUpdateUserStats,
-} from "utils/firebase/firebase.utils";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { CircleSpinner } from "react-spinners-kit";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
@@ -38,7 +34,8 @@ const ReportView = () => {
   const { t } = useTranslation("report");
   const dispatch = useAppDispatch();
   const userData = useAppSelector(selectUserData);
-  const useAuth = useAppSelector(selectUserAuth);
+  const userAuth = useAppSelector(selectUserAuth);
+  const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
   const formikInitialValues: ReportFormikInterface = {
     techniqueHours: "",
@@ -53,22 +50,7 @@ const ReportView = () => {
   };
 
   const onSubmit = (inputData: ReportFormikInterface) => {
-    const {
-      time,
-      habitsCount,
-      maxPoints,
-      sessionCount,
-      points,
-      lastReportDate,
-      actualDayWithoutBreak,
-      dayWithoutBreak,
-    } = userData!;
-    const { techniqueTime, theoryTime, hearingTime, creativeTime, sumTime } =
-      convertInputTime(inputData);
-    const raiting = makeRatingData(inputData, sumTime);
-    const todayDate = new Date();
-    const userLastReportDate = new Date(lastReportDate!);
-    const didPracticeToday = checkIsPracticeToday(userLastReportDate);
+    const { sumTime } = convertInputTime(inputData);
     if (sumTime >= 86400000) {
       toast.error("Nie da się ćwiczyć więcej niż 24 godziny dziennie");
       return;
@@ -77,37 +59,13 @@ const ReportView = () => {
       toast.error("Wpisz czas");
       return;
     }
+    if (!userAuth) {
+      toast.error("Nie jesteś  zalogowany");
+      return;
+    }
+    const raiting = makeRatingData(inputData, sumTime);
 
-    const updatedActualDayWithoutBreak = didPracticeToday
-      ? actualDayWithoutBreak
-      : actualDayWithoutBreak + 1;
-
-    const updatedUserData = {
-      time: {
-        technique: time.technique + techniqueTime,
-        theory: time.theory + theoryTime,
-        hearing: time.hearing + hearingTime,
-        creativity: time.creativity + creativeTime,
-        longestSession:
-          time.longestSession < sumTime ? sumTime : time.longestSession,
-      },
-      lvl: 1,
-      points: points + raiting.basePoints,
-      sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
-      habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
-      dayWithoutBreak:
-        dayWithoutBreak < updatedActualDayWithoutBreak
-          ? updatedActualDayWithoutBreak
-          : dayWithoutBreak,
-      maxPoints:
-        maxPoints < raiting.basePoints ? raiting.basePoints : maxPoints,
-      achievements: [],
-      actualDayWithoutBreak: updatedActualDayWithoutBreak,
-      lastReportDate: todayDate.toISOString(),
-    };
-    dispatch(updateUserData(updatedUserData));
-    firebaseSetUserExceriseRaprot(useAuth!, raiting, todayDate);
-    firebaseUpdateUserStats(useAuth!, updatedUserData);
+    dispatch(updateUserDataViaReport({ userAuth, inputData, raiting }));
     setRatingSummaryVisible(true);
     setRatingSummaryData(raiting);
   };
@@ -204,7 +162,15 @@ const ReportView = () => {
                   <div className='m-2 h-6'>
                     {Object.keys(errors).length !== 0 && <ErrorBox />}
                   </div>
-                  <Button type='submit'>{t("report_button")}</Button>
+                  <Button type='submit'>
+                    {isFetching ? (
+                      <div className='px-3'>
+                        <CircleSpinner size={24} />
+                      </div>
+                    ) : (
+                      t("report_button")
+                    )}
+                  </Button>
                 </div>
               </ReportFormLayout>
             </>
