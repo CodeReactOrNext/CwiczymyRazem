@@ -1,8 +1,4 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  isAnyOf
-} from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import Router from "next/router";
 import { toast } from "react-toastify";
@@ -224,7 +220,6 @@ export const userSlice = createSlice({
           state.userInfo = action.payload.userInfo;
           state.userData = action.payload.userData;
           state.userAuth = action.payload.userAuth;
-          Router.push("/");
         }
       );
   },
