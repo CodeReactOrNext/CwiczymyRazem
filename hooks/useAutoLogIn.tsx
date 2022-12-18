@@ -13,7 +13,7 @@ function useAutoLogIn() {
     if (user && !isUserLoggedIn) dispatch(autoLogIn(user));
   }, [user, dispatch, isUserLoggedIn]);
 
-  return { isLoggedIn: Boolean(user && isUserLoggedIn), loading };
+  return { isLoggedIn: Boolean(user && isUserLoggedIn), isLoading: loading };
 }
 
 export default useAutoLogIn;
