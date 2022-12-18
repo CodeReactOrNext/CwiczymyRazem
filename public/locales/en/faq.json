@@ -1,1 +1,15 @@
-{ "faq": "Frequently asked questions" }
+{
+  "faq": "Frequently asked questions",
+  "about_title": "What is Practice Together",
+  "about_description": "Practice Together is a website that allows you to collect statistics about your guitar exercises. All you have to do is show us what and how long you practiced, and we will reward you with points, achievements, and a ranking among other players. The goal of our website is to motivate you to play the instrument more often and regularly, and to record the effort you put into improving your skills. With us, you can track your progress and enjoy it on your guitar journey.",
+  "how_its_work_title": "How to practice?",
+  "how_its_work_description": "With 'Practice Together', you can practice in two ways. You can use our stopwatch, available under the 'Practice' tab. The stopwatch will record the time you spend on individual skills, which will help you focus during practice. After the session, you will be taken to the 'Report' section, where you can mark your good habits and edit your time. If you don't want to use the stopwatch, you can simply choose the 'Report' option, enter the time and mark the 'good habits' you used during training. After approval, you will receive a summary of your training.",
+  "about_points_title": "For what are points awarded?",
+  "about_points_description": "Points are awarded for time and healthy habits, which are multiplied by the number of days in a row. After each report, you receive a summary of your scoring.",
+  "several_times_repotr_title": "Can I submit a report more than once a day?",
+  "several_times_repotr_description": "Yes. They are not then included in the number of sessions and the number of consecutive days.",
+  "get_achievement_title": "How to earn a badge?",
+  "get_achievement_description": "Badges are awarded for meeting specific conditions, such as: exceeding a specific number of points for one report or exceeding the total time spent practicing the guitar. Badges and requirements for earning them are hidden, but you can view them in the rankings and profiles of other players.",
+  "about_excerise_title": "How do I distinguish what I am currently practicing?",
+  "about_excerise_description": "We propose dividing it into technique, theory, listening, and creative work. In the report prompts, you can see exercise suggestions for each of these pillars. The final choice of exercises is up to you and depends on your individual goals and needs. It is important to find a balance between these different areas and not neglect any of them."
+}
