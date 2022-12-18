@@ -1,13 +1,13 @@
 import Avatar from "components/Avatar";
 import Logo from "components/Logo";
 import UserNav from "components/UserNav";
-import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { Level } from "./components/Level";
 import { NavDecoration } from "./components/NavDecoration";
 import { WelcomeMessage } from "./components/WelcomMessage";
 
 interface UserHeaderProps {
-  userStats: statisticsDataInterface;
+  userStats: StatisticsDataInterface;
   userName: string;
 }
 

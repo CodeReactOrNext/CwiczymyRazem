@@ -1,17 +1,30 @@
-import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  isAnyOf
+} from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import Router from "next/router";
+import { toast } from "react-toastify";
 import {
   firebaseCreateAccountWithEmail,
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
   firebaseGetUserName,
   firebaseLogUserOut,
+  firebaseSetUserExceriseRaprot,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
+  firebaseUpdateUserStats,
 } from "utils/firebase/firebase.utils";
-import { statisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
+import { checkIsPracticeToday } from "../view/ReportView/helpers/checkIsPracticeToday";
+import { convertInputTime } from "../view/ReportView/helpers/convertInputTime";
+import {
+  ReportDataInterface,
+  ReportFormikInterface,
+} from "../view/ReportView/ReportView.types";
 import { signUpCredentials } from "../view/SingupView/SingupView";
 import {
   createAccountErrorHandler,
@@ -22,16 +35,14 @@ import {
 export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName: string } | null;
-  userData: statisticsDataInterface | null;
-  isFetching: "google" | "email" | "createAccount" | null;
-  error: string | null;
+  userData: StatisticsDataInterface | null;
+  isFetching: "google" | "email" | "createAccount" | "updateData" | null;
 }
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
   userData: null,
   isFetching: null,
-  error: null,
 };
 
 export const logInViaGoogle = createAsyncThunk(
@@ -83,11 +94,72 @@ export const createAccount = createAsyncThunk(
     return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
-
 export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   await firebaseLogUserOut();
   return null;
 });
+
+interface updateUserDataViaReportProps {
+  userAuth: string;
+  inputData: ReportFormikInterface;
+  raiting: ReportDataInterface;
+}
+
+export const updateUserDataViaReport = createAsyncThunk(
+  "user/updateUserDataViaReport",
+  async ({ userAuth, inputData, raiting }: updateUserDataViaReportProps) => {
+    const userData = await firebaseGetUserData(userAuth);
+
+    const { techniqueTime, theoryTime, hearingTime, creativeTime, sumTime } =
+      convertInputTime(inputData);
+
+    const {
+      time,
+      habitsCount,
+      maxPoints,
+      sessionCount,
+      points,
+      lastReportDate,
+      actualDayWithoutBreak,
+      dayWithoutBreak,
+    } = userData;
+
+    const userLastReportDate = new Date(lastReportDate);
+    const didPracticeToday = checkIsPracticeToday(userLastReportDate);
+
+    const updatedActualDayWithoutBreak = didPracticeToday
+      ? actualDayWithoutBreak
+      : actualDayWithoutBreak + 1;
+
+    const updatedUserData = {
+      time: {
+        technique: time.technique + techniqueTime,
+        theory: time.theory + theoryTime,
+        hearing: time.hearing + hearingTime,
+        creativity: time.creativity + creativeTime,
+        longestSession:
+          time.longestSession < sumTime ? sumTime : time.longestSession,
+      },
+      lvl: 1,
+      points: points + raiting.basePoints,
+      sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
+      habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
+      dayWithoutBreak:
+        dayWithoutBreak < updatedActualDayWithoutBreak
+          ? updatedActualDayWithoutBreak
+          : dayWithoutBreak,
+      maxPoints:
+        maxPoints < raiting.basePoints ? raiting.basePoints : maxPoints,
+      achievements: [],
+      actualDayWithoutBreak: updatedActualDayWithoutBreak,
+      lastReportDate: new Date().toISOString(),
+    };
+
+    firebaseSetUserExceriseRaprot(userAuth, raiting, new Date());
+    firebaseUpdateUserStats(userAuth, updatedUserData);
+    return updatedUserData;
+  }
+);
 
 export const userSlice = createSlice({
   name: "user",
@@ -97,6 +169,9 @@ export const userSlice = createSlice({
       state.userAuth = action.payload;
     },
     addUserData: (state, action) => {
+      state.userData = action.payload;
+    },
+    addPracticeData: (state, action) => {
       state.userData = action.payload;
     },
   },
@@ -111,6 +186,13 @@ export const userSlice = createSlice({
       .addCase(createAccount.pending, (state) => {
         state.isFetching = "createAccount";
       })
+      .addCase(updateUserDataViaReport.pending, (state) => {
+        state.isFetching = "updateData";
+      })
+      .addCase(updateUserDataViaReport.rejected, (state) => {
+        state.isFetching = null;
+        toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+      })
       .addCase(logInViaEmail.rejected, (state, { error }) => {
         state.isFetching = null;
         loginViaEmailErrorHandler(error);
@@ -122,6 +204,10 @@ export const userSlice = createSlice({
       .addCase(createAccount.rejected, (state, { error }) => {
         state.isFetching = null;
         createAccountErrorHandler(error);
+      })
+      .addCase(updateUserDataViaReport.fulfilled, (state, { payload }) => {
+        state.isFetching = null;
+        state.userData = payload;
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
