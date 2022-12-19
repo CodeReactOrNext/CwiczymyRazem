@@ -1,27 +1,6 @@
 {
-  "subtitlebar_text": "Report",
-  "exercise_type_title": "Enter exercise time",
-  "technique": "Technique",
-  "theory": "Theory",
-  "hearing": "Hearing",
-  "creative": "Creative work",
-  "healthy_habits_title": "Healthy habits",
-  "exercise_plan": "Completed exercise plan?",
-  "new_things": "Practiced new things?",
-  "warmup": "Performed warmup?",
-  "metronome": "Used metronome?",
-  "recording": "Recorded yourself?",
-  "report_button": "Report",
-  "rating_popup": {
-    "title": "YOU GOT",
-    "points": "pts",
-    "back": "Back",
-    "regularity": "for regularity",
-    "streak": "days in a row",
-    "habits": "for healthy habits",
-    "habitsWithCount_one": "you have adopted {{count}} healthy habit",
-    "habitsWithCount_other": "you have adopted {{count}} healthy habits",
-    "time": "for the amount of time",
-    "time_amount": "you practiced for"
-  }
+  "fetch_error": "An error occurred while retrieving data. Please refresh the page.",
+  "points": "Points",
+  "exercise_time": "Exercise time",
+  "achievements": "Achievements"
 }

@@ -2,10 +2,8 @@ import Achievement from "components/Achievement";
 import Avatar from "components/Avatar";
 import { achievements } from "data/achievements";
 import { convertMsToHM } from "helpers/timeConverter";
-import {
-  FaAngleLeft,
-  FaAngleRight,
-} from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 interface LeadboardColumnProps {
   place: number;
@@ -14,6 +12,7 @@ interface LeadboardColumnProps {
 }
 
 const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
+  const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
   return (
     <div className='flex w-full justify-center p-5 text-xs xs:text-base'>
@@ -52,7 +51,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
               <p className='text-xl leading-[22px] xxs:text-3xl '>
                 {statistics.points}
               </p>
-              <p className='leading-[25px]  text-tertiary'>Punktów</p>
+              <p className='leading-[25px]  text-tertiary'>{t("points")}</p>
             </div>
             <div className='flex  flex-col items-center md:justify-end md:px-2'>
               <p className='text-xl leading-[22px] xxs:text-3xl'>
@@ -60,7 +59,9 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
                   time.creativity + time.hearing + time.technique + time.theory
                 )}
               </p>
-              <p className='  leading-[25px] text-tertiary'>Czas Ćwiczeń</p>
+              <p className='  leading-[25px] text-tertiary'>
+                {t("exercise_time")}
+              </p>
             </div>
           </div>
           <div className=' col-span-3 flex h-full w-full flex-col items-center justify-center  md:col-span-1  md:w-fit md:justify-end '>
@@ -86,7 +87,8 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
               <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText' />
             </div>
             <p className=' text-tertiary'>
-              Osiągnięcia {statistics.achievements.length}/{achievements.length}
+              {t("achievements")} {statistics.achievements.length}/
+              {achievements.length}
             </p>
           </div>
         </div>
