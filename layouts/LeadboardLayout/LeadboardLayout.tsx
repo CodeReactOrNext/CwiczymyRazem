@@ -1,10 +1,12 @@
 import MainLayout from "layouts/MainLayout";
-import { firebaseGetUsersExceriseRaprot } from "utils/firebase/firebase.utils";
 import LeadboardColumn from "./components/LeadboardColumn/LeadboardColumn";
-import { useState, useEffect } from "react";
-import { statistics } from "utils/firebase/userStatisticsInitialData";
+import { FirebaseUserDataInterface } from "utils/firebase/firebase.types";
 
-const LeadboardLayout = ({ usersData }) => {
+interface LeadboardLayoutProps {
+  usersData: FirebaseUserDataInterface[];
+}
+
+const LeadboardLayout = ({ usersData }: LeadboardLayoutProps) => {
   return (
     <MainLayout subtitle='Leadboard' variant='secondary'>
       {usersData.map((user, index) => (
