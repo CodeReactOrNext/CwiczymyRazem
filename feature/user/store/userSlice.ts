@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
-import Router from "next/router";
+
 import { toast } from "react-toastify";
 import {
   firebaseCreateAccountWithEmail,
@@ -8,7 +8,7 @@ import {
   firebaseGetUserData,
   firebaseGetUserName,
   firebaseLogUserOut,
-  firebaseSetUserExceriseRaprot,
+  firebaseSetUserExerciseRaprot,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
   firebaseUpdateUserStats,
@@ -151,7 +151,7 @@ export const updateUserDataViaReport = createAsyncThunk(
       lastReportDate: new Date().toISOString(),
     };
 
-    firebaseSetUserExceriseRaprot(userAuth, raiting, new Date());
+    firebaseSetUserExerciseRaprot(userAuth, raiting, new Date());
     firebaseUpdateUserStats(userAuth, updatedUserData);
     return updatedUserData;
   }

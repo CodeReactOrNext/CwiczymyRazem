@@ -17,6 +17,9 @@ import {
   updateDoc,
   getDocs,
   collection,
+  query,
+  orderBy,
+  Firestore,
 } from "firebase/firestore";
 import {
   statistics,
@@ -57,15 +60,13 @@ export const firebaseCreateUserDocumentFromAuth = async (userAuth: User) => {
   const userDocRef = doc(db, "users", userAuth.uid);
   const userSnapshot = await getDoc(userDocRef);
   if (!userSnapshot.exists()) {
-    const { displayName, email } = userAuth;
+    const { displayName } = userAuth;
     const createdAt = new Date();
     try {
       await setDoc(userDocRef, {
         displayName,
-        email,
         createdAt,
         statistics,
-        exercisesData: [],
       });
     } catch (error) {
       console.log(error);
@@ -90,7 +91,7 @@ export const firebaseGetUserName = async (userAuth: string) => {
   return userSnapshot.data()!.displayName;
 };
 
-export const firebaseSetUserExceriseRaprot = async (
+export const firebaseSetUserExerciseRaprot = async (
   userAuth: string,
   raport: ReportDataInterface,
   date: Date
@@ -105,14 +106,15 @@ export const firebaseUpdateUserStats = async (
   statistics: StatisticsDataInterface
 ) => {
   const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
   await updateDoc(userDocRef, { statistics });
 };
-export const firebaseGetUserExceriseRaprot = async (userAuth: string) => {
-  const userDocRef = await getDocs(
-    collection(db, "users", userAuth, "exerciseData")
-  );
+
+export const firebaseGetUsersExceriseRaprot = async () => {
+  const userDocRef = await getDocs(collection(db, "users"));
+  const userStatsArr = [];
   userDocRef.forEach((doc) => {
-    console.log(doc.data().reportDate.toDate());
+    userStatsArr.push(doc.data());
   });
+
+  return userStatsArr;
 };

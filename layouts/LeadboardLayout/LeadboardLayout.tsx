@@ -1,25 +1,40 @@
 import MainLayout from "layouts/MainLayout";
+import { firebaseGetUsersExceriseRaprot } from "utils/firebase/firebase.utils";
 import LeadboardColumn from "./components/LeadboardColumn/LeadboardColumn";
+import { useState, useEffect } from "react";
+import { statistics } from "utils/firebase/userStatisticsInitialData";
 
 const LeadboardLayout = () => {
+  const [usersData, setUsersData] = useState<any>(null);
+
+  useEffect(() => {
+    firebaseGetUsersExceriseRaprot()
+      .then((usersData) =>
+        setUsersData(
+          usersData.sort(
+            (a, b) =>
+              b.statistics.points - a.statistics.points
+          )
+        )
+      )
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
     <MainLayout subtitle='Leadboard' variant='secondary'>
       <div>
-        <div className='flex w-full justify-end gap-6 px-4 text-xl xl:mr-12'>
-          <p>Dzień</p>
-          <p>Tydzień</p>
-          <p>Wszystko</p>
-        </div>
-
-        <LeadboardColumn place={1} nick='Darek' />
-        <LeadboardColumn place={2} nick='WWWWWWWWWW...' />
-        <LeadboardColumn place={1} nick='Dzień dobry' />
-        <LeadboardColumn place={4} nick='Dududek' />
-        <LeadboardColumn place={2} nick='Rais' />
-        <LeadboardColumn place={3} nick='Krokon' />
-        <LeadboardColumn place={4} nick='Marcin Srzyżewski' />
-        <LeadboardColumn place={4} nick='kamils_p' />
-        <LeadboardColumn place={4} nick='wrop_330' />
+       
+        {usersData &&
+          usersData.map((user, index) => (
+            <LeadboardColumn
+              key={index}
+              place={index + 1}
+              nick={user.displayName}
+              statistics={user.statistics}
+            />
+          ))}
       </div>
     </MainLayout>
   );
