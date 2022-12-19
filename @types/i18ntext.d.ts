@@ -13,6 +13,7 @@ import type login from "../public/locales/en/login.json";
 import type signup from "../public/locales/en/signup.json";
 import type footer from "../public/locales/en/footer.json";
 import type faq from "../public/locales/en/faq.json";
+import type leadboard from "../public/locales/en/leadboard.json";
 import type report from "../public/locales/en/report.json";
 import type achievements from "../public/locales/en/achievements.json";
 import type not_found from "../public/locales/en/404.json";
@@ -26,6 +27,7 @@ interface I18nNamespaces {
   signup: typeof signup;
   footer: typeof footer;
   faq: typeof faq;
+  leadboard: typeof leadboard;
   report: typeof report;
   achievements: typeof achievements;
   "404": typeof not_found;
