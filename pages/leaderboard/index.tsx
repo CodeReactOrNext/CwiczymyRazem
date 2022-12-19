@@ -11,7 +11,10 @@ export default LeaderBoardPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", ["common"])),
+      ...(await serverSideTranslations(locale ?? "pl", [
+        "common",
+        "leadboard",
+      ])),
     },
   };
 }
