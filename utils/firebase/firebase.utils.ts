@@ -17,11 +17,6 @@ import {
   updateDoc,
   getDocs,
   collection,
-  query,
-  orderBy,
-  Firestore,
-  DocumentData,
-  DocumentReference,
 } from "firebase/firestore";
 import { FirebaseUserDataInterface } from "./firebase.types";
 import {
@@ -113,9 +108,9 @@ export const firebaseUpdateUserStats = async (
 };
 
 export const firebaseGetUsersExceriseRaprot = async () => {
-  const userDocRef = await getDocs(collection(db, "users"));
+  const usersDocRef = await getDocs(collection(db, "users"));
   const userStatsArr: FirebaseUserDataInterface[] = [];
-  userDocRef.forEach((doc) => {
+  usersDocRef.forEach((doc) => {
     const userData = doc.data() as FirebaseUserDataInterface;
     userStatsArr.push(userData);
   });
