@@ -108,6 +108,17 @@ export const firebaseUpdateUserStats = async (
   const userSnapshot = await getDoc(userDocRef);
   await updateDoc(userDocRef, { statistics });
 };
+
+export const firebaseUpdateUserCredentials = async (
+  userAuth: string,
+  newUserData: { displayName: string; email: string; password: string }
+) => {
+  const userDocRef = doc(db, "users", userAuth);
+  const newName = newUserData.displayName;
+  const userSnapshot = await getDoc(userDocRef);
+  await updateDoc(userDocRef, { displayName: newName });
+};
+
 export const firebaseGetUserExceriseRaprot = async (userAuth: string) => {
   const userDocRef = await getDocs(
     collection(db, "users", userAuth, "exerciseData")

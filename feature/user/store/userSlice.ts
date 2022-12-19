@@ -3,6 +3,7 @@ import { User } from "firebase/auth";
 import Router from "next/router";
 import { toast } from "react-toastify";
 import {
+  auth,
   firebaseCreateAccountWithEmail,
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
@@ -11,6 +12,7 @@ import {
   firebaseSetUserExceriseRaprot,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
+  firebaseUpdateUserCredentials,
   firebaseUpdateUserStats,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
@@ -90,6 +92,29 @@ export const createAccount = createAsyncThunk(
     return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
+
+export const updateAccount = createAsyncThunk(
+  "user/updateAccount",
+  async ({ login, email, password }: signUpCredentials) => {
+    const userAuth = await firebaseCreateUserDocumentFromAuth(
+      auth.currentUser!
+    );
+    const updatedUserInfo = {
+      displayName: login,
+      email,
+      password,
+    };
+    await firebaseUpdateUserCredentials(userAuth, {
+      displayName: login,
+      email,
+      password,
+    });
+    console.log(updatedUserInfo);
+    const userData = await firebaseGetUserData(userAuth);
+    return { userInfo: updatedUserInfo, userAuth, userData };
+  }
+);
+
 export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   await firebaseLogUserOut();
   return null;
@@ -207,6 +232,12 @@ export const userSlice = createSlice({
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
+      })
+      .addCase(updateAccount.fulfilled, (state, action) => {
+        state.isFetching = null;
+        state.userInfo = action.payload.userInfo;
+        state.userData = action.payload.userData;
+        state.userAuth = action.payload.userAuth;
       })
       .addMatcher(
         isAnyOf(
