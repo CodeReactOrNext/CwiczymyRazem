@@ -1,8 +1,9 @@
-import LeadboardLayout from "layouts/LeadboardLayout";
+import LeadboardView from "feature/leadboard/view/LeadboardView";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 const LeaderBoardPage: NextPage = () => {
-  return <LeadboardLayout />;
+  return <LeadboardView />;
 };
 
 export default LeaderBoardPage;
