@@ -23,7 +23,11 @@ export default ReportPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", ["common", "report"])),
+      ...(await serverSideTranslations(locale ?? "pl", [
+        "common",
+        "report",
+        "landing",
+      ])),
     },
   };
 }
