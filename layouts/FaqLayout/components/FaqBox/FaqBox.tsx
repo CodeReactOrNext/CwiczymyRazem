@@ -10,7 +10,7 @@ const FaqBox = ({ title, message }: FaqBoxProps) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className='cursor-pointer' onClick={() => setIsOpen(!isOpen)}>
-      <div className='min-h-20  flex w-full flex-row items-center gap-4 bg-second p-4 text-4xl text-tertiary hover:bg-second-100'>
+      <div className='min-h-20 flex w-full flex-row items-center gap-4 bg-second p-4 text-2xl text-tertiary hover:bg-second-100 md:text-3xl lg:text-4xl'>
         <div className='text-main-opposed'>
           {isOpen ? <FaMinus /> : <FaPlus />}
         </div>
