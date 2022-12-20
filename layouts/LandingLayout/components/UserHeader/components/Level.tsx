@@ -1,3 +1,4 @@
+import { calcExperience } from "helpers/calcExperience";
 import { useTranslation } from "react-i18next";
 
 export const Level = ({ points, lvl }: { points: number; lvl: number }) => {
@@ -21,7 +22,8 @@ export const Level = ({ points, lvl }: { points: number; lvl: number }) => {
         </p>
       </div>
       <p>
-        {points}/550{t("points_short")}
+        {points}/{calcExperience(lvl + 1)}
+        {t("points_short")}
       </p>
     </div>
   );

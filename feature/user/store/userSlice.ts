@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
+import { calcExperience } from "helpers/calcExperience";
 
 import { toast } from "react-toastify";
 import {
@@ -22,6 +23,7 @@ import {
   ReportFormikInterface,
 } from "../view/ReportView/ReportView.types";
 import { signUpCredentials } from "../view/SingupView/SingupView";
+import { getUserLvl } from "./helpers/getUserLvl";
 import {
   createAccountErrorHandler,
   loginViaEmailErrorHandler,
@@ -115,6 +117,7 @@ export const updateUserDataViaReport = createAsyncThunk(
       maxPoints,
       sessionCount,
       points,
+      lvl,
       lastReportDate,
       actualDayWithoutBreak,
       dayWithoutBreak,
@@ -136,8 +139,8 @@ export const updateUserDataViaReport = createAsyncThunk(
         longestSession:
           time.longestSession < sumTime ? sumTime : time.longestSession,
       },
-      lvl: 1,
       points: points + raiting.basePoints,
+      lvl: getUserLvl(lvl, points + raiting.basePoints),
       sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
       habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
       dayWithoutBreak:
