@@ -2,28 +2,37 @@ import Avatar from "components/Avatar";
 import Button from "components/Button";
 import Input from "components/Input";
 import {
+  getUserProvider,
   selectUserAuth,
   selectUserData,
   updateAccount,
 } from "feature/user/store/userSlice";
+import { UserInfo } from "firebase/auth";
 import { Form, Formik } from "formik";
 import FormLayout from "layouts/FormLayout";
 import MainLayout from "layouts/MainLayout";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaUserAlt } from "react-icons/fa";
-import { changeDataSchema } from "schemas/changeData";
+import { updateCredsSchema } from "schemas/updateCreds";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { signUpCredentials } from "../SingupView/SingupView";
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings"]);
   const [nameInputVisible, setNameInputVisible] = useState(false);
+  const [userProviderData, setUserProviderData] = useState<UserInfo>();
 
   const dispatch = useAppDispatch();
+  const userName = useAppSelector((state) => state.user.userInfo?.displayName);
+
+  useEffect(() => {
+    dispatch(getUserProvider()).then((data) => {
+      setUserProviderData(data.payload as UserInfo);
+    });
+  }, [dispatch]);
 
   const changeNameHandler = (data: signUpCredentials) => {
-    console.log(data);
     dispatch(updateAccount(data));
   };
 
@@ -48,14 +57,14 @@ const SettingsView = () => {
         <hr className='border-main-opposed-400' />
         <Formik
           initialValues={formikInitialValues}
-          validationSchema={changeDataSchema}
+          validationSchema={updateCredsSchema}
           onSubmit={changeNameHandler}>
           <Form>
             <>
               <div className='flex flex-col'>
                 <div className='flex flex-row gap-2 p-4 text-2xl'>
                   <p className='text-tertiary'>Nick:</p>
-                  <p>NazwaUżytwkonika</p>
+                  <p>{userName}</p>
                   {!nameInputVisible && (
                     <button
                       type='button'
@@ -76,26 +85,35 @@ const SettingsView = () => {
                   </div>
                 )}
               </div>
-              <hr className='border-main-opposed-400' />
-              <div className='flex flex-row gap-2 p-4 text-2xl'>
-                <p className='text-tertiary'>E-mail:</p>
-                <p>mail@mail.pl</p>
-                <button type='button' className='items-end text-lg text-main'>
-                  Edytuj
-                </button>
-              </div>
-              <hr className='border-main-opposed-400' />
-              <div className='flex  flex-row gap-2 p-4 text-2xl'>
-                <p className='text-tertiary'>Hasło</p>
-                <button type='button' className='text-lg text-main'>
-                  Edytuj
-                </button>
-              </div>
+              <>
+                <hr className='border-main-opposed-400' />
+                <div className='flex flex-row gap-2 p-4 text-2xl'>
+                  <p className='text-tertiary'>E-mail:</p>
+                  <p>{userProviderData?.email}</p>
+                  {userProviderData?.providerId !== "google.com" ? (
+                    <button type='button' className='text-lg text-main'>
+                      Edytuj
+                    </button>
+                  ) : (
+                    "Zalogowano z Google"
+                  )}
+                </div>
+                <hr className='border-main-opposed-400' />
+                <div className='flex  flex-row gap-2 p-4 text-2xl'>
+                  <p className='text-tertiary'>Hasło</p>
+                  {userProviderData?.providerId !== "google.com" ? (
+                    <button type='button' className='text-lg text-main'>
+                      Edytuj
+                    </button>
+                  ) : (
+                    "Zalogowano z Google"
+                  )}
+                </div>
+              </>
             </>
           </Form>
         </Formik>
         <hr className='border-main-opposed-400' />
-
         <div className='flex flex-col gap-2  p-4 text-2xl'>
           <p className='text-tertiary'>Restart Statystyk</p>
           <p className='text-lg'>

@@ -8,6 +8,8 @@ import {
   createUserWithEmailAndPassword,
   User,
   signOut,
+  updateProfile,
+  onAuthStateChanged,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -85,9 +87,11 @@ export const firebaseGetUserData = async (userAuth: string) => {
 };
 
 export const firebaseGetUserName = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
-  return userSnapshot.data()!.displayName;
+  // const userDocRef = doc(db, "users", userAuth);
+  // const userSnapshot = await getDoc(userDocRef);
+  const displayName = auth.currentUser?.displayName;
+  return displayName as string;
+  // return userSnapshot.data()!.displayName;
 };
 
 export const firebaseSetUserExceriseRaprot = async (
@@ -106,6 +110,7 @@ export const firebaseUpdateUserStats = async (
 ) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
+
   await updateDoc(userDocRef, { statistics });
 };
 
@@ -113,9 +118,15 @@ export const firebaseUpdateUserCredentials = async (
   userAuth: string,
   newUserData: { displayName: string; email: string; password: string }
 ) => {
-  const userDocRef = doc(db, "users", userAuth);
   const newName = newUserData.displayName;
-  const userSnapshot = await getDoc(userDocRef);
+  const userDocRef = doc(db, "users", userAuth);
+  if (auth.currentUser) {
+    updateProfile(auth.currentUser, { displayName: newName })
+      .then(() => {
+        console.log("Updated!");
+      })
+      .catch((error) => console.log(error));
+  }
   await updateDoc(userDocRef, { displayName: newName });
 };
 
@@ -127,3 +138,20 @@ export const firebaseGetUserExceriseRaprot = async (userAuth: string) => {
     console.log(doc.data().reportDate.toDate());
   });
 };
+
+export const firebaseGetUserProviderData = async () => {
+  const providerData = auth.currentUser?.providerData[0];
+  if (providerData) {
+    return providerData;
+  }
+  return {
+    providerId: null,
+    uid: null,
+    displayName: null,
+    email: null,
+    phoneNumber: null,
+    photoURL: null,
+  };
+};
+
+// firebaseGetUserProviderData();
