@@ -10,7 +10,7 @@ import {
 import { IconType } from "react-icons/lib";
 import { AchievementsRarityType } from "./achievementsRarity";
 
-export interface AchievementsInterface extends AchievementsRarityType{
+export interface AchievementsInterface extends AchievementsRarityType {
   id: string;
   name: string;
   Icon: IconType;
@@ -52,7 +52,7 @@ export const achievements: AchievementsInterface[] = [
     name: "Ogień!",
     Icon: FaHotjar,
     rarity: "veryRare",
-    description: "Zdobądź 30 punktów za jeden raport",
+    description: "Zdobądź 60 punktów za jeden raport",
   },
   {
     id: "health_habits",
