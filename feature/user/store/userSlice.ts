@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
+import { achievements } from "data/achievements";
 import { User } from "firebase/auth";
 import { calcExperience } from "helpers/calcExperience";
 
@@ -121,6 +122,7 @@ export const updateUserDataViaReport = createAsyncThunk(
       lastReportDate,
       actualDayWithoutBreak,
       dayWithoutBreak,
+      achievements,
     } = userData;
 
     const userLastReportDate = new Date(lastReportDate);
@@ -130,7 +132,7 @@ export const updateUserDataViaReport = createAsyncThunk(
       ? actualDayWithoutBreak
       : actualDayWithoutBreak + 1;
 
-    const updatedUserData = {
+    const updatedUserData: StatisticsDataInterface = {
       time: {
         technique: time.technique + techniqueTime,
         theory: time.theory + theoryTime,
@@ -149,14 +151,36 @@ export const updateUserDataViaReport = createAsyncThunk(
           : dayWithoutBreak,
       maxPoints:
         maxPoints < raiting.basePoints ? raiting.basePoints : maxPoints,
-      achievements: [],
       actualDayWithoutBreak: updatedActualDayWithoutBreak,
+      achievements: achievements,
       lastReportDate: new Date().toISOString(),
     };
 
+    const fetchAchievements = () =>
+      fetch("/api/achievement", {
+        method: "POST",
+        body: JSON.stringify({
+          statistics: updatedUserData,
+          raiting,
+          inputData,
+        }),
+      });
+
+    const achievementCheck = async () => {
+      const response = await fetchAchievements();
+      const data = await response.json();
+      return JSON.parse(data);
+    };
+    const newAchievements = await achievementCheck();
+
+    const updatedUserDataWithAchievements: StatisticsDataInterface = {
+      ...updatedUserData,
+      achievements: [...newAchievements, ...updatedUserData.achievements],
+    };
+
     firebaseSetUserExerciseRaprot(userAuth, raiting, new Date());
-    firebaseUpdateUserStats(userAuth, updatedUserData);
-    return updatedUserData;
+    firebaseUpdateUserStats(userAuth, updatedUserDataWithAchievements);
+    return updatedUserDataWithAchievements;
   }
 );
 
