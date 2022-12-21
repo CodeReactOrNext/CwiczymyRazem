@@ -8,6 +8,7 @@ import {
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
   firebaseGetUserName,
+  firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseSetUserExceriseRaprot,
   firebaseSignInWithEmail,
@@ -30,17 +31,35 @@ import {
   loginViaGoogleErrorHandler,
 } from "./userErrorsHandling";
 
+export interface providerData {
+  providerId: string | null;
+  uid: string | null;
+  displayName: string | null;
+  email: string | null;
+  phoneNumber: string | null;
+  photoURL: string | null;
+}
+
 export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName: string } | null;
   userData: StatisticsDataInterface | null;
   isFetching: "google" | "email" | "createAccount" | "updateData" | null;
+  providerData: providerData;
 }
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
   userData: null,
   isFetching: null,
+  providerData: {
+    providerId: null,
+    uid: null,
+    displayName: null,
+    email: null,
+    phoneNumber: null,
+    photoURL: null,
+  },
 };
 
 export const logInViaGoogle = createAsyncThunk(
@@ -75,6 +94,7 @@ export const autoLogIn = createAsyncThunk(
     };
     const userData = await firebaseGetUserData(userAuth);
     const userName = userWithDisplayName.displayName;
+    console.log(user);
     return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
@@ -109,9 +129,17 @@ export const updateAccount = createAsyncThunk(
       email,
       password,
     });
-    console.log(updatedUserInfo);
+
     const userData = await firebaseGetUserData(userAuth);
     return { userInfo: updatedUserInfo, userAuth, userData };
+  }
+);
+
+export const getUserProvider = createAsyncThunk(
+  "user/getUserProvider",
+  async () => {
+    const providerData = await firebaseGetUserProviderData();
+    return providerData;
   }
 );
 
@@ -232,6 +260,9 @@ export const userSlice = createSlice({
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
+      })
+      .addCase(getUserProvider.fulfilled, (state, action) => {
+        state.providerData = action.payload;
       })
       .addCase(updateAccount.fulfilled, (state, action) => {
         state.isFetching = null;

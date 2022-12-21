@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import { passwordRegexRules } from "schemas/passwordRules";
 
-export const changeDataSchema = yup.object().shape({
+export const updateCredsSchema = yup.object().shape({
   login: yup.string().min(3).required("yup_errors:required"),
   email: yup.string().email("yup_errors:valid_email"),
   password: yup
