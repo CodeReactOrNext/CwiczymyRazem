@@ -26,13 +26,9 @@ export default function AchievementBox({
           {achievment.length === 0 ? (
             <p>Brak</p>
           ) : (
-            achievment.map(({ Icon, description, rarity, name }, index) => (
+            achievment.map(({ id, name }, index) => (
               <div key={index} className='flex flex-col items-center'>
-                <Achievement
-                  Icon={Icon}
-                  description={description}
-                  rarity={rarity}
-                />
+                <Achievement id={id} />
                 <p className='py-2 text-xs font-light'>{name}</p>
               </div>
             ))

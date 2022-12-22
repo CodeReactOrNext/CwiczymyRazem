@@ -9,9 +9,16 @@ import {
 } from "react-icons/fa";
 import { IconType } from "react-icons/lib";
 import { AchievementsRarityType } from "./achievementsRarity";
+export type AchievementList =
+  | "time_1"
+  | "time_2"
+  | "time_3"
+  | "balance"
+  | "fire"
+  | "health_habits";
 
 export interface AchievementsInterface extends AchievementsRarityType {
-  id: string;
+  id: AchievementList;
   name: string;
   Icon: IconType;
   description: string;

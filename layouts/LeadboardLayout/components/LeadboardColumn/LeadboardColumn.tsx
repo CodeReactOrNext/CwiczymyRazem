@@ -31,8 +31,10 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
           <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar name={nick} lvl={lvl} />
             <div className='absolute top-[5px] right-[-60px] flex  items-center gap-x-1 '>
-              <p className='text-xl uppercase text-tertiary'>Lvl </p>
-              <p className='text-3xl text-main '>{lvl} </p>
+              <p className='text-xl uppercase text-tertiary drop-shadow'>
+                Lvl{" "}
+              </p>
+              <p className='text-3xl text-main drop-shadow'>{lvl} </p>
             </div>
           </div>
           <div className='relative col-span-2 self-center justify-self-start md:col-span-1 '>
@@ -40,8 +42,10 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
               {nick}
             </p>
             <div className='absolute top-[-20px] right-[-60px]  hidden items-center gap-x-1 md:top-[-35px] md:flex'>
-              <p className='text-xl uppercase text-tertiary'>Lvl </p>
-              <p className='text-4xl text-main  md:text-5xl'>
+              <p className='text-xl uppercase text-tertiary drop-shadow'>
+                Lvl{" "}
+              </p>
+              <p className='text-4xl text-main drop-shadow md:text-5xl'>
                 {statistics.lvl}
               </p>
             </div>
@@ -70,18 +74,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
               <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
                 {statistics.achievements.length === 0 && "Brak"}
                 {statistics.achievements.map((achivId, index) => {
-                  const achievementData = achievements.find(
-                    (achiv) => achiv.id === achivId
-                  );
-                  const { Icon, description, rarity } = achievementData!;
-                  return (
-                    <Achievement
-                      key={index}
-                      Icon={Icon}
-                      description={description}
-                      rarity={rarity}
-                    />
-                  );
+                  return <Achievement key={index} id={achivId} />;
                 })}
               </div>
               <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText active:click-behavior-second' />
