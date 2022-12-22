@@ -1,18 +1,20 @@
-import { achievements, AchievementsInterface } from "data/achievements";
+import {
+  AchievementList,
+  achievements,
+  AchievementsInterface,
+} from "data/achievements";
 import AchievementBox from "./AchievementBox";
 
 const AchievementWrapper = ({
   userAchievements,
 }: {
-  userAchievements: string[];
+  userAchievements: AchievementList[];
 }) => {
   interface grupedAchievements {
     common: AchievementsInterface[];
     rare: AchievementsInterface[];
     veryRare: AchievementsInterface[];
   }
-
-  console.log(userAchievements);
 
   const { common, rare, veryRare } =
     userAchievements.reduce<grupedAchievements>(

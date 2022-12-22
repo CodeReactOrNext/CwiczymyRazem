@@ -5,10 +5,7 @@ export interface LandingNavProps {
   rightSideLinks: { name: string; href: string }[];
 }
 
-export default function LandingNav({
-  leftSideLinks,
-  rightSideLinks,
-}: LandingNavProps) {
+const LandingNav = ({ leftSideLinks, rightSideLinks }: LandingNavProps) => {
   return (
     <div className='relative flex w-full justify-around bg-tertiary py-3 text-xl uppercase text-second sm:text-3xl md:gap-x-[150px] xl:gap-x-[250px]'>
       <div className='z-50 flex w-full justify-around'>
@@ -31,4 +28,6 @@ export default function LandingNav({
       </div>
     </div>
   );
-}
+};
+
+export default LandingNav;

@@ -1,13 +1,15 @@
 import { Form } from "formik";
 
-interface Props {
+interface ReportFormLayoutProps {
   children: React.ReactNode;
 }
 
-export default function ReportFormLayout({ children }: Props) {
+const ReportFormLayout = ({ children }: ReportFormLayoutProps) => {
   return (
     <Form className='flex flex-col items-center gap-10 text-mainText'>
       {children}
     </Form>
   );
-}
+};
+
+export default ReportFormLayout;
