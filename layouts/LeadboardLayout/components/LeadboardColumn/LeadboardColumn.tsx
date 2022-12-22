@@ -66,7 +66,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
           </div>
           <div className=' col-span-3 flex h-full w-full flex-col items-center justify-center  md:col-span-1  md:w-fit md:justify-end '>
             <div className='flex  text-base xxs:text-2xl lg:text-xl xl:text-2xl '>
-              <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-mainText' />
+              <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-mainText active:click-behavior-second' />
               <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
                 {statistics.achievements.length === 0 && "Brak"}
                 {statistics.achievements.map((achivId, index) => {
@@ -84,7 +84,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
                   );
                 })}
               </div>
-              <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText' />
+              <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText active:click-behavior-second' />
             </div>
             <p className=' text-tertiary'>
               {t("achievements")} {statistics.achievements.length}/

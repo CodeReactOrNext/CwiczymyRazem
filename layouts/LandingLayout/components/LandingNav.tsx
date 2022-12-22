@@ -14,14 +14,18 @@ export default function LandingNav({
       <div className='z-50 flex w-full justify-around'>
         {leftSideLinks.map(({ href, name }, index) => (
           <Link key={index} href={href}>
-            <button>{name}</button>
+            <button className='hover:text-second-200 active:click-behavior'>
+              {name}
+            </button>
           </Link>
         ))}
       </div>
       <div className='z-50  flex w-full  justify-around'>
         {rightSideLinks.map(({ href, name }, index) => (
           <Link key={index} href={href}>
-            <button>{name}</button>
+            <button className='hover:text-second-200 active:click-behavior'>
+              {name}
+            </button>
           </Link>
         ))}
       </div>

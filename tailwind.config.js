@@ -71,6 +71,17 @@ const scrollbarHide = plugin(function ({ addUtilities }) {
   );
 });
 
+const defaultClick = plugin(function ({ addUtilities }) {
+  addUtilities({
+    ".click-behavior": {
+      transform: "scale(95%)",
+    },
+    ".click-behavior-second": {
+      transform: "scale(90%)",
+    },
+  });
+});
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -175,5 +186,6 @@ module.exports = {
     rotateX,
     rotateY,
     scrollbarHide,
+    defaultClick,
   ],
 };
