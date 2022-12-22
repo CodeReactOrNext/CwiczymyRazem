@@ -5,13 +5,11 @@ import LandingNav, { LandingNavProps } from "./components/LandingNav";
 import StatisticBar from "./components/StatisticBar";
 import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
 import MobileHeaderWrapper from "./components/UserHeader/MobileHeaderWrapper";
-import AchievementBox from "./components/Achievement/AchievementBox";
 import Decoration from "./components/Decoration";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
 import UserHeader from "./components/UserHeader/UserHeader";
 import { convertMsToHM } from "helpers/timeConverter";
-import { achievements, AchievementsInterface } from "data/achievements";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 interface LandingLayoutProps {
