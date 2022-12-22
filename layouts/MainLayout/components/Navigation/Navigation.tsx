@@ -1,6 +1,7 @@
 import HamburgerLayout from "layouts/HamburgerLayout";
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaBars } from "react-icons/fa";
 import NavLink from "./component/NavLink";
 
@@ -10,6 +11,7 @@ export default function Navigation({
   variant: "primary" | "secondary" | "landing";
 }) {
   const [hamburgerVisible, setHamburgerVisible] = useState<boolean>(false);
+  const { t } = useTranslation("common");
 
   const hamburgerHandler = () => {
     setHamburgerVisible(!hamburgerVisible);
@@ -25,9 +27,9 @@ export default function Navigation({
         variant === "secondary" ? "lg:bg-main-opposed-500" : "lg:bg-second-500"
       }  lg:pl-16`}>
       <ul className='hidden w-full items-center justify-evenly gap-8 text-3xl lg:flex'>
-        <NavLink url='/leaderboard' title={"Leaderboard"} />
-        <NavLink url='/leaderboard' title={"Discord"} />
-        <NavLink url='/leaderboard' title={"FAQ"} />
+        <NavLink url='/leaderboard' title={t("nav.leadboard")} />
+        <NavLink url='/discord' title={t("nav.discord")} />
+        <NavLink url='/faq' title={t("nav.faq")} />
       </ul>
       <button className='h-8 w-8 lg:hidden' onClick={hamburgerHandler}>
         <FaBars className='h-full w-full' />
