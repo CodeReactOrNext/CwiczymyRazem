@@ -180,7 +180,11 @@ export const updateUserDataViaReport = createAsyncThunk(
 
     firebaseSetUserExerciseRaprot(userAuth, raiting, new Date());
     firebaseUpdateUserStats(userAuth, updatedUserDataWithAchievements);
-    return updatedUserDataWithAchievements;
+
+    return {
+      updatedData: updatedUserDataWithAchievements,
+      oldStatistic: userData,
+    };
   }
 );
 
@@ -230,7 +234,7 @@ export const userSlice = createSlice({
       })
       .addCase(updateUserDataViaReport.fulfilled, (state, { payload }) => {
         state.isFetching = null;
-        state.userData = payload;
+        state.userData = payload.updatedData;
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
