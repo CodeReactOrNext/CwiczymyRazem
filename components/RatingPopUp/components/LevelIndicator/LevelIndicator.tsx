@@ -1,10 +1,8 @@
-export default function LevelIndicator({
-  children,
-  position,
-}: {
+interface LevelIndicatorProps {
   children: number;
   position: "left" | "right";
-}) {
+}
+const LevelIndicator = ({ children, position }: LevelIndicatorProps) => {
   return (
     <div
       className={`absolute flex items-end gap-1
@@ -15,4 +13,6 @@ export default function LevelIndicator({
       </p>
     </div>
   );
-}
+};
+
+export default LevelIndicator;
