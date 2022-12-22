@@ -2,6 +2,7 @@ import HamburgerLayout from "layouts/HamburgerLayout";
 import Link from "next/link";
 import { useState } from "react";
 import { FaBars } from "react-icons/fa";
+import NavLink from "./component/NavLink";
 
 export default function Navigation({
   variant,
@@ -24,22 +25,16 @@ export default function Navigation({
         variant === "secondary" ? "lg:bg-main-opposed-500" : "lg:bg-second-500"
       }  lg:pl-16`}>
       <ul className='hidden w-full items-center justify-evenly gap-8 text-3xl lg:flex'>
-        <li className='active:click-behavior'>
-          <Link href='/leaderboard'>Leaderboard</Link>
-        </li>
-        <li className='active:click-behavior'>
-          <Link href='/discord'>Discord</Link>
-        </li>
-        <li className='hover:bg-second-50 active:click-behavior'>
-          <Link href='/faq'>FAQ</Link>
-        </li>
+        <NavLink url='/leaderboard' title={"Leaderboard"} />
+        <NavLink url='/leaderboard' title={"Discord"} />
+        <NavLink url='/leaderboard' title={"FAQ"} />
       </ul>
       <button className='h-8 w-8 lg:hidden' onClick={hamburgerHandler}>
         <FaBars className='h-full w-full' />
       </button>
       {hamburgerVisible && (
         <HamburgerLayout buttonOnClick={hamburgerHandler}>
-          <li className='active:click-behavior'>
+          <li className='hover:click-behavior active:click-behavior'>
             <Link href='/leaderboard'>Leaderboard</Link>
           </li>
           <li className='active:click-behavior'>
