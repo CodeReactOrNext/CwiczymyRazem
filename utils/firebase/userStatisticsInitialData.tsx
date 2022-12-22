@@ -1,3 +1,5 @@
+import { AchievementList } from "data/achievements";
+
 export interface StatisticsTime {
   technique: number;
   theory: number;
@@ -14,7 +16,7 @@ export interface StatisticsDataInterface {
   habitsCount: number;
   dayWithoutBreak: number;
   maxPoints: number;
-  achievements: string[];
+  achievements: AchievementList[];
   actualDayWithoutBreak: number;
   lastReportDate?: string;
 }
