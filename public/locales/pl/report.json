@@ -24,6 +24,8 @@
     "habitsWithCount_few": "zastosowałeś {{count}} zdrowych nawyki",
     "habitsWithCount_many": "zastosowałeś {{count}} zdrowych nawyków",
     "time": "za ilość czasu",
-    "time_amount": "ćwiczyłeś łącznie"
+    "time_amount": "ćwiczyłeś łącznie",
+    "new_level": "Nowy poziom!",
+    "new_achievements": "Nowe osiągnięcia:"
   }
 }
