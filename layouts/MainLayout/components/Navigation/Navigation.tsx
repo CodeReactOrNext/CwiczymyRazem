@@ -24,13 +24,13 @@ export default function Navigation({
         variant === "secondary" ? "lg:bg-main-opposed-500" : "lg:bg-second-500"
       }  lg:pl-16`}>
       <ul className='hidden w-full items-center justify-evenly gap-8 text-3xl lg:flex'>
-        <li>
+        <li className='active:click-behavior'>
           <Link href='/leaderboard'>Leaderboard</Link>
         </li>
-        <li>
+        <li className='active:click-behavior'>
           <Link href='/discord'>Discord</Link>
         </li>
-        <li>
+        <li className='hover:bg-second-50 active:click-behavior'>
           <Link href='/faq'>FAQ</Link>
         </li>
       </ul>
@@ -39,13 +39,13 @@ export default function Navigation({
       </button>
       {hamburgerVisible && (
         <HamburgerLayout buttonOnClick={hamburgerHandler}>
-          <li>
+          <li className='active:click-behavior'>
             <Link href='/leaderboard'>Leaderboard</Link>
           </li>
-          <li>
+          <li className='active:click-behavior'>
             <Link href='/discord'>Discord</Link>
           </li>
-          <li>
+          <li className=' active:click-behavior'>
             <Link href='/faq'>FAQ</Link>
           </li>
         </HamburgerLayout>

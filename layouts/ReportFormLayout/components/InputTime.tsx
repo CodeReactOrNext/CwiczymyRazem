@@ -9,7 +9,7 @@ export default function InputTime({ name }: { name: string }) {
     <>
       <div className='flex max-w-[3rem] flex-col items-center gap-y-2'>
         <FaChevronUp
-          className='cursor-pointer active:scale-90'
+          className='cursor-pointer active:click-behavior-second'
           onClick={() => helpers.setValue(field.value ? ++field.value : 1)}
         />
         <input
@@ -19,7 +19,7 @@ export default function InputTime({ name }: { name: string }) {
           {...field}
         />
         <FaChevronDown
-          className='cursor-pointer active:scale-90'
+          className='cursor-pointer active:click-behavior-second'
           onClick={() => helpers.setValue(field.value ? --field.value : 1)}
         />
       </div>
