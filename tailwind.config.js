@@ -71,6 +71,25 @@ const scrollbarHide = plugin(function ({ addUtilities }) {
   );
 });
 
+const defaultClick = plugin(function ({ addUtilities }) {
+  addUtilities({
+    ".click-behavior": {
+      transform: "scale(95%)",
+      transitionProperty: "transform",
+      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+      transitionDuration: "100ms",
+    },
+    ".click-behavior-second": {
+      transform: "scale(90%)",
+    },
+    ".transition-background": {
+      transitionProperty: "background-color, border-color",
+      transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+      transitionDuration: "30ms",
+    },
+  });
+});
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -175,5 +194,6 @@ module.exports = {
     rotateX,
     rotateY,
     scrollbarHide,
+    defaultClick,
   ],
 };

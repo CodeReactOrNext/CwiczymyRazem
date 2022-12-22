@@ -21,5 +21,10 @@
   "loading": {
     "subtitle": "Loading...",
     "loading_text": "Loading..."
+  },
+  "nav": {
+    "leadboard": "Leadboard",
+    "discord": "Discord",
+    "faq": "FAQ"
   }
 }

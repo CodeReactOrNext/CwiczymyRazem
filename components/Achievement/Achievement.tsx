@@ -13,7 +13,11 @@ const Achievement = ({ Icon, rarity, description }: AchievementProps) => {
   return (
     <>
       <ToolTip />
-      <Icon color={achievementsRarity[rarity].color} data-tip={description} />
+      <Icon
+        className='cursor-help '
+        color={achievementsRarity[rarity].color}
+        data-tip={description}
+      />
     </>
   );
 };
