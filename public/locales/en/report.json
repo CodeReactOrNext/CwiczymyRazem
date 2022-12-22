@@ -22,6 +22,8 @@
     "habitsWithCount_one": "you have adopted {{count}} healthy habit",
     "habitsWithCount_other": "you have adopted {{count}} healthy habits",
     "time": "for the amount of time",
-    "time_amount": "you practiced for"
+    "time_amount": "you practiced for",
+    "new_level": "Level Up!",
+    "new_achievements": "New achievements:"
   }
 }

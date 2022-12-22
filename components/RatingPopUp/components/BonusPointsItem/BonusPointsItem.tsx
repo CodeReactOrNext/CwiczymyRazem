@@ -20,20 +20,22 @@ const BonusPointsItem = ({
   const { t } = useTranslation(["common", "report"]);
   const { timePoints, additionalPoints, habitsCount, time, multiplier } =
     bonusPoints;
-  console.log(isGetNewLevel, achievements);
+
   return (
     <ul className='relative -mt-[10%] md:-ml-[20%]'>
       <li>
         <ul className='mb-5'>
           {isGetNewLevel && (
             <li className=' flex items-center '>
-              <p className='text-2xl text-tertiary sm:text-4xl'>Nowy poziom!</p>
+              <p className='text-2xl text-tertiary sm:text-4xl'>
+                {t("report:rating_popup.new_level")}
+              </p>
             </li>
           )}
           {achievements.length > 0 && (
             <li className=' flex items-center '>
               <p className='text-2xl text-tertiary sm:text-2xl'>
-                Nowe osiągnięcia:
+                {t("report:rating_popup.new_achievements")}
               </p>
               <p className='flex gap-3 p-2'>
                 {achievements.map((id, index) => (
