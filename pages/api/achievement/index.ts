@@ -12,13 +12,14 @@ import {
   time2Check,
   time3Check,
 } from "./utils/achievementMethods";
+import { AchievementList } from "data/achievements";
 
 export const checkAchievement = (
   statistics: StatisticsDataInterface,
   reportData: ReportDataInterface,
   inputData: ReportFormikInterface
 ) => {
-  const achievedAchievements = [
+  const achievedAchievements: (AchievementList | undefined)[] = [
     time1Check(statistics),
     time2Check(statistics),
     time3Check(statistics),
@@ -27,7 +28,9 @@ export const checkAchievement = (
     checkHealthHabits(reportData),
   ];
 
-  const isAchievements = (item: string | undefined): item is string => {
+  const isAchievements = (
+    item: AchievementList | undefined
+  ): item is AchievementList => {
     return !!item;
   };
 
