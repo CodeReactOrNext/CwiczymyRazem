@@ -11,10 +11,10 @@ export interface InputProps {
   type?: string;
 }
 
-function ErrorWrapper({ error }: { error: TFuncKey }) {
+const ErrorWrapper = ({ error }: { error: TFuncKey }) => {
   const { t } = useTranslation();
   return <>{t(error)}</>;
-}
+};
 
 const Input = ({ Icon, placeholder, id, name, type = "text" }: InputProps) => {
   const [field, meta] = useField(name);

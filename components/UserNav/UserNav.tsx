@@ -2,7 +2,6 @@ import { logUserOff } from "feature/user/store/userSlice";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "store/hooks";
-import { text } from "stream/consumers";
 
 const UserNav = () => {
   const { t } = useTranslation("common");

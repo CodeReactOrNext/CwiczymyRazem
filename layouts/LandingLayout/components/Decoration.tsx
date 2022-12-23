@@ -1,6 +1,6 @@
 import Fire from "public/static/images/svg/Fire";
 
-export default function Decoration() {
+const Decoration = () => {
   return (
     <>
       <div className=' relative -z-10 flex h-0 justify-center fill-second sm:hidden '>
@@ -23,4 +23,6 @@ export default function Decoration() {
       </div>
     </>
   );
-}
+};
+
+export default Decoration;

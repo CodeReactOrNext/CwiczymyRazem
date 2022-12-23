@@ -19,12 +19,12 @@ interface LandingLayoutProps {
   userName: string;
 }
 
-export default function LandingLayout({
+const LandingLayout = ({
   statistics,
   navigation,
   userStats,
   userName,
-}: LandingLayoutProps) {
+}: LandingLayoutProps) => {
   const { t } = useTranslation("landing");
   const { time, achievements } = userStats;
   const totalTime =
@@ -91,4 +91,6 @@ export default function LandingLayout({
       </div>
     </main>
   );
-}
+};
+
+export default LandingLayout;

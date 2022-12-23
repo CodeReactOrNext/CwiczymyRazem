@@ -1,8 +1,7 @@
 import { useField } from "formik";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { toast } from "react-toastify";
 
-export default function InputTime({ name }: { name: string }) {
+const InputTime = ({ name }: { name: string }) => {
   const [field, meta, helpers] = useField(name);
 
   return (
@@ -25,4 +24,6 @@ export default function InputTime({ name }: { name: string }) {
       </div>
     </>
   );
-}
+};
+
+export default InputTime;
