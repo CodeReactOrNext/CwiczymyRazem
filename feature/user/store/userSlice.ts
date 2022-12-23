@@ -10,10 +10,12 @@ import {
   firebaseGetUserName,
   firebaseGetUserProviderData,
   firebaseLogUserOut,
+  firebaseReauthenticateUser,
   firebaseSetUserExceriseRaprot,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
-  firebaseUpdateUserCredentials,
+  firebaseUpdateUserDisplayName,
+  firebaseUpdateUserEmail,
   firebaseUpdateUserStats,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
@@ -113,25 +115,37 @@ export const createAccount = createAsyncThunk(
   }
 );
 
-export const updateAccount = createAsyncThunk(
+export const updateDisplayName = createAsyncThunk(
   "user/updateAccount",
-  async ({ login, email, password }: signUpCredentials) => {
+  async ({ login }: signUpCredentials) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(
       auth.currentUser!
     );
-    const updatedUserInfo = {
-      displayName: login,
-      email,
-      password,
-    };
-    await firebaseUpdateUserCredentials(userAuth, {
-      displayName: login,
-      email,
-      password,
-    });
+
+    if (login && login.length > 0) {
+      await firebaseUpdateUserDisplayName(userAuth, login);
+    }
 
     const userData = await firebaseGetUserData(userAuth);
-    return { userInfo: updatedUserInfo, userAuth, userData };
+    return { userInfo: { displayName: login }, userAuth, userData };
+  }
+);
+
+export const updateUserEmail = createAsyncThunk(
+  "user/updateUserEmail",
+  async ({ email }: signUpCredentials) => {
+    if (email && email.length > 0) {
+      await firebaseUpdateUserEmail(email);
+    }
+  }
+);
+
+export const reauthenticateUser = createAsyncThunk(
+  "user/reauthenticateUser",
+  async ({ email, password }: signUpCredentials) => {
+    if (email && email.length > 0) {
+      await firebaseReauthenticateUser({ email, password });
+    }
   }
 );
 
@@ -262,9 +276,16 @@ export const userSlice = createSlice({
         state.userAuth = null;
       })
       .addCase(getUserProvider.fulfilled, (state, action) => {
+        state.isFetching = null;
         state.providerData = action.payload;
       })
-      .addCase(updateAccount.fulfilled, (state, action) => {
+      .addCase(updateUserEmail.fulfilled, (state) => {
+        state.isFetching = null;
+      })
+      .addCase(reauthenticateUser.fulfilled, (state) => {
+        state.isFetching = null;
+      })
+      .addCase(updateDisplayName.fulfilled, (state, action) => {
         state.isFetching = null;
         state.userInfo = action.payload.userInfo;
         state.userData = action.payload.userData;

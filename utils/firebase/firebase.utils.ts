@@ -10,6 +10,10 @@ import {
   signOut,
   updateProfile,
   onAuthStateChanged,
+  updateEmail,
+  reauthenticateWithCredential,
+  AuthCredential,
+  EmailAuthProvider,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -114,20 +118,29 @@ export const firebaseUpdateUserStats = async (
   await updateDoc(userDocRef, { statistics });
 };
 
-export const firebaseUpdateUserCredentials = async (
+export const firebaseUpdateUserDisplayName = async (
   userAuth: string,
-  newUserData: { displayName: string; email: string; password: string }
+  newDisplayName: string
 ) => {
-  const newName = newUserData.displayName;
   const userDocRef = doc(db, "users", userAuth);
   if (auth.currentUser) {
-    updateProfile(auth.currentUser, { displayName: newName })
+    updateProfile(auth.currentUser, { displayName: newDisplayName })
       .then(() => {
-        console.log("Updated!");
+        console.log("Updated Name!");
       })
       .catch((error) => console.log(error));
   }
-  await updateDoc(userDocRef, { displayName: newName });
+  await updateDoc(userDocRef, { displayName: newDisplayName });
+};
+
+export const firebaseUpdateUserEmail = async (newEmail: string) => {
+  if (auth.currentUser) {
+    updateEmail(auth.currentUser, newEmail)
+      .then(() => {
+        console.log("Updated Email!");
+      })
+      .catch((error) => console.log(error));
+  }
 };
 
 export const firebaseGetUserExceriseRaprot = async (userAuth: string) => {
@@ -154,4 +167,21 @@ export const firebaseGetUserProviderData = async () => {
   };
 };
 
-// firebaseGetUserProviderData();
+export const firebaseReauthenticateUser = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
+  const user = auth.currentUser;
+  if (user && user.email) {
+    const credential = EmailAuthProvider.credential(user.email, password);
+    reauthenticateWithCredential(user, credential);
+  }
+};
+
+// firebaseReauthenticateUser({
+//   email: "testuser4@test.com",
+//   password: "ZAQ!2wsx",
+// });
