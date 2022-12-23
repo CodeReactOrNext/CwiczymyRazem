@@ -10,7 +10,7 @@ import { createAccount, selectIsFetching } from "feature/user/store/userSlice";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { CircleSpinner } from "react-spinners-kit";
 
-export interface signUpCredentials {
+export interface SignUpCredentials {
   login: string;
   email: string;
   password: string;
@@ -23,7 +23,7 @@ const SingupView = () => {
   const dispatch = useAppDispatch();
   const isFetching = useAppSelector(selectIsFetching) === "createAccount";
 
-  const onSubmit = (credentials: signUpCredentials) => {
+  const onSubmit = (credentials: SignUpCredentials) => {
     dispatch(createAccount(credentials));
   };
 
