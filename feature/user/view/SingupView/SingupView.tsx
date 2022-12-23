@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { CircleSpinner } from "react-spinners-kit";
 
 export interface signUpCredentials {
-  login: string ;
+  login: string;
   email: string;
   password: string;
   repeat_password: string;
