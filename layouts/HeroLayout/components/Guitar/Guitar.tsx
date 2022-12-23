@@ -2,7 +2,7 @@
 import LightningSVG from "public/static/images/svg/Lightning";
 import LightningRevSVG from "public/static/images/svg/LightningRev";
 
-export default function Guitar() {
+const Guitar = () => {
   return (
     <div className='h-full w-full'>
       <div className='absolute left-[50%] -bottom-[10%] z-40 h-fit w-[20%] max-w-[100px] -translate-x-[50%] lg:bottom-[15%] lg:w-[35%] lg:max-w-max xl:w-[25%]'>
@@ -21,4 +21,6 @@ export default function Guitar() {
       </div>
     </div>
   );
-}
+};
+
+export default Guitar;

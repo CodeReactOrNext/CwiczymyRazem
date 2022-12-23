@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+
 export interface BonusPointsInterface {
   timePoints: number;
   additionalPoints: number;

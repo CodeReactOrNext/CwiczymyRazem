@@ -3,11 +3,11 @@ import MainLayout from "layouts/MainLayout";
 import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 import { useTranslation } from "react-i18next";
 
-function PageLoadingSpinner({
+const PageLoadingSpinner = ({
   layoutVariant,
 }: {
   layoutVariant: layoutVariant;
-}) {
+}) => {
   const { t } = useTranslation("common");
   return (
     <MainLayout subtitle={t("loading.subtitle")} variant={layoutVariant}>
@@ -21,5 +21,5 @@ function PageLoadingSpinner({
       </div>
     </MainLayout>
   );
-}
+};
 export default PageLoadingSpinner;

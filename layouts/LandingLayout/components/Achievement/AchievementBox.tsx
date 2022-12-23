@@ -8,10 +8,7 @@ export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsInterface[];
 }
 
-export default function AchievementBox({
-  achievment,
-  rarity,
-}: AchievementBoxProps) {
+const AchievementBox = ({ achievment, rarity }: AchievementBoxProps) => {
   const { t } = useTranslation("achievements");
 
   return (
@@ -37,4 +34,5 @@ export default function AchievementBox({
       </div>
     </div>
   );
-}
+};
+export default AchievementBox;
