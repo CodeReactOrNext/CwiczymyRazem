@@ -6,12 +6,13 @@ import Input from "components/Input";
 import OldEffect from "components/OldEffect";
 import {
   getUserProvider,
-  reauthenticateUser,
+  // reauthenticateUser,
   selectIsFetching,
   selectUserAuth,
   selectUserData,
   updateDisplayName,
   updateUserEmail,
+  updateUserInterface as UpdatedUserCredentials,
 } from "feature/user/store/userSlice";
 import { UserInfo } from "firebase/auth";
 import { Form, Formik } from "formik";
@@ -22,10 +23,11 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAt, FaLock, FaUserAlt } from "react-icons/fa";
 import { CircleSpinner } from "react-spinners-kit";
+import { toast } from "react-toastify";
 import { loginSchema } from "schemas/login";
 import { updateCredsSchema } from "schemas/updateCreds";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { signUpCredentials } from "../SingupView/SingupView";
+import { signUpCredentials as SignUpCredentials } from "../SingupView/SingupView";
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings"]);
@@ -33,6 +35,8 @@ const SettingsView = () => {
   const [emailInputVisible, setEmailInputVisible] = useState(false);
   const [reauthFormVisible, setReauthFormVisible] = useState(false);
   const [userProviderData, setUserProviderData] = useState<UserInfo>();
+
+  const [newEmail, setNewEmail] = useState("");
 
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
@@ -43,21 +47,27 @@ const SettingsView = () => {
     dispatch(getUserProvider()).then((data) => {
       setUserProviderData(data.payload as UserInfo);
     });
-  }, [dispatch]);
+  }, [dispatch, newEmail]);
 
   const changeNameHandler = (name: string) => {
-    dispatch(updateDisplayName({ login: name } as signUpCredentials));
+    dispatch(updateDisplayName({ login: name } as SignUpCredentials));
   };
-  const changeEmailHandler = (email: string) => {
-    // dispatch(reauthenticateUser({ email } as signUpCredentials));
-    setReauthFormVisible(true);
+  // const changeEmailHandler = () => {
+  //   // dispatch(reauthenticateUser({ email } as signUpCredentials));
+  //   setReauthFormVisible(true);
+  // };
+  const changeEmailHandler = async (data: UpdatedUserCredentials) => {
+    await dispatch(updateUserEmail(data)).then(() => {
+      setNewEmail("");
+      setReauthFormVisible(false);
+      setEmailInputVisible(false);
+    });
   };
 
   const changeHandler = (name: "login" | "email", data: string) => {
     console.log("Button is clicked", name);
-
     if (name === "login") changeNameHandler(data);
-    if (name === "email") changeEmailHandler(data);
+    if (name === "email") setReauthFormVisible(true);
   };
   const showNameInputHandler = () => {
     setNameInputVisible(true);
@@ -75,28 +85,19 @@ const SettingsView = () => {
     repeat_password: "",
   };
 
-  const onSubmit = (data: signUpCredentials) => {
-    // if (data.login && data.login.length > 0) {
-    //   changeNameHandler(data.login);
-    // }
-    // if (data.email && data.login.length > 0) {
-    //   changeEmailHandler(data.email);
-    // }
-  };
-
   return (
     <>
       <MainLayout subtitle='Edytuj Profil' variant='primary'>
         <div className='flex max-w-[800px] flex-col p-6'>
           <div className='flex flex-row gap-2 p-4  text-2xl'>
-            <Avatar name='Dummy name' lvl={28} />
+            <Avatar name={userName!} lvl={28} />
             <button className='text-lg text-main'>Edytuj</button>
           </div>
           <hr className='border-main-opposed-400' />
           <Formik
             initialValues={formikInitialValues}
             validationSchema={updateCredsSchema}
-            onSubmit={onSubmit}>
+            onSubmit={() => {}}>
             {({ values, errors }) => (
               <Form>
                 <>
@@ -155,8 +156,11 @@ const SettingsView = () => {
                         />
                         <Button
                           onClick={() => {
-                            // changeHandler("email", values.email);
                             if (values.email && !errors.email) {
+                              setNewEmail(values.email);
+                              toast.info(
+                                "Do zmiany danych musisz się ponownie zalogować."
+                              );
                               setReauthFormVisible(true);
                             }
                           }}
@@ -211,7 +215,9 @@ const SettingsView = () => {
                 <Formik
                   initialValues={formikInitialValues}
                   validationSchema={loginSchema}
-                  onSubmit={onSubmit}>
+                  onSubmit={(data) => {
+                    changeEmailHandler({ ...data, newEmail });
+                  }}>
                   <Form>
                     <FormLayout>
                       <>

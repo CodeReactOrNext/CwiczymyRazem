@@ -135,11 +135,7 @@ export const firebaseUpdateUserDisplayName = async (
 
 export const firebaseUpdateUserEmail = async (newEmail: string) => {
   if (auth.currentUser) {
-    updateEmail(auth.currentUser, newEmail)
-      .then(() => {
-        console.log("Updated Email!");
-      })
-      .catch((error) => console.log(error));
+    return updateEmail(auth.currentUser, newEmail);
   }
 };
 
@@ -175,10 +171,17 @@ export const firebaseReauthenticateUser = async ({
   password: string;
 }) => {
   const user = auth.currentUser;
-  if (user && user.email) {
-    const credential = EmailAuthProvider.credential(user.email, password);
-    reauthenticateWithCredential(user, credential);
+  if (user && email) {
+    const credential = EmailAuthProvider.credential(email, password);
+
+    return await reauthenticateWithCredential(user, credential);
+    // .then(() => {
+    //   console.log("Authenticated");
+    //   return { message: "Authenticated" };
+    // })
+    // .catch((error) => error);
   }
+  return null;
 };
 
 // firebaseReauthenticateUser({

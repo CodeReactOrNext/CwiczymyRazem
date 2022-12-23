@@ -14,6 +14,10 @@ export const loginViaEmailErrorHandler = (error: SerializedError) => {
     toast.error("Nie udało się zalogować - błąd połączenia");
     return;
   }
+  if (error.code === "auth/email-already-in-use") {
+    toast.error("Podany e-mail jest już używany");
+    return;
+  }
   toast.error("Nie udało się zalogować");
 };
 
@@ -36,7 +40,7 @@ export const createAccountErrorHandler = (error: SerializedError) => {
     return;
   }
   if (error.code === "auth/email-already-in-use") {
-    toast.error("Podane e-mail jest już używany");
+    toast.error("Podany e-mail jest już używany");
     return;
   }
   if (error.code === "auth/timeout") {
