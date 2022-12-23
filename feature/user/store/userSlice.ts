@@ -97,7 +97,6 @@ export const autoLogIn = createAsyncThunk(
     };
     const userData = await firebaseGetUserData(userAuth);
     const userName = userWithDisplayName.displayName;
-    console.log(user);
     return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
