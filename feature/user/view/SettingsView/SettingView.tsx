@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 import { loginSchema } from "schemas/login";
 import { updateCredsSchema } from "schemas/updateCreds";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { signUpCredentials as SignUpCredentials } from "../SingupView/SingupView";
+import { SignUpCredentials as SignUpCredentials } from "../SingupView/SingupView";
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings"]);

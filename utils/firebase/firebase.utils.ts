@@ -178,34 +178,3 @@ export const firebaseReauthenticateUser = async ({
   }
   return null;
 };
-
-export const firebaseGetUserProviderData = async () => {
-  const providerData = auth.currentUser?.providerData[0];
-  if (providerData) {
-    return providerData;
-  }
-  return {
-    providerId: null,
-    uid: null,
-    displayName: null,
-    email: null,
-    phoneNumber: null,
-    photoURL: null,
-  };
-};
-
-export const firebaseReauthenticateUser = async ({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) => {
-  const user = auth.currentUser;
-  if (user && email) {
-    const credential = EmailAuthProvider.credential(email, password);
-
-    return await reauthenticateWithCredential(user, credential);
-  }
-  return null;
-};
