@@ -23,7 +23,11 @@ export default Settings;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", ["common", "settings"])),
+      ...(await serverSideTranslations(locale ?? "pl", [
+        "common",
+        "settings",
+        "yup_errors",
+      ])),
     },
   };
 }

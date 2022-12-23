@@ -8,6 +8,11 @@ import {
   createUserWithEmailAndPassword,
   User,
   signOut,
+  updateProfile,
+  updateEmail,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  updatePassword,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -83,10 +88,9 @@ export const firebaseGetUserData = async (userAuth: string) => {
   return userSnapshot.data()!.statistics;
 };
 
-export const firebaseGetUserName = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
-  return userSnapshot.data()!.displayName;
+export const firebaseGetUserName = async () => {
+  const displayName = auth.currentUser?.displayName;
+  return displayName as string;
 };
 
 export const firebaseSetUserExerciseRaprot = async (
@@ -104,7 +108,34 @@ export const firebaseUpdateUserStats = async (
   statistics: StatisticsDataInterface
 ) => {
   const userDocRef = doc(db, "users", userAuth);
+
   await updateDoc(userDocRef, { statistics });
+};
+
+export const firebaseUpdateUserDisplayName = async (
+  userAuth: string,
+  newDisplayName: string
+) => {
+  const userDocRef = doc(db, "users", userAuth);
+  if (auth.currentUser) {
+    updateProfile(auth.currentUser, { displayName: newDisplayName })
+      .then(() => {
+        console.log("Updated Name!");
+      })
+      .catch((error) => console.log(error));
+  }
+  await updateDoc(userDocRef, { displayName: newDisplayName });
+};
+
+export const firebaseUpdateUserEmail = async (newEmail: string) => {
+  if (auth.currentUser) {
+    return updateEmail(auth.currentUser, newEmail);
+  }
+};
+export const firebaseUpdateUserPassword = async (newPassword: string) => {
+  if (auth.currentUser) {
+    return updatePassword(auth.currentUser, newPassword);
+  }
 };
 
 export const firebaseGetUsersExceriseRaprot = async () => {
@@ -115,4 +146,35 @@ export const firebaseGetUsersExceriseRaprot = async () => {
     userStatsArr.push(userData);
   });
   return userStatsArr;
+};
+
+export const firebaseGetUserProviderData = async () => {
+  const providerData = auth.currentUser?.providerData[0];
+  if (providerData) {
+    return providerData;
+  }
+  return {
+    providerId: null,
+    uid: null,
+    displayName: null,
+    email: null,
+    phoneNumber: null,
+    photoURL: null,
+  };
+};
+
+export const firebaseReauthenticateUser = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
+  const user = auth.currentUser;
+  if (user && email) {
+    const credential = EmailAuthProvider.credential(email, password);
+
+    return await reauthenticateWithCredential(user, credential);
+  }
+  return null;
 };
