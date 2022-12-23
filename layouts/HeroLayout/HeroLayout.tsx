@@ -12,7 +12,7 @@ interface HeroProps {
   buttonOnClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-export default function HeroLayout({ children, buttonOnClick }: HeroProps) {
+const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
   const { t } = useTranslation("landing");
 
   return (
@@ -37,4 +37,6 @@ export default function HeroLayout({ children, buttonOnClick }: HeroProps) {
       </div>
     </div>
   );
-}
+};
+
+export default HeroLayout;

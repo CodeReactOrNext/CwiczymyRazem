@@ -8,10 +8,7 @@ export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsInterface[];
 }
 
-export default function AchievementBox({
-  achievment,
-  rarity,
-}: AchievementBoxProps) {
+const AchievementBox = ({ achievment, rarity }: AchievementBoxProps) => {
   const { t } = useTranslation("achievements");
 
   return (
@@ -26,13 +23,9 @@ export default function AchievementBox({
           {achievment.length === 0 ? (
             <p>Brak</p>
           ) : (
-            achievment.map(({ Icon, description, rarity, name }, index) => (
+            achievment.map(({ id, name }, index) => (
               <div key={index} className='flex flex-col items-center'>
-                <Achievement
-                  Icon={Icon}
-                  description={description}
-                  rarity={rarity}
-                />
+                <Achievement id={id} />
                 <p className='py-2 text-xs font-light'>{name}</p>
               </div>
             ))
@@ -41,4 +34,5 @@ export default function AchievementBox({
       </div>
     </div>
   );
-}
+};
+export default AchievementBox;

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
-interface Props {
+interface RatingPopUpProps {
   children: React.ReactElement;
   selector: string;
   onClick?: () => void;
 }
-export default function RatingPopUp({ children, selector, onClick }: Props) {
+const RatingPopUp = ({ children, selector, onClick }: RatingPopUpProps) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -30,4 +30,6 @@ export default function RatingPopUp({ children, selector, onClick }: Props) {
         document.getElementById(selector)!
       )
     : null;
-}
+};
+
+export default RatingPopUp;

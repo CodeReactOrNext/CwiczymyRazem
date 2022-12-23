@@ -13,11 +13,7 @@ interface LayoutProps {
   variant: layoutVariant;
 }
 
-export default function MainLayout({
-  children,
-  subtitle,
-  variant,
-}: LayoutProps) {
+const MainLayout = ({ children, subtitle, variant }: LayoutProps) => {
   return (
     <main className='h-screen min-h-[650px] p-4 font-sans xs:min-h-[950px] lg:p-8'>
       <div className='relative flex h-full w-full items-center justify-center'>
@@ -37,4 +33,6 @@ export default function MainLayout({
       </div>
     </main>
   );
-}
+};
+
+export default MainLayout;

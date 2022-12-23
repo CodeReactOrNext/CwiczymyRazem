@@ -23,9 +23,9 @@ const SingupView = () => {
   const dispatch = useAppDispatch();
   const isFetching = useAppSelector(selectIsFetching) === "createAccount";
 
-  function onSubmit(credentials: signUpCredentials) {
+  const onSubmit = (credentials: signUpCredentials) => {
     dispatch(createAccount(credentials));
-  }
+  };
 
   const formikInitialValues = {
     login: "",

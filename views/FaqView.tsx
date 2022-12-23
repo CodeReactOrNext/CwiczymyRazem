@@ -1,5 +1,4 @@
 import FaqLayout, { faqQuestionInterface } from "layouts/FaqLayout/FaqLayout";
-import { title } from "process";
 import { useTranslation } from "react-i18next";
 
 const FaqView = () => {
@@ -16,10 +15,6 @@ const FaqView = () => {
     {
       title: t("about_points_title"),
       message: t("about_points_description"),
-    },
-    {
-      title: t("several_times_repotr_title"),
-      message: t("several_times_repotr_description"),
     },
     {
       title: t("several_times_repotr_title"),
