@@ -5,14 +5,20 @@ import { calcExperience } from "helpers/calcExperience";
 
 import { toast } from "react-toastify";
 import {
+  auth,
   firebaseCreateAccountWithEmail,
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
   firebaseGetUserName,
+  firebaseGetUserProviderData,
   firebaseLogUserOut,
+  firebaseReauthenticateUser,
   firebaseSetUserExerciseRaprot,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
+  firebaseUpdateUserDisplayName,
+  firebaseUpdateUserEmail,
+  firebaseUpdateUserPassword,
   firebaseUpdateUserStats,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
@@ -23,25 +29,44 @@ import {
   ReportDataInterface,
   ReportFormikInterface,
 } from "../view/ReportView/ReportView.types";
-import { signUpCredentials } from "../view/SingupView/SingupView";
+import { SignUpCredentials } from "../view/SingupView/SingupView";
 import { getUserLvl } from "./helpers/getUserLvl";
+
 import {
   createAccountErrorHandler,
   loginViaEmailErrorHandler,
   loginViaGoogleErrorHandler,
 } from "./userErrorsHandling";
 
+export interface providerData {
+  providerId: string | null;
+  uid: string | null;
+  displayName: string | null;
+  email: string | null;
+  phoneNumber: string | null;
+  photoURL: string | null;
+}
+
 export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName: string } | null;
   userData: StatisticsDataInterface | null;
   isFetching: "google" | "email" | "createAccount" | "updateData" | null;
+  providerData: providerData;
 }
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
   userData: null,
   isFetching: null,
+  providerData: {
+    providerId: null,
+    uid: null,
+    displayName: null,
+    email: null,
+    phoneNumber: null,
+    photoURL: null,
+  },
 };
 
 export const logInViaGoogle = createAsyncThunk(
@@ -72,7 +97,7 @@ export const autoLogIn = createAsyncThunk(
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
     const userWithDisplayName = {
       ...user,
-      displayName: await firebaseGetUserName(userAuth),
+      displayName: await firebaseGetUserName(),
     };
     const userData = await firebaseGetUserData(userAuth);
     const userName = userWithDisplayName.displayName;
@@ -82,7 +107,7 @@ export const autoLogIn = createAsyncThunk(
 
 export const createAccount = createAsyncThunk(
   "user/createAccount",
-  async ({ login, email, password }: signUpCredentials) => {
+  async ({ login, email, password }: SignUpCredentials) => {
     const { user } = await firebaseCreateAccountWithEmail(email, password);
     const userWithDisplayName = { ...user, displayName: login };
     const userAuth = await firebaseCreateUserDocumentFromAuth(
@@ -93,6 +118,62 @@ export const createAccount = createAsyncThunk(
     return { userInfo: { displayName: userName }, userAuth, userData };
   }
 );
+
+export const updateDisplayName = createAsyncThunk(
+  "user/updateAccount",
+  async ({ login }: SignUpCredentials) => {
+    const userAuth = await firebaseCreateUserDocumentFromAuth(
+      auth.currentUser!
+    );
+
+    if (login && login.length > 0) {
+      await firebaseUpdateUserDisplayName(userAuth, login);
+    }
+
+    const userData = await firebaseGetUserData(userAuth);
+    return { userInfo: { displayName: login }, userAuth, userData };
+  }
+);
+
+export interface updateUserInterface extends SignUpCredentials {
+  newEmail?: string;
+  newPassword?: string;
+}
+
+export const updateUserEmail = createAsyncThunk(
+  "user/updateUserEmail",
+  async ({ email, password, newEmail }: updateUserInterface) => {
+    // reauthenticateUser({ email, password } as SignUpCredentials);
+    const authState = await firebaseReauthenticateUser({ email, password });
+
+    if (newEmail && newEmail.length > 0 && authState) {
+      await firebaseUpdateUserEmail(newEmail);
+    }
+    const userInfo = await firebaseGetUserProviderData();
+    return { userInfo };
+  }
+);
+export const updateUserPassword = createAsyncThunk(
+  "user/updateUserPassword",
+  async ({ email, password, newPassword }: updateUserInterface) => {
+    const authState = await firebaseReauthenticateUser({ email, password });
+
+    if (newPassword && newPassword.length > 0 && authState) {
+      await firebaseUpdateUserPassword(newPassword);
+    }
+    const userInfo = await firebaseGetUserProviderData();
+    return { userInfo };
+  }
+);
+
+export const getUserProvider = createAsyncThunk(
+  "user/getUserProvider",
+  async () => {
+    const providerData = await firebaseGetUserProviderData();
+    return providerData;
+  }
+);
+
 export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   await firebaseLogUserOut();
   return null;
@@ -216,9 +297,23 @@ export const userSlice = createSlice({
       .addCase(updateUserDataViaReport.pending, (state) => {
         state.isFetching = "updateData";
       })
+      .addCase(updateUserEmail.pending, (state) => {
+        state.isFetching = "updateData";
+      })
+      .addCase(updateUserPassword.pending, (state) => {
+        state.isFetching = "updateData";
+      })
       .addCase(updateUserDataViaReport.rejected, (state) => {
         state.isFetching = null;
         toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+      })
+      .addCase(updateUserEmail.rejected, (state, { error }) => {
+        state.isFetching = null;
+        loginViaEmailErrorHandler(error);
+      })
+      .addCase(updateUserPassword.rejected, (state, { error }) => {
+        state.isFetching = null;
+        loginViaEmailErrorHandler(error);
       })
       .addCase(logInViaEmail.rejected, (state, { error }) => {
         state.isFetching = null;
@@ -238,6 +333,24 @@ export const userSlice = createSlice({
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
+      })
+      .addCase(getUserProvider.fulfilled, (state, action) => {
+        state.isFetching = null;
+        state.providerData = action.payload;
+      })
+      .addCase(updateUserEmail.fulfilled, (state) => {
+        toast.success("Zmieniono email");
+        state.isFetching = null;
+      })
+      .addCase(updateUserPassword.fulfilled, (state) => {
+        toast.success("Zmieniono hasło");
+        state.isFetching = null;
+      })
+      .addCase(updateDisplayName.fulfilled, (state, action) => {
+        state.isFetching = null;
+        state.userInfo = action.payload.userInfo;
+        state.userData = action.payload.userData;
+        state.userAuth = action.payload.userAuth;
       })
       .addMatcher(
         isAnyOf(
