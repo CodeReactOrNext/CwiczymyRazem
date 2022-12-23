@@ -16,6 +16,7 @@ import {
   firebaseSignInWithGooglePopup,
   firebaseUpdateUserDisplayName,
   firebaseUpdateUserEmail,
+  firebaseUpdateUserPassword,
   firebaseUpdateUserStats,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
@@ -92,7 +93,7 @@ export const autoLogIn = createAsyncThunk(
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
     const userWithDisplayName = {
       ...user,
-      displayName: await firebaseGetUserName(userAuth),
+      displayName: await firebaseGetUserName(),
     };
     const userData = await firebaseGetUserData(userAuth);
     const userName = userWithDisplayName.displayName;
@@ -133,6 +134,7 @@ export const updateDisplayName = createAsyncThunk(
 
 export interface updateUserInterface extends SignUpCredentials {
   newEmail?: string;
+  newPassword?: string;
 }
 
 export const updateUserEmail = createAsyncThunk(
@@ -148,15 +150,18 @@ export const updateUserEmail = createAsyncThunk(
     return { userInfo };
   }
 );
+export const updateUserPassword = createAsyncThunk(
+  "user/updateUserPassword",
+  async ({ email, password, newPassword }: updateUserInterface) => {
+    const authState = await firebaseReauthenticateUser({ email, password });
 
-// export const reauthenticateUser = createAsyncThunk(
-//   "user/reauthenticateUser",
-//   async ({ email, password }: SignUpCredentials) => {
-//     if (email && email.length > 0) {
-//       await firebaseReauthenticateUser({ email, password });
-//     }
-//   }
-// );
+    if (newPassword && newPassword.length > 0 && authState) {
+      await firebaseUpdateUserPassword(newPassword);
+    }
+    const userInfo = await firebaseGetUserProviderData();
+    return { userInfo };
+  }
+);
 
 export const getUserProvider = createAsyncThunk(
   "user/getUserProvider",
@@ -261,23 +266,22 @@ export const userSlice = createSlice({
       .addCase(updateUserDataViaReport.pending, (state) => {
         state.isFetching = "updateData";
       })
-      // .addCase(reauthenticateUser.pending, (state) => {
-      //   state.isFetching = "updateData";
-      // })
       .addCase(updateUserEmail.pending, (state) => {
         state.isFetching = "updateData";
       })
-      // .addCase(reauthenticateUser.rejected, (state) => {
-      //   state.isFetching = null;
-      //   toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
-      // })
+      .addCase(updateUserPassword.pending, (state) => {
+        state.isFetching = "updateData";
+      })
       .addCase(updateUserDataViaReport.rejected, (state) => {
         state.isFetching = null;
         toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
       })
       .addCase(updateUserEmail.rejected, (state, { error }) => {
         state.isFetching = null;
-        console.log(error);
+        loginViaEmailErrorHandler(error);
+      })
+      .addCase(updateUserPassword.rejected, (state, { error }) => {
+        state.isFetching = null;
         loginViaEmailErrorHandler(error);
       })
       .addCase(logInViaEmail.rejected, (state, { error }) => {
@@ -307,9 +311,10 @@ export const userSlice = createSlice({
         toast.success("Zmieniono email");
         state.isFetching = null;
       })
-      // .addCase(reauthenticateUser.fulfilled, (state) => {
-      //   state.isFetching = null;
-      // })
+      .addCase(updateUserPassword.fulfilled, (state) => {
+        toast.success("Zmieniono hasło");
+        state.isFetching = null;
+      })
       .addCase(updateDisplayName.fulfilled, (state, action) => {
         state.isFetching = null;
         state.userInfo = action.payload.userInfo;
