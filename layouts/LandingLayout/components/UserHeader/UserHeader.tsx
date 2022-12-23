@@ -11,7 +11,7 @@ interface UserHeaderProps {
   userName: string;
 }
 
-export default function UserHeader({ userStats, userName }: UserHeaderProps) {
+const UserHeader = ({ userStats, userName }: UserHeaderProps) => {
   const { points, lvl } = userStats;
   return (
     <>
@@ -29,4 +29,6 @@ export default function UserHeader({ userStats, userName }: UserHeaderProps) {
       <Level points={points} lvl={lvl} />
     </>
   );
-}
+};
+
+export default UserHeader;

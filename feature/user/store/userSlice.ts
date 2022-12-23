@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
+import { achievements } from "data/achievements";
 import { User } from "firebase/auth";
-import Router from "next/router";
+import { calcExperience } from "helpers/calcExperience";
+
 import { toast } from "react-toastify";
 import {
   auth,
@@ -11,7 +13,7 @@ import {
   firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseReauthenticateUser,
-  firebaseSetUserExceriseRaprot,
+  firebaseSetUserExerciseRaprot,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
   firebaseUpdateUserDisplayName,
@@ -27,7 +29,9 @@ import {
   ReportDataInterface,
   ReportFormikInterface,
 } from "../view/ReportView/ReportView.types";
-import { signUpCredentials as SignUpCredentials } from "../view/SingupView/SingupView";
+import { SignUpCredentials } from "../view/SingupView/SingupView";
+import { getUserLvl } from "./helpers/getUserLvl";
+
 import {
   createAccountErrorHandler,
   loginViaEmailErrorHandler,
@@ -195,9 +199,11 @@ export const updateUserDataViaReport = createAsyncThunk(
       maxPoints,
       sessionCount,
       points,
+      lvl,
       lastReportDate,
       actualDayWithoutBreak,
       dayWithoutBreak,
+      achievements,
     } = userData;
 
     const userLastReportDate = new Date(lastReportDate);
@@ -207,7 +213,7 @@ export const updateUserDataViaReport = createAsyncThunk(
       ? actualDayWithoutBreak
       : actualDayWithoutBreak + 1;
 
-    const updatedUserData = {
+    const updatedUserData: StatisticsDataInterface = {
       time: {
         technique: time.technique + techniqueTime,
         theory: time.theory + theoryTime,
@@ -216,8 +222,8 @@ export const updateUserDataViaReport = createAsyncThunk(
         longestSession:
           time.longestSession < sumTime ? sumTime : time.longestSession,
       },
-      lvl: 1,
       points: points + raiting.basePoints,
+      lvl: getUserLvl(lvl, points + raiting.basePoints),
       sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
       habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
       dayWithoutBreak:
@@ -226,14 +232,40 @@ export const updateUserDataViaReport = createAsyncThunk(
           : dayWithoutBreak,
       maxPoints:
         maxPoints < raiting.basePoints ? raiting.basePoints : maxPoints,
-      achievements: [],
       actualDayWithoutBreak: updatedActualDayWithoutBreak,
+      achievements: achievements,
       lastReportDate: new Date().toISOString(),
     };
 
-    firebaseSetUserExceriseRaprot(userAuth, raiting, new Date());
-    firebaseUpdateUserStats(userAuth, updatedUserData);
-    return updatedUserData;
+    const fetchAchievements = () =>
+      fetch("/api/achievement", {
+        method: "POST",
+        body: JSON.stringify({
+          statistics: updatedUserData,
+          raiting,
+          inputData,
+        }),
+      });
+
+    const achievementCheck = async () => {
+      const response = await fetchAchievements();
+      const data = await response.json();
+      return JSON.parse(data);
+    };
+    const newAchievements = await achievementCheck();
+
+    const updatedUserDataWithAchievements: StatisticsDataInterface = {
+      ...updatedUserData,
+      achievements: [...newAchievements, ...updatedUserData.achievements],
+    };
+
+    firebaseSetUserExerciseRaprot(userAuth, raiting, new Date());
+    firebaseUpdateUserStats(userAuth, updatedUserDataWithAchievements);
+
+    return {
+      updatedData: updatedUserDataWithAchievements,
+      oldStatistic: userData,
+    };
   }
 );
 
@@ -297,7 +329,7 @@ export const userSlice = createSlice({
       })
       .addCase(updateUserDataViaReport.fulfilled, (state, { payload }) => {
         state.isFetching = null;
-        state.userData = payload;
+        state.userData = payload.updatedData;
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;

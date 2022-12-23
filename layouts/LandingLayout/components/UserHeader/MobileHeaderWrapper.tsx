@@ -1,4 +1,4 @@
-export const MobileHeaderWrapper = ({
+const MobileHeaderWrapper = ({
   children,
 }: {
   children: React.ReactElement;

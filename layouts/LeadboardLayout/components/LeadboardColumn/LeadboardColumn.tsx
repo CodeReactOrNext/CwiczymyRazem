@@ -1,20 +1,19 @@
 import Achievement from "components/Achievement";
 import Avatar from "components/Avatar";
-import {
-  FaAngleLeft,
-  FaAngleRight,
-  FaBed,
-  FaEvernote,
-  FaGuitar,
-} from "react-icons/fa";
-import ReactTooltip from "react-tooltip";
+import { achievements } from "data/achievements";
+import { convertMsToHM } from "helpers/timeConverter";
+import { useTranslation } from "react-i18next";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 interface LeadboardColumnProps {
   place: number;
   nick: string;
-  // Max nick size - 19
+  statistics: StatisticsDataInterface;
 }
 
-const LeadboardColumn = ({ place, nick }: LeadboardColumnProps) => {
+const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
+  const { t } = useTranslation("leadboard");
+  const { lvl, time } = statistics;
   return (
     <div className='flex w-full justify-center p-5 text-xs xs:text-base'>
       <p className='flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl'>
@@ -22,14 +21,20 @@ const LeadboardColumn = ({ place, nick }: LeadboardColumnProps) => {
       </p>
       <div className=' ml-2 flex w-full max-w-[800px] items-center md:h-16 xl:ml-5 '>
         <div className='hidden md:block'>
-        <Avatar name='Dummy name' lvl={28} />
+          <Avatar name={nick} lvl={lvl} />
         </div>
-        <div className=' mr-5 grid w-full grid-cols-3 grid-rows-3 justify-items-center  bg-second bg-opacity-75 px-2 md:h-16 md:grid-rows-1'>
+        <div
+          className={`mr-5 grid w-full grid-cols-3 grid-rows-3 justify-items-center  bg-second bg-opacity-75 px-2 md:h-16 md:grid-rows-1
+        ${place === 1 ? "bg-yellow-500" : ""}
+        ${place === 2 ? "bg-slate-400" : ""}
+        ${place === 3 ? "bg-yellow-700" : ""}`}>
           <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
-          <Avatar name='Dummy name' lvl={28} />
+            <Avatar name={nick} lvl={lvl} />
             <div className='absolute top-[5px] right-[-60px] flex  items-center gap-x-1 '>
-              <p className='text-xl uppercase text-tertiary'>Lvl </p>
-              <p className='text-3xl text-main '>34</p>
+              <p className='text-xl uppercase text-tertiary drop-shadow'>
+                Lvl{" "}
+              </p>
+              <p className='text-3xl text-main drop-shadow'>{lvl} </p>
             </div>
           </div>
           <div className='relative col-span-2 self-center justify-self-start md:col-span-1 '>
@@ -37,44 +42,47 @@ const LeadboardColumn = ({ place, nick }: LeadboardColumnProps) => {
               {nick}
             </p>
             <div className='absolute top-[-20px] right-[-60px]  hidden items-center gap-x-1 md:top-[-35px] md:flex'>
-              <p className='text-xl uppercase text-tertiary'>Lvl </p>
-              <p className='text-4xl text-main  md:text-5xl'>34</p>
+              <p className='text-xl uppercase text-tertiary drop-shadow'>
+                Lvl{" "}
+              </p>
+              <p className='text-4xl text-main drop-shadow md:text-5xl'>
+                {statistics.lvl}
+              </p>
             </div>
           </div>
           <div className='col-span-3 flex h-full w-full items-center justify-evenly md:col-span-1 md:w-[300px]  md:justify-center  md:gap-x-5'>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
-              <p className='text-xl leading-[22px] xxs:text-3xl '>12415</p>
-              <p className='leading-[25px]  text-tertiary'>Punktów</p>
+              <p className='text-xl leading-[22px] xxs:text-3xl '>
+                {statistics.points}
+              </p>
+              <p className='leading-[25px]  text-tertiary'>{t("points")}</p>
             </div>
             <div className='flex  flex-col items-center md:justify-end md:px-2'>
-              <p className='text-xl leading-[22px] xxs:text-3xl'>14:15</p>
-              <p className='  leading-[25px] text-tertiary'>Czas Ćwiczeń</p>
+              <p className='text-xl leading-[22px] xxs:text-3xl'>
+                {convertMsToHM(
+                  time.creativity + time.hearing + time.technique + time.theory
+                )}
+              </p>
+              <p className='  leading-[25px] text-tertiary'>
+                {t("exercise_time")}
+              </p>
             </div>
           </div>
           <div className=' col-span-3 flex h-full w-full flex-col items-center justify-center  md:col-span-1  md:w-fit md:justify-end '>
             <div className='flex  text-base xxs:text-2xl lg:text-xl xl:text-2xl '>
-              <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-mainText' />
+              <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-mainText active:click-behavior-second' />
               <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
-                <ReactTooltip />
-                <Achievement
-                  Icon={FaEvernote}
-                  description='Super Achivment'
-                  rarity='common'
-                />
-                <Achievement
-                  Icon={FaGuitar}
-                  description='Super Achivment nr.2'
-                  rarity='rare'
-                />
-                <Achievement
-                  Icon={FaBed}
-                  description='Super Achivment ne.3'
-                  rarity='veryRare'
-                />
+                {statistics.achievements.length === 0 && "Brak"}
+                {statistics.achievements.map((achivId, index) => {
+                  return <Achievement key={index} id={achivId} />;
+                })}
               </div>
-              <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText' />
+              <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText active:click-behavior-second' />
             </div>
-            <p className=' text-tertiary'>Osiągnięcia 4/16 </p>
+            <p className=' text-tertiary'>
+              {t("achievements")} {statistics.achievements.length}/
+              {achievements.length}
+            </p>
           </div>
         </div>
       </div>

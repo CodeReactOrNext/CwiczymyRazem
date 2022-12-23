@@ -9,9 +9,16 @@ import {
 } from "react-icons/fa";
 import { IconType } from "react-icons/lib";
 import { AchievementsRarityType } from "./achievementsRarity";
+export type AchievementList =
+  | "time_1"
+  | "time_2"
+  | "time_3"
+  | "balance"
+  | "fire"
+  | "health_habits";
 
-export interface AchievementsInterface extends AchievementsRarityType{
-  id: string;
+export interface AchievementsInterface extends AchievementsRarityType {
+  id: AchievementList;
   name: string;
   Icon: IconType;
   description: string;
@@ -52,7 +59,7 @@ export const achievements: AchievementsInterface[] = [
     name: "Ogień!",
     Icon: FaHotjar,
     rarity: "veryRare",
-    description: "Zdobądź 30 punktów za jeden raport",
+    description: "Zdobądź 60 punktów za jeden raport",
   },
   {
     id: "health_habits",

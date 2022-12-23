@@ -10,7 +10,7 @@ const QuestionMark = ({ description }: QuestionMarkProps) => {
     <>
       <ToolTip />
       <RiQuestionnaireFill
-        className='fill-mainText text-sm'
+        className='cursor-help fill-tertiary text-sm hover:fill-mainText'
         data-tip={description}
       />
     </>

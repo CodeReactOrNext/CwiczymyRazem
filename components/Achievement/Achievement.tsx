@@ -1,19 +1,19 @@
 import ToolTip from "components/ToolTip";
-import {
-  AchievementsRarityType,
-  achievementsRarity,
-} from "data/achievementsRarity";
-import { IconType } from "react-icons/lib";
+import { AchievementList, achievements } from "data/achievements";
+import { achievementsRarity } from "data/achievementsRarity";
 
-interface AchievementProps extends AchievementsRarityType {
-  Icon: IconType;
-  description: string;
-}
-const Achievement = ({ Icon, rarity, description }: AchievementProps) => {
+const Achievement = ({ id }: { id: AchievementList }) => {
+  const achievementData = achievements.find((achiv) => achiv.id === id);
+
+  const { Icon, rarity, description } = achievementData!;
   return (
     <>
       <ToolTip />
-      <Icon color={achievementsRarity[rarity].color} data-tip={description} />
+      <Icon
+        className='cursor-help drop-shadow-md	'
+        color={achievementsRarity[rarity].color}
+        data-tip={description}
+      />
     </>
   );
 };

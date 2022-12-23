@@ -11,7 +11,7 @@ interface useAutoLogInProps {
   redirects?: { loggedIn?: pagesToRedirectTo; loggedOut?: pagesToRedirectTo };
 }
 
-function useAutoLogIn(props: useAutoLogInProps) {
+const useAutoLogIn = (props: useAutoLogInProps) => {
   const [user, loading] = useAuthState(auth);
   const isUserLoggedIn = useAppSelector(selectUserAuth);
   const dispatch = useAppDispatch();
@@ -36,6 +36,6 @@ function useAutoLogIn(props: useAutoLogInProps) {
   ]);
 
   return { isLoggedIn: Boolean(user && isUserLoggedIn), isLoading: loading };
-}
+};
 
 export default useAutoLogIn;

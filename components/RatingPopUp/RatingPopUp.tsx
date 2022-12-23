@@ -3,13 +3,15 @@ import FireSVG from "public/static/images/svg/Fire";
 import Lightning from "public/static/images/svg/Lightning";
 import blackGuitar from "public/static/images/guitar_black.png";
 import Button from "components/Button";
-import LevelIndicator from "components/RatingPopUp/LevelIndicator";
+import LevelIndicator from "components/RatingPopUp/components/LevelIndicator";
 import OldEffect from "components/OldEffect";
-import BonusPointsItem from "./BonusPointsItem";
+import BonusPointsItem from "./components/BonusPointsItem";
 import { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+
 export interface BonusPointsInterface {
   timePoints: number;
   additionalPoints: number;
@@ -19,24 +21,29 @@ export interface BonusPointsInterface {
 }
 interface RatingPopUpProps {
   ratingData: ReportDataInterface;
-  currentLevel: number;
-  actualDayWithoutBreak: number;
+  userData: StatisticsDataInterface;
+  oldUserData: StatisticsDataInterface;
   onClick: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function RatingPopUp({
-  ratingData: { basePoints, bonusPoints },
-  currentLevel,
-  actualDayWithoutBreak,
+const RatingPopUp = ({
+  ratingData,
+  userData,
+  oldUserData,
   onClick,
-}: RatingPopUpProps) {
+}: RatingPopUpProps) => {
   const { t } = useTranslation("report");
+  const isGetNewLevel = userData.lvl > oldUserData.lvl;
+  const newAchievements = userData.achievements.filter(
+    (x) => !oldUserData.achievements.includes(x)
+  );
+
   return (
     <div className='relative flex h-5/6 max-h-[1020px] w-[95%] translate-y-[10%] items-center justify-center bg-main-opposed-500 font-sans md:min-h-[700px] lg:aspect-square lg:w-auto'>
       <OldEffect className='absolute z-10' />
       <div className='absolute top-[20%] -left-[5%] right-0 flex w-[110%] items-center justify-center bg-main-500 text-5xl font-medium sm:text-8xl'>
         <p>
-          {basePoints}
+          {ratingData.basePoints}
           {t("rating_popup.points")}
         </p>
       </div>
@@ -58,18 +65,20 @@ export default function RatingPopUp({
             <div className='h-4/5 w-full bg-second-500'></div>
             <div className={`absolute left-0 top-0 h-full w-[50%] bg-main-500`}>
               <p className='absolute -right-[18%] -top-[80%]  text-lg font-medium text-main-500 md:text-xl'>
-                +{basePoints} {t("rating_popup.points")}
+                +{ratingData.basePoints} {t("rating_popup.points")}
               </p>
             </div>
-            <LevelIndicator position='left'>{currentLevel}</LevelIndicator>
-            <LevelIndicator position='right'>{currentLevel + 1}</LevelIndicator>
+            <LevelIndicator position='left'>{userData.lvl}</LevelIndicator>
+            <LevelIndicator position='right'>{userData.lvl + 1}</LevelIndicator>
           </div>
         </div>
       </div>
 
       <BonusPointsItem
-        bonusPoints={bonusPoints}
-        actualDayWithoutBreak={actualDayWithoutBreak}
+        bonusPoints={ratingData.bonusPoints}
+        actualDayWithoutBreak={userData.actualDayWithoutBreak}
+        achievements={newAchievements}
+        isGetNewLevel={isGetNewLevel}
       />
 
       <div className='absolute -bottom-[10%] -left-[25%] z-40 w-[50%] sm:-left-[15%] md:-bottom-[5%] md:-left-[10%] md:w-auto'>
@@ -83,4 +92,6 @@ export default function RatingPopUp({
       <Lightning className='absolute -right-[25%] -top-[25%] z-10 h-5/6 w-[50%] -rotate-12 fill-tertiary-500 md:-right-[25%] md:-top-[5%]' />
     </div>
   );
-}
+};
+
+export default RatingPopUp;

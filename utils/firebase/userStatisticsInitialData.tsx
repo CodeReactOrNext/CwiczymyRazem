@@ -1,18 +1,22 @@
+import { AchievementList } from "data/achievements";
+
+export interface StatisticsTime {
+  technique: number;
+  theory: number;
+  hearing: number;
+  creativity: number;
+  longestSession: number;
+}
+
 export interface StatisticsDataInterface {
-  time: {
-    technique: number;
-    theory: number;
-    hearing: number;
-    creativity: number;
-    longestSession: number;
-  };
+  time: StatisticsTime;
   lvl: number;
   points: number;
   sessionCount: number;
   habitsCount: number;
   dayWithoutBreak: number;
   maxPoints: number;
-  achievements: string[];
+  achievements: AchievementList[];
   actualDayWithoutBreak: number;
   lastReportDate?: string;
 }

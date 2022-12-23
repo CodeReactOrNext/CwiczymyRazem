@@ -25,11 +25,14 @@ import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
 import { ReportDataInterface, ReportFormikInterface } from "./ReportView.types";
 import { CircleSpinner } from "react-spinners-kit";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
   const [ratingSummaryData, setRatingSummaryData] =
     useState<ReportDataInterface | null>(null);
+  const [oldUserData, setOldUserData] =
+    useState<StatisticsDataInterface | null>(null);
 
   const { t } = useTranslation("report");
   const dispatch = useAppDispatch();
@@ -61,13 +64,15 @@ const ReportView = () => {
       return;
     }
     if (!userAuth) {
-      toast.error("Nie jesteś  zalogowany");
+      toast.error("Nie jesteś zalogowany");
       return;
     }
     const raiting = makeRatingData(inputData, sumTime);
+    const oldUserData = userData;
 
     dispatch(updateUserDataViaReport({ userAuth, inputData, raiting }));
     setRatingSummaryVisible(true);
+    setOldUserData(oldUserData);
     setRatingSummaryData(raiting);
   };
 
@@ -183,8 +188,9 @@ const ReportView = () => {
           <RatingPopUp
             onClick={setRatingSummaryVisible}
             ratingData={ratingSummaryData!}
-            currentLevel={userData!.lvl}
-            actualDayWithoutBreak={userData!.actualDayWithoutBreak}
+            userData={userData!}
+            oldUserData={oldUserData!}
+
           />
         </Backdrop>
       )}
