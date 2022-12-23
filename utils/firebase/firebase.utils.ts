@@ -9,11 +9,10 @@ import {
   User,
   signOut,
   updateProfile,
-  onAuthStateChanged,
   updateEmail,
   reauthenticateWithCredential,
-  AuthCredential,
   EmailAuthProvider,
+  updatePassword,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -90,12 +89,9 @@ export const firebaseGetUserData = async (userAuth: string) => {
   return userSnapshot.data()!.statistics;
 };
 
-export const firebaseGetUserName = async (userAuth: string) => {
-  // const userDocRef = doc(db, "users", userAuth);
-  // const userSnapshot = await getDoc(userDocRef);
+export const firebaseGetUserName = async () => {
   const displayName = auth.currentUser?.displayName;
   return displayName as string;
-  // return userSnapshot.data()!.displayName;
 };
 
 export const firebaseSetUserExceriseRaprot = async (
@@ -113,7 +109,6 @@ export const firebaseUpdateUserStats = async (
   statistics: StatisticsDataInterface
 ) => {
   const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
 
   await updateDoc(userDocRef, { statistics });
 };
@@ -136,6 +131,11 @@ export const firebaseUpdateUserDisplayName = async (
 export const firebaseUpdateUserEmail = async (newEmail: string) => {
   if (auth.currentUser) {
     return updateEmail(auth.currentUser, newEmail);
+  }
+};
+export const firebaseUpdateUserPassword = async (newPassword: string) => {
+  if (auth.currentUser) {
+    return updatePassword(auth.currentUser, newPassword);
   }
 };
 
@@ -175,16 +175,6 @@ export const firebaseReauthenticateUser = async ({
     const credential = EmailAuthProvider.credential(email, password);
 
     return await reauthenticateWithCredential(user, credential);
-    // .then(() => {
-    //   console.log("Authenticated");
-    //   return { message: "Authenticated" };
-    // })
-    // .catch((error) => error);
   }
   return null;
 };
-
-// firebaseReauthenticateUser({
-//   email: "testuser4@test.com",
-//   password: "ZAQ!2wsx",
-// });

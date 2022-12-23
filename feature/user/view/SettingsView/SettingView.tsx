@@ -1,25 +1,20 @@
 import Avatar from "components/Avatar";
 import Backdrop from "components/Backdrop";
 import Button from "components/Button";
-import GoogleButton from "components/GoogleButton";
 import Input from "components/Input";
-import OldEffect from "components/OldEffect";
 import {
   getUserProvider,
-  // reauthenticateUser,
   selectIsFetching,
-  selectUserAuth,
-  selectUserData,
   updateDisplayName,
   updateUserEmail,
   updateUserInterface as UpdatedUserCredentials,
+  updateUserPassword,
 } from "feature/user/store/userSlice";
 import { UserInfo } from "firebase/auth";
 import { Form, Formik } from "formik";
 import FormLayout from "layouts/FormLayout";
 import MainLayout from "layouts/MainLayout";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAt, FaLock, FaUserAlt } from "react-icons/fa";
 import { CircleSpinner } from "react-spinners-kit";
@@ -33,10 +28,13 @@ const SettingsView = () => {
   const { t } = useTranslation(["common", "settings"]);
   const [nameInputVisible, setNameInputVisible] = useState(false);
   const [emailInputVisible, setEmailInputVisible] = useState(false);
+  const [passwordInputVisible, setPasswordInputVisible] = useState(false);
+
   const [reauthFormVisible, setReauthFormVisible] = useState(false);
   const [userProviderData, setUserProviderData] = useState<UserInfo>();
 
   const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
@@ -52,16 +50,22 @@ const SettingsView = () => {
   const changeNameHandler = (name: string) => {
     dispatch(updateDisplayName({ login: name } as SignUpCredentials));
   };
-  // const changeEmailHandler = () => {
-  //   // dispatch(reauthenticateUser({ email } as signUpCredentials));
-  //   setReauthFormVisible(true);
-  // };
-  const changeEmailHandler = async (data: UpdatedUserCredentials) => {
-    await dispatch(updateUserEmail(data)).then(() => {
-      setNewEmail("");
-      setReauthFormVisible(false);
-      setEmailInputVisible(false);
-    });
+
+  const changeCredentialsHandler = async (data: UpdatedUserCredentials) => {
+    if (data.newEmail) {
+      await dispatch(updateUserEmail(data)).then(() => {
+        setNewEmail("");
+        setReauthFormVisible(false);
+        setEmailInputVisible(false);
+      });
+    }
+    if (data.newPassword) {
+      await dispatch(updateUserPassword(data)).then(() => {
+        setNewPassword("");
+        setReauthFormVisible(false);
+        setPasswordInputVisible(false);
+      });
+    }
   };
 
   const changeHandler = (name: "login" | "email", data: string) => {
@@ -72,9 +76,16 @@ const SettingsView = () => {
   const showNameInputHandler = () => {
     setNameInputVisible(true);
     setEmailInputVisible(false);
+    setPasswordInputVisible(false);
   };
   const showEmailInputHandler = () => {
     setEmailInputVisible(true);
+    setNameInputVisible(false);
+    setPasswordInputVisible(false);
+  };
+  const showPasswordInputHandler = () => {
+    setPasswordInputVisible(true);
+    setEmailInputVisible(false);
     setNameInputVisible(false);
   };
 
@@ -173,13 +184,50 @@ const SettingsView = () => {
                     <div className='flex  flex-row gap-2 p-4 text-2xl'>
                       <p className='text-tertiary'>Hasło</p>
                       {userProviderData?.providerId !== "google.com" ? (
-                        <button type='button' className='text-lg text-main'>
+                        <button
+                          onClick={showPasswordInputHandler}
+                          type='button'
+                          className='text-lg text-main'>
                           Edytuj
                         </button>
                       ) : (
                         "Zalogowano z Google"
                       )}
                     </div>
+                    {passwordInputVisible && (
+                      <div className='flex h-full w-full gap-2 pb-5'>
+                        <Input
+                          Icon={FaUserAlt}
+                          placeholder={"Nowe hasło"}
+                          name={"password"}
+                          type='password'
+                        />
+                        <Input
+                          Icon={FaUserAlt}
+                          placeholder={"Powtórz nowe hasło"}
+                          name={"repeat_password"}
+                          type='password'
+                        />
+                        <Button
+                          onClick={() => {
+                            if (
+                              values.password &&
+                              !errors.password &&
+                              values.repeat_password &&
+                              !errors.repeat_password
+                            ) {
+                              setNewPassword(values.password);
+                              toast.info(
+                                "Do zmiany danych musisz się ponownie zalogować."
+                              );
+                              setReauthFormVisible(true);
+                            }
+                          }}
+                          type='submit'>
+                          Zapisz
+                        </Button>
+                      </div>
+                    )}
                   </>
                 </>
               </Form>
@@ -216,7 +264,11 @@ const SettingsView = () => {
                   initialValues={formikInitialValues}
                   validationSchema={loginSchema}
                   onSubmit={(data) => {
-                    changeEmailHandler({ ...data, newEmail });
+                    changeCredentialsHandler({
+                      ...data,
+                      newEmail,
+                      newPassword,
+                    });
                   }}>
                   <Form>
                     <FormLayout>
