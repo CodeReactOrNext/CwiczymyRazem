@@ -1,4 +1,4 @@
-import { convertInputTime } from "feature/user/view/ReportView/helpers/convertInputTime";
+import { convertInputTime } from "pages/api/report/utils/convertInputTime";
 import {
   ReportDataInterface,
   ReportFormikInterface,

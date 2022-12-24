@@ -3,7 +3,7 @@ import {
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
-import type { NextApiRequest, NextApiResponse } from "next";
+
 import {
   checkBalance,
   checkFire,
@@ -40,10 +40,3 @@ export const checkAchievement = (
 
   return userAchievedAchievements;
 };
-
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { statistics, raiting, inputData } = JSON.parse(req.body);
-  const achievement = checkAchievement(statistics, raiting, inputData);
-
-  res.status(200).json(JSON.stringify(achievement));
-}

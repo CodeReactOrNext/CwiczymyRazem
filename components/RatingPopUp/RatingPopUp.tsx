@@ -21,21 +21,21 @@ export interface BonusPointsInterface {
 }
 interface RatingPopUpProps {
   ratingData: ReportDataInterface;
-  userData: StatisticsDataInterface;
-  oldUserData: StatisticsDataInterface;
+  currentUserStats: StatisticsDataInterface;
+  previousUserStats: StatisticsDataInterface;
   onClick: Dispatch<SetStateAction<boolean>>;
 }
 
 const RatingPopUp = ({
   ratingData,
-  userData,
-  oldUserData,
+  currentUserStats,
+  previousUserStats,
   onClick,
 }: RatingPopUpProps) => {
   const { t } = useTranslation("report");
-  const isGetNewLevel = userData.lvl > oldUserData.lvl;
-  const newAchievements = userData.achievements.filter(
-    (x) => !oldUserData.achievements.includes(x)
+  const isGetNewLevel = currentUserStats.lvl > previousUserStats.lvl;
+  const newAchievements = currentUserStats.achievements.filter(
+    (x) => !previousUserStats.achievements.includes(x)
   );
 
   return (
@@ -68,15 +68,19 @@ const RatingPopUp = ({
                 +{ratingData.basePoints} {t("rating_popup.points")}
               </p>
             </div>
-            <LevelIndicator position='left'>{userData.lvl}</LevelIndicator>
-            <LevelIndicator position='right'>{userData.lvl + 1}</LevelIndicator>
+            <LevelIndicator position='left'>
+              {currentUserStats.lvl}
+            </LevelIndicator>
+            <LevelIndicator position='right'>
+              {currentUserStats.lvl + 1}
+            </LevelIndicator>
           </div>
         </div>
       </div>
 
       <BonusPointsItem
         bonusPoints={ratingData.bonusPoints}
-        actualDayWithoutBreak={userData.actualDayWithoutBreak}
+        actualDayWithoutBreak={currentUserStats.actualDayWithoutBreak}
         achievements={newAchievements}
         isGetNewLevel={isGetNewLevel}
       />

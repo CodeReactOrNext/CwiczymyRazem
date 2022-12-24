@@ -37,11 +37,11 @@ const BonusPointsItem = ({
               <p className='text-2xl text-tertiary sm:text-2xl'>
                 {t("report:rating_popup.new_achievements")}
               </p>
-              <p className='flex gap-3 p-2'>
+              <div className='flex gap-3 p-2'>
                 {achievements.map((id, index) => (
                   <Achievement key={index} id={id} />
                 ))}
-              </p>
+              </div>
             </li>
           )}
         </ul>

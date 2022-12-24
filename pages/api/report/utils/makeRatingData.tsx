@@ -1,6 +1,9 @@
-import { HABBITS_POINTS_VALUE, TIME_POINTS_VALUE } from "constants/ratingValue";
-import { ReportFormikInterface } from "../ReportView.types";
+import { ReportFormikInterface } from "../../../../feature/user/view/ReportView/ReportView.types";
 import { getMultiplerValue } from "./getMulitplerValue";
+import {
+  HABBITS_POINTS_VALUE,
+  TIME_POINTS_VALUE,
+} from "pages/api/constants/ratingValue";
 
 export const makeRatingData = (
   data: ReportFormikInterface,
