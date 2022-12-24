@@ -51,6 +51,7 @@ export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName: string } | null;
   currentUserStats: StatisticsDataInterface | null;
+  previousUserStats: StatisticsDataInterface | null;
   isFetching: "google" | "email" | "createAccount" | "updateData" | null;
   providerData: providerData;
 }
@@ -58,6 +59,7 @@ const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
   currentUserStats: null,
+  previousUserStats: null,
   isFetching: null,
   providerData: {
     providerId: null,
@@ -262,6 +264,7 @@ export const userSlice = createSlice({
       .addCase(updateUserStats.fulfilled, (state, { payload }) => {
         state.isFetching = null;
         state.currentUserStats = payload.currentUserStats;
+        state.previousUserStats = payload.previousUserStats;
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
@@ -304,6 +307,8 @@ export const userSlice = createSlice({
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
 export const selectCurrentUserStats = (state: RootState) =>
   state.user.currentUserStats;
+export const selectPreviousUserStats = (state: RootState) =>
+  state.user.previousUserStats;
 export const selectIsFetching = (state: RootState) => state.user.isFetching;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
