@@ -18,6 +18,7 @@ import {
   selectUserAuth,
   selectCurrentUserStats,
   updateUserStats,
+  selectPreviousUserStats,
 } from "feature/user/store/userSlice";
 import { convertInputTime } from "../../../../pages/api/report/utils/convertInputTime";
 import { toast } from "react-toastify";
@@ -25,18 +26,16 @@ import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
 import { ReportDataInterface, ReportFormikInterface } from "./ReportView.types";
 import { CircleSpinner } from "react-spinners-kit";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
   const [ratingSummaryData, setRatingSummaryData] =
     useState<ReportDataInterface | null>(null);
-  const [previousUserStats, setPreviousUserStats] =
-    useState<StatisticsDataInterface | null>(null);
 
   const { t } = useTranslation("report");
   const dispatch = useAppDispatch();
   const currentUserStats = useAppSelector(selectCurrentUserStats);
+  const previousUserStats = useAppSelector(selectPreviousUserStats);
   const userAuth = useAppSelector(selectUserAuth);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
@@ -68,10 +67,8 @@ const ReportView = () => {
       return;
     }
     const raiting = makeRatingData(inputData, sumTime);
-    const previousUserStats = currentUserStats;
 
     dispatch(updateUserStats({ userAuth, inputData })).then(() => {
-      setPreviousUserStats(previousUserStats);
       setRatingSummaryData(raiting);
       setRatingSummaryVisible(true);
       toast.success("Poprawnie zraportowano");
@@ -185,7 +182,7 @@ const ReportView = () => {
           )}
         </Formik>
       </MainLayout>
-      {ratingSummaryVisible && currentUserStats && (
+      {ratingSummaryVisible && (
         <Backdrop selector='overlays'>
           <RatingPopUp
             onClick={setRatingSummaryVisible}
