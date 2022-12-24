@@ -3,7 +3,7 @@ import {
   FOUR_DAY_MULTIPLER,
   THREE_DAY_MULTIPLER,
   TWO_DAY_MULTIPLER,
-} from "constants/ratingValue";
+} from "pages/api/constants/ratingValue";
 
 export const getMultiplerValue = (streak: number) => {
   if (streak === 2) return TWO_DAY_MULTIPLER;

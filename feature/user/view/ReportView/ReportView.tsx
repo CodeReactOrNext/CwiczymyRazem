@@ -11,15 +11,15 @@ import { MdSchool } from "react-icons/md";
 import { IoMdHand } from "react-icons/io";
 import { Checkbox, TimeInputBox } from "layouts/ReportFormLayout/components";
 import { Formik } from "formik";
-import { makeRatingData } from "./helpers/makeRatingData";
+import { makeRatingData } from "../../../../pages/api/report/utils/makeRatingData";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
   selectIsFetching,
   selectUserAuth,
-  selectUserData,
-  updateUserDataViaReport,
+  selectCurrentUserStats,
+  updateUserStats,
 } from "feature/user/store/userSlice";
-import { convertInputTime } from "./helpers/convertInputTime";
+import { convertInputTime } from "../../../../pages/api/report/utils/convertInputTime";
 import { toast } from "react-toastify";
 import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
@@ -31,12 +31,12 @@ const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
   const [ratingSummaryData, setRatingSummaryData] =
     useState<ReportDataInterface | null>(null);
-  const [oldUserData, setOldUserData] =
+  const [previousUserStats, setPreviousUserStats] =
     useState<StatisticsDataInterface | null>(null);
 
   const { t } = useTranslation("report");
   const dispatch = useAppDispatch();
-  const userData = useAppSelector(selectUserData);
+  const currentUserStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
@@ -68,12 +68,14 @@ const ReportView = () => {
       return;
     }
     const raiting = makeRatingData(inputData, sumTime);
-    const oldUserData = userData;
+    const previousUserStats = currentUserStats;
 
-    dispatch(updateUserDataViaReport({ userAuth, inputData, raiting }));
-    setRatingSummaryVisible(true);
-    setOldUserData(oldUserData);
-    setRatingSummaryData(raiting);
+    dispatch(updateUserStats({ userAuth, inputData })).then(() => {
+      setPreviousUserStats(previousUserStats);
+      setRatingSummaryData(raiting);
+      setRatingSummaryVisible(true);
+      toast.success("Poprawnie zraportowano");
+    });
   };
 
   return (
@@ -183,14 +185,13 @@ const ReportView = () => {
           )}
         </Formik>
       </MainLayout>
-      {ratingSummaryVisible && (
+      {ratingSummaryVisible && currentUserStats && (
         <Backdrop selector='overlays'>
           <RatingPopUp
             onClick={setRatingSummaryVisible}
             ratingData={ratingSummaryData!}
-            userData={userData!}
-            oldUserData={oldUserData!}
-
+            currentUserStats={currentUserStats!}
+            previousUserStats={previousUserStats!}
           />
         </Backdrop>
       )}

@@ -1,4 +1,7 @@
-import { selectUserData, selectUserName } from "feature/user/store/userSlice";
+import {
+  selectCurrentUserStats,
+  selectUserName,
+} from "feature/user/store/userSlice";
 import { convertMsToHM } from "helpers/timeConverter";
 import LandingLayout from "layouts/LandingLayout";
 import { LandingNavProps } from "layouts/LandingLayout/components/LandingNav";
@@ -17,7 +20,7 @@ import {
 import { useAppSelector } from "store/hooks";
 
 const LandingView = () => {
-  const userStats = useAppSelector(selectUserData);
+  const userStats = useAppSelector(selectCurrentUserStats);
   const userName = useAppSelector(selectUserName);
   const {
     points,

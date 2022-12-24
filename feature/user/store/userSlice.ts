@@ -23,14 +23,14 @@ import {
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
-import { checkIsPracticeToday } from "../view/ReportView/helpers/checkIsPracticeToday";
-import { convertInputTime } from "../view/ReportView/helpers/convertInputTime";
+import { checkIsPracticeToday } from "../../../pages/api/report/utils/checkIsPracticeToday";
+import { convertInputTime } from "../../../pages/api/report/utils/convertInputTime";
 import {
   ReportDataInterface,
   ReportFormikInterface,
 } from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
-import { getUserLvl } from "./helpers/getUserLvl";
+import { getUserLvl } from "../../../pages/api/report/utils/getUserLvl";
 
 import {
   createAccountErrorHandler,
@@ -50,14 +50,14 @@ export interface providerData {
 export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName: string } | null;
-  userData: StatisticsDataInterface | null;
+  currentUserStats: StatisticsDataInterface | null;
   isFetching: "google" | "email" | "createAccount" | "updateData" | null;
   providerData: providerData;
 }
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
-  userData: null,
+  currentUserStats: null,
   isFetching: null,
   providerData: {
     providerId: null,
@@ -74,9 +74,9 @@ export const logInViaGoogle = createAsyncThunk(
   async (parameters, thunkAPI) => {
     const { user } = await firebaseSignInWithGooglePopup();
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
-    const userData = await firebaseGetUserData(userAuth);
+    const currentUserStats = await firebaseGetUserData(userAuth);
     const userName = user.displayName!;
-    return { userInfo: { displayName: userName }, userAuth, userData };
+    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
   }
 );
 
@@ -85,9 +85,9 @@ export const logInViaEmail = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }) => {
     const { user } = await firebaseSignInWithEmail(email, password);
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
-    const userData = await firebaseGetUserData(userAuth);
+    const currentUserStats = await firebaseGetUserData(userAuth);
     const userName = user.displayName!;
-    return { userInfo: { displayName: userName }, userAuth, userData };
+    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
   }
 );
 
@@ -99,9 +99,9 @@ export const autoLogIn = createAsyncThunk(
       ...user,
       displayName: await firebaseGetUserName(),
     };
-    const userData = await firebaseGetUserData(userAuth);
+    const currentUserStats = await firebaseGetUserData(userAuth);
     const userName = userWithDisplayName.displayName;
-    return { userInfo: { displayName: userName }, userAuth, userData };
+    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
   }
 );
 
@@ -113,9 +113,9 @@ export const createAccount = createAsyncThunk(
     const userAuth = await firebaseCreateUserDocumentFromAuth(
       userWithDisplayName
     );
-    const userData = await firebaseGetUserData(userAuth);
+    const currentUserStats = await firebaseGetUserData(userAuth);
     const userName = userWithDisplayName.displayName;
-    return { userInfo: { displayName: userName }, userAuth, userData };
+    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
   }
 );
 
@@ -130,8 +130,8 @@ export const updateDisplayName = createAsyncThunk(
       await firebaseUpdateUserDisplayName(userAuth, login);
     }
 
-    const userData = await firebaseGetUserData(userAuth);
-    return { userInfo: { displayName: login }, userAuth, userData };
+    const currentUserStats = await firebaseGetUserData(userAuth);
+    return { userInfo: { displayName: login }, userAuth, currentUserStats };
   }
 );
 
@@ -179,92 +179,24 @@ export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   return null;
 });
 
-interface updateUserDataViaReportProps {
+interface updateUserStatsProps {
   userAuth: string;
   inputData: ReportFormikInterface;
-  raiting: ReportDataInterface;
 }
 
-export const updateUserDataViaReport = createAsyncThunk(
-  "user/updateUserDataViaReport",
-  async ({ userAuth, inputData, raiting }: updateUserDataViaReportProps) => {
-    const userData = await firebaseGetUserData(userAuth);
-
-    const { techniqueTime, theoryTime, hearingTime, creativeTime, sumTime } =
-      convertInputTime(inputData);
-
-    const {
-      time,
-      habitsCount,
-      maxPoints,
-      sessionCount,
-      points,
-      lvl,
-      lastReportDate,
-      actualDayWithoutBreak,
-      dayWithoutBreak,
-      achievements,
-    } = userData;
-
-    const userLastReportDate = new Date(lastReportDate);
-    const didPracticeToday = checkIsPracticeToday(userLastReportDate);
-
-    const updatedActualDayWithoutBreak = didPracticeToday
-      ? actualDayWithoutBreak
-      : actualDayWithoutBreak + 1;
-
-    const updatedUserData: StatisticsDataInterface = {
-      time: {
-        technique: time.technique + techniqueTime,
-        theory: time.theory + theoryTime,
-        hearing: time.hearing + hearingTime,
-        creativity: time.creativity + creativeTime,
-        longestSession:
-          time.longestSession < sumTime ? sumTime : time.longestSession,
-      },
-      points: points + raiting.basePoints,
-      lvl: getUserLvl(lvl, points + raiting.basePoints),
-      sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
-      habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
-      dayWithoutBreak:
-        dayWithoutBreak < updatedActualDayWithoutBreak
-          ? updatedActualDayWithoutBreak
-          : dayWithoutBreak,
-      maxPoints:
-        maxPoints < raiting.basePoints ? raiting.basePoints : maxPoints,
-      actualDayWithoutBreak: updatedActualDayWithoutBreak,
-      achievements: achievements,
-      lastReportDate: new Date().toISOString(),
-    };
-
-    const fetchAchievements = () =>
-      fetch("/api/achievement", {
+export const updateUserStats = createAsyncThunk(
+  "user/updateUserStats",
+  async ({ userAuth, inputData }: updateUserStatsProps) => {
+    const fetchReport = () =>
+      fetch("/api/report", {
         method: "POST",
-        body: JSON.stringify({
-          statistics: updatedUserData,
-          raiting,
-          inputData,
-        }),
+        body: JSON.stringify({ userAuth, inputData }),
       });
+    const statistics = await (await fetchReport()).json();
 
-    const achievementCheck = async () => {
-      const response = await fetchAchievements();
-      const data = await response.json();
-      return JSON.parse(data);
-    };
-    const newAchievements = await achievementCheck();
-
-    const updatedUserDataWithAchievements: StatisticsDataInterface = {
-      ...updatedUserData,
-      achievements: [...newAchievements, ...updatedUserData.achievements],
-    };
-
-    firebaseSetUserExerciseRaprot(userAuth, raiting, new Date());
-    firebaseUpdateUserStats(userAuth, updatedUserDataWithAchievements);
-
-    return {
-      updatedData: updatedUserDataWithAchievements,
-      oldStatistic: userData,
+    return JSON.parse(statistics) as {
+      currentUserStats: StatisticsDataInterface;
+      previousUserStats: StatisticsDataInterface;
     };
   }
 );
@@ -277,10 +209,10 @@ export const userSlice = createSlice({
       state.userAuth = action.payload;
     },
     addUserData: (state, action) => {
-      state.userData = action.payload;
+      state.currentUserStats = action.payload;
     },
     addPracticeData: (state, action) => {
-      state.userData = action.payload;
+      state.currentUserStats = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -294,7 +226,7 @@ export const userSlice = createSlice({
       .addCase(createAccount.pending, (state) => {
         state.isFetching = "createAccount";
       })
-      .addCase(updateUserDataViaReport.pending, (state) => {
+      .addCase(updateUserStats.pending, (state) => {
         state.isFetching = "updateData";
       })
       .addCase(updateUserEmail.pending, (state) => {
@@ -303,7 +235,7 @@ export const userSlice = createSlice({
       .addCase(updateUserPassword.pending, (state) => {
         state.isFetching = "updateData";
       })
-      .addCase(updateUserDataViaReport.rejected, (state) => {
+      .addCase(updateUserStats.rejected, (state) => {
         state.isFetching = null;
         toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
       })
@@ -327,9 +259,9 @@ export const userSlice = createSlice({
         state.isFetching = null;
         createAccountErrorHandler(error);
       })
-      .addCase(updateUserDataViaReport.fulfilled, (state, { payload }) => {
+      .addCase(updateUserStats.fulfilled, (state, { payload }) => {
         state.isFetching = null;
-        state.userData = payload.updatedData;
+        state.currentUserStats = payload.currentUserStats;
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
@@ -349,7 +281,7 @@ export const userSlice = createSlice({
       .addCase(updateDisplayName.fulfilled, (state, action) => {
         state.isFetching = null;
         state.userInfo = action.payload.userInfo;
-        state.userData = action.payload.userData;
+        state.currentUserStats = action.payload.currentUserStats;
         state.userAuth = action.payload.userAuth;
       })
       .addMatcher(
@@ -362,7 +294,7 @@ export const userSlice = createSlice({
         (state, action) => {
           state.isFetching = null;
           state.userInfo = action.payload.userInfo;
-          state.userData = action.payload.userData;
+          state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
         }
       );
@@ -370,7 +302,8 @@ export const userSlice = createSlice({
 });
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
-export const selectUserData = (state: RootState) => state.user.userData;
+export const selectCurrentUserStats = (state: RootState) =>
+  state.user.currentUserStats;
 export const selectIsFetching = (state: RootState) => state.user.isFetching;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
