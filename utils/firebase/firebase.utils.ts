@@ -142,8 +142,8 @@ export const firebaseGetUsersExceriseRaprot = async () => {
   const usersDocRef = await getDocs(collection(db, "users"));
   const userStatsArr: FirebaseUserDataInterface[] = [];
   usersDocRef.forEach((doc) => {
-    const userData = doc.data() as FirebaseUserDataInterface;
-    userStatsArr.push(userData);
+    const currentUserStats = doc.data() as FirebaseUserDataInterface;
+    userStatsArr.push(currentUserStats);
   });
   return userStatsArr;
 };

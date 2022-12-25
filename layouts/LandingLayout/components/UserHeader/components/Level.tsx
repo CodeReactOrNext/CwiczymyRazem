@@ -1,7 +1,16 @@
-import { calcExperience } from "helpers/calcExperience";
 import { useTranslation } from "react-i18next";
 
-export const Level = ({ points, lvl }: { points: number; lvl: number }) => {
+interface LevelInterfaceProps {
+  points: number;
+  lvl: number;
+  pointsToNextLvl: number;
+}
+
+export const Level = ({
+  points,
+  lvl,
+  pointsToNextLvl,
+}: LevelInterfaceProps) => {
   const { t } = useTranslation("landing");
   return (
     <div className='col-span-2 flex flex-col items-center md:col-auto lg:w-64 lg:justify-self-end xl:w-80'>
@@ -22,7 +31,7 @@ export const Level = ({ points, lvl }: { points: number; lvl: number }) => {
         </p>
       </div>
       <p>
-        {points}/{calcExperience(lvl + 1)}
+        {points}/{pointsToNextLvl}
         {t("points_short")}
       </p>
     </div>
