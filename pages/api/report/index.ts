@@ -12,6 +12,7 @@ import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialDat
 import { NextApiRequest, NextApiResponse } from "next";
 import { makeRatingData } from "./utils/makeRatingData";
 import { checkAchievement } from "./achievement";
+import { calcExperience } from "./utils/calcExperience";
 
 interface updateUserStatsProps {
   userAuth: string;
@@ -41,6 +42,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const userLastReportDate = new Date(lastReportDate!);
   const didPracticeToday = checkIsPracticeToday(userLastReportDate);
 
+  const level = getUserLvl(lvl, points + raiting.basePoints);
   const updatedActualDayWithoutBreak = didPracticeToday
     ? actualDayWithoutBreak
     : actualDayWithoutBreak + 1;
@@ -55,7 +57,8 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
         time.longestSession < sumTime ? sumTime : time.longestSession,
     },
     points: points + raiting.basePoints,
-    lvl: getUserLvl(lvl, points + raiting.basePoints),
+    lvl: level,
+    pointsToNextLvl: calcExperience(level + 1),
     sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
     habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
     dayWithoutBreak:
