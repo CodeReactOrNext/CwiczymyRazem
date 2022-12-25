@@ -84,6 +84,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   return {
     currentUserStats: updatedUserDataWithAchievements,
     previousUserStats: currentUserStats,
+    raitingData: raiting,
   };
 };
 

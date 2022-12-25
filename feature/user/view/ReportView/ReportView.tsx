@@ -6,12 +6,11 @@ import ReportFormLayout from "layouts/ReportFormLayout";
 import ReportCategoryLayout from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaBrain, FaMusic, FaTimesCircle } from "react-icons/fa";
+import { FaBrain, FaMusic } from "react-icons/fa";
 import { MdSchool } from "react-icons/md";
 import { IoMdHand } from "react-icons/io";
 import { Checkbox, TimeInputBox } from "layouts/ReportFormLayout/components";
 import { Formik } from "formik";
-import { makeRatingData } from "../../../../pages/api/report/utils/makeRatingData";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
   selectIsFetching,
@@ -19,6 +18,7 @@ import {
   selectCurrentUserStats,
   updateUserStats,
   selectPreviousUserStats,
+  selectRaitingData,
 } from "feature/user/store/userSlice";
 import { convertInputTime } from "../../../../pages/api/report/utils/convertInputTime";
 import { toast } from "react-toastify";
@@ -29,13 +29,12 @@ import { CircleSpinner } from "react-spinners-kit";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
-  const [ratingSummaryData, setRatingSummaryData] =
-    useState<ReportDataInterface | null>(null);
 
   const { t } = useTranslation("report");
   const dispatch = useAppDispatch();
   const currentUserStats = useAppSelector(selectCurrentUserStats);
   const previousUserStats = useAppSelector(selectPreviousUserStats);
+  const raitingData = useAppSelector(selectRaitingData);
   const userAuth = useAppSelector(selectUserAuth);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
@@ -66,10 +65,8 @@ const ReportView = () => {
       toast.error("Nie jesteś zalogowany");
       return;
     }
-    const raiting = makeRatingData(inputData, sumTime);
 
     dispatch(updateUserStats({ userAuth, inputData })).then(() => {
-      setRatingSummaryData(raiting);
       setRatingSummaryVisible(true);
       toast.success("Poprawnie zraportowano");
     });
@@ -186,7 +183,7 @@ const ReportView = () => {
         <Backdrop selector='overlays'>
           <RatingPopUp
             onClick={setRatingSummaryVisible}
-            ratingData={ratingSummaryData!}
+            ratingData={raitingData!}
             currentUserStats={currentUserStats!}
             previousUserStats={previousUserStats!}
           />
