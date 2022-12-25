@@ -18,8 +18,6 @@ import {
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
-import { checkIsPracticeToday } from "../../../pages/api/report/utils/checkIsPracticeToday";
-import { convertInputTime } from "../../../pages/api/report/utils/convertInputTime";
 import {
   ReportDataInterface,
   ReportFormikInterface,
@@ -45,6 +43,7 @@ export interface userSliceInitialState {
   userInfo: { displayName: string } | null;
   currentUserStats: StatisticsDataInterface | null;
   previousUserStats: StatisticsDataInterface | null;
+  raitingData: ReportDataInterface | null;
   isFetching: "google" | "email" | "createAccount" | "updateData" | null;
   providerData: providerData;
 }
@@ -53,6 +52,7 @@ const initialState: userSliceInitialState = {
   userAuth: null,
   currentUserStats: null,
   previousUserStats: null,
+  raitingData: null,
   isFetching: null,
   providerData: {
     providerId: null,
@@ -258,6 +258,7 @@ export const userSlice = createSlice({
         state.isFetching = null;
         state.currentUserStats = payload.currentUserStats;
         state.previousUserStats = payload.previousUserStats;
+        state.raitingData = payload.raitingData;
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
@@ -303,8 +304,10 @@ export const selectCurrentUserStats = (state: RootState) =>
 export const selectPreviousUserStats = (state: RootState) =>
   state.user.previousUserStats;
 export const selectIsFetching = (state: RootState) => state.user.isFetching;
+export const selectRaitingData = (state: RootState) => state.user.raitingData;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
+
 export const { addUserAuth, addUserData } = userSlice.actions;
 
 export default userSlice.reducer;
