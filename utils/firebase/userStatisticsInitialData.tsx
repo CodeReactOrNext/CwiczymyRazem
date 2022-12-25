@@ -11,6 +11,7 @@ export interface StatisticsTime {
 export interface StatisticsDataInterface {
   time: StatisticsTime;
   lvl: number;
+  pointsToNextLvl: number;
   points: number;
   sessionCount: number;
   habitsCount: number;
@@ -31,6 +32,7 @@ export const statistics: StatisticsDataInterface = {
   },
   lvl: 1,
   points: 0,
+  pointsToNextLvl: 35,
   sessionCount: 0,
   habitsCount: 0,
   dayWithoutBreak: 0,

@@ -7,9 +7,9 @@ import {
   selectIsFetching,
   updateDisplayName,
   updateUserEmail,
-  updateUserInterface as UpdatedUserCredentials,
   updateUserPassword,
 } from "feature/user/store/userSlice";
+import { updateUserInterface as UpdatedUserCredentials } from "feature/user/store/userSlice.types";
 import { UserInfo } from "firebase/auth";
 import { Form, Formik } from "formik";
 import FormLayout from "layouts/FormLayout";
