@@ -20,7 +20,6 @@ import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialDat
 import { RootState } from "../../../store/store";
 import {
   ReportDataInterface,
-  ReportFormikInterface,
 } from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 import {
@@ -28,25 +27,9 @@ import {
   loginViaEmailErrorHandler,
   loginViaGoogleErrorHandler,
 } from "./userErrorsHandling";
+import { updateUserInterface, updateUserStatsProps, userSliceInitialState } from "./userSlice.types";
 
-export interface providerData {
-  providerId: string | null;
-  uid: string | null;
-  displayName: string | null;
-  email: string | null;
-  phoneNumber: string | null;
-  photoURL: string | null;
-}
 
-export interface userSliceInitialState {
-  userAuth: string | null;
-  userInfo: { displayName: string } | null;
-  currentUserStats: StatisticsDataInterface | null;
-  previousUserStats: StatisticsDataInterface | null;
-  raitingData: ReportDataInterface | null;
-  isFetching: "google" | "email" | "createAccount" | "updateData" | null;
-  providerData: providerData;
-}
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
@@ -130,10 +113,7 @@ export const updateDisplayName = createAsyncThunk(
   }
 );
 
-export interface updateUserInterface extends SignUpCredentials {
-  newEmail?: string;
-  newPassword?: string;
-}
+
 
 export const updateUserEmail = createAsyncThunk(
   "user/updateUserEmail",
@@ -174,10 +154,6 @@ export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   return null;
 });
 
-interface updateUserStatsProps {
-  userAuth: string;
-  inputData: ReportFormikInterface;
-}
 
 export const updateUserStats = createAsyncThunk(
   "user/updateUserStats",
@@ -192,6 +168,7 @@ export const updateUserStats = createAsyncThunk(
     return JSON.parse(statistics) as {
       currentUserStats: StatisticsDataInterface;
       previousUserStats: StatisticsDataInterface;
+      raitingData: ReportDataInterface;
     };
   }
 );
