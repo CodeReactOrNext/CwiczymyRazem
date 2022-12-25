@@ -1,8 +1,5 @@
 import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
-import { achievements } from "data/achievements";
 import { User } from "firebase/auth";
-import { calcExperience } from "helpers/calcExperience";
-
 import { toast } from "react-toastify";
 import {
   auth,
@@ -13,13 +10,11 @@ import {
   firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseReauthenticateUser,
-  firebaseSetUserExerciseRaprot,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
   firebaseUpdateUserDisplayName,
   firebaseUpdateUserEmail,
   firebaseUpdateUserPassword,
-  firebaseUpdateUserStats,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
@@ -30,8 +25,6 @@ import {
   ReportFormikInterface,
 } from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
-import { getUserLvl } from "../../../pages/api/report/utils/getUserLvl";
-
 import {
   createAccountErrorHandler,
   loginViaEmailErrorHandler,
