@@ -24,7 +24,7 @@ import { convertInputTime } from "../../../../pages/api/report/utils/convertInpu
 import { toast } from "react-toastify";
 import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
-import { ReportDataInterface, ReportFormikInterface } from "./ReportView.types";
+import {  ReportFormikInterface } from "./ReportView.types";
 import { CircleSpinner } from "react-spinners-kit";
 
 const ReportView = () => {
@@ -164,15 +164,15 @@ const ReportView = () => {
                   <div className='m-2 h-6'>
                     {Object.keys(errors).length !== 0 && <ErrorBox />}
                   </div>
-                  <Button type='submit'>
-                    {isFetching ? (
+                  {isFetching ? (
+                    <Button type='submit' disabled>
                       <div className='px-3'>
                         <CircleSpinner size={24} />
                       </div>
-                    ) : (
-                      t("report_button")
-                    )}
-                  </Button>
+                    </Button>
+                  ) : (
+                    <Button type='submit'>{t("report_button")}</Button>
+                  )}
                 </div>
               </ReportFormLayout>
             </>

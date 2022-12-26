@@ -6,6 +6,7 @@ interface ButtonProps {
   variant?: "primary" | "secondary";
   style?: string;
   type?: "submit" | "reset" | "button";
+  disabled?: boolean;
   otherProps?: React.ReactNode;
 }
 
@@ -15,12 +16,14 @@ const Button = ({
   children,
   style,
   type,
+  disabled,
   ...otherProps
 }: ButtonProps) => {
   return (
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={
         " sm:w-45 cursor-pointer border-2 border-transparent p-2 px-5 text-center font-bold uppercase active:click-behavior xs:text-xl sm:text-2xl " +
         (variant === "secondary"
