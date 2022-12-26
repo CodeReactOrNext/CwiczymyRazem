@@ -1,7 +1,7 @@
 import Button from "components/Button";
 import { Form, Formik } from "formik";
 import { useTranslation } from "react-i18next";
-import { signupSchema } from "schemas/signup";
+import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
 import { FaUserAlt, FaLock, FaAt } from "react-icons/fa";
 import MainLayout from "layouts/MainLayout";
 import FormLayout from "layouts/FormLayout";

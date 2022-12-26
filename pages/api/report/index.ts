@@ -24,7 +24,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
     userAuth
   )) as StatisticsDataInterface;
-  const userName = await firebaseGetUserName();
+  const userName = await firebaseGetUserName(userAuth);
   console.log(userName);
   const { techniqueTime, theoryTime, hearingTime, creativeTime, sumTime } =
     convertInputTime(inputData);
