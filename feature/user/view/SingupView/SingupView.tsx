@@ -66,15 +66,15 @@ const SingupView = () => {
                 name={"repeat_password"}
               />
               <div className='flex space-x-1 '>
-                <Button type='submit'>
-                  {isFetching ? (
+                {isFetching ? (
+                  <Button type='submit' disabled>
                     <div className='px-3'>
                       <CircleSpinner size={24} />
                     </div>
-                  ) : (
-                    t("common:button.sign_up")
-                  )}
-                </Button>
+                  </Button>
+                ) : (
+                  <Button type='submit'>{t("common:button.sign_up")}</Button>
+                )}
               </div>
             </>
           </FormLayout>

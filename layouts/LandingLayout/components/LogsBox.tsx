@@ -12,7 +12,6 @@ const LogsBox = () => {
   useEffect(() => {
     firebaseGetLogs()
       .then((logsData) => {
-        console.log(logsData);
         setLogs(logsData.reverse());
       })
       .catch((error) => {
