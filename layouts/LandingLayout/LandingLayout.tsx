@@ -49,7 +49,7 @@ const LandingLayout = ({
               leftSideLinks={navigation.leftSideLinks}
               rightSideLinks={navigation.rightSideLinks}
             />
-            <div className=' relative z-40   m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
+            <div className='m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
               <Decoration />
               <div className='grid-cols-2 grid-rows-2  items-center md:grid'>
                 <div className=' order-2 row-span-1 my-5 flex justify-center '>
@@ -85,7 +85,7 @@ const LandingLayout = ({
                   ))}
                 </div>
 
-                <div className=' row-cols-1 order-3 '>
+                <div className='row-cols-1 order-3 '>
                   <AchievementWrapper userAchievements={achievements} />
                 </div>
                 <LogsBox />
