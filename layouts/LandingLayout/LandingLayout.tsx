@@ -11,8 +11,6 @@ import { useTranslation } from "react-i18next";
 import UserHeader from "./components/UserHeader/UserHeader";
 import { convertMsToHM } from "helpers/timeConverter";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
-import Achievement from "components/Achievement";
-import { firebaseGetLogs } from "utils/firebase/firebase.utils";
 import LogsBox from "./components/LogsBox";
 
 interface LandingLayoutProps {
