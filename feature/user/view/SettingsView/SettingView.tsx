@@ -285,15 +285,17 @@ const SettingsView = () => {
                           placeholder={t("common:input.password")}
                         />
                         <div className='flex space-x-1 '>
-                          <Button type='submit'>
-                            {isFetching ? (
+                          {isFetching ? (
+                            <Button type='submit' disabled>
                               <div className='px-3'>
                                 <CircleSpinner size={24} />
                               </div>
-                            ) : (
-                              t("common:button.sign_in")
-                            )}
-                          </Button>
+                            </Button>
+                          ) : (
+                            <Button type='submit'>
+                              {t("common:button.sign_in")}
+                            </Button>
+                          )}
                         </div>
                       </>
                     </FormLayout>
