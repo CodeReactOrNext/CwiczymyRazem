@@ -6,6 +6,8 @@ import {
   firebaseGetUserData,
   firebaseSetUserExerciseRaprot,
   firebaseUpdateUserStats,
+  firebaseAddLogReport,
+  firebaseGetUserName,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 
@@ -22,7 +24,8 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
     userAuth
   )) as StatisticsDataInterface;
-
+  const userName = await firebaseGetUserName();
+  console.log(userName);
   const { techniqueTime, theoryTime, hearingTime, creativeTime, sumTime } =
     convertInputTime(inputData);
   const {
@@ -43,6 +46,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const didPracticeToday = checkIsPracticeToday(userLastReportDate);
 
   const level = getUserLvl(lvl, points + raiting.basePoints);
+  const isNewLevel = level > lvl;
   const updatedActualDayWithoutBreak = didPracticeToday
     ? actualDayWithoutBreak
     : actualDayWithoutBreak + 1;
@@ -80,6 +84,26 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
 
   await firebaseSetUserExerciseRaprot(userAuth, raiting, new Date());
   await firebaseUpdateUserStats(userAuth, updatedUserDataWithAchievements);
+  console.log(
+    updatedUserData.lastReportDate,
+    "dd",
+    raiting.basePoints,
+    newAchievements,
+    {
+      isNewLevel,
+      level,
+    }
+  );
+  await firebaseAddLogReport(
+    userAuth,
+    updatedUserData.lastReportDate,
+    raiting.basePoints,
+    newAchievements,
+    {
+      isNewLevel,
+      level,
+    }
+  );
 
   return {
     currentUserStats: updatedUserDataWithAchievements,

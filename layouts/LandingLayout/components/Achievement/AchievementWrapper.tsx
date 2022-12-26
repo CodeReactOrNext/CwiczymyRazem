@@ -39,11 +39,11 @@ const AchievementWrapper = ({
     );
 
   return (
-    <div className=' row-cols-1 order-2 '>
+    <>
       <AchievementBox achievment={common} rarity='common' />
       <AchievementBox achievment={rare} rarity='rare' />
       <AchievementBox achievment={veryRare} rarity='veryRare' />
-    </div>
+    </>
   );
 };
 export default AchievementWrapper;

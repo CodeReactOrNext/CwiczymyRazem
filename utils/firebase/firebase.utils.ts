@@ -1,3 +1,4 @@
+import { AchievementList } from "data/achievements";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { initializeApp } from "firebase/app";
 import {
@@ -22,8 +23,14 @@ import {
   updateDoc,
   getDocs,
   collection,
+  orderBy,
+  limit,
+  query,
 } from "firebase/firestore";
-import { FirebaseUserDataInterface } from "./firebase.types";
+import {
+  FirebaseLogsInterface,
+  FirebaseUserDataInterface,
+} from "./firebase.types";
 import {
   statistics,
   StatisticsDataInterface,
@@ -87,6 +94,17 @@ export const firebaseGetUserData = async (userAuth: string) => {
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.statistics;
 };
+export const firebaseGetLogs = async () => {
+  const logsDocRef = collection(db, "logs");
+  const sortLogs = query(logsDocRef, orderBy("data"));
+  const logsDoc = await getDocs(sortLogs);
+  const logsArr: FirebaseLogsInterface[] = [];
+  logsDoc.forEach((doc) => {
+    const log = doc.data() as FirebaseLogsInterface;
+    logsArr.push(log);
+  });
+  return logsArr;
+};
 
 export const firebaseGetUserName = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
@@ -111,8 +129,28 @@ export const firebaseUpdateUserStats = async (
   statistics: StatisticsDataInterface
 ) => {
   const userDocRef = doc(db, "users", userAuth);
-
   await updateDoc(userDocRef, { statistics });
+};
+
+export const firebaseAddLogReport = async (
+  userAuth: string,
+  data: string,
+  points: number,
+  newAchievements: AchievementList[],
+  newLevel: { isNewLevel: boolean; level: number }
+) => {
+  const logsDocRef = doc(collection(db, "logs"));
+  const userDocRef = doc(db, "users", userAuth);
+  const userSnapshot = await getDoc(userDocRef);
+  const userName = userSnapshot.data()!.displayName;
+
+  await setDoc(logsDocRef, {
+    data,
+    userName,
+    points,
+    newAchievements,
+    newLevel,
+  });
 };
 
 export const firebaseUpdateUserDisplayName = async (
