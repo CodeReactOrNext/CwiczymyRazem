@@ -11,6 +11,9 @@ import { useTranslation } from "react-i18next";
 import UserHeader from "./components/UserHeader/UserHeader";
 import { convertMsToHM } from "helpers/timeConverter";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
+import Achievement from "components/Achievement";
+import { firebaseGetLogs } from "utils/firebase/firebase.utils";
+import LogsBox from "./components/LogsBox";
 
 interface LandingLayoutProps {
   statistics: StatisticProps[];
@@ -26,6 +29,7 @@ const LandingLayout = ({
   userName,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("landing");
+
   const { time, achievements } = userStats;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
@@ -50,7 +54,7 @@ const LandingLayout = ({
             <div className=' relative z-40   m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
               <Decoration />
               <div className='grid-cols-2 grid-rows-2  items-center md:grid'>
-                <div className=' order-2 row-span-2 my-5 flex justify-center '>
+                <div className=' order-2 row-span-1 my-5 flex justify-center '>
                   <StatisticBar
                     title={t("technique")}
                     value={convertMsToHM(time.technique)}
@@ -82,7 +86,11 @@ const LandingLayout = ({
                     />
                   ))}
                 </div>
-                <AchievementWrapper userAchievements={achievements} />
+
+                <div className=' row-cols-1 order-3 '>
+                  <AchievementWrapper userAchievements={achievements} />
+                </div>
+                <LogsBox />
               </div>
             </div>
           </Wrapper>
