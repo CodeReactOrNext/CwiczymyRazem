@@ -19,7 +19,7 @@ export interface StatisticsDataInterface {
   maxPoints: number;
   achievements: AchievementList[];
   actualDayWithoutBreak: number;
-  lastReportDate?: string;
+  lastReportDate: string;
 }
 
 export const statistics: StatisticsDataInterface = {
@@ -39,4 +39,5 @@ export const statistics: StatisticsDataInterface = {
   maxPoints: 0,
   achievements: [],
   actualDayWithoutBreak: 0,
+  lastReportDate: "",
 };
