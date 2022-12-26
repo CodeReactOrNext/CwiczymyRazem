@@ -88,7 +88,10 @@ export const firebaseGetUserData = async (userAuth: string) => {
   return userSnapshot.data()!.statistics;
 };
 
-export const firebaseGetUserName = async () => {
+export const firebaseGetUserName = async (userAuth: string) => {
+  const userDocRef = doc(db, "users", userAuth);
+  const userSnapshot = await getDoc(userDocRef);
+  return userSnapshot.data()!.displayName;
   const displayName = auth.currentUser?.displayName;
   return displayName as string;
 };
