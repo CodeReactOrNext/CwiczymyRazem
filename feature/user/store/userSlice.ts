@@ -18,17 +18,18 @@ import {
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
-import {
-  ReportDataInterface,
-} from "../view/ReportView/ReportView.types";
+import { ReportDataInterface } from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 import {
   createAccountErrorHandler,
   loginViaEmailErrorHandler,
   loginViaGoogleErrorHandler,
 } from "./userErrorsHandling";
-import { updateUserInterface, updateUserStatsProps, userSliceInitialState } from "./userSlice.types";
-
+import {
+  updateUserInterface,
+  updateUserStatsProps,
+  userSliceInitialState,
+} from "./userSlice.types";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -75,7 +76,7 @@ export const autoLogIn = createAsyncThunk(
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
     const userWithDisplayName = {
       ...user,
-      displayName: await firebaseGetUserName(),
+      displayName: await firebaseGetUserName(userAuth),
     };
     const currentUserStats = await firebaseGetUserData(userAuth);
     const userName = userWithDisplayName.displayName;
@@ -112,8 +113,6 @@ export const updateDisplayName = createAsyncThunk(
     return { userInfo: { displayName: login }, userAuth, currentUserStats };
   }
 );
-
-
 
 export const updateUserEmail = createAsyncThunk(
   "user/updateUserEmail",
@@ -153,7 +152,6 @@ export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   await firebaseLogUserOut();
   return null;
 });
-
 
 export const updateUserStats = createAsyncThunk(
   "user/updateUserStats",
