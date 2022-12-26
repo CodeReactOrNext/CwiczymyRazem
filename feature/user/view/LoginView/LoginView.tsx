@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Router from "next/router";
 import { Formik, Form } from "formik";
-import { loginSchema } from "schemas/login";
+import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { useTranslation } from "react-i18next";
 import {
   logInViaEmail,

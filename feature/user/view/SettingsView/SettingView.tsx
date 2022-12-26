@@ -19,8 +19,8 @@ import { useTranslation } from "react-i18next";
 import { FaAt, FaLock, FaUserAlt } from "react-icons/fa";
 import { CircleSpinner } from "react-spinners-kit";
 import { toast } from "react-toastify";
-import { loginSchema } from "schemas/login";
-import { updateCredsSchema } from "schemas/updateCreds";
+import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
+import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { SignUpCredentials as SignUpCredentials } from "../SingupView/SingupView";
 
