@@ -26,6 +26,7 @@ import { SignUpCredentials as SignUpCredentials } from "../SingupView/SingupView
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings"]);
+  const [avatarInputVisible, setAvatarInputVisible] = useState(false);
   const [nameInputVisible, setNameInputVisible] = useState(false);
   const [emailInputVisible, setEmailInputVisible] = useState(false);
   const [passwordInputVisible, setPasswordInputVisible] = useState(false);
@@ -73,6 +74,9 @@ const SettingsView = () => {
     if (name === "login") changeNameHandler(data);
     if (name === "email") setReauthFormVisible(true);
   };
+  const showAvatarInputHandler = () => {
+    setAvatarInputVisible(true);
+  };
   const showNameInputHandler = () => {
     setNameInputVisible(true);
     setEmailInputVisible(false);
@@ -102,7 +106,28 @@ const SettingsView = () => {
         <div className='flex max-w-[800px] flex-col p-6'>
           <div className='flex flex-row gap-2 p-4  text-2xl'>
             <Avatar name={userName!} lvl={28} />
-            <button className='text-lg text-main'>Edytuj</button>
+            {avatarInputVisible && (
+              <form
+                action='/api/user/avatar'
+                method='POST'
+                encType='multipart/form-data'>
+                <input
+                  type='file'
+                  id='avatar'
+                  name='avatar'
+                  required
+                  accept='image/png, image/jpeg'
+                />
+                <Button type='submit'>Zapisz</Button>
+              </form>
+            )}
+            {!avatarInputVisible && (
+              <button
+                onClick={showAvatarInputHandler}
+                className='text-lg text-main'>
+                Edytuj
+              </button>
+            )}
           </div>
           <hr className='border-main-opposed-400' />
           <Formik
