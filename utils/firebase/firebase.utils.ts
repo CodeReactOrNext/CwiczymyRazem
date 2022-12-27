@@ -96,7 +96,7 @@ export const firebaseGetUserData = async (userAuth: string) => {
 };
 export const firebaseGetLogs = async () => {
   const logsDocRef = collection(db, "logs");
-  const sortLogs = query(logsDocRef, orderBy("data"));
+  const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(20));
   const logsDoc = await getDocs(sortLogs);
   const logsArr: FirebaseLogsInterface[] = [];
   logsDoc.forEach((doc) => {
