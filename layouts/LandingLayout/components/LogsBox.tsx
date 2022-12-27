@@ -2,9 +2,7 @@ import Achievement from "components/Achievement";
 import { useState, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { FirebaseLogsInterface } from "utils/firebase/firebase.types";
-import {
-  firebaseGetLogs,
-} from "utils/firebase/firebase.utils";
+import { firebaseGetLogs } from "utils/firebase/firebase.utils";
 
 const LogsBox = () => {
   const [logs, setLogs] = useState<FirebaseLogsInterface[] | null>(null);
@@ -12,12 +10,19 @@ const LogsBox = () => {
   useEffect(() => {
     firebaseGetLogs()
       .then((logsData) => {
-        setLogs(logsData.reverse());
+        setLogs(logsData);
       })
       .catch((error) => {
         console.log(error);
       });
   }, []);
+
+  const addZeroToTime = (time: number) => {
+    if (time.toString().length === 1) {
+      return "0" + time.toString();
+    }
+    return time.toString();
+  };
 
   return logs ? (
     <div className='order-4 row-span-1 h-80  overflow-scroll border-4 border-tertiary bg-main-opposed p-5'>
@@ -33,9 +38,9 @@ const LogsBox = () => {
                 <span className='mr-2 text-xs'>
                   {date.toLocaleDateString() +
                     " " +
-                    date.getHours() +
+                    addZeroToTime(date.getHours()) +
                     ":" +
-                    date.getMinutes()}
+                    addZeroToTime(date.getMinutes())}
                 </span>
               </p>
               <p className='mr-1'>
