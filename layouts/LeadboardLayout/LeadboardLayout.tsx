@@ -9,14 +9,16 @@ interface LeadboardLayoutProps {
 const LeadboardLayout = ({ usersData }: LeadboardLayoutProps) => {
   return (
     <MainLayout subtitle='Leadboard' variant='secondary'>
-      {usersData.map((user, index) => (
-        <LeadboardColumn
-          key={index}
-          place={index + 1}
-          nick={user.displayName}
-          statistics={user.statistics}
-        />
-      ))}
+      <ul>
+        {usersData.map((user, index) => (
+          <LeadboardColumn
+            key={index}
+            place={index + 1}
+            nick={user.displayName}
+            statistics={user.statistics}
+          />
+        ))}
+      </ul>
     </MainLayout>
   );
 };
