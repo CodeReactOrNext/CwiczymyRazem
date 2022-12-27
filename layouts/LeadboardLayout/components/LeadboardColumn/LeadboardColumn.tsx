@@ -14,8 +14,20 @@ interface LeadboardColumnProps {
 const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
+
+  const shortenNick = (nick: string) => {
+    const MAX_SHOW_NICK_LENGTH = 16;
+    if (!nick) return;
+    if (nick.length > MAX_SHOW_NICK_LENGTH) {
+      return (
+        <p data-tip={nick}>{nick.substring(0, MAX_SHOW_NICK_LENGTH) + "..."}</p>
+      );
+    }
+    return nick;
+  };
+
   return (
-    <div className='flex w-full justify-center p-5 text-xs xs:text-base'>
+    <li className='flex w-full justify-center p-5 text-xs xs:text-base'>
       <p className='flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl'>
         {place + "."}
       </p>
@@ -39,7 +51,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
           </div>
           <div className='relative col-span-2 self-center justify-self-start md:col-span-1 '>
             <p className='whitespace-nowrap text-lg xs:text-2xl lg:text-xl xl:text-2xl'>
-              {nick}
+              {shortenNick(nick)}
             </p>
             <div className='absolute top-[-20px] right-[-60px]  hidden items-center gap-x-1 md:top-[-35px] md:flex'>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
@@ -86,7 +98,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
           </div>
         </div>
       </div>
-    </div>
+    </li>
   );
 };
 
