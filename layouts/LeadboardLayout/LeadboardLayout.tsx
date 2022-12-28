@@ -1,5 +1,5 @@
 import MainLayout from "layouts/MainLayout";
-import LeadboardColumn from "./components/LeadboardColumn/LeadboardColumn";
+import LeadboardColumn from "./components/LeadboardColumn";
 import { FirebaseUserDataInterface } from "utils/firebase/firebase.types";
 
 interface LeadboardLayoutProps {
