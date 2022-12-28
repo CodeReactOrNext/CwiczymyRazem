@@ -6,7 +6,7 @@ import {
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
-import { string } from "yup";
+
 
 const Carousel = ({ achievements }: { achievements: AchievementList[] }) => {
   const [index, setIndex] = useState(0);
