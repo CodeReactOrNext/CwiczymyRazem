@@ -1,10 +1,11 @@
 import Achievement from "components/Achievement";
 import Avatar from "components/Avatar";
-import { achievements } from "data/achievements";
+
 import { convertMsToHM } from "helpers/timeConverter";
 import { useTranslation } from "react-i18next";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import Carousel from "./Carousel";
 interface LeadboardColumnProps {
   place: number;
   nick: string;
@@ -80,22 +81,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
               </p>
             </div>
           </div>
-          <div className=' col-span-3 flex h-full w-full flex-col items-center justify-center  md:col-span-1  md:w-fit md:justify-end '>
-            <div className='flex  text-base xxs:text-2xl lg:text-xl xl:text-2xl '>
-              <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-mainText active:click-behavior-second' />
-              <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
-                {statistics.achievements.length === 0 && "Brak"}
-                {statistics.achievements.map((achivId, index) => {
-                  return <Achievement key={index} id={achivId} />;
-                })}
-              </div>
-              <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText active:click-behavior-second' />
-            </div>
-            <p className=' text-tertiary'>
-              {t("achievements")} {statistics.achievements.length}/
-              {achievements.length}
-            </p>
-          </div>
+          <Carousel achievements={statistics.achievements} />
         </div>
       </div>
     </li>
