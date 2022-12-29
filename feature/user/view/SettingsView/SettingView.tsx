@@ -10,10 +10,7 @@ import {
   updateUserPassword,
   uploadUserAvatar,
 } from "feature/user/store/userSlice";
-import {
-  updateUserInterface as UpdatedUserCredentials,
-  UserAvatarType,
-} from "feature/user/store/userSlice.types";
+import { updateUserInterface as UpdatedUserCredentials } from "feature/user/store/userSlice.types";
 import { UserInfo } from "firebase/auth";
 import { Form, Formik } from "formik";
 import FormLayout from "layouts/FormLayout";
@@ -27,13 +24,6 @@ import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { SignUpCredentials as SignUpCredentials } from "../SingupView/SingupView";
-import {
-  storage,
-  auth,
-  firebaseUploadAvatar,
-} from "utils/firebase/firebase.utils";
-import { ReadStream } from "fs";
-import { base64Encode } from "@firebase/util";
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings"]);
@@ -48,7 +38,8 @@ const SettingsView = () => {
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
-  const [imageUpload, setImageUpload] = useState<UserAvatarType>();
+  const [imageUpload, setImageUpload] = useState<Blob>();
+  const [avatarIsValid, setAvatarIsValid] = useState(false);
 
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
@@ -89,21 +80,27 @@ const SettingsView = () => {
   };
   const showAvatarInputHandler = () => {
     setAvatarInputVisible(true);
+    setNameInputVisible(false);
+    setEmailInputVisible(false);
+    setPasswordInputVisible(false);
   };
   const showNameInputHandler = () => {
     setNameInputVisible(true);
     setEmailInputVisible(false);
     setPasswordInputVisible(false);
+    setAvatarInputVisible(false);
   };
   const showEmailInputHandler = () => {
     setEmailInputVisible(true);
     setNameInputVisible(false);
     setPasswordInputVisible(false);
+    setAvatarInputVisible(false);
   };
   const showPasswordInputHandler = () => {
     setPasswordInputVisible(true);
     setEmailInputVisible(false);
     setNameInputVisible(false);
+    setAvatarInputVisible(false);
   };
 
   const formikInitialValues = {
@@ -113,28 +110,28 @@ const SettingsView = () => {
     repeat_password: "",
   };
 
-  // const imageUploadHandler = (event: React.FormEvent) => {
-  //   event.preventDefault();
-  //   if (imageUpload == null) return;
-  //   const imageRef = ref(storage, `avatars/${auth.currentUser?.uid}`);
-
-  //   uploadBytes(imageRef, imageUpload).then(() => {
-  //     alert("Image Uploaded");
-  //   });
-  // };
   const onImageChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setImageUpload(event.target.files[0]);
+    if (event.target.files?.[0]) {
+      const avatarFile = event.target.files[0];
+      setImageUpload(avatarFile);
+      const reader = new FileReader();
+      reader.readAsDataURL(avatarFile);
+      const img = new Image();
+      img.src = URL.createObjectURL(avatarFile);
+      img.onload = () => {
+        if (img.naturalHeight > 250 || img.naturalWidth > 250) {
+          setAvatarIsValid(false);
+          toast.error("Awatar może mieć maksymalnie 250px na 250px.");
+        } else {
+          setAvatarIsValid(true);
+        }
+      };
     }
-    const reader = new FileReader();
-    reader.readAsDataURL(imageUpload as Blob);
-    const img = new Image();
-    img.src = URL.createObjectURL(imageUpload as Blob);
-    img.onload = () => {
-      console.log(img.naturalHeight, img.naturalWidth);
-    };
-    // if(image)
   };
+
+  useEffect(() => {
+    console.log(isFetching);
+  }, [isFetching]);
 
   return (
     <>
@@ -146,23 +143,38 @@ const SettingsView = () => {
               <form
                 onSubmit={(event) => {
                   event.preventDefault();
-                  uploadUserAvatar(imageUpload);
+                  if (imageUpload) {
+                    dispatch(uploadUserAvatar(imageUpload));
+                  }
                 }}
                 // action='/api/user/avatar'
                 // method='POST'
                 // encType='multipart/form-data'
               >
-                <input
-                  onChange={(event) => {
-                    onImageChangeHandler(event);
-                  }}
-                  type='file'
-                  id='avatar'
-                  name='avatar'
-                  required
-                  accept='image/png, image/jpeg'
-                />
-                <Button type='submit'>Zapisz</Button>
+                <div className='flex flex-col'>
+                  <input
+                    onChange={(event) => {
+                      onImageChangeHandler(event);
+                    }}
+                    type='file'
+                    id='avatar'
+                    name='avatar'
+                    required
+                    accept='image/png, image/jpeg'
+                  />
+                  <p>(250px/250px)</p>
+                </div>
+                {isFetching ? (
+                  <Button type='submit' disabled>
+                    <div className='px-3'>
+                      <CircleSpinner size={24} />
+                    </div>
+                  </Button>
+                ) : (
+                  <Button disabled={!avatarIsValid} type='submit'>
+                    Zapisz
+                  </Button>
+                )}
               </form>
             )}
             {!avatarInputVisible && (
@@ -201,14 +213,22 @@ const SettingsView = () => {
                           placeholder={"Nowy nick"}
                           name={"login"}
                         />
-                        <Button
-                          disabled={!Boolean(values.login && !errors.login)}
-                          onClick={() => {
-                            changeHandler("login", values.login);
-                          }}
-                          type='submit'>
-                          Zapisz
-                        </Button>
+                        {isFetching ? (
+                          <Button type='submit' disabled>
+                            <div className='px-3'>
+                              <CircleSpinner size={24} />
+                            </div>
+                          </Button>
+                        ) : (
+                          <Button
+                            disabled={Boolean(!values.login || errors.login)}
+                            onClick={() => {
+                              changeHandler("login", values.login);
+                            }}
+                            type='submit'>
+                            Zapisz
+                          </Button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -235,19 +255,28 @@ const SettingsView = () => {
                           placeholder={"Nowy email"}
                           name={"email"}
                         />
-                        <Button
-                          onClick={() => {
-                            if (values.email && !errors.email) {
-                              setNewEmail(values.email);
-                              toast.info(
-                                "Do zmiany danych musisz się ponownie zalogować."
-                              );
-                              setReauthFormVisible(true);
-                            }
-                          }}
-                          type='submit'>
-                          Zapisz
-                        </Button>
+                        {isFetching ? (
+                          <Button type='submit' disabled>
+                            <div className='px-3'>
+                              <CircleSpinner size={24} />
+                            </div>
+                          </Button>
+                        ) : (
+                          <Button
+                            disabled={Boolean(!values.email || errors.email)}
+                            onClick={() => {
+                              if (values.email && !errors.email) {
+                                setNewEmail(values.email);
+                                toast.info(
+                                  "Do zmiany danych musisz się ponownie zalogować."
+                                );
+                                setReauthFormVisible(true);
+                              }
+                            }}
+                            type='submit'>
+                            Zapisz
+                          </Button>
+                        )}
                       </div>
                     )}
                     <hr className='border-main-opposed-400' />
@@ -278,24 +307,38 @@ const SettingsView = () => {
                           name={"repeat_password"}
                           type='password'
                         />
-                        <Button
-                          onClick={() => {
-                            if (
-                              values.password &&
-                              !errors.password &&
-                              values.repeat_password &&
-                              !errors.repeat_password
-                            ) {
-                              setNewPassword(values.password);
-                              toast.info(
-                                "Do zmiany danych musisz się ponownie zalogować."
-                              );
-                              setReauthFormVisible(true);
-                            }
-                          }}
-                          type='submit'>
-                          Zapisz
-                        </Button>
+                        {isFetching ? (
+                          <Button type='submit' disabled>
+                            <div className='px-3'>
+                              <CircleSpinner size={24} />
+                            </div>
+                          </Button>
+                        ) : (
+                          <Button
+                            disabled={Boolean(
+                              !values.password ||
+                                errors.password ||
+                                !values.repeat_password ||
+                                errors.repeat_password
+                            )}
+                            onClick={() => {
+                              if (
+                                values.password &&
+                                !errors.password &&
+                                values.repeat_password &&
+                                !errors.repeat_password
+                              ) {
+                                setNewPassword(values.password);
+                                toast.info(
+                                  "Do zmiany danych musisz się ponownie zalogować."
+                                );
+                                setReauthFormVisible(true);
+                              }
+                            }}
+                            type='submit'>
+                            Zapisz
+                          </Button>
+                        )}
                       </div>
                     )}
                   </>

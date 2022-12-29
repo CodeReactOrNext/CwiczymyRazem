@@ -34,4 +34,4 @@ export interface updateUserStatsProps {
   inputData: ReportFormikInterface;
 }
 
-export type UserAvatarType = Blob | Uint8Array | ArrayBuffer | undefined;
+// export type UserAvatarType = Blob | Uint8Array | ArrayBuffer | undefined;
