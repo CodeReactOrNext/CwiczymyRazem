@@ -20,7 +20,7 @@ const Timer: NextPage = () => {
 
 export default Timer;
 
-//TODO add timer locale files
+
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
