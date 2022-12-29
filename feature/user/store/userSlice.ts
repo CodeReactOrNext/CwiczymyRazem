@@ -29,7 +29,6 @@ import {
 import {
   updateUserInterface,
   updateUserStatsProps,
-  UserAvatarType,
   userSliceInitialState,
 } from "./userSlice.types";
 
@@ -101,7 +100,7 @@ export const createAccount = createAsyncThunk(
 );
 
 export const updateDisplayName = createAsyncThunk(
-  "user/updateAccount",
+  "user/updateDisplayName",
   async ({ login }: SignUpCredentials) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(
       auth.currentUser!
@@ -175,16 +174,8 @@ export const updateUserStats = createAsyncThunk(
 
 export const uploadUserAvatar = createAsyncThunk(
   "user/uploadUserAvatar",
-  async (avatar: UserAvatarType) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(avatar as Blob);
-    const img = new Image();
-    img.src = URL.createObjectURL(avatar as Blob);
-    img.onload = () => {
-      console.log(img.naturalHeight, img.naturalWidth);
-    };
-    await firebaseUploadAvatar(avatar);
-    return null;
+  async (avatar: Blob) => {
+    return await firebaseUploadAvatar(avatar);
   }
 );
 
@@ -219,6 +210,9 @@ export const userSlice = createSlice({
       .addCase(updateUserEmail.pending, (state) => {
         state.isFetching = "updateData";
       })
+      .addCase(updateDisplayName.pending, (state) => {
+        state.isFetching = "updateData";
+      })
       .addCase(updateUserPassword.pending, (state) => {
         state.isFetching = "updateData";
       })
@@ -226,6 +220,10 @@ export const userSlice = createSlice({
         state.isFetching = "updateData";
       })
       .addCase(updateUserStats.rejected, (state) => {
+        state.isFetching = null;
+        toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+      })
+      .addCase(updateDisplayName.rejected, (state) => {
         state.isFetching = null;
         toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
       })
@@ -279,6 +277,9 @@ export const userSlice = createSlice({
         state.userInfo = action.payload.userInfo;
         state.currentUserStats = action.payload.currentUserStats;
         state.userAuth = action.payload.userAuth;
+      })
+      .addCase(uploadUserAvatar.fulfilled, (state) => {
+        state.isFetching = null;
       })
       .addMatcher(
         isAnyOf(
