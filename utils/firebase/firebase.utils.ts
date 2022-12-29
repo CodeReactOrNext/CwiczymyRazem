@@ -1,6 +1,7 @@
 import { AchievementList } from "data/achievements";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { initializeApp } from "firebase/app";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -57,6 +58,7 @@ export const firebaseSignInWithGooglePopup = () =>
   signInWithPopup(auth, provider);
 export const auth = getAuth();
 export const db = getFirestore(firebaseApp);
+export const storage = getStorage(firebaseApp);
 
 export const firebaseSignInWithEmail = (email: string, password: string) =>
   signInWithEmailAndPassword(auth, email, password);
@@ -216,4 +218,17 @@ export const firebaseReauthenticateUser = async ({
     return await reauthenticateWithCredential(user, credential);
   }
   return null;
+};
+
+export const firebaseUploadAvatar = async (
+  image: Blob | Uint8Array | ArrayBuffer | undefined
+) => {
+  if (!image) return;
+  const imageRef = ref(storage, `avatars/${auth.currentUser?.uid}`);
+  console.log(imageRef);
+  uploadBytes(imageRef, image)
+    .then(() => {
+      console.log("Image Uploaded");
+    })
+    .catch((error) => console.log(error));
 };

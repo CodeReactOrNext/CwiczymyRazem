@@ -1,5 +1,8 @@
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
-import { ReportDataInterface, ReportFormikInterface } from "../view/ReportView/ReportView.types";
+import {
+  ReportDataInterface,
+  ReportFormikInterface,
+} from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 
 export interface UserSliceProviderData {
@@ -30,3 +33,5 @@ export interface updateUserStatsProps {
   userAuth: string;
   inputData: ReportFormikInterface;
 }
+
+export type UserAvatarType = Blob | Uint8Array | ArrayBuffer | undefined;

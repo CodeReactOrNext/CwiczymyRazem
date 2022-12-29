@@ -15,6 +15,7 @@ import {
   firebaseUpdateUserDisplayName,
   firebaseUpdateUserEmail,
   firebaseUpdateUserPassword,
+  firebaseUploadAvatar,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
@@ -28,6 +29,7 @@ import {
 import {
   updateUserInterface,
   updateUserStatsProps,
+  UserAvatarType,
   userSliceInitialState,
 } from "./userSlice.types";
 
@@ -171,6 +173,21 @@ export const updateUserStats = createAsyncThunk(
   }
 );
 
+export const uploadUserAvatar = createAsyncThunk(
+  "user/uploadUserAvatar",
+  async (avatar: UserAvatarType) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(avatar as Blob);
+    const img = new Image();
+    img.src = URL.createObjectURL(avatar as Blob);
+    img.onload = () => {
+      console.log(img.naturalHeight, img.naturalWidth);
+    };
+    await firebaseUploadAvatar(avatar);
+    return null;
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -205,9 +222,16 @@ export const userSlice = createSlice({
       .addCase(updateUserPassword.pending, (state) => {
         state.isFetching = "updateData";
       })
+      .addCase(uploadUserAvatar.pending, (state) => {
+        state.isFetching = "updateData";
+      })
       .addCase(updateUserStats.rejected, (state) => {
         state.isFetching = null;
         toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+      })
+      .addCase(uploadUserAvatar.rejected, (state) => {
+        state.isFetching = null;
+        toast.error("Awatar może mieć maksymalnie 250px na 250px.");
       })
       .addCase(updateUserEmail.rejected, (state, { error }) => {
         state.isFetching = null;

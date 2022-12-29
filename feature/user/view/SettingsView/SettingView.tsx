@@ -8,13 +8,17 @@ import {
   updateDisplayName,
   updateUserEmail,
   updateUserPassword,
+  uploadUserAvatar,
 } from "feature/user/store/userSlice";
-import { updateUserInterface as UpdatedUserCredentials } from "feature/user/store/userSlice.types";
+import {
+  updateUserInterface as UpdatedUserCredentials,
+  UserAvatarType,
+} from "feature/user/store/userSlice.types";
 import { UserInfo } from "firebase/auth";
 import { Form, Formik } from "formik";
 import FormLayout from "layouts/FormLayout";
 import MainLayout from "layouts/MainLayout";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAt, FaLock, FaUserAlt } from "react-icons/fa";
 import { CircleSpinner } from "react-spinners-kit";
@@ -23,6 +27,13 @@ import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { SignUpCredentials as SignUpCredentials } from "../SingupView/SingupView";
+import {
+  storage,
+  auth,
+  firebaseUploadAvatar,
+} from "utils/firebase/firebase.utils";
+import { ReadStream } from "fs";
+import { base64Encode } from "@firebase/util";
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings"]);
@@ -36,6 +47,8 @@ const SettingsView = () => {
 
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
+
+  const [imageUpload, setImageUpload] = useState<UserAvatarType>();
 
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
@@ -100,6 +113,29 @@ const SettingsView = () => {
     repeat_password: "",
   };
 
+  // const imageUploadHandler = (event: React.FormEvent) => {
+  //   event.preventDefault();
+  //   if (imageUpload == null) return;
+  //   const imageRef = ref(storage, `avatars/${auth.currentUser?.uid}`);
+
+  //   uploadBytes(imageRef, imageUpload).then(() => {
+  //     alert("Image Uploaded");
+  //   });
+  // };
+  const onImageChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setImageUpload(event.target.files[0]);
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(imageUpload as Blob);
+    const img = new Image();
+    img.src = URL.createObjectURL(imageUpload as Blob);
+    img.onload = () => {
+      console.log(img.naturalHeight, img.naturalWidth);
+    };
+    // if(image)
+  };
+
   return (
     <>
       <MainLayout subtitle='Edytuj Profil' variant='primary'>
@@ -108,10 +144,18 @@ const SettingsView = () => {
             <Avatar name={userName!} lvl={28} />
             {avatarInputVisible && (
               <form
-                action='/api/user/avatar'
-                method='POST'
-                encType='multipart/form-data'>
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  uploadUserAvatar(imageUpload);
+                }}
+                // action='/api/user/avatar'
+                // method='POST'
+                // encType='multipart/form-data'
+              >
                 <input
+                  onChange={(event) => {
+                    onImageChangeHandler(event);
+                  }}
                   type='file'
                   id='avatar'
                   name='avatar'
@@ -158,6 +202,7 @@ const SettingsView = () => {
                           name={"login"}
                         />
                         <Button
+                          disabled={!Boolean(values.login && !errors.login)}
                           onClick={() => {
                             changeHandler("login", values.login);
                           }}
