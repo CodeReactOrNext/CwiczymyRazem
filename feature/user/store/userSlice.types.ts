@@ -1,7 +1,11 @@
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
-import { ReportDataInterface, ReportFormikInterface } from "../view/ReportView/ReportView.types";
+import {
+  ReportDataInterface,
+  ReportFormikInterface,
+} from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 
+export type SkillsType = "technique" | "hearing" | "theory" | "creativity";
 export interface UserSliceProviderData {
   providerId: string | null;
   uid: string | null;
@@ -14,6 +18,12 @@ export interface UserSliceProviderData {
 export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName: string } | null;
+  timer: {
+    technique: number;
+    theory: number;
+    hearing: number;
+    creativity: number;
+  };
   currentUserStats: StatisticsDataInterface | null;
   previousUserStats: StatisticsDataInterface | null;
   raitingData: ReportDataInterface | null;
