@@ -1,6 +1,6 @@
 import PageLoadingSpinner from "components/PageLoadingSpinner";
+import TimerView from "feature/user/view/TimerView";
 import useAutoLogIn from "hooks/useAutoLogIn";
-import TimerLayout from "layouts/TimerLayout";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
@@ -14,12 +14,11 @@ const Timer: NextPage = () => {
   return !isLoggedIn ? (
     <PageLoadingSpinner layoutVariant='primary' />
   ) : (
-    <TimerLayout />
+    <TimerView />
   );
 };
 
 export default Timer;
-
 
 export async function getStaticProps({ locale }: { locale: string }) {
   return {

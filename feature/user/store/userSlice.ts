@@ -196,7 +196,7 @@ export const userSlice = createSlice({
     addPracticeData: (state, action) => {
       state.currentUserStats = action.payload;
     },
-    updateTime: (
+    updateTimerTime: (
       state,
       { payload }: PayloadAction<{ type: SkillsType; time: number }>
     ) => {
@@ -259,6 +259,10 @@ export const userSlice = createSlice({
         createAccountErrorHandler(error);
       })
       .addCase(updateUserStats.fulfilled, (state, { payload }) => {
+        state.timer.technique = 0;
+        state.timer.creativity = 0;
+        state.timer.hearing = 0;
+        state.timer.theory = 0;
         state.isFetching = null;
         state.currentUserStats = payload.currentUserStats;
         state.previousUserStats = payload.previousUserStats;
@@ -302,7 +306,8 @@ export const userSlice = createSlice({
   },
 });
 
-export const { addUserAuth, addUserData, updateTime } = userSlice.actions;
+export const { addUserAuth, addUserData, updateTimerTime } =
+  userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
 export const selectCurrentUserStats = (state: RootState) =>

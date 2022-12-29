@@ -14,8 +14,7 @@ const useTimer = () => {
 
   useEffect(() => {
     if (!timerEnabled) return;
-    // const time = setInterval(() => counter(), 10000);
-        const time = setInterval(() => counter(), 1000);
+    const time = setInterval(() => counter(), 1000);
     return () => clearInterval(time);
   }, [counter, timerEnabled]);
 
