@@ -5,7 +5,7 @@ const useTimer = () => {
   const [timerEnabled, setTimerEnabled] = useState(false);
 
   const counter = useCallback(() => {
-    setTime((prev) => prev + 10000);
+    setTime((prev) => prev + 1000);
   }, []);
 
   const restartTime = () => {
@@ -15,7 +15,7 @@ const useTimer = () => {
   useEffect(() => {
     if (!timerEnabled) return;
     // const time = setInterval(() => counter(), 10000);
-        const time = setInterval(() => counter(), 100);
+        const time = setInterval(() => counter(), 1000);
     return () => clearInterval(time);
   }, [counter, timerEnabled]);
 

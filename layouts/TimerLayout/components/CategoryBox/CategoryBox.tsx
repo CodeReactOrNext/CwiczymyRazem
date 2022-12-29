@@ -24,7 +24,7 @@ const CategoryBox = ({
         className={`text-2xl text-main-opposed xs:text-4xl ${
           chosen ? "text-main" : "text-main-opposed"
         } `}>
-        {percent}%
+        {percent ? percent : 0}%
       </p>
       <p className=' text-center text-xl xs:text-2xl'>{title}</p>
       <p>{convertMsToHM(time)}</p>
@@ -32,7 +32,7 @@ const CategoryBox = ({
         <button
           onClick={onClick}
           className={
-            "uppercas  border-2 border-transparent bg-main p-1 px-3 text-center text-sm font-bold text-mainText hover:bg-main-100 "
+            "uppercas border-2 border-transparent bg-main p-1 px-3 text-center text-sm font-bold text-mainText hover:bg-main-100 "
           }>
           Wybierz
         </button>
