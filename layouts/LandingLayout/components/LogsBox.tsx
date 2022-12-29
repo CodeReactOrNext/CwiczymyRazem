@@ -58,7 +58,9 @@ const LogsBox = () => {
                 <>
                   <p>Zdobył:</p>
                   {newAchievements.map((id, index) => (
-                    <Achievement key={index} id={id} />
+                    <div className='mx-1' key={index}>
+                      <Achievement id={id} />
+                    </div>
                   ))}
                 </>
               )}
