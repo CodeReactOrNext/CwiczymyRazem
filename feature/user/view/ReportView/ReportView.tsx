@@ -4,7 +4,7 @@ import RatingPopUp from "components/RatingPopUp";
 import MainLayout from "layouts/MainLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import ReportCategoryLayout from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBrain, FaMusic } from "react-icons/fa";
 import { MdSchool } from "react-icons/md";
@@ -19,13 +19,15 @@ import {
   updateUserStats,
   selectPreviousUserStats,
   selectRaitingData,
+  selectTimerData,
 } from "feature/user/store/userSlice";
 import { convertInputTime } from "../../../../pages/api/report/utils/convertInputTime";
 import { toast } from "react-toastify";
 import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
-import {  ReportFormikInterface } from "./ReportView.types";
+import { ReportFormikInterface } from "./ReportView.types";
 import { CircleSpinner } from "react-spinners-kit";
+import { convertMsToHMObject } from "helpers/timeConverter";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
@@ -36,17 +38,28 @@ const ReportView = () => {
   const previousUserStats = useAppSelector(selectPreviousUserStats);
   const raitingData = useAppSelector(selectRaitingData);
   const userAuth = useAppSelector(selectUserAuth);
+  const timerData = useAppSelector(selectTimerData);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
+  const sumTime =
+    timerData.creativity +
+    timerData.hearing +
+    timerData.theory +
+    timerData.technique;
+
+  const techniqueTime = convertMsToHMObject(timerData.technique);
+  const theoryTime = convertMsToHMObject(timerData.theory);
+  const hearingTime = convertMsToHMObject(timerData.hearing);
+  const creativityTime = convertMsToHMObject(timerData.creativity);
 
   const formikInitialValues: ReportFormikInterface = {
-    techniqueHours: "",
-    techniqueMinutes: "",
-    theoryHours: "",
-    theoryMinutes: "",
-    hearingHours: "",
-    hearingMinutes: "",
-    creativeHours: "",
-    creativeMinutes: "",
+    techniqueHours: techniqueTime.hours,
+    techniqueMinutes: techniqueTime.minutes,
+    theoryHours: theoryTime.hours,
+    theoryMinutes: theoryTime.minutes,
+    hearingHours: hearingTime.hours,
+    hearingMinutes: hearingTime.minutes,
+    creativeHours: creativityTime.hours,
+    creativeMinutes: creativityTime.minutes,
     habbits: [],
   };
 
@@ -71,6 +84,12 @@ const ReportView = () => {
       toast.success("Poprawnie zraportowano");
     });
   };
+
+  useEffect(() => {
+    if (sumTime) {
+      toast.info("Wprowadzono czas ze stopera");
+    }
+  }, [sumTime]);
 
   return (
     <>

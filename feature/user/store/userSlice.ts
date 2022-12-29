@@ -1,4 +1,9 @@
-import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  isAnyOf,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import { toast } from "react-toastify";
 import {
@@ -26,6 +31,7 @@ import {
   loginViaGoogleErrorHandler,
 } from "./userErrorsHandling";
 import {
+  SkillsType,
   updateUserInterface,
   updateUserStatsProps,
   userSliceInitialState,
@@ -38,6 +44,12 @@ const initialState: userSliceInitialState = {
   previousUserStats: null,
   raitingData: null,
   isFetching: null,
+  timer: {
+    creativity: 0,
+    hearing: 0,
+    technique: 0,
+    theory: 0,
+  },
   providerData: {
     providerId: null,
     uid: null,
@@ -184,6 +196,23 @@ export const userSlice = createSlice({
     addPracticeData: (state, action) => {
       state.currentUserStats = action.payload;
     },
+    updateTimerTime: (
+      state,
+      { payload }: PayloadAction<{ type: SkillsType; time: number }>
+    ) => {
+      if (payload.type === "technique") {
+        state.timer.technique = payload.time;
+      }
+      if (payload.type === "creativity") {
+        state.timer.creativity = payload.time;
+      }
+      if (payload.type === "hearing") {
+        state.timer.hearing = payload.time;
+      }
+      if (payload.type === "theory") {
+        state.timer.theory = payload.time;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -230,6 +259,10 @@ export const userSlice = createSlice({
         createAccountErrorHandler(error);
       })
       .addCase(updateUserStats.fulfilled, (state, { payload }) => {
+        state.timer.technique = 0;
+        state.timer.creativity = 0;
+        state.timer.hearing = 0;
+        state.timer.theory = 0;
         state.isFetching = null;
         state.currentUserStats = payload.currentUserStats;
         state.previousUserStats = payload.previousUserStats;
@@ -273,6 +306,9 @@ export const userSlice = createSlice({
   },
 });
 
+export const { addUserAuth, addUserData, updateTimerTime } =
+  userSlice.actions;
+
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
 export const selectCurrentUserStats = (state: RootState) =>
   state.user.currentUserStats;
@@ -280,9 +316,8 @@ export const selectPreviousUserStats = (state: RootState) =>
   state.user.previousUserStats;
 export const selectIsFetching = (state: RootState) => state.user.isFetching;
 export const selectRaitingData = (state: RootState) => state.user.raitingData;
+export const selectTimerData = (state: RootState) => state.user.timer;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
-
-export const { addUserAuth, addUserData } = userSlice.actions;
 
 export default userSlice.reducer;
