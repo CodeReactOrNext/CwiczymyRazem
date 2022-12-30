@@ -1,7 +1,13 @@
 import { AchievementList } from "data/achievements";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  getBlob,
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -113,6 +119,12 @@ export const firebaseGetUserName = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.displayName;
+};
+
+export const firebaseGetUserAvatarURL = async () => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  const userSnapshot = await getDoc(userDocRef);
+  return userSnapshot.data()!.avatar;
 };
 
 export const firebaseSetUserExerciseRaprot = async (
@@ -228,10 +240,44 @@ export const firebaseUploadAvatar = async (image: Blob) => {
     storage,
     `avatars/${generateRandomString(auth.currentUser?.uid!)}`
   );
-  console.log(imageRef);
   return uploadBytes(imageRef, image)
-    .then(() => {
+    .then(async (data) => {
+      const fullPath = data.metadata.fullPath;
+      const fileType = data.metadata.contentType;
       console.log("Image Uploaded");
+      console.log(data);
+      console.log(`${fullPath}.${fileType?.slice(-3)}`);
+      // await firebaseUpdateUserDocument();
+      // const blob = await getBlob(ref(storage, fullPath));
+      // console.log(blob);
+      const avatarRef = ref(storage, fullPath);
+      const avatarUrl = await getDownloadURL(avatarRef);
+      // .then((url) => url)
+      // .catch((error) => {
+      //   switch (error.code) {
+      //     case "storage/object-not-found":
+      //       // File doesn't exist
+      //       break;
+      //     case "storage/unauthorized":
+      //       // User doesn't have permission to access the object
+      //       break;
+      //     case "storage/canceled":
+      //       // User canceled the upload
+      //       break;
+
+      //     // ...
+
+      //     case "storage/unknown":
+      //       // Unknown error occurred, inspect the server response
+      //       break;
+      //   }
+      // });
+      await firebaseUpdateUserDocument(avatarUrl);
     })
     .catch((error) => console.log(error));
+};
+
+export const firebaseUpdateUserDocument = async (avatar: string) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, { avatar: avatar });
 };

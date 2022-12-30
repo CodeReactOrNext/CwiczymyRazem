@@ -24,6 +24,7 @@ import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { SignUpCredentials as SignUpCredentials } from "../SingupView/SingupView";
+import { firebaseGetUserAvatarURL } from "utils/firebase/firebase.utils";
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings"]);
@@ -41,6 +42,8 @@ const SettingsView = () => {
   const [imageUpload, setImageUpload] = useState<Blob>();
   const [avatarIsValid, setAvatarIsValid] = useState(false);
 
+  const [avatarURL, setAvatarURL] = useState<string | undefined>();
+
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
   const dispatch = useAppDispatch();
@@ -51,6 +54,15 @@ const SettingsView = () => {
       setUserProviderData(data.payload as UserInfo);
     });
   }, [dispatch, newEmail]);
+
+  useEffect(() => {
+    const getAvatar = async () => {
+      const userAvatarUrl = await firebaseGetUserAvatarURL();
+      console.log(userAvatarUrl);
+      setAvatarURL(userAvatarUrl);
+    };
+    getAvatar();
+  }, []);
 
   const changeNameHandler = (name: string) => {
     dispatch(updateDisplayName({ login: name } as SignUpCredentials));
@@ -109,7 +121,6 @@ const SettingsView = () => {
     password: "",
     repeat_password: "",
   };
-
   const onImageChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.[0]) {
       const avatarFile = event.target.files[0];
@@ -129,16 +140,12 @@ const SettingsView = () => {
     }
   };
 
-  useEffect(() => {
-    console.log(isFetching);
-  }, [isFetching]);
-
   return (
     <>
       <MainLayout subtitle='Edytuj Profil' variant='primary'>
         <div className='flex max-w-[800px] flex-col p-6'>
           <div className='flex flex-row gap-2 p-4  text-2xl'>
-            <Avatar name={userName!} lvl={28} />
+            <Avatar avatarURL={avatarURL} name={userName!} lvl={28} />
             {avatarInputVisible && (
               <form
                 onSubmit={(event) => {
