@@ -14,6 +14,7 @@ const LeadboardLayout = ({ usersData }: LeadboardLayoutProps) => {
           key={index}
           place={index + 1}
           nick={user.displayName}
+          userAvatar={user.avatar}
           statistics={user.statistics}
         />
       ))}

@@ -7,7 +7,6 @@ import {
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
   firebaseGetUserDocument,
-  firebaseGetUserName,
   firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseReauthenticateUser,
@@ -76,11 +75,6 @@ export const autoLogIn = createAsyncThunk(
   "user/autoLogin",
   async (user: User) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
-    // const userWithDisplayName = {
-    //   ...user,
-    //   displayName: await firebaseGetUserName(userAuth),
-    // };
-    // const userName = userWithDisplayName.displayName;
     const currentUserStats = await firebaseGetUserData(userAuth);
     const userDoc = await firebaseGetUserDocument(auth.currentUser?.uid!);
     return {
@@ -124,7 +118,6 @@ export const updateDisplayName = createAsyncThunk(
 export const updateUserEmail = createAsyncThunk(
   "user/updateUserEmail",
   async ({ email, password, newEmail }: updateUserInterface) => {
-    // reauthenticateUser({ email, password } as SignUpCredentials);
     const authState = await firebaseReauthenticateUser({ email, password });
 
     if (newEmail && newEmail.length > 0 && authState) {
@@ -185,14 +178,6 @@ export const uploadUserAvatar = createAsyncThunk(
     return { avatar: avatarUrl };
   }
 );
-
-// export const getUserAvatar = createAsyncThunk(
-//   "user/updateUserAvatar",
-//   async (imageFile: Blob) => {
-//     const avatarUrl = await firebaseUploadAvatar(imageFile);
-//     return { userInfo: { avatar: avatarUrl } };
-//   }
-// );
 
 export const userSlice = createSlice({
   name: "user",
@@ -296,6 +281,7 @@ export const userSlice = createSlice({
       .addCase(uploadUserAvatar.fulfilled, (state, action) => {
         state.isFetching = null;
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
+        toast.success("Zmieniono awatar");
       })
       .addMatcher(
         isAnyOf(

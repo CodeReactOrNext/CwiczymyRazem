@@ -26,7 +26,6 @@ import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { SignUpCredentials as SignUpCredentials } from "../SingupView/SingupView";
-import { firebaseGetUserAvatarURL } from "utils/firebase/firebase.utils";
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings"]);
@@ -44,8 +43,6 @@ const SettingsView = () => {
   const [imageUpload, setImageUpload] = useState<Blob>();
   const [avatarIsValid, setAvatarIsValid] = useState(false);
 
-  // const [avatarURL, setAvatarURL] = useState<string | undefined>();
-
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
   const dispatch = useAppDispatch();
@@ -57,15 +54,6 @@ const SettingsView = () => {
       setUserProviderData(data.payload as UserInfo);
     });
   }, [dispatch, newEmail]);
-
-  // useEffect(() => {
-  //   const getAvatar = async () => {
-  //     const userAvatarUrl = await firebaseGetUserAvatarURL();
-  //     console.log(userAvatarUrl);
-  //     setAvatarURL(userAvatarUrl);
-  //   };
-  //   getAvatar();
-  // }, []);
 
   const changeNameHandler = (name: string) => {
     dispatch(updateDisplayName({ login: name } as SignUpCredentials));
@@ -156,11 +144,7 @@ const SettingsView = () => {
                   if (imageUpload) {
                     dispatch(uploadUserAvatar(imageUpload));
                   }
-                }}
-                // action='/api/user/avatar'
-                // method='POST'
-                // encType='multipart/form-data'
-              >
+                }}>
                 <div className='flex flex-col'>
                   <input
                     onChange={(event) => {

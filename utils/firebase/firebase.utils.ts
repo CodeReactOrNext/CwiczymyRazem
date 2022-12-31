@@ -1,13 +1,7 @@
 import { AchievementList } from "data/achievements";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { initializeApp } from "firebase/app";
-import {
-  getBlob,
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytes,
-} from "firebase/storage";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -200,7 +194,7 @@ export const firebaseUpdateUserPassword = async (newPassword: string) => {
   }
 };
 
-export const firebaseGetUsersExceriseRaprot = async () => {
+export const firebaseGetUsersExceriseRaport = async () => {
   const usersDocRef = await getDocs(collection(db, "users"));
   const userStatsArr: FirebaseUserDataInterface[] = [];
   usersDocRef.forEach((doc) => {

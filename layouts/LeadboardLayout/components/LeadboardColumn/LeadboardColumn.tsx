@@ -9,9 +9,15 @@ interface LeadboardColumnProps {
   place: number;
   nick: string;
   statistics: StatisticsDataInterface;
+  userAvatar?: string;
 }
 
-const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
+const LeadboardColumn = ({
+  place,
+  nick,
+  statistics,
+  userAvatar,
+}: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
   return (
@@ -21,7 +27,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
       </p>
       <div className=' ml-2 flex w-full max-w-[800px] items-center md:h-16 xl:ml-5 '>
         <div className='hidden md:block'>
-          <Avatar name={nick} lvl={lvl} />
+          <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
         </div>
         <div
           className={`mr-5 grid w-full grid-cols-3 grid-rows-3 justify-items-center  bg-second bg-opacity-75 px-2 md:h-16 md:grid-rows-1
@@ -29,7 +35,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
         ${place === 2 ? "bg-slate-400" : ""}
         ${place === 3 ? "bg-yellow-700" : ""}`}>
           <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
-            <Avatar name={nick} lvl={lvl} />
+            <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
             <div className='absolute top-[5px] right-[-60px] flex  items-center gap-x-1 '>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
