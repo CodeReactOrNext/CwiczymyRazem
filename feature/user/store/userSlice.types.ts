@@ -16,7 +16,7 @@ export interface UserSliceProviderData {
 
 export interface userSliceInitialState {
   userAuth: string | null;
-  userInfo: { displayName: string } | null;
+  userInfo: { displayName?: string; avatar?: string } | null;
   currentUserStats: StatisticsDataInterface | null;
   previousUserStats: StatisticsDataInterface | null;
   raitingData: ReportDataInterface | null;
@@ -33,5 +33,3 @@ export interface updateUserStatsProps {
   userAuth: string;
   inputData: ReportFormikInterface;
 }
-
-// export type UserAvatarType = Blob | Uint8Array | ArrayBuffer | undefined;
