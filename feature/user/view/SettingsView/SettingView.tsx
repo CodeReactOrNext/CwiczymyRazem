@@ -5,6 +5,8 @@ import Input from "components/Input";
 import {
   getUserProvider,
   selectIsFetching,
+  selectUserAvatar,
+  selectUserName,
   updateDisplayName,
   updateUserEmail,
   updateUserPassword,
@@ -42,12 +44,13 @@ const SettingsView = () => {
   const [imageUpload, setImageUpload] = useState<Blob>();
   const [avatarIsValid, setAvatarIsValid] = useState(false);
 
-  const [avatarURL, setAvatarURL] = useState<string | undefined>();
+  // const [avatarURL, setAvatarURL] = useState<string | undefined>();
 
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
   const dispatch = useAppDispatch();
-  const userName = useAppSelector((state) => state.user.userInfo?.displayName);
+  const userName = useAppSelector(selectUserName);
+  const userAvatar = useAppSelector(selectUserAvatar);
 
   useEffect(() => {
     dispatch(getUserProvider()).then((data) => {
@@ -55,14 +58,14 @@ const SettingsView = () => {
     });
   }, [dispatch, newEmail]);
 
-  useEffect(() => {
-    const getAvatar = async () => {
-      const userAvatarUrl = await firebaseGetUserAvatarURL();
-      console.log(userAvatarUrl);
-      setAvatarURL(userAvatarUrl);
-    };
-    getAvatar();
-  }, []);
+  // useEffect(() => {
+  //   const getAvatar = async () => {
+  //     const userAvatarUrl = await firebaseGetUserAvatarURL();
+  //     console.log(userAvatarUrl);
+  //     setAvatarURL(userAvatarUrl);
+  //   };
+  //   getAvatar();
+  // }, []);
 
   const changeNameHandler = (name: string) => {
     dispatch(updateDisplayName({ login: name } as SignUpCredentials));
@@ -145,7 +148,7 @@ const SettingsView = () => {
       <MainLayout subtitle='Edytuj Profil' variant='primary'>
         <div className='flex max-w-[800px] flex-col p-6'>
           <div className='flex flex-row gap-2 p-4  text-2xl'>
-            <Avatar avatarURL={avatarURL} name={userName!} lvl={28} />
+            <Avatar avatarURL={userAvatar} name={userName!} lvl={28} />
             {avatarInputVisible && (
               <form
                 onSubmit={(event) => {

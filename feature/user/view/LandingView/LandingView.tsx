@@ -22,6 +22,7 @@ import { useAppSelector } from "store/hooks";
 const LandingView = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userName = useAppSelector(selectUserName);
+  const userAvatar = useAppSelector((state) => state.user.userInfo?.avatar);
   const {
     points,
     sessionCount,
@@ -105,6 +106,7 @@ const LandingView = () => {
       navigation={navigation}
       userStats={userStats!}
       userName={userName!}
+      userAvatar={userAvatar}
     />
   );
 };

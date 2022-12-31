@@ -7,7 +7,6 @@ interface AvatarProps {
   avatarURL?: string;
 }
 
-//TODO refresh avatar when changed
 const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
   const getRankImgPath = () => {
     if (lvl >= IMG_RANKS_NUMBER) {
@@ -17,9 +16,9 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
   };
   return (
     <div className='relative'>
-      <div className='flex  h-20 w-20 items-center justify-center bg-tertiary-400'>
+      <div className='flex h-20 w-20 items-center justify-center bg-tertiary-400'>
         {avatarURL ? (
-          <img src={avatarURL} alt='avatar' />
+          <img className='h-full w-full' src={avatarURL} alt='avatar' />
         ) : (
           <p className='text-5xl uppercase text-main-opposed'>{name?.[0]}</p>
         )}

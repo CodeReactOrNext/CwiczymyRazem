@@ -6,6 +6,7 @@ import {
   firebaseCreateAccountWithEmail,
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
+  firebaseGetUserDocument,
   firebaseGetUserName,
   firebaseGetUserProviderData,
   firebaseLogUserOut,
@@ -75,13 +76,18 @@ export const autoLogIn = createAsyncThunk(
   "user/autoLogin",
   async (user: User) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
-    const userWithDisplayName = {
-      ...user,
-      displayName: await firebaseGetUserName(userAuth),
-    };
+    // const userWithDisplayName = {
+    //   ...user,
+    //   displayName: await firebaseGetUserName(userAuth),
+    // };
+    // const userName = userWithDisplayName.displayName;
     const currentUserStats = await firebaseGetUserData(userAuth);
-    const userName = userWithDisplayName.displayName;
-    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
+    const userDoc = await firebaseGetUserDocument(auth.currentUser?.uid!);
+    return {
+      userInfo: { displayName: userDoc?.displayName, avatar: userDoc?.avatar },
+      userAuth,
+      currentUserStats,
+    };
   }
 );
 
@@ -175,9 +181,18 @@ export const updateUserStats = createAsyncThunk(
 export const uploadUserAvatar = createAsyncThunk(
   "user/uploadUserAvatar",
   async (avatar: Blob) => {
-    return await firebaseUploadAvatar(avatar);
+    const avatarUrl = await firebaseUploadAvatar(avatar);
+    return { avatar: avatarUrl };
   }
 );
+
+// export const getUserAvatar = createAsyncThunk(
+//   "user/updateUserAvatar",
+//   async (imageFile: Blob) => {
+//     const avatarUrl = await firebaseUploadAvatar(imageFile);
+//     return { userInfo: { avatar: avatarUrl } };
+//   }
+// );
 
 export const userSlice = createSlice({
   name: "user",
@@ -274,12 +289,13 @@ export const userSlice = createSlice({
       })
       .addCase(updateDisplayName.fulfilled, (state, action) => {
         state.isFetching = null;
-        state.userInfo = action.payload.userInfo;
+        state.userInfo = { ...state.userInfo, ...action.payload.userInfo };
         state.currentUserStats = action.payload.currentUserStats;
         state.userAuth = action.payload.userAuth;
       })
-      .addCase(uploadUserAvatar.fulfilled, (state) => {
+      .addCase(uploadUserAvatar.fulfilled, (state, action) => {
         state.isFetching = null;
+        state.userInfo = { ...state.userInfo, ...action.payload.avatar };
       })
       .addMatcher(
         isAnyOf(
@@ -307,6 +323,8 @@ export const selectIsFetching = (state: RootState) => state.user.isFetching;
 export const selectRaitingData = (state: RootState) => state.user.raitingData;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
+export const selectUserAvatar = (state: RootState) =>
+  state.user.userInfo?.avatar;
 
 export const { addUserAuth, addUserData } = userSlice.actions;
 
