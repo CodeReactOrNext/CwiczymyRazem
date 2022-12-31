@@ -13,6 +13,7 @@ import type login from "../public/locales/en/login.json";
 import type signup from "../public/locales/en/signup.json";
 import type footer from "../public/locales/en/footer.json";
 import type faq from "../public/locales/en/faq.json";
+import type timer from "../public/locales/en/timer.json";
 import type leadboard from "../public/locales/en/leadboard.json";
 import type report from "../public/locales/en/report.json";
 import type achievements from "../public/locales/en/achievements.json";
@@ -33,6 +34,7 @@ interface I18nNamespaces {
   "404": typeof not_found;
   yup_errors: typeof yup_errors;
   settings: typeof settings;
+  timer: typeof timer;
 }
 // interface I18nNamespaces
 //   extends common,

@@ -1,10 +1,11 @@
 import Achievement from "components/Achievement";
 import Avatar from "components/Avatar";
-import { achievements } from "data/achievements";
+
 import { convertMsToHM } from "helpers/timeConverter";
 import { useTranslation } from "react-i18next";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import Carousel from "./Carousel";
 interface LeadboardColumnProps {
   place: number;
   nick: string;
@@ -20,8 +21,20 @@ const LeadboardColumn = ({
 }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
+
+  const shortenNick = (nick: string) => {
+    const MAX_SHOW_NICK_LENGTH = 16;
+    if (!nick) return;
+    if (nick.length > MAX_SHOW_NICK_LENGTH) {
+      return (
+        <p data-tip={nick}>{nick.substring(0, MAX_SHOW_NICK_LENGTH) + "..."}</p>
+      );
+    }
+    return nick;
+  };
+
   return (
-    <div className='flex w-full justify-center p-5 text-xs xs:text-base'>
+    <li className='flex w-full justify-center p-5 text-xs xs:text-base'>
       <p className='flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl'>
         {place + "."}
       </p>
@@ -45,7 +58,7 @@ const LeadboardColumn = ({
           </div>
           <div className='relative col-span-2 self-center justify-self-start md:col-span-1 '>
             <p className='whitespace-nowrap text-lg xs:text-2xl lg:text-xl xl:text-2xl'>
-              {nick}
+              {shortenNick(nick)}
             </p>
             <div className='absolute top-[-20px] right-[-60px]  hidden items-center gap-x-1 md:top-[-35px] md:flex'>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
@@ -74,25 +87,10 @@ const LeadboardColumn = ({
               </p>
             </div>
           </div>
-          <div className=' col-span-3 flex h-full w-full flex-col items-center justify-center  md:col-span-1  md:w-fit md:justify-end '>
-            <div className='flex  text-base xxs:text-2xl lg:text-xl xl:text-2xl '>
-              <FaAngleLeft className='cursor-pointer text-main-opposed hover:text-mainText active:click-behavior-second' />
-              <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
-                {statistics.achievements.length === 0 && "Brak"}
-                {statistics.achievements.map((achivId, index) => {
-                  return <Achievement key={index} id={achivId} />;
-                })}
-              </div>
-              <FaAngleRight className='cursor-pointer text-main-opposed hover:text-mainText active:click-behavior-second' />
-            </div>
-            <p className=' text-tertiary'>
-              {t("achievements")} {statistics.achievements.length}/
-              {achievements.length}
-            </p>
-          </div>
+          <Carousel achievements={statistics.achievements} />
         </div>
       </div>
-    </div>
+    </li>
   );
 };
 

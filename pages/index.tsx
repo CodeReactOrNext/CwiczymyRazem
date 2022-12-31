@@ -1,4 +1,4 @@
-import LandingView from "feature/user/view/LandingView/LandingView";
+import LandingView from "feature/user/view/LandingView";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import HeroView from "views/HeroView";
