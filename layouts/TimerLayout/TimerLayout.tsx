@@ -1,7 +1,7 @@
 import Button from "components/Button";
 import { updateTimerTime } from "feature/user/store/userSlice";
 import { SkillsType } from "feature/user/store/userSlice.types";
-import { convertMsToHM, convertMsToHMObject } from "helpers/timeConverter";
+import { convertMsToHM } from "helpers/timeConverter";
 import useTimer from "hooks/useTimer";
 import { useState, useEffect } from "react";
 import { useAppDispatch } from "store/hooks";
@@ -62,12 +62,13 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
   };
 
   useEffect(() => {
+    if (!timerEnabled) return;
     const payload = {
       type: chosenSkill,
       time: time,
     };
     dispatch(updateTimerTime(payload));
-  }, [time, chosenSkill, dispatch]);
+  }, [time, chosenSkill, dispatch, timerEnabled]);
 
   return (
     <div className='flex flex-col items-center justify-center '>
