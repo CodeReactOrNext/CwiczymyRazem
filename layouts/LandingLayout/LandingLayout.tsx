@@ -18,6 +18,7 @@ interface LandingLayoutProps {
   navigation: LandingNavProps;
   userStats: StatisticsDataInterface;
   userName: string;
+  userAvatar?: string;
 }
 
 const LandingLayout = ({
@@ -25,6 +26,7 @@ const LandingLayout = ({
   navigation,
   userStats,
   userName,
+  userAvatar,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("landing");
 
@@ -39,10 +41,18 @@ const LandingLayout = ({
           overflow-x-hidden scrollbar-hide`}>
           <Wrapper>
             <DesktopHeaderWrapper>
-              <UserHeader userStats={userStats} userName={userName} />
+              <UserHeader
+                avatar={userAvatar}
+                userStats={userStats}
+                userName={userName}
+              />
             </DesktopHeaderWrapper>
             <MobileHeaderWrapper>
-              <UserHeader userStats={userStats} userName={userName} />
+              <UserHeader
+                avatar={userAvatar}
+                userStats={userStats}
+                userName={userName}
+              />
             </MobileHeaderWrapper>
 
             <LandingNav

@@ -1,6 +1,7 @@
 import { AchievementList } from "data/achievements";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { initializeApp } from "firebase/app";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import {
   getAuth,
   GoogleAuthProvider,
@@ -35,6 +36,7 @@ import {
   statistics,
   StatisticsDataInterface,
 } from "./userStatisticsInitialData";
+import generateRandomString from "helpers/generateRandomString";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
@@ -57,6 +59,7 @@ export const firebaseSignInWithGooglePopup = () =>
   signInWithPopup(auth, provider);
 export const auth = getAuth();
 export const db = getFirestore(firebaseApp);
+export const storage = getStorage(firebaseApp);
 
 export const firebaseSignInWithEmail = (email: string, password: string) =>
   signInWithEmailAndPassword(auth, email, password);
@@ -94,6 +97,14 @@ export const firebaseGetUserData = async (userAuth: string) => {
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.statistics;
 };
+
+export const firebaseGetUserDocument = async (userAuth: string) => {
+  const userDocRef = doc(db, "users", userAuth);
+  const userSnapshot = await getDoc(userDocRef);
+  const userData = userSnapshot.data();
+  return userData;
+};
+
 export const firebaseGetLogs = async () => {
   const logsDocRef = collection(db, "logs");
   const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(20));
@@ -110,6 +121,12 @@ export const firebaseGetUserName = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.displayName;
+};
+
+export const firebaseGetUserAvatarURL = async () => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  const userSnapshot = await getDoc(userDocRef);
+  return userSnapshot.data()!.avatar;
 };
 
 export const firebaseSetUserExerciseRaprot = async (
@@ -177,7 +194,7 @@ export const firebaseUpdateUserPassword = async (newPassword: string) => {
   }
 };
 
-export const firebaseGetUsersExceriseRaprot = async () => {
+export const firebaseGetUsersExceriseRaport = async () => {
   const usersDocRef = await getDocs(collection(db, "users"));
   const userStatsArr: FirebaseUserDataInterface[] = [];
   usersDocRef.forEach((doc) => {
@@ -216,4 +233,27 @@ export const firebaseReauthenticateUser = async ({
     return await reauthenticateWithCredential(user, credential);
   }
   return null;
+};
+
+export const firebaseUploadAvatar = async (image: Blob) => {
+  if (!image) return;
+  const imageRef = ref(
+    storage,
+    `avatars/${generateRandomString(auth.currentUser?.uid!)}`
+  );
+  const data = await uploadBytes(imageRef, image);
+  const fullPath = data.metadata.fullPath;
+  console.log("Image Uploaded");
+  const avatarRef = ref(storage, fullPath);
+  const avatarUrl = await getDownloadURL(avatarRef);
+  await firebaseUpdateUserDocument("avatar", avatarUrl);
+  return { avatar: avatarUrl };
+};
+
+export const firebaseUpdateUserDocument = async (
+  key: string,
+  value: string
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, { [key]: value });
 };

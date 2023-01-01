@@ -1,5 +1,6 @@
 import {
   selectCurrentUserStats,
+  selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
 import { convertMsToHM } from "helpers/timeConverter";
@@ -22,6 +23,7 @@ import { useAppSelector } from "store/hooks";
 const LandingView = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userName = useAppSelector(selectUserName);
+  const userAvatar = useAppSelector(selectUserAvatar);
   const {
     points,
     sessionCount,
@@ -105,6 +107,7 @@ const LandingView = () => {
       navigation={navigation}
       userStats={userStats!}
       userName={userName!}
+      userAvatar={userAvatar}
     />
   );
 };
