@@ -36,7 +36,8 @@ import {
   statistics,
   StatisticsDataInterface,
 } from "./userStatisticsInitialData";
-import generateRandomString from "helpers/generateRandomString";
+import { decodeUid } from "helpers/decodeUid";
+import { encodeUid } from "helpers/encodeUid";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
@@ -237,10 +238,7 @@ export const firebaseReauthenticateUser = async ({
 
 export const firebaseUploadAvatar = async (image: Blob) => {
   if (!image) return;
-  const imageRef = ref(
-    storage,
-    `avatars/${generateRandomString(auth.currentUser?.uid!)}`
-  );
+  const imageRef = ref(storage, `avatars/${encodeUid(auth.currentUser?.uid!)}`);
   const data = await uploadBytes(imageRef, image);
   const fullPath = data.metadata.fullPath;
   console.log("Image Uploaded");
