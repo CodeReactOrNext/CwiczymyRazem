@@ -1,22 +1,33 @@
 import { useState, useEffect, useCallback } from "react";
 
 const useTimer = () => {
+  const [initialTime, setInitialTime] = useState(0);
   const [time, setTime] = useState(0);
+  const [startTimeDate, setStartTimeDate] = useState(new Date().getTime());
   const [timerEnabled, setTimerEnabled] = useState(false);
-
-  const counter = useCallback(() => {
-    setTime((prev) => prev + 1000);
-  }, []);
 
   const restartTime = () => {
     setTime(0);
   };
 
   useEffect(() => {
-    if (!timerEnabled) return;
-    const time = setInterval(() => counter(), 1000);
+    const timeDiffrence = new Date().getTime() - startTimeDate;
+
+    if (!timerEnabled) {
+      setInitialTime((prev) => prev + timeDiffrence);
+    }
+    setStartTimeDate(new Date().getTime());
+  }, [timerEnabled, startTimeDate]);
+
+  useEffect(() => {
+    if (!timerEnabled) {
+      return;
+    }
+    const timeDiffrence = new Date().getTime() - startTimeDate;
+
+    const time = setInterval(() => setTime(timeDiffrence + initialTime), 1000);
     return () => clearInterval(time);
-  }, [counter, timerEnabled]);
+  }, [time, timerEnabled, initialTime, startTimeDate]);
 
   return {
     time,
