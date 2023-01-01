@@ -102,7 +102,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
       </p>
       <div className='mb-14  flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
         <CategoryBox
-          title={t("creative")}
+          title={t("technique")}
           time={timerData.technique}
           onClick={() => {
             setChosenSkill("technique");
