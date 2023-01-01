@@ -11,7 +11,7 @@ import {
   firebaseCreateAccountWithEmail,
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
-  firebaseGetUserName,
+  firebaseGetUserDocument,
   firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseReauthenticateUser,
@@ -20,6 +20,7 @@ import {
   firebaseUpdateUserDisplayName,
   firebaseUpdateUserEmail,
   firebaseUpdateUserPassword,
+  firebaseUploadAvatar,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
@@ -86,13 +87,13 @@ export const autoLogIn = createAsyncThunk(
   "user/autoLogin",
   async (user: User) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
-    const userWithDisplayName = {
-      ...user,
-      displayName: await firebaseGetUserName(userAuth),
-    };
     const currentUserStats = await firebaseGetUserData(userAuth);
-    const userName = userWithDisplayName.displayName;
-    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
+    const userDoc = await firebaseGetUserDocument(auth.currentUser?.uid!);
+    return {
+      userInfo: { displayName: userDoc?.displayName, avatar: userDoc?.avatar },
+      userAuth,
+      currentUserStats,
+    };
   }
 );
 
@@ -111,7 +112,7 @@ export const createAccount = createAsyncThunk(
 );
 
 export const updateDisplayName = createAsyncThunk(
-  "user/updateAccount",
+  "user/updateDisplayName",
   async ({ login }: SignUpCredentials) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(
       auth.currentUser!
@@ -129,7 +130,6 @@ export const updateDisplayName = createAsyncThunk(
 export const updateUserEmail = createAsyncThunk(
   "user/updateUserEmail",
   async ({ email, password, newEmail }: updateUserInterface) => {
-    // reauthenticateUser({ email, password } as SignUpCredentials);
     const authState = await firebaseReauthenticateUser({ email, password });
 
     if (newEmail && newEmail.length > 0 && authState) {
@@ -183,6 +183,14 @@ export const updateUserStats = createAsyncThunk(
   }
 );
 
+export const uploadUserAvatar = createAsyncThunk(
+  "user/uploadUserAvatar",
+  async (avatar: Blob) => {
+    const avatarUrl = await firebaseUploadAvatar(avatar);
+    return { avatar: avatarUrl };
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -231,12 +239,26 @@ export const userSlice = createSlice({
       .addCase(updateUserEmail.pending, (state) => {
         state.isFetching = "updateData";
       })
+      .addCase(updateDisplayName.pending, (state) => {
+        state.isFetching = "updateData";
+      })
       .addCase(updateUserPassword.pending, (state) => {
+        state.isFetching = "updateData";
+      })
+      .addCase(uploadUserAvatar.pending, (state) => {
         state.isFetching = "updateData";
       })
       .addCase(updateUserStats.rejected, (state) => {
         state.isFetching = null;
         toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+      })
+      .addCase(updateDisplayName.rejected, (state) => {
+        state.isFetching = null;
+        toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+      })
+      .addCase(uploadUserAvatar.rejected, (state) => {
+        state.isFetching = null;
+        toast.error("Awatar może mieć maksymalnie 250px na 250px.");
       })
       .addCase(updateUserEmail.rejected, (state, { error }) => {
         state.isFetching = null;
@@ -285,9 +307,14 @@ export const userSlice = createSlice({
       })
       .addCase(updateDisplayName.fulfilled, (state, action) => {
         state.isFetching = null;
-        state.userInfo = action.payload.userInfo;
+        state.userInfo = { ...state.userInfo, ...action.payload.userInfo };
         state.currentUserStats = action.payload.currentUserStats;
         state.userAuth = action.payload.userAuth;
+      })
+      .addCase(uploadUserAvatar.fulfilled, (state, action) => {
+        state.isFetching = null;
+        state.userInfo = { ...state.userInfo, ...action.payload.avatar };
+        toast.success("Zmieniono awatar");
       })
       .addMatcher(
         isAnyOf(
@@ -319,5 +346,7 @@ export const selectRaitingData = (state: RootState) => state.user.raitingData;
 export const selectTimerData = (state: RootState) => state.user.timer;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
+export const selectUserAvatar = (state: RootState) =>
+  state.user.userInfo?.avatar;
 
 export default userSlice.reducer;

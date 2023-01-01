@@ -9,9 +9,10 @@ import { WelcomeMessage } from "./components/WelcomMessage";
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
   userName: string;
+  avatar?: string;
 }
 
-const UserHeader = ({ userStats, userName }: UserHeaderProps) => {
+const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
   const { points, lvl, pointsToNextLvl } = userStats;
   return (
     <>
@@ -19,7 +20,7 @@ const UserHeader = ({ userStats, userName }: UserHeaderProps) => {
         <div className='flex flex-row items-center gap-5 sm:gap-10'>
           <div className=' lg:mr-4'>
             <Logo />
-            <Avatar name={userName} lvl={lvl} />
+            <Avatar avatarURL={avatar} name={userName} lvl={lvl} />
             <UserNav />
           </div>
           <WelcomeMessage userName={userName} place={1} points={points} />

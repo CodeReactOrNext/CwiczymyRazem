@@ -29,7 +29,8 @@ const Button = ({
         (variant === "secondary"
           ? "bg-main-opposed hover:bg-main-opposed-100"
           : "bg-main hover:bg-main-100") +
-        (style ? style : "")
+        (style ? style : "") +
+        (disabled ? "pointer-events-none grayscale" : "")
       }
       {...otherProps}>
       {children}
