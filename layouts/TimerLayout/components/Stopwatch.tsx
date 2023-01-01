@@ -5,10 +5,16 @@ import { FaPause, FaPlay } from "react-icons/fa";
 export interface StopwachProps {
   time: number;
   timerEnabled: boolean;
-  setTimerEnabled: (arg0: boolean) => void;
+  startTimer: () => void;
+  stopTimer: () => void;
 }
 
-const Stopwatch = ({ time, timerEnabled, setTimerEnabled }: StopwachProps) => {
+const Stopwatch = ({
+  time,
+  timerEnabled,
+  startTimer,
+  stopTimer,
+}: StopwachProps) => {
   const { t } = useTranslation("timer");
   return (
     <div className='mb-6 grid h-52 w-52 grid-rows-3 items-center rounded-full border-2  border-white text-7xl tracking-wider text-tertiary xs:h-64 xs:w-64 sm:text-8xl'>
@@ -30,14 +36,14 @@ const Stopwatch = ({ time, timerEnabled, setTimerEnabled }: StopwachProps) => {
         {timerEnabled ? (
           <button
             className='hover:text-mainText active:click-behavior-second'
-            onClick={() => setTimerEnabled(false)}>
+            onClick={() => stopTimer()}>
             <FaPause size={25} />
             {t("pause")}
           </button>
         ) : (
           <button
             className='hover:text-mainText active:click-behavior-second '
-            onClick={() => setTimerEnabled(true)}>
+            onClick={() => startTimer()}>
             <FaPlay size={25} /> {t("start")}
           </button>
         )}
