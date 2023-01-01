@@ -21,8 +21,14 @@ interface TimerLayoutProps {
 }
 
 const TimerLayout = ({ timerData }: TimerLayoutProps) => {
-  const { time, setTime, restartTime, timerEnabled, setTimerEnabled } =
-    useTimer();
+  const {
+    time,
+    restartTime,
+    startTimer,
+    stopTimer,
+    timerEnabled,
+    setInitialStartTime,
+  } = useTimer();
   const [chosenSkill, setChosenSkill] = useState<SkillsType>("technique");
   const { t } = useTranslation("timer");
   const dispatch = useAppDispatch();
@@ -68,7 +74,8 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
       <Stopwatch
         time={time}
         timerEnabled={timerEnabled}
-        setTimerEnabled={setTimerEnabled}
+        startTimer={startTimer}
+        stopTimer={stopTimer}
       />
       <div className='mb-2 flex flex-row gap-5 text-center text-2xl'>
         <div className='flex flex-row gap-1 '>
@@ -99,7 +106,8 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           time={timerData.technique}
           onClick={() => {
             setChosenSkill("technique");
-            setTime(timerData.technique);
+            restartTime();
+            setInitialStartTime(timerData.technique);
           }}
           percent={calculatePercent(timerData.technique)}
           chosen={chosenSkill === "technique"}
@@ -109,7 +117,8 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           time={timerData.theory}
           onClick={() => {
             setChosenSkill("theory");
-            setTime(timerData.theory);
+            restartTime();
+            setInitialStartTime(timerData.theory);
           }}
           percent={calculatePercent(timerData.theory)}
           chosen={chosenSkill === "theory"}
@@ -119,7 +128,8 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           time={timerData.hearing}
           onClick={() => {
             setChosenSkill("hearing");
-            setTime(timerData.hearing);
+            restartTime();
+            setInitialStartTime(timerData.hearing);
           }}
           percent={calculatePercent(timerData.hearing)}
           chosen={chosenSkill === "hearing"}
@@ -129,7 +139,8 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           time={timerData.creativity}
           onClick={() => {
             setChosenSkill("creativity");
-            setTime(timerData.creativity);
+            restartTime();
+            setInitialStartTime(timerData.creativity);
           }}
           percent={calculatePercent(timerData.creativity)}
           chosen={chosenSkill === "creativity"}
