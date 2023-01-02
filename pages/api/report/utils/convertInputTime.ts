@@ -10,15 +10,15 @@ export const convertInputTime = (data: ReportFormikInterface) => {
     hoursToMs(+data.theoryHours) + minutesToMs(+data.theoryMinutes);
   const hearingTime =
     hoursToMs(+data.hearingHours) + minutesToMs(+data.hearingMinutes);
-  const creativeTime =
-    hoursToMs(+data.creativeHours) + minutesToMs(+data.creativeMinutes);
-  const sumTime = techniqueTime + theoryTime + hearingTime + creativeTime;
+  const creativityTime =
+    hoursToMs(+data.creativityHours) + minutesToMs(+data.creativityMinutes);
+  const sumTime = techniqueTime + theoryTime + hearingTime + creativityTime;
 
   return {
     techniqueTime: techniqueTime,
     theoryTime: theoryTime,
     hearingTime: hearingTime,
-    creativeTime: creativeTime,
+    creativityTime: creativityTime,
     sumTime: sumTime,
   };
 };
