@@ -2,7 +2,7 @@ import Avatar from "components/Avatar";
 import { convertMsToHM } from "helpers/timeConverter";
 import { useTranslation } from "react-i18next";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
-import Carousel from "./Carousel";
+import Carousel from "./AchievementsCarousel";
 interface LeadboardColumnProps {
   place: number;
   nick: string;
