@@ -238,13 +238,6 @@ export const firebaseReauthenticateUser = async ({
 
 export const firebaseUploadAvatar = async (image: Blob) => {
   if (!image) return;
-  const encoded1 = encodeUid("0TO9mCScTiehZ1LRQ6mDu2YFQxk2");
-  const encoded2 = encodeUid("0TO9mCScTiehZ1LRQ6mDu2YFQxk2");
-  console.log(encoded1);
-  console.log(encoded2);
-
-  console.log(decodeUid(encoded1));
-  console.log(decodeUid(encoded2));
   const imageRef = ref(storage, `avatars/${encodeUid(auth.currentUser?.uid!)}`);
   const data = await uploadBytes(imageRef, image);
   const fullPath = data.metadata.fullPath;
