@@ -79,7 +79,7 @@ const LandingLayout = ({
                     percent={Math.round((time.hearing / totalTime) * 100)}
                   />
                   <StatisticBar
-                    title={t("creative")}
+                    title={t("creativity")}
                     value={convertMsToHM(time.creativity)}
                     percent={Math.round((time.creativity / totalTime) * 100)}
                   />

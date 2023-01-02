@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
 
-const Carousel = ({ achievements }: { achievements: AchievementList[] }) => {
+const AchievementsCarousel = ({ achievements }: { achievements: AchievementList[] }) => {
   const [index, setIndex] = useState(0);
   const { t } = useTranslation("leadboard");
   const itemsShow = 4;
@@ -75,4 +75,4 @@ const Carousel = ({ achievements }: { achievements: AchievementList[] }) => {
   );
 };
 
-export default Carousel;
+export default AchievementsCarousel;
