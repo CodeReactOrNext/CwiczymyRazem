@@ -42,7 +42,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {
       case "creativity":
-        return t("creative");
+        return t("creativity");
       case "hearing":
         return t("hearing");
       case "technique":
@@ -136,7 +136,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           chosen={chosenSkill === "hearing"}
         />
         <CategoryBox
-          title={t("creative")}
+          title={t("creativity")}
           time={timerData.creativity}
           onClick={() => {
             setChosenSkill("creativity");

@@ -5,8 +5,8 @@ export interface ReportFormikInterface {
   theoryMinutes: string;
   hearingHours: string;
   hearingMinutes: string;
-  creativeHours: string;
-  creativeMinutes: string;
+  creativityHours: string;
+  creativityMinutes: string;
   habbits: string[];
 }
 export interface ReportDataInterface {

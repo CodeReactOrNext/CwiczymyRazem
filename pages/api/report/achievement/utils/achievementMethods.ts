@@ -33,13 +33,13 @@ export const time3Check = (statistics: StatisticsDataInterface) => {
   }
 };
 export const checkBalance = (inputData: ReportFormikInterface) => {
-  const { techniqueTime, theoryTime, hearingTime, creativeTime } =
+  const { techniqueTime, theoryTime, hearingTime, creativityTime } =
     convertInputTime(inputData);
 
   if (techniqueTime < 3600000) return;
   if (theoryTime < 3600000) return;
   if (hearingTime < 3600000) return;
-  if (creativeTime < 3600000) return;
+  if (creativityTime < 3600000) return;
 
   return "balance";
 };
