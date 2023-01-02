@@ -1,9 +1,6 @@
-import Achievement from "components/Achievement";
 import Avatar from "components/Avatar";
-
 import { convertMsToHM } from "helpers/timeConverter";
 import { useTranslation } from "react-i18next";
-import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import Carousel from "./Carousel";
 interface LeadboardColumnProps {
@@ -12,7 +9,7 @@ interface LeadboardColumnProps {
   statistics: StatisticsDataInterface;
 }
 
-const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
+const LeadboardRow = ({ place, nick, statistics }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
 
@@ -88,4 +85,4 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
   );
 };
 
-export default LeadboardColumn;
+export default LeadboardRow;
