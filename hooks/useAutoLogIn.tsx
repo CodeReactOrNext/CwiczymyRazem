@@ -1,7 +1,11 @@
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "utils/firebase/firebase.utils";
 import { useEffect } from "react";
-import { autoLogIn, selectUserAuth } from "feature/user/store/userSlice";
+import {
+  autoLogIn,
+  selectUserAuth,
+  updateLocalTimer,
+} from "feature/user/store/userSlice";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import Router from "next/router";
 
@@ -17,6 +21,15 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (localStorage.getItem("userSlice.timer")) {
+        console.log(localStorage.getItem("userSlice.timer"));
+        dispatch(
+          updateLocalTimer(JSON.parse(localStorage.getItem("userSlice.timer")!))
+        );
+      }
+    }
+
     if (user && !isUserLoggedIn) {
       dispatch(autoLogIn(user));
     }

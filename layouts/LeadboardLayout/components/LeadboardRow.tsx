@@ -1,11 +1,8 @@
-import Achievement from "components/Achievement";
 import Avatar from "components/Avatar";
-
 import { convertMsToHM } from "helpers/timeConverter";
 import { useTranslation } from "react-i18next";
-import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
-import Carousel from "./Carousel";
+import Carousel from "./AchievementsCarousel";
 interface LeadboardColumnProps {
   place: number;
   nick: string;
@@ -13,7 +10,7 @@ interface LeadboardColumnProps {
   userAvatar?: string;
 }
 
-const LeadboardColumn = ({
+const LeadboardRow = ({
   place,
   nick,
   statistics,
@@ -94,4 +91,4 @@ const LeadboardColumn = ({
   );
 };
 
-export default LeadboardColumn;
+export default LeadboardRow;

@@ -26,7 +26,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   )) as StatisticsDataInterface;
   const userName = await firebaseGetUserName(userAuth);
   console.log(userName);
-  const { techniqueTime, theoryTime, hearingTime, creativeTime, sumTime } =
+  const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
     convertInputTime(inputData);
   const {
     time,
@@ -56,7 +56,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
       technique: time.technique + techniqueTime,
       theory: time.theory + theoryTime,
       hearing: time.hearing + hearingTime,
-      creativity: time.creativity + creativeTime,
+      creativity: time.creativity + creativityTime,
       longestSession:
         time.longestSession < sumTime ? sumTime : time.longestSession,
     },

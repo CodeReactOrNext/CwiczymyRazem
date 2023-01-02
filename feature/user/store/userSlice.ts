@@ -45,12 +45,7 @@ const initialState: userSliceInitialState = {
   previousUserStats: null,
   raitingData: null,
   isFetching: null,
-  timer: {
-    creativity: 0,
-    hearing: 0,
-    technique: 0,
-    theory: 0,
-  },
+  timer: { creativity: 0, hearing: 0, technique: 0, theory: 0 },
   providerData: {
     providerId: null,
     uid: null,
@@ -204,6 +199,22 @@ export const userSlice = createSlice({
     addPracticeData: (state, action) => {
       state.currentUserStats = action.payload;
     },
+    updateLocalTimer: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        creativity: number;
+        hearing: number;
+        technique: number;
+        theory: number;
+      }>
+    ) => {
+      if (!payload) {
+        return;
+      }
+      state.timer = payload;
+    },
     updateTimerTime: (
       state,
       { payload }: PayloadAction<{ type: SkillsType; time: number }>
@@ -333,7 +344,7 @@ export const userSlice = createSlice({
   },
 });
 
-export const { addUserAuth, addUserData, updateTimerTime } =
+export const { addUserAuth, addUserData, updateTimerTime, updateLocalTimer } =
   userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;

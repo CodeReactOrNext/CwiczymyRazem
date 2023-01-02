@@ -1,7 +1,7 @@
 import Button from "components/Button";
 import { updateTimerTime } from "feature/user/store/userSlice";
 import { SkillsType } from "feature/user/store/userSlice.types";
-import { convertMsToHM, convertMsToHMObject } from "helpers/timeConverter";
+import { convertMsToHM } from "helpers/timeConverter";
 import useTimer from "hooks/useTimer";
 import { useState, useEffect } from "react";
 import { useAppDispatch } from "store/hooks";
@@ -21,8 +21,14 @@ interface TimerLayoutProps {
 }
 
 const TimerLayout = ({ timerData }: TimerLayoutProps) => {
-  const { time, setTime, restartTime, timerEnabled, setTimerEnabled } =
-    useTimer();
+  const {
+    time,
+    restartTime,
+    startTimer,
+    stopTimer,
+    timerEnabled,
+    setInitialStartTime,
+  } = useTimer();
   const [chosenSkill, setChosenSkill] = useState<SkillsType>("technique");
   const { t } = useTranslation("timer");
   const dispatch = useAppDispatch();
@@ -36,7 +42,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {
       case "creativity":
-        return t("creative");
+        return t("creativity");
       case "hearing":
         return t("hearing");
       case "technique":
@@ -56,19 +62,21 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
   };
 
   useEffect(() => {
+    if (!timerEnabled) return;
     const payload = {
       type: chosenSkill,
       time: time,
     };
     dispatch(updateTimerTime(payload));
-  }, [time, chosenSkill, dispatch]);
+  }, [time, chosenSkill, dispatch, timerEnabled]);
 
   return (
     <div className='flex flex-col items-center justify-center '>
       <Stopwatch
         time={time}
         timerEnabled={timerEnabled}
-        setTimerEnabled={setTimerEnabled}
+        startTimer={startTimer}
+        stopTimer={stopTimer}
       />
       <div className='mb-2 flex flex-row gap-5 text-center text-2xl'>
         <div className='flex flex-row gap-1 '>
@@ -95,11 +103,12 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
       </p>
       <div className='mb-14  flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
         <CategoryBox
-          title={t("creative")}
+          title={t("technique")}
           time={timerData.technique}
           onClick={() => {
             setChosenSkill("technique");
-            setTime(timerData.technique);
+            restartTime();
+            setInitialStartTime(timerData.technique);
           }}
           percent={calculatePercent(timerData.technique)}
           chosen={chosenSkill === "technique"}
@@ -109,7 +118,8 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           time={timerData.theory}
           onClick={() => {
             setChosenSkill("theory");
-            setTime(timerData.theory);
+            restartTime();
+            setInitialStartTime(timerData.theory);
           }}
           percent={calculatePercent(timerData.theory)}
           chosen={chosenSkill === "theory"}
@@ -119,17 +129,19 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           time={timerData.hearing}
           onClick={() => {
             setChosenSkill("hearing");
-            setTime(timerData.hearing);
+            restartTime();
+            setInitialStartTime(timerData.hearing);
           }}
           percent={calculatePercent(timerData.hearing)}
           chosen={chosenSkill === "hearing"}
         />
         <CategoryBox
-          title={t("creative")}
+          title={t("creativity")}
           time={timerData.creativity}
           onClick={() => {
             setChosenSkill("creativity");
-            setTime(timerData.creativity);
+            restartTime();
+            setInitialStartTime(timerData.creativity);
           }}
           percent={calculatePercent(timerData.creativity)}
           chosen={chosenSkill === "creativity"}

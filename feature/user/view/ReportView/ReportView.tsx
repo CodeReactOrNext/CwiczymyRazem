@@ -58,8 +58,8 @@ const ReportView = () => {
     theoryMinutes: theoryTime.minutes,
     hearingHours: hearingTime.hours,
     hearingMinutes: hearingTime.minutes,
-    creativeHours: creativityTime.hours,
-    creativeMinutes: creativityTime.minutes,
+    creativityHours: creativityTime.hours,
+    creativityMinutes: creativityTime.minutes,
     habbits: [],
   };
 
@@ -134,11 +134,11 @@ const ReportView = () => {
                     />
                     <TimeInputBox
                       errors={errors}
-                      title={t("creative")}
+                      title={t("creativity")}
                       questionMarkProps={{ description: "Kreatywność" }}
                       Icon={FaBrain}
-                      hoursName={"creativeHours"}
-                      minutesName={"creativeMinutes"}
+                      hoursName={"creativityHours"}
+                      minutesName={"creativityMinutes"}
                     />
                   </div>
                 </ReportCategoryLayout>
