@@ -1,1 +1,21 @@
-{}
+{
+  "settings_subtilte": "Edit profile",
+  "edit": "Edit",
+  "save": "Save",
+  "nickname": "Nickname:",
+  "new_nickname": "New nickname",
+  "new_email": "New e-mail",
+  "password": "Password:",
+  "new_password": "New password",
+  "repeat_new_password": "Repeat new password",
+  "reset_stats": "Reset statistics",
+  "reset_warning": "Warning. Pushing this button will cause your statistics to reset.",
+  "reset": "Reset",
+  "anonimity": "Anonimity:",
+  "anonimity_info": "Do you want to hide your nickname in leaderboard?",
+  "logged_in_via_google": "Zalogowano z Google",
+  "toasts": {
+    "avatar_too_big": "Avatar can only max 250px by 250px.",
+    "log_in_again": "To change data you have to log in again."
+  }
+}
