@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { FirebaseUserDataInterface } from "utils/firebase/firebase.types";
-import { firebaseGetUsersExceriseRaprot } from "utils/firebase/firebase.utils";
+import { firebaseGetUsersExceriseRaport as firebaseGetUsersExceriseRaport } from "utils/firebase/firebase.utils";
 
 const LeadboardView = () => {
   const [usersData, setUsersData] = useState<
@@ -14,7 +14,7 @@ const LeadboardView = () => {
   const { t } = useTranslation("leadboard");
 
   useEffect(() => {
-    firebaseGetUsersExceriseRaprot()
+    firebaseGetUsersExceriseRaport()
       .then((usersData) =>
         setUsersData(
           usersData.sort((a, b) => b.statistics.points - a.statistics.points)
