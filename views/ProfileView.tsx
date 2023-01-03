@@ -36,7 +36,7 @@ const ProfileView = () => {
     actualDayWithoutBreak: 0,
     lastReportDate: "",
   };
-  const userName = "ziemniak";
+  const userName = "placeholder";
   const userAvatar = undefined;
   const {
     points,
