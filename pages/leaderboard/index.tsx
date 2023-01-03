@@ -14,6 +14,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
       ...(await serverSideTranslations(locale ?? "pl", [
         "common",
         "leadboard",
+        "achievements",
       ])),
     },
   };

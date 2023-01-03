@@ -1,4 +1,4 @@
-import { AchievementList } from "data/achievements";
+import { AchievementList } from "assets/achievements/achievementsData";
 import { Timestamp } from "firebase/firestore";
 import { StatisticsDataInterface } from "./userStatisticsInitialData";
 

@@ -11,7 +11,7 @@ import {
   FaStar,
   FaStarHalf,
 } from "react-icons/fa";
-import { achievements as achievementsData } from "data/achievements";
+import { achievements as achievementsData } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
 

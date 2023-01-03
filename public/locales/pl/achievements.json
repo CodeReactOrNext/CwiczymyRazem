@@ -1,5 +1,31 @@
 {
-  "common": "Zwykłe",
-  "rare": "Rzadkie",
-  "veryRare": "Bardzo Rzadkie"
+  "rarity": {
+    "common": "Zwykłe",
+    "rare": "Rzadkie",
+    "veryRare": "Bardzo Rzadkie"
+  },
+  "time_1": {
+    "title": "Ciężka praca popłaca",
+    "description": "Przekrocz próg 10 godzin ćwiczeń."
+  },
+  "time_2": {
+    "title": "Niezłomny determinacja",
+    "description": "Przekrocz próg 30 godzin ćwiczeń."
+  },
+  "time_3": {
+    "title": "1% - 10000h rule",
+    "description": "Przekrocz próg 100 godzin ćwiczeń."
+  },
+  "balance": {
+    "title": "Złoty środek",
+    "description": "Raportuj za jednym razem przynajmniej 1 godzinę z każdego filaru umiejętności."
+  },
+  "fire": {
+    "title": "Gitarowa Potęga",
+    "description": "Zdobądź 60 punktów za jeden raport."
+  },
+  "health_habits": {
+    "title": "Zdrowy jak ryba",
+    "description": "Zrealizuj wszystkie zdrowe nawyki w jednym raporcie."
+  }
 }

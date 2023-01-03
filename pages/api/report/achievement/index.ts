@@ -12,7 +12,7 @@ import {
   time2Check,
   time3Check,
 } from "./utils/achievementMethods";
-import { AchievementList } from "data/achievements";
+import { AchievementList } from "assets/achievements/achievementsData";
 
 export const checkAchievement = (
   statistics: StatisticsDataInterface,
