@@ -4,14 +4,45 @@
   "technique": "Technika",
   "theory": "Teoria",
   "hearing": "Słuch",
-  "creative": "Praca kreatywna",
+  "creativity": "Praca kreatywna",
   "healthy_habits_title": "Zdrowe nawyki",
-  "exercise_plan": "Zrealizowałeś swój plan ćwiczeń?",
-  "new_things": "Ćwiczyłeś nowe rzeczy?",
-  "warmup": "Wykonałeś rozgrzewkę?",
-  "metronome": "Używałeś metronom?",
-  "recording": "Nagrywałeś się?",
+
   "report_button": "Raportuj",
+  "toast": {
+    "24h_error": "Nie da się ćwiczyć więcej niż 24 godziny dziennie",
+    "input_time": "Wpisz czas",
+    "not_logged": "Nie jesteś zalogowany",
+    "report_success": "Poprawnie zraportowano",
+    "stoper_entered": "Wprowadzono czas ze stopera"
+  },
+  "habits": {
+    "exercise_plan": {
+      "title": "Did you fulfill your exercise plan?",
+      "description": "Setting goals and planning your guitar practice is important because it helps maintain motivation, track progress, and achieve desired goals."
+    },
+    "new_things": {
+      "title": "Did you practice new things?",
+      "description": "Practicing new things on the guitar is important for several reasons. First, it helps develop new skills and improve existing ones. By tackling new challenges, you can try to become a better musician and expand your abilities. Practicing new things can also help keep your interest in playing and add variety."
+    },
+    "warmup": {
+      "title": "Did you warm up?",
+      "description": "A warm up helps prepare your muscles and joints for the physical demands of playing. This can help reduce the risk of injury and make your practice sessions more comfortable. A warm up can also help improve technique and accuracy by getting your fingers and muscles working properly."
+    },
+    "metronome": {
+      "title": "Did you use a metronome?",
+      "description": "Using a metronome can help improve your sense of timing and rhythm. By practicing with a metronome, you can learn to play in time with a consistent beat and develop a more solid rhythmic foundation."
+    },
+    "recording": {
+      "title": "Did you record yourself?",
+      "description": "Recording yourself allows you to see and hear your playing from a different perspective than when you play live. This can help you notice mistakes or weaknesses that you might have missed. "
+    }
+  },
+  "description": {
+    "technique": "Np. granie i nauka utworów, rozgrzewka, ćwiczenie rytmu oraz różnych technik, takich jak kostkowanie naprzemienne lub legato",
+    "hearing": "Np. odtwarzanie utworów bądź ich fragmentów ze słuchu, słuchanie i wskazywanie interwałów oraz śpiewanie",
+    "theory": "Np. transkrypcja utworów i ich analiza, nauka dźwięków na gryfie, czytanie nut",
+    "creative": "Np. pisanie własnych utworów, improwizacja, praca nad własnym stylem"
+  },
   "rating_popup": {
     "title": "ZDOBYŁEŚ",
     "points": "pkt",
