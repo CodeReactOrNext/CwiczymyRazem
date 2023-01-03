@@ -1,13 +1,6 @@
-import {
-  selectCurrentUserStats,
-  selectUserAvatar,
-  selectUserName,
-} from "feature/user/store/userSlice";
 import { convertMsToHM } from "helpers/timeConverter";
-import LandingLayout from "layouts/ProfileLayout";
-import { LandingNavProps } from "layouts/ProfileLayout/components/LandingNav";
 import { StatisticProps } from "layouts/ProfileLayout/components/Statistic";
-import { achievements as achievementsData } from "data/achievements";
+import ProfileLayout from "layouts/ProfileLayout/ProfileLayout";
 import {
   FaCalendarDay,
   FaClock,
@@ -18,14 +11,33 @@ import {
   FaStar,
   FaStarHalf,
 } from "react-icons/fa";
-import { useAppSelector } from "store/hooks";
+import { achievements as achievementsData } from "data/achievements";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
 
-const LandingView = () => {
+const ProfileView = () => {
   const { t } = useTranslation("profile");
-  const userStats = useAppSelector(selectCurrentUserStats);
-  const userName = useAppSelector(selectUserName);
-  const userAvatar = useAppSelector(selectUserAvatar);
+  const userStats: StatisticsDataInterface = {
+    time: {
+      technique: 0,
+      theory: 0,
+      hearing: 0,
+      creativity: 0,
+      longestSession: 0,
+    },
+    lvl: 1,
+    points: 25,
+    pointsToNextLvl: 35,
+    sessionCount: 0,
+    habitsCount: 0,
+    dayWithoutBreak: 0,
+    maxPoints: 0,
+    achievements: ["time_1", "time_2", "time_3"],
+    actualDayWithoutBreak: 0,
+    lastReportDate: "",
+  };
+  const userName = "placeholder";
+  const userAvatar = undefined;
   const {
     points,
     sessionCount,
@@ -81,37 +93,14 @@ const LandingView = () => {
     },
   ];
 
-  const navigation: LandingNavProps = {
-    leftSideLinks: [
-      {
-        name: t("nav.report"),
-        href: "/report",
-      },
-      {
-        name: t("nav.exercise"),
-        href: "/timer",
-      },
-    ],
-    rightSideLinks: [
-      {
-        name: t("nav.leadboard"),
-        href: "/leaderboard",
-      },
-      {
-        name: t("nav.faq"),
-        href: "/faq",
-      },
-    ],
-  };
   return (
-    <LandingLayout
+    <ProfileLayout
       statistics={statistics}
-      navigation={navigation}
-      userStats={userStats!}
+      userStats={userStats}
       userName={userName!}
       userAvatar={userAvatar}
     />
   );
 };
 
-export default LandingView;
+export default ProfileView;
