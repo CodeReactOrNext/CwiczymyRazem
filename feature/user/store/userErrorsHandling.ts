@@ -1,59 +1,59 @@
 import { SerializedError } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+import i18n from "i18next";
 
 export const loginViaEmailErrorHandler = (error: SerializedError) => {
   if (error.code === "auth/wrong-password") {
-    toast.error("Błędne hasło");
+    toast.error(i18n.t("toast:errors.password"));
     return;
   }
   if (error.code === "auth/user-not-found") {
-    toast.error("Błędny adres e-mail");
+    toast.error(i18n.t("toast:errors.email"));
     return;
   }
   if (error.code === "auth/timeout") {
-    toast.error("Nie udało się zalogować - błąd połączenia");
+    toast.error(i18n.t("toast:errors.timeout"));
     return;
   }
   if (error.code === "auth/email-already-in-use") {
-    toast.error("Podany e-mail jest już używany");
+    toast.error(i18n.t("toast:errors.email_already-in-use"));
     return;
   }
-  toast.error("Nie udało się zalogować");
+  toast.error(i18n.t("toast:errors.login"));
 };
 
 export const loginViaGoogleErrorHandler = (error: SerializedError) => {
   if (error.code === "auth/popup-closed-by-user") {
-    toast.error("Nie udało się zalogować - zamknięto okno logowania ");
+    toast.error(i18n.t("toast:errors.popup_closed_by_user"));
     return;
   }
   if (error.code === "auth/timeout") {
-    toast.error("Nie udało się zalogować - błąd połączenia");
+    toast.error(i18n.t("toast:errors.timeout"));
     return;
   }
-  toast.error("Nie udało się zalogować");
+  toast.error(i18n.t("toast:errors.login"));
 };
 
 export const createAccountErrorHandler = (error: SerializedError) => {
   if (error.code === "auth/credential-already-in-use") {
-    toast.error("Podane dane są już używane");
+    toast.error(i18n.t("toast:errors.credential_already_in_use"));
     return;
   }
   if (error.code === "auth/email-already-in-use") {
-    toast.error("Podany e-mail jest już używany");
+    toast.error(i18n.t("toast:errors.email_already-in-use"));
     return;
   }
   if (error.code === "auth/timeout") {
-    toast.error("Nie udało się zalogować - błąd połączenia");
+    toast.error(i18n.t("toast:errors.timeout"));
     return;
   }
-  toast.error("Nie udało się zarejestrować");
+  toast.error(i18n.t("toast:errors.singup"));
 };
 
 export const udpateDataErrorHandler = () => {
-  toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+  toast.error(i18n.t("toast:errors.upadate"));
 };
 
-
 export const avatarErrorHandler = () => {
-  toast.error("Awatar może mieć maksymalnie 250px na 250px.");
-}
+  toast.error(i18n.t("toast:errors.avatar_max"));
+};
