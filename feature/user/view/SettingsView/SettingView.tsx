@@ -145,7 +145,6 @@ const SettingsView = () => {
                   }
                 }}>
                 <div className='flex flex-col'>
-                  {/* TODO change file input language */}
                   <input
                     onChange={(event) => {
                       onImageChangeHandler(event);
