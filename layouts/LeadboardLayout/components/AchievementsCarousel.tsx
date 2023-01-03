@@ -2,7 +2,7 @@ import Achievement from "components/Achievement";
 import ToolTip from "components/ToolTip";
 import {
   AchievementList,
-achievementsData,
+  achievementsData,
 } from "assets/achievements/achievementsData";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -56,7 +56,7 @@ const AchievementsCarousel = ({
         <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
           <ToolTip />
           {achievements.length === 0
-            ? "Brak"
+            ? t("empty")
             : displayItems(index).map((achivId, index) => {
                 return <Achievement key={index} id={achivId} />;
               })}
