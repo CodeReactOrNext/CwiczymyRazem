@@ -1,9 +1,8 @@
 {
-  "rarity": {
-    "common": "Common",
-    "rare": "Rare",
-    "veryRare": "Very Rare"
-  },
+  "common": "Common",
+  "rare": "Rare",
+  "veryRare": "Very Rare",
+
   "time_1": {
     "title": "Hard Work Pays Off",
     "description": "Exceed the 10 hour exercise threshold."
