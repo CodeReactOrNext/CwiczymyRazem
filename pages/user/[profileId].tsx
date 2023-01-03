@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { firebaseGetUserData } from "utils/firebase/firebase.utils";
 
 import ProfileView from "views/ProfileView";
 
@@ -19,5 +20,12 @@ export async function getStaticProps({ locale }: { locale: string }) {
         "achievements",
       ])),
     },
+  };
+}
+
+export async function getStaticPaths() {
+  return {
+    paths: [],
+    fallback: true,
   };
 }
