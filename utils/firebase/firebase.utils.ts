@@ -72,7 +72,8 @@ export const firebaseCreateAccountWithEmail = (
 ) => createUserWithEmailAndPassword(auth, email, password);
 
 export const firebaseCreateUserDocumentFromAuth = async (userAuth: User) => {
-  const userDocRef = doc(db, "users", userAuth.uid);
+  const encodedUid = encodeUid(userAuth.uid);
+  const userDocRef = doc(db, "users", encodedUid);
   const userSnapshot = await getDoc(userDocRef);
   if (!userSnapshot.exists()) {
     const { displayName } = userAuth;
@@ -87,7 +88,7 @@ export const firebaseCreateUserDocumentFromAuth = async (userAuth: User) => {
       console.log(error);
     }
   }
-  return userAuth.uid;
+  return encodedUid;
 };
 
 export const firebaseLogUserOut = async () => {
@@ -126,7 +127,7 @@ export const firebaseGetUserName = async (userAuth: string) => {
 };
 
 export const firebaseGetUserAvatarURL = async () => {
-  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  const userDocRef = doc(db, "users", encodeUid(auth.currentUser?.uid!));
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.avatar;
 };
@@ -197,12 +198,14 @@ export const firebaseUpdateUserPassword = async (newPassword: string) => {
 
 export const firebaseGetUsersExceriseRaport = async () => {
   const usersDocRef = await getDocs(collection(db, "users"));
-  const userStatsArr: FirebaseUserDataInterface[] = [];
+
+  const usersDataArr: FirebaseUserDataInterface[] = [];
   usersDocRef.forEach((doc) => {
-    const currentUserStats = doc.data() as FirebaseUserDataInterface;
-    userStatsArr.push(currentUserStats);
+    let currentUserData = doc.data() as FirebaseUserDataInterface;
+    currentUserData.profileId = doc.id;
+    usersDataArr.push(currentUserData);
   });
-  return userStatsArr;
+  return usersDataArr;
 };
 
 export const firebaseGetUserProviderData = async () => {
@@ -251,6 +254,6 @@ export const firebaseUpdateUserDocument = async (
   key: string,
   value: string
 ) => {
-  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  const userDocRef = doc(db, "users", encodeUid(auth.currentUser?.uid!));
   await updateDoc(userDocRef, { [key]: value });
 };
