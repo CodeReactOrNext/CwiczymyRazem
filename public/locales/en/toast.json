@@ -1,0 +1,21 @@
+{
+  "errors": {
+    "password": "Wrong password",
+    "email": "Invalid email address",
+    "timeout": "Failed to log in - time expired",
+    "email_already-in-use": "The email address is already in use",
+    "login": "Failed to log in",
+    "popup_closed_by_user": "Failed to log in - login window closed",
+    "credential_already_in_use": "The provided credentials are already in use",
+    "singup": "Failed to sign up",
+    "upadate": "Failed to update data. Please try again.",
+    "avatar_max": "Avatar can be a maximum of 250px by 250px."
+  },
+
+  "toast": {
+    "update_email": "Email updated",
+    "update_password": "Password updated",
+    "update_avatar ": "Avatar updated",
+    "new_user_tip": "Check out the FAQ to learn how to use 'Ćwiczymy Razem'"
+  }
+}

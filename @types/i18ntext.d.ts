@@ -20,7 +20,7 @@ import type achievements from "../public/locales/en/achievements.json";
 import type not_found from "../public/locales/en/404.json";
 import type yup_errors from "../public/locales/en/yup_errors.json";
 import type settings from "../public/locales/en/settings.json";
-
+import type toast from "../public/locales/en/toast.json";
 interface I18nNamespaces {
   common: typeof common;
   profile: typeof profile;
@@ -35,6 +35,7 @@ interface I18nNamespaces {
   yup_errors: typeof yup_errors;
   settings: typeof settings;
   timer: typeof timer;
+  toast: typeof toast;
 }
 
 declare module "i18next" {
