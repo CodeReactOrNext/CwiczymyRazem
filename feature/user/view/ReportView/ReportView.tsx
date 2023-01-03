@@ -178,9 +178,9 @@ const ReportView = () => {
                   <Checkbox
                     name='recording'
                     questionMarkProps={{
-                      description: t("habits.recording.title"),
+                      description: t("habits.recording.description"),
                     }}
-                    title={t("habits.recording.description")}
+                    title={t("habits.recording.title")}
                   />
                 </ReportCategoryLayout>
                 <div className='flex flex-col items-center justify-self-center md:col-span-2 lg:col-span-1 xl:col-span-2'>

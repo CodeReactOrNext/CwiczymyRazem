@@ -42,6 +42,7 @@ declare module "i18next" {
   interface CustomTypeOptions {
     defaultNS: "common";
     achievements: "achievements";
+    toast: "toast";
     resources: I18nNamespaces;
   }
 }
