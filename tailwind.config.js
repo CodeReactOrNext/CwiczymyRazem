@@ -182,6 +182,7 @@ module.exports = {
           800: "#920020",
           900: "#7d001c",
         },
+        googleButtonText: { DEFAULT: "#555555" },
       },
     },
     fontFamily: {
