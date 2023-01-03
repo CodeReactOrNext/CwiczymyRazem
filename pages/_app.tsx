@@ -25,7 +25,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name='keywords' content='ćwiczenie, gitara' />
       </Head>
       <Component {...pageProps} />
-      <ToastContainer toastClassName={"toastify-custom"} />
+      <ToastContainer toastClassName={"toastify-custom"}  />
     </Provider>
   );
 }
