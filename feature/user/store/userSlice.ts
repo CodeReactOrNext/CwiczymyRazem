@@ -342,6 +342,14 @@ export const userSlice = createSlice({
           state.userInfo = action.payload.userInfo;
           state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
+          if (action.payload.currentUserStats.points === 0) {
+            toast.info(
+              'Zerknij do FAQ żeby dowiedzieć się jak używać "Ćwiczymy Razem"',
+              {
+                autoClose: 10000,
+              }
+            );
+          }
         }
       );
   },

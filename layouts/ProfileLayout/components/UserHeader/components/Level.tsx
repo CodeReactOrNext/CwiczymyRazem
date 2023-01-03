@@ -11,9 +11,10 @@ export const Level = ({
   lvl,
   pointsToNextLvl,
 }: LevelInterfaceProps) => {
-  const { t } = useTranslation("landing");
+  const { t } = useTranslation("profile");
+  const progressPercent = (points / pointsToNextLvl) * 100;
   return (
-    <div className='col-span-2 flex flex-col items-center md:col-auto lg:w-64 lg:justify-self-end xl:w-80'>
+    <div className='col-span-2 flex w-[90%] flex-col items-center text-tertiary md:col-auto lg:w-64 lg:justify-self-end xl:w-80'>
       <p>
         {t("your_level")} <span className='text-4xl text-mainText'>{lvl}</span>
       </p>
@@ -23,7 +24,9 @@ export const Level = ({
           <span className='text-xl text-mainText'>{lvl}</span>
         </p>
         <div className='relative flex h-4 w-full items-center bg-main-opposed'>
-          <div className='relative h-5 w-[20%] bg-main'></div>
+          <div
+            className='relative h-5 bg-main'
+            style={{ width: progressPercent + "%" }}></div>
         </div>
         <p className='relative right-3 text-sm'>
           {t("lvl_short")}

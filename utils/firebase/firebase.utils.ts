@@ -38,6 +38,7 @@ import {
 } from "./userStatisticsInitialData";
 import { decodeUid } from "helpers/decodeUid";
 import { encodeUid } from "helpers/encodeUid";
+import { toast } from "react-toastify";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
@@ -244,7 +245,6 @@ export const firebaseUploadAvatar = async (image: Blob) => {
   const imageRef = ref(storage, `avatars/${encodeUid(auth.currentUser?.uid!)}`);
   const data = await uploadBytes(imageRef, image);
   const fullPath = data.metadata.fullPath;
-  console.log("Image Uploaded");
   const avatarRef = ref(storage, fullPath);
   const avatarUrl = await getDownloadURL(avatarRef);
   await firebaseUpdateUserDocument("avatar", avatarUrl);
