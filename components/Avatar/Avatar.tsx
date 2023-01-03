@@ -4,8 +4,10 @@ import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 interface AvatarProps {
   name: string;
   lvl: number;
+  avatarURL?: string;
 }
-const Avatar = ({ name, lvl }: AvatarProps) => {
+
+const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
   const getRankImgPath = () => {
     if (lvl >= IMG_RANKS_NUMBER) {
       return IMG_RANKS_NUMBER;
@@ -14,8 +16,12 @@ const Avatar = ({ name, lvl }: AvatarProps) => {
   };
   return (
     <div className='relative'>
-      <div className='flex  h-20 w-20 items-center justify-center bg-tertiary-400'>
-        <p className='text-5xl uppercase text-main-opposed'>{name?.[0]}</p>
+      <div className='flex h-20 w-20 items-center justify-center bg-tertiary-400'>
+        {avatarURL ? (
+          <img className='h-full w-full' src={avatarURL} alt={name} />
+        ) : (
+          <p className='text-5xl uppercase text-main-opposed'>{name?.[0]}</p>
+        )}
       </div>
       <img
         className='absolute bottom-[18px] left-[35px] -rotate-90'

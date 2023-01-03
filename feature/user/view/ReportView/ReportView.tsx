@@ -58,8 +58,8 @@ const ReportView = () => {
     theoryMinutes: theoryTime.minutes,
     hearingHours: hearingTime.hours,
     hearingMinutes: hearingTime.minutes,
-    creativeHours: creativityTime.hours,
-    creativeMinutes: creativityTime.minutes,
+    creativityHours: creativityTime.hours,
+    creativityMinutes: creativityTime.minutes,
     habbits: [],
   };
 
@@ -67,27 +67,27 @@ const ReportView = () => {
     const { sumTime } = convertInputTime(inputData);
 
     if (sumTime >= 86400000) {
-      toast.error("Nie da się ćwiczyć więcej niż 24 godziny dziennie");
+      toast.error(t("toast.24h_error"));
       return;
     }
     if (sumTime === 0) {
-      toast.error("Wpisz czas");
+      toast.error(t("toast.input_time"));
       return;
     }
     if (!userAuth) {
-      toast.error("Nie jesteś zalogowany");
+      toast.error(t("toast.not_logged"));
       return;
     }
 
     dispatch(updateUserStats({ userAuth, inputData })).then(() => {
       setRatingSummaryVisible(true);
-      toast.success("Poprawnie zraportowano");
+      toast.success(t("toast.report_success"));
     });
   };
 
   useEffect(() => {
     if (sumTime) {
-      toast.info("Wprowadzono czas ze stopera");
+      toast.info(t("toast.stoper_entered"));
     }
   }, [sumTime]);
 
@@ -108,7 +108,7 @@ const ReportView = () => {
                       errors={errors}
                       title={t("technique")}
                       questionMarkProps={{
-                        description: "Technika",
+                        description: t("description.technique"),
                       }}
                       Icon={IoMdHand}
                       hoursName={"techniqueHours"}
@@ -118,7 +118,7 @@ const ReportView = () => {
                       errors={errors}
                       title={t("theory")}
                       questionMarkProps={{
-                        description: "Teoria",
+                        description: t("description.theory"),
                       }}
                       Icon={MdSchool}
                       hoursName={"theoryHours"}
@@ -127,18 +127,22 @@ const ReportView = () => {
                     <TimeInputBox
                       errors={errors}
                       title={t("hearing")}
-                      questionMarkProps={{ description: "Słuch" }}
+                      questionMarkProps={{
+                        description: t("description.hearing"),
+                      }}
                       Icon={FaMusic}
                       hoursName={"hearingHours"}
                       minutesName={"hearingMinutes"}
                     />
                     <TimeInputBox
                       errors={errors}
-                      title={t("creative")}
-                      questionMarkProps={{ description: "Kreatywność" }}
+                      title={t("creativity")}
+                      questionMarkProps={{
+                        description: t("description.creative"),
+                      }}
                       Icon={FaBrain}
-                      hoursName={"creativeHours"}
-                      minutesName={"creativeMinutes"}
+                      hoursName={"creativityHours"}
+                      minutesName={"creativityMinutes"}
                     />
                   </div>
                 </ReportCategoryLayout>
@@ -146,37 +150,37 @@ const ReportView = () => {
                   <Checkbox
                     name='exercise_plan'
                     questionMarkProps={{
-                      description: "...",
+                      description: t("habits.exercise_plan.description"),
                     }}
-                    title={t("exercise_plan")}
+                    title={t("habits.exercise_plan.title")}
                   />
                   <Checkbox
                     name='new_things'
                     questionMarkProps={{
-                      description: "...",
+                      description: t("habits.new_things.description"),
                     }}
-                    title={t("new_things")}
+                    title={t("habits.new_things.title")}
                   />
                   <Checkbox
                     name='warmup'
                     questionMarkProps={{
-                      description: "...",
+                      description: t("habits.warmup.description"),
                     }}
-                    title={t("warmup")}
+                    title={t("habits.warmup.title")}
                   />
                   <Checkbox
                     name='metronome'
                     questionMarkProps={{
-                      description: "...",
+                      description: t("habits.metronome.description"),
                     }}
-                    title={t("metronome")}
+                    title={t("habits.metronome.title")}
                   />
                   <Checkbox
                     name='recording'
                     questionMarkProps={{
-                      description: "...",
+                      description: t("habits.recording.description"),
                     }}
-                    title={t("recording")}
+                    title={t("habits.recording.title")}
                   />
                 </ReportCategoryLayout>
                 <div className='flex flex-col items-center justify-self-center md:col-span-2 lg:col-span-1 xl:col-span-2'>

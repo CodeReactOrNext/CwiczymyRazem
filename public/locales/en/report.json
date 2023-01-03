@@ -4,14 +4,44 @@
   "technique": "Technique",
   "theory": "Theory",
   "hearing": "Hearing",
-  "creative": "Creative work",
+  "creativity": "Creative work",
   "healthy_habits_title": "Healthy habits",
-  "exercise_plan": "Completed exercise plan?",
-  "new_things": "Practiced new things?",
-  "warmup": "Performed warmup?",
-  "metronome": "Used metronome?",
-  "recording": "Recorded yourself?",
   "report_button": "Report",
+  "toast": {
+    "24h_error": "It is not possible to exercise more than 24 hours per day",
+    "input_time": "Enter time",
+    "not_logged": "You are not logged in",
+    "report_success": "Reported successfully",
+    "stoper_entered": "Time from stopwatch entered"
+  },
+  "description": {
+    "technique": "E.g. playing and learning songs, warming up, practicing rhythm and various techniques such as alternate picking or legato",
+    "hearing": "E.g. playing or listening to songs or fragments of them by ear, listening and identifying intervals, singing",
+    "theory": "E.g. transcribing and analyzing songs, learning notes on the fretboard, reading sheet music",
+    "creative": "E.g. writing original songs, improvising, working on one's own style"
+  },  "habits": {
+    "exercise_plan": {
+      "title": "Did you fulfill your exercise plan?",
+      "description": "Setting goals and planning your guitar practice is important because it helps maintain motivation, track progress, and achieve desired goals."
+    },
+    "new_things": {
+      "title": "Did you practice new things?",
+      "description": "Practicing new things on the guitar is important for several reasons. First, it helps develop new skills and improve existing ones. By tackling new challenges, you can try to become a better musician and expand your abilities. Practicing new things can also help keep your interest in playing and add variety."
+    },
+    "warmup": {
+      "title": "Did you warm up?",
+      "description": "A warm up helps prepare your muscles and joints for the physical demands of playing. This can help reduce the risk of injury and make your practice sessions more comfortable. A warm up can also help improve technique and accuracy by getting your fingers and muscles working properly."
+    },
+    "metronome": {
+      "title": "Did you use a metronome?",
+      "description": "Using a metronome can help improve your sense of timing and rhythm. By practicing with a metronome, you can learn to play in time with a consistent beat and develop a more solid rhythmic foundation."
+    },
+    "recording": {
+      "title": "Did you record yourself?",
+      "description": "Recording yourself allows you to see and hear your playing from a different perspective than when you play live. This can help you notice mistakes or weaknesses that you might have missed. "
+    }
+  },
+  
   "rating_popup": {
     "title": "YOU GOT",
     "points": "pts",

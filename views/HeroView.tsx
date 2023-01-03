@@ -4,19 +4,16 @@ import MainLayout from "layouts/MainLayout";
 import { useTranslation } from "react-i18next";
 
 const HeroView = () => {
-  const { t } = useTranslation(["common", "footer", "landing"]);
+  const { t } = useTranslation(["common", "footer", "profile"]);
 
   return (
-    <MainLayout variant={"landing"} subtitle={t("landing:subtitlebar_text")}>
-      <HeroLayout
-        buttonOnClick={() => {
-          console.log("Here should be onclick");
-        }}>
+    <MainLayout variant={"landing"} subtitle={t("profile:subtitlebar_text")}>
+      <HeroLayout buttonOnClick={() => {}}>
         <>
-          <p>{t("landing:hero_line_1")}</p>
-          <p>{t("landing:hero_line_2")}</p>
-          <p>{t("landing:hero_line_3")}</p>
-          <p>{t("landing:hero_line_4")}</p>
+          <p>{t("profile:hero_line_1")}</p>
+          <p>{t("profile:hero_line_2")}</p>
+          <p>{t("profile:hero_line_3")}</p>
+          <p>{t("profile:hero_line_4")}</p>
         </>
       </HeroLayout>
       <Footer>
