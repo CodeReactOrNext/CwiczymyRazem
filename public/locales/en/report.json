@@ -6,12 +6,42 @@
   "hearing": "Hearing",
   "creativity": "Creative work",
   "healthy_habits_title": "Healthy habits",
-  "exercise_plan": "Completed exercise plan?",
-  "new_things": "Practiced new things?",
-  "warmup": "Performed warmup?",
-  "metronome": "Used metronome?",
-  "recording": "Recorded yourself?",
   "report_button": "Report",
+  "toast": {
+    "24h_error": "It is not possible to exercise more than 24 hours per day",
+    "input_time": "Enter time",
+    "not_logged": "You are not logged in",
+    "report_success": "Reported successfully",
+    "stoper_entered": "Time from stopwatch entered"
+  },
+  "description": {
+    "technique": "E.g. playing and learning songs, warming up, practicing rhythm and various techniques such as alternate picking or legato",
+    "hearing": "E.g. playing or listening to songs or fragments of them by ear, listening and identifying intervals, singing",
+    "theory": "E.g. transcribing and analyzing songs, learning notes on the fretboard, reading sheet music",
+    "creative": "E.g. writing original songs, improvising, working on one's own style"
+  },
+  "habits": {
+    "exercise_plan": {
+      "title": "Zrealizowałeś swój plan ćwiczeń?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+    },
+    "new_things": {
+      "title": "Ćwiczyłeś nowe rzeczy?",
+      "description": " Ćwiczenie nowych rzeczy na gitarze jest ważne z kilku powodów. Po pierwsze, pomaga to rozwijać nowe umiejętności i poprawiać już posiadane. Poprzez podejmowanie nowych wyzwań, możesz próbować stać się lepszym muzykiem i rozszerzyć swoje możliwości. Ćwiczenie nowych rzeczy może też pomóc Ci utrzymać zainteresowanie graniem i urozmaicić je."
+    },
+    "warmup": {
+      "title": "Wykonałeś rozgrzewkę?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+    },
+    "metronome": {
+      "title": "Używałeś metronom?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+    },
+    "recording": {
+      "title": "Nagrywałeś się?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+    }
+  },
   "rating_popup": {
     "title": "YOU GOT",
     "points": "pts",

@@ -10,6 +10,7 @@
     "singup": "Failed to sign up",
     "upadate": "Failed to update data. Please try again.",
     "avatar_max": "Avatar can be a maximum of 250px by 250px."
+    
   },
 
   "toast": {
