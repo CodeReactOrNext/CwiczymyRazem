@@ -1,5 +1,7 @@
 import Avatar from "components/Avatar";
 import { convertMsToHM } from "helpers/timeConverter";
+import Link from "next/link";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import Carousel from "./AchievementsCarousel";
@@ -8,6 +10,7 @@ interface LeadboardColumnProps {
   nick: string;
   statistics: StatisticsDataInterface;
   userAvatar?: string;
+  profileId?: string;
 }
 
 const LeadboardRow = ({
@@ -15,6 +18,7 @@ const LeadboardRow = ({
   nick,
   statistics,
   userAvatar,
+  profileId,
 }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
@@ -54,9 +58,11 @@ const LeadboardRow = ({
             </div>
           </div>
           <div className='relative col-span-2 self-center justify-self-start md:col-span-1 '>
-            <p className='whitespace-nowrap text-lg xs:text-2xl lg:text-xl xl:text-2xl'>
-              {shortenNick(nick)}
-            </p>
+            <Link href={`/user/${profileId}`}>
+              <p className='cursor-pointer whitespace-nowrap text-lg xs:text-2xl lg:text-xl xl:text-2xl'>
+                {shortenNick(nick)}
+              </p>
+            </Link>
             <div className='absolute top-[-20px] right-[-60px]  hidden items-center gap-x-1 md:top-[-35px] md:flex'>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
