@@ -18,7 +18,7 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
     <div className='relative'>
       <div className='flex h-20 w-20 items-center justify-center bg-tertiary-400'>
         {avatarURL ? (
-          <img className='h-full w-full' src={avatarURL} alt='avatar' />
+          <img className='h-full w-full' src={avatarURL} alt={name} />
         ) : (
           <p className='text-5xl uppercase text-main-opposed'>{name?.[0]}</p>
         )}
