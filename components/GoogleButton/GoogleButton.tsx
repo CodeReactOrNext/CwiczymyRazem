@@ -1,5 +1,4 @@
 import { selectIsFetching } from "feature/user/store/userSlice";
-import { is } from "immer/dist/internal";
 import { FcGoogle } from "react-icons/fc";
 import { CircleSpinner } from "react-spinners-kit";
 import { useAppSelector } from "store/hooks";

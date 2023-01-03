@@ -36,20 +36,11 @@ interface I18nNamespaces {
   settings: typeof settings;
   timer: typeof timer;
 }
-// interface I18nNamespaces
-//   extends common,
-//     landing,
-//     login,
-//     signup,
-//     footer,
-//     faq,
-//     report {
-//   report: typeof report;
-// }
 
 declare module "i18next" {
   interface CustomTypeOptions {
     defaultNS: "common";
+    achievements: "achievements";
     resources: I18nNamespaces;
   }
 }

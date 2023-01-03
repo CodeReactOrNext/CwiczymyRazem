@@ -1,5 +1,31 @@
 {
-  "common": "Common",
-  "rare": "Rare",
-  "veryRare": "Very Rare"
+  "rarity": {
+    "common": "Common",
+    "rare": "Rare",
+    "veryRare": "Very Rare"
+  },
+  "time_1": {
+    "title": "Hard Work Pays Off",
+    "description": "Exceed the 10 hour exercise threshold."
+  },
+  "time_2": {
+    "title": "Unflinching Determination",
+    "description": "Exceed the 30 hour exercise threshold."
+  },
+  "time_3": {
+    "title": "1% - 10000h rule",
+    "description": "Exceed the 100 hour exercise threshold."
+  },
+  "balance": {
+    "title": "Golden Mean",
+    "description": "Report at least 1 hour from each skill pillar at once."
+  },
+  "fire": {
+    "title": "Guitar Power",
+    "description": "Earn 60 points in one report."
+  },
+  "health_habits": {
+    "title": "Healthy as a Fish",
+    "description": "Achieve all healthy habits in one report."
+  }
 }

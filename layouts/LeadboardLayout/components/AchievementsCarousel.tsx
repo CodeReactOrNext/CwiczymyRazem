@@ -2,14 +2,17 @@ import Achievement from "components/Achievement";
 import ToolTip from "components/ToolTip";
 import {
   AchievementList,
-  achievements as achievementsData,
-} from "data/achievements";
+achievementsData,
+} from "assets/achievements/achievementsData";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
-
-const AchievementsCarousel = ({ achievements }: { achievements: AchievementList[] }) => {
+const AchievementsCarousel = ({
+  achievements,
+}: {
+  achievements: AchievementList[];
+}) => {
   const [index, setIndex] = useState(0);
   const { t } = useTranslation("leadboard");
   const itemsShow = 4;
@@ -51,7 +54,7 @@ const AchievementsCarousel = ({ achievements }: { achievements: AchievementList[
         </button>
 
         <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
-        <ToolTip />
+          <ToolTip />
           {achievements.length === 0
             ? "Brak"
             : displayItems(index).map((achivId, index) => {
