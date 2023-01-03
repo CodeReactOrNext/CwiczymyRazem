@@ -5,7 +5,7 @@ import LandingNav, { LandingNavProps } from "./components/LandingNav";
 import StatisticBar from "./components/StatisticBar";
 import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
 import MobileHeaderWrapper from "./components/UserHeader/MobileHeaderWrapper";
-import Decoration from "./components/Decoration";
+import HeadDecoration from "./components/HeadDecoration";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
 import UserHeader from "./components/UserHeader/UserHeader";
@@ -28,8 +28,7 @@ const LandingLayout = ({
   userName,
   userAvatar,
 }: LandingLayoutProps) => {
-  const { t } = useTranslation("landing");
-
+  const { t } = useTranslation("profile");
   const { time, achievements } = userStats;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
@@ -60,7 +59,7 @@ const LandingLayout = ({
               rightSideLinks={navigation.rightSideLinks}
             />
             <div className='m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
-              <Decoration />
+              <HeadDecoration title={t("statistics")} />
               <div className='grid-cols-2 grid-rows-2  items-center md:grid'>
                 <div className=' order-2 row-span-1 my-5 flex justify-center '>
                   <StatisticBar
