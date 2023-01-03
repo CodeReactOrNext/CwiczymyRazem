@@ -21,7 +21,6 @@ const LeadboardView = () => {
         )
       )
       .catch((error) => {
-        console.log(error);
         toast(t("fetch_error"));
       });
   }, [t]);
