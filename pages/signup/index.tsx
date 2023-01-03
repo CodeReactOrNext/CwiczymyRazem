@@ -22,6 +22,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
         "common",
         "signup",
         "yup_errors",
+        "toast",
       ])),
     },
   };

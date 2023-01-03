@@ -6,7 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import { encodeUid } from "helpers/encodeUid";
-import { toast } from "react-toastify";
+
 import {
   auth,
   firebaseCreateAccountWithEmail,
@@ -28,9 +28,11 @@ import { RootState } from "../../../store/store";
 import { ReportDataInterface } from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 import {
+  avatarErrorHandler,
   createAccountErrorHandler,
   loginViaEmailErrorHandler,
   loginViaGoogleErrorHandler,
+  udpateDataErrorHandler,
 } from "./userErrorsHandling";
 import {
   SkillsType,
@@ -38,6 +40,12 @@ import {
   updateUserStatsProps,
   userSliceInitialState,
 } from "./userSlice.types";
+import {
+  newUserInfo,
+  updateUserAvatarSuccess,
+  updateUserEmailSuccess,
+  updateUserPasswordSuccess,
+} from "./userToast";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -264,15 +272,15 @@ export const userSlice = createSlice({
       })
       .addCase(updateUserStats.rejected, (state) => {
         state.isFetching = null;
-        toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+        udpateDataErrorHandler();
       })
       .addCase(updateDisplayName.rejected, (state) => {
         state.isFetching = null;
-        toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+        udpateDataErrorHandler();
       })
       .addCase(uploadUserAvatar.rejected, (state) => {
         state.isFetching = null;
-        toast.error("Awatar może mieć maksymalnie 250px na 250px.");
+        avatarErrorHandler();
       })
       .addCase(updateUserEmail.rejected, (state, { error }) => {
         state.isFetching = null;
@@ -312,12 +320,12 @@ export const userSlice = createSlice({
         state.providerData = action.payload;
       })
       .addCase(updateUserEmail.fulfilled, (state) => {
-        toast.success("Zmieniono email");
         state.isFetching = null;
+        updateUserEmailSuccess();
       })
       .addCase(updateUserPassword.fulfilled, (state) => {
-        toast.success("Zmieniono hasło");
         state.isFetching = null;
+        updateUserPasswordSuccess();
       })
       .addCase(updateDisplayName.fulfilled, (state, action) => {
         state.isFetching = null;
@@ -328,7 +336,7 @@ export const userSlice = createSlice({
       .addCase(uploadUserAvatar.fulfilled, (state, action) => {
         state.isFetching = null;
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
-        toast.success("Zmieniono awatar");
+        updateUserAvatarSuccess();
       })
       .addMatcher(
         isAnyOf(
@@ -342,14 +350,7 @@ export const userSlice = createSlice({
           state.userInfo = action.payload.userInfo;
           state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
-          if (action.payload.currentUserStats.points === 0) {
-            toast.info(
-              'Zerknij do FAQ żeby dowiedzieć się jak używać "Ćwiczymy Razem"',
-              {
-                autoClose: 10000,
-              }
-            );
-          }
+          newUserInfo(action.payload.currentUserStats.points);
         }
       );
   },

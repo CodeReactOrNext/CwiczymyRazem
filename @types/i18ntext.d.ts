@@ -20,7 +20,7 @@ import type achievements from "../public/locales/en/achievements.json";
 import type not_found from "../public/locales/en/404.json";
 import type yup_errors from "../public/locales/en/yup_errors.json";
 import type settings from "../public/locales/en/settings.json";
-
+import type toast from "../public/locales/en/toast.json";
 interface I18nNamespaces {
   common: typeof common;
   profile: typeof profile;
@@ -35,21 +35,14 @@ interface I18nNamespaces {
   yup_errors: typeof yup_errors;
   settings: typeof settings;
   timer: typeof timer;
+  toast: typeof toast;
 }
-// interface I18nNamespaces
-//   extends common,
-//     landing,
-//     login,
-//     signup,
-//     footer,
-//     faq,
-//     report {
-//   report: typeof report;
-// }
 
 declare module "i18next" {
   interface CustomTypeOptions {
     defaultNS: "common";
+    achievements: "achievements";
+    toast: "toast";
     resources: I18nNamespaces;
   }
 }

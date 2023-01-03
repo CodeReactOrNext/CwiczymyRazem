@@ -1,5 +1,6 @@
+import { CustomTypeOptions, TFuncKey } from "i18next";
+
 import {
-  FaBolt,
   FaHotjar,
   FaThumbsUp,
   FaClock,
@@ -9,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { IconType } from "react-icons/lib";
 import { AchievementsRarityType } from "./achievementsRarity";
+
 export type AchievementList =
   | "time_1"
   | "time_2"
@@ -17,55 +19,54 @@ export type AchievementList =
   | "fire"
   | "health_habits";
 
-export interface AchievementsInterface extends AchievementsRarityType {
+export interface AchievementsDataInterface extends AchievementsRarityType {
   id: AchievementList;
-  name: string;
+  name: TFuncKey<CustomTypeOptions["achievements"]>;
   Icon: IconType;
-  description: string;
+  description: TFuncKey<CustomTypeOptions["achievements"]>;
 }
 
-export const achievements: AchievementsInterface[] = [
+export const achievementsData: AchievementsDataInterface[] = [
   {
     id: "time_1",
-    name: "Dobra Robota!",
+    name: "time_1.title",
     Icon: FaThumbsUp,
     rarity: "common",
-    description: "Przekrocz próg 10 godzin ćwiczeń.",
+    description: "time_1.description",
   },
   {
     id: "time_2",
-    name: "Dobra Robota!",
+    name: "time_2.title",
     Icon: FaClock,
     rarity: "rare",
-    description: "Przekrocz próg 30 godzin ćwiczeń.",
+    description: "time_2.description",
   },
   {
     id: "time_3",
-    name: "1% - 10000h rule",
+    name: "time_3.title",
     Icon: FaHourglass,
     rarity: "veryRare",
-    description: "Przekrocz próg 100 godzin ćwiczeń.",
+    description: "time_3.description",
   },
   {
     id: "balance",
-    name: "Równowaga",
+    name: "balance.title",
     Icon: FaBalanceScale,
     rarity: "rare",
-    description:
-      "Raportuj za jednym razem przynajmniej 1 godzinę z każdego filaru umiejętności",
+    description: "balance.description",
   },
   {
     id: "fire",
-    name: "Ogień!",
+    name: "fire.title",
     Icon: FaHotjar,
     rarity: "veryRare",
-    description: "Zdobądź 60 punktów za jeden raport",
+    description: "fire.description",
   },
   {
     id: "health_habits",
-    name: "Zdrowy jak ryba",
+    name: "health_habits.title",
     Icon: FaHeart,
     rarity: "common",
-    description: "Zrealizuj wszystkie zdrowe nawyki w jednym raporcie",
+    description: "health_habits.description",
   },
 ];

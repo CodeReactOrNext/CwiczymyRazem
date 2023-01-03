@@ -1,11 +1,12 @@
-import { AchievementsInterface } from "data/achievements";
+import { AchievementsDataInterface } from "assets/achievements/achievementsData";
 import { useTranslation } from "react-i18next";
 import { FaMedal } from "react-icons/fa";
 import Achievement from "components/Achievement";
-import { AchievementsRarityType } from "data/achievementsRarity";
+import { AchievementsRarityType } from "assets/achievements/achievementsRarity";
+
 
 export interface AchievementBoxProps extends AchievementsRarityType {
-  achievment: AchievementsInterface[];
+  achievment: AchievementsDataInterface[];
 }
 
 const AchievementBox = ({ achievment, rarity }: AchievementBoxProps) => {

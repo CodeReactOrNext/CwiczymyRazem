@@ -1,9 +1,16 @@
 import ToolTip from "components/ToolTip";
-import { AchievementList, achievements } from "data/achievements";
-import { achievementsRarity } from "data/achievementsRarity";
+import {
+  AchievementList,
+  achievementsData,
+} from "assets/achievements/achievementsData";
+import { achievementsRarity } from "assets/achievements/achievementsRarity";
+import { useTranslation } from "react-i18next";
+
+
 
 const Achievement = ({ id }: { id: AchievementList }) => {
-  const achievementData = achievements.find((achiv) => achiv.id === id);
+  const { t } = useTranslation("achievements");
+  const achievementData = achievementsData.find((achiv) => achiv.id === id);
 
   const { Icon, rarity, description } = achievementData!;
   return (
@@ -12,7 +19,7 @@ const Achievement = ({ id }: { id: AchievementList }) => {
       <Icon
         className='cursor-help drop-shadow-md	'
         color={achievementsRarity[rarity].color}
-        data-tip={description}
+        data-tip={t(description )}
       />
     </>
   );
