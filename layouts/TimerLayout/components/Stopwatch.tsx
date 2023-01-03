@@ -37,14 +37,14 @@ const Stopwatch = ({
           <button
             className='hover:text-mainText active:click-behavior-second'
             onClick={() => stopTimer()}>
-            <FaPause size={25} />
+            <FaPause size={35} />
             {t("pause")}
           </button>
         ) : (
           <button
             className='hover:text-mainText active:click-behavior-second '
             onClick={() => startTimer()}>
-            <FaPlay size={25} /> {t("start")}
+            <FaPlay size={35} /> {t("start")}
           </button>
         )}
       </div>

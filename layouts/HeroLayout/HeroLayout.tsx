@@ -13,7 +13,7 @@ interface HeroProps {
 }
 
 const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
-  const { t } = useTranslation("landing");
+  const { t } = useTranslation("profile");
 
   return (
     <div className='grid h-full w-full grid-cols-1 grid-rows-2 gap-[20%] lg:grid-cols-[4fr_5fr] lg:grid-rows-1'>
