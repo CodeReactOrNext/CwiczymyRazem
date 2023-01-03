@@ -8,7 +8,7 @@
 import "i18next";
 
 import type common from "../public/locales/en/common.json";
-import type landing from "../public/locales/en/landing.json";
+import type profile from "../public/locales/en/profile.json";
 import type login from "../public/locales/en/login.json";
 import type signup from "../public/locales/en/signup.json";
 import type footer from "../public/locales/en/footer.json";
@@ -23,7 +23,7 @@ import type settings from "../public/locales/en/settings.json";
 
 interface I18nNamespaces {
   common: typeof common;
-  landing: typeof landing;
+  profile: typeof profile;
   login: typeof login;
   signup: typeof signup;
   footer: typeof footer;

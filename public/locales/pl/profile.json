@@ -15,6 +15,25 @@
   "ranking_place": "Miejsce w rankingu",
   "hey": "Cześć",
   "lvl_short": "lvl",
-  "your_level": "Twój poziom",
-  "points_short": "pkt"
+  "your_level": "Poziom",
+  "points": "Points",
+  "points_short": "pkt",
+  "profile": "Profil",
+  "statistics": "Statystyki",
+  "stats": {
+    "spent_time": "Łącznie spędziłeś na ćwiczeniach:",
+    "num_sessions": "Liczba sesji:",
+    "num_points": "Punktów:",
+    "num_habbits": "Liczba zdrowych nawyków: ",
+    "num_achievements": "Odznaki:",
+    "longest_session": "Najdłuższa sesja:",
+    "consecutive days": "Ilość dni bez przerwy:",
+    "max_points": "Najwięcej punktów za jeden raport"
+  },
+  "nav": {
+    "exercise": "Ćwicz",
+    "report": "Raportuj",
+    "leadboard": "Leadboard",
+    "faq": "FAQ"
+  }
 }

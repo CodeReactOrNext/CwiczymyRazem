@@ -8,7 +8,6 @@ export const localStorageMiddleware: Middleware =
       result.type.startsWith("user/updateTimerTime") ||
       result.type.startsWith("user/updateUserStats/fulfilled")
     ) {
-      console.log("dupa");
       const state = store.getState().user.timer;
       localStorage.setItem("userSlice.timer", JSON.stringify(state));
     }

@@ -1,0 +1,39 @@
+{
+  "cta_button": "Join us!",
+  "hero_line_1": "Climb up the ranks.",
+  "hero_line_2": "Collect statistics of your exercises.",
+  "hero_line_3": "Get points for your daily exercise.",
+  "hero_line_4": "Join us and motivate yourself to play the guitar!",
+  "subtitlebar_text": "Practice, report, earn points!",
+  "slogan_line_1": "PRACTICE",
+  "slogan_line_2": "TOGETHER",
+  "technique": "Technique",
+  "theory": "Theory",
+  "hearing": "Hearing",
+  "creativity": "Creative work",
+  "earned_points": "You heve got points",
+  "ranking_place": "Place in the ranking",
+  "hey": "Hey",
+  "lvl_short": "lvl",
+  "your_level": "Level",
+  "points": "Points",
+  "points_short": "pt.",
+  "profile": "Profile",
+  "statistics": "Statistics",
+  "stats": {
+    "spent_time": "You have spent a total of:",
+    "num_sessions": "Number of sessions:",
+    "num_points": "Points:",
+    "num_habbits": "Number of healthy habits ",
+    "num_achievements": "Achievements:",
+    "longest_session": "Longest session:",
+    "consecutive days": "Number of consecutive days:",
+    "max_points": "Most points for a single report"
+  },
+  "nav": {
+    "exercise": "Exercise",
+    "report": "Report",
+    "leadboard": "Leadboard",
+    "faq": "FAQ"
+  }
+}
