@@ -12,6 +12,7 @@ const LeadboardLayout = ({ usersData }: LeadboardLayoutProps) => {
       <ul>
         {usersData.map((user, index) => (
           <LeadboardColumn
+            profileId={user.profileId}
             key={index}
             place={index + 1}
             nick={user.displayName}

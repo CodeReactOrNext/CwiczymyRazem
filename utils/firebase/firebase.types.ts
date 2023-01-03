@@ -3,6 +3,7 @@ import { Timestamp } from "firebase/firestore";
 import { StatisticsDataInterface } from "./userStatisticsInitialData";
 
 export interface FirebaseUserDataInterface {
+  profileId: string;
   createdAt: Timestamp;
   displayName: string;
   avatar?: string;
