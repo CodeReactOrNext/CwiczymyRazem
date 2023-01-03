@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FaMedal } from "react-icons/fa";
 import Achievement from "components/Achievement";
 import { AchievementsRarityType } from "assets/achievements/achievementsRarity";
-import { CustomTypeOptions, TFuncKey } from "i18next";
+
 
 export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];

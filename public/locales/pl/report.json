@@ -17,24 +17,24 @@
   },
   "habits": {
     "exercise_plan": {
-      "title": "Did you fulfill your exercise plan?",
-      "description": "Setting goals and planning your guitar practice is important because it helps maintain motivation, track progress, and achieve desired goals."
+      "title": "Zrealizowałeś swój plan ćwiczeń?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
     },
     "new_things": {
-      "title": "Did you practice new things?",
-      "description": "Practicing new things on the guitar is important for several reasons. First, it helps develop new skills and improve existing ones. By tackling new challenges, you can try to become a better musician and expand your abilities. Practicing new things can also help keep your interest in playing and add variety."
+      "title": "Ćwiczyłeś nowe rzeczy?",
+      "description": " Ćwiczenie nowych rzeczy na gitarze jest ważne z kilku powodów. Po pierwsze, pomaga to rozwijać nowe umiejętności i poprawiać już posiadane. Poprzez podejmowanie nowych wyzwań, możesz próbować stać się lepszym muzykiem i rozszerzyć swoje możliwości. Ćwiczenie nowych rzeczy może też pomóc Ci utrzymać zainteresowanie graniem i urozmaicić je."
     },
     "warmup": {
-      "title": "Did you warm up?",
-      "description": "A warm up helps prepare your muscles and joints for the physical demands of playing. This can help reduce the risk of injury and make your practice sessions more comfortable. A warm up can also help improve technique and accuracy by getting your fingers and muscles working properly."
+      "title": "Wykonałeś rozgrzewkę?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
     },
     "metronome": {
-      "title": "Did you use a metronome?",
-      "description": "Using a metronome can help improve your sense of timing and rhythm. By practicing with a metronome, you can learn to play in time with a consistent beat and develop a more solid rhythmic foundation."
+      "title": "Używałeś metronom?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
     },
     "recording": {
-      "title": "Did you record yourself?",
-      "description": "Recording yourself allows you to see and hear your playing from a different perspective than when you play live. This can help you notice mistakes or weaknesses that you might have missed. "
+      "title": "Nagrywałeś się?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
     }
   },
   "description": {
