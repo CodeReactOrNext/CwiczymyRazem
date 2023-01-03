@@ -77,7 +77,6 @@ const SettingsView = () => {
   };
 
   const changeHandler = (name: "login" | "email", data: string) => {
-    console.log("Button is clicked", name);
     if (name === "login") changeNameHandler(data);
     if (name === "email") setReauthFormVisible(true);
   };
