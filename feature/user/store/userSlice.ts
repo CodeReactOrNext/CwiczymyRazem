@@ -5,6 +5,7 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
+import { encodeUid } from "helpers/encodeUid";
 import { toast } from "react-toastify";
 import {
   auth,
@@ -83,7 +84,9 @@ export const autoLogIn = createAsyncThunk(
   async (user: User) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
     const currentUserStats = await firebaseGetUserData(userAuth);
-    const userDoc = await firebaseGetUserDocument(auth.currentUser?.uid!);
+    const userDoc = await firebaseGetUserDocument(
+      encodeUid(auth.currentUser?.uid!)
+    );
     return {
       userInfo: { displayName: userDoc?.displayName, avatar: userDoc?.avatar },
       userAuth,

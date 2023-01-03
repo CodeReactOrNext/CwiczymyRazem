@@ -14,9 +14,29 @@ import {
 import { achievements as achievementsData } from "data/achievements";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/router";
+import { decodeUid } from "helpers/decodeUid";
+import { useEffect, useState } from "react";
+import { firebaseGetUserDocument } from "utils/firebase/firebase.utils";
+import { DocumentData } from "firebase/firestore";
+import PageLoadingSpinner from "components/PageLoadingSpinner";
 
 const ProfileView = () => {
+  const [userData, setUserData] = useState<DocumentData | undefined>(undefined);
   const { t } = useTranslation("profile");
+  const router = useRouter();
+  const { profileId } = router.query;
+
+  useEffect(() => {
+    async function getUserDoc() {
+      const userDoc = await firebaseGetUserDocument(profileId as string);
+      setUserData(userDoc);
+    }
+    if (profileId) {
+      getUserDoc();
+    }
+  }, [profileId]);
+
   const userStats: StatisticsDataInterface = {
     time: {
       technique: 0,
@@ -36,6 +56,7 @@ const ProfileView = () => {
     actualDayWithoutBreak: 0,
     lastReportDate: "",
   };
+
   const userName = "placeholder";
   const userAvatar = undefined;
   const {
@@ -93,13 +114,15 @@ const ProfileView = () => {
     },
   ];
 
-  return (
+  return userData ? (
     <ProfileLayout
       statistics={statistics}
-      userStats={userStats}
-      userName={userName!}
-      userAvatar={userAvatar}
+      userStats={userData?.statistics}
+      userName={userData?.displayName}
+      userAvatar={userData?.avatar}
     />
+  ) : (
+    <PageLoadingSpinner layoutVariant='secondary' />
   );
 };
 
