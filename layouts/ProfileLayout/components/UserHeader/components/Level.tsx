@@ -11,7 +11,7 @@ export const Level = ({
   lvl,
   pointsToNextLvl,
 }: LevelInterfaceProps) => {
-  const { t } = useTranslation("landing");
+  const { t } = useTranslation("profile");
   const progressPercent = (points / pointsToNextLvl) * 100;
   return (
     <div className='col-span-2 flex w-[90%] flex-col items-center text-tertiary md:col-auto lg:w-64 lg:justify-self-end xl:w-80'>

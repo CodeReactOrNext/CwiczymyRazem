@@ -13,8 +13,10 @@ import {
 } from "react-icons/fa";
 import { achievements as achievementsData } from "data/achievements";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { useTranslation } from "react-i18next";
 
 const ProfileView = () => {
+  const { t } = useTranslation("profile");
   const userStats: StatisticsDataInterface = {
     time: {
       technique: 0,
@@ -49,44 +51,44 @@ const ProfileView = () => {
   const statistics: StatisticProps[] = [
     {
       Icon: FaClock,
-      description: "Łącznie spędziłeś na ćwiczeniach: ",
+      description: t("stats.spent_time"),
       value: convertMsToHM(
         time.technique + time.theory + time.creativity + time.hearing
       ),
     },
     {
       Icon: FaGuitar,
-      description: "Liczba sesji: ",
+      description: t("stats.num_sessions"),
       value: sessionCount,
     },
     {
       Icon: FaStar,
-      description: "Punktów: ",
+      description: t("stats.num_points"),
       value: points,
     },
     {
       Icon: FaHeart,
-      description: "Liczba zdrowych nawyków: ",
+      description: t("stats.num_habbits"),
       value: habitsCount,
     },
     {
       Icon: FaMedal,
-      description: "Odznaki: ",
+      description: t("stats.num_achievements"),
       value: achievements.length + "/" + achievementsData.length,
     },
     {
       Icon: FaDumbbell,
-      description: "Najdłuższa sesja: ",
+      description: t("stats.longest_session"),
       value: convertMsToHM(time.longestSession),
     },
     {
       Icon: FaCalendarDay,
-      description: "Ilość dni bez przerwy: ",
+      description: t("stats.consecutive days"),
       value: dayWithoutBreak,
     },
     {
       Icon: FaStarHalf,
-      description: "Najwięcej punktów za jeden raport: ",
+      description: t("stats.max_points"),
       value: maxPoints,
     },
   ];
