@@ -122,7 +122,7 @@ const SettingsView = () => {
       img.onload = () => {
         if (img.naturalHeight > 250 || img.naturalWidth > 250) {
           setAvatarIsValid(false);
-          toast.error("Awatar może mieć maksymalnie 250px na 250px.");
+          toast.error(t("settings:toasts.avatar_too_big"));
         } else {
           setAvatarIsValid(true);
         }
@@ -132,7 +132,7 @@ const SettingsView = () => {
 
   return (
     <>
-      <MainLayout subtitle='Edytuj Profil' variant='primary'>
+      <MainLayout subtitle={t("settings:settings_subtilte")} variant='primary'>
         <div className='flex max-w-[800px] flex-col p-6'>
           <div className='flex flex-row gap-2 p-4  text-2xl'>
             <Avatar avatarURL={userAvatar} name={userName!} lvl={28} />
@@ -154,6 +154,7 @@ const SettingsView = () => {
                     name='avatar'
                     required
                     accept='image/png, image/jpeg'
+                    className='hid'
                   />
                   <p>(250px/250px)</p>
                 </div>
@@ -165,7 +166,7 @@ const SettingsView = () => {
                   </Button>
                 ) : (
                   <Button disabled={!avatarIsValid} type='submit'>
-                    Zapisz
+                    {t("settings:save")}
                   </Button>
                 )}
               </form>
@@ -174,7 +175,7 @@ const SettingsView = () => {
               <button
                 onClick={showAvatarInputHandler}
                 className='text-lg text-main'>
-                Edytuj
+                {t("settings:edit")}
               </button>
             )}
           </div>
@@ -188,14 +189,14 @@ const SettingsView = () => {
                 <>
                   <div className='flex flex-col'>
                     <div className='flex flex-row gap-2 p-4 text-2xl'>
-                      <p className='text-tertiary'>Nick:</p>
+                      <p className='text-tertiary'>{t("settings:nickname")}</p>
                       <p>{userName}</p>
                       {!nameInputVisible && (
                         <button
                           type='button'
                           onClick={showNameInputHandler}
                           className='text-lg text-main'>
-                          Edytuj
+                          {t("settings:edit")}
                         </button>
                       )}
                     </div>
@@ -203,7 +204,7 @@ const SettingsView = () => {
                       <div className='flex h-full w-full gap-2 pb-5'>
                         <Input
                           Icon={FaUserAlt}
-                          placeholder={"Nowy nick"}
+                          placeholder={t("settings:new_nickname")}
                           name={"login"}
                         />
                         {isFetching ? (
@@ -219,7 +220,7 @@ const SettingsView = () => {
                               changeHandler("login", values.login);
                             }}
                             type='submit'>
-                            Zapisz
+                            {t("settings:save")}
                           </Button>
                         )}
                       </div>
@@ -235,17 +236,17 @@ const SettingsView = () => {
                           type='button'
                           onClick={showEmailInputHandler}
                           className='text-lg text-main'>
-                          Edytuj
+                          {t("settings:edit")}
                         </button>
                       ) : (
-                        "Zalogowano z Google"
+                        t("settings:logged_in_via_google")
                       )}
                     </div>
                     {emailInputVisible && (
                       <div className='flex h-full w-full gap-2 pb-5'>
                         <Input
                           Icon={FaUserAlt}
-                          placeholder={"Nowy email"}
+                          placeholder={t("settings:new_email")}
                           name={"email"}
                         />
                         {isFetching ? (
@@ -260,44 +261,42 @@ const SettingsView = () => {
                             onClick={() => {
                               if (values.email && !errors.email) {
                                 setNewEmail(values.email);
-                                toast.info(
-                                  "Do zmiany danych musisz się ponownie zalogować."
-                                );
+                                toast.info(t("settings:toasts.log_in_again"));
                                 setReauthFormVisible(true);
                               }
                             }}
                             type='submit'>
-                            Zapisz
+                            {t("settings:save")}
                           </Button>
                         )}
                       </div>
                     )}
                     <hr className='border-main-opposed-400' />
                     <div className='flex  flex-row gap-2 p-4 text-2xl'>
-                      <p className='text-tertiary'>Hasło</p>
+                      <p className='text-tertiary'>{t("settings:password")}</p>
                       {userProviderData?.providerId !== "google.com" ? (
                         <button
                           onClick={showPasswordInputHandler}
                           type='button'
                           className='text-lg text-main'>
-                          Edytuj
+                          {t("settings:edit")}
                         </button>
                       ) : (
-                        "Zalogowano z Google"
+                        t("settings:logged_in_via_google")
                       )}
                     </div>
                     {passwordInputVisible && (
                       <div className='flex h-full w-full gap-2 pb-5'>
                         <Input
                           Icon={FaUserAlt}
-                          placeholder={"Nowe hasło"}
-                          name={"password"}
+                          placeholder={t("settings:new_password")}
+                          name='password'
                           type='password'
                         />
                         <Input
                           Icon={FaUserAlt}
-                          placeholder={"Powtórz nowe hasło"}
-                          name={"repeat_password"}
+                          placeholder={t("settings:repeat_new_password")}
+                          name='repeat_password'
                           type='password'
                         />
                         {isFetching ? (
@@ -322,14 +321,12 @@ const SettingsView = () => {
                                 !errors.repeat_password
                               ) {
                                 setNewPassword(values.password);
-                                toast.info(
-                                  "Do zmiany danych musisz się ponownie zalogować."
-                                );
+                                toast.info(t("settings:toasts.log_in_again"));
                                 setReauthFormVisible(true);
                               }
                             }}
                             type='submit'>
-                            Zapisz
+                            {t("settings:save")}
                           </Button>
                         )}
                       </div>
@@ -341,19 +338,14 @@ const SettingsView = () => {
           </Formik>
           <hr className='border-main-opposed-400' />
           <div className='flex flex-col gap-2  p-4 text-2xl'>
-            <p className='text-tertiary'>Restart Statystyk</p>
-            <p className='text-lg'>
-              Uwaga. Wciśnięcie tego spowoduje restart wszystkich twoich
-              statystyk.
-            </p>
-            <button className='text-lg text-main'>Restartuj</button>
+            <p className='text-tertiary'>{t("settings:reset_stats")}</p>
+            <p className='text-lg'>{t("settings:reset_warning")}</p>
+            <button className='text-lg text-main'>{t("settings:reset")}</button>
           </div>
           <hr className='border-main-opposed-400' />
           <div className='flex flex-col gap-2 p-4 text-2xl'>
-            <p className='text-tertiary'>Anonimowość </p>
-            <p className='text-lg'>
-              Czy chcesz aby twój nick pozostał anonimowy w ledbordzie?
-            </p>
+            <p className='text-tertiary'>{t("settings:anonimity")} </p>
+            <p className='text-lg'>{t("settings:anonimity_info")}</p>
           </div>
         </div>
       </MainLayout>
