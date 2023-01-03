@@ -1,4 +1,4 @@
-import { AchievementList } from "data/achievements";
+import { AchievementList } from "assets/achievements/achievementsData";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
@@ -179,7 +179,6 @@ export const firebaseUpdateUserDisplayName = async (
   if (auth.currentUser) {
     updateProfile(auth.currentUser, { displayName: newDisplayName })
       .then(() => {
-        console.log("Updated Name!");
       })
       .catch((error) => console.log(error));
   }

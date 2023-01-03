@@ -4,14 +4,45 @@
   "technique": "Technika",
   "theory": "Teoria",
   "hearing": "Słuch",
-  "creative": "Praca kreatywna",
+  "creativity": "Praca kreatywna",
   "healthy_habits_title": "Zdrowe nawyki",
-  "exercise_plan": "Zrealizowałeś swój plan ćwiczeń?",
-  "new_things": "Ćwiczyłeś nowe rzeczy?",
-  "warmup": "Wykonałeś rozgrzewkę?",
-  "metronome": "Używałeś metronom?",
-  "recording": "Nagrywałeś się?",
+
   "report_button": "Raportuj",
+  "toast": {
+    "24h_error": "Nie da się ćwiczyć więcej niż 24 godziny dziennie",
+    "input_time": "Wpisz czas",
+    "not_logged": "Nie jesteś zalogowany",
+    "report_success": "Poprawnie zraportowano",
+    "stoper_entered": "Wprowadzono czas ze stopera"
+  },
+  "habits": {
+    "exercise_plan": {
+      "title": "Zrealizowałeś swój plan ćwiczeń?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+    },
+    "new_things": {
+      "title": "Ćwiczyłeś nowe rzeczy?",
+      "description": " Ćwiczenie nowych rzeczy na gitarze jest ważne z kilku powodów. Po pierwsze, pomaga to rozwijać nowe umiejętności i poprawiać już posiadane. Poprzez podejmowanie nowych wyzwań, możesz próbować stać się lepszym muzykiem i rozszerzyć swoje możliwości. Ćwiczenie nowych rzeczy może też pomóc Ci utrzymać zainteresowanie graniem i urozmaicić je."
+    },
+    "warmup": {
+      "title": "Wykonałeś rozgrzewkę?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+    },
+    "metronome": {
+      "title": "Używałeś metronom?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+    },
+    "recording": {
+      "title": "Nagrywałeś się?",
+      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+    }
+  },
+  "description": {
+    "technique": "Np. granie i nauka utworów, rozgrzewka, ćwiczenie rytmu oraz różnych technik, takich jak kostkowanie naprzemienne lub legato",
+    "hearing": "Np. odtwarzanie utworów bądź ich fragmentów ze słuchu, słuchanie i wskazywanie interwałów oraz śpiewanie",
+    "theory": "Np. transkrypcja utworów i ich analiza, nauka dźwięków na gryfie, czytanie nut",
+    "creative": "Np. pisanie własnych utworów, improwizacja, praca nad własnym stylem"
+  },
   "rating_popup": {
     "title": "ZDOBYŁEŚ",
     "points": "pkt",

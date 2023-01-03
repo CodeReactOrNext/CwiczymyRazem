@@ -7,7 +7,7 @@ import { convertMsToHM } from "helpers/timeConverter";
 import LandingLayout from "layouts/ProfileLayout";
 import { LandingNavProps } from "layouts/ProfileLayout/components/LandingNav";
 import { StatisticProps } from "layouts/ProfileLayout/components/Statistic";
-import { achievements as achievementsData } from "data/achievements";
+import { achievementsData } from "assets/achievements/achievementsData";
 import {
   FaCalendarDay,
   FaClock,

@@ -1,4 +1,4 @@
-import { AchievementList } from "data/achievements";
+import { AchievementList } from "assets/achievements/achievementsData";
 
 export interface StatisticsTime {
   technique: number;
