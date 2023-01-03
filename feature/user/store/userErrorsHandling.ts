@@ -34,7 +34,6 @@ export const loginViaGoogleErrorHandler = (error: SerializedError) => {
 };
 
 export const createAccountErrorHandler = (error: SerializedError) => {
-  console.log(error);
   if (error.code === "auth/credential-already-in-use") {
     toast.error("Podane dane są już używane");
     return;
@@ -49,3 +48,12 @@ export const createAccountErrorHandler = (error: SerializedError) => {
   }
   toast.error("Nie udało się zarejestrować");
 };
+
+export const udpateDataErrorHandler = () => {
+  toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+};
+
+
+export const avatarErrorHandler = () => {
+  toast.error("Awatar może mieć maksymalnie 250px na 250px.");
+}
