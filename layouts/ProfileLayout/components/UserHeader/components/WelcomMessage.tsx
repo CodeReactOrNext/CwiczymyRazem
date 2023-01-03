@@ -10,7 +10,7 @@ export const WelcomeMessage = ({
   place,
   points,
 }: WelocmeMessageProps) => {
-  const { t } = useTranslation("landing");
+  const { t } = useTranslation("profile");
   return (
     <div className='text:xs xxs:text-base sm:text-2xl md:text-base lg:text-xl xl:text-2xl'>
       <p className=' xs:text-lg md:text-xl lg:text-2xl xl:text-3xl  '>

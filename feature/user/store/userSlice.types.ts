@@ -17,7 +17,7 @@ export interface UserSliceProviderData {
 
 export interface userSliceInitialState {
   userAuth: string | null;
-  userInfo: { displayName: string } | null;
+  userInfo: { displayName?: string; avatar?: string } | null;
   timer: {
     technique: number;
     theory: number;

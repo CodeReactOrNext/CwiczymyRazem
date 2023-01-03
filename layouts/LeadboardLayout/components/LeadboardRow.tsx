@@ -1,18 +1,25 @@
-import Achievement from "components/Achievement";
 import Avatar from "components/Avatar";
-
 import { convertMsToHM } from "helpers/timeConverter";
+import Link from "next/link";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
-import Carousel from "./Carousel";
+import Carousel from "./AchievementsCarousel";
 interface LeadboardColumnProps {
   place: number;
   nick: string;
   statistics: StatisticsDataInterface;
+  userAvatar?: string;
+  profileId?: string;
 }
 
-const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
+const LeadboardRow = ({
+  place,
+  nick,
+  statistics,
+  userAvatar,
+  profileId,
+}: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
 
@@ -34,7 +41,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
       </p>
       <div className=' ml-2 flex w-full max-w-[800px] items-center md:h-16 xl:ml-5 '>
         <div className='hidden md:block'>
-          <Avatar name={nick} lvl={lvl} />
+          <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
         </div>
         <div
           className={`mr-5 grid w-full grid-cols-3 grid-rows-3 justify-items-center  bg-second bg-opacity-75 px-2 md:h-16 md:grid-rows-1
@@ -42,7 +49,7 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
         ${place === 2 ? "bg-slate-400" : ""}
         ${place === 3 ? "bg-yellow-700" : ""}`}>
           <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
-            <Avatar name={nick} lvl={lvl} />
+            <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
             <div className='absolute top-[5px] right-[-60px] flex  items-center gap-x-1 '>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
@@ -51,9 +58,11 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
             </div>
           </div>
           <div className='relative col-span-2 self-center justify-self-start md:col-span-1 '>
-            <p className='whitespace-nowrap text-lg xs:text-2xl lg:text-xl xl:text-2xl'>
-              {shortenNick(nick)}
-            </p>
+            <Link href={`/user/${profileId}`}>
+              <p className='cursor-pointer whitespace-nowrap text-lg xs:text-2xl lg:text-xl xl:text-2xl'>
+                {shortenNick(nick)}
+              </p>
+            </Link>
             <div className='absolute top-[-20px] right-[-60px]  hidden items-center gap-x-1 md:top-[-35px] md:flex'>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
@@ -88,4 +97,4 @@ const LeadboardColumn = ({ place, nick, statistics }: LeadboardColumnProps) => {
   );
 };
 
-export default LeadboardColumn;
+export default LeadboardRow;

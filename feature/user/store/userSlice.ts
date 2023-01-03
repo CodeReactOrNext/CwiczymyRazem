@@ -5,13 +5,14 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
-import { toast } from "react-toastify";
+import { encodeUid } from "helpers/encodeUid";
+
 import {
   auth,
   firebaseCreateAccountWithEmail,
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
-  firebaseGetUserName,
+  firebaseGetUserDocument,
   firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseReauthenticateUser,
@@ -20,15 +21,18 @@ import {
   firebaseUpdateUserDisplayName,
   firebaseUpdateUserEmail,
   firebaseUpdateUserPassword,
+  firebaseUploadAvatar,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
 import { ReportDataInterface } from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 import {
+  avatarErrorHandler,
   createAccountErrorHandler,
   loginViaEmailErrorHandler,
   loginViaGoogleErrorHandler,
+  udpateDataErrorHandler,
 } from "./userErrorsHandling";
 import {
   SkillsType,
@@ -36,6 +40,12 @@ import {
   updateUserStatsProps,
   userSliceInitialState,
 } from "./userSlice.types";
+import {
+  newUserInfo,
+  updateUserAvatarSuccess,
+  updateUserEmailSuccess,
+  updateUserPasswordSuccess,
+} from "./userToast";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -44,12 +54,7 @@ const initialState: userSliceInitialState = {
   previousUserStats: null,
   raitingData: null,
   isFetching: null,
-  timer: {
-    creativity: 0,
-    hearing: 0,
-    technique: 0,
-    theory: 0,
-  },
+  timer: { creativity: 0, hearing: 0, technique: 0, theory: 0 },
   providerData: {
     providerId: null,
     uid: null,
@@ -86,13 +91,15 @@ export const autoLogIn = createAsyncThunk(
   "user/autoLogin",
   async (user: User) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
-    const userWithDisplayName = {
-      ...user,
-      displayName: await firebaseGetUserName(userAuth),
-    };
     const currentUserStats = await firebaseGetUserData(userAuth);
-    const userName = userWithDisplayName.displayName;
-    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
+    const userDoc = await firebaseGetUserDocument(
+      encodeUid(auth.currentUser?.uid!)
+    );
+    return {
+      userInfo: { displayName: userDoc?.displayName, avatar: userDoc?.avatar },
+      userAuth,
+      currentUserStats,
+    };
   }
 );
 
@@ -111,7 +118,7 @@ export const createAccount = createAsyncThunk(
 );
 
 export const updateDisplayName = createAsyncThunk(
-  "user/updateAccount",
+  "user/updateDisplayName",
   async ({ login }: SignUpCredentials) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(
       auth.currentUser!
@@ -129,7 +136,6 @@ export const updateDisplayName = createAsyncThunk(
 export const updateUserEmail = createAsyncThunk(
   "user/updateUserEmail",
   async ({ email, password, newEmail }: updateUserInterface) => {
-    // reauthenticateUser({ email, password } as SignUpCredentials);
     const authState = await firebaseReauthenticateUser({ email, password });
 
     if (newEmail && newEmail.length > 0 && authState) {
@@ -183,6 +189,14 @@ export const updateUserStats = createAsyncThunk(
   }
 );
 
+export const uploadUserAvatar = createAsyncThunk(
+  "user/uploadUserAvatar",
+  async (avatar: Blob) => {
+    const avatarUrl = await firebaseUploadAvatar(avatar);
+    return { avatar: avatarUrl };
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -195,6 +209,22 @@ export const userSlice = createSlice({
     },
     addPracticeData: (state, action) => {
       state.currentUserStats = action.payload;
+    },
+    updateLocalTimer: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{
+        creativity: number;
+        hearing: number;
+        technique: number;
+        theory: number;
+      }>
+    ) => {
+      if (!payload) {
+        return;
+      }
+      state.timer = payload;
     },
     updateTimerTime: (
       state,
@@ -231,12 +261,26 @@ export const userSlice = createSlice({
       .addCase(updateUserEmail.pending, (state) => {
         state.isFetching = "updateData";
       })
+      .addCase(updateDisplayName.pending, (state) => {
+        state.isFetching = "updateData";
+      })
       .addCase(updateUserPassword.pending, (state) => {
+        state.isFetching = "updateData";
+      })
+      .addCase(uploadUserAvatar.pending, (state) => {
         state.isFetching = "updateData";
       })
       .addCase(updateUserStats.rejected, (state) => {
         state.isFetching = null;
-        toast.error("Nie udało się zaktualizować danych. Spróbuj jeszcze raz.");
+        udpateDataErrorHandler();
+      })
+      .addCase(updateDisplayName.rejected, (state) => {
+        state.isFetching = null;
+        udpateDataErrorHandler();
+      })
+      .addCase(uploadUserAvatar.rejected, (state) => {
+        state.isFetching = null;
+        avatarErrorHandler();
       })
       .addCase(updateUserEmail.rejected, (state, { error }) => {
         state.isFetching = null;
@@ -276,18 +320,23 @@ export const userSlice = createSlice({
         state.providerData = action.payload;
       })
       .addCase(updateUserEmail.fulfilled, (state) => {
-        toast.success("Zmieniono email");
         state.isFetching = null;
+        updateUserEmailSuccess();
       })
       .addCase(updateUserPassword.fulfilled, (state) => {
-        toast.success("Zmieniono hasło");
         state.isFetching = null;
+        updateUserPasswordSuccess();
       })
       .addCase(updateDisplayName.fulfilled, (state, action) => {
         state.isFetching = null;
-        state.userInfo = action.payload.userInfo;
+        state.userInfo = { ...state.userInfo, ...action.payload.userInfo };
         state.currentUserStats = action.payload.currentUserStats;
         state.userAuth = action.payload.userAuth;
+      })
+      .addCase(uploadUserAvatar.fulfilled, (state, action) => {
+        state.isFetching = null;
+        state.userInfo = { ...state.userInfo, ...action.payload.avatar };
+        updateUserAvatarSuccess();
       })
       .addMatcher(
         isAnyOf(
@@ -301,12 +350,13 @@ export const userSlice = createSlice({
           state.userInfo = action.payload.userInfo;
           state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
+          newUserInfo(action.payload.currentUserStats.points);
         }
       );
   },
 });
 
-export const { addUserAuth, addUserData, updateTimerTime } =
+export const { addUserAuth, addUserData, updateTimerTime, updateLocalTimer } =
   userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
@@ -319,5 +369,7 @@ export const selectRaitingData = (state: RootState) => state.user.raitingData;
 export const selectTimerData = (state: RootState) => state.user.timer;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
+export const selectUserAvatar = (state: RootState) =>
+  state.user.userInfo?.avatar;
 
 export default userSlice.reducer;

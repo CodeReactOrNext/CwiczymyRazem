@@ -1,8 +1,8 @@
 import {
   AchievementList,
-  achievements,
-  AchievementsInterface,
-} from "data/achievements";
+  achievementsData,
+  AchievementsDataInterface,
+} from "assets/achievements/achievementsData";
 import AchievementBox from "./AchievementBox";
 
 const AchievementWrapper = ({
@@ -11,15 +11,15 @@ const AchievementWrapper = ({
   userAchievements: AchievementList[];
 }) => {
   interface grupedAchievements {
-    common: AchievementsInterface[];
-    rare: AchievementsInterface[];
-    veryRare: AchievementsInterface[];
+    common: AchievementsDataInterface[];
+    rare: AchievementsDataInterface[];
+    veryRare: AchievementsDataInterface[];
   }
 
   const { common, rare, veryRare } =
     userAchievements.reduce<grupedAchievements>(
       ({ common, rare, veryRare }, userAchivId) => {
-        const achievementData = achievements.find(
+        const achievementData = achievementsData.find(
           (achiv) => achiv.id === userAchivId
         );
         switch (achievementData?.rarity) {

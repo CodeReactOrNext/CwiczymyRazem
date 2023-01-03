@@ -1,0 +1,39 @@
+{
+  "cta_button": "Ćwicz z nami!",
+  "hero_line_1": "Pnij się po szczeblach rankingu.",
+  "hero_line_2": "Gromadź statystyki swoich ćwiczeń.",
+  "hero_line_3": "Otrzymuj punkty za swoje codzinne ćwiczenia.",
+  "hero_line_4": "Dołącz do nas i zmotywuj się do grania na gitarze!",
+  "subtitlebar_text": "Ćwicz, raportuj, zdobywaj punkty!",
+  "slogan_line_1": "ĆWICZYMY",
+  "slogan_line_2": "RAZEM",
+  "technique": "Technika",
+  "theory": "Teoria",
+  "hearing": "Słuch",
+  "creativity": "Praca kreatywna",
+  "earned_points": "Zdobyłeś punktów",
+  "ranking_place": "Miejsce w rankingu",
+  "hey": "Cześć",
+  "lvl_short": "lvl",
+  "your_level": "Poziom",
+  "points": "Points",
+  "points_short": "pkt",
+  "profile": "Profil",
+  "statistics": "Statystyki",
+  "stats": {
+    "spent_time": "Łącznie spędziłeś na ćwiczeniach:",
+    "num_sessions": "Liczba sesji:",
+    "num_points": "Punktów:",
+    "num_habbits": "Liczba zdrowych nawyków: ",
+    "num_achievements": "Odznaki:",
+    "longest_session": "Najdłuższa sesja:",
+    "consecutive days": "Ilość dni bez przerwy:",
+    "max_points": "Najwięcej punktów za jeden raport"
+  },
+  "nav": {
+    "exercise": "Ćwicz",
+    "report": "Raportuj",
+    "leadboard": "Leadboard",
+    "faq": "FAQ"
+  }
+}

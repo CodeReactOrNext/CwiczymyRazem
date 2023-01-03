@@ -5,7 +5,7 @@ import LandingNav, { LandingNavProps } from "./components/LandingNav";
 import StatisticBar from "./components/StatisticBar";
 import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
 import MobileHeaderWrapper from "./components/UserHeader/MobileHeaderWrapper";
-import Decoration from "./components/Decoration";
+import HeadDecoration from "./components/HeadDecoration";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
 import UserHeader from "./components/UserHeader/UserHeader";
@@ -18,6 +18,7 @@ interface LandingLayoutProps {
   navigation: LandingNavProps;
   userStats: StatisticsDataInterface;
   userName: string;
+  userAvatar?: string;
 }
 
 const LandingLayout = ({
@@ -25,9 +26,9 @@ const LandingLayout = ({
   navigation,
   userStats,
   userName,
+  userAvatar,
 }: LandingLayoutProps) => {
-  const { t } = useTranslation("landing");
-
+  const { t } = useTranslation("profile");
   const { time, achievements } = userStats;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
@@ -39,10 +40,18 @@ const LandingLayout = ({
           overflow-x-hidden scrollbar-hide`}>
           <Wrapper>
             <DesktopHeaderWrapper>
-              <UserHeader userStats={userStats} userName={userName} />
+              <UserHeader
+                avatar={userAvatar}
+                userStats={userStats}
+                userName={userName}
+              />
             </DesktopHeaderWrapper>
             <MobileHeaderWrapper>
-              <UserHeader userStats={userStats} userName={userName} />
+              <UserHeader
+                avatar={userAvatar}
+                userStats={userStats}
+                userName={userName}
+              />
             </MobileHeaderWrapper>
 
             <LandingNav
@@ -50,7 +59,7 @@ const LandingLayout = ({
               rightSideLinks={navigation.rightSideLinks}
             />
             <div className='m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
-              <Decoration />
+              <HeadDecoration title={t("statistics")} />
               <div className='grid-cols-2 grid-rows-2  items-center md:grid'>
                 <div className=' order-2 row-span-1 my-5 flex justify-center '>
                   <StatisticBar
@@ -69,7 +78,7 @@ const LandingLayout = ({
                     percent={Math.round((time.hearing / totalTime) * 100)}
                   />
                   <StatisticBar
-                    title={t("creative")}
+                    title={t("creativity")}
                     value={convertMsToHM(time.creativity)}
                     percent={Math.round((time.creativity / totalTime) * 100)}
                   />

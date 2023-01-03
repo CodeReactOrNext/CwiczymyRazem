@@ -5,12 +5,12 @@ import {
   getDefaultMiddleware,
 } from "@reduxjs/toolkit";
 import usersSlice from "../feature/user/store/userSlice";
+import { localStorageMiddleware } from "./localStorageMiddleware";
 
 export const store = configureStore({
   reducer: { user: usersSlice },
-  // middleware: getDefaultMiddleware({
-  //   serializableCheck: false,
-  // }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(localStorageMiddleware),
 });
 
 export type AppDispatch = typeof store.dispatch;
