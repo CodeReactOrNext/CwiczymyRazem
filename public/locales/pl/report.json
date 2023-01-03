@@ -26,15 +26,15 @@
     },
     "warmup": {
       "title": "Wykonałeś rozgrzewkę?",
-      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+      "description": "Rozgrzewka pomaga przygotować mięśnie i stawy do wymagań fizycznych związanych z graniem. Może to zmniejszyć ryzyko kontuzji i sprawić, że sesje ćwiczeniowe będą bardziej komfortowe. Rozgrzewka może też poprawić technikę i precyzję, rozruszając palce i mięśnie."
     },
     "metronome": {
       "title": "Używałeś metronom?",
-      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+      "description": "Używanie metronomu może  poprawić Twoje wyczucie rytmu i tempa. Ćwicząc z metronomem, możesz nauczyć się grać zgodnie z rytmem i rozwinąć solidniejsze podstawy rytmiczne. "
     },
     "recording": {
       "title": "Nagrywałeś się?",
-      "description": "Ustalanie celów i planowanie swojej nauki gry na gitarze jest ważne, ponieważ pomaga utrzymać motywację, monitorować postęp i osiągniąć zamierzone cele. "
+      "description": "Nagrywanie pozwala Ci zobaczyć i usłyszeć swoją grę z perspektywy innej niż ta, gdy grasz na żywo. Może to pomóc Ci zauważyć błędy lub słabe punkty, które mogłyby przeoczyć. "
     }
   },
   "description": {
