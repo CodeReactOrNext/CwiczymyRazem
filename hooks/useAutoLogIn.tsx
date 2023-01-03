@@ -23,7 +23,6 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       if (localStorage.getItem("userSlice.timer")) {
-        console.log(localStorage.getItem("userSlice.timer"));
         dispatch(
           updateLocalTimer(JSON.parse(localStorage.getItem("userSlice.timer")!))
         );

@@ -25,7 +25,6 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
     userAuth
   )) as StatisticsDataInterface;
   const userName = await firebaseGetUserName(userAuth);
-  console.log(userName);
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
     convertInputTime(inputData);
   const {
@@ -84,16 +83,6 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
 
   await firebaseSetUserExerciseRaprot(userAuth, raiting, new Date());
   await firebaseUpdateUserStats(userAuth, updatedUserDataWithAchievements);
-  console.log(
-    updatedUserData.lastReportDate,
-    "dd",
-    raiting.basePoints,
-    newAchievements,
-    {
-      isNewLevel,
-      level,
-    }
-  );
   await firebaseAddLogReport(
     userAuth,
     updatedUserData.lastReportDate,

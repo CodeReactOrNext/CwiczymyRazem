@@ -178,7 +178,6 @@ export const firebaseUpdateUserDisplayName = async (
   if (auth.currentUser) {
     updateProfile(auth.currentUser, { displayName: newDisplayName })
       .then(() => {
-        console.log("Updated Name!");
       })
       .catch((error) => console.log(error));
   }
