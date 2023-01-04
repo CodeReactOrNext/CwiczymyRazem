@@ -8,7 +8,7 @@ const Guitar = () => {
       <div className='absolute left-[50%] -bottom-[10%] z-40 h-fit w-[20%] max-w-[100px] -translate-x-[50%] lg:bottom-[15%] lg:w-[35%] lg:max-w-max xl:w-[25%]'>
         <div className='shadow-animation absolute -bottom-[15%] aspect-square w-full rounded-full'></div>
         <img
-          className='hover-animation h-full w-full'
+          className='hover-animation w-full'
           src='/static/images/guitar_red.png'
           alt='red guitar'
         />
