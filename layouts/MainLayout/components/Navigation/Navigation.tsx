@@ -40,9 +40,11 @@ const Navigation = ({
       </button>
       {hamburgerVisible && (
         <HamburgerLayout buttonOnClick={hamburgerHandler}>
-          <li className='hover:click-behavior active:click-behavior'>
-            <Link href='/leaderboard'>{t("nav.profile")}</Link>
-          </li>
+          {isUserLoggedIn && (
+            <li className='hover:click-behavior active:click-behavior'>
+              <Link href='/leaderboard'>{t("nav.profile")}</Link>
+            </li>
+          )}
           <li className='hover:click-behavior active:click-behavior'>
             <Link href='/leaderboard'>{t("nav.leadboard")}</Link>
           </li>
