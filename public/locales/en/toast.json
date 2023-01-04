@@ -12,13 +12,14 @@
     "avatar_max": "Avatar can be a maximum of 250px by 250px.",
     "wrong_file_type": "Only png and jpg/jpeg file types are allowed"
   },
-  "toast": {
+  "info": {
+    "new_user_tip": "Check out the FAQ to learn how to use 'Ćwiczymy Razem'",
+    "log_in_again": "To change data you have to log in again."
+  },
+  "success": {
     "update_email": "Email updated",
     "update_password": "Password updated",
     "update_avatar ": "Avatar updated",
-    "new_user_tip": "Check out the FAQ to learn how to use 'Ćwiczymy Razem'"
-  },
-  "info": {
-    "log_in_again": "To change data you have to log in again."
+    "logOut": "Successfully logged out"
   }
 }
