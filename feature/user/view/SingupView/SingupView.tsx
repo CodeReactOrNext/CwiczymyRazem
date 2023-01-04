@@ -2,13 +2,14 @@ import Button from "components/Button";
 import { Form, Formik } from "formik";
 import { useTranslation } from "react-i18next";
 import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
-import { FaUserAlt, FaLock, FaAt } from "react-icons/fa";
+import { FaUserAlt, FaLock, FaAt, FaArrowLeft } from "react-icons/fa";
 import MainLayout from "layouts/MainLayout";
 import FormLayout from "layouts/FormLayout";
 import Input from "components/Input";
 import { createAccount, selectIsFetching } from "feature/user/store/userSlice";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { CircleSpinner } from "react-spinners-kit";
+import Link from "next/link";
 
 export interface SignUpCredentials {
   login: string;
@@ -43,6 +44,12 @@ const SingupView = () => {
         <Form>
           <FormLayout>
             <>
+              <Link href='/login'>
+                <a className='flex flex-row gap-x-2 click-behavior'>
+                  <FaArrowLeft /> Back to login
+                </a>
+              </Link>
+
               <Input
                 Icon={FaUserAlt}
                 placeholder={t("common:input.login")}

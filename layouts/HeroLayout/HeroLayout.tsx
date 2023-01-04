@@ -13,7 +13,7 @@ interface HeroProps {
 }
 
 const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
-  const { t } = useTranslation("profile");
+  const { t } = useTranslation(["profile", "common"]);
 
   return (
     <div className='grid h-full w-full grid-cols-1 grid-rows-2 gap-[20%] lg:grid-cols-[4fr_5fr] lg:grid-rows-1'>
@@ -31,9 +31,25 @@ const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
         </span>
         <Link href='/login'>
           <a>
-            <Button onClick={buttonOnClick}>{t("cta_button")}</Button>
+            <Button onClick={buttonOnClick}>{t("profile:cta_button")}</Button>
           </a>
         </Link>
+        <div className='flex flex-row gap-6 text-xl'>
+          <Link href='/login'>
+            <a>
+              <button onClick={buttonOnClick}>
+                {t("common:button.sign_in")}
+              </button>
+            </a>
+          </Link>
+          <Link href='/signup'>
+            <a>
+              <button onClick={buttonOnClick}>
+                {t("common:button.sign_up")}
+              </button>
+            </a>
+          </Link>
+        </div>
       </div>
     </div>
   );
