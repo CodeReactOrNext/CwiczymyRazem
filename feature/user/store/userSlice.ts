@@ -92,9 +92,7 @@ export const autoLogIn = createAsyncThunk(
   async (user: User) => {
     const userAuth = await firebaseCreateUserDocumentFromAuth(user);
     const currentUserStats = await firebaseGetUserData(userAuth);
-    const userDoc = await firebaseGetUserDocument(
-      encodeUid(auth.currentUser?.uid!)
-    );
+    const userDoc = await firebaseGetUserDocument(encodeUid(user.uid));
     return {
       userInfo: { displayName: userDoc?.displayName, avatar: userDoc?.avatar },
       userAuth,
