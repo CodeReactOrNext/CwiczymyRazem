@@ -114,19 +114,24 @@ const SettingsView = () => {
   const onImageChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.[0]) {
       const avatarFile = event.target.files[0];
-      setImageUpload(avatarFile);
-      const reader = new FileReader();
-      reader.readAsDataURL(avatarFile);
-      const img = new Image();
-      img.src = URL.createObjectURL(avatarFile);
-      img.onload = () => {
-        if (img.naturalHeight > 250 || img.naturalWidth > 250) {
-          setAvatarIsValid(false);
-          toast.error(t("settings:toasts.avatar_too_big"));
-        } else {
-          setAvatarIsValid(true);
-        }
-      };
+      if (avatarFile.type !== "image/png" && avatarFile.type !== "image/jpeg") {
+        toast.error(t("settings:toasts.wrong_file_type"));
+        return;
+      } else {
+        setImageUpload(avatarFile);
+        const reader = new FileReader();
+        reader.readAsDataURL(avatarFile);
+        const img = new Image();
+        img.src = URL.createObjectURL(avatarFile);
+        img.onload = () => {
+          if (img.naturalHeight > 250 || img.naturalWidth > 250) {
+            setAvatarIsValid(false);
+            toast.error(t("settings:toasts.avatar_too_big"));
+          } else {
+            setAvatarIsValid(true);
+          }
+        };
+      }
     }
   };
 
