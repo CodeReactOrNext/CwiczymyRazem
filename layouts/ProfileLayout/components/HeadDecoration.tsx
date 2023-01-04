@@ -4,7 +4,7 @@ const HeadDecoration = ({ title }: { title: string }) => {
   return (
     <>
       <div className=' relative  flex h-0 justify-center fill-second sm:hidden '>
-        <Fire className='  fill-red relative h-max w-[85vw] self-center ' />
+        <Fire className='  fill-red relative w-[85vw] self-center ' />
       </div>
       <p className=' p-2  text-center text-2xl text-main-opposed sm:hidden '>
         {title}
