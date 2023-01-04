@@ -21,13 +21,13 @@ const CategoryBox = ({
         chosen ? "bg-tertiary text-main-opposed" : "bg-second text-tertiary"
       } `}>
       <p
-        className={`text-2xl text-main-opposed xs:text-4xl ${
+        className={`text-2xl text-main-opposed xs:text-2xl ${
           chosen ? "text-main" : "text-main-opposed"
         } `}>
         {percent ? percent : 0}%
       </p>
-      <p className=' text-center text-xl xs:text-2xl'>{title}</p>
-      <p>{convertMsToHM(time)}</p>
+      <p className=' text-center text-xl xs:text-3xl'>{title}</p>
+      <p className='tracking-wide	 text-main-opposed	'>{convertMsToHM(time)}</p>
       {!chosen && (
         <button
           onClick={onClick}
