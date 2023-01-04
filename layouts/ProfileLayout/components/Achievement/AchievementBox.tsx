@@ -4,7 +4,6 @@ import { FaMedal } from "react-icons/fa";
 import Achievement from "components/Achievement";
 import { AchievementsRarityType } from "assets/achievements/achievementsRarity";
 
-
 export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];
 }
@@ -22,14 +21,16 @@ const AchievementBox = ({ achievment, rarity }: AchievementBoxProps) => {
         <p className=' mb-2 text-sm text-main-opposed-700'>{t(rarity)}</p>
         <div className='flex w-full max-w-[20rem] flex-row flex-wrap gap-4'>
           {achievment.length === 0 ? (
-            <p>Brak</p>
+            <p>{t("empty")}</p>
           ) : (
-            achievment.map(({ id, name }, index) => (
-              <div key={index} className='flex flex-col items-center'>
-                <Achievement id={id} />
-                <p className='py-2 text-xs font-light'>{name}</p>
-              </div>
-            ))
+            achievment.map(({ id, name }, index) => {
+              return (
+                <div key={index} className='flex flex-col items-center'>
+                  <Achievement id={id} />
+                  <p className='py-2 text-xs font-light'>{t(name) as string}</p>
+                </div>
+              );
+            })
           )}
         </div>
       </div>
