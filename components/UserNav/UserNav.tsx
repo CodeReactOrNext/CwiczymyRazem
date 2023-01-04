@@ -7,14 +7,13 @@ const UserNav = () => {
   const { t } = useTranslation("common");
   const dispatch = useAppDispatch();
   return (
-    <div className='mt-3 text-base text-mainText'>
+    <div className='relative z-10 mt-3 text-base text-mainText'>
       <Link href='/settings'>
         <button className='active:click-behavior'>{t("button.edit")}</button>
       </Link>
       <button
-        className='active:click-behavior ml-3'
-        onClick={() => dispatch(logUserOff())}
-      >
+        className='ml-3 active:click-behavior'
+        onClick={() => dispatch(logUserOff())}>
         {t("button.logout")}
       </button>
     </div>
