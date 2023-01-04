@@ -7,14 +7,15 @@ export function encodeUid(input: string) {
   // Create a hash of the input string using a hashing algorithm
   const hash = crypto.createHash("sha256").update(input).digest("hex");
 
-  // Combine the hash with the seed password
+  // Combine the hash with the seed password and the input string
   const combinedString = hash + password + input;
 
   // Encode the combined string using base64
   const base64 = Buffer.from(combinedString).toString("base64");
 
-  // Encode the base64 string using URL encoding
-  const output = encodeURIComponent(base64);
+  // Take the first 20 characters of the base64 encoded string
+  const output = base64.substring(0, 20);
 
-  return output;
+  // Encode the output string using URL encoding
+  return encodeURIComponent(output);
 }

@@ -4,10 +4,13 @@ export function decodeUid(input: string) {
   const password = process.env.NEXT_PUBLIC_UID_SEED_PASSWORD;
   if (password) {
     // Decode the encoded string using decodeURIComponent
-    const base64 = decodeURIComponent(input + "==="); // Add padding to ensure the string is a valid base64 string
+    const output = decodeURIComponent(input + "==="); // Add padding to ensure the string is a valid base64 string
+
+    // Add padding to the output string to make it a valid base64 string
+    const paddedOutput = output.padEnd(26, "=");
 
     // Convert the base64 encoded string back into a buffer
-    const buffer = Buffer.from(base64, "base64");
+    const buffer = Buffer.from(paddedOutput, "base64");
 
     // Convert the buffer back into a string
     const decodedString = buffer.toString();
