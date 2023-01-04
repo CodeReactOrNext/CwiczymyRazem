@@ -106,6 +106,10 @@ module.exports = {
       ...defaultTheme.screens,
     },
     extend: {
+      display: ["group-hover"],
+      dropShadow: {
+        "3xl": "0 1px 3px rgba(0, 0, 0, 0.45)",
+      },
       backgroundImage: {
         "old-effect": "url('/static/images/old_effect.webp')",
         "old-effect-hr": "url('/static/images/old_effect_hr.png')",
