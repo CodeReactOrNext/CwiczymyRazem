@@ -23,9 +23,9 @@ export const Level = ({
           {t("lvl_short")}
           <span className='text-xl text-mainText'>{lvl}</span>
         </p>
-        <div className='relative flex h-4 w-full items-center bg-main-opposed'>
+        <div className='relative flex h-4 w-full items-center bg-main-opposed bg-opacity-80'>
           <div
-            className='relative h-5 bg-main'
+            className='relative h-5 bg-gradient-to-r from-main-600 to-main-200 '
             style={{ width: progressPercent + "%" }}></div>
         </div>
         <p className='relative right-3 text-sm'>
