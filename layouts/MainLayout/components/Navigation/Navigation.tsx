@@ -1,16 +1,19 @@
+import { selectUserAuth } from "feature/user/store/userSlice";
 import HamburgerLayout from "layouts/HamburgerLayout";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBars } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
 import NavLink from "./component/NavLink";
 
-export default function Navigation({
+const Navigation = ({
   variant,
 }: {
   variant: "primary" | "secondary" | "landing";
-}) {
+}) => {
   const [hamburgerVisible, setHamburgerVisible] = useState<boolean>(false);
+  const isUserLoggedIn = useAppSelector(selectUserAuth);
   const { t } = useTranslation("common");
 
   const hamburgerHandler = () => {
@@ -27,6 +30,7 @@ export default function Navigation({
         variant === "secondary" ? "lg:bg-main-opposed-500" : "lg:bg-second-500"
       }  lg:pl-16`}>
       <ul className='hidden w-full items-center justify-evenly gap-8 text-3xl lg:flex'>
+        {isUserLoggedIn && <NavLink url='/' title={t("nav.profile")} />}
         <NavLink url='/leaderboard' title={t("nav.leadboard")} />
         <NavLink url='/discord' title={t("nav.discord")} />
         <NavLink url='/faq' title={t("nav.faq")} />
@@ -36,17 +40,24 @@ export default function Navigation({
       </button>
       {hamburgerVisible && (
         <HamburgerLayout buttonOnClick={hamburgerHandler}>
+          {isUserLoggedIn && (
+            <li className='hover:click-behavior active:click-behavior'>
+              <Link href='/leaderboard'>{t("nav.profile")}</Link>
+            </li>
+          )}
           <li className='hover:click-behavior active:click-behavior'>
-            <Link href='/leaderboard'>Leaderboard</Link>
+            <Link href='/leaderboard'>{t("nav.leadboard")}</Link>
           </li>
           <li className='active:click-behavior'>
-            <Link href='/discord'>Discord</Link>
+            <Link href='/discord'>{t("nav.discord")}</Link>
           </li>
           <li className=' active:click-behavior'>
-            <Link href='/faq'>FAQ</Link>
+            <Link href='/faq'>{t("nav.faq")}</Link>
           </li>
         </HamburgerLayout>
       )}
     </nav>
   );
-}
+};
+
+export default Navigation;

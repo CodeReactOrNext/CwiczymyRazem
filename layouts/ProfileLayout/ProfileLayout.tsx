@@ -42,7 +42,10 @@ const ProfileLayout = ({
                 <div className='flex-col'>
                   <p className='relative  text-4xl'>{userName}</p>
                   <p className='relative  text-xl'>
-                    {t("points")}: {userStats.points}
+                    {t("points")}:{" "}
+                    <span className='text-2xl font-extrabold'>
+                      {userStats.points}
+                    </span>
                   </p>
                 </div>
               </div>

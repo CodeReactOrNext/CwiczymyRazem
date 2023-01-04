@@ -6,6 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 import { encodeUid } from "helpers/encodeUid";
+import { toast } from "react-toastify";
 
 import {
   auth,
@@ -41,6 +42,7 @@ import {
   userSliceInitialState,
 } from "./userSlice.types";
 import {
+  logOutInfo,
   newUserInfo,
   updateUserAvatarSuccess,
   updateUserEmailSuccess,
@@ -312,6 +314,7 @@ export const userSlice = createSlice({
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
+        logOutInfo();
       })
       .addCase(getUserProvider.fulfilled, (state, action) => {
         state.isFetching = null;

@@ -33,7 +33,7 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
       dispatch(autoLogIn(user));
     }
     if (user && isUserLoggedIn && !loading && props?.redirects?.loggedIn) {
-      Router.push(props?.redirects?.loggedIn);
+      Router.push(props.redirects.loggedIn);
     }
     if (!user && !isUserLoggedIn && !loading && props?.redirects?.loggedOut) {
       Router.push(props?.redirects?.loggedOut);
