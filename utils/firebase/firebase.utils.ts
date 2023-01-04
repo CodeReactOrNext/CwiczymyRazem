@@ -71,12 +71,12 @@ export const firebaseCreateAccountWithEmail = (
   password: string
 ) => createUserWithEmailAndPassword(auth, email, password);
 
-export const firebaseCreateUserDocumentFromAuth = async (userAuth: User) => {
-  const encodedUid = encodeUid(userAuth.uid);
+export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
+  const encodedUid = encodeUid(user.uid);
   const userDocRef = doc(db, "users", encodedUid);
   const userSnapshot = await getDoc(userDocRef);
   if (!userSnapshot.exists()) {
-    const { displayName } = userAuth;
+    const { displayName } = user;
     const createdAt = new Date();
     try {
       await setDoc(userDocRef, {
@@ -178,8 +178,7 @@ export const firebaseUpdateUserDisplayName = async (
   const userDocRef = doc(db, "users", userAuth);
   if (auth.currentUser) {
     updateProfile(auth.currentUser, { displayName: newDisplayName })
-      .then(() => {
-      })
+      .then(() => {})
       .catch((error) => console.log(error));
   }
   await updateDoc(userDocRef, { displayName: newDisplayName });
