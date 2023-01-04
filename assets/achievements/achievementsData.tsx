@@ -21,9 +21,9 @@ export type AchievementList =
 
 export interface AchievementsDataInterface extends AchievementsRarityType {
   id: AchievementList;
-  name: TFuncKey<CustomTypeOptions["achievements"]>;
+  name: TFuncKey<"achievements">;
   Icon: IconType;
-  description: TFuncKey<CustomTypeOptions["achievements"]>;
+  description: TFuncKey<"achievements">;
 }
 
 export const achievementsData: AchievementsDataInterface[] = [
