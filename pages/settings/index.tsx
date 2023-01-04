@@ -27,6 +27,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
         "common",
         "settings",
         "yup_errors",
+        "toast",
       ])),
     },
   };
