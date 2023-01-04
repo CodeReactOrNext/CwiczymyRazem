@@ -42,6 +42,7 @@ const SettingsView = () => {
 
   const [imageUpload, setImageUpload] = useState<Blob>();
   const [avatarIsValid, setAvatarIsValid] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string>();
 
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
@@ -114,19 +115,25 @@ const SettingsView = () => {
   const onImageChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files?.[0]) {
       const avatarFile = event.target.files[0];
-      setImageUpload(avatarFile);
-      const reader = new FileReader();
-      reader.readAsDataURL(avatarFile);
-      const img = new Image();
-      img.src = URL.createObjectURL(avatarFile);
-      img.onload = () => {
-        if (img.naturalHeight > 250 || img.naturalWidth > 250) {
-          setAvatarIsValid(false);
-          toast.error(t("settings:toasts.avatar_too_big"));
-        } else {
-          setAvatarIsValid(true);
-        }
-      };
+      if (avatarFile.type !== "image/png" && avatarFile.type !== "image/jpeg") {
+        toast.error(t("settings:toasts.wrong_file_type"));
+        return;
+      } else {
+        setImageUpload(avatarFile);
+        const reader = new FileReader();
+        reader.readAsDataURL(avatarFile);
+        const img = new Image();
+        img.src = URL.createObjectURL(avatarFile);
+        img.onload = () => {
+          if (img.naturalHeight > 250 || img.naturalWidth > 250) {
+            setAvatarIsValid(false);
+            toast.error(t("settings:toasts.avatar_too_big"));
+          } else {
+            setAvatarPreview(img.src);
+            setAvatarIsValid(true);
+          }
+        };
+      }
     }
   };
 
@@ -135,7 +142,11 @@ const SettingsView = () => {
       <MainLayout subtitle={t("settings:settings_subtilte")} variant='primary'>
         <div className='flex max-w-[800px] flex-col p-6'>
           <div className='flex flex-row gap-2 p-4  text-2xl'>
-            <Avatar avatarURL={userAvatar} name={userName!} lvl={28} />
+            <Avatar
+              avatarURL={avatarPreview ? avatarPreview : userAvatar}
+              name={userName!}
+              lvl={28}
+            />
             {avatarInputVisible && (
               <form
                 onSubmit={(event) => {

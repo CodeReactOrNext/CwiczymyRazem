@@ -16,6 +16,7 @@
   "logged_in_via_google": "Zalogowano z Google",
   "toasts": {
     "avatar_too_big": "Avatar can only max 250px by 250px.",
+    "wrong_file_type": "Only png and jpg/jpeg file types are allowed",
     "log_in_again": "To change data you have to log in again."
   }
 }
