@@ -14,7 +14,7 @@ export const Level = ({
   const { t } = useTranslation("profile");
   const progressPercent = (points / pointsToNextLvl) * 100;
   return (
-    <div className='col-span-2 flex w-[90%] flex-col items-center text-tertiary md:col-auto lg:w-64 lg:justify-self-end xl:w-80'>
+    <div className='col-span-2 m-auto flex w-[90%] flex-col items-center text-tertiary md:col-auto lg:w-64 lg:justify-self-end xl:w-80'>
       <p>
         {t("your_level")}{" "}
         <span className='text-4xl font-bold text-mainText'>{lvl}</span>
