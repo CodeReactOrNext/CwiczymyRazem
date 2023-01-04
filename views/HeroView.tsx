@@ -8,7 +8,7 @@ const HeroView = () => {
 
   return (
     <MainLayout variant={"landing"} subtitle={t("profile:subtitlebar_text")}>
-      <HeroLayout buttonOnClick={() => {}}>
+      <HeroLayout>
         <>
           <p>{t("profile:hero_line_1")}</p>
           <p>{t("profile:hero_line_2")}</p>

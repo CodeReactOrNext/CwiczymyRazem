@@ -62,8 +62,9 @@ const RatingPopUp = ({
             {t("rating_popup.back")}
           </Button>
           <div className='absolute -top-[170%] z-40 my-auto flex h-7 w-2/3 items-center md:-top-[130%] md:w-5/12'>
-            <div className='h-4/5 w-full bg-second-500'></div>
-            <div className={`absolute left-0 top-0 h-full w-[50%] bg-main-500`}>
+            <div className='h-4/5 w-full bg-second-500 '></div>
+            <div
+              className={`absolute left-0 top-0 h-full w-[50%] bg-main-500 bg-gradient-to-r from-main-700 to-main-300`}>
               <p className='absolute -right-[18%] -top-[80%]  text-lg font-medium text-main-500 md:text-xl'>
                 +{ratingData.basePoints} {t("rating_popup.points")}
               </p>
