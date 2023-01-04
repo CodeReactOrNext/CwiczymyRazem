@@ -1,6 +1,6 @@
 import OldEffect from "components/OldEffect";
 import Wrapper from "./components/Wrapper";
-import Statistic, { StatisticProps } from "./components/Statistic";
+import StatsField, { StatsFieldProps } from "./components/StatsField";
 import LandingNav, { LandingNavProps } from "./components/LandingNav";
 import StatisticBar from "./components/StatisticBar";
 import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
@@ -14,7 +14,7 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import LogsBox from "./components/LogsBox";
 
 interface LandingLayoutProps {
-  statistics: StatisticProps[];
+  statsField: StatsFieldProps[];
   navigation: LandingNavProps;
   userStats: StatisticsDataInterface;
   userName: string;
@@ -22,7 +22,7 @@ interface LandingLayoutProps {
 }
 
 const LandingLayout = ({
-  statistics,
+  statsField,
   navigation,
   userStats,
   userName,
@@ -84,8 +84,8 @@ const LandingLayout = ({
                   />
                 </div>
                 <div className=' row-cols-1  order-1'>
-                  {statistics.map(({ Icon, description, value }, index) => (
-                    <Statistic
+                  {statsField.map(({ Icon, description, value }, index) => (
+                    <StatsField
                       key={index}
                       Icon={Icon}
                       description={description}

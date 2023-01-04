@@ -1,5 +1,4 @@
 import ProfileLayout from "layouts/ProfileLayout/ProfileLayout";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { firebaseGetUserDocument } from "utils/firebase/firebase.utils";
@@ -22,29 +21,9 @@ const ProfileView = () => {
     }
   }, [profileId]);
 
-  const userStats: StatisticsDataInterface = {
-    time: {
-      technique: 0,
-      theory: 0,
-      hearing: 0,
-      creativity: 0,
-      longestSession: 0,
-    },
-    lvl: 1,
-    points: 25,
-    pointsToNextLvl: 35,
-    sessionCount: 0,
-    habitsCount: 0,
-    dayWithoutBreak: 0,
-    maxPoints: 0,
-    achievements: ["time_1", "time_2", "time_3"],
-    actualDayWithoutBreak: 0,
-    lastReportDate: "",
-  };
-
   return userData ? (
     <ProfileLayout
-      statistics={getUserStatsField(userData?.statistics)}
+      statsField={getUserStatsField(userData?.statistics)}
       userStats={userData.statistics}
       userName={userData.displayName}
       userAvatar={userData.avatar}

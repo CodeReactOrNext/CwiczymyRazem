@@ -1,4 +1,4 @@
-import { StatisticProps } from "layouts/ProfileLayout/components/Statistic";
+import { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import {
   FaCalendarDay,
@@ -67,5 +67,5 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
       description: i18n?.t("profile:stats.max_points"),
       value: maxPoints,
     },
-  ] as StatisticProps[];
+  ] as StatsFieldProps[];
 };
