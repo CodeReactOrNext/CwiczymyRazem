@@ -39,7 +39,7 @@ const LandingView = () => {
   };
   return (
     <LandingLayout
-      statistics={getUserStatsField(userStats!)}
+      statsField={getUserStatsField(userStats!)}
       navigation={navigation}
       userStats={userStats!}
       userName={userName!}

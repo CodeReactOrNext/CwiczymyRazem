@@ -1,4 +1,4 @@
-import Statistic, { StatisticProps } from "./components/Statistic";
+import StatsField, { StatsFieldProps } from "./components/StatsField";
 import StatisticBar from "./components/StatisticBar";
 import { Level } from "./components/UserHeader/components/Level";
 import HeadDecoration from "./components/HeadDecoration";
@@ -10,14 +10,14 @@ import MainLayout from "layouts/MainLayout";
 import Avatar from "components/Avatar";
 
 interface LandingLayoutProps {
-  statistics: StatisticProps[];
+  statsField: StatsFieldProps[];
   userStats: StatisticsDataInterface;
   userName: string;
   userAvatar?: string;
 }
 
 const ProfileLayout = ({
-  statistics,
+  statsField,
   userStats,
   userName,
   userAvatar,
@@ -75,8 +75,8 @@ const ProfileLayout = ({
               />
             </div>
             <div className='row-cols-1'>
-              {statistics.map(({ Icon, description, value }, index) => (
-                <Statistic
+              {statsField.map(({ Icon, description, value }, index) => (
+                <StatsField
                   key={index}
                   Icon={Icon}
                   description={description}
