@@ -13,10 +13,5 @@
   "reset": "Resetuj",
   "anonimity": "Anonimowość:",
   "anonimity_info": "Czy chcesz aby twój nick pozostał anonimowy w ledbordzie?",
-  "logged_in_via_google": "Zalogowano z Google",
-  "toasts": {
-    "avatar_too_big": "Awatar może mieć maksymalnie 250px na 250px.",
-    "wrong_file_type": "Dozwolone są tylko pliki typu png i jpg/jpeg",
-    "log_in_again": "Do zmiany danych musisz się ponownie zalogować."
-  }
+  "logged_in_via_google": "Zalogowano z Google"
 }
