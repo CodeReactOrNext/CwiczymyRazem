@@ -1,9 +1,8 @@
 {
- 
-    "common": "Zwykłe",
-    "rare": "Rzadkie",
-    "veryRare": "Bardzo Rzadkie"
-  ,
+  "common": "Zwykłe",
+  "rare": "Rzadkie",
+  "veryRare": "Bardzo Rzadkie",
+  "empty": "Brak",
   "time_1": {
     "title": "Ciężka praca popłaca",
     "description": "Przekrocz próg 10 godzin ćwiczeń."
