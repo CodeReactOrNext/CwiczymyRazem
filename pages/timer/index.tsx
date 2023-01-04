@@ -23,7 +23,11 @@ export default Timer;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", ["common", "timer"])),
+      ...(await serverSideTranslations(locale ?? "pl", [
+        "common",
+        "timer",
+        "toast",
+      ])),
     },
   };
 }
