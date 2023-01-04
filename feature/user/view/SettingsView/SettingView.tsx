@@ -28,7 +28,7 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { SignUpCredentials as SignUpCredentials } from "../SingupView/SingupView";
 
 const SettingsView = () => {
-  const { t } = useTranslation(["common", "settings"]);
+  const { t } = useTranslation(["common", "settings", "toast"]);
   const [avatarInputVisible, setAvatarInputVisible] = useState(false);
   const [nameInputVisible, setNameInputVisible] = useState(false);
   const [emailInputVisible, setEmailInputVisible] = useState(false);
@@ -116,7 +116,7 @@ const SettingsView = () => {
     if (event.target.files?.[0]) {
       const avatarFile = event.target.files[0];
       if (avatarFile.type !== "image/png" && avatarFile.type !== "image/jpeg") {
-        toast.error(t("settings:toasts.wrong_file_type"));
+        toast.error(t("toast:errors.wrong_file_type"));
         return;
       } else {
         setImageUpload(avatarFile);
@@ -127,7 +127,7 @@ const SettingsView = () => {
         img.onload = () => {
           if (img.naturalHeight > 250 || img.naturalWidth > 250) {
             setAvatarIsValid(false);
-            toast.error(t("settings:toasts.avatar_too_big"));
+            toast.error(t("toast:errors.avatar_max"));
           } else {
             setAvatarPreview(img.src);
             setAvatarIsValid(true);
@@ -272,7 +272,7 @@ const SettingsView = () => {
                             onClick={() => {
                               if (values.email && !errors.email) {
                                 setNewEmail(values.email);
-                                toast.info(t("settings:toasts.log_in_again"));
+                                toast.info(t("toast:info.log_in_again"));
                                 setReauthFormVisible(true);
                               }
                             }}
@@ -332,7 +332,7 @@ const SettingsView = () => {
                                 !errors.repeat_password
                               ) {
                                 setNewPassword(values.password);
-                                toast.info(t("settings:toasts.log_in_again"));
+                                toast.info(t("toast:info.log_in_again"));
                                 setReauthFormVisible(true);
                               }
                             }}
