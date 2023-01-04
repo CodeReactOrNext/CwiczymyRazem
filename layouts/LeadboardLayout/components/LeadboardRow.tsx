@@ -1,8 +1,9 @@
 import Avatar from "components/Avatar";
 import { convertMsToHM } from "helpers/timeConverter";
 import Link from "next/link";
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { FaExternalLinkAlt } from "react-icons/fa";
+import { RiExternalLinkFill } from "react-icons/ri";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import Carousel from "./AchievementsCarousel";
 interface LeadboardColumnProps {
@@ -44,13 +45,13 @@ const LeadboardRow = ({
           <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
         </div>
         <div
-          className={`mr-5 grid w-full grid-cols-3 grid-rows-3 justify-items-center  bg-second bg-opacity-75 px-2 md:h-16 md:grid-rows-1
+          className={`group mr-5 grid w-full grid-cols-3 grid-rows-3 justify-items-center  bg-second bg-opacity-75 px-2 hover:bg-opacity-90 md:h-16 md:grid-rows-1
         ${place === 1 ? "bg-yellow-500" : ""}
         ${place === 2 ? "bg-slate-400" : ""}
         ${place === 3 ? "bg-yellow-700" : ""}`}>
           <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
-            <div className='absolute top-[5px] right-[-60px] flex  items-center gap-x-1 '>
+            <div className='absolute top-[5px] right-[-50px] flex  items-center gap-x-1  '>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
               </p>
@@ -59,33 +60,32 @@ const LeadboardRow = ({
           </div>
           <div className='relative col-span-2 self-center justify-self-start md:col-span-1 '>
             <Link href={`/user/${profileId}`}>
-              <p className='cursor-pointer whitespace-nowrap text-lg xs:text-2xl lg:text-xl xl:text-2xl'>
+              <p className='flex cursor-pointer flex-row whitespace-nowrap text-lg hover:text-slate-100 active:click-behavior xs:text-2xl lg:text-xl xl:text-2xl '>
                 {shortenNick(nick)}
+                <FaExternalLinkAlt className='ml-2 text-xs opacity-0  group-hover:opacity-100' />
               </p>
             </Link>
-            <div className='absolute top-[-20px] right-[-60px]  hidden items-center gap-x-1 md:top-[-35px] md:flex'>
+            <div className='absolute top-[-20px] right-[-50px] hidden  items-center gap-x-1  md:top-[-35px] md:flex'>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
               </p>
-              <p className='text-4xl text-main drop-shadow md:text-5xl'>
+              <p className=' text-4xl font-extrabold text-main drop-shadow-3xl md:text-5xl'>
                 {statistics.lvl}
               </p>
             </div>
           </div>
           <div className='col-span-3 flex h-full w-full items-center justify-evenly md:col-span-1 md:w-[300px]  md:justify-center  md:gap-x-5'>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
-              <p className='text-xl leading-[22px] xxs:text-3xl '>
-                {statistics.points}
-              </p>
-              <p className='leading-[25px]  text-tertiary'>{t("points")}</p>
+              <p className='text-xl  xxs:text-3xl '>{statistics.points}</p>
+              <p className='leading-[15px]  text-tertiary'>{t("points")}</p>
             </div>
             <div className='flex  flex-col items-center md:justify-end md:px-2'>
-              <p className='text-xl leading-[22px] xxs:text-3xl'>
+              <p className='text-xl  xxs:text-3xl'>
                 {convertMsToHM(
                   time.creativity + time.hearing + time.technique + time.theory
                 )}
               </p>
-              <p className='  leading-[25px] text-tertiary'>
+              <p className='  leading-[15px] text-tertiary'>
                 {t("exercise_time")}
               </p>
             </div>
