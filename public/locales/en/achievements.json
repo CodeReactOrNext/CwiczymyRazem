@@ -27,5 +27,113 @@
   "health_habits": {
     "title": "Healthy as a Fish",
     "description": "Achieve all healthy habits in one report."
+  },
+  "points_1": {
+    "title": "Scratch the surface",
+    "description": "Earn 100 points"
+  },
+  "points_2": {
+    "title": "Birds Chords",
+    "description": "Earn 1000 points"
+  },
+  "points_3": {
+    "title": "Frog Chords",
+    "description": "Earn 10000 points"
+  },
+  "doctor": {
+    "title": "Doctor",
+    "description": "Apply 100 healthy habbits"
+  },
+  "tired": {
+    "title": "I can't anymore...",
+    "description": "Complete a 5 hour session"
+  },
+  "diamond": {
+    "title": "Diamond guitar",
+    "description": "Get 28 lvl"
+  },
+  "scientist": {
+    "title": "Scientist",
+    "description": "Achieve 50 hours in theory"
+  },
+  "artist": {
+    "title": "Musical Artist",
+    "description": "Achieve 10 hours in creative work"
+  },
+  "book": {
+    "title": "Erudite",
+    "description": "Achieve 10 hours in theory"
+  },
+  "bigear": {
+    "title": "Duże ucho",
+    "description": "Achieve 50 hours in hearing"
+  },
+  "wizard": {
+    "title": "Wizard",
+    "description": "Achieve 50 hours in creative work"
+  },
+  "medal": {
+    "title": "Awarded",
+    "description": "Get 20 achievements"
+  },
+  "day_1": {
+    "title": "Consistency",
+    "description": "Exercise continuously for 3 days"
+  },
+  "day_2": {
+    "title": "Week",
+    "description": "Exercise continuously for 7 days"
+  },
+  "day_3": {
+    "title": "Infinity",
+    "description": "Exercise continuously for 15 days"
+  },
+  "session_1": {
+    "title": "Clicker",
+    "description": "Complete 20 sessions"
+  },
+  "session_2": {
+    "title": "Guitar Traveler",
+    "description": "Complete 50 sessions"
+  },
+  "session_3": {
+    "title": "Cowboy",
+    "description": "Complete 100 sessions"
+  },
+  "ring": {
+    "title": "String Ring",
+    "description": "Spend over 5 hours in each pillar"
+  },
+  "headphones": {
+    "title": "Well-Listened",
+    "description": "Spend over 10 hours in listening"
+  },
+  "ninja": {
+    "title": "Technical Warrior",
+    "description": "Spend over 10 hours in technique"
+  },
+  "record": {
+    "title": "Something was Recorded",
+    "description": "This player has been intensively recording something."
+  },
+  "vinyl": {
+    "title": "Record Idea",
+    "description": "This player came up with an idea and recorded it... probably."
+  },
+  "dumbbel": {
+    "title": "Real Heavy Work",
+    "description": "This player is really working hard."
+  },
+  "rightway": {
+    "title": "No Injuries",
+    "description": "This player is warming up by the book."
+  },
+  "path": {
+    "title": "Great Plan",
+    "description": "This player has a great training plan and is well on their way to achieving their goals."
+  },
+  "yolo": {
+    "title": "Yolo",
+    "description": "This player doesn't care about healthy habits."
   }
 }
