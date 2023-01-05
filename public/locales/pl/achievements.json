@@ -26,5 +26,114 @@
   "health_habits": {
     "title": "Zdrowy jak ryba",
     "description": "Zrealizuj wszystkie zdrowe nawyki w jednym raporcie."
+  },
+  "points_1": {
+    "title": "Pierwsze koty za płoty",
+    "description": "Zdobądź 100 punktów."
+  },
+  "points_2": {
+    "title": "Ptasie akordy",
+    "description": "Zdobądź 1000 punktów."
+  },
+  "points_3": {
+    "title": "Żabie akordy",
+    "description": "Zdobądź 10000 punktów."
+  },
+  "doctor": {
+    "title": "Doktor",
+    "description": "Zastosuj 100 zdrowych nawyków"
+  },
+  "tired": {
+    "title": "Już nie mogę...",
+    "description": "Zalicz 5 godzinną sesje"
+  },
+  "diamond": {
+    "title": "Diamenotwa gitara",
+    "description": "Osiągnij 28 poziom"
+  },
+  "scientist": {
+    "title": "Naukowiec",
+    "description": "Przekrocz 50 godzin w teorii"
+  },
+  "bigear": {
+    "title": "Duże ucho",
+    "description": "Przekrocz 50 godzin w słuchu"
+  },
+  "artist": {
+    "title": "Muzyczny artysta",
+    "description": "Przekrocz 10 godzin w pracy kreatywnej"
+  },
+  "book": {
+    "title": "Oczytany",
+    "description": "Przekrocz 10 godzin w teorii"
+  },
+  "wizard": {
+    "title": "Czarodziej",
+    "description": "Przekrocz 50 godzin w pracy kreatywnej"
+  },
+
+  "medal": {
+    "title": "Odznaczony",
+    "description": "Zdobądź 20 osiągnięć"
+  },
+  "day_1": {
+    "title": "Systematyczność",
+    "description": "Ćwicz bez przerwy przez 3 dni"
+  },
+  "day_2": {
+    "title": "Tydzień",
+    "description": "Ćwicz bez przerwy przez 7 dni"
+  },
+  "day_3": {
+    "title": "Nieskończoność",
+    "description": "Ćwicz bez przerwy przez 15 dni"
+  },
+  "session_1": {
+    "title": "Klikacz",
+    "description": "Zalicz 20 sesji"
+  },
+  "session_2": {
+    "title": "Gitarowy Podróżnik",
+    "description": "Zalicz 50 sesji"
+  },
+  "session_3": {
+    "title": "Kowboj",
+    "description": "Zalicz 100 sesji"
+  },
+  "ring": {
+    "title": "Pierścień ze strun",
+    "description": "Przekrocz 5 godzin w każdym z filarów"
+  },
+  "headphones": {
+    "title": "Osłuchany",
+    "description": "Przekrocz 10 godzin w słuchu"
+  },
+  "ninja": {
+    "title": "Techniczny wojownik",
+    "description": "Przekrocz 10 godzin w technice"
+  },
+  "record": {
+    "title": "Coś było nagrywane",
+    "description": "Ten gracz intensywnie coś nagrywał."
+  },
+  "vinyl": {
+    "title": "Pomysł na płytę",
+    "description": "Ten gracz wpadł na pomysł i to nagrał... chyba."
+  },
+  "dumbbel": {
+    "title": "Napradę ciężka praca",
+    "description": "Ten gracz na prawdę ciężko pracuje."
+  },
+  "rightway": {
+    "title": "Bez kontuzji",
+    "description": "Ten gracz książkowo wykonuje rozgrzewkę."
+  },
+  "path": {
+    "title": "Świeny plan",
+    "description": "Ten gracz ma świetny plan treningowy i dobrze realizuje swoje cele."
+  },
+  "yolo": {
+    "title": "Yolo",
+    "description": "Ten gracz ma gdzieś zdrowe nawyki."
   }
 }

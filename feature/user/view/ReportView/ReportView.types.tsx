@@ -7,7 +7,13 @@ export interface ReportFormikInterface {
   hearingMinutes: string;
   creativityHours: string;
   creativityMinutes: string;
-  habbits: string[];
+  habbits: (
+    | "exercise_plan"
+    | "new_things"
+    | "warmup"
+    | "metronome"
+    | "recording"
+  )[];
 }
 export interface ReportDataInterface {
   reportDate: Date;
