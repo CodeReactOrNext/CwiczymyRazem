@@ -1,9 +1,7 @@
 export let shuffleUid = (inputString: string, unshuffle = false) => {
-  console.log(inputString);
   const seed = process.env.NEXT_PUBLIC_UID_SEED_NUMBER as string;
   let inArr = Array.from(inputString);
   let seedArr = Array.from(String(seed), Number);
-  console.log(seedArr);
   let outArr = Array.from(inArr),
     len = inArr.length;
 
@@ -16,7 +14,6 @@ export let shuffleUid = (inputString: string, unshuffle = false) => {
     i += unshuffle ? -1 : 1
   )
     swap(seedArr[i % seedArr.length] % len, i);
-  console.log("shuffled", outArr.join(""));
   return outArr.join("");
 };
 // seed variable should be a number as 4 characters string,
