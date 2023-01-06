@@ -5,12 +5,10 @@ import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.t
 import {
   firebaseGetUserData,
   firebaseSetUserExerciseRaprot,
-  firebaseUpdateUserStats,
   firebaseAddLogReport,
-  firebaseGetUserName,
+  firebaseUpdateUserStats,
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
-
 import { NextApiRequest, NextApiResponse } from "next";
 import { makeRatingData } from "./utils/makeRatingData";
 import { checkAchievement } from "./achievement";
@@ -24,7 +22,6 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
     userAuth
   )) as StatisticsDataInterface;
-  const userName = await firebaseGetUserName(userAuth);
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
     convertInputTime(inputData);
   const {
