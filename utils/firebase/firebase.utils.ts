@@ -206,6 +206,16 @@ export const firebaseGetUsersExceriseRaport = async () => {
   });
   return usersDataArr;
 };
+export const firebaseCheckUsersNameIsNotUnique = async (displayName: string) => {
+  const usersDocRef = await getDocs(collection(db, "users"));
+  const usersDataArr: FirebaseUserDataInterface[] = [];
+  usersDocRef.forEach((doc) => {
+    let currentUserData = doc.data() as FirebaseUserDataInterface;
+    currentUserData.profileId = doc.id;
+    usersDataArr.push(currentUserData);
+  });
+  return usersDataArr.some((user) => user.displayName === displayName);
+};
 
 export const firebaseGetUserProviderData = async () => {
   const providerData = auth.currentUser?.providerData[0];

@@ -111,7 +111,7 @@ module.exports = {
         "3xl": "0 1px 3px rgba(0, 0, 0, 0.45)",
       },
       boxShadow: {
-        "inset-cool": "inset 0 -3px 10px -3px rgba(0, 0, 0, 0.3)",
+        "inset-cool": "inset 0 -3px 8px -3px rgba(88, 96, 132,0.7)",
       },
       backgroundImage: {
         "old-effect": "url('/static/images/old_effect.webp')",

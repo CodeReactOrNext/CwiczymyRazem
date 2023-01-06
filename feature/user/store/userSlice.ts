@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 
 import {
   auth,
+  firebaseCheckUsersNameIsNotUnique,
   firebaseCreateAccountWithEmail,
   firebaseCreateUserDocumentFromAuth,
   firebaseGetUserData,
@@ -105,7 +106,11 @@ export const autoLogIn = createAsyncThunk(
 
 export const createAccount = createAsyncThunk(
   "user/createAccount",
-  async ({ login, email, password }: SignUpCredentials) => {
+  async ({ login, email, password }: SignUpCredentials, thunkAPI) => {
+    if (await firebaseCheckUsersNameIsNotUnique(login)) {
+      toast.error("nick zajęty");
+      return thunkAPI.rejectWithValue(login);
+    }
     const { user } = await firebaseCreateAccountWithEmail(email, password);
     const userWithDisplayName = { ...user, displayName: login };
     const userAuth = await firebaseCreateUserDocumentFromAuth(
@@ -170,6 +175,8 @@ export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   await firebaseLogUserOut();
   return null;
 });
+
+
 
 export const updateUserStats = createAsyncThunk(
   "user/updateUserStats",
