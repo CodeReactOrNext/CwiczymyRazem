@@ -5,7 +5,7 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
-import { encodeUid } from "helpers/encodeUid";
+import { shuffleUid } from "helpers/shuffleUid";
 import { toast } from "react-toastify";
 
 import {
@@ -73,7 +73,12 @@ export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
   async (parameters, thunkAPI) => {
     const { user } = await firebaseSignInWithGooglePopup();
-    const userAuth = await firebaseCreateUserDocumentFromAuth(user);
+    const userAuth = await fetch("/api/user/createUserFromAuth", {
+      method: "POST",
+      body: JSON.stringify(user),
+    }).then((response) => {
+      return response.json();
+    });
     const currentUserStats = await firebaseGetUserData(userAuth);
     const userName = user.displayName!;
     return { userInfo: { displayName: userName }, userAuth, currentUserStats };
@@ -94,9 +99,14 @@ export const logInViaEmail = createAsyncThunk(
 export const autoLogIn = createAsyncThunk(
   "user/autoLogin",
   async (user: User) => {
-    const userAuth = await firebaseCreateUserDocumentFromAuth(user);
+    const userAuth = await fetch("/api/user/createUserFromAuth", {
+      method: "POST",
+      body: JSON.stringify(user),
+    }).then((response) => {
+      return response.json();
+    });
     const currentUserStats = await firebaseGetUserData(userAuth);
-    const userDoc = await firebaseGetUserDocument(encodeUid(user.uid));
+    const userDoc = await firebaseGetUserDocument(shuffleUid(user.uid));
     return {
       userInfo: { displayName: userDoc?.displayName, avatar: userDoc?.avatar },
       userAuth,
@@ -181,7 +191,6 @@ export const restartUserStats = createAsyncThunk(
   "user/restartUserStats",
   async () => {
     await firebaseRestartUserStats();
-    
   }
 );
 
