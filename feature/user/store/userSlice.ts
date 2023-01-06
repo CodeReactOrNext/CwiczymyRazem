@@ -18,6 +18,7 @@ import {
   firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseReauthenticateUser,
+  firebaseRestartUserStats,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
   firebaseUpdateUserDisplayName,
@@ -176,7 +177,13 @@ export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   return null;
 });
 
-
+export const restartUserStats = createAsyncThunk(
+  "user/restartUserStats",
+  async () => {
+    await firebaseRestartUserStats();
+    
+  }
+);
 
 export const updateUserStats = createAsyncThunk(
   "user/updateUserStats",

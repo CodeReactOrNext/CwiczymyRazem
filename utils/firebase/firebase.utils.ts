@@ -36,9 +36,7 @@ import {
   statistics,
   StatisticsDataInterface,
 } from "./userStatisticsInitialData";
-import { decodeUid } from "helpers/decodeUid";
 import { encodeUid } from "helpers/encodeUid";
-import { toast } from "react-toastify";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
@@ -149,6 +147,13 @@ export const firebaseUpdateUserStats = async (
   const userDocRef = doc(db, "users", userAuth);
   await updateDoc(userDocRef, { statistics });
 };
+export const firebaseRestartUserStats = async () => {
+  if (auth.currentUser) {
+    const userDocRef = doc(db, "users", encodeUid(auth.currentUser?.uid!));
+    await updateDoc(userDocRef, { statistics });
+
+  }
+};
 
 export const firebaseAddLogReport = async (
   userAuth: string,
@@ -206,7 +211,9 @@ export const firebaseGetUsersExceriseRaport = async () => {
   });
   return usersDataArr;
 };
-export const firebaseCheckUsersNameIsNotUnique = async (displayName: string) => {
+export const firebaseCheckUsersNameIsNotUnique = async (
+  displayName: string
+) => {
   const usersDocRef = await getDocs(collection(db, "users"));
   const usersDataArr: FirebaseUserDataInterface[] = [];
   usersDocRef.forEach((doc) => {
