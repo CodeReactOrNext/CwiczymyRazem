@@ -36,7 +36,7 @@ import {
   statistics,
   StatisticsDataInterface,
 } from "./userStatisticsInitialData";
-import { encodeUid } from "helpers/encodeUid";
+import { shuffleUid } from "helpers/shuffleUid";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
@@ -70,8 +70,8 @@ export const firebaseCreateAccountWithEmail = (
 ) => createUserWithEmailAndPassword(auth, email, password);
 
 export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
-  const encodedUid = encodeUid(user.uid);
-  const userDocRef = doc(db, "users", encodedUid);
+  const shuffledUid = shuffleUid(user.uid);
+  const userDocRef = doc(db, "users", shuffledUid);
   const userSnapshot = await getDoc(userDocRef);
   if (!userSnapshot.exists()) {
     const { displayName } = user;
@@ -86,7 +86,7 @@ export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
       console.log(error);
     }
   }
-  return encodedUid;
+  return shuffledUid;
 };
 
 export const firebaseLogUserOut = async () => {
@@ -94,7 +94,7 @@ export const firebaseLogUserOut = async () => {
 };
 
 export const firebaseGetUserData = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth);
+  const userDocRef = doc(db, "users", userAuth.replaceAll('"', ""));
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.statistics;
 };
@@ -125,7 +125,7 @@ export const firebaseGetUserName = async (userAuth: string) => {
 };
 
 export const firebaseGetUserAvatarURL = async () => {
-  const userDocRef = doc(db, "users", encodeUid(auth.currentUser?.uid!));
+  const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.avatar;
 };
@@ -149,9 +149,8 @@ export const firebaseUpdateUserStats = async (
 };
 export const firebaseRestartUserStats = async () => {
   if (auth.currentUser) {
-    const userDocRef = doc(db, "users", encodeUid(auth.currentUser?.uid!));
+    const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
     await updateDoc(userDocRef, { statistics });
-
   }
 };
 
@@ -257,7 +256,10 @@ export const firebaseReauthenticateUser = async ({
 
 export const firebaseUploadAvatar = async (image: Blob) => {
   if (!image) return;
-  const imageRef = ref(storage, `avatars/${encodeUid(auth.currentUser?.uid!)}`);
+  const imageRef = ref(
+    storage,
+    `avatars/${shuffleUid(auth.currentUser?.uid!)}`
+  );
   const data = await uploadBytes(imageRef, image);
   const fullPath = data.metadata.fullPath;
   const avatarRef = ref(storage, fullPath);
@@ -270,6 +272,6 @@ export const firebaseUpdateUserDocument = async (
   key: string,
   value: string
 ) => {
-  const userDocRef = doc(db, "users", encodeUid(auth.currentUser?.uid!));
+  const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
   await updateDoc(userDocRef, { [key]: value });
 };
