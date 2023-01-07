@@ -40,3 +40,9 @@ export interface updateUserStatsProps {
   userAuth: string;
   inputData: ReportFormikInterface;
 }
+
+export interface UserDataInterface {
+  userInfo: { displayName: string };
+  userAuth: string;
+  currentUserStats: StatisticsDataInterface;
+}

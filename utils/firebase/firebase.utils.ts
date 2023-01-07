@@ -69,41 +69,8 @@ export const firebaseCreateAccountWithEmail = (
   password: string
 ) => createUserWithEmailAndPassword(auth, email, password);
 
-export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
-  const shuffledUid = shuffleUid(user.uid);
-  const userDocRef = doc(db, "users", shuffledUid);
-  const userSnapshot = await getDoc(userDocRef);
-  if (!userSnapshot.exists()) {
-    const { displayName } = user;
-    const createdAt = new Date();
-    try {
-      await setDoc(userDocRef, {
-        displayName,
-        createdAt,
-        statistics,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  return shuffledUid;
-};
-
 export const firebaseLogUserOut = async () => {
   return await signOut(auth);
-};
-
-export const firebaseGetUserData = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth.replaceAll('"', ""));
-  const userSnapshot = await getDoc(userDocRef);
-  return userSnapshot.data()!.statistics;
-};
-
-export const firebaseGetUserDocument = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
-  const userData = userSnapshot.data();
-  return userData;
 };
 
 export const firebaseGetLogs = async () => {
@@ -140,13 +107,6 @@ export const firebaseSetUserExerciseRaprot = async (
   await setDoc(userDocRef, raport);
 };
 
-export const firebaseUpdateUserStats = async (
-  userAuth: string,
-  statistics: StatisticsDataInterface
-) => {
-  const userDocRef = doc(db, "users", userAuth);
-  await updateDoc(userDocRef, { statistics });
-};
 export const firebaseRestartUserStats = async () => {
   if (auth.currentUser) {
     const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
@@ -201,7 +161,6 @@ export const firebaseUpdateUserPassword = async (newPassword: string) => {
 
 export const firebaseGetUsersExceriseRaport = async () => {
   const usersDocRef = await getDocs(collection(db, "users"));
-
   const usersDataArr: FirebaseUserDataInterface[] = [];
   usersDocRef.forEach((doc) => {
     let currentUserData = doc.data() as FirebaseUserDataInterface;
@@ -254,6 +213,18 @@ export const firebaseReauthenticateUser = async ({
   return null;
 };
 
+export const firebaseGetCurrentUser = async () => {
+  return auth.currentUser;
+};
+
+export const firebaseUpdateUserDocument = async (
+  key: string,
+  value: string
+) => {
+  const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
+  await updateDoc(userDocRef, { [key]: value });
+};
+
 export const firebaseUploadAvatar = async (image: Blob) => {
   if (!image) return;
   const imageRef = ref(
@@ -266,12 +237,4 @@ export const firebaseUploadAvatar = async (image: Blob) => {
   const avatarUrl = await getDownloadURL(avatarRef);
   await firebaseUpdateUserDocument("avatar", avatarUrl);
   return { avatar: avatarUrl };
-};
-
-export const firebaseUpdateUserDocument = async (
-  key: string,
-  value: string
-) => {
-  const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
-  await updateDoc(userDocRef, { [key]: value });
 };
