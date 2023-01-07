@@ -7,7 +7,7 @@ const UserNav = () => {
   const { t } = useTranslation("common");
   const dispatch = useAppDispatch();
   return (
-    <div className='relative z-10 mt-3 text-base text-mainText'>
+    <div className='relative z-30 mt-3 text-base text-mainText'>
       <Link href='/settings'>
         <button className='active:click-behavior'>{t("button.edit")}</button>
       </Link>

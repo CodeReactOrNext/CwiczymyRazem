@@ -58,9 +58,9 @@ const LandingLayout = ({
               leftSideLinks={navigation.leftSideLinks}
               rightSideLinks={navigation.rightSideLinks}
             />
-            <div className='m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
+            <div className='z-20 m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
               <HeadDecoration title={t("statistics")} />
-              <div className='grid-cols-2 grid-rows-auto  items-center md:grid'>
+              <div className='grid-rows-auto grid-cols-2  items-center md:grid'>
                 <div className=' order-2 row-span-1 my-5 flex justify-center '>
                   <StatisticBar
                     title={t("technique")}
