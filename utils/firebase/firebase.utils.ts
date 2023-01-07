@@ -97,7 +97,7 @@ export const firebaseUpdateUserDisplayName = async (
   userAuth: string,
   newDisplayName: string
 ) => {
-  const userDocRef = doc(db, "users", userAuth);
+  const userDocRef = doc(db, "users", shuffleUid(userAuth));
   if (auth.currentUser) {
     updateProfile(auth.currentUser, { displayName: newDisplayName })
       .then(() => {})
