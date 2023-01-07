@@ -22,7 +22,6 @@ import {
 } from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
-import { ReportDataInterface } from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 import { fetchReport, fetchUserData } from "./services/userServices";
 import {
@@ -31,7 +30,7 @@ import {
   loginViaEmailErrorHandler,
   loginViaGoogleErrorHandler,
   udpateDataErrorHandler,
-} from "./userErrorsHandling";
+} from "./userSlice.errorsHandling";
 import {
   SkillsType,
   updateUserInterface,
@@ -41,10 +40,11 @@ import {
 import {
   logOutInfo,
   newUserInfo,
+  updateDisplayNameSuccess,
   updateUserAvatarSuccess,
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
-} from "./userToast";
+} from "./userSlice.toast";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -100,7 +100,7 @@ export const createAccount = createAsyncThunk(
   "user/createAccount",
   async ({ login, email, password }: SignUpCredentials) => {
     if (await firebaseCheckUsersNameIsNotUnique(login)) {
-      throw new Error("auth/nick-alredy-in-use");
+      throw new Error("nick-alredy-in-use");
     }
     const { user } = await firebaseCreateAccountWithEmail(email, password);
     const userWithDisplayName = { ...user, displayName: login };
@@ -116,7 +116,7 @@ export const changeUserDisplayName = createAsyncThunk(
       throw new Error("nick-alredy-in-use");
     }
     if (!newDisplayName && newDisplayName.length === 0) {
-      throw new Error("");
+      throw new Error();
     }
     if (newDisplayName && newDisplayName.length > 0 && auth.currentUser) {
       await firebaseUpdateUserDisplayName(auth.currentUser.uid, newDisplayName);
@@ -323,6 +323,7 @@ export const userSlice = createSlice({
           ...state.userInfo,
           displayName: action.payload,
         };
+        updateDisplayNameSuccess();
       })
       .addCase(uploadUserAvatar.fulfilled, (state, action) => {
         state.isFetching = null;

@@ -40,4 +40,3 @@ export interface updateReprotInterface {
   userAuth: string;
   inputData: ReportFormikInterface;
 }
-
