@@ -24,7 +24,7 @@ import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialDat
 import { RootState } from "../../../store/store";
 import { ReportDataInterface } from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
-import { getUserData } from "./services/userServices";
+import { fetchReport, fetchUserData } from "./services/userServices";
 import {
   avatarErrorHandler,
   createAccountErrorHandler,
@@ -35,7 +35,7 @@ import {
 import {
   SkillsType,
   updateUserInterface,
-  updateUserStatsProps,
+  updateReprotInterface,
   userSliceInitialState,
 } from "./userSlice.types";
 import {
@@ -74,7 +74,7 @@ export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
   async () => {
     const { user } = await firebaseSignInWithGooglePopup();
-    const userData = await getUserData(user);
+    const userData = await fetchUserData(user);
     return userData;
   }
 );
@@ -83,7 +83,7 @@ export const logInViaEmail = createAsyncThunk(
   "user/loginViaEmail",
   async ({ email, password }: { email: string; password: string }) => {
     const { user } = await firebaseSignInWithEmail(email, password);
-    const userData = await getUserData(user);
+    const userData = await fetchUserData(user);
     return userData;
   }
 );
@@ -91,7 +91,7 @@ export const logInViaEmail = createAsyncThunk(
 export const autoLogIn = createAsyncThunk(
   "user/autoLogin",
   async (user: User) => {
-    const userData = await getUserData(user);
+    const userData = await fetchUserData(user);
     return userData;
   }
 );
@@ -104,7 +104,7 @@ export const createAccount = createAsyncThunk(
     }
     const { user } = await firebaseCreateAccountWithEmail(email, password);
     const userWithDisplayName = { ...user, displayName: login };
-    const userData = await getUserData(userWithDisplayName);
+    const userData = await fetchUserData(userWithDisplayName);
     return userData;
   }
 );
@@ -172,19 +172,9 @@ export const restartUserStats = createAsyncThunk(
 
 export const updateUserStats = createAsyncThunk(
   "user/updateUserStats",
-  async ({ userAuth, inputData }: updateUserStatsProps) => {
-    const fetchReport = () =>
-      fetch("/api/user/report", {
-        method: "POST",
-        body: JSON.stringify({ userAuth, inputData }),
-      });
-    const statistics = await (await fetchReport()).json();
-
-    return JSON.parse(statistics) as {
-      currentUserStats: StatisticsDataInterface;
-      previousUserStats: StatisticsDataInterface;
-      raitingData: ReportDataInterface;
-    };
+  async ({ userAuth, inputData }: updateReprotInterface) => {
+    const statistics = fetchReport({ userAuth, inputData });
+    return statistics;
   }
 );
 
