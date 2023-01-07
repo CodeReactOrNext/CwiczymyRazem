@@ -57,8 +57,8 @@ const AchievementsCarousel = ({
           <ToolTip />
           {achievements.length === 0
             ? t("empty")
-            : displayItems(index).map((achivId, index) => {
-                return <Achievement key={index} id={achivId} />;
+            : displayItems(index).map((achivId) => {
+                return <Achievement key={achivId} id={achivId} />;
               })}
         </div>
         <button onClick={handleNext}>

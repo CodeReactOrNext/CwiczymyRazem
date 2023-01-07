@@ -7,6 +7,7 @@
     "login": "Nie udało się zalogować",
     "popup_closed_by_user": "Nie udało się zalogować - zamknięto okno logowania ",
     "credential_already_in_use": "Podane dane są już używane",
+    "nick_already_in_use": "Podany nick jest już używany",
     "singup": "Nie udało się zarejestrować",
     "upadate": "Nie udało się zaktualizować danych. Spróbuj jeszcze raz.",
     "avatar_max": "Awatar może mieć maksymalnie 250px na 250px.",
@@ -20,6 +21,7 @@
     "logOut": "Pomyślnie wylogowano",
     "update_email": "Zmieniono email",
     "update_password": "Zmieniono hasło",
-    "update_avatar ": "Zmieniono awatar"
+    "update_avatar ": "Zmieniono awatar",
+    "update_displayname": "Zmieniono nick"
   }
 }

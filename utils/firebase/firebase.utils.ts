@@ -1,6 +1,5 @@
 import { AchievementList } from "assets/achievements/achievementsData";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import {
   getAuth,
@@ -36,20 +35,8 @@ import {
   statistics,
   StatisticsDataInterface,
 } from "./userStatisticsInitialData";
-
-import { toast } from "react-toastify";
 import { shuffleUid } from "helpers/shuffleUid";
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_AUTHDOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_PROJECTID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_STORAGEBUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_MESSAGEINGSENDERID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APPID,
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
+import { firebaseApp } from "./firebase.cofig";
 
 const provider = new GoogleAuthProvider();
 
@@ -71,41 +58,8 @@ export const firebaseCreateAccountWithEmail = (
   password: string
 ) => createUserWithEmailAndPassword(auth, email, password);
 
-export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
-  const shuffledUid = shuffleUid(user.uid);
-  const userDocRef = doc(db, "users", shuffledUid);
-  const userSnapshot = await getDoc(userDocRef);
-  if (!userSnapshot.exists()) {
-    const { displayName } = user;
-    const createdAt = new Date();
-    try {
-      await setDoc(userDocRef, {
-        displayName,
-        createdAt,
-        statistics,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  return shuffledUid;
-};
-
 export const firebaseLogUserOut = async () => {
   return await signOut(auth);
-};
-
-export const firebaseGetUserData = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
-  return userSnapshot.data()!.statistics;
-};
-
-export const firebaseGetUserDocument = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
-  const userData = userSnapshot.data();
-  return userData;
 };
 
 export const firebaseGetLogs = async () => {
@@ -132,43 +86,11 @@ export const firebaseGetUserAvatarURL = async () => {
   return userSnapshot.data()!.avatar;
 };
 
-export const firebaseSetUserExerciseRaprot = async (
-  userAuth: string,
-  raport: ReportDataInterface,
-  date: Date
-) => {
-  const dateString = date.toISOString();
-  const userDocRef = doc(db, "users", userAuth, "exerciseData", dateString);
-  await setDoc(userDocRef, raport);
-};
-
-export const firebaseUpdateUserStats = async (
-  userAuth: string,
-  statistics: StatisticsDataInterface
-) => {
-  const userDocRef = doc(db, "users", userAuth);
-  await updateDoc(userDocRef, { statistics });
-};
-
-export const firebaseAddLogReport = async (
-  userAuth: string,
-  data: string,
-  points: number,
-  newAchievements: AchievementList[],
-  newLevel: { isNewLevel: boolean; level: number }
-) => {
-  const logsDocRef = doc(collection(db, "logs"));
-  const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
-  const userName = userSnapshot.data()!.displayName;
-
-  await setDoc(logsDocRef, {
-    data,
-    userName,
-    points,
-    newAchievements,
-    newLevel,
-  });
+export const firebaseRestartUserStats = async () => {
+  if (auth.currentUser) {
+    const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
+    await updateDoc(userDocRef, { statistics });
+  }
 };
 
 export const firebaseUpdateUserDisplayName = async (
@@ -197,7 +119,6 @@ export const firebaseUpdateUserPassword = async (newPassword: string) => {
 
 export const firebaseGetUsersExceriseRaport = async () => {
   const usersDocRef = await getDocs(collection(db, "users"));
-
   const usersDataArr: FirebaseUserDataInterface[] = [];
   usersDocRef.forEach((doc) => {
     let currentUserData = doc.data() as FirebaseUserDataInterface;
@@ -205,6 +126,25 @@ export const firebaseGetUsersExceriseRaport = async () => {
     usersDataArr.push(currentUserData);
   });
   return usersDataArr;
+};
+export const firebaseCheckUsersNameIsNotUnique = async (
+  displayName: string
+) => {
+  const usersDocRef = await getDocs(collection(db, "users"));
+  const usersDataArr: FirebaseUserDataInterface[] = [];
+  usersDocRef.forEach((doc) => {
+    let currentUserData = doc.data() as FirebaseUserDataInterface;
+    currentUserData.profileId = doc.id;
+    usersDataArr.push(currentUserData);
+  });
+  return usersDataArr.some((user) => user.displayName === displayName);
+};
+
+export const firebaseGetUserDocument = async (userAuth: string) => {
+  const userDocRef = doc(db, "users", userAuth);
+  const userSnapshot = await getDoc(userDocRef);
+  const userData = userSnapshot.data();
+  return userData;
 };
 
 export const firebaseGetUserProviderData = async () => {
@@ -238,6 +178,18 @@ export const firebaseReauthenticateUser = async ({
   return null;
 };
 
+export const firebaseGetCurrentUser = async () => {
+  return auth.currentUser;
+};
+
+export const firebaseUpdateUserDocument = async (
+  key: string,
+  value: string
+) => {
+  const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
+  await updateDoc(userDocRef, { [key]: value });
+};
+
 export const firebaseUploadAvatar = async (image: Blob) => {
   if (!image) return;
   const imageRef = ref(
@@ -250,12 +202,4 @@ export const firebaseUploadAvatar = async (image: Blob) => {
   const avatarUrl = await getDownloadURL(avatarRef);
   await firebaseUpdateUserDocument("avatar", avatarUrl);
   return { avatar: avatarUrl };
-};
-
-export const firebaseUpdateUserDocument = async (
-  key: string,
-  value: string
-) => {
-  const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
-  await updateDoc(userDocRef, { [key]: value });
 };

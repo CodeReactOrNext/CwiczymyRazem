@@ -7,6 +7,7 @@
     "login": "Failed to log in",
     "popup_closed_by_user": "Failed to log in - login window closed",
     "credential_already_in_use": "The provided credentials are already in use",
+    "nick_already_in_use": "Nick is already in use",
     "singup": "Failed to sign up",
     "upadate": "Failed to update data. Please try again.",
     "avatar_max": "Avatar can be a maximum of 250px by 250px.",
@@ -20,6 +21,7 @@
     "update_email": "Email updated",
     "update_password": "Password updated",
     "update_avatar ": "Avatar updated",
-    "logOut": "Successfully logged out"
+    "logOut": "Successfully logged out",
+    "update_displayname": "Successfully change nick"
   }
 }

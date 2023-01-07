@@ -4,10 +4,11 @@ import Button from "components/Button";
 import Input from "components/Input";
 import {
   getUserProvider,
+  restartUserStats,
   selectIsFetching,
   selectUserAvatar,
   selectUserName,
-  updateDisplayName,
+  changeUserDisplayName,
   updateUserEmail,
   updateUserPassword,
   uploadUserAvatar,
@@ -57,7 +58,7 @@ const SettingsView = () => {
   }, [dispatch, newEmail]);
 
   const changeNameHandler = (name: string) => {
-    dispatch(updateDisplayName({ login: name } as SignUpCredentials));
+    dispatch(changeUserDisplayName(name));
   };
 
   const changeCredentialsHandler = async (data: UpdatedUserCredentials) => {
@@ -351,7 +352,11 @@ const SettingsView = () => {
           <div className='flex flex-col gap-2  p-4 text-2xl'>
             <p className='text-tertiary'>{t("settings:reset_stats")}</p>
             <p className='text-lg'>{t("settings:reset_warning")}</p>
-            <button className='text-lg text-main'>{t("settings:reset")}</button>
+            <button
+              onClick={() => dispatch(restartUserStats())}
+              className='text-lg text-main'>
+              {t("settings:reset")}
+            </button>
           </div>
           <hr className='border-main-opposed-400' />
           <div className='flex flex-col gap-2 p-4 text-2xl'>

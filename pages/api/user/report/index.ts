@@ -1,20 +1,19 @@
 import { getUserLvl } from "../report/utils/getUserLvl";
 import { checkIsPracticeToday } from "../report/utils/checkIsPracticeToday";
-import { convertInputTime } from "../report/utils/convertInputTime";
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import {
-  firebaseGetUserData,
-  firebaseSetUserExerciseRaprot,
-  firebaseUpdateUserStats,
-  firebaseAddLogReport,
-  firebaseGetUserName,
-} from "utils/firebase/firebase.utils";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 
+import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { NextApiRequest, NextApiResponse } from "next";
 import { makeRatingData } from "./utils/makeRatingData";
 import { checkAchievement } from "./achievement";
 import { calcExperience } from "./utils/calcExperience";
+import {
+  firebaseGetUserData,
+  firebaseUpdateUserStats,
+  firebaseSetUserExerciseRaprot,
+  firebaseAddLogReport,
+} from "pages/api/firebase/firebase.utils";
+import { convertInputTime } from "helpers/convertInputTime";
 
 interface updateUserStatsProps {
   userAuth: string;
@@ -24,7 +23,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
     userAuth
   )) as StatisticsDataInterface;
-  const userName = await firebaseGetUserName(userAuth);
+
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
     convertInputTime(inputData);
   const {
@@ -106,9 +105,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { userAuth, inputData } = JSON.parse(req.body);
+    const { userAuth, inputData } = req.body;
     const report = await reportHandler({ userAuth, inputData });
-    res.status(200).json(JSON.stringify(report));
+    res.status(200).json(report);
   }
   res.status(400);
 }

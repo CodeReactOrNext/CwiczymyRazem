@@ -1,8 +1,8 @@
-import { convertInputTime } from "pages/api/report/utils/convertInputTime";
 import {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
+import { convertInputTime } from "helpers/convertInputTime";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 
 export const time1Check = (statistics: StatisticsDataInterface) => {
@@ -85,7 +85,7 @@ export const checksWizard = (statistic: StatisticsDataInterface) => {
   if (statistic.time.creativity >= 180000000) return "wizard";
 };
 export const checksBook = (statistic: StatisticsDataInterface) => {
-  if (statistic.time.theory >= 36000000) return "scientist";
+  if (statistic.time.theory >= 36000000) return "book";
 };
 export const checkArtist = (statistic: StatisticsDataInterface) => {
   if (statistic.time.creativity >= 36000000) return "artist";
