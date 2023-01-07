@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { firebaseGetUserStats } from "../action/firebaseGetUserData";
+
 import { firebaseCreateUserDocumentFromAuth } from "../action/createUserFromAuth";
+import { firebaseGetUserDocument } from "utils/firebase/firebase.utils";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,12 +11,14 @@ export default async function handler(
     try {
       const user = req.body.user;
       const userAuth = await firebaseCreateUserDocumentFromAuth(user);
-      const currentUserStats = await firebaseGetUserStats(userAuth);
-      const userName = user.displayName!;
+      const userData = await firebaseGetUserDocument(userAuth);
       res.status(200).json({
-        userInfo: { displayName: userName },
+        userInfo: {
+          displayName: userData!.displayName,
+          avatar: userData!.avatar,
+        },
         userAuth,
-        currentUserStats,
+        currentUserStats: userData!.statistics,
       });
     } catch (error) {
       res.status(500).json({ error });

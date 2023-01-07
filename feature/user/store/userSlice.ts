@@ -122,7 +122,6 @@ export const changeUserDisplayName = createAsyncThunk(
       await firebaseUpdateUserDisplayName(auth.currentUser.uid, newDisplayName);
       return newDisplayName;
     }
-   
   }
 );
 
@@ -328,7 +327,6 @@ export const userSlice = createSlice({
       })
       .addCase(uploadUserAvatar.fulfilled, (state, action) => {
         state.isFetching = null;
-        console.log(action.payload);
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
         updateUserAvatarSuccess();
       })
