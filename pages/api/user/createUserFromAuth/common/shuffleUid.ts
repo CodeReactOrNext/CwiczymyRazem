@@ -14,7 +14,7 @@ export let shuffleUid = (inputString: string, unshuffle = false) => {
     i += unshuffle ? -1 : 1
   )
     swap(seedArr[i % seedArr.length] % len, i);
-  return outArr.join('');
+  return outArr.join("");
 };
 // seed variable should be a number as 4 characters string,
 //ex.: 1234 in env file, don't use quotes, string with letters won't work

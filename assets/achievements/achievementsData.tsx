@@ -1,4 +1,4 @@
-import { CustomTypeOptions, TFuncKey } from "i18next";
+import {  TFuncKey } from "i18next";
 
 import {
   FaHotjar,
@@ -284,13 +284,6 @@ export const achievementsData: AchievementsDataInterface[] = [
     Icon: FaRecordVinyl,
     rarity: "rare",
     description: "vinyl.description",
-  },
-  {
-    id: "rightway",
-    name: "rightway.title",
-    Icon: FaHandSparkles,
-    rarity: "rare",
-    description: "rightway.description",
   },
   {
     id: "rightway",

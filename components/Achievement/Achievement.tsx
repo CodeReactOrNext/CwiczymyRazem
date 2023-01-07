@@ -15,7 +15,7 @@ const Achievement = ({ id }: { id: AchievementList }) => {
     <>
       <ToolTip />
       <Icon
-        className='cursor-help drop-shadow-md	'
+        className='text-md cursor-help	drop-shadow-md'
         color={achievementsRarity[rarity].color}
         data-tip={t(description)}
       />

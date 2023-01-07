@@ -36,7 +36,7 @@ export interface updateUserInterface extends SignUpCredentials {
   newPassword?: string;
 }
 
-export interface updateUserStatsProps {
+export interface updateReprotInterface {
   userAuth: string;
   inputData: ReportFormikInterface;
 }
