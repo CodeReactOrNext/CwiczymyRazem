@@ -1,6 +1,5 @@
 import { AchievementList } from "assets/achievements/achievementsData";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import {
   getAuth,
@@ -37,17 +36,7 @@ import {
   StatisticsDataInterface,
 } from "./userStatisticsInitialData";
 import { shuffleUid } from "helpers/shuffleUid";
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_AUTHDOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_PROJECTID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_STORAGEBUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_MESSAGEINGSENDERID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APPID,
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
+import { firebaseApp } from "./firebase.cofig";
 
 const provider = new GoogleAuthProvider();
 
@@ -97,42 +86,11 @@ export const firebaseGetUserAvatarURL = async () => {
   return userSnapshot.data()!.avatar;
 };
 
-export const firebaseSetUserExerciseRaprot = async (
-  userAuth: string,
-  raport: ReportDataInterface,
-  date: Date
-) => {
-  const dateString = date.toISOString();
-  const userDocRef = doc(db, "users", userAuth, "exerciseData", dateString);
-  await setDoc(userDocRef, raport);
-};
-
 export const firebaseRestartUserStats = async () => {
   if (auth.currentUser) {
     const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
     await updateDoc(userDocRef, { statistics });
   }
-};
-
-export const firebaseAddLogReport = async (
-  userAuth: string,
-  data: string,
-  points: number,
-  newAchievements: AchievementList[],
-  newLevel: { isNewLevel: boolean; level: number }
-) => {
-  const logsDocRef = doc(collection(db, "logs"));
-  const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
-  const userName = userSnapshot.data()!.displayName;
-
-  await setDoc(logsDocRef, {
-    data,
-    userName,
-    points,
-    newAchievements,
-    newLevel,
-  });
 };
 
 export const firebaseUpdateUserDisplayName = async (
@@ -180,6 +138,13 @@ export const firebaseCheckUsersNameIsNotUnique = async (
     usersDataArr.push(currentUserData);
   });
   return usersDataArr.some((user) => user.displayName === displayName);
+};
+
+export const firebaseGetUserDocument = async (userAuth: string) => {
+  const userDocRef = doc(db, "users", userAuth);
+  const userSnapshot = await getDoc(userDocRef);
+  const userData = userSnapshot.data();
+  return userData;
 };
 
 export const firebaseGetUserProviderData = async () => {

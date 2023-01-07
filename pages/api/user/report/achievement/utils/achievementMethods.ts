@@ -1,8 +1,8 @@
-import { convertInputTime } from "pages/api/report/utils/convertInputTime";
 import {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
+import { convertInputTime } from "helpers/convertInputTime";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 
 export const time1Check = (statistics: StatisticsDataInterface) => {
