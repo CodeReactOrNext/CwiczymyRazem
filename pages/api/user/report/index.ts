@@ -105,9 +105,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { userAuth, inputData } = JSON.parse(req.body);
+    const { userAuth, inputData } = req.body;
     const report = await reportHandler({ userAuth, inputData });
-    res.status(200).json(JSON.stringify(report));
+    res.status(200).json(report);
   }
   res.status(400);
 }
