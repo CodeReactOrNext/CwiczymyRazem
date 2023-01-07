@@ -12,7 +12,9 @@ export const updateUserPasswordSuccess = () => {
 export const updateUserAvatarSuccess = () => {
   toast.success(i18n?.t("toast:success.update_avatar "));
 };
-
+export const updateDisplayNameSuccess = () => {
+  toast.success(i18n?.t("toast:success.update_displayname"));
+};
 export const newUserInfo = (points: number) => {
   if (points === 0) {
     toast.info(i18n?.t("toast:info.new_user_tip"), {
@@ -20,7 +22,6 @@ export const newUserInfo = (points: number) => {
     });
   }
 };
-
 export const logOutInfo = () => {
   toast.success(i18n?.t("toast:success.logOut"));
 };
