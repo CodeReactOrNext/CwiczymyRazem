@@ -1,18 +1,19 @@
 import { getUserLvl } from "../report/utils/getUserLvl";
 import { checkIsPracticeToday } from "../report/utils/checkIsPracticeToday";
-import { convertInputTime } from "../report/utils/convertInputTime";
+
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import {
-  firebaseGetUserData,
-  firebaseSetUserExerciseRaprot,
-  firebaseAddLogReport,
-  firebaseUpdateUserStats,
-} from "utils/firebase/firebase.utils";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { NextApiRequest, NextApiResponse } from "next";
 import { makeRatingData } from "./utils/makeRatingData";
 import { checkAchievement } from "./achievement";
 import { calcExperience } from "./utils/calcExperience";
+import {
+  firebaseGetUserData,
+  firebaseUpdateUserStats,
+  firebaseSetUserExerciseRaprot,
+  firebaseAddLogReport,
+} from "pages/api/firebase/firebase.utils";
+import { convertInputTime } from "helpers/convertInputTime";
 
 interface updateUserStatsProps {
   userAuth: string;
@@ -22,6 +23,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
     userAuth
   )) as StatisticsDataInterface;
+
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
     convertInputTime(inputData);
   const {

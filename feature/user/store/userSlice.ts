@@ -174,7 +174,7 @@ export const updateUserStats = createAsyncThunk(
   "user/updateUserStats",
   async ({ userAuth, inputData }: updateUserStatsProps) => {
     const fetchReport = () =>
-      fetch("/api/report", {
+      fetch("/api/user/report", {
         method: "POST",
         body: JSON.stringify({ userAuth, inputData }),
       });
