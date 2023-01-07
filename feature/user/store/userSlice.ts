@@ -120,8 +120,9 @@ export const changeUserDisplayName = createAsyncThunk(
     }
     if (newDisplayName && newDisplayName.length > 0 && auth.currentUser) {
       await firebaseUpdateUserDisplayName(auth.currentUser.uid, newDisplayName);
+      return newDisplayName;
     }
-    return newDisplayName;
+   
   }
 );
 
