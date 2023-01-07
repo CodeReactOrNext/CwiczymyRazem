@@ -5,23 +5,17 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
-import { shuffleUid } from "helpers/shuffleUid";
-import { toast } from "react-toastify";
-
 import {
   auth,
   firebaseCheckUsersNameIsNotUnique,
   firebaseCreateAccountWithEmail,
-  firebaseCreateUserDocumentFromAuth,
-  firebaseGetUserData,
-  firebaseGetUserDocument,
   firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseReauthenticateUser,
   firebaseRestartUserStats,
   firebaseSignInWithEmail,
-  firebaseSignInWithGooglePopup,
   firebaseUpdateUserDisplayName,
+  firebaseSignInWithGooglePopup,
   firebaseUpdateUserEmail,
   firebaseUpdateUserPassword,
   firebaseUploadAvatar,
@@ -30,6 +24,7 @@ import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialDat
 import { RootState } from "../../../store/store";
 import { ReportDataInterface } from "../view/ReportView/ReportView.types";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
+import { getUserData } from "./services/userServices";
 import {
   avatarErrorHandler,
   createAccountErrorHandler,
@@ -69,19 +64,18 @@ const initialState: userSliceInitialState = {
   },
 };
 
+export interface UserDataInterface {
+  userInfo: { displayName: string };
+  userAuth: string;
+  currentUserStats: StatisticsDataInterface;
+}
+
 export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
-  async (parameters, thunkAPI) => {
+  async () => {
     const { user } = await firebaseSignInWithGooglePopup();
-    const userAuth = await fetch("/api/user/createUserFromAuth", {
-      method: "POST",
-      body: JSON.stringify(user),
-    }).then((response) => {
-      return response.json();
-    });
-    const currentUserStats = await firebaseGetUserData(userAuth);
-    const userName = user.displayName!;
-    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
+    const userData = await getUserData(user);
+    return userData;
   }
 );
 
@@ -89,63 +83,45 @@ export const logInViaEmail = createAsyncThunk(
   "user/loginViaEmail",
   async ({ email, password }: { email: string; password: string }) => {
     const { user } = await firebaseSignInWithEmail(email, password);
-    const userAuth = await firebaseCreateUserDocumentFromAuth(user);
-    const currentUserStats = await firebaseGetUserData(userAuth);
-    const userName = user.displayName!;
-    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
+    const userData = await getUserData(user);
+    return userData;
   }
 );
 
 export const autoLogIn = createAsyncThunk(
   "user/autoLogin",
   async (user: User) => {
-    const userAuth = await fetch("/api/user/createUserFromAuth", {
-      method: "POST",
-      body: JSON.stringify(user),
-    }).then((response) => {
-      return response.json();
-    });
-    const currentUserStats = await firebaseGetUserData(userAuth);
-    const userDoc = await firebaseGetUserDocument(shuffleUid(user.uid));
-    return {
-      userInfo: { displayName: userDoc?.displayName, avatar: userDoc?.avatar },
-      userAuth,
-      currentUserStats,
-    };
+    const userData = await getUserData(user);
+    return userData;
   }
 );
 
 export const createAccount = createAsyncThunk(
   "user/createAccount",
-  async ({ login, email, password }: SignUpCredentials, thunkAPI) => {
+  async ({ login, email, password }: SignUpCredentials) => {
     if (await firebaseCheckUsersNameIsNotUnique(login)) {
-      toast.error("nick zajęty");
-      return thunkAPI.rejectWithValue(login);
+      throw new Error("auth/nick-alredy-in-use");
     }
     const { user } = await firebaseCreateAccountWithEmail(email, password);
     const userWithDisplayName = { ...user, displayName: login };
-    const userAuth = await firebaseCreateUserDocumentFromAuth(
-      userWithDisplayName
-    );
-    const currentUserStats = await firebaseGetUserData(userAuth);
-    const userName = userWithDisplayName.displayName;
-    return { userInfo: { displayName: userName }, userAuth, currentUserStats };
+    const userData = await getUserData(userWithDisplayName);
+    return userData;
   }
 );
 
-export const updateDisplayName = createAsyncThunk(
+export const changeUserDisplayName = createAsyncThunk(
   "user/updateDisplayName",
-  async ({ login }: SignUpCredentials) => {
-    const userAuth = await firebaseCreateUserDocumentFromAuth(
-      auth.currentUser!
-    );
-
-    if (login && login.length > 0) {
-      await firebaseUpdateUserDisplayName(userAuth, login);
+  async (newDisplayName: string) => {
+    if (await firebaseCheckUsersNameIsNotUnique(newDisplayName)) {
+      throw new Error("nick-alredy-in-use");
     }
-
-    const currentUserStats = await firebaseGetUserData(userAuth);
-    return { userInfo: { displayName: login }, userAuth, currentUserStats };
+    if (!newDisplayName && newDisplayName.length === 0) {
+      throw new Error("");
+    }
+    if (newDisplayName && newDisplayName.length > 0 && auth.currentUser) {
+      await firebaseUpdateUserDisplayName(auth.currentUser.uid, newDisplayName);
+    }
+    return newDisplayName;
   }
 );
 
@@ -284,7 +260,7 @@ export const userSlice = createSlice({
       .addCase(updateUserEmail.pending, (state) => {
         state.isFetching = "updateData";
       })
-      .addCase(updateDisplayName.pending, (state) => {
+      .addCase(changeUserDisplayName.pending, (state) => {
         state.isFetching = "updateData";
       })
       .addCase(updateUserPassword.pending, (state) => {
@@ -293,13 +269,13 @@ export const userSlice = createSlice({
       .addCase(uploadUserAvatar.pending, (state) => {
         state.isFetching = "updateData";
       })
-      .addCase(updateUserStats.rejected, (state) => {
+      .addCase(updateUserStats.rejected, (state, { error }) => {
         state.isFetching = null;
-        udpateDataErrorHandler();
+        udpateDataErrorHandler(error);
       })
-      .addCase(updateDisplayName.rejected, (state) => {
+      .addCase(changeUserDisplayName.rejected, (state, { error }) => {
         state.isFetching = null;
-        udpateDataErrorHandler();
+        udpateDataErrorHandler(error);
       })
       .addCase(uploadUserAvatar.rejected, (state) => {
         state.isFetching = null;
@@ -351,14 +327,16 @@ export const userSlice = createSlice({
         state.isFetching = null;
         updateUserPasswordSuccess();
       })
-      .addCase(updateDisplayName.fulfilled, (state, action) => {
+      .addCase(changeUserDisplayName.fulfilled, (state, action) => {
         state.isFetching = null;
-        state.userInfo = { ...state.userInfo, ...action.payload.userInfo };
-        state.currentUserStats = action.payload.currentUserStats;
-        state.userAuth = action.payload.userAuth;
+        state.userInfo = {
+          ...state.userInfo,
+          displayName: action.payload,
+        };
       })
       .addCase(uploadUserAvatar.fulfilled, (state, action) => {
         state.isFetching = null;
+        console.log(action.payload);
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
         updateUserAvatarSuccess();
       })

@@ -8,7 +8,7 @@ import {
   selectIsFetching,
   selectUserAvatar,
   selectUserName,
-  updateDisplayName,
+  changeUserDisplayName,
   updateUserEmail,
   updateUserPassword,
   uploadUserAvatar,
@@ -58,7 +58,7 @@ const SettingsView = () => {
   }, [dispatch, newEmail]);
 
   const changeNameHandler = (name: string) => {
-    dispatch(updateDisplayName({ login: name } as SignUpCredentials));
+    dispatch(changeUserDisplayName(name));
   };
 
   const changeCredentialsHandler = async (data: UpdatedUserCredentials) => {

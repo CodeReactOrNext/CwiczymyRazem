@@ -7,6 +7,7 @@
     "login": "Failed to log in",
     "popup_closed_by_user": "Failed to log in - login window closed",
     "credential_already_in_use": "The provided credentials are already in use",
+    "nick_already_in_use": "The nick is already in use",
     "singup": "Failed to sign up",
     "upadate": "Failed to update data. Please try again.",
     "avatar_max": "Avatar can be a maximum of 250px by 250px.",

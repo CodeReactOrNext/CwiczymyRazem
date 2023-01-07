@@ -35,6 +35,7 @@ export const loginViaGoogleErrorHandler = (error: SerializedError) => {
 };
 
 export const createAccountErrorHandler = (error: SerializedError) => {
+  console.log(error);
   if (error.code === "auth/credential-already-in-use") {
     toast.error(i18n?.t("toast:errors.credential_already_in_use"));
     return;
@@ -47,10 +48,22 @@ export const createAccountErrorHandler = (error: SerializedError) => {
     toast.error(i18n?.t("toast:errors.timeout"));
     return;
   }
+  if (error.message === "auth/nick-alredy-in-use") {
+    toast.error(i18n?.t("toast:errors.nick_already_in_use"));
+    return;
+  }
   toast.error(i18n?.t("toast:errors.singup"));
 };
 
-export const udpateDataErrorHandler = () => {
+export const udpateDataErrorHandler = (error: SerializedError) => {
+  if (error.message === "auth/nick-alredy-in-use") {
+    toast.error(i18n?.t("toast:errors.nick_already_in_use"));
+    return;
+  }
+  if (error.message === "auth/nick-wrong-format") {
+    toast.error(i18n?.t("toast:errors.nick_already_in_use"));
+    return;
+  }
   toast.error(i18n?.t("toast:errors.upadate"));
 };
 
