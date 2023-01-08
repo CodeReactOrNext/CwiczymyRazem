@@ -160,7 +160,6 @@ export const getUserProvider = createAsyncThunk(
 
 export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   await firebaseLogUserOut();
-  return null;
 });
 
 export const restartUserStats = createAsyncThunk(
@@ -303,6 +302,11 @@ export const userSlice = createSlice({
       })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
+        state.userInfo = null;
+        state.currentUserStats = null;
+        state.previousUserStats = null;
+        state.raitingData = null;
+        state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };
         logOutInfo();
       })
       .addCase(getUserProvider.fulfilled, (state, action) => {
