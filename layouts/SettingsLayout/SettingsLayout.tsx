@@ -20,7 +20,7 @@ import FormLayout from "layouts/FormLayout";
 import MainLayout from "layouts/MainLayout";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaAt, FaLock, } from "react-icons/fa";
+import { FaAt, FaLock } from "react-icons/fa";
 import { CircleSpinner } from "react-spinners-kit";
 import { toast } from "react-toastify";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
@@ -112,7 +112,7 @@ const SettingsLayout = () => {
   return (
     <>
       <MainLayout subtitle={t("settings:settings_subtilte")} variant='primary'>
-        <div className='m-auto flex max-w-[800px] flex-col bg-main-opposed-400 p-6 '>
+        <div className='m-auto flex w-full flex-col bg-main-opposed-400 p-6 sm:w-[640px] '>
           <div className='flex flex-row justify-around gap-2 p-4 text-2xl'>
             <div>
               <Avatar
