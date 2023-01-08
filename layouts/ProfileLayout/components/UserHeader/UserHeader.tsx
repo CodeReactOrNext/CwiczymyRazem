@@ -21,7 +21,9 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
           <div className=' lg:mr-4'>
             <Logo />
             <Avatar avatarURL={avatar} name={userName} lvl={lvl} />
-            <UserNav />
+            <div className='mt-3'>
+              <UserNav />
+            </div>
           </div>
           <WelcomeMessage userName={userName} place={1} points={points} />
         </div>
