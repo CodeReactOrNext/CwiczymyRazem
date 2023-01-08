@@ -118,7 +118,6 @@ const SettingsLayout = () => {
               <Avatar
                 avatarURL={avatarPreview ? avatarPreview : userAvatar}
                 name={userName!}
-                lvl={28}
               />
             </div>
 
