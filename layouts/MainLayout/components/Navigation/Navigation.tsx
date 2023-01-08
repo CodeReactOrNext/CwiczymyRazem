@@ -1,4 +1,11 @@
-import { selectUserAuth } from "feature/user/store/userSlice";
+import Avatar from "components/Avatar";
+import UserNav from "components/UserNav";
+import {
+  selectCurrentUserStats,
+  selectUserAuth,
+  selectUserAvatar,
+  selectUserName,
+} from "feature/user/store/userSlice";
 import HamburgerLayout from "layouts/HamburgerLayout";
 import Link from "next/link";
 import { useState } from "react";
@@ -14,6 +21,9 @@ const Navigation = ({
 }) => {
   const [hamburgerVisible, setHamburgerVisible] = useState<boolean>(false);
   const isUserLoggedIn = useAppSelector(selectUserAuth);
+  const avatar = useAppSelector(selectUserAvatar);
+  const userName = useAppSelector(selectUserName);
+  const userStats = useAppSelector(selectCurrentUserStats);
   const { t } = useTranslation("common");
 
   const hamburgerHandler = () => {
@@ -35,6 +45,14 @@ const Navigation = ({
         <NavLink url='/discord' title={t("nav.discord")} />
         <NavLink url='/faq' title={t("nav.faq")} />
       </ul>
+      {isUserLoggedIn && (
+        <div className=' hidden flex-row lg:flex'>
+          <UserNav flexDirection={"col"} />
+          <div className='scale-75 '>
+            <Avatar lvl={userStats!.lvl} name={userName!} avatarURL={avatar} />
+          </div>
+        </div>
+      )}
       <button className='h-8 w-8 lg:hidden' onClick={hamburgerHandler}>
         <FaBars className='h-full w-full' />
       </button>
