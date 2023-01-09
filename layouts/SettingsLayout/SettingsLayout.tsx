@@ -42,6 +42,8 @@ const SettingsLayout = () => {
   const [avatarIsValid, setAvatarIsValid] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string>();
 
+  const [restartConfirmShow, setRestartConfirmShow] = useState(false);
+
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
 
   const dispatch = useAppDispatch();
@@ -244,10 +246,39 @@ const SettingsLayout = () => {
           <Divider />
           <div className='flex flex-col gap-2  p-4 text-2xl'>
             <p className='text-tertiary'>{t("settings:reset_stats")}</p>
-            <p className='text-lg'>{t("settings:reset_warning")}</p>
-            <Button onClick={() => dispatch(restartUserStats())}>
-              {t("settings:reset")}
-            </Button>
+            {!restartConfirmShow && (
+              <>
+                <p className='text-lg'>{t("settings:reset_warning")}</p>
+                <Button
+                  variant='small'
+                  onClick={() => setRestartConfirmShow(true)}>
+                  {t("settings:reset")}
+                </Button>
+              </>
+            )}
+            {restartConfirmShow && (
+              <>
+                <p className=' text-lg'>{t("settings:reset_approve_info")}</p>
+                <div className='flex flex-row justify-center gap-3'>
+                  {isFetching ? (
+                    <CircleSpinner />
+                  ) : (
+                    <>
+                      <Button
+                        variant='small'
+                        onClick={() => dispatch(restartUserStats())}>
+                        {t("settings:reset")}
+                      </Button>
+                      <Button
+                        variant='small'
+                        onClick={() => setRestartConfirmShow(false)}>
+                        {t("settings:back")}
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </MainLayout>

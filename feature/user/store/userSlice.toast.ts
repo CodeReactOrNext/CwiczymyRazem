@@ -25,3 +25,6 @@ export const newUserInfo = (points: number) => {
 export const logOutInfo = () => {
   toast.success(i18n?.t("toast:success.logOut"));
 };
+export const restartInfo = () => {
+  toast.success(i18n?.t("toast:success.restart"));
+};
