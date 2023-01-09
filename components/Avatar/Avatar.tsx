@@ -3,12 +3,12 @@ import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 
 interface AvatarProps {
   name: string;
-  lvl: number;
+  lvl?: number;
   avatarURL?: string;
 }
 
 const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
-  const getRankImgPath = () => {
+  const getRankImgPath = (lvl: number) => {
     if (lvl >= IMG_RANKS_NUMBER) {
       return IMG_RANKS_NUMBER;
     }
@@ -23,11 +23,13 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
           <p className='text-5xl uppercase text-main-opposed'>{name?.[0]}</p>
         )}
       </div>
-      <img
-        className='absolute bottom-[18px] left-[35px] -rotate-90'
-        src={`/static/images/rank/${getRankImgPath()}.png`}
-        alt='gutiar_rank'
-      />
+      {lvl && (
+        <img
+          className='absolute bottom-[18px] left-[35px] -rotate-90'
+          src={`/static/images/rank/${getRankImgPath(lvl)}.png`}
+          alt='gutiar_rank'
+        />
+      )}
     </div>
   );
 };

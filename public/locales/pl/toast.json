@@ -22,6 +22,7 @@
     "update_email": "Zmieniono email",
     "update_password": "Zmieniono hasło",
     "update_avatar ": "Zmieniono awatar",
-    "update_displayname": "Zmieniono nick"
+    "update_displayname": "Zmieniono nick",
+    "restart": "Pomyślnie zrestartowano statystyki"
   }
 }
