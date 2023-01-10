@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { motion } from "framer-motion";
 
 export interface BonusPointsInterface {
   timePoints: number;
@@ -51,9 +52,15 @@ const RatingPopUp = ({
         {t("rating_popup.title")}
       </p>
       <div className='absolute right-0 left-0 bottom-0 z-10 h-[40%] w-full overflow-hidden sm:h-[50%] md:h-[55%]'>
-        <FireSVG className='absolute bottom-0 -left-[10%] w-4/6 rotate-6 fill-second-500 md:bottom-auto' />
-        <FireSVG className='absolute bottom-0 -right-[10%] w-4/6 -rotate-6  fill-second-500 md:bottom-auto' />
-        <div className='absolute bottom-0 flex h-1/3 w-full items-start justify-center bg-second-500'>
+        <motion.div
+          className='relative h-full w-full'
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          transition={{ delay: 0.6, type: "just" }}>
+          <FireSVG className='absolute -bottom-10 -left-[10%] w-4/6 rotate-6 fill-second-500 md:bottom-auto' />
+          <FireSVG className='absolute -bottom-10  -right-[10%] w-4/6 -rotate-6 fill-second-500 md:bottom-auto' />
+        </motion.div>
+        <div className='absolute bottom-0 flex h-1/3 w-full items-start justify-center'>
           <Button
             onClick={() => {
               onClick(false);
@@ -94,7 +101,13 @@ const RatingPopUp = ({
           objectFit='contain'
           alt='black guitar'></Image>
       </div>
-      <Lightning className='absolute -right-[25%] -top-[25%] z-10 h-5/6 w-[50%] -rotate-12 fill-tertiary-500 md:-right-[25%] md:-top-[5%]' />
+      <motion.div
+        className='absolute -right-[25%] -top-[25%] z-10  h-5/6 w-[50%] -rotate-12 md:-right-[25%] md:-top-[5%]'
+        initial={{ y: "-100%" }}
+        animate={{ y: 0 }}
+        transition={{ delay: 0.3, type: "tween" }}>
+        <Lightning className='absolute -rotate-12 fill-tertiary-500' />
+      </motion.div>
     </div>
   );
 };
