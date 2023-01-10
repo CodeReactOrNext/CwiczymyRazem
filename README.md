@@ -1,8 +1,10 @@
- ##This project is still being developed
+ ## This project is still being developed
+ 
 <div align="center">
  We are currently engaged in the process of refactoring a significant amount of code and focusing on improving security and adding new features.
- 
 </div>
+<br>
+<br>
 <div align="center">
   <img height="240" src="https://raw.githubusercontent.com/CodeReactOrNext/CwiczymyRazem/develop/gitImg/gif.gif"  />
 </div>
