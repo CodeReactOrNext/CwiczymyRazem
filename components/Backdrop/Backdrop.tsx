@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { motion } from "framer-motion";
 
 interface RatingPopUpProps {
   children: React.ReactElement;
@@ -16,7 +17,11 @@ const RatingPopUp = ({ children, selector, onClick }: RatingPopUpProps) => {
 
   return mounted
     ? createPortal(
-        <div
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ opacity: { duration: 0.3 } }}
           onClick={(event) => {
             const eventTarget = event.target as HTMLDivElement;
             if (eventTarget.id === "backdrop" && onClick) {
@@ -26,7 +31,7 @@ const RatingPopUp = ({ children, selector, onClick }: RatingPopUpProps) => {
           id='backdrop'
           className='fixed left-0 top-0 bottom-0 z-50 flex h-full w-full justify-center overflow-y-auto overflow-x-hidden bg-black/60'>
           {children}
-        </div>,
+        </motion.div>,
         document.getElementById(selector)!
       )
     : null;
