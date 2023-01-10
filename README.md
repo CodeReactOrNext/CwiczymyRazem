@@ -13,8 +13,8 @@
 
 A guitar exercise tracker featuring a leaderboard, leveling system, and Figma-designed interface. Record and track progress, compete with others, and earn rewards as you improve your skills.
 
-## This project is still being developed
-<b>Demo:</b> https://cwiczymy-razem.vercel.app/
+## Demo
+ https://cwiczymy-razem.vercel.app/
 <br> 
 <br> 
 Test Account: <br> 
