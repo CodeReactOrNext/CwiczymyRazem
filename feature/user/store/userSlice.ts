@@ -40,11 +40,13 @@ import {
 import {
   logOutInfo,
   newUserInfo,
+  restartInfo,
   updateDisplayNameSuccess,
   updateUserAvatarSuccess,
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
+import { statisticsInitial } from "pages/api/user/data/userStatisticsInitialData";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -122,7 +124,6 @@ export const changeUserDisplayName = createAsyncThunk(
       await firebaseUpdateUserDisplayName(auth.currentUser.uid, newDisplayName);
       return newDisplayName;
     }
-   
   }
 );
 
@@ -161,7 +162,6 @@ export const getUserProvider = createAsyncThunk(
 
 export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   await firebaseLogUserOut();
-  return null;
 });
 
 export const restartUserStats = createAsyncThunk(
@@ -260,7 +260,14 @@ export const userSlice = createSlice({
       .addCase(uploadUserAvatar.pending, (state) => {
         state.isFetching = "updateData";
       })
+      .addCase(restartUserStats.pending, (state) => {
+        state.isFetching = "updateData";
+      })
       .addCase(updateUserStats.rejected, (state, { error }) => {
+        state.isFetching = null;
+        udpateDataErrorHandler(error);
+      })
+      .addCase(restartUserStats.rejected, (state, { error }) => {
         state.isFetching = null;
         udpateDataErrorHandler(error);
       })
@@ -302,8 +309,21 @@ export const userSlice = createSlice({
         state.previousUserStats = payload.previousUserStats;
         state.raitingData = payload.raitingData;
       })
+      .addCase(restartUserStats.fulfilled, (state) => {
+        state.isFetching = null;
+        state.currentUserStats = statisticsInitial;
+        state.previousUserStats = null;
+        state.raitingData = null;
+        state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };
+        restartInfo();
+      })
       .addCase(logUserOff.fulfilled, (state) => {
         state.userAuth = null;
+        state.userInfo = null;
+        state.currentUserStats = null;
+        state.previousUserStats = null;
+        state.raitingData = null;
+        state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };
         logOutInfo();
       })
       .addCase(getUserProvider.fulfilled, (state, action) => {
@@ -328,7 +348,6 @@ export const userSlice = createSlice({
       })
       .addCase(uploadUserAvatar.fulfilled, (state, action) => {
         state.isFetching = null;
-        console.log(action.payload);
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
         updateUserAvatarSuccess();
       })
