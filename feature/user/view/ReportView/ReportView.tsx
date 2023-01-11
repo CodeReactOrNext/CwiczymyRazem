@@ -27,8 +27,9 @@ import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
 import { ReportFormikInterface } from "./ReportView.types";
 import { CircleSpinner } from "react-spinners-kit";
-import { convertMsToHMObject } from "helpers/timeConverter";
+import { convertMsToHM, convertMsToHMObject } from "helpers/timeConverter";
 import { convertInputTime } from "helpers/convertInputTime";
+import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
@@ -66,7 +67,18 @@ const ReportView = () => {
 
   const reportOnSubmit = (inputData: ReportFormikInterface) => {
     const { sumTime } = convertInputTime(inputData);
-
+    const lastReportTimeExceded = isLastReportTimeExceeded(
+      currentUserStats!.lastReportDate,
+      sumTime
+    );
+    if (lastReportTimeExceded) {
+      console.log(convertMsToHM(lastReportTimeExceded));
+      toast.error(
+        "Od poprzedniego raportu minęło mniej czasu niż wpisałeś w obecnym. Przesadziłeś o:" +
+          convertMsToHM(lastReportTimeExceded)
+      );
+      return;
+    }
     if (sumTime >= 86400000) {
       toast.error(t("toast.24h_error"));
       return;
@@ -75,6 +87,7 @@ const ReportView = () => {
       toast.error(t("toast.input_time"));
       return;
     }
+
     if (!userAuth) {
       toast.error(t("toast.not_logged"));
       return;
