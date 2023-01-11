@@ -1,6 +1,5 @@
 import { getUserLvl } from "../report/utils/getUserLvl";
 import { checkIsPracticeToday } from "../report/utils/checkIsPracticeToday";
-
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -23,7 +22,6 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
     userAuth
   )) as StatisticsDataInterface;
-
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
     convertInputTime(inputData);
   const {
@@ -42,13 +40,11 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const raiting = makeRatingData(inputData, sumTime);
   const userLastReportDate = new Date(lastReportDate!);
   const didPracticeToday = checkIsPracticeToday(userLastReportDate);
-
   const level = getUserLvl(lvl, points + raiting.basePoints);
   const isNewLevel = level > lvl;
   const updatedActualDayWithoutBreak = didPracticeToday
     ? actualDayWithoutBreak
     : actualDayWithoutBreak + 1;
-
   const updatedUserData: StatisticsDataInterface = {
     time: {
       technique: time.technique + techniqueTime,
