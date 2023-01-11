@@ -7,19 +7,23 @@
   "creativity": "Creative work",
   "healthy_habits_title": "Healthy habits",
   "report_button": "Report",
+  "exceeding_time":"I want to add another report despite the time limit.",
   "toast": {
     "24h_error": "It is not possible to exercise more than 24 hours per day",
     "input_time": "Enter time",
     "not_logged": "You are not logged in",
     "report_success": "Reported successfully",
-    "stoper_entered": "Time from stopwatch entered"
+    "stoper_entered": "Time from stopwatch entered",
+    "exceeding_time": "You have entered more time than has passed since the last report. You exceeded the time by  "
   },
   "description": {
     "technique": "E.g. playing and learning songs, warming up, practicing rhythm and various techniques such as alternate picking or legato",
     "hearing": "E.g. playing or listening to songs or fragments of them by ear, listening and identifying intervals, singing",
     "theory": "E.g. transcribing and analyzing songs, learning notes on the fretboard, reading sheet music",
-    "creative": "E.g. writing original songs, improvising, working on one's own style"
-  },  "habits": {
+    "creative": "E.g. writing original songs, improvising, working on one's own style",
+    "exceeding_time": "If you forgot to add the time/healthy habit to the previous report or want to report an additional exercise session you did earlier, check this box."
+  },
+  "habits": {
     "exercise_plan": {
       "title": "Did you fulfill your exercise plan?",
       "description": "Setting goals and planning your guitar practice is important because it helps maintain motivation, track progress, and achieve desired goals."
@@ -41,7 +45,7 @@
       "description": "Recording yourself allows you to see and hear your playing from a different perspective than when you play live. This can help you notice mistakes or weaknesses that you might have missed. "
     }
   },
-  
+
   "rating_popup": {
     "title": "YOU GOT",
     "points": "pts",
