@@ -47,6 +47,7 @@ import {
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
 import { statisticsInitial } from "pages/api/user/data/userStatisticsInitialData";
+import { toast } from "react-toastify";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -264,7 +265,9 @@ export const userSlice = createSlice({
         state.isFetching = "updateData";
       })
       .addCase(updateUserStats.rejected, (state, { error }) => {
+        console.log(error);
         state.isFetching = null;
+
         udpateDataErrorHandler(error);
       })
       .addCase(restartUserStats.rejected, (state, { error }) => {
@@ -300,6 +303,12 @@ export const userSlice = createSlice({
         createAccountErrorHandler(error);
       })
       .addCase(updateUserStats.fulfilled, (state, { payload }) => {
+        console.log(payload, "w fullfield");
+        if (payload?.error) {
+          toast.error("d");
+          return;
+        }
+
         state.timer.technique = 0;
         state.timer.creativity = 0;
         state.timer.hearing = 0;

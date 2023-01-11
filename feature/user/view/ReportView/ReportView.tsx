@@ -27,11 +27,15 @@ import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
 import { ReportFormikInterface } from "./ReportView.types";
 import { CircleSpinner } from "react-spinners-kit";
-import { convertMsToHMObject } from "helpers/timeConverter";
+import { convertMsToHM, convertMsToHMObject } from "helpers/timeConverter";
 import { convertInputTime } from "helpers/convertInputTime";
+import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
+import QuestionMark from "components/QuestionMark";
+import { checkIsPracticeToday } from "pages/api/user/report/utils/checkIsPracticeToday";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
+  const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
 
   const { t } = useTranslation("report");
   const dispatch = useAppDispatch();
@@ -51,6 +55,9 @@ const ReportView = () => {
   const theoryTime = convertMsToHMObject(timerData.theory);
   const hearingTime = convertMsToHMObject(timerData.hearing);
   const creativityTime = convertMsToHMObject(timerData.creativity);
+  const isPracticeToday = checkIsPracticeToday(
+    new Date(currentUserStats!.lastReportDate)
+  );
 
   const formikInitialValues: ReportFormikInterface = {
     techniqueHours: techniqueTime.hours,
@@ -66,7 +73,17 @@ const ReportView = () => {
 
   const reportOnSubmit = (inputData: ReportFormikInterface) => {
     const { sumTime } = convertInputTime(inputData);
+    const lastReportTimeExceded = isLastReportTimeExceeded(
+      currentUserStats!.lastReportDate,
+      sumTime
+    );
 
+    if (lastReportTimeExceded && !acceptExceedingTime) {
+      toast.error(
+        t("toast.exceeding_time") + convertMsToHM(lastReportTimeExceded)
+      );
+      return;
+    }
     if (sumTime >= 86400000) {
       toast.error(t("toast.24h_error"));
       return;
@@ -75,6 +92,7 @@ const ReportView = () => {
       toast.error(t("toast.input_time"));
       return;
     }
+
     if (!userAuth) {
       toast.error(t("toast.not_logged"));
       return;
@@ -147,6 +165,21 @@ const ReportView = () => {
                     />
                   </div>
                 </ReportCategoryLayout>
+                {isPracticeToday && (
+                  <div className='flex flex-row  gap-2 text-xl'>
+                    <p>{t("exceeding_time")}</p>
+                    <QuestionMark
+                      description={t("description.exceeding_time")}
+                    />
+                    <input
+                      type='checkbox'
+                      className='h-8'
+                      onClick={() => {
+                        setAcceptExceedingTime((prev) => !prev);
+                      }}
+                    />
+                  </div>
+                )}
                 <ReportCategoryLayout title={t("healthy_habits_title")}>
                   <Checkbox
                     name='exercise_plan'
