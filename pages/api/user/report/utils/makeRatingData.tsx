@@ -1,4 +1,3 @@
-
 import { getMultiplerValue } from "./getMulitplerValue";
 import {
   HABBITS_POINTS_VALUE,
@@ -8,9 +7,10 @@ import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.t
 
 export const makeRatingData = (
   data: ReportFormikInterface,
-  totalTime: number
+  totalTime: number,
+  actualDayWithoutBreak: number
 ) => {
-  const streak = 5;
+  const streak = actualDayWithoutBreak;
   const multipler = getMultiplerValue(streak);
   const habbitsCount = data.habbits.length;
   const additionalPoints = Math.floor(habbitsCount * HABBITS_POINTS_VALUE);
