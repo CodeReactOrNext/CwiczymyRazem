@@ -23,10 +23,11 @@ export const fetchUserData = async (user: User) =>
     })
     .then((response) => response.data);
 
-export const fetchReport = ({userAuth, inputData }: updateReprotInterface) =>
+export const fetchReport = ({ userAuth, inputData }: updateReprotInterface) =>
   axios
     .post<fetchedReportDataInterface>("/api/user/report", {
       userAuth,
       inputData,
     })
-    .then((response) => response.data);
+    .then((response) => response.data)
+    .catch((error) => error);

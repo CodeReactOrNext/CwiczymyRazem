@@ -27,5 +27,10 @@
     "leadboard": "Leadboard",
     "discord": "Discord",
     "faq": "FAQ"
+  },
+  "day_since":{
+    "no_practice": "Gracz nie ćwiczył",
+    "pracitce_last_24":"Ćwiczył w ciągu ostatnich 24h",
+    "practice_day": "Ćwiczył {{days}} dni temu"
   }
 }
