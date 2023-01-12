@@ -6,10 +6,8 @@ import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialDat
 import { useTranslation } from "react-i18next";
 import { convertMsToHM } from "helpers/timeConverter";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
-import MainLayout from "layouts/MainLayout";
 import Avatar from "components/Avatar";
 import DaySince from "components/DaySince/DaySince";
-
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
   userStats: StatisticsDataInterface;
@@ -28,7 +26,6 @@ const ProfileLayout = ({
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
   return (
-    <MainLayout subtitle='Leadboard' variant='secondary'>
       <div className='flex justify-center'>
         <div className='m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
           <HeadDecoration title={t("profile")} />
@@ -95,7 +92,6 @@ const ProfileLayout = ({
           </div>
         </div>
       </div>
-    </MainLayout>
   );
 };
 

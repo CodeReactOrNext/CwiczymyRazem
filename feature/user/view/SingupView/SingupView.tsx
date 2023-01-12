@@ -35,52 +35,50 @@ const SingupView = () => {
   };
 
   return (
-    <MainLayout subtitle={t("signup:subtitlebar_text")} variant='primary'>
-      <Formik
-        initialValues={formikInitialValues}
-        validationSchema={signupSchema}
-        onSubmit={onSubmit}>
-        <Form>
-          <FormLayout>
-            <>
-              <Link href='/login'>
-                <a className='flex flex-row gap-x-2 click-behavior'>
-                  <FaArrowLeft /> Back to login
-                </a>
-              </Link>
+    <Formik
+      initialValues={formikInitialValues}
+      validationSchema={signupSchema}
+      onSubmit={onSubmit}>
+      <Form>
+        <FormLayout>
+          <>
+            <Link href='/login'>
+              <a className='flex flex-row gap-x-2 click-behavior'>
+                <FaArrowLeft /> Back to login
+              </a>
+            </Link>
 
-              <Input
-                Icon={FaUserAlt}
-                placeholder={t("common:input.login")}
-                name={"login"}
-              />
-              <Input
-                Icon={FaAt}
-                placeholder={t("common:input.email")}
-                name={"email"}
-              />
-              <Input
-                type='password'
-                Icon={FaLock}
-                placeholder={t("common:input.password")}
-                name={"password"}
-              />
-              <Input
-                type='password'
-                Icon={FaLock}
-                placeholder={t("common:input.repeat_password")}
-                name={"repeat_password"}
-              />
-              <div className='flex space-x-1 '>
-                <Button loading={isFetching} type='submit'>
-                  {t("common:button.sign_up")}
-                </Button>
-              </div>
-            </>
-          </FormLayout>
-        </Form>
-      </Formik>
-    </MainLayout>
+            <Input
+              Icon={FaUserAlt}
+              placeholder={t("common:input.login")}
+              name={"login"}
+            />
+            <Input
+              Icon={FaAt}
+              placeholder={t("common:input.email")}
+              name={"email"}
+            />
+            <Input
+              type='password'
+              Icon={FaLock}
+              placeholder={t("common:input.password")}
+              name={"password"}
+            />
+            <Input
+              type='password'
+              Icon={FaLock}
+              placeholder={t("common:input.repeat_password")}
+              name={"repeat_password"}
+            />
+            <div className='flex space-x-1 '>
+              <Button loading={isFetching} type='submit'>
+                {t("common:button.sign_up")}
+              </Button>
+            </div>
+          </>
+        </FormLayout>
+      </Form>
+    </Formik>
   );
 };
 

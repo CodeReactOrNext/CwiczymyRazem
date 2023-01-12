@@ -1,20 +1,23 @@
-import PageLoadingSpinner from "components/PageLoadingSpinner";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
 import ReportView from "feature/user/view/ReportView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import MainLayout from "layouts/MainLayout";
+import { useTranslation } from "react-i18next";
 
 const ReportPage: NextPage = () => {
+  const { t } = useTranslation("report");
   const { isLoggedIn } = useAutoLogIn({
     redirects: {
       loggedOut: "/login",
     },
   });
 
-  return !isLoggedIn ? (
-    <PageLoadingSpinner layoutVariant='primary' />
-  ) : (
-    <ReportView />
+  return (
+    <MainLayout subtitle={t("subtitlebar_text")} variant='primary'>
+      {!isLoggedIn ? <PageLoadingLayout /> : <ReportView />}
+    </MainLayout>
   );
 };
 
