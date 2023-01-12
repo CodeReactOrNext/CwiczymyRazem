@@ -1,5 +1,6 @@
 import React, { ButtonHTMLAttributes } from "react";
 import { CircleSpinner } from "react-spinners-kit";
+import { motion } from "framer-motion";
 
 interface ButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -23,7 +24,8 @@ const Button = ({
   ...otherProps
 }: ButtonProps) => {
   return (
-    <button
+    <motion.button
+      whileTap={{ scale: 0.9 }}
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
@@ -46,7 +48,7 @@ const Button = ({
       ) : (
         children
       )}
-    </button>
+    </motion.button>
   );
 };
 
