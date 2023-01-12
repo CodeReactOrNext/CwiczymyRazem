@@ -37,7 +37,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
     achievements,
   } = currentUserStats;
 
-  const raiting = makeRatingData(inputData, sumTime);
+  const raiting = makeRatingData(inputData, sumTime, actualDayWithoutBreak);
   const userLastReportDate = new Date(lastReportDate!);
   const didPracticeToday = checkIsPracticeToday(userLastReportDate);
   const level = getUserLvl(lvl, points + raiting.basePoints);
