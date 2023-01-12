@@ -47,6 +47,7 @@ const SettingsLayout = () => {
   const dispatch = useAppDispatch();
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
+  const isViaGoogle = userProviderData?.providerId !== "google.com";
 
   useEffect(() => {
     dispatch(getUserProvider()).then((data) => {
@@ -139,7 +140,7 @@ const SettingsLayout = () => {
                 accept='image/png, image/jpeg'
                 className='text-base'
               />
-              <p className='text-base '>Max resolutin: (250px/250px)</p>
+              <p className='text-base '>{t("settings:resolution_info")}</p>
             </div>
             <Button
               disabled={!avatarIsValid}
@@ -168,64 +169,69 @@ const SettingsLayout = () => {
                 isFetching={isFetching}
                 value={userName}
               />
-
               <Divider />
-              <FieldBox
-                title={"Email"}
-                submitHandler={() => {
-                  if (values.email && !errors.email) {
-                    setNewEmail(values.email);
-                    toast.info(t("toast:info.log_in_again"));
-                    setReauthFormVisible(true);
-                  }
-                }}
-                errors={errors}
-                values={values}
-                inputName={"email"}
-                isFetching={isFetching}
-                value={userProviderData?.email}
-              />
-              <Divider />
-              <div className='flex  flex-row gap-2 p-4 text-2xl'>
-                <p className='text-tertiary'>{t("settings:password")}</p>
-              </div>
-
-              <div className='flex h-full w-full flex-col items-center gap-4 pb-5'>
-                <Input
-                  placeholder={t("settings:new_password")}
-                  name='password'
-                  type='password'
-                />
-                <Input
-                  placeholder={t("settings:repeat_new_password")}
-                  name='repeat_password'
-                  type='password'
-                />
-                <Button
-                  variant='small'
-                  loading={isFetching}
-                  disabled={Boolean(
-                    !values.password ||
-                      errors.password ||
-                      !values.repeat_password ||
-                      errors.repeat_password
-                  )}
-                  onClick={() => {
-                    if (
-                      values.password &&
-                      !errors.password &&
-                      values.repeat_password &&
-                      !errors.repeat_password
-                    ) {
-                      setNewPassword(values.password);
-                      toast.info(t("toast:info.log_in_again"));
-                      setReauthFormVisible(true);
-                    }
-                  }}
-                  type='submit'>
-                  {t("settings:save")}
-                </Button>
-              </div>
+              {isViaGoogle ? (
+                <>
+                  <FieldBox
+                    title={"Email"}
+                    submitHandler={() => {
+                      if (values.email && !errors.email) {
+                        setNewEmail(values.email);
+                        toast.info(t("toast:info.log_in_again"));
+                        setReauthFormVisible(true);
+                      }
+                    }}
+                    errors={errors}
+                    values={values}
+                    inputName={"email"}
+                    isFetching={isFetching}
+                    value={userProviderData?.email}
+                  />
+                  )
+                  <Divider />
+                  <div className='flex  flex-row gap-2 p-4 text-2xl'>
+                    <p className='text-tertiary'>{t("settings:password")}</p>
+                  </div>
+                  <div className='flex h-full w-full flex-col items-center gap-4 pb-5'>
+                    <Input
+                      placeholder={t("settings:new_password")}
+                      name='password'
+                      type='password'
+                    />
+                    <Input
+                      placeholder={t("settings:repeat_new_password")}
+                      name='repeat_password'
+                      type='password'
+                    />
+                    <Button
+                      variant='small'
+                      loading={isFetching}
+                      disabled={Boolean(
+                        !values.password ||
+                          errors.password ||
+                          !values.repeat_password ||
+                          errors.repeat_password
+                      )}
+                      onClick={() => {
+                        if (
+                          values.password &&
+                          !errors.password &&
+                          values.repeat_password &&
+                          !errors.repeat_password
+                        ) {
+                          setNewPassword(values.password);
+                          toast.info(t("toast:info.log_in_again"));
+                          setReauthFormVisible(true);
+                        }
+                      }}
+                      type='submit'>
+                      {t("settings:save")}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <p className='p-5'>{t("settings:logged_in_via_google")}</p>
+              )}
             </Form>
           )}
         </Formik>
