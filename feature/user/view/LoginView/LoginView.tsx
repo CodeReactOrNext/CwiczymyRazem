@@ -15,7 +15,6 @@ import FormLayout from "layouts/FormLayout";
 import Button from "components/Button";
 import GoogleButton from "components/GoogleButton";
 import Input from "components/Input";
-import { CircleSpinner } from "react-spinners-kit";
 
 export interface logInCredentials {
   email: string;
@@ -62,15 +61,9 @@ const LoginView = () => {
                 placeholder={t("common:input.password")}
               />
               <div className='flex space-x-1 '>
-                {isFetching ? (
-                  <Button type='submit' disabled>
-                    <div className='px-3'>
-                      <CircleSpinner size={24} />
-                    </div>
-                  </Button>
-                ) : (
-                  <Button type='submit'>{t("common:button.sign_in")}</Button>
-                )}
+                <Button type='submit' loading={isFetching}>
+                  {t("common:button.sign_in")}
+                </Button>
                 <Link href='/signup'>
                   <a>
                     <Button variant='secondary'>

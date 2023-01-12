@@ -1,4 +1,5 @@
 import React, { ButtonHTMLAttributes } from "react";
+import { CircleSpinner } from "react-spinners-kit";
 
 interface ButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -7,6 +8,7 @@ interface ButtonProps {
   style?: string;
   type?: "submit" | "reset" | "button";
   disabled?: boolean;
+  loading?: boolean;
   otherProps?: React.ReactNode;
 }
 
@@ -17,24 +19,33 @@ const Button = ({
   style,
   type,
   disabled,
+  loading,
   ...otherProps
 }: ButtonProps) => {
   return (
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
       className={
         " sm:w-45 cursor-pointer border-2 border-transparent  text-center font-bold uppercase active:click-behavior xs:text-xl   " +
         (variant === "secondary"
           ? "bg-main-opposed hover:bg-main-opposed-100"
           : "bg-main hover:bg-main-100") +
-        (variant === "small" ? "p-2 px-2  sm:text-xl " : " p-2 px-5  sm:text-2xl ") +
+        (variant === "small"
+          ? "p-2 px-2  sm:text-xl "
+          : " p-2 px-5  sm:text-2xl ") +
         (style ? style : "") +
         (disabled ? "pointer-events-none grayscale" : "")
       }
       {...otherProps}>
-      {children}
+      {loading ? (
+        <div className='px-3'>
+          <CircleSpinner size={24} />
+        </div>
+      ) : (
+        children
+      )}
     </button>
   );
 };

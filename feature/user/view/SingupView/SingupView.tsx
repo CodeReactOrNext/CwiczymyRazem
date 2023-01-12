@@ -8,7 +8,6 @@ import FormLayout from "layouts/FormLayout";
 import Input from "components/Input";
 import { createAccount, selectIsFetching } from "feature/user/store/userSlice";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { CircleSpinner } from "react-spinners-kit";
 import Link from "next/link";
 
 export interface SignUpCredentials {
@@ -73,15 +72,9 @@ const SingupView = () => {
                 name={"repeat_password"}
               />
               <div className='flex space-x-1 '>
-                {isFetching ? (
-                  <Button type='submit' disabled>
-                    <div className='px-3'>
-                      <CircleSpinner size={24} />
-                    </div>
-                  </Button>
-                ) : (
-                  <Button type='submit'>{t("common:button.sign_up")}</Button>
-                )}
+                <Button loading={isFetching} type='submit'>
+                  {t("common:button.sign_up")}
+                </Button>
               </div>
             </>
           </FormLayout>
