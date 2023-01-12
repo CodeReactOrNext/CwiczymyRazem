@@ -5,7 +5,7 @@ import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { NextApiRequest, NextApiResponse } from "next";
 import { makeRatingData } from "../../../../utils/gameLogic/makeRatingData";
 import { checkAchievement } from "../../../../utils/gameLogic/checkAvievement";
-import { calcExperience } from "../../../../utils/gameLogic/calcExperience";
+import { getPointsToLvlUp } from "../../../../utils/gameLogic/getPointsToLvlUp";
 import {
   firebaseGetUserData,
   firebaseUpdateUserStats,
@@ -56,7 +56,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
     },
     points: points + raiting.basePoints,
     lvl: level,
-    pointsToNextLvl: calcExperience(level + 1),
+    pointsToNextLvl: getPointsToLvlUp(level + 1),
     sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
     habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
     dayWithoutBreak:

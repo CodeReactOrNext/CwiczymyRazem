@@ -12,9 +12,8 @@ import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { calcExperience } from "utils/gameLogic/calcExperience";
+import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 import LevelIndicator from "./components/LevelIndicator";
-
 
 export interface BonusPointsInterface {
   timePoints: number;
@@ -59,8 +58,8 @@ const RatingPopUp = ({
   };
 
   const levelXpStart =
-    currentUserStats.lvl === 1 ? 0 : calcExperience(currentUserStats.lvl - 1);
-  const levelXpEnd = calcExperience(currentUserStats.lvl);
+    currentUserStats.lvl === 1 ? 0 : getPointsToLvlUp(currentUserStats.lvl - 1);
+  const levelXpEnd = getPointsToLvlUp(currentUserStats.lvl);
 
   const pointsInThisLevel = currentUserStats.points - levelXpStart;
 
