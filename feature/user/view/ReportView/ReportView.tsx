@@ -26,7 +26,6 @@ import { toast } from "react-toastify";
 import { RaportSchema } from "./helpers/RaportShcema";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
 import { ReportFormikInterface } from "./ReportView.types";
-import { CircleSpinner } from "react-spinners-kit";
 import { convertMsToHM, convertMsToHMObject } from "helpers/timeConverter";
 import { convertInputTime } from "helpers/convertInputTime";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
@@ -221,15 +220,9 @@ const ReportView = () => {
                   <div className='m-2 h-6'>
                     {Object.keys(errors).length !== 0 && <ErrorBox />}
                   </div>
-                  {isFetching ? (
-                    <Button type='submit' disabled>
-                      <div className='px-3'>
-                        <CircleSpinner size={24} />
-                      </div>
-                    </Button>
-                  ) : (
-                    <Button type='submit'>{t("report_button")}</Button>
-                  )}
+                  <Button type='submit' loading={isFetching}>
+                    {t("report_button")}
+                  </Button>
                 </div>
               </ReportFormLayout>
             </>

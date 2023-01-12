@@ -10,7 +10,7 @@ import MainLayout from "layouts/MainLayout";
 import Avatar from "components/Avatar";
 import DaySince from "components/DaySince/DaySince";
 
-interface LandingLayoutProps {
+export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
   userStats: StatisticsDataInterface;
   userName: string;

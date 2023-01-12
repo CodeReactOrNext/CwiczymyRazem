@@ -21,7 +21,6 @@ import MainLayout from "layouts/MainLayout";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAt, FaLock } from "react-icons/fa";
-import { CircleSpinner } from "react-spinners-kit";
 import { toast } from "react-toastify";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
@@ -144,17 +143,13 @@ const SettingsLayout = () => {
                 />
                 <p className='text-base '>Max resolutin: (250px/250px)</p>
               </div>
-              {isFetching ? (
-                <Button type='submit' variant='small' disabled>
-                  <div className='px-3'>
-                    <CircleSpinner size={24} />
-                  </div>
-                </Button>
-              ) : (
-                <Button disabled={!avatarIsValid} variant='small' type='submit'>
-                  {t("settings:save")}
-                </Button>
-              )}
+              <Button
+                disabled={!avatarIsValid}
+                variant='small'
+                type='submit'
+                loading={isFetching}>
+                {t("settings:save")}
+              </Button>
             </form>
           </div>
           <Divider />
@@ -208,37 +203,30 @@ const SettingsLayout = () => {
                     name='repeat_password'
                     type='password'
                   />
-                  {isFetching ? (
-                    <Button type='submit' variant='small' disabled>
-                      <div className='px-3'>
-                        <CircleSpinner size={24} />
-                      </div>
-                    </Button>
-                  ) : (
-                    <Button
-                      variant='small'
-                      disabled={Boolean(
-                        !values.password ||
-                          errors.password ||
-                          !values.repeat_password ||
-                          errors.repeat_password
-                      )}
-                      onClick={() => {
-                        if (
-                          values.password &&
-                          !errors.password &&
-                          values.repeat_password &&
-                          !errors.repeat_password
-                        ) {
-                          setNewPassword(values.password);
-                          toast.info(t("toast:info.log_in_again"));
-                          setReauthFormVisible(true);
-                        }
-                      }}
-                      type='submit'>
-                      {t("settings:save")}
-                    </Button>
-                  )}
+                  <Button
+                    variant='small'
+                    loading={isFetching}
+                    disabled={Boolean(
+                      !values.password ||
+                        errors.password ||
+                        !values.repeat_password ||
+                        errors.repeat_password
+                    )}
+                    onClick={() => {
+                      if (
+                        values.password &&
+                        !errors.password &&
+                        values.repeat_password &&
+                        !errors.repeat_password
+                      ) {
+                        setNewPassword(values.password);
+                        toast.info(t("toast:info.log_in_again"));
+                        setReauthFormVisible(true);
+                      }
+                    }}
+                    type='submit'>
+                    {t("settings:save")}
+                  </Button>
                 </div>
               </Form>
             )}
@@ -260,22 +248,17 @@ const SettingsLayout = () => {
               <>
                 <p className=' text-lg'>{t("settings:reset_approve_info")}</p>
                 <div className='flex flex-row justify-center gap-3'>
-                  {isFetching ? (
-                    <CircleSpinner />
-                  ) : (
-                    <>
-                      <Button
-                        variant='small'
-                        onClick={() => dispatch(restartUserStats())}>
-                        {t("settings:reset")}
-                      </Button>
-                      <Button
-                        variant='small'
-                        onClick={() => setRestartConfirmShow(false)}>
-                        {t("settings:back")}
-                      </Button>
-                    </>
-                  )}
+                  <Button
+                    variant='small'
+                    loading={isFetching}
+                    onClick={() => dispatch(restartUserStats())}>
+                    {t("settings:reset")}
+                  </Button>
+                  <Button
+                    variant='small'
+                    onClick={() => setRestartConfirmShow(false)}>
+                    {t("settings:back")}
+                  </Button>
                 </div>
               </>
             )}
@@ -316,17 +299,9 @@ const SettingsLayout = () => {
                           placeholder={t("common:input.password")}
                         />
                         <div className='flex space-x-1 '>
-                          {isFetching ? (
-                            <Button type='submit' disabled>
-                              <div className='px-3'>
-                                <CircleSpinner size={24} />
-                              </div>
-                            </Button>
-                          ) : (
-                            <Button type='submit'>
-                              {t("common:button.sign_in")}
-                            </Button>
-                          )}
+                          <Button loading={isFetching} type='submit'>
+                            {t("common:button.sign_in")}
+                          </Button>
                         </div>
                       </>
                     </FormLayout>
