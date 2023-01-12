@@ -20,7 +20,7 @@ import {
   firebaseUpdateUserPassword,
   firebaseUploadAvatar,
 } from "utils/firebase/firebase.utils";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 import { fetchReport, fetchUserData } from "./services/userServices";
@@ -46,7 +46,7 @@ import {
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
-import { statisticsInitial } from "pages/api/user/data/userStatisticsInitialData";
+import { statisticsInitial } from "constants/userStatisticsInitialData";
 
 const initialState: userSliceInitialState = {
   userInfo: null,

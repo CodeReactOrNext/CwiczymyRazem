@@ -1,5 +1,5 @@
 import { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import {
   FaCalendarDay,
   FaClock,
@@ -10,7 +10,7 @@ import {
   FaStar,
   FaStarHalf,
 } from "react-icons/fa";
-import { convertMsToHM } from "helpers/timeConverter";
+import { convertMsToHM } from "utils/converter/timeConverter";
 import { achievementsData } from "assets/achievements/achievementsData";
 import { i18n } from "next-i18next";
 

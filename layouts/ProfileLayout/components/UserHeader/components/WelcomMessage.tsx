@@ -1,4 +1,4 @@
-import { checkIsPracticeToday } from "pages/api/user/report/utils/checkIsPracticeToday";
+import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 import { useTranslation } from "react-i18next";
 import { FaCheck, FaTimes } from "react-icons/fa";
 
