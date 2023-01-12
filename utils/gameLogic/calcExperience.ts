@@ -1,7 +1,6 @@
-import { BASE_EXP, LEVER_FACTOR } from "constants/gameSettings";
+import { BASE_EXP } from "constants/gameSettings";
 
-export const calcExperience = (currentLevel: number) => {
-  const expperience =
-    BASE_EXP + currentLevel * (currentLevel - 1) * LEVER_FACTOR;
+export const calcExperience = (level: number) => {
+  const expperience = (BASE_EXP + level) * level;
   return Math.floor(expperience);
 };
