@@ -8,6 +8,7 @@ import { convertMsToHM } from "helpers/timeConverter";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import MainLayout from "layouts/MainLayout";
 import Avatar from "components/Avatar";
+import DaySince from "components/DaySince/DaySince";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -23,7 +24,7 @@ const ProfileLayout = ({
   userAvatar,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
-  const { time, achievements } = userStats;
+  const { time, achievements, lastReportDate } = userStats;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
   return (
@@ -31,7 +32,7 @@ const ProfileLayout = ({
       <div className='flex justify-center'>
         <div className='m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
           <HeadDecoration title={t("profile")} />
-          <div className='grid-cols-2  grid-rows-auto  md:grid'>
+          <div className='grid-rows-auto  grid-cols-2  md:grid'>
             <div className=' row-span-1  flex flex-col  items-center justify-center gap-6 '>
               <div className='z-10 flex flex-row items-center gap-4 p-4 '>
                 <Avatar
@@ -47,6 +48,7 @@ const ProfileLayout = ({
                       {userStats.points}
                     </span>
                   </p>
+                  <DaySince date={new Date(lastReportDate)} />
                 </div>
               </div>
               <Level

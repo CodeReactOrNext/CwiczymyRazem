@@ -53,7 +53,6 @@ const LandingLayout = ({
                 userName={userName}
               />
             </MobileHeaderWrapper>
-
             <LandingNav
               leftSideLinks={navigation.leftSideLinks}
               rightSideLinks={navigation.rightSideLinks}
@@ -93,7 +92,6 @@ const LandingLayout = ({
                     />
                   ))}
                 </div>
-
                 <div className='row-cols-1 order-3 '>
                   <AchievementWrapper userAchievements={achievements} />
                 </div>
