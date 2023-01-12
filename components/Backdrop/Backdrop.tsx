@@ -7,7 +7,7 @@ interface RatingPopUpProps {
   selector: string;
   onClick?: () => void;
 }
-const RatingPopUp = ({ children, selector, onClick }: RatingPopUpProps) => {
+const Backdrop = ({ children, selector, onClick }: RatingPopUpProps) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -37,4 +37,4 @@ const RatingPopUp = ({ children, selector, onClick }: RatingPopUpProps) => {
     : null;
 };
 
-export default RatingPopUp;
+export default Backdrop;

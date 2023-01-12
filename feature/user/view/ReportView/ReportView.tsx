@@ -90,7 +90,7 @@ const ReportView = () => {
     if (sumTime) {
       toast.info(t("toast.stoper_entered"));
     }
-  }, [sumTime]);
+  }, [sumTime, t]);
 
   return (
     <>
