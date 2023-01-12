@@ -8,6 +8,7 @@ import { LandingNavProps } from "layouts/ProfileLayout/components/LandingNav";
 import { useAppSelector } from "store/hooks";
 import { useTranslation } from "react-i18next";
 import { getUserStatsField } from "assets/stats/profileStats";
+import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 
 const LandingView = () => {
   const { t } = useTranslation("profile");
@@ -44,6 +45,7 @@ const LandingView = () => {
       userStats={userStats!}
       userName={userName!}
       userAvatar={userAvatar}
+      featSlot={<LogsBoxView />}
     />
   );
 };
