@@ -111,7 +111,7 @@ const ReportView = () => {
 
   return (
     <>
-      <MainLayout subtitle={t("subtitlebar_text")} variant='primary'>
+ 
         <Formik
           initialValues={formikInitialValues}
           validationSchema={RaportSchema}
@@ -228,7 +228,6 @@ const ReportView = () => {
             </>
           )}
         </Formik>
-      </MainLayout>
       {ratingSummaryVisible && (
         <Backdrop selector='overlays'>
           <RatingPopUpLayout
