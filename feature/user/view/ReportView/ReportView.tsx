@@ -1,6 +1,6 @@
 import Backdrop from "components/Backdrop";
 import Button from "components/Button";
-import RatingPopUp from "components/RatingPopUp";
+import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import MainLayout from "layouts/MainLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import ReportCategoryLayout from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
@@ -231,7 +231,7 @@ const ReportView = () => {
       </MainLayout>
       {ratingSummaryVisible && (
         <Backdrop selector='overlays'>
-          <RatingPopUp
+          <RatingPopUpLayout
             onClick={setRatingSummaryVisible}
             ratingData={raitingData!}
             currentUserStats={currentUserStats!}
