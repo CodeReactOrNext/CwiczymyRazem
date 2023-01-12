@@ -6,10 +6,10 @@ import StatisticBar from "./components/StatisticBar";
 import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
 import MobileHeaderWrapper from "./components/UserHeader/MobileHeaderWrapper";
 import HeadDecoration from "./components/HeadDecoration";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
 import UserHeader from "./components/UserHeader/UserHeader";
-import { convertMsToHM } from "helpers/timeConverter";
+import { convertMsToHM } from "utils/converter/timeConverter";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 interface LandingLayoutProps {

@@ -1,9 +1,5 @@
-
-import { getMultiplerValue } from "./getMulitplerValue";
-import {
-  HABBITS_POINTS_VALUE,
-  TIME_POINTS_VALUE,
-} from "pages/api/constants/ratingValue";
+import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
+import { HABBITS_POINTS_VALUE, TIME_POINTS_VALUE } from "constants/ratingValue";
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 
 export const makeRatingData = (
@@ -11,7 +7,7 @@ export const makeRatingData = (
   totalTime: number
 ) => {
   const streak = 5;
-  const multipler = getMultiplerValue(streak);
+  const multipler = getDailyStreakMultiplier(streak);
   const habbitsCount = data.habbits.length;
   const additionalPoints = Math.floor(habbitsCount * HABBITS_POINTS_VALUE);
   const timePoints = Math.floor(totalTime * TIME_POINTS_VALUE);

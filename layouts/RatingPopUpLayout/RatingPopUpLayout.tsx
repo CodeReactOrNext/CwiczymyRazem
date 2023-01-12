@@ -10,7 +10,7 @@ import { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 
 export interface BonusPointsInterface {
   timePoints: number;

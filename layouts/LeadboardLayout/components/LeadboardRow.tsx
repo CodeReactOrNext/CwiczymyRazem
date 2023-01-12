@@ -1,11 +1,11 @@
 import Avatar from "components/Avatar";
 import DaySince from "components/DaySince/DaySince";
-import { convertMsToHM } from "helpers/timeConverter";
+import { convertMsToHM } from "utils/converter/timeConverter";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { RiExternalLinkFill } from "react-icons/ri";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import Carousel from "./AchievementsCarousel";
 interface LeadboardColumnProps {
   place: number;
