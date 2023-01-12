@@ -1,8 +1,8 @@
 import { User } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { shuffleUid } from "helpers/shuffleUid";
 import { db } from "utils/firebase/firebase.utils";
-import { statisticsInitial as statistics } from "../data/userStatisticsInitialData";
+import { statisticsInitial as statistics } from "../../constants/userStatisticsInitialData";
+import { shuffleUid } from "./shuffleUid";
 
 export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
   const shuffledUid = shuffleUid(user.uid);

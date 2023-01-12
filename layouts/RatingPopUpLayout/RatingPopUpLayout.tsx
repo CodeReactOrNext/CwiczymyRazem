@@ -3,16 +3,18 @@ import FireSVG from "public/static/images/svg/Fire";
 import Lightning from "public/static/images/svg/Lightning";
 import blackGuitar from "public/static/images/guitar_black.png";
 import Button from "components/Button";
-import LevelIndicator from "components/RatingPopUp/components/LevelIndicator";
+
 import OldEffect from "components/OldEffect";
 import BonusPointsItem from "./components/BonusPointsItem";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
 import { motion } from "framer-motion";
-import { calcExperience } from "pages/api/user/report/utils/calcExperience";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { calcExperience } from "utils/gameLogic/calcExperience";
+import LevelIndicator from "./components/LevelIndicator";
+
 
 export interface BonusPointsInterface {
   timePoints: number;

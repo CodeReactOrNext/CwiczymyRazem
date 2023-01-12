@@ -3,12 +3,15 @@ import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import HeroView from "views/HeroView";
 import useAutoLogIn from "hooks/useAutoLogIn";
-import PageLoadingSpinner from "components/PageLoadingSpinner";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
+import MainLayout from "layouts/MainLayout";
 
 const Home: NextPage = () => {
   const { isLoggedIn, isLoading } = useAutoLogIn({});
   return isLoading ? (
-    <PageLoadingSpinner layoutVariant={"primary"} />
+    <MainLayout subtitle="" variant='primary'>
+      <PageLoadingLayout />
+    </MainLayout>
   ) : isLoggedIn ? (
     <LandingView />
   ) : (

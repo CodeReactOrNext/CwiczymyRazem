@@ -1,4 +1,4 @@
-import { BASE_EXP, LEVEL_FACTOR } from "constants/gameSettings";
+import { BASE_EXP } from "constants/gameSettings";
 
 export const calcExperience = (level: number) => {
   const expperience = (BASE_EXP + level) * level;

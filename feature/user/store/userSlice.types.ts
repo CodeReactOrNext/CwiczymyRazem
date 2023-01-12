@@ -1,4 +1,4 @@
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import {
   ReportDataInterface,
   ReportFormikInterface,

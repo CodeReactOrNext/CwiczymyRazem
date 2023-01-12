@@ -1,8 +1,8 @@
 import Achievement from "components/Achievement";
 import { AchievementList } from "assets/achievements/achievementsData";
-import { convertMsToHM } from "helpers/timeConverter";
+import { convertMsToHM } from "utils/converter/timeConverter";
 import { useTranslation } from "react-i18next";
-import { BonusPointsInterface } from "../../RatingPopUp";
+import { BonusPointsInterface } from "../../RatingPopUpLayout";
 import { motion } from "framer-motion";
 
 interface BonusPointsItemProps {

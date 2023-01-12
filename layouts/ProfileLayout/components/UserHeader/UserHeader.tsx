@@ -1,7 +1,7 @@
 import Avatar from "components/Avatar";
 import Logo from "components/Logo";
 import UserNav from "components/UserNav";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { Level } from "./components/Level";
 import { NavDecoration } from "./components/NavDecoration";
 import { WelcomeMessage } from "./components/WelcomMessage";

@@ -2,7 +2,7 @@ import axios from "axios";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 
 import { User } from "firebase/auth";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { updateReprotInterface } from "../userSlice.types";
 
 export interface UserDataInterface {

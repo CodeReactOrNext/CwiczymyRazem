@@ -1,4 +1,5 @@
 import FaqLayout, { faqQuestionInterface } from "layouts/FaqLayout/FaqLayout";
+import MainLayout from "layouts/MainLayout";
 import { useTranslation } from "react-i18next";
 
 const FaqView = () => {
@@ -26,7 +27,11 @@ const FaqView = () => {
     },
   ];
 
-  return <FaqLayout faqQuestion={faqQuestion} />;
+  return (
+    <MainLayout subtitle={t("faq")} variant='secondary'>
+      <FaqLayout faqQuestion={faqQuestion} />
+    </MainLayout>
+  );
 };
 
 export default FaqView;

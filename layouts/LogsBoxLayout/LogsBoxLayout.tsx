@@ -1,29 +1,20 @@
 import Achievement from "components/Achievement";
-import { useState, useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { FirebaseLogsInterface } from "utils/firebase/firebase.types";
-import { firebaseGetLogs } from "utils/firebase/firebase.utils";
 
-const LogsBox = () => {
-  const [logs, setLogs] = useState<FirebaseLogsInterface[] | null>(null);
 
-  useEffect(() => {
-    firebaseGetLogs()
-      .then((logsData) => {
-        setLogs(logsData);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+export interface LogsBoxLayoutProps {
+  logs: FirebaseLogsInterface[] | null;
+}
 
-  const addZeroToTime = (time: number) => {
-    if (time.toString().length === 1) {
-      return "0" + time.toString();
-    }
-    return time.toString();
-  };
+const addZeroToTime = (time: number) => {
+  if (time.toString().length === 1) {
+    return "0" + time.toString();
+  }
+  return time.toString();
+};
 
+const LogsBoxLayout = ({ logs }: LogsBoxLayoutProps) => {
   return logs ? (
     <div className='order-4 row-span-1 h-80  overflow-scroll border-4 border-tertiary bg-main-opposed p-5'>
       {logs.map(
@@ -74,4 +65,4 @@ const LogsBox = () => {
   );
 };
 
-export default LogsBox;
+export default LogsBoxLayout;
