@@ -1,4 +1,4 @@
-import { convertMsToHMObject } from "helpers/timeConverter";
+import { convertMsToHMObject } from "utils/converter/timeConverter";
 import { useTranslation } from "react-i18next";
 import { FaPause, FaPlay } from "react-icons/fa";
 

@@ -22,7 +22,7 @@ export interface StatisticsDataInterface {
   lastReportDate: string;
 }
 
-export const statistics: StatisticsDataInterface = {
+export const statisticsInitial: StatisticsDataInterface = {
   time: {
     technique: 0,
     theory: 0,

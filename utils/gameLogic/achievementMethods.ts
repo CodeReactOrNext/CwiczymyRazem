@@ -2,8 +2,8 @@ import {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
-import { convertInputTime } from "helpers/convertInputTime";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { inputTimeConverter } from "utils/converter/InputTimeConverter";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 
 export const time1Check = (statistics: StatisticsDataInterface) => {
   const { time } = statistics;
@@ -34,7 +34,7 @@ export const time3Check = (statistics: StatisticsDataInterface) => {
 };
 export const checkBalance = (inputData: ReportFormikInterface) => {
   const { techniqueTime, theoryTime, hearingTime, creativityTime } =
-    convertInputTime(inputData);
+    inputTimeConverter(inputData);
 
   if (techniqueTime < 3600000) return;
   if (theoryTime < 3600000) return;
@@ -67,7 +67,7 @@ export const checkDoctor = (statistic: StatisticsDataInterface) => {
 
 export const checkTired = (inputData: ReportFormikInterface) => {
   const { techniqueTime, theoryTime, hearingTime, creativityTime } =
-    convertInputTime(inputData);
+    inputTimeConverter(inputData);
   const totalTime = techniqueTime + theoryTime + hearingTime + creativityTime;
   if (totalTime >= 18000000) return "tired";
 };
@@ -130,7 +130,7 @@ export const checkNinja = (statistic: StatisticsDataInterface) => {
   return "ninja";
 };
 export const checkRecord = (inputData: ReportFormikInterface) => {
-  const { techniqueTime } = convertInputTime(inputData);
+  const { techniqueTime } = inputTimeConverter(inputData);
   if (
     inputData.habbits.includes("recording") &&
     inputData.habbits.includes("metronome") &&
@@ -139,26 +139,26 @@ export const checkRecord = (inputData: ReportFormikInterface) => {
     return "record";
 };
 export const checkVinyl = (inputData: ReportFormikInterface) => {
-  const { creativityTime } = convertInputTime(inputData);
+  const { creativityTime } = inputTimeConverter(inputData);
   if (inputData.habbits.includes("recording") && creativityTime >= 10800000)
     return "vinyl";
 };
 export const checkRightway = (inputData: ReportFormikInterface) => {
-  const { techniqueTime } = convertInputTime(inputData);
+  const { techniqueTime } = inputTimeConverter(inputData);
   if (inputData.habbits.includes("warmup") && techniqueTime >= 10800000)
     return "rightway";
 };
 
 export const checkYolo = (inputData: ReportFormikInterface) => {
   const { techniqueTime, theoryTime, hearingTime, creativityTime } =
-    convertInputTime(inputData);
+    inputTimeConverter(inputData);
   const totalTime = techniqueTime + theoryTime + hearingTime + creativityTime;
   if (totalTime >= 10800000 && inputData.habbits.length === 0) return "yolo";
 };
 
 export const checkPath = (inputData: ReportFormikInterface) => {
   const { techniqueTime, theoryTime, hearingTime, creativityTime } =
-    convertInputTime(inputData);
+    inputTimeConverter(inputData);
 
   if (techniqueTime <= 1800000) return;
   if (theoryTime <= 1800000) return;
@@ -172,7 +172,7 @@ export const checkDumbbel = (
   statistic: StatisticsDataInterface
 ) => {
   const { techniqueTime, theoryTime, hearingTime, creativityTime } =
-    convertInputTime(inputData);
+    inputTimeConverter(inputData);
   const totalTime = techniqueTime + theoryTime + hearingTime + creativityTime;
 
   if (totalTime >= 12600000 && statistic.dayWithoutBreak >= 7) return "dumbbel";

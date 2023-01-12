@@ -2,7 +2,7 @@ import {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 
 import {
   checkArtist,
@@ -38,7 +38,7 @@ import {
   time1Check,
   time2Check,
   time3Check,
-} from "./utils/achievementMethods";
+} from "./achievementMethods";
 import { AchievementList } from "assets/achievements/achievementsData";
 
 export const checkAchievement = (

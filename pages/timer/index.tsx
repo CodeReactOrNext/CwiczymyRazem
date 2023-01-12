@@ -1,8 +1,9 @@
-import PageLoadingSpinner from "components/PageLoadingSpinner";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
 import TimerView from "feature/user/view/TimerView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import MainLayout from "layouts/MainLayout";
 
 const Timer: NextPage = () => {
   const { isLoggedIn } = useAutoLogIn({
@@ -10,12 +11,12 @@ const Timer: NextPage = () => {
       loggedOut: "/login",
     },
   });
-
-  return !isLoggedIn ? (
-    <PageLoadingSpinner layoutVariant='primary' />
-  ) : (
-    <TimerView />
+  return (
+    <MainLayout subtitle='Timer' variant='secondary'>
+      {!isLoggedIn ? <PageLoadingLayout /> : <TimerView />}
+    </MainLayout>
   );
+  
 };
 
 export default Timer;

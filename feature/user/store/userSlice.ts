@@ -20,7 +20,7 @@ import {
   firebaseUpdateUserPassword,
   firebaseUploadAvatar,
 } from "utils/firebase/firebase.utils";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { RootState } from "../../../store/store";
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 import { fetchReport, fetchUserData } from "./services/userServices";
@@ -46,8 +46,7 @@ import {
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
-import { statisticsInitial } from "pages/api/user/data/userStatisticsInitialData";
-import { toast } from "react-toastify";
+import { statisticsInitial } from "constants/userStatisticsInitialData";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -203,19 +202,17 @@ export const userSlice = createSlice({
     },
     updateLocalTimer: (
       state,
-      {
-        payload,
-      }: PayloadAction<{
+      action: PayloadAction<{
         creativity: number;
         hearing: number;
         technique: number;
         theory: number;
       }>
     ) => {
-      if (!payload) {
+      if (!action.payload) {
         return;
       }
-      state.timer = payload;
+      state.timer = action.payload;
     },
     updateTimerTime: (
       state,
@@ -303,24 +300,18 @@ export const userSlice = createSlice({
         createAccountErrorHandler(error);
       })
       .addCase(updateUserStats.fulfilled, (state, { payload }) => {
-        console.log(payload, "w fullfield");
-        if (payload?.error) {
-          toast.error("d");
-          return;
-        }
-
         state.timer.technique = 0;
         state.timer.creativity = 0;
         state.timer.hearing = 0;
         state.timer.theory = 0;
-        state.isFetching = null;
         state.currentUserStats = payload.currentUserStats;
         state.previousUserStats = payload.previousUserStats;
         state.raitingData = payload.raitingData;
+        state.isFetching = null;
       })
       .addCase(restartUserStats.fulfilled, (state) => {
-        state.isFetching = null;
         state.currentUserStats = statisticsInitial;
+        state.isFetching = null;
         state.previousUserStats = null;
         state.raitingData = null;
         state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };

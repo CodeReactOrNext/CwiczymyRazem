@@ -1,18 +1,18 @@
-import { getUserLvl } from "../report/utils/getUserLvl";
-import { checkIsPracticeToday } from "../report/utils/checkIsPracticeToday";
+import { getUserLvl } from "../../../../utils/gameLogic/getUserLvl";
+import { checkIsPracticeToday } from "../../../../utils/gameLogic/checkIsPracticeToday";
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { NextApiRequest, NextApiResponse } from "next";
-import { makeRatingData } from "./utils/makeRatingData";
-import { checkAchievement } from "./achievement";
-import { calcExperience } from "./utils/calcExperience";
+import { makeRatingData } from "../../../../utils/gameLogic/makeRatingData";
+import { checkAchievement } from "../../../../utils/gameLogic/checkAvievement";
+import { calcExperience } from "../../../../utils/gameLogic/calcExperience";
 import {
   firebaseGetUserData,
   firebaseUpdateUserStats,
   firebaseSetUserExerciseRaprot,
   firebaseAddLogReport,
-} from "pages/api/firebase/firebase.utils";
-import { convertInputTime } from "helpers/convertInputTime";
+} from "utils/firebase/api/firebase.utils";
+import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 
 interface updateUserStatsProps {
   userAuth: string;
@@ -23,7 +23,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
     userAuth
   )) as StatisticsDataInterface;
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
-    convertInputTime(inputData);
+    inputTimeConverter(inputData);
   const {
     time,
     habitsCount,
