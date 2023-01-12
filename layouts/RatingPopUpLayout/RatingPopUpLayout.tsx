@@ -3,7 +3,7 @@ import FireSVG from "public/static/images/svg/Fire";
 import Lightning from "public/static/images/svg/Lightning";
 import blackGuitar from "public/static/images/guitar_black.png";
 import Button from "components/Button";
-import LevelIndicator from "components/RatingPopUp/components/LevelIndicator";
+import LevelIndicator from "./components/LevelIndicator";
 import OldEffect from "components/OldEffect";
 import BonusPointsItem from "./components/BonusPointsItem";
 import { Dispatch, SetStateAction } from "react";
@@ -26,7 +26,7 @@ interface RatingPopUpProps {
   onClick: Dispatch<SetStateAction<boolean>>;
 }
 
-const RatingPopUp = ({
+const RatingPopUpLayout = ({
   ratingData,
   currentUserStats,
   previousUserStats,
@@ -99,4 +99,4 @@ const RatingPopUp = ({
   );
 };
 
-export default RatingPopUp;
+export default RatingPopUpLayout;
