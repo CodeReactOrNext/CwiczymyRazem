@@ -1,13 +1,16 @@
-import StatsField, { StatsFieldProps } from "./components/StatsField";
-import StatisticBar from "./components/StatisticBar";
-import { Level } from "./components/UserHeader/components/Level";
-import HeadDecoration from "./components/HeadDecoration";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
-import { convertMsToHM } from "utils/converter/timeConverter";
-import AchievementWrapper from "./components/Achievement/AchievementWrapper";
+
 import Avatar from "components/Avatar";
 import DaySince from "components/DaySince/DaySince";
+import StatisticBar from "./components/StatisticBar";
+import HeadDecoration from "./components/HeadDecoration";
+import Level from "./components/UserHeader/components/Level";
+import StatsField, { StatsFieldProps } from "./components/StatsField";
+import AchievementWrapper from "./components/Achievement/AchievementWrapper";
+
+import { convertMsToHM } from "utils/converter/timeConverter";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
   userStats: StatisticsDataInterface;

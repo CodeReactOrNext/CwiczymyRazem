@@ -1,13 +1,17 @@
-import QuestionMark, { QuestionMarkProps } from "components/QuestionMark";
 import { useField } from "formik";
+import QuestionMark, { QuestionMarkProps } from "components/QuestionMark";
 
-interface CheckboxProps {
+interface HealthHabbitsBoxProps {
   title: string;
   name: string;
   questionMarkProps: QuestionMarkProps;
 }
 
-const Exercise = ({ title, questionMarkProps, name }: CheckboxProps) => {
+const HealthHabbitsBox = ({
+  title,
+  questionMarkProps,
+  name,
+}: HealthHabbitsBoxProps) => {
   const [field] = useField("habbits");
 
   return (
@@ -20,4 +24,4 @@ const Exercise = ({ title, questionMarkProps, name }: CheckboxProps) => {
     </div>
   );
 };
-export default Exercise;
+export default HealthHabbitsBox;

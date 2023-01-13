@@ -1,16 +1,24 @@
-import Backdrop from "components/Backdrop";
-import Button from "components/Button";
-import RatingPopUpLayout from "layouts/RatingPopUpLayout";
-import MainLayout from "layouts/MainLayout";
-import ReportFormLayout from "layouts/ReportFormLayout";
-import ReportCategoryLayout from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
+import { Formik } from "formik";
+import { toast } from "react-toastify";
+import { MdSchool } from "react-icons/md";
+import { IoMdHand } from "react-icons/io";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBrain, FaMusic } from "react-icons/fa";
-import { MdSchool } from "react-icons/md";
-import { IoMdHand } from "react-icons/io";
-import { Checkbox, TimeInputBox } from "layouts/ReportFormLayout/components";
-import { Formik } from "formik";
+
+import RatingPopUpLayout from "layouts/RatingPopUpLayout";
+import ReportFormLayout from "layouts/ReportFormLayout";
+import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
+import ReportCategoryLayout from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
+import {
+  HealthHabbitsBox,
+  TimeInputBox,
+} from "layouts/ReportFormLayout/components";
+
+import Button from "components/Button";
+import Backdrop from "components/Backdrop";
+import QuestionMark from "components/QuestionMark";
+
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
   selectIsFetching,
@@ -22,9 +30,7 @@ import {
   selectTimerData,
 } from "feature/user/store/userSlice";
 
-import { toast } from "react-toastify";
 import { RaportSchema } from "./helpers/RaportShcema";
-import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
 import { ReportFormikInterface } from "./ReportView.types";
 import {
   convertMsToHM,
@@ -32,7 +38,6 @@ import {
 } from "utils/converter/timeConverter";
 import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
-import QuestionMark from "components/QuestionMark";
 import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 
 const ReportView = () => {
@@ -180,35 +185,35 @@ const ReportView = () => {
                 </div>
               )}
               <ReportCategoryLayout title={t("healthy_habits_title")}>
-                <Checkbox
+                <HealthHabbitsBox
                   name='exercise_plan'
                   questionMarkProps={{
                     description: t("habits.exercise_plan.description"),
                   }}
                   title={t("habits.exercise_plan.title")}
                 />
-                <Checkbox
+                <HealthHabbitsBox
                   name='new_things'
                   questionMarkProps={{
                     description: t("habits.new_things.description"),
                   }}
                   title={t("habits.new_things.title")}
                 />
-                <Checkbox
+                <HealthHabbitsBox
                   name='warmup'
                   questionMarkProps={{
                     description: t("habits.warmup.description"),
                   }}
                   title={t("habits.warmup.title")}
                 />
-                <Checkbox
+                <HealthHabbitsBox
                   name='metronome'
                   questionMarkProps={{
                     description: t("habits.metronome.description"),
                   }}
                   title={t("habits.metronome.title")}
                 />
-                <Checkbox
+                <HealthHabbitsBox
                   name='recording'
                   questionMarkProps={{
                     description: t("habits.recording.description"),

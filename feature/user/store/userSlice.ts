@@ -5,6 +5,13 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
+
+import { SignUpCredentials } from "../view/SingupView/SingupView";
+
+import { RootState } from "store/store";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { fetchReport, fetchUserData } from "./services/userServices";
+import { statisticsInitial } from "constants/userStatisticsInitialData";
 import {
   auth,
   firebaseCheckUsersNameIsNotUnique,
@@ -20,10 +27,6 @@ import {
   firebaseUpdateUserPassword,
   firebaseUploadAvatar,
 } from "utils/firebase/firebase.utils";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { RootState } from "../../../store/store";
-import { SignUpCredentials } from "../view/SingupView/SingupView";
-import { fetchReport, fetchUserData } from "./services/userServices";
 import {
   avatarErrorHandler,
   createAccountErrorHandler,
@@ -46,7 +49,6 @@ import {
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
-import { statisticsInitial } from "constants/userStatisticsInitialData";
 
 const initialState: userSliceInitialState = {
   userInfo: null,

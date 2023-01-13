@@ -1,5 +1,4 @@
-import { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { i18n } from "next-i18next";
 import {
   FaCalendarDay,
   FaClock,
@@ -10,9 +9,12 @@ import {
   FaStar,
   FaStarHalf,
 } from "react-icons/fa";
+
+import { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
+
 import { convertMsToHM } from "utils/converter/timeConverter";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { achievementsData } from "assets/achievements/achievementsData";
-import { i18n } from "next-i18next";
 
 export const getUserStatsField = (userStats: StatisticsDataInterface) => {
   const {

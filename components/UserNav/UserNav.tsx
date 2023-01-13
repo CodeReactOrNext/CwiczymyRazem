@@ -1,11 +1,17 @@
-import { logUserOff } from "feature/user/store/userSlice";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch } from "store/hooks";
 
-const UserNav = ({ flexDirection }: { flexDirection?: "row" | "col" }) => {
+import { useAppDispatch } from "store/hooks";
+import { logUserOff } from "feature/user/store/userSlice";
+
+interface UserNavProps {
+  flexDirection?: "row" | "col";
+}
+
+const UserNav = ({ flexDirection }: UserNavProps) => {
   const { t } = useTranslation("common");
   const dispatch = useAppDispatch();
+
   return (
     <div
       className={`relative z-30 flex text-center text-base text-mainText ${

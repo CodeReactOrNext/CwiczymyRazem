@@ -1,14 +1,16 @@
+import { useTranslation } from "react-i18next";
+
+import LandingLayout from "layouts/ProfileLayout";
+import { LandingNavProps } from "layouts/ProfileLayout/components/LandingNav";
+
+import { useAppSelector } from "store/hooks";
+import LogsBoxView from "feature/logsBox/view/LogsBoxView";
+import { getUserStatsField } from "assets/stats/profileStats";
 import {
   selectCurrentUserStats,
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
-import LandingLayout from "layouts/ProfileLayout";
-import { LandingNavProps } from "layouts/ProfileLayout/components/LandingNav";
-import { useAppSelector } from "store/hooks";
-import { useTranslation } from "react-i18next";
-import { getUserStatsField } from "assets/stats/profileStats";
-import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 
 const LandingView = () => {
   const { t } = useTranslation("profile");
@@ -38,6 +40,7 @@ const LandingView = () => {
       },
     ],
   };
+
   return (
     <LandingLayout
       statsField={getUserStatsField(userStats!)}

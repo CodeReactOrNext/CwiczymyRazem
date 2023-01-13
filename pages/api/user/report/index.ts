@@ -1,18 +1,20 @@
-import { getUserLvl } from "../../../../utils/gameLogic/getUserLvl";
-import { checkIsPracticeToday } from "../../../../utils/gameLogic/checkIsPracticeToday";
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { NextApiRequest, NextApiResponse } from "next";
-import { makeRatingData } from "../../../../utils/gameLogic/makeRatingData";
-import { checkAchievement } from "../../../../utils/gameLogic/checkAvievement";
-import { getPointsToLvlUp } from "../../../../utils/gameLogic/getPointsToLvlUp";
+
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+
+import { getUserLvl } from "utils/gameLogic/getUserLvl";
+import { makeRatingData } from "utils/gameLogic/makeRatingData";
+import { checkAchievement } from "utils/gameLogic/checkAvievement";
+import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
+import { inputTimeConverter } from "utils/converter/InputTimeConverter";
+import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 import {
   firebaseGetUserData,
   firebaseUpdateUserStats,
   firebaseSetUserExerciseRaprot,
   firebaseAddLogReport,
 } from "utils/firebase/api/firebase.utils";
-import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 
 interface updateUserStatsProps {
   userAuth: string;
@@ -63,7 +65,8 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
       dayWithoutBreak < updatedActualDayWithoutBreak
         ? updatedActualDayWithoutBreak
         : dayWithoutBreak,
-    maxPoints: maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
+    maxPoints:
+      maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
     actualDayWithoutBreak: updatedActualDayWithoutBreak,
     achievements: achievements,
     lastReportDate: new Date().toISOString(),

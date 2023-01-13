@@ -1,14 +1,15 @@
-import Button from "components/Button";
+import Link from "next/link";
 import { Form, Formik } from "formik";
 import { useTranslation } from "react-i18next";
-import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
 import { FaUserAlt, FaLock, FaAt, FaArrowLeft } from "react-icons/fa";
-import MainLayout from "layouts/MainLayout";
-import FormLayout from "layouts/FormLayout";
+
 import Input from "components/Input";
-import { createAccount, selectIsFetching } from "feature/user/store/userSlice";
+import Button from "components/Button";
+import FormLayout from "layouts/FormLayout";
+
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import Link from "next/link";
+import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
+import { createAccount, selectIsFetching } from "feature/user/store/userSlice";
 
 export interface SignUpCredentials {
   login: string;

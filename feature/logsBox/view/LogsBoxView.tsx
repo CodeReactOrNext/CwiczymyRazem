@@ -1,7 +1,8 @@
+import { FaSpinner } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
 import LogsBoxLayout from "layouts/LogsBoxLayout";
-import { useState, useEffect } from "react";
-import { FaSpinner } from "react-icons/fa";
+
 import { FirebaseLogsInterface } from "utils/firebase/firebase.types";
 import { firebaseGetLogs } from "utils/firebase/firebase.utils";
 
