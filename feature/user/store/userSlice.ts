@@ -161,7 +161,7 @@ export const getUserProvider = createAsyncThunk(
 );
 
 export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
-  await firebaseLogUserOut();
+  return await firebaseLogUserOut();
 });
 
 export const restartUserStats = createAsyncThunk(
