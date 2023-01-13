@@ -40,7 +40,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const raiting = makeRatingData(inputData, sumTime, actualDayWithoutBreak);
   const userLastReportDate = new Date(lastReportDate!);
   const didPracticeToday = checkIsPracticeToday(userLastReportDate);
-  const level = getUserLvl(lvl, points + raiting.basePoints);
+  const level = getUserLvl(lvl, points + raiting.totalPoints);
   const isNewLevel = level > lvl;
   const updatedActualDayWithoutBreak = didPracticeToday
     ? actualDayWithoutBreak
@@ -54,7 +54,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
       longestSession:
         time.longestSession < sumTime ? sumTime : time.longestSession,
     },
-    points: points + raiting.basePoints,
+    points: points + raiting.totalPoints,
     lvl: level,
     pointsToNextLvl: getPointsToLvlUp(level + 1),
     sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
@@ -63,7 +63,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
       dayWithoutBreak < updatedActualDayWithoutBreak
         ? updatedActualDayWithoutBreak
         : dayWithoutBreak,
-    maxPoints: maxPoints < raiting.basePoints ? raiting.basePoints : maxPoints,
+    maxPoints: maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
     actualDayWithoutBreak: updatedActualDayWithoutBreak,
     achievements: achievements,
     lastReportDate: new Date().toISOString(),
@@ -81,7 +81,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   await firebaseAddLogReport(
     userAuth,
     updatedUserData.lastReportDate,
-    raiting.basePoints,
+    raiting.totalPoints,
     newAchievements,
     {
       isNewLevel,
