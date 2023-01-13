@@ -5,11 +5,20 @@ import HeroView from "views/HeroView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import MainLayout from "layouts/MainLayout";
+import { useEffect } from "react";
 
 const Home: NextPage = () => {
-  const { isLoggedIn, isLoading } = useAutoLogIn({});
+  const { isLoggedIn, isLoading } = useAutoLogIn({
+    redirects: { loggedOut: "/" },
+  });
+  useEffect(() => {
+    console.log("LoggedIn", isLoggedIn);
+    console.log("Loading", isLoading);
+    return () => {};
+  }, [isLoggedIn, isLoading]);
+
   return isLoading ? (
-    <MainLayout subtitle="" variant='primary'>
+    <MainLayout subtitle='' variant='primary'>
       <PageLoadingLayout />
     </MainLayout>
   ) : isLoggedIn ? (
