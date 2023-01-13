@@ -12,9 +12,8 @@ import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { calcExperience } from "utils/gameLogic/calcExperience";
+import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 import LevelIndicator from "./components/LevelIndicator";
-
 
 export interface BonusPointsInterface {
   timePoints: number;
@@ -59,14 +58,14 @@ const RatingPopUp = ({
   };
 
   const levelXpStart =
-    currentUserStats.lvl === 1 ? 0 : calcExperience(currentUserStats.lvl - 1);
-  const levelXpEnd = calcExperience(currentUserStats.lvl);
+    currentUserStats.lvl === 1 ? 0 : getPointsToLvlUp(currentUserStats.lvl - 1);
+  const levelXpEnd = getPointsToLvlUp(currentUserStats.lvl);
 
   const pointsInThisLevel = currentUserStats.points - levelXpStart;
 
   const levelXpDifference = levelXpEnd - levelXpStart;
   const prevProgressPercent =
-    ((pointsInThisLevel - ratingData.basePoints) / levelXpDifference) * 100;
+    ((pointsInThisLevel - ratingData.totalPoints) / levelXpDifference) * 100;
 
   const currProgressPercent = (pointsInThisLevel / levelXpDifference) * 100;
 
@@ -75,7 +74,7 @@ const RatingPopUp = ({
       <OldEffect className='absolute z-10' />
       <div className='absolute top-[20%] -left-[5%] right-0 flex w-[110%] items-center justify-center bg-main-500 text-5xl font-medium sm:text-8xl'>
         <p>
-          {ratingData.basePoints}
+          {ratingData.totalPoints}
           {t("rating_popup.points")}
         </p>
       </div>
@@ -116,7 +115,7 @@ const RatingPopUp = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ ease: "easeOut", duration: 0.3, delay: 0.9 }}
                   className='absolute right-0 -top-[80%] overflow-hidden whitespace-nowrap text-lg font-medium text-main-500 md:text-xl'>
-                  +{ratingData.basePoints} {t("rating_popup.points")}
+                  +{ratingData.totalPoints} {t("rating_popup.points")}
                 </motion.p>
               </motion.div>
             </div>

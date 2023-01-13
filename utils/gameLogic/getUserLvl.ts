@@ -1,8 +1,8 @@
-import { calcExperience } from "./calcExperience";
+import { getPointsToLvlUp } from "./getPointsToLvlUp";
 
 export const getUserLvl = (lvl: number, points: number) => {
   let level = lvl;
-  while (calcExperience(level) <= points) {
+  while (getPointsToLvlUp(level) <= points) {
     level++;
   }
   return level;
