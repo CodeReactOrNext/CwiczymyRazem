@@ -25,21 +25,23 @@ const Button = ({
 }: ButtonProps) => {
   return (
     <motion.button
-      whileTap={{ scale: 0.9 }}
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={
-        " sm:w-45 cursor-pointer border-2 border-transparent  text-center font-bold uppercase active:click-behavior xs:text-xl   " +
-        (variant === "secondary"
-          ? "bg-main-opposed hover:bg-main-opposed-100"
-          : "bg-main hover:bg-main-100") +
-        (variant === "small"
-          ? "p-2 px-2  sm:text-xl "
-          : " p-2 px-5  sm:text-2xl ") +
-        (style ? style : "") +
-        (disabled ? "pointer-events-none grayscale" : "")
-      }
+      className={`sm:w-45 xs:text-xl" cursor-pointer border-2  border-transparent text-center font-bold uppercase active:click-behavior 
+        ${
+          variant === "secondary"
+            ? "bg-main-opposed hover:bg-main-opposed-100"
+            : "bg-main hover:bg-main-100"
+        }
+        ${
+          variant === "small"
+            ? "p-2 px-2  sm:text-xl "
+            : " p-2 px-5  sm:text-2xl "
+        } 
+          ${disabled ? "pointer-events-none grayscale" : ""}
+          ${style ? style : ""}
+      `}
       {...otherProps}>
       {loading ? (
         <div className='px-3'>
