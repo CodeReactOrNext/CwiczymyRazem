@@ -13,12 +13,12 @@ export const makeRatingData = (
   const habbitsCount = data.habbits.length;
   const additionalPoints = Math.floor(habbitsCount * HABBITS_POINTS_VALUE);
   const timePoints = Math.floor(totalTime * TIME_POINTS_VALUE);
-  const basePoints =
+  const totalPoints =
     additionalPoints +
     timePoints +
     Math.floor((additionalPoints + timePoints) * multipler);
   return {
-    basePoints: basePoints,
+    totalPoints: totalPoints,
     reportDate: new Date(),
     bonusPoints: {
       streak: streak,
