@@ -1,17 +1,20 @@
-import PageLoadingLayout from "layouts/PageLoadingLayout";
-import LeadboardLayout from "layouts/LeadboardLayout";
+import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+
+
+import MainLayout from "layouts/MainLayout";
+import LeadboardLayout from "layouts/LeadboardLayout";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
+
+
 import { FirebaseUserDataInterface } from "utils/firebase/firebase.types";
 import { firebaseGetUsersExceriseRaport as firebaseGetUsersExceriseRaport } from "utils/firebase/firebase.utils";
-import MainLayout from "layouts/MainLayout";
 
 const LeadboardView = () => {
   const [usersData, setUsersData] = useState<
     FirebaseUserDataInterface[] | null
   >(null);
-
   const { t } = useTranslation("leadboard");
 
   useEffect(() => {

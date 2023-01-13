@@ -1,4 +1,4 @@
-import {  TFuncKey } from "i18next";
+import { TFuncKey } from "i18next";
 
 import {
   FaHotjar,
@@ -38,7 +38,7 @@ import {
 import { IconType } from "react-icons/lib";
 import { AchievementsRarityType } from "./achievementsRarity";
 
-export type AchievementList =
+export type achievementList =
   | "time_1"
   | "time_2"
   | "time_3"
@@ -74,7 +74,7 @@ export type AchievementList =
   | "dumbbel";
 
 export interface AchievementsDataInterface extends AchievementsRarityType {
-  id: AchievementList;
+  id: achievementList;
   name: TFuncKey<"achievements">;
   Icon: IconType;
   description: TFuncKey<"achievements">;

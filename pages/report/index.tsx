@@ -1,10 +1,12 @@
-import PageLoadingLayout from "layouts/PageLoadingLayout";
-import ReportView from "feature/user/view/ReportView";
-import useAutoLogIn from "hooks/useAutoLogIn";
 import type { NextPage } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import MainLayout from "layouts/MainLayout";
 import { useTranslation } from "react-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+import MainLayout from "layouts/MainLayout";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
+
+import useAutoLogIn from "hooks/useAutoLogIn";
+import ReportView from "feature/user/view/ReportView";
 
 const ReportPage: NextPage = () => {
   const { t } = useTranslation("report");

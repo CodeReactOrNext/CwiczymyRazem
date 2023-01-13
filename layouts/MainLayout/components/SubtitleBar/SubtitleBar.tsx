@@ -1,10 +1,11 @@
+import { layoutVariant } from "layouts/MainLayout/MainLayout";
 import LightningRevSVG from "public/static/images/svg/LightningRev";
 interface SubtitleBarProps {
-  variant: "primary" | "secondary" | "landing";
+  variant: layoutVariant;
   children: React.ReactNode;
 }
 
-export default function SubtitleBar({ variant, children }: SubtitleBarProps) {
+const SubtitleBar = ({ variant, children }: SubtitleBarProps) => {
   return (
     <div
       className={`z-30 flex w-[120%] -translate-x-[10%] items-center justify-end lg:h-20
@@ -28,4 +29,6 @@ export default function SubtitleBar({ variant, children }: SubtitleBarProps) {
       </span>
     </div>
   );
-}
+};
+
+export default SubtitleBar;

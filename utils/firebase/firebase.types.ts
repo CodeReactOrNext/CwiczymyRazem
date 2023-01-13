@@ -1,6 +1,6 @@
-import { AchievementList } from "assets/achievements/achievementsData";
 import { Timestamp } from "firebase/firestore";
-import { StatisticsDataInterface } from "../../constants/userStatisticsInitialData";
+import { achievementList } from "assets/achievements/achievementsData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 
 export interface FirebaseUserDataInterface {
   profileId: string;
@@ -13,7 +13,7 @@ export interface FirebaseUserDataInterface {
 export interface FirebaseLogsInterface {
   data: string;
   userName: string;
-  newAchievements: AchievementList[];
+  newAchievements: achievementList[];
   newLevel: {
     isNewLevel: boolean;
     level: number;

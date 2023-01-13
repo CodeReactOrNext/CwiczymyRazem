@@ -1,5 +1,6 @@
 import Lightning from "public/static/images/svg/Lightning";
-export const NavDecoration = () => {
+
+const NavDecoration = () => {
   return (
     <div className='relative hidden flex-col md:flex  '>
       <Lightning className='relative bottom-[-150px] h-72 fill-tertiary xl:bottom-[-240px] xl:h-96' />
@@ -11,3 +12,4 @@ export const NavDecoration = () => {
     </div>
   );
 };
+export default NavDecoration;

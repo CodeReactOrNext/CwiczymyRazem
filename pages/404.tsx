@@ -1,10 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-import OldEffect from "components/OldEffect";
-import MainLayout from "layouts/MainLayout";
 import type { NextPage } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import Fire_double from "public/static/images/svg/Fire_double";
 import { useTranslation } from "react-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+import MainLayout from "layouts/MainLayout";
+import OldEffect from "components/OldEffect";
+
+import Fire_double from "public/static/images/svg/Fire_double";
 
 const NotFoundPage: NextPage = () => {
   const { t } = useTranslation("404");

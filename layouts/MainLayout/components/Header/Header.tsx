@@ -1,15 +1,17 @@
 import Logo from "components/Logo";
-import Navigation from "../Navigation/Navigation";
+import MainNavigation from "components/MainNavigation";
+import { layoutVariant } from "layouts/MainLayout/MainLayout";
 
-export default function Header({
-  variant,
-}: {
-  variant: "primary" | "secondary" | "landing";
-}) {
+interface HeaderProps {
+  variant: layoutVariant;
+}
+const Header = ({ variant }: HeaderProps) => {
   return (
     <div className='top-0 left-0 z-50 flex h-20 min-h-[5rem] w-full items-center justify-between pl-8'>
       <Logo />
-      <Navigation variant={variant} />
+      <MainNavigation variant={variant} />
     </div>
   );
-}
+};
+
+export default Header;

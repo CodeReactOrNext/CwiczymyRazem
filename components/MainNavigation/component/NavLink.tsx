@@ -1,8 +1,12 @@
 import Link from "next/link";
 
-const NavLink = ({ url, title }: { url: string; title: string }) => {
+interface NavLinkProps {
+  url: string;
+  title: string;
+}
+const NavLink = ({ url, title }: NavLinkProps) => {
   return (
-    <Link  href={url}>
+    <Link href={url}>
       <li className='min-w-[6rem]  cursor-pointer p-2 px-4 text-center transition-background hover:bg-white hover:bg-opacity-10 hover:shadow-sm active:click-behavior'>
         {title}
       </li>

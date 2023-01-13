@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes } from "react";
+import React from "react";
 import { CircleSpinner } from "react-spinners-kit";
 import { motion } from "framer-motion";
 

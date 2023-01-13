@@ -1,7 +1,8 @@
-import { selectIsFetching } from "feature/user/store/userSlice";
 import { FcGoogle } from "react-icons/fc";
 import { CircleSpinner } from "react-spinners-kit";
+
 import { useAppSelector } from "store/hooks";
+import { selectIsFetching } from "feature/user/store/userSlice";
 
 interface GoogleButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;

@@ -1,11 +1,11 @@
 import React from "react";
-
-interface Props {
-  variant: "primary" | "secondary" | "landing";
+import { layoutVariant } from "layouts/MainLayout/MainLayout";
+interface ContentBoxProps {
+  variant: layoutVariant;
   children: React.ReactNode;
 }
 
-export default function ContentBox({ children, variant }: Props) {
+const ContentBox = ({ children, variant }: ContentBoxProps) => {
   return (
     <section
       className={`relative z-40 flex h-full w-full items-center justify-center overflow-y-auto py-8 2xl:w-full 2xl:justify-center ${
@@ -19,4 +19,6 @@ export default function ContentBox({ children, variant }: Props) {
       </div>
     </section>
   );
-}
+};
+
+export default ContentBox;

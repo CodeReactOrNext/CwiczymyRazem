@@ -1,4 +1,3 @@
-import MainLayout from "layouts/MainLayout";
 import LeadboardColumn from "./components/LeadboardRow";
 import { FirebaseUserDataInterface } from "utils/firebase/firebase.types";
 

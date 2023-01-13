@@ -1,30 +1,35 @@
+import Link from "next/link";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { FaBars } from "react-icons/fa";
+
 import Avatar from "components/Avatar";
 import UserNav from "components/UserNav";
+import NavLink from "./component/NavLink";
+import HamburgerLayout from "layouts/HamburgerLayout";
+import { layoutVariant } from "layouts/MainLayout/MainLayout";
+
+import { useAppSelector } from "store/hooks";
 import {
   selectCurrentUserStats,
   selectUserAuth,
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
-import HamburgerLayout from "layouts/HamburgerLayout";
-import Link from "next/link";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { FaBars } from "react-icons/fa";
-import { useAppSelector } from "store/hooks";
-import NavLink from "./component/NavLink";
 
-const Navigation = ({
-  variant,
-}: {
-  variant: "primary" | "secondary" | "landing";
-}) => {
+interface MainNavigationProps {
+  variant: layoutVariant;
+}
+
+const MainNavigation = ({ variant }: MainNavigationProps) => {
   const [hamburgerVisible, setHamburgerVisible] = useState<boolean>(false);
+
+  const { t } = useTranslation("common");
+
   const isUserLoggedIn = useAppSelector(selectUserAuth);
   const avatar = useAppSelector(selectUserAvatar);
   const userName = useAppSelector(selectUserName);
   const userStats = useAppSelector(selectCurrentUserStats);
-  const { t } = useTranslation("common");
 
   const hamburgerHandler = () => {
     setHamburgerVisible(!hamburgerVisible);
@@ -78,4 +83,4 @@ const Navigation = ({
   );
 };
 
-export default Navigation;
+export default MainNavigation;

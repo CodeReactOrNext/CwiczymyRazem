@@ -1,9 +1,9 @@
+import { inputTimeConverter } from "utils/converter/InputTimeConverter";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
-import { inputTimeConverter } from "utils/converter/InputTimeConverter";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 
 export const time1Check = (statistics: StatisticsDataInterface) => {
   const { time } = statistics;
