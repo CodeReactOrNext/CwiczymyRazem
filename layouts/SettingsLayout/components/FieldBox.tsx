@@ -1,7 +1,6 @@
 import Button from "components/Button";
 import Input from "components/Input";
 import { useTranslation } from "react-i18next";
-import { CircleSpinner } from "react-spinners-kit";
 
 export interface FieldBoxProps {
   title: string;
@@ -30,21 +29,14 @@ const FieldBox = ({
 
       <div className='flex h-full w-full gap-2 pb-5'>
         <Input placeholder={value!} name={inputName} />
-        {isFetching ? (
-          <Button type='submit' variant='small' disabled>
-            <div className='px-3'>
-              <CircleSpinner size={24} />
-            </div>
-          </Button>
-        ) : (
-          <Button
-            variant='small'
-            disabled={Boolean(!values[inputName] || errors[inputName])}
-            onClick={submitHandler}
-            type='submit'>
-            {t("settings:save")}
-          </Button>
-        )}
+        <Button
+          variant='small'
+          loading={isFetching}
+          disabled={Boolean(!values[inputName] || errors[inputName])}
+          onClick={submitHandler}
+          type='submit'>
+          {t("settings:save")}
+        </Button>
       </div>
     </div>
   );

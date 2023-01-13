@@ -1,7 +1,7 @@
 import Button from "components/Button";
 import { updateTimerTime } from "feature/user/store/userSlice";
 import { SkillsType } from "feature/user/store/userSlice.types";
-import { convertMsToHM } from "helpers/timeConverter";
+import { convertMsToHM } from "utils/converter/timeConverter";
 import useTimer from "hooks/useTimer";
 import { useState, useEffect } from "react";
 import { useAppDispatch } from "store/hooks";

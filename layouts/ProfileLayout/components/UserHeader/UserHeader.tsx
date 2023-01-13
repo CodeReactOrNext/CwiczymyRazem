@@ -1,7 +1,7 @@
 import Avatar from "components/Avatar";
 import Logo from "components/Logo";
 import UserNav from "components/UserNav";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { Level } from "./components/Level";
 import { NavDecoration } from "./components/NavDecoration";
 import { WelcomeMessage } from "./components/WelcomMessage";
@@ -13,7 +13,7 @@ interface UserHeaderProps {
 }
 
 const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
-  const { points, lvl, pointsToNextLvl } = userStats;
+  const { points, lvl, pointsToNextLvl, lastReportDate } = userStats;
   return (
     <>
       <div className='flex flex-col items-start space-x-2 space-y-2 text-lg '>
@@ -25,7 +25,11 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
               <UserNav />
             </div>
           </div>
-          <WelcomeMessage userName={userName} place={1} points={points} />
+          <WelcomeMessage
+            userName={userName}
+            lastReportDate={lastReportDate}
+            points={points}
+          />
         </div>
       </div>
       <NavDecoration />

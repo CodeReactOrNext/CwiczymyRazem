@@ -31,12 +31,9 @@ import {
   FirebaseLogsInterface,
   FirebaseUserDataInterface,
 } from "./firebase.types";
-import {
-  statistics,
-  StatisticsDataInterface,
-} from "./userStatisticsInitialData";
-import { shuffleUid } from "helpers/shuffleUid";
+import { statisticsInitial as statistics } from "../../constants/userStatisticsInitialData";
 import { firebaseApp } from "./firebase.cofig";
+import { shuffleUid } from "utils/user/shuffleUid";
 
 const provider = new GoogleAuthProvider();
 
