@@ -3,6 +3,7 @@ import { auth } from "utils/firebase/firebase.utils";
 import { useEffect } from "react";
 import {
   autoLogIn,
+  logUserOff,
   selectUserAuth,
   updateLocalTimer,
 } from "feature/user/store/userSlice";
@@ -28,7 +29,7 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
         );
       }
     }
-
+    console.log("place 0", user);
     if (user && !isUserLoggedIn) {
       dispatch(autoLogIn(user));
     }
