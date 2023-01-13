@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 const Home: NextPage = () => {
   const { isLoggedIn, isLoading } = useAutoLogIn({
-    redirects: {},
+    redirects: { loggedOut: "/" },
   });
   useEffect(() => {
     console.log("LoggedIn", isLoggedIn);
