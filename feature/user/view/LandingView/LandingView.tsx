@@ -42,14 +42,17 @@ const LandingView = () => {
   };
 
   return (
-    <LandingLayout
-      statsField={getUserStatsField(userStats!)}
-      navigation={navigation}
-      userStats={userStats!}
-      userName={userName!}
-      userAvatar={userAvatar}
-      featSlot={<LogsBoxView />}
-    />
+    userStats &&
+    userName && (
+      <LandingLayout
+        statsField={getUserStatsField(userStats)}
+        navigation={navigation}
+        userStats={userStats}
+        userName={userName}
+        userAvatar={userAvatar}
+        featSlot={<LogsBoxView />}
+      />
+    )
   );
 };
 
