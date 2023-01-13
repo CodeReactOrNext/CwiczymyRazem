@@ -1,19 +1,18 @@
-import { getUserLvl } from "../report/utils/getUserLvl";
-import { checkIsPracticeToday } from "../report/utils/checkIsPracticeToday";
-
+import { getUserLvl } from "../../../../utils/gameLogic/getUserLvl";
+import { checkIsPracticeToday } from "../../../../utils/gameLogic/checkIsPracticeToday";
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { NextApiRequest, NextApiResponse } from "next";
-import { makeRatingData } from "./utils/makeRatingData";
-import { checkAchievement } from "./achievement";
-import { calcExperience } from "./utils/calcExperience";
+import { makeRatingData } from "../../../../utils/gameLogic/makeRatingData";
+import { checkAchievement } from "../../../../utils/gameLogic/checkAvievement";
+import { getPointsToLvlUp } from "../../../../utils/gameLogic/getPointsToLvlUp";
 import {
   firebaseGetUserData,
   firebaseUpdateUserStats,
   firebaseSetUserExerciseRaprot,
   firebaseAddLogReport,
-} from "pages/api/firebase/firebase.utils";
-import { convertInputTime } from "helpers/convertInputTime";
+} from "utils/firebase/api/firebase.utils";
+import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 
 interface updateUserStatsProps {
   userAuth: string;
@@ -23,9 +22,8 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
     userAuth
   )) as StatisticsDataInterface;
-
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
-    convertInputTime(inputData);
+    inputTimeConverter(inputData);
   const {
     time,
     habitsCount,
@@ -39,16 +37,14 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
     achievements,
   } = currentUserStats;
 
-  const raiting = makeRatingData(inputData, sumTime);
+  const raiting = makeRatingData(inputData, sumTime, actualDayWithoutBreak);
   const userLastReportDate = new Date(lastReportDate!);
   const didPracticeToday = checkIsPracticeToday(userLastReportDate);
-
-  const level = getUserLvl(lvl, points + raiting.basePoints);
+  const level = getUserLvl(lvl, points + raiting.totalPoints);
   const isNewLevel = level > lvl;
   const updatedActualDayWithoutBreak = didPracticeToday
     ? actualDayWithoutBreak
     : actualDayWithoutBreak + 1;
-
   const updatedUserData: StatisticsDataInterface = {
     time: {
       technique: time.technique + techniqueTime,
@@ -58,16 +54,16 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
       longestSession:
         time.longestSession < sumTime ? sumTime : time.longestSession,
     },
-    points: points + raiting.basePoints,
+    points: points + raiting.totalPoints,
     lvl: level,
-    pointsToNextLvl: calcExperience(level + 1),
+    pointsToNextLvl: getPointsToLvlUp(level + 1),
     sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
     habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
     dayWithoutBreak:
       dayWithoutBreak < updatedActualDayWithoutBreak
         ? updatedActualDayWithoutBreak
         : dayWithoutBreak,
-    maxPoints: maxPoints < raiting.basePoints ? raiting.basePoints : maxPoints,
+    maxPoints: maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
     actualDayWithoutBreak: updatedActualDayWithoutBreak,
     achievements: achievements,
     lastReportDate: new Date().toISOString(),
@@ -85,7 +81,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
   await firebaseAddLogReport(
     userAuth,
     updatedUserData.lastReportDate,
-    raiting.basePoints,
+    raiting.totalPoints,
     newAchievements,
     {
       isNewLevel,

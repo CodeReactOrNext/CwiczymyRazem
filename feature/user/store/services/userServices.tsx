@@ -2,7 +2,7 @@ import axios from "axios";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 
 import { User } from "firebase/auth";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { updateReprotInterface } from "../userSlice.types";
 
 export interface UserDataInterface {
@@ -23,10 +23,11 @@ export const fetchUserData = async (user: User) =>
     })
     .then((response) => response.data);
 
-export const fetchReport = ({userAuth, inputData }: updateReprotInterface) =>
+export const fetchReport = ({ userAuth, inputData }: updateReprotInterface) =>
   axios
     .post<fetchedReportDataInterface>("/api/user/report", {
       userAuth,
       inputData,
     })
-    .then((response) => response.data);
+    .then((response) => response.data)
+    .catch((error) => error);

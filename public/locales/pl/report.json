@@ -6,14 +6,15 @@
   "hearing": "Słuch",
   "creativity": "Praca kreatywna",
   "healthy_habits_title": "Zdrowe nawyki",
-
+  "exceeding_time": "Chcę dodać kolejny raport mimo ograniczenia czasowego",
   "report_button": "Raportuj",
   "toast": {
     "24h_error": "Nie da się ćwiczyć więcej niż 24 godziny dziennie",
     "input_time": "Wpisz czas",
     "not_logged": "Nie jesteś zalogowany",
     "report_success": "Poprawnie zraportowano",
-    "stoper_entered": "Wprowadzono czas ze stopera"
+    "stoper_entered": "Wprowadzono czas ze stopera",
+    "exceeding_time": "Wpisałeś więcej czasu niż minęło od poprzedniego raportu. Przekroczyłeś czas o "
   },
   "habits": {
     "exercise_plan": {
@@ -41,7 +42,8 @@
     "technique": "Np. granie i nauka utworów, rozgrzewka, ćwiczenie rytmu oraz różnych technik, takich jak kostkowanie naprzemienne lub legato",
     "hearing": "Np. odtwarzanie utworów bądź ich fragmentów ze słuchu, słuchanie i wskazywanie interwałów oraz śpiewanie",
     "theory": "Np. transkrypcja utworów i ich analiza, nauka dźwięków na gryfie, czytanie nut",
-    "creative": "Np. pisanie własnych utworów, improwizacja, praca nad własnym stylem"
+    "creative": "Np. pisanie własnych utworów, improwizacja, praca nad własnym stylem",
+    "exceeding_time": " Jeżeli zapomniałeś dodać czasu/zdrowego nawyku do poprzedniego raportu lub chcesz zraportować kolejną sesje ćwiczeń którą wykonałeś wcześniej zaznacz to pole."
   },
   "rating_popup": {
     "title": "ZDOBYŁEŚ",

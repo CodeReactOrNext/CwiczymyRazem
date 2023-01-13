@@ -6,12 +6,11 @@ import StatisticBar from "./components/StatisticBar";
 import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
 import MobileHeaderWrapper from "./components/UserHeader/MobileHeaderWrapper";
 import HeadDecoration from "./components/HeadDecoration";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { useTranslation } from "react-i18next";
 import UserHeader from "./components/UserHeader/UserHeader";
-import { convertMsToHM } from "helpers/timeConverter";
+import { convertMsToHM } from "utils/converter/timeConverter";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
-import LogsBox from "./components/LogsBox";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -19,6 +18,7 @@ interface LandingLayoutProps {
   userStats: StatisticsDataInterface;
   userName: string;
   userAvatar?: string;
+  featSlot: React.ReactNode;
 }
 
 const LandingLayout = ({
@@ -27,6 +27,7 @@ const LandingLayout = ({
   userStats,
   userName,
   userAvatar,
+  featSlot,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
   const { time, achievements } = userStats;
@@ -53,7 +54,6 @@ const LandingLayout = ({
                 userName={userName}
               />
             </MobileHeaderWrapper>
-
             <LandingNav
               leftSideLinks={navigation.leftSideLinks}
               rightSideLinks={navigation.rightSideLinks}
@@ -93,11 +93,10 @@ const LandingLayout = ({
                     />
                   ))}
                 </div>
-
                 <div className='row-cols-1 order-3 '>
                   <AchievementWrapper userAchievements={achievements} />
                 </div>
-                <LogsBox />
+                {featSlot}
               </div>
             </div>
           </Wrapper>

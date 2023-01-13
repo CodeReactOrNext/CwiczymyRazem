@@ -1,10 +1,11 @@
 import Avatar from "components/Avatar";
-import { convertMsToHM } from "helpers/timeConverter";
+import DaySince from "components/DaySince/DaySince";
+import { convertMsToHM } from "utils/converter/timeConverter";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { RiExternalLinkFill } from "react-icons/ri";
-import { StatisticsDataInterface } from "utils/firebase/userStatisticsInitialData";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import Carousel from "./AchievementsCarousel";
 interface LeadboardColumnProps {
   place: number;
@@ -51,11 +52,10 @@ const LeadboardRow = ({
         ${place === 3 ? "bg-yellow-700" : ""}`}>
           <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
-            <div className='absolute top-[5px] right-[-50px] flex  items-center gap-x-1  '>
-              <p className='text-xl uppercase text-tertiary drop-shadow'>
-                Lvl{" "}
+            <div className='absolute top-[-20px] right-[-60px] flex  items-center gap-x-1  '>
+              <p className='text-5xl font-extrabold text-main drop-shadow-3xl'>
+                {lvl}{" "}
               </p>
-              <p className='text-3xl text-main drop-shadow'>{lvl} </p>
             </div>
           </div>
           <div className='relative col-span-2 self-center justify-self-start md:col-span-1 '>
@@ -65,7 +65,9 @@ const LeadboardRow = ({
                 <FaExternalLinkAlt className='ml-2 text-xs opacity-0  group-hover:opacity-100' />
               </p>
             </Link>
-            <div className='absolute top-[-20px] right-[-50px] hidden  items-center gap-x-1  md:top-[-35px] md:flex'>
+            <DaySince date={new Date(statistics.lastReportDate)} />
+
+            <div className='absolute right-[-50px] top-[-30px] hidden items-center gap-x-1 md:flex'>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
               </p>

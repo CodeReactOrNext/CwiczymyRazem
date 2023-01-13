@@ -3,8 +3,9 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { firebaseGetUserDocument } from "utils/firebase/firebase.utils";
 import { DocumentData } from "firebase/firestore";
-import PageLoadingSpinner from "components/PageLoadingSpinner";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { getUserStatsField } from "assets/stats/profileStats";
+import MainLayout from "layouts/MainLayout";
 
 const ProfileView = () => {
   const [userData, setUserData] = useState<DocumentData | undefined>(undefined);
@@ -21,15 +22,19 @@ const ProfileView = () => {
     }
   }, [profileId]);
 
-  return userData ? (
-    <ProfileLayout
-      statsField={getUserStatsField(userData?.statistics)}
-      userStats={userData.statistics}
-      userName={userData.displayName}
-      userAvatar={userData.avatar}
-    />
-  ) : (
-    <PageLoadingSpinner layoutVariant='secondary' />
+  return (
+    <MainLayout subtitle='Profile' variant='secondary'>
+      {userData ? (
+        <ProfileLayout
+          statsField={getUserStatsField(userData?.statistics)}
+          userStats={userData.statistics}
+          userName={userData.displayName}
+          userAvatar={userData.avatar}
+        />
+      ) : (
+        <PageLoadingLayout />
+      )}
+    </MainLayout>
   );
 };
 

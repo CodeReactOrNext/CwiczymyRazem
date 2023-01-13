@@ -17,11 +17,9 @@ import { updateUserInterface as UpdatedUserCredentials } from "feature/user/stor
 import { UserInfo } from "firebase/auth";
 import { Form, Formik } from "formik";
 import FormLayout from "layouts/FormLayout";
-import MainLayout from "layouts/MainLayout";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAt, FaLock } from "react-icons/fa";
-import { CircleSpinner } from "react-spinners-kit";
 import { toast } from "react-toastify";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
@@ -49,6 +47,7 @@ const SettingsLayout = () => {
   const dispatch = useAppDispatch();
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
+  const isViaGoogle = userProviderData?.providerId !== "google.com";
 
   useEffect(() => {
     dispatch(getUserProvider()).then((data) => {
@@ -113,110 +112,100 @@ const SettingsLayout = () => {
 
   return (
     <>
-      <MainLayout subtitle={t("settings:settings_subtilte")} variant='primary'>
-        <div className='m-auto flex w-full flex-col bg-main-opposed-400 p-4 sm:w-[640px] '>
-          <div className='flex flex-row justify-around gap-2 p-2 text-2xl'>
-            <div>
-              <Avatar
-                avatarURL={avatarPreview ? avatarPreview : userAvatar}
-                name={userName!}
-              />
-            </div>
-
-            <form
-              onSubmit={(event) => {
-                event.preventDefault();
-                if (imageUpload) {
-                  dispatch(uploadUserAvatar(imageUpload));
-                }
-              }}>
-              <div className='flex flex-col'>
-                <input
-                  onChange={(event) => {
-                    onImageChangeHandler(event);
-                  }}
-                  type='file'
-                  id='avatar'
-                  name='avatar'
-                  required
-                  accept='image/png, image/jpeg'
-                  className='text-base'
-                />
-                <p className='text-base '>Max resolutin: (250px/250px)</p>
-              </div>
-              {isFetching ? (
-                <Button type='submit' variant='small' disabled>
-                  <div className='px-3'>
-                    <CircleSpinner size={24} />
-                  </div>
-                </Button>
-              ) : (
-                <Button disabled={!avatarIsValid} variant='small' type='submit'>
-                  {t("settings:save")}
-                </Button>
-              )}
-            </form>
+      <div className='m-auto flex w-full flex-col bg-main-opposed-400 p-4 sm:w-[640px] '>
+        <div className='flex flex-row justify-around gap-2 p-2 text-2xl'>
+          <div>
+            <Avatar
+              avatarURL={avatarPreview ? avatarPreview : userAvatar}
+              name={userName!}
+            />
           </div>
-          <Divider />
-          <Formik
-            initialValues={formikInitialValues}
-            validationSchema={updateCredsSchema}
-            onSubmit={() => {}}>
-            {({ values, errors }) => (
-              <Form>
-                <FieldBox
-                  title={t("settings:nickname")}
-                  submitHandler={() => {
-                    changeHandler("login", values.login);
-                  }}
-                  errors={errors}
-                  values={values}
-                  inputName={"login"}
-                  isFetching={isFetching}
-                  value={userName}
-                />
 
-                <Divider />
-                <FieldBox
-                  title={"Email"}
-                  submitHandler={() => {
-                    if (values.email && !errors.email) {
-                      setNewEmail(values.email);
-                      toast.info(t("toast:info.log_in_again"));
-                      setReauthFormVisible(true);
-                    }
-                  }}
-                  errors={errors}
-                  values={values}
-                  inputName={"email"}
-                  isFetching={isFetching}
-                  value={userProviderData?.email}
-                />
-                <Divider />
-                <div className='flex  flex-row gap-2 p-4 text-2xl'>
-                  <p className='text-tertiary'>{t("settings:password")}</p>
-                </div>
-
-                <div className='flex h-full w-full flex-col items-center gap-4 pb-5'>
-                  <Input
-                    placeholder={t("settings:new_password")}
-                    name='password'
-                    type='password'
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (imageUpload) {
+                dispatch(uploadUserAvatar(imageUpload));
+              }
+            }}>
+            <div className='flex flex-col'>
+              <input
+                onChange={(event) => {
+                  onImageChangeHandler(event);
+                }}
+                type='file'
+                id='avatar'
+                name='avatar'
+                required
+                accept='image/png, image/jpeg'
+                className='text-base'
+              />
+              <p className='text-base '>{t("settings:resolution_info")}</p>
+            </div>
+            <Button
+              disabled={!avatarIsValid}
+              variant='small'
+              type='submit'
+              loading={isFetching}>
+              {t("settings:save")}
+            </Button>
+          </form>
+        </div>
+        <Divider />
+        <Formik
+          initialValues={formikInitialValues}
+          validationSchema={updateCredsSchema}
+          onSubmit={() => {}}>
+          {({ values, errors }) => (
+            <Form>
+              <FieldBox
+                title={t("settings:nickname")}
+                submitHandler={() => {
+                  changeHandler("login", values.login);
+                }}
+                errors={errors}
+                values={values}
+                inputName={"login"}
+                isFetching={isFetching}
+                value={userName}
+              />
+              <Divider />
+              {isViaGoogle ? (
+                <>
+                  <FieldBox
+                    title={"Email"}
+                    submitHandler={() => {
+                      if (values.email && !errors.email) {
+                        setNewEmail(values.email);
+                        toast.info(t("toast:info.log_in_again"));
+                        setReauthFormVisible(true);
+                      }
+                    }}
+                    errors={errors}
+                    values={values}
+                    inputName={"email"}
+                    isFetching={isFetching}
+                    value={userProviderData?.email}
                   />
-                  <Input
-                    placeholder={t("settings:repeat_new_password")}
-                    name='repeat_password'
-                    type='password'
-                  />
-                  {isFetching ? (
-                    <Button type='submit' variant='small' disabled>
-                      <div className='px-3'>
-                        <CircleSpinner size={24} />
-                      </div>
-                    </Button>
-                  ) : (
+                  )
+                  <Divider />
+                  <div className='flex  flex-row gap-2 p-4 text-2xl'>
+                    <p className='text-tertiary'>{t("settings:password")}</p>
+                  </div>
+                  <div className='flex h-full w-full flex-col items-center gap-4 pb-5'>
+                    <Input
+                      placeholder={t("settings:new_password")}
+                      name='password'
+                      type='password'
+                    />
+                    <Input
+                      placeholder={t("settings:repeat_new_password")}
+                      name='repeat_password'
+                      type='password'
+                    />
                     <Button
                       variant='small'
+                      loading={isFetching}
                       disabled={Boolean(
                         !values.password ||
                           errors.password ||
@@ -238,50 +227,48 @@ const SettingsLayout = () => {
                       type='submit'>
                       {t("settings:save")}
                     </Button>
-                  )}
-                </div>
-              </Form>
-            )}
-          </Formik>
-          <Divider />
-          <div className='flex flex-col gap-2  p-4 text-2xl'>
-            <p className='text-tertiary'>{t("settings:reset_stats")}</p>
-            {!restartConfirmShow && (
-              <>
-                <p className='text-lg'>{t("settings:reset_warning")}</p>
+                  </div>
+                </>
+              ) : (
+                <p className='p-5'>{t("settings:logged_in_via_google")}</p>
+              )}
+            </Form>
+          )}
+        </Formik>
+        <Divider />
+        <div className='flex flex-col gap-2  p-4 text-2xl'>
+          <p className='text-tertiary'>{t("settings:reset_stats")}</p>
+          {!restartConfirmShow && (
+            <>
+              <p className='text-lg'>{t("settings:reset_warning")}</p>
+              <Button
+                variant='small'
+                onClick={() => setRestartConfirmShow(true)}>
+                {t("settings:reset")}
+              </Button>
+            </>
+          )}
+          {restartConfirmShow && (
+            <>
+              <p className=' text-lg'>{t("settings:reset_approve_info")}</p>
+              <div className='flex flex-row justify-center gap-3'>
                 <Button
                   variant='small'
-                  onClick={() => setRestartConfirmShow(true)}>
+                  loading={isFetching}
+                  onClick={() => dispatch(restartUserStats())}>
                   {t("settings:reset")}
                 </Button>
-              </>
-            )}
-            {restartConfirmShow && (
-              <>
-                <p className=' text-lg'>{t("settings:reset_approve_info")}</p>
-                <div className='flex flex-row justify-center gap-3'>
-                  {isFetching ? (
-                    <CircleSpinner />
-                  ) : (
-                    <>
-                      <Button
-                        variant='small'
-                        onClick={() => dispatch(restartUserStats())}>
-                        {t("settings:reset")}
-                      </Button>
-                      <Button
-                        variant='small'
-                        onClick={() => setRestartConfirmShow(false)}>
-                        {t("settings:back")}
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
+                <Button
+                  variant='small'
+                  onClick={() => setRestartConfirmShow(false)}>
+                  {t("settings:back")}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
-      </MainLayout>
+      </div>
+
       {reauthFormVisible && (
         <Backdrop
           onClick={() => {
@@ -316,17 +303,9 @@ const SettingsLayout = () => {
                           placeholder={t("common:input.password")}
                         />
                         <div className='flex space-x-1 '>
-                          {isFetching ? (
-                            <Button type='submit' disabled>
-                              <div className='px-3'>
-                                <CircleSpinner size={24} />
-                              </div>
-                            </Button>
-                          ) : (
-                            <Button type='submit'>
-                              {t("common:button.sign_in")}
-                            </Button>
-                          )}
+                          <Button loading={isFetching} type='submit'>
+                            {t("common:button.sign_in")}
+                          </Button>
                         </div>
                       </>
                     </FormLayout>
