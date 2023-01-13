@@ -17,7 +17,7 @@ export interface ReportFormikInterface {
 }
 export interface ReportDataInterface {
   reportDate: Date;
-  basePoints: number;
+  totalPoints: number;
   bonusPoints: {
     multiplier: number;
     habitsCount: number;

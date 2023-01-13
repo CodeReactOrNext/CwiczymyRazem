@@ -44,7 +44,7 @@ export const checkBalance = (inputData: ReportFormikInterface) => {
   return "balance";
 };
 export const checkFire = (reportData: ReportDataInterface) => {
-  if (reportData.basePoints >= 60) return "fire";
+  if (reportData.totalPoints >= 60) return "fire";
 };
 
 export const checkHealthHabits = (reportData: ReportDataInterface) => {
