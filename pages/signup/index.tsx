@@ -8,12 +8,12 @@ import MainLayout from "layouts/MainLayout";
 
 const SignUpPage: NextPage = () => {
   const { t } = useTranslation("signup");
-  const { isLoggedIn } = useAutoLogIn({
+  const { isLoggedIn, isLoading } = useAutoLogIn({
     redirects: { loggedIn: "/" },
   });
   return (
     <MainLayout subtitle={t("subtitlebar_text")} variant='primary'>
-      {!isLoggedIn ? <PageLoadingLayout /> : <SingupView />}
+      {isLoggedIn || isLoading ? <PageLoadingLayout /> : <SingupView />}
     </MainLayout>
   );
 };
