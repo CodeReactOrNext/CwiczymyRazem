@@ -11,15 +11,10 @@ import useTimer from "hooks/useTimer";
 import { useAppDispatch } from "store/hooks";
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { updateTimerTime } from "feature/user/store/userSlice";
-import { SkillsType } from "feature/user/store/userSlice.types";
+import { SkillsType, TimerInterface } from "feature/user/store/userSlice.types";
 
 interface TimerLayoutProps {
-  timerData: {
-    technique: number;
-    theory: number;
-    hearing: number;
-    creativity: number;
-  };
+  timerData: TimerInterface;
 }
 
 const TimerLayout = ({ timerData }: TimerLayoutProps) => {

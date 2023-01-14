@@ -2,16 +2,10 @@ import { useEffect } from "react";
 import Router from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { useAppDispatch, useAppSelector } from "store/hooks";
-import {
-  autoLogIn,
-  selectUserAuth,
-  updateLocalTimer,
-} from "feature/user/store/userSlice";
 import { auth } from "utils/firebase/firebase.utils";
-
-
-
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
+import { selectUserAuth, updateLocalTimer } from "feature/user/store/userSlice";
 
 type pagesToRedirectTo = "/" | "/login";
 

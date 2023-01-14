@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 import { useAppDispatch } from "store/hooks";
-import { logUserOff } from "feature/user/store/userSlice";
+import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 
 interface UserNavProps {
   flexDirection?: "row" | "col";
