@@ -26,10 +26,10 @@ const AchievementBox = ({ achievment, rarity }: AchievementBoxProps) => {
           {achievment.length === 0 ? (
             <p>{t("empty")}</p>
           ) : (
-            achievment.map(({ id }, index) => {
+            achievment.map(({ id }) => {
               return (
                 <div
-                  key={index}
+                  key={id}
                   className='mb-2 flex w-[4rem] flex-col items-center text-center'>
                   <AchievementCard id={id} />
                 </div>
