@@ -54,7 +54,7 @@ const ProfileLayout = ({
             <Level
               points={userStats.points}
               lvl={userStats.lvl}
-              pointsToNextLvl={userStats.pointsToNextLvl}
+              currentLevelMaxPoints={userStats.currentLevelMaxPoints}
             />
           </div>
           <div className=' row-span-1 my-5 flex justify-center '>
@@ -82,7 +82,7 @@ const ProfileLayout = ({
           <div className='row-cols-1'>
             {statsField.map(({ Icon, description, value }) => (
               <StatsField
-                key={description} 
+                key={description}
                 Icon={Icon}
                 description={description}
                 value={value}

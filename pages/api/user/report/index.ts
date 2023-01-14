@@ -58,7 +58,7 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
     },
     points: points + raiting.totalPoints,
     lvl: level,
-    pointsToNextLvl: getPointsToLvlUp(level + 1),
+    currentLevelMaxPoints: getPointsToLvlUp(level + 1),
     sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
     habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
     dayWithoutBreak:
