@@ -11,6 +11,7 @@ import {
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
+import HeroView from "views/HeroView";
 
 const LandingView = () => {
   const { t } = useTranslation("profile");
@@ -41,18 +42,17 @@ const LandingView = () => {
     ],
   };
 
-  return (
-    userStats &&
-    userName && (
-      <LandingLayout
-        statsField={getUserStatsField(userStats)}
-        navigation={navigation}
-        userStats={userStats}
-        userName={userName}
-        userAvatar={userAvatar}
-        featSlot={<LogsBoxView />}
-      />
-    )
+  return userStats && userName ? (
+    <LandingLayout
+      statsField={getUserStatsField(userStats)}
+      navigation={navigation}
+      userStats={userStats}
+      userName={userName}
+      userAvatar={userAvatar}
+      featSlot={<LogsBoxView />}
+    />
+  ) : (
+    <HeroView />
   );
 };
 
