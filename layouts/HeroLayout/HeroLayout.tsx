@@ -1,11 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
-import { useTranslation } from "react-i18next";
 import Link from "next/link";
-import FireDoubleSVG from "public/static/images/svg/Fire_double";
+import { useTranslation } from "react-i18next";
+
 import Button from "components/Button";
 import OldEffect from "components/OldEffect";
-import HeroSlogan from "./components/HeroSlogan";
 import Guitar from "./components/Guitar";
+import HeroSlogan from "./components/HeroSlogan";
+
+import FireDoubleSVG from "public/static/images/svg/Fire_double";
 
 interface HeroProps {
   children: React.ReactElement;

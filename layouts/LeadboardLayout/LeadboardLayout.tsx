@@ -1,6 +1,6 @@
-import MainLayout from "layouts/MainLayout";
 import LeadboardColumn from "./components/LeadboardRow";
 import { FirebaseUserDataInterface } from "utils/firebase/firebase.types";
+import { udpateDataErrorHandler } from "feature/user/store/userSlice.errorsHandling";
 
 interface LeadboardLayoutProps {
   usersData: FirebaseUserDataInterface[];
@@ -12,7 +12,7 @@ const LeadboardLayout = ({ usersData }: LeadboardLayoutProps) => {
       {usersData.map((user, index) => (
         <LeadboardColumn
           profileId={user.profileId}
-          key={index}
+          key={user.profileId}
           place={index + 1}
           nick={user.displayName}
           userAvatar={user.avatar}

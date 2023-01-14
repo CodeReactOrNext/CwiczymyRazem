@@ -1,16 +1,18 @@
+import { useTranslation } from "react-i18next";
+
 import OldEffect from "components/OldEffect";
 import Wrapper from "./components/Wrapper";
+import StatisticBar from "./components/StatisticBar";
+import HeadDecoration from "./components/HeadDecoration";
+import UserHeader from "./components/UserHeader/UserHeader";
 import StatsField, { StatsFieldProps } from "./components/StatsField";
 import LandingNav, { LandingNavProps } from "./components/LandingNav";
-import StatisticBar from "./components/StatisticBar";
+import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import DesktopHeaderWrapper from "./components/UserHeader/DesktopHeaderWrapper";
 import MobileHeaderWrapper from "./components/UserHeader/MobileHeaderWrapper";
-import HeadDecoration from "./components/HeadDecoration";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { useTranslation } from "react-i18next";
-import UserHeader from "./components/UserHeader/UserHeader";
+
 import { convertMsToHM } from "utils/converter/timeConverter";
-import AchievementWrapper from "./components/Achievement/AchievementWrapper";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -33,6 +35,7 @@ const LandingLayout = ({
   const { time, achievements } = userStats;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
+
   return (
     <main className='h-screen min-h-[600px] p-4 font-sans md:min-h-[900px] lg:p-8 '>
       <div className='relative flex h-full w-full items-center justify-center'>
@@ -84,9 +87,9 @@ const LandingLayout = ({
                   />
                 </div>
                 <div className=' row-cols-1  order-1'>
-                  {statsField.map(({ Icon, description, value }, index) => (
+                  {statsField.map(({ Icon, description, value }) => (
                     <StatsField
-                      key={index}
+                      key={description}
                       Icon={Icon}
                       description={description}
                       value={value}
