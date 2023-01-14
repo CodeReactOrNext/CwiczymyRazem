@@ -32,13 +32,13 @@ import {
 
 import { RaportSchema } from "./helpers/RaportShcema";
 import { ReportFormikInterface } from "./ReportView.types";
+import { inputTimeConverter } from "utils/converter/InputTimeConverter";
+import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
+import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import {
   convertMsToHM,
   convertMsToHMObject,
 } from "utils/converter/timeConverter";
-import { inputTimeConverter } from "utils/converter/InputTimeConverter";
-import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
-import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
