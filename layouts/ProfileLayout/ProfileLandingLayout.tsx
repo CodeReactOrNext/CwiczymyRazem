@@ -87,9 +87,9 @@ const LandingLayout = ({
                   />
                 </div>
                 <div className=' row-cols-1  order-1'>
-                  {statsField.map(({ Icon, description, value }, index) => (
+                  {statsField.map(({ Icon, description, value }) => (
                     <StatsField
-                      key={index}
+                      key={description}
                       Icon={Icon}
                       description={description}
                       value={value}
