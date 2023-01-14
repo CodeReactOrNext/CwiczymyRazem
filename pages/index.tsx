@@ -9,16 +9,10 @@ import PageLoadingLayout from "layouts/PageLoadingLayout";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import LandingView from "feature/user/view/LandingView";
 
-
 const Home: NextPage = () => {
   const { isLoggedIn, isLoading } = useAutoLogIn({
     redirects: { loggedOut: "/" },
   });
-  useEffect(() => {
-    console.log("LoggedIn", isLoggedIn);
-    console.log("Loading", isLoading);
-    return () => {};
-  }, [isLoggedIn, isLoading]);
 
   return isLoading ? (
     <MainLayout subtitle='' variant='primary'>
