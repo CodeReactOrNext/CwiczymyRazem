@@ -1,3 +1,24 @@
+@font-face {
+  font-family: "teko";
+  src: url("../public/static/fonts/teko-regular.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "teko";
+  src: url("../public/static/fonts/teko-semibold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "teko";
+  src: url("../public/static/fonts/teko-bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
 html,
 body {
   padding: 0;
