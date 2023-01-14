@@ -8,8 +8,9 @@ import Button from "components/Button";
 import FormLayout from "layouts/FormLayout";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
+import { selectIsFetching } from "feature/user/store/userSlice";
+import { createAccount } from "feature/user/store/userSlice.asyncThunk";
 import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
-import { createAccount, selectIsFetching } from "feature/user/store/userSlice";
 
 export interface SignUpCredentials {
   login: string;

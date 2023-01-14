@@ -7,6 +7,12 @@ import { SignUpCredentials } from "../view/SingupView/SingupView";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 
 export type SkillsType = "technique" | "hearing" | "theory" | "creativity";
+export interface TimerInterface {
+  technique: number;
+  theory: number;
+  hearing: number;
+  creativity: number;
+}
 export interface UserSliceProviderData {
   providerId: string | null;
   uid: string | null;
@@ -15,16 +21,10 @@ export interface UserSliceProviderData {
   phoneNumber: string | null;
   photoURL: string | null;
 }
-
 export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName?: string; avatar?: string } | null;
-  timer: {
-    technique: number;
-    theory: number;
-    hearing: number;
-    creativity: number;
-  };
+  timer: TimerInterface;
   currentUserStats: StatisticsDataInterface | null;
   previousUserStats: StatisticsDataInterface | null;
   raitingData: ReportDataInterface | null;

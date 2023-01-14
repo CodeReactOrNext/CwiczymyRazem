@@ -20,11 +20,11 @@ import Backdrop from "components/Backdrop";
 import QuestionMark from "components/QuestionMark";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
+import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import {
   selectIsFetching,
   selectUserAuth,
   selectCurrentUserStats,
-  updateUserStats,
   selectPreviousUserStats,
   selectRaitingData,
   selectTimerData,

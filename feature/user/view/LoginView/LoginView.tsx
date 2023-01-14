@@ -9,12 +9,12 @@ import Button from "components/Button";
 import GoogleButton from "components/GoogleButton";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
+import { selectIsFetching } from "feature/user/store/userSlice";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import {
   logInViaEmail,
   logInViaGoogle,
-  selectIsFetching,
-} from "feature/user/store/userSlice";
+} from "feature/user/store/userSlice.asyncThunk";
 
 export interface logInCredentials {
   email: string;
