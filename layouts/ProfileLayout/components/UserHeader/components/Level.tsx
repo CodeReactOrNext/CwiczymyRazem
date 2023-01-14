@@ -3,9 +3,13 @@ import { useTranslation } from "react-i18next";
 interface LevelInterfaceProps {
   points: number;
   lvl: number;
-  pointsToNextLvl: number;
+  currentLevelMaxPoints: number;
 }
-const Level = ({ points, lvl, pointsToNextLvl }: LevelInterfaceProps) => {
+const Level = ({
+  points,
+  lvl,
+  currentLevelMaxPoints: pointsToNextLvl,
+}: LevelInterfaceProps) => {
   const { t } = useTranslation("profile");
   const progressPercent = (points / pointsToNextLvl) * 100;
 

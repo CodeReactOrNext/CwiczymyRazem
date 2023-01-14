@@ -13,7 +13,7 @@ interface UserHeaderProps {
 }
 
 const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
-  const { points, lvl, pointsToNextLvl, lastReportDate } = userStats;
+  const { points, lvl, currentLevelMaxPoints, lastReportDate } = userStats;
   return (
     <>
       <div className='flex flex-col items-start space-x-2 space-y-2 text-lg '>
@@ -33,7 +33,11 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
         </div>
       </div>
       <NavDecoration />
-      <Level points={points} lvl={lvl} pointsToNextLvl={pointsToNextLvl} />
+      <Level
+        points={points}
+        lvl={lvl}
+        currentLevelMaxPoints={currentLevelMaxPoints}
+      />
     </>
   );
 };
