@@ -14,6 +14,7 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
     }
     return lvl;
   };
+
   return (
     <div className='relative'>
       <div className='flex h-20 w-20 items-center justify-center bg-tertiary-400'>

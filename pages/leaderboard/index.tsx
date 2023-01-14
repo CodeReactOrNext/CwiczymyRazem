@@ -1,6 +1,6 @@
-import LeadboardView from "feature/leadboard/view/LeadboardView";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import LeadboardView from "feature/leadboard/view/LeadboardView";
 
 const LeaderBoardPage: NextPage = () => {
   return <LeadboardView />;

@@ -1,4 +1,4 @@
-import {  TFuncKey } from "i18next";
+import { TFuncKey } from "i18next";
 
 import {
   FaHotjar,

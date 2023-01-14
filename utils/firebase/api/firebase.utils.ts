@@ -1,8 +1,8 @@
-import { AchievementList } from "assets/achievements/achievementsData";
-import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/firebase.utils";
+import { AchievementList } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 
 export const firebaseGetUserData = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);

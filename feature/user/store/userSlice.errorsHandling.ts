@@ -64,6 +64,10 @@ export const udpateDataErrorHandler = (error: SerializedError) => {
     toast.error(i18n?.t("toast:errors.nick_already_in_use"));
     return;
   }
+  if (error.code === "auth/email-already-in-use") {
+    toast.error(i18n?.t("toast:errors.email_already-in-use"));
+    return;
+  }
   toast.error(i18n?.t("toast:errors.upadate"));
 };
 

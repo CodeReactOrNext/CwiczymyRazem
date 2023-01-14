@@ -1,6 +1,7 @@
-import { convertMsToHMObject } from "utils/converter/timeConverter";
 import { useTranslation } from "react-i18next";
 import { FaPause, FaPlay } from "react-icons/fa";
+
+import { convertMsToHMObject } from "utils/converter/timeConverter";
 
 export interface StopwachProps {
   time: number;
@@ -16,6 +17,7 @@ const Stopwatch = ({
   stopTimer,
 }: StopwachProps) => {
   const { t } = useTranslation("timer");
+  
   return (
     <div className='mb-6 grid h-52 w-52 grid-rows-3 items-center rounded-full border-2 border-white bg-main-opposed-700 text-7xl tracking-wider text-tertiary xs:h-64 xs:w-64 sm:text-8xl'>
       <div className=' row-start-1 flex justify-evenly justify-self-center p-6'>

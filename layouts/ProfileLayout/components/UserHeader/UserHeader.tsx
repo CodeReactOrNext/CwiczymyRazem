@@ -1,11 +1,11 @@
-import Avatar from "components/Avatar";
 import Logo from "components/Logo";
+import Level from "./components/Level";
+import Avatar from "components/Avatar";
 import UserNav from "components/UserNav";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { Level } from "./components/Level";
-import { NavDecoration } from "./components/NavDecoration";
-import { WelcomeMessage } from "./components/WelcomMessage";
+import NavDecoration from "./components/NavDecoration";
+import WelcomeMessage from "./components/WelcomMessage";
 
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
   userName: string;

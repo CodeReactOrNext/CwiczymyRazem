@@ -1,19 +1,19 @@
-import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 import { useTranslation } from "react-i18next";
 import { FaCheck, FaTimes } from "react-icons/fa";
-
+import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 interface WelocmeMessageProps {
   userName: string;
   lastReportDate: string;
   points: number;
 }
-export const WelcomeMessage = ({
+const WelcomeMessage = ({
   userName,
   points,
   lastReportDate,
 }: WelocmeMessageProps) => {
   const { t } = useTranslation("profile");
   const isPracticeToday = checkIsPracticeToday(new Date(lastReportDate));
+
   return (
     <div className='text:xs xxs:text-base sm:text-2xl md:text-base lg:text-xl xl:text-2xl'>
       <p className=' xs:text-lg md:text-xl lg:text-2xl xl:text-3xl  '>
@@ -33,3 +33,5 @@ export const WelcomeMessage = ({
     </div>
   );
 };
+
+export default WelcomeMessage;

@@ -1,15 +1,15 @@
+import { useTranslation } from "react-i18next";
 import ToolTip from "components/ToolTip";
 import {
   AchievementList,
   achievementsData,
 } from "assets/achievements/achievementsData";
-import { useTranslation } from "react-i18next";
 
 const AchievementCard = ({ id }: { id: AchievementList }) => {
   const { t } = useTranslation("achievements");
   const achievementData = achievementsData.find((achiv) => achiv.id === id);
-
   const { Icon, rarity, description, name } = achievementData!;
+
   return (
     <div className='group'>
       <ToolTip />

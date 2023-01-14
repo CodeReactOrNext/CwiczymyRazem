@@ -1,29 +1,7 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  isAnyOf,
-  PayloadAction,
-} from "@reduxjs/toolkit";
-import { User } from "firebase/auth";
-import {
-  auth,
-  firebaseCheckUsersNameIsNotUnique,
-  firebaseCreateAccountWithEmail,
-  firebaseGetUserProviderData,
-  firebaseLogUserOut,
-  firebaseReauthenticateUser,
-  firebaseRestartUserStats,
-  firebaseSignInWithEmail,
-  firebaseUpdateUserDisplayName,
-  firebaseSignInWithGooglePopup,
-  firebaseUpdateUserEmail,
-  firebaseUpdateUserPassword,
-  firebaseUploadAvatar,
-} from "utils/firebase/firebase.utils";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { RootState } from "../../../store/store";
-import { SignUpCredentials } from "../view/SingupView/SingupView";
-import { fetchReport, fetchUserData } from "./services/userServices";
+import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
+
+import { RootState } from "store/store";
+import { statisticsInitial } from "constants/userStatisticsInitialData";
 import {
   avatarErrorHandler,
   createAccountErrorHandler,
@@ -33,8 +11,7 @@ import {
 } from "./userSlice.errorsHandling";
 import {
   SkillsType,
-  updateUserInterface,
-  updateReprotInterface,
+  TimerInterface,
   userSliceInitialState,
 } from "./userSlice.types";
 import {
@@ -46,7 +23,20 @@ import {
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
-import { statisticsInitial } from "constants/userStatisticsInitialData";
+import {
+  autoLogIn,
+  changeUserDisplayName,
+  createAccount,
+  getUserProvider,
+  logInViaEmail,
+  logInViaGoogle,
+  logUserOff,
+  restartUserStats,
+  updateUserEmail,
+  updateUserPassword,
+  updateUserStats,
+  uploadUserAvatar,
+} from "./userSlice.asyncThunk";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -66,127 +56,6 @@ const initialState: userSliceInitialState = {
   },
 };
 
-export interface UserDataInterface {
-  userInfo: { displayName: string };
-  userAuth: string;
-  currentUserStats: StatisticsDataInterface;
-}
-
-export const logInViaGoogle = createAsyncThunk(
-  "user/logInViaGoogle",
-  async () => {
-    const { user } = await firebaseSignInWithGooglePopup();
-    const userData = await fetchUserData(user);
-    return userData;
-  }
-);
-
-export const logInViaEmail = createAsyncThunk(
-  "user/loginViaEmail",
-  async ({ email, password }: { email: string; password: string }) => {
-    const { user } = await firebaseSignInWithEmail(email, password);
-    const userData = await fetchUserData(user);
-    return userData;
-  }
-);
-
-export const autoLogIn = createAsyncThunk(
-  "user/autoLogin",
-  async (user: User) => {
-    const userData = await fetchUserData(user);
-    return userData;
-  }
-);
-
-export const createAccount = createAsyncThunk(
-  "user/createAccount",
-  async ({ login, email, password }: SignUpCredentials) => {
-    if (await firebaseCheckUsersNameIsNotUnique(login)) {
-      throw new Error("nick-alredy-in-use");
-    }
-    const { user } = await firebaseCreateAccountWithEmail(email, password);
-    const userWithDisplayName = { ...user, displayName: login };
-    const userData = await fetchUserData(userWithDisplayName);
-    return userData;
-  }
-);
-
-export const changeUserDisplayName = createAsyncThunk(
-  "user/updateDisplayName",
-  async (newDisplayName: string) => {
-    if (await firebaseCheckUsersNameIsNotUnique(newDisplayName)) {
-      throw new Error("nick-alredy-in-use");
-    }
-    if (!newDisplayName && newDisplayName.length === 0) {
-      throw new Error();
-    }
-    if (newDisplayName && newDisplayName.length > 0 && auth.currentUser) {
-      await firebaseUpdateUserDisplayName(auth.currentUser.uid, newDisplayName);
-      return newDisplayName;
-    }
-  }
-);
-
-export const updateUserEmail = createAsyncThunk(
-  "user/updateUserEmail",
-  async ({ email, password, newEmail }: updateUserInterface) => {
-    const authState = await firebaseReauthenticateUser({ email, password });
-
-    if (newEmail && newEmail.length > 0 && authState) {
-      await firebaseUpdateUserEmail(newEmail);
-    }
-    const userInfo = await firebaseGetUserProviderData();
-    return { userInfo };
-  }
-);
-export const updateUserPassword = createAsyncThunk(
-  "user/updateUserPassword",
-  async ({ email, password, newPassword }: updateUserInterface) => {
-    const authState = await firebaseReauthenticateUser({ email, password });
-
-    if (newPassword && newPassword.length > 0 && authState) {
-      await firebaseUpdateUserPassword(newPassword);
-    }
-    const userInfo = await firebaseGetUserProviderData();
-    return { userInfo };
-  }
-);
-
-export const getUserProvider = createAsyncThunk(
-  "user/getUserProvider",
-  async () => {
-    const providerData = await firebaseGetUserProviderData();
-    return providerData;
-  }
-);
-
-export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
-  return await firebaseLogUserOut();
-});
-
-export const restartUserStats = createAsyncThunk(
-  "user/restartUserStats",
-  async () => {
-    await firebaseRestartUserStats();
-  }
-);
-
-export const updateUserStats = createAsyncThunk(
-  "user/updateUserStats",
-  async ({ userAuth, inputData }: updateReprotInterface) => {
-    const statistics = fetchReport({ userAuth, inputData });
-    return statistics;
-  }
-);
-
-export const uploadUserAvatar = createAsyncThunk(
-  "user/uploadUserAvatar",
-  async (avatar: Blob) => {
-    const avatarUrl = await firebaseUploadAvatar(avatar);
-    return { avatar: avatarUrl };
-  }
-);
-
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -200,19 +69,11 @@ export const userSlice = createSlice({
     addPracticeData: (state, action) => {
       state.currentUserStats = action.payload;
     },
-    updateLocalTimer: (
-      state,
-      action: PayloadAction<{
-        creativity: number;
-        hearing: number;
-        technique: number;
-        theory: number;
-      }>
-    ) => {
-      if (!action.payload) {
+    updateLocalTimer: (state, { payload }: PayloadAction<TimerInterface>) => {
+      if (!payload) {
         return;
       }
-      state.timer = action.payload;
+      state.timer = payload;
     },
     updateTimerTime: (
       state,
@@ -243,49 +104,9 @@ export const userSlice = createSlice({
       .addCase(createAccount.pending, (state) => {
         state.isFetching = "createAccount";
       })
-      .addCase(updateUserStats.pending, (state) => {
-        state.isFetching = "updateData";
-      })
-      .addCase(updateUserEmail.pending, (state) => {
-        state.isFetching = "updateData";
-      })
-      .addCase(changeUserDisplayName.pending, (state) => {
-        state.isFetching = "updateData";
-      })
-      .addCase(updateUserPassword.pending, (state) => {
-        state.isFetching = "updateData";
-      })
-      .addCase(uploadUserAvatar.pending, (state) => {
-        state.isFetching = "updateData";
-      })
-      .addCase(restartUserStats.pending, (state) => {
-        state.isFetching = "updateData";
-      })
-      .addCase(updateUserStats.rejected, (state, { error }) => {
-        console.log(error);
-        state.isFetching = null;
-
-        udpateDataErrorHandler(error);
-      })
-      .addCase(restartUserStats.rejected, (state, { error }) => {
-        state.isFetching = null;
-        udpateDataErrorHandler(error);
-      })
-      .addCase(changeUserDisplayName.rejected, (state, { error }) => {
-        state.isFetching = null;
-        udpateDataErrorHandler(error);
-      })
       .addCase(uploadUserAvatar.rejected, (state) => {
         state.isFetching = null;
         avatarErrorHandler();
-      })
-      .addCase(updateUserEmail.rejected, (state, { error }) => {
-        state.isFetching = null;
-        loginViaEmailErrorHandler(error);
-      })
-      .addCase(updateUserPassword.rejected, (state, { error }) => {
-        state.isFetching = null;
-        loginViaEmailErrorHandler(error);
       })
       .addCase(logInViaEmail.rejected, (state, { error }) => {
         state.isFetching = null;
@@ -338,11 +159,11 @@ export const userSlice = createSlice({
         state.isFetching = null;
         updateUserPasswordSuccess();
       })
-      .addCase(changeUserDisplayName.fulfilled, (state, action) => {
+      .addCase(changeUserDisplayName.fulfilled, (state, { payload }) => {
         state.isFetching = null;
         state.userInfo = {
           ...state.userInfo,
-          displayName: action.payload,
+          displayName: payload,
         };
         updateDisplayNameSuccess();
       })
@@ -351,6 +172,32 @@ export const userSlice = createSlice({
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
         updateUserAvatarSuccess();
       })
+      .addMatcher(
+        isAnyOf(
+          updateUserStats.pending,
+          uploadUserAvatar.pending,
+          restartUserStats.pending,
+          changeUserDisplayName.pending,
+          updateUserPassword.pending,
+          updateUserEmail.pending
+        ),
+        (state) => {
+          state.isFetching = "updateData";
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          updateUserStats.rejected,
+          restartUserStats.rejected,
+          changeUserDisplayName.rejected,
+          updateUserPassword.rejected,
+          updateUserEmail.rejected
+        ),
+        (state, { error }) => {
+          state.isFetching = null;
+          udpateDataErrorHandler(error);
+        }
+      )
       .addMatcher(
         isAnyOf(
           logInViaGoogle.fulfilled,
