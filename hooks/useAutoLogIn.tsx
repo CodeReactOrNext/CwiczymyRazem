@@ -26,7 +26,7 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
         );
       }
     }
-
+    console.log("place 0", user);
     if (user && !isUserLoggedIn) {
       dispatch(autoLogIn(user));
     }

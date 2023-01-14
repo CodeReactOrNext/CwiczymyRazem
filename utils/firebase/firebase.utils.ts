@@ -56,7 +56,7 @@ export const firebaseCreateAccountWithEmail = (
 ) => createUserWithEmailAndPassword(auth, email, password);
 
 export const firebaseLogUserOut = async () => {
-  return await signOut(auth);
+  await signOut(auth);
 };
 
 export const firebaseGetLogs = async () => {
