@@ -1,7 +1,7 @@
 import Achievement from "components/Achievement";
 import ToolTip from "components/ToolTip";
 import {
-  achievementList,
+  AchievementList,
   achievementsData,
 } from "assets/achievements/achievementsData";
 import React, { useState } from "react";
@@ -11,7 +11,7 @@ import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 const AchievementsCarousel = ({
   achievements,
 }: {
-  achievements: achievementList[];
+  achievements: AchievementList[];
 }) => {
   const [index, setIndex] = useState(0);
   const { t } = useTranslation("leadboard");

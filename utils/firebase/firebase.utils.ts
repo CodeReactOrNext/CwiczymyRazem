@@ -1,4 +1,4 @@
-import { achievementList } from "assets/achievements/achievementsData";
+import { AchievementList } from "assets/achievements/achievementsData";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import {

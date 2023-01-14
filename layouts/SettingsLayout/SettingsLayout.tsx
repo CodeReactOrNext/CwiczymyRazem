@@ -190,7 +190,7 @@ const SettingsLayout = () => {
                     isFetching={isFetching}
                     value={userProviderData?.email}
                   />
-                  )
+
                   <Divider />
                   <div className='flex  flex-row gap-2 p-4 text-2xl'>
                     <p className='text-tertiary'>{t("settings:password")}</p>
