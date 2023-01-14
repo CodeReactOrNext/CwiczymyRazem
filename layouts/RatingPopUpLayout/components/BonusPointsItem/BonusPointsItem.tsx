@@ -1,5 +1,5 @@
 import Achievement from "components/Achievement";
-import { achievementList } from "assets/achievements/achievementsData";
+import { AchievementList } from "assets/achievements/achievementsData";
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { useTranslation } from "react-i18next";
 import { BonusPointsInterface } from "../../RatingPopUpLayout";
@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 interface BonusPointsItemProps {
   bonusPoints: BonusPointsInterface;
   actualDayWithoutBreak: number;
-  achievements: achievementList[];
+  achievements: AchievementList[];
   isGetNewLevel: boolean;
 }
 

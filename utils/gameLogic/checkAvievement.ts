@@ -39,14 +39,14 @@ import {
   time2Check,
   time3Check,
 } from "./achievementMethods";
-import { achievementList } from "assets/achievements/achievementsData";
+import { AchievementList } from "assets/achievements/achievementsData";
 
 export const checkAchievement = (
   statistics: StatisticsDataInterface,
   reportData: ReportDataInterface,
   inputData: ReportFormikInterface
 ) => {
-  const achievedAchievements: (achievementList | undefined)[] = [
+  const achievedAchievements: (AchievementList | undefined)[] = [
     checkFire(reportData),
     checkHealthHabits(reportData),
     time1Check(statistics),
@@ -83,8 +83,8 @@ export const checkAchievement = (
   ];
 
   const isAchievements = (
-    item: achievementList | undefined
-  ): item is achievementList => {
+    item: AchievementList | undefined
+  ): item is AchievementList => {
     return !!item;
   };
 

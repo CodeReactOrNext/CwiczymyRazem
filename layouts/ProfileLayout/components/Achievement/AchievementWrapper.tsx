@@ -1,5 +1,5 @@
 import {
-  achievementList,
+  AchievementList,
   achievementsData,
   AchievementsDataInterface,
 } from "assets/achievements/achievementsData";
@@ -8,7 +8,7 @@ import AchievementBox from "./AchievementBox";
 const AchievementWrapper = ({
   userAchievements,
 }: {
-  userAchievements: achievementList[];
+  userAchievements: AchievementList[];
 }) => {
   interface grupedAchievements {
     common: AchievementsDataInterface[];

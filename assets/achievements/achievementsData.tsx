@@ -38,7 +38,7 @@ import {
 import { IconType } from "react-icons/lib";
 import { AchievementsRarityType } from "./achievementsRarity";
 
-export type achievementList =
+export type AchievementList =
   | "time_1"
   | "time_2"
   | "time_3"
@@ -74,7 +74,7 @@ export type achievementList =
   | "dumbbel";
 
 export interface AchievementsDataInterface extends AchievementsRarityType {
-  id: achievementList;
+  id: AchievementList;
   name: TFuncKey<"achievements">;
   Icon: IconType;
   description: TFuncKey<"achievements">;

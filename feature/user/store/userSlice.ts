@@ -175,6 +175,7 @@ export const userSlice = createSlice({
       .addMatcher(
         isAnyOf(
           updateUserStats.pending,
+          uploadUserAvatar.pending,
           restartUserStats.pending,
           changeUserDisplayName.pending,
           updateUserPassword.pending,
