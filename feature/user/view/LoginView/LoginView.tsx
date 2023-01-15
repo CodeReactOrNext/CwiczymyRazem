@@ -1,20 +1,20 @@
 import Link from "next/link";
-
 import { Formik, Form } from "formik";
-import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
+import { FaAt, FaLock } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+
+import FormLayout from "layouts/FormLayout";
+import Input from "components/Input";
+import Button from "components/Button";
+import GoogleButton from "components/GoogleButton";
+
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { selectIsFetching } from "feature/user/store/userSlice";
+import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import {
   logInViaEmail,
   logInViaGoogle,
-  selectIsFetching,
-} from "../../store/userSlice";
-import { useAppDispatch, useAppSelector } from "store/hooks";
-import { FaAt, FaLock } from "react-icons/fa";
-import MainLayout from "layouts/MainLayout";
-import FormLayout from "layouts/FormLayout";
-import Button from "components/Button";
-import GoogleButton from "components/GoogleButton";
-import Input from "components/Input";
+} from "feature/user/store/userSlice.asyncThunk";
 
 export interface logInCredentials {
   email: string;

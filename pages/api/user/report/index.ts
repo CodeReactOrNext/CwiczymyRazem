@@ -1,26 +1,29 @@
-import { getUserLvl } from "../../../../utils/gameLogic/getUserLvl";
-import { checkIsPracticeToday } from "../../../../utils/gameLogic/checkIsPracticeToday";
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { NextApiRequest, NextApiResponse } from "next";
-import { makeRatingData } from "../../../../utils/gameLogic/makeRatingData";
-import { checkAchievement } from "../../../../utils/gameLogic/checkAvievement";
-import { getPointsToLvlUp } from "../../../../utils/gameLogic/getPointsToLvlUp";
+
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+
+import { getUserLvl } from "utils/gameLogic/getUserLvl";
+import { auth } from "utils/firebase/api/firebase.config";
+import { makeRatingData } from "utils/gameLogic/makeRatingData";
+import { checkAchievement } from "utils/gameLogic/checkAvievement";
+import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
+import { inputTimeConverter } from "utils/converter/InputTimeConverter";
+import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 import {
   firebaseGetUserData,
   firebaseUpdateUserStats,
   firebaseSetUserExerciseRaprot,
   firebaseAddLogReport,
 } from "utils/firebase/api/firebase.utils";
-import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 
 interface updateUserStatsProps {
-  userAuth: string;
+  userUid: string;
   inputData: ReportFormikInterface;
 }
-const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
+const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
-    userAuth
+    userUid
   )) as StatisticsDataInterface;
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
     inputTimeConverter(inputData);
@@ -56,14 +59,15 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
     },
     points: points + raiting.totalPoints,
     lvl: level,
-    pointsToNextLvl: getPointsToLvlUp(level + 1),
+    currentLevelMaxPoints: getPointsToLvlUp(level + 1),
     sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
     habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
     dayWithoutBreak:
       dayWithoutBreak < updatedActualDayWithoutBreak
         ? updatedActualDayWithoutBreak
         : dayWithoutBreak,
-    maxPoints: maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
+    maxPoints:
+      maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
     actualDayWithoutBreak: updatedActualDayWithoutBreak,
     achievements: achievements,
     lastReportDate: new Date().toISOString(),
@@ -76,10 +80,10 @@ const reportHandler = async ({ userAuth, inputData }: updateUserStatsProps) => {
     achievements: [...newAchievements, ...updatedUserData.achievements],
   };
 
-  await firebaseSetUserExerciseRaprot(userAuth, raiting, new Date());
-  await firebaseUpdateUserStats(userAuth, updatedUserDataWithAchievements);
+  await firebaseSetUserExerciseRaprot(userUid, raiting, new Date());
+  await firebaseUpdateUserStats(userUid, updatedUserDataWithAchievements);
   await firebaseAddLogReport(
-    userAuth,
+    userUid,
     updatedUserData.lastReportDate,
     raiting.totalPoints,
     newAchievements,
@@ -101,8 +105,13 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { userAuth, inputData } = req.body;
-    const report = await reportHandler({ userAuth, inputData });
+    if (!req.body.token) {
+      return res.status(401).json("Please include id token");
+    }
+    const { uid } = await auth.verifyIdToken(req.body.token.token);
+    const userUid = uid;
+    const { inputData } = req.body;
+    const report = await reportHandler({ userUid, inputData });
     res.status(200).json(report);
   }
   res.status(400);

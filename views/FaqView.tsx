@@ -1,6 +1,7 @@
-import FaqLayout, { faqQuestionInterface } from "layouts/FaqLayout/FaqLayout";
-import MainLayout from "layouts/MainLayout";
 import { useTranslation } from "react-i18next";
+
+import MainLayout from "layouts/MainLayout";
+import FaqLayout, { faqQuestionInterface } from "layouts/FaqLayout/FaqLayout";
 
 const FaqView = () => {
   const { t } = useTranslation("faq");

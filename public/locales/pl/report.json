@@ -12,7 +12,7 @@
     "24h_error": "Nie da się ćwiczyć więcej niż 24 godziny dziennie",
     "input_time": "Wpisz czas",
     "not_logged": "Nie jesteś zalogowany",
-    "report_success": "Poprawnie zraportowano",
+
     "stoper_entered": "Wprowadzono czas ze stopera",
     "exceeding_time": "Wpisałeś więcej czasu niż minęło od poprzedniego raportu. Przekroczyłeś czas o "
   },

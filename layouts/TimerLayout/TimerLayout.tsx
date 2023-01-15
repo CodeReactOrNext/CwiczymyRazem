@@ -1,26 +1,25 @@
-import Button from "components/Button";
-import { updateTimerTime } from "feature/user/store/userSlice";
-import { SkillsType } from "feature/user/store/userSlice.types";
-import { convertMsToHM } from "utils/converter/timeConverter";
-import useTimer from "hooks/useTimer";
-import { useState, useEffect } from "react";
-import { useAppDispatch } from "store/hooks";
-import CategoryBox from "./components/CategoryBox";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
 import Router from "next/router";
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+
+import Button from "components/Button";
 import Stopwatch from "./components/Stopwatch";
+import CategoryBox from "./components/CategoryBox";
+
+import useTimer from "hooks/useTimer";
+import { useAppDispatch } from "store/hooks";
+import { convertMsToHM } from "utils/converter/timeConverter";
+import { updateTimerTime } from "feature/user/store/userSlice";
+import { SkillsType, TimerInterface } from "feature/user/store/userSlice.types";
 
 interface TimerLayoutProps {
-  timerData: {
-    technique: number;
-    theory: number;
-    hearing: number;
-    creativity: number;
-  };
+  timerData: TimerInterface;
 }
 
 const TimerLayout = ({ timerData }: TimerLayoutProps) => {
+  const { t } = useTranslation("timer");
+
   const {
     time,
     restartTime,
@@ -30,7 +29,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
     setInitialStartTime,
   } = useTimer();
   const [chosenSkill, setChosenSkill] = useState<SkillsType>("technique");
-  const { t } = useTranslation("timer");
+
   const dispatch = useAppDispatch();
   const sumTime =
     timerData.creativity +

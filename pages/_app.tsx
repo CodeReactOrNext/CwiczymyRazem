@@ -1,14 +1,15 @@
 import Head from "next/head";
-import type { AppProps } from "next/app";
 import { Provider } from "react-redux";
-import { store } from "../store/store";
+import type { AppProps } from "next/app";
+import { ToastContainer } from "react-toastify";
 import { appWithTranslation } from "next-i18next";
+
+import { store } from "store/store";
+
 import "../styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
 
 function MyApp({ Component, pageProps }: AppProps) {
-
   return (
     <Provider store={store}>
       <Head>
@@ -25,7 +26,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name='keywords' content='ćwiczenie, gitara' />
       </Head>
       <Component {...pageProps} />
-      <ToastContainer toastClassName={"toastify-custom"}  />
+      <ToastContainer toastClassName={"toastify-custom"} />
     </Provider>
   );
 }
