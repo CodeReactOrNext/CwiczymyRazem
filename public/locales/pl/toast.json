@@ -21,6 +21,7 @@
     "logOut": "Pomyślnie wylogowano",
     "update_email": "Zmieniono email",
     "update_password": "Zmieniono hasło",
+    "report_success": "Poprawnie zraportowano",
     "update_avatar ": "Zmieniono awatar",
     "update_displayname": "Zmieniono nick",
     "restart": "Pomyślnie zrestartowano statystyki"

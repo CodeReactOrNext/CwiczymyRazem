@@ -7,7 +7,7 @@ import ProfileLayout from "layouts/ProfileLayout/ProfileLayout";
 
 import { DocumentData } from "firebase/firestore";
 import { getUserStatsField } from "assets/stats/profileStats";
-import { firebaseGetUserDocument } from "utils/firebase/firebase.utils";
+import { firebaseGetUserDocument } from "utils/firebase/client/firebase.utils";
 
 const ProfileView = () => {
   const [userData, setUserData] = useState<DocumentData | undefined>(undefined);

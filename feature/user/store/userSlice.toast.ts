@@ -28,3 +28,6 @@ export const logOutInfo = () => {
 export const restartInfo = () => {
   toast.success(i18n?.t("toast:success.restart"));
 };
+export const reportSuccess = () => {
+  toast.success(i18n?.t("toast:success.report_success"));
+};

@@ -1,6 +1,6 @@
 import { FaSpinner } from "react-icons/fa";
 import Achievement from "components/Achievement";
-import { FirebaseLogsInterface } from "utils/firebase/firebase.types";
+import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
 
 export interface LogsBoxLayoutProps {
   logs: FirebaseLogsInterface[] | null;

@@ -17,6 +17,7 @@ import {
 import {
   logOutInfo,
   newUserInfo,
+  reportSuccess,
   restartInfo,
   updateDisplayNameSuccess,
   updateUserAvatarSuccess,
@@ -129,6 +130,7 @@ export const userSlice = createSlice({
         state.previousUserStats = payload.previousUserStats;
         state.raitingData = payload.raitingData;
         state.isFetching = null;
+        reportSuccess();
       })
       .addCase(restartUserStats.fulfilled, (state) => {
         state.currentUserStats = statisticsInitial;
