@@ -22,6 +22,7 @@
     "update_password": "Password updated",
     "update_avatar ": "Avatar updated",
     "logOut": "Successfully logged out",
+    "report_success": "Reported successfully",
     "update_displayname": "Successfully change nick",
     "restart": "Successfully restarted statistics"
   }

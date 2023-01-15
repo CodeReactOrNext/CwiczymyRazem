@@ -1,10 +1,7 @@
-import {
-  createAsyncThunk,
-} from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
 
 import { SignUpCredentials } from "../view/SingupView/SingupView";
-
 
 import { fetchReport, fetchUserData } from "./services/userServices";
 import {
@@ -21,11 +18,10 @@ import {
   firebaseUpdateUserEmail,
   firebaseUpdateUserPassword,
   firebaseUploadAvatar,
-} from "utils/firebase/firebase.utils";
-import {
-  updateUserInterface,
-  updateReprotInterface,
-} from "./userSlice.types";
+} from "utils/firebase/client/firebase.utils";
+import { updateUserInterface } from "./userSlice.types";
+import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
+import { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 
 export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
@@ -128,8 +124,10 @@ export const restartUserStats = createAsyncThunk(
 
 export const updateUserStats = createAsyncThunk(
   "user/updateUserStats",
-  async ({ userAuth, inputData }: updateReprotInterface) => {
-    const statistics = fetchReport({ userAuth, inputData });
+  async ({ inputData }: { inputData: ReportFormikInterface }) => {
+    const user = await firebaseGetCurrentUser();
+    const token = await user!.getIdTokenResult();
+    const statistics = await fetchReport({ token, inputData });
     return statistics;
   }
 );
