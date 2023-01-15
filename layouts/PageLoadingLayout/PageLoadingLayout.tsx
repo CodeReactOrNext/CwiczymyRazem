@@ -1,7 +1,5 @@
-import Guitar from "layouts/HeroLayout/components/Guitar";
-import MainLayout from "layouts/MainLayout";
-import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 import { useTranslation } from "react-i18next";
+import Guitar from "layouts/HeroLayout/components/Guitar";
 
 const PageLoadingLayout = () => {
   const { t } = useTranslation("common");

@@ -12,7 +12,7 @@
     "24h_error": "It is not possible to exercise more than 24 hours per day",
     "input_time": "Enter time",
     "not_logged": "You are not logged in",
-    "report_success": "Reported successfully",
+   
     "stoper_entered": "Time from stopwatch entered",
     "exceeding_time": "You have entered more time than has passed since the last report. You exceeded the time by  "
   },

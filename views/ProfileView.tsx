@@ -1,11 +1,13 @@
-import ProfileLayout from "layouts/ProfileLayout/ProfileLayout";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { firebaseGetUserDocument } from "utils/firebase/firebase.utils";
-import { DocumentData } from "firebase/firestore";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
-import { getUserStatsField } from "assets/stats/profileStats";
+
 import MainLayout from "layouts/MainLayout";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
+import ProfileLayout from "layouts/ProfileLayout/ProfileLayout";
+
+import { DocumentData } from "firebase/firestore";
+import { getUserStatsField } from "assets/stats/profileStats";
+import { firebaseGetUserDocument } from "utils/firebase/client/firebase.utils";
 
 const ProfileView = () => {
   const [userData, setUserData] = useState<DocumentData | undefined>(undefined);

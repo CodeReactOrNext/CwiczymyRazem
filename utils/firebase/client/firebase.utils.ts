@@ -1,5 +1,3 @@
-import { AchievementList } from "assets/achievements/achievementsData";
-import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import {
   getAuth,
@@ -7,7 +5,6 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  User,
   signOut,
   updateProfile,
   updateEmail,
@@ -19,7 +16,6 @@ import {
   getFirestore,
   doc,
   getDoc,
-  setDoc,
   updateDoc,
   getDocs,
   collection,
@@ -31,7 +27,7 @@ import {
   FirebaseLogsInterface,
   FirebaseUserDataInterface,
 } from "./firebase.types";
-import { statisticsInitial as statistics } from "../../constants/userStatisticsInitialData";
+import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 import { firebaseApp } from "./firebase.cofig";
 import { shuffleUid } from "utils/user/shuffleUid";
 
@@ -78,14 +74,14 @@ export const firebaseGetUserName = async (userAuth: string) => {
 };
 
 export const firebaseGetUserAvatarURL = async () => {
-  const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.avatar;
 };
 
 export const firebaseRestartUserStats = async () => {
   if (auth.currentUser) {
-    const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
+    const userDocRef = doc(db, "users", auth.currentUser?.uid!);
     await updateDoc(userDocRef, { statistics });
   }
 };
@@ -94,11 +90,10 @@ export const firebaseUpdateUserDisplayName = async (
   userAuth: string,
   newDisplayName: string
 ) => {
-  const userDocRef = doc(db, "users", shuffleUid(userAuth));
+  const userDocRef = doc(db, "users", userAuth);
   if (auth.currentUser) {
     updateProfile(auth.currentUser, { displayName: newDisplayName })
-      .then(() => {})
-      .catch((error) => console.log(error));
+      .catch((error) => new Error(error));
   }
   await updateDoc(userDocRef, { displayName: newDisplayName });
 };
@@ -183,7 +178,7 @@ export const firebaseUpdateUserDocument = async (
   key: string,
   value: string
 ) => {
-  const userDocRef = doc(db, "users", shuffleUid(auth.currentUser?.uid!));
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   await updateDoc(userDocRef, { [key]: value });
 };
 

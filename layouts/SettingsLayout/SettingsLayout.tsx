@@ -3,16 +3,19 @@ import Backdrop from "components/Backdrop";
 import Button from "components/Button";
 import Input from "components/Input";
 import {
-  getUserProvider,
-  restartUserStats,
   selectIsFetching,
   selectUserAvatar,
   selectUserName,
+} from "feature/user/store/userSlice";
+import {
+  getUserProvider,
+  restartUserStats,
   changeUserDisplayName,
   updateUserEmail,
   updateUserPassword,
   uploadUserAvatar,
-} from "feature/user/store/userSlice";
+} from "feature/user/store/userSlice.asyncThunk";
+
 import { updateUserInterface as UpdatedUserCredentials } from "feature/user/store/userSlice.types";
 import { UserInfo } from "firebase/auth";
 import { Form, Formik } from "formik";
@@ -187,7 +190,7 @@ const SettingsLayout = () => {
                     isFetching={isFetching}
                     value={userProviderData?.email}
                   />
-                  )
+
                   <Divider />
                   <div className='flex  flex-row gap-2 p-4 text-2xl'>
                     <p className='text-tertiary'>{t("settings:password")}</p>

@@ -1,12 +1,10 @@
 import { User } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "utils/firebase/firebase.utils";
-import { statisticsInitial as statistics } from "../../constants/userStatisticsInitialData";
-import { shuffleUid } from "./shuffleUid";
+import { db } from "utils/firebase/client/firebase.utils";
+import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 
 export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
-  const shuffledUid = shuffleUid(user.uid);
-  const userDocRef = doc(db, "users", shuffledUid);
+  const userDocRef = doc(db, "users", user.uid);
 
   const userSnapshot = await getDoc(userDocRef);
   if (!userSnapshot.exists()) {
@@ -19,8 +17,8 @@ export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
         statistics,
       });
     } catch (error) {
-      console.log(error);
+      throw new Error();
     }
   }
-  return shuffledUid;
+  return user.uid;
 };
