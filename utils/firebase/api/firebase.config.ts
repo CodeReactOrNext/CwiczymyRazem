@@ -5,7 +5,7 @@ if (!admin.apps.length) {
     credential: admin.credential.cert({
       projectId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_PROJECTID,
       clientEmail: process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.NEXT_PUBLIC_FIREBASE_PRIVATEKY!.replace(
+      privateKey: process.env.NEXT_PUBLIC_FIREBASE_PRIVATEKEY!.replace(
         /\\n/g,
         "\n"
       ),
