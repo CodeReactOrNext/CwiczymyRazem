@@ -1,3 +1,4 @@
+import { IdTokenResult } from "firebase/auth";
 import {
   ReportDataInterface,
   ReportFormikInterface,
@@ -38,6 +39,6 @@ export interface updateUserInterface extends SignUpCredentials {
 }
 
 export interface updateReprotInterface {
-  userAuth: string;
+  token: IdTokenResult;
   inputData: ReportFormikInterface;
 }

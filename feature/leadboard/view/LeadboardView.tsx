@@ -8,8 +8,8 @@ import LeadboardLayout from "layouts/LeadboardLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 
-import { FirebaseUserDataInterface } from "utils/firebase/firebase.types";
-import { firebaseGetUsersExceriseRaport as firebaseGetUsersExceriseRaport } from "utils/firebase/firebase.utils";
+import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
+import { firebaseGetUsersExceriseRaport as firebaseGetUsersExceriseRaport } from "utils/firebase/client/firebase.utils";
 
 const LeadboardView = () => {
   const [usersData, setUsersData] = useState<

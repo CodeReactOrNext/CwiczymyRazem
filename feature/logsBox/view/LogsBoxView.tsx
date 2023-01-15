@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 
 import LogsBoxLayout from "layouts/LogsBoxLayout";
 
-import { FirebaseLogsInterface } from "utils/firebase/firebase.types";
-import { firebaseGetLogs } from "utils/firebase/firebase.utils";
+import { firebaseGetLogs } from "utils/firebase/client/firebase.utils";
+import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
 
 const LogsBoxView = () => {
   const [logs, setLogs] = useState<FirebaseLogsInterface[] | null>(null);
@@ -15,7 +15,7 @@ const LogsBoxView = () => {
         setLogs(logsData);
       })
       .catch((error) => {
-        console.log(error);
+        throw new Error(error);
       });
   }, []);
 
