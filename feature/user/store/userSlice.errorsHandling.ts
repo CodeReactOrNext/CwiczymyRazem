@@ -35,7 +35,6 @@ export const loginViaGoogleErrorHandler = (error: SerializedError) => {
 };
 
 export const createAccountErrorHandler = (error: SerializedError) => {
-  console.log(error);
   if (error.code === "auth/credential-already-in-use") {
     toast.error(i18n?.t("toast:errors.credential_already_in_use"));
     return;

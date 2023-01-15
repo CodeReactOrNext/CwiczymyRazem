@@ -105,9 +105,8 @@ const ReportView = () => {
       return;
     }
 
-    dispatch(updateUserStats({ userAuth, inputData })).then(() => {
+    dispatch(updateUserStats({ inputData })).then(() => {
       setRatingSummaryVisible(true);
-      toast.success(t("toast.report_success"));
     });
   };
 
@@ -233,16 +232,19 @@ const ReportView = () => {
           </>
         )}
       </Formik>
-      {ratingSummaryVisible && (
-        <Backdrop selector='overlays'>
-          <RatingPopUpLayout
-            onClick={setRatingSummaryVisible}
-            ratingData={raitingData!}
-            currentUserStats={currentUserStats!}
-            previousUserStats={previousUserStats!}
-          />
-        </Backdrop>
-      )}
+      {ratingSummaryVisible &&
+        raitingData &&
+        currentUserStats &&
+        previousUserStats &&(
+          <Backdrop selector='overlays'>
+            <RatingPopUpLayout
+              onClick={setRatingSummaryVisible}
+              ratingData={raitingData}
+              currentUserStats={currentUserStats}
+              previousUserStats={previousUserStats}
+            />
+          </Backdrop>
+        )}
     </>
   );
 };

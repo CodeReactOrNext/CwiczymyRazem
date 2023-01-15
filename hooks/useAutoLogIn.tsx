@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Router from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { auth } from "utils/firebase/firebase.utils";
+import { auth } from "utils/firebase/client/firebase.utils";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
 import { selectUserAuth, updateLocalTimer } from "feature/user/store/userSlice";
