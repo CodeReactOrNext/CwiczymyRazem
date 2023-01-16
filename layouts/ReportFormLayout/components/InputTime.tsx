@@ -1,6 +1,8 @@
 import { useField } from "formik";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
+import { addZeroToTime } from "utils/converter/addZeroToTime";
+
 const InputTime = ({ name }: { name: string }) => {
   const [field, meta, helpers] = useField(name);
 
@@ -16,7 +18,7 @@ const InputTime = ({ name }: { name: string }) => {
       <div className='flex max-w-[3rem] flex-col items-center gap-y-2'>
         <button
           type='button'
-          onClick={() => helpers.setValue(addValue(field.value))}
+          onClick={() => helpers.setValue(addZeroToTime(addValue(field.value)))}
           className='active:click-behavior-second'>
           <FaChevronUp />
         </button>
@@ -28,7 +30,9 @@ const InputTime = ({ name }: { name: string }) => {
         />
         <button
           type='button'
-          onClick={() => helpers.setValue(minusValue(field.value))}
+          onClick={() =>
+            helpers.setValue(addZeroToTime(minusValue(field.value)))
+          }
           className='active:click-behavior-second'>
           <FaChevronDown />
         </button>
