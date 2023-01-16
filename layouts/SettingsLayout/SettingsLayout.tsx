@@ -243,7 +243,7 @@ const SettingsLayout = () => {
           )}
         </Formik>
         <Divider />
-        <div className='flex flex-col gap-2  p-4 text-2xl'>
+        <div className='flex flex-col gap-2 p-4 text-2xl'>
           <p className='text-tertiary'>{t("settings:reset_stats")}</p>
           {!restartConfirmShow && (
             <>
