@@ -30,7 +30,7 @@ const LeadboardView = () => {
   }, [t]);
 
   return (
-    <MainLayout subtitle='Leadboard' variant='secondary'>
+    <MainLayout subtitle='Leaderboard' variant='secondary'>
       {usersData ? (
         <LeadboardLayout usersData={usersData} />
       ) : (
