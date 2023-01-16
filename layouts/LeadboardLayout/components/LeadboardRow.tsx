@@ -78,16 +78,18 @@ const LeadboardRow = ({
           </div>
           <div className='col-span-3 flex h-full w-full items-center justify-evenly md:col-span-1 md:w-[300px]  md:justify-center  md:gap-x-5'>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
-              <p className='text-xl  xxs:text-3xl '>{statistics.points}</p>
-              <p className='leading-[15px]  text-tertiary'>{t("points")}</p>
+              <p className='text-xl xxs:text-3xl '>{statistics.points}</p>
+              <p className='font-openSans text-xs font-bold leading-[15px] text-tertiary'>
+                {t("points")}
+              </p>
             </div>
-            <div className='flex  flex-col items-center md:justify-end md:px-2'>
+            <div className='flex flex-col items-center md:justify-end md:px-2'>
               <p className='text-xl  xxs:text-3xl'>
                 {convertMsToHM(
                   time.creativity + time.hearing + time.technique + time.theory
                 )}
               </p>
-              <p className='  leading-[15px] text-tertiary'>
+              <p className='font-openSans text-xs font-bold leading-[15px] text-tertiary '>
                 {t("exercise_time")}
               </p>
             </div>
