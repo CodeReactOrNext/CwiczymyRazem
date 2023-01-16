@@ -28,7 +28,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
     timerEnabled,
     setInitialStartTime,
   } = useTimer();
-  const [chosenSkill, setChosenSkill] = useState<SkillsType>("technique");
+  const [chosenSkill, setChosenSkill] = useState<SkillsType | null>(null);
 
   const dispatch = useAppDispatch();
   const sumTime =
@@ -52,16 +52,18 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
   };
 
   const timerSubmitHandler = () => {
-    const payload = {
-      type: chosenSkill,
-      time: time,
-    };
-    dispatch(updateTimerTime(payload));
+    if (chosenSkill) {
+      const payload = {
+        type: chosenSkill,
+        time: time,
+      };
+      dispatch(updateTimerTime(payload));
+    }
     Router.push("/report");
   };
 
   useEffect(() => {
-    if (!timerEnabled) return;
+    if (!timerEnabled || !chosenSkill) return;
     const payload = {
       type: chosenSkill,
       time: time,
@@ -76,8 +78,9 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
         timerEnabled={timerEnabled}
         startTimer={startTimer}
         stopTimer={stopTimer}
+        isSkillChosen={!!chosenSkill}
       />
-      <div className='mb-2 flex flex-row gap-5 text-center text-2xl'>
+      <div className='mb-2 flex flex-row gap-5 text-center text-2xl font-openSans'>
         <div className='flex flex-row gap-1 '>
           <p>
             {t("total_time")}{" "}
@@ -88,15 +91,15 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           <p>
             {t("currently_exercising")}
             <span className='m-1 text-tertiary'>
-              {getSkillName(chosenSkill)}
+              {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
             </span>
           </p>
         </div>
       </div>
-      <p>
+      <p className='font-openSans'>
         {t("info_about_repot ")}
         <Link href={"/report"}>
-          <a className='text-main-200'> {t("raport_link")}</a>
+          <a className='text-second-200'> {t("raport_link")}</a>
         </Link>
         .
       </p>
