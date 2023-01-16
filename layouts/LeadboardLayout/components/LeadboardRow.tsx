@@ -53,7 +53,7 @@ const LeadboardRow = ({
           <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
             <div className='absolute top-[-20px] right-[-60px] flex  items-center gap-x-1  '>
-              <p className='text-5xl font-extrabold text-main drop-shadow-3xl'>
+              <p className='text-5xl font-extrabold text-tertiary-300 drop-shadow-3xl'>
                 {lvl}{" "}
               </p>
             </div>
@@ -71,7 +71,7 @@ const LeadboardRow = ({
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
               </p>
-              <p className=' text-4xl font-extrabold text-main drop-shadow-3xl md:text-5xl'>
+              <p className=' text-4xl font-extrabold text-tertiary-300  drop-shadow-3xl md:text-5xl'>
                 {statistics.lvl}
               </p>
             </div>
