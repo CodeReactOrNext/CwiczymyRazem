@@ -128,7 +128,7 @@ const ReportView = () => {
           <>
             <ReportFormLayout>
               <ReportCategoryLayout title={t("exercise_type_title")}>
-                <div className='m-5 flex flex-row flex-wrap justify-center gap-14  2xl:gap-20'>
+                <div className='m-5 flex flex-row flex-wrap justify-center gap-14 2xl:gap-20'>
                   <TimeInputBox
                     errors={errors}
                     title={t("technique")}
