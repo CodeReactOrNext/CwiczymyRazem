@@ -14,7 +14,7 @@ const UserNav = ({ flexDirection }: UserNavProps) => {
 
   return (
     <div
-      className={`relative z-30 flex text-center text-base text-mainText ${
+      className={`relative z-30 flex text-center font-openSans text-xs gap-2 font-bold text-mainText  ${
         flexDirection === "col"
           ? "flex-col items-start justify-center"
           : "flex-row justify-around"

@@ -143,7 +143,9 @@ const SettingsLayout = () => {
                 accept='image/png, image/jpeg'
                 className='text-base'
               />
-              <p className='text-base '>{t("settings:resolution_info")}</p>
+              <p className='font-openSans text-xs font-bold '>
+                {t("settings:resolution_info")}
+              </p>
             </div>
             <Button
               disabled={!avatarIsValid}
@@ -233,7 +235,9 @@ const SettingsLayout = () => {
                   </div>
                 </>
               ) : (
-                <p className='p-5'>{t("settings:logged_in_via_google")}</p>
+                <p className='p-5 font-openSans text-sm font-bold'>
+                  {t("settings:logged_in_via_google")}
+                </p>
               )}
             </Form>
           )}
@@ -243,7 +247,9 @@ const SettingsLayout = () => {
           <p className='text-tertiary'>{t("settings:reset_stats")}</p>
           {!restartConfirmShow && (
             <>
-              <p className='text-lg'>{t("settings:reset_warning")}</p>
+              <p className='font-openSans text-sm font-bold '>
+                {t("settings:reset_warning")}
+              </p>
               <Button
                 variant='small'
                 onClick={() => setRestartConfirmShow(true)}>
