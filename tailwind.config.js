@@ -115,7 +115,7 @@ module.exports = {
       },
       backgroundImage: {
         "old-effect": "url('/static/images/old_effect.webp')",
-        "old-effect-hr": "url('/static/images/old_effect_hr.png')",
+        "old-effect-hr": "url('/static/images/old_effect_hr.webp')",
       },
       colors: {
         achievements: {
@@ -193,7 +193,8 @@ module.exports = {
       },
     },
     fontFamily: {
-      sans: ["Teko"],
+      sans: "Teko",
+      openSans: "Open Sans",
     },
   },
   plugins: [

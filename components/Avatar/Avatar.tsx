@@ -21,7 +21,9 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
         {avatarURL ? (
           <img className='h-full w-full' src={avatarURL} alt={name} />
         ) : (
-          <p className='text-5xl uppercase text-main-opposed'>{name?.[0]}</p>
+          <p className='font-openSans text-4xl font-bold uppercase text-main-opposed'>
+            {name?.[0]}
+          </p>
         )}
       </div>
       {lvl && (

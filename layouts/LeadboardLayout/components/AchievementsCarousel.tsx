@@ -41,8 +41,8 @@ const AchievementsCarousel = ({
   };
 
   return (
-    <div className=' col-span-3 flex h-full w-full flex-col items-center justify-center  md:col-span-1  md:w-fit md:justify-end '>
-      <div className='flex  text-base xxs:text-2xl lg:text-xl xl:text-2xl '>
+    <div className='col-span-3 flex h-full w-full flex-col items-center justify-center  md:col-span-1  md:w-fit md:justify-end '>
+      <div className='flex text-base xxs:text-2xl lg:text-xl xl:text-2xl '>
         <button onClick={handlePrev}>
           <FaAngleLeft
             className={`${
@@ -53,7 +53,7 @@ const AchievementsCarousel = ({
           />
         </button>
 
-        <div className='flex w-[100px] justify-around text-base xxs:text-xl xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
+        <div className='flex w-[100px]  justify-around font-openSans text-base font-bold xxs:text-lg xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
           <ToolTip />
           {achievements.length === 0
             ? t("empty")
@@ -71,7 +71,7 @@ const AchievementsCarousel = ({
           />
         </button>
       </div>
-      <p className=' text-tertiary'>
+      <p className='pb-2 font-openSans text-xs font-bold text-tertiary'>
         {t("achievements")} {achievements.length}/{achievementsData.length}
       </p>
     </div>

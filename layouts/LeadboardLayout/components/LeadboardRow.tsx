@@ -53,7 +53,7 @@ const LeadboardRow = ({
           <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
             <div className='absolute top-[-20px] right-[-60px] flex  items-center gap-x-1  '>
-              <p className='text-5xl font-extrabold text-main drop-shadow-3xl'>
+              <p className='text-5xl font-extrabold text-tertiary-300 drop-shadow-3xl'>
                 {lvl}{" "}
               </p>
             </div>
@@ -71,23 +71,25 @@ const LeadboardRow = ({
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
               </p>
-              <p className=' text-4xl font-extrabold text-main drop-shadow-3xl md:text-5xl'>
+              <p className=' text-4xl font-extrabold text-tertiary-300  drop-shadow-3xl md:text-5xl'>
                 {statistics.lvl}
               </p>
             </div>
           </div>
           <div className='col-span-3 flex h-full w-full items-center justify-evenly md:col-span-1 md:w-[300px]  md:justify-center  md:gap-x-5'>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
-              <p className='text-xl  xxs:text-3xl '>{statistics.points}</p>
-              <p className='leading-[15px]  text-tertiary'>{t("points")}</p>
+              <p className='text-xl xxs:text-3xl '>{statistics.points}</p>
+              <p className='font-openSans text-xs font-bold leading-[15px] text-tertiary'>
+                {t("points")}
+              </p>
             </div>
-            <div className='flex  flex-col items-center md:justify-end md:px-2'>
+            <div className='flex flex-col items-center md:justify-end md:px-2'>
               <p className='text-xl  xxs:text-3xl'>
                 {convertMsToHM(
                   time.creativity + time.hearing + time.technique + time.theory
                 )}
               </p>
-              <p className='  leading-[15px] text-tertiary'>
+              <p className='font-openSans text-xs font-bold leading-[15px] text-tertiary '>
                 {t("exercise_time")}
               </p>
             </div>
