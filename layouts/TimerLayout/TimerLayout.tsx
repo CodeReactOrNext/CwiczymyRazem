@@ -80,7 +80,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
         stopTimer={stopTimer}
         isSkillChosen={!!chosenSkill}
       />
-      <div className='mb-2 flex flex-row gap-5 text-center text-2xl'>
+      <div className='mb-2 flex flex-row gap-5 text-center text-2xl font-openSans'>
         <div className='flex flex-row gap-1 '>
           <p>
             {t("total_time")}{" "}
@@ -96,7 +96,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           </p>
         </div>
       </div>
-      <p>
+      <p className='font-openSans'>
         {t("info_about_repot ")}
         <Link href={"/report"}>
           <a className='text-second-200'> {t("raport_link")}</a>

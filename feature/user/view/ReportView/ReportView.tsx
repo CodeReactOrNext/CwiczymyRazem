@@ -51,7 +51,6 @@ const ReportView = () => {
   const raitingData = useAppSelector(selectRaitingData);
   const userAuth = useAppSelector(selectUserAuth);
   const timerData = useAppSelector(selectTimerData);
-  console.log(timerData.creativity);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
   const sumTime =
     timerData.creativity +
@@ -128,7 +127,7 @@ const ReportView = () => {
           <>
             <ReportFormLayout>
               <ReportCategoryLayout title={t("exercise_type_title")}>
-                <div className='m-5 flex flex-row flex-wrap justify-center gap-14  2xl:gap-20'>
+                <div className='m-5 flex flex-row flex-wrap justify-center gap-14 2xl:gap-20'>
                   <TimeInputBox
                     errors={errors}
                     title={t("technique")}
