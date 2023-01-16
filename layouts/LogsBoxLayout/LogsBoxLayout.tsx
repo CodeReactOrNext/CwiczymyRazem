@@ -9,7 +9,7 @@ export interface LogsBoxLayoutProps {
 
 const LogsBoxLayout = ({ logs }: LogsBoxLayoutProps) => {
   return logs ? (
-    <div className='line order-4 row-span-1 h-80 overflow-scroll	  border-4 border-tertiary bg-main-opposed p-1 font-openSans text-xs leading-5 xs:p-3 sm:p-5 lg:text-sm'>
+    <div className='line order-4 row-span-1 mt-5 h-80 overflow-scroll border-4 border-tertiary bg-main-opposed p-1 font-openSans text-xs leading-5 xs:p-3 md:mt-0 sm:p-5 lg:text-sm'>
       {logs.map(({ userName, points, data, newAchievements, newLevel }) => {
         const date = new Date(data);
 
