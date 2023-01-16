@@ -1,6 +1,7 @@
 .toolTipStyle {
-  font-size: medium !important;
+  font-family: Open Sans;
+  font-size: small !important;
   border: 2px solid #fff !important;
-  padding: 5px 12px !important;
+  padding: 10px 14px !important;
   max-width: 250px;
 }
