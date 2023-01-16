@@ -18,7 +18,7 @@ const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
       <p className='my-2 w-full bg-main-opposed bg-opacity-80 px-5 font-openSans text-sm  font-bold sm:px-10 md:px-5 xl:px-8 '>
         {value}h
       </p>
-      <p className='font-openSans text-sm font-bold'>{title}</p>
+      <p className='text-center font-openSans text-sm font-bold'>{title}</p>
     </div>
   );
 };

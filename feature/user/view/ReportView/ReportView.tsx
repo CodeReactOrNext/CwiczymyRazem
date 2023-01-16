@@ -127,7 +127,7 @@ const ReportView = () => {
           <>
             <ReportFormLayout>
               <ReportCategoryLayout title={t("exercise_type_title")}>
-                <div className='m-5 flex flex-row flex-wrap justify-center gap-14 2xl:gap-20'>
+                <div className='\ my-5 flex flex-row flex-wrap justify-center gap-14 2xl:gap-20'>
                   <TimeInputBox
                     errors={errors}
                     title={t("technique")}
@@ -171,8 +171,8 @@ const ReportView = () => {
                 </div>
               </ReportCategoryLayout>
               {isPracticeToday && (
-                <div className='flex flex-row  gap-2 text-xl'>
-                  <p>{t("exceeding_time")}</p>
+                <div className='flex flex-row gap-2 p-2 text-xl'>
+                  <p className='text-end'>{t("exceeding_time")}</p>
                   <QuestionMark description={t("description.exceeding_time")} />
                   <input
                     type='checkbox'

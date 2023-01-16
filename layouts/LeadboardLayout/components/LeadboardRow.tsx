@@ -50,11 +50,14 @@ const LeadboardRow = ({
         ${place === 1 ? "bg-yellow-500" : ""}
         ${place === 2 ? "bg-slate-400" : ""}
         ${place === 3 ? "bg-yellow-700" : ""}`}>
-          <div className='relative top-[-15px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
+          <div className='relative top-[-23px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
-            <div className='absolute top-[-20px] right-[-60px] flex  items-center gap-x-1  '>
-              <p className='text-5xl font-extrabold text-tertiary-300 drop-shadow-3xl'>
-                {lvl}{" "}
+            <div className='absolute top-[-10px] right-[-60px] flex  items-center gap-x-1  '>
+              <p className='text-2xl uppercase text-tertiary drop-shadow'>
+                Lvl{" "}
+              </p>
+              <p className=' text-4xl font-extrabold text-tertiary-300  drop-shadow-3xl md:text-5xl'>
+                {statistics.lvl}
               </p>
             </div>
           </div>
@@ -67,7 +70,7 @@ const LeadboardRow = ({
             </Link>
             <DaySince date={new Date(statistics.lastReportDate)} />
 
-            <div className='absolute right-[-50px] top-[-30px] hidden items-center gap-x-1 md:flex'>
+            <div className=' absolute top-[-30px] hidden items-center gap-x-1 md:right-[-50px] md:flex lg:right-[-0px] xl:right-[-50px]'>
               <p className='text-xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
               </p>
@@ -76,7 +79,7 @@ const LeadboardRow = ({
               </p>
             </div>
           </div>
-          <div className='col-span-3 flex h-full w-full items-center justify-evenly md:col-span-1 md:w-[300px]  md:justify-center  md:gap-x-5'>
+          <div className='col-span-3 flex h-full w-full items-center justify-evenly md:col-span-1 md:w-[300px]  md:justify-center '>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
               <p className='text-xl xxs:text-3xl '>{statistics.points}</p>
               <p className='font-openSans text-xs font-bold leading-[15px] text-tertiary'>
