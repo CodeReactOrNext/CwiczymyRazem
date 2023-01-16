@@ -35,9 +35,9 @@ const TimeInputBox = ({
         <QuestionMark description={questionMarkProps.description} />
       </label>
       <div className='xL:gap-3 flex items-center justify-center gap-2 text-xl'>
-        <InputTime name={hoursName} />
+        <InputTime name={hoursName} description={'HH'} />
         <p className='text-3xl'>:</p>
-        <InputTime name={minutesName} />
+        <InputTime name={minutesName} description={'MM'} />
       </div>
     </div>
   );

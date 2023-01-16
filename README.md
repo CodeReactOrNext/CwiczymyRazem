@@ -25,7 +25,7 @@ Pass: qwertyui
 ## Features
 
 - RWD
-- Leadboard
+- Leaderboard
 - Login/register via Firebase
 - Reporting progress and saving in in database
 - Points and leveling system
