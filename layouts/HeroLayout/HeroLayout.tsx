@@ -28,7 +28,7 @@ const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
         <Guitar />
       </div>
       <div className='z-30 flex flex-col items-center justify-center gap-6 xsm:flex-row lg:-mb-24 lg:flex-col xl:pr-8 '>
-        <span className='text-left text-[min(5vw,2vh)] text-tertiary-500 xxs:text-[min(5vw,2vh)] xsm:text-[min(3vw,1rem)] md:text-2xl lg:text-right xl:text-3xl 2xl:text-4xl'>
+        <span className='text-left font-openSans text-[min(5vw,2vh)] font-bold text-tertiary-500 xxs:text-[min(3.5vw,2vh)] xsm:text-[min(1.7vw,12px)] md:text-sm lg:text-right xl:text-xl 2xl:text-2xl'>
           {children}
         </span>
         <Link href='/login'>
