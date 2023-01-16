@@ -78,6 +78,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
         timerEnabled={timerEnabled}
         startTimer={startTimer}
         stopTimer={stopTimer}
+        isSkillChosen={!!chosenSkill}
       />
       <div className='mb-2 flex flex-row gap-5 text-center text-2xl'>
         <div className='flex flex-row gap-1 '>
@@ -90,7 +91,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           <p>
             {t("currently_exercising")}
             <span className='m-1 text-tertiary'>
-              {chosenSkill ? getSkillName(chosenSkill) : 'Nie wybrano'}
+              {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
             </span>
           </p>
         </div>
