@@ -96,7 +96,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
       <p>
         {t("info_about_repot ")}
         <Link href={"/report"}>
-          <a className='text-main-200'> {t("raport_link")}</a>
+          <a className='text-second-200'> {t("raport_link")}</a>
         </Link>
         .
       </p>
