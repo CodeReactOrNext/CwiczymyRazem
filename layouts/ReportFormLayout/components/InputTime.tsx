@@ -3,7 +3,12 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 import { addZeroToTime } from "utils/converter/addZeroToTime";
 
-const InputTime = ({ name }: { name: string }) => {
+interface InputTimeProps {
+  name: string;
+  description: string;
+}
+
+const InputTime = ({ name, description }: InputTimeProps) => {
   const [field, meta, helpers] = useField(name);
 
   const addValue = (value: number) => {
@@ -22,12 +27,17 @@ const InputTime = ({ name }: { name: string }) => {
           className='active:click-behavior-second'>
           <FaChevronUp />
         </button>
-        <input
-          className='w-full bg-second p-1 text-center	 text-xl font-bold tracking-widest	 text-tertiary focus:outline-none focus:ring focus:ring-main-opposed xs:p-2'
-          type='string'
-          placeholder={"00"}
-          {...field}
-        />
+        <div>
+      
+          <p className='m-0 bg-second-800 bg-opacity-50 text-center text-sm'>{description}</p>
+          <input
+            className='mb-0 w-full bg-second p-1 text-center	 text-xl font-bold tracking-widest	 text-tertiary focus:outline-none focus:ring focus:ring-main-opposed xs:p-2'
+            type='string'
+            placeholder={"00"}
+            {...field}
+          />
+        </div>
+
         <button
           type='button'
           onClick={() =>
