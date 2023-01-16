@@ -17,8 +17,8 @@ const FaqBox = ({ title, message }: FaqBoxProps) => {
         <p>{title}</p>
       </div>
       {isOpen && (
-        <div className='mt-1 flex w-full flex-row items-center bg-second p-4 px-8 text-xl tracking-wide text-mainText'>
-          <p> {message}</p>
+        <div className='mt-1 flex w-full flex-row items-center bg-second-800 p-4 px-8 font-openSans text-sm tracking-wide text-mainText md:text-base lg:px-12'>
+          <p>{message}</p>
         </div>
       )}
     </div>
