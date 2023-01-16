@@ -51,6 +51,7 @@ const ReportView = () => {
   const raitingData = useAppSelector(selectRaitingData);
   const userAuth = useAppSelector(selectUserAuth);
   const timerData = useAppSelector(selectTimerData);
+  console.log(timerData.creativity);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
   const sumTime =
     timerData.creativity +
@@ -235,7 +236,7 @@ const ReportView = () => {
       {ratingSummaryVisible &&
         raitingData &&
         currentUserStats &&
-        previousUserStats &&(
+        previousUserStats && (
           <Backdrop selector='overlays'>
             <RatingPopUpLayout
               onClick={setRatingSummaryVisible}

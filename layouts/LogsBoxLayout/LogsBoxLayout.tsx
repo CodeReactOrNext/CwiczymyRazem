@@ -1,17 +1,11 @@
 import { FaSpinner } from "react-icons/fa";
 import Achievement from "components/Achievement";
 import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
+import { addZeroToTime } from "utils/converter/addZeroToTime";
 
 export interface LogsBoxLayoutProps {
   logs: FirebaseLogsInterface[] | null;
 }
-
-const addZeroToTime = (time: number) => {
-  if (time.toString().length === 1) {
-    return "0" + time.toString();
-  }
-  return time.toString();
-};
 
 const LogsBoxLayout = ({ logs }: LogsBoxLayoutProps) => {
   return logs ? (
@@ -23,7 +17,7 @@ const LogsBoxLayout = ({ logs }: LogsBoxLayoutProps) => {
           <div
             key={data + userName}
             className='flex flex-row flex-wrap  items-center py-2 text-base sm:text-base'>
-            <p className='mr-2 w-20 text-sm tracking-wide border-r-2 border-main-opposed-300'>
+            <p className='mr-2 w-20 border-r-2 border-main-opposed-300 text-sm tracking-wide'>
               {date.toLocaleDateString() +
                 " " +
                 addZeroToTime(date.getHours()) +
