@@ -193,7 +193,8 @@ module.exports = {
       },
     },
     fontFamily: {
-      sans: ["Teko"],
+      sans: "Teko",
+      openSans: "Open Sans",
     },
   },
   plugins: [
