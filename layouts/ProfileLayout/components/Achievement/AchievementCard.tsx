@@ -36,7 +36,7 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
       <p className=' absolute z-40 hidden bg-black bg-opacity-80 p-2 text-lg opacity-0	transition-opacity group-hover:block  group-hover:opacity-100'>
         <>
           {t(name) as string}
-          <span className='hidden text-base group-hover:block'>
+          <span className='hidden text-sm group-hover:block  '>
             {t(description) as string}
           </span>
         </>
