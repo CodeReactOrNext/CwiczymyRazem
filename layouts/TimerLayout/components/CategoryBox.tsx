@@ -1,4 +1,7 @@
-import { convertMsToHM } from "utils/converter/timeConverter";
+import {
+  convertMsToHM,
+  convertMsToHMObject,
+} from "utils/converter/timeConverter";
 
 interface CategoryBox {
   title: string;
@@ -15,6 +18,7 @@ const CategoryBox = ({
   percent,
   onClick,
 }: CategoryBox) => {
+  const timeObject = convertMsToHMObject(time);
   return (
     <div
       className={`m-2 flex w-28 flex-col items-center justify-center p-2 text-xl xs:m-4 xs:p-4 xs:text-2xl md:m-6 md:w-52 ${
@@ -27,7 +31,9 @@ const CategoryBox = ({
         {percent ? percent : 0}%
       </p>
       <p className=' text-center text-xl xs:text-3xl'>{title}</p>
-      <p className='tracking-wide	 text-main-opposed	'>{convertMsToHM(time)}</p>
+      <p className='tracking-wide	 text-main-opposed	'>
+        {timeObject.hours}:{timeObject.minutes}
+      </p>
       {!chosen && (
         <button
           onClick={onClick}

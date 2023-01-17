@@ -62,6 +62,14 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
     Router.push("/report");
   };
 
+  const choseSkillHandler = (chosenSkill: SkillsType) => {
+    stopTimer();
+  
+    setChosenSkill(chosenSkill);
+    restartTime();
+    setInitialStartTime(timerData[chosenSkill]);
+  };
+
   useEffect(() => {
     if (!timerEnabled || !chosenSkill) return;
     const payload = {
@@ -108,9 +116,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           title={t("technique")}
           time={timerData.technique}
           onClick={() => {
-            setChosenSkill("technique");
-            restartTime();
-            setInitialStartTime(timerData.technique);
+            choseSkillHandler("technique");
           }}
           percent={calculatePercent(timerData.technique)}
           chosen={chosenSkill === "technique"}
@@ -119,9 +125,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           title={t("theory")}
           time={timerData.theory}
           onClick={() => {
-            setChosenSkill("theory");
-            restartTime();
-            setInitialStartTime(timerData.theory);
+            choseSkillHandler("theory");
           }}
           percent={calculatePercent(timerData.theory)}
           chosen={chosenSkill === "theory"}
@@ -130,9 +134,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           title={t("hearing")}
           time={timerData.hearing}
           onClick={() => {
-            setChosenSkill("hearing");
-            restartTime();
-            setInitialStartTime(timerData.hearing);
+            choseSkillHandler("hearing");
           }}
           percent={calculatePercent(timerData.hearing)}
           chosen={chosenSkill === "hearing"}
@@ -141,9 +143,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           title={t("creativity")}
           time={timerData.creativity}
           onClick={() => {
-            setChosenSkill("creativity");
-            restartTime();
-            setInitialStartTime(timerData.creativity);
+            choseSkillHandler("creativity");
           }}
           percent={calculatePercent(timerData.creativity)}
           chosen={chosenSkill === "creativity"}
