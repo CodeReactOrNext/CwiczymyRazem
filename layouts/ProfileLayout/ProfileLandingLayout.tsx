@@ -86,7 +86,7 @@ const LandingLayout = ({
                     percent={Math.round((time.creativity / totalTime) * 100)}
                   />
                 </div>
-                <div className=' row-cols-1  order-1'>
+                <div className=' row-cols-1  order-1 flex flex-wrap justify-around'>
                   {statsField.map(({ Icon, description, value }) => (
                     <StatsField
                       key={description}
@@ -96,7 +96,7 @@ const LandingLayout = ({
                     />
                   ))}
                 </div>
-                <div className='row-cols-1 order-3 '>
+                <div className='row-cols-1 order-3 flex flex-col justify-between p-4 '>
                   <AchievementWrapper userAchievements={achievements} />
                 </div>
                 {featSlot}

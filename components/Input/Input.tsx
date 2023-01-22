@@ -21,9 +21,9 @@ const Input = ({ Icon, placeholder, id, name, type = "text" }: InputProps) => {
   const [field, meta] = useField(name);
 
   return (
-    <div className='relative flex w-full max-w-sm flex-row items-center justify-center'>
+    <div className='relative flex w-full max-w-sm flex-row items-center justify-center '>
       {Icon && (
-        <div className='z-10 flex h-[50px] w-[50px] items-center justify-center bg-main-opposed xs:h-[60px] xs:w-[60px]'>
+        <div className='z-10 flex h-[50px] w-[50px] items-center justify-center bg-main-opposed xs:h-[60px] xs:w-[60px] radius-default'>
           <Icon size='24' />
         </div>
       )}

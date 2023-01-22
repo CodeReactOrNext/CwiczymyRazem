@@ -16,10 +16,10 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
   };
 
   return (
-    <div className='relative'>
-      <div className='flex h-20 w-20 items-center justify-center bg-tertiary-400'>
+    <div className='relative '>
+      <div className='flex h-20 w-20 items-center justify-center bg-tertiary-400 radius-default'>
         {avatarURL ? (
-          <img className='h-full w-full' src={avatarURL} alt={name} />
+          <img className='h-full w-full radius-default' src={avatarURL} alt={name} />
         ) : (
           <p className='font-openSans text-4xl font-bold uppercase text-main-opposed'>
             {name?.[0]}

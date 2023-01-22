@@ -79,7 +79,7 @@ const ProfileLayout = ({
               percent={Math.round((time.creativity / totalTime) * 100)}
             />
           </div>
-          <div className='row-cols-1'>
+          <div className='row-cols-1 flex flex-wrap justify-around'>
             {statsField.map(({ Icon, description, value }) => (
               <StatsField
                 key={description}
@@ -89,7 +89,7 @@ const ProfileLayout = ({
               />
             ))}
           </div>
-          <div className='row-cols-1  '>
+          <div className='row-cols-1 flex flex-col justify-between '>
             <AchievementWrapper userAchievements={achievements} />
           </div>
         </div>
