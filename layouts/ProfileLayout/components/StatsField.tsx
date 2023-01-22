@@ -1,3 +1,4 @@
+import IconBox from "components/IconBox";
 import { IconType } from "react-icons/lib";
 
 export interface StatsFieldProps {
@@ -8,14 +9,15 @@ export interface StatsFieldProps {
 
 const StatsField = ({ Icon, description, value }: StatsFieldProps) => {
   return (
-    <div className='relative right-2 flex flex-row font-openSans font-bold text-xs sm:text-sm '>
-      <div className='flex h-8  w-8 shrink-0 items-center justify-center  bg-main  text-mainText sm:h-10 sm:w-10 sm:text-lg'>
-        <Icon />
+    <div className='relative right-2 m-2 flex w-48 flex-col  border-2 border-second-400 bg-second-600 p-1 font-openSans text-xs shadow-inset-cool shadow-second-700 radius-default sm:text-sm'>
+      <div className='flex w-full flex-row items-center justify-around border-b-2 border-second-400'>
+        <IconBox Icon={Icon} />
+        <p className='  w-[50%] border-main text-center font-sans text-3xl font-extrabold tracking-wider opacity-90 '>
+          {value}
+        </p>
       </div>
-      <p className='mx-2  self-center text-main-opposed-600'>
-        {description}
-        <span className='fonte- ml-1 text-mainText'>{value}</span>
-      </p>
+
+      <p className='mx-2 self-center p-1 font-bold '>{description}</p>
     </div>
   );
 };
