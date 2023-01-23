@@ -15,12 +15,12 @@ const WelcomeMessage = ({
   const isPracticeToday = checkIsPracticeToday(new Date(lastReportDate));
 
   return (
-    <div className='text:xs xxs:text-base sm:text-2xl md:text-base lg:text-xl xl:text-2xl'>
+    <div className='text:xs tracking-wide xxs:text-base sm:text-2xl md:text-base lg:text-xl xl:text-2xl'>
       <p className=' xs:text-lg md:text-xl lg:text-2xl xl:text-3xl  '>
         {t("hey")} <span className='text-mainText'>{userName}!</span>
       </p>
       <p>
-        {t("earned_points")} <span className='text-mainText'>{points}</span>
+        {t("earned_points")}: <span className='text-mainText'>{points}</span>
       </p>
       <div className='flex flex-row items-center gap-2'>
         <p>Czy dziś ćwiczyłeś? </p>

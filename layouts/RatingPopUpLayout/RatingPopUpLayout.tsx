@@ -70,7 +70,7 @@ const RatingPopUp = ({
   const currProgressPercent = (pointsInThisLevel / levelXpDifference) * 100;
 
   return (
-    <div className='relative flex h-5/6 max-h-[1020px] w-[95%] translate-y-[10%] items-center justify-center bg-main-opposed-500 font-sans md:min-h-[700px] lg:aspect-square lg:w-auto'>
+    <div className='relative flex h-5/6 max-h-[1020px] w-[95%] translate-y-[10%] items-center justify-center bg-main-opposed-500 font-sans tracking-wider md:min-h-[700px] lg:aspect-square lg:w-auto'>
       <OldEffect className='absolute z-10' />
       <div className='absolute top-[20%] -left-[5%] right-0 flex w-[110%] items-center justify-center bg-main-500 text-5xl font-medium sm:text-8xl'>
         <p>
