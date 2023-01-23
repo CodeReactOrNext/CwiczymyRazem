@@ -64,7 +64,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
 
   const choseSkillHandler = (chosenSkill: SkillsType) => {
     stopTimer();
-  
+
     setChosenSkill(chosenSkill);
     restartTime();
     setInitialStartTime(timerData[chosenSkill]);
@@ -88,30 +88,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
         stopTimer={stopTimer}
         isSkillChosen={!!chosenSkill}
       />
-      <div className='mb-2 flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
-        <div className='flex flex-row gap-1 '>
-          <p>
-            {t("total_time")}{" "}
-            <span className='text-tertiary'>{convertMsToHM(sumTime)}</span>
-          </p>
-        </div>
-        <div className='flex flex-row gap-1 '>
-          <p>
-            {t("currently_exercising")}
-            <span className='m-1 text-tertiary'>
-              {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
-            </span>
-          </p>
-        </div>
-      </div>
-      <p className='p-4  font-openSans  '>
-        {t("info_about_repot ")}
-        <Link href={"/report"}>
-          <a className='text-second-200'> {t("raport_link")}</a>
-        </Link>
-        .
-      </p>
-      <div className='mb-14  flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
+      <div className='  flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
         <CategoryBox
           title={t("technique")}
           time={timerData.technique}
@@ -149,6 +126,28 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           chosen={chosenSkill === "creativity"}
         />
       </div>
+      <div className=' flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
+        <div className='flex flex-row gap-1 '>
+          <p>
+            {t("total_time")}
+            <span className='text-tertiary'>{convertMsToHM(sumTime)}</span>
+          </p>
+        </div>
+        <div className='flex flex-row gap-1 '>
+          <p>
+            {t("currently_exercising")}
+            <span className='m-1 text-tertiary'>
+              {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
+            </span>
+          </p>
+        </div>
+      </div>
+      <p className='p-4  font-openSans  '>
+        {t("info_about_repot ")}
+        <Link href={"/report"}>
+          <a className='text-second-200'> {t("raport_link")}</a>
+        </Link>
+      </p>
       <Button onClick={timerSubmitHandler}> {t("end_button")}</Button>
     </div>
   );
