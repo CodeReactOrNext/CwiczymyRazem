@@ -20,7 +20,7 @@ const InputTime = ({ name, description }: InputTimeProps) => {
   };
   return (
     <>
-      <div className='flex max-w-[3rem] flex-col items-center gap-y-2'>
+      <div className='flex max-w-[3rem] flex-col items-center gap-y-2 '>
         <button
           type='button'
           onClick={() => helpers.setValue(addZeroToTime(addValue(field.value)))}
@@ -29,7 +29,7 @@ const InputTime = ({ name, description }: InputTimeProps) => {
         </button>
         <div>
       
-          <p className='m-0 bg-second-800 bg-opacity-50 text-center text-sm'>{description}</p>
+          <p className='m-0 bg-second-800 bg-opacity-50 text-center text-sm '>{description}</p>
           <input
             className='mb-0 w-full bg-second p-1 text-center	 text-xl font-bold tracking-widest	 text-tertiary focus:outline-none focus:ring focus:ring-main-opposed xs:p-2'
             type='string'

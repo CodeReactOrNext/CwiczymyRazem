@@ -15,7 +15,7 @@ const GoogleButton = ({ onClick, children }: GoogleButtonProps) => {
     <button
       onClick={onClick}
       type='button'
-      className='flex flex-row gap-3 bg-white p-3 font-medium tracking-wide text-googleButtonText active:click-behavior'
+      className='active:click-behavio flex flex-row gap-3 bg-white p-3 font-medium tracking-wide text-googleButtonText radius-default'
       disabled={isFetching ? true : false}>
       {isFetching ? (
         <CircleSpinner size={24} color='#555555' />

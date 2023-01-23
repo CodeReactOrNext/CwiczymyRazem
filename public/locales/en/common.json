@@ -26,11 +26,22 @@
     "profile": "Profil",
     "leadboard": "Leaderboard",
     "discord": "Discord",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "exercise": "Exercise",
+    "report": "Report"
   },
   "day_since": {
     "no_practice": "Player hasn't practiced",
     "pracitce_last_24": "Practiced within the last 24 hours",
     "practice_day": "Practiced {{days}} days ago"
+  },
+  "header": {
+    "hey": "Hey",
+    "lvl_short": "lvl",
+    "earned_points": "You heve got points",
+    "your_level": "Level",
+    "points": "Points",
+    "points_short": "pt.",
+    "practice_today": "Do you practice today?"
   }
 }
