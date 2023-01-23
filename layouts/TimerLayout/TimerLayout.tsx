@@ -88,6 +88,22 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
         stopTimer={stopTimer}
         isSkillChosen={!!chosenSkill}
       />
+      <div className=' flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
+        <div className='flex flex-row gap-1 '>
+          <p>
+            {t("total_time")}
+            <span className='px-2 text-tertiary'>{convertMsToHM(sumTime)}</span>
+          </p>
+        </div>
+        <div className='flex flex-row gap-1 '>
+          <p>
+            {t("currently_exercising")}
+            <span className='m-1 text-tertiary'>
+              {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
+            </span>
+          </p>
+        </div>
+      </div>
       <div className='  flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
         <CategoryBox
           title={t("technique")}
@@ -126,23 +142,8 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           chosen={chosenSkill === "creativity"}
         />
       </div>
-      <div className=' flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
-        <div className='flex flex-row gap-1 '>
-          <p>
-            {t("total_time")}
-            <span className='text-tertiary'>{convertMsToHM(sumTime)}</span>
-          </p>
-        </div>
-        <div className='flex flex-row gap-1 '>
-          <p>
-            {t("currently_exercising")}
-            <span className='m-1 text-tertiary'>
-              {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
-            </span>
-          </p>
-        </div>
-      </div>
-      <p className='p-4  font-openSans  '>
+
+      <p className='p-4 text-center font-openSans text-sm '>
         {t("info_about_repot ")}
         <Link href={"/report"}>
           <a className='text-second-200'> {t("raport_link")}</a>

@@ -21,7 +21,7 @@ const CategoryBox = ({
   const timeObject = convertMsToHMObject(time);
   return (
     <div
-      className={`m-2 flex w-28 flex-col items-center justify-center p-2 text-xl radius-default xs:m-4 xs:p-4 xs:text-2xl md:m-6 md:w-52 ${
+      className={`m-2 flex w-28 flex-col items-center justify-center p-2 text-xl radius-default xs:m-4  xs:text-2xl md:m-6 md:w-44 ${
         chosen ? "bg-tertiary text-main-opposed" : "bg-second text-tertiary"
       } `}>
       <p
