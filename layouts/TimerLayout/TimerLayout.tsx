@@ -90,13 +90,13 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
       />
       <div className=' flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
         <div className='flex flex-row gap-1 '>
-          <p>
-            {t("total_time")}
-            <span className='px-2 text-tertiary'>{convertMsToHM(sumTime)}</span>
+          <p className='flex flex-col text-sm xs:text-base'>
+            {t("total_time")}{" "}
+            <span className='text-tertiary'>{convertMsToHM(sumTime)}</span>
           </p>
         </div>
         <div className='flex flex-row gap-1 '>
-          <p>
+          <p className='flex flex-col text-sm xs:text-base'>
             {t("currently_exercising")}
             <span className='m-1 text-tertiary'>
               {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
@@ -104,7 +104,8 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           </p>
         </div>
       </div>
-      <div className='  flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
+
+      <div className='mb-14 flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
         <CategoryBox
           title={t("technique")}
           time={timerData.technique}
@@ -143,7 +144,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
         />
       </div>
 
-      <p className='p-4 text-center font-openSans text-sm '>
+      <p className='p-4 text-center font-openSans'>
         {t("info_about_repot ")}
         <Link href={"/report"}>
           <a className='text-second-200'> {t("raport_link")}</a>
