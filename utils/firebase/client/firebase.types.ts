@@ -1,6 +1,7 @@
 import { Timestamp } from "firebase/firestore";
 import { AchievementList } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { SkillsType } from "feature/user/store/userSlice.types";
 
 export interface FirebaseUserDataInterface {
   profileId: string;
@@ -19,4 +20,10 @@ export interface FirebaseLogsInterface {
     level: number;
   };
   points: number;
+}
+
+export interface FirebaseEventsInteface {
+  category: SkillsType;
+  name: string;
+  link: string;
 }

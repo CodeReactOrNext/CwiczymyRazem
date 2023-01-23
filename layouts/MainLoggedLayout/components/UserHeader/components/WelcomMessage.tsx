@@ -11,19 +11,22 @@ const WelcomeMessage = ({
   points,
   lastReportDate,
 }: WelocmeMessageProps) => {
-  const { t } = useTranslation("profile");
+  const { t } = useTranslation("common");
   const isPracticeToday = checkIsPracticeToday(new Date(lastReportDate));
 
   return (
     <div className='text:xs tracking-wide xxs:text-base sm:text-2xl md:text-base lg:text-xl xl:text-2xl'>
       <p className=' xs:text-lg md:text-xl lg:text-2xl xl:text-3xl  '>
-        {t("hey")} <span className='text-mainText'>{userName}!</span>
+        {t("header.hey")} <span className='text-mainText'>{userName}!</span>
       </p>
       <p>
-        {t("earned_points")}: <span className='text-mainText'>{points}</span>
+        <>
+          {t("header.earned_points")}:{" "}
+          <span className='text-mainText'>{points}</span>
+        </>
       </p>
       <div className='flex flex-row items-center gap-2'>
-        <p>Czy dziś ćwiczyłeś? </p>
+        <p>{t("header.practice_today")}</p>
         {isPracticeToday ? (
           <FaCheck className='text-green-300' />
         ) : (

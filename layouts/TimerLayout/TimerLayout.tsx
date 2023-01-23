@@ -88,7 +88,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
         stopTimer={stopTimer}
         isSkillChosen={!!chosenSkill}
       />
-      <div className='mb-2 flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
+      <div className=' flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
         <div className='flex flex-row gap-1 '>
           <p className='flex flex-col text-sm xs:text-base'>
             {t("total_time")}{" "}
@@ -104,13 +104,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           </p>
         </div>
       </div>
-      <p className='p-4 text-center font-openSans'>
-        {t("info_about_repot ")}
-        <Link href={"/report"}>
-          <a className='text-second-200'> {t("raport_link")}</a>
-        </Link>
-        .
-      </p>
+
       <div className='mb-14 flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
         <CategoryBox
           title={t("technique")}
@@ -149,6 +143,13 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           chosen={chosenSkill === "creativity"}
         />
       </div>
+
+      <p className='p-4 text-center font-openSans'>
+        {t("info_about_repot ")}
+        <Link href={"/report"}>
+          <a className='text-second-200'> {t("raport_link")}</a>
+        </Link>
+      </p>
       <Button onClick={timerSubmitHandler}> {t("end_button")}</Button>
     </div>
   );
