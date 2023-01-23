@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
 
 import Avatar from "components/Avatar";
+import LevelBar from "components/LevelBar";
 import DaySince from "components/DaySince/DaySince";
 import StatisticBar from "./components/StatisticBar";
 import HeadDecoration from "./components/HeadDecoration";
-import Level from "./components/UserHeader/components/Level";
 import StatsField, { StatsFieldProps } from "./components/StatsField";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
@@ -30,7 +30,7 @@ const ProfileLayout = ({
     time.technique + time.theory + time.hearing + time.creativity;
   return (
     <div className='flex justify-center'>
-      <div className='m-4 mt-28 flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
+      <div className='m-4  flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
         <HeadDecoration title={t("profile")} />
         <div className='grid-rows-auto  grid-cols-2  md:grid'>
           <div className=' row-span-1  flex flex-col  items-center justify-center gap-6 '>
@@ -51,7 +51,7 @@ const ProfileLayout = ({
                 <DaySince date={new Date(lastReportDate)} />
               </div>
             </div>
-            <Level
+            <LevelBar
               points={userStats.points}
               lvl={userStats.lvl}
               currentLevelMaxPoints={userStats.currentLevelMaxPoints}

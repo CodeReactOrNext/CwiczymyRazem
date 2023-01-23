@@ -11,9 +11,6 @@
   "theory": "Theory",
   "hearing": "Hearing",
   "creativity": "Creative work",
-  "earned_points": "You heve got points",
-  "ranking_place": "Place in the ranking",
-  "hey": "Hey",
   "lvl_short": "lvl",
   "your_level": "Level",
   "points": "Points",
@@ -29,11 +26,5 @@
     "longest_session": "Longest session:",
     "consecutive days": "Number of consecutive days:",
     "max_points": "Most points for a single report:"
-  },
-  "nav": {
-    "exercise": "Exercise",
-    "report": "Report",
-    "leadboard": "Leaderboard",
-    "faq": "FAQ"
   }
 }

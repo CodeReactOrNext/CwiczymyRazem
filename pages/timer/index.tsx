@@ -1,11 +1,11 @@
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
-import MainLayout from "layouts/MainLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import useAutoLogIn from "hooks/useAutoLogIn";
 import TimerView from "feature/user/view/TimerView";
+import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
 
 const Timer: NextPage = () => {
   const { isLoggedIn } = useAutoLogIn({
@@ -14,9 +14,9 @@ const Timer: NextPage = () => {
     },
   });
   return (
-    <MainLayout subtitle='Timer' variant='secondary'>
+    <AuthLayoutWrapper pageId={"exercise"} subtitle='Timer' variant='secondary'>
       {!isLoggedIn ? <PageLoadingLayout /> : <TimerView />}
-    </MainLayout>
+    </AuthLayoutWrapper>
   );
 };
 

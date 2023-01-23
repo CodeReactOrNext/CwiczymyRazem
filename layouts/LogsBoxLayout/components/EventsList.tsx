@@ -9,7 +9,7 @@ interface EventsListProps {
 }
 
 const EventsList = ({ eventList }: EventsListProps) => {
-  const { t } = useTranslation("timer");
+  const { t } = useTranslation("profile");
 
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {
@@ -26,7 +26,6 @@ const EventsList = ({ eventList }: EventsListProps) => {
   return (
     <>
       {eventList.map(({ category, link, name }) => {
-        console.log(eventList);
         return (
           <div
             key={link}

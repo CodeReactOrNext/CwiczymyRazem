@@ -11,9 +11,6 @@
   "theory": "Teoria",
   "hearing": "Słuch",
   "creativity": "Praca kreatywna",
-  "earned_points": "Zdobyłeś punktów",
-  "ranking_place": "Miejsce w rankingu",
-  "hey": "Cześć",
   "lvl_short": "lvl",
   "your_level": "Poziom",
   "points": "Punktów",
@@ -29,11 +26,5 @@
     "longest_session": "Najdłuższa sesja",
     "consecutive days": "Dni bez przerwy",
     "max_points": "Rekord punktów "
-  },
-  "nav": {
-    "exercise": "Ćwicz",
-    "report": "Raportuj",
-    "leadboard": "Leaderboard",
-    "faq": "FAQ"
   }
 }
