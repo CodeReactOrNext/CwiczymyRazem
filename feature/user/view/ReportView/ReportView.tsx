@@ -176,7 +176,7 @@ const ReportView = () => {
                   <QuestionMark description={t("description.exceeding_time")} />
                   <input
                     type='checkbox'
-                    className='h-8'
+                    className='w-10'
                     onClick={() => {
                       setAcceptExceedingTime((prev) => !prev);
                     }}
