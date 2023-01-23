@@ -1,60 +1,55 @@
-import { FaSpinner } from "react-icons/fa";
-import Achievement from "components/Achievement";
-import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
-import { addZeroToTime } from "utils/converter/addZeroToTime";
+import { useState } from "react";
+
+import Logs from "./components/Logs";
+import EventsList from "./components/EventsList";
+import AchievementsMap from "./components/AchievementsMap";
+import LogsBoxButton from "./components/LogsBoxButton";
+
+import { AchievementList } from "assets/achievements/achievementsData";
+import {
+  FirebaseEventsInteface,
+  FirebaseLogsInterface,
+} from "utils/firebase/client/firebase.types";
 
 export interface LogsBoxLayoutProps {
-  logs: FirebaseLogsInterface[] | null;
+  logs: FirebaseLogsInterface[];
+  events: FirebaseEventsInteface[];
+  userAchievements: AchievementList[];
 }
 
-const LogsBoxLayout = ({ logs }: LogsBoxLayoutProps) => {
-  return logs ? (
-    <div className='line order-4 row-span-1 mt-5 h-80 overflow-scroll border-4 border-tertiary bg-main-opposed bg-opacity-80 p-1 font-openSans text-xs leading-5 radius-default xs:p-3 sm:p-5 md:mt-0 lg:text-sm'>
-      {logs.map(({ userName, points, data, newAchievements, newLevel }) => {
-        const date = new Date(data);
-
-        return (
-          <div
-            key={data + userName}
-            className='flex flex-row flex-nowrap  items-center border-b-2 border-main-opposed-400 py-2 '>
-            <p className='mr-2 w-[20%] border-r-2 border-main-opposed-400 pr-2 text-[0.55rem]  lg:text-xs'>
-              {date.toLocaleDateString() +
-                " " +
-                addZeroToTime(date.getHours()) +
-                ":" +
-                addZeroToTime(date.getMinutes())}
-            </p>
-            <div className='flex w-[80%] flex-wrap '>
-              <p className='mr-1'>
-                <span className='text-tertiary'>{userName}</span> zdobył
-                <span className='m-1 text-second-50'> +{points}</span>pkt.
-              </p>
-              {newLevel.isNewLevel && (
-                <p className='mr-1'>
-                  Awansował na
-                  <span className='ml-1 text-second-50'>
-                    {newLevel.level}
-                  </span>{" "}
-                  poziom
-                </p>
-              )}
-              {newAchievements.length !== 0 && (
-                <>
-                  <p>Osiągnięcia:</p>
-                  {newAchievements.map((id) => (
-                    <div className='mx-1' key={id}>
-                      <Achievement id={id} />
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
-          </div>
-        );
-      })}
+const LogsBoxLayout = ({
+  logs,
+  events,
+  userAchievements,
+}: LogsBoxLayoutProps) => {
+  const [showedCategory, setShowedCategory] = useState<
+    "logs" | "events" | "achievements"
+  >("logs");
+  return (
+    <div className='line order-4 row-span-1 m-4 mt-5 h-80 overflow-scroll border-4 border-second-400 bg-main-opposed bg-opacity-80 p-1 font-openSans text-xs leading-5 radius-default xs:p-3 sm:p-5 md:mt-0 lg:text-sm'>
+      <div className='flex flex-row gap-4 border-b-2 border-main-opposed-500  font-bold'>
+        <LogsBoxButton
+          title={"Logs"}
+          active={showedCategory === "logs"}
+          onClick={() => setShowedCategory("logs")}
+        />
+        <LogsBoxButton
+          title={"Events"}
+          active={showedCategory === "events"}
+          onClick={() => setShowedCategory("events")}
+        />
+        <LogsBoxButton
+          title={" Achievements Map"}
+          active={showedCategory === "achievements"}
+          onClick={() => setShowedCategory("achievements")}
+        />
+      </div>
+      {showedCategory === "achievements" && (
+        <AchievementsMap userAchievements={userAchievements} />
+      )}
+      {showedCategory === "events" && <EventsList eventList={events} />}
+      {showedCategory === "logs" && logs && <Logs logs={logs} />}
     </div>
-  ) : (
-    <FaSpinner />
   );
 };
 
