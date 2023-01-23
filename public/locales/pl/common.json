@@ -26,11 +26,22 @@
     "profile": "Profil",
     "leadboard": "Leaderboard",
     "discord": "Discord",
-    "faq": "FAQ"
+    "faq": "FAQ",
+    "exercise": "Ćwicz",
+    "report": "Raportuj"
   },
-  "day_since":{
+  "day_since": {
     "no_practice": "Gracz nie ćwiczył",
-    "pracitce_last_24":"Ćwiczył w ciągu ostatnich 24h",
+    "pracitce_last_24": "Ćwiczył w ciągu ostatnich 24h",
     "practice_day": "Ćwiczył {{days}} dni temu"
+  },
+  "header": {
+    "hey": "Cześć",
+    "lvl_short": "lvl",
+    "earned_points": "Posiadasz punktów:",
+    "your_level": "Poziom",
+    "points": "Punktów",
+    "points_short": "pkt.",
+    "practice_today": "Czy dziś ćwiczyłeś?"
   }
 }

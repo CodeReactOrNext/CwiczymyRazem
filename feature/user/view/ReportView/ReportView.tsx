@@ -9,7 +9,7 @@ import { FaBrain, FaMusic } from "react-icons/fa";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
-import ReportCategoryLayout from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
+import ReportCategoryWrapper from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
 import {
   HealthHabbitsBox,
   TimeInputBox,
@@ -126,7 +126,7 @@ const ReportView = () => {
         {({ errors }) => (
           <>
             <ReportFormLayout>
-              <ReportCategoryLayout title={t("exercise_type_title")}>
+              <ReportCategoryWrapper title={t("exercise_type_title")}>
                 <div className='\ my-5 flex flex-row flex-wrap justify-center gap-14 2xl:gap-20'>
                   <TimeInputBox
                     errors={errors}
@@ -169,7 +169,7 @@ const ReportView = () => {
                     minutesName={"creativityMinutes"}
                   />
                 </div>
-              </ReportCategoryLayout>
+              </ReportCategoryWrapper>
               {isPracticeToday && (
                 <div className='flex flex-row gap-2 p-2 text-xl'>
                   <p className='text-end'>{t("exceeding_time")}</p>
@@ -183,7 +183,7 @@ const ReportView = () => {
                   />
                 </div>
               )}
-              <ReportCategoryLayout title={t("healthy_habits_title")}>
+              <ReportCategoryWrapper title={t("healthy_habits_title")}>
                 <HealthHabbitsBox
                   name='exercise_plan'
                   questionMarkProps={{
@@ -219,7 +219,7 @@ const ReportView = () => {
                   }}
                   title={t("habits.recording.title")}
                 />
-              </ReportCategoryLayout>
+              </ReportCategoryWrapper>
               <div className='flex flex-col items-center justify-self-center md:col-span-2 lg:col-span-1 xl:col-span-2'>
                 <div className='m-2 h-6'>
                   {Object.keys(errors).length !== 0 && <ErrorBox />}

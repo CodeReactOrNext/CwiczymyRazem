@@ -24,6 +24,7 @@ import {
   query,
 } from "firebase/firestore";
 import {
+  FirebaseEventsInteface,
   FirebaseLogsInterface,
   FirebaseUserDataInterface,
 } from "./firebase.types";
@@ -67,6 +68,17 @@ export const firebaseGetLogs = async () => {
   return logsArr;
 };
 
+export const firebaseGetEvents = async () => {
+  const eventsDocRef = collection(db, "events");
+  const eventsDoc = await getDocs(eventsDocRef);
+  const eventsArr: FirebaseEventsInteface[] = [];
+  eventsDoc.forEach((doc) => {
+    const event = doc.data() as FirebaseEventsInteface;
+    eventsArr.push(event);
+  });
+  return eventsArr;
+};
+
 export const firebaseGetUserName = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
@@ -92,8 +104,9 @@ export const firebaseUpdateUserDisplayName = async (
 ) => {
   const userDocRef = doc(db, "users", userAuth);
   if (auth.currentUser) {
-    updateProfile(auth.currentUser, { displayName: newDisplayName })
-      .catch((error) => new Error(error));
+    updateProfile(auth.currentUser, { displayName: newDisplayName }).catch(
+      (error) => new Error(error)
+    );
   }
   await updateDoc(userDocRef, { displayName: newDisplayName });
 };

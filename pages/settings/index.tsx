@@ -2,11 +2,11 @@ import type { NextPage } from "next";
 import { useTranslation } from "react-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
-import MainLayout from "layouts/MainLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import useAutoLogIn from "hooks/useAutoLogIn";
 import SettingsView from "feature/user/view/SettingsView";
+import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
 
 const Settings: NextPage = () => {
   const { t } = useTranslation("settings");
@@ -17,9 +17,12 @@ const Settings: NextPage = () => {
   });
 
   return (
-    <MainLayout subtitle={t("settings_subtilte")} variant='primary'>
+    <AuthLayoutWrapper
+      pageId={null}
+      subtitle={t("settings_subtilte")}
+      variant='secondary'>
       {!isLoggedIn ? <PageLoadingLayout /> : <SettingsView />}
-    </MainLayout>
+    </AuthLayoutWrapper>
   );
 };
 
