@@ -9,10 +9,10 @@ export interface StatsFieldProps {
 
 const StatsField = ({ Icon, description, value }: StatsFieldProps) => {
   return (
-    <div className='relative right-2 m-2 flex w-48 flex-col  border-2 border-second-400 bg-second-600 p-1 font-openSans text-xs shadow-inset-cool shadow-second-700 radius-default sm:text-sm'>
+    <div className='relative right-2 m-2 flex w-28 flex-col border-2  border-second-400 bg-second-600 p-1 font-openSans text-xs shadow-inset-cool shadow-second-700 radius-default sm:w-48 sm:text-sm'>
       <div className='flex w-full flex-row items-center justify-around border-b-2 border-second-400'>
         <IconBox Icon={Icon} />
-        <p className='  w-[50%] border-main text-center font-sans text-3xl font-extrabold tracking-wider opacity-90 '>
+        <p className='  w-[50%] border-main text-center font-sans text-xl sm:text-3xl font-extrabold tracking-wider opacity-90 '>
           {value}
         </p>
       </div>
