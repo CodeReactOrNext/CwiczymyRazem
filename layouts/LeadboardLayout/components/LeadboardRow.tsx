@@ -46,7 +46,7 @@ const LeadboardRow = ({
           <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
         </div>
         <div
-          className={`group mr-5 grid w-full grid-cols-3 grid-rows-3 justify-items-center  bg-second bg-opacity-75 px-2 hover:bg-opacity-90 md:h-16 md:grid-rows-1
+          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-3 justify-items-center bg-second bg-opacity-75 px-2 radius-default hover:bg-opacity-90 md:h-16 md:grid-rows-1
         ${place === 1 ? "bg-yellow-500" : ""}
         ${place === 2 ? "bg-slate-400" : ""}
         ${place === 3 ? "bg-yellow-700" : ""}`}>

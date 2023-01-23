@@ -8,6 +8,7 @@ import { store } from "store/store";
 
 import "../styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
+import BetaInfo from "components/BetaInfo";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -27,6 +28,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <Component {...pageProps} />
       <ToastContainer toastClassName={"toastify-custom"} />
+      <BetaInfo />
     </Provider>
   );
 }

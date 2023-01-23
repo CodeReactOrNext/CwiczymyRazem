@@ -115,7 +115,7 @@ const SettingsLayout = () => {
 
   return (
     <>
-      <div className='m-auto flex w-full flex-col bg-main-opposed-400 p-4 sm:w-[640px] '>
+      <div className='bg-second-500 m-auto flex w-full flex-col p-4 radius-default sm:w-[640px] '>
         <div className='flex flex-row justify-around gap-2 p-2 text-2xl'>
           <div>
             <Avatar

@@ -35,26 +35,6 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
       ),
     },
     {
-      Icon: FaGuitar,
-      description: i18n?.t("profile:stats.num_sessions"),
-      value: sessionCount,
-    },
-    {
-      Icon: FaStar,
-      description: i18n?.t("profile:stats.num_points"),
-      value: points,
-    },
-    {
-      Icon: FaHeart,
-      description: i18n?.t("profile:stats.num_habbits"),
-      value: habitsCount,
-    },
-    {
-      Icon: FaMedal,
-      description: i18n?.t("profile:stats.num_achievements"),
-      value: achievements.length + "/" + achievementsData.length,
-    },
-    {
       Icon: FaDumbbell,
       description: i18n?.t("profile:stats.longest_session"),
       value: convertMsToHM(time.longestSession),
@@ -65,9 +45,29 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
       value: dayWithoutBreak,
     },
     {
+      Icon: FaGuitar,
+      description: i18n?.t("profile:stats.num_sessions"),
+      value: sessionCount,
+    },
+    {
+      Icon: FaStar,
+      description: i18n?.t("profile:stats.num_points"),
+      value: points,
+    },
+    {
       Icon: FaStarHalf,
       description: i18n?.t("profile:stats.max_points"),
       value: maxPoints,
+    },
+    {
+      Icon: FaHeart,
+      description: i18n?.t("profile:stats.num_habbits"),
+      value: habitsCount,
+    },
+    {
+      Icon: FaMedal,
+      description: i18n?.t("profile:stats.num_achievements"),
+      value: achievements.length + "/" + achievementsData.length,
     },
   ] as StatsFieldProps[];
 };

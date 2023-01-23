@@ -28,7 +28,7 @@ const Button = ({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`sm:w-45 xs:text-xl" cursor-pointer border-2  border-transparent text-center font-bold uppercase active:click-behavior 
+      className={`sm:w-45 xs:text-xl" cursor-pointer border-2  border-transparent text-center font-bold uppercase radius-default active:click-behavior
         ${
           variant === "secondary"
             ? "bg-main-opposed hover:bg-main-opposed-100"

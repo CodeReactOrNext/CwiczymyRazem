@@ -2,14 +2,12 @@ import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-
-import MainLayout from "layouts/MainLayout";
 import LeadboardLayout from "layouts/LeadboardLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
-
 import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 import { firebaseGetUsersExceriseRaport as firebaseGetUsersExceriseRaport } from "utils/firebase/client/firebase.utils";
+import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
 
 const LeadboardView = () => {
   const [usersData, setUsersData] = useState<
@@ -30,13 +28,16 @@ const LeadboardView = () => {
   }, [t]);
 
   return (
-    <MainLayout subtitle='Leaderboard' variant='secondary'>
+    <AuthLayoutWrapper
+      pageId={"leadboard"}
+      subtitle='Leaderboard'
+      variant='secondary'>
       {usersData ? (
         <LeadboardLayout usersData={usersData} />
       ) : (
         <PageLoadingLayout />
       )}
-    </MainLayout>
+    </AuthLayoutWrapper>
   );
 };
 

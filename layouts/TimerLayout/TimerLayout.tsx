@@ -62,6 +62,14 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
     Router.push("/report");
   };
 
+  const choseSkillHandler = (chosenSkill: SkillsType) => {
+    stopTimer();
+
+    setChosenSkill(chosenSkill);
+    restartTime();
+    setInitialStartTime(timerData[chosenSkill]);
+  };
+
   useEffect(() => {
     if (!timerEnabled || !chosenSkill) return;
     const payload = {
@@ -80,15 +88,15 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
         stopTimer={stopTimer}
         isSkillChosen={!!chosenSkill}
       />
-      <div className='mb-2 flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
+      <div className=' flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
         <div className='flex flex-row gap-1 '>
-          <p>
+          <p className='flex flex-col text-sm xs:text-base'>
             {t("total_time")}{" "}
             <span className='text-tertiary'>{convertMsToHM(sumTime)}</span>
           </p>
         </div>
         <div className='flex flex-row gap-1 '>
-          <p>
+          <p className='flex flex-col text-sm xs:text-base'>
             {t("currently_exercising")}
             <span className='m-1 text-tertiary'>
               {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
@@ -96,21 +104,13 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           </p>
         </div>
       </div>
-      <p className='p-4  font-openSans  '>
-        {t("info_about_repot ")}
-        <Link href={"/report"}>
-          <a className='text-second-200'> {t("raport_link")}</a>
-        </Link>
-        .
-      </p>
-      <div className='mb-14  flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
+
+      <div className='mb-14 flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
         <CategoryBox
           title={t("technique")}
           time={timerData.technique}
           onClick={() => {
-            setChosenSkill("technique");
-            restartTime();
-            setInitialStartTime(timerData.technique);
+            choseSkillHandler("technique");
           }}
           percent={calculatePercent(timerData.technique)}
           chosen={chosenSkill === "technique"}
@@ -119,9 +119,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           title={t("theory")}
           time={timerData.theory}
           onClick={() => {
-            setChosenSkill("theory");
-            restartTime();
-            setInitialStartTime(timerData.theory);
+            choseSkillHandler("theory");
           }}
           percent={calculatePercent(timerData.theory)}
           chosen={chosenSkill === "theory"}
@@ -130,9 +128,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           title={t("hearing")}
           time={timerData.hearing}
           onClick={() => {
-            setChosenSkill("hearing");
-            restartTime();
-            setInitialStartTime(timerData.hearing);
+            choseSkillHandler("hearing");
           }}
           percent={calculatePercent(timerData.hearing)}
           chosen={chosenSkill === "hearing"}
@@ -141,14 +137,19 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           title={t("creativity")}
           time={timerData.creativity}
           onClick={() => {
-            setChosenSkill("creativity");
-            restartTime();
-            setInitialStartTime(timerData.creativity);
+            choseSkillHandler("creativity");
           }}
           percent={calculatePercent(timerData.creativity)}
           chosen={chosenSkill === "creativity"}
         />
       </div>
+
+      <p className='p-4 text-center font-openSans'>
+        {t("info_about_repot ")}
+        <Link href={"/report"}>
+          <a className='text-second-200'> {t("raport_link")}</a>
+        </Link>
+      </p>
       <Button onClick={timerSubmitHandler}> {t("end_button")}</Button>
     </div>
   );
