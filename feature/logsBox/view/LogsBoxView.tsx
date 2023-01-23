@@ -3,11 +3,21 @@ import { useState, useEffect } from "react";
 
 import LogsBoxLayout from "layouts/LogsBoxLayout";
 
-import { firebaseGetLogs } from "utils/firebase/client/firebase.utils";
-import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
+import {
+  firebaseGetEvents,
+  firebaseGetLogs,
+} from "utils/firebase/client/firebase.utils";
+import {
+  FirebaseEventsInteface,
+  FirebaseLogsInterface,
+} from "utils/firebase/client/firebase.types";
+import { useAppSelector } from "store/hooks";
+import { selectCurrentUserStats } from "feature/user/store/userSlice";
 
 const LogsBoxView = () => {
   const [logs, setLogs] = useState<FirebaseLogsInterface[] | null>(null);
+  const [events, setEvents] = useState<FirebaseEventsInteface[] | null>(null);
+  const userAchievement = useAppSelector(selectCurrentUserStats)?.achievements;
 
   useEffect(() => {
     firebaseGetLogs()
@@ -17,9 +27,23 @@ const LogsBoxView = () => {
       .catch((error) => {
         throw new Error(error);
       });
+
+    firebaseGetEvents()
+      .then((events) => setEvents(events))
+      .catch((error) => {
+        throw new Error(error);
+      });
   }, []);
 
-  return logs ? <LogsBoxLayout logs={logs} /> : <FaSpinner />;
+  return logs && events && userAchievement ? (
+    <LogsBoxLayout
+      logs={logs}
+      events={events}
+      userAchievements={userAchievement}
+    />
+  ) : (
+    <FaSpinner />
+  );
 };
 
 export default LogsBoxView;
