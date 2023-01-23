@@ -19,7 +19,7 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
     <>
       <div className='flex flex-col items-start space-x-2 space-y-2 text-lg '>
         <div className='flex flex-row items-center gap-5 sm:gap-10'>
-          <div className=' lg:mr-4'>
+          <div className='scale-75 sm:scale-100 lg:mr-4'>
             <Logo />
             <Avatar avatarURL={avatar} name={userName} lvl={lvl} />
             <div className='mt-3'>
