@@ -30,7 +30,9 @@ const CategoryBox = ({
         } `}>
         {percent ? percent : 0}%
       </p>
-      <p className=' text-center text-xl xs:text-3xl'>{title}</p>
+      <p className=' text-center text-xl tracking-wide xs:text-2xl md:text-3xl'>
+        {title}
+      </p>
       <p className='tracking-wide	 text-main-opposed	'>
         {timeObject.hours}:{timeObject.minutes}
       </p>
