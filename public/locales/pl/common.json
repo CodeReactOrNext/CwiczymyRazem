@@ -43,5 +43,15 @@
     "points": "Punktów",
     "points_short": "pkt.",
     "practice_today": "Czy dziś ćwiczyłeś?"
+  },
+  "logsBox": {
+    "achievements_map": "Mapa osiągnięć",
+    "logs": "Logi",
+    "events": "Eventy",
+    "lvl_up": "Awansował na",
+    "lvl": "Poziom",
+    "achievements": "Osiągnięcia:",
+    "get": "zdobył",
+    "points": "pkt"
   }
 }

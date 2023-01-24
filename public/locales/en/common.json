@@ -43,5 +43,15 @@
     "points": "Points",
     "points_short": "pt.",
     "practice_today": "Do you practice today?"
+  },
+  "logsBox": {
+    "achievements_map": "Achievements Map",
+    "logs": "Logs",
+    "events": "Events",
+    "lvl_up": "Lvl up to",
+    "lvl": "lvl",
+    "achievements": "Achievements:",
+    "get": "get",
+    "points": "pt"
   }
 }

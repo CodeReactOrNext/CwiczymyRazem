@@ -1,4 +1,5 @@
 import Achievement from "components/Achievement";
+import { useTranslation } from "react-i18next";
 
 import { addZeroToTime } from "utils/converter/addZeroToTime";
 import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
@@ -7,6 +8,7 @@ export interface LogsBoxLayoutProps {
   logs: FirebaseLogsInterface[];
 }
 const Logs = ({ logs }: LogsBoxLayoutProps) => {
+  const { t } = useTranslation("common");
   return (
     <>
       {logs.map(({ userName, points, data, newAchievements, newLevel }) => {
@@ -24,21 +26,23 @@ const Logs = ({ logs }: LogsBoxLayoutProps) => {
             </p>
             <div className='flex w-[80%] flex-wrap '>
               <p className='mr-1'>
-                <span className='text-tertiary'>{userName}</span> zdobył
-                <span className='m-1 text-second-50'> +{points}</span>pkt.
+                <span className='text-tertiary'>{userName}</span>{" "}
+                {t("logsBox.get")}
+                <span className='m-1 text-second-50'> +{points}</span>
+                {t("logsBox.points")}
               </p>
               {newLevel.isNewLevel && (
                 <p className='mr-1'>
-                  Awansował na
+                  {t("logsBox.lvl_up")}
                   <span className='ml-1 text-second-50'>
                     {newLevel.level}
                   </span>{" "}
-                  poziom
+                  {t("logsBox.lvl")}
                 </p>
               )}
               {newAchievements.length !== 0 && (
                 <>
-                  <p>Osiągnięcia:</p>
+                  <p> {t("logsBox.achievements")}</p>
                   {newAchievements.map((id) => (
                     <div className='mx-1' key={id}>
                       <Achievement id={id} />
