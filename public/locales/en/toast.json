@@ -15,7 +15,8 @@
   },
   "info": {
     "new_user_tip": "Check out the FAQ to learn how to use 'Ćwiczymy Razem'",
-    "log_in_again": "To change data you have to log in again."
+    "log_in_again": "To change data you have to log in again.",
+    "copy_link": "Copy to clipboard"
   },
   "success": {
     "update_email": "Email updated",

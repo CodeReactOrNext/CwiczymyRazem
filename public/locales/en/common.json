@@ -3,7 +3,8 @@
     "sign_in": "Log in",
     "sign_up": "Sign Up",
     "edit": "Edit",
-    "logout": "Log out"
+    "logout": "Log out",
+    "link_copy_profile": "Copy link to your profil"
   },
   "google_button": {
     "sign_in": "Sign In With Google"
