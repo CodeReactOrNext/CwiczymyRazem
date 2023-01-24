@@ -31,13 +31,9 @@ const useTimer = () => {
     if (!timerEnabled) {
       const timeDiffrence = new Date().getTime() - startTimeDate;
       setInitialTime((prev) => {
-        console.log("prevInitial", prev);
         return prev + timeDiffrence;
       });
     }
-    console.log("1 startTimeDate", startTimeDate);
-    console.log("1 timerEnabled", timerEnabled);
-    console.log(`*********************************`);
   }, [startTimeDate, timerEnabled]);
 
   useEffect(() => {
@@ -46,12 +42,6 @@ const useTimer = () => {
     }
     const timeDiffrence = new Date().getTime() - startTimeDate;
     const timer = setInterval(() => setTime(timeDiffrence + initialTime), 1000);
-    console.log("2 time", time);
-    console.log("2 timer time", timeDiffrence + initialTime);
-    console.log("2 timerEnabled", timerEnabled);
-    console.log("2 initialTime", initialTime);
-    console.log("2 startTimeDate", startTimeDate);
-    console.log(`*********************************`);
     return () => clearInterval(timer);
   }, [time, timerEnabled, initialTime, startTimeDate]);
 
