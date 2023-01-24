@@ -25,6 +25,7 @@ export interface UserSliceProviderData {
 export interface userSliceInitialState {
   userAuth: string | null;
   userInfo: { displayName?: string; avatar?: string } | null;
+  theme: "default-theme" | "dark-theme";
   timer: TimerInterface;
   currentUserStats: StatisticsDataInterface | null;
   previousUserStats: StatisticsDataInterface | null;

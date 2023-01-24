@@ -48,6 +48,7 @@ const initialState: userSliceInitialState = {
   raitingData: null,
   isFetching: null,
   timer: { creativity: 0, hearing: 0, technique: 0, theory: 0 },
+  theme: "default-theme",
   providerData: {
     providerId: null,
     uid: null,
@@ -70,6 +71,10 @@ export const userSlice = createSlice({
     },
     addPracticeData: (state, action) => {
       state.currentUserStats = action.payload;
+    },
+    changeTheme: (state) => {
+      state.theme =
+        state.theme === "default-theme" ? "dark-theme" : "default-theme";
     },
     updateLocalTimer: (state, { payload }: PayloadAction<TimerInterface>) => {
       if (!payload) {
@@ -220,10 +225,16 @@ export const userSlice = createSlice({
   },
 });
 
-export const { addUserAuth, addUserData, updateTimerTime, updateLocalTimer } =
-  userSlice.actions;
+export const {
+  addUserAuth,
+  addUserData,
+  updateTimerTime,
+  updateLocalTimer,
+  changeTheme,
+} = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
+export const selectLayoutMode = (state: RootState) => state.user.theme;
 export const selectCurrentUserStats = (state: RootState) =>
   state.user.currentUserStats;
 export const selectPreviousUserStats = (state: RootState) =>
