@@ -73,6 +73,10 @@ body {
   @apply bg-transparent;
 }
 
+::-webkit-scrollbar-corner {
+  background: rgba(0, 0, 0, 0);
+}
+
 ::-webkit-scrollbar-thumb {
   @apply bg-second-100;
 }
