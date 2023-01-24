@@ -28,13 +28,13 @@ const Logs = ({ logs }: LogsBoxLayoutProps) => {
               <p className='mr-1'>
                 <span className='text-tertiary'>{userName}</span>{" "}
                 {t("logsBox.get")}
-                <span className='m-1 text-second-50'> +{points}</span>
+                <span className='m-1 text-second-text'> +{points}</span>
                 {t("logsBox.points")}
               </p>
               {newLevel.isNewLevel && (
                 <p className='mr-1'>
                   {t("logsBox.lvl_up")}
-                  <span className='ml-1 text-second-50'>
+                  <span className='ml-1 text-second-text'>
                     {newLevel.level}
                   </span>{" "}
                   {t("logsBox.lvl")}

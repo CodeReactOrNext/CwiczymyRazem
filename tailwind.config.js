@@ -156,6 +156,7 @@ module.exports = {
               second: {
                 DEFAULT: "#1193a4",
                 special: "#1193a4",
+                text: "#43c5d6",
                 50: "#43c5d6",
                 100: "#39bbcc",
                 200: "#2fb1c2",
@@ -243,6 +244,7 @@ module.exports = {
               second: {
                 DEFAULT: "#1A1A1A",
                 special: "#1A1A1A",
+                text: "#ff4855",
                 50: "#757575",
                 100: "#6B6B6B",
                 200: "#575757",
