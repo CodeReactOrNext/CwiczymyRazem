@@ -15,7 +15,8 @@
   },
   "info": {
     "new_user_tip": "Zerknij do FAQ żeby dowiedzieć się jak używać \"Ćwiczymy Razem\"",
-    "log_in_again": "Do zmiany danych musisz się ponownie zalogować."
+    "log_in_again": "Do zmiany danych musisz się ponownie zalogować.",
+    "copy_link": "Skopiowano do schowka"
   },
   "success": {
     "logOut": "Pomyślnie wylogowano",

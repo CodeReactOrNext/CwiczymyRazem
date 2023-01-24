@@ -3,7 +3,8 @@
     "sign_in": "Loguj",
     "sign_up": "Zarejestruj się",
     "edit": "Edytuj",
-    "logout": "Wyloguj"
+    "logout": "Wyloguj",
+    "link_copy_profile": "Kopiuj link do Twojego profilu"
   },
   "google_button": {
     "sign_in": " Zaloguj Się Z Google"
@@ -43,5 +44,15 @@
     "points": "Punktów",
     "points_short": "pkt.",
     "practice_today": "Czy dziś ćwiczyłeś?"
+  },
+  "logsBox": {
+    "achievements_map": "Mapa osiągnięć",
+    "logs": "Logi",
+    "events": "Eventy",
+    "lvl_up": "Awansował na",
+    "lvl": "Poziom",
+    "achievements": "Osiągnięcia:",
+    "get": "zdobył",
+    "points": "pkt"
   }
 }
