@@ -26,8 +26,8 @@ const LogsBoxLayout = ({
     "logs" | "events" | "achievements"
   >("logs");
   return (
-    <div className='line order-4 row-span-1 m-4 mt-5 h-80 overflow-scroll border-4 border-second-400 bg-main-opposed bg-opacity-80 p-1 font-openSans text-xs leading-5 radius-default xs:p-3 sm:p-5 md:mt-0 lg:text-sm'>
-      <div className='flex flex-row gap-4 border-b-2 border-main-opposed-500  font-bold'>
+    <div className='relative order-4 row-span-1 m-4 mt-5 h-80 border-4 border-second-400 bg-main-opposed-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-3 sm:p-5 md:mt-0 lg:text-sm'>
+      <div className='sticky top-0 left-0 flex flex-row gap-4 border-b-2 border-main-opposed-500 font-bold'>
         <LogsBoxButton
           title={"Logs"}
           active={showedCategory === "logs"}
@@ -44,11 +44,13 @@ const LogsBoxLayout = ({
           onClick={() => setShowedCategory("achievements")}
         />
       </div>
-      {showedCategory === "achievements" && (
-        <AchievementsMap userAchievements={userAchievements} />
-      )}
-      {showedCategory === "events" && <EventsList eventList={events} />}
-      {showedCategory === "logs" && logs && <Logs logs={logs} />}
+      <div className='h-full overflow-scroll'>
+        {showedCategory === "achievements" && (
+          <AchievementsMap userAchievements={userAchievements} />
+        )}
+        {showedCategory === "events" && <EventsList eventList={events} />}
+        {showedCategory === "logs" && logs && <Logs logs={logs} />}
+      </div>
     </div>
   );
 };
