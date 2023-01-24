@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { FaCheck, FaTimes } from "react-icons/fa";
+
+import CopyLinkProfile from "components/CopyLinkProfile";
+
 import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 interface WelocmeMessageProps {
   userName: string;
@@ -21,7 +24,7 @@ const WelcomeMessage = ({
       </p>
       <p>
         <>
-          {t("header.earned_points")}:{" "}
+          {t("header.earned_points")}{" "}
           <span className='text-mainText'>{points}</span>
         </>
       </p>
@@ -33,6 +36,7 @@ const WelcomeMessage = ({
           <FaTimes className='text-red-300' />
         )}
       </div>
+      <CopyLinkProfile />
     </div>
   );
 };
