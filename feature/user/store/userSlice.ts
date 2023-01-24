@@ -72,7 +72,13 @@ export const userSlice = createSlice({
     addPracticeData: (state, action) => {
       state.currentUserStats = action.payload;
     },
-    changeTheme: (state) => {
+    changeTheme: (
+      state,
+      { payload }: PayloadAction<"dark-theme" | "default-theme" | undefined>
+    ) => {
+      if (payload) {
+        state.theme = payload;
+      }
       state.theme =
         state.theme === "default-theme" ? "dark-theme" : "default-theme";
     },

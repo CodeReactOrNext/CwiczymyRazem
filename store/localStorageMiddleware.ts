@@ -5,10 +5,15 @@ export const localStorageMiddleware: Middleware =
     const result = next(action);
     if (
       result.type.startsWith("user/updateTimerTime") ||
-      result.type.startsWith("user/updateUserStats/fulfilled")
+      result.type.startsWith("user/updateUserStats/fulfilled") ||
+      result.type.startsWith("user/changeTheme")
     ) {
-      const state = store.getState().user.timer;
-      localStorage.setItem("userSlice.timer", JSON.stringify(state));
+      const timer = store.getState().user.timer;
+      localStorage.setItem("userSlice.timer", JSON.stringify(timer));
+    }
+    if (result.type.startsWith("user/changeTheme")) {
+      const theme = store.getState().user.theme;
+      localStorage.setItem("userSlice.theme", JSON.stringify(theme));
     }
     return result;
   };
