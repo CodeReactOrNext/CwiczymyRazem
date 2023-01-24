@@ -21,7 +21,7 @@ const WelcomeMessage = ({
       </p>
       <p>
         <>
-          {t("header.earned_points")}:{" "}
+          {t("header.earned_points")}{" "}
           <span className='text-mainText'>{points}</span>
         </>
       </p>
