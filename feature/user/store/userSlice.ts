@@ -1,3 +1,4 @@
+import Router from "next/router";
 import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
 
 import { RootState } from "store/store";
@@ -147,6 +148,7 @@ export const userSlice = createSlice({
         state.previousUserStats = null;
         state.raitingData = null;
         state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };
+        Router.push("/");
         logOutInfo();
       })
       .addCase(getUserProvider.fulfilled, (state, action) => {
