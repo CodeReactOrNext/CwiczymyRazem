@@ -9,7 +9,7 @@ const HeroSlogan = () => {
       <p className='self-start text-left text-mainText drop-shadow-lg'>
         {t("slogan_line_1")}
       </p>
-      <p className='-mr-[10%] self-end text-[0.8em] font-bold text-second-500 drop-shadow-lg'>
+      <p className='-mr-[10%] self-end text-[0.8em] font-bold text-second-special drop-shadow-lg'>
         {t("slogan_line_2")}
       </p>
     </div>
