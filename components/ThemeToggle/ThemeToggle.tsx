@@ -6,8 +6,8 @@ const ThemeToggle = () => {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(selectLayoutMode);
   return (
-    <div className='flex flex-col'>
-      <label className='relative mr-5 inline-flex cursor-pointer items-center'>
+    <div className='flex w-fit flex-col'>
+      <label className='relative inline-flex cursor-pointer items-center'>
         <input
           type='checkbox'
           className='peer sr-only'
