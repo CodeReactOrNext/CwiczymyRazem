@@ -171,7 +171,7 @@ const ReportView = () => {
                 </div>
               </ReportCategoryWrapper>
               {isPracticeToday && (
-                <div className='flex flex-row gap-2 p-2 text-xl'>
+                <div className='flex flex-row gap-2 p-2 font-openSans text-lg'>
                   <p className='text-end'>{t("exceeding_time")}</p>
                   <QuestionMark description={t("description.exceeding_time")} />
                   <input
