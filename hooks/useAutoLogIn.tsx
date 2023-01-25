@@ -29,11 +29,6 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
           updateLocalTimer(JSON.parse(localStorage.getItem("userSlice.timer")!))
         );
       }
-      if (localStorage.getItem("userSlice.theme")) {
-        dispatch(
-          changeTheme(JSON.parse(localStorage.getItem("userSlice.theme")!))
-        );
-      }
     }
     if (user && !isUserLoggedIn) {
       dispatch(autoLogIn(user));
