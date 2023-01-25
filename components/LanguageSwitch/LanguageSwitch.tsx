@@ -26,11 +26,11 @@ function LanguageSwitch() {
   }, [i18n?.language]);
 
   return (
-    <div className='flex w-fit overflow-hidden text-xs text-main-opposed-900'>
+    <div className='flex overflow-hidden font-openSans text-xs font-bold text-main-opposed-900'>
       <div
-        className={`flex rounded-l-sm p-1 ${
+        className={`flex rounded-l-sm py-1 px-1 ${
           currentLang === "pl"
-            ? "bg-main-opposed-500 text-mainText"
+            ? "bg-main-opposed-500/80 text-mainText"
             : "bg-tertiary-500"
         }`}>
         <input
@@ -60,9 +60,9 @@ function LanguageSwitch() {
         </label>
       </div>
       <div
-        className={`flex rounded-r-sm p-1 ${
+        className={`flex rounded-r-sm py-1 px-1 ${
           currentLang === "en"
-            ? "bg-main-opposed-500 text-mainText"
+            ? "bg-main-opposed-500/80 text-mainText"
             : "bg-tertiary-500"
         }`}>
         <input
