@@ -114,7 +114,7 @@ const RatingPopUp = ({
                   initial={{ opacity: 0, y: 20, x: "50%" }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ ease: "easeOut", duration: 0.3, delay: 0.9 }}
-                  className='absolute right-0 -top-[80%] overflow-hidden whitespace-nowrap text-lg font-medium text-second-50 md:text-xl'>
+                  className='absolute right-0 -top-[80%] overflow-hidden whitespace-nowrap text-lg font-medium text-second-text md:text-xl'>
                   +{ratingData.totalPoints} {t("rating_popup.points")}
                 </motion.p>
               </motion.div>

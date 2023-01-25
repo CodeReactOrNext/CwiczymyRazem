@@ -57,7 +57,7 @@ const BonusPointsItem = ({
         animate={{ x: 0 }}
         transition={{ delay: 2, duration: 0.3 }}
         className='flex items-center gap-3 '>
-        <p className='text-2xl text-second-50 sm:text-4xl'>x{multiplier}</p>
+        <p className='text-2xl text-second-text sm:text-4xl'>x{multiplier}</p>
         <p className='xs:text-xl md:text-2xl'>
           {t("report:rating_popup.regularity")}
         </p>
@@ -67,7 +67,7 @@ const BonusPointsItem = ({
       </motion.li>
       {additionalPoints ? (
         <li className='ml-5 flex items-center gap-3 '>
-          <p className='text-2xl text-second-50 sm:text-4xl'>
+          <p className='text-2xl text-second-text sm:text-4xl'>
             +{additionalPoints}
           </p>
           <p className='xs:text-xl md:text-2xl'>
@@ -85,7 +85,7 @@ const BonusPointsItem = ({
         animate={{ x: 0 }}
         transition={{ delay: 2.3, duration: 0.3 }}
         className='ml-10 flex items-center gap-3 '>
-        <p className='text-2xl text-second-50 sm:text-4xl'>+{timePoints}</p>
+        <p className='text-2xl text-second-text sm:text-4xl'>+{timePoints}</p>
         <p className='xs:text-xl md:text-2xl'>
           {t("report:rating_popup.time")}
         </p>

@@ -1,3 +1,4 @@
+import Router from "next/router";
 import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
 
 import { RootState } from "store/store";
@@ -47,6 +48,7 @@ const initialState: userSliceInitialState = {
   raitingData: null,
   isFetching: null,
   timer: { creativity: 0, hearing: 0, technique: 0, theory: 0 },
+  theme: "default-theme",
   providerData: {
     providerId: null,
     uid: null,
@@ -69,6 +71,17 @@ export const userSlice = createSlice({
     },
     addPracticeData: (state, action) => {
       state.currentUserStats = action.payload;
+    },
+    changeTheme: (
+      state,
+      { payload }: PayloadAction<"dark-theme" | "default-theme" | undefined>
+    ) => {
+      if (payload) {
+        state.theme = payload;
+        return;
+      }
+      state.theme =
+        state.theme === "default-theme" ? "dark-theme" : "default-theme";
     },
     updateLocalTimer: (state, { payload }: PayloadAction<TimerInterface>) => {
       if (!payload) {
@@ -147,6 +160,7 @@ export const userSlice = createSlice({
         state.previousUserStats = null;
         state.raitingData = null;
         state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };
+        Router.push("/");
         logOutInfo();
       })
       .addCase(getUserProvider.fulfilled, (state, action) => {
@@ -218,10 +232,16 @@ export const userSlice = createSlice({
   },
 });
 
-export const { addUserAuth, addUserData, updateTimerTime, updateLocalTimer } =
-  userSlice.actions;
+export const {
+  addUserAuth,
+  addUserData,
+  updateTimerTime,
+  updateLocalTimer,
+  changeTheme,
+} = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
+export const selectLayoutMode = (state: RootState) => state.user.theme;
 export const selectCurrentUserStats = (state: RootState) =>
   state.user.currentUserStats;
 export const selectPreviousUserStats = (state: RootState) =>
