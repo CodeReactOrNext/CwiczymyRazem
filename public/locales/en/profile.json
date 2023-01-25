@@ -18,13 +18,13 @@
   "profile": "Profile",
   "statistics": "Statistics",
   "stats": {
-    "spent_time": "Total time:",
-    "num_sessions": "Number of sessions:",
-    "num_points": "Points:",
-    "num_habbits": "Number of healthy habits ",
-    "num_achievements": "Achievements:",
-    "longest_session": "Longest session:",
-    "consecutive days": "Number of consecutive days:",
-    "max_points": "Most points for a single report:"
+    "spent_time": "Total time",
+    "num_sessions": "Sessions",
+    "num_points": "Points",
+    "num_habbits": "Healthy habits",
+    "num_achievements": "Achievements",
+    "longest_session": "Longest session",
+    "consecutive days": "Consecutive days",
+    "max_points": "Highest score"
   }
 }

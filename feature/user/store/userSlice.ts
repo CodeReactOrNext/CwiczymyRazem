@@ -78,6 +78,7 @@ export const userSlice = createSlice({
     ) => {
       if (payload) {
         state.theme = payload;
+        return;
       }
       state.theme =
         state.theme === "default-theme" ? "dark-theme" : "default-theme";
