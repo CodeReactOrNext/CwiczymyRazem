@@ -29,6 +29,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name='keywords' content='ćwiczenie, gitara' />
       </Head>
       <ThemeModeProvider>
+        <div id='overlays'></div>
         <Component {...pageProps} />
         <ToastContainer toastClassName={"toastify-custom"} />
         <BetaInfo />
