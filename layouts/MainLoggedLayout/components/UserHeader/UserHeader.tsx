@@ -20,7 +20,7 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
   return (
     <>
       <div className='z-30 flex flex-col items-start space-x-2 space-y-2 text-lg '>
-        <div className='flex flex-row items-center gap-5 sm:gap-10'>
+        <div className='flex flex-row items-center gap-5 sm:gap-10 '>
           <div className='scale-75 sm:scale-100 lg:mr-4'>
             <Logo />
             <Avatar avatarURL={avatar} name={userName} lvl={lvl} />
@@ -34,10 +34,10 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
             lastReportDate={lastReportDate}
             points={points}
           />
-          <div className='flex flex-col items-center gap-4'>
-            <ThemeToggle />
-            <LanguageSwitch />
-          </div>
+        </div>
+        <div className='absolute right-2 top-2 flex flex-col items-end gap-4'>
+          <LanguageSwitch />
+          <ThemeToggle />
         </div>
       </div>
       <NavDecoration />
