@@ -5,7 +5,11 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "utils/firebase/client/firebase.utils";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
-import { selectUserAuth, updateLocalTimer } from "feature/user/store/userSlice";
+import {
+  changeTheme,
+  selectUserAuth,
+  updateLocalTimer,
+} from "feature/user/store/userSlice";
 
 type pagesToRedirectTo = "/" | "/login";
 
@@ -23,6 +27,11 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
       if (localStorage.getItem("userSlice.timer")) {
         dispatch(
           updateLocalTimer(JSON.parse(localStorage.getItem("userSlice.timer")!))
+        );
+      }
+      if (localStorage.getItem("userSlice.theme")) {
+        dispatch(
+          changeTheme(JSON.parse(localStorage.getItem("userSlice.theme")!))
         );
       }
     }

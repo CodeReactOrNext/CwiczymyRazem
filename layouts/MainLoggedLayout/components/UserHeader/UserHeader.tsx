@@ -6,6 +6,7 @@ import NavDecoration from "./components/NavDecoration";
 import WelcomeMessage from "./components/WelcomeMessage";
 
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import ThemeToggle from "components/ThemeToggle";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
@@ -26,11 +27,13 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
               <UserNav />
             </div>
           </div>
+        
           <WelcomeMessage
             userName={userName}
             lastReportDate={lastReportDate}
             points={points}
           />
+          <ThemeToggle />
         </div>
       </div>
       <NavDecoration />
