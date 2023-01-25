@@ -40,15 +40,6 @@ import {
   uploadUserAvatar,
 } from "./userSlice.asyncThunk";
 
-const getLocalTheme = () => {
-  if (typeof window !== "undefined") {
-    if (localStorage.getItem("userSlice.theme")) {
-      return JSON.parse(localStorage.getItem("userSlice.theme")!);
-    }
-    return "default-theme";
-  }
-};
-
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
@@ -57,7 +48,7 @@ const initialState: userSliceInitialState = {
   raitingData: null,
   isFetching: null,
   timer: { creativity: 0, hearing: 0, technique: 0, theory: 0 },
-  theme: getLocalTheme(),
+  theme: "default-theme",
   providerData: {
     providerId: null,
     uid: null,
@@ -87,6 +78,7 @@ export const userSlice = createSlice({
     ) => {
       if (payload) {
         state.theme = payload;
+        return;
       }
       state.theme =
         state.theme === "default-theme" ? "dark-theme" : "default-theme";
