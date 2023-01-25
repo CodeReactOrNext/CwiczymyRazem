@@ -6,6 +6,8 @@ import { FaBars } from "react-icons/fa";
 import NavLink from "./component/NavLink";
 import HamburgerLayout from "layouts/HamburgerLayout";
 import { layoutVariant } from "layouts/MainLayout/MainLayout";
+import LanguageSwitch from "components/LanguageSwitch";
+import ThemeToggle from "components/ThemeToggle";
 
 interface MainNavigationProps {
   variant: layoutVariant;
@@ -29,7 +31,7 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
       }  ${
         variant === "secondary" ? "lg:bg-main-opposed-500" : "lg:bg-second-500"
       }  lg:pl-16`}>
-      <ul className='hidden w-full items-center justify-evenly gap-8 text-3xl lg:flex'>
+      <ul className='mr-11 hidden w-full items-center justify-evenly text-3xl lg:flex'>
         <NavLink url='/leaderboard' title={t("nav.leadboard")} />
         <NavLink url='/discord' title={t("nav.discord")} />
         <NavLink url='/faq' title={t("nav.faq")} />
@@ -49,8 +51,16 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
           <li className=' active:click-behavior'>
             <Link href='/faq'>{t("nav.faq")}</Link>
           </li>
+          <li className=' right-0 m-1 flex flex-col items-center gap-4'>
+            <LanguageSwitch />
+            <ThemeToggle />
+          </li>
         </HamburgerLayout>
       )}
+      <div className='absolute right-1 top-1 hidden flex-col items-end gap-4 lg:flex'>
+        <LanguageSwitch />
+        <ThemeToggle />
+      </div>
     </nav>
   );
 };

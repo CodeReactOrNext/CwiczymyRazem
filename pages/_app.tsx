@@ -9,8 +9,10 @@ import { store } from "store/store";
 import "../styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import BetaInfo from "components/BetaInfo";
+import ThemeModeProvider from "Hoc/ThemeModeProvider";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  // const layoutTheme = useAppSelector(selectLayoutMode);
   return (
     <Provider store={store}>
       <Head>
@@ -26,9 +28,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
         <meta name='keywords' content='ćwiczenie, gitara' />
       </Head>
-      <Component {...pageProps} />
-      <ToastContainer toastClassName={"toastify-custom"} />
-      <BetaInfo />
+      <ThemeModeProvider>
+        <div id='overlays'></div>
+        <Component {...pageProps} />
+        <ToastContainer toastClassName={"toastify-custom"} />
+        <BetaInfo />
+      </ThemeModeProvider>
     </Provider>
   );
 }

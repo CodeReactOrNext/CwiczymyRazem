@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 
 interface LevelInterfaceProps {
   points: number;
@@ -11,7 +12,12 @@ const LevelBar = ({
   currentLevelMaxPoints: pointsToNextLvl,
 }: LevelInterfaceProps) => {
   const { t } = useTranslation("common");
-  const progressPercent = (points / pointsToNextLvl) * 100;
+
+  const levelXpStart = lvl === 1 ? 0 : getPointsToLvlUp(lvl - 1);
+  const levelXpEnd = getPointsToLvlUp(lvl);
+  const pointsInThisLevel = points - levelXpStart;
+  const levelXpDifference = levelXpEnd - levelXpStart;
+  const progressPercent = (pointsInThisLevel / levelXpDifference) * 100;
 
   return (
     <div className='col-span-2 m-auto flex w-[90%] flex-col items-center text-tertiary md:col-auto lg:w-64 lg:justify-self-end xl:w-80 '>
