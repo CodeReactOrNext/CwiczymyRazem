@@ -96,7 +96,16 @@ const borderRadius = plugin(function ({ addUtilities }) {
     },
   });
 });
-
+const box = plugin(function ({ addUtilities }) {
+  addUtilities({
+    ".box-default": {
+      "border-radius": "3px",
+      border: "2px solid",
+      margin: "8px",
+      padding: "8px",
+    },
+  });
+});
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",

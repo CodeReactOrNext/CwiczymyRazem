@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import Router from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -22,7 +22,7 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
   const isUserLoggedIn = useAppSelector(selectUserAuth);
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof window !== "undefined") {
       if (localStorage.getItem("userSlice.timer")) {
         dispatch(
