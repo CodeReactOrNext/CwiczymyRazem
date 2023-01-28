@@ -1,1 +1,4 @@
-{ "subtitlebar_text": "Practice, report, earn points!" }
+{
+  "subtitlebar_text": "Practice, report, earn points!",
+  "back_to_login": "Back to login page"
+}
