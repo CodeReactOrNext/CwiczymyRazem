@@ -79,7 +79,7 @@ const LeadboardRow = ({
               </p>
             </div>
           </div>
-          <div className='col-span-3 flex h-full w-full items-center justify-evenly md:col-span-1 md:w-[300px]  md:justify-center '>
+          <div className='col-span-3 flex h-full w-full items-center justify-evenly border-y-2 border-white/10  sm:border-y-0 md:col-span-1 md:w-[300px] md:justify-center '>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
               <p className='text-xl xxs:text-3xl '>{statistics.points}</p>
               <p className='font-openSans text-xs font-bold leading-[15px] text-tertiary'>

@@ -28,7 +28,7 @@ const LandingLayout = ({
     <div className='bg-second-500 radius-default'>
       <HeadDecoration title={t("statistics")} />
       <div className='grid-rows-auto grid-cols-2 items-center md:mt-5 md:grid '>
-        <div className=' order-2 row-span-1 my-5 flex justify-center '>
+        <div className=' z-10 order-2 row-span-1 m-4 my-5 flex justify-center border-2 border-second-400 bg-second-600 p-2 radius-default  '>
           <StatisticBar
             title={t("technique")}
             value={convertMsToHM(time.technique)}
