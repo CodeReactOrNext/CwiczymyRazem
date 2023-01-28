@@ -46,7 +46,7 @@ const LeadboardRow = ({
           <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
         </div>
         <div
-          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-3 justify-items-center bg-second bg-opacity-75 px-2 radius-default hover:bg-opacity-90 md:h-16 md:grid-rows-1
+          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-3 justify-items-center bg-second bg-opacity-75 radius-default hover:bg-opacity-90 md:h-16 md:grid-rows-1 lg:px-2
         ${place === 1 ? "bg-yellow-500" : ""}
         ${place === 2 ? "bg-slate-400" : ""}
         ${place === 3 ? "bg-yellow-700" : ""}`}>
@@ -79,7 +79,7 @@ const LeadboardRow = ({
               </p>
             </div>
           </div>
-          <div className='col-span-3 flex h-full w-full items-center justify-evenly border-y-2 border-white/10  sm:border-y-0 md:col-span-1 md:w-[300px] md:justify-center '>
+          <div className='col-span-3 flex h-full w-full items-center justify-evenly border-y-2 border-black/10 bg-black/10 md:col-span-1 md:w-[300px] md:justify-center md:border-y-0 md:bg-transparent '>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
               <p className='text-xl xxs:text-3xl '>{statistics.points}</p>
               <p className='font-openSans text-xs font-bold leading-[15px] text-tertiary'>
