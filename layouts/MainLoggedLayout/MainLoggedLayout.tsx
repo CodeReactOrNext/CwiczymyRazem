@@ -32,7 +32,6 @@ const MainLoggedLayout = ({
       <div className='relative flex h-full w-full items-center justify-center '>
         <div className='relative flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-y-auto  overflow-x-hidden  bg-main-opposed-bg scrollbar-hide'>
           <Wrapper>
-       
             <DesktopHeaderWrapper>
               <UserHeader
                 avatar={userAvatar}
