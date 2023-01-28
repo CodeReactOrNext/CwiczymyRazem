@@ -2,6 +2,8 @@
   "valid_email": "Enter a valid email",
   "stronger_password": "Enter a stronger password",
   "password_char_number": "Password must be at least 8 characters",
+  "username_char_number": "Username must be at least 3 characters",
   "required": "Required",
-  "same_passwords": "Passwords must be the same"
+  "same_passwords": "Passwords must be the same",
+  "no_ends_whitespace": "Username can't start or end with empty space"
 }
