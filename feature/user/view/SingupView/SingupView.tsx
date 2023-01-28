@@ -46,7 +46,7 @@ const SingupView = () => {
           <>
             <Link href='/login'>
               <a className='flex flex-row gap-x-2 click-behavior'>
-                <FaArrowLeft /> Back to login
+                <FaArrowLeft /> {t("signup:back_to_login")}
               </a>
             </Link>
 
