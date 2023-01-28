@@ -96,7 +96,16 @@ const borderRadius = plugin(function ({ addUtilities }) {
     },
   });
 });
-
+const box = plugin(function ({ addUtilities }) {
+  addUtilities({
+    ".box-default": {
+      "border-radius": "3px",
+      border: "2px solid",
+      margin: "8px",
+      padding: "8px",
+    },
+  });
+});
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -140,6 +149,8 @@ module.exports = {
                 veryRare: "#ffe54c",
               },
               mainText: { DEFAULT: "#ffff" },
+
+              link: { DEFAULT: "#43c5d6" },
               main: {
                 DEFAULT: "#FF2A37",
                 50: "#ff5c69",
@@ -214,6 +225,7 @@ module.exports = {
             backgroundImage: {
               "old-effect": "url('/static/images/old_effect.webp')",
               "old-effect-hr": "url('/static/images/old_effect_hr.webp')",
+              guitarImage: "url('/static/images/guitar_blue.png')",
             },
           },
         },
@@ -227,6 +239,7 @@ module.exports = {
                 veryRare: "#ffe54c",
               },
               mainText: { DEFAULT: "#ffff" },
+              link: { DEFAULT: "#e5626b" },
               main: {
                 DEFAULT: "#FF2A37",
                 bg: "#FF2A37",
@@ -302,6 +315,7 @@ module.exports = {
             backgroundImage: {
               "old-effect": "url('/static/images/old_effect_dark.webp')",
               "old-effect-hr": "url('/static/images/old_effect_hr_dark.webp')",
+              guitarImage: "url('/static/images/guitar_red.png')",
             },
           },
         },

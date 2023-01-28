@@ -22,12 +22,12 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
        }
         ${
           rarity === "rare"
-            ? "border-achievements-rare bg-achievements-rare text-main-opposed-300"
+            ? "border-achievements-rare bg-achievements-rare text-main-opposed-800"
             : ""
         }
         ${
           rarity === "veryRare"
-            ? " border-achievements-veryRare bg-achievements-veryRare text-main-opposed-300"
+            ? " border-achievements-veryRare bg-achievements-veryRare text-main-opposed-800"
             : ""
         }
         cursor-help  border-2 border-opacity-20  p-2 shadow-inset-cool  transition-transform radius-default group-hover:scale-[170%]`}>

@@ -147,7 +147,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
       <p className='p-4 text-center font-openSans'>
         {t("info_about_repot ")}
         <Link href={"/report"}>
-          <a className='text-second-200'> {t("raport_link")}</a>
+          <a className='text-link'> {t("raport_link")}</a>
         </Link>
       </p>
       <Button onClick={timerSubmitHandler}> {t("end_button")}</Button>
