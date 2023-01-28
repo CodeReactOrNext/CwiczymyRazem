@@ -29,10 +29,10 @@ const ProfileLayout = ({
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
   return (
-    <div className='flex justify-center'>
-      <div className='m-4  flex w-[90%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
+    <div className='mt-8 flex justify-center'>
+      <div className='m-4 flex w-[95%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
         <HeadDecoration title={t("profile")} />
-        <div className='grid-rows-auto  grid-cols-2  md:grid'>
+        <div className='grid-rows-auto  grid-cols-2  xl:grid'>
           <div className=' row-span-1  flex flex-col  items-center justify-center gap-6 '>
             <div className='z-10 flex flex-row items-center gap-4 p-4 '>
               <Avatar
@@ -57,7 +57,7 @@ const ProfileLayout = ({
               currentLevelMaxPoints={userStats.currentLevelMaxPoints}
             />
           </div>
-          <div className=' row-span-1 my-5 flex justify-center '>
+          <div className=' z-10 row-span-1 m-4 my-5 flex justify-center border-2 border-second-400 bg-second-600 p-2 radius-default '>
             <StatisticBar
               title={t("technique")}
               value={convertMsToHM(time.technique)}
