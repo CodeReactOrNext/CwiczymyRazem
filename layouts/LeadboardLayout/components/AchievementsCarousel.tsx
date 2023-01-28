@@ -47,7 +47,7 @@ const AchievementsCarousel = ({
           <FaAngleLeft
             className={`${
               leftMax
-                ? "cursor-default text-tertiary-50"
+                ? "cursor-default text-main-opposed/20"
                 : "text-main-opposed hover:text-mainText active:click-behavior-second"
             } `}
           />
@@ -65,7 +65,7 @@ const AchievementsCarousel = ({
           <FaAngleRight
             className={`${
               rightMax
-                ? "cursor-default text-tertiary-50"
+                ? "cursor-default text-main-opposed/20"
                 : "text-main-opposed hover:text-mainText active:click-behavior-second"
             } `}
           />

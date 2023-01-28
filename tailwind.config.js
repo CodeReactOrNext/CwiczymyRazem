@@ -149,6 +149,8 @@ module.exports = {
                 veryRare: "#ffe54c",
               },
               mainText: { DEFAULT: "#ffff" },
+
+              link: { DEFAULT: "#43c5d6" },
               main: {
                 DEFAULT: "#FF2A37",
                 50: "#ff5c69",
@@ -236,6 +238,7 @@ module.exports = {
                 veryRare: "#ffe54c",
               },
               mainText: { DEFAULT: "#ffff" },
+              link: { DEFAULT:"#e5626b"},
               main: {
                 DEFAULT: "#FF2A37",
                 bg: "#FF2A37",

@@ -37,7 +37,7 @@ const EventsList = ({ eventList }: EventsListProps) => {
               <Link href={link}>
                 <a>
                   <p className='mr-1'>
-                    <span className='text-tertiary'> {name}</span>
+                    <span className='text-link'> {name}</span>
                   </p>
                 </a>
               </Link>
