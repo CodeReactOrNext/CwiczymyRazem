@@ -17,6 +17,7 @@ import {
 
 import Button from "components/Button";
 import Backdrop from "components/Backdrop";
+import BeginnerMsg from "components/BeginnerMsg";
 import QuestionMark from "components/QuestionMark";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -224,6 +225,7 @@ const ReportView = () => {
                 <div className='m-2 h-6'>
                   {Object.keys(errors).length !== 0 && <ErrorBox />}
                 </div>
+                <BeginnerMsg />
                 <Button type='submit' loading={isFetching}>
                   {t("report_button")}
                 </Button>

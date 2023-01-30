@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import Button from "components/Button";
 import Stopwatch from "./components/Stopwatch";
+import BeginnerMsg from "components/BeginnerMsg";
 import CategoryBox from "./components/CategoryBox";
 
 import useTimer from "hooks/useTimer";
@@ -143,7 +144,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           chosen={chosenSkill === "creativity"}
         />
       </div>
-
+      <BeginnerMsg />
       <p className='p-4 text-center font-openSans'>
         {t("info_about_repot ")}
         <Link href={"/report"}>
