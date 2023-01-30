@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import GitHubCalendar from "react-github-calendar";
 
 import Avatar from "components/Avatar";
+import Calendar from "components/Calendar";
 import LevelBar from "components/LevelBar";
 import DaySince from "components/DaySince/DaySince";
 import StatisticBar from "./components/StatisticBar";
@@ -11,7 +11,6 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import Calendar from "components/Calendar";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -97,7 +96,7 @@ const ProfileLayout = ({
           <div className='row-cols-1 m-4  flex flex-col justify-between  '>
             <AchievementWrapper userAchievements={achievements} />
           </div>
-          <div className='col-span-2 m-auto  lg:max-w-[80%] p-2'>
+          <div className='col-span-2 m-auto  p-2 lg:max-w-[80%]'>
             <Calendar userAuth={userAuth} />
           </div>
         </div>
