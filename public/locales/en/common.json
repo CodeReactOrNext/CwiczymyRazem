@@ -54,5 +54,12 @@
     "achievements": "Achievements:",
     "get": "get",
     "points": "pt"
+  },
+  "calendar": {
+    "title": "Activity Calendar",
+    "monday": "Mon",
+    "thursday": "Thu",
+    "sunday": "Sun",
+    "points": "Points"
   }
 }

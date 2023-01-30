@@ -1,49 +1,60 @@
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
-import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";
-import { FirebaseUserExceriseLog } from "utils/firebase/client/firebase.types";
-import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
-import ToolTip from "components/ToolTip";
-import { convertMsToHM } from "utils/converter/timeConverter";
+import { useEffect, useState } from "react";
 
+import ToolTip from "components/ToolTip";
+
+import { convertMsToHM } from "utils/converter/timeConverter";
+import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";
+import { useTranslation } from "react-i18next";
+
+interface ReportListInterface {
+  points: number;
+  date: Date;
+  totalTime: number;
+}
 const Calendar = ({ userAuth }: { userAuth: string }) => {
-  const [state, setState] = useState<
-    { points: number; date: Date; totalTime: number }[] | null
-  >(null);
+  const { t } = useTranslation("common");
+  const [reportList, setReportList] = useState<ReportListInterface[] | null>(
+    null
+  );
 
   useEffect(() => {
-    if (userAuth && state === null) {
-      firebaseGetUserRaprotsLogs(userAuth).then((r) => {
-        const newR = r.reduce((previousValue, exceriesLog) => {
-          const indexOfRepeted = previousValue.findIndex(({ date }) => {
-            const reportDate = new Date(exceriesLog.reportDate.seconds * 1000);
-            return (
-              reportDate.getUTCFullYear() === date.getFullYear() &&
-              reportDate.getUTCMonth() === date.getMonth() &&
-              reportDate.getUTCDate() === date.getDate()
-            );
-          });
-          if (indexOfRepeted != -1) {
-            previousValue[indexOfRepeted].points =
-              previousValue[indexOfRepeted].points + exceriesLog.totalPoints;
-            previousValue[indexOfRepeted].totalTime =
-              previousValue[indexOfRepeted].totalTime +
-              exceriesLog.bonusPoints.time;
+    if (userAuth && reportList === null) {
+      firebaseGetUserRaprotsLogs(userAuth).then((response) => {
+        const reducedReportsList = response.reduce(
+          (previousValue, exceriesLog) => {
+            const indexOfRepeted = previousValue.findIndex(({ date }) => {
+              const reportDate = new Date(
+                exceriesLog.reportDate.seconds * 1000
+              );
+              return (
+                reportDate.getUTCFullYear() === date.getFullYear() &&
+                reportDate.getUTCMonth() === date.getMonth() &&
+                reportDate.getUTCDate() === date.getDate()
+              );
+            });
+            if (indexOfRepeted != -1) {
+              previousValue[indexOfRepeted].points =
+                previousValue[indexOfRepeted].points + exceriesLog.totalPoints;
+              previousValue[indexOfRepeted].totalTime =
+                previousValue[indexOfRepeted].totalTime +
+                exceriesLog.bonusPoints.time;
+              return previousValue;
+            }
+            previousValue.push({
+              points: exceriesLog.totalPoints,
+              date: new Date(exceriesLog.reportDate.seconds * 1000),
+              totalTime: exceriesLog.bonusPoints.time,
+            });
             return previousValue;
-          }
-          previousValue.push({
-            points: exceriesLog.totalPoints,
-            date: new Date(exceriesLog.reportDate.seconds * 1000),
-            totalTime: exceriesLog.bonusPoints.time,
-          });
-          return previousValue;
-        }, [] as { points: number; date: Date; totalTime: number }[]);
+          },
+          [] as { points: number; date: Date; totalTime: number }[]
+        );
 
-        setState(newR);
+        setReportList(reducedReportsList);
       });
     }
-  }, [userAuth, state]);
+  }, [userAuth, reportList]);
 
   const getNullToCorrectDaysStartInUi = (dayWhenYearStart: number) => {
     const numOfDayWhereUiStart = 6;
@@ -54,68 +65,62 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   };
 
   let year = 2023;
-  let dates: Array<{
+  let datasWithReports: Array<{
     date: Date;
-    report: { points: number; date: Date; totalTime: number } | undefined;
+    report: ReportListInterface | undefined;
   }> = [];
+
   for (let month = 0; month < 12; month++) {
     for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
       let date = new Date(year, month, day);
       if (month === 0 && day === 1) {
-        dates.push(...getNullToCorrectDaysStartInUi(date.getDay()));
+        datasWithReports.push(...getNullToCorrectDaysStartInUi(date.getDay()));
       }
 
-      let exceries = state?.find((state) => {
-        const reportDate = new Date(state.date);
-
+      let exceries = reportList?.find((report) => {
+        const reportDate = new Date(report.date);
         return (
           reportDate.getFullYear() === date.getFullYear() &&
           reportDate.getMonth() === date.getMonth() &&
           reportDate.getDate() === date.getDate()
         );
       });
-
-      dates.push({ date, report: exceries });
+      datasWithReports.push({ date, report: exceries });
     }
   }
+
   const getPointRaitings = (
-    date: {
+    datasWithReports: {
       date: Date;
-      report: { points: number; date: Date; totalTime: number } | undefined;
+      report: ReportListInterface | undefined;
     } | null
   ) => {
-    if (date === null) return null;
-    if (date.report === undefined) return;
-    if (date.report.points > 30) {
+    if (datasWithReports === null) return null;
+    if (datasWithReports.report === undefined) return;
+    if (datasWithReports.report.points > 30) {
       return "super";
     }
-    if (date.report.points > 20) {
+    if (datasWithReports.report.points > 20) {
       return "great";
     }
-    if (date.report.points > 10) {
+    if (datasWithReports.report.points > 10) {
       return "nice";
     }
-    if (date.report.points) {
+    if (datasWithReports.report.points) {
       return "ok";
     }
   };
 
-  return state ? (
+  return reportList ? (
     <div className=' overflow-y-scroll border-2 border-second-400 bg-second-600  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-100 radius-default'>
       <p className='pb-2 text-sm font-bold'>
-        Kalendarz Aktywności <span className='text-main-calendar'></span>
-        {year}
+        {t("calendar.title")} <span className='text-main-calendar'>{year}</span>
       </p>
       <div className=' grid grid-flow-col grid-rows-7 p-2 text-xs  '>
-        <ToolTip />
-        <p className='mr-3'>Pon</p>
-        <p></p>
-        <p></p>
-        <p>Czw</p>
-        <p></p>
-        <p></p>
-        <p>Nied</p>
-        {dates.map((date, index) => {
+        <p className='row-span-3 mr-3'> {t("calendar.monday")}</p>
+        <p className='row-span-3 mr-3'>{t("calendar.thursday")}</p>
+        <p>{t("calendar.sunday")}</p>
+        {datasWithReports.map((date, index) => {
           const raiting = getPointRaitings(date);
 
           return date ? (
@@ -130,15 +135,12 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
             `}
               data-tip={`${
                 date.report
-                  ? "Punktów " +
-                    date.report.points +
-                    " | " +
-                    convertMsToHM(date.report.totalTime) +
-                    "h" +
-                    " | "
+                  ? `${t("calendar.points")}: ${
+                      date.report.points
+                    } | ${convertMsToHM(date.report.totalTime)}h | `
                   : ""
               }  
-            ${date.date.toLocaleDateString()}  
+              ${date.date.toLocaleDateString()}  
              `}></div>
           ) : (
             <div
@@ -146,6 +148,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
               className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
           );
         })}
+        <ToolTip />
       </div>
     </div>
   ) : (
