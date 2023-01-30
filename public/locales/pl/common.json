@@ -54,5 +54,12 @@
     "achievements": "Osiągnięcia:",
     "get": "zdobył",
     "points": "pkt"
+  },
+  "calendar": {
+    "title": "Kalendarz aktywności",
+    "monday": "Pon",
+    "thursday": "Czw",
+    "sunday": "Nie",
+    "points": "Punktów"
   }
 }
