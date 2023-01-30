@@ -7,11 +7,10 @@ import { FaSpinner } from "react-icons/fa";
 import ToolTip from "components/ToolTip";
 import { convertMsToHM } from "utils/converter/timeConverter";
 
-const Calendar = () => {
+const Calendar = ({ userAuth }: { userAuth: string }) => {
   const [state, setState] = useState<
     { points: number; date: Date; totalTime: number }[] | null
   >(null);
-  const userAuth = useAppSelector(selectUserAuth);
 
   useEffect(() => {
     if (userAuth && state === null) {
@@ -102,46 +101,52 @@ const Calendar = () => {
   };
 
   return state ? (
-    <div className='grid grid-flow-col grid-rows-7 overflow-y-scroll border-2 border-second-400 bg-second-600 p-5 text-xs  scrollbar-thin scrollbar-track-main-opposed-800 scrollbar-thumb-second-100 radius-default'>
-      <ToolTip />
-      <p className='mr-3'>Pon</p>
-      <p></p>
-      <p></p>
-      <p>Czw</p>
-      <p></p>
-      <p></p>
-      <p>Nied</p>
-      {dates.map((date, index) => {
-        const raiting = getPointRaitings(date);
+    <div className=' overflow-y-scroll border-2 border-second-400 bg-second-600  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-100 radius-default'>
+      <p className='pb-2 text-sm font-bold'>
+        Kalendarz Aktywności <span className='text-main-calendar'></span>
+        {year}
+      </p>
+      <div className=' grid grid-flow-col grid-rows-7 p-2 text-xs  '>
+        <ToolTip />
+        <p className='mr-3'>Pon</p>
+        <p></p>
+        <p></p>
+        <p>Czw</p>
+        <p></p>
+        <p></p>
+        <p>Nied</p>
+        {dates.map((date, index) => {
+          const raiting = getPointRaitings(date);
 
-        return date ? (
-          <div
-            key={index}
-            className={`\ m-[0.2rem] rounded-[1px] p-[0.3rem]
+          return date ? (
+            <div
+              key={index}
+              className={` m-[0.2rem] rounded-[1px] p-[0.3rem]
             ${raiting === "super" ? "bg-main-calendar" : ""}
-            ${raiting === "great" ? "bg-main-calendar/60" : ""}
-            ${raiting === "nice" ? "bg-main-calendar/40" : ""}
-            ${raiting === "ok" ? "bg-main-calendar/20" : ""}}
-            ${raiting ? "" : " bg-slate-600/40"}
+            ${raiting === "great" ? "bg-main-calendar/80" : ""}
+            ${raiting === "nice" ? "bg-main-calendar/70" : ""}
+            ${raiting === "ok" ? "bg-main-calendar/60" : ""}
+            ${raiting ? "" : " bg-slate-600/50"}
             `}
-            data-tip={`${
-              date.report
-                ? "Punktów " +
-                  date.report.points +
-                  " | " +
-                  convertMsToHM(date.report.totalTime) +
-                  "h" +
-                  " | "
-                : ""
-            }  
+              data-tip={`${
+                date.report
+                  ? "Punktów " +
+                    date.report.points +
+                    " | " +
+                    convertMsToHM(date.report.totalTime) +
+                    "h" +
+                    " | "
+                  : ""
+              }  
             ${date.date.toLocaleDateString()}  
              `}></div>
-        ) : (
-          <div
-            key={index}
-            className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
-        );
-      })}
+          ) : (
+            <div
+              key={index}
+              className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
+          );
+        })}
+      </div>
     </div>
   ) : (
     <FaSpinner />
