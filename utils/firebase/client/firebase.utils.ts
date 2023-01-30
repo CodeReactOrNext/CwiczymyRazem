@@ -27,6 +27,7 @@ import {
   FirebaseEventsInteface,
   FirebaseLogsInterface,
   FirebaseUserDataInterface,
+  FirebaseUserExceriseLog,
 } from "./firebase.types";
 import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 import { firebaseApp } from "./firebase.cofig";
@@ -83,6 +84,17 @@ export const firebaseGetUserName = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.displayName;
+};
+
+export const firebaseGetUserRaprotsLogs = async (userAuth: string) => {
+  const userDocRef = doc(db, "users", userAuth);
+  const exerciseDocRef = await getDocs(collection(userDocRef, "exerciseData"));
+  const exerciseArr: FirebaseUserExceriseLog[] = [];
+  exerciseDocRef.forEach((doc) => {
+    const log = doc.data() as FirebaseUserExceriseLog;
+    exerciseArr.push(log);
+  });
+  return exerciseArr;
 };
 
 export const firebaseGetUserAvatarURL = async () => {

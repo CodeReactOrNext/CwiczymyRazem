@@ -129,6 +129,9 @@ module.exports = {
       boxShadow: {
         "inset-cool": "inset 0 -3px 8px -3px rgba(88, 96, 132,0.7)",
       },
+      gridTemplateRows: {
+        7: "repeat(7, minmax(0, 1fr))",
+      },
     },
     fontFamily: {
       sans: "Teko",
@@ -153,6 +156,7 @@ module.exports = {
               link: { DEFAULT: "#43c5d6" },
               main: {
                 DEFAULT: "#FF2A37",
+                calendar: "#ffecac",
                 50: "#ff5c69",
                 100: "#ff525f",
                 200: "#ff4855",
@@ -243,6 +247,7 @@ module.exports = {
               main: {
                 DEFAULT: "#FF2A37",
                 bg: "#FF2A37",
+                calendar: "#FF2A37",
                 50: "#ff5c69",
                 100: "#ff525f",
                 200: "#ff4855",
