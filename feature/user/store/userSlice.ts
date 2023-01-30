@@ -226,7 +226,7 @@ export const userSlice = createSlice({
           state.userInfo = action.payload.userInfo;
           state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
-          newUserInfo(action.payload.currentUserStats.points);
+ 
         }
       );
   },
