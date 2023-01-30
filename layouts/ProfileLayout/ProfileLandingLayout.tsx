@@ -13,11 +13,13 @@ interface LandingLayoutProps {
   statsField: StatsFieldProps[];
   userStats: StatisticsDataInterface;
   featSlot: React.ReactNode;
+  userAuth: string;
 }
 
 const LandingLayout = ({
   statsField,
   userStats,
+  userAuth,
   featSlot,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
@@ -65,7 +67,7 @@ const LandingLayout = ({
           <AchievementWrapper userAchievements={achievements} />
         </div>
         <div className='d-flex justify-content-center my-2 p-4 '>
-          <Calendar />
+          <Calendar userAuth={userAuth} />
         </div>
         <div className='col-span-2 p-4'>{featSlot}</div>
       </div>
