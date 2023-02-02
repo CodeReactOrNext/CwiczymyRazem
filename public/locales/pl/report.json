@@ -6,7 +6,7 @@
   "hearing": "Słuch",
   "creativity": "Praca kreatywna",
   "healthy_habits_title": "Zdrowe nawyki",
-  "exceeding_time": "Chcę dodać kolejny raport mimo ograniczenia czasowego",
+  "exceeding_time": "Czy na pewno chcesz zraportować mimo przekroczenia czasu?",
   "report_button": "Raportuj",
   "toast": {
     "24h_error": "Nie da się ćwiczyć więcej niż 24 godziny dziennie",

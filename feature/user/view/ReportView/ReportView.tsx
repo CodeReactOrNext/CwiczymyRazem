@@ -18,7 +18,6 @@ import {
 import Button from "components/Button";
 import Backdrop from "components/Backdrop";
 import BeginnerMsg from "components/BeginnerMsg";
-import QuestionMark from "components/QuestionMark";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
@@ -34,7 +33,6 @@ import {
 import { RaportSchema } from "./helpers/RaportShcema";
 import { ReportFormikInterface } from "./ReportView.types";
 import { inputTimeConverter } from "utils/converter/InputTimeConverter";
-import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import {
   convertMsToHM,
@@ -43,6 +41,8 @@ import {
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
+  const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
+  const [exceedingTime, setExceedingTime] = useState<number | null>(null);
   const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
 
   const { t } = useTranslation("report");
@@ -63,9 +63,6 @@ const ReportView = () => {
   const theoryTime = convertMsToHMObject(timerData.theory);
   const hearingTime = convertMsToHMObject(timerData.hearing);
   const creativityTime = convertMsToHMObject(timerData.creativity);
-  const isPracticeToday = checkIsPracticeToday(
-    new Date(currentUserStats!.lastReportDate)
-  );
 
   const formikInitialValues: ReportFormikInterface = {
     techniqueHours: techniqueTime.hours,
@@ -79,17 +76,20 @@ const ReportView = () => {
     habbits: [],
   };
 
+  const getSumTime = (formikValues: ReportFormikInterface) => {
+    const { sumTime } = inputTimeConverter(formikValues);
+    return sumTime;
+  };
+
   const reportOnSubmit = (inputData: ReportFormikInterface) => {
-    const { sumTime } = inputTimeConverter(inputData);
+    const sumTime = getSumTime(inputData);
     const lastReportTimeExceded = isLastReportTimeExceeded(
       currentUserStats!.lastReportDate,
       sumTime
     );
-
     if (lastReportTimeExceded && !acceptExceedingTime) {
-      toast.error(
-        t("toast.exceeding_time") + convertMsToHM(lastReportTimeExceded)
-      );
+      setAcceptPopUpVisible(true);
+      setExceedingTime(lastReportTimeExceded);
       return;
     }
     if (sumTime >= 86400000) {
@@ -107,6 +107,7 @@ const ReportView = () => {
     }
 
     dispatch(updateUserStats({ inputData })).then(() => {
+      setAcceptPopUpVisible(false);
       setRatingSummaryVisible(true);
     });
   };
@@ -124,7 +125,7 @@ const ReportView = () => {
         validationSchema={RaportSchema}
         validateOnBlur={false}
         onSubmit={reportOnSubmit}>
-        {({ errors }) => (
+        {({ errors, handleSubmit }) => (
           <>
             <ReportFormLayout>
               <ReportCategoryWrapper title={t("exercise_type_title")}>
@@ -171,19 +172,7 @@ const ReportView = () => {
                   />
                 </div>
               </ReportCategoryWrapper>
-              {isPracticeToday && (
-                <div className='flex flex-row gap-2 p-2 font-openSans text-lg'>
-                  <p className='text-end'>{t("exceeding_time")}</p>
-                  <QuestionMark description={t("description.exceeding_time")} />
-                  <input
-                    type='checkbox'
-                    className='w-10'
-                    onClick={() => {
-                      setAcceptExceedingTime((prev) => !prev);
-                    }}
-                  />
-                </div>
-              )}
+
               <ReportCategoryWrapper title={t("healthy_habits_title")}>
                 <HealthHabbitsBox
                   name='exercise_plan'
@@ -231,6 +220,36 @@ const ReportView = () => {
                 </Button>
               </div>
             </ReportFormLayout>
+            {acceptPopUpVisible && exceedingTime && (
+              <Backdrop selector='overlays'>
+                <div className=' m-auto mx-2 flex h-1/4 min-h-[300px] flex-col items-center justify-center gap-4 border-2 border-second-400 bg-second p-6 radius-default'>
+                  <p className='font-openSans text-base'>
+                    {t("toast.exceeding_time") + convertMsToHM(exceedingTime)}
+                  </p>
+                  <p className=' font-openSans text-sm'>
+                    {t("exceeding_time")}
+                  </p>
+                  <div className=' flex gap-4'>
+                    <Button
+                      type='button'
+                      variant='small'
+                      onClick={() => {
+                        setAcceptExceedingTime(true);
+                        handleSubmit();
+                      }}
+                      loading={isFetching}>
+                      {t("report_button")}
+                    </Button>
+                    <Button
+                      type='button'
+                      variant='small'
+                      onClick={() => setAcceptPopUpVisible(false)}>
+                      {t("rating_popup.back")}
+                    </Button>
+                  </div>
+                </div>
+              </Backdrop>
+            )}
           </>
         )}
       </Formik>
