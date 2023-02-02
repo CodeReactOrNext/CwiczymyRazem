@@ -7,12 +7,12 @@
   "creativity": "Creative work",
   "healthy_habits_title": "Healthy habits",
   "report_button": "Report",
-  "exceeding_time":"I want to add another report despite the time limit.",
+  "exceeding_time": "Are you sure you want to add report?",
   "toast": {
     "24h_error": "It is not possible to exercise more than 24 hours per day",
     "input_time": "Enter time",
     "not_logged": "You are not logged in",
-   
+
     "stoper_entered": "Time from stopwatch entered",
     "exceeding_time": "You have entered more time than has passed since the last report. You exceeded the time by  "
   },
