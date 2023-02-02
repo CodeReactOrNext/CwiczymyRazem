@@ -17,7 +17,6 @@ import {
 } from "./userSlice.types";
 import {
   logOutInfo,
-  newUserInfo,
   reportSuccess,
   restartInfo,
   updateDisplayNameSuccess,

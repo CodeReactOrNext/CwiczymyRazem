@@ -25,7 +25,7 @@ const LandingNav = ({
 }: LandingNavProps) => {
   return (
     <div className='relative flex w-full justify-around bg-tertiary py-2 text-base uppercase text-second sm:text-3xl md:gap-x-[150px] xl:gap-x-[250px]'>
-      <div className='z-50 flex h-full w-full justify-around'>
+      <div className='z-40 flex h-full w-full justify-around'>
         {leftSideLinks.map(({ href, name, id }) => (
           <NavLink
             key={id}
@@ -35,7 +35,7 @@ const LandingNav = ({
           />
         ))}
       </div>
-      <div className='z-50  flex w-full  justify-around'>
+      <div className='z-40  flex w-full  justify-around'>
         {rightSideLinks.map(({ href, name, id }) => (
           <NavLink
             key={id}
