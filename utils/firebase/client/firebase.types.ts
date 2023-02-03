@@ -12,6 +12,7 @@ export interface FirebaseUserDataInterface {
 }
 
 export interface FirebaseLogsInterface {
+  uid:string;
   data: string;
   userName: string;
   newAchievements: AchievementList[];
