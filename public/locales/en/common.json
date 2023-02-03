@@ -61,5 +61,11 @@
     "thursday": "Thu",
     "sunday": "Sun",
     "points": "Points"
+  },
+  "sort": {
+    "sort_by": "Sort by:",
+    "points": "Points",
+    "time": "Time",
+    "session_count": "Session Count"
   }
 }
