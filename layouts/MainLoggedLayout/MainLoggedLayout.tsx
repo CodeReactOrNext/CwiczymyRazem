@@ -26,7 +26,6 @@ const MainLoggedLayout = ({
   children,
   pageId,
 }: LandingLayoutProps) => {
-
   return (
     <main className='h-screen min-h-[600px] bg-tertiary-bg p-4 font-sans md:min-h-[900px] lg:p-8  '>
       <div className='relative flex h-full w-full items-center justify-center '>
@@ -52,7 +51,7 @@ const MainLoggedLayout = ({
               pageId={pageId}
             />
             <div
-              className={`z-20 m-4 mt-28 xl:mt-36  flex w-full max-w-[1380px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 `}>
+              className={`z-20 m-4 mt-28 flex  w-full max-w-[1380px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 xl:mt-36 `}>
               {children}
             </div>
           </Wrapper>
