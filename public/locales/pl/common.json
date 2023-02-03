@@ -61,5 +61,11 @@
     "thursday": "Czw",
     "sunday": "Nie",
     "points": "Punktów"
+  },
+  "sort": {
+    "sort_by": "Sortuj według:",
+    "points": "Punktów",
+    "time": "Czasu",
+    "session_count": "Ilości Sesji"
   }
 }
