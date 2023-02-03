@@ -12,7 +12,7 @@ function SortBySwitch({ setSortBy }: SortBySwitchInterface) {
   };
 
   return (
-    <div className='absolute right-2 top-2 flex items-center gap-2 text-main-opposed-500'>
+    <div className='absolute right-[5%] -top-6 flex items-center gap-2 text-main-opposed-500 lg:right-[10%] xl:right-[15%]'>
       <p className='text-tertiary-500'>Sort by</p>
       <select name='SortBySwitch' id='sort' onChange={selectChandler}>
         <option value='points'>points</option>

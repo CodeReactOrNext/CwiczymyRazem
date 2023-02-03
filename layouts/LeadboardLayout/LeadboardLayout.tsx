@@ -11,7 +11,7 @@ interface LeadboardLayoutProps {
 
 const LeadboardLayout = ({ usersData, setSortBy }: LeadboardLayoutProps) => {
   return (
-    <ul>
+    <ul className='relative'>
       <SortBySwitch setSortBy={setSortBy} />
       {usersData.map((user, index) => (
         <LeadboardColumn
