@@ -35,7 +35,7 @@ const EventsList = ({ eventList }: EventsListProps) => {
             </p>
             <div className='flex w-[80%] flex-wrap '>
               <Link href={link}>
-                <a>
+                <a target='_blank' rel='noreferrer'>
                   <p className='mr-1'>
                     <span className='text-link'> {name}</span>
                   </p>
