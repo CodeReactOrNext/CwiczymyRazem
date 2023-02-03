@@ -87,6 +87,7 @@ const ReportView = () => {
       currentUserStats!.lastReportDate,
       sumTime
     );
+
     if (lastReportTimeExceded && !acceptExceedingTime) {
       setAcceptPopUpVisible(true);
       setExceedingTime(lastReportTimeExceded);
