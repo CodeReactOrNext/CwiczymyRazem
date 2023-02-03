@@ -30,7 +30,6 @@ const LeadboardView = () => {
       technique: techniqueB,
       theory: theoryB,
     } = b.statistics.time;
-    console.log(creativity + hearing + technique + theory);
     return (
       creativityB +
       hearingB +

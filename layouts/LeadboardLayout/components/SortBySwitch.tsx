@@ -7,7 +7,6 @@ interface SortBySwitchInterface {
 
 function SortBySwitch({ setSortBy }: SortBySwitchInterface) {
   const selectChandler = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log(event.target.value);
     setSortBy(event.target.value as sortBy);
   };
 
