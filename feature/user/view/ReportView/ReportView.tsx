@@ -85,6 +85,8 @@ const ReportView = () => {
       sumTime
     );
 
+    console.log(inputData);
+
     if (lastReportTimeExceded && !acceptExceedingTime) {
       toast.error(
         t("toast.exceeding_time") + convertMsToHM(lastReportTimeExceded)

@@ -1,14 +1,18 @@
 import LeadboardColumn from "./components/LeadboardRow";
 import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
-
+import SortBySwitch from "./components/SortBySwitch";
+import { Dispatch, SetStateAction } from "react";
+import { sortBy } from "feature/leadboard/view/LeadboardView";
 
 interface LeadboardLayoutProps {
   usersData: FirebaseUserDataInterface[];
+  setSortBy: Dispatch<SetStateAction<sortBy>>;
 }
 
-const LeadboardLayout = ({ usersData }: LeadboardLayoutProps) => {
+const LeadboardLayout = ({ usersData, setSortBy }: LeadboardLayoutProps) => {
   return (
     <ul>
+      <SortBySwitch setSortBy={setSortBy} />
       {usersData.map((user, index) => (
         <LeadboardColumn
           profileId={user.profileId}
