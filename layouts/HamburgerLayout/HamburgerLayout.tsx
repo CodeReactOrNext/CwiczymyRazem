@@ -11,7 +11,7 @@ interface HamburgerProps {
 
 const HamburgerLayout = ({ buttonOnClick, children }: HamburgerProps) => {
   return (
-    <div className='absolute top-0 bottom-0 left-0 z-40 h-full min-h-full w-full overflow-hidden'>
+    <div className='absolute top-0 bottom-0 left-0 z-50 h-full min-h-full w-full overflow-hidden '>
       <div className='h-full w-full bg-second-500'>
         <header className='flex items-center justify-between py-4 px-8'>
           <Logo />
