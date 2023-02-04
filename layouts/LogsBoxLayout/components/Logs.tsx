@@ -10,7 +10,6 @@ export interface LogsBoxLayoutProps {
 }
 const Logs = ({ logs }: LogsBoxLayoutProps) => {
   const { t } = useTranslation("common");
-  console.log(logs);
 
   return (
     <>
