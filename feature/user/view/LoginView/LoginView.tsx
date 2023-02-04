@@ -12,9 +12,12 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import {
+  logInViaDiscord,
   logInViaEmail,
   logInViaGoogle,
 } from "feature/user/store/userSlice.asyncThunk";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useEffect } from "react";
 
 export interface logInCredentials {
   email: string;
@@ -28,6 +31,13 @@ const LoginView = () => {
   const googleLogInHandler = () => {
     dispatch(logInViaGoogle());
   };
+  const discordLogInHandler = () => {
+    dispatch(logInViaDiscord());
+  };
+
+  const oAuthSignOut = () => {
+    signOut();
+  };
 
   const isFetching = useAppSelector(selectIsFetching) === "email";
 
@@ -39,6 +49,11 @@ const LoginView = () => {
     email: "",
     password: "",
   };
+
+  const { data: session } = useSession();
+  useEffect(() => {
+    console.log(session);
+  }, [session]);
 
   return (
     <Formik
@@ -74,6 +89,15 @@ const LoginView = () => {
             <GoogleButton onClick={googleLogInHandler}>
               {t("common:google_button.sign_in")}
             </GoogleButton>
+            <Button
+              type='button'
+              onClick={discordLogInHandler}
+              loading={isFetching}>
+              {t("common:button.sign_in")}
+            </Button>
+            <Button type='button' onClick={oAuthSignOut} loading={isFetching}>
+              {t("common:button.logout")}
+            </Button>
           </>
         </FormLayout>
       </Form>

@@ -30,7 +30,7 @@ import {
   FirebaseUserExceriseLog,
 } from "./firebase.types";
 import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
-import { firebaseApp } from "./firebase.cofig";
+import { firebaseApp } from "./firebase.config";
 import { shuffleUid } from "utils/user/shuffleUid";
 
 const provider = new GoogleAuthProvider();

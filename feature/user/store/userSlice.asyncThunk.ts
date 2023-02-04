@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
+import { signIn } from "next-auth/react";
 
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 
@@ -37,6 +38,18 @@ export const logInViaEmail = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }) => {
     const { user } = await firebaseSignInWithEmail(email, password);
     const userData = await fetchUserData(user);
+    return userData;
+  }
+);
+
+export const logInViaDiscord = createAsyncThunk(
+  "user/logInViaDiscord",
+  async () => {
+    await signIn();
+    const userData = await fetch("/api/auth/user").then((response) =>
+      response.json()
+    );
+
     return userData;
   }
 );

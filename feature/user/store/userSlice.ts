@@ -29,6 +29,7 @@ import {
   changeUserDisplayName,
   createAccount,
   getUserProvider,
+  logInViaDiscord,
   logInViaEmail,
   logInViaGoogle,
   logUserOff,
@@ -215,6 +216,7 @@ export const userSlice = createSlice({
       )
       .addMatcher(
         isAnyOf(
+          // logInViaDiscord.fulfilled,
           logInViaGoogle.fulfilled,
           logInViaEmail.fulfilled,
           createAccount.fulfilled,
@@ -225,7 +227,6 @@ export const userSlice = createSlice({
           state.userInfo = action.payload.userInfo;
           state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
- 
         }
       );
   },
