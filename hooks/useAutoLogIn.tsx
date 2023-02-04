@@ -6,7 +6,6 @@ import { auth } from "utils/firebase/client/firebase.utils";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
 import {
-  changeTheme,
   selectUserAuth,
   updateLocalTimer,
 } from "feature/user/store/userSlice";

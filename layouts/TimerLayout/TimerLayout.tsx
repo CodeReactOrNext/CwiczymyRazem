@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import Button from "components/Button";
 import Stopwatch from "./components/Stopwatch";
+import BeginnerMsg from "components/BeginnerMsg";
 import CategoryBox from "./components/CategoryBox";
 
 import useTimer from "hooks/useTimer";
@@ -143,11 +144,11 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           chosen={chosenSkill === "creativity"}
         />
       </div>
-
+      <BeginnerMsg />
       <p className='p-4 text-center font-openSans'>
         {t("info_about_repot ")}
         <Link href={"/report"}>
-          <a className='text-second-200'> {t("raport_link")}</a>
+          <a className='text-link'> {t("raport_link")}</a>
         </Link>
       </p>
       <Button onClick={timerSubmitHandler}> {t("end_button")}</Button>

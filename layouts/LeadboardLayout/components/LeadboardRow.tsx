@@ -4,7 +4,6 @@ import { convertMsToHM } from "utils/converter/timeConverter";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import { RiExternalLinkFill } from "react-icons/ri";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import Carousel from "./AchievementsCarousel";
 interface LeadboardColumnProps {
@@ -37,7 +36,7 @@ const LeadboardRow = ({
   };
 
   return (
-    <li className='flex w-full justify-center p-5 text-xs xs:text-base'>
+    <li className='flex w-full justify-center p-7 text-xs xs:text-base'>
       <p className='flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl'>
         {place + "."}
       </p>
@@ -46,7 +45,7 @@ const LeadboardRow = ({
           <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
         </div>
         <div
-          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-3 justify-items-center bg-second bg-opacity-75 px-2 radius-default hover:bg-opacity-90 md:h-16 md:grid-rows-1
+          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-3 justify-items-center bg-second bg-opacity-75 radius-default hover:bg-opacity-90 md:h-16 md:grid-rows-1 lg:px-2
         ${place === 1 ? "bg-yellow-500" : ""}
         ${place === 2 ? "bg-slate-400" : ""}
         ${place === 3 ? "bg-yellow-700" : ""}`}>
@@ -79,7 +78,7 @@ const LeadboardRow = ({
               </p>
             </div>
           </div>
-          <div className='col-span-3 flex h-full w-full items-center justify-evenly md:col-span-1 md:w-[300px]  md:justify-center '>
+          <div className='col-span-3 flex h-full w-full items-center justify-evenly border-y-2 border-black/10 bg-black/10 md:col-span-1 md:w-[300px] md:justify-center md:border-y-0 md:bg-transparent '>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
               <p className='text-xl xxs:text-3xl '>{statistics.points}</p>
               <p className='font-openSans text-xs font-bold leading-[15px] text-tertiary'>

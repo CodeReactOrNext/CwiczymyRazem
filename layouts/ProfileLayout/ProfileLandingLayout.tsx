@@ -7,16 +7,19 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import Calendar from "components/Calendar";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
   userStats: StatisticsDataInterface;
   featSlot: React.ReactNode;
+  userAuth: string;
 }
 
 const LandingLayout = ({
   statsField,
   userStats,
+  userAuth,
   featSlot,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
@@ -27,8 +30,18 @@ const LandingLayout = ({
   return (
     <div className='bg-second-500 radius-default'>
       <HeadDecoration title={t("statistics")} />
-      <div className='grid-rows-auto grid-cols-2 items-center md:mt-5 md:grid '>
-        <div className=' order-2 row-span-1 my-5 flex justify-center '>
+      <div className='grid-rows-auto grid-cols-2 items-start  lg:mt-5 lg:grid '>
+        <div className=' flex flex-wrap justify-evenly'>
+          {statsField.map(({ Icon, description, value }) => (
+            <StatsField
+              key={description}
+              Icon={Icon}
+              description={description}
+              value={value}
+            />
+          ))}
+        </div>
+        <div className=' relative z-20 mx-4 my-2 flex justify-center border-2 border-second-400 bg-second-600 p-2 radius-default  '>
           <StatisticBar
             title={t("technique")}
             value={convertMsToHM(time.technique)}
@@ -50,20 +63,13 @@ const LandingLayout = ({
             percent={Math.round((time.creativity / totalTime) * 100)}
           />
         </div>
-        <div className=' row-cols-1  order-1 flex flex-wrap justify-around'>
-          {statsField.map(({ Icon, description, value }) => (
-            <StatsField
-              key={description}
-              Icon={Icon}
-              description={description}
-              value={value}
-            />
-          ))}
-        </div>
-        <div className='row-cols-1 order-3 flex flex-col justify-between p-4 '>
+        <div className=' my-2 flex flex-col justify-between p-4 '>
           <AchievementWrapper userAchievements={achievements} />
         </div>
-        {featSlot}
+        <div className='d-flex justify-content-center my-2 p-4 '>
+          <Calendar userAuth={userAuth} />
+        </div>
+        <div className='col-span-2 p-4'>{featSlot}</div>
       </div>
     </div>
   );

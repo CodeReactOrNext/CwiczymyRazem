@@ -1,1 +1,4 @@
-{ "subtitlebar_text": "Ćwicz, raportuj, zdobywaj punkty!" }
+{
+  "subtitlebar_text": "Ćwicz, raportuj, zdobywaj punkty!",
+  "back_to_login": "Wróć do strony logowania"
+}

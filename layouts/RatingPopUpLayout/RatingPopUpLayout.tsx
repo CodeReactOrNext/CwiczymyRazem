@@ -70,9 +70,9 @@ const RatingPopUp = ({
   const currProgressPercent = (pointsInThisLevel / levelXpDifference) * 100;
 
   return (
-    <div className='relative flex h-5/6 max-h-[1020px] w-[95%] translate-y-[10%] items-center justify-center bg-main-opposed-500 font-sans tracking-wider md:min-h-[700px] lg:aspect-square lg:w-auto'>
+    <div className='relative flex h-5/6 max-h-[1020px] min-h-[750px] w-[95%] translate-y-[10%] items-center justify-center bg-main-opposed-500 font-sans tracking-wider  md:min-h-[800px] lg:aspect-square lg:w-auto'>
       <OldEffect className='absolute z-10' />
-      <div className='absolute top-[20%] -left-[5%] right-0 flex w-[110%] items-center justify-center bg-main-500 text-5xl font-medium sm:text-8xl'>
+      <div className='absolute  top-[20%] -left-[5%] right-0 flex w-[110%] items-center justify-center bg-main-500 text-5xl font-medium sm:text-8xl'>
         <p>
           {ratingData.totalPoints}
           {t("rating_popup.points")}
@@ -81,11 +81,12 @@ const RatingPopUp = ({
       <p className='absolute top-[5%] text-5xl font-medium text-tertiary-500 md:text-8xl'>
         {t("rating_popup.title")}
       </p>
-      <div className='absolute right-0 left-0 bottom-0 z-10 h-[40%] w-full overflow-hidden sm:h-[50%] md:h-[55%]'>
+      <div className='absolute right-0 left-0 bottom-0 z-10 h-[30%] max-h-[270px] w-full  sm:h-[50%] md:max-h-[500px] '>
         <FireSVG className='absolute -bottom-10 -left-[10%] w-4/6 rotate-6 fill-second-500 md:bottom-auto' />
         <FireSVG className='absolute -bottom-10  -right-[10%] w-4/6 -rotate-6 fill-second-500 md:bottom-auto' />
+        <div className='absolute bottom-0  h-12 w-full bg-second-500'></div>
 
-        <div className='absolute bottom-0 flex h-1/3 w-full items-start justify-center'>
+        <div className='absolute bottom-0 flex h-1/4 w-full items-start justify-center'>
           <Button
             onClick={() => {
               onClick(false);
@@ -93,7 +94,7 @@ const RatingPopUp = ({
             }}>
             {t("rating_popup.back")}
           </Button>
-          <div className='absolute -top-[170%] z-40 my-auto flex h-7 w-2/3 items-center md:-top-[130%] md:w-5/12'>
+          <div className='absolute -top-[230%] z-40 my-auto flex h-7 w-2/5 items-center md:-top-[130%] md:w-5/12'>
             <div className='h-4/5 w-full bg-second-500 '>
               <motion.div
                 initial={{
@@ -119,6 +120,7 @@ const RatingPopUp = ({
                 </motion.p>
               </motion.div>
             </div>
+
             <LevelIndicator position='left'>{currentLevel}</LevelIndicator>
             <LevelIndicator position='right'>{currentLevel + 1}</LevelIndicator>
           </div>
@@ -132,7 +134,7 @@ const RatingPopUp = ({
         isGetNewLevel={isGetNewLevel}
       />
 
-      <div className='absolute -bottom-[10%] -left-[25%] z-40 w-[50%] sm:-left-[15%] md:-bottom-[5%] md:-left-[10%] md:w-auto'>
+      <div className='absolute -bottom-[15%] -left-[27%] z-40 w-[50%] sm:-left-[15%] md:-bottom-[5%] md:-left-[10%] md:w-auto'>
         <Image
           src={blackGuitar}
           height={705}
@@ -141,7 +143,7 @@ const RatingPopUp = ({
           alt='black guitar'></Image>
       </div>
       <motion.div
-        className='absolute -right-[25%] -top-[25%] z-10  h-5/6 w-[50%] -rotate-12 md:-right-[25%] md:-top-[5%]'
+        className='absolute -right-[25%] -top-[25%] z-10  h-5/6 w-[50%] -rotate-12 md:-top-[5%] lg:-right-[25%]'
         initial={{ y: "-100%" }}
         animate={{ y: 0 }}
         transition={{ delay: 0.3, type: "tween" }}>

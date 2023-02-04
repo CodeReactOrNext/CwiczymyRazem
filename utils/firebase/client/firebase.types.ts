@@ -12,6 +12,7 @@ export interface FirebaseUserDataInterface {
 }
 
 export interface FirebaseLogsInterface {
+  uid:string;
   data: string;
   userName: string;
   newAchievements: AchievementList[];
@@ -26,4 +27,17 @@ export interface FirebaseEventsInteface {
   category: SkillsType;
   name: string;
   link: string;
+}
+
+export interface FirebaseUserExceriseLog {
+  reportDate: any;
+  bonusPoints: {
+    additionalPoints: number;
+    habitsCount: number;
+    multiplier: number;
+    streak: number;
+    time: number;
+    timePoints: number;
+  };
+  totalPoints: number;
 }
