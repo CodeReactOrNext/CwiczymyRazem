@@ -1,12 +1,12 @@
 import { changeTheme, selectLayoutMode } from "feature/user/store/userSlice";
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const ThemeModeProvider = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(selectLayoutMode);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (typeof window !== "undefined") {
       if (localStorage.getItem("userSlice.theme")) {
         dispatch(

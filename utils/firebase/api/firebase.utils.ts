@@ -29,19 +29,20 @@ export const firebaseSetUserExerciseRaprot = async (
 };
 
 export const firebaseAddLogReport = async (
-  userAuth: string,
+  uid: string,
   data: string,
   points: number,
   newAchievements: AchievementList[],
   newLevel: { isNewLevel: boolean; level: number }
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
-  const userDocRef = doc(db, "users", userAuth);
+  const userDocRef = doc(db, "users", uid);
   const userSnapshot = await getDoc(userDocRef);
   const userName = userSnapshot.data()!.displayName;
 
   await setDoc(logsDocRef, {
     data,
+    uid,
     userName,
     points,
     newAchievements,
