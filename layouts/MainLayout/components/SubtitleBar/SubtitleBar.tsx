@@ -16,7 +16,7 @@ const SubtitleBar = ({ variant, children }: SubtitleBarProps) => {
     }`}>
       <div
         className={`clip-bg-mobile absolute -z-10 h-full w-full rotate-x-40 lg:hidden ${
-          variant === "secondary" ? "bg-main-opposed-500" : "bg-second-500"
+          variant === "secondary" ? "bg-main-opposed-bg" : "bg-second-500"
         } ${variant === "landing" ? "bg-transparent" : ""}`}></div>
       <LightningRevSVG
         className={`min-h-full w-full fill-tertiary-500 rotate-x-40 lg:hidden`}
