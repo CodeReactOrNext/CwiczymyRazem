@@ -54,5 +54,18 @@
     "achievements": "Achievements:",
     "get": "get",
     "points": "pt"
+  },
+  "calendar": {
+    "title": "Activity Calendar",
+    "monday": "Mon",
+    "thursday": "Thu",
+    "sunday": "Sun",
+    "points": "Points"
+  },
+  "sort": {
+    "sort_by": "Sort by:",
+    "points": "Points",
+    "time": "Time",
+    "session_count": "Session Count"
   }
 }

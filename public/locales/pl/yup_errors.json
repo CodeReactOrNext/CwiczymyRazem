@@ -1,7 +1,10 @@
 {
   "valid_email": "Podaj poprawny email",
   "stronger_password": "Podaj silniejsze hasło",
-  "password_char_number": "Hasło musi mieć conajmniej 8 znaków",
+  "password_char_number": "Hasło musi mieć co najmniej 8 znaków",
+  "username_char_number": "Nick musi mieć co najmniej 3 znaki",
+  "username_char_max_number": "Nick musi mieć co najwyżej 28 znaków",
   "required": "Wymagane",
-  "same_passwords": "Hasła muszą być takie same"
+  "same_passwords": "Hasła muszą być takie same",
+  "no_ends_whitespace": "Nick nie może zaczynać lub kończyć się od spacji"
 }

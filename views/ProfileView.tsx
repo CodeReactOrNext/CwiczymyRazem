@@ -32,6 +32,7 @@ const ProfileView = () => {
           userStats={userData.statistics}
           userName={userData.displayName}
           userAvatar={userData.avatar}
+          userAuth={profileId as string}
         />
       ) : (
         <PageLoadingLayout />
