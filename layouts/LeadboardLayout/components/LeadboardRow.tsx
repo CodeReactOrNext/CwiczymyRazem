@@ -4,7 +4,6 @@ import { convertMsToHM } from "utils/converter/timeConverter";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import { RiExternalLinkFill } from "react-icons/ri";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import Carousel from "./AchievementsCarousel";
 interface LeadboardColumnProps {
@@ -37,7 +36,7 @@ const LeadboardRow = ({
   };
 
   return (
-    <li className='flex w-full justify-center p-5 text-xs xs:text-base'>
+    <li className='flex w-full justify-center p-7 text-xs xs:text-base'>
       <p className='flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl'>
         {place + "."}
       </p>
