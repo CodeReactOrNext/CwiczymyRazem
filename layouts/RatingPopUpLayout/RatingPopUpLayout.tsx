@@ -81,7 +81,8 @@ const RatingPopUp = ({
       <p className='absolute top-[5%] text-5xl font-medium text-tertiary-500 md:text-8xl'>
         {t("rating_popup.title")}
       </p>
-      <div className='absolute right-0 left-0 bottom-0 z-10 h-[30%] max-h-[270px] w-full overflow-hidden sm:h-[50%] md:max-h-[500px] '>
+
+      <div className='absolute right-0 left-0 bottom-0 z-10 h-[30%] max-h-[270px] w-full overflow-hidden  sm:h-[50%] md:max-h-[500px] '>
         <FireSVG className='absolute -bottom-10 -left-[10%] w-4/6 rotate-6 fill-second-500 md:bottom-auto' />
         <FireSVG className='absolute -bottom-10  -right-[10%] w-4/6 -rotate-6 fill-second-500 md:bottom-auto' />
         <div className='absolute bottom-0  h-12 w-full bg-second-500'></div>
