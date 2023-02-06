@@ -8,11 +8,10 @@ const ThemeToggle = () => {
   return (
     <div className='flex w-fit flex-col'>
       <label
-        htmlFor='dark-mode-toggle'
+        aria-hidden
         className='relative inline-flex cursor-pointer items-center'>
         <input
-          id='dark-mode-toggle'
-          name='dark-mode-toggle'
+          tabIndex={-1}
           type='checkbox'
           className='peer sr-only'
           checked={theme === "dark-theme"}
