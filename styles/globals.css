@@ -60,7 +60,7 @@ body {
   margin: 0;
   font-family: "Teko", sans;
   font-weight: 500;
-  color: white;
+  color: #f5f5f5;
   min-height: 100vh;
   position: relative;
   @apply bg-tertiary-500;
@@ -78,7 +78,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-second-100;
+  @apply bg-second-200;
 }
 #__next {
   @apply relative flex h-screen flex-col;

@@ -71,7 +71,7 @@ const AchievementsCarousel = ({
           />
         </button>
       </div>
-      <p className='pb-2 font-openSans text-xs font-bold text-tertiary'>
+      <p className='pb-2 font-openSans text-xs font-bold text-tertiary-300'>
         {t("achievements")} {achievements.length}/{achievementsData.length}
       </p>
     </div>

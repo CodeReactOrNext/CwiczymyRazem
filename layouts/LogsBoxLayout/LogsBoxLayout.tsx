@@ -29,7 +29,7 @@ const LogsBoxLayout = ({
 
   const { t } = useTranslation("common");
   return (
-    <div className='relative m-auto mt-5 flex h-80 flex-col border-4 border-second-400 bg-main-opposed-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:max-w-[70%]'>
+    <div className='relative m-auto mt-5 flex h-80 flex-col border-4 border-second-400/60 bg-main-opposed-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:max-w-[70%]'>
       <div className='sticky top-0 left-0 flex flex-row gap-4 border-b-2 border-main-opposed-500 font-bold'>
         <LogsBoxButton
           title={t("logsBox.logs")}
