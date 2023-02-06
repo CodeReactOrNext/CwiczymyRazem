@@ -12,6 +12,7 @@ interface LeadboardColumnProps {
   statistics: StatisticsDataInterface;
   userAvatar?: string;
   profileId?: string;
+  currentUserId: string | null;
 }
 
 const LeadboardRow = ({
@@ -20,6 +21,7 @@ const LeadboardRow = ({
   statistics,
   userAvatar,
   profileId,
+  currentUserId,
 }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
@@ -36,21 +38,29 @@ const LeadboardRow = ({
   };
 
   return (
-    <li className='flex w-full justify-center p-7 text-xs xs:text-base'>
-      <p className='flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl'>
+    <li
+      className={`flex w-full justify-center p-7 text-xs xs:text-base 
+    ${profileId === currentUserId ? "scale-105" : ""} `}>
+      <p
+        className={`flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl
+       ${profileId === currentUserId ? "text-white" : ""}`}>
         {place + "."}
       </p>
       <div className=' ml-2 flex w-full max-w-[800px] items-center md:h-16 xl:ml-5 '>
         <div className='hidden md:block'>
           <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
         </div>
+
         <div
-          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-3 justify-items-center bg-second bg-opacity-75 radius-default hover:bg-opacity-90 md:h-16 md:grid-rows-1 lg:px-2
-        ${place === 1 ? "bg-yellow-500" : ""}
-        ${place === 2 ? "bg-slate-400" : ""}
-        ${place === 3 ? "bg-yellow-700" : ""}`}>
+          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-3 justify-items-center border-b-2 border-second bg-second bg-opacity-75 radius-default hover:bg-opacity-90 md:h-16 md:grid-rows-1 lg:px-2
+        ${place === 1 ? "border-yellow-500 bg-yellow-500" : ""}
+        ${place === 2 ? "border-slate-400 bg-slate-400" : ""}
+        ${place === 3 ? "border-yellow-700 bg-yellow-700" : ""}
+        ${profileId === currentUserId ? "shadow-lg shadow-black/50" : ""}
+       `}>
           <div className='relative top-[-23px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
+
             <div className='absolute top-[-10px] right-[-60px] flex  items-center gap-x-1  '>
               <p className='text-2xl uppercase text-tertiary drop-shadow'>
                 Lvl{" "}
