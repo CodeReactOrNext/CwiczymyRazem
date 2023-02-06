@@ -61,7 +61,7 @@ const ProfileLayout = ({
               currentLevelMaxPoints={userStats.currentLevelMaxPoints}
             />
           </div>
-          <div className=' z-10 row-span-1 m-4 flex justify-center border-2 border-second-400 bg-second-600 p-2 radius-default '>
+          <div className=' z-10 row-span-1 m-4 flex justify-center border-2 border-second-400/60 bg-second-600 p-2 radius-default '>
             <StatisticBar
               title={t("technique")}
               value={convertMsToHM(time.technique)}

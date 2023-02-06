@@ -112,9 +112,9 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   };
 
   return reportList ? (
-    <div className=' overflow-y-scroll border-2 border-second-400 bg-second-600  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-100 radius-default'>
+    <div className=' border-second-400/60 overflow-y-scroll border-2 bg-second-600  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-200 radius-default'>
       <p className='pb-2 text-sm font-bold'>
-        {t("calendar.title")} <span className='text-main-calendar'>{year}</span>
+        {t("calendar.title")}: {year}
       </p>
       <div className=' grid grid-flow-col grid-rows-7 p-2 text-xs  '>
         <p className='row-span-3 mr-3'> {t("calendar.monday")}</p>
