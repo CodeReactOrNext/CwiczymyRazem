@@ -10,7 +10,7 @@ const Guitar = () => {
         <img
           className='hover-animation w-full'
           src='/static/images/guitar_red.png'
-          alt='red guitar'
+          alt=''
         />
         <div className='shake-animation absolute -bottom-[5%] -left-[100%] w-[65%] lg:-bottom-[15%]'>
           <LightningRevSVG className='origin-right rotate-[140deg] fill-tertiary-500 ' />
