@@ -116,11 +116,13 @@ a {
 @keyframes shadow-effect {
   from {
     transform: scale(0.7) rotateX(80deg);
-    background-color: #00000077;
+    background-color: #000000a3;
+    opacity: 0.7;
   }
   to {
     transform: scale(1) rotateX(80deg);
     background-color: #000000a3;
+    opacity: 1;
   }
 }
 
