@@ -23,7 +23,7 @@ const MainLayout = ({ children, subtitle, variant }: LayoutProps) => {
           }`}>
           <Header variant={variant} />
           <SubtitleBar variant={variant}>{subtitle}</SubtitleBar>
-          <div className='relative  -mt-[5.5%] flex h-full w-full items-center justify-center lg:m-0'>
+          <div className='relative z-10  -mt-[5.5%] flex h-full w-full items-center justify-center lg:m-0'>
             <Background variant={variant} />
             <LightningDesktopDivider variant={variant} />
             {variant !== "landing" && <OldEffect />}
