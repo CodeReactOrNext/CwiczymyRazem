@@ -7,8 +7,12 @@ const ThemeToggle = () => {
   const theme = useAppSelector(selectLayoutMode);
   return (
     <div className='flex w-fit flex-col'>
-      <label className='relative inline-flex cursor-pointer items-center'>
+      <label
+        htmlFor='dark-mode-toggle'
+        className='relative inline-flex cursor-pointer items-center'>
         <input
+          id='dark-mode-toggle'
+          name='dark-mode-toggle'
           type='checkbox'
           className='peer sr-only'
           checked={theme === "dark-theme"}
