@@ -37,7 +37,10 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
         <NavLink url='/faq' title={t("nav.faq")} />
       </ul>
 
-      <button className='h-8 w-8 lg:hidden' onClick={hamburgerHandler}>
+      <button
+        name='hamburger-menu-button'
+        className='h-8 w-8 lg:hidden'
+        onClick={hamburgerHandler}>
         <FaBars className='h-full w-full' />
       </button>
       {hamburgerVisible && (
