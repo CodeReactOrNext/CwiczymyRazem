@@ -3,7 +3,9 @@
   "stronger_password": "Enter a stronger password",
   "password_char_number": "Password must be at least 8 characters",
   "username_char_number": "Username must be at least 3 characters",
+  "username_char_max_number": "Username must be at most 28 characters",
   "required": "Required",
   "same_passwords": "Passwords must be the same",
-  "no_ends_whitespace": "Username can't start or end with empty space"
+  "no_ends_whitespace": "Username can't start or end with empty space",
+  "allowed_signs": "Allowed are only letters, numbers and . - _ characters"
 }
