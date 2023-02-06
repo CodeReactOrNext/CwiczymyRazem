@@ -20,6 +20,7 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
       <div className='flex h-20 w-20 items-center justify-center bg-tertiary-400 radius-default'>
         {avatarURL ? (
           <img
+            referrerPolicy='no-referrer'
             className='h-full w-full radius-default'
             src={avatarURL}
             alt={name}
