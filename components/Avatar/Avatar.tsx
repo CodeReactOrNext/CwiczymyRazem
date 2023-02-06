@@ -19,7 +19,11 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
     <div className='relative '>
       <div className='flex h-20 w-20 items-center justify-center bg-tertiary-400 radius-default'>
         {avatarURL ? (
-          <img className='h-full w-full radius-default' src={avatarURL} alt={name} />
+          <img
+            className='h-full w-full radius-default'
+            src={avatarURL}
+            alt={name}
+          />
         ) : (
           <p className='font-openSans text-4xl font-bold uppercase text-main-opposed'>
             {name?.[0]}
@@ -30,7 +34,7 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
         <img
           className='absolute bottom-[18px] left-[35px] -rotate-90'
           src={`/static/images/rank/${getRankImgPath(lvl)}.png`}
-          alt='gutiar_rank'
+          alt={`gutiar rank image for level ${getRankImgPath(lvl)}`}
         />
       )}
     </div>
