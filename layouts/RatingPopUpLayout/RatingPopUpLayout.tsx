@@ -141,7 +141,7 @@ const RatingPopUp = ({
           height={705}
           width={254}
           objectFit='contain'
-          alt='black guitar'></Image>
+          alt=''></Image>
       </div>
       <motion.div
         className='absolute -right-[25%] -top-[25%] z-10  h-5/6 w-[50%] -rotate-12 md:-top-[5%] lg:-right-[25%]'
