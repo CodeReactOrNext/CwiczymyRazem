@@ -38,6 +38,7 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
       </ul>
 
       <button
+        aria-label='hamburger menu button'
         name='hamburger-menu-button'
         className='h-8 w-8 lg:hidden'
         onClick={hamburgerHandler}>
