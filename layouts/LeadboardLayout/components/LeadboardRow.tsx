@@ -31,7 +31,7 @@ const LeadboardRow = ({
     if (!nick) return;
     if (nick.length > MAX_SHOW_NICK_LENGTH) {
       return (
-        <p data-tip={nick}>{nick.substring(0, MAX_SHOW_NICK_LENGTH) + "..."}</p>
+        <span data-tip={nick}>{nick.substring(0, MAX_SHOW_NICK_LENGTH) + "..."}</span>
       );
     }
     return nick;
