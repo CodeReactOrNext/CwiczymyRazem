@@ -34,11 +34,12 @@ const Stopwatch = ({
           <p className='font-openSans text-[0.6rem]'>{t("seconds")}</p>
         </div>
       </div>
-      <div className=' row-start-2 flex w-full justify-evenly justify-self-center p-6'>
+      <div className=' row-start-2 flex w-full justify-evenly justify-self-center p-5'>
         <p>{convertMsToHMObject(time).hours}</p>
         <span className={`${timerEnabled ? "animate-pulse" : ""} `}>:</span>
         <p>{convertMsToHMObject(time).minutes}</p>
       </div>
+
       {isSkillChosen && (
         <div className='row-start-3  text-center text-sm text-tertiary'>
           {timerEnabled ? (
@@ -56,6 +57,11 @@ const Stopwatch = ({
             </button>
           )}
         </div>
+      )}
+      {!isSkillChosen && (
+        <p className='m-auto w-24 text-center text-sm text-mainText'>
+          {t("choose")}
+        </p>
       )}
     </div>
   );
