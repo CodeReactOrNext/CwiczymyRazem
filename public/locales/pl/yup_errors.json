@@ -6,5 +6,6 @@
   "username_char_max_number": "Nick musi mieć co najwyżej 28 znaków",
   "required": "Wymagane",
   "same_passwords": "Hasła muszą być takie same",
-  "no_ends_whitespace": "Nick nie może zaczynać lub kończyć się od spacji"
+  "no_ends_whitespace": "Nick nie może zaczynać lub kończyć się od spacji",
+  "allowed_signs": "Dozwolone są tylko litery, cyfry i znaki: . - _"
 }

@@ -16,19 +16,20 @@ interface LayoutProps {
 const MainLayout = ({ children, subtitle, variant }: LayoutProps) => {
   return (
     <main className='h-screen min-h-[650px] bg-tertiary-bg p-4 font-sans xs:min-h-[950px] lg:p-8'>
-      <div className='relative flex h-full w-full items-center justify-center'>
+      <div className='relative flex h-full w-full items-center justify-center '>
         <div
-          className={`relative  flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
+          className={`relative   flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
           <Header variant={variant} />
           <SubtitleBar variant={variant}>{subtitle}</SubtitleBar>
-          <div className='relative z-20 -mt-[5.5%] flex h-full w-full items-center justify-center lg:m-0'>
+          <div className='relative z-10  -mt-[5.5%] flex h-full w-full items-center justify-center lg:m-0'>
             <Background variant={variant} />
             <LightningDesktopDivider variant={variant} />
+            {variant !== "landing" && <OldEffect />}
             <ContentBox variant={variant}>{children}</ContentBox>
           </div>
-          {variant !== "landing" && <OldEffect />}
+         
         </div>
       </div>
     </main>

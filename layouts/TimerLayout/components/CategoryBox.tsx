@@ -26,7 +26,7 @@ const CategoryBox = ({
       } `}>
       <p
         className={`text-2xl text-main-opposed xs:text-2xl ${
-          chosen ? "text-main" : "text-main-opposed"
+          chosen ? "text-main-900" : "text-main-opposed"
         } `}>
         {percent ? percent : 0}%
       </p>
@@ -40,7 +40,7 @@ const CategoryBox = ({
         <button
           onClick={onClick}
           className={
-            "uppercas border-2 border-transparent radius-default  bg-main p-1 px-3 text-center text-sm font-bold text-mainText hover:bg-main-100 "
+            "uppercas border-2 border-transparent radius-default  bg-main-900 p-1 px-3 text-center text-sm font-bold text-mainText hover:bg-main-100 "
           }>
           Wybierz
         </button>

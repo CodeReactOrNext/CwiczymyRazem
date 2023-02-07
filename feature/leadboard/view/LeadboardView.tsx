@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
+import { useAppSelector } from "store/hooks";
 import { useTranslation } from "react-i18next";
 
 import LeadboardLayout from "layouts/LeadboardLayout";
@@ -8,6 +9,7 @@ import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 import { firebaseGetUsersExceriseRaport as firebaseGetUsersExceriseRaport } from "utils/firebase/client/firebase.utils";
 import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
+import { selectUserAuth } from "feature/user/store/userSlice";
 
 export type sortBy = "points" | "time" | "sessionCount";
 
@@ -18,6 +20,7 @@ const LeadboardView = () => {
   const [sortBy, setSortBy] = useState<sortBy>("points");
 
   const { t } = useTranslation("leadboard");
+  const currentUserId = useAppSelector(selectUserAuth);
 
   const sortByTime = (
     a: FirebaseUserDataInterface,
@@ -75,7 +78,11 @@ const LeadboardView = () => {
       subtitle='Leaderboard'
       variant='secondary'>
       {usersData ? (
-        <LeadboardLayout usersData={usersData} setSortBy={setSortBy} />
+        <LeadboardLayout
+          usersData={usersData}
+          setSortBy={setSortBy}
+          currentUserId={currentUserId}
+        />
       ) : (
         <PageLoadingLayout />
       )}
