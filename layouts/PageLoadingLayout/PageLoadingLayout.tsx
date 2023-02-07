@@ -1,16 +1,9 @@
-import { useTranslation } from "react-i18next";
-import Guitar from "layouts/HeroLayout/components/Guitar";
+import { CircleSpinner } from "react-spinners-kit";
 
 const PageLoadingLayout = () => {
-  const { t } = useTranslation("common");
   return (
-    <div className='relative flex h-1/2 w-full items-start justify-center lg:items-center'>
-      <div className='relative flex aspect-square  w-2/5 max-w-[150px] -translate-y-[40%] items-start justify-center lg:w-1/5 lg:translate-y-0'>
-        <Guitar />
-        <p className='absolute bottom-[50%] left-[50%] z-50 -translate-x-[50%] text-center text-xl lg:bottom-[60%] lg:text-3xl'>
-          {t("loading.loading_text")}
-        </p>
-      </div>
+    <div className=' flex h-[40vh] w-full items-center justify-center'>
+      <CircleSpinner size='60' />
     </div>
   );
 };
