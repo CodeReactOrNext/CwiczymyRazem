@@ -135,5 +135,9 @@
   "yolo": {
     "title": "Yolo",
     "description": "Ten gracz ma gdzieś zdrowe nawyki."
+  },
+  "vip": {
+    "title": "Zasłużony",
+    "description": "Ten gracz pomógł w rozwoju Ćwiczymy Razem"
   }
 }
