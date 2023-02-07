@@ -6,7 +6,7 @@ import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 
 export interface UserDataInterface {
-  userInfo: { displayName: string };
+  userInfo: { displayName: string; avatar: string };
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
 }

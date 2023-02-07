@@ -8,13 +8,14 @@ export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
 
   const userSnapshot = await getDoc(userDocRef);
   if (!userSnapshot.exists()) {
-    const { displayName } = user;
+    const { displayName, photoURL: avatar } = user;
     const createdAt = new Date();
     try {
       await setDoc(userDocRef, {
         displayName,
         createdAt,
         statistics,
+        avatar,
       });
     } catch (error) {
       throw new Error();

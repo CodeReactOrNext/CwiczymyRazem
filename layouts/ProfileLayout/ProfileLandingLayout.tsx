@@ -41,7 +41,7 @@ const LandingLayout = ({
             />
           ))}
         </div>
-        <div className=' relative z-20 mx-4 my-2 flex justify-center border-2 border-second-400 bg-second-600 p-2 radius-default  '>
+        <div className=' relative z-20 mx-4 my-2 flex justify-center border-2 border-second-400/60 bg-second-600 p-2 radius-default  '>
           <StatisticBar
             title={t("technique")}
             value={convertMsToHM(time.technique)}
