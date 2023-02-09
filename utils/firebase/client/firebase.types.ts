@@ -1,7 +1,8 @@
 import { Timestamp } from "firebase/firestore";
 import { AchievementList } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { SkillsType } from "feature/user/store/userSlice.types";
+import { SkillsType } from "types/skillsTypes";
+
 
 export interface FirebaseUserDataInterface {
   profileId: string;
