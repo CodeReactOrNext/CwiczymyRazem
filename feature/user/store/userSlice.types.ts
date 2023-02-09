@@ -7,7 +7,6 @@ import { SignUpCredentials } from "../view/SingupView/SingupView";
 
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 
-export type SkillsType = "technique" | "hearing" | "theory" | "creativity";
 export interface TimerInterface {
   technique: number;
   theory: number;

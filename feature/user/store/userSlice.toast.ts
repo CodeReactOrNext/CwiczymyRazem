@@ -4,11 +4,9 @@ import { toast } from "react-toastify";
 export const updateUserEmailSuccess = () => {
   toast.success(i18n?.t("toast:success.update_email"));
 };
-
 export const updateUserPasswordSuccess = () => {
   toast.success(i18n?.t("toast:success.update_password"));
 };
-
 export const updateUserAvatarSuccess = () => {
   toast.success(i18n?.t("toast:success.update_avatar "));
 };
