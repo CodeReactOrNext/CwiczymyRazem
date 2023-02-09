@@ -10,9 +10,10 @@ import CategoryBox from "./components/CategoryBox";
 
 import useTimer from "hooks/useTimer";
 import { useAppDispatch } from "store/hooks";
+import { SkillsType } from "types/skillsTypes";
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { updateTimerTime } from "feature/user/store/userSlice";
-import { SkillsType, TimerInterface } from "feature/user/store/userSlice.types";
+import { TimerInterface } from "feature/user/store/userSlice.types";
 
 interface TimerLayoutProps {
   timerData: TimerInterface;

@@ -135,5 +135,9 @@
   "yolo": {
     "title": "Yolo",
     "description": "This player doesn't care about healthy habits."
+  },
+  "vip": {
+    "title": "Deserving",
+    "description": "This player helped in the development of Practice Together"
   }
 }
