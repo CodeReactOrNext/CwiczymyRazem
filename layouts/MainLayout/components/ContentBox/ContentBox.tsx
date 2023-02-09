@@ -12,7 +12,7 @@ const ContentBox = ({ children, variant }: ContentBoxProps) => {
         variant === "landing" ? "z-0" : "lg:w-full"
       } `}>
       <div
-        className={`absolute top-0 bottom-0 left-0 right-0 grid grid-cols-1 items-center overflow-x-hidden py-8 ${
+        className={`absolute top-0 bottom-0 left-0 right-0 grid mb-4 sm:mb-0 grid-cols-1 items-center overflow-x-hidden py-8 ${
           variant === "landing" ? "h-[100%] overflow-y-hidden" : ""
         }`}>
         {children}

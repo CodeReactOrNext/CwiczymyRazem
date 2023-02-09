@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import { SkillsType } from "feature/user/store/userSlice.types";
+import { SkillsType } from "types/skillsTypes";
 import { FirebaseEventsInteface } from "utils/firebase/client/firebase.types";
 
 interface EventsListProps {

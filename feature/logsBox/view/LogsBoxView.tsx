@@ -29,7 +29,9 @@ const LogsBoxView = () => {
       });
 
     firebaseGetEvents()
-      .then((events) => setEvents(events))
+      .then((events) => {
+        setEvents(events);
+      })
       .catch((error) => {
         throw new Error(error);
       });
