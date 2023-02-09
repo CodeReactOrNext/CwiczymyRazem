@@ -34,6 +34,7 @@ import {
   FaGrimace,
   FaRoute,
   FaDumbbell,
+  FaWrench,
 } from "react-icons/fa";
 import { IconType } from "react-icons/lib";
 import { AchievementsRarityType } from "./achievementsRarity";
@@ -71,7 +72,8 @@ export type AchievementList =
   | "rightway"
   | "yolo"
   | "path"
-  | "dumbbel";
+  | "dumbbel"
+  | "vip";
 
 export interface AchievementsDataInterface extends AchievementsRarityType {
   id: AchievementList;
@@ -319,5 +321,12 @@ export const achievementsData: AchievementsDataInterface[] = [
     Icon: FaDumbbell,
     rarity: "veryRare",
     description: "dumbbel.description",
+  },
+  {
+    id: "vip",
+    name: "vip.title",
+    Icon: FaWrench,
+    rarity: "veryRare",
+    description: "vip.description",
   },
 ];

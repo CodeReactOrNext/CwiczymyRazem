@@ -2,7 +2,11 @@ import Router from "next/router";
 import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
 
 import { RootState } from "store/store";
-import { statisticsInitial } from "constants/userStatisticsInitialData";
+import { SkillsType } from "types/skillsTypes";
+import {
+  StatisticsDataInterface,
+  statisticsInitial,
+} from "constants/userStatisticsInitialData";
 import {
   avatarErrorHandler,
   createAccountErrorHandler,
@@ -10,11 +14,7 @@ import {
   loginViaGoogleErrorHandler,
   udpateDataErrorHandler,
 } from "./userSlice.errorsHandling";
-import {
-  SkillsType,
-  TimerInterface,
-  userSliceInitialState,
-} from "./userSlice.types";
+import { TimerInterface, userSliceInitialState } from "./userSlice.types";
 import {
   logOutInfo,
   reportSuccess,
@@ -62,15 +62,24 @@ export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    addUserAuth: (state, action) => {
-      state.userAuth = action.payload;
+    addUserAuth: (state, { payload }: PayloadAction<"string">) => {
+      state.userAuth = payload;
     },
-    addUserData: (state, action) => {
-      state.currentUserStats = action.payload;
+
+    addUserData: (
+      state,
+      { payload }: PayloadAction<StatisticsDataInterface>
+    ) => {
+      state.currentUserStats = payload;
     },
-    addPracticeData: (state, action) => {
-      state.currentUserStats = action.payload;
+
+    addPracticeData: (
+      state,
+      { payload }: PayloadAction<StatisticsDataInterface>
+    ) => {
+      state.currentUserStats = payload;
     },
+
     changeTheme: (
       state,
       { payload }: PayloadAction<"dark-theme" | "default-theme" | undefined>
@@ -82,12 +91,14 @@ export const userSlice = createSlice({
       state.theme =
         state.theme === "default-theme" ? "dark-theme" : "default-theme";
     },
+
     updateLocalTimer: (state, { payload }: PayloadAction<TimerInterface>) => {
       if (!payload) {
         return;
       }
       state.timer = payload;
     },
+    
     updateTimerTime: (
       state,
       { payload }: PayloadAction<{ type: SkillsType; time: number }>
@@ -225,7 +236,6 @@ export const userSlice = createSlice({
           state.userInfo = action.payload.userInfo;
           state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
- 
         }
       );
   },
