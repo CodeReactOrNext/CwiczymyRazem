@@ -54,7 +54,6 @@ const AchievementsCarousel = ({
         </button>
 
         <div className='flex w-[100px]  justify-around font-openSans text-base font-bold xxs:text-lg xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
-          <ToolTip />
           {achievements.length === 0
             ? t("empty")
             : displayItems(index).map((achivId) => {
