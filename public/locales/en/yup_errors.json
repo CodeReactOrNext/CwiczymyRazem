@@ -7,5 +7,5 @@
   "required": "Required",
   "same_passwords": "Passwords must be the same",
   "no_ends_whitespace": "Username can't start or end with empty space",
-  "allowed_signs": "Allowed are only letters, numbers and . - _ characters"
+  "allowed_signs": "Allowed are only letters, numbers and - _ characters"
 }
