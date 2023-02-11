@@ -40,17 +40,22 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
     achievements,
   } = currentUserStats;
 
-  const raiting = makeRatingData(inputData, sumTime, actualDayWithoutBreak);
   const userLastReportDate = new Date(lastReportDate!);
   const didPracticeToday = checkIsPracticeToday(userLastReportDate);
+  const isStreak =
+    new Date().getDate() - userLastReportDate.getDate() === 1 &&
+    !didPracticeToday;
+  const updatedActualDayWithoutBreak = isStreak
+    ? actualDayWithoutBreak + 1
+    : actualDayWithoutBreak;
+  const raiting = makeRatingData(
+    inputData,
+    sumTime,
+    updatedActualDayWithoutBreak
+  );
   const level = getUserLvl(lvl, points + raiting.totalPoints);
   const isNewLevel = level > lvl;
-  const oneDayInMs = 24 * 60 * 60 * 1000;
-  const isStreak =
-    new Date().getDate() - userLastReportDate.getDate() < oneDayInMs;
-  const updatedActualDayWithoutBreak = isStreak
-    ? actualDayWithoutBreak
-    : actualDayWithoutBreak + 1;
+
   const updatedUserData: StatisticsDataInterface = {
     time: {
       technique: time.technique + techniqueTime,
