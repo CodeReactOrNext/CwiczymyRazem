@@ -1,7 +1,5 @@
 import { useTranslation } from "react-i18next";
-
 import FaqLayout, { faqQuestionInterface } from "layouts/FaqLayout/FaqLayout";
-import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
 
 const FaqView = () => {
   const { t } = useTranslation("faq");
@@ -28,11 +26,7 @@ const FaqView = () => {
     },
   ];
 
-  return (
-    <AuthLayoutWrapper pageId={"faq"} subtitle={t("faq")} variant='secondary'>
-      <FaqLayout faqQuestion={faqQuestion} />
-    </AuthLayoutWrapper>
-  );
+  return <FaqLayout faqQuestion={faqQuestion} />;
 };
 
 export default FaqView;

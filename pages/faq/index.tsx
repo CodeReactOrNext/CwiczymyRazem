@@ -1,9 +1,27 @@
 import type { NextPage } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "react-i18next";
+
 import FaqView from "views/FaqView";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+import useAutoLogIn from "hooks/useAutoLogIn";
+import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
 
 const FaqPage: NextPage = () => {
-  return <FaqView />;
+  const { t } = useTranslation("faq");
+  const { isLoggedIn } = useAutoLogIn({
+    redirects: {
+      loggedOut: "/leaderboard",
+    },
+  });
+
+  return (
+    <AuthLayoutWrapper pageId={"faq"} subtitle={t("faq")} variant='secondary'>
+      {isLoggedIn ? <FaqView /> : <PageLoadingLayout />}
+    </AuthLayoutWrapper>
+  );
 };
 
 export default FaqPage;
