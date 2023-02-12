@@ -45,9 +45,7 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
   const isStreak =
     new Date().getDate() - userLastReportDate.getDate() === 1 &&
     !didPracticeToday;
-  const updatedActualDayWithoutBreak = isStreak
-    ? actualDayWithoutBreak + 1
-    : actualDayWithoutBreak;
+  const updatedActualDayWithoutBreak = isStreak ? actualDayWithoutBreak + 1 : 1;
   const raiting = makeRatingData(
     inputData,
     sumTime,
