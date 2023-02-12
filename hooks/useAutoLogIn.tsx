@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
 import { selectUserAuth, updateLocalTimer } from "feature/user/store/userSlice";
 
-type pagesToRedirectTo = "/" | "/login" | "/leaderboard";
+type pagesToRedirectTo = "/" | "/login" | "/leaderboard" | "/faq";
 
 interface useAutoLogInProps {
   redirects?: { loggedIn?: pagesToRedirectTo; loggedOut?: pagesToRedirectTo };

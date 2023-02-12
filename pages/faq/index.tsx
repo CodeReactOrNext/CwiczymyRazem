@@ -13,13 +13,13 @@ const FaqPage: NextPage = () => {
   const { t } = useTranslation("faq");
   const { isLoggedIn } = useAutoLogIn({
     redirects: {
-      loggedOut: "/leaderboard",
+      loggedOut: "/faq",
     },
   });
 
   return (
     <AuthLayoutWrapper pageId={"faq"} subtitle={t("faq")} variant='secondary'>
-      {isLoggedIn ? <FaqView /> : <PageLoadingLayout />}
+      <FaqView />
     </AuthLayoutWrapper>
   );
 };

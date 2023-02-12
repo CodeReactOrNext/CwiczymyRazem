@@ -17,7 +17,7 @@ const LeaderBoardPage: NextPage = () => {
       pageId={"leadboard"}
       subtitle='Leaderboard'
       variant='secondary'>
-      {isLoggedIn ? <LeadboardView /> : <PageLoadingLayout />}
+      <LeadboardView />
     </AuthLayoutWrapper>
   );
 };
