@@ -22,6 +22,9 @@ const BonusPointsItem = ({
   const { timePoints, additionalPoints, habitsCount, time, multiplier } =
     bonusPoints;
 
+  const getMulitplierString = (multiplier: number) =>
+    "1" + "." + multiplier.toString().split("").pop();
+
   return (
     <ul className='relative  ml-4  overflow-hidden text-sm  xs:text-base md:-ml-[20%]'>
       <li className='ml-4'>
@@ -57,7 +60,9 @@ const BonusPointsItem = ({
         animate={{ x: 0 }}
         transition={{ delay: 2, duration: 0.3 }}
         className='flex items-center gap-3 border-b-2 border-mainText/10 p-2 '>
-        <p className='text-second-text sm:text-4xl'>x{multiplier}</p>
+        <p className='text-second-text sm:text-4xl'>
+          x{getMulitplierString(multiplier)}
+        </p>
         <p className=' md:text-2xl'>{t("report:rating_popup.regularity")}</p>
         <p className='text-base md:text-lg'>
           {actualDayWithoutBreak} {t("report:rating_popup.streak")}
