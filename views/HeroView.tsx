@@ -19,7 +19,7 @@ const HeroView = () => {
       </HeroLayout>
       <Footer>
         {t("footer:disclaimer")}
-        <a href='https://www.freepik.com/'> Freepick</a>
+        <a href='https://www.freepik.com/'> Freepik</a>
         <br />
         {t("footer:authors")}: Michał Jabłoński, Damian Sobieraj
       </Footer>
