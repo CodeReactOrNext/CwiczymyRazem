@@ -8,7 +8,6 @@ import { store } from "store/store";
 
 import "../styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
-import BetaInfo from "components/BetaInfo";
 import ThemeModeProvider from "Hoc/ThemeModeProvider";
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -32,7 +31,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <div id='overlays'></div>
         <Component {...pageProps} />
         <ToastContainer toastClassName={"toastify-custom"} />
-        <BetaInfo />
+      
       </ThemeModeProvider>
     </Provider>
   );
