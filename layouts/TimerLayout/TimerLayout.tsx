@@ -14,6 +14,7 @@ import { SkillsType } from "types/skillsTypes";
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { updateTimerTime } from "feature/user/store/userSlice";
 import { TimerInterface } from "feature/user/store/userSlice.types";
+import { calculatePercent } from "utils/converter/calculatePercent";
 
 interface TimerLayoutProps {
   timerData: TimerInterface;
@@ -39,7 +40,6 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
     timerData.theory +
     timerData.technique;
 
-  const calculatePercent = (time: number) => Math.floor((time / sumTime) * 100);
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {
       case "creativity":
@@ -66,7 +66,6 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
 
   const choseSkillHandler = (chosenSkill: SkillsType) => {
     stopTimer();
-
     setChosenSkill(chosenSkill);
     restartTime();
     setInitialStartTime(timerData[chosenSkill]);
@@ -114,7 +113,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("technique");
           }}
-          percent={calculatePercent(timerData.technique)}
+          percent={calculatePercent(timerData.technique, sumTime)}
           chosen={chosenSkill === "technique"}
         />
         <CategoryBox
@@ -123,7 +122,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("theory");
           }}
-          percent={calculatePercent(timerData.theory)}
+          percent={calculatePercent(timerData.theory, sumTime)}
           chosen={chosenSkill === "theory"}
         />
         <CategoryBox
@@ -132,7 +131,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("hearing");
           }}
-          percent={calculatePercent(timerData.hearing)}
+          percent={calculatePercent(timerData.hearing, sumTime)}
           chosen={chosenSkill === "hearing"}
         />
         <CategoryBox
@@ -141,7 +140,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("creativity");
           }}
-          percent={calculatePercent(timerData.creativity)}
+          percent={calculatePercent(timerData.creativity, sumTime)}
           chosen={chosenSkill === "creativity"}
         />
       </div>
