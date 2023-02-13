@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
 
+export interface useTimerInterface {
+  time: number;
+  restartTime: () => void;
+  startTimer: () => void;
+  stopTimer: () => void;
+  timerEnabled: boolean;
+  setInitialStartTime: (startTime: number) => void;
+}
+
 const useTimer = () => {
   const [initialTime, setInitialTime] = useState(0);
   const [time, setTime] = useState(0);
@@ -52,7 +61,7 @@ const useTimer = () => {
     stopTimer,
     timerEnabled,
     setInitialStartTime,
-  };
+  } as useTimerInterface;
 };
 
 export default useTimer;
