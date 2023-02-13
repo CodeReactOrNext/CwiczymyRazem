@@ -1,4 +1,5 @@
 {
+  "or": "or",
   "button": {
     "sign_in": "Log in",
     "sign_up": "Sign Up",
@@ -7,7 +8,8 @@
     "link_copy_profile": "Copy link to your profil"
   },
   "google_button": {
-    "sign_in": "Sign In With Google"
+    "sign_in": "Sign In With Google",
+    "sign_up": "Sign Up With Google"
   },
   "input": {
     "login": "Login",

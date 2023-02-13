@@ -106,13 +106,19 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
     if (datasWithReports.report.points > 10) {
       return "nice";
     }
-    if (datasWithReports.report.points) {
+    if (
+      datasWithReports.report.points ||
+      datasWithReports.report.points === 0
+    ) {
       return "ok";
+    }
+    if (datasWithReports.report.points === 0) {
+      return "zero";
     }
   };
 
   return reportList ? (
-    <div className=' border-second-400/60 overflow-y-scroll border-2 bg-second-600  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-200 radius-default'>
+    <div className=' overflow-y-scroll border-2 border-second-400/60 bg-second-600  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-200 radius-default'>
       <p className='pb-2 text-sm font-bold'>
         {t("calendar.title")}: {year}
       </p>
@@ -131,6 +137,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
             ${raiting === "great" ? "bg-main-calendar/80" : ""}
             ${raiting === "nice" ? "bg-main-calendar/70" : ""}
             ${raiting === "ok" ? "bg-main-calendar/60" : ""}
+            ${raiting === "zero" ? "bg-main-calendar/20" : ""}
             ${raiting ? "" : " bg-slate-600/50"}
             `}
               data-tip={`${

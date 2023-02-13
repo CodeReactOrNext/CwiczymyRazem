@@ -9,8 +9,12 @@ import FormLayout from "layouts/FormLayout";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectIsFetching } from "feature/user/store/userSlice";
-import { createAccount } from "feature/user/store/userSlice.asyncThunk";
+import {
+  createAccount,
+  logInViaGoogle,
+} from "feature/user/store/userSlice.asyncThunk";
 import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
+import GoogleButton from "components/GoogleButton";
 
 export interface SignUpCredentials {
   login: string;
@@ -27,6 +31,9 @@ const SingupView = () => {
 
   const onSubmit = (credentials: SignUpCredentials) => {
     dispatch(createAccount(credentials));
+  };
+  const googleLogInHandler = () => {
+    dispatch(logInViaGoogle());
   };
 
   const formikInitialValues = {
@@ -45,11 +52,10 @@ const SingupView = () => {
         <FormLayout>
           <>
             <Link href='/login'>
-              <a className='flex flex-row gap-x-2 click-behavior'>
+              <a className='flex flex-row gap-x-2 font-sans click-behavior'>
                 <FaArrowLeft /> {t("signup:back_to_login")}
               </a>
             </Link>
-
             <Input
               Icon={FaUserAlt}
               placeholder={t("common:input.login")}
@@ -77,6 +83,16 @@ const SingupView = () => {
                 {t("common:button.sign_up")}
               </Button>
             </div>
+            <div className='flex w-full flex-row items-center '>
+              <hr className=' w-full border-second-300 ' />
+              <p className='p-2 font-sans text-lg uppercase tracking-wider '>
+                {t("common:or")}
+              </p>
+              <hr className='w-full  border-second-300' />
+            </div>
+            <GoogleButton onClick={googleLogInHandler}>
+              {t("common:google_button.sign_up")}
+            </GoogleButton>
           </>
         </FormLayout>
       </Form>
