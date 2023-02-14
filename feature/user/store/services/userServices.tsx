@@ -10,7 +10,7 @@ export interface UserDataInterface {
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
 }
-export interface fetchedReportDataInterface {
+export interface FetchedReportDataInterface {
   currentUserStats: StatisticsDataInterface;
   previousUserStats: StatisticsDataInterface;
   raitingData: ReportDataInterface;
@@ -26,7 +26,7 @@ export const fetchUserData = async (user: User) =>
 
 export const fetchReport = ({ token, inputData }: updateReprotInterface) =>
   axios
-    .post<fetchedReportDataInterface>("/api/user/report", {
+    .post<FetchedReportDataInterface>("/api/user/report", {
       token,
       inputData,
     })

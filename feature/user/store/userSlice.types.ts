@@ -26,6 +26,7 @@ export interface userSliceInitialState {
   userInfo: { displayName?: string; avatar?: string } | null;
   theme: "default-theme" | "dark-theme";
   timer: TimerInterface;
+  isLoggedOut: true | null;
   currentUserStats: StatisticsDataInterface | null;
   previousUserStats: StatisticsDataInterface | null;
   raitingData: ReportDataInterface | null;
