@@ -35,7 +35,7 @@
   },
   "day_since": {
     "no_practice": "Player hasn't practiced",
-    "pracitce_last_24": "Practiced within the last 24 hours",
+    "pracitce_last_24": "Recently practiced",
     "practice_day": "Practiced {{days}} days ago"
   },
   "header": {
