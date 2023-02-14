@@ -25,6 +25,7 @@
     "logOut": "Successfully logged out",
     "report_success": "Reported successfully",
     "update_displayname": "Successfully change nick",
-    "restart": "Successfully restarted statistics"
+    "restart": "Successfully restarted statistics",
+    "singup": "Successfully signup"
   }
 }
