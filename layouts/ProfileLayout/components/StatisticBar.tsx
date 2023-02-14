@@ -16,7 +16,7 @@ const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
         />
       </div>
       <p className='my-2 w-full bg-main-opposed p-1 px-3 font-openSans text-sm tracking-wider  sm:px-10  xl:px-8 '>
-        {value}h
+        {value}
       </p>
       <p className='text-center font-openSans text-sm font-bold'>{title}</p>
     </div>
