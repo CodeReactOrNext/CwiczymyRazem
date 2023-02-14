@@ -1,6 +1,4 @@
 import Link from "next/link";
-import Router from "next/router";
-import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import Button from "components/Button";
@@ -8,38 +6,30 @@ import Stopwatch from "./components/Stopwatch";
 import BeginnerMsg from "components/BeginnerMsg";
 import CategoryBox from "./components/CategoryBox";
 
-import useTimer from "hooks/useTimer";
-import { useAppDispatch } from "store/hooks";
 import { SkillsType } from "types/skillsTypes";
+import { useTimerInterface } from "hooks/useTimer";
 import { convertMsToHM } from "utils/converter/timeConverter";
-import { updateTimerTime } from "feature/user/store/userSlice";
 import { TimerInterface } from "feature/user/store/userSlice.types";
+import { calculatePercent } from "utils/converter/calculatePercent";
 
 interface TimerLayoutProps {
+  timer: useTimerInterface;
   timerData: TimerInterface;
+  chosenSkill: SkillsType | null;
+  timerSubmitHandler: () => void;
+  choseSkillHandler: (chosenSkill: SkillsType) => void;
 }
 
-const TimerLayout = ({ timerData }: TimerLayoutProps) => {
+const TimerLayout = ({
+  timer,
+  timerData,
+  timerSubmitHandler,
+  chosenSkill,
+  choseSkillHandler,
+}: TimerLayoutProps) => {
   const { t } = useTranslation("timer");
+  const { time, startTimer, stopTimer, timerEnabled } = timer;
 
-  const {
-    time,
-    restartTime,
-    startTimer,
-    stopTimer,
-    timerEnabled,
-    setInitialStartTime,
-  } = useTimer();
-  const [chosenSkill, setChosenSkill] = useState<SkillsType | null>(null);
-
-  const dispatch = useAppDispatch();
-  const sumTime =
-    timerData.creativity +
-    timerData.hearing +
-    timerData.theory +
-    timerData.technique;
-
-  const calculatePercent = (time: number) => Math.floor((time / sumTime) * 100);
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {
       case "creativity":
@@ -53,33 +43,11 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
     }
   };
 
-  const timerSubmitHandler = () => {
-    if (chosenSkill) {
-      const payload = {
-        type: chosenSkill,
-        time: time,
-      };
-      dispatch(updateTimerTime(payload));
-    }
-    Router.push("/report");
-  };
-
-  const choseSkillHandler = (chosenSkill: SkillsType) => {
-    stopTimer();
-
-    setChosenSkill(chosenSkill);
-    restartTime();
-    setInitialStartTime(timerData[chosenSkill]);
-  };
-
-  useEffect(() => {
-    if (!timerEnabled || !chosenSkill) return;
-    const payload = {
-      type: chosenSkill,
-      time: time,
-    };
-    dispatch(updateTimerTime(payload));
-  }, [time, chosenSkill, dispatch, timerEnabled]);
+  const sumTime =
+    timerData.creativity +
+    timerData.hearing +
+    timerData.theory +
+    timerData.technique;
 
   return (
     <div className='flex flex-col items-center justify-center '>
@@ -114,7 +82,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("technique");
           }}
-          percent={calculatePercent(timerData.technique)}
+          percent={calculatePercent(timerData.technique, sumTime)}
           chosen={chosenSkill === "technique"}
         />
         <CategoryBox
@@ -123,7 +91,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("theory");
           }}
-          percent={calculatePercent(timerData.theory)}
+          percent={calculatePercent(timerData.theory, sumTime)}
           chosen={chosenSkill === "theory"}
         />
         <CategoryBox
@@ -132,7 +100,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("hearing");
           }}
-          percent={calculatePercent(timerData.hearing)}
+          percent={calculatePercent(timerData.hearing, sumTime)}
           chosen={chosenSkill === "hearing"}
         />
         <CategoryBox
@@ -141,7 +109,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("creativity");
           }}
-          percent={calculatePercent(timerData.creativity)}
+          percent={calculatePercent(timerData.creativity, sumTime)}
           chosen={chosenSkill === "creativity"}
         />
       </div>

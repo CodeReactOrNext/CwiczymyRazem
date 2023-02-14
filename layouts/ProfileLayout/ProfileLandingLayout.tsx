@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next";
 
+import Calendar from "components/Calendar";
 import StatisticBar from "./components/StatisticBar";
 import HeadDecoration from "./components/HeadDecoration";
 import StatsField, { StatsFieldProps } from "./components/StatsField";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 import { convertMsToHM } from "utils/converter/timeConverter";
+import { calculatePercent } from "utils/converter/calculatePercent";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import Calendar from "components/Calendar";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -45,22 +46,22 @@ const LandingLayout = ({
           <StatisticBar
             title={t("technique")}
             value={convertMsToHM(time.technique)}
-            percent={Math.round((time.technique / totalTime) * 100)}
+            percent={calculatePercent(time.technique, totalTime)}
           />
           <StatisticBar
             title={t("theory")}
             value={convertMsToHM(time.theory)}
-            percent={Math.round((time.theory / totalTime) * 100)}
+            percent={calculatePercent(time.theory, totalTime)}
           />
           <StatisticBar
             title={t("hearing")}
             value={convertMsToHM(time.hearing)}
-            percent={Math.round((time.hearing / totalTime) * 100)}
+            percent={calculatePercent(time.hearing, totalTime)}
           />
           <StatisticBar
             title={t("creativity")}
             value={convertMsToHM(time.creativity)}
-            percent={Math.round((time.creativity / totalTime) * 100)}
+            percent={calculatePercent(time.creativity, totalTime)}
           />
         </div>
         <div className=' my-2 flex flex-col justify-between p-4 '>

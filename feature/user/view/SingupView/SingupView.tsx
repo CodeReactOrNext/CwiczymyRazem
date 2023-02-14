@@ -29,18 +29,18 @@ const SingupView = () => {
   const dispatch = useAppDispatch();
   const isFetching = useAppSelector(selectIsFetching) === "createAccount";
 
-  const onSubmit = (credentials: SignUpCredentials) => {
-    dispatch(createAccount(credentials));
-  };
-  const googleLogInHandler = () => {
-    dispatch(logInViaGoogle());
-  };
-
   const formikInitialValues = {
     login: "",
     email: "",
     password: "",
     repeat_password: "",
+  };
+
+  const onSubmit = (credentials: SignUpCredentials) => {
+    dispatch(createAccount(credentials));
+  };
+  const googleLogInHandler = () => {
+    dispatch(logInViaGoogle());
   };
 
   return (
