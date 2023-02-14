@@ -41,7 +41,7 @@ const AchievementsCarousel = ({
   };
 
   return (
-    <div className='col-span-3 flex h-full w-full flex-col items-center justify-center  md:col-span-1  md:w-fit md:justify-end '>
+    <div className='col-span-3 hidden h-full w-full flex-col items-center justify-center  sm:flex  md:col-span-1  md:w-fit md:justify-end'>
       <div className='flex text-base xxs:text-2xl lg:text-xl xl:text-2xl '>
         <button onClick={handlePrev}>
           <FaAngleLeft
