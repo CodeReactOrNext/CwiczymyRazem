@@ -35,7 +35,7 @@
   },
   "day_since": {
     "no_practice": "Gracz nie ćwiczył",
-    "pracitce_last_24": "Ćwiczył w ciągu ostatnich 24h",
+    "pracitce_last_24": "Ostatnio ćwiczył",
     "practice_day": "Ćwiczył {{days}} dni temu"
   },
   "header": {
