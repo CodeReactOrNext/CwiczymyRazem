@@ -3,7 +3,6 @@ import { toast } from "react-toastify";
 import { i18n } from "next-i18next";
 
 export const loginViaEmailErrorHandler = (error: SerializedError) => {
-  console.log(error, "xd");
   if (error.code === "auth/wrong-password") {
     toast.error(i18n?.t("toast:errors.password"));
     return;
