@@ -8,16 +8,18 @@ import LogsBoxButton from "./components/LogsBoxButton";
 
 import { AchievementList } from "assets/achievements/achievementsData";
 import {
+  FirebaseDiscordEventsInteface,
   FirebaseEventsInteface,
   FirebaseLogsInterface,
 } from "utils/firebase/client/firebase.types";
-import DiscordEvents from "./components/DiscordEvents";
+import DiscordEvent from "./components/DiscordEvent";
 import { MdEmojiEvents } from "react-icons/md";
 import { FaExternalLinkSquareAlt, FaGuitar, FaMedal } from "react-icons/fa";
 
 export interface LogsBoxLayoutProps {
   logs: FirebaseLogsInterface[];
   events: FirebaseEventsInteface[];
+  discordEvent: FirebaseDiscordEventsInteface | null;
   userAchievements: AchievementList[];
 }
 
@@ -25,6 +27,7 @@ const LogsBoxLayout = ({
   logs,
   events,
   userAchievements,
+  discordEvent,
 }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
     "logs" | "events" | "achievements" | "discord"
@@ -65,7 +68,9 @@ const LogsBoxLayout = ({
         )}
         {showedCategory === "events" && <EventsList eventList={events} />}
         {showedCategory === "logs" && logs && <Logs logs={logs} />}
-        {showedCategory === "discord" && logs && <DiscordEvents />}
+        {showedCategory === "discord" && logs && (
+          <DiscordEvent discordEvent={discordEvent ? discordEvent : null} />
+        )}
       </div>
     </div>
   );

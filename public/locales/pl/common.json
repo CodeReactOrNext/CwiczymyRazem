@@ -57,6 +57,17 @@
     "get": "zdobył",
     "points": "pkt"
   },
+  "discord_event": {
+    "active": "Aktywne",
+    "deadline": "Deadline:",
+    "join_us": "Dołącz do naszej społeczności na Discord i weź udział w evencie",
+    "join_us_offline": "Dołącz do naszej społeczności na Discord i zaproponuj lub zagłosuj następny event",
+    "link": "Link do materiału:",
+    "offline": "Aktualnie nie ma aktywnego eventu na Discord",
+    "data_none": "Brak:",
+    "get": "zdobył",
+    "points": "pkt"
+  },
   "calendar": {
     "title": "Kalendarz aktywności",
     "monday": "Pon",
