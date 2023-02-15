@@ -24,6 +24,7 @@ import {
   query,
 } from "firebase/firestore";
 import {
+  FirebaseDiscordEventsInteface,
   FirebaseEventsInteface,
   FirebaseLogsInterface,
   FirebaseUserDataInterface,
@@ -78,6 +79,14 @@ export const firebaseGetEvents = async () => {
     eventsArr.push(event);
   });
   return eventsArr;
+};
+
+export const firebaseGetDiscordEvent = async () => {
+  const discordEventDocRef = collection(db, "discordEvent");
+  const discordEventDoc = await getDocs(discordEventDocRef);
+  let event;
+  discordEventDoc.forEach((doc) => (event = doc.data()));
+  return event as FirebaseDiscordEventsInteface | undefined;
 };
 
 export const firebaseGetUserName = async (userAuth: string) => {

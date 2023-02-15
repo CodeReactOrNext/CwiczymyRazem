@@ -1,5 +1,6 @@
 {
   "errors": {
+    "fetch_error": "Nie udało się pobrać danych",
     "password": "Błędne hasło",
     "email": "Błędny adres e-mail",
     "timeout": "Nie udało się zalogować - czas minął",
