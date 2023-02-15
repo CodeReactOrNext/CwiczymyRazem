@@ -15,7 +15,7 @@ const DiscordEvents = ({}: EventsListProps) => {
         <p>Aktywne</p>
         <div className='m-2 h-2 w-2 animate-ping rounded-full bg-green-700'></div>
         <p className='px-2  '>
-          Data końca: <span className='text-second-text'> 01.03.2023</span>
+          Deadline: <span className='text-second-text'> 01.03.2023</span>
         </p>
       </div>
       <div className='m-2 flex flex-row items-center'>
