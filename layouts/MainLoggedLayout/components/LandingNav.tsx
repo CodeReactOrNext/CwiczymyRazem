@@ -33,7 +33,7 @@ const LandingNav = ({
             href={href}
             name={name}
             isCurrentPage={id === pageId}
-            external
+            external={external}
           />
         ))}
       </div>
@@ -44,7 +44,7 @@ const LandingNav = ({
             href={href}
             name={name}
             isCurrentPage={id === pageId}
-            external
+            external={external}
           />
         ))}
       </div>
