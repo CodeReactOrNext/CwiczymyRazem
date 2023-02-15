@@ -54,7 +54,7 @@ const LeadboardRow = ({
         </div>
 
         <div
-          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-3 justify-items-center border-b-2 border-second bg-second bg-opacity-75 radius-default hover:bg-opacity-90 md:h-16 md:grid-rows-1 lg:px-2
+          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-2 justify-items-center border-b-2 border-second bg-second bg-opacity-75 radius-default hover:bg-opacity-90 sm:grid-rows-3 md:h-16 md:grid-rows-1 lg:px-2
         ${place === 1 ? "border-yellow-500 bg-[#736d00] bg-opacity-90" : ""}
         ${place === 2 ? "border-slate-400 bg-[#656d6d] bg-opacity-90" : ""}
         ${place === 3 ? "border-yellow-700 bg-[#5D3F17] bg-opacity-90" : ""}
@@ -90,6 +90,7 @@ const LeadboardRow = ({
               </p>
             </div>
           </div>
+
           <div className='col-span-3 flex h-full w-full items-center justify-evenly border-y-2 border-black/10 bg-black/10 md:col-span-1 md:w-[300px] md:justify-center md:border-y-0 md:bg-transparent '>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
               <p className='text-xl xxs:text-3xl '>{statistics.points}</p>
@@ -108,7 +109,9 @@ const LeadboardRow = ({
               </p>
             </div>
           </div>
-          <Carousel achievements={statistics.achievements} />
+         
+            <Carousel achievements={statistics.achievements} />
+  
         </div>
       </div>
     </li>

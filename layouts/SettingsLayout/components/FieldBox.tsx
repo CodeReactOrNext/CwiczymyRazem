@@ -34,7 +34,7 @@ const FieldBox = ({
           loading={isFetching}
           disabled={Boolean(!values[inputName] || errors[inputName])}
           onClick={submitHandler}
-          type='submit'>
+          type='button'>
           {t("settings:save")}
         </Button>
       </div>
