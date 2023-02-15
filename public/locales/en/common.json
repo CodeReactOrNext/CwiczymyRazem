@@ -38,6 +38,17 @@
     "pracitce_last_24": "Recently practiced",
     "practice_day": "Practiced {{days}} days ago"
   },
+  "discord_event": {
+    "active": "Active",
+    "deadline": "Deadline:",
+    "join_us": "Join our community on Discord and participate in the event",
+    "join_us_offline": "Join our community on Discord and suggest or vote for the next event",
+    "link": "Link to the material:",
+    "offline": "There is currently no active event on Discord",
+    "data_none": "None:",
+    "get": "got",
+    "points": "pts"
+  },
   "header": {
     "hey": "Hey",
     "lvl_short": "lvl",
