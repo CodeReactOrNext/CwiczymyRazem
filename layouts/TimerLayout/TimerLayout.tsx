@@ -11,6 +11,7 @@ import { useTimerInterface } from "hooks/useTimer";
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { TimerInterface } from "feature/user/store/userSlice.types";
 import { calculatePercent } from "utils/converter/calculatePercent";
+import Metronom from "./components/Metronom";
 
 interface TimerLayoutProps {
   timer: useTimerInterface;
@@ -50,22 +51,13 @@ const TimerLayout = ({
     timerData.technique;
 
   return (
-    <div className='flex flex-col items-center justify-center '>
-      <Stopwatch
-        time={time}
-        timerEnabled={timerEnabled}
-        startTimer={startTimer}
-        stopTimer={stopTimer}
-        isSkillChosen={!!chosenSkill}
-      />
-      <div className=' flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
-        <div className='flex flex-row gap-1 '>
+    <div className='flex flex-col items-center justify-center  '>
+      <div className='flex w-full flex-col items-center gap-5 border-2 border-main-opposed-300/50 bg-main-opposed-600/50 p-5 radius-default md:w-auto md:flex-row'>
+        <div className=' order-3 flex flex-row gap-5 p-4 text-center font-openSans md:order-none md:flex-col md:text-right  md:text-2xl'>
           <p className='flex flex-col text-sm xs:text-base'>
             {t("total_time")}{" "}
             <span className='text-tertiary'>{convertMsToHM(sumTime)}</span>
           </p>
-        </div>
-        <div className='flex flex-row gap-1 '>
           <p className='flex flex-col text-sm xs:text-base'>
             {t("currently_exercising")}
             <span className='m-1 text-tertiary'>
@@ -73,6 +65,14 @@ const TimerLayout = ({
             </span>
           </p>
         </div>
+        <Stopwatch
+          time={time}
+          timerEnabled={timerEnabled}
+          startTimer={startTimer}
+          stopTimer={stopTimer}
+          isSkillChosen={!!chosenSkill}
+        />
+        <Metronom />
       </div>
 
       <div className='mb-14 flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
