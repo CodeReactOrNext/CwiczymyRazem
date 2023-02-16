@@ -12,8 +12,8 @@ const Metronome = () => {
   let count = 0;
   const elements = Array.from({ length: beatsPerMeasure }, (_, index) => index);
 
-  const click1 = "/static/sounds/hi_click.wav";
-  const click2 =  "/static/sounds/lo_click.wav";
+  const click1 = "/static/sounds/lo_click.wav";
+  const click2 = "/static/sounds/hi_click.wav";
 
   const click1Ref = useRef<HTMLAudioElement>(null);
   const click2Ref = useRef<HTMLAudioElement>(null);
@@ -44,18 +44,26 @@ const Metronome = () => {
     clearInterval(timerRef.current!);
     if (emptyClick?.includes(dot)) {
       setEmptyClick(emptyClick.filter((item) => item !== dot));
+      console.log(emptyClick);
       return;
     }
     setEmptyClick([dot, ...emptyClick]);
+    console.log(emptyClick);
   };
 
   const playClick = () => {
     setanimation(count === beatsPerMeasure ? 0 : count);
+    console.log(emptyClick?.includes(count));
     if (emptyClick?.includes(count)) {
       count++;
       return;
     }
     if (count !== 0 && count % beatsPerMeasure === 0) {
+      if (emptyClick?.includes(0)) {
+        count = 0;
+        count++;
+        return;
+      }
       count = 0;
     }
     if (count === 0) {
