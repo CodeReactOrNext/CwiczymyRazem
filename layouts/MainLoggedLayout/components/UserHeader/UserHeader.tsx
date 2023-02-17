@@ -28,14 +28,13 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
               <UserNav />
             </div>
           </div>
-
           <WelcomeMessage
             userName={userName}
             lastReportDate={lastReportDate}
             points={points}
           />
         </div>
-        <div className='absolute right-2 top-2 flex flex-col items-end gap-4'>
+        <div className='absolute -right-2 top-0 flex w-full scale-[85%] items-end justify-between gap-4 xs:right-2 xs:top-2 xs:w-auto sm:scale-100 sm:flex-col'>
           <LanguageSwitch />
           <ThemeToggle />
         </div>

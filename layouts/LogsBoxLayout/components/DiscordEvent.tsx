@@ -11,7 +11,7 @@ const DiscordEvent = ({ discordEvent }: DiscordEventProps) => {
   const { t } = useTranslation("common");
 
   return discordEvent ? (
-    <div className='flex h-full flex-col  items-center py-2 '>
+    <div className='flex h-full flex-col  items-center py-2  '>
       <p className=' p-2 text-center text-lg font-bold sm:text-xl'>
         {discordEvent.title}
       </p>
@@ -36,7 +36,7 @@ const DiscordEvent = ({ discordEvent }: DiscordEventProps) => {
 
       <Link href={discordEvent.link}>
         <a target='_blank' rel='noopener noreferrer'>
-          <p className='flex flex-row items-center  text-second-text '>
+          <p className='flex flex-row items-center  text-second-text mb-5 '>
             {t("discord_event.link")}
             <FaExternalLinkAlt size={15} className='mx-2' />
           </p>
@@ -58,7 +58,7 @@ const DiscordEvent = ({ discordEvent }: DiscordEventProps) => {
           </span>
         </p>
       </div>
-      <div className='m-2 flex flex-row items-center'>
+      <div className='m-2  flex flex-row items-center'>
         <FaInfoCircle size={20} className='m-1' />
         <p className='text-center text-xs text-tertiary'>
           {t("discord_event.join_us_offline")}
