@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import { FaPlay, FaStop } from "react-icons/fa";
+import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
+import { FaPlay, FaStop } from "react-icons/fa";
 
 const Metronome = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -12,11 +12,11 @@ const Metronome = () => {
   let count = 0;
   const elements = Array.from({ length: beatsPerMeasure }, (_, index) => index);
 
-  const click1 = "/static/sounds/lo_click.wav";
-  const click2 = "/static/sounds/hi_click.wav";
+  const accentClick = "/static/sounds/lo_click.wav";
+  const normalClick = "/static/sounds/hi_click.wav";
 
-  const click1Ref = useRef<HTMLAudioElement>(null);
-  const click2Ref = useRef<HTMLAudioElement>(null);
+  const accentClickRef = useRef<HTMLAudioElement>(null);
+  const normalClickRef = useRef<HTMLAudioElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,16 +44,13 @@ const Metronome = () => {
     clearInterval(timerRef.current!);
     if (emptyClick?.includes(dot)) {
       setEmptyClick(emptyClick.filter((item) => item !== dot));
-      console.log(emptyClick);
       return;
     }
     setEmptyClick([dot, ...emptyClick]);
-    console.log(emptyClick);
   };
 
   const playClick = () => {
     setanimation(count === beatsPerMeasure ? 0 : count);
-    console.log(emptyClick?.includes(count));
     if (emptyClick?.includes(count)) {
       count++;
       return;
@@ -67,11 +64,11 @@ const Metronome = () => {
       count = 0;
     }
     if (count === 0) {
-      click2Ref.current?.play();
+      normalClickRef.current?.play();
       count++;
       return;
     }
-    click1Ref.current?.play();
+    accentClickRef.current?.play();
     count++;
   };
 
@@ -88,7 +85,7 @@ const Metronome = () => {
   };
 
   return (
-    <div className='flex min-w-[200px] scale-75 flex-col justify-center gap-3 bg-main-opposed-400/50  p-5 font-openSans radius-default xs:scale-90 sm:scale-100'>
+    <div className='flex min-w-[200px] scale-75 flex-col justify-center gap-3  bg-main-opposed-400/50  p-5 font-openSans radius-default xs:scale-90 sm:scale-100'>
       <div className='margin-auto relative m-3 flex w-full gap-[10px]  '>
         {elements.map((element, index) => (
           <div
@@ -101,6 +98,7 @@ const Metronome = () => {
             } `}
             onClick={() => handleBeatDot(element)}></div>
         ))}
+
         {isPlaying && (
           <motion.div
             className='absolute top-0 left-0 h-1 w-1 rounded-full bg-main-300/80 p-2'
@@ -121,8 +119,8 @@ const Metronome = () => {
       <input
         id='bpm-range'
         type='range'
-        min='60'
-        max='240'
+        min='40'
+        max='200'
         value={bpm}
         onChange={handleInputChange}
         className='h-2 w-full cursor-pointer appearance-none rounded-lg bg-tertiary '></input>
@@ -154,8 +152,8 @@ const Metronome = () => {
           </>
         )}
       </button>
-      <audio ref={click1Ref} src={click1} />
-      <audio ref={click2Ref} src={click2} />
+      <audio ref={accentClickRef} src={accentClick} />
+      <audio ref={normalClickRef} src={normalClick} />
     </div>
   );
 };
