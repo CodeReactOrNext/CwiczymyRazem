@@ -118,7 +118,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   };
 
   return reportList ? (
-    <div className=' overflow-y-scroll border-2 border-second-400/60 bg-second-600  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-200 radius-default'>
+    <div className=' overflow-y-scroll  border-2 border-second-400/60 bg-second-600  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-200 radius-default'>
       <p className='pb-2 text-sm font-bold'>
         {t("calendar.title")}: {year}
       </p>

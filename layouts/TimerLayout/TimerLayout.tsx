@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 import Button from "components/Button";
+import Metronom from "components/Metronom/";
 import Stopwatch from "./components/Stopwatch";
 import BeginnerMsg from "components/BeginnerMsg";
 import CategoryBox from "./components/CategoryBox";
@@ -11,7 +12,6 @@ import { useTimerInterface } from "hooks/useTimer";
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { TimerInterface } from "feature/user/store/userSlice.types";
 import { calculatePercent } from "utils/converter/calculatePercent";
-import Metronom from "./components/Metronom";
 
 interface TimerLayoutProps {
   timer: useTimerInterface;
@@ -51,8 +51,8 @@ const TimerLayout = ({
     timerData.technique;
 
   return (
-    <div className='flex flex-col items-center justify-center  '>
-      <div className='flex w-full flex-col items-center gap-5 border-2 border-main-opposed-300/50 bg-main-opposed-600/50 p-5 radius-default md:w-auto md:flex-row'>
+    <div className='mb-10 flex flex-col items-center justify-center '>
+      <div className='flex w-full flex-col items-center gap-5 border-main-opposed-200/70 bg-main-opposed-600/50 p-5 radius-default md:w-auto md:flex-row md:border-2'>
         <div className=' order-3 flex flex-row gap-5 p-4 text-center font-openSans md:order-none md:flex-col md:text-right  md:text-2xl'>
           <p className='flex flex-col text-sm xs:text-base'>
             {t("total_time")}{" "}
@@ -75,7 +75,7 @@ const TimerLayout = ({
         <Metronom />
       </div>
 
-      <div className='mb-14 flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
+      <div className='mt-5 flex w-full flex-row flex-wrap justify-evenly md:w-[570px] md:justify-center lg:w-full '>
         <CategoryBox
           title={t("technique")}
           time={timerData.technique}
@@ -114,7 +114,7 @@ const TimerLayout = ({
         />
       </div>
       <BeginnerMsg />
-      <p className='p-4 text-center font-openSans'>
+      <p className='p-4 text-center font-openSans text-xs sm:text-base'>
         {t("info_about_repot ")}
         <Link href={"/report"}>
           <a className='text-link'> {t("raport_link")}</a>

@@ -51,7 +51,7 @@ const MainLoggedLayout = ({
               pageId={pageId}
             />
             <div
-              className={`z-20 m-4 mt-28 flex  w-full max-w-[1380px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 xl:mt-36 `}>
+              className={`z-20 m-4 mt-28 flex  w-full mb-12 max-w-[1380px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 xl:mt-36 `}>
               {children}
             </div>
           </Wrapper>

@@ -8,7 +8,7 @@ const BeginnerMsg = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
 
   return userStats && userStats.points === 0 ? (
-    <p className='p-4 text-center font-openSans'>
+    <p className='p-4 text-center font-openSans text-xs sm:text-base'>
       {t("info.new_user_tip")}
       <Link href={"/faq"}>
         <a className='text-link'> FAQ</a>
