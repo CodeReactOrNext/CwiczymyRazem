@@ -16,6 +16,7 @@ import {
   firebaseSetUserExerciseRaprot,
   firebaseAddLogReport,
 } from "utils/firebase/api/firebase.utils";
+import { getUpdatedActualDayWithoutBreak } from "utils/gameLogic/getUpdatedActualDayWithoutBreak";
 
 interface updateUserStatsProps {
   userUid: string;
@@ -42,10 +43,11 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
 
   const userLastReportDate = new Date(lastReportDate!);
   const didPracticeToday = checkIsPracticeToday(userLastReportDate);
-  const isStreak =
-    new Date().getDate() - userLastReportDate.getDate() === 1 &&
-    !didPracticeToday;
-  const updatedActualDayWithoutBreak = isStreak ? actualDayWithoutBreak + 1 : 1;
+  const updatedActualDayWithoutBreak = getUpdatedActualDayWithoutBreak(
+    actualDayWithoutBreak,
+    userLastReportDate,
+    didPracticeToday
+  );
   const raiting = makeRatingData(
     inputData,
     sumTime,
@@ -98,7 +100,6 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
       level,
     }
   );
-
   return {
     currentUserStats: updatedUserDataWithAchievements,
     previousUserStats: currentUserStats,
