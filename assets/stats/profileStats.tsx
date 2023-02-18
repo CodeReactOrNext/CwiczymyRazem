@@ -44,21 +44,21 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
       description: i18n?.t("profile:stats.consecutive days"),
       value: dayWithoutBreak,
     },
-    {
-      Icon: FaGuitar,
-      description: i18n?.t("profile:stats.num_sessions"),
-      value: sessionCount,
-    },
-    {
-      Icon: FaStar,
-      description: i18n?.t("profile:stats.num_points"),
-      value: points,
-    },
-    {
-      Icon: FaStarHalf,
-      description: i18n?.t("profile:stats.max_points"),
-      value: maxPoints,
-    },
+    // {
+    //   Icon: FaGuitar,
+    //   description: i18n?.t("profile:stats.num_sessions"),
+    //   value: sessionCount,
+    // },
+    // {
+    //   Icon: FaStar,
+    //   description: i18n?.t("profile:stats.num_points"),
+    //   value: points,
+    // },
+    // {
+    //   Icon: FaStarHalf,
+    //   description: i18n?.t("profile:stats.max_points"),
+    //   value: maxPoints,
+    // },
     {
       Icon: FaHeart,
       description: i18n?.t("profile:stats.num_habbits"),
