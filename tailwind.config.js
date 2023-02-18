@@ -92,7 +92,7 @@ const defaultClick = plugin(function ({ addUtilities }) {
 const borderRadius = plugin(function ({ addUtilities }) {
   addUtilities({
     ".radius-default": {
-      "border-radius": "3px",
+      "border-radius": "4px",
     },
   });
 });
