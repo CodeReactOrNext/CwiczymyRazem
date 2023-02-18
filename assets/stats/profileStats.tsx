@@ -27,13 +27,13 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
     maxPoints,
   } = userStats;
   return [
-    {
-      Icon: FaClock,
-      description: i18n?.t("profile:stats.spent_time"),
-      value: convertMsToHM(
-        time.technique + time.theory + time.creativity + time.hearing
-      ),
-    },
+    // {
+    //   Icon: FaClock,
+    //   description: i18n?.t("profile:stats.spent_time"),
+    //   value: convertMsToHM(
+    //     time.technique + time.theory + time.creativity + time.hearing
+    //   ),
+    // },
     {
       Icon: FaDumbbell,
       description: i18n?.t("profile:stats.longest_session"),
