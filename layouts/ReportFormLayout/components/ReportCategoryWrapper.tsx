@@ -9,7 +9,7 @@ const ReportCategoryWrapper = ({
 }: ReportCategoryWrapperProps) => {
   return (
     <div className='flex flex-col justify-self-center p-2 text-xl   lg:text-2xl  '>
-      <p className='text-center text-xl text-mainText sm:text-2xl md:text-3xl'>
+      <p className='p-2 text-center text-xl text-mainText sm:text-2xl md:text-3xl'>
         {title}
       </p>
       {children}

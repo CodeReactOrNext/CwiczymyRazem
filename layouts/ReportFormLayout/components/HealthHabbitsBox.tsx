@@ -17,10 +17,10 @@ const HealthHabbitsBox = ({
 
   return (
     <div
-      className={` grid grid-cols-[3fr_1fr] items-center gap-2 border-b-2 border-tertiary-100/50 p-4  
-    ${isActive ? "bg-main-opposed-600" : ""}`}>
-      <div className='flex flex-row gap-2 justify-self-end '>
-        <p className='float-right text-end font-openSans text-base font-bold'>
+      className={` grid grid-cols-[3fr_1fr]  items-center gap-2 border-tertiary-100/50 p-4  
+    ${isActive ? "bg-main-opposed-600 " : "bg-main-opposed-500/40"}`}>
+      <div className='flex flex-row gap-2 justify-self-end'>
+        <p className='float-right text-end font-openSans text-sm font-bold sm:text-base'>
           {title}
         </p>
         <QuestionMark description={questionMarkProps.description} />
