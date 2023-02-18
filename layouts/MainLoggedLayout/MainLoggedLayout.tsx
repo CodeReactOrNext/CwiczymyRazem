@@ -29,7 +29,7 @@ const MainLoggedLayout = ({
   return (
     <main className='h-screen min-h-[600px] bg-tertiary-bg p-4 font-sans md:min-h-[900px] lg:p-8  '>
       <div className='relative flex h-full w-full items-center justify-center '>
-        <div className='relative flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-y-auto  overflow-x-hidden  bg-main-opposed-bg scrollbar-hide'>
+        <div className='relative flex h-full max-h-[calc(1300px_-_4rem)] w-full max-w-[2200px] flex-col overflow-y-auto  overflow-x-hidden  bg-main-opposed-bg scrollbar-hide'>
           <Wrapper>
             <DesktopHeaderWrapper>
               <UserHeader
@@ -51,7 +51,7 @@ const MainLoggedLayout = ({
               pageId={pageId}
             />
             <div
-              className={`z-20 m-4 mt-28 flex  w-full mb-12 max-w-[1380px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 xl:mt-36 `}>
+              className={`z-20 m-4 mt-28 mb-12  flex w-full max-w-[1400px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 xl:mt-36 `}>
               {children}
             </div>
           </Wrapper>
