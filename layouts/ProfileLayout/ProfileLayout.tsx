@@ -34,7 +34,7 @@ const ProfileLayout = ({
 
   return (
     <div className='mt-8 flex justify-center'>
-      <div className='m-4 flex w-[95%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
+      <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col justify-center bg-second pb-4 '>
         <HeadDecoration title={t("profile")} />
         <div className='grid-rows-auto  grid-cols-2  xl:grid'>
           <div className=' row-span-1  flex flex-col  items-center justify-center gap-6 '>
