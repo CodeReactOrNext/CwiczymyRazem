@@ -44,7 +44,7 @@ const LeadboardRow = ({
   return (
     <li
       className={`flex w-full justify-center p-7 text-xs xs:text-base 
-    ${profileId === currentUserId ? "scale-105" : ""} `}>
+    `}>
       <p
         className={`flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl
        ${profileId === currentUserId ? "text-mainText" : ""}`}>
@@ -60,7 +60,11 @@ const LeadboardRow = ({
         ${place === 1 ? "border-yellow-500 bg-[#736d00] bg-opacity-90" : ""}
         ${place === 2 ? "border-slate-400 bg-[#656d6d] bg-opacity-90" : ""}
         ${place === 3 ? "border-yellow-700 bg-[#5D3F17] bg-opacity-90" : ""}
-        ${profileId === currentUserId ? "shadow-lg shadow-black/50" : ""}
+        ${
+          profileId === currentUserId
+            ? "bg-second-200 shadow-lg shadow-second-50/50"
+            : ""
+        }
        `}>
           <div className='relative top-[-23px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
