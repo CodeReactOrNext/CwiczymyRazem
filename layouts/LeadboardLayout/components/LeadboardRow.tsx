@@ -1,11 +1,13 @@
-import Avatar from "components/Avatar";
-import DaySince from "components/DaySince/DaySince";
-import { convertMsToHM } from "utils/converter/timeConverter";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+
+import Avatar from "components/Avatar";
 import Carousel from "./AchievementsCarousel";
+import DaySince from "components/DaySince/DaySince";
+
+import { convertMsToHM } from "utils/converter/timeConverter";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 interface LeadboardColumnProps {
   place: number;
   nick: string;
@@ -109,9 +111,8 @@ const LeadboardRow = ({
               </p>
             </div>
           </div>
-         
-            <Carousel achievements={statistics.achievements} />
-  
+
+          <Carousel achievements={statistics.achievements} />
         </div>
       </div>
     </li>
