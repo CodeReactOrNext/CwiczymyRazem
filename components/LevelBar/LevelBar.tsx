@@ -13,7 +13,7 @@ const LevelBar = ({
 }: LevelInterfaceProps) => {
   const { t } = useTranslation("common");
 
-  const levelXpStart = lvl === 1 ? 0 : getPointsToLvlUp(lvl - 1);
+  const levelXpStart = getPointsToLvlUp(lvl - 1);
   const levelXpEnd = getPointsToLvlUp(lvl);
   const pointsInThisLevel = points - levelXpStart;
   const levelXpDifference = levelXpEnd - levelXpStart;
@@ -23,7 +23,9 @@ const LevelBar = ({
     <div className='col-span-2 m-auto flex w-[90%] flex-col items-center text-lg text-tertiary-400 sm:text-xl md:col-auto lg:w-64 lg:justify-self-end xl:w-80 '>
       <p>
         {t("header.your_level")}{" "}
-        <span className='text-3xl sm:text-4xl font-bold text-mainText'>{lvl}</span>
+        <span className='text-3xl font-bold text-mainText sm:text-4xl'>
+          {lvl}
+        </span>
       </p>
       <div className=' flex w-full'>
         <p className=' relative left-3 z-10 text-sm'>
@@ -41,7 +43,7 @@ const LevelBar = ({
         </p>
       </div>
       <p>
-        {points}/{pointsToNextLvl}
+        {points - levelXpStart}/{levelXpEnd - levelXpStart}
         {t("header.points_short")}
       </p>
     </div>
