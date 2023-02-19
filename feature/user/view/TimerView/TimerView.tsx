@@ -4,7 +4,7 @@ import Router from "next/router";
 import TimerLayout from "layouts/TimerLayout";
 
 import useTimer from "hooks/useTimer";
-import { SkillsType } from "types/SkillsTypes";
+import { SkillsType } from "types/skillsTypes";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectTimerData, updateTimerTime } from "feature/user/store/userSlice";
 

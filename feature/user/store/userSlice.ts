@@ -23,7 +23,7 @@ import {
   uploadUserAvatar,
   uploadUserSocialData,
 } from "./userSlice.asyncThunk";
-import { SkillsType } from "types/SkillsTypes";
+import { SkillsType } from "types/skillsTypes";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
