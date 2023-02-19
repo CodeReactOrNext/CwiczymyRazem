@@ -39,6 +39,7 @@ import {
   logOutInfo,
   reportSuccess,
   restartInfo,
+  signUpSuccess,
   updateDisplayNameSuccess,
   updateUserAvatarSuccess,
   updateUserEmailSuccess,
@@ -91,6 +92,7 @@ export const createAccount = createAsyncThunk(
       const { user } = await firebaseCreateAccountWithEmail(email, password);
       const userWithDisplayName = { ...user, displayName: login };
       const userData = await fetchUserData(userWithDisplayName);
+      signUpSuccess();
       return userData as UserDataInterface;
     } catch (error) {
       createAccountErrorHandler(error as SerializedError);
