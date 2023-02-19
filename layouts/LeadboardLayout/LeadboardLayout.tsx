@@ -1,8 +1,10 @@
-import LeadboardColumn from "./components/LeadboardRow";
-import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
-import SortBySwitch from "./components/SortBySwitch";
 import { Dispatch, SetStateAction } from "react";
+
+import SortBySwitch from "./components/SortBySwitch";
+import LeadboardColumn from "./components/LeadboardRow";
+
 import { sortBy } from "feature/leadboard/view/LeadboardView";
+import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 
 interface LeadboardLayoutProps {
   usersData: FirebaseUserDataInterface[];
