@@ -7,7 +7,7 @@ import ProfileLayout from "layouts/ProfileLayout/ProfileLayout";
 import { getUserStatsField } from "assets/stats/profileStats";
 import { firebaseGetUserDocument } from "utils/firebase/client/firebase.utils";
 import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
-import { ProfileInterface } from "types/profileInterface";
+import { ProfileInterface } from "types/ProfileInterface";
 
 const ProfileView = () => {
   const [userData, setUserData] = useState<ProfileInterface | undefined>(
