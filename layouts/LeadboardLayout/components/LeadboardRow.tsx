@@ -1,11 +1,13 @@
-import Avatar from "components/Avatar";
-import DaySince from "components/DaySince/DaySince";
-import { convertMsToHM } from "utils/converter/timeConverter";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaExternalLinkAlt } from "react-icons/fa";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+
+import Avatar from "components/Avatar";
 import Carousel from "./AchievementsCarousel";
+import DaySince from "components/DaySince/DaySince";
+
+import { convertMsToHM } from "utils/converter/timeConverter";
+import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 interface LeadboardColumnProps {
   place: number;
   nick: string;
@@ -42,7 +44,7 @@ const LeadboardRow = ({
   return (
     <li
       className={`flex w-full justify-center p-7 text-xs xs:text-base 
-    ${profileId === currentUserId ? "scale-105" : ""} `}>
+    `}>
       <p
         className={`flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl
        ${profileId === currentUserId ? "text-mainText" : ""}`}>
@@ -54,11 +56,15 @@ const LeadboardRow = ({
         </div>
 
         <div
-          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-3 justify-items-center border-b-2 border-second bg-second bg-opacity-75 radius-default hover:bg-opacity-90 md:h-16 md:grid-rows-1 lg:px-2
+          className={`group mr-5 grid w-full  grid-cols-3 grid-rows-2 justify-items-center border-b-2 border-second bg-second bg-opacity-75 radius-default hover:bg-opacity-90 sm:grid-rows-3 md:h-16 md:grid-rows-1 lg:px-2
         ${place === 1 ? "border-yellow-500 bg-[#736d00] bg-opacity-90" : ""}
         ${place === 2 ? "border-slate-400 bg-[#656d6d] bg-opacity-90" : ""}
         ${place === 3 ? "border-yellow-700 bg-[#5D3F17] bg-opacity-90" : ""}
-        ${profileId === currentUserId ? "shadow-lg shadow-black/50" : ""}
+        ${
+          profileId === currentUserId
+            ? "border-second-100 bg-second-200 shadow-lg shadow-second-50/30"
+            : ""
+        }
        `}>
           <div className='relative top-[-23px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
@@ -90,6 +96,7 @@ const LeadboardRow = ({
               </p>
             </div>
           </div>
+
           <div className='col-span-3 flex h-full w-full items-center justify-evenly border-y-2 border-black/10 bg-black/10 md:col-span-1 md:w-[300px] md:justify-center md:border-y-0 md:bg-transparent '>
             <div className='flex  flex-col items-center md:justify-end md:px-2 '>
               <p className='text-xl xxs:text-3xl '>{statistics.points}</p>
@@ -108,6 +115,7 @@ const LeadboardRow = ({
               </p>
             </div>
           </div>
+
           <Carousel achievements={statistics.achievements} />
         </div>
       </div>

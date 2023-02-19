@@ -7,5 +7,11 @@
   "required": "Wymagane",
   "same_passwords": "Hasła muszą być takie same",
   "no_ends_whitespace": "Nick nie może zaczynać lub kończyć się od spacji",
-  "allowed_signs": "Dozwolone są tylko litery, cyfry i znaki: - _"
+  "allowed_signs": "Dozwolone są tylko litery, cyfry i znaki: - _",
+  "not_yt_link": "To nie jest poprawny link do kanału YouTube",
+  "not_sc_link": "To nie jest poprawny link do SoundCloud",
+  "empty": "Nie może być puste",
+  "max_bands": "Nie może być więcej niż 60 znaków",
+  "min_bands": "Nie może być mniej niż 2 znaki"
+
 }

@@ -139,5 +139,9 @@
   "vip": {
     "title": "Deserving",
     "description": "This player helped in the development of Practice Together"
+  },
+  "short": {
+    "title": "Endurance",
+    "description": "This player maintained the consistency of practice at all costs"
   }
 }

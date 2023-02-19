@@ -4,6 +4,9 @@ import { toast } from "react-toastify";
 export const updateUserEmailSuccess = () => {
   toast.success(i18n?.t("toast:success.update_email"));
 };
+export const updateUserDataSuccess = () => {
+  toast.success(i18n?.t("toast:success.update"));
+};
 export const updateUserPasswordSuccess = () => {
   toast.success(i18n?.t("toast:success.update_password"));
 };
@@ -21,4 +24,7 @@ export const restartInfo = () => {
 };
 export const reportSuccess = () => {
   toast.success(i18n?.t("toast:success.report_success"));
+};
+export const signUpSuccess = () => {
+  toast.success(i18n?.t("toast:success.singup"));
 };

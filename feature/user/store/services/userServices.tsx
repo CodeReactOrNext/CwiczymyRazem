@@ -6,11 +6,14 @@ import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 
 export interface UserDataInterface {
-  userInfo: { displayName: string; avatar: string };
+  userInfo: { displayName: string; avatar: string;
+    soundCloudLink?: string;
+    youTubeLink?: string;
+    band?: string;};
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
 }
-export interface fetchedReportDataInterface {
+export interface FetchedReportDataInterface {
   currentUserStats: StatisticsDataInterface;
   previousUserStats: StatisticsDataInterface;
   raitingData: ReportDataInterface;
@@ -26,7 +29,7 @@ export const fetchUserData = async (user: User) =>
 
 export const fetchReport = ({ token, inputData }: updateReprotInterface) =>
   axios
-    .post<fetchedReportDataInterface>("/api/user/report", {
+    .post<FetchedReportDataInterface>("/api/user/report", {
       token,
       inputData,
     })

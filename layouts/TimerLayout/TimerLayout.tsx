@@ -1,45 +1,36 @@
 import Link from "next/link";
-import Router from "next/router";
-import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import Button from "components/Button";
+import Metronom from "components/Metronom/";
 import Stopwatch from "./components/Stopwatch";
 import BeginnerMsg from "components/BeginnerMsg";
 import CategoryBox from "./components/CategoryBox";
 
-import useTimer from "hooks/useTimer";
-import { useAppDispatch } from "store/hooks";
 import { SkillsType } from "types/skillsTypes";
+import { useTimerInterface } from "hooks/useTimer";
 import { convertMsToHM } from "utils/converter/timeConverter";
-import { updateTimerTime } from "feature/user/store/userSlice";
 import { TimerInterface } from "feature/user/store/userSlice.types";
+import { calculatePercent } from "utils/converter/calculatePercent";
 
 interface TimerLayoutProps {
+  timer: useTimerInterface;
   timerData: TimerInterface;
+  chosenSkill: SkillsType | null;
+  timerSubmitHandler: () => void;
+  choseSkillHandler: (chosenSkill: SkillsType) => void;
 }
 
-const TimerLayout = ({ timerData }: TimerLayoutProps) => {
+const TimerLayout = ({
+  timer,
+  timerData,
+  timerSubmitHandler,
+  chosenSkill,
+  choseSkillHandler,
+}: TimerLayoutProps) => {
   const { t } = useTranslation("timer");
+  const { time, startTimer, stopTimer, timerEnabled } = timer;
 
-  const {
-    time,
-    restartTime,
-    startTimer,
-    stopTimer,
-    timerEnabled,
-    setInitialStartTime,
-  } = useTimer();
-  const [chosenSkill, setChosenSkill] = useState<SkillsType | null>(null);
-
-  const dispatch = useAppDispatch();
-  const sumTime =
-    timerData.creativity +
-    timerData.hearing +
-    timerData.theory +
-    timerData.technique;
-
-  const calculatePercent = (time: number) => Math.floor((time / sumTime) * 100);
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {
       case "creativity":
@@ -53,51 +44,20 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
     }
   };
 
-  const timerSubmitHandler = () => {
-    if (chosenSkill) {
-      const payload = {
-        type: chosenSkill,
-        time: time,
-      };
-      dispatch(updateTimerTime(payload));
-    }
-    Router.push("/report");
-  };
-
-  const choseSkillHandler = (chosenSkill: SkillsType) => {
-    stopTimer();
-
-    setChosenSkill(chosenSkill);
-    restartTime();
-    setInitialStartTime(timerData[chosenSkill]);
-  };
-
-  useEffect(() => {
-    if (!timerEnabled || !chosenSkill) return;
-    const payload = {
-      type: chosenSkill,
-      time: time,
-    };
-    dispatch(updateTimerTime(payload));
-  }, [time, chosenSkill, dispatch, timerEnabled]);
+  const sumTime =
+    timerData.creativity +
+    timerData.hearing +
+    timerData.theory +
+    timerData.technique;
 
   return (
-    <div className='flex flex-col items-center justify-center '>
-      <Stopwatch
-        time={time}
-        timerEnabled={timerEnabled}
-        startTimer={startTimer}
-        stopTimer={stopTimer}
-        isSkillChosen={!!chosenSkill}
-      />
-      <div className=' flex flex-row gap-5 p-4 text-center font-openSans md:text-2xl'>
-        <div className='flex flex-row gap-1 '>
+    <div className='mb-10 flex flex-col items-center justify-center '>
+      <div className='flex w-full flex-col items-center gap-5 border-main-opposed-200/70 bg-main-opposed-600/50 p-5 radius-default md:w-auto md:flex-row md:border-2'>
+        <div className=' order-3 flex flex-row gap-5 p-4 text-center font-openSans md:order-none md:flex-col md:text-right  md:text-2xl'>
           <p className='flex flex-col text-sm xs:text-base'>
             {t("total_time")}{" "}
             <span className='text-tertiary'>{convertMsToHM(sumTime)}</span>
           </p>
-        </div>
-        <div className='flex flex-row gap-1 '>
           <p className='flex flex-col text-sm xs:text-base'>
             {t("currently_exercising")}
             <span className='m-1 text-tertiary'>
@@ -105,16 +65,24 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
             </span>
           </p>
         </div>
+        <Stopwatch
+          time={time}
+          timerEnabled={timerEnabled}
+          startTimer={startTimer}
+          stopTimer={stopTimer}
+          isSkillChosen={!!chosenSkill}
+        />
+        <Metronom />
       </div>
 
-      <div className='mb-14 flex w-[330px] flex-row flex-wrap justify-center md:w-[570px] lg:w-full '>
+      <div className='mt-5 flex w-full flex-row flex-wrap justify-evenly md:w-[570px] md:justify-center lg:w-full '>
         <CategoryBox
           title={t("technique")}
           time={timerData.technique}
           onClick={() => {
             choseSkillHandler("technique");
           }}
-          percent={calculatePercent(timerData.technique)}
+          percent={calculatePercent(timerData.technique, sumTime)}
           chosen={chosenSkill === "technique"}
         />
         <CategoryBox
@@ -123,7 +91,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("theory");
           }}
-          percent={calculatePercent(timerData.theory)}
+          percent={calculatePercent(timerData.theory, sumTime)}
           chosen={chosenSkill === "theory"}
         />
         <CategoryBox
@@ -132,7 +100,7 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("hearing");
           }}
-          percent={calculatePercent(timerData.hearing)}
+          percent={calculatePercent(timerData.hearing, sumTime)}
           chosen={chosenSkill === "hearing"}
         />
         <CategoryBox
@@ -141,12 +109,12 @@ const TimerLayout = ({ timerData }: TimerLayoutProps) => {
           onClick={() => {
             choseSkillHandler("creativity");
           }}
-          percent={calculatePercent(timerData.creativity)}
+          percent={calculatePercent(timerData.creativity, sumTime)}
           chosen={chosenSkill === "creativity"}
         />
       </div>
       <BeginnerMsg />
-      <p className='p-4 text-center font-openSans'>
+      <p className='p-4 text-center font-openSans text-xs sm:text-base'>
         {t("info_about_repot ")}
         <Link href={"/report"}>
           <a className='text-link'> {t("raport_link")}</a>
