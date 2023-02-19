@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
-import { sortByType } from "feature/leadboard/view/LeadboardView";
+import { SortByType } from "feature/leadboard/view/LeadboardView";
 
 interface SortBySwitchInterface {
-  setSortBy: Dispatch<SetStateAction<sortByType>>;
-  sortBy: sortByType;
+  setSortBy: Dispatch<SetStateAction<SortByType>>;
+  sortBy: SortByType;
 }
 
 function SortBySwitch({ setSortBy, sortBy }: SortBySwitchInterface) {

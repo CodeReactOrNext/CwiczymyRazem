@@ -3,13 +3,13 @@ import { Dispatch, SetStateAction } from "react";
 import SortBySwitch from "./components/SortBySwitch";
 import LeadboardColumn from "./components/LeadboardRow";
 
-import { sortByType } from "feature/leadboard/view/LeadboardView";
+import { SortByType } from "feature/leadboard/view/LeadboardView";
 import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 
 interface LeadboardLayoutProps {
   usersData: FirebaseUserDataInterface[];
-  setSortBy: Dispatch<SetStateAction<sortByType>>;
-  sortBy: sortByType;
+  setSortBy: Dispatch<SetStateAction<SortByType>>;
+  sortBy: SortByType;
   currentUserId: string | null;
 }
 
