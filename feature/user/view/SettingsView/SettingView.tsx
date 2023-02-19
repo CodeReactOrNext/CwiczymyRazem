@@ -87,7 +87,7 @@ const SettingsView = () => {
       )}
 
       <Divider />
-      <MediaLinks isFetching={isFetching} />
+      <MediaLinks />
       <Divider />
       <StatisticRestart />
     </SettingsLayout>

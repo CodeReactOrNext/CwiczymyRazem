@@ -2,14 +2,20 @@ import { Formik } from "formik";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";
-import { mediaSchema } from "feature/user/view/SettingsView/Settings.schemas";
 
 import FieldBox from "layouts/SettingsLayout/components/FieldBox";
 
-function MediaLinks({ isFetching }: { isFetching: boolean }) {
-  const [youtubeLink, setYoutubeLink] = useState("YouTube");
-  const [soundcloudLink, setSoundcloudLink] = useState("SoundCloud");
-  const [bands, setBands] = useState("");
+import { mediaSchema } from "feature/user/view/SettingsView/Settings.schemas";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
+import { uploadUserSocialData } from "feature/user/store/userSlice.asyncThunk";
+
+export type MediaType = "youTubeLink" | "soundCloudLink" | "band";
+
+const MediaLinks = () => {
+  const isFetching = useAppSelector(selectIsFetching) === "updateData";
+  const { soundCloudLink, youTubeLink, band } = useAppSelector(selectUserInfo)!;
+  const dispatch = useAppDispatch();
 
   const { t } = useTranslation(["common", "toast", "settings"]);
 
@@ -18,19 +24,6 @@ function MediaLinks({ isFetching }: { isFetching: boolean }) {
     soundcloud: "",
     bands: "",
   };
-
-  function updateYtLink(link: string) {
-    setYoutubeLink(link);
-  }
-
-  function updateScLink(link: string) {
-    setSoundcloudLink(link);
-  }
-
-  function updateBands(bands: string) {
-    setBands(bands);
-  }
-
   return (
     <Formik
       initialValues={formikInitialValues}
@@ -42,41 +35,56 @@ function MediaLinks({ isFetching }: { isFetching: boolean }) {
             title={"YouTube"}
             Icon={FaYoutube}
             submitHandler={() => {
-              updateYtLink(values.youtube);
+              dispatch(
+                uploadUserSocialData({
+                  value: values.youtube,
+                  type: "youTubeLink",
+                })
+              );
             }}
             errors={errors}
             values={values}
             inputName={"youtube"}
             isFetching={isFetching}
-            value={youtubeLink}
+            value={youTubeLink ? youTubeLink : "YouTube Link"}
           />
           <FieldBox
             title={"SoundCloud"}
             Icon={FaSoundcloud}
             submitHandler={() => {
-              updateScLink(values.soundcloud);
+              dispatch(
+                uploadUserSocialData({
+                  value: values.soundcloud,
+                  type: "soundCloudLink",
+                })
+              );
             }}
             errors={errors}
             values={values}
             inputName={"soundcloud"}
             isFetching={isFetching}
-            value={soundcloudLink}
+            value={soundCloudLink ? soundCloudLink : "SoundCloud Link"}
           />
           <FieldBox
             title={t("settings:bands")}
             Icon={FaGuitar}
             submitHandler={() => {
-              updateBands(values.bands);
+              dispatch(
+                uploadUserSocialData({
+                  value: values.bands,
+                  type: "band",
+                })
+              );
             }}
             errors={errors}
             values={values}
             inputName={"bands"}
             isFetching={isFetching}
-            value={bands}
+            value={band ? band : t("settings:bands")}
           />
         </>
       )}
     </Formik>
   );
-}
+};
 export default MediaLinks;

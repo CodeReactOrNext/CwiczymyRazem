@@ -4,20 +4,22 @@ import { useEffect, useState } from "react";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import ProfileLayout from "layouts/ProfileLayout/ProfileLayout";
 
-import { DocumentData } from "firebase/firestore";
 import { getUserStatsField } from "assets/stats/profileStats";
 import { firebaseGetUserDocument } from "utils/firebase/client/firebase.utils";
 import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
+import { ProfileInterface } from "types/ProfileInterface";
 
 const ProfileView = () => {
-  const [userData, setUserData] = useState<DocumentData | undefined>(undefined);
+  const [userData, setUserData] = useState<ProfileInterface | undefined>(
+    undefined
+  );
   const router = useRouter();
   const { profileId } = router.query;
 
   useEffect(() => {
     async function getUserDoc() {
       const userDoc = await firebaseGetUserDocument(profileId as string);
-      setUserData(userDoc);
+      setUserData(userDoc as ProfileInterface);
     }
     if (profileId) {
       getUserDoc();
@@ -29,9 +31,7 @@ const ProfileView = () => {
       {userData ? (
         <ProfileLayout
           statsField={getUserStatsField(userData?.statistics)}
-          userStats={userData.statistics}
-          userName={userData.displayName}
-          userAvatar={userData.avatar}
+          userData={userData}
           userAuth={profileId as string}
         />
       ) : (
