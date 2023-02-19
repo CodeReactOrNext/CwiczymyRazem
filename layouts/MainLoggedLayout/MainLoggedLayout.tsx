@@ -29,7 +29,7 @@ const MainLoggedLayout = ({
   return (
     <main className='h-screen min-h-[600px] bg-tertiary-bg p-4 font-sans md:min-h-[900px] lg:p-8  '>
       <div className='relative flex h-full w-full items-center justify-center '>
-        <div className='relative flex h-full max-h-[calc(1300px_-_4rem)] w-full max-w-[2200px] flex-col overflow-y-auto  overflow-x-hidden  bg-main-opposed-bg scrollbar-hide'>
+        <div className='relative flex h-full max-h-[calc(1200px_-_4rem)] w-full max-w-[2200px] flex-col overflow-y-auto  overflow-x-hidden  bg-main-opposed-bg scrollbar-hide'>
           <Wrapper>
             <DesktopHeaderWrapper>
               <UserHeader
