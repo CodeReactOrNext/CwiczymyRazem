@@ -3,7 +3,6 @@ import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
 
 import { RootState } from "store/store";
 
-import { SkillsType } from "types/SkillsTypes";
 import {
   StatisticsDataInterface,
   statisticsInitial,
@@ -24,6 +23,7 @@ import {
   uploadUserAvatar,
   uploadUserSocialData,
 } from "./userSlice.asyncThunk";
+import { SkillsType } from "types/SkillsTypes";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
