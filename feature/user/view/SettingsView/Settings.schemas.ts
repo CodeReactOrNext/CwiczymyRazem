@@ -17,3 +17,23 @@ export const updateCredsSchema = yup.object().shape({
     .string()
     .oneOf([yup.ref("password"), null], "yup_errors:same_passwords"),
 });
+
+export const mediaSchema = yup.object().shape({
+  youtube: yup
+    .string()
+    .matches(
+      /(https?:\/\/)?(www\.)?youtu((\.be)|(be\..{2,5}))\/((user)|(channel|@))\/?([a-zA-Z0-9\-_]{1,})/,
+      "yup_errors:not_yt_link"
+    ),
+  soundcloud: yup
+    .string()
+    .matches(
+      /^((https?:\/\/)?(www\.)?soundcloud\.com\/)([\w\-]+)(\/)?$/i,
+      "yup_errors:not_sc_link"
+    ),
+  bands: yup
+    .string()
+    .min(2, "yup_errors:min_bands")
+    .max(60, "yup_errors:max_bands")
+    .matches(/^(?!\s*$).+/, "yup_errors:empty"),
+});

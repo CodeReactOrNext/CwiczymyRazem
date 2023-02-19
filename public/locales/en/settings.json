@@ -16,5 +16,6 @@
   "anonimity": "Anonimity:",
   "anonimity_info": "Do you want to hide your nickname in leaderboard?",
   "resolution_info": "Max resolution 250x250",
-  "logged_in_via_google": "The password and email change option has been disabled because you logged in using Google."
+  "logged_in_via_google": "The password and email change option has been disabled because you logged in using Google.",
+  "bands": "Your bands"
 }
