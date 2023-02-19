@@ -7,8 +7,11 @@ const ThemeToggle = () => {
   const theme = useAppSelector(selectLayoutMode);
   return (
     <div className='flex w-fit flex-col'>
-      <label className='relative inline-flex cursor-pointer items-center'>
+      <label
+        aria-hidden
+        className='relative inline-flex cursor-pointer items-center'>
         <input
+          tabIndex={-1}
           type='checkbox'
           className='peer sr-only'
           checked={theme === "dark-theme"}

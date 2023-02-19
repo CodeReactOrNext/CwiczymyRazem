@@ -7,5 +7,5 @@
   "required": "Wymagane",
   "same_passwords": "Hasła muszą być takie same",
   "no_ends_whitespace": "Nick nie może zaczynać lub kończyć się od spacji",
-  "allowed_signs": "Dozwolone są tylko litery, cyfry i znaki: . - _"
+  "allowed_signs": "Dozwolone są tylko litery, cyfry i znaki: - _"
 }

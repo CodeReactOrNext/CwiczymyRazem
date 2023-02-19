@@ -13,7 +13,7 @@ const LevelBar = ({
 }: LevelInterfaceProps) => {
   const { t } = useTranslation("common");
 
-  const levelXpStart = lvl === 1 ? 0 : getPointsToLvlUp(lvl - 1);
+  const levelXpStart = getPointsToLvlUp(lvl - 1);
   const levelXpEnd = getPointsToLvlUp(lvl);
   const pointsInThisLevel = points - levelXpStart;
   const levelXpDifference = levelXpEnd - levelXpStart;
@@ -43,7 +43,7 @@ const LevelBar = ({
         </p>
       </div>
       <p>
-        {points}/{getPointsToLvlUp(lvl)}
+        {points - levelXpStart}/{levelXpEnd - levelXpStart}
         {t("header.points_short")}
       </p>
     </div>

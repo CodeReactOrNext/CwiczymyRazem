@@ -5,6 +5,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   i18n,
+  productionBrowserSourceMaps: true,
 };
 
 module.exports = nextConfig;
