@@ -10,13 +10,13 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 import { firebaseGetUsersExceriseRaport as firebaseGetUsersExceriseRaport } from "utils/firebase/client/firebase.utils";
 
-export type sortByType = "points" | "time" | "sessionCount";
+export type SortByType = "points" | "time" | "sessionCount";
 
 const LeadboardView = () => {
   const [usersData, setUsersData] = useState<
     FirebaseUserDataInterface[] | null
   >(null);
-  const [sortBy, setSortBy] = useState<sortByType>("points");
+  const [sortBy, setSortBy] = useState<SortByType>("points");
 
   const { t } = useTranslation("leadboard");
   const currentUserId = useAppSelector(selectUserAuth);
