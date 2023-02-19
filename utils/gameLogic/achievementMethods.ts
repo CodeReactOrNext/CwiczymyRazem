@@ -121,6 +121,11 @@ export const checkRing = (statistic: StatisticsDataInterface) => {
   if (statistic.time.hearing <= 18000000) return;
   return "ring";
 };
+export const checkShort = (statistic: StatisticsDataInterface) => {
+  if (statistic.actualDayWithoutBreak < 10) return;
+  if (statistic.points > 15) return;
+  return "ring";
+};
 export const checkHeadphones = (statistic: StatisticsDataInterface) => {
   if (statistic.time.hearing <= 36000000) return;
   return "headphones";
