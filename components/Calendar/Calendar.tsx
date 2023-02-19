@@ -155,6 +155,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
               className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
           );
         })}
+        <div className='p-2'></div>
         <ToolTip />
       </div>
     </div>

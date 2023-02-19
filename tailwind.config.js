@@ -1,7 +1,7 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
 /** @type {import('tailwindcss').Config} */
-// Rotate X utilities
+
 const rotateX = plugin(function ({ addUtilities }) {
   addUtilities({
     ".rotate-x-20": {
@@ -42,26 +42,16 @@ const scrollbarHide = plugin(function ({ addUtilities }) {
   addUtilities(
     {
       ".scrollbar-hide": {
-        /* IE and Edge */
         "-ms-overflow-style": "none",
-
-        /* Firefox */
         "scrollbar-width": "none",
-
-        /* Safari and Chrome */
         "&::-webkit-scrollbar": {
           display: "none",
         },
       },
 
       ".scrollbar-default": {
-        /* IE and Edge */
         "-ms-overflow-style": "auto",
-
-        /* Firefox */
         "scrollbar-width": "auto",
-
-        /* Safari and Chrome */
         "&::-webkit-scrollbar": {
           display: "block",
         },
@@ -93,16 +83,6 @@ const borderRadius = plugin(function ({ addUtilities }) {
   addUtilities({
     ".radius-default": {
       "border-radius": "4px",
-    },
-  });
-});
-const box = plugin(function ({ addUtilities }) {
-  addUtilities({
-    ".box-default": {
-      "border-radius": "3px",
-      border: "2px solid",
-      margin: "8px",
-      padding: "8px",
     },
   });
 });

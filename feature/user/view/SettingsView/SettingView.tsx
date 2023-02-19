@@ -10,6 +10,7 @@ import EmailChange from "feature/user/components/settings/EmailChange";
 import AvatarChange from "feature/user/components/settings/AvatarChange";
 import PasswordChange from "feature/user/components/settings/PasswordChange";
 import StatisticRestart from "feature/user/components/settings/StatisticsRestart";
+import MediaLinks from "feature/user/components/settings/MediaLinks";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectIsFetching, selectUserName } from "feature/user/store/userSlice";
@@ -85,6 +86,8 @@ const SettingsView = () => {
         </p>
       )}
 
+      <Divider />
+      <MediaLinks />
       <Divider />
       <StatisticRestart />
     </SettingsLayout>

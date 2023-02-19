@@ -21,6 +21,7 @@
   },
   "success": {
     "logOut": "Pomyślnie wylogowano",
+    "update": "Pomyślnie zaktualizowano",
     "update_email": "Zmieniono email",
     "update_password": "Zmieniono hasło",
     "report_success": "Poprawnie zraportowano",

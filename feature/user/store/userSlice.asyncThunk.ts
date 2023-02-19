@@ -23,8 +23,11 @@ import {
   firebaseUpdateUserEmail,
   firebaseUpdateUserPassword,
   firebaseUploadAvatar,
+  firebaseUpdateBand,
+  firebaseUpdateYouTubeLink,
+  firebaseUpdateSoundCloudLink,
 } from "utils/firebase/client/firebase.utils";
-import { updateUserInterface } from "./userSlice.types";
+import { updateSocialInterface, updateUserInterface } from "./userSlice.types";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 import { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 import {
@@ -39,8 +42,10 @@ import {
   logOutInfo,
   reportSuccess,
   restartInfo,
+  signUpSuccess,
   updateDisplayNameSuccess,
   updateUserAvatarSuccess,
+  updateUserDataSuccess,
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
@@ -91,6 +96,7 @@ export const createAccount = createAsyncThunk(
       const { user } = await firebaseCreateAccountWithEmail(email, password);
       const userWithDisplayName = { ...user, displayName: login };
       const userData = await fetchUserData(userWithDisplayName);
+      signUpSuccess();
       return userData as UserDataInterface;
     } catch (error) {
       createAccountErrorHandler(error as SerializedError);
@@ -216,6 +222,31 @@ export const uploadUserAvatar = createAsyncThunk(
       return { avatar: avatarUrl };
     } catch (error) {
       avatarErrorHandler();
+      return Promise.reject();
+    }
+  }
+);
+
+export const uploadUserSocialData = createAsyncThunk(
+  "user/uploadUserYouTube",
+  async ({ value, type }: updateSocialInterface) => {
+    try {
+      switch (type) {
+        case "band":
+          firebaseUpdateBand(value);
+          break;
+        case "youTubeLink":
+          firebaseUpdateYouTubeLink(value);
+          break;
+        case "soundCloudLink":
+          firebaseUpdateSoundCloudLink(value);
+          break;
+        default:
+          break;
+      }
+      updateUserDataSuccess();
+    } catch (error) {
+      udpateDataErrorHandler(new Error());
       return Promise.reject();
     }
   }

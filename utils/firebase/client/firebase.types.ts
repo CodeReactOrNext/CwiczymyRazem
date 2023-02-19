@@ -8,6 +8,9 @@ export interface FirebaseUserDataInterface {
   createdAt: Timestamp;
   displayName: string;
   avatar?: string;
+  soundCloudLink?: string;
+  youTubeLink?: string;
+  band?: string;
   statistics: StatisticsDataInterface;
 }
 

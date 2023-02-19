@@ -26,7 +26,7 @@ const BonusPointsItem = ({
     "1" + "." + multiplier.toString().split("").pop();
 
   return (
-    <ul className='relative  ml-4  overflow-hidden text-sm  xs:text-base md:-ml-[20%]'>
+    <ul className='relative  ml-4  text-sm  xs:text-base md:-ml-[20%]'>
       <li className='ml-4'>
         <motion.ul
           initial={{ x: "-120%" }}

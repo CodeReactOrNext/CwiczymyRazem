@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { ImSoundcloud2 } from "react-icons/im";
 
 import Avatar from "components/Avatar";
 import Calendar from "components/Calendar";
@@ -10,55 +12,85 @@ import StatsField, { StatsFieldProps } from "./components/StatsField";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 import { convertMsToHM } from "utils/converter/timeConverter";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { ProfileInterface } from "types/ProfileInterface";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
-  userStats: StatisticsDataInterface;
-  userName: string;
-  userAvatar?: string;
+  userData: ProfileInterface;
   userAuth: string;
 }
 
 const ProfileLayout = ({
   statsField,
-  userStats,
-  userName,
-  userAvatar,
+  userData,
   userAuth,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
-  const { time, achievements, lastReportDate } = userStats;
+  const {
+    statistics,
+    displayName,
+    avatar,
+    createdAt,
+    band,
+    soundCloudLink,
+    youTubeLink,
+  } = userData;
+  const { time, achievements, lastReportDate } = statistics;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
 
   return (
     <div className='mt-8 flex justify-center'>
-      <div className='m-4 flex w-[95%]  max-w-[1080px] flex-col justify-center bg-second pb-4 '>
+      <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col justify-center bg-second pb-4 '>
         <HeadDecoration title={t("profile")} />
         <div className='grid-rows-auto  grid-cols-2  xl:grid'>
           <div className=' row-span-1  flex flex-col  items-center justify-center gap-6 '>
-            <div className='z-10 flex flex-row items-center gap-4 p-4 '>
+            <div className='z-10 flex flex-row items-center justify-center gap-6 p-4 pb-0 '>
               <Avatar
-                name={userName}
-                lvl={userStats.lvl}
-                avatarURL={userAvatar}
+                name={displayName}
+                lvl={statistics.lvl}
+                avatarURL={avatar}
               />
               <div className='flex-col'>
-                <p className='relative  text-4xl'>{userName}</p>
+                <p className='relative  text-4xl'>{displayName}</p>
                 <p className='relative  text-xl'>
                   {t("points")}:{" "}
                   <span className='text-2xl font-extrabold'>
-                    {userStats.points}
+                    {statistics.points}
                   </span>
                 </p>
                 <DaySince date={new Date(lastReportDate)} />
+                <p className='my-1 font-openSans text-xs font-bold text-tertiary-300 '>
+                  {t("joined")}{" "}
+                  <span className='text-mainText'>
+                    {createdAt.toDate().toLocaleDateString()}
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div className='z-10 flex w-[40%] flex-col justify-center gap-1 font-openSans text-xs radius-default'>
+              {band && (
+                <p>
+                  {t("band")} <span className='font-bold'>{band}</span>
+                </p>
+              )}
+              <div className='flex flex-row items-center justify-evenly gap-4 p-2 text-xl'>
+                {youTubeLink && (
+                  <a target='_blank' rel='noreferrer' href={youTubeLink}>
+                    <FaYoutube size={35} />
+                  </a>
+                )}
+                {soundCloudLink && (
+                  <a target='_blank' rel='noreferrer' href={soundCloudLink}>
+                    <FaSoundcloud size={35} />
+                  </a>
+                )}
               </div>
             </div>
             <LevelBar
-              points={userStats.points}
-              lvl={userStats.lvl}
-              currentLevelMaxPoints={userStats.currentLevelMaxPoints}
+              points={statistics.points}
+              lvl={statistics.lvl}
+              currentLevelMaxPoints={statistics.currentLevelMaxPoints}
             />
           </div>
           <div className=' z-10 row-span-1 m-4 flex justify-center border-2 border-second-400/60 bg-second-600 p-2 radius-default '>

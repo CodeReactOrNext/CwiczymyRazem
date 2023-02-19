@@ -2,7 +2,7 @@ import Router from "next/router";
 import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
 
 import { RootState } from "store/store";
-import { SkillsType } from "types/skillsTypes";
+
 import {
   StatisticsDataInterface,
   statisticsInitial,
@@ -21,7 +21,9 @@ import {
   updateUserPassword,
   updateUserStats,
   uploadUserAvatar,
+  uploadUserSocialData,
 } from "./userSlice.asyncThunk";
+import { SkillsType } from "types/skillsTypes";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -38,7 +40,6 @@ const initialState: userSliceInitialState = {
     uid: null,
     displayName: null,
     email: null,
-    phoneNumber: null,
     photoURL: null,
   },
 };
@@ -50,14 +51,12 @@ export const userSlice = createSlice({
     addUserAuth: (state, { payload }: PayloadAction<"string">) => {
       state.userAuth = payload;
     },
-
     addUserData: (
       state,
       { payload }: PayloadAction<StatisticsDataInterface>
     ) => {
       state.currentUserStats = payload;
     },
-
     addPracticeData: (
       state,
       { payload }: PayloadAction<StatisticsDataInterface>
@@ -144,7 +143,6 @@ export const userSlice = createSlice({
         state.isFetching = null;
         state.providerData = action.payload;
       })
-
       .addCase(changeUserDisplayName.fulfilled, (state, { payload }) => {
         state.isFetching = null;
         state.userInfo = {
@@ -163,7 +161,8 @@ export const userSlice = createSlice({
           restartUserStats.pending,
           changeUserDisplayName.pending,
           updateUserPassword.pending,
-          updateUserEmail.pending
+          updateUserEmail.pending,
+          uploadUserSocialData.pending
         ),
         (state) => {
           state.isFetching = "updateData";
@@ -173,6 +172,8 @@ export const userSlice = createSlice({
         isAnyOf(
           updateUserEmail.fulfilled,
           updateUserPassword.fulfilled,
+          uploadUserSocialData.fulfilled,
+          uploadUserSocialData.fulfilled,
           updateUserStats.rejected,
           restartUserStats.rejected,
           changeUserDisplayName.rejected,
@@ -181,7 +182,8 @@ export const userSlice = createSlice({
           uploadUserAvatar.rejected,
           logInViaEmail.rejected,
           logInViaGoogle.rejected,
-          createAccount.rejected
+          createAccount.rejected,
+          uploadUserSocialData.rejected
         ),
         (state) => {
           state.isFetching = null;
@@ -223,6 +225,7 @@ export const selectRaitingData = (state: RootState) => state.user.raitingData;
 export const selectTimerData = (state: RootState) => state.user.timer;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
+export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectUserAvatar = (state: RootState) =>
   state.user.userInfo?.avatar;
 export const selectIsLoggedOut = (state: RootState) => state.user.isLoggedOut;
