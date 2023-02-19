@@ -1,13 +1,16 @@
 import { Timestamp } from "firebase/firestore";
 import { AchievementList } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { SkillsType } from "types/skillsTypes";
+import { SkillsType } from "types/SkillsTypes";
 
 export interface FirebaseUserDataInterface {
   profileId: string;
   createdAt: Timestamp;
   displayName: string;
   avatar?: string;
+  soundCloudLink?: string;
+  youTubeLink?: string;
+  band?: string;
   statistics: StatisticsDataInterface;
 }
 

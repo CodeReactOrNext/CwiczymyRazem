@@ -19,6 +19,9 @@ export default async function handler(
         userInfo: {
           displayName: userData!.displayName,
           avatar: userData!.avatar,
+          youTubeLink: userData!.youTubeLink,
+          soundCloudLink: userData!.soundCloudLink,
+          band: userData!.band,
         },
         userAuth,
         currentUserStats: userData!.statistics,

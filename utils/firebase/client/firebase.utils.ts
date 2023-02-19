@@ -183,7 +183,6 @@ export const firebaseGetUserProviderData = async () => {
     uid: null,
     displayName: null,
     email: null,
-    phoneNumber: null,
     photoURL: null,
   };
 };
@@ -228,4 +227,19 @@ export const firebaseUploadAvatar = async (image: Blob) => {
   const avatarUrl = await getDownloadURL(avatarRef);
   await firebaseUpdateUserDocument("avatar", avatarUrl);
   return { avatar: avatarUrl };
+};
+
+export const firebaseUpdateBand = async (band: string) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, { band: band });
+};
+
+export const firebaseUpdateYouTubeLink = async (youtubeLink: string) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, { youTubeLink: youtubeLink });
+};
+
+export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
 };

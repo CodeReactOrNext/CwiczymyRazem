@@ -21,6 +21,7 @@
   },
   "success": {
     "update_email": "Email updated",
+    "update": "Successfully updated data",
     "update_password": "Password updated",
     "update_avatar ": "Avatar updated",
     "logOut": "Successfully logged out",
