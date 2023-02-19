@@ -2,28 +2,12 @@ import Router from "next/router";
 import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
 
 import { RootState } from "store/store";
-import { SkillsType } from "types/skillsTypes";
+
 import {
   StatisticsDataInterface,
   statisticsInitial,
 } from "constants/userStatisticsInitialData";
-import {
-  avatarErrorHandler,
-  createAccountErrorHandler,
-  loginViaEmailErrorHandler,
-  loginViaGoogleErrorHandler,
-  udpateDataErrorHandler,
-} from "./userSlice.errorsHandling";
 import { TimerInterface, userSliceInitialState } from "./userSlice.types";
-import {
-  logOutInfo,
-  reportSuccess,
-  restartInfo,
-  updateDisplayNameSuccess,
-  updateUserAvatarSuccess,
-  updateUserEmailSuccess,
-  updateUserPasswordSuccess,
-} from "./userSlice.toast";
 import {
   autoLogIn,
   changeUserDisplayName,
@@ -37,7 +21,9 @@ import {
   updateUserPassword,
   updateUserStats,
   uploadUserAvatar,
+  uploadUserSocialData,
 } from "./userSlice.asyncThunk";
+import { SkillsType } from "types/skillsTypes";
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -46,6 +32,7 @@ const initialState: userSliceInitialState = {
   previousUserStats: null,
   raitingData: null,
   isFetching: null,
+  isLoggedOut: null,
   timer: { creativity: 0, hearing: 0, technique: 0, theory: 0 },
   theme: "default-theme",
   providerData: {
@@ -53,7 +40,6 @@ const initialState: userSliceInitialState = {
     uid: null,
     displayName: null,
     email: null,
-    phoneNumber: null,
     photoURL: null,
   },
 };
@@ -65,14 +51,12 @@ export const userSlice = createSlice({
     addUserAuth: (state, { payload }: PayloadAction<"string">) => {
       state.userAuth = payload;
     },
-
     addUserData: (
       state,
       { payload }: PayloadAction<StatisticsDataInterface>
     ) => {
       state.currentUserStats = payload;
     },
-
     addPracticeData: (
       state,
       { payload }: PayloadAction<StatisticsDataInterface>
@@ -98,7 +82,7 @@ export const userSlice = createSlice({
       }
       state.timer = payload;
     },
-    
+
     updateTimerTime: (
       state,
       { payload }: PayloadAction<{ type: SkillsType; time: number }>
@@ -128,22 +112,6 @@ export const userSlice = createSlice({
       .addCase(createAccount.pending, (state) => {
         state.isFetching = "createAccount";
       })
-      .addCase(uploadUserAvatar.rejected, (state) => {
-        state.isFetching = null;
-        avatarErrorHandler();
-      })
-      .addCase(logInViaEmail.rejected, (state, { error }) => {
-        state.isFetching = null;
-        loginViaEmailErrorHandler(error);
-      })
-      .addCase(logInViaGoogle.rejected, (state, { error }) => {
-        state.isFetching = null;
-        loginViaGoogleErrorHandler(error);
-      })
-      .addCase(createAccount.rejected, (state, { error }) => {
-        state.isFetching = null;
-        createAccountErrorHandler(error);
-      })
       .addCase(updateUserStats.fulfilled, (state, { payload }) => {
         state.timer.technique = 0;
         state.timer.creativity = 0;
@@ -153,7 +121,6 @@ export const userSlice = createSlice({
         state.previousUserStats = payload.previousUserStats;
         state.raitingData = payload.raitingData;
         state.isFetching = null;
-        reportSuccess();
       })
       .addCase(restartUserStats.fulfilled, (state) => {
         state.currentUserStats = statisticsInitial;
@@ -161,9 +128,9 @@ export const userSlice = createSlice({
         state.previousUserStats = null;
         state.raitingData = null;
         state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };
-        restartInfo();
       })
       .addCase(logUserOff.fulfilled, (state) => {
+        state.isLoggedOut = true;
         state.userAuth = null;
         state.userInfo = null;
         state.currentUserStats = null;
@@ -171,19 +138,10 @@ export const userSlice = createSlice({
         state.raitingData = null;
         state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };
         Router.push("/");
-        logOutInfo();
       })
       .addCase(getUserProvider.fulfilled, (state, action) => {
         state.isFetching = null;
         state.providerData = action.payload;
-      })
-      .addCase(updateUserEmail.fulfilled, (state) => {
-        state.isFetching = null;
-        updateUserEmailSuccess();
-      })
-      .addCase(updateUserPassword.fulfilled, (state) => {
-        state.isFetching = null;
-        updateUserPasswordSuccess();
       })
       .addCase(changeUserDisplayName.fulfilled, (state, { payload }) => {
         state.isFetching = null;
@@ -191,12 +149,10 @@ export const userSlice = createSlice({
           ...state.userInfo,
           displayName: payload,
         };
-        updateDisplayNameSuccess();
       })
       .addCase(uploadUserAvatar.fulfilled, (state, action) => {
         state.isFetching = null;
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
-        updateUserAvatarSuccess();
       })
       .addMatcher(
         isAnyOf(
@@ -205,7 +161,8 @@ export const userSlice = createSlice({
           restartUserStats.pending,
           changeUserDisplayName.pending,
           updateUserPassword.pending,
-          updateUserEmail.pending
+          updateUserEmail.pending,
+          uploadUserSocialData.pending
         ),
         (state) => {
           state.isFetching = "updateData";
@@ -213,15 +170,23 @@ export const userSlice = createSlice({
       )
       .addMatcher(
         isAnyOf(
+          updateUserEmail.fulfilled,
+          updateUserPassword.fulfilled,
+          uploadUserSocialData.fulfilled,
+          uploadUserSocialData.fulfilled,
           updateUserStats.rejected,
           restartUserStats.rejected,
           changeUserDisplayName.rejected,
           updateUserPassword.rejected,
-          updateUserEmail.rejected
+          updateUserEmail.rejected,
+          uploadUserAvatar.rejected,
+          logInViaEmail.rejected,
+          logInViaGoogle.rejected,
+          createAccount.rejected,
+          uploadUserSocialData.rejected
         ),
-        (state, { error }) => {
+        (state) => {
           state.isFetching = null;
-          udpateDataErrorHandler(error);
         }
       )
       .addMatcher(
@@ -260,7 +225,9 @@ export const selectRaitingData = (state: RootState) => state.user.raitingData;
 export const selectTimerData = (state: RootState) => state.user.timer;
 export const selectUserName = (state: RootState) =>
   state.user.userInfo?.displayName;
+export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectUserAvatar = (state: RootState) =>
   state.user.userInfo?.avatar;
+export const selectIsLoggedOut = (state: RootState) => state.user.isLoggedOut;
 
 export default userSlice.reducer;

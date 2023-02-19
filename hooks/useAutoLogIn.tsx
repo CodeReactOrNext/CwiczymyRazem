@@ -6,11 +6,12 @@ import { auth } from "utils/firebase/client/firebase.utils";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
 import {
+  selectIsLoggedOut,
   selectUserAuth,
   updateLocalTimer,
 } from "feature/user/store/userSlice";
 
-type pagesToRedirectTo = "/" | "/login";
+type pagesToRedirectTo = "/" | "/login" | "/leaderboard" | "/faq";
 
 interface useAutoLogInProps {
   redirects?: { loggedIn?: pagesToRedirectTo; loggedOut?: pagesToRedirectTo };
@@ -19,6 +20,7 @@ interface useAutoLogInProps {
 const useAutoLogIn = (props: useAutoLogInProps) => {
   const [user, loading] = useAuthState(auth);
   const isUserLoggedIn = useAppSelector(selectUserAuth);
+  const isLoggedOut = useAppSelector(selectIsLoggedOut);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
         );
       }
     }
-    if (user && !isUserLoggedIn) {
+    if (user && !isUserLoggedIn && !isLoggedOut) {
       dispatch(autoLogIn(user));
     }
     if (user && isUserLoggedIn && !loading && props?.redirects?.loggedIn) {
@@ -45,6 +47,7 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
     loading,
     props?.redirects?.loggedIn,
     props?.redirects?.loggedOut,
+    isLoggedOut,
   ]);
 
   return { isLoggedIn: Boolean(user && isUserLoggedIn), isLoading: loading };

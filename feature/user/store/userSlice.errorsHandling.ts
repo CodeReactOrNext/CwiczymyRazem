@@ -47,7 +47,7 @@ export const createAccountErrorHandler = (error: SerializedError) => {
     toast.error(i18n?.t("toast:errors.timeout"));
     return;
   }
-  if (error.message === "auth/nick-alredy-in-use") {
+  if (error.message === "nick-alredy-in-use") {
     toast.error(i18n?.t("toast:errors.nick_already_in_use"));
     return;
   }

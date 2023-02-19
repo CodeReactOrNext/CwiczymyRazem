@@ -6,18 +6,17 @@ import { useTranslation } from "react-i18next";
 import LeadboardLayout from "layouts/LeadboardLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 import { firebaseGetUsersExceriseRaport as firebaseGetUsersExceriseRaport } from "utils/firebase/client/firebase.utils";
-import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
-import { selectUserAuth } from "feature/user/store/userSlice";
 
-export type sortBy = "points" | "time" | "sessionCount";
+export type SortByType = "points" | "time" | "sessionCount";
 
 const LeadboardView = () => {
   const [usersData, setUsersData] = useState<
     FirebaseUserDataInterface[] | null
   >(null);
-  const [sortBy, setSortBy] = useState<sortBy>("points");
+  const [sortBy, setSortBy] = useState<SortByType>("points");
 
   const { t } = useTranslation("leadboard");
   const currentUserId = useAppSelector(selectUserAuth);
@@ -73,20 +72,18 @@ const LeadboardView = () => {
   }, [sortBy, t]);
 
   return (
-    <AuthLayoutWrapper
-      pageId={"leadboard"}
-      subtitle='Leaderboard'
-      variant='secondary'>
+    <>
       {usersData ? (
         <LeadboardLayout
           usersData={usersData}
           setSortBy={setSortBy}
+          sortBy={sortBy}
           currentUserId={currentUserId}
         />
       ) : (
         <PageLoadingLayout />
       )}
-    </AuthLayoutWrapper>
+    </>
   );
 };
 

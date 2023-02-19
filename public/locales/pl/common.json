@@ -1,4 +1,5 @@
 {
+  "or": "lub",
   "button": {
     "sign_in": "Loguj",
     "sign_up": "Zarejestruj się",
@@ -7,7 +8,8 @@
     "link_copy_profile": "Kopiuj link do Twojego profilu"
   },
   "google_button": {
-    "sign_in": " Zaloguj Się Z Google"
+    "sign_in": "Zaloguj się z Google",
+    "sign_up": "Zarejestruj się z Google"
   },
   "input": {
     "login": "Login",
@@ -33,7 +35,7 @@
   },
   "day_since": {
     "no_practice": "Gracz nie ćwiczył",
-    "pracitce_last_24": "Ćwiczył w ciągu ostatnich 24h",
+    "pracitce_last_24": "Ostatnio ćwiczył",
     "practice_day": "Ćwiczył {{days}} dni temu"
   },
   "header": {
@@ -52,6 +54,17 @@
     "lvl_up": "Awansował na",
     "lvl": "Poziom",
     "achievements": "Osiągnięcia:",
+    "get": "zdobył",
+    "points": "pkt"
+  },
+  "discord_event": {
+    "active": "Aktywne",
+    "deadline": "Deadline:",
+    "join_us": "Dołącz do naszej społeczności na Discord i weź udział w evencie",
+    "join_us_offline": "Dołącz do naszej społeczności na Discord i zaproponuj lub zagłosuj następny event",
+    "link": "Link do materiału:",
+    "offline": "Aktualnie nie ma aktywnego eventu na Discord",
+    "data_none": "Brak:",
     "get": "zdobył",
     "points": "pkt"
   },

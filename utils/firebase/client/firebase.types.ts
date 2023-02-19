@@ -3,17 +3,19 @@ import { AchievementList } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 import { SkillsType } from "types/skillsTypes";
 
-
 export interface FirebaseUserDataInterface {
   profileId: string;
   createdAt: Timestamp;
   displayName: string;
   avatar?: string;
+  soundCloudLink?: string;
+  youTubeLink?: string;
+  band?: string;
   statistics: StatisticsDataInterface;
 }
 
 export interface FirebaseLogsInterface {
-  uid:string;
+  uid: string;
   data: string;
   userName: string;
   newAchievements: AchievementList[];
@@ -27,6 +29,12 @@ export interface FirebaseLogsInterface {
 export interface FirebaseEventsInteface {
   category: SkillsType;
   name: string;
+  link: string;
+}
+export interface FirebaseDiscordEventsInteface {
+  title: string;
+  deadline: string;
+  description: string;
   link: string;
 }
 

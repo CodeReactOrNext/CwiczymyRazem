@@ -36,6 +36,7 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
         <NavLink
           url='https://discord.com/invite/pCHjCZx'
           title={t("nav.discord")}
+          external
         />
         <NavLink url='/faq' title={t("nav.faq")} />
       </ul>
@@ -54,7 +55,9 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
           </li>
           <li className='active:click-behavior'>
             <Link href='https://discord.com/invite/pCHjCZx'>
-              {t("nav.discord")}
+              <a target='_blank' rel='noreferrer'>
+                {t("nav.discord")}
+              </a>
             </Link>
           </li>
           <li className=' active:click-behavior'>
