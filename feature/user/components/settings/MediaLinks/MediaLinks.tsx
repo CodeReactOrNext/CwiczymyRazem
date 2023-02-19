@@ -1,8 +1,8 @@
 import { Formik } from "formik";
-import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";
-import { mediaSchema } from "feature/user/view/SettingsView/Settings.schemas";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { mediaSchema } from "feature/user/view/SettingsView/Settings.schemas";
 
 import FieldBox from "layouts/SettingsLayout/components/FieldBox";
 
