@@ -17,6 +17,8 @@
   "points_short": "pt.",
   "profile": "Profile",
   "statistics": "Statistics",
+  "band": "Band:",
+  "joined": "Joined:",
   "stats": {
     "spent_time": "Total time",
     "num_sessions": "Sessions",

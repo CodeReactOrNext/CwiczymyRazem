@@ -17,6 +17,8 @@
   "points_short": "pkt",
   "profile": "Profil",
   "statistics": "Statystyki",
+  "band": "Zespół:",
+  "joined": "Dołączył:",
   "stats": {
     "spent_time": "Czas łącznie",
     "num_sessions": "Liczba sesji",

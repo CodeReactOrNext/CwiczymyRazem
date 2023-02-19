@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { ImSoundcloud2 } from "react-icons/im";
 
 import Avatar from "components/Avatar";
 import Calendar from "components/Calendar";
@@ -38,7 +40,7 @@ const ProfileLayout = ({
         <HeadDecoration title={t("profile")} />
         <div className='grid-rows-auto  grid-cols-2  xl:grid'>
           <div className=' row-span-1  flex flex-col  items-center justify-center gap-6 '>
-            <div className='z-10 flex flex-row items-center gap-4 p-4 '>
+            <div className='z-10 flex flex-row items-center justify-center gap-6 p-4 pb-0 '>
               <Avatar
                 name={userName}
                 lvl={userStats.lvl}
@@ -53,6 +55,22 @@ const ProfileLayout = ({
                   </span>
                 </p>
                 <DaySince date={new Date(lastReportDate)} />
+                <p className='my-1 font-openSans text-xs font-bold text-tertiary-300 '>
+                  {t("joined")}{" "}
+                  <span className='text-mainText'>23-04-2023</span>
+                </p>
+              </div>
+            </div>
+            <div className='z-10 flex w-[40%] flex-col justify-center gap-1 font-openSans text-xs radius-default'>
+              <p>
+                {t("band")}{" "}
+                <span className='font-bold'>
+                  Sublunar / Free Return Trajectory
+                </span>
+              </p>
+              <div className='flex flex-row items-center justify-evenly gap-4 p-2 text-xl'>
+                <FaYoutube size={35} />
+                <FaSoundcloud size={35} />
               </div>
             </div>
             <LevelBar
