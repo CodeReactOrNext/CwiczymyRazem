@@ -18,7 +18,7 @@ const MainLayout = ({ children, subtitle, variant }: LayoutProps) => {
     <main className='h-screen min-h-[650px] bg-tertiary-bg p-4 font-sans xs:min-h-[950px] lg:p-8'>
       <div className='relative flex h-full w-full items-center justify-center '>
         <div
-          className={`relative   flex h-full max-h-[calc(1080px_-_4rem)] w-full max-w-[1920px] flex-col overflow-x-hidden scrollbar-hide ${
+          className={`relative  flex h-full max-h-[calc(1200px_-_4rem)] w-full max-w-[2200px] flex-col overflow-x-hidden scrollbar-hide ${
             variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
           }`}>
           <Header variant={variant} />
@@ -29,7 +29,6 @@ const MainLayout = ({ children, subtitle, variant }: LayoutProps) => {
             {variant !== "landing" && <OldEffect />}
             <ContentBox variant={variant}>{children}</ContentBox>
           </div>
-         
         </div>
       </div>
     </main>

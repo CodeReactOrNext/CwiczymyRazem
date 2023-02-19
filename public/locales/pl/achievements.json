@@ -139,5 +139,9 @@
   "vip": {
     "title": "Zasłużony",
     "description": "Ten gracz pomógł w rozwoju Ćwiczymy Razem"
+  },
+  "short": {
+    "title": "Wytrzymał",
+    "description": "Ten gracz utrzymał ciąłość ćwiczeń za wszelką cenę"
   }
 }

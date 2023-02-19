@@ -7,5 +7,10 @@
   "required": "Required",
   "same_passwords": "Passwords must be the same",
   "no_ends_whitespace": "Username can't start or end with empty space",
-  "allowed_signs": "Allowed are only letters, numbers and - _ characters"
+  "allowed_signs": "Allowed are only letters, numbers and - _ characters",
+  "not_yt_link": "It is not correct YouTube channel link",
+  "not_sc_link": "It is not correct SoundCloud link",
+  "empty": "Can't be empty",
+  "max_bands": "Can't be more than 60 characters",
+  "min_bands": "Can't be less than 2 characters"
 }
