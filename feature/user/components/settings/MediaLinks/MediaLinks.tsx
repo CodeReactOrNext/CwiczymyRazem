@@ -31,91 +31,51 @@ function MediaLinks({ isFetching }: { isFetching: boolean }) {
   }
 
   return (
-    <>
-      {/* <Formik
-        initialValues={formikInitialValues}
-        validationSchema={mediaSchema}
-        onSubmit={(data) => {
-          linksChangeHandler(data);
-        }}>
-        {({ values, errors }) => (
+    <Formik
+      initialValues={formikInitialValues}
+      validationSchema={mediaSchema}
+      onSubmit={() => {}}>
+      {({ values, errors }) => (
+        <>
           <FieldBox
             title={"YouTube"}
             Icon={FaYoutube}
-            submitHandler={() => {}}
+            submitHandler={() => {
+              updateYtLink(values.youtube);
+            }}
             errors={errors}
             values={values}
             inputName={"youtube"}
             isFetching={isFetching}
             value={youtubeLink}
           />
-        )}
-      </Formik> */}
-      <Formik
-        initialValues={formikInitialValues}
-        validationSchema={mediaSchema}
-        onSubmit={() => {}}>
-        {({ values, errors }) => (
-          <>
-            <FieldBox
-              title={"YouTube"}
-              Icon={FaYoutube}
-              submitHandler={() => {
-                updateYtLink(values.youtube);
-              }}
-              errors={errors}
-              values={values}
-              inputName={"youtube"}
-              isFetching={isFetching}
-              value={youtubeLink}
-            />
-            <FieldBox
-              title={"SoundCloud"}
-              Icon={FaSoundcloud}
-              submitHandler={() => {
-                console.log(errors, values);
-              }}
-              errors={errors}
-              values={values}
-              inputName={"soundcloud"}
-              isFetching={isFetching}
-              value={soundcloudLink}
-            />
-            <FieldBox
-              title={t("settings:bands")}
-              Icon={FaGuitar}
-              submitHandler={() => {
-                updateBands(values.bands);
-              }}
-              errors={errors}
-              values={values}
-              inputName={"bands"}
-              isFetching={isFetching}
-              value={bands}
-            />
-          </>
-        )}
-      </Formik>
-      {/* <Formik
-        initialValues={formikInitialValues}
-        validationSchema={mediaSchema}
-        onSubmit={() => {}}>
-        {({ values, errors }) => (
+          <FieldBox
+            title={"SoundCloud"}
+            Icon={FaSoundcloud}
+            submitHandler={() => {
+              updateScLink(values.soundcloud);
+            }}
+            errors={errors}
+            values={values}
+            inputName={"soundcloud"}
+            isFetching={isFetching}
+            value={soundcloudLink}
+          />
           <FieldBox
             title={t("settings:bands")}
             Icon={FaGuitar}
             submitHandler={() => {
-              console.log(errors, values);
+              updateBands(values.bands);
             }}
             errors={errors}
             values={values}
             inputName={"bands"}
             isFetching={isFetching}
-            value={"Band Name"}
+            value={bands}
           />
-        )}
-      </Formik> */}
-    </>
+        </>
+      )}
+    </Formik>
   );
 }
 export default MediaLinks;
