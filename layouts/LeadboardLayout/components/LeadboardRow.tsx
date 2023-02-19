@@ -62,7 +62,7 @@ const LeadboardRow = ({
         ${place === 3 ? "border-yellow-700 bg-[#5D3F17] bg-opacity-90" : ""}
         ${
           profileId === currentUserId
-            ? "bg-second-200 shadow-lg shadow-second-50/50"
+            ? "border-second-100 bg-second-200 shadow-lg shadow-second-50/30"
             : ""
         }
        `}>
