@@ -12,7 +12,7 @@ import StatsField, { StatsFieldProps } from "./components/StatsField";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 import { convertMsToHM } from "utils/converter/timeConverter";
-import { ProfileInterface } from "types/ProfileInterface";
+import { ProfileInterface } from "types/profileInterface";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];

@@ -7,7 +7,7 @@ import Stopwatch from "./components/Stopwatch";
 import BeginnerMsg from "components/BeginnerMsg";
 import CategoryBox from "./components/CategoryBox";
 
-import { SkillsType } from "types/SkillsTypes";
+import { SkillsType } from "types/skillsTypes";
 import { useTimerInterface } from "hooks/useTimer";
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { TimerInterface } from "feature/user/store/userSlice.types";
