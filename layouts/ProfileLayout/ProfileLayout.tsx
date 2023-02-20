@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import { FaSoundcloud, FaYoutube } from "react-icons/fa";
-import { ImSoundcloud2 } from "react-icons/im";
 
 import Avatar from "components/Avatar";
 import Calendar from "components/Calendar";
