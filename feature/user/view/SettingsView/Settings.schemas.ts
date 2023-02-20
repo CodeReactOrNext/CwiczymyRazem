@@ -9,8 +9,7 @@ export const updateCredsSchema = yup.object().shape({
     .matches(
       /^[\u0041-\u005A\u0061-\u007A\u0100-\u017F\u0180-\u024F\u0259\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03CE\u03D0-\u03D7\u03DA-\u03FB\u1F00-\u1FFF\p{N}\d_-\s]+$/,
       "yup_errors:allowed_signs"
-    )
-    .required("yup_errors:required"),
+    ),
   email: yup.string().email("yup_errors:valid_email"),
   password: yup.string().min(8, "yup_errors:password_char_number"),
   repeat_password: yup
