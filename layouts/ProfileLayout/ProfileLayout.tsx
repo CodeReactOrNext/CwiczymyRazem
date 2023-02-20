@@ -68,21 +68,31 @@ const ProfileLayout = ({
                 </p>
               </div>
             </div>
-            <div className='z-10 flex w-[40%] flex-col justify-center gap-1 font-openSans text-xs radius-default'>
+            <div className='z-10 flex w-[40%] flex-col items-center justify-center gap-1 font-openSans text-sm radius-default'>
               {band && (
                 <p>
                   {t("band")} <span className='font-bold'>{band}</span>
                 </p>
               )}
-              <div className='flex flex-row items-center justify-evenly gap-4 p-2 text-xl'>
+              <div className='flex flex-row items-center justify-evenly gap-4 p-2 text-sm'>
                 {youTubeLink && (
-                  <a target='_blank' rel='noreferrer' href={youTubeLink}>
-                    <FaYoutube size={35} />
+                  <a
+                    target='_blank'
+                    rel='noreferrer'
+                    href={youTubeLink}
+                    className={"flex items-center gap-1"}>
+                    <FaYoutube size={30} />
+                    YouTube
                   </a>
                 )}
                 {soundCloudLink && (
-                  <a target='_blank' rel='noreferrer' href={soundCloudLink}>
-                    <FaSoundcloud size={35} />
+                  <a
+                    target='_blank'
+                    rel='noreferrer'
+                    href={soundCloudLink}
+                    className={"flex items-center gap-1"}>
+                    <FaSoundcloud size={30} />
+                    SoundCloud
                   </a>
                 )}
               </div>
