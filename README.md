@@ -6,7 +6,7 @@
 <br>
 <br>
 <div align="center">
-  <img height="240" src="https://raw.githubusercontent.com/CodeReactOrNext/CwiczymyRazem/develop/gitImg/gif.gif"  />
+  <img height="800" src="https://raw.githubusercontent.com/CodeReactOrNext/CwiczymyRazem/tasks_v.1.0/promo.png"  />
 </div>
 
 # Ćwiczymy Razem
