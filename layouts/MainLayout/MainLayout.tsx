@@ -22,7 +22,7 @@ const MainLayout = ({
 }: MainLayoutProps) => {
   return (
     <main
-      className={`h-screen bg-tertiary-bg  font-sans lg:min-h-[640px] xl:p-4
+      className={`h-screen bg-tertiary-bg  font-sans  lg:min-h-[920px] 2xl:p-4
       ${minHeightLimit ? "min-h-[650px] " : ""}`}>
       <div className='relative flex h-full w-full items-center justify-center '>
         <div
