@@ -23,7 +23,7 @@ const MainLayout = ({
   return (
     <main
       className={`h-screen bg-tertiary-bg  font-sans  lg:min-h-[920px] 2xl:p-4
-      ${minHeightLimit ? "min-h-[650px] " : ""}`}>
+      ${minHeightLimit ? "min-h-[820px] sm:min-h-[1000px]" : ""}`}>
       <div className='relative flex h-full w-full items-center justify-center '>
         <div
           className={`relative  flex h-full max-h-[calc(1200px_-_4rem)] w-full max-w-[2200px] flex-col overflow-x-hidden scrollbar-hide ${

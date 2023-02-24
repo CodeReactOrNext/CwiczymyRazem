@@ -19,13 +19,22 @@ const SubtitleBar = ({ variant, children }: SubtitleBarProps) => {
           variant === "secondary" ? "bg-main-opposed-bg" : "bg-second-500"
         } ${variant === "landing" ? "bg-transparent" : ""}`}></div>
       <LightningRevSVG
-        className={`min-h-full w-full fill-tertiary-500 rotate-x-40 lg:hidden`}
+        className={` w-full fill-tertiary-500 rotate-x-40 lg:hidden
+        ${
+          variant === "landing"
+            ? " max-h-[200px] sm:max-h-[260px] md:max-h-[290px]"
+            : " "
+        }`}
       />
       <span
-        className={`absolute top-0 bottom-0 right-[10%] my-auto flex h-fit translate-y-[60%] items-center text-right text-[5vw] font-medium text-main-opposed-text lg:relative lg:right-0 lg:top-0 lg:h-20  lg:translate-y-0 lg:bg-tertiary-500 lg:text-left lg:text-3xl  xl:text-4xl ${
-          variant === "landing" ? " lg:w-6/12" : " lg:w-[70%] xl:w-[80%]"
+        className={`absolute top-0 bottom-0 right-[20%] my-auto flex h-fit translate-y-[60%] items-center lg:relative  lg:right-0 lg:top-0 lg:h-20  lg:translate-y-0 lg:bg-tertiary-500 ${
+          variant === "landing"
+            ? " lg:w-5/12 xl:w-6/12"
+            : " lg:w-[75%] xl:w-[80%]"
         }`}>
-        <p>{children}</p>
+        <p className='text-right font-medium text-main-opposed-text xs:text-xl  sm:text-4xl lg:text-left lg:text-3xl  xl:text-4xl'>
+          {children}
+        </p>
       </span>
     </div>
   );
