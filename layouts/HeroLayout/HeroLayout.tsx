@@ -27,8 +27,8 @@ const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
         <OldEffect />
         <Guitar />
       </div>
-      <div className='z-30 flex flex-col items-center justify-center gap-6 xsm:flex-row lg:-mb-24 lg:flex-col xl:pr-8 '>
-        <span className='p-2 text-left font-openSans text-[min(5vw,2vh)] font-bold text-mainText xxs:text-[min(3.5vw,2vh)] xsm:text-[min(1.7vw,12px)] md:text-sm lg:text-right xl:text-xl 2xl:text-2xl'>
+      <div className='z-30 flex flex-col items-center justify-center gap-6  lg:-mb-24 lg:flex-col xl:pr-8 '>
+        <span className='px-4 text-left font-openSans text-xs font-bold text-mainText xs:text-sm sm:text-base lg:text-right '>
           {children}
         </span>
         <Link href='/login'>

@@ -69,7 +69,7 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
           </li>
         </HamburgerLayout>
       )}
-      <div className='absolute right-1 top-1 hidden flex-col items-end gap-4 lg:flex'>
+      <div className='absolute right-2 top-2 hidden flex-col items-end gap-3 lg:flex'>
         <LanguageSwitch />
         <ThemeToggle />
       </div>
