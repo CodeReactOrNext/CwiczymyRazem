@@ -8,7 +8,10 @@ const HeroView = () => {
   const { t } = useTranslation(["common", "footer", "profile"]);
 
   return (
-    <MainLayout variant={"landing"} subtitle={t("profile:subtitlebar_text")}>
+    <MainLayout
+      variant={"landing"}
+      subtitle={t("profile:subtitlebar_text")}
+      minHeightLimit>
       <HeroLayout>
         <>
           <p>{t("profile:hero_line_1")}</p>
