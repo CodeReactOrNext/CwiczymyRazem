@@ -7,15 +7,23 @@ import LightningDesktopDivider from "./components/LightningDesktopDivider";
 
 export type layoutVariant = "primary" | "secondary" | "landing";
 
-interface LayoutProps {
+interface MainLayoutProps {
   children: React.ReactNode;
   subtitle: string;
   variant: layoutVariant;
+  minHeightLimit?: boolean;
 }
 
-const MainLayout = ({ children, subtitle, variant }: LayoutProps) => {
+const MainLayout = ({
+  children,
+  subtitle,
+  variant,
+  minHeightLimit = false,
+}: MainLayoutProps) => {
   return (
-    <main className='h-screen min-h-[650px] bg-tertiary-bg p-4 font-sans xs:min-h-[950px] lg:p-8'>
+    <main
+      className={`h-screen bg-tertiary-bg  font-sans  lg:min-h-[920px] 2xl:p-4
+      ${minHeightLimit ? "min-h-[820px] sm:min-h-[1000px]" : ""}`}>
       <div className='relative flex h-full w-full items-center justify-center '>
         <div
           className={`relative  flex h-full max-h-[calc(1200px_-_4rem)] w-full max-w-[2200px] flex-col overflow-x-hidden scrollbar-hide ${

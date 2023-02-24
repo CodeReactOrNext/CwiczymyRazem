@@ -29,7 +29,7 @@ const EventsList = ({ eventList }: EventsListProps) => {
         return (
           <div
             key={link}
-            className='flex flex-row flex-nowrap  items-center border-b-2 border-main-opposed-400 py-2 '>
+            className='flex flex-row flex-nowrap  items-center border-b-2 border-main-opposed-400 py-2  '>
             <p className='mr-2 w-[20%] max-w-[8rem] border-r-2 border-main-opposed-400 pr-2 text-center text-[0.55rem]  lg:text-xs'>
               {getSkillName(category)}
             </p>
