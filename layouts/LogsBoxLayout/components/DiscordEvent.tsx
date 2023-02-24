@@ -20,7 +20,7 @@ const DiscordEvent = ({ discordEvent }: DiscordEventProps) => {
         <div className='m-2 h-2 w-2 animate-ping rounded-full bg-green-700'></div>
         <p className='px-2  '>
           {t("discord_event.deadline")}
-          <span className='text-second-text'>{discordEvent.deadline}</span>
+          <span className='mx-2 text-second-text'>{discordEvent.deadline}</span>
         </p>
       </div>
       <div className='m-2 flex flex-row items-center'>
@@ -36,7 +36,7 @@ const DiscordEvent = ({ discordEvent }: DiscordEventProps) => {
 
       <Link href={discordEvent.link}>
         <a target='_blank' rel='noopener noreferrer'>
-          <p className='flex flex-row items-center  text-second-text mb-5 '>
+          <p className='mb-5 flex flex-row  items-center text-second-text '>
             {t("discord_event.link")}
             <FaExternalLinkAlt size={15} className='mx-2' />
           </p>
