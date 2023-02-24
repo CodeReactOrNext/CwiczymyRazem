@@ -62,7 +62,7 @@ const LogsBoxLayout = ({
           Icon={MdEmojiEvents}
         />
       </div>
-      <div className='overflow-scroll'>
+      <div className='overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
         {showedCategory === "achievements" && (
           <AchievementsMap userAchievements={userAchievements} />
         )}

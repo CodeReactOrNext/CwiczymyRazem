@@ -75,16 +75,12 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 13px;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  @apply bg-main-opposed-700/60;
 }
-
-::-webkit-scrollbar-corner {
-  background: rgba(0, 0, 0, 0);
-}
-
 ::-webkit-scrollbar-thumb {
   @apply bg-second-200;
 }
