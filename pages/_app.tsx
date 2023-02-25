@@ -8,10 +8,9 @@ import { store } from "store/store";
 
 import "../styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
-import ThemeModeProvider from "Hoc/ThemeModeProvider";
+import ThemeModeProvider from "wrappers/ThemeModeProvider";
 
 function MyApp({ Component, pageProps }: AppProps) {
-  // const layoutTheme = useAppSelector(selectLayoutMode);
   return (
     <Provider store={store}>
       <Head>
@@ -31,7 +30,6 @@ function MyApp({ Component, pageProps }: AppProps) {
         <div id='overlays'></div>
         <Component {...pageProps} />
         <ToastContainer toastClassName={"toastify-custom"} />
-      
       </ThemeModeProvider>
     </Provider>
   );

@@ -17,7 +17,63 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   const [reportList, setReportList] = useState<ReportListInterface[] | null>(
     null
   );
+  const getEmptyFiled = (dayWhenYearStart: number) => {
+    const numOfDayWhereUiStart = 6;
+    const nullsToGenerateSapceForUi = new Array(
+      numOfDayWhereUiStart - dayWhenYearStart
+    ).fill(null);
+    return nullsToGenerateSapceForUi;
+  };
 
+  let year = 2023;
+  let datasWithReports: Array<{
+    date: Date;
+    report: ReportListInterface | undefined;
+  }> = [];
+
+  for (let month = 0; month < 12; month++) {
+    for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
+      let date = new Date(year, month, day);
+      if (month === 0 && day === 1) {
+        datasWithReports.push(...getEmptyFiled(date.getDay()));
+      }
+
+      let exceries = reportList?.find((report) => {
+        const reportDate = new Date(report.date);
+        return (
+          reportDate.getFullYear() === date.getFullYear() &&
+          reportDate.getMonth() === date.getMonth() &&
+          reportDate.getDate() === date.getDate()
+        );
+      });
+      datasWithReports.push({ date, report: exceries });
+    }
+  }
+  const getPointRaitings = (
+    datasWithReports: {
+      date: Date;
+      report: ReportListInterface | undefined;
+    } | null
+  ) => {
+    if (datasWithReports === null) return null;
+    if (datasWithReports.report === undefined) return;
+
+    switch (true) {
+      case datasWithReports.report.points > 30:
+        return "super";
+      case datasWithReports.report.points > 20:
+        return "great";
+      case datasWithReports.report.points > 10:
+        return "nice";
+      case datasWithReports.report.points ||
+        datasWithReports.report.points === 0:
+        return "ok";
+      case datasWithReports.report.points === 0:
+        return "zero";
+      default:
+        return null;
+    }
+  };
   useEffect(() => {
     if (userAuth && reportList === null) {
       firebaseGetUserRaprotsLogs(userAuth).then((response) => {
@@ -55,67 +111,6 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
       });
     }
   }, [userAuth, reportList]);
-
-  const getNullToCorrectDaysStartInUi = (dayWhenYearStart: number) => {
-    const numOfDayWhereUiStart = 6;
-    const nullsToGenerateSapceForUi = new Array(
-      numOfDayWhereUiStart - dayWhenYearStart
-    ).fill(null);
-    return nullsToGenerateSapceForUi;
-  };
-
-  let year = 2023;
-  let datasWithReports: Array<{
-    date: Date;
-    report: ReportListInterface | undefined;
-  }> = [];
-
-  for (let month = 0; month < 12; month++) {
-    for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
-      let date = new Date(year, month, day);
-      if (month === 0 && day === 1) {
-        datasWithReports.push(...getNullToCorrectDaysStartInUi(date.getDay()));
-      }
-
-      let exceries = reportList?.find((report) => {
-        const reportDate = new Date(report.date);
-        return (
-          reportDate.getFullYear() === date.getFullYear() &&
-          reportDate.getMonth() === date.getMonth() &&
-          reportDate.getDate() === date.getDate()
-        );
-      });
-      datasWithReports.push({ date, report: exceries });
-    }
-  }
-
-  const getPointRaitings = (
-    datasWithReports: {
-      date: Date;
-      report: ReportListInterface | undefined;
-    } | null
-  ) => {
-    if (datasWithReports === null) return null;
-    if (datasWithReports.report === undefined) return;
-    if (datasWithReports.report.points > 30) {
-      return "super";
-    }
-    if (datasWithReports.report.points > 20) {
-      return "great";
-    }
-    if (datasWithReports.report.points > 10) {
-      return "nice";
-    }
-    if (
-      datasWithReports.report.points ||
-      datasWithReports.report.points === 0
-    ) {
-      return "ok";
-    }
-    if (datasWithReports.report.points === 0) {
-      return "zero";
-    }
-  };
 
   return reportList ? (
     <div className=' overflow-y-scroll  border-2 border-second-400/60 bg-second-600  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-200 radius-default'>

@@ -9,11 +9,9 @@ import { FaBrain, FaMusic } from "react-icons/fa";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
+import TimeInputBox from "layouts/ReportFormLayout/components/TimeInputBox";
+import HealthHabbitsBox from "layouts/ReportFormLayout/components/HealthHabbitsBox";
 import ReportCategoryWrapper from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
-import {
-  HealthHabbitsBox,
-  TimeInputBox,
-} from "layouts/ReportFormLayout/components";
 
 import Button from "components/UI/Button";
 import Backdrop from "components/Backdrop";

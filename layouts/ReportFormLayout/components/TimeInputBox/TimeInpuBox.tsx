@@ -1,7 +1,7 @@
 import { FormikErrors } from "formik";
 import { IconType } from "react-icons/lib";
 
-import InputTime from "./InputTime";
+import InputTime from "../InputTime/InputTime";
 import QuestionMark, { QuestionMarkProps } from "components/UI/QuestionMark";
 
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";

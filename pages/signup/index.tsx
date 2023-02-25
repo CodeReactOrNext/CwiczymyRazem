@@ -6,7 +6,7 @@ import MainLayout from "layouts/MainLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import useAutoLogIn from "hooks/useAutoLogIn";
-import SingupView from "feature/user/view/SingupView/SingupView";
+import SingupView from "feature/user/view/SingupView";
 
 const SignUpPage: NextPage = () => {
   const { t } = useTranslation("signup");

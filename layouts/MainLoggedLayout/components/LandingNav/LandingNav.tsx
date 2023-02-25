@@ -1,5 +1,5 @@
-import { NavPagesTypes } from "Hoc/AuthLayoutWrapper";
-import NavLink from "./NavLink";
+import { NavPagesTypes } from "wrappers/AuthLayoutWrapper";
+import NavLink from "../NavLink";
 
 export interface LandingNavLinkInterface {
   id: NavPagesTypes;

@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { FaHandPointLeft } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 import { useAppSelector } from "store/hooks";

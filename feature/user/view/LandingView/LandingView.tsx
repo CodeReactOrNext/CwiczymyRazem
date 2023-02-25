@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
 
-import HeroView from "views/HeroView";
+import HeroView from "feature/hero/HeroView";
 import LandingLayout from "layouts/ProfileLayout";
 
 import { useAppSelector } from "store/hooks";
-import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
+import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import { getUserStatsField } from "assets/stats/profileStats";
 import {
