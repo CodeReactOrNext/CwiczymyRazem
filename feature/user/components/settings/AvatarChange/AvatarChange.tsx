@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
-import Button from "components/Button";
+import Button from "components/UI/Button";
 import Avatar from "components/Avatar";
 
 import { uploadUserAvatar } from "feature/user/store/userSlice.asyncThunk";

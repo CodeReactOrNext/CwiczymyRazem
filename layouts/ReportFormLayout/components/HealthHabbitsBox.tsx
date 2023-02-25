@@ -1,5 +1,5 @@
 import { useField } from "formik";
-import QuestionMark, { QuestionMarkProps } from "components/QuestionMark";
+import QuestionMark, { QuestionMarkProps } from "components/UI/QuestionMark";
 
 interface HealthHabbitsBoxProps {
   title: string;

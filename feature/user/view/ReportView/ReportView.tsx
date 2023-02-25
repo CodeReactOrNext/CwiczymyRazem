@@ -15,7 +15,7 @@ import {
   TimeInputBox,
 } from "layouts/ReportFormLayout/components";
 
-import Button from "components/Button";
+import Button from "components/UI/Button";
 import Backdrop from "components/Backdrop";
 import BeginnerMsg from "components/BeginnerMsg";
 

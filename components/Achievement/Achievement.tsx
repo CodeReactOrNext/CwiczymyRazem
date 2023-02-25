@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import ToolTip from "components/ToolTip";
+import ToolTip from "components/UI/ToolTip";
 
 import {
   AchievementList,

@@ -6,8 +6,8 @@ import { FaBars } from "react-icons/fa";
 import NavLink from "./component/NavLink";
 import HamburgerLayout from "layouts/HamburgerLayout";
 import { layoutVariant } from "layouts/MainLayout/MainLayout";
-import LanguageSwitch from "components/LanguageSwitch";
-import ThemeToggle from "components/ThemeToggle";
+import LanguageSwitch from "components/UI/LanguageSwitch";
+import ThemeToggle from "components/UI/ThemeToggle";
 
 interface MainNavigationProps {
   variant: layoutVariant;
