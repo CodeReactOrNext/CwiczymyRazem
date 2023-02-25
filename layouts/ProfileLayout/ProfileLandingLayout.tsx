@@ -17,7 +17,7 @@ interface LandingLayoutProps {
   userAuth: string;
 }
 
-const LandingLayout = ({
+const ProfileLandingLayout = ({
   statsField,
   userStats,
   userAuth,
@@ -76,4 +76,4 @@ const LandingLayout = ({
   );
 };
 
-export default LandingLayout;
+export default ProfileLandingLayout;

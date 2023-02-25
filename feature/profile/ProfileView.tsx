@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import PageLoadingLayout from "layouts/PageLoadingLayout";
-import ProfileLayout from "layouts/ProfileLayout/ProfileLayout";
+import { ProfileLayout } from "layouts/ProfileLayout";
 
 import { getUserStatsField } from "assets/stats/profileStats";
 import { firebaseGetUserDocument } from "utils/firebase/client/firebase.utils";

@@ -1,2 +1,2 @@
-export * as ProfileLandingLayout from "./ProfileLandingLayout";
-export * as ProfileLayout from "./ProfileLayout";
+export { default as ProfileLayout } from "./ProfileLayout";
+export { default as ProfileLandingLayout } from "./ProfileLandingLayout";

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import HeroView from "feature/hero/HeroView";
-import LandingLayout from "layouts/ProfileLayout";
+import { ProfileLandingLayout } from "layouts/ProfileLayout";
 
 import { useAppSelector } from "store/hooks";
 import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
@@ -23,7 +23,7 @@ const LandingView = () => {
       pageId={"profile"}
       subtitle={t("profile")}
       variant='secondary'>
-      <LandingLayout
+      <ProfileLandingLayout
         statsField={getUserStatsField(userStats)}
         userStats={userStats}
         featSlot={<LogsBoxView />}
