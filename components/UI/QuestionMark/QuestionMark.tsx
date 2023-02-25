@@ -1,5 +1,5 @@
 import { RiQuestionnaireFill } from "react-icons/ri";
-import ToolTip from "components/ToolTip";
+import ToolTip from "components/UI/ToolTip";
 
 export interface QuestionMarkProps {
   description: string;

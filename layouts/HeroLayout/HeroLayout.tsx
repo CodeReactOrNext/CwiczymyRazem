@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import Button from "components/Button";
+import Button from "components/UI/Button";
 import OldEffect from "components/OldEffect";
 import Guitar from "./components/Guitar";
 import HeroSlogan from "./components/HeroSlogan";

@@ -1,7 +1,7 @@
 import { FaSpinner } from "react-icons/fa";
 import { useEffect, useState } from "react";
 
-import ToolTip from "components/ToolTip";
+import ToolTip from "components/UI/ToolTip";
 
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";

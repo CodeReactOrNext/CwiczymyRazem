@@ -3,8 +3,8 @@ import { Form, Formik } from "formik";
 import { useTranslation } from "react-i18next";
 import { FaUserAlt, FaLock, FaAt, FaArrowLeft } from "react-icons/fa";
 
-import Input from "components/Input";
-import Button from "components/Button";
+import Input from "components/UI/Input";
+import Button from "components/UI/Button";
 import FormLayout from "layouts/FormLayout";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -14,7 +14,7 @@ import {
   logInViaGoogle,
 } from "feature/user/store/userSlice.asyncThunk";
 import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
-import GoogleButton from "components/GoogleButton";
+import GoogleButton from "components/UI/GoogleButton";
 
 export interface SignUpCredentials {
   login: string;

@@ -2,7 +2,7 @@ import Image from "next/image";
 import FireSVG from "public/static/images/svg/Fire";
 import Lightning from "public/static/images/svg/Lightning";
 import blackGuitar from "public/static/images/guitar_black.png";
-import Button from "components/Button";
+import Button from "components/UI/Button";
 
 import OldEffect from "components/OldEffect";
 import BonusPointsItem from "./components/BonusPointsItem";

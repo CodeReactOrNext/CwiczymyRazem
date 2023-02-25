@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
-import Input from "components/Input";
+import Input from "components/UI/Input";
 import ReauthForm from "../ReauthForm";
-import Button from "components/Button";
+import Button from "components/UI/Button";
 
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { updateUserPassword } from "feature/user/store/userSlice.asyncThunk";

@@ -1,13 +1,13 @@
 import Logo from "components/Logo";
 import Avatar from "components/Avatar";
-import LevelBar from "components/LevelBar";
+import LevelBar from "components/UI/LevelBar";
 import UserNav from "components/UserNav";
 import NavDecoration from "./components/NavDecoration";
 import WelcomeMessage from "./components/WelcomeMessage";
 
 import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import ThemeToggle from "components/ThemeToggle";
-import LanguageSwitch from "components/LanguageSwitch";
+import ThemeToggle from "components/UI/ThemeToggle";
+import LanguageSwitch from "components/UI/LanguageSwitch";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;

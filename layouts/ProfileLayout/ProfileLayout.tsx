@@ -3,7 +3,7 @@ import { FaSoundcloud, FaYoutube } from "react-icons/fa";
 
 import Avatar from "components/Avatar";
 import Calendar from "components/Calendar";
-import LevelBar from "components/LevelBar";
+import LevelBar from "components/UI/LevelBar";
 import DaySince from "components/DaySince/DaySince";
 import StatisticBar from "./components/StatisticBar";
 import HeadDecoration from "./components/HeadDecoration";

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import Button from "components/Button";
+import Button from "components/UI/Button";
 import Metronom from "components/Metronom/";
 import Stopwatch from "./components/Stopwatch";
 import BeginnerMsg from "components/BeginnerMsg";
