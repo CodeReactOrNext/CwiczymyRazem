@@ -3,12 +3,12 @@ import { Provider } from "react-redux";
 import type { AppProps } from "next/app";
 import { ToastContainer } from "react-toastify";
 import { appWithTranslation } from "next-i18next";
-
+import ThemeModeProvider from "wrappers/ThemeModeProvider";
 import { store } from "store/store";
 
+import "../styles/fonts.css";
 import "../styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
-import ThemeModeProvider from "wrappers/ThemeModeProvider";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
