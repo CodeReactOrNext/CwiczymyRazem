@@ -6,7 +6,7 @@ import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import useAutoLogIn from "hooks/useAutoLogIn";
 import SettingsView from "feature/user/view/SettingsView";
-import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
+import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 
 const Settings: NextPage = () => {
   const { t } = useTranslation("settings");

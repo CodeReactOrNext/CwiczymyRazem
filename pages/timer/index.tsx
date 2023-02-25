@@ -5,7 +5,7 @@ import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import useAutoLogIn from "hooks/useAutoLogIn";
 import TimerView from "feature/user/view/TimerView";
-import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
+import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 
 const Timer: NextPage = () => {
   const { isLoggedIn } = useAutoLogIn({

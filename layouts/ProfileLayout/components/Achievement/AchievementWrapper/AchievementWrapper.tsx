@@ -3,7 +3,7 @@ import {
   achievementsData,
   AchievementsDataInterface,
 } from "assets/achievements/achievementsData";
-import AchievementBox from "./AchievementBox";
+import AchievementBox from "../AchievementBox";
 
 const AchievementWrapper = ({
   userAchievements,

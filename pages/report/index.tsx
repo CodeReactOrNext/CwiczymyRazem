@@ -6,7 +6,7 @@ import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import useAutoLogIn from "hooks/useAutoLogIn";
 import ReportView from "feature/user/view/ReportView";
-import AuthLayoutWrapper from "Hoc/AuthLayoutWrapper";
+import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 
 const ReportPage: NextPage = () => {
   const { t } = useTranslation("report");

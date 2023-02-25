@@ -6,7 +6,7 @@ import MainLayout from "layouts/MainLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import useAutoLogIn from "hooks/useAutoLogIn";
-import LoginView from "feature/user/view/LoginView/LoginView";
+import LoginView from "feature/user/view/LoginView";
 
 const LoginPage: NextPage = () => {
   const { t } = useTranslation("login");
