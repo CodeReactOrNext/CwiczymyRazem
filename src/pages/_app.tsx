@@ -6,8 +6,8 @@ import { appWithTranslation } from "next-i18next";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
 import { store } from "store/store";
 
-import "../styles/fonts.css";
-import "../styles/globals.css";
+import "styles/fonts.css";
+import "styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
