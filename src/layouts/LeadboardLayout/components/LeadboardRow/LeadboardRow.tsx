@@ -7,7 +7,7 @@ import DaySince from "components/DaySince";
 import AchievementsCarousel from "../AchievementsCarousel";
 
 import { convertMsToHM } from "utils/converter/timeConverter";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 
 interface LeadboardColumnProps {
   place: number;
@@ -44,7 +44,7 @@ const LeadboardRow = ({
 
   return (
     <li
-      className={`flex w-full justify-center p-7 text-xs xs:text-base 
+      className={` flex w-full justify-center p-7 text-xs xs:text-base
     `}>
       <p
         className={`flex items-center justify-end font-semibold text-tertiary xxs:text-lg xs:text-4xl  lg:text-5xl  xl:w-[100px]  xl:text-6xl

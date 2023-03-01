@@ -6,7 +6,7 @@ interface ReportFormLayoutProps {
 
 const ReportFormLayout = ({ children }: ReportFormLayoutProps) => {
   return (
-    <Form className='flex flex-col items-center gap-10 bg-second text-mainText'>
+    <Form className=' flex flex-col items-center gap-10 text-mainText'>
       {children}
     </Form>
   );
