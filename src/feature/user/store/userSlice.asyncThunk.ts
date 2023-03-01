@@ -3,12 +3,13 @@ import { User } from "firebase/auth";
 
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 
+import { fetchReport, fetchUserData } from "./services/userServices";
 import {
   FetchedReportDataInterface,
-  fetchReport,
-  fetchUserData,
   UserDataInterface,
-} from "./services/userServices";
+  updateSocialInterface,
+  updateUserInterface,
+} from "types/api.types";
 import {
   auth,
   firebaseCheckUsersNameIsNotUnique,
@@ -26,8 +27,7 @@ import {
   firebaseUpdateBand,
   firebaseUpdateYouTubeLink,
   firebaseUpdateSoundCloudLink,
-} from "utils/firebase/client/firebase.utils";
-import { updateSocialInterface, updateUserInterface } from "./userSlice.types";
+} from "utils/firebase/client/firebase.utils";;
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 import { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 import {

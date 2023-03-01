@@ -1,26 +1,5 @@
-import { AchievementList } from "assets/achievements/achievementsData";
+import { StatisticsDataInterface } from "types/api.types";
 
-export interface StatisticsTime {
-  technique: number;
-  theory: number;
-  hearing: number;
-  creativity: number;
-  longestSession: number;
-}
-
-export interface StatisticsDataInterface {
-  time: StatisticsTime;
-  lvl: number;
-  currentLevelMaxPoints: number;
-  points: number;
-  sessionCount: number;
-  habitsCount: number;
-  dayWithoutBreak: number;
-  maxPoints: number;
-  achievements: AchievementList[];
-  actualDayWithoutBreak: number;
-  lastReportDate: string;
-}
 
 export const statisticsInitial: StatisticsDataInterface = {
   time: {

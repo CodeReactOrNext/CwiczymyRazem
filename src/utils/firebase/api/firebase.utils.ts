@@ -1,5 +1,5 @@
 import { AchievementList } from "assets/achievements/achievementsData";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { db } from "../client/firebase.utils";
