@@ -1,23 +1,11 @@
 import axios from "axios";
 import { User } from "firebase/auth";
 
-import { updateReprotInterface } from "../userSlice.types";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-
-export interface UserDataInterface {
-  userInfo: { displayName: string; avatar: string;
-    soundCloudLink?: string;
-    youTubeLink?: string;
-    band?: string;};
-  userAuth: string;
-  currentUserStats: StatisticsDataInterface;
-}
-export interface FetchedReportDataInterface {
-  currentUserStats: StatisticsDataInterface;
-  previousUserStats: StatisticsDataInterface;
-  raitingData: ReportDataInterface;
-}
+import {
+  FetchedReportDataInterface,
+  UserDataInterface,
+  updateReprotInterface,
+} from "types/api.types";
 
 export const fetchUserData = async (user: User) =>
   axios
