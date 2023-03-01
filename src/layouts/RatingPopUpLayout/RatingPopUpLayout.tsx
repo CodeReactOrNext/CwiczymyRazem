@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 import LevelIndicator from "./components/LevelIndicator";
 

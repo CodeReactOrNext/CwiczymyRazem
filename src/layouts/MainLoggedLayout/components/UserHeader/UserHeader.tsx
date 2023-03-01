@@ -7,7 +7,7 @@ import LanguageSwitch from "components/UI/LanguageSwitch";
 import NavDecoration from "./components/NavDecoration";
 import WelcomeMessage from "./components/WelcomeMessage";
 
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
