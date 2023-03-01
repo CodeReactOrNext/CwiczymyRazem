@@ -43,23 +43,23 @@ const ProfileLayout = ({
       <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col justify-center bg-second pb-4 '>
         <HeadDecoration title={t("profile")} />
         <div className='grid-rows-auto  grid-cols-2  xl:grid'>
-          <div className=' row-span-1  flex flex-col  items-center justify-center gap-6 '>
-            <div className='z-10 flex flex-row items-center justify-center gap-6 p-4 pb-0 '>
+          <div className='content-box z-10 row-span-1 flex flex-col m-4 items-center justify-center gap-3 '>
+            <div className=' flex  flex-row items-center justify-center gap-6 p-4 pb-0 '>
               <Avatar
                 name={displayName}
                 lvl={statistics.lvl}
                 avatarURL={avatar}
               />
-              <div className='flex-col'>
+              <div className='flex-col '>
                 <p className='relative  text-4xl'>{displayName}</p>
                 <p className='relative  text-xl'>
                   {t("points")}:{" "}
-                  <span className='text-2xl font-extrabold'>
+                  <span className='text-2xl  font-extrabold'>
                     {statistics.points}
                   </span>
                 </p>
                 <DaySince date={new Date(lastReportDate)} />
-                <p className='my-1 font-openSans text-xs font-bold text-tertiary-300 '>
+                <p className='my-1  font-openSans text-xs font-bold text-tertiary-300 '>
                   {t("joined")}{" "}
                   <span className='text-mainText'>
                     {createdAt.toDate().toLocaleDateString()}
@@ -67,7 +67,7 @@ const ProfileLayout = ({
                 </p>
               </div>
             </div>
-            <div className='z-10 flex w-[40%] flex-col items-center justify-center gap-1 font-openSans text-sm radius-default'>
+            <div className=' z-10 flex w-[40%] flex-col items-center justify-center gap-1 font-openSans text-sm radius-default'>
               {band && (
                 <p>
                   {t("band")} <span className='font-bold'>{band}</span>
@@ -102,7 +102,7 @@ const ProfileLayout = ({
               currentLevelMaxPoints={statistics.currentLevelMaxPoints}
             />
           </div>
-          <div className=' z-10 row-span-1 m-4 flex justify-center border-2 border-second-400/60 bg-second-600 p-2 radius-default '>
+          <div className=' content-box z-10 row-span-1 m-4 flex justify-center '>
             <StatisticBar
               title={t("technique")}
               value={convertMsToHM(time.technique)}

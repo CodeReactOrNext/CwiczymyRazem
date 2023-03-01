@@ -6,9 +6,9 @@ import HeadDecoration from "./components/HeadDecoration";
 import StatsField, { StatsFieldProps } from "./components/StatsField";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
+import { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter/timeConverter";
 import { calculatePercent } from "utils/converter/calculatePercent";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -42,7 +42,7 @@ const ProfileLandingLayout = ({
             />
           ))}
         </div>
-        <div className=' relative z-20 mx-4 my-2 flex justify-center border-2 border-second-400/60 bg-second-600 p-2 radius-default  '>
+        <div className=' content-box relative z-20 mx-4 my-2 flex justify-center '>
           <StatisticBar
             title={t("technique")}
             value={convertMsToHM(time.technique)}
