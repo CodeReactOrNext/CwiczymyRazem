@@ -13,7 +13,7 @@ import {
 import { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
 
 import { convertMsToHM } from "utils/converter/timeConverter";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 import { achievementsData } from "assets/achievements/achievementsData";
 
 export const getUserStatsField = (userStats: StatisticsDataInterface) => {

@@ -1,5 +1,5 @@
 import { inputTimeConverter } from "utils/converter/InputTimeConverter";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 import {
   ReportDataInterface,
   ReportFormikInterface,
