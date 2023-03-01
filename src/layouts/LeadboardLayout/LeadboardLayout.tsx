@@ -20,8 +20,11 @@ const LeadboardLayout = ({
   sortBy,
 }: LeadboardLayoutProps) => {
   return (
-    <ul className='arelative mt-2 '>
-      <SortBySwitch setSortBy={setSortBy} sortBy={sortBy} />
+    <ul>
+      <div className='flex w-full justify-end p-2 px-4'>
+        <SortBySwitch setSortBy={setSortBy} sortBy={sortBy} />
+      </div>
+
       {usersData.map((user, index) => (
         <LeadboardColumn
           profileId={user.profileId}
