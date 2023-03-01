@@ -2,13 +2,13 @@ import { useTranslation } from "react-i18next";
 
 import Footer from "components/Footer";
 import HeroLayout from "layouts/HeroLayout";
-import MainLayout from "layouts/MainLayout";
+import MainHeroLayout from "layouts/MainHeroLayout";
 
 const HeroView = () => {
   const { t } = useTranslation(["common", "footer", "profile"]);
 
   return (
-    <MainLayout
+    <MainHeroLayout
       variant={"landing"}
       subtitle={t("profile:subtitlebar_text")}
       minHeightLimit>
@@ -26,7 +26,7 @@ const HeroView = () => {
         <br />
         {t("footer:authors")}: Michał Jabłoński, Damian Sobieraj
       </Footer>
-    </MainLayout>
+    </MainHeroLayout>
   );
 };
 
