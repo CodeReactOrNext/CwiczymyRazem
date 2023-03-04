@@ -24,7 +24,6 @@ const WelcomeMessage = ({
     userLastReportDate,
     didPracticeToday
   );
-
   return (
     <div className='text:xs tracking-wide xxs:text-base sm:text-2xl md:text-base lg:text-xl 2xl:w-[650px]'>
       <p className='py-2 xs:text-lg md:text-xl lg:text-2xl xl:text-3xl '>
@@ -45,7 +44,9 @@ const WelcomeMessage = ({
         </div>
         <p className='flex flex-row items-center  gap-1'>
           {t("day_since.actual_streak")}
-          <span className='item-center flex h-7 min-w-[28px] justify-center bg-main-400/90  text-center  font-extrabold text-mainText radius-default'>
+          <span
+            className={`item-center flex h-7 min-w-[28px] justify-center  text-center  font-extrabold text-mainText radius-default
+          ${isStreak === 1 ? "bg-slate-600" : "bg-main-400/90 "}`}>
             {isStreak === 1 ? 0 : actualDayWithoutBreak}
           </span>
         </p>
