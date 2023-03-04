@@ -3,7 +3,7 @@ import { FaSoundcloud, FaYoutube } from "react-icons/fa";
 
 import Avatar from "components/Avatar";
 import Calendar from "components/Calendar";
-import LevelBar from "components/UI/LevelBar";
+import LevelBar from "components/LevelBar";
 import DaySince from "components/DaySince/DaySince";
 import StatisticBar from "./components/StatisticBar";
 import HeadDecoration from "./components/HeadDecoration";
@@ -43,7 +43,7 @@ const ProfileLayout = ({
       <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col justify-center bg-second pb-4 '>
         <HeadDecoration title={t("profile")} />
         <div className='grid-rows-auto  grid-cols-2  xl:grid'>
-          <div className='content-box z-10 row-span-1 flex flex-col m-4 items-center justify-center gap-3 '>
+          <div className='content-box z-10 row-span-1 m-4 flex flex-col items-center justify-center gap-3 '>
             <div className=' flex  flex-row items-center justify-center gap-6 p-4 pb-0 '>
               <Avatar
                 name={displayName}
@@ -124,7 +124,7 @@ const ProfileLayout = ({
               percent={Math.round((time.creativity / totalTime) * 100)}
             />
           </div>
-          <div className='row-cols-1 m-2 flex flex-wrap justify-around'>
+          <div className='row-cols-1 m-2 flex flex-wrap content-around justify-around'>
             {statsField.map(({ Icon, description, value }) => (
               <StatsField
                 key={description}
