@@ -10,7 +10,7 @@ import FormLayout from "layouts/FormLayout";
 
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
-import { updateUserInterface as UpdatedUserCredentials } from "feature/user/store/userSlice.types";
+import { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
 
 interface ReauthFormInteface {
   changeCredentialsHandler: (data: UpdatedUserCredentials) => Promise<void>;

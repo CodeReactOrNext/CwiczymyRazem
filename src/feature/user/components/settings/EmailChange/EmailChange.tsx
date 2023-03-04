@@ -15,7 +15,7 @@ import {
   getUserProvider,
   updateUserEmail,
 } from "feature/user/store/userSlice.asyncThunk";
-import { updateUserInterface as UpdatedUserCredentials } from "feature/user/store/userSlice.types";
+import { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
 
 const EmailChange = () => {
   const { t } = useTranslation(["common", "toast"]);

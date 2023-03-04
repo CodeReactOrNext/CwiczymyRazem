@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 import LevelIndicator from "./components/LevelIndicator";
 
@@ -121,20 +121,17 @@ const RatingPopUp = ({
                 </motion.p>
               </motion.div>
             </div>
-
             <LevelIndicator position='left'>{currentLevel}</LevelIndicator>
             <LevelIndicator position='right'>{currentLevel + 1}</LevelIndicator>
           </div>
         </div>
       </div>
-
       <BonusPointsItem
         bonusPoints={ratingData.bonusPoints}
         actualDayWithoutBreak={currentUserStats.actualDayWithoutBreak}
         achievements={newAchievements}
         isGetNewLevel={isGetNewLevel}
       />
-
       <div className='absolute -bottom-[15%] -left-[27%] z-40 w-[50%] sm:-left-[15%] md:-bottom-[5%] md:-left-[10%] md:w-auto'>
         <Image
           src={blackGuitar}

@@ -3,11 +3,14 @@ import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
 
 import { RootState } from "store/store";
 
+import { statisticsInitial } from "constants/userStatisticsInitialData";
+
+import { SkillsType } from "types/skillsTypes";
 import {
   StatisticsDataInterface,
-  statisticsInitial,
-} from "constants/userStatisticsInitialData";
-import { TimerInterface, userSliceInitialState } from "./userSlice.types";
+  TimerInterface,
+  userSliceInitialState,
+} from "types/api.types";
 import {
   autoLogIn,
   changeUserDisplayName,
@@ -23,7 +26,6 @@ import {
   uploadUserAvatar,
   uploadUserSocialData,
 } from "./userSlice.asyncThunk";
-import { SkillsType } from "types/skillsTypes";
 
 const initialState: userSliceInitialState = {
   userInfo: null,

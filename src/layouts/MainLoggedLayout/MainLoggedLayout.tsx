@@ -6,7 +6,7 @@ import MobileHeaderWrapper from "./components/MobileHeaderWrapper";
 
 import LandingNav from "./components/LandingNav";
 
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 import { NavPagesTypes } from "wrappers/AuthLayoutWrapper";
 import { LandingNavObjectInterface } from "./components/LandingNav/LandingNav";
 

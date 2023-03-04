@@ -10,7 +10,7 @@ import CategoryBox from "./components/CategoryBox";
 import { SkillsType } from "types/skillsTypes";
 import { useTimerInterface } from "hooks/useTimer";
 import { convertMsToHM } from "utils/converter/timeConverter";
-import { TimerInterface } from "feature/user/store/userSlice.types";
+import { TimerInterface } from "types/api.types";
 import { calculatePercent } from "utils/converter/calculatePercent";
 
 interface TimerLayoutProps {
@@ -53,13 +53,16 @@ const TimerLayout = ({
   return (
     <div className='mb-10 flex flex-col items-center justify-center '>
       <div className='flex w-full flex-col items-center gap-5 border-main-opposed-200/70 bg-main-opposed-600/50 p-5 radius-default md:w-auto md:flex-row md:border-2'>
-        <div className=' order-3 flex flex-row gap-5 p-4 text-center font-openSans md:order-none md:flex-col md:text-right  md:text-2xl'>
-          <p className='flex flex-col text-sm xs:text-base'>
-            {t("total_time")}{" "}
-            <span className='text-tertiary'>{convertMsToHM(sumTime)}</span>
+        <div className=' order-3 flex  flex-row gap-5 bg-main-opposed-400/80 p-4 text-center font-openSans md:order-none  md:flex-col  md:text-2xl'>
+          <p className='flex flex-col text-sm xs:text-base '>
+            <span className='content-box'>{t("total_time")} </span>
+            <span className='content-boxtext-tertiary m-1'>
+              {convertMsToHM(sumTime)}
+            </span>
           </p>
           <p className='flex flex-col text-sm xs:text-base'>
-            {t("currently_exercising")}
+            <span className='content-box'> {t("currently_exercising")}</span>
+
             <span className='m-1 text-tertiary'>
               {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
             </span>
@@ -114,7 +117,7 @@ const TimerLayout = ({
         />
       </div>
       <BeginnerMsg />
-      <p className='p-4 text-center font-openSans text-xs sm:text-base'>
+      <p className='p-4 text-center  font-openSans text-xs sm:text-base'>
         {t("info_about_repot ")}
         <Link href={"/report"}>
           <a className='text-link'> {t("raport_link")}</a>

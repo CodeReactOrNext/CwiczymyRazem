@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 
 import { getUserLvl } from "utils/gameLogic/getUserLvl";

@@ -1,4 +1,4 @@
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
+import { StatisticsDataInterface } from "types/api.types";
 import { Timestamp } from "firebase/firestore";
 
 export interface ProfileInterface {
