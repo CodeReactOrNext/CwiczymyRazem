@@ -4,9 +4,9 @@ const DaySince = ({ date }: { date: Date }) => {
   const { t } = useTranslation("common");
 
   const daysSince = (date: Date) => {
-    var currentDate = new Date();
-    var timeDiff = Math.abs(currentDate.getTime() - date.getTime());
-    var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    const currentDate = new Date();
+    const timeDiff = Math.abs(currentDate.getTime() - date.getTime());
+    const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
     return diffDays;
   };
 

@@ -143,5 +143,9 @@
   "short": {
     "title": "Wytrzymał",
     "description": "Ten gracz utrzymał ciąłość ćwiczeń za wszelką cenę"
+  },
+  "event": {
+    "title": "Wytrzymał",
+    "description": "Ten gracz wział udział w discordowym evencie"
   }
 }

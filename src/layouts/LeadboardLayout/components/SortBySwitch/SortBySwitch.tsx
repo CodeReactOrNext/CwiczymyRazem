@@ -11,7 +11,7 @@ function SortBySwitch({ setSortBy, sortBy }: SortBySwitchInterface) {
   const { t } = useTranslation("common");
 
   return (
-    <div className='absolute right-[5%] -top-8 flex items-center gap-2 border-2 border-second-400/60 bg-second-600 px-2 text-xs text-mainText xs:text-sm sm:text-base lg:right-[10%] xl:right-[15%]'>
+    <div className='content-box flex w-[300px] items-center justify-center gap-2 px-2 text-xs text-mainText xs:text-sm sm:text-base '>
       <p className='text-tertiary-500'>{t("sort.sort_by")}</p>
       <button
         onClick={() => setSortBy("points")}

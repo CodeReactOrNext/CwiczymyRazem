@@ -108,6 +108,7 @@ module.exports = {
       },
       boxShadow: {
         "inset-cool": "inset 0 -3px 8px -3px rgba(88, 96, 132,0.7)",
+        "outside-cool": "0px 4px 4px 0px rgb(0 0 0 / 8%);",
       },
       gridTemplateRows: {
         7: "repeat(7, minmax(0, 1fr))",

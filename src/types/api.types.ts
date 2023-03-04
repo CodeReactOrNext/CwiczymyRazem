@@ -1,13 +1,52 @@
-import { IdTokenResult } from "firebase/auth";
+import { AchievementList } from "assets/achievements/achievementsData";
+import { MediaType } from "feature/user/components/settings/MediaLinks/MediaLinks";
 import {
   ReportDataInterface,
   ReportFormikInterface,
-} from "../view/ReportView/ReportView.types";
-import { SignUpCredentials } from "../view/SingupView/SingupView";
-
-import { StatisticsDataInterface } from "constants/userStatisticsInitialData";
-import { MediaType } from "../components/settings/MediaLinks/MediaLinks";
+} from "feature/user/view/ReportView/ReportView.types";
+import { SignUpCredentials } from "feature/user/view/SingupView/SingupView";
+import { IdTokenResult } from "firebase/auth";
 import { Timestamp } from "firebase/firestore";
+
+export interface UserDataInterface {
+  userInfo: {
+    displayName: string;
+    avatar: string;
+    soundCloudLink?: string;
+    youTubeLink?: string;
+    band?: string;
+  };
+  userAuth: string;
+  currentUserStats: StatisticsDataInterface;
+}
+
+export interface FetchedReportDataInterface {
+  currentUserStats: StatisticsDataInterface;
+  previousUserStats: StatisticsDataInterface;
+  raitingData: ReportDataInterface;
+}
+
+export interface StatisticsTime {
+  technique: number;
+  theory: number;
+  hearing: number;
+  creativity: number;
+  longestSession: number;
+}
+
+export interface StatisticsDataInterface {
+  time: StatisticsTime;
+  lvl: number;
+  currentLevelMaxPoints: number;
+  points: number;
+  sessionCount: number;
+  habitsCount: number;
+  dayWithoutBreak: number;
+  maxPoints: number;
+  achievements: AchievementList[];
+  actualDayWithoutBreak: number;
+  lastReportDate: string;
+}
 
 export interface TimerInterface {
   technique: number;

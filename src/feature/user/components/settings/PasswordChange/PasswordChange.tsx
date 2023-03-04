@@ -11,7 +11,7 @@ import Button from "components/UI/Button";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { updateUserPassword } from "feature/user/store/userSlice.asyncThunk";
 import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
-import { updateUserInterface as UpdatedUserCredentials } from "feature/user/store/userSlice.types";
+import { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
 
 const PasswordChangeView = () => {
   const { t } = useTranslation(["common", "toast", "settings"]);

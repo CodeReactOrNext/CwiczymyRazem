@@ -1,4 +1,3 @@
-
 html,
 body {
   padding: 0;
@@ -78,6 +77,16 @@ a {
   to {
     transform: translate3d(4px, 0, 0);
   }
+}
+
+.content-box {
+  @apply bg-second-200;
+  @apply border-2;
+  @apply radius-default;
+  @apply border-second-400/60;
+  @apply bg-second-600;
+  @apply p-2;
+  @apply shadow-outside-cool;
 }
 
 @layer utilities {

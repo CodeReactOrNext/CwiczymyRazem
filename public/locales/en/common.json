@@ -36,7 +36,8 @@
   "day_since": {
     "no_practice": "Player hasn't practiced",
     "pracitce_last_24": "Recently practiced",
-    "practice_day": "Practiced {{days}} days ago"
+    "practice_day": "Practiced {{days}} days ago",
+    "actual_streak": "Actual streak:"
   },
   "discord_event": {
     "active": "Active",
