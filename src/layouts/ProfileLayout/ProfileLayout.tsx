@@ -43,7 +43,7 @@ const ProfileLayout = ({
       <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col justify-center bg-second pb-4 '>
         <HeadDecoration title={t("profile")} />
         <div className='grid-rows-auto  grid-cols-2  xl:grid'>
-          <div className='content-box z-10 row-span-1 m-4 flex flex-col items-center justify-center gap-3 '>
+          <div className='content-box relative z-10 row-span-1 m-4 flex flex-col items-center justify-center gap-3 '>
             <div className=' flex  flex-row items-center justify-center gap-6 p-4 pb-0 '>
               <Avatar
                 name={displayName}
