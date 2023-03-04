@@ -42,7 +42,7 @@ const ProfileLandingLayout = ({
             />
           ))}
         </div>
-        <div className=' content-box relative z-20 mx-4 my-2 flex justify-center '>
+        <div className=' content-box relative z-20 mx-4 my-2 flex  content-around justify-center '>
           <StatisticBar
             title={t("technique")}
             value={convertMsToHM(time.technique)}

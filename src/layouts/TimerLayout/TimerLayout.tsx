@@ -53,10 +53,10 @@ const TimerLayout = ({
   return (
     <div className='mb-10 flex flex-col items-center justify-center '>
       <div className='flex w-full flex-col items-center gap-5 border-main-opposed-200/70 bg-main-opposed-600/50 p-5 radius-default md:w-auto md:flex-row md:border-2'>
-        <div className=' order-3 flex  flex-row gap-5 p-4 text-center font-openSans md:order-none md:flex-col  bg-main-opposed-400/80  md:text-2xl'>
+        <div className=' order-3 flex  flex-row gap-5 bg-main-opposed-400/80 p-4 text-center font-openSans md:order-none  md:flex-col  md:text-2xl'>
           <p className='flex flex-col text-sm xs:text-base '>
             <span className='content-box'>{t("total_time")} </span>
-            <span className='content-boxtext-tertiary'>
+            <span className='content-boxtext-tertiary m-1'>
               {convertMsToHM(sumTime)}
             </span>
           </p>
