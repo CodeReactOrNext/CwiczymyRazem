@@ -9,7 +9,7 @@ interface FaqLayoutProps {
 
 const FaqLayout = ({ faqQuestion }: FaqLayoutProps) => {
   return (
-    <div className='flex  w-full flex-col gap-8 p-8 '>
+    <div className='m-auto flex w-full max-w-[1280px] flex-col gap-8 p-8 '>
       {faqQuestion.map(({ title, message }) => (
         <FaqBox key={title} title={title} message={message} />
       ))}
