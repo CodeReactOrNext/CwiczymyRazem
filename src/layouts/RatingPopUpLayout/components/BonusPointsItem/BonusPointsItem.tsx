@@ -26,11 +26,11 @@ const BonusPointsItem = ({
     "1" + "." + multiplier.toString().split("").pop();
 
   return (
-    <ul className='relative  ml-4  text-sm  xs:text-base md:-ml-[20%]'>
+    <ul className='relative  ml-4 text-sm  xs:text-base md:-ml-[20%]'>
       <li className='ml-4'>
         <motion.ul
-          initial={{ x: "-120%" }}
-          animate={{ x: 0 }}
+          initial={{ x: "-120%", opacity: "0%" }}
+          animate={{ x: 0, opacity: "100%" }}
           transition={{ delay: 3 }}
           className='mb-5'>
           {isGetNewLevel && (
@@ -56,8 +56,8 @@ const BonusPointsItem = ({
       </li>
 
       <motion.li
-        initial={{ x: "-120%" }}
-        animate={{ x: 0 }}
+        initial={{ x: "-120%", opacity: "0%" }}
+        animate={{ x: 0, opacity: "100%" }}
         transition={{ delay: 2, duration: 0.3 }}
         className='flex items-center gap-3 border-b-2 border-mainText/10 p-2 '>
         <p className='text-second-text sm:text-4xl'>
@@ -80,8 +80,8 @@ const BonusPointsItem = ({
         ""
       )}
       <motion.li
-        initial={{ x: "-120%" }}
-        animate={{ x: 0 }}
+        initial={{ x: "-120%", opacity: "0%" }}
+        animate={{ x: 0, opacity: "100%" }}
         transition={{ delay: 2.3, duration: 0.3 }}
         className=' flex items-center gap-3 border-b-2 border-mainText/10 p-2 '>
         <p className=' text-second-text sm:text-4xl'>+{timePoints}</p>
