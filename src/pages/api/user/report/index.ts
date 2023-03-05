@@ -88,18 +88,18 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
     achievements: [...newAchievements, ...updatedUserData.achievements],
   };
 
-  await firebaseSetUserExerciseRaprot(userUid, raiting, new Date());
+  await firebaseSetUserExerciseRaprot(userUid, raiting, new Date(), time);
   await firebaseUpdateUserStats(userUid, updatedUserDataWithAchievements);
   await firebaseAddLogReport(
     userUid,
+
     updatedUserData.lastReportDate,
     raiting.totalPoints,
     newAchievements,
     {
       isNewLevel,
       level,
-    },
-    time
+    }
   );
   return {
     currentUserStats: updatedUserDataWithAchievements,
