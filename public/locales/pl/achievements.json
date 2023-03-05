@@ -145,7 +145,7 @@
     "description": "Ten gracz utrzymał ciąłość ćwiczeń za wszelką cenę"
   },
   "event": {
-    "title": "Wytrzymał",
+    "title": "Event",
     "description": "Ten gracz wział udział w discordowym evencie"
   }
 }
