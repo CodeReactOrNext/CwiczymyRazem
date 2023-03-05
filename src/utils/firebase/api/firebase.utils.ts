@@ -26,7 +26,7 @@ export const firebaseSetUserExerciseRaprot = async (
 ) => {
   const dateString = date.toISOString();
   const userDocRef = doc(db, "users", userAuth, "exerciseData", dateString);
-  await setDoc(userDocRef, raport, time);
+  await setDoc(userDocRef, { raport, time });
 };
 
 export const firebaseAddLogReport = async (
