@@ -26,7 +26,6 @@ const WelcomeMessage = ({
   );
   const dayWithoutBreak =
     (isStreak === 1 ? 0 : actualDayWithoutBreak) + +didPracticeToday;
-  console.log(dayWithoutBreak);
   return (
     <div className='text:xs tracking-wide xxs:text-base sm:text-2xl md:text-base lg:text-xl 2xl:w-[650px]'>
       <p className='py-2 xs:text-lg md:text-xl lg:text-2xl xl:text-3xl '>
