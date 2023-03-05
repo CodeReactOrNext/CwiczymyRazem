@@ -98,7 +98,8 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
     {
       isNewLevel,
       level,
-    }
+    },
+    time
   );
   return {
     currentUserStats: updatedUserDataWithAchievements,
