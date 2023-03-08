@@ -30,12 +30,14 @@ import {
 
 import { RaportSchema } from "./helpers/RaportShcema";
 import { ReportFormikInterface } from "./ReportView.types";
+import { healthHabbitsList } from "assets/report/healthHabbitsList";
 import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import {
   convertMsToHM,
   convertMsToHMObject,
 } from "utils/converter/timeConverter";
+import Input from "components/UI/Input";
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
@@ -171,44 +173,28 @@ const ReportView = () => {
                   />
                 </div>
               </ReportCategoryWrapper>
+              <div className='flex flex-row gap-10'>
+                <ReportCategoryWrapper title={t("healthy_habits_title")}>
+                  {healthHabbitsList.map(
+                    ({ name, questionMarkProps, title }) => (
+                      <HealthHabbitsBox
+                        key={name}
+                        name={name}
+                        questionMarkProps={questionMarkProps}
+                        title={title}
+                      />
+                    )
+                  )}
+                </ReportCategoryWrapper>
 
-              <ReportCategoryWrapper title={t("healthy_habits_title")}>
-                <HealthHabbitsBox
-                  name='exercise_plan'
-                  questionMarkProps={{
-                    description: t("habits.exercise_plan.description"),
-                  }}
-                  title={t("habits.exercise_plan.title")}
-                />
-                <HealthHabbitsBox
-                  name='new_things'
-                  questionMarkProps={{
-                    description: t("habits.new_things.description"),
-                  }}
-                  title={t("habits.new_things.title")}
-                />
-                <HealthHabbitsBox
-                  name='warmup'
-                  questionMarkProps={{
-                    description: t("habits.warmup.description"),
-                  }}
-                  title={t("habits.warmup.title")}
-                />
-                <HealthHabbitsBox
-                  name='metronome'
-                  questionMarkProps={{
-                    description: t("habits.metronome.description"),
-                  }}
-                  title={t("habits.metronome.title")}
-                />
-                <HealthHabbitsBox
-                  name='recording'
-                  questionMarkProps={{
-                    description: t("habits.recording.description"),
-                  }}
-                  title={t("habits.recording.title")}
-                />
-              </ReportCategoryWrapper>
+                <ReportCategoryWrapper title={t("exercise_type_title")}>
+                  <p>Data Wstecz</p>
+                  <Input name='datawstecz' />
+
+                  <p>Opisz swoje ćwiczenie</p>
+                  <Input name='datawstecz' />
+                </ReportCategoryWrapper>
+              </div>
               <div className='flex flex-col items-center justify-self-center md:col-span-2 lg:col-span-1 xl:col-span-2'>
                 <div className='m-2 h-6'>
                   {Object.keys(errors).length !== 0 && <ErrorBox />}
