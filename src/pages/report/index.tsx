@@ -7,6 +7,7 @@ import PageLoadingLayout from "layouts/PageLoadingLayout";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import ReportView from "feature/user/view/ReportView";
 import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
+import { i18n } from "next-i18next";
 
 const ReportPage: NextPage = () => {
   const { t } = useTranslation("report");

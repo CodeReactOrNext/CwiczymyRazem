@@ -1,10 +1,12 @@
 import { Formik } from "formik";
 import { toast } from "react-toastify";
-import { MdSchool } from "react-icons/md";
-import { IoMdHand } from "react-icons/io";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { IoMdHand } from "react-icons/io";
+import { MdSchool } from "react-icons/md";
 import { FaBrain, FaMusic } from "react-icons/fa";
+
+import { useTranslation } from "react-i18next";
+import { i18n } from "next-i18next";
 
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
@@ -30,7 +32,6 @@ import {
 
 import { RaportSchema } from "./helpers/RaportShcema";
 import { ReportFormikInterface } from "./ReportView.types";
-import { healthHabbitsList } from "assets/report/healthHabbitsList";
 import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import {
@@ -38,14 +39,18 @@ import {
   convertMsToHMObject,
 } from "utils/converter/timeConverter";
 import Input from "components/UI/Input";
+import { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
+import { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
+
+type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
   const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
-
   const { t } = useTranslation("report");
+
   const dispatch = useAppDispatch();
   const currentUserStats = useAppSelector(selectCurrentUserStats);
   const previousUserStats = useAppSelector(selectPreviousUserStats);
@@ -76,6 +81,83 @@ const ReportView = () => {
     habbits: [],
   };
 
+  const timeInputList: TimeInputProps[] = [
+    {
+      title: i18n?.t("report:technique"),
+      questionMarkProps: {
+        description: i18n?.t("report:description.technique"),
+      },
+      Icon: IoMdHand,
+      hoursName: "techniqueHours",
+      minutesName: "techniqueMinutes",
+    },
+    {
+      title: i18n?.t("report:theory"),
+      questionMarkProps: {
+        description: i18n?.t("report:description.theory"),
+      },
+      Icon: MdSchool,
+      hoursName: "theoryHours",
+      minutesName: "theoryMinutes",
+    },
+    {
+      title: i18n?.t("report:hearing"),
+      questionMarkProps: {
+        description: i18n?.t("report:description.hearing"),
+      },
+      Icon: FaMusic,
+      hoursName: "hearingHours",
+      minutesName: "hearingMinutes",
+    },
+    {
+      title: i18n?.t("report:creativity"),
+      questionMarkProps: {
+        description: i18n?.t("report:description.creative"),
+      },
+      Icon: FaBrain,
+      hoursName: "creativityHours",
+      minutesName: "creativityMinutes",
+    },
+  ];
+
+  const healthHabbitsList: HealthHabbitsBoxProps[] = [
+    {
+      name: "exercise_plan",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.exercise_plan.description"),
+      },
+      title: i18n?.t("report:habits.exercise_plan.title"),
+    },
+    {
+      name: "new_things",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.new_things.description"),
+      },
+      title: i18n?.t("report:habits.new_things.title"),
+    },
+    {
+      name: "warmup",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.warmup.description"),
+      },
+      title: i18n?.t("report:habits.warmup.title"),
+    },
+    {
+      name: "metronome",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.metronome.description"),
+      },
+      title: i18n?.t("report:habits.metronome.title"),
+    },
+    {
+      name: "recording",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.recording.description"),
+      },
+      title: i18n?.t("report:habits.recording.title"),
+    },
+  ];
+
   const getSumTime = (formikValues: ReportFormikInterface) => {
     const { sumTime } = inputTimeConverter(formikValues);
     return sumTime;
@@ -101,7 +183,6 @@ const ReportView = () => {
       toast.error(t("toast.input_time"));
       return;
     }
-
     if (!userAuth) {
       toast.error(t("toast.not_logged"));
       return;
@@ -131,54 +212,36 @@ const ReportView = () => {
             <ReportFormLayout>
               <ReportCategoryWrapper title={t("exercise_type_title")}>
                 <div className='my-5 mt-14 flex flex-row flex-wrap justify-center gap-10 2xl:gap-20 '>
-                  <TimeInputBox
-                    errors={errors}
-                    title={t("technique")}
-                    questionMarkProps={{
-                      description: t("description.technique"),
-                    }}
-                    Icon={IoMdHand}
-                    hoursName={"techniqueHours"}
-                    minutesName={"techniqueMinutes"}
-                  />
-                  <TimeInputBox
-                    errors={errors}
-                    title={t("theory")}
-                    questionMarkProps={{
-                      description: t("description.theory"),
-                    }}
-                    Icon={MdSchool}
-                    hoursName={"theoryHours"}
-                    minutesName={"theoryMinutes"}
-                  />
-                  <TimeInputBox
-                    errors={errors}
-                    title={t("hearing")}
-                    questionMarkProps={{
-                      description: t("description.hearing"),
-                    }}
-                    Icon={FaMusic}
-                    hoursName={"hearingHours"}
-                    minutesName={"hearingMinutes"}
-                  />
-                  <TimeInputBox
-                    errors={errors}
-                    title={t("creativity")}
-                    questionMarkProps={{
-                      description: t("description.creative"),
-                    }}
-                    Icon={FaBrain}
-                    hoursName={"creativityHours"}
-                    minutesName={"creativityMinutes"}
-                  />
+                  {timeInputList.map(
+                    (
+                      {
+                        title,
+                        questionMarkProps,
+                        Icon,
+                        hoursName,
+                        minutesName,
+                      },
+                      index
+                    ) => (
+                      <TimeInputBox
+                        key={index}
+                        errors={errors}
+                        title={title}
+                        questionMarkProps={questionMarkProps}
+                        Icon={Icon}
+                        hoursName={hoursName}
+                        minutesName={minutesName}
+                      />
+                    )
+                  )}
                 </div>
               </ReportCategoryWrapper>
               <div className='flex flex-row gap-10'>
                 <ReportCategoryWrapper title={t("healthy_habits_title")}>
                   {healthHabbitsList.map(
-                    ({ name, questionMarkProps, title }) => (
+                    ({ name, questionMarkProps, title }, index) => (
                       <HealthHabbitsBox
-                        key={name}
+                        key={name + index}
                         name={name}
                         questionMarkProps={questionMarkProps}
                         title={title}

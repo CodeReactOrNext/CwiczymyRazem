@@ -6,8 +6,8 @@ import QuestionMark, { QuestionMarkProps } from "components/UI/QuestionMark";
 
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 
-interface TimeInputBoxProps {
-  title: string;
+export interface TimeInputBoxProps {
+  title?: string;
   Icon: IconType;
   questionMarkProps: QuestionMarkProps;
   hoursName: string;
