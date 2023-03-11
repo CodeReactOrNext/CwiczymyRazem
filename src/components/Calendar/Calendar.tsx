@@ -1,22 +1,32 @@
-import { FaSpinner } from "react-icons/fa";
+import { FaClock, FaRegCalendarAlt, FaSpinner, FaStar } from "react-icons/fa";
 import { useEffect, useState } from "react";
 
-import ToolTip from "components/UI/ToolTip";
-
-import { convertMsToHM } from "utils/converter/timeConverter";
 import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";
 import { useTranslation } from "react-i18next";
+
+import ExerciseShortInfo from "./components/ExerciseShortInfo";
+import ReactTooltip from "react-tooltip";
 
 interface ReportListInterface {
   points: number;
   date: Date;
   totalTime: number;
+  exceriseTitle?: string;
+  timeSumary?: {
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+    sumTime: number;
+  };
 }
+
 const Calendar = ({ userAuth }: { userAuth: string }) => {
   const { t } = useTranslation("common");
   const [reportList, setReportList] = useState<ReportListInterface[] | null>(
     null
   );
+
   const getEmptyFiled = (dayWhenYearStart: number) => {
     const numOfDayWhereUiStart = 6;
     const nullsToGenerateSapceForUi = new Array(
@@ -74,6 +84,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
         return null;
     }
   };
+
   useEffect(() => {
     if (userAuth && reportList === null) {
       firebaseGetUserRaprotsLogs(userAuth).then((response) => {
@@ -95,16 +106,64 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
               previousValue[indexOfRepeted].totalTime =
                 previousValue[indexOfRepeted].totalTime +
                 exceriesLog.bonusPoints.time;
+
+              if (previousValue[indexOfRepeted].exceriseTitle) {
+                previousValue[indexOfRepeted].exceriseTitle =
+                  exceriesLog.exceriseTitle +
+                  "  " +
+                  previousValue[indexOfRepeted].exceriseTitle;
+              }
+
+              if (exceriesLog.timeSumary) {
+                if (!previousValue[indexOfRepeted].timeSumary) {
+                  previousValue[indexOfRepeted].timeSumary =
+                    exceriesLog.timeSumary;
+                } else {
+                  previousValue[indexOfRepeted].timeSumary = {
+                    techniqueTime:
+                      previousValue[indexOfRepeted].timeSumary.techniqueTime +
+                      exceriesLog.timeSumary.techniqueTime,
+                    theoryTime:
+                      previousValue[indexOfRepeted].timeSumary.theoryTime +
+                      exceriesLog.timeSumary.theoryTime,
+                    hearingTime:
+                      previousValue[indexOfRepeted].timeSumary.hearingTime +
+                      exceriesLog.timeSumary.hearingTime,
+                    creativityTime:
+                      previousValue[indexOfRepeted].timeSumary.creativityTime +
+                      exceriesLog.timeSumary.creativityTime,
+                    sumTime:
+                      previousValue[indexOfRepeted].timeSumary?.sumTime +
+                      exceriesLog.timeSumary.sumTime,
+                  };
+                }
+              }
+
               return previousValue;
             }
+
             previousValue.push({
               points: exceriesLog.totalPoints,
               date: new Date(exceriesLog.reportDate.seconds * 1000),
               totalTime: exceriesLog.bonusPoints.time,
+              exceriseTitle: exceriesLog.exceriseTitle,
+              timeSumary: exceriesLog.timeSumary,
             });
             return previousValue;
           },
-          [] as { points: number; date: Date; totalTime: number }[]
+          [] as {
+            points: number;
+            date: Date;
+            totalTime: number;
+            exceriseTitle: string;
+            timeSumary: {
+              techniqueTime: number;
+              theoryTime: number;
+              hearingTime: number;
+              creativityTime: number;
+              sumTime: number;
+            };
+          }[]
         );
 
         setReportList(reducedReportsList);
@@ -113,37 +172,38 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   }, [userAuth, reportList]);
 
   return reportList ? (
-    <div className=' content-box  overflow-y-scroll  p-3 font-openSans  scrollbar-thin scrollbar-thumb-second-200'>
+    <div className='content-box overflow-x-scroll   p-3 font-openSans '>
       <p className='pb-2 text-sm font-bold'>
         {t("calendar.title")}: {year}
       </p>
-      <div className=' grid grid-flow-col grid-rows-7 p-2 text-xs  '>
+      <div className='relative grid cursor-pointer grid-flow-col grid-rows-7   p-2 text-xs  '>
         <p className='row-span-3 mr-3'> {t("calendar.monday")}</p>
         <p className='row-span-3 mr-3'>{t("calendar.thursday")}</p>
         <p>{t("calendar.sunday")}</p>
+
         {datasWithReports.map((date, index) => {
           const raiting = getPointRaitings(date);
-
           return date ? (
-            <div
-              key={index}
-              className={` m-[0.2rem] rounded-[1px] p-[0.3rem]
+            <div key={index + date.date.toISOString()} className='group  '>
+              <div className='  hidden  group-hover:block'>
+                {date.report ? (
+                  <ExerciseShortInfo date={date} />
+                ) : (
+                  <p className='absolute p-1'>
+                    {date.date.toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+              <div
+                className={`m-[0.2rem] rounded-[1px] p-[0.3rem]
             ${raiting === "super" ? "bg-main-calendar" : ""}
             ${raiting === "great" ? "bg-main-calendar/80" : ""}
             ${raiting === "nice" ? "bg-main-calendar/70" : ""}
             ${raiting === "ok" ? "bg-main-calendar/60" : ""}
             ${raiting === "zero" ? "bg-main-calendar/20" : ""}
-            ${raiting ? "" : " bg-slate-600/50"}
-            `}
-              data-tip={`${
-                date.report
-                  ? `${t("calendar.points")}: ${
-                      date.report.points
-                    } | ${convertMsToHM(date.report.totalTime)}h | `
-                  : ""
-              }  
-              ${date.date.toLocaleDateString()}  
-             `}></div>
+            ${raiting ? "" : "bg-slate-600/50"}
+            `}></div>
+            </div>
           ) : (
             <div
               key={index}
@@ -151,7 +211,6 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
           );
         })}
         <div className='p-2'></div>
-        <ToolTip />
       </div>
     </div>
   ) : (

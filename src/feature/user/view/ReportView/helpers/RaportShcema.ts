@@ -9,4 +9,6 @@ export const RaportSchema = yup.object().shape({
   hearingMinutes: yup.number().max(59).min(0),
   creativityHours: yup.number().max(23).min(0),
   creativityMinutes: yup.number().max(59).min(0),
+  countBackDays: yup.number().max(7).min(0),
+  reportTitle: yup.string().max(60).min(0),
 });

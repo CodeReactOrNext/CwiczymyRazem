@@ -41,6 +41,8 @@ import {
 import Input from "components/UI/Input";
 import { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
 import { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
+import Divider from "components/UI/Divider";
+import InputTime from "layouts/ReportFormLayout/components/InputTime";
 
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
@@ -79,6 +81,8 @@ const ReportView = () => {
     creativityHours: creativityTime.hours,
     creativityMinutes: creativityTime.minutes,
     habbits: [],
+    countBackDays: 0,
+    reportTitle: '',
   };
 
   const timeInputList: TimeInputProps[] = [
@@ -236,7 +240,7 @@ const ReportView = () => {
                   )}
                 </div>
               </ReportCategoryWrapper>
-              <div className='flex flex-row gap-10'>
+              <div className='flex flex-row justify-evenly '>
                 <ReportCategoryWrapper title={t("healthy_habits_title")}>
                   {healthHabbitsList.map(
                     ({ name, questionMarkProps, title }, index) => (
@@ -249,14 +253,42 @@ const ReportView = () => {
                     )
                   )}
                 </ReportCategoryWrapper>
+                <div className='max-w-[30%]'>
+                  <ReportCategoryWrapper title={"Dodatkowe opcje"}>
+                    <div className='flex flex-col gap-2 bg-main-opposed-500/40 p-4'>
+                      <div className='flex flex-col gap-2'>
+                        <p>Cele tej sesji ćwiczeń:</p>
+                        <p className='font-openSans text-xs text-tertiary'>
+                          Opcjonalne
+                        </p>
+                      </div>
 
-                <ReportCategoryWrapper title={t("exercise_type_title")}>
-                  <p>Data Wstecz</p>
-                  <Input name='datawstecz' />
+                      <Input name='reportTitle' />
+                      <p className='font-openSans text-xs'>
+                        Zatytułuj swoją sesję. Będzie ona widoczna w Twoim
+                        Kalendarzu pod tą nazwą.
+                      </p>
+                      <Divider />
+                      <div className='text-center'>
+                        <p>Data Wstecz</p>
+                        <p className='font-openSans text-xs'>Maks. 7 dni</p>
+                      </div>
 
-                  <p>Opisz swoje ćwiczenie</p>
-                  <Input name='datawstecz' />
-                </ReportCategoryWrapper>
+                      <div className='flex flex-row items-center justify-center gap-5'>
+                        <InputTime name={"countBackDays"} description={"Dni"} />
+                        <p className='font-openSans text-sm'>
+                          Dodasz raport do dnia: <br />
+                          04.03.2023
+                        </p>
+                      </div>
+                      <p className='font-openSans text-xs'>
+                        Jeżeli zapomniałeś możesz dodać do 7 dni wstecz swój
+                        raport. Nie będzie on jednak wliczony do dni pod rząd
+                        oraz będzie wyszczególniony w kalendarzu.
+                      </p>
+                    </div>
+                  </ReportCategoryWrapper>
+                </div>
               </div>
               <div className='flex flex-col items-center justify-self-center md:col-span-2 lg:col-span-1 xl:col-span-2'>
                 <div className='m-2 h-6'>
