@@ -7,6 +7,8 @@ export interface ReportFormikInterface {
   hearingMinutes: string;
   creativityHours: string;
   creativityMinutes: string;
+  countBackDays: number;
+  reportTitle: string;
   habbits: (
     | "exercise_plan"
     | "new_things"

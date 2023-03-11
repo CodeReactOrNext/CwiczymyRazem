@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
 
 import SettingsLayout from "layouts/SettingsLayout";
-import Divider from "layouts/SettingsLayout/components/Divider";
+import Divider from "components/UI/Divider";
 import FieldBox from "layouts/SettingsLayout/components/FieldBox";
 import EmailChange from "feature/user/components/settings/EmailChange";
 import AvatarChange from "feature/user/components/settings/AvatarChange";

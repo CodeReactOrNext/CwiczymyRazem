@@ -26,8 +26,11 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
     userUid
   )) as StatisticsDataInterface;
+
+  const timeSumary = inputTimeConverter(inputData);
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
-    inputTimeConverter(inputData);
+    timeSumary;
+
   const {
     time,
     habitsCount,
@@ -88,11 +91,16 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
     achievements: [...newAchievements, ...updatedUserData.achievements],
   };
 
-  await firebaseSetUserExerciseRaprot(userUid, raiting, new Date());
+  await firebaseSetUserExerciseRaprot(
+    userUid,
+    raiting,
+    new Date(),
+    inputData.reportTitle,
+    timeSumary
+  );
   await firebaseUpdateUserStats(userUid, updatedUserDataWithAchievements);
   await firebaseAddLogReport(
     userUid,
-
     updatedUserData.lastReportDate,
     raiting.totalPoints,
     newAchievements,
