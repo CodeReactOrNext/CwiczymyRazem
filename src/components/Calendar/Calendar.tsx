@@ -172,28 +172,29 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   }, [userAuth, reportList]);
 
   return reportList ? (
-    <div className='content-box overflow-x-scroll   p-3 font-openSans '>
+    <div className='content-box relative  overflow-x-scroll p-3  font-openSans  scrollbar-thin scrollbar-thumb-second-200 '>
       <p className='pb-2 text-sm font-bold'>
         {t("calendar.title")}: {year}
       </p>
-      <div className='relative grid cursor-pointer grid-flow-col grid-rows-7   p-2 text-xs  '>
+      <div className=' grid cursor-pointer grid-flow-col grid-rows-7   p-2 text-xs  '>
         <p className='row-span-3 mr-3'> {t("calendar.monday")}</p>
         <p className='row-span-3 mr-3'>{t("calendar.thursday")}</p>
         <p>{t("calendar.sunday")}</p>
-
         {datasWithReports.map((date, index) => {
           const raiting = getPointRaitings(date);
           return date ? (
-            <div key={index + date.date.toISOString()} className='group  '>
-              <div className='  hidden  group-hover:block'>
+            <div
+              key={index + date.date.toISOString()}
+              data-tip
+              data-for={index.toString()}>
+              <ReactTooltip id={index.toString()}>
                 {date.report ? (
                   <ExerciseShortInfo date={date} />
                 ) : (
-                  <p className='absolute p-1'>
-                    {date.date.toLocaleDateString()}
-                  </p>
+                  <p className='p-1'>{date.date.toLocaleDateString()}</p>
                 )}
-              </div>
+              </ReactTooltip>
+
               <div
                 className={`m-[0.2rem] rounded-[1px] p-[0.3rem]
             ${raiting === "super" ? "bg-main-calendar" : ""}
@@ -205,9 +206,13 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
             `}></div>
             </div>
           ) : (
-            <div
-              key={index}
-              className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
+            <>
+              <div
+                key={index}
+                data-tip
+                data-for={index.toString()}
+                className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
+            </>
           );
         })}
         <div className='p-2'></div>

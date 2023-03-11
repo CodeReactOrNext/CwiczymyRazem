@@ -4,7 +4,7 @@ import { convertMsToHM } from "utils/converter/timeConverter";
 
 const ExerciseShortInfo = ({ date }) => {
   return (
-    <div className='absolute z-40 flex flex-col justify-center bg-black/50 p-2'>
+    <div className=' z-40 flex flex-col justify-center'>
       {date.report.exceriseTitle ? (
         <p className='content-box relative -top-4 m-auto max-w-[280px]  text-center text-sm font-bold'>
           {date.report.exceriseTitle}
