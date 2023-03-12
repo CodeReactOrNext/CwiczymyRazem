@@ -23,6 +23,7 @@ export const firebaseSetUserExerciseRaprot = async (
   raport: ReportDataInterface,
   date: Date,
   exceriseTitle: string,
+  isDateBackReport: number,
   timeSumary: {
     techniqueTime: number;
     theoryTime: number;
@@ -32,7 +33,7 @@ export const firebaseSetUserExerciseRaprot = async (
   }
 ) => {
   const dateString = date.toISOString();
-  const dataRaport = { ...raport, exceriseTitle, timeSumary };
+  const dataRaport = { ...raport, exceriseTitle, timeSumary, isDateBackReport };
   const userDocRef = doc(db, "users", userAuth, "exerciseData", dateString);
   await setDoc(userDocRef, dataRaport);
 };

@@ -50,6 +50,7 @@ export interface FirebaseUserExceriseLog {
   };
   totalPoints: number;
   exceriseTitle: string;
+  isDateBackReport: string;
   timeSumary: {
     techniqueTime: number;
     theoryTime: number;
