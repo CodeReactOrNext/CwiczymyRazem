@@ -44,6 +44,7 @@ import { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInput
 import { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 import Divider from "components/UI/Divider";
 import InputTime from "layouts/ReportFormLayout/components/InputTime";
+import { MAX_DAYS_BACK } from "constants/gameSettings";
 
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
@@ -258,20 +259,19 @@ const ReportView = () => {
                   <ReportCategoryWrapper title={"Dodatkowe opcje"}>
                     <div className='flex flex-col gap-2 bg-main-opposed-500/40 p-4'>
                       <div className='flex flex-col gap-2'>
-                        <p>Cele tej sesji ćwiczeń:</p>
+                        <p>{t("sesion_title")}</p>
                         <p className='font-openSans text-xs text-tertiary'>
-                          Opcjonalne
+                          {t("optional")}
                         </p>
                       </div>
 
                       <Input name='reportTitle' />
                       <p className='font-openSans text-xs'>
-                        Zatytułuj swoją sesję. Będzie ona widoczna w Twoim
-                        Kalendarzu pod tą nazwą.
+                        {t("description.sesion_title")}
                       </p>
                       <Divider />
                       <div className='text-center'>
-                        <p>Data Wstecz</p>
+                        <p>{t("date_back")}</p>
                         <p
                           className={`flex flex-row justify-center gap-2 font-openSans text-xs
                         ${
@@ -282,14 +282,17 @@ const ReportView = () => {
                           {errors.hasOwnProperty("countBackDays") && (
                             <FaTimesCircle className='text-error-200' />
                           )}
-                          Maks. 7 dni
+                          {t("max_days", { days: MAX_DAYS_BACK })}
                         </p>
                       </div>
 
                       <div className='flex flex-row items-center justify-center gap-5'>
-                        <InputTime name={"countBackDays"} description={"Dni"} />
+                        <InputTime
+                          name={"countBackDays"}
+                          description={t("days")}
+                        />
                         <p className='font-openSans text-sm'>
-                          Dodasz raport do dnia: <br />
+                          {t("add_report_to_day")} <br />
                           <span
                             className={`${
                               errors.hasOwnProperty("countBackDays")
@@ -303,9 +306,7 @@ const ReportView = () => {
                         </p>
                       </div>
                       <p className='font-openSans text-xs'>
-                        Jeżeli zapomniałeś możesz dodać do 7 dni wstecz swój
-                        raport. Nie będzie on jednak wliczony do dni pod rząd
-                        oraz będzie wyszczególniony w kalendarzu.
+                        {t("description.max_days", { days: MAX_DAYS_BACK })}
                       </p>
                     </div>
                   </ReportCategoryWrapper>
@@ -330,10 +331,8 @@ const ReportView = () => {
                   <p className='font-openSans text-base'>
                     {t("toast.exceeding_time") + convertMsToHM(exceedingTime)}
                   </p>
-                  <p className=' font-openSans text-sm'>
-                    {t("exceeding_time")}
-                  </p>
-                  <div className=' flex gap-4'>
+                  <p className='font-openSans text-sm'>{t("exceeding_time")}</p>
+                  <div className='flex gap-4'>
                     <Button
                       type='button'
                       variant='small'

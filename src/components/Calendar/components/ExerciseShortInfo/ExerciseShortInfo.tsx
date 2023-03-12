@@ -1,8 +1,10 @@
 import IconBox from "components/IconBox";
+import { useTranslation } from "react-i18next";
 import { FaClock, FaRegCalendarAlt, FaStar } from "react-icons/fa";
 import { convertMsToHM } from "utils/converter/timeConverter";
 
 const ExerciseShortInfo = ({ date }) => {
+  const { t } = useTranslation("common");
   return (
     <div className=' z-40 flex flex-col justify-center'>
       {date.report.exceriseTitle ? (
@@ -35,28 +37,28 @@ const ExerciseShortInfo = ({ date }) => {
               <p className='text-sm font-bold'>
                 {convertMsToHM(date.report.timeSumary.techniqueTime) + "h"}
               </p>
-              <p>Technika</p>
+              <p>{t("calendar.technique")}</p>
             </div>
 
             <div className='content-box flex flex-col items-center'>
               <p className='text-sm font-bold'>
                 {convertMsToHM(date.report.timeSumary.theoryTime) + "h"}
               </p>
-              <p>Teoria</p>
+              <p>{t("calendar.theory")}</p>
             </div>
 
             <div className='content-box flex flex-col items-center'>
               <p className='text-sm font-bold'>
                 {convertMsToHM(date.report.timeSumary.hearingTime) + "h"}
               </p>
-              <p>Słuch</p>
+              <p>{t("calendar.hearing")}</p>
             </div>
 
             <div className='content-box flex flex-col items-center'>
               <p className='text-sm font-bold'>
                 {convertMsToHM(date.report.timeSumary.creativityTime) + "h"}
               </p>
-              <p>Kreatywność</p>
+              <p>{t("calendar.creativity")}</p>
             </div>
           </div>
         </div>
