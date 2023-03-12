@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { IoMdHand } from "react-icons/io";
 import { MdSchool } from "react-icons/md";
-import { FaBrain, FaMusic } from "react-icons/fa";
+import { FaBrain, FaMusic, FaTimesCircle } from "react-icons/fa";
 
 import { useTranslation } from "react-i18next";
 import { i18n } from "next-i18next";
@@ -32,6 +32,7 @@ import {
 
 import { RaportSchema } from "./helpers/RaportShcema";
 import { ReportFormikInterface } from "./ReportView.types";
+import { getDateFromPast } from "utils/converter/getDateFromPast";
 import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import {
@@ -82,7 +83,7 @@ const ReportView = () => {
     creativityMinutes: creativityTime.minutes,
     habbits: [],
     countBackDays: 0,
-    reportTitle: '',
+    reportTitle: "",
   };
 
   const timeInputList: TimeInputProps[] = [
@@ -211,7 +212,7 @@ const ReportView = () => {
         validationSchema={RaportSchema}
         validateOnBlur={false}
         onSubmit={reportOnSubmit}>
-        {({ errors, handleSubmit }) => (
+        {({ errors, handleSubmit, values }) => (
           <>
             <ReportFormLayout>
               <ReportCategoryWrapper title={t("exercise_type_title")}>
@@ -271,14 +272,34 @@ const ReportView = () => {
                       <Divider />
                       <div className='text-center'>
                         <p>Data Wstecz</p>
-                        <p className='font-openSans text-xs'>Maks. 7 dni</p>
+                        <p
+                          className={`flex flex-row justify-center gap-2 font-openSans text-xs
+                        ${
+                          errors.hasOwnProperty("countBackDays")
+                            ? "font-extrabold text-error-200"
+                            : "text-mainText"
+                        }`}>
+                          {errors.hasOwnProperty("countBackDays") && (
+                            <FaTimesCircle className='text-error-200' />
+                          )}
+                          Maks. 7 dni
+                        </p>
                       </div>
 
                       <div className='flex flex-row items-center justify-center gap-5'>
                         <InputTime name={"countBackDays"} description={"Dni"} />
                         <p className='font-openSans text-sm'>
                           Dodasz raport do dnia: <br />
-                          04.03.2023
+                          <span
+                            className={`${
+                              errors.hasOwnProperty("countBackDays")
+                                ? "font-extrabold text-error-200"
+                                : "text-mainText"
+                            }`}>
+                            {getDateFromPast(
+                              values.countBackDays
+                            ).toLocaleDateString()}
+                          </span>
                         </p>
                       </div>
                       <p className='font-openSans text-xs'>
@@ -295,7 +316,10 @@ const ReportView = () => {
                   {Object.keys(errors).length !== 0 && <ErrorBox />}
                 </div>
                 <BeginnerMsg />
-                <Button type='submit' loading={isFetching}>
+                <Button
+                  type='submit'
+                  disabled={Object.keys(errors).length !== 0}
+                  loading={isFetching}>
                   {t("report_button")}
                 </Button>
               </div>

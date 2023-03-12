@@ -12,6 +12,7 @@ interface ReportListInterface {
   date: Date;
   totalTime: number;
   exceriseTitle?: string;
+  isDateBackReport: string;
   timeSumary?: {
     techniqueTime: number;
     theoryTime: number;
@@ -23,6 +24,7 @@ interface ReportListInterface {
 
 const Calendar = ({ userAuth }: { userAuth: string }) => {
   const { t } = useTranslation("common");
+
   const [reportList, setReportList] = useState<ReportListInterface[] | null>(
     null
   );
@@ -69,12 +71,15 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
     if (datasWithReports.report === undefined) return;
 
     switch (true) {
+      case !!datasWithReports.report.isDateBackReport !== false:
+        return "backDate";
       case datasWithReports.report.points > 30:
         return "super";
       case datasWithReports.report.points > 20:
         return "great";
       case datasWithReports.report.points > 10:
         return "nice";
+
       case datasWithReports.report.points ||
         datasWithReports.report.points === 0:
         return "ok";
@@ -146,6 +151,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
               points: exceriesLog.totalPoints,
               date: new Date(exceriesLog.reportDate.seconds * 1000),
               totalTime: exceriesLog.bonusPoints.time,
+              isDateBackReport: exceriesLog.isDateBackReport,
               exceriseTitle: exceriesLog.exceriseTitle,
               timeSumary: exceriesLog.timeSumary,
             });
@@ -156,6 +162,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
             date: Date;
             totalTime: number;
             exceriseTitle: string;
+            isDateBackReport: string;
             timeSumary: {
               techniqueTime: number;
               theoryTime: number;
@@ -197,11 +204,12 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
 
               <div
                 className={`m-[0.2rem] rounded-[1px] p-[0.3rem]
-            ${raiting === "super" ? "bg-main-calendar" : ""}
-            ${raiting === "great" ? "bg-main-calendar/80" : ""}
-            ${raiting === "nice" ? "bg-main-calendar/70" : ""}
-            ${raiting === "ok" ? "bg-main-calendar/60" : ""}
-            ${raiting === "zero" ? "bg-main-calendar/20" : ""}
+                ${raiting === "backDate" ? "bg-blue-400" : null}
+            ${raiting === "super" ? "bg-main-calendar" : null}
+            ${raiting === "great" ? "bg-main-calendar/80" : null}
+            ${raiting === "nice" ? "bg-main-calendar/70" : null}
+            ${raiting === "ok" ? "bg-main-calendar/60" : null}
+            ${raiting === "zero" ? "bg-main-calendar/20" : null}
             ${raiting ? "" : "bg-slate-600/50"}
             `}></div>
             </div>
