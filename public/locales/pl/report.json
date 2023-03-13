@@ -8,13 +8,28 @@
   "healthy_habits_title": "Zdrowe nawyki",
   "exceeding_time": "Czy na pewno chcesz zraportować mimo przekroczenia czasu?",
   "report_button": "Raportuj",
+  "sesion_title": "Cele tej sesji ćwiczeń:",
+  "optional": "Opcjonalne",
+  "days": "Dni",
+  "date_back": "Data Wstecz",
+  "max_days": "Maksymalnie {{days}} dni",
+  "add_report_to_day": "Dodasz raport do dnia:",
+
   "toast": {
     "24h_error": "Nie da się ćwiczyć więcej niż 24 godziny dziennie",
     "input_time": "Wpisz czas",
     "not_logged": "Nie jesteś zalogowany",
-
     "stoper_entered": "Wprowadzono czas ze stopera",
     "exceeding_time": "Wpisałeś więcej czasu niż minęło od poprzedniego raportu. Przekroczyłeś czas o "
+  },
+  "description": {
+    "technique": "Np. granie i nauka utworów, rozgrzewka, ćwiczenie rytmu oraz różnych technik, takich jak kostkowanie naprzemienne lub legato",
+    "hearing": "Np. odtwarzanie utworów bądź ich fragmentów ze słuchu, słuchanie i wskazywanie interwałów oraz śpiewanie",
+    "theory": "Np. transkrypcja utworów i ich analiza, nauka dźwięków na gryfie, czytanie nut",
+    "creative": "Np. pisanie własnych utworów, improwizacja, praca nad własnym stylem",
+    "exceeding_time": " Jeżeli zapomniałeś dodać czasu/zdrowego nawyku do poprzedniego raportu lub chcesz zraportować kolejną sesje ćwiczeń którą wykonałeś wcześniej zaznacz to pole.",
+    "sesion_title": "Zatytułuj swoją sesję. Będzie ona widoczna w Twoim kalendarzu.",
+    "max_days": " Jeżeli zapomniałeś możesz dodać do {{days}} dni wstecz swój raport. Nie będzie on jednak wliczony do dni pod rząd oraz będzie wyszczególniony w kalendarzu."
   },
   "habits": {
     "exercise_plan": {
@@ -38,13 +53,7 @@
       "description": "Nagrywanie pozwala Ci zobaczyć i usłyszeć swoją grę z perspektywy innej niż ta, gdy grasz na żywo. Może to pomóc Ci zauważyć błędy lub słabe punkty, które mogłyby przeoczyć. "
     }
   },
-  "description": {
-    "technique": "Np. granie i nauka utworów, rozgrzewka, ćwiczenie rytmu oraz różnych technik, takich jak kostkowanie naprzemienne lub legato",
-    "hearing": "Np. odtwarzanie utworów bądź ich fragmentów ze słuchu, słuchanie i wskazywanie interwałów oraz śpiewanie",
-    "theory": "Np. transkrypcja utworów i ich analiza, nauka dźwięków na gryfie, czytanie nut",
-    "creative": "Np. pisanie własnych utworów, improwizacja, praca nad własnym stylem",
-    "exceeding_time": " Jeżeli zapomniałeś dodać czasu/zdrowego nawyku do poprzedniego raportu lub chcesz zraportować kolejną sesje ćwiczeń którą wykonałeś wcześniej zaznacz to pole."
-  },
+
   "rating_popup": {
     "title": "ZDOBYŁEŚ",
     "points": "pkt",

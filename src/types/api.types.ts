@@ -54,6 +54,23 @@ export interface TimerInterface {
   hearing: number;
   creativity: number;
 }
+
+export interface ReportTimeData {
+  techniqueTime: number;
+  theoryTime: number;
+  hearingTime: number;
+  creativityTime: number;
+  sumTime: number;
+}
+export interface ReportListInterface {
+  points: number;
+  date: Date;
+  totalTime: number;
+  exceriseTitle?: string;
+  isDateBackReport: string;
+  timeSumary?: ReportTimeData;
+}
+
 export interface UserSliceProviderData {
   providerId: string | null;
   uid: string | null;

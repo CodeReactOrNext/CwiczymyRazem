@@ -1,9 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { FaPause, FaPlay } from "react-icons/fa";
-import { addZeroToTime } from "utils/converter/addZeroToTime";
-
-import { convertMsToHMObject } from "utils/converter/timeConverter";
-
+import { addZeroToTime, convertMsToHMObject } from "utils/converter";
 export interface StopwachProps {
   time: number;
   timerEnabled: boolean;

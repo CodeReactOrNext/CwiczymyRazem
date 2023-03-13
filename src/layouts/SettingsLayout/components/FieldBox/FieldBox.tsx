@@ -1,5 +1,5 @@
-import Button from "components/UI/Button";
-import Input from "components/UI/Input";
+import { Button, Input } from "components/UI";
+
 import { useTranslation } from "react-i18next";
 import { IconType } from "react-icons";
 

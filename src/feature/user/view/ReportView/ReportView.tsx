@@ -1,19 +1,27 @@
 import { Formik } from "formik";
 import { toast } from "react-toastify";
-import { MdSchool } from "react-icons/md";
-import { IoMdHand } from "react-icons/io";
 import { useEffect, useState } from "react";
+import { IoMdHand } from "react-icons/io";
+import { MdSchool } from "react-icons/md";
+import { FaBrain, FaMusic, FaTimesCircle } from "react-icons/fa";
+
 import { useTranslation } from "react-i18next";
-import { FaBrain, FaMusic } from "react-icons/fa";
+import { i18n } from "next-i18next";
 
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
-import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
-import TimeInputBox from "layouts/ReportFormLayout/components/TimeInputBox";
-import HealthHabbitsBox from "layouts/ReportFormLayout/components/HealthHabbitsBox";
-import ReportCategoryWrapper from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
+import { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
+import { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
+import {
+  ErrorBox,
+  InputTime,
+  TimeInputBox,
+  HealthHabbitsBox,
+  AcceptExceedingPopUp,
+  ReportCategoryWrapper,
+} from "layouts/ReportFormLayout/components";
 
-import Button from "components/UI/Button";
+import { Input, Button, Divider } from "components/UI";
 import Backdrop from "components/Backdrop";
 import BeginnerMsg from "components/BeginnerMsg";
 
@@ -30,20 +38,24 @@ import {
 
 import { RaportSchema } from "./helpers/RaportShcema";
 import { ReportFormikInterface } from "./ReportView.types";
-import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import {
-  convertMsToHM,
+  getDateFromPast,
   convertMsToHMObject,
-} from "utils/converter/timeConverter";
+  inputTimeConverter,
+} from "utils/converter";
+
+import { MAX_DAYS_BACK } from "constants/gameSettings";
+
+type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
 const ReportView = () => {
   const [ratingSummaryVisible, setRatingSummaryVisible] = useState(false);
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
   const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
-
   const { t } = useTranslation("report");
+
   const dispatch = useAppDispatch();
   const currentUserStats = useAppSelector(selectCurrentUserStats);
   const previousUserStats = useAppSelector(selectPreviousUserStats);
@@ -72,7 +84,86 @@ const ReportView = () => {
     creativityHours: creativityTime.hours,
     creativityMinutes: creativityTime.minutes,
     habbits: [],
+    countBackDays: 0,
+    reportTitle: "",
   };
+
+  const timeInputList: TimeInputProps[] = [
+    {
+      title: i18n?.t("report:technique"),
+      questionMarkProps: {
+        description: i18n?.t("report:description.technique"),
+      },
+      Icon: IoMdHand,
+      hoursName: "techniqueHours",
+      minutesName: "techniqueMinutes",
+    },
+    {
+      title: i18n?.t("report:theory"),
+      questionMarkProps: {
+        description: i18n?.t("report:description.theory"),
+      },
+      Icon: MdSchool,
+      hoursName: "theoryHours",
+      minutesName: "theoryMinutes",
+    },
+    {
+      title: i18n?.t("report:hearing"),
+      questionMarkProps: {
+        description: i18n?.t("report:description.hearing"),
+      },
+      Icon: FaMusic,
+      hoursName: "hearingHours",
+      minutesName: "hearingMinutes",
+    },
+    {
+      title: i18n?.t("report:creativity"),
+      questionMarkProps: {
+        description: i18n?.t("report:description.creative"),
+      },
+      Icon: FaBrain,
+      hoursName: "creativityHours",
+      minutesName: "creativityMinutes",
+    },
+  ];
+
+  const healthHabbitsList: HealthHabbitsBoxProps[] = [
+    {
+      name: "exercise_plan",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.exercise_plan.description"),
+      },
+      title: i18n?.t("report:habits.exercise_plan.title"),
+    },
+    {
+      name: "new_things",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.new_things.description"),
+      },
+      title: i18n?.t("report:habits.new_things.title"),
+    },
+    {
+      name: "warmup",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.warmup.description"),
+      },
+      title: i18n?.t("report:habits.warmup.title"),
+    },
+    {
+      name: "metronome",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.metronome.description"),
+      },
+      title: i18n?.t("report:habits.metronome.title"),
+    },
+    {
+      name: "recording",
+      questionMarkProps: {
+        description: i18n?.t("report:habits.recording.description"),
+      },
+      title: i18n?.t("report:habits.recording.title"),
+    },
+  ];
 
   const getSumTime = (formikValues: ReportFormikInterface) => {
     const { sumTime } = inputTimeConverter(formikValues);
@@ -99,7 +190,6 @@ const ReportView = () => {
       toast.error(t("toast.input_time"));
       return;
     }
-
     if (!userAuth) {
       toast.error(t("toast.not_logged"));
       return;
@@ -124,129 +214,126 @@ const ReportView = () => {
         validationSchema={RaportSchema}
         validateOnBlur={false}
         onSubmit={reportOnSubmit}>
-        {({ errors, handleSubmit }) => (
+        {({ errors, handleSubmit, values }) => (
           <>
             <ReportFormLayout>
               <ReportCategoryWrapper title={t("exercise_type_title")}>
                 <div className='my-5 mt-14 flex flex-row flex-wrap justify-center gap-10 2xl:gap-20 '>
-                  <TimeInputBox
-                    errors={errors}
-                    title={t("technique")}
-                    questionMarkProps={{
-                      description: t("description.technique"),
-                    }}
-                    Icon={IoMdHand}
-                    hoursName={"techniqueHours"}
-                    minutesName={"techniqueMinutes"}
-                  />
-                  <TimeInputBox
-                    errors={errors}
-                    title={t("theory")}
-                    questionMarkProps={{
-                      description: t("description.theory"),
-                    }}
-                    Icon={MdSchool}
-                    hoursName={"theoryHours"}
-                    minutesName={"theoryMinutes"}
-                  />
-                  <TimeInputBox
-                    errors={errors}
-                    title={t("hearing")}
-                    questionMarkProps={{
-                      description: t("description.hearing"),
-                    }}
-                    Icon={FaMusic}
-                    hoursName={"hearingHours"}
-                    minutesName={"hearingMinutes"}
-                  />
-                  <TimeInputBox
-                    errors={errors}
-                    title={t("creativity")}
-                    questionMarkProps={{
-                      description: t("description.creative"),
-                    }}
-                    Icon={FaBrain}
-                    hoursName={"creativityHours"}
-                    minutesName={"creativityMinutes"}
-                  />
+                  {timeInputList.map(
+                    (
+                      {
+                        title,
+                        questionMarkProps,
+                        Icon,
+                        hoursName,
+                        minutesName,
+                      },
+                      index
+                    ) => (
+                      <TimeInputBox
+                        key={index}
+                        errors={errors}
+                        title={title}
+                        questionMarkProps={questionMarkProps}
+                        Icon={Icon}
+                        hoursName={hoursName}
+                        minutesName={minutesName}
+                      />
+                    )
+                  )}
                 </div>
               </ReportCategoryWrapper>
+              <div className='flex flex-row justify-evenly '>
+                <ReportCategoryWrapper title={t("healthy_habits_title")}>
+                  {healthHabbitsList.map(
+                    ({ name, questionMarkProps, title }, index) => (
+                      <HealthHabbitsBox
+                        key={name + index}
+                        name={name}
+                        questionMarkProps={questionMarkProps}
+                        title={title}
+                      />
+                    )
+                  )}
+                </ReportCategoryWrapper>
+                <div className='max-w-[30%]'>
+                  <ReportCategoryWrapper title={"Dodatkowe opcje"}>
+                    <div className='flex flex-col gap-2 bg-main-opposed-500/40 p-4'>
+                      <div className='flex flex-col gap-2'>
+                        <p>{t("sesion_title")}</p>
+                        <p className='font-openSans text-xs text-tertiary'>
+                          {t("optional")}
+                        </p>
+                      </div>
 
-              <ReportCategoryWrapper title={t("healthy_habits_title")}>
-                <HealthHabbitsBox
-                  name='exercise_plan'
-                  questionMarkProps={{
-                    description: t("habits.exercise_plan.description"),
-                  }}
-                  title={t("habits.exercise_plan.title")}
-                />
-                <HealthHabbitsBox
-                  name='new_things'
-                  questionMarkProps={{
-                    description: t("habits.new_things.description"),
-                  }}
-                  title={t("habits.new_things.title")}
-                />
-                <HealthHabbitsBox
-                  name='warmup'
-                  questionMarkProps={{
-                    description: t("habits.warmup.description"),
-                  }}
-                  title={t("habits.warmup.title")}
-                />
-                <HealthHabbitsBox
-                  name='metronome'
-                  questionMarkProps={{
-                    description: t("habits.metronome.description"),
-                  }}
-                  title={t("habits.metronome.title")}
-                />
-                <HealthHabbitsBox
-                  name='recording'
-                  questionMarkProps={{
-                    description: t("habits.recording.description"),
-                  }}
-                  title={t("habits.recording.title")}
-                />
-              </ReportCategoryWrapper>
+                      <Input name='reportTitle' />
+                      <p className='font-openSans text-xs'>
+                        {t("description.sesion_title")}
+                      </p>
+                      <Divider />
+                      <div className='text-center'>
+                        <p>{t("date_back")}</p>
+                        <p
+                          className={`flex flex-row justify-center gap-2 font-openSans text-xs
+                        ${
+                          errors.hasOwnProperty("countBackDays")
+                            ? "font-extrabold text-error-200"
+                            : "text-mainText"
+                        }`}>
+                          {errors.hasOwnProperty("countBackDays") && (
+                            <FaTimesCircle className='text-error-200' />
+                          )}
+                          {t("max_days", { days: MAX_DAYS_BACK })}
+                        </p>
+                      </div>
+                      <div className='flex flex-row items-center justify-center gap-5'>
+                        <InputTime
+                          name={"countBackDays"}
+                          description={t("days")}
+                        />
+                        <p className='font-openSans text-sm'>
+                          {t("add_report_to_day")} <br />
+                          <span
+                            className={`${
+                              errors.hasOwnProperty("countBackDays")
+                                ? "font-extrabold text-error-200"
+                                : "text-mainText"
+                            }`}>
+                            {getDateFromPast(
+                              values.countBackDays
+                            ).toLocaleDateString()}
+                          </span>
+                        </p>
+                      </div>
+                      <p className='font-openSans text-xs'>
+                        {t("description.max_days", { days: MAX_DAYS_BACK })}
+                      </p>
+                    </div>
+                  </ReportCategoryWrapper>
+                </div>
+              </div>
               <div className='flex flex-col items-center justify-self-center md:col-span-2 lg:col-span-1 xl:col-span-2'>
                 <div className='m-2 h-6'>
                   {Object.keys(errors).length !== 0 && <ErrorBox />}
                 </div>
                 <BeginnerMsg />
-                <Button type='submit' loading={isFetching}>
+                <Button
+                  type='submit'
+                  disabled={Object.keys(errors).length !== 0}
+                  loading={isFetching}>
                   {t("report_button")}
                 </Button>
               </div>
             </ReportFormLayout>
             {acceptPopUpVisible && exceedingTime && (
               <Backdrop selector='overlays'>
-                <div className=' m-auto mx-2 flex h-1/4 min-h-[300px] flex-col items-center justify-center gap-4 border-2 border-second-400 bg-second p-6 radius-default'>
-                  <p className='font-openSans text-base'>
-                    {t("toast.exceeding_time") + convertMsToHM(exceedingTime)}
-                  </p>
-                  <p className=' font-openSans text-sm'>
-                    {t("exceeding_time")}
-                  </p>
-                  <div className=' flex gap-4'>
-                    <Button
-                      type='button'
-                      variant='small'
-                      onClick={() => {
-                        setAcceptExceedingTime(true);
-                        handleSubmit();
-                      }}
-                      loading={isFetching}>
-                      {t("report_button")}
-                    </Button>
-                    <Button
-                      type='button'
-                      variant='small'
-                      onClick={() => setAcceptPopUpVisible(false)}>
-                      {t("rating_popup.back")}
-                    </Button>
-                  </div>
-                </div>
+                <AcceptExceedingPopUp
+                  exceedingTime={exceedingTime}
+                  handleSubmit={handleSubmit}
+                  isFetching={isFetching}
+                  setAcceptExceedingTime={setAcceptExceedingTime}
+                  setAcceptPopUpVisible={setAcceptPopUpVisible}
+                />
               </Backdrop>
             )}
           </>

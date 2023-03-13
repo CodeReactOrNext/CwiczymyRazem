@@ -2,10 +2,9 @@ import Logo from "components/Logo";
 import Avatar from "components/Avatar";
 import UserNav from "components/UserNav";
 import LevelBar from "components/LevelBar";
-import ThemeToggle from "components/UI/ThemeToggle";
-import LanguageSwitch from "components/UI/LanguageSwitch";
 import NavDecoration from "./components/NavDecoration";
 import WelcomeMessage from "./components/WelcomeMessage";
+import { ThemeToggle, LanguageSwitch } from "components/UI";
 
 import { StatisticsDataInterface } from "types/api.types";
 import CopyLinkProfile from "components/CopyLinkProfile";
