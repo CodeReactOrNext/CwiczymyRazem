@@ -243,7 +243,7 @@ const ReportView = () => {
                   )}
                 </div>
               </ReportCategoryWrapper>
-              <div className='flex flex-row justify-evenly '>
+              <div className='flex flex-col justify-evenly md:flex-row '>
                 <ReportCategoryWrapper title={t("healthy_habits_title")}>
                   {healthHabbitsList.map(
                     ({ name, questionMarkProps, title }, index) => (
@@ -256,7 +256,7 @@ const ReportView = () => {
                     )
                   )}
                 </ReportCategoryWrapper>
-                <div className='max-w-[30%]'>
+                <div className='md:max-w-[30%]'>
                   <ReportCategoryWrapper title={"Dodatkowe opcje"}>
                     <div className='flex flex-col gap-2 bg-main-opposed-500/40 p-4'>
                       <div className='flex flex-col gap-2'>
