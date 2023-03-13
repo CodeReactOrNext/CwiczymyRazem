@@ -1,4 +1,4 @@
-import { FaClock, FaRegCalendarAlt, FaSpinner, FaStar } from "react-icons/fa";
+import { FaSpinner } from "react-icons/fa";
 import { useEffect, useState } from "react";
 
 import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";
@@ -6,8 +6,9 @@ import { useTranslation } from "react-i18next";
 
 import ExerciseShortInfo from "./components/ExerciseShortInfo";
 import ReactTooltip from "react-tooltip";
+import CalendarSquare from "./components/CalendarSquare/CalendarSquare";
 
-interface ReportListInterface {
+export interface ReportListInterface {
   points: number;
   date: Date;
   totalTime: number;
@@ -21,6 +22,13 @@ interface ReportListInterface {
     sumTime: number;
   };
 }
+const getEmptyFiled = (dayWhenYearStart: number) => {
+  const numOfDayWhereUiStart = 6;
+  const nullsToGenerateSapceForUi = new Array(
+    numOfDayWhereUiStart - dayWhenYearStart
+  ).fill(null);
+  return nullsToGenerateSapceForUi;
+};
 
 const Calendar = ({ userAuth }: { userAuth: string }) => {
   const { t } = useTranslation("common");
@@ -28,14 +36,6 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   const [reportList, setReportList] = useState<ReportListInterface[] | null>(
     null
   );
-
-  const getEmptyFiled = (dayWhenYearStart: number) => {
-    const numOfDayWhereUiStart = 6;
-    const nullsToGenerateSapceForUi = new Array(
-      numOfDayWhereUiStart - dayWhenYearStart
-    ).fill(null);
-    return nullsToGenerateSapceForUi;
-  };
 
   let year = 2023;
   let datasWithReports: Array<{
@@ -61,34 +61,6 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
       datasWithReports.push({ date, report: exceries });
     }
   }
-  const getPointRaitings = (
-    datasWithReports: {
-      date: Date;
-      report: ReportListInterface | undefined;
-    } | null
-  ) => {
-    if (datasWithReports === null) return null;
-    if (datasWithReports.report === undefined) return;
-
-    switch (true) {
-      case !!datasWithReports.report.isDateBackReport !== false:
-        return "backDate";
-      case datasWithReports.report.points > 30:
-        return "super";
-      case datasWithReports.report.points > 20:
-        return "great";
-      case datasWithReports.report.points > 10:
-        return "nice";
-
-      case datasWithReports.report.points ||
-        datasWithReports.report.points === 0:
-        return "ok";
-      case datasWithReports.report.points === 0:
-        return "zero";
-      default:
-        return null;
-    }
-  };
 
   useEffect(() => {
     if (userAuth && reportList === null) {
@@ -138,15 +110,13 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
                       previousValue[indexOfRepeted].timeSumary.creativityTime +
                       exceriesLog.timeSumary.creativityTime,
                     sumTime:
-                      previousValue[indexOfRepeted].timeSumary?.sumTime +
+                      previousValue[indexOfRepeted].timeSumary.sumTime +
                       exceriesLog.timeSumary.sumTime,
                   };
                 }
               }
-
               return previousValue;
             }
-
             previousValue.push({
               points: exceriesLog.totalPoints,
               date: new Date(exceriesLog.reportDate.seconds * 1000),
@@ -172,7 +142,6 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
             };
           }[]
         );
-
         setReportList(reducedReportsList);
       });
     }
@@ -183,44 +152,29 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
       <p className='pb-2 text-sm font-bold'>
         {t("calendar.title")}: {year}
       </p>
-      <div className=' grid cursor-pointer grid-flow-col grid-rows-7   p-2 text-xs  '>
+      <div className=' grid  grid-flow-col grid-rows-7 p-2 text-xs'>
         <p className='row-span-3 mr-3'> {t("calendar.monday")}</p>
         <p className='row-span-3 mr-3'>{t("calendar.thursday")}</p>
         <p>{t("calendar.sunday")}</p>
         {datasWithReports.map((date, index) => {
-          const raiting = getPointRaitings(date);
           return date ? (
             <div
               key={index + date.date.toISOString()}
               data-tip
               data-for={index.toString()}>
-              <ReactTooltip id={index.toString()}>
-                {date.report ? (
-                  <ExerciseShortInfo date={date} />
-                ) : (
-                  <p className='p-1'>{date.date.toLocaleDateString()}</p>
-                )}
-              </ReactTooltip>
-
-              <div
-                className={`m-[0.2rem] rounded-[1px] p-[0.3rem]
-                ${raiting === "backDate" ? "bg-blue-400" : null}
-            ${raiting === "super" ? "bg-main-calendar" : null}
-            ${raiting === "great" ? "bg-main-calendar/80" : null}
-            ${raiting === "nice" ? "bg-main-calendar/70" : null}
-            ${raiting === "ok" ? "bg-main-calendar/60" : null}
-            ${raiting === "zero" ? "bg-main-calendar/20" : null}
-            ${raiting ? "" : "bg-slate-600/50"}
-            `}></div>
+              {date.report && (
+                <ReactTooltip id={index.toString()}>
+                  <ExerciseShortInfo date={date.date} report={date.report} />
+                </ReactTooltip>
+              )}
+              <CalendarSquare report={date.report} />
             </div>
           ) : (
-            <>
-              <div
-                key={index}
-                data-tip
-                data-for={index.toString()}
-                className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
-            </>
+            <div
+              key={index}
+              data-tip
+              data-for={index.toString()}
+              className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
           );
         })}
         <div className='p-2'></div>
