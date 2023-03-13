@@ -11,11 +11,17 @@ import { i18n } from "next-i18next";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
+import InputTime from "layouts/ReportFormLayout/components/InputTime";
 import TimeInputBox from "layouts/ReportFormLayout/components/TimeInputBox";
 import HealthHabbitsBox from "layouts/ReportFormLayout/components/HealthHabbitsBox";
+import AcceptExceedingPopUp from "layouts/ReportFormLayout/components/AcceptExceedingPopUp";
 import ReportCategoryWrapper from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
+import { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
+import { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 
+import Input from "components/UI/Input";
 import Button from "components/UI/Button";
+import Divider from "components/UI/Divider";
 import Backdrop from "components/Backdrop";
 import BeginnerMsg from "components/BeginnerMsg";
 
@@ -33,17 +39,10 @@ import {
 import { RaportSchema } from "./helpers/RaportShcema";
 import { ReportFormikInterface } from "./ReportView.types";
 import { getDateFromPast } from "utils/converter/getDateFromPast";
+import { convertMsToHMObject } from "utils/converter/timeConverter";
 import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
-import {
-  convertMsToHM,
-  convertMsToHMObject,
-} from "utils/converter/timeConverter";
-import Input from "components/UI/Input";
-import { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
-import { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
-import Divider from "components/UI/Divider";
-import InputTime from "layouts/ReportFormLayout/components/InputTime";
+
 import { MAX_DAYS_BACK } from "constants/gameSettings";
 
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
@@ -285,7 +284,6 @@ const ReportView = () => {
                           {t("max_days", { days: MAX_DAYS_BACK })}
                         </p>
                       </div>
-
                       <div className='flex flex-row items-center justify-center gap-5'>
                         <InputTime
                           name={"countBackDays"}
@@ -327,30 +325,13 @@ const ReportView = () => {
             </ReportFormLayout>
             {acceptPopUpVisible && exceedingTime && (
               <Backdrop selector='overlays'>
-                <div className=' m-auto mx-2 flex h-1/4 min-h-[300px] flex-col items-center justify-center gap-4 border-2 border-second-400 bg-second p-6 radius-default'>
-                  <p className='font-openSans text-base'>
-                    {t("toast.exceeding_time") + convertMsToHM(exceedingTime)}
-                  </p>
-                  <p className='font-openSans text-sm'>{t("exceeding_time")}</p>
-                  <div className='flex gap-4'>
-                    <Button
-                      type='button'
-                      variant='small'
-                      onClick={() => {
-                        setAcceptExceedingTime(true);
-                        handleSubmit();
-                      }}
-                      loading={isFetching}>
-                      {t("report_button")}
-                    </Button>
-                    <Button
-                      type='button'
-                      variant='small'
-                      onClick={() => setAcceptPopUpVisible(false)}>
-                      {t("rating_popup.back")}
-                    </Button>
-                  </div>
-                </div>
+                <AcceptExceedingPopUp
+                  exceedingTime={exceedingTime}
+                  handleSubmit={handleSubmit}
+                  isFetching={isFetching}
+                  setAcceptExceedingTime={setAcceptExceedingTime}
+                  setAcceptPopUpVisible={setAcceptPopUpVisible}
+                />
               </Backdrop>
             )}
           </>

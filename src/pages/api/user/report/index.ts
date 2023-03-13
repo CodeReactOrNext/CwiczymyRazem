@@ -93,12 +93,10 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
   };
 
   const newAchievements = checkAchievement(updatedUserData, raiting, inputData);
-
   const updatedUserDataWithAchievements: StatisticsDataInterface = {
     ...updatedUserData,
     achievements: [...newAchievements, ...updatedUserData.achievements],
   };
-
   const dateToReport = isDateBackReport
     ? getDateFromPast(isDateBackReport)
     : new Date();
@@ -112,7 +110,6 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
     timeSumary
   );
   await firebaseUpdateUserStats(userUid, updatedUserDataWithAchievements);
-
   if (!isDateBackReport) {
     await firebaseAddLogReport(
       userUid,

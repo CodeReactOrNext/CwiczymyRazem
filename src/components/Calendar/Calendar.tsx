@@ -7,21 +7,16 @@ import { useTranslation } from "react-i18next";
 import ExerciseShortInfo from "./components/ExerciseShortInfo";
 import ReactTooltip from "react-tooltip";
 import CalendarSquare from "./components/CalendarSquare/CalendarSquare";
+import { ReportListInterface } from "types/api.types";
 
-export interface ReportListInterface {
-  points: number;
-  date: Date;
-  totalTime: number;
-  exceriseTitle?: string;
-  isDateBackReport: string;
-  timeSumary?: {
-    techniqueTime: number;
-    theoryTime: number;
-    hearingTime: number;
-    creativityTime: number;
-    sumTime: number;
-  };
-}
+type PartiallyRequired<T, K extends keyof T> = Omit<T, K> &
+  Required<Pick<T, K>>;
+
+type ReportListInterfaceWithTimeSumary = PartiallyRequired<
+  ReportListInterface,
+  "timeSumary"
+>;
+
 const getEmptyFiled = (dayWhenYearStart: number) => {
   const numOfDayWhereUiStart = 6;
   const nullsToGenerateSapceForUi = new Array(
@@ -127,20 +122,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
             });
             return previousValue;
           },
-          [] as {
-            points: number;
-            date: Date;
-            totalTime: number;
-            exceriseTitle: string;
-            isDateBackReport: string;
-            timeSumary: {
-              techniqueTime: number;
-              theoryTime: number;
-              hearingTime: number;
-              creativityTime: number;
-              sumTime: number;
-            };
-          }[]
+          [] as ReportListInterfaceWithTimeSumary[]
         );
         setReportList(reducedReportsList);
       });
