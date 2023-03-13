@@ -1,4 +1,4 @@
-import { ReportListInterface } from "components/Calendar/Calendar";
+import { ReportListInterface } from "types/api.types";
 
 interface CalendarSquareProps {
   report: ReportListInterface | undefined;
