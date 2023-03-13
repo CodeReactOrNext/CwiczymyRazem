@@ -1,22 +1,22 @@
 import { FaSpinner } from "react-icons/fa";
 import { useState, useEffect } from "react";
+import { useAppSelector } from "store/hooks";
+import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 import LogsBoxLayout from "layouts/LogsBoxLayout";
 
-import {
-  firebaseGetDiscordEvent,
-  firebaseGetEvents,
-  firebaseGetLogs,
-} from "utils/firebase/client/firebase.utils";
+import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import {
   FirebaseDiscordEventsInteface,
   FirebaseEventsInteface,
   FirebaseLogsInterface,
 } from "utils/firebase/client/firebase.types";
-import { useAppSelector } from "store/hooks";
-import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { toast } from "react-toastify";
-import { useTranslation } from "react-i18next";
+import {
+  firebaseGetDiscordEvent,
+  firebaseGetEvents,
+  firebaseGetLogs,
+} from "utils/firebase/client/firebase.utils";
 
 const LogsBoxView = () => {
   const [logs, setLogs] = useState<FirebaseLogsInterface[] | null>(null);

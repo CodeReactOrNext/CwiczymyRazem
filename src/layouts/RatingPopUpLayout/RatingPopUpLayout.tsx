@@ -2,7 +2,7 @@ import Image from "next/image";
 import FireSVG from "public/static/images/svg/Fire";
 import Lightning from "public/static/images/svg/Lightning";
 import blackGuitar from "public/static/images/guitar_black.png";
-import Button from "components/UI/Button";
+import { Button } from "components/UI";
 
 import OldEffect from "components/OldEffect";
 import BonusPointsItem from "./components/BonusPointsItem";
@@ -12,7 +12,7 @@ import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
 import { StatisticsDataInterface } from "types/api.types";
-import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
+import { getPointsToLvlUp } from "utils/gameLogic";
 import LevelIndicator from "./components/LevelIndicator";
 
 export interface BonusPointsInterface {

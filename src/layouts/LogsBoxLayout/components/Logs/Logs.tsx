@@ -2,7 +2,7 @@ import Achievement from "components/Achievement";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import { addZeroToTime } from "utils/converter/addZeroToTime";
+import { addZeroToTime } from "utils/converter";
 import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
 
 export interface LogsBoxLayoutProps {

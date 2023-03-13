@@ -1,10 +1,10 @@
-import { Form, Formik } from "formik";
+import { Formik } from "formik";
 import { UserInfo } from "firebase/auth";
 import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
 
+import { Divider } from "components/UI";
 import SettingsLayout from "layouts/SettingsLayout";
-import Divider from "layouts/SettingsLayout/components/Divider";
 import FieldBox from "layouts/SettingsLayout/components/FieldBox";
 import EmailChange from "feature/user/components/settings/EmailChange";
 import AvatarChange from "feature/user/components/settings/AvatarChange";

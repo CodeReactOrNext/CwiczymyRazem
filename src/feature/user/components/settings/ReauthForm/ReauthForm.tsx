@@ -3,8 +3,7 @@ import { useAppSelector } from "store/hooks";
 import { FaAt, FaLock } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 
-import Input from "components/UI/Input";
-import Button from "components/UI/Button";
+import { Input, Button } from "components/UI";
 import Backdrop from "components/Backdrop";
 import FormLayout from "layouts/FormLayout";
 
