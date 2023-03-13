@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
-import Button from "components/UI/Button";
+import { Button } from "components/UI";
 
 import { restartUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { selectIsFetching } from "feature/user/store/userSlice";

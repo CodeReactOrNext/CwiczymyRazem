@@ -37,7 +37,7 @@
     "no_practice": "Gracz nie ćwiczył",
     "pracitce_last_24": "Ostatnio ćwiczył",
     "practice_day": "Ćwiczył {{days}} dni temu",
-    "actual_streak" : "Aktualny streak:"
+    "actual_streak": "Aktualny streak:"
   },
   "header": {
     "hey": "Cześć",
@@ -74,7 +74,11 @@
     "monday": "Pon",
     "thursday": "Czw",
     "sunday": "Nie",
-    "points": "Punktów"
+    "points": "Punktów",
+    "technique": "Technika",
+    "theory": "Teoria",
+    "hearing": "Słuch",
+    "creativity": "Kreatywność"
   },
   "sort": {
     "sort_by": "Sortuj według:",

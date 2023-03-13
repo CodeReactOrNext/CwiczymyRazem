@@ -1,22 +1,23 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { StatisticsDataInterface } from "types/api.types";
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-
-import { getUserLvl } from "utils/gameLogic/getUserLvl";
 import { auth } from "utils/firebase/api/firebase.config";
-import { makeRatingData } from "utils/gameLogic/makeRatingData";
-import { checkAchievement } from "utils/gameLogic/checkAvievement";
-import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
-import { inputTimeConverter } from "utils/converter/InputTimeConverter";
-import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
+import { StatisticsDataInterface } from "types/api.types";
+import { inputTimeConverter, getDateFromPast } from "utils/converter";
+import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import {
+  getUserLvl,
+  makeRatingData,
+  checkAchievement,
+  getPointsToLvlUp,
+  checkIsPracticeToday,
+  getUpdatedActualDayWithoutBreak,
+} from "utils/gameLogic";
 import {
   firebaseGetUserData,
   firebaseUpdateUserStats,
   firebaseSetUserExerciseRaprot,
   firebaseAddLogReport,
 } from "utils/firebase/api/firebase.utils";
-import { getUpdatedActualDayWithoutBreak } from "utils/gameLogic/getUpdatedActualDayWithoutBreak";
 
 interface updateUserStatsProps {
   userUid: string;
@@ -26,8 +27,12 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
   const currentUserStats = (await firebaseGetUserData(
     userUid
   )) as StatisticsDataInterface;
+
+  const isDateBackReport = inputData.countBackDays;
+  const timeSumary = inputTimeConverter(inputData);
   const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
-    inputTimeConverter(inputData);
+    timeSumary;
+
   const {
     time,
     habitsCount,
@@ -42,17 +47,19 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
   } = currentUserStats;
 
   const userLastReportDate = new Date(lastReportDate!);
-  const didPracticeToday = checkIsPracticeToday(userLastReportDate);
+  const didPracticeToday = isDateBackReport
+    ? false
+    : checkIsPracticeToday(userLastReportDate);
   const updatedActualDayWithoutBreak = getUpdatedActualDayWithoutBreak(
     actualDayWithoutBreak,
     userLastReportDate,
     didPracticeToday
   );
-  const raiting = makeRatingData(
-    inputData,
-    sumTime,
-    updatedActualDayWithoutBreak
-  );
+
+  const raiting = isDateBackReport
+    ? makeRatingData(inputData, sumTime, 1)
+    : makeRatingData(inputData, sumTime, updatedActualDayWithoutBreak);
+
   const level = getUserLvl(lvl, points + raiting.totalPoints);
   const isNewLevel = level > lvl;
 
@@ -76,31 +83,45 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
         : dayWithoutBreak,
     maxPoints:
       maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
-    actualDayWithoutBreak: updatedActualDayWithoutBreak,
+    actualDayWithoutBreak: isDateBackReport
+      ? actualDayWithoutBreak
+      : updatedActualDayWithoutBreak,
     achievements: achievements,
-    lastReportDate: new Date().toISOString(),
+    lastReportDate: isDateBackReport
+      ? lastReportDate
+      : new Date().toISOString(),
   };
 
   const newAchievements = checkAchievement(updatedUserData, raiting, inputData);
-
   const updatedUserDataWithAchievements: StatisticsDataInterface = {
     ...updatedUserData,
     achievements: [...newAchievements, ...updatedUserData.achievements],
   };
+  const dateToReport = isDateBackReport
+    ? getDateFromPast(isDateBackReport)
+    : new Date();
 
-  await firebaseSetUserExerciseRaprot(userUid, raiting, new Date());
-  await firebaseUpdateUserStats(userUid, updatedUserDataWithAchievements);
-  await firebaseAddLogReport(
+  await firebaseSetUserExerciseRaprot(
     userUid,
-
-    updatedUserData.lastReportDate,
-    raiting.totalPoints,
-    newAchievements,
-    {
-      isNewLevel,
-      level,
-    }
+    { ...raiting, reportDate: dateToReport },
+    dateToReport,
+    inputData.reportTitle,
+    isDateBackReport,
+    timeSumary
   );
+  await firebaseUpdateUserStats(userUid, updatedUserDataWithAchievements);
+  if (!isDateBackReport) {
+    await firebaseAddLogReport(
+      userUid,
+      updatedUserData.lastReportDate,
+      raiting.totalPoints,
+      newAchievements,
+      {
+        isNewLevel,
+        level,
+      }
+    );
+  }
   return {
     currentUserStats: updatedUserDataWithAchievements,
     previousUserStats: currentUserStats,
