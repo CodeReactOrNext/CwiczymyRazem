@@ -1,22 +1,23 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { StatisticsDataInterface } from "types/api.types";
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-
-import { getUserLvl } from "utils/gameLogic/getUserLvl";
 import { auth } from "utils/firebase/api/firebase.config";
-import { makeRatingData } from "utils/gameLogic/makeRatingData";
-import { checkAchievement } from "utils/gameLogic/checkAvievement";
-import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
+import { StatisticsDataInterface } from "types/api.types";
 import { inputTimeConverter, getDateFromPast } from "utils/converter";
-import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
+import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import {
+  getUserLvl,
+  makeRatingData,
+  checkAchievement,
+  getPointsToLvlUp,
+  checkIsPracticeToday,
+  getUpdatedActualDayWithoutBreak,
+} from "utils/gameLogic";
 import {
   firebaseGetUserData,
   firebaseUpdateUserStats,
   firebaseSetUserExerciseRaprot,
   firebaseAddLogReport,
 } from "utils/firebase/api/firebase.utils";
-import { getUpdatedActualDayWithoutBreak } from "utils/gameLogic/getUpdatedActualDayWithoutBreak";
 
 interface updateUserStatsProps {
   userUid: string;

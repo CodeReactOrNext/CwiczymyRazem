@@ -1,8 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { FaCheck, FaTimes } from "react-icons/fa";
 
-import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
-import { getUpdatedActualDayWithoutBreak } from "utils/gameLogic/getUpdatedActualDayWithoutBreak";
+import {
+  checkIsPracticeToday,
+  getUpdatedActualDayWithoutBreak,
+} from "utils/gameLogic";
 interface WelocmeMessageProps {
   userName: string;
   lastReportDate: string;

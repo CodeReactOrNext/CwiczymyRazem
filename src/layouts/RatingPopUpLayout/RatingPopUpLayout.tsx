@@ -12,7 +12,7 @@ import Router from "next/router";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
 import { StatisticsDataInterface } from "types/api.types";
-import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
+import { getPointsToLvlUp } from "utils/gameLogic";
 import LevelIndicator from "./components/LevelIndicator";
 
 export interface BonusPointsInterface {
