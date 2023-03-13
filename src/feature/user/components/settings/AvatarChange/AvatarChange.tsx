@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
-import Button from "components/UI/Button";
 import Avatar from "components/Avatar";
 
 import { uploadUserAvatar } from "feature/user/store/userSlice.asyncThunk";
@@ -12,6 +11,7 @@ import {
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
+import { Button } from "components/UI";
 
 const AvatarChange = () => {
   const [avatarIsValid, setAvatarIsValid] = useState(false);
