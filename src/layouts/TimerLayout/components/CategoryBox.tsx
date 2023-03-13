@@ -1,7 +1,4 @@
-import {
-  convertMsToHM,
-  convertMsToHMObject,
-} from "utils/converter/timeConverter";
+import { convertMsToHMObject } from "utils/converter";
 
 interface CategoryBox {
   title: string;

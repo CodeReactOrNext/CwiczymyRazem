@@ -7,11 +7,13 @@ import QuestionMark from "./QuestionMark";
 import GoogleButton from "./GoogleButton";
 import LanguageSwitch from "./LanguageSwitch";
 
-export { Input };
-export { Button };
-export { Divider };
-export { ToolTip };
-export { ThemeToggle };
-export { QuestionMark };
-export { GoogleButton };
-export { LanguageSwitch };
+export {
+  Input,
+  Button,
+  Divider,
+  ToolTip,
+  ThemeToggle,
+  QuestionMark,
+  GoogleButton,
+  LanguageSwitch,
+};

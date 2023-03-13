@@ -8,7 +8,7 @@ import { auth } from "utils/firebase/api/firebase.config";
 import { makeRatingData } from "utils/gameLogic/makeRatingData";
 import { checkAchievement } from "utils/gameLogic/checkAvievement";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
-import { inputTimeConverter } from "utils/converter/InputTimeConverter";
+import { inputTimeConverter, getDateFromPast } from "utils/converter";
 import { checkIsPracticeToday } from "utils/gameLogic/checkIsPracticeToday";
 import {
   firebaseGetUserData,
@@ -17,7 +17,6 @@ import {
   firebaseAddLogReport,
 } from "utils/firebase/api/firebase.utils";
 import { getUpdatedActualDayWithoutBreak } from "utils/gameLogic/getUpdatedActualDayWithoutBreak";
-import { getDateFromPast } from "utils/converter/getDateFromPast";
 
 interface updateUserStatsProps {
   userUid: string;

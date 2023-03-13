@@ -10,7 +10,7 @@ import HeadDecoration from "./components/HeadDecoration";
 import StatsField, { StatsFieldProps } from "./components/StatsField";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
-import { convertMsToHM } from "utils/converter/timeConverter";
+import { convertMsToHM } from "utils/converter";
 import { ProfileInterface } from "types/ProfileInterface";
 
 export interface LandingLayoutProps {
