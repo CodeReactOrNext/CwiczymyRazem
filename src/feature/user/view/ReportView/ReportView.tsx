@@ -10,14 +10,16 @@ import { i18n } from "next-i18next";
 
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
-import ErrorBox from "layouts/ReportFormLayout/components/ErrorBox";
-import InputTime from "layouts/ReportFormLayout/components/InputTime";
-import TimeInputBox from "layouts/ReportFormLayout/components/TimeInputBox";
-import HealthHabbitsBox from "layouts/ReportFormLayout/components/HealthHabbitsBox";
-import AcceptExceedingPopUp from "layouts/ReportFormLayout/components/AcceptExceedingPopUp";
-import ReportCategoryWrapper from "layouts/ReportFormLayout/components/ReportCategoryWrapper";
 import { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
 import { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
+import {
+  ErrorBox,
+  InputTime,
+  TimeInputBox,
+  HealthHabbitsBox,
+  AcceptExceedingPopUp,
+  ReportCategoryWrapper,
+} from "layouts/ReportFormLayout/components";
 
 import { Input, Button, Divider } from "components/UI";
 import Backdrop from "components/Backdrop";
