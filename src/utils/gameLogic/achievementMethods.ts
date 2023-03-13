@@ -1,4 +1,4 @@
-import { inputTimeConverter } from "utils/converter/InputTimeConverter";
+import { inputTimeConverter } from "utils/converter";
 import { StatisticsDataInterface } from "types/api.types";
 import {
   ReportDataInterface,

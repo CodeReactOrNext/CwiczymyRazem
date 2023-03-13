@@ -6,8 +6,8 @@ import QuestionMark, { QuestionMarkProps } from "components/UI/QuestionMark";
 
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 
-interface TimeInputBoxProps {
-  title: string;
+export interface TimeInputBoxProps {
+  title?: string;
   Icon: IconType;
   questionMarkProps: QuestionMarkProps;
   hoursName: string;
@@ -35,9 +35,9 @@ const TimeInputBox = ({
         <QuestionMark description={questionMarkProps.description} />
       </label>
       <div className='xL:gap-3 flex items-center justify-center gap-2 text-xl'>
-        <InputTime name={hoursName} description={"HH"} />
+        <InputTime name={hoursName} description={"HH"} addZero />
         <p className='text-3xl'>:</p>
-        <InputTime name={minutesName} description={"MM"} />
+        <InputTime name={minutesName} description={"MM"} addZero />
       </div>
     </div>
   );

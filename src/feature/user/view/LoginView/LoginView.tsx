@@ -4,9 +4,7 @@ import { FaAt, FaLock } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 
 import FormLayout from "layouts/FormLayout";
-import Input from "components/UI/Input";
-import Button from "components/UI/Button";
-import GoogleButton from "components/UI/GoogleButton";
+import { Input, Button, GoogleButton } from "components/UI";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectIsFetching } from "feature/user/store/userSlice";

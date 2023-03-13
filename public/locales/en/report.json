@@ -8,11 +8,17 @@
   "healthy_habits_title": "Healthy habits",
   "report_button": "Report",
   "exceeding_time": "Are you sure you want to add report?",
+  "sesion_title": "Goals of this practice session:",
+  "optional": "optional",
+  "days": "Days",
+  "date_back": "Date back",
+  "max_days": "Max {{days}} days",
+  "add_report_to_day": "You add report do day:",
+
   "toast": {
     "24h_error": "It is not possible to exercise more than 24 hours per day",
     "input_time": "Enter time",
     "not_logged": "You are not logged in",
-
     "stoper_entered": "Time from stopwatch entered",
     "exceeding_time": "You have entered more time than has passed since the last report. You exceeded the time by  "
   },
@@ -21,7 +27,9 @@
     "hearing": "E.g. playing or listening to songs or fragments of them by ear, listening and identifying intervals, singing",
     "theory": "E.g. transcribing and analyzing songs, learning notes on the fretboard, reading sheet music",
     "creative": "E.g. writing original songs, improvising, working on one's own style",
-    "exceeding_time": "If you forgot to add the time/healthy habit to the previous report or want to report an additional exercise session you did earlier, check this box."
+    "exceeding_time": "If you forgot to add the time/healthy habit to the previous report or want to report an additional exercise session you did earlier, check this box.",
+    "sesion_title": "Title your session. It will be visible in your calendar.",
+    "max_days": "If you forgot, you can add your report from up to {{days}} days back. However, it won't be counted as consecutive days and will be highlighted on the calendar."
   },
   "habits": {
     "exercise_plan": {

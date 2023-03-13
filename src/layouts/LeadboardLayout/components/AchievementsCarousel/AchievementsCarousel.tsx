@@ -1,5 +1,4 @@
 import Achievement from "components/Achievement";
-import ToolTip from "components/UI/ToolTip";
 import {
   AchievementList,
   achievementsData,

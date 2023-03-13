@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import Button from "components/UI/Button";
+import { Button } from "components/UI";
 import Metronom from "components/Metronom/";
 import Stopwatch from "./components/Stopwatch";
 import BeginnerMsg from "components/BeginnerMsg";
@@ -9,9 +9,8 @@ import CategoryBox from "./components/CategoryBox";
 
 import { SkillsType } from "types/skillsTypes";
 import { useTimerInterface } from "hooks/useTimer";
-import { convertMsToHM } from "utils/converter/timeConverter";
+import { convertMsToHM, calculatePercent } from "utils/converter";
 import { TimerInterface } from "types/api.types";
-import { calculatePercent } from "utils/converter/calculatePercent";
 
 interface TimerLayoutProps {
   timer: useTimerInterface;

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
+import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface LevelInterfaceProps {
   points: number;

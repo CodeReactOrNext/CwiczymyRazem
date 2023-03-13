@@ -74,7 +74,11 @@
     "monday": "Mon",
     "thursday": "Thu",
     "sunday": "Sun",
-    "points": "Points"
+    "points": "Points",
+    "technique": "Technique",
+    "theory": "Theory",
+    "hearing": "Hearing",
+    "creativity": "Creativity"
   },
   "sort": {
     "sort_by": "Sort by:",
