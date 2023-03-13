@@ -1,6 +1,6 @@
 import { addZeroToTime } from "./addZeroToTime";
 import { calculatePercent } from "./calculatePercent";
-import { inputTimeConverter } from "./inputTimeConverter";
+import { inputTimeConverter } from "./InputTimeConverter";
 import { getDateFromPast } from "./getDateFromPast";
 import { convertMsToHM, convertMsToHMObject } from "./timeConverter";
 
