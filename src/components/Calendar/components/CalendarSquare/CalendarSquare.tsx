@@ -18,7 +18,7 @@ const CalendarSquare = ({ report }: CalendarSquareProps) => {
         return "great";
       case report.points > 10:
         return "nice";
-      case report.points || report.points === 0:
+      case report.points >= 0:
         return "ok";
       case report.points === 0:
         return "zero";
