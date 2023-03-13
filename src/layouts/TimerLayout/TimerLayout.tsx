@@ -9,9 +9,8 @@ import CategoryBox from "./components/CategoryBox";
 
 import { SkillsType } from "types/skillsTypes";
 import { useTimerInterface } from "hooks/useTimer";
-import { convertMsToHM } from "utils/converter/timeConverter";
+import { convertMsToHM, calculatePercent } from "utils/converter";
 import { TimerInterface } from "types/api.types";
-import { calculatePercent } from "utils/converter/calculatePercent";
 
 interface TimerLayoutProps {
   timer: useTimerInterface;

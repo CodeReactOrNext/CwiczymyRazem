@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
-import { addZeroToTime } from "utils/converter/addZeroToTime";
+import { addZeroToTime } from "utils/converter";
 
 interface InputTimeProps {
   name: string;

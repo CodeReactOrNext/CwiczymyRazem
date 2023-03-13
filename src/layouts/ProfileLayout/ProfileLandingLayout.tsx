@@ -7,8 +7,7 @@ import StatsField, { StatsFieldProps } from "./components/StatsField";
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 import { StatisticsDataInterface } from "types/api.types";
-import { convertMsToHM } from "utils/converter/timeConverter";
-import { calculatePercent } from "utils/converter/calculatePercent";
+import { convertMsToHM, calculatePercent } from "utils/converter";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];

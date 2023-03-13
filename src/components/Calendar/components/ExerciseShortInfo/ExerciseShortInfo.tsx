@@ -2,7 +2,7 @@ import IconBox from "components/IconBox";
 import { useTranslation } from "react-i18next";
 import { FaClock, FaRegCalendarAlt, FaStar } from "react-icons/fa";
 import { ReportListInterface } from "types/api.types";
-import { convertMsToHM } from "utils/converter/timeConverter";
+import { convertMsToHM } from "utils/converter";
 
 const ExerciseShortInfo = ({
   date,

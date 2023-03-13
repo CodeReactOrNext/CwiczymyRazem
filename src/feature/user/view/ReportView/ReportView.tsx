@@ -36,10 +36,12 @@ import {
 
 import { RaportSchema } from "./helpers/RaportShcema";
 import { ReportFormikInterface } from "./ReportView.types";
-import { getDateFromPast } from "utils/converter/getDateFromPast";
-import { convertMsToHMObject } from "utils/converter/timeConverter";
-import { inputTimeConverter } from "utils/converter/InputTimeConverter";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
+import {
+  getDateFromPast,
+  convertMsToHMObject,
+  inputTimeConverter,
+} from "utils/converter";
 
 import { MAX_DAYS_BACK } from "constants/gameSettings";
 

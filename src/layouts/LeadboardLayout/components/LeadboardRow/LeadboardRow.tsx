@@ -6,7 +6,7 @@ import Avatar from "components/Avatar";
 import DaySince from "components/DaySince";
 import AchievementsCarousel from "../AchievementsCarousel";
 
-import { convertMsToHM } from "utils/converter/timeConverter";
+import { convertMsToHM } from "utils/converter";
 import { StatisticsDataInterface } from "types/api.types";
 
 interface LeadboardColumnProps {
