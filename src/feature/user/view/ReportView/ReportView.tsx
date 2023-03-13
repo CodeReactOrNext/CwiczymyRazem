@@ -19,9 +19,7 @@ import ReportCategoryWrapper from "layouts/ReportFormLayout/components/ReportCat
 import { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
 import { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 
-import Input from "components/UI/Input";
-import Button from "components/UI/Button";
-import Divider from "components/UI/Divider";
+import { Input, Button, Divider } from "components/UI";
 import Backdrop from "components/Backdrop";
 import BeginnerMsg from "components/BeginnerMsg";
 

@@ -1,4 +1,4 @@
-import Button from "components/UI/Button";
+import { Button } from "components/UI";
 import { SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { convertMsToHM } from "utils/converter/timeConverter";
