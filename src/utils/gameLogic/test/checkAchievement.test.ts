@@ -44,7 +44,7 @@ describe("checkAchievement", () => {
     expect(achievement).toEqual([]);
   });
 
-  it("returns achievements id's in array if you if you meet the conditions ", () => {
+  it("returns achievements id's in array  if you meet the conditions ", () => {
     const statistics: StatisticsDataInterface = {
       ...statisticsInitial,
       points: 10000,

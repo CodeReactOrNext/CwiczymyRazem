@@ -1,3 +1,10 @@
+export type HabbitsType =
+  | "exercise_plan"
+  | "new_things"
+  | "warmup"
+  | "metronome"
+  | "recording";
+
 export interface ReportFormikInterface {
   techniqueHours: string;
   techniqueMinutes: string;
@@ -9,13 +16,7 @@ export interface ReportFormikInterface {
   creativityMinutes: string;
   countBackDays: number;
   reportTitle: string;
-  habbits: (
-    | "exercise_plan"
-    | "new_things"
-    | "warmup"
-    | "metronome"
-    | "recording"
-  )[];
+  habbits: HabbitsType[];
 }
 export interface ReportDataInterface {
   reportDate: Date;
