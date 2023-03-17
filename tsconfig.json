@@ -27,13 +27,16 @@
       "types/*": ["./src/types/*"],
       "utils/*": ["./src/utils/*"],
       "wrappers/*": ["./src/wrappers/*"]
+      
     }
   },
   "include": [
     "src/**/*",
     "tailwind.config.js",
     "next-env.d.ts",
-    "next-i18next.config.js"
-, "tailwind.config.js"  ],
+    "next-i18next.config.js",
+    "tailwind.config.js",
+    "**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

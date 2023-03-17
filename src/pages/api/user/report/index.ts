@@ -5,7 +5,7 @@ import { StatisticsDataInterface } from "types/api.types";
 import { inputTimeConverter, getDateFromPast } from "utils/converter";
 import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import {
-  getUserLvl,
+  levelUpUser,
   makeRatingData,
   checkAchievement,
   getPointsToLvlUp,
@@ -60,7 +60,7 @@ const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
     ? makeRatingData(inputData, sumTime, 1)
     : makeRatingData(inputData, sumTime, updatedActualDayWithoutBreak);
 
-  const level = getUserLvl(lvl, points + raiting.totalPoints);
+  const level = levelUpUser(lvl, points + raiting.totalPoints);
   const isNewLevel = level > lvl;
 
   const updatedUserData: StatisticsDataInterface = {
