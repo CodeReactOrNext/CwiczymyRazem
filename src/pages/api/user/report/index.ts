@@ -2,132 +2,13 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import { auth } from "utils/firebase/api/firebase.config";
 import { StatisticsDataInterface } from "types/api.types";
-import { inputTimeConverter, getDateFromPast } from "utils/converter";
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import {
-  levelUpUser,
-  makeRatingData,
-  checkAchievement,
-  getPointsToLvlUp,
-  checkIsPracticeToday,
-  getUpdatedActualDayWithoutBreak,
-} from "utils/gameLogic";
+import { reportUpdateUserStats } from "utils/gameLogic/reportUpdateUserState";
 import {
   firebaseGetUserData,
   firebaseUpdateUserStats,
   firebaseSetUserExerciseRaprot,
   firebaseAddLogReport,
 } from "utils/firebase/api/firebase.utils";
-
-interface updateUserStatsProps {
-  userUid: string;
-  inputData: ReportFormikInterface;
-}
-const reportHandler = async ({ userUid, inputData }: updateUserStatsProps) => {
-  const currentUserStats = (await firebaseGetUserData(
-    userUid
-  )) as StatisticsDataInterface;
-
-  const isDateBackReport = inputData.countBackDays;
-  const timeSumary = inputTimeConverter(inputData);
-  const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
-    timeSumary;
-
-  const {
-    time,
-    habitsCount,
-    maxPoints,
-    sessionCount,
-    points,
-    lvl,
-    lastReportDate,
-    actualDayWithoutBreak,
-    dayWithoutBreak,
-    achievements,
-  } = currentUserStats;
-
-  const userLastReportDate = new Date(lastReportDate!);
-  const didPracticeToday = isDateBackReport
-    ? false
-    : checkIsPracticeToday(userLastReportDate);
-  const updatedActualDayWithoutBreak = getUpdatedActualDayWithoutBreak(
-    actualDayWithoutBreak,
-    userLastReportDate,
-    didPracticeToday
-  );
-
-  const raiting = isDateBackReport
-    ? makeRatingData(inputData, sumTime, 1)
-    : makeRatingData(inputData, sumTime, updatedActualDayWithoutBreak);
-
-  const level = levelUpUser(lvl, points + raiting.totalPoints);
-  const isNewLevel = level > lvl;
-
-  const updatedUserData: StatisticsDataInterface = {
-    time: {
-      technique: time.technique + techniqueTime,
-      theory: time.theory + theoryTime,
-      hearing: time.hearing + hearingTime,
-      creativity: time.creativity + creativityTime,
-      longestSession:
-        time.longestSession < sumTime ? sumTime : time.longestSession,
-    },
-    points: points + raiting.totalPoints,
-    lvl: level,
-    currentLevelMaxPoints: getPointsToLvlUp(level + 1),
-    sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
-    habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
-    dayWithoutBreak:
-      dayWithoutBreak < updatedActualDayWithoutBreak
-        ? updatedActualDayWithoutBreak
-        : dayWithoutBreak,
-    maxPoints:
-      maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
-    actualDayWithoutBreak: isDateBackReport
-      ? actualDayWithoutBreak
-      : updatedActualDayWithoutBreak,
-    achievements: achievements,
-    lastReportDate: isDateBackReport
-      ? lastReportDate
-      : new Date().toISOString(),
-  };
-
-  const newAchievements = checkAchievement(updatedUserData, raiting, inputData);
-  const updatedUserDataWithAchievements: StatisticsDataInterface = {
-    ...updatedUserData,
-    achievements: [...newAchievements, ...updatedUserData.achievements],
-  };
-  const dateToReport = isDateBackReport
-    ? getDateFromPast(isDateBackReport)
-    : new Date();
-
-  await firebaseSetUserExerciseRaprot(
-    userUid,
-    { ...raiting, reportDate: dateToReport },
-    dateToReport,
-    inputData.reportTitle,
-    isDateBackReport,
-    timeSumary
-  );
-  await firebaseUpdateUserStats(userUid, updatedUserDataWithAchievements);
-  if (!isDateBackReport) {
-    await firebaseAddLogReport(
-      userUid,
-      updatedUserData.lastReportDate,
-      raiting.totalPoints,
-      newAchievements,
-      {
-        isNewLevel,
-        level,
-      }
-    );
-  }
-  return {
-    currentUserStats: updatedUserDataWithAchievements,
-    previousUserStats: currentUserStats,
-    raitingData: raiting,
-  };
-};
 
 export default async function handler(
   req: NextApiRequest,
@@ -140,7 +21,36 @@ export default async function handler(
     const { uid } = await auth.verifyIdToken(req.body.token.token);
     const userUid = uid;
     const { inputData } = req.body;
-    const report = await reportHandler({ userUid, inputData });
+    const currentUserStats = (await firebaseGetUserData(
+      userUid
+    )) as StatisticsDataInterface;
+    const report = reportUpdateUserStats({
+      currentUserStats,
+      inputData,
+    });
+
+    await firebaseSetUserExerciseRaprot(
+      userUid,
+      { ...report.raitingData, ...report.reportDate },
+      report.reportDate,
+      inputData.reportTitle,
+      report.isDateBackReport,
+      report.timeSummary
+    );
+    await firebaseUpdateUserStats(userUid, report.currentUserStats);
+
+    if (!report.isDateBackReport) {
+      await firebaseAddLogReport(
+        userUid,
+        report.currentUserStats.lastReportDate,
+        report.raitingData.totalPoints,
+        report.newAchievements,
+        {
+          isNewLevel: report.isNewLevel,
+          level: report.currentUserStats.lvl,
+        }
+      );
+    }
     res.status(200).json(report);
   }
   res.status(400);
