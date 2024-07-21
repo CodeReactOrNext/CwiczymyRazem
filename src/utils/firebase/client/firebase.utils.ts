@@ -22,6 +22,8 @@ import {
   orderBy,
   limit,
   query,
+  setDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import {
   FirebaseDiscordEventsInteface,
@@ -33,6 +35,7 @@ import {
 import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 import { firebaseApp } from "./firebase.cofig";
 import { shuffleUid } from "utils/user/shuffleUid";
+import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 
 const provider = new GoogleAuthProvider();
 
@@ -87,12 +90,6 @@ export const firebaseGetDiscordEvent = async () => {
   let event;
   discordEventDoc.forEach((doc) => (event = doc.data()));
   return event as FirebaseDiscordEventsInteface | undefined;
-};
-
-export const firebaseGetUserName = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
-  return userSnapshot.data()!.displayName;
 };
 
 export const firebaseGetUserRaprotsLogs = async (userAuth: string) => {
@@ -185,6 +182,41 @@ export const firebaseGetUserProviderData = async () => {
     email: null,
     photoURL: null,
   };
+};
+
+export const firebaseUploadExercisePlan = async (
+  exercise: exercisePlanInterface,
+  id?: string
+) => {
+  const userAuth = auth.currentUser?.uid;
+  const exerciseId = new Date().toISOString();
+  if (id && userAuth) {
+    firebaseDeleteExercisePlan(id);
+  }
+  if (userAuth) {
+    const userDocRef = doc(db, "users", userAuth, "exercisePlan", exerciseId);
+    await setDoc(userDocRef, exercise);
+    return;
+  }
+};
+export const firebaseDeleteExercisePlan = async (id: string) => {
+  const userAuth = auth.currentUser?.uid;
+  if (userAuth) {
+    const userDocRef = doc(db, "users", userAuth, "exercisePlan", id);
+    await deleteDoc(userDocRef);
+  }
+};
+export const firebaseGetExercisePlan = async (userAuth: string) => {
+  const userDocRef = doc(db, "users", userAuth);
+  const exercisePlanDocRef = await getDocs(
+    collection(userDocRef, "exercisePlan")
+  );
+  const exercisePlanArr: exercisePlanInterface[] = [];
+  exercisePlanDocRef.forEach((doc) => {
+    const log = doc.data() as exercisePlanInterface;
+    exercisePlanArr.push({ ...log, id: doc.id });
+  });
+  return exercisePlanArr;
 };
 
 export const firebaseReauthenticateUser = async ({

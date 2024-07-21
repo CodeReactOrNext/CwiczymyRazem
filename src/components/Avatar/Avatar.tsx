@@ -8,12 +8,7 @@ interface AvatarProps {
 }
 
 const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
-  const getRankImgPath = (lvl: number) => {
-    if (lvl >= IMG_RANKS_NUMBER) {
-      return IMG_RANKS_NUMBER;
-    }
-    return lvl;
-  };
+  const imgPath = getRankImgPath(lvl ?? 0);
 
   return (
     <div className='relative '>
@@ -34,8 +29,8 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
       {lvl && (
         <img
           className='absolute bottom-[18px] left-[35px] -rotate-90'
-          src={`/static/images/rank/${getRankImgPath(lvl)}.png`}
-          alt={`gutiar rank image for level ${getRankImgPath(lvl)}`}
+          src={`/static/images/rank/${imgPath}.png`}
+          alt={`gutiar rank image for level ${lvl ?? 0}`}
         />
       )}
     </div>
@@ -43,3 +38,10 @@ const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
 };
 
 export default Avatar;
+
+const getRankImgPath = (lvl: number) => {
+  if (lvl >= IMG_RANKS_NUMBER) {
+    return IMG_RANKS_NUMBER;
+  }
+  return lvl;
+};

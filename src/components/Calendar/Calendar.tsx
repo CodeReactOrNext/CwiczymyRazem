@@ -8,6 +8,7 @@ import ExerciseShortInfo from "./components/ExerciseShortInfo";
 import ReactTooltip from "react-tooltip";
 import CalendarSquare from "./components/CalendarSquare/CalendarSquare";
 import { ReportListInterface } from "types/api.types";
+import CalendarWrapperSquare from "components/Calendar/components/CalendarWrapperSquare";
 
 type PartiallyRequired<T, K extends keyof T> = Omit<T, K> &
   Required<Pick<T, K>>;
@@ -32,7 +33,8 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
     null
   );
 
-  let year = 2023;
+  const [year, setYear] = useState(2024);
+
   let datasWithReports: Array<{
     date: Date;
     report: ReportListInterface | undefined;
@@ -130,27 +132,36 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   }, [userAuth, reportList]);
 
   return reportList ? (
-    <div className='content-box relative  overflow-x-scroll p-3  font-openSans  scrollbar-thin scrollbar-thumb-second-200 '>
-      <p className='pb-2 text-sm font-bold'>
-        {t("calendar.title")}: {year}
-      </p>
+    <div className='content-box relative  overflow-x-scroll p-3  font-openSans  scrollbar-thin scrollbar-thumb-second-200'>
+      <div className='flex items-center gap-2'>
+        <p className='pb-2 text-sm font-bold'>{t("calendar.title")}:</p>
+        <div role='tablist' className='tabs-lifted tabs'>
+          <button
+            role='tab'
+            onClick={() => setYear(2023)}
+            className={`tab ${year === 2023 ? "tab-active" : ""}`}>
+            2023
+          </button>
+          <button
+            role='tab'
+            className={`tab ${year === 2024 ? "tab-active" : ""}`}
+            onClick={() => setYear(2024)}>
+            2024
+          </button>
+        </div>
+      </div>
+
       <div className=' grid  grid-flow-col grid-rows-7 p-2 text-xs'>
         <p className='row-span-3 mr-3'> {t("calendar.monday")}</p>
         <p className='row-span-3 mr-3'>{t("calendar.thursday")}</p>
         <p>{t("calendar.sunday")}</p>
         {datasWithReports.map((date, index) => {
           return date ? (
-            <div
-              key={index + date.date.toISOString()}
-              data-tip
-              data-for={index.toString()}>
-              {date.report && (
-                <ReactTooltip id={index.toString()}>
-                  <ExerciseShortInfo date={date.date} report={date.report} />
-                </ReactTooltip>
-              )}
-              <CalendarSquare report={date.report} />
-            </div>
+            <CalendarWrapperSquare
+              date={date.date}
+              index={index}
+              report={date.report}
+            />
           ) : (
             <div
               key={index}
