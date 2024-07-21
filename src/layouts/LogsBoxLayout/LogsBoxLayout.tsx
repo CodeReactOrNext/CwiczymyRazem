@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import Logs from "./components/Logs";
-import EventsList from "./components/EventsList";
 import AchievementsMap from "./components/AchievementsMap";
 import LogsBoxButton from "./components/LogsBoxButton";
+import ExerciseBox from "../../feature/exercisePlan/view/ExerciseBox";
 
 import { AchievementList } from "assets/achievements/achievementsData";
 import {
@@ -14,7 +14,12 @@ import {
 } from "utils/firebase/client/firebase.types";
 import DiscordEvent from "./components/DiscordEvent";
 import { MdEmojiEvents } from "react-icons/md";
-import { FaExternalLinkSquareAlt, FaGuitar, FaMedal } from "react-icons/fa";
+import {
+  FaExternalLinkSquareAlt,
+  FaGuitar,
+  FaMedal,
+  FaTasks,
+} from "react-icons/fa";
 
 export interface LogsBoxLayoutProps {
   logs: FirebaseLogsInterface[];
@@ -25,17 +30,16 @@ export interface LogsBoxLayoutProps {
 
 const LogsBoxLayout = ({
   logs,
-  events,
   userAchievements,
   discordEvent,
 }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
-    "logs" | "events" | "achievements" | "discord"
+    "logs" | "achievements" | "discord" | "excerise"
   >("logs");
 
   const { t } = useTranslation("common");
   return (
-    <div className='relative m-auto mt-5 flex h-80 flex-col border-4 border-second-400/60 bg-main-opposed-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:max-w-[70%]'>
+    <div className='relative m-auto mt-5 flex h-80 flex-col border-4 border-second-400/60 bg-main-opposed-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]'>
       <div className='sticky top-0 left-0 flex flex-row  justify-around gap-4 border-b-2 border-main-opposed-500 font-bold'>
         <LogsBoxButton
           title={t("logsBox.logs")}
@@ -43,17 +47,18 @@ const LogsBoxLayout = ({
           onClick={() => setShowedCategory("logs")}
           Icon={FaGuitar}
         />
-        <LogsBoxButton
-          title={t("logsBox.events")}
-          active={showedCategory === "events"}
-          onClick={() => setShowedCategory("events")}
-          Icon={FaExternalLinkSquareAlt}
-        />
+
         <LogsBoxButton
           title={t("logsBox.achievements_map")}
           active={showedCategory === "achievements"}
           onClick={() => setShowedCategory("achievements")}
           Icon={FaMedal}
+        />
+        <LogsBoxButton
+          title={"Plany Ćwiczeń"}
+          active={showedCategory === "excerise"}
+          onClick={() => setShowedCategory("excerise")}
+          Icon={FaTasks}
         />
         <LogsBoxButton
           title={"Discord Event"}
@@ -66,8 +71,8 @@ const LogsBoxLayout = ({
         {showedCategory === "achievements" && (
           <AchievementsMap userAchievements={userAchievements} />
         )}
-        {showedCategory === "events" && <EventsList eventList={events} />}
         {showedCategory === "logs" && logs && <Logs logs={logs} />}
+        {showedCategory === "excerise" && logs && <ExerciseBox />}
         {showedCategory === "discord" && logs && (
           <DiscordEvent discordEvent={discordEvent ? discordEvent : null} />
         )}

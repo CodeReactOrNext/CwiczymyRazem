@@ -15,7 +15,7 @@ const LogsBoxButton = ({
 }: LogsBoxButtonProps) => {
   return (
     <button
-      className={`flex flex-row items-center bg-opacity-80 p-2 radius-default hover:bg-main-opposed-100
+      className={`flex flex-row items-center bg-opacity-80 p-1  radius-default hover:bg-main-opposed-100 xs:p-2
       ${active ? "bg-main-opposed-200 " : ""}`}
       onClick={onClick}>
       <Icon className='mx-1 text-base  xs:text-2xl sm:text-base' />

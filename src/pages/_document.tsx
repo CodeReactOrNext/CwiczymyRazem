@@ -3,7 +3,7 @@ import Document, { Html, Head, Main, NextScript } from "next/document";
 class MyDocument extends Document {
   render(): JSX.Element {
     return (
-      <Html lang='pl'>
+      <Html lang='pl' className='dark'>
         <Head>
           <link
             rel='apple-touch-icon'
@@ -29,7 +29,6 @@ class MyDocument extends Document {
         </Head>
         <body>
           <Main />
-
           <NextScript />
         </body>
       </Html>

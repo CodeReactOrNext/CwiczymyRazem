@@ -2,7 +2,9 @@ const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
 /** @type {import('tailwindcss').Config} */
 
-const rotateX = plugin(function ({ addUtilities }) {
+const rotateX = plugin(function ({
+  addUtilities
+}) {
   addUtilities({
     ".rotate-x-20": {
       transform: "rotateX(20deg)",
@@ -21,7 +23,9 @@ const rotateX = plugin(function ({ addUtilities }) {
     },
   });
 });
-const rotateY = plugin(function ({ addUtilities }) {
+const rotateY = plugin(function ({
+  addUtilities
+}) {
   addUtilities({
     ".rotate-y-20": {
       transform: "rotateY(20deg)",
@@ -38,9 +42,10 @@ const rotateY = plugin(function ({ addUtilities }) {
   });
 });
 
-const scrollbarHide = plugin(function ({ addUtilities }) {
-  addUtilities(
-    {
+const scrollbarHide = plugin(function ({
+  addUtilities
+}) {
+  addUtilities({
       ".scrollbar-hide": {
         "-ms-overflow-style": "none",
         "scrollbar-width": "none",
@@ -61,7 +66,9 @@ const scrollbarHide = plugin(function ({ addUtilities }) {
   );
 });
 
-const defaultClick = plugin(function ({ addUtilities }) {
+const defaultClick = plugin(function ({
+  addUtilities
+}) {
   addUtilities({
     ".click-behavior": {
       transform: "scale(95%)",
@@ -79,7 +86,9 @@ const defaultClick = plugin(function ({ addUtilities }) {
     },
   });
 });
-const borderRadius = plugin(function ({ addUtilities }) {
+const borderRadius = plugin(function ({
+  addUtilities
+}) {
   addUtilities({
     ".radius-default": {
       "border-radius": "4px",
@@ -119,11 +128,27 @@ module.exports = {
       openSans: "Open Sans",
     },
   },
+  daisyui: {
+    themes: [{
+      light: {
+        "base-100": "#30385c",
+      }
+    }, 'dark'],
+
+    darkTheme: "dark", // name of one of the included themes for dark mode
+    base: true, // applies background color and foreground color for root element by default
+    styled: true, // include daisyUI colors and design decisions for all components
+    utils: true, // adds responsive and modifier utility classes
+    prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
+    logs: true, // Shows info about daisyUI version and used config in the console when building your CSS
+    themeRoot: ":root", // The element that receives theme color CSS variables
+  },
   plugins: [
+    require('daisyui'),
+
     require("prettier-plugin-tailwindcss"),
     require("tailwindcss-themer")({
-      themes: [
-        {
+      themes: [{
           name: "default-theme",
           extend: {
             colors: {
@@ -132,9 +157,13 @@ module.exports = {
                 rare: "#b1f9ff",
                 veryRare: "#ffe54c",
               },
-              mainText: { DEFAULT: "#F5F5F5" },
+              mainText: {
+                DEFAULT: "#F5F5F5"
+              },
 
-              link: { DEFAULT: "#43c5d6" },
+              link: {
+                DEFAULT: "#43c5d6"
+              },
               main: {
                 DEFAULT: "#FF2A37",
                 calendar: "#ffecac",
@@ -206,8 +235,11 @@ module.exports = {
                 800: "#920020",
                 900: "#7d001c",
               },
-              googleButtonText: { DEFAULT: "#555555" },
+              googleButtonText: {
+                DEFAULT: "#555555"
+              },
             },
+
             backgroundImage: {
               "old-effect": "url('/static/images/old_effect.webp')",
               "old-effect-hr": "url('/static/images/old_effect_hr.webp')",
@@ -224,8 +256,12 @@ module.exports = {
                 rare: "#b1f9ff",
                 veryRare: "#ffe54c",
               },
-              mainText: { DEFAULT: "#ffff" },
-              link: { DEFAULT: "#e5626b" },
+              mainText: {
+                DEFAULT: "#ffff"
+              },
+              link: {
+                DEFAULT: "#e5626b"
+              },
               main: {
                 DEFAULT: "#FF2A37",
                 bg: "#FF2A37",
@@ -298,7 +334,9 @@ module.exports = {
                 800: "#920020",
                 900: "#7d001c",
               },
-              googleButtonText: { DEFAULT: "#555555" },
+              googleButtonText: {
+                DEFAULT: "#555555"
+              },
             },
             backgroundImage: {
               "old-effect": "url('/static/images/old_effect_dark.webp')",
