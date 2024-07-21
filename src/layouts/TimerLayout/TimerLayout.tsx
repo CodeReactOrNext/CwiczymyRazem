@@ -11,6 +11,7 @@ import { SkillsType } from "types/skillsTypes";
 import { useTimerInterface } from "hooks/useTimer";
 import { convertMsToHM, calculatePercent } from "utils/converter";
 import { TimerInterface } from "types/api.types";
+import ExercisePlan from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 
 interface TimerLayoutProps {
   timer: useTimerInterface;
@@ -76,7 +77,6 @@ const TimerLayout = ({
         />
         <Metronom />
       </div>
-
       <div className='mt-5 flex w-full flex-row flex-wrap justify-evenly md:w-[570px] md:justify-center lg:w-full '>
         <CategoryBox
           title={t("technique")}
@@ -115,6 +115,7 @@ const TimerLayout = ({
           chosen={chosenSkill === "creativity"}
         />
       </div>
+      <ExercisePlan />
       <BeginnerMsg />
       <p className='p-4 text-center  font-openSans text-xs sm:text-base'>
         {t("info_about_repot ")}

@@ -27,7 +27,6 @@
       "types/*": ["./src/types/*"],
       "utils/*": ["./src/utils/*"],
       "wrappers/*": ["./src/wrappers/*"]
-      
     }
   },
   "include": [
