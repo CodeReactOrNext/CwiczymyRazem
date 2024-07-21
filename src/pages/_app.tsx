@@ -3,8 +3,8 @@ import { Provider } from "react-redux";
 import type { AppProps } from "next/app";
 import { ToastContainer } from "react-toastify";
 import { appWithTranslation } from "next-i18next";
-import ThemeModeProvider from "wrappers/ThemeModeProvider";
 import { store } from "store/store";
+import ThemeModeProvider from "wrappers/ThemeModeProvider";
 
 import "styles/fonts.css";
 import "styles/globals.css";
@@ -27,7 +27,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name='keywords' content='ćwiczenie, gitara' />
       </Head>
       <ThemeModeProvider>
-        <div id='overlays'></div>
+   
+        <div id='overlays'></div>   
         <Component {...pageProps} />
         <ToastContainer toastClassName={"toastify-custom"} />
       </ThemeModeProvider>

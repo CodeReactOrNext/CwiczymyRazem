@@ -19,7 +19,7 @@ const Logs = ({ logs }: LogsBoxLayoutProps) => {
           return (
             <div
               key={data + userName}
-              className='flex flex-row flex-nowrap  items-center border-b-2 border-main-opposed-400 py-2 '>
+              className='flex flex-row flex-nowrap  alert bg-main-opposed  items-center p-4 my-2 radius-default border-b-2 border-main-opposed-400  w'>
               <p className='mr-2 w-[20%] max-w-[7rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem]  lg:text-xs'>
                 {date.toLocaleDateString() +
                   " " +
