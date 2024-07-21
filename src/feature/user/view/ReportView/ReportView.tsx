@@ -277,7 +277,7 @@ const ReportView = () => {
                           className={`flex flex-row justify-center gap-2 font-openSans text-xs
                         ${
                           errors.hasOwnProperty("countBackDays")
-                            ? "font-extrabold text-error-200"
+                            ? "text-error-200 font-extrabold"
                             : "text-mainText"
                         }`}>
                           {errors.hasOwnProperty("countBackDays") && (
@@ -296,7 +296,7 @@ const ReportView = () => {
                           <span
                             className={`${
                               errors.hasOwnProperty("countBackDays")
-                                ? "font-extrabold text-error-200"
+                                ? "text-error-200 font-extrabold"
                                 : "text-mainText"
                             }`}>
                             {getDateFromPast(
