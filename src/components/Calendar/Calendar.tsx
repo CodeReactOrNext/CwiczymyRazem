@@ -148,6 +148,12 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
             onClick={() => setYear(2024)}>
             2024
           </button>
+          <button
+            role='tab'
+            className={`tab ${year === 2025 ? "tab-active" : ""}`}
+            onClick={() => setYear(2025)}>
+            2025
+          </button>
         </div>
       </div>
 

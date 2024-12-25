@@ -15,10 +15,10 @@ const AchievementBox = ({ achievment, rarity }: AchievementBoxProps) => {
   const { t } = useTranslation("achievements");
 
   return (
-    <div className='content-box mb-4 flex flex-row font-openSans text-sm font-bold'>
-      <IconBox Icon={FaMedal} />
+    <div className='content-box mb-4 flex flex-row font-openSans text-sm '>
+      <IconBox Icon={FaMedal} medium />
       <div className='mx-2 self-center '>
-        <p className=' mb-2  text-mainText '>{t(rarity)}</p>
+        <p className='text- mb-2  text-secondText '>{t(rarity)}</p>
         <div className='flex w-full  flex-row flex-wrap gap-4'>
           {achievment.length === 0 ? (
             <p>{t("empty")}</p>

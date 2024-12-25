@@ -6,6 +6,7 @@ const FireSvg = (props: Props) => (
   <svg
     viewBox='0 -10 230.95 249.16'
     preserveAspectRatio='none'
+    fill=""
     xmlns='http://www.w3.org/2000/svg'
     className={props?.className}>
     <path

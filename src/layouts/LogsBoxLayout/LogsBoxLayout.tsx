@@ -13,13 +13,8 @@ import {
   FirebaseLogsInterface,
 } from "utils/firebase/client/firebase.types";
 import DiscordEvent from "./components/DiscordEvent";
-import { MdEmojiEvents } from "react-icons/md";
-import {
-  FaExternalLinkSquareAlt,
-  FaGuitar,
-  FaMedal,
-  FaTasks,
-} from "react-icons/fa";
+import { TbNews } from "react-icons/tb";
+import { FaGuitar, FaMedal, FaTasks } from "react-icons/fa";
 
 export interface LogsBoxLayoutProps {
   logs: FirebaseLogsInterface[];
@@ -39,7 +34,7 @@ const LogsBoxLayout = ({
 
   const { t } = useTranslation("common");
   return (
-    <div className='relative m-auto mt-5 flex h-80 flex-col border-4 border-second-400/60 bg-main-opposed-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]'>
+    <div className='relative m-auto mt-5 flex h-[600px] flex-col border-4 border-second-400/60 bg-main-opposed-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]'>
       <div className='sticky top-0 left-0 flex flex-row  justify-around gap-4 border-b-2 border-main-opposed-500 font-bold'>
         <LogsBoxButton
           title={t("logsBox.logs")}
@@ -61,10 +56,10 @@ const LogsBoxLayout = ({
           Icon={FaTasks}
         />
         <LogsBoxButton
-          title={"Discord Event"}
+          title={"Changelog"}
           active={showedCategory === "discord"}
           onClick={() => setShowedCategory("discord")}
-          Icon={MdEmojiEvents}
+          Icon={TbNews}
         />
       </div>
       <div className='overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
