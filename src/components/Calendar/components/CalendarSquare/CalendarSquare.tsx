@@ -24,7 +24,7 @@ const CalendarSquare = ({ report }: CalendarSquareProps) => {
   }, [raiting]);
 
   const divClassName = `
-    m-[2px]
+    m-[3px]
   `;
 
   return (

@@ -82,11 +82,10 @@ a {
 }
 
 .content-box {
-  @apply bg-second-200;
-  @apply border-2;
+  @apply border;
   @apply radius-default;
   @apply border-second-400/60;
-  @apply bg-second-600;
+  @apply bg-second;
   @apply p-2;
   @apply shadow-outside-cool;
 }

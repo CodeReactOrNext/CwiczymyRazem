@@ -91,7 +91,7 @@ const borderRadius = plugin(function ({
 }) {
   addUtilities({
     ".radius-default": {
-      "border-radius": "4px",
+      "border-radius": "10px",
     },
   });
 });
@@ -259,6 +259,9 @@ module.exports = {
               mainText: {
                 DEFAULT: "#ffff"
               },
+              secondText: {
+                DEFAULT: "#b5b5b5"
+              },
               link: {
                 DEFAULT: "#e5626b"
               },
@@ -294,7 +297,7 @@ module.exports = {
               },
               "main-opposed": {
                 DEFAULT: "#54575F",
-                bg: "#323232",
+                bg: "#2E2E2E",
                 text: "#1A1A1A",
                 50: "#747983",
                 100: "#71767F",

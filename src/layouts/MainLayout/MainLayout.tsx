@@ -18,7 +18,7 @@ const MainHeroLayout = ({ children, subtitle, variant }: MainLayoutProps) => {
       <div className='relative flex h-full w-full items-center justify-center '>
         <div
           className={`relative  flex h-full max-h-[calc(1200px_-_4rem)] w-full max-w-[2200px] flex-col overflow-x-hidden scrollbar-hide ${
-            variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
+            variant === "secondary" ? "bg-second-600" : "bg-main-opposed-600"
           }`}>
           <Header variant={variant} />
           <SubtitleBar variant={variant}>{subtitle}</SubtitleBar>

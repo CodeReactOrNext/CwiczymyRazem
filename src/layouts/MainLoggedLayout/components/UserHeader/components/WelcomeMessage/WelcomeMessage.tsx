@@ -29,12 +29,12 @@ const WelcomeMessage = ({
   const dayWithoutBreak =
     (isStreak === 1 ? 0 : actualDayWithoutBreak) + +didPracticeToday;
   return (
-    <div className='text:xs tracking-wide xxs:text-base sm:text-2xl md:text-base lg:text-xl 2xl:w-[650px]'>
+    <div className='text:xs tracking-wide  xxs:text-base sm:text-2xl md:text-base lg:text-xl 2xl:w-[650px]'>
       <p className='py-2 xs:text-lg md:text-xl lg:text-2xl xl:text-3xl '>
         {t("header.hey")} <span className='text-mainText'>{userName}!</span>
       </p>
       <div className='flex flex-col gap-2 2xl:flex-row 2xl:gap-8'>
-        <p>
+        <p className='font-normal text-secondText'>
           {t("header.earned_points")}{" "}
           <span className='text-mainText'>{points}</span>
         </p>
@@ -49,8 +49,8 @@ const WelcomeMessage = ({
         <p className='flex flex-row items-center  gap-1'>
           {t("day_since.actual_streak")}
           <span
-            className={`item-center flex h-7 min-w-[28px] justify-center  text-center  font-extrabold text-mainText radius-default
-          ${dayWithoutBreak ? "bg-main-400/90 " : "bg-slate-600"}`}>
+            className={`item-center flex justify-center  text-center  font-extrabold text-mainText radius-default
+          `}>
             {dayWithoutBreak}
           </span>
         </p>

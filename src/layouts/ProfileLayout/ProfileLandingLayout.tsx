@@ -28,10 +28,10 @@ const ProfileLandingLayout = ({
     time.technique + time.theory + time.hearing + time.creativity;
 
   return (
-    <div className='bg-second-500 radius-default'>
+    <div className='bg-second-600 radius-default'>
       <HeadDecoration title={t("statistics")} />
-      <div className='grid-rows-auto grid-cols-2 items-start  lg:mt-5 lg:grid '>
-        <div className=' flex flex-wrap justify-evenly'>
+      <div className='grid-rows-auto grid-cols-2 items-start  lg:mt-5 lg:grid !p-6 '>
+        <div className='row-cols-1 m-2 flex w-full flex-wrap gap-3'>
           {statsField.map(({ Icon, description, value }) => (
             <StatsField
               key={description}
