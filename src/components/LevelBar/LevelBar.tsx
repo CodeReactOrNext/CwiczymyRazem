@@ -28,23 +28,15 @@ const LevelBar = ({
         </span>
       </p>
       <div className=' flex w-full'>
-        <p className=' relative left-3 z-10 text-sm'>
-          {t("header.lvl_short")}
-          <span className='text-xl  text-mainText'>{lvl}</span>
-        </p>
         <div className='relative flex h-4 w-full items-center bg-main-opposed bg-opacity-80 radius-default'>
           <div
             className='relative h-5 bg-gradient-to-r from-main-600 to-main-200 radius-default '
             style={{ width: progressPercent + "%" }}></div>
         </div>
-        <p className='relative right-3 text-sm'>
-          {t("header.lvl_short")}
-          <span className='text-xl  text-mainText'>{lvl + 1}</span>
-        </p>
       </div>
-      <p>
+      <p className='mt-2 !font-semibold text-mainText'>
         {points - levelXpStart}/{levelXpEnd - levelXpStart}
-        {t("header.points_short")}
+        <span className='text-sm'> {t("header.points_short")}</span>
       </p>
     </div>
   );

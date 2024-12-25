@@ -13,7 +13,7 @@ const HeadDecoration = ({ title }: { title: string }) => {
         <div className=' relative flex h-0 justify-center fill-second md:w-full  '>
           <Fire className='  relative h-max w-full self-center xl:max-w-none' />
         </div>
-        <p className=' relative -top-[40px] bg-tertiary p-2 px-12 text-center text-2xl text-main-opposed radius-default '>
+        <p className=' relative -top-[40px] bg-tertiary p-2 px-12 text-center text-3xl text-main-opposed radius-default '>
           {title}
         </p>
 
