@@ -39,12 +39,12 @@ const ProfileLayout = ({
     time.technique + time.theory + time.hearing + time.creativity;
 
   return (
-    <div className='mt-8 flex justify-center'>
-      <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col justify-center bg-second pb-4 '>
+    <div className='mt-8 flex '>
+      <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col  bg-second pb-4 '>
         <HeadDecoration title={t("profile")} />
         <div className='grid-rows-auto  grid-cols-2  xl:grid'>
-          <div className='content-box relative z-10 row-span-1 m-4 flex flex-col items-center justify-center gap-3 '>
-            <div className=' flex  flex-row items-center justify-center gap-6 p-4 pb-0 '>
+          <div className='content-box relative z-10 row-span-1 m-4 flex flex-col items-start gap-3 !p-6'>
+            <div className=' flex  flex-row items-center gap-6 p-4 pb-0 '>
               <Avatar
                 name={displayName}
                 lvl={statistics.lvl}
@@ -52,28 +52,28 @@ const ProfileLayout = ({
               />
               <div className='flex-col '>
                 <p className='relative  text-4xl'>{displayName}</p>
-                <p className='relative  text-xl'>
+                <p className='relative text-xl font-thin'>
                   {t("points")}:{" "}
-                  <span className='text-2xl  font-extrabold'>
+                  <span className='text-2xl font-bold'>
                     {statistics.points}
-                  </span>
-                </p>
-                <DaySince date={new Date(lastReportDate)} />
-                <p className='my-1  font-openSans text-xs font-bold text-tertiary-300 '>
-                  {t("joined")}{" "}
-                  <span className='text-mainText'>
-                    {createdAt.toDate().toLocaleDateString()}
                   </span>
                 </p>
               </div>
             </div>
-            <div className=' z-10 flex w-[40%] flex-col items-center justify-center gap-1 font-openSans text-sm radius-default'>
+            <div className='z-10 mt-2 gap-1 font-openSans text-sm'>
+              <DaySince date={new Date(lastReportDate)} />
+              <p className='my-1 font-thin '>
+                {t("joined")}{" "}
+                <span className='font-semibold'>
+                  {createdAt.toDate().toLocaleDateString()}
+                </span>
+              </p>
               {band && (
-                <p>
+                <p className='font-thin'>
                   {t("band")} <span className='font-bold'>{band}</span>
                 </p>
               )}
-              <div className='flex flex-row items-center justify-evenly gap-4 p-2 text-sm'>
+              <div className='flex flex-row justify-evenly gap-4 p-2 text-sm'>
                 {youTubeLink && (
                   <a
                     target='_blank'

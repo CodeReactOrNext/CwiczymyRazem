@@ -1,5 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { ToolTip } from "components/UI";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+import { useState } from "react";
 import {
   AchievementList,
   achievementsData,
@@ -9,11 +15,41 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
   const { t } = useTranslation("achievements");
   const achievementData = achievementsData.find((achiv) => achiv.id === id);
   const { Icon, rarity, description, name } = achievementData!;
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useTransform(y, [-100, 100], [45, -45]);
+  const rotateY = useTransform(x, [-100, 100], [-45, 45]);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set((event.clientX - centerX) * 1.5);
+    y.set((event.clientY - centerY) * 1.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
-    <div className='group'>
-      <ToolTip />
-      <div
+    <div className='group relative'>
+      <motion.div
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d",
+          perspective: "1000px",
+        }}
+        whileHover={{ scale: 2 }}
+        onClick={() => setShowTooltip(!showTooltip)}
+        onHoverStart={() => setShowTooltip(true)}
+        onHoverEnd={() => setShowTooltip(false)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         className={`
        ${
          rarity === "common"
@@ -30,17 +66,53 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
             ? " border-achievements-veryRare bg-achievements-veryRare text-main-opposed-800"
             : ""
         }
-        cursor-help  border-2 border-opacity-20  p-2 shadow-inset-cool  transition-transform radius-default group-hover:scale-[170%]`}>
-        <Icon className=' text-lg drop-shadow-md	md:text-3xl' />
-      </div>
-      <p className='absolute z-40 hidden bg-black bg-opacity-80 p-2 text-lg opacity-0 transition-opacity	radius-default group-hover:block  group-hover:opacity-100'>
-        <>
-          {t(name) as string}
-          <span className='hidden text-sm group-hover:block  '>
-            {t(description) as string}
-          </span>
-        </>
-      </p>
+        relative cursor-help overflow-hidden border-2 border-opacity-20 p-2 shadow-inset-cool radius-default`}>
+        <motion.div
+          className='absolute inset-0 opacity-0 group-hover:opacity-100'
+          style={{
+            background:
+              "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%)",
+            transform: "skewX(-25deg) translateX(-200%)",
+            width: "200%",
+            height: "100%",
+          }}
+          animate={{
+            translateX: ["-200%", "200%"],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: 1.2,
+            ease: "linear",
+            repeatDelay: 1.5,
+          }}
+        />
+        <motion.div
+          className='absolute inset-0 opacity-0 group-hover:opacity-60'
+          style={{
+            background:
+              rarity === "veryRare"
+                ? "radial-gradient(circle, rgba(255,229,76,0.6) 0%, transparent 70%)"
+                : rarity === "rare"
+                ? "radial-gradient(circle, rgba(177,249,255,0.6) 0%, transparent 70%)"
+                : "radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%)",
+          }}
+          animate={{
+            scale: [1, 1.5, 1],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: 1.8,
+          }}
+        />
+        <Icon className='relative z-10 text-lg drop-shadow-lg md:text-3xl' />{" "}
+      </motion.div>
+      {showTooltip && (
+        <div className='absolute left-1/2 bottom-full z-50 mb-6 w-max max-w-[200px] -translate-x-1/2 rounded-lg bg-black/90 p-3 text-white shadow-lg'>
+          <h3 className='mb-1 font-semibold'>{t(name) as string}</h3>
+          <p className='text-sm text-gray-300'>{t(description) as string}</p>
+          <div className='absolute left-1/2 -bottom-2 -translate-x-1/2 border-8 border-transparent border-t-black/90' />
+        </div>
+      )}
     </div>
   );
 };
