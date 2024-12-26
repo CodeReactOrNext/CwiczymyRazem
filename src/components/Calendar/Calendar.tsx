@@ -4,9 +4,6 @@ import { useEffect, useState } from "react";
 import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";
 import { useTranslation } from "react-i18next";
 
-import ExerciseShortInfo from "./components/ExerciseShortInfo";
-import ReactTooltip from "react-tooltip";
-import CalendarSquare from "./components/CalendarSquare/CalendarSquare";
 import { ReportListInterface } from "types/api.types";
 import CalendarWrapperSquare from "components/Calendar/components/CalendarWrapperSquare";
 
@@ -134,7 +131,6 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   return reportList ? (
     <div className='content-box relative  overflow-x-scroll p-3  font-openSans  scrollbar-thin scrollbar-thumb-second-200'>
       <div className='flex items-center gap-2'>
-        <p className='pb-2 text-sm font-bold'>{t("calendar.title")}:</p>
         <div role='tablist' className='tabs-lifted tabs'>
           <button
             role='tab'
@@ -157,26 +153,49 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
         </div>
       </div>
 
-      <div className=' grid  grid-flow-col grid-rows-7 p-2 text-xs'>
-        <p className='row-span-3 mr-3'> {t("calendar.monday")}</p>
-        <p className='row-span-3 mr-3'>{t("calendar.thursday")}</p>
-        <p>{t("calendar.sunday")}</p>
-        {datasWithReports.map((date, index) => {
-          return date ? (
-            <CalendarWrapperSquare
-              date={date.date}
-              index={index}
-              report={date.report}
-            />
-          ) : (
-            <div
-              key={index}
-              data-tip
-              data-for={index.toString()}
-              className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
-          );
-        })}
-        <div className='p-2'></div>
+      <div className='flex flex-col gap-4'>
+        <div className='grid grid-flow-col grid-rows-7 p-2 text-xs'>
+          <p className='row-span-3 mr-3'> {t("calendar.monday")}</p>
+          <p className='row-span-3 mr-3'>{t("calendar.thursday")}</p>
+          <p>{t("calendar.sunday")}</p>
+          {datasWithReports.map((date, index) => {
+            return date ? (
+              <CalendarWrapperSquare
+                date={date.date}
+                index={index}
+                report={date.report}
+              />
+            ) : (
+              <div
+                key={index}
+                data-tip
+                data-for={index.toString()}
+                className={`m-[0.2rem] rounded-[1px] bg-second-600 p-[0.3rem]`}></div>
+            );
+          })}
+          <div className='p-2'></div>
+        </div>
+
+        <div className='flex flex-col gap-2 p-2 text-xs'>
+          <div className='flex flex-wrap gap-4'>
+            <div className='flex items-center gap-2'>
+              <div
+                className='relative h-3 w-3'
+                style={{ backgroundColor: "#EF4444" }}>
+                <div className='absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white'></div>
+              </div>
+              <span>{t("calendar.hasTitle")}</span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <div
+                className='relative h-3 w-3'
+                style={{ backgroundColor: "#EF4444" }}>
+                <div className='absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white'></div>
+              </div>
+              <span>{t("calendar.backDate")}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   ) : (
