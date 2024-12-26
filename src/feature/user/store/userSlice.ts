@@ -36,7 +36,7 @@ const initialState: userSliceInitialState = {
   isFetching: null,
   isLoggedOut: null,
   timer: { creativity: 0, hearing: 0, technique: 0, theory: 0 },
-  theme: "default-theme",
+  theme: "dark-theme",
   providerData: {
     providerId: null,
     uid: null,
@@ -74,8 +74,7 @@ export const userSlice = createSlice({
         state.theme = payload;
         return;
       }
-      state.theme =
-        state.theme === "default-theme" ? "dark-theme" : "default-theme";
+      state.theme = "dark-theme";
     },
 
     updateLocalTimer: (state, { payload }: PayloadAction<TimerInterface>) => {

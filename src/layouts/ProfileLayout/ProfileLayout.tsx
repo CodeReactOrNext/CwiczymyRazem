@@ -39,7 +39,7 @@ const ProfileLayout = ({
     time.technique + time.theory + time.hearing + time.creativity;
 
   return (
-    <div className='mt-8 flex '>
+    <div className=' flex '>
       <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col bg-second-600  pb-4 '>
         <HeadDecoration title={t("profile")} />
         <div className='grid-rows-auto  grid-cols-2 px-5  xl:grid'>
@@ -124,7 +124,7 @@ const ProfileLayout = ({
               percent={Math.round((time.creativity / totalTime) * 100)}
             />
           </div>
-          <div className='row-cols-1 flex flex-wrap  gap-3 p-6'>
+          <div className='row-cols-1 flex flex-wrap content-start gap-3 p-6'>
             {statsField.map(({ Icon, description, value }) => (
               <StatsField
                 key={description}
@@ -137,7 +137,7 @@ const ProfileLayout = ({
           <div className='row-cols-1 m-4  flex flex-col justify-between  '>
             <AchievementWrapper userAchievements={achievements} />
           </div>
-          <div className='col-span-2 m-auto  p-2 lg:max-w-[80%]'>
+          <div className='col-span-2  p-2 '>
             <Calendar userAuth={userAuth} />
           </div>
         </div>

@@ -129,9 +129,9 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   }, [userAuth, reportList]);
 
   return reportList ? (
-    <div className='content-box relative  overflow-x-scroll p-3  font-openSans  scrollbar-thin scrollbar-thumb-second-200'>
+    <div className='content-box relative w-full  overflow-x-scroll p-3  font-openSans  scrollbar-thin scrollbar-thumb-second-200'>
       <div className='flex items-center gap-2'>
-        <div role='tablist' className='tabs-lifted tabs'>
+        <div role='tablist' className='tabs tabs-lifted'>
           <button
             role='tab'
             onClick={() => setYear(2023)}
