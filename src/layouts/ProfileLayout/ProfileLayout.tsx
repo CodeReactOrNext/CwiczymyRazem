@@ -39,10 +39,10 @@ const ProfileLayout = ({
     time.technique + time.theory + time.hearing + time.creativity;
 
   return (
-    <div className='mt-8 flex '>
-      <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col  bg-second pb-4 '>
+    <div className=' flex '>
+      <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col bg-second-600  pb-4 '>
         <HeadDecoration title={t("profile")} />
-        <div className='grid-rows-auto  grid-cols-2  xl:grid'>
+        <div className='grid-rows-auto  grid-cols-2 px-5  xl:grid'>
           <div className='content-box relative z-10 row-span-1 m-4 flex flex-col items-start gap-3 !p-6'>
             <div className=' flex  flex-row items-center gap-6 p-4 pb-0 '>
               <Avatar
@@ -102,7 +102,7 @@ const ProfileLayout = ({
               currentLevelMaxPoints={statistics.currentLevelMaxPoints}
             />
           </div>
-          <div className=' content-box z-10 row-span-1 m-4 flex justify-center '>
+          <div className='content-box z-10 row-span-1 m-4 flex justify-center '>
             <StatisticBar
               title={t("technique")}
               value={convertMsToHM(time.technique)}
@@ -124,7 +124,7 @@ const ProfileLayout = ({
               percent={Math.round((time.creativity / totalTime) * 100)}
             />
           </div>
-          <div className='row-cols-1 m-2 flex flex-wrap content-around justify-around'>
+          <div className='row-cols-1 flex flex-wrap content-start gap-3 p-6'>
             {statsField.map(({ Icon, description, value }) => (
               <StatsField
                 key={description}
@@ -137,7 +137,7 @@ const ProfileLayout = ({
           <div className='row-cols-1 m-4  flex flex-col justify-between  '>
             <AchievementWrapper userAchievements={achievements} />
           </div>
-          <div className='col-span-2 m-auto  p-2 lg:max-w-[80%]'>
+          <div className='col-span-2  p-2 '>
             <Calendar userAuth={userAuth} />
           </div>
         </div>

@@ -43,7 +43,6 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
         </div>
         <div className='absolute -right-2 top-0 flex w-full scale-[85%] items-end justify-between gap-4 xs:right-2 xs:top-2 xs:w-auto sm:scale-100 sm:flex-col'>
           <LanguageSwitch />
-          <ThemeToggle />
         </div>
       </div>
       <NavDecoration />
