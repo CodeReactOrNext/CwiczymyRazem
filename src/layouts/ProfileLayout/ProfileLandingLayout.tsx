@@ -30,7 +30,7 @@ const ProfileLandingLayout = ({
   return (
     <div className='bg-second-600 radius-default'>
       <HeadDecoration title={t("statistics")} />
-      <div className='grid-rows-auto grid-cols-2 items-start  lg:mt-5 lg:grid !p-6 '>
+      <div className='grid-rows-auto grid-cols-2 items-start gap-6  p-3 md:!p-6 lg:mt-5 lg:grid '>
         <div className='row-cols-1 m-2 flex w-full flex-wrap gap-3'>
           {statsField.map(({ Icon, description, value }) => (
             <StatsField
@@ -41,7 +41,7 @@ const ProfileLandingLayout = ({
             />
           ))}
         </div>
-        <div className=' content-box relative z-20 mx-4 my-2 flex  content-around justify-center '>
+        <div className=' content-box relative z-20  my-2 flex  content-around justify-center '>
           <StatisticBar
             title={t("technique")}
             value={convertMsToHM(time.technique)}
@@ -63,13 +63,13 @@ const ProfileLandingLayout = ({
             percent={calculatePercent(time.creativity, totalTime)}
           />
         </div>
-        <div className=' my-2 flex flex-col justify-between p-4 '>
+        <div className=' my-2 flex flex-col justify-between  '>
           <AchievementWrapper userAchievements={achievements} />
         </div>
-        <div className='d-flex justify-content-center my-2 p-4 '>
+        <div className='d-flex justify-content-center  '>
           <Calendar userAuth={userAuth} />
         </div>
-        <div className='col-span-2 p-4'>{featSlot}</div>
+        <div className='col-span-2 '>{featSlot}</div>
       </div>
     </div>
   );
