@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { ReportListInterface } from "types/api.types";
 
 interface CalendarSquareProps {
@@ -7,6 +7,7 @@ interface CalendarSquareProps {
 
 const CalendarSquare = ({ report }: CalendarSquareProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
   const raiting = getPointRaitings(report);
 
   useEffect(() => {
@@ -16,73 +17,80 @@ const CalendarSquare = ({ report }: CalendarSquareProps) => {
       if (context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
 
+        // Draw background
         context.fillStyle = getRaitingColor(raiting);
-
         context.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Add dot indicator for title or back date
+        if (report?.exceriseTitle || report?.isDateBackReport) {
+          context.fillStyle = "#ffffff";
+          context.beginPath();
+          if (report.isDateBackReport) {
+            // Draw a ring for back date reports
+            context.arc(canvas.width/2, canvas.height/2, 3, 0, 2 * Math.PI);
+            context.stroke();
+          } else {
+            // Draw a filled dot for regular reports with title
+            context.arc(canvas.width/2, canvas.height/2, 2, 0, 2 * Math.PI);
+            context.fill();
+          }
+        }
+
+        // Add hover effect
+        if (isHovered && report) {
+          context.strokeStyle = "#ffffff";
+          context.lineWidth = 2;
+          context.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
+        }
       }
     }
-  }, [raiting]);
+  }, [raiting, isHovered, report?.exceriseTitle, report?.isDateBackReport]);
 
   const divClassName = `
-    m-[2px]
+    m-[3px] 
+    transition-transform duration-200 ease-in-out
+    ${isHovered ? "scale-150" : ""}
+    cursor-pointer
   `;
 
   return (
-    <canvas ref={canvasRef} width={13} height={13} className={divClassName} />
+    <canvas
+      ref={canvasRef}
+      width={13}
+      height={13}
+      className={divClassName}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    />
   );
 };
+
 export default memo(CalendarSquare);
 
 const getPointRaitings = (report: ReportListInterface | undefined) => {
   if (!report) return null;
-  const { isDateBackReport, points } = report;
-  if (isDateBackReport) return "backDate";
+  const { points } = report;
   if (points > 30) return "super";
   if (points > 20) return "great";
   if (points > 10) return "nice";
   if (points >= 0) return "ok";
   if (points === 0) return "zero";
-
   return null;
 };
 
 const getRaitingColor = (raiting: string | null) => {
   switch (raiting) {
-    case "backDate":
-      return "#60A5FA"; // blue-400
     case "super":
-      return "#ffecac"; // main-calendar
+      return "#EF4444"; // A vibrant red
     case "great":
-      return "rgba(255, 236, 172, 0.8)"; // main-calendar/80
+      return "#F87171"; // A lighter red
     case "nice":
-      return "rgba(255, 236, 172, 0.7)"; // main-calendar/70
+      return "#FCA5A5"; // An even lighter red
     case "ok":
-      return "rgba(245, 216, 152, 1)"; // main-calendar/60
+      return "#FEE2E2"; // A very light red
     case "zero":
-      return "rgba(245, 216, 152, 0.2)"; // main-calendar/20
+      return "#FEF2F2"; // The lightest red tint
     default:
-      return "rgba(71, 85, 105, 0.5)"; // slate-600/50
+      return "#1F2937"; // A dark gray for empty squares
   }
-};
-
-const drawRoundedRect = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number
-) => {
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
-  ctx.closePath();
-  ctx.fill();
 };

@@ -9,14 +9,15 @@ export interface StatsFieldProps {
 
 const StatsField = ({ Icon, description, value }: StatsFieldProps) => {
   return (
-    <div className='content-box relative right-2 m-2 flex  w-32 flex-col p-1 font-openSans text-xs sm:w-48 sm:text-sm'>
-      <div className='flex w-full flex-row items-center justify-around border-b-2 border-second-400/60'>
+    <div className='content-box relative right-2 flex w-[45%] min-w-[200px]  flex-1 flex-col gap-1 p-1 font-openSans text-xs sm:text-sm'>
+      <p className='p-1 text-secondText'>{description}</p>
+      <div className='flex w-full flex-row items-center'>
         <IconBox medium Icon={Icon} />
+
         <p className='ml-1 w-[70%] border-main font-sans text-xl font-extrabold tracking-wider opacity-90 sm:text-2xl '>
           {value}
         </p>
       </div>
-      <p className=' p-1 font-thin'>{description}</p>
     </div>
   );
 };

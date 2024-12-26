@@ -78,7 +78,9 @@
     "technique": "Technique",
     "theory": "Theory",
     "hearing": "Hearing",
-    "creativity": "Creativity"
+    "creativity": "Creativity",
+    "backDate": "Backdated report",
+    "hasTitle": "Report with title"
   },
   "sort": {
     "sort_by": "Sort by:",
