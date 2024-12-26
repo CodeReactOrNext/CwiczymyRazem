@@ -1,5 +1,6 @@
 {
   "or": "lub",
+
   "button": {
     "sign_in": "Loguj",
     "sign_up": "Zarejestruj się",
@@ -78,7 +79,9 @@
     "technique": "Technika",
     "theory": "Teoria",
     "hearing": "Słuch",
-    "creativity": "Kreatywność"
+    "creativity": "Kreatywność",
+    "backDate": "Raport z datą wsteczną",
+    "hasTitle": "Raport z tytułem"
   },
   "sort": {
     "sort_by": "Sortuj według:",
