@@ -1,8 +1,9 @@
 import Achievement from "components/Achievement";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-
 import { addZeroToTime } from "utils/converter";
+import { IoPersonOutline } from "react-icons/io5";
+
 import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
 
 export interface LogsBoxLayoutProps {
@@ -19,31 +20,30 @@ const Logs = ({ logs }: LogsBoxLayoutProps) => {
           return (
             <div
               key={data + userName}
-              className=' border-b-border-main-opposed-400 alert  my-2 flex  flex-row flex-nowrap items-center  p-4  radius-default'>
-              <p className='mr-2 w-[20%] max-w-[7rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem]  lg:text-xs'>
+              className=' my-4 flex flex-row  flex-nowrap items-center bg-main-opposed-bg   p-4  text-white radius-default '>
+              <p className='mr-3 w-[20%] max-w-[7rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem] text-secondText lg:text-xs'>
                 {date.toLocaleDateString() +
                   " " +
                   addZeroToTime(date.getHours()) +
                   ":" +
                   addZeroToTime(date.getMinutes())}
               </p>
-              <div className='flex w-[80%] flex-wrap '>
-                <p className='mr-1'>
-                  <span className='text-tertiary'>
-                    {uid ? (
-                      <Link href={"/user/" + uid}>{userName}</Link>
-                    ) : (
-                      userName
-                    )}
-                  </span>{" "}
-                  {t("logsBox.get")}
-                  <span className='m-1 text-second-text'> +{points}</span>
-                  {t("logsBox.points")}
-                </p>
+              <div className='flex w-[80%] flex-wrap items-center gap-1 '>
+                <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
+                  <IoPersonOutline className='text-white' />
+                  {uid ? (
+                    <Link href={"/user/" + uid}>{userName}</Link>
+                  ) : (
+                    userName
+                  )}
+                </span>{" "}
+                {t("logsBox.get")}
+                <span className='m-1 text-main'> +{points}</span>
+                {t("logsBox.points")}
                 {newLevel.isNewLevel && (
                   <p className='mr-1'>
                     {t("logsBox.lvl_up")}
-                    <span className='ml-1 text-second-text'>
+                    <span className='ml-1 text-main'>
                       {newLevel.level}
                     </span>{" "}
                     {t("logsBox.lvl")}

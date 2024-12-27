@@ -297,7 +297,7 @@ module.exports = {
               },
               "main-opposed": {
                 DEFAULT: "#54575F",
-                bg: "#2E2E2E",
+                bg: "#212121",
                 text: "#1A1A1A",
                 50: "#747983",
                 100: "#71767F",
