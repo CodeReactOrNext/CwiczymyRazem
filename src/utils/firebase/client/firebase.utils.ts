@@ -84,14 +84,6 @@ export const firebaseGetEvents = async () => {
   return eventsArr;
 };
 
-export const firebaseGetDiscordEvent = async () => {
-  const discordEventDocRef = collection(db, "discordEvent");
-  const discordEventDoc = await getDocs(discordEventDocRef);
-  let event;
-  discordEventDoc.forEach((doc) => (event = doc.data()));
-  return event as FirebaseDiscordEventsInteface | undefined;
-};
-
 export const firebaseGetUserRaprotsLogs = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const exerciseDocRef = await getDocs(collection(userDocRef, "exerciseData"));
