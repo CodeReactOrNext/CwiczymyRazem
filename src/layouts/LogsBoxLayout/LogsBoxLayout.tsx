@@ -8,26 +8,21 @@ import ExerciseBox from "../../feature/exercisePlan/view/ExerciseBox";
 
 import { AchievementList } from "assets/achievements/achievementsData";
 import {
-  FirebaseDiscordEventsInteface,
   FirebaseEventsInteface,
   FirebaseLogsInterface,
 } from "utils/firebase/client/firebase.types";
-import DiscordEvent from "./components/DiscordEvent";
 import { TbNews } from "react-icons/tb";
 import { FaGuitar, FaMedal, FaTasks } from "react-icons/fa";
+import Changelog from "./components/Changelog";
+import { changelogEntries } from "changelogEntries";
 
 export interface LogsBoxLayoutProps {
   logs: FirebaseLogsInterface[];
   events: FirebaseEventsInteface[];
-  discordEvent: FirebaseDiscordEventsInteface | null;
   userAchievements: AchievementList[];
 }
 
-const LogsBoxLayout = ({
-  logs,
-  userAchievements,
-  discordEvent,
-}: LogsBoxLayoutProps) => {
+const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
     "logs" | "achievements" | "discord" | "excerise"
   >("logs");
@@ -69,7 +64,7 @@ const LogsBoxLayout = ({
         {showedCategory === "logs" && logs && <Logs logs={logs} />}
         {showedCategory === "excerise" && logs && <ExerciseBox />}
         {showedCategory === "discord" && logs && (
-          <DiscordEvent discordEvent={discordEvent ? discordEvent : null} />
+          <Changelog entries={changelogEntries} />
         )}
       </div>
     </div>

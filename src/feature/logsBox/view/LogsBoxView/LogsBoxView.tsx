@@ -8,12 +8,10 @@ import LogsBoxLayout from "layouts/LogsBoxLayout";
 
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import {
-  FirebaseDiscordEventsInteface,
   FirebaseEventsInteface,
   FirebaseLogsInterface,
 } from "utils/firebase/client/firebase.types";
 import {
-  firebaseGetDiscordEvent,
   firebaseGetEvents,
   firebaseGetLogs,
 } from "utils/firebase/client/firebase.utils";
@@ -21,8 +19,7 @@ import {
 const LogsBoxView = () => {
   const [logs, setLogs] = useState<FirebaseLogsInterface[] | null>(null);
   const [events, setEvents] = useState<FirebaseEventsInteface[] | null>(null);
-  const [discordEvent, setDiscordEvent] =
-    useState<FirebaseDiscordEventsInteface | null>(null);
+
   const userAchievement = useAppSelector(selectCurrentUserStats)?.achievements;
   const { t } = useTranslation("toast");
 
@@ -42,14 +39,6 @@ const LogsBoxView = () => {
       .catch((error) => {
         toast.error(t("errors.fetch_error"));
       });
-
-    firebaseGetDiscordEvent()
-      .then((events) => {
-        setDiscordEvent(events ? events : null);
-      })
-      .catch((error) => {
-        toast.error(t("errors.fetch_error"));
-      });
   }, [t]);
 
   return logs && events && userAchievement ? (
@@ -57,7 +46,6 @@ const LogsBoxView = () => {
       logs={logs}
       events={events}
       userAchievements={userAchievement}
-      discordEvent={discordEvent}
     />
   ) : (
     <FaSpinner />
