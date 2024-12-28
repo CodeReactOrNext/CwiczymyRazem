@@ -2,7 +2,7 @@ import { Middleware } from "@reduxjs/toolkit";
 
 export const localStorageMiddleware: Middleware =
   (store) => (next) => (action) => {
-    const result = next(action);
+    const result = next(action) as any; // yes,yes I know...
     if (
       result.type.startsWith("user/updateTimerTime") ||
       result.type.startsWith("user/updateUserStats/fulfilled") ||
