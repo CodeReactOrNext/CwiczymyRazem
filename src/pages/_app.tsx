@@ -5,10 +5,10 @@ import { appWithTranslation } from "next-i18next";
 import { store } from "store/store";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
 
-import "styles/fonts.css";
 import "styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "sonner";
+import { inter, teko } from "src/pages/fonts";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -30,7 +30,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         <Toaster theme='dark' position='top-right' />
 
         <div id='overlays'></div>
-        <Component {...pageProps} />
+        <main className={`  ${teko.variable} ${inter.variable} `}>
+          <Component {...pageProps} />
+        </main>
       </ThemeModeProvider>
     </Provider>
   );
