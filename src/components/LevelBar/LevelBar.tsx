@@ -20,7 +20,7 @@ const LevelBar = ({
   const progressPercent = (pointsInThisLevel / levelXpDifference) * 100;
 
   return (
-    <div className=' flex w-full flex-col items-center text-lg text-tertiary-400 sm:text-xl md:w-52 lg:w-64 lg:justify-self-end xl:w-80 '>
+    <div className='relative z-30 flex w-full flex-col items-center text-lg text-tertiary-400 sm:text-xl md:w-52 lg:w-64 lg:justify-self-end xl:w-80 '>
       <p>
         {t("header.your_level")}{" "}
         <span className='text-3xl font-bold text-mainText sm:text-4xl'>
@@ -28,7 +28,7 @@ const LevelBar = ({
         </span>
       </p>
       <div className=' flex w-full'>
-        <div className='relative flex h-3 w-full items-center bg-main-opposed bg-opacity-80 radius-default'>
+        <div className='relative  flex h-3 w-full items-center bg-main-opposed bg-opacity-80 radius-default'>
           <div
             className='relative h-3 bg-gradient-to-r from-main-600 to-main-200 radius-default '
             style={{ width: progressPercent + "%" }}></div>

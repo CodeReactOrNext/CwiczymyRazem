@@ -10,9 +10,9 @@ import {
   FaRegClock,
   FaTimes,
 } from "react-icons/fa";
-import { toast } from "react-toastify";
 import { firebaseUploadExercisePlan } from "utils/firebase/client/firebase.utils";
 import { exerciseSchema } from "./ExerciseEdit.schema";
+import { toast } from "sonner";
 
 interface ExcerisePlanProps {
   backHandler: () => void;

@@ -62,11 +62,9 @@ const LoginView = () => {
                 {t("common:button.sign_in")}
               </Button>
               <Link href='/signup'>
-                <a>
-                  <Button variant='secondary'>
-                    {t("common:button.sign_up")}
-                  </Button>
-                </a>
+                <Button variant='secondary'>
+                  {t("common:button.sign_up")}
+                </Button>
               </Link>
             </div>
             <GoogleButton onClick={googleLogInHandler}>

@@ -1,22 +1,26 @@
 import { useTranslation } from "react-i18next";
+import { FaClock, FaStar } from "react-icons/fa";
 import { FaCheck, FaTimes } from "react-icons/fa";
-
 import {
   checkIsPracticeToday,
   getUpdatedActualDayWithoutBreak,
 } from "utils/gameLogic";
-interface WelocmeMessageProps {
+
+interface WelcomeMessageProps {
   userName: string;
   lastReportDate: string;
   points: number;
   actualDayWithoutBreak: number;
+  totalPracticeTime: string;
 }
+
 const WelcomeMessage = ({
   userName,
   points,
   lastReportDate,
   actualDayWithoutBreak,
-}: WelocmeMessageProps) => {
+  totalPracticeTime,
+}: WelcomeMessageProps) => {
   const { t } = useTranslation("common");
 
   const userLastReportDate = new Date(lastReportDate);
@@ -28,32 +32,51 @@ const WelcomeMessage = ({
   );
   const dayWithoutBreak =
     (isStreak === 1 ? 0 : actualDayWithoutBreak) + +didPracticeToday;
+
   return (
-    <div className='text:xs tracking-wide  xxs:text-base sm:text-2xl md:text-base lg:text-xl 2xl:w-[650px]'>
-      <p className='py-2 xs:text-lg md:text-xl lg:text-2xl xl:text-3xl '>
-        {t("header.hey")} <span className='text-mainText'>{userName}!</span>
-      </p>
-      <div className='flex flex-col gap-2 2xl:flex-row 2xl:gap-8'>
-        <p className='font-normal text-secondText'>
-          {t("header.earned_points")}{" "}
-          <span className='text-mainText'>{points}</span>
-        </p>
-        <div className='flex flex-row items-center gap-2'>
-          <p>{t("header.practice_today")}</p>
-          {didPracticeToday ? (
-            <FaCheck className='text-green-300' />
-          ) : (
-            <FaTimes className='text-red-300' />
-          )}
+    <div className='flex flex-col '>
+      <div className='stats bg-second'>
+        <div className='stat min-w-[180px] !p-3 font-openSans text-white'>
+          <div className='flex flex-row items-center gap-2'>
+            <div className='stat-title text-[12px] text-secondText'>
+              {t("header.practice_today")}
+            </div>
+            {didPracticeToday ? (
+              <FaCheck className='text-green-300' />
+            ) : (
+              <FaTimes className='text-red-300' />
+            )}
+          </div>
         </div>
-        <p className='flex flex-row items-center  gap-1'>
-          {t("day_since.actual_streak")}
-          <span
-            className={`item-center flex justify-center  text-center  font-extrabold text-mainText radius-default
-          `}>
-            {dayWithoutBreak}
-          </span>
-        </p>
+
+        <div className='stat hidden min-w-[180px] !p-3 font-openSans text-white xl:block'>
+          <div className='flex flex-row items-center gap-2'>
+            <div className='stat-title text-[12px] text-secondText'>
+              {t("day_since.actual_streak")}
+            </div>
+            <div className='stat-value font-sans text-2xl'>
+              {dayWithoutBreak}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className='stats bg-second'>
+        <div className='stat min-w-[180px] !p-3 font-openSans text-white'>
+          <div className='stat-title text-[12px] text-secondText'>
+            {t("header.earned_points")}
+          </div>
+          <div className='stat-value font-sans text-2xl'>{points}</div>
+        </div>
+
+        <div className='stat hidden min-w-[180px] !p-3 font-openSans text-white xl:block'>
+          <div className='stat-title text-[12px] text-secondText'>
+            {t("header.total_practice_time")}
+          </div>
+          <div className='stat-value font-sans text-2xl'>
+            {totalPracticeTime}
+          </div>
+        </div>
       </div>
     </div>
   );

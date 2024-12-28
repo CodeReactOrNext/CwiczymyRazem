@@ -1,6 +1,6 @@
+import Image from "next/image";
 import LightningSVG from "public/static/images/svg/Lightning";
 import LightningRevSVG from "public/static/images/svg/LightningRev";
-import Image from "next/future/image";
 
 const Guitar = () => {
   return (

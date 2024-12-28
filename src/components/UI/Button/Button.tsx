@@ -1,5 +1,4 @@
 import React from "react";
-import { CircleSpinner } from "react-spinners-kit";
 import { motion } from "framer-motion";
 
 interface ButtonProps {
@@ -43,13 +42,7 @@ const Button = ({
           ${style ? style : ""}
       `}
       {...otherProps}>
-      {loading ? (
-        <div className='px-3'>
-          <CircleSpinner size={24} />
-        </div>
-      ) : (
-        children
-      )}
+      {loading ? <div className='px-3'></div> : children}
     </motion.button>
   );
 };

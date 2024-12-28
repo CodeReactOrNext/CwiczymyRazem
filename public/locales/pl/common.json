@@ -47,7 +47,8 @@
     "your_level": "Poziom",
     "points": "Punktów",
     "points_short": "pkt.",
-    "practice_today": "Czy dziś ćwiczyłeś?"
+    "practice_today": "Czy dziś ćwiczyłeś?",
+    "total_practice_time": "Łączny czas"
   },
   "logsBox": {
     "achievements_map": "Mapa osiągnięć",
