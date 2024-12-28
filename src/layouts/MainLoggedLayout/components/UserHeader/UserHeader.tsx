@@ -8,6 +8,7 @@ import { ThemeToggle, LanguageSwitch } from "components/UI";
 
 import { StatisticsDataInterface } from "types/api.types";
 import CopyLinkProfile from "components/CopyLinkProfile";
+import { convertMsToHM } from "utils/converter";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
@@ -22,6 +23,7 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
     currentLevelMaxPoints,
     lastReportDate,
     actualDayWithoutBreak,
+    time,
   } = userStats;
   return (
     <>
@@ -39,6 +41,9 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
             lastReportDate={lastReportDate}
             points={points}
             actualDayWithoutBreak={actualDayWithoutBreak}
+            totalPracticeTime={convertMsToHM(
+              time.technique + time.theory + time.creativity + time.hearing
+            )}
           />
         </div>
         <div className='absolute -right-2 top-0 flex w-full scale-[85%] items-end justify-between gap-4 xs:right-2 xs:top-2 xs:w-auto sm:scale-100 sm:flex-col'>

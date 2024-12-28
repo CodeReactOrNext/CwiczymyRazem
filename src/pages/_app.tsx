@@ -8,7 +8,19 @@ import ThemeModeProvider from "wrappers/ThemeModeProvider";
 import "styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "sonner";
-import { inter, teko } from "src/pages/fonts";
+import { Inter, Teko } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const teko = Teko({
+  subsets: ["latin"],
+  variable: "--font-teko",
+  display: "swap",
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
