@@ -6,7 +6,6 @@ import { store } from "store/store";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
 
 import "styles/globals.css";
-import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "sonner";
 import { Inter, Teko } from "next/font/google";
 
