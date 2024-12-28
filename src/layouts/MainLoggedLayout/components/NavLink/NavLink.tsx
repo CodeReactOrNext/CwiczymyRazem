@@ -7,21 +7,20 @@ interface NavLinkProps {
   external?: boolean;
 }
 
-const NavLink = ({ href, name, isCurrentPage, external }: NavLinkProps) => {
+const NavLink = ({ href, name, isCurrentPage }: NavLinkProps) => {
   return (
     <Link href={href}>
-      <a target={external ? "_blank" : undefined} rel='noopener noreferrer'>
-        <button
-          disabled={isCurrentPage}
-          className={`active:click-behavio p-1 px-2 radius-default sm:px-4  
-            ${
-              isCurrentPage
-                ? " bg-second-500 text-mainText shadow-sm"
-                : " click-behavior hover:bg-second-500 hover:text-mainText"
-            } `}>
-          {name}
-        </button>
-      </a>
+      <button
+        disabled={isCurrentPage}
+        className={`p-1 px-2 tracking-wide radius-default sm:px-4 
+          ${
+            isCurrentPage
+              ? "bg-second-500 text-mainText shadow-sm"
+              : "hover:bg-second-400 hover:text-mainText"
+          } 
+          transition-colors  duration-200 ease-in-out`}>
+        {name}
+      </button>
     </Link>
   );
 };

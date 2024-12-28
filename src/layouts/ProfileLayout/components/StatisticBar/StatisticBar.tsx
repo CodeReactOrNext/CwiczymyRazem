@@ -7,7 +7,7 @@ const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
   const percentValue = percent ? percent : 0;
 
   return (
-    <div className=' m-1 flex flex-col  items-center font-openSans sm:text-xl'>
+    <div className=' m-1 flex  flex-col items-center font-openSans sm:text-xl'>
       <p className='m-2 text-[14px]'>{percentValue}%</p>
       <div className='flex h-32 w-2 bg-main-opposed/30 radius-default sm:h-56 sm:w-6 '>
         <div

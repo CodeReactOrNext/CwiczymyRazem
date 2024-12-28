@@ -124,7 +124,7 @@ const ProfileLayout = ({
               percent={Math.round((time.creativity / totalTime) * 100)}
             />
           </div>
-          <div className='row-cols-1 flex flex-wrap content-start gap-3 p-6'>
+          <div className='row-cols-1 flex max-h-[300px] flex-wrap content-start gap-3 p-6'>
             {statsField.map(({ Icon, description, value }) => (
               <StatsField
                 key={description}
