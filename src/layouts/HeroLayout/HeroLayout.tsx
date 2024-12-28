@@ -32,24 +32,18 @@ const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
           {children}
         </span>
         <Link href='/login'>
-          <a>
-            <Button onClick={buttonOnClick}>{t("profile:cta_button")}</Button>
-          </a>
+          <Button onClick={buttonOnClick}>{t("profile:cta_button")}</Button>
         </Link>
         <div className='flex flex-row gap-6  text-xl'>
           <Link href='/login'>
-            <a>
-              <button className='text-mainText' onClick={buttonOnClick}>
-                {t("common:button.sign_in")}
-              </button>
-            </a>
+            <button className='text-mainText' onClick={buttonOnClick}>
+              {t("common:button.sign_in")}
+            </button>
           </Link>
           <Link href='/signup'>
-            <a>
-              <button className='text-mainText' onClick={buttonOnClick}>
-                {t("common:button.sign_up")}
-              </button>
-            </a>
+            <button className='text-mainText' onClick={buttonOnClick}>
+              {t("common:button.sign_up")}
+            </button>
           </Link>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { Form, Formik } from "formik";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
