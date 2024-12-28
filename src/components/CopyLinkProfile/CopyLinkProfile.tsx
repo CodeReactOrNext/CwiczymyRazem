@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { MdCopyAll } from "react-icons/md";
 
 import { useAppSelector } from "store/hooks";

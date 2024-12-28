@@ -2,7 +2,7 @@ import { FaSpinner } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { useAppSelector } from "store/hooks";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 import LogsBoxLayout from "layouts/LogsBoxLayout";
 

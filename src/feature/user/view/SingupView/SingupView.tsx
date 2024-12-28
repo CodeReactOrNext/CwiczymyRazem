@@ -49,10 +49,10 @@ const SingupView = () => {
       <Form>
         <FormLayout>
           <>
-            <Link href='/login'>
-              <a className='flex flex-row gap-x-2 font-sans click-behavior'>
-                <FaArrowLeft /> {t("signup:back_to_login")}
-              </a>
+            <Link
+              href='/login'
+              className='flex flex-row gap-x-2 font-sans click-behavior'>
+              <FaArrowLeft /> {t("signup:back_to_login")}
             </Link>
             <Input
               Icon={FaUserAlt}
