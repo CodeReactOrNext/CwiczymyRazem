@@ -11,7 +11,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "1.8.6",
+    "@reduxjs/toolkit": "https://pkg.csb.dev/reduxjs/redux-toolkit/commit/436d29c1/@reduxjs/toolkit", 
     "axios": "^1.2.2",
     "firebase": "9.13.0",
     "firebase-admin": "^11.4.1",
@@ -26,7 +26,7 @@
     "react-firebase-hooks": "^5.1.1",
     "react-i18next": "12.0.0",
     "react-icons": "4.6.0",
-    "react-redux": "8.0.4",
+    "react-redux": "https://pkg.csb.dev/reduxjs/react-redux/commit/3271037e/react-redux", 
     "react-spinners-kit": "^1.9.1",
     "react-tooltip": "^4.5.1",
     "sonner": "^1.7.1",
