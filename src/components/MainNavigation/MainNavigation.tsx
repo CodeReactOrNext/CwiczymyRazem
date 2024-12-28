@@ -53,10 +53,11 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
             <Link href='/leaderboard'>{t("nav.leadboard")}</Link>
           </li>
           <li className='active:click-behavior'>
-            <Link href='https://discord.com/invite/pCHjCZx'>
-              <a target='_blank' rel='noreferrer'>
-                {t("nav.discord")}
-              </a>
+            <Link
+              href='https://discord.com/invite/pCHjCZx'
+              target='_blank'
+              rel='noreferrer'>
+              {t("nav.discord")}
             </Link>
           </li>
           <li className=' active:click-behavior'>

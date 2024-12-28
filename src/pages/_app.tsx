@@ -1,14 +1,25 @@
 import Head from "next/head";
 import { Provider } from "react-redux";
 import type { AppProps } from "next/app";
-import { ToastContainer } from "react-toastify";
 import { appWithTranslation } from "next-i18next";
 import { store } from "store/store";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
 
-import "styles/fonts.css";
 import "styles/globals.css";
-import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "sonner";
+import { Inter, Teko } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const teko = Teko({
+  subsets: ["latin"],
+  variable: "--font-teko",
+  display: "swap",
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -27,9 +38,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name='keywords' content='ćwiczenie, gitara' />
       </Head>
       <ThemeModeProvider>
+        <Toaster theme='dark' position='top-right' />
+
         <div id='overlays'></div>
-        <Component {...pageProps} />
-        <ToastContainer toastClassName={"toastify-custom"} />
+        <main className={`  ${teko.variable} ${inter.variable} `}>
+          <Component {...pageProps} />
+        </main>
       </ThemeModeProvider>
     </Provider>
   );

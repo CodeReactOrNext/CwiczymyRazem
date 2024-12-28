@@ -1,5 +1,5 @@
 import { i18n } from "next-i18next";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export const updateUserEmailSuccess = () => {
   toast.success(i18n?.t("toast:success.update_email"));

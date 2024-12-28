@@ -119,8 +119,8 @@ const TimerLayout = ({
       <BeginnerMsg />
       <p className='p-4 text-center  font-openSans text-xs sm:text-base'>
         {t("info_about_repot ")}
-        <Link href={"/report"}>
-          <a className='text-link'> {t("raport_link")}</a>
+        <Link href={"/report"} className='text-link'>
+          {t("raport_link")}
         </Link>
       </p>
       <Button onClick={timerSubmitHandler}> {t("end_button")}</Button>

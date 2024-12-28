@@ -57,7 +57,8 @@
     "your_level": "Level",
     "points": "Points",
     "points_short": "pt.",
-    "practice_today": "Do you practice today?"
+    "practice_today": "Do you practice today?",
+    "total_practice_time": "Total time"
   },
   "logsBox": {
     "achievements_map": "Achievements Map",
