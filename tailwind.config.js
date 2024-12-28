@@ -124,8 +124,10 @@ module.exports = {
       },
     },
     fontFamily: {
-      sans: "Teko",
-      openSans: "Open Sans",
+      sans: [
+        'var(--font-teko)'
+      ],
+      openSans: ['var(--font-inter)'],
     },
   },
   daisyui: {
@@ -145,7 +147,6 @@ module.exports = {
   },
   plugins: [
     require('daisyui'),
-
     require("prettier-plugin-tailwindcss"),
     require("tailwindcss-themer")({
       themes: [{
