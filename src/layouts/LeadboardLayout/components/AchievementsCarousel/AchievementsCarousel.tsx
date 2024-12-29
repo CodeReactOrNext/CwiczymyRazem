@@ -40,19 +40,19 @@ const AchievementsCarousel = ({
   };
 
   return (
-    <div className='col-span-3 hidden h-full w-full flex-col items-center justify-center  sm:flex  md:col-span-1  md:w-fit md:justify-end'>
-      <div className='flex text-base xxs:text-2xl lg:text-xl xl:text-2xl '>
+    <div className='col-span-3 hidden h-full w-full flex-col items-center justify-center sm:flex md:col-span-1 md:w-fit md:justify-end bg-opacity-80'>
+      <div className='flex text-base xxs:text-2xl lg:text-xl xl:text-2xl backdrop-blur-sm p-2 rounded-lg'>
         <button onClick={handlePrev}>
           <FaAngleLeft
             className={`${
               leftMax
-                ? "cursor-default text-main-opposed/20"
-                : "text-main-opposed hover:text-mainText active:click-behavior-second"
+                ? "cursor-default text-gray-600"
+                : "text-gray-300 hover:text-white transition-colors active:click-behavior-second"
             } `}
           />
         </button>
 
-        <div className='flex w-[100px]  justify-around font-openSans text-base font-bold xxs:text-lg xs:w-[150px] lg:w-[100px] xl:w-[150px] '>
+        <div className='flex w-[100px] justify-around font-openSans text-base font-bold xxs:text-lg xs:w-[150px] lg:w-[100px] xl:w-[150px]'>
           {achievements.length === 0
             ? t("empty")
             : displayItems(index).map((achivId) => {
@@ -63,13 +63,13 @@ const AchievementsCarousel = ({
           <FaAngleRight
             className={`${
               rightMax
-                ? "cursor-default text-main-opposed/20"
-                : "text-main-opposed hover:text-mainText active:click-behavior-second"
+                ? "cursor-default text-gray-600"
+                : "text-gray-300 hover:text-white transition-colors active:click-behavior-second"
             } `}
           />
         </button>
       </div>
-      <p className='pb-2 font-openSans text-xs font-bold text-tertiary-300'>
+      <p className='pb-2 font-openSans text-xs font-bold text-gray-400'>
         {t("achievements")} {achievements.length}/{achievementsData.length}
       </p>
     </div>
