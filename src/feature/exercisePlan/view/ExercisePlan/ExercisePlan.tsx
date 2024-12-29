@@ -54,7 +54,7 @@ const ExercisePlan = () => {
                   exerciseNumber={item.exercise.length}
                   sumTime={item.exercise.reduce(
                     (sumTime, item) => sumTime + item.time,
-                    0
+                    0                 
                   )}
                   onClick={() => setExercises(exercisePlans[index].exercise)}
                 />
