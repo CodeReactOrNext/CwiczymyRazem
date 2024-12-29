@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { IoMdHand } from "react-icons/io";
 import { MdSchool } from "react-icons/md";
 import { FaBrain, FaMusic, FaTimesCircle } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { useTranslation } from "react-i18next";
 import { i18n } from "next-i18next";
@@ -170,46 +171,67 @@ const ReportView = () => {
     return sumTime;
   };
 
-  const reportOnSubmit = (inputData: ReportFormikInterface) => {
-    console.log("here?");
+  const reportOnSubmit = async (inputData: ReportFormikInterface) => {
     const sumTime = getSumTime(inputData);
     const lastReportTimeExceded = isLastReportTimeExceeded(
       currentUserStats!.lastReportDate,
       sumTime
     );
 
+    if (!userAuth) {
+      toast.error(t("toast.not_logged"), {
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (sumTime === 0) {
+      toast.error(t("toast.input_time"), {
+        duration: 3000,
+      });
+      return;
+    }
+
+    if (sumTime >= 86400000) {
+      toast.error(t("toast.24h_error"), {
+        duration: 3000,
+      });
+      return;
+    }
+
     if (lastReportTimeExceded && !acceptExceedingTime) {
       setAcceptPopUpVisible(true);
       setExceedingTime(lastReportTimeExceded);
       return;
     }
-    if (sumTime >= 86400000) {
-      toast.error(t("toast.24h_error"));
-      return;
-    }
-    if (sumTime === 0) {
-      toast.error(t("toast.input_time"));
-      return;
-    }
-    if (!userAuth) {
-      toast.error(t("toast.not_logged"));
-      return;
-    }
 
-    dispatch(updateUserStats({ inputData })).then(() => {
+    try {
+      await dispatch(updateUserStats({ inputData }));
       setAcceptPopUpVisible(false);
       setRatingSummaryVisible(true);
-    });
+      toast.success(t("toast.report_success"), {
+        duration: 3000,
+      });
+    } catch (error) {
+      toast.error(t("toast.report_error"), {
+        duration: 3000,
+      });
+    }
   };
 
   useEffect(() => {
     if (sumTime) {
-      toast.info(t("toast.stoper_entered"));
+      toast.info(t("toast.stoper_entered"), {
+        duration: 3000,
+      });
     }
   }, [sumTime, t]);
 
   return (
-    <>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}>
       <Formik
         initialValues={formikInitialValues}
         validationSchema={RaportSchema}
@@ -218,142 +240,200 @@ const ReportView = () => {
         {({ errors, handleSubmit, values }) => (
           <>
             <ReportFormLayout>
-              <ReportCategoryWrapper title={t("exercise_type_title")}>
-                <div className='my-5 mt-14 flex flex-row flex-wrap justify-center gap-10 2xl:gap-20 '>
-                  {timeInputList.map(
-                    (
-                      {
-                        title,
-                        questionMarkProps,
-                        Icon,
-                        hoursName,
-                        minutesName,
-                      },
-                      index
-                    ) => (
-                      <TimeInputBox
-                        key={index}
-                        errors={errors}
-                        title={title}
-                        questionMarkProps={questionMarkProps}
-                        Icon={Icon}
-                        hoursName={hoursName}
-                        minutesName={minutesName}
-                      />
-                    )
-                  )}
-                </div>
-              </ReportCategoryWrapper>
-              <div className='flex flex-col justify-evenly md:flex-row '>
-                <ReportCategoryWrapper title={t("healthy_habits_title")}>
-                  {healthHabbitsList.map(
-                    ({ name, questionMarkProps, title }, index) => (
-                      <HealthHabbitsBox
-                        key={name + index}
-                        name={name}
-                        questionMarkProps={questionMarkProps}
-                        title={title}
-                      />
-                    )
-                  )}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5 }}>
+                <ReportCategoryWrapper title={t("exercise_type_title")}>
+                  <div className='my-5 mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 2xl:gap-12'>
+                    {timeInputList.map(
+                      (
+                        {
+                          title,
+                          questionMarkProps,
+                          Icon,
+                          hoursName,
+                          minutesName,
+                        },
+                        index
+                      ) => (
+                        <motion.div
+                          key={index}
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: index * 0.1 }}>
+                          <TimeInputBox
+                            errors={errors}
+                            title={title}
+                            questionMarkProps={questionMarkProps}
+                            Icon={Icon}
+                            hoursName={hoursName}
+                            minutesName={minutesName}
+                          />
+                        </motion.div>
+                      )
+                    )}
+                  </div>
                 </ReportCategoryWrapper>
-                <div className='md:max-w-[30%]'>
-                  <ReportCategoryWrapper title={"Dodatkowe opcje"}>
-                    <div className='flex flex-col gap-2 bg-main-opposed-500/40 p-4'>
-                      <div className='flex flex-col gap-2'>
-                        <p>{t("sesion_title")}</p>
-                        <p className='font-openSans text-xs text-tertiary'>
-                          {t("optional")}
-                        </p>
-                      </div>
+              </motion.div>
 
-                      <Input name='reportTitle' />
-                      <p className='font-openSans text-xs'>
-                        {t("description.sesion_title")}
-                      </p>
-                      <Divider />
-                      <div className='text-center'>
-                        <p>{t("date_back")}</p>
-                        <p
-                          className={`flex flex-row justify-center gap-2 font-openSans text-xs
-                        ${
-                          errors.hasOwnProperty("countBackDays")
-                            ? "text-error-200 font-extrabold"
-                            : "text-mainText"
-                        }`}>
-                          {errors.hasOwnProperty("countBackDays") && (
-                            <FaTimesCircle className='text-error-200' />
-                          )}
-                          {t("max_days", { days: MAX_DAYS_BACK })}
-                        </p>
-                      </div>
-                      <div className='flex flex-row items-center justify-center gap-5'>
-                        <InputTime
-                          name={"countBackDays"}
-                          description={t("days")}
-                        />
-                        <p className='font-openSans text-sm'>
-                          {t("add_report_to_day")} <br />
-                          <span
-                            className={`${
-                              errors.hasOwnProperty("countBackDays")
-                                ? "text-error-200 font-extrabold"
-                                : "text-mainText"
-                            }`}>
-                            {getDateFromPast(
-                              values.countBackDays
-                            ).toLocaleDateString()}
-                          </span>
-                        </p>
-                      </div>
-                      <p className='font-openSans text-xs'>
-                        {t("description.max_days", { days: MAX_DAYS_BACK })}
-                      </p>
+              <div className='mt-10 flex flex-col gap-8 lg:flex-row lg:justify-between'>
+                <motion.div
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className='lg:w-1/2'>
+                  <ReportCategoryWrapper title={t("healthy_habits_title")}>
+                    <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+                      {healthHabbitsList.map(
+                        ({ name, questionMarkProps, title }, index) => (
+                          <motion.div
+                            key={name + index}
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ type: "spring", stiffness: 300 }}>
+                            <HealthHabbitsBox
+                              name={name}
+                              questionMarkProps={questionMarkProps}
+                              title={title}
+                            />
+                          </motion.div>
+                        )
+                      )}
                     </div>
                   </ReportCategoryWrapper>
-                </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className='lg:w-[45%]'>
+                  <ReportCategoryWrapper title={t("additional_options")}>
+                    <div className='rounded-lg bg-main-opposed-500/40 p-6 shadow-lg'>
+                      <div className='space-y-4'>
+                        <div>
+                          <h3 className='text-lg font-semibold'>{t("sesion_title")}</h3>
+                          <p className='text-sm text-tertiary'>{t("optional")}</p>
+                          <Input
+                            name='reportTitle'
+                            className='mt-2 w-full rounded-md'
+                          />
+                          <p className='mt-1 text-sm text-gray-500'>
+                            {t("description.sesion_title")}
+                          </p>
+                        </div>
+
+                        <Divider className='my-4' />
+
+                        <div>
+                          <h3 className='text-center text-lg font-semibold'>
+                            {t("date_back")}
+                          </h3>
+                          <div className='flex items-center justify-center gap-4'>
+                            <InputTime
+                              name={"countBackDays"}
+                              description={t("days")}
+                            />
+                            <div className='text-sm'>
+                              <p>{t("add_report_to_day")}</p>
+                              <p
+                                className={`font-medium ${
+                                  errors.countBackDays
+                                    ? "text-error-200"
+                                    : "text-mainText"
+                                }`}>
+                                {getDateFromPast(
+                                  values.countBackDays
+                                ).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          {errors.countBackDays && (
+                            <motion.p
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className='mt-2 text-center text-sm text-error-200'>
+                              <FaTimesCircle className='mr-1 inline' />
+                              {t("max_days", { days: MAX_DAYS_BACK })}
+                            </motion.p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </ReportCategoryWrapper>
+                </motion.div>
               </div>
-              <div className='flex flex-col items-center justify-self-center md:col-span-2 lg:col-span-1 xl:col-span-2'>
-                <div className='m-2 h-6'>
-                  {Object.keys(errors).length !== 0 && <ErrorBox />}
-                </div>
+
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className='mt-8 flex flex-col items-center'>
+                <AnimatePresence>
+                  {Object.keys(errors).length !== 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className='mb-4'>
+                      <ErrorBox />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <BeginnerMsg />
+
                 <Button
                   type='submit'
                   disabled={Object.keys(errors).length !== 0}
-                  loading={isFetching}>
+                  loading={isFetching}
+                  className='mt-4 min-w-[200px] transform transition-all hover:scale-105'>
                   {t("report_button")}
                 </Button>
-              </div>
+              </motion.div>
             </ReportFormLayout>
-            {acceptPopUpVisible && exceedingTime && (
-              <Backdrop selector='overlays'>
-                <AcceptExceedingPopUp
-                  exceedingTime={exceedingTime}
-                  handleSubmit={handleSubmit}
-                  isFetching={isFetching}
-                  setAcceptExceedingTime={setAcceptExceedingTime}
-                  setAcceptPopUpVisible={setAcceptPopUpVisible}
-                />
-              </Backdrop>
-            )}
+
+            <AnimatePresence>
+              {acceptPopUpVisible && exceedingTime && (
+                <Backdrop selector='overlays'>
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}>
+                    <AcceptExceedingPopUp
+                      exceedingTime={exceedingTime}
+                      handleSubmit={handleSubmit}
+                      isFetching={isFetching}
+                      setAcceptExceedingTime={setAcceptExceedingTime}
+                      setAcceptPopUpVisible={setAcceptPopUpVisible}
+                    />
+                  </motion.div>
+                </Backdrop>
+              )}
+
+              {ratingSummaryVisible &&
+                raitingData &&
+                currentUserStats &&
+                previousUserStats && (
+                  <Backdrop selector='overlays'>
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.9, opacity: 0 }}>
+                      <RatingPopUpLayout
+                        onClick={setRatingSummaryVisible}
+                        ratingData={raitingData}
+                        currentUserStats={currentUserStats}
+                        previousUserStats={previousUserStats}
+                      />
+                    </motion.div>
+                  </Backdrop>
+                )}
+            </AnimatePresence>
           </>
         )}
       </Formik>
-      {ratingSummaryVisible &&
-        raitingData &&
-        currentUserStats &&
-        previousUserStats && (
-          <Backdrop selector='overlays'>
-            <RatingPopUpLayout
-              onClick={setRatingSummaryVisible}
-              ratingData={raitingData}
-              currentUserStats={currentUserStats}
-              previousUserStats={previousUserStats}
-            />
-          </Backdrop>
-        )}
-    </>
+    </motion.div>
   );
 };
 
