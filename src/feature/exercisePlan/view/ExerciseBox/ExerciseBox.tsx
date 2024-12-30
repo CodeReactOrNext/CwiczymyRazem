@@ -87,7 +87,7 @@ const ExerciseBox = () => {
             }}
           />
         ))}
-        <div className='bg-main-opposed-300/20 p-3 text-xs '>
+        <div>
           <button
             className='btn'
             //@ts-ignore

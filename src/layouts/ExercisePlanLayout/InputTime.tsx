@@ -11,9 +11,6 @@ const InputTime = ({ name, Icon }: { Icon: IconType; name: string }) => {
         <Icon />
         <input type='text' className='w-full' {...fieldHours}></input>
       </label>
-      <div className='label'>
-        <span className='label-text'>Czas ćwiczenia w minuach</span>
-      </div>
     </div>
   );
 };

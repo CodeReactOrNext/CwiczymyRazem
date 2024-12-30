@@ -57,10 +57,10 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           Icon={TbNews}
         />
       </div>
-      <div className='overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
-        {showedCategory === "achievements" && (
-          <AchievementsMap userAchievements={userAchievements} />
-        )}
+      {showedCategory === "achievements" && (
+        <AchievementsMap userAchievements={userAchievements} />
+      )}
+      <div className='h-full overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
         {showedCategory === "logs" && logs && <Logs logs={logs} />}
         {showedCategory === "excerise" && logs && <ExerciseBox />}
         {showedCategory === "discord" && logs && (

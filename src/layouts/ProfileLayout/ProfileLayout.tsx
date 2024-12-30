@@ -12,6 +12,7 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 import { convertMsToHM } from "utils/converter";
 import { ProfileInterface } from "types/ProfileInterface";
+import MainContainer from "components/MainContainer";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -39,9 +40,7 @@ const ProfileLayout = ({
     time.technique + time.theory + time.hearing + time.creativity;
 
   return (
-    <div className=' flex '>
-      <div className='m-4 flex w-[95%]  max-w-[1280px] flex-col bg-second-600  pb-4 '>
-        <HeadDecoration title={t("profile")} />
+      <MainContainer title={t("profile")} >
         <div className='grid-rows-auto  grid-cols-2 px-5  xl:grid'>
           <div className='content-box relative z-10 row-span-1 m-4 flex flex-col items-start gap-3 !p-6'>
             <div className=' flex  flex-row items-center gap-6 p-4 pb-0 '>
@@ -50,7 +49,7 @@ const ProfileLayout = ({
                 lvl={statistics.lvl}
                 avatarURL={avatar}
               />
-              <div className='flex-col '>
+              <div className='flex-col'>
                 <p className='relative  text-4xl'>{displayName}</p>
                 <p className='relative text-xl font-thin'>
                   {t("points")}:{" "}
@@ -141,8 +140,7 @@ const ProfileLayout = ({
             <Calendar userAuth={userAuth} />
           </div>
         </div>
-      </div>
-    </div>
+      </MainContainer>
   );
 };
 
