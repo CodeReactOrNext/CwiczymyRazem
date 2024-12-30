@@ -76,6 +76,8 @@ const TimerLayout = ({
             startTimer={startTimer}
             stopTimer={stopTimer}
             isSkillChosen={!!chosenSkill}
+            chosenSkill={chosenSkill}
+            timerData={timerData}
           />
         </div>
         <div className='mt-5 flex w-full flex-row flex-wrap justify-evenly md:w-[570px] md:justify-center lg:w-full '>
