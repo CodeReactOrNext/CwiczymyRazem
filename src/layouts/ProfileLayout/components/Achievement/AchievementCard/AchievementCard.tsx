@@ -51,6 +51,7 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         className={`
+          
        ${
          rarity === "common"
            ? "border-achievements-common bg-second-200 text-achievements-common"
