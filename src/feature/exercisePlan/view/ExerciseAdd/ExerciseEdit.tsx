@@ -104,7 +104,7 @@ const ExerciseEdit = ({ backHandler, exercise }: ExcerisePlanProps) => {
                         </p>
                         <Field type='checkbox' name='isPrivate' />
                       </div>
-                      <div className='m-3 flex flex-row justify-center gap-5 bg-main-opposed-500/20 p-3 text-base '>
+                      <div className='m-3 flex flex-row justify-center gap-5 rounded-sm bg-main-opposed-500/20 p-3 text-base '>
                         <button type='button' onClick={backHandler}>
                           Wróć
                         </button>

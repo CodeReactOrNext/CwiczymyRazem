@@ -13,7 +13,7 @@ const DaySince = ({ date }: { date: Date }) => {
   const daysSinceNumber = daysSince(date);
 
   return (
-    <p className='font-openSans text-[0.6rem] font-bold  xs:text-[0.65rem] sm:text-xs '>
+    <p className='font-openSans text-[0.6rem] text-secondText  xs:text-[0.65rem] sm:text-xs '>
       {!daysSinceNumber && t("day_since.no_practice")}
       {daysSinceNumber === 1 && t("day_since.pracitce_last_24")}
       {daysSinceNumber > 1 &&

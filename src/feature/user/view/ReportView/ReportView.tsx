@@ -205,18 +205,9 @@ const ReportView = () => {
       return;
     }
 
-    try {
-      await dispatch(updateUserStats({ inputData }));
-      setAcceptPopUpVisible(false);
-      setRatingSummaryVisible(true);
-      toast.success(t("toast.report_success"), {
-        duration: 3000,
-      });
-    } catch (error) {
-      toast.error(t("toast.report_error"), {
-        duration: 3000,
-      });
-    }
+    await dispatch(updateUserStats({ inputData }));
+    setAcceptPopUpVisible(false);
+    setRatingSummaryVisible(true);
   };
 
   useEffect(() => {
@@ -277,14 +268,14 @@ const ReportView = () => {
                 </ReportCategoryWrapper>
               </motion.div>
 
-              <div className='mt-10 flex flex-col gap-8 lg:flex-row lg:justify-between'>
+              <div className='mt-10 flex w-full flex-col gap-8 px-8 lg:flex-row lg:justify-between'>
                 <motion.div
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
                   className='lg:w-1/2'>
                   <ReportCategoryWrapper title={t("healthy_habits_title")}>
-                    <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+                    <div className='mt-6 flex flex-col  gap-4'>
                       {healthHabbitsList.map(
                         ({ name, questionMarkProps, title }, index) => (
                           <motion.div
@@ -293,8 +284,8 @@ const ReportView = () => {
                             transition={{ type: "spring", stiffness: 300 }}>
                             <HealthHabbitsBox
                               name={name}
-                              questionMarkProps={questionMarkProps}
                               title={title}
+                              questionMarkProps={questionMarkProps}
                             />
                           </motion.div>
                         )
@@ -307,60 +298,59 @@ const ReportView = () => {
                   initial={{ x: 20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className='lg:w-[45%]'>
-                  <ReportCategoryWrapper title={t("additional_options")}>
-                    <div className='rounded-lg bg-main-opposed-500/40 p-6 shadow-lg'>
-                      <div className='space-y-4'>
-                        <div>
-                          <h3 className='text-lg font-semibold'>{t("sesion_title")}</h3>
-                          <p className='text-sm text-tertiary'>{t("optional")}</p>
-                          <Input
-                            name='reportTitle'
-                            className='mt-2 w-full rounded-md'
-                          />
-                          <p className='mt-1 text-sm text-gray-500'>
-                            {t("description.sesion_title")}
-                          </p>
-                        </div>
-
-                        <Divider className='my-4' />
-
-                        <div>
-                          <h3 className='text-center text-lg font-semibold'>
-                            {t("date_back")}
-                          </h3>
-                          <div className='flex items-center justify-center gap-4'>
-                            <InputTime
-                              name={"countBackDays"}
-                              description={t("days")}
-                            />
-                            <div className='text-sm'>
-                              <p>{t("add_report_to_day")}</p>
-                              <p
-                                className={`font-medium ${
-                                  errors.countBackDays
-                                    ? "text-error-200"
-                                    : "text-mainText"
-                                }`}>
-                                {getDateFromPast(
-                                  values.countBackDays
-                                ).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
-                          {errors.countBackDays && (
-                            <motion.p
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              className='mt-2 text-center text-sm text-error-200'>
-                              <FaTimesCircle className='mr-1 inline' />
-                              {t("max_days", { days: MAX_DAYS_BACK })}
-                            </motion.p>
-                          )}
-                        </div>
+                  className='font-openSans lg:w-[45%]'>
+                  <div className='mb-4 rounded-lg border border-second-400/60 bg-second p-6'>
+                    <div className='space-y-4'>
+                      <div>
+                        <h3 className='mb-2 text-lg font-semibold'>
+                          {t("sesion_title")}
+                        </h3>
+                        <p className='text-sm text-secondText'>
+                          {t("optional")}*
+                        </p>
+                        <Input name='reportTitle' />
+                        <p className='text-secondTitle mt-2 text-sm'>
+                          {t("description.sesion_title")}
+                        </p>
                       </div>
                     </div>
-                  </ReportCategoryWrapper>
+                  </div>
+
+                  <div className='rounded-lg border border-second-400/60 bg-second  p-6 '>
+                    <div>
+                      <h3 className='m-2 text-lg font-semibold'>
+                        {t("date_back")}
+                      </h3>
+                      <div className='flex  gap-4'>
+                        <InputTime
+                          name={"countBackDays"}
+                          description={t("days")}
+                        />
+                        <div className='text-sm'>
+                          <p>{t("add_report_to_day")}</p>
+                          <p
+                            className={`font-medium ${
+                              errors.countBackDays
+                                ? "text-error-200"
+                                : "text-mainText"
+                            }`}>
+                            {getDateFromPast(
+                              values.countBackDays
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      {errors.countBackDays && (
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className='mt-2  text-sm text-red-400'>
+                          <FaTimesCircle className='mr-1 inline' />
+                          {t("max_days", { days: MAX_DAYS_BACK })}
+                        </motion.p>
+                      )}
+                    </div>
+                  </div>
                 </motion.div>
               </div>
 
@@ -386,8 +376,7 @@ const ReportView = () => {
                 <Button
                   type='submit'
                   disabled={Object.keys(errors).length !== 0}
-                  loading={isFetching}
-                  className='mt-4 min-w-[200px] transform transition-all hover:scale-105'>
+                  loading={isFetching}>
                   {t("report_button")}
                 </Button>
               </motion.div>
