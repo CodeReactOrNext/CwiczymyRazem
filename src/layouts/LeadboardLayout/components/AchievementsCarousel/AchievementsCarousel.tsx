@@ -40,14 +40,14 @@ const AchievementsCarousel = ({
   };
 
   return (
-    <div className='col-span-3 hidden h-full w-full flex-col items-center justify-center sm:flex md:col-span-1 md:w-fit md:justify-end bg-opacity-80'>
-      <div className='flex text-base xxs:text-2xl lg:text-xl xl:text-2xl backdrop-blur-sm p-2 rounded-lg'>
+    <div className='col-span-3 hidden h-full w-full flex-col items-center justify-center bg-opacity-80 sm:flex md:col-span-1 md:w-fit md:justify-end'>
+      <div className='flex rounded-lg p-2 text-base backdrop-blur-sm xxs:text-2xl lg:text-xl xl:text-2xl'>
         <button onClick={handlePrev}>
           <FaAngleLeft
             className={`${
               leftMax
                 ? "cursor-default text-gray-600"
-                : "text-gray-300 hover:text-white transition-colors active:click-behavior-second"
+                : "text-gray-300 transition-colors hover:text-white active:click-behavior-second"
             } `}
           />
         </button>
@@ -64,12 +64,12 @@ const AchievementsCarousel = ({
             className={`${
               rightMax
                 ? "cursor-default text-gray-600"
-                : "text-gray-300 hover:text-white transition-colors active:click-behavior-second"
+                : "text-gray-300 transition-colors hover:text-white active:click-behavior-second"
             } `}
           />
         </button>
       </div>
-      <p className='pb-2 font-openSans text-xs font-bold text-gray-400'>
+      <p className='pb-2 font-openSans text-xs  text-secondText'>
         {t("achievements")} {achievements.length}/{achievementsData.length}
       </p>
     </div>

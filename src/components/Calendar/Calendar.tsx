@@ -30,7 +30,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
     null
   );
 
-  const [year, setYear] = useState(2024);
+  const [year, setYear] = useState(2025);
 
   let datasWithReports: Array<{
     date: Date;
@@ -131,22 +131,28 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
   return reportList ? (
     <div className='content-box relative w-full  overflow-x-scroll p-3  font-openSans  scrollbar-thin scrollbar-thumb-second-200'>
       <div className='flex items-center gap-2'>
-        <div role='tablist' className='tabs tabs-lifted'>
+        <div className='mb-4 flex gap-2 rounded-md bg-second-400 p-1'>
           <button
             role='tab'
             onClick={() => setYear(2023)}
-            className={`tab ${year === 2023 ? "tab-active" : ""}`}>
+            className={`tab rounded-md text-[12px] font-medium transition-colors hover:text-white ${
+              year === 2023 ? "bg-second text-white" : " "
+            }`}>
             2023
           </button>
           <button
             role='tab'
-            className={`tab ${year === 2024 ? "tab-active" : ""}`}
+            className={`tab rounded-md text-[12px] font-medium transition-colors hover:text-white ${
+              year === 2024 ? "bg-second text-white" : " "
+            }`}
             onClick={() => setYear(2024)}>
             2024
           </button>
           <button
             role='tab'
-            className={`tab ${year === 2025 ? "tab-active" : ""}`}
+            className={`tab rounded-md text-[12px] font-medium transition-colors hover:text-white ${
+              year === 2025 ? "bg-second text-white" : " "
+            }`}
             onClick={() => setYear(2025)}>
             2025
           </button>

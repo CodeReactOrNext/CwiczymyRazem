@@ -43,8 +43,9 @@ const LeadboardRow = ({
   };
 
   return (
-    <li className='flex w-full justify-center p-7 text-xs xs:text-base'>
-      <p className={`flex items-center justify-end font-semibold xxs:text-lg xs:text-4xl lg:text-5xl xl:w-[100px] xl:text-6xl
+    <li className='flex w-full justify-center p-8 text-xs xs:text-base'>
+      <p
+        className={`flex items-center justify-end font-semibold xxs:text-lg xs:text-4xl lg:text-5xl xl:w-[100px] xl:text-6xl
          ${profileId === currentUserId ? "text-blue-400" : "text-gray-400"}`}>
         {place + "."}
       </p>
@@ -53,15 +54,16 @@ const LeadboardRow = ({
           <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
         </div>
 
-        <div className={`group mr-5 grid w-full grid-cols-3 grid-rows-2 justify-items-center 
-          border-b-2 bg-opacity-75 radius-default transition-all duration-200 
-          hover:bg-opacity-90 sm:grid-rows-3 md:h-16 md:grid-rows-1 lg:px-2
-          ${place === 1 ? "border-yellow-500 bg-yellow-900/40 hover:bg-yellow-900/60" : ""}
-          ${place === 2 ? "border-gray-400 bg-gray-800/40 hover:bg-gray-800/60" : ""}
-          ${place === 3 ? "border-yellow-700 bg-yellow-950/40 hover:bg-yellow-950/60" : ""}
-          ${profileId === currentUserId 
-            ? "border-blue-500 bg-blue-900/20 hover:bg-blue-900/40 shadow-lg shadow-blue-500/20" 
-            : "border-gray-700 bg-gray-900/40 hover:bg-gray-800/60"}
+        <div
+          className={`md:h-18 group mr-5 grid w-full grid-cols-3 grid-rows-2 
+          justify-items-center rounded-md border bg-opacity-75 transition-all 
+          duration-200 hover:bg-opacity-90 sm:grid-rows-3 md:grid-rows-1 lg:px-2
+        
+          ${
+            profileId === currentUserId
+              ? "border-blue-500 bg-blue-900/20 shadow-lg shadow-blue-500/20 hover:bg-blue-900/40"
+              : "border-second-400/60 bg-second hover:bg-gray-800/60"
+          }
         `}>
           <div className='relative top-[-23px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
@@ -82,9 +84,10 @@ const LeadboardRow = ({
                 <FaExternalLinkAlt className='ml-2 text-xs opacity-0 group-hover:opacity-100' />
               </p>
             </Link>
+
             <DaySince date={new Date(statistics.lastReportDate)} />
 
-            <div className='absolute top-[-30px] hidden items-center gap-x-1 md:right-[-50px] md:flex lg:right-[-0px] xl:right-[-50px]'>
+            <div className='absolute top-[-30px] hidden items-center gap-x-1 md:right-[-50px] md:flex lg:right-[-0px] xl:right-[-70px]'>
               <p className='text-xl uppercase text-gray-400 drop-shadow'>
                 Lvl{" "}
               </p>
@@ -94,12 +97,13 @@ const LeadboardRow = ({
             </div>
           </div>
 
-          <div className='col-span-3 flex h-full w-full items-center justify-evenly 
-            border-y-2 border-gray-800/30 bg-black/20 backdrop-blur-sm
+          <div
+            className='col-span-3 flex h-full w-full items-center justify-evenly 
+            border-y-2 border-gray-800/30 bg-black/20
             md:col-span-1 md:w-[300px] md:justify-center md:border-y-0 md:bg-transparent'>
             <div className='flex flex-col items-center md:justify-end md:px-2'>
               <p className='text-xl xxs:text-3xl'>{statistics.points}</p>
-              <p className='font-openSans text-xs font-bold leading-[15px] text-gray-400'>
+              <p className='font-openSans text-xs  leading-[15px] text-secondText'>
                 {t("points")}
               </p>
             </div>
@@ -109,7 +113,7 @@ const LeadboardRow = ({
                   time.creativity + time.hearing + time.technique + time.theory
                 )}
               </p>
-              <p className='font-openSans text-xs font-bold leading-[15px] text-gray-400'>
+              <p className='font-openSans text-xs  leading-[15px] text-secondText'>
                 {t("exercise_time")}
               </p>
             </div>

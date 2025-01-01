@@ -1,13 +1,16 @@
 import { convertMsToHMObject } from "utils/converter";
-import { FaPause, FaPlay } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { VscDebugStart, VscDebugPause } from "react-icons/vsc";
 
 interface CategoryBox {
   title: string;
   chosen?: boolean;
   time: number;
   percent: number;
-  onClick: () => void;
+  timerEnabled: boolean;
+  skillColor: string;
+  onStart: () => void;
+  onStop: () => void;
 }
 
 const CategoryBox = ({
@@ -15,57 +18,58 @@ const CategoryBox = ({
   chosen,
   time,
   percent,
-  onClick,
+  onStart,
+  onStop,
+  skillColor,
   timerEnabled,
-  onStartStop,
-}: CategoryBox & {
-  timerEnabled?: boolean;
-  onStartStop?: () => void;
-}) => {
+}: CategoryBox) => {
   const { t } = useTranslation("timer");
   const timeObject = convertMsToHMObject(time);
-  
+
   return (
     <div
-      className={`m-2 flex w-40 flex-col items-center justify-center p-6 rounded-lg transition-all
-        ${chosen 
-          ? "bg-gray-800 text-white shadow-lg" 
-          : "bg-gray-900 text-gray-300 hover:bg-gray-800"
-        }`}
-    >
-      <p className="text-2xl font-bold mb-1">
-        {percent ? Math.round(percent) : 0}%
+      className={`w m-2 flex flex-col  justify-center rounded-lg border border-dashed  bg-second p-6 px-12 transition-all
+        ${
+          chosen
+            ? "text-whit !border-solid  border-white bg-second"
+            : " border-second-200  text-secondText transition-colors hover:bg-second-400"
+        }`}>
+      <p className='mb-3 flex items-center gap-2 font-openSans text-xl font-semibold '>
+        {title}{" "}
+        <span
+          className={`  inline-flex h-2 w-2 rounded-full bg-[${skillColor}] ${
+            timerEnabled && chosen ? "animate-pulse" : ""
+          }`}></span>
       </p>
-      <p className="text-lg mb-1 font-medium">{title}</p>
-      <p className="text-sm text-gray-400 mb-3">
-        {timeObject.hours}:{timeObject.minutes}
+      <p className='mb-1 font-openSans text-sm font-normal'>
+        Procent:{" "}
+        <span className='font-semibold text-white'>
+          {percent ? Math.round(percent) : 0}%
+        </span>
       </p>
-      
-      {chosen ? (
-        <button
-          onClick={onStartStop}
-          className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors"
-        >
-          {timerEnabled ? (
-            <>
-              <FaPause size={14} />
-              {t("pause")}
-            </>
-          ) : (
-            <>
-              <FaPlay size={14} />
-              {t("start")}
-            </>
-          )}
-        </button>
-      ) : (
-        <button
-          onClick={onClick}
-          className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors"
-        >
-          {t("choose")}
-        </button>
-      )}
+
+      <p className='mb-1 font-openSans text-sm font-normal'>
+        Czas:{" "}
+        <span className='font-semibold text-white'>
+          {timeObject.hours}:{timeObject.minutes}
+        </span>
+      </p>
+
+      <button
+        onClick={timerEnabled && chosen ? onStop : onStart}
+        className='${} mt-5 flex items-center justify-center gap-2 rounded-md bg-white  px-4 py-1 font-openSans text-black transition-colors transition-colors first-letter:uppercase hover:bg-white/80 '>
+        {timerEnabled && chosen ? (
+          <>
+            <VscDebugPause />
+            {t("pause")}
+          </>
+        ) : (
+          <>
+            <VscDebugStart />
+            {t("start")}
+          </>
+        )}
+      </button>
     </div>
   );
 };

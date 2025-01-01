@@ -22,8 +22,8 @@ const LeadboardLayout = ({
 }: LeadboardLayoutProps) => {
   return (
     <MainContainer title={"Leadboard"}>
-      <ul className='bg-gray-950 min-h-screen'>
-        <div className='sticky top-0 z-10 flex w-full justify-end bg-gray-900/50 p-2 px-4 backdrop-blur-sm'>
+      <ul className='min-h-screen'>
+        <div className='sticky top-0 z-10 flex w-full justify-end  p-2 px-4 backdrop-blur-sm'>
           <SortBySwitch setSortBy={setSortBy} sortBy={sortBy} />
         </div>
 

@@ -10,7 +10,13 @@ interface InputTimeProps {
   max?: number;
 }
 
-const InputTime = ({ name, description, addZero, min = 0, max = 99 }: InputTimeProps) => {
+const InputTime = ({
+  name,
+  description,
+  addZero,
+  min = 0,
+  max = 99,
+}: InputTimeProps) => {
   const [field, meta, helpers] = useField(name);
 
   const addValue = (value: number) => {
@@ -41,40 +47,38 @@ const InputTime = ({ name, description, addZero, min = 0, max = 99 }: InputTimeP
   };
 
   return (
-    <div className="flex flex-col items-center gap-y-2 p-4 bg-gray-800 rounded-lg shadow-lg">
-      <label className="text-center text-sm text-gray-300 mb-2" htmlFor={name}>
+    <div className='flex flex-col items-center gap-y-2 rounded-lg bg-gray-800 p-4 shadow-lg'>
+      <label className='mb-2 text-center text-sm text-gray-300' htmlFor={name}>
         {description}
       </label>
-      <div className="flex flex-col items-center">
+      <div className='flex flex-col items-center'>
         <button
-          type="button"
+          type='button'
           onClick={() =>
             addZero
               ? helpers.setValue(addZeroToTime(addValue(field.value)))
               : helpers.setValue(addValue(field.value))
           }
-          className="btn btn-circle btn-sm bg-gray-700 hover:bg-gray-600 text-white mb-2"
-        >
+          className='btn btn-circle btn-sm mb-2 bg-gray-700 text-white hover:bg-gray-600'>
           <FaChevronUp />
         </button>
         <input
           id={name}
-          className="w-16 bg-gray-900 text-center text-xl font-bold text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          type="text"
-          placeholder="00"
+          className='w-16 rounded-md bg-gray-900 py-2 text-center text-xl font-bold text-white focus:outline-none focus:ring-2 focus:ring-second-100'
+          type='text'
+          placeholder='00'
           value={field.value}
           onChange={handleInputChange}
           onBlur={handleInputBlur}
         />
         <button
-          type="button"
+          type='button'
           onClick={() =>
             addZero
               ? helpers.setValue(addZeroToTime(minusValue(field.value)))
               : helpers.setValue(minusValue(field.value))
           }
-          className="btn btn-circle btn-sm bg-gray-700 hover:bg-gray-600 text-white mt-2"
-        >
+          className='btn btn-circle btn-sm mt-2 bg-gray-700 text-white hover:bg-gray-600'>
           <FaChevronDown />
         </button>
       </div>

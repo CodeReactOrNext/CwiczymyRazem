@@ -2,10 +2,10 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "components/UI";
-import Metronom from "components/Metronom/";
 import Stopwatch from "./components/Stopwatch";
 import BeginnerMsg from "components/BeginnerMsg";
 import CategoryBox from "./components/CategoryBox";
+import { MdAccessTime } from "react-icons/md";
 
 import { SkillsType } from "types/skillsTypes";
 import { useTimerInterface } from "hooks/useTimer";
@@ -13,6 +13,9 @@ import { convertMsToHM, calculatePercent } from "utils/converter";
 import { TimerInterface } from "types/api.types";
 import ExercisePlan from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import MainContainer from "components/MainContainer";
+import IconBox from "components/IconBox";
+import BlinkingDot from "layouts/TimerLayout/components/BlinkingDot";
+import { skillColors } from "layouts/TimerLayout/components/Stopwatch/Stopwatch";
 
 interface TimerLayoutProps {
   timer: useTimerInterface;
@@ -52,73 +55,95 @@ const TimerLayout = ({
     timerData.technique;
 
   return (
-    <MainContainer title={t("title")}>
+    <MainContainer title={"Ćwicz"}>
       <div className='mb-10 flex flex-col items-center justify-center '>
-        <div className='flex w-full flex-row items-center gap-5 p-5 radius-default md:w-auto md:flex-col '>
-          <div className='order-3 flex  flex-col gap-5  p-4 text-center font-openSans md:order-none  md:flex-row  md:text-2xl'>
-            <p className='flex flex-col text-sm xs:text-base '>
-              <span className='content-box'>{t("total_time")} </span>
-              <span className='content-boxtext-tertiary m-1'>
-                {convertMsToHM(sumTime)}
+        <div className='flex w-auto flex-col  gap-5 p-5 radius-default md:flex-row '>
+          <Stopwatch time={time} timerData={timerData} />
+          <div className='flex  flex-col gap-5 p-4 font-openSans md:order-none  md:flex-col  md:text-2xl'>
+            <div className='flex min-w-[200px] flex-col border border-second-400/60 bg-second-500 p-4 radius-default xs:text-base '>
+              <span className='text-sm text-secondText'>
+                {t("total_time")}{" "}
               </span>
-            </p>
-            <p className='flex flex-col text-sm xs:text-base'>
-              <span className='content-box'> {t("currently_exercising")}</span>
+              <div className='flex items-center'>
+                <IconBox Icon={MdAccessTime} small />
 
-              <span className='m-1 text-tertiary'>
-                {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
+                <span className=' m-1 font-sans text-2xl tracking-wider'>
+                  {convertMsToHM(sumTime)}
+                </span>
+              </div>
+            </div>
+
+            <div className='flex flex-col border border-second-400/60 bg-second-500 p-4 radius-default xs:text-base'>
+              <span className='text-sm text-secondText'>
+                {t("currently_exercising")}
               </span>
-            </p>
+              <div className='flex items-center gap-1'>
+                <BlinkingDot isActive={timerEnabled} />
+
+                <span className='m-1 font-openSans  text-lg'>
+                  {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
+                </span>
+              </div>
+            </div>
           </div>
-          <Stopwatch
-            time={time}
-            timerEnabled={timerEnabled}
-            startTimer={startTimer}
-            stopTimer={stopTimer}
-            isSkillChosen={!!chosenSkill}
-            chosenSkill={chosenSkill}
-            timerData={timerData}
-          />
         </div>
+
         <div className='mt-5 flex w-full flex-row flex-wrap justify-evenly md:w-[570px] md:justify-center lg:w-full '>
           <CategoryBox
             title={t("technique")}
             time={timerData.technique}
-            onClick={() => {
+            skillColor={skillColors.technique}
+            timerEnabled={timerEnabled}
+            onStart={() => {
               choseSkillHandler("technique");
+              startTimer();
             }}
+            onStop={stopTimer}
             percent={calculatePercent(timerData.technique, sumTime)}
             chosen={chosenSkill === "technique"}
           />
+
           <CategoryBox
             title={t("theory")}
+            skillColor={skillColors.theory}
             time={timerData.theory}
-            onClick={() => {
-              choseSkillHandler("theory");
-            }}
+            timerEnabled={timerEnabled}
             percent={calculatePercent(timerData.theory, sumTime)}
             chosen={chosenSkill === "theory"}
+            onStart={() => {
+              choseSkillHandler("theory");
+              startTimer();
+            }}
+            onStop={stopTimer}
           />
           <CategoryBox
             title={t("hearing")}
+            skillColor={skillColors.hearing}
             time={timerData.hearing}
-            onClick={() => {
+            timerEnabled={timerEnabled}
+            onStart={() => {
               choseSkillHandler("hearing");
+              startTimer();
             }}
+            onStop={stopTimer}
             percent={calculatePercent(timerData.hearing, sumTime)}
             chosen={chosenSkill === "hearing"}
           />
           <CategoryBox
             title={t("creativity")}
+            skillColor={skillColors.creativity}
             time={timerData.creativity}
-            onClick={() => {
+            timerEnabled={timerEnabled}
+            onStart={() => {
               choseSkillHandler("creativity");
+              startTimer();
             }}
+            onStop={stopTimer}
             percent={calculatePercent(timerData.creativity, sumTime)}
             chosen={chosenSkill === "creativity"}
           />
         </div>
-        <ExercisePlan />
+        {/* <ExercisePlan /> TODO */}
         <BeginnerMsg />
         <p className='p-4 text-center  font-openSans text-xs sm:text-base'>
           {t("info_about_repot ")}

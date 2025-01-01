@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import { appWithTranslation } from "next-i18next";
 import { store } from "store/store";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
+import NextTopLoader from "nextjs-toploader";
 
 import "styles/globals.css";
 import { Toaster } from "sonner";
@@ -49,7 +50,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Script>
       <ThemeModeProvider>
         <Toaster theme='dark' position='top-right' />
-
+        <NextTopLoader color='#ff3e4b' />
         <div id='overlays'></div>
         <main className={`  ${teko.variable} ${inter.variable} `}>
           <Component {...pageProps} />
