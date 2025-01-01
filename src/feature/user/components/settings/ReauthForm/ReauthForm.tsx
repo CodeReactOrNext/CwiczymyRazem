@@ -3,13 +3,15 @@ import { useAppSelector } from "store/hooks";
 import { FaAt, FaLock } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 
-import { Input, Button } from "components/UI";
+import { Input } from "components/UI";
 import Backdrop from "components/Backdrop";
 import FormLayout from "layouts/FormLayout";
 
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
+import { Loader2 } from "lucide-react";
+import { Button } from "assets/components/ui/button";
 
 interface ReauthFormInteface {
   changeCredentialsHandler: (data: UpdatedUserCredentials) => Promise<void>;
@@ -58,7 +60,8 @@ const ReauthForm = ({
                       placeholder={t("common:input.password")}
                     />
                     <div className='flex space-x-1 '>
-                      <Button loading={isFetching} type='submit'>
+                      <Button type='submit'>
+                        {isFetching && <Loader2 className='animate-spin' />}
                         {t("common:button.sign_in")}
                       </Button>
                     </div>

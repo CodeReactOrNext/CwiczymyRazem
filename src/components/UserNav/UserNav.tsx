@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { useAppDispatch } from "store/hooks";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
+import { Button, buttonVariants } from "assets/components/ui/button";
 
 interface UserNavProps {
   flexDirection?: "row" | "col";
@@ -19,14 +20,18 @@ const UserNav = ({ flexDirection }: UserNavProps) => {
           ? "flex-col items-start justify-center"
           : "flex-row justify-around"
       }`}>
-      <Link href='/settings'>
-        <button className='active:click-behavior'>{t("button.edit")}</button>
+      <Link
+        href='/settings'
+        className={buttonVariants({ variant: "outline", size: "sm" })}>
+        {t("button.edit")}
       </Link>
-      <button
-        className=' active:click-behavior'
+
+      <Button
+        variant='outline'
+        size='sm'
         onClick={() => dispatch(logUserOff())}>
         {t("button.logout")}
-      </button>
+      </Button>
     </div>
   );
 };

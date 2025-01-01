@@ -1,5 +1,7 @@
 import ExercisePlanLayout from "layouts/ExercisePlanLayout/ExercisePlanLayout";
 import { exerciseInterface } from "../ExercisePlan/ExercisePlan";
+import { IoIosReturnLeft } from "react-icons/io";
+import { Button } from "assets/components/ui/button";
 
 interface ExerciseTodoProps {
   exercisesArr: exerciseInterface[];
@@ -20,11 +22,10 @@ const ExerciseTodo = ({ backFn, exercisesArr }: ExerciseTodoProps) => {
       ))}
 
       <div className='m-3  flex flex-row justify-center gap-5 p-3 text-base '>
-        <button
-          className='rounded-md bg-white p-1 py-2 text-second'
-          onClick={backFn}>
+        <Button variant='outline' onClick={backFn}>
+          <IoIosReturnLeft />
           Wróć
-        </button>
+        </Button>
       </div>
     </>
   );

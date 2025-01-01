@@ -4,7 +4,7 @@ import UserNav from "components/UserNav";
 import LevelBar from "components/LevelBar";
 import NavDecoration from "./components/NavDecoration";
 import WelcomeMessage from "./components/WelcomeMessage";
-import { ThemeToggle, LanguageSwitch } from "components/UI";
+import { LanguageSwitch } from "components/UI";
 
 import { StatisticsDataInterface } from "types/api.types";
 import CopyLinkProfile from "components/CopyLinkProfile";
@@ -31,9 +31,11 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
         <div className='flex flex-row items-center gap-5 lg:gap-4 xl:gap-8 '>
           <div className='scale-75 sm:scale-100 lg:mr-4'>
             <Logo />
-            <Avatar avatarURL={avatar} name={userName} lvl={lvl} />
-            <div className='mt-3'>
-              <UserNav />
+            <div className='flex flex-col items-center'>
+              <Avatar avatarURL={avatar} name={userName} lvl={lvl} />
+              <div className='mt-3'>
+                <UserNav />
+              </div>
             </div>
           </div>
           <WelcomeMessage

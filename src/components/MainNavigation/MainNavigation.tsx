@@ -6,7 +6,7 @@ import { FaBars } from "react-icons/fa";
 import NavLink from "./component/NavLink";
 import HamburgerLayout from "layouts/HamburgerLayout";
 import { layoutVariant } from "layouts/MainLayout/MainLayout";
-import { LanguageSwitch, ThemeToggle } from "components/UI";
+import { LanguageSwitch } from "components/UI";
 
 interface MainNavigationProps {
   variant: layoutVariant;
@@ -65,13 +65,11 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
           </li>
           <li className=' right-0 m-1 flex flex-col items-center gap-4'>
             <LanguageSwitch />
-            <ThemeToggle />
           </li>
         </HamburgerLayout>
       )}
       <div className='absolute right-2 top-2 hidden flex-col items-end gap-3 lg:flex'>
         <LanguageSwitch />
-        <ThemeToggle />
       </div>
     </nav>
   );

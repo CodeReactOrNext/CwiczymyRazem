@@ -4,7 +4,7 @@ import { FaAt, FaLock } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 
 import FormLayout from "layouts/FormLayout";
-import { Input, Button, GoogleButton } from "components/UI";
+import { Input, GoogleButton } from "components/UI";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectIsFetching } from "feature/user/store/userSlice";
@@ -13,6 +13,8 @@ import {
   logInViaEmail,
   logInViaGoogle,
 } from "feature/user/store/userSlice.asyncThunk";
+import { Button } from "assets/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 export interface logInCredentials {
   email: string;
@@ -58,11 +60,12 @@ const LoginView = () => {
               placeholder={t("common:input.password")}
             />
             <div className='flex space-x-1 '>
-              <Button type='submit' loading={isFetching}>
+              <Button size='lg' type='submit'>
+                {isFetching && <Loader2 className='animate-spin' />}
                 {t("common:button.sign_in")}
               </Button>
               <Link href='/signup'>
-                <Button variant='secondary'>
+                <Button variant='secondary' size='lg'>
                   {t("common:button.sign_up")}
                 </Button>
               </Link>
