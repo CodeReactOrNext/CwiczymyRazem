@@ -2,16 +2,15 @@ import { toast } from "sonner";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-
 import Avatar from "components/Avatar";
-
 import { uploadUserAvatar } from "feature/user/store/userSlice.asyncThunk";
 import {
   selectIsFetching,
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
-import { Button } from "components/UI";
+import { Button } from "assets/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const AvatarChange = () => {
   const [avatarIsValid, setAvatarIsValid] = useState(false);
@@ -75,15 +74,16 @@ const AvatarChange = () => {
             accept='image/png, image/jpeg'
             className='text-base'
           />
-          <p className='font-openSans text-xs font-bold '>
+          <p className='mt-2 font-openSans text-xs text-secondText  '>
             {t("settings:resolution_info")}
           </p>
         </div>
         <Button
-          disabled={!avatarIsValid}
-          variant='small'
+          className='mt-4'
+          disabled={!avatarIsValid || isFetching}
           type='submit'
-          loading={isFetching}>
+          size='sm'>
+          {isFetching && <Loader2 className='animate-spin' />}
           {t("settings:save")}
         </Button>
       </form>

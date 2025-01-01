@@ -1,4 +1,6 @@
-import { Button, Input } from "components/UI";
+import { Button } from "assets/components/ui/button";
+import { Input } from "components/UI";
+import { Loader2 } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
 import { IconType } from "react-icons";
@@ -32,11 +34,9 @@ const FieldBox = ({
         {Icon && <Icon size={35} />}
         <Input placeholder={value!} name={inputName} />
         <Button
-          variant='small'
-          loading={isFetching}
           disabled={Boolean(!values[inputName] || errors[inputName])}
-          onClick={submitHandler}
-          type='button'>
+          onClick={submitHandler}>
+          {isFetching && <Loader2 className='animate-spin' />}
           {t("settings:save")}
         </Button>
       </div>

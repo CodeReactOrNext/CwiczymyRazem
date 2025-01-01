@@ -3,7 +3,7 @@ import { Form, Formik } from "formik";
 import { useTranslation } from "react-i18next";
 import { FaUserAlt, FaLock, FaAt, FaArrowLeft } from "react-icons/fa";
 
-import { Input, Button, GoogleButton } from "components/UI";
+import { Input, GoogleButton } from "components/UI";
 import FormLayout from "layouts/FormLayout";
 
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -13,6 +13,8 @@ import {
   logInViaGoogle,
 } from "feature/user/store/userSlice.asyncThunk";
 import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
+import { Button } from "assets/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 export interface SignUpCredentials {
   login: string;
@@ -77,7 +79,9 @@ const SingupView = () => {
               name={"repeat_password"}
             />
             <div className='flex space-x-1 '>
-              <Button loading={isFetching} type='submit'>
+              <Button type='submit'>
+                {isFetching && <Loader2 className='animate-spin' />}
+
                 {t("common:button.sign_up")}
               </Button>
             </div>
