@@ -15,6 +15,7 @@ import {
 import { firebaseUploadExercisePlan } from "utils/firebase/client/firebase.utils";
 import { exerciseSchema } from "./ExerciseEdit.schema";
 import { toast } from "sonner";
+import { Button } from "assets/components/ui/button";
 
 interface ExcerisePlanProps {
   backHandler: () => void;
@@ -146,20 +147,18 @@ const ExceriseAdd = ({ backHandler }: ExcerisePlanProps) => {
                                   <button
                                     type='button'
                                     onClick={() => remove(index)}
-                                    className='p-2 text-red-400 transition-colors hover:scale-110 hover:text-red-300'
+                                    className='p-2 text-red-500 transition-colors hover:scale-110 hover:text-red-300'
                                     title='Usuń ćwiczenie'>
                                     <FaTimes size={22} />
                                   </button>
                                 </div>
                               </div>
                             ))}
-                          <button
-                            type='button'
-                            className='btn w-full gap-2'
+                          <Button
+                            variant='outline'
                             onClick={() => addNewExercise(push)}>
-                            <FaPlus className='animate-pulse' /> Dodaj nowe
-                            ćwiczenie
-                          </button>
+                            <FaPlus /> Dodaj nowe ćwiczenie
+                          </Button>
                         </div>
                       </div>
 
@@ -182,17 +181,10 @@ const ExceriseAdd = ({ backHandler }: ExcerisePlanProps) => {
                       </div>
 
                       <div className='modal-action mt-6 flex justify-end gap-3'>
-                        <button
-                          type='button'
-                          className='btn btn-outline '
-                          onClick={backHandler}>
+                        <Button variant='outline' onClick={backHandler}>
                           Anuluj
-                        </button>
-                        <button
-                          type='submit'
-                          className='0 btn transition-colors'>
-                          Zapisz plan
-                        </button>
+                        </Button>
+                        <Button>Zapisz plan</Button>
                       </div>
                     </Form>
                   )}

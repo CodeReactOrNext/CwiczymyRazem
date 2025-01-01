@@ -15,8 +15,8 @@ const NavLink = ({ href, name, isCurrentPage }: NavLinkProps) => {
         className={`rounded-md p-1  px-6 tracking-wide sm:px-4 
           ${
             isCurrentPage
-              ? "bg-second-500 text-mainText shadow-sm"
-              : "text-second-400  hover:text-second-800"
+              ? "bg-second-400 text-mainText shadow-sm"
+              : "text-second-400  hover:text-second-900"
           } 
           transition-colors  duration-200`}>
         {name}

@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-
-import { Button } from "components/UI";
-
 import { restartUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { selectIsFetching } from "feature/user/store/userSlice";
+import { Button } from "assets/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const StatisticsRestart = () => {
   const { t } = useTranslation(["common", "toast", "settings"]);
@@ -23,7 +22,9 @@ const StatisticsRestart = () => {
           <p className='font-openSans text-sm font-bold '>
             {t("settings:reset_warning")}
           </p>
-          <Button variant='small' onClick={() => setRestartConfirmShow(true)}>
+          <Button
+            variant='destructive'
+            onClick={() => setRestartConfirmShow(true)}>
             {t("settings:reset")}
           </Button>
         </>
@@ -33,14 +34,13 @@ const StatisticsRestart = () => {
           <p className=' text-lg'>{t("settings:reset_approve_info")}</p>
           <div className='flex flex-row justify-center gap-3'>
             <Button
-              variant='small'
-              loading={isFetching}
+              variant={"destructive"}
               onClick={() => dispatch(restartUserStats())}>
+              {isFetching && <Loader2 className='animate-spin' />}
+
               {t("settings:reset")}
             </Button>
-            <Button
-              variant='small'
-              onClick={() => setRestartConfirmShow(false)}>
+            <Button onClick={() => setRestartConfirmShow(false)}>
               {t("settings:back")}
             </Button>
           </div>

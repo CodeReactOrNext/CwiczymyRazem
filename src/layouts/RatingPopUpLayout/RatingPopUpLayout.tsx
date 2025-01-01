@@ -2,7 +2,6 @@ import Image from "next/image";
 import FireSVG from "public/static/images/svg/Fire";
 import Lightning from "public/static/images/svg/Lightning";
 import blackGuitar from "public/static/images/guitar_black.png";
-import { Button } from "components/UI";
 
 import OldEffect from "components/OldEffect";
 import BonusPointsItem from "./components/BonusPointsItem";
@@ -14,6 +13,7 @@ import { motion } from "framer-motion";
 import { StatisticsDataInterface } from "types/api.types";
 import { getPointsToLvlUp } from "utils/gameLogic";
 import LevelIndicator from "./components/LevelIndicator";
+import { Button } from "assets/components/ui/button";
 
 export interface BonusPointsInterface {
   timePoints: number;

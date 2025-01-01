@@ -12,6 +12,8 @@ import ExerciseAdd from "../ExerciseAdd";
 import ExercisePlanLayout from "layouts/ExercisePlanLayout/ExercisePlanLayout";
 import ExerciseEdit from "../ExerciseAdd/ExerciseEdit";
 import { CircleSpinner, SpiralSpinner } from "react-spinners-kit";
+import { Button } from "assets/components/ui/button";
+import { IoIosReturnLeft } from "react-icons/io";
 
 interface ExercisesBoxShow {
   index?: number;
@@ -64,11 +66,10 @@ const ExerciseBox = () => {
           />
         ))}
         <div className='m-3 flex flex-row justify-center gap-5 rounded-sm p-3 text-base '>
-          <button
-            className='rounded-md bg-white p-1 py-2 text-second'
-            onClick={refreshBox}>
+          <Button variant='outline' onClick={refreshBox}>
+            <IoIosReturnLeft />
             Wróć
-          </button>
+          </Button>
         </div>
       </>
     );
@@ -91,13 +92,12 @@ const ExerciseBox = () => {
             }}
           />
         ))}
-        <div>
-          <button
-            className='btn'
+        <div className='mt-6'>
+          <Button
             //@ts-ignore
             onClick={() => document?.getElementById("my_modal_3")?.showModal()}>
             <FaPlus /> Dodaj Nowe ćwiczenie
-          </button>
+          </Button>
         </div>
         <ExerciseAdd
           backHandler={() =>

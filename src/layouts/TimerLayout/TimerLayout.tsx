@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "components/UI";
 import Stopwatch from "./components/Stopwatch";
 import BeginnerMsg from "components/BeginnerMsg";
 import CategoryBox from "./components/CategoryBox";
@@ -16,6 +15,7 @@ import MainContainer from "components/MainContainer";
 import IconBox from "components/IconBox";
 import BlinkingDot from "layouts/TimerLayout/components/BlinkingDot";
 import { skillColors } from "layouts/TimerLayout/components/Stopwatch/Stopwatch";
+import { Button } from "assets/components/ui/button";
 
 interface TimerLayoutProps {
   timer: useTimerInterface;
