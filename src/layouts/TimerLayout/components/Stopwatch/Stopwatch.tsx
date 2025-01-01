@@ -1,65 +1,82 @@
-import { useTranslation } from "react-i18next";
-import { FaPause, FaPlay } from "react-icons/fa";
 import { addZeroToTime, convertMsToHMObject } from "utils/converter";
-export interface StopwachProps {
-  time: number;
-  timerEnabled: boolean;
-  isSkillChosen: boolean;
-  startTimer: () => void;
-  stopTimer: () => void;
-}
 
-const Stopwatch = ({
-  time,
-  timerEnabled,
-  startTimer,
-  stopTimer,
-  isSkillChosen,
-}: StopwachProps) => {
-  const { t } = useTranslation("timer");
+export interface StopwatchProps {
+  time: number;
+  timerData: {
+    creativity: number;
+    hearing: number;
+    technique: number;
+    theory: number;
+  };
+}
+export const skillColors = {
+  creativity: "#4CAF50",
+  hearing: "#2196F3",
+  technique: "#FFC107",
+  theory: "#9C27B0",
+};
+
+const Stopwatch = ({ time, timerData }: StopwatchProps) => {
+  const radius = 120;
+  const strokeWidth = 3; 
+  const circumference = 2 * Math.PI * radius;
+  const gap = 8;
+  const getCircleOffset = (skillTime: number) => {
+    const progress = (skillTime / (30 * 60 * 1000)) * 100;
+    return circumference - (progress / 100) * circumference;
+  };
 
   return (
-    <div className='mb-6 grid h-52 w-52 grid-rows-3 items-center rounded-full border-2 border-tertiary-50 bg-main-opposed-700 bg-gradient-to-tr  from-main-opposed-600 to-main-opposed-700 text-7xl tracking-wider  text-tertiary shadow-inset-cool shadow-main-opposed-400 xs:h-64 xs:w-64 sm:text-8xl'>
-      <div className=' row-start-1 flex justify-evenly justify-self-center p-6'>
-        <div className='row-start-1 flex w-10 flex-col items-center  text-lg'>
-          <p className='text-2xl leading-none '>
+    <div className='relative mb-6 h-64 w-64'>
+      <svg
+        className='absolute inset-0 -rotate-90 transform'
+        width='100%'
+        height='100%'
+        viewBox='0 0 264 264'
+        style={{ zIndex: 10 }}>
+        {Object.keys(skillColors).map((skill, index) => {
+          const color = skillColors[skill as keyof typeof skillColors];
+          const r = radius - gap * index;
+          return (
+            <g key={skill}>
+              <circle
+                cx='132'
+                cy='132'
+                r={r}
+                stroke={color}
+                strokeWidth={strokeWidth}
+                fill='none'
+                opacity='0.2'
+              />
+              <circle
+                cx='132'
+                cy='132'
+                r={r}
+                stroke={color}
+                strokeWidth={strokeWidth}
+                fill='none'
+                strokeLinecap='round'
+                style={{
+                  strokeDasharray: circumference,
+                  strokeDashoffset: getCircleOffset(
+                    timerData[skill as keyof StopwatchProps["timerData"]]
+                  ),
+                  transition: "stroke-dashoffset 0.5s ease",
+                }}
+              />
+            </g>
+          );
+        })}
+      </svg>
+
+      <div className='absolute inset-0 flex flex-col items-center justify-center rounded-full  text-white'>
+        <div className='text-center'>
+          <p className='text-6xl font-semibold tracking-wider'>
+            {convertMsToHMObject(time).minutes}:
             {addZeroToTime(convertMsToHMObject(time).seconds)}
           </p>
-          <div
-            className='h-1 bg-main-opposed-50 '
-            style={{ width: convertMsToHMObject(time).seconds }}></div>
-          <p className='font-openSans text-[0.6rem]'>{t("seconds")}</p>
         </div>
       </div>
-      <div className=' row-start-2 flex w-full justify-evenly justify-self-center p-5'>
-        <p>{convertMsToHMObject(time).hours}</p>
-        <span className={`${timerEnabled ? "animate-pulse" : ""} `}>:</span>
-        <p>{convertMsToHMObject(time).minutes}</p>
-      </div>
-
-      {isSkillChosen && (
-        <div className='row-start-3  text-center text-sm text-tertiary'>
-          {timerEnabled ? (
-            <button
-              className='text-mainText hover:text-tertiary active:click-behavior-second'
-              onClick={() => stopTimer()}>
-              <FaPause size={35} />
-              {t("pause")}
-            </button>
-          ) : (
-            <button
-              className='text-mainText hover:text-tertiary active:click-behavior-second '
-              onClick={() => startTimer()}>
-              <FaPlay size={35} /> {t("start")}
-            </button>
-          )}
-        </div>
-      )}
-      {!isSkillChosen && (
-        <p className='m-auto w-24 text-center text-sm text-mainText'>
-          {t("choose")}
-        </p>
-      )}
     </div>
   );
 };

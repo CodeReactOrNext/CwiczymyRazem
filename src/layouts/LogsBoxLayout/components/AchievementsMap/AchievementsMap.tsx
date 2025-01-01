@@ -1,31 +1,39 @@
 import { useTranslation } from "react-i18next";
-
+import { motion } from "framer-motion";
 import { ToolTip } from "components/UI";
 
 import {
   AchievementList,
   achievementsData,
 } from "assets/achievements/achievementsData";
-import { achievementsRarity } from "assets/achievements/achievementsRarity";
+import AchievementCard from "layouts/ProfileLayout/components/Achievement/AchievementCard";
+
 interface AchievementsMapProps {
   userAchievements: AchievementList[];
 }
 
 const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
-  const { t } = useTranslation("achievements");
-
   return (
-    <div className='flex flex-row flex-wrap  items-center gap-7 border-b-2 border-main-opposed-400 py-2 lg:p-3 '>
+    <div className='mt-4 flex flex-row flex-wrap items-center justify-center gap-5'>
       <ToolTip />
-      {achievementsData.map(({ Icon, id, rarity, description }) => {
+      {achievementsData.map(({ Icon, id }, index) => {
         const isUnlocked = userAchievements?.includes(id);
+
         return (
-          <Icon
+          <motion.div
             key={id}
-            className='text-3xl text-black/60  drop-shadow-md'
-            color={isUnlocked ? achievementsRarity[rarity].color : ""}
-            data-tip={isUnlocked ? t(description) : null}
-          />
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.1, delay: index * 0.01 }}
+            className={`rounded-xl p-3 ${isUnlocked ? "" : "bg-second-600"}`}>
+            {isUnlocked && <AchievementCard id={id} />}
+            {!isUnlocked && (
+              <Icon
+                className={`text-3xl transition-all duration-300 ${"text-gray-600 grayscale"}`}
+                data-tip={"Achievement Locked"}
+              />
+            )}
+          </motion.div>
         );
       })}
     </div>

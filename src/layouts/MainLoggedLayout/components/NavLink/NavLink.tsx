@@ -12,13 +12,13 @@ const NavLink = ({ href, name, isCurrentPage }: NavLinkProps) => {
     <Link href={href}>
       <button
         disabled={isCurrentPage}
-        className={`p-1 px-2 tracking-wide radius-default sm:px-4 
+        className={`rounded-md p-1  px-6 tracking-wide sm:px-4 
           ${
             isCurrentPage
               ? "bg-second-500 text-mainText shadow-sm"
-              : "hover:bg-second-400 hover:text-mainText"
+              : "text-second-400  hover:text-second-800"
           } 
-          transition-colors  duration-200 ease-in-out`}>
+          transition-colors  duration-200`}>
         {name}
       </button>
     </Link>

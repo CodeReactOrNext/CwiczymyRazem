@@ -3,7 +3,7 @@ import Fire from "public/static/images/svg/Fire";
 const HeadDecoration = ({ title }: { title: string }) => {
   return (
     <>
-      <div className='relative flex h-0 justify-center sm:hidden '>
+      <div className='relative flex h-0 justify-center sm:hidden z-0 '>
         <Fire className='relative w-[85vw] self-center fill-second-600 ' />
       </div>
       <p className='  p-2 text-center text-2xl text-main-opposed  sm:hidden '>
