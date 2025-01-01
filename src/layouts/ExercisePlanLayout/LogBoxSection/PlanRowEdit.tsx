@@ -43,20 +43,12 @@ const PlanRowEdit = ({
   );
 
   return (
-    <div className='m-2  w-full gap-4 border border-main-opposed-200/70 bg-main-opposed-bg p-4 font-openSans text-sm radius-default hover:bg-main-opposed-800'>
-      <div className='mb-2 flex gap-4'>
-        {isTechnicPresent && (
-          <TechniqueIcon size='small' className='text-secondText' />
-        )}
-        {isHearingPresent && (
-          <HearingIcon size='small' className='text-secondText' />
-        )}
-        {isTheoryPresent && (
-          <TheoryIcon size='small' className='text-secondText' />
-        )}
-        {isCreativityPresent && (
-          <CreativityIcon size='small' className='text-secondText' />
-        )}
+    <div className='m-2  w-full gap-4 border border-second-400/60 bg-main-opposed-bg p-4 font-openSans text-sm radius-default hover:bg-main-opposed-800'>
+      <div className='mb-2 flex w-fit gap-4 rounded-md bg-second-400 p-2'>
+        {isTechnicPresent && <TechniqueIcon className='text-secondText' />}
+        {isHearingPresent && <HearingIcon className='text-secondText' />}
+        {isTheoryPresent && <TheoryIcon className='text-secondText' />}
+        {isCreativityPresent && <CreativityIcon className='text-secondText' />}
       </div>
       <p className='text-lg font-semibold' onClick={showExercise}>
         {exercise.title}

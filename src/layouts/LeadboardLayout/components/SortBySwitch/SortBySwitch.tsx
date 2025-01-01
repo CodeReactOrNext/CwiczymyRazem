@@ -11,22 +11,26 @@ function SortBySwitch({ setSortBy, sortBy }: SortBySwitchInterface) {
   const { t } = useTranslation("common");
 
   return (
-    <div className='content-box flex w-[300px] items-center justify-center gap-2 px-2 text-xs text-mainText xs:text-sm sm:text-base '>
-      <p className='text-tertiary-500'>{t("sort.sort_by")}</p>
+    <div className='flex  items-center justify-center gap-2 rounded-md bg-second-300 p-1 px-2 font-openSans text-xs text-mainText xs:text-sm sm:text-base  '>
+      <p className=' text-[12px] text-secondText'>{t("sort.sort_by")}</p>
       <button
         onClick={() => setSortBy("points")}
-        className={` px-2 ${sortBy === "points" ? " bg-second-400" : ""}`}>
+        className={`tab rounded-md text-[12px] font-medium transition-colors hover:text-white ${
+          sortBy === "points" ? "bg-second text-white" : " "
+        }`}>
         {t("sort.points")}
       </button>
       <button
         onClick={() => setSortBy("time")}
-        className={` px-2 ${sortBy === "time" ? " bg-second-400" : ""}`}>
+        className={`tab rounded-md text-[12px] font-medium transition-colors hover:text-white ${
+          sortBy === "time" ? "bg-second text-white" : " "
+        }`}>
         {t("sort.time")}
       </button>
       <button
         onClick={() => setSortBy("sessionCount")}
-        className={` px-2 ${
-          sortBy === "sessionCount" ? " bg-second-400" : ""
+        className={`tab rounded-md text-[12px] font-medium transition-colors hover:text-white ${
+          sortBy === "sessionCount" ? "bg-second text-white" : " "
         }`}>
         {t("sort.session_count")}
       </button>

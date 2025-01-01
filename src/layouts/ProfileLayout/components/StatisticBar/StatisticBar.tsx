@@ -15,7 +15,7 @@ const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
           style={{ height: percentValue + "%" }}
         />
       </div>
-      <p className='my-2 w-full border-b border-white/20 px-3  pb-2  text-center text-[0.6rem] tracking-wider xs:text-xs sm:px-10 sm:text-sm md:px-9 lg:px-6 xl:px-8 '>
+      <p className='my-2 w-full px-3  pb-2  text-center text-[0.6rem] tracking-wider xs:text-xs sm:px-10 sm:text-sm md:px-9 lg:px-6 xl:px-8 '>
         {value}
       </p>
       <p className='text-center text-[0.6rem]  text-secondText xs:text-xs sm:text-sm'>

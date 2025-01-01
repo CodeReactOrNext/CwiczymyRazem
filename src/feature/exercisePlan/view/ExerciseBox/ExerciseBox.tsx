@@ -63,8 +63,12 @@ const ExerciseBox = () => {
             type={item.category}
           />
         ))}
-        <div className='m-3 flex flex-row justify-center gap-5 bg-main-opposed-500/20 p-3 text-base '>
-          <button onClick={refreshBox}>Wróć</button>
+        <div className='m-3 flex flex-row justify-center gap-5 rounded-sm p-3 text-base '>
+          <button
+            className='rounded-md bg-white p-1 py-2 text-second'
+            onClick={refreshBox}>
+            Wróć
+          </button>
         </div>
       </>
     );
@@ -87,7 +91,7 @@ const ExerciseBox = () => {
             }}
           />
         ))}
-        <div className='bg-main-opposed-300/20 p-3 text-xs '>
+        <div>
           <button
             className='btn'
             //@ts-ignore

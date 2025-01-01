@@ -1,11 +1,16 @@
 import { convertMsToHMObject } from "utils/converter";
+import { useTranslation } from "react-i18next";
+import { VscDebugStart, VscDebugPause } from "react-icons/vsc";
 
 interface CategoryBox {
   title: string;
   chosen?: boolean;
   time: number;
   percent: number;
-  onClick: () => void;
+  timerEnabled: boolean;
+  skillColor: string;
+  onStart: () => void;
+  onStop: () => void;
 }
 
 const CategoryBox = ({
@@ -13,37 +18,58 @@ const CategoryBox = ({
   chosen,
   time,
   percent,
-  onClick,
+  onStart,
+  onStop,
+  skillColor,
+  timerEnabled,
 }: CategoryBox) => {
+  const { t } = useTranslation("timer");
   const timeObject = convertMsToHMObject(time);
+
   return (
     <div
-      className={`m-2 flex w-28 flex-col items-center justify-center border-2 border-second-300 p-6 text-xl  radius-default xs:m-4 xs:text-2xl   xsm:w-40 md:m-6 md:w-44 ${
-        chosen
-          ? "border-tertiary-300 bg-tertiary text-main-opposed"
-          : "bg-second text-tertiary"
-      } `}>
-      <p
-        className={`text-2xl text-main-opposed xs:text-2xl ${
-          chosen ? "text-main-900" : "text-main-opposed"
-        } `}>
-        {percent ? percent : 0}%
+      className={`w m-2 flex flex-col  justify-center rounded-lg border border-dashed  bg-second p-6 px-12 transition-all
+        ${
+          chosen
+            ? "text-whit !border-solid  border-white bg-second"
+            : " border-second-200  text-secondText transition-colors hover:bg-second-400"
+        }`}>
+      <p className='mb-3 flex items-center gap-2 font-openSans text-xl font-semibold '>
+        {title}{" "}
+        <span
+          className={`  inline-flex h-2 w-2 rounded-full bg-[${skillColor}] ${
+            timerEnabled && chosen ? "animate-pulse" : ""
+          }`}></span>
       </p>
-      <p className=' text-center text-xl tracking-wide  xs:text-2xl md:text-3xl'>
-        {title}
+      <p className='mb-1 font-openSans text-sm font-normal'>
+        Procent:{" "}
+        <span className='font-semibold text-white'>
+          {percent ? Math.round(percent) : 0}%
+        </span>
       </p>
-      <p className='tracking-wide	 text-main-opposed	'>
-        {timeObject.hours}:{timeObject.minutes}
+
+      <p className='mb-1 font-openSans text-sm font-normal'>
+        Czas:{" "}
+        <span className='font-semibold text-white'>
+          {timeObject.hours}:{timeObject.minutes}
+        </span>
       </p>
-      {!chosen && (
-        <button
-          onClick={onClick}
-          className={
-            "uppercas border-2 border-transparent bg-main-900  p-1 px-3 text-center text-sm font-bold text-mainText radius-default hover:bg-main-100 "
-          }>
-          Wybierz
-        </button>
-      )}
+
+      <button
+        onClick={timerEnabled && chosen ? onStop : onStart}
+        className='${} mt-5 flex items-center justify-center gap-2 rounded-md bg-white  px-4 py-1 font-openSans text-black transition-colors transition-colors first-letter:uppercase hover:bg-white/80 '>
+        {timerEnabled && chosen ? (
+          <>
+            <VscDebugPause />
+            {t("pause")}
+          </>
+        ) : (
+          <>
+            <VscDebugStart />
+            {t("start")}
+          </>
+        )}
+      </button>
     </div>
   );
 };

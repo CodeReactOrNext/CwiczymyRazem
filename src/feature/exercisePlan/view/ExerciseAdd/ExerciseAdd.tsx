@@ -9,6 +9,8 @@ import {
   FaPlus,
   FaRegClock,
   FaTimes,
+  FaLock,
+  FaLockOpen,
 } from "react-icons/fa";
 import { firebaseUploadExercisePlan } from "utils/firebase/client/firebase.utils";
 import { exerciseSchema } from "./ExerciseEdit.schema";
@@ -32,6 +34,13 @@ const ExceriseAdd = ({ backHandler }: ExcerisePlanProps) => {
     ],
   };
 
+  const exerciseCategories = [
+    { value: "technique", label: "Technika" },
+    { value: "theory", label: "Teoria" },
+    { value: "hearing", label: "Sluch" },
+    { value: "creativity", label: "Kreatywnosc" },
+  ];
+
   const submitHandler = async (values: exercisePlanInterface) => {
     const exercise = values.exercise.map((item) => {
       return { ...item, time: item.time * 60000 };
@@ -41,13 +50,22 @@ const ExceriseAdd = ({ backHandler }: ExcerisePlanProps) => {
       toast.success("Dodano ćwiczenie");
       backHandler();
     } catch {
-      toast.success("Nie udało się dodać ćwiczenia");
+      toast.error("Nie udało się dodać ćwiczenia");
     }
+  };
+
+  const addNewExercise = (push: (obj: any) => void) => {
+    push({
+      title: "",
+      category: "technique",
+      time: 0,
+      done: false,
+    });
   };
 
   return (
     <dialog className='modal' id='my_modal_3'>
-      <div className='modal-box max-w-[900px]'>
+      <div className='modal-box max-w-[900px] border border-second-400/60 bg-second '>
         <Formik
           initialValues={initialValues}
           onSubmit={submitHandler}
@@ -55,82 +73,125 @@ const ExceriseAdd = ({ backHandler }: ExcerisePlanProps) => {
           {({ values }: { values: exercisePlanInterface }) => {
             return (
               <>
-                <div className=' bg-main-opposed-500/20 p-3 radius-default '>
-                  <p className='py-1'>Tytuł</p>
-                  <Input
-                    name='title'
-                    Icon={FaIndent}
-                    placeholder={"Np. Dzień 2 - Ćwiczenie improwizacji"}
-                  />
+                <div className='mb-4 rounded-lg bg-second-800/50 p-6 '>
+                  <h3 className='mb-4 text-xl font-semibold text-white'>
+                    Nowy plan ćwiczeń
+                  </h3>
+                  <div className='space-y-2'>
+                    <label className='text-sm text-secondText'>
+                      Tytuł planu
+                    </label>
+                    <Input
+                      name='title'
+                      Icon={FaIndent}
+                      placeholder={"Np. Dzień 2 - Ćwiczenie improwizacji"}
+                    />
+                  </div>
                 </div>
                 <FieldArray
                   name={"exercise"}
                   render={({ push, remove }) => (
                     <Form>
-                      <div className='flex  flex-col bg-main-opposed-500/20 p-3 radius-default'>
-                        <p className='self-start py-1'>Ćwiczenia</p>
-                        {values.exercise.length > 0 &&
-                          values.exercise.map((exercise, index) => (
-                            <>
+                      <div className='rounded-lg bg-second-800/50 p-6 '>
+                        <h4 className='mb-2 text-lg font-medium text-white'>
+                          Lista ćwiczeń
+                        </h4>
+
+                        <div className='space-y-2'>
+                          <div className='flex items-center gap-4'>
+                            <div className='flex-1'>Nazwa ćwiczenia</div>
+                            <div className='w-48'>Rodzaj</div>
+                            <div className='w-32'>
+                              <div className='label'>
+                                <span className='label'>
+                                  Czas ćwiczenia w minuach
+                                </span>
+                              </div>
+                            </div>
+                            <div className='w-[38px]' />
+                          </div>
+                          {values.exercise.length > 0 &&
+                            values.exercise.map((exercise, index) => (
                               <div
                                 key={index}
-                                className='flex w-full flex-row gap-3'>
-                                <div className='w-full max-w-[350px]'>
-                                  <Input
-                                    name={`exercise[${index}].title`}
-                                    placeholder='Np. '
-                                    Icon={FaIndent}
-                                  />
+                                className='pb-3 transition-all duration-200'>
+                                <div className='flex items-center gap-4'>
+                                  <div className='flex-1'>
+                                    <Input
+                                      name={`exercise[${index}].title`}
+                                      placeholder='Nazwa ćwiczenia'
+                                      Icon={FaIndent}
+                                    />
+                                  </div>
+                                  <div className='w-48'>
+                                    <Field
+                                      as='select'
+                                      name={`exercise[${index}].category`}
+                                      className='select select-bordered w-full bg-second-800/50 text-gray-200'>
+                                      {exerciseCategories.map((category) => (
+                                        <option
+                                          key={category.value}
+                                          value={category.value}>
+                                          {category.label}
+                                        </option>
+                                      ))}
+                                    </Field>
+                                  </div>
+                                  <div className='w-32'>
+                                    <InputTime
+                                      name={`exercise[${index}].time`}
+                                      Icon={FaRegClock}
+                                    />
+                                  </div>
+                                  <button
+                                    type='button'
+                                    onClick={() => remove(index)}
+                                    className='p-2 text-red-400 transition-colors hover:scale-110 hover:text-red-300'
+                                    title='Usuń ćwiczenie'>
+                                    <FaTimes size={22} />
+                                  </button>
                                 </div>
-                                <Select
-                                  name={`exercise[${index}].category`}
-                                  Icon={FaGuitar}
-                                />
-
-                                <InputTime
-                                  name={`exercise[${index}].time`}
-                                  Icon={FaRegClock}
-                                />
-                                <button
-                                  type='button'
-                                  onClick={() => remove(index)}>
-                                  <FaTimes size={22} />
-                                </button>
                               </div>
-                              <div className='divider' />
-                            </>
-                          ))}
+                            ))}
+                          <button
+                            type='button'
+                            className='btn w-full gap-2'
+                            onClick={() => addNewExercise(push)}>
+                            <FaPlus className='animate-pulse' /> Dodaj nowe
+                            ćwiczenie
+                          </button>
+                        </div>
+                      </div>
 
+                      <div className='mt-6 flex items-center justify-between rounded-lg bg-second-800/50 p-4'>
+                        <label className='flex cursor-pointer items-center gap-2 text-gray-300 transition-colors hover:text-gray-200'>
+                          <Field
+                            type='checkbox'
+                            name='isPrivate'
+                            className='checkbox-primary checkbox'
+                          />
+                          <span className='flex items-center gap-2'>
+                            {values.isPrivate ? (
+                              <FaLock className='text-white' />
+                            ) : (
+                              <FaLockOpen />
+                            )}
+                            Plan prywatny
+                          </span>
+                        </label>
+                      </div>
+
+                      <div className='modal-action mt-6 flex justify-end gap-3'>
                         <button
                           type='button'
-                          className='btn btn-neutral m-2 flex  flex-row justify-center  gap-1'
-                          onClick={() => {
-                            push({
-                              title: "",
-                              category: "technique",
-                              time: "0",
-                              done: false,
-                            });
-                          }}>
-                          <FaPlus /> Dodaj
-                        </button>
-                      </div>
-                      <div className='m-3 flex flex-row justify-center gap-4 p-3'>
-                        <p>
-                          Czy chcesz żeby to ćwiczenie nie było widoczne na
-                          Twoim profilu?
-                        </p>
-                        <Field type='checkbox' name='isPrivate' />
-                      </div>
-                      <div className='modal-action  p-3 text-base '>
-                        <button
-                          type='button'
-                          className='btn  btn-neutral'
+                          className='btn btn-outline '
                           onClick={backHandler}>
-                          Wróć
+                          Anuluj
                         </button>
-                        <button type='submit' className='btn  btn-neutral'>
-                          Wyślij
+                        <button
+                          type='submit'
+                          className='0 btn transition-colors'>
+                          Zapisz plan
                         </button>
                       </div>
                     </Form>
