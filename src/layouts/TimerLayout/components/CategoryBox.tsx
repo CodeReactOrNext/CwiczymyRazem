@@ -1,6 +1,7 @@
 import { convertMsToHMObject } from "utils/converter";
 import { useTranslation } from "react-i18next";
 import { VscDebugStart, VscDebugPause } from "react-icons/vsc";
+import { Button } from "assets/components/ui/button";
 
 interface CategoryBox {
   title: string;
@@ -28,7 +29,7 @@ const CategoryBox = ({
 
   return (
     <div
-      className={`w m-2 flex flex-col  justify-center rounded-lg border border-dashed  bg-second p-6 px-12 transition-all
+      className={`w m-2 flex min-w-[250px] flex-col  justify-center rounded-lg border border-dashed  bg-second p-6 px-12 transition-all
         ${
           chosen
             ? "text-whit !border-solid  border-white bg-second"
@@ -55,9 +56,9 @@ const CategoryBox = ({
         </span>
       </p>
 
-      <button
-        onClick={timerEnabled && chosen ? onStop : onStart}
-        className='${} mt-5 flex items-center justify-center gap-2 rounded-md bg-white  px-4 py-1 font-openSans text-black transition-colors transition-colors first-letter:uppercase hover:bg-white/80 '>
+      <Button
+        className='mt-3'
+        onClick={timerEnabled && chosen ? onStop : onStart}>
         {timerEnabled && chosen ? (
           <>
             <VscDebugPause />
@@ -69,7 +70,7 @@ const CategoryBox = ({
             {t("start")}
           </>
         )}
-      </button>
+      </Button>
     </div>
   );
 };

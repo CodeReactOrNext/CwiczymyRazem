@@ -4,13 +4,15 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
-import { Input, Button } from "components/UI";
+import { Input } from "components/UI";
 import ReauthForm from "../ReauthForm";
 
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { updateUserPassword } from "feature/user/store/userSlice.asyncThunk";
 import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
 import { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
+import { Button } from "assets/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const PasswordChangeView = () => {
   const { t } = useTranslation(["common", "toast", "settings"]);
@@ -69,8 +71,7 @@ const PasswordChangeView = () => {
                 type='password'
               />
               <Button
-                variant='small'
-                loading={isFetching}
+                size='sm'
                 disabled={Boolean(
                   !values.password ||
                     errors.password ||
@@ -78,6 +79,7 @@ const PasswordChangeView = () => {
                     errors.repeat_password
                 )}
                 type='submit'>
+                {isFetching && <Loader2 className='animate-spin' />}
                 {t("settings:save")}
               </Button>
             </div>

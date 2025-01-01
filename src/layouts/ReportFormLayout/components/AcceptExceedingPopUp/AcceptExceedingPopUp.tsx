@@ -1,4 +1,4 @@
-import { Button } from "components/UI";
+import { Button } from "assets/components/ui/button";
 import { SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { convertMsToHM } from "utils/converter";
@@ -27,19 +27,13 @@ const AcceptExceedingPopUp = ({
       <p className='font-openSans text-sm'>{t("exceeding_time")}</p>
       <div className='flex gap-4'>
         <Button
-          type='button'
-          variant='small'
           onClick={() => {
             setAcceptExceedingTime(true);
             handleSubmit();
-          }}
-          loading={isFetching}>
+          }}>
           {t("report_button")}
         </Button>
-        <Button
-          type='button'
-          variant='small'
-          onClick={() => setAcceptPopUpVisible(false)}>
+        <Button onClick={() => setAcceptPopUpVisible(false)}>
           {t("rating_popup.back")}
         </Button>
       </div>

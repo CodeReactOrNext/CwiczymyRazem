@@ -22,7 +22,7 @@ import {
   ReportCategoryWrapper,
 } from "layouts/ReportFormLayout/components";
 
-import { Input, Button, Divider } from "components/UI";
+import { Input } from "components/UI";
 import Backdrop from "components/Backdrop";
 import BeginnerMsg from "components/BeginnerMsg";
 
@@ -47,6 +47,8 @@ import {
 } from "utils/converter";
 
 import { MAX_DAYS_BACK } from "constants/gameSettings";
+import { Button } from "assets/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
@@ -373,10 +375,8 @@ const ReportView = () => {
 
                 <BeginnerMsg />
 
-                <Button
-                  type='submit'
-                  disabled={Object.keys(errors).length !== 0}
-                  loading={isFetching}>
+                <Button size='lg' disabled={Object.keys(errors).length !== 0}>
+                  {isFetching && <Loader2 className='animate-spin' />}
                   {t("report_button")}
                 </Button>
               </motion.div>

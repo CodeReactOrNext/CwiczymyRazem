@@ -2,12 +2,12 @@
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "components/UI";
 import OldEffect from "components/OldEffect";
 import Guitar from "./components/Guitar";
 import HeroSlogan from "./components/HeroSlogan";
 
 import FireDoubleSVG from "public/static/images/svg/Fire_double";
+import { Button } from "assets/components/ui/button";
 
 interface HeroProps {
   children: React.ReactElement;
@@ -32,7 +32,9 @@ const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
           {children}
         </span>
         <Link href='/login'>
-          <Button onClick={buttonOnClick}>{t("profile:cta_button")}</Button>
+          <Button size='lg' onClick={buttonOnClick}>
+            {t("profile:cta_button")}
+          </Button>
         </Link>
         <div className='flex flex-row gap-6  text-xl'>
           <Link href='/login'>
