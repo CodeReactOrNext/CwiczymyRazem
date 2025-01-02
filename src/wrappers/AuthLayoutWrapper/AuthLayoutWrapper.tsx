@@ -58,12 +58,6 @@ const AuthLayoutWrapper = ({
     rightSideLinks: [
       { id: "leadboard", name: t("nav.leadboard"), href: "/leaderboard" },
       { id: "faq", name: t("nav.faq"), href: "/faq" },
-      {
-        id: "discord",
-        name: t("nav.discord"),
-        href: "https://discord.com/invite/pCHjCZx",
-        external: true,
-      },
     ],
   };
 

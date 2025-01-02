@@ -19,7 +19,7 @@ const AchievementBox = ({ achievment, rarity }: AchievementBoxProps) => {
       <IconBox Icon={FaMedal} medium />
       <div className='mx-2 self-center '>
         <p className='text- mb-2  text-secondText '>{t(rarity)}</p>
-        <div className='flex w-full  flex-row flex-wrap gap-4'>
+        <div className='flex w-full  flex-row flex-wrap md:gap-4'>
           {achievment.length === 0 ? (
             <p>{t("empty")}</p>
           ) : (

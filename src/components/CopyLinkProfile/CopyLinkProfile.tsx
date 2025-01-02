@@ -18,7 +18,7 @@ const CopyLinkProfile = () => {
         );
         toast.info(t("toast:info.copy_link"));
       }}
-      className='z-40 m-auto flex max-w-[220px] flex-row items-center gap-2 border-dashed  text-center text-[0.7rem] click-behavior xs:text-xs'>
+      className='z-40   m-auto flex max-w-[220px] flex-row items-center gap-2 border-dashed  text-center text-[0.7rem] click-behavior xs:text-xs'>
       <MdCopyAll className='text-[1rem]' />
       {t("common:button.link_copy_profile")}
     </Button>
