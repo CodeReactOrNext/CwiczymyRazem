@@ -30,8 +30,8 @@ const ProfileLandingLayout = ({
   return (
     <div className='bg-second-600 radius-default'>
       <HeadDecoration title={t("statistics")} />
-      <div className='grid-rows-auto grid-cols-2 items-start gap-6  p-3 md:!p-6 lg:grid '>
-        <div className='row-cols-1 m-2 flex w-full flex-wrap gap-3'>
+      <div className='grid-rows-auto grid-cols-1 items-start gap-6 p-3  md:grid-cols-2 md:!p-6 lg:grid '>
+        <div className='grid h-fit  grid-flow-row grid-cols-2 gap-4 p-6 md:grid-cols-3'>
           {statsField.map(({ Icon, description, value }) => (
             <StatsField
               key={description}
@@ -41,7 +41,7 @@ const ProfileLandingLayout = ({
             />
           ))}
         </div>
-        <div className=' content-box relative z-20 my-2  flex max-h-[300px]  content-around justify-center '>
+        <div className=' content-box relative z-20 my-2  flex  content-around justify-center '>
           <StatisticBar
             title={t("technique")}
             value={convertMsToHM(time.technique)}

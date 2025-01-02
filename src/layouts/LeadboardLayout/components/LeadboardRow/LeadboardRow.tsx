@@ -43,7 +43,7 @@ const LeadboardRow = ({
   };
 
   return (
-    <li className='flex w-full justify-center p-8 text-xs xs:text-base'>
+    <li className='flex w-full justify-center p-4 pb-8 pt-8 text-xs xs:text-base md:p-8'>
       <p
         className={`flex items-center justify-end font-semibold xxs:text-lg xs:text-4xl lg:text-5xl xl:w-[100px] xl:text-6xl
          ${profileId === currentUserId ? "text-blue-400" : "text-gray-400"}`}>

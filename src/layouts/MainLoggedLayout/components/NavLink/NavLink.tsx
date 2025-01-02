@@ -12,7 +12,7 @@ const NavLink = ({ href, name, isCurrentPage }: NavLinkProps) => {
     <Link href={href}>
       <button
         disabled={isCurrentPage}
-        className={`rounded-md p-1  px-6 tracking-wide sm:px-4 
+        className={`rounded-md p-1  md:px-6 tracking-wide sm:px-4 
           ${
             isCurrentPage
               ? "bg-second-400 text-mainText shadow-sm"
