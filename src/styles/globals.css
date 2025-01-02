@@ -20,7 +20,7 @@ body {
   @apply bg-second-200;
 }
 #__next {
-  @apply relative flex h-screen flex-col;
+  @apply relative flex  flex-col;
 }
 
 a {

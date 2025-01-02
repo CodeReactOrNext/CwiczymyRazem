@@ -145,8 +145,8 @@ const TimerLayout = ({
         </div>
         {/* <ExercisePlan /> TODO */}
         <BeginnerMsg />
-        <p className='p-4 text-center  font-openSans text-xs sm:text-base'>
-          {t("info_about_repot ")}
+        <p className='m-5 p-4  text-center font-openSans text-xs sm:text-base'>
+          {t("info_about_repot ")}{" "}
           <Link href={"/report"} className='text-link'>
             {t("raport_link")}
           </Link>
