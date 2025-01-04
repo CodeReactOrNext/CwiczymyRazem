@@ -59,3 +59,19 @@ export interface FirebaseUserExceriseLog {
     sumTime: number;
   };
 }
+
+export interface SongDifficulty {
+  userId: string;
+  rating: number;
+  date: Timestamp;
+}
+
+export interface Song {
+  id: string;
+  title: string;
+  artist: string;
+  difficulties: SongDifficulty[];
+  learningUsers: string[];
+  createdAt: Timestamp;
+  createdBy: string;
+}
