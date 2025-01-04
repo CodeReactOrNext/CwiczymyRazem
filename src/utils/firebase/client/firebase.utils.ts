@@ -487,19 +487,43 @@ export const getSongs = async (
 
 export const updateSongStatus = async (userId: string, songId: string, status: SongStatus) => {
   const db = getFirestore();
-  const userSongRef = doc(db, 'userSongs', `${userId}_${songId}`);
+  const userDocRef = doc(db, 'users', userId);
   const songRef = doc(db, 'songs', songId);
 
   try {
     await runTransaction(db, async (transaction) => {
-      const userSongDoc = await transaction.get(userSongRef);
+      const userDoc = await transaction.get(userDocRef);
       const songDoc = await transaction.get(songRef);
       
       if (!songDoc.exists()) {
         throw new Error("Song not found");
       }
 
-      const oldStatus = userSongDoc.exists() ? userSongDoc.data().status : null;
+      const userData = userDoc.data();
+      const songLists = userData.songLists || {
+        wantToLearn: [],
+        learning: [],
+        learned: [],
+        lastUpdated: Timestamp.now()
+      };
+
+      // Remove song from all lists first
+      const allLists: SongStatus[] = ['wantToLearn', 'learning', 'learned'];
+      let oldStatus: SongStatus | null = null;
+
+      for (const list of allLists) {
+        const index = songLists[list].indexOf(songId);
+        if (index > -1) {
+          oldStatus = list;
+          songLists[list].splice(index, 1);
+        }
+      }
+
+      // Add to new status list
+      songLists[status].push(songId);
+      songLists.lastUpdated = Timestamp.now();
+
+      // Update song status counts
       const songData = songDoc.data();
       const statusCounts = songData.statusCounts || {
         wantToLearn: 0,
@@ -507,23 +531,13 @@ export const updateSongStatus = async (userId: string, songId: string, status: S
         learned: 0,
       };
 
-      // Decrease old status count if it existed
       if (oldStatus) {
         statusCounts[oldStatus]--;
       }
-
-      // Increase new status count
       statusCounts[status]++;
 
-      // Update user's song status
-      transaction.set(userSongRef, {
-        userId,
-        songId,
-        status,
-        updatedAt: Timestamp.now(),
-      });
-
-      // Update song status counts
+      // Update both documents
+      transaction.update(userDocRef, { songLists });
       transaction.update(songRef, { statusCounts });
     });
 
@@ -534,15 +548,74 @@ export const updateSongStatus = async (userId: string, songId: string, status: S
   }
 };
 
-export const getUserSongStatuses = async (userId: string) => {
+export const getUserSongs = async (userId: string) => {
   const db = getFirestore();
-  const userSongsRef = collection(db, 'userSongs');
-  const q = query(userSongsRef, where('userId', '==', userId));
+  const userDocRef = doc(db, 'users', userId);
   
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.reduce((acc, doc) => {
-    const data = doc.data();
-    acc[data.songId] = data.status;
-    return acc;
-  }, {} as Record<string, SongStatus>);
+  try {
+    const userDoc = await getDoc(userDocRef);
+    if (!userDoc.exists()) {
+      throw new Error("User not found");
+    }
+
+    const songLists = userDoc.data().songLists || {
+      wantToLearn: [],
+      learning: [],
+      learned: [],
+      lastUpdated: Timestamp.now()
+    };
+
+    // Get all unique song IDs
+    const allSongIds = [...new Set([
+      ...songLists.wantToLearn,
+      ...songLists.learning,
+      ...songLists.learned
+    ])];
+
+    // Fetch all songs in parallel
+    const songDocs = await Promise.all(
+      allSongIds.map(id => getDoc(doc(db, 'songs', id)))
+    );
+
+    const songs = songDocs.reduce((acc, doc) => {
+      if (doc.exists()) {
+        acc[doc.id] = { id: doc.id, ...doc.data() } as Song;
+      }
+      return acc;
+    }, {} as Record<string, Song>);
+
+    // Return organized lists with full song objects
+    return {
+      wantToLearn: songLists.wantToLearn.map(id => songs[id]).filter(Boolean),
+      learning: songLists.learning.map(id => songs[id]).filter(Boolean),
+      learned: songLists.learned.map(id => songs[id]).filter(Boolean),
+      lastUpdated: songLists.lastUpdated
+    };
+  } catch (error) {
+    console.error('Error getting user songs:', error);
+    throw error;
+  }
+};
+
+// Helper function to get current status of a song for a user
+export const getUserSongStatus = async (userId: string, songId: string) => {
+  const db = getFirestore();
+  const userDocRef = doc(db, 'users', userId);
+  
+  try {
+    const userDoc = await getDoc(userDocRef);
+    if (!userDoc.exists()) return null;
+
+    const songLists = userDoc.data().songLists;
+    if (!songLists) return null;
+
+    if (songLists.wantToLearn.includes(songId)) return 'wantToLearn';
+    if (songLists.learning.includes(songId)) return 'learning';
+    if (songLists.learned.includes(songId)) return 'learned';
+
+    return null;
+  } catch (error) {
+    console.error('Error getting song status:', error);
+    throw error;
+  }
 };
