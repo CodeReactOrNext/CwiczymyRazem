@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Song } from 'utils/firebase/client/firebase.types';
-import { rateSongDifficulty, toggleLearningSong } from 'utils/firebase/client/firebase.utils';
+import { getUserSongStatuses, rateSongDifficulty, toggleLearningSong,  } from 'utils/firebase/client/firebase.utils';
 import { toast } from 'sonner';
 import { useAppSelector } from 'store/hooks';
 import { selectUserAuth } from 'feature/user/store/userSlice';
@@ -11,10 +11,11 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow, 
 } from  "assets/components/ui/table";
 import { Star } from "lucide-react";
 import { Button } from 'assets/components/ui/button';
+import type { SongStatus } from 'utils/firebase/client/firebase.types';
 
 interface SongsTableProps {
   songs: Song[];
@@ -27,10 +28,20 @@ const SongsTable = ({ songs, onSort, sortBy, sortDirection }: SongsTableProps) =
   const { t } = useTranslation('songs');
   const userId = useAppSelector(selectUserAuth);
   const [ratingHover, setRatingHover] = useState<{songId: string, rating: number} | null>(null);
+  const [songStatuses, setSongStatuses] = useState<Record<string, SongStatus>>({});
+
+  useEffect(() => {
+    const loadSongStatuses = async () => {
+      if (!userId) return;
+      const statuses = await getUserSongStatuses(userId);
+      setSongStatuses(statuses);
+    };
+
+    loadSongStatuses();
+  }, [userId]);
 
   const handleRating = async (songId: string, rating: number) => {
     if (!userId) {
-      toast.error(t('must_be_logged_in'));
       return;
     }
 
@@ -53,6 +64,24 @@ const SongsTable = ({ songs, onSort, sortBy, sortDirection }: SongsTableProps) =
       toast.success(t('learning_status_updated'));
     } catch (error) {
       toast.error(t('error_updating_learning'));
+    }
+  };
+
+  const handleStatusChange = async (songId: string, newStatus: SongStatus) => {
+    if (!userId) {
+      toast.error(t('must_be_logged_in'));
+      return;
+    }
+
+    try {
+      await updateSongStatus(userId, songId, newStatus);
+      setSongStatuses(prev => ({
+        ...prev,
+        [songId]: newStatus
+      }));
+      toast.success(t('status_updated'));
+    } catch (error) {
+      toast.error(t('error_updating_status'));
     }
   };
 
@@ -90,7 +119,7 @@ const SongsTable = ({ songs, onSort, sortBy, sortDirection }: SongsTableProps) =
             >
               {t('learners')} {sortBy === 'learners' && (sortDirection === 'asc' ? '↑' : '↓')}
             </TableHead>
-            <TableHead>{t('actions')}</TableHead>
+            <TableHead>{t('status')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -128,6 +157,22 @@ const SongsTable = ({ songs, onSort, sortBy, sortDirection }: SongsTableProps) =
                 >
                   {song.learningUsers?.includes(userId) ? t('learning') : t('learn')}
                 </Button>
+              </TableCell>
+              <TableCell>
+                <select
+                  value={songStatuses[song.id] || ''}
+                  onChange={(value) => handleStatusChange(song.id, value.target.value as SongStatus)}
+                >
+                  <option value="">{t('select_status')}</option>
+                  <option value="wantToLearn">{t('want_to_learn')}</option>
+                  <option value="learning">{t('learning')}</option>
+                  <option value="learned">{t('learned')}</option>
+                </select>
+                {song.statusCounts && (
+                  <div className="text-xs text-muted-foreground mt-1">
+                    ({song.statusCounts.wantToLearn}/{song.statusCounts.learning}/{song.statusCounts.learned})
+                  </div>
+                )}
               </TableCell>
             </TableRow>
           ))}

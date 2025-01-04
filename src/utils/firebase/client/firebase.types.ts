@@ -66,6 +66,8 @@ export interface SongDifficulty {
   date: Timestamp;
 }
 
+export type SongStatus = 'wantToLearn' | 'learning' | 'learned';
+
 export interface Song {
   id: string;
   title: string;
@@ -74,4 +76,16 @@ export interface Song {
   learningUsers: string[];
   createdAt: Timestamp;
   createdBy: string;
+  statusCounts: {
+    wantToLearn: number;
+    learning: number;
+    learned: number;
+  };
+}
+
+export interface UserSongStatus {
+  userId: string;
+  songId: string;
+  status: SongStatus;
+  updatedAt: Timestamp;
 }

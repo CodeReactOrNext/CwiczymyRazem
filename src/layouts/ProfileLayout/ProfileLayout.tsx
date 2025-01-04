@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
 import Avatar from "components/Avatar";
 import Calendar from "components/Calendar";
@@ -13,6 +14,7 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import { convertMsToHM } from "utils/converter";
 import { ProfileInterface } from "types/ProfileInterface";
 import MainContainer from "components/MainContainer";
+import { getUserSongsWithStatus } from 'utils/firebase/client/firebase.utils';
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -38,6 +40,30 @@ const ProfileLayout = ({
   const { time, achievements, lastReportDate } = statistics;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
+
+  const [userSongs, setUserSongs] = useState({
+    wantToLearn: [],
+    learning: [],
+    learned: [],
+  });
+
+  useEffect(() => {
+    const loadUserSongs = async () => {
+      if (!userAuth) return;
+
+      const wantToLearn = await getUserSongsWithStatus(userAuth, 'wantToLearn');
+      const learning = await getUserSongsWithStatus(userAuth, 'learning');
+      const learned = await getUserSongsWithStatus(userAuth, 'learned');
+
+      setUserSongs({
+        wantToLearn,
+        learning,
+        learned,
+      });
+    };
+
+    loadUserSongs();
+  }, [userAuth]);
 
   return (
     <MainContainer title={t("profile")}>
@@ -136,6 +162,35 @@ const ProfileLayout = ({
         </div>
         <div className='col-span-2  p-2 '>
           <Calendar userAuth={userAuth} />
+        </div>
+        <div className="content-box z-10 row-span-1 m-4">
+          <h3 className="text-xl font-semibold mb-4">{t('my_songs')}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <h4 className="font-medium mb-2">{t('want_to_learn')} ({userSongs.wantToLearn.length})</h4>
+              <ul className="space-y-2">
+                {userSongs.wantToLearn.map(song => (
+                  <li key={song.id} className="text-sm">{song.title} - {song.artist}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium mb-2">{t('learning')} ({userSongs.learning.length})</h4>
+              <ul className="space-y-2">
+                {userSongs.learning.map(song => (
+                  <li key={song.id} className="text-sm">{song.title} - {song.artist}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium mb-2">{t('learned')} ({userSongs.learned.length})</h4>
+              <ul className="space-y-2">
+                {userSongs.learned.map(song => (
+                  <li key={song.id} className="text-sm">{song.title} - {song.artist}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </MainContainer>
