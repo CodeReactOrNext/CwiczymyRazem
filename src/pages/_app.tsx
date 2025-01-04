@@ -6,10 +6,10 @@ import { store } from "store/store";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
 import NextTopLoader from "nextjs-toploader";
 
-import "styles/globals.css";
 import { Toaster } from "sonner";
 import { Inter, Teko } from "next/font/google";
 import Script from "next/script";
+import "styles/globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,6 +26,7 @@ const teko = Teko({
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
+      
       <Head>
         <meta name='viewport' content='initial-scale=1.0, width=device-width' />
         <meta
@@ -47,12 +48,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "plp3vbsypt");
   `}
-      </Script>
+      </Script>{" "}
       <ThemeModeProvider>
-        <Toaster theme='dark' position='top-right' />
-        <NextTopLoader color='#ff3e4b' />
-        <div id='overlays'></div>
-        <main className={`  ${teko.variable} ${inter.variable} `}>
+        <main className={`${teko.variable} ${inter.variable} `}>
+          <Toaster theme='dark' position='top-right' />
+          <NextTopLoader color='#ff3e4b' />
+          <div id='overlays'></div>
           <Component {...pageProps} />
         </main>
       </ThemeModeProvider>
