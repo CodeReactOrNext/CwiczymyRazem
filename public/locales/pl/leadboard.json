@@ -3,5 +3,7 @@
   "points": "Punktów",
   "exercise_time": "Czas ćwiczeń",
   "achievements": "Osiągnięcia",
-  "empty": "Brak"
+  "empty": "Brak",
+  "sort_by_points": "Sortuj według punktów",
+  "sort_by_sessions": "Sortuj według sesji"
 }

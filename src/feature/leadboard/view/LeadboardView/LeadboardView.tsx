@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAppSelector } from "store/hooks";
 import { useTranslation } from "react-i18next";
 
@@ -8,77 +8,71 @@ import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
-import { firebaseGetUsersExceriseRaport as firebaseGetUsersExceriseRaport } from "utils/firebase/client/firebase.utils";
+import { firebaseGetUsersExceriseRaport, getTotalUsersCount } from "utils/firebase/client/firebase.utils";
 
-export type SortByType = "points" | "time" | "sessionCount";
+export type SortByType = "points" | "sessionCount";
 
 const LeadboardView = () => {
-  const [usersData, setUsersData] = useState<
-    FirebaseUserDataInterface[] | null
-  >(null);
+  const [usersData, setUsersData] = useState<FirebaseUserDataInterface[]>([]);
   const [sortBy, setSortBy] = useState<SortByType>("points");
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 30;
 
   const { t } = useTranslation("leadboard");
   const currentUserId = useAppSelector(selectUserAuth);
 
-  const sortByTime = (
-    a: FirebaseUserDataInterface,
-    b: FirebaseUserDataInterface
-  ) => {
-    const { creativity, hearing, technique, theory } = a.statistics.time;
-    const {
-      creativity: creativityB,
-      hearing: hearingB,
-      technique: techniqueB,
-      theory: theoryB,
-    } = b.statistics.time;
-    return (
-      creativityB +
-      hearingB +
-      techniqueB +
-      theoryB -
-      (creativity + hearing + technique + theory)
-    );
+  const loadUsers = async (page: number) => {
+    try {
+      setIsLoading(true);
+      const response = await firebaseGetUsersExceriseRaport(
+        sortBy,
+        page,
+        ITEMS_PER_PAGE
+      );
+      setUsersData(response.users);
+    } catch (error) {
+      toast(t("fetch_error"));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const sortByPoints = (
-    a: FirebaseUserDataInterface,
-    b: FirebaseUserDataInterface
-  ) => {
-    return b.statistics.points - a.statistics.points;
+  const loadTotalCount = async () => {
+    try {
+      const count = await getTotalUsersCount();
+      setTotalUsers(count);
+    } catch (error) {
+      console.error("Error fetching total count:", error);
+    }
   };
 
-  const sortBySessionCount = (
-    a: FirebaseUserDataInterface,
-    b: FirebaseUserDataInterface
-  ) => {
-    return b.statistics.sessionCount - a.statistics.sessionCount;
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    loadUsers(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   useEffect(() => {
-    firebaseGetUsersExceriseRaport()
-      .then((usersData) =>
-        setUsersData(
-          usersData.sort((a, b) => {
-            if (sortBy === "time") return sortByTime(a, b);
-            if (sortBy === "sessionCount") return sortBySessionCount(a, b);
-            return sortByPoints(a, b);
-          })
-        )
-      )
-      .catch((error) => {
-        toast(t("fetch_error"));
-      });
-  }, [sortBy, t]);
+    loadTotalCount();
+    setCurrentPage(1);
+    loadUsers(1);
+  }, [sortBy]);
 
   return (
     <>
-      {usersData ? (
+      {usersData.length > 0 || isLoading ? (
         <LeadboardLayout
           usersData={usersData}
           setSortBy={setSortBy}
           sortBy={sortBy}
           currentUserId={currentUserId}
+          isLoading={isLoading}
+          totalUsers={totalUsers}
+          currentPage={currentPage}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={handlePageChange}
         />
       ) : (
         <PageLoadingLayout />
