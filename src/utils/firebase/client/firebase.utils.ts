@@ -24,6 +24,13 @@ import {
   query,
   setDoc,
   deleteDoc,
+  getCountFromServer,
+  startAfter,
+  addDoc,
+  arrayRemove,
+  arrayUnion,
+  where,
+  Timestamp,
 } from "firebase/firestore";
 import {
   FirebaseDiscordEventsInteface,
@@ -31,11 +38,13 @@ import {
   FirebaseLogsInterface,
   FirebaseUserDataInterface,
   FirebaseUserExceriseLog,
+  Song,
 } from "./firebase.types";
 import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 import { firebaseApp } from "./firebase.cofig";
 import { shuffleUid } from "utils/user/shuffleUid";
 import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
+import { SortByType } from "feature/leadboard/view/LeadboardView";
 
 const provider = new GoogleAuthProvider();
 
@@ -132,16 +141,64 @@ export const firebaseUpdateUserPassword = async (newPassword: string) => {
   }
 };
 
-export const firebaseGetUsersExceriseRaport = async () => {
-  const usersDocRef = await getDocs(collection(db, "users"));
-  const usersDataArr: FirebaseUserDataInterface[] = [];
-  usersDocRef.forEach((doc) => {
-    let currentUserData = doc.data() as FirebaseUserDataInterface;
-    currentUserData.profileId = doc.id;
-    usersDataArr.push(currentUserData);
-  });
-  return usersDataArr;
+export const getTotalUsersCount = async () => {
+  const coll = collection(db, "users");
+  const snapshot = await getCountFromServer(coll);
+  return snapshot.data().count;
 };
+
+export const firebaseGetUsersExceriseRaport = async (
+  sortBy: SortByType,
+  page: number,
+  itemsPerPage: number
+) => {
+  try {
+    let q;
+    
+    if (page === 1) {
+      // First page query
+      q = query(
+        collection(db, "users"),
+        orderBy(`statistics.${sortBy}`, "desc"),
+        limit(itemsPerPage)
+      );
+    } else {
+      // Get the last document from the previous page
+      const lastVisibleDoc = await getDocumentAtIndex(
+        sortBy,
+        (page - 1) * itemsPerPage
+      );
+      
+      if (!lastVisibleDoc) {
+        throw new Error("Could not find the reference document");
+      }
+
+      // Query after the last document
+      q = query(
+        collection(db, "users"),
+        orderBy(`statistics.${sortBy}`, "desc"),
+        startAfter(lastVisibleDoc),
+        limit(itemsPerPage)
+      );
+    }
+
+    const querySnapshot = await getDocs(q);
+    
+    const users = querySnapshot.docs.map((doc) => ({
+      profileId: doc.id,
+      ...doc.data(),
+    })) as FirebaseUserDataInterface[];
+
+    return {
+      users,
+      hasMore: users.length === itemsPerPage,
+    };
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+};
+
 export const firebaseCheckUsersNameIsNotUnique = async (
   displayName: string
 ) => {
@@ -266,4 +323,162 @@ export const firebaseUpdateYouTubeLink = async (youtubeLink: string) => {
 export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
+};
+
+export const getDocumentAtIndex = async (
+  sortBy: SortByType,
+  index: number
+) => {
+  try {
+    // Get the document at the specified index
+    const q = query(
+      collection(db, "users"),
+      orderBy(`statistics.${sortBy}`, "desc"),
+      limit(1),
+      ...(index > 0 ? [startAfter(index - 1)] : [])
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs[0];
+  } catch (error) {
+    console.error("Error getting document at index:", error);
+    return null;
+  }
+};
+
+export const addSong = async (title: string, artist: string, userId: string) => {
+  try {
+    const songsRef = collection(db, "songs");
+    const newSong = {
+      title,
+      artist,
+      difficulties: [],
+      learningUsers: [],
+      createdAt: Timestamp.now(),
+      createdBy: userId
+    };
+    
+    const docRef = await addDoc(songsRef, newSong);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding song:", error);
+    throw error;
+  }
+};
+
+export const rateSongDifficulty = async (songId: string, userId: string, rating: number) => {
+  try {
+    const songRef = doc(db, "songs", songId);
+    const songDoc = await getDoc(songRef);
+    
+    if (!songDoc.exists()) {
+      throw new Error("Song not found");
+    }
+
+    const song = songDoc.data() as Song;
+    const difficulties = song.difficulties || [];
+    
+    // Remove existing rating by this user if it exists
+    const filteredDifficulties = difficulties.filter(d => d.userId !== userId);
+    
+    // Add new rating
+    const newDifficulties = [...filteredDifficulties, {
+      userId,
+      rating,
+      date: Timestamp.now()
+    }];
+
+    await updateDoc(songRef, {
+      difficulties: newDifficulties
+    });
+  } catch (error) {
+    console.error("Error rating song:", error);
+    throw error;
+  }
+};
+
+export const toggleLearningSong = async (songId: string, userId: string) => {
+  try {
+    const songRef = doc(db, "songs", songId);
+    const songDoc = await getDoc(songRef);
+    
+    if (!songDoc.exists()) {
+      throw new Error("Song not found");
+    }
+
+    const song = songDoc.data() as Song;
+    const learningUsers = song.learningUsers || [];
+    
+    if (learningUsers.includes(userId)) {
+      await updateDoc(songRef, {
+        learningUsers: arrayRemove(userId)
+      });
+    } else {
+      await updateDoc(songRef, {
+        learningUsers: arrayUnion(userId)
+      });
+    }
+  } catch (error) {
+    console.error("Error toggling learning status:", error);
+    throw error;
+  }
+};
+
+export const getSongs = async (
+  sortBy: 'title' | 'artist' | 'avgDifficulty' | 'learners',
+  sortDirection: 'asc' | 'desc',
+  searchQuery: string,
+  page: number,
+  limitNumber: number
+) => {
+  try {
+    let q = query(collection(db, "songs"));
+    
+    // Apply search if provided
+    if (searchQuery) {
+      q = query(q, 
+        where('title', '>=', searchQuery),
+        where('title', '<=', searchQuery + '\uf8ff')
+      );
+    }
+    
+    // Apply sorting
+    if (sortBy !== 'avgDifficulty' && sortBy !== 'learners') {
+      q = query(q, orderBy(sortBy, sortDirection));
+    }
+    
+    // Apply pagination
+    q = query(q, 
+      limit(limitNumber ?? 15),
+      startAfter(((page - 1) * limitNumber) ?? 0)
+    );
+    
+    const snapshot = await getDocs(q);
+    const songs = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Song[];
+    
+    // Handle custom sorting
+    if (sortBy === 'avgDifficulty') {
+      songs.sort((a, b) => {
+        const avgA = a.difficulties.reduce((acc, curr) => acc + curr.rating, 0) / 
+                    (a.difficulties.length || 1);
+        const avgB = b.difficulties.reduce((acc, curr) => acc + curr.rating, 0) / 
+                    (b.difficulties.length || 1);
+        return sortDirection === 'asc' ? avgA - avgB : avgB - avgA;
+      });
+    } else if (sortBy === 'learners') {
+      songs.sort((a, b) => {
+        return sortDirection === 'asc' 
+          ? (a.learningUsers?.length || 0) - (b.learningUsers?.length || 0)
+          : (b.learningUsers?.length || 0) - (a.learningUsers?.length || 0);
+      });
+    }
+    
+    return songs;
+  } catch (error) {
+    console.error("Error getting songs:", error);
+    throw error;
+  }
 };
