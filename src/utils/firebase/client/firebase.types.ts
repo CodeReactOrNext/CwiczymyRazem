@@ -12,6 +12,14 @@ export interface FirebaseUserDataInterface {
   youTubeLink?: string;
   band?: string;
   statistics: StatisticsDataInterface;
+  songLists: UserSongLists;
+}
+
+export interface UserSongLists {
+  wantToLearn: string[];
+  learning: string[];
+  learned: string[];
+  lastUpdated: Timestamp;
 }
 
 export interface FirebaseLogsInterface {
