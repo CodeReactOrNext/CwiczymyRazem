@@ -15,12 +15,13 @@ const Achievement = ({ id }: { id: AchievementList }) => {
 
   return (
     <>
+      <ToolTip />
+       <div  data-tip={t(description)}>
       <Icon
         className='text-md cursor-help	drop-shadow-md'
         color={achievementsRarity[rarity].color}
-        data-tip={t(description)}
-      />
-      <ToolTip />
+       
+      /></div>
     </>
   );
 };

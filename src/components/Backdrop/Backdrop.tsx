@@ -29,7 +29,7 @@ const Backdrop = ({ children, selector, onClick }: RatingPopUpProps) => {
             }
           }}
           id='backdrop'
-          className='fixed left-0 top-0 bottom-0 z-50 flex h-full w-full justify-center overflow-y-auto overflow-x-hidden bg-black/60'>
+          className='fixed  flex justify-center items-center left-0 top-0 bottom-0 z-50  h-full w-full  overflow-y-auto overflow-x-hidden bg-black/60 font-sans'>
           {children}
         </motion.div>,
         document.getElementById(selector)!
