@@ -3,5 +3,7 @@
   "points": "Points",
   "exercise_time": "Exercise time",
   "achievements": "Achievements",
-  "empty": "Empty"
+  "empty": "Empty",
+  "sort_by_points": "Sort by points",
+  "sort_by_sessions": "Sort by session"
 }
