@@ -4,12 +4,15 @@ import { convertMsToHM } from "utils/converter";
 import { useTranslation } from "react-i18next";
 import { BonusPointsInterface } from "../../RatingPopUpLayout";
 import { motion } from "framer-motion";
+import { MdUpgrade } from "react-icons/md";
+
 
 interface BonusPointsItemProps {
   bonusPoints: BonusPointsInterface;
   actualDayWithoutBreak: number;
   achievements: AchievementList[];
   isGetNewLevel: boolean;
+  
 }
 
 const BonusPointsItem = ({
@@ -26,23 +29,55 @@ const BonusPointsItem = ({
     "1" + "." + multiplier.toString().split("").pop();
 
   return (
-    <ul className='relative  ml-4 text-sm  xs:text-base md:-ml-[20%]'>
-      <li className='ml-4'>
+    <ul className='relative font-openSans mb-12 py-8  w-full bg-second-500 radius-default border border-second-400/60 px-8 text-sm xs:text-base'>
+      <li>
         <motion.ul
           initial={{ x: "-120%", opacity: "0%" }}
           animate={{ x: 0, opacity: "100%" }}
-          transition={{ delay: 3 }}
-          className='mb-5'>
+          transition={{ delay: 2 }}>
           {isGetNewLevel && (
-            <li className=' flex items-center '>
-              <p className='text-tertiary sm:text-4xl'>
+            <li className='flex items-center text-white mb-5'>
+                 <MdUpgrade className="text-4xl" />
+              <p className='text-2xl'>
                 {t("report:rating_popup.new_level")}
               </p>
             </li>
           )}
-          {achievements.length > 0 && (
-            <li className=' flex items-center '>
-              <p className='text-tertiary sm:text-2xl'>
+         
+        </motion.ul>
+      </li>
+
+      <motion.li
+        initial={{ x: "-120%", opacity: "0%" }}
+        animate={{ x: 0, opacity: "100%" }}
+        transition={{ delay: 1, duration: 0.3 }}
+        className='flex items-center gap-3 mb-3'>
+        <p className='text-main-300 text-4xl font-sans'>
+          x{getMulitplierString(multiplier)}
+        </p>
+        <p>{t("report:rating_popup.regularity")}</p>
+      </motion.li>
+      <motion.li
+        initial={{ x: "-120%", opacity: "0%" }}
+        animate={{ x: 0, opacity: "100%" }}
+        transition={{ delay: 1.3, duration: 0.3 }}
+        className='flex items-center gap-3 mb-3'>
+        <p className='text-main-300 text-4xl  font-sans'>+{timePoints}</p>
+        <p>{t("report:rating_popup.time")}</p>
+        
+      </motion.li>
+      {additionalPoints ? (
+        <li className="mb-3">
+          <p >    <span className=' text-main-300 text-4xl  font-sans'>+{additionalPoints}</span>  {t("report:rating_popup.habits")}</p>
+          
+        </li>
+      ) : (
+        ""
+      )}
+
+{achievements.length > 0 && (
+            <li className=' flex items-center mb-3 '>
+              <p>
                 {t("report:rating_popup.new_achievements")}
               </p>
               <div className='flex gap-3 p-2'>
@@ -52,44 +87,17 @@ const BonusPointsItem = ({
               </div>
             </li>
           )}
-        </motion.ul>
-      </li>
-
-      <motion.li
-        initial={{ x: "-120%", opacity: "0%" }}
-        animate={{ x: 0, opacity: "100%" }}
-        transition={{ delay: 2, duration: 0.3 }}
-        className='flex items-center gap-3 border-b-2 border-mainText/10 p-2 '>
-        <p className='text-second-text sm:text-4xl'>
-          x{getMulitplierString(multiplier)}
-        </p>
-        <p className=' md:text-2xl'>{t("report:rating_popup.regularity")}</p>
-        <p className='text-base md:text-lg'>
+          
+      <p className="text-secondText">
           {actualDayWithoutBreak} {t("report:rating_popup.streak")}
         </p>
-      </motion.li>
-      {additionalPoints ? (
-        <li className='flex items-center gap-3 border-b-2 border-mainText/10 p-2 '>
-          <p className=' text-second-text sm:text-4xl'>+{additionalPoints}</p>
-          <p className=' md:text-2xl'>{t("report:rating_popup.habits")}</p>
-          <p className=' md:text-lg'>
+        <p className="text-secondText">
             {t("report:rating_popup.habitsWithCount", { count: habitsCount })}
           </p>
-        </li>
-      ) : (
-        ""
-      )}
-      <motion.li
-        initial={{ x: "-120%", opacity: "0%" }}
-        animate={{ x: 0, opacity: "100%" }}
-        transition={{ delay: 2.3, duration: 0.3 }}
-        className=' flex items-center gap-3 border-b-2 border-mainText/10 p-2 '>
-        <p className=' text-second-text sm:text-4xl'>+{timePoints}</p>
-        <p className=' md:text-2xl'>{t("report:rating_popup.time")}</p>
-        <p className='text-base md:text-lg'>
+          <p className="text-secondText">
           {t("report:rating_popup.time_amount")} {convertMsToHM(time)}
         </p>
-      </motion.li>
+     
     </ul>
   );
 };

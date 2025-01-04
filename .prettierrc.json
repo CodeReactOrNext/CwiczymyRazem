@@ -4,5 +4,5 @@
   "semi": true,
   "bracketSameLine": true,
   "jsxSingleQuote": true,
-  "tailwindConfig": "./tailwind.config.js"
+  "tailwindConfig": "./tailwind.config.ts"
 }
