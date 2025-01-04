@@ -15,6 +15,8 @@ import { TbNews } from "react-icons/tb";
 import { FaGuitar, FaMedal, FaTasks } from "react-icons/fa";
 import Changelog from "./components/Changelog";
 import { changelogEntries } from "changelogEntries";
+import { IoChatboxEllipses } from "react-icons/io5";
+import Chat from "./components/Chat";
 
 export interface LogsBoxLayoutProps {
   logs: FirebaseLogsInterface[];
@@ -24,7 +26,7 @@ export interface LogsBoxLayoutProps {
 
 const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
-    "logs" | "achievements" | "discord" | "excerise"
+    "logs" | "achievements" | "discord" | "excerise" | "chat"
   >("logs");
 
   const { t } = useTranslation("common");
@@ -56,6 +58,12 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           onClick={() => setShowedCategory("discord")}
           Icon={TbNews}
         />
+        <LogsBoxButton
+          title="Chat"
+          active={showedCategory === "chat"}
+          onClick={() => setShowedCategory("chat")}
+          Icon={IoChatboxEllipses}
+        />
       </div>
       {showedCategory === "achievements" && (
         <AchievementsMap userAchievements={userAchievements} />
@@ -66,6 +74,7 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
         {showedCategory === "discord" && logs && (
           <Changelog entries={changelogEntries} />
         )}
+        {showedCategory === "chat" && <Chat />}
       </div>
     </div>
   );
