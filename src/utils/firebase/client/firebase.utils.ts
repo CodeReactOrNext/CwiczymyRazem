@@ -370,12 +370,35 @@ export const getDocumentAtIndex = async (sortBy: SortByType, index: number) => {
   }
 };
 
+export const checkSongExists = async (title: string, artist: string) => {
+  try {
+    const songsRef = collection(db, "songs");
+    const q = query(
+      songsRef,
+      where("title", "==", title),
+      where("artist", "==", artist)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
+  } catch (error) {
+    console.error("Error checking for duplicate song:", error);
+    throw error;
+  }
+};
+
 export const addSong = async (
   title: string,
   artist: string,
   userId: string
 ) => {
   try {
+    // Check for duplicate song first
+    const exists = await checkSongExists(title, artist);
+    if (exists) {
+      throw new Error("song_already_exists");
+    }
+
     const songsRef = collection(db, "songs");
     const newSong = {
       title,
@@ -445,19 +468,19 @@ export const rateSongDifficulty = async (
 };
 
 export const getSongs = async (
-  sortBy: "title" | "artist" | "avgDifficulty" | "learners",
-  sortDirection: "asc" | "desc",
+  sortBy: string,
+  sortDirection: 'asc' | 'desc',
   searchQuery: string,
   page: number,
-  limitNumber: number
+  itemsPerPage: number
 ) => {
   try {
-    let q = query(collection(db, "songs"));
+    let baseQuery = query(collection(db, "songs"));
 
     // Apply search if provided
     if (searchQuery) {
-      q = query(
-        q,
+      baseQuery = query(
+        baseQuery,
         where("title", ">=", searchQuery),
         where("title", "<=", searchQuery + "\uf8ff")
       );
@@ -465,20 +488,29 @@ export const getSongs = async (
 
     // Apply sorting
     if (sortBy !== "avgDifficulty" && sortBy !== "learners") {
-      q = query(q, orderBy(sortBy, sortDirection));
+      baseQuery = query(baseQuery, orderBy(sortBy, sortDirection));
     }
 
-    // Apply pagination
-    q = query(
-      q,
-      limit(limitNumber ?? 15),
-      startAfter((page - 1) * limitNumber)
-    );
+    // Get total count
+    const totalSnapshot = await getCountFromServer(baseQuery);
+    const total = totalSnapshot.data().count;
 
-    const snapshot = await getDocs(q);
-    const songs = snapshot.docs.map((doc) => ({
+    // Get all documents up to the start of the requested page
+    const pageQuery = query(
+      baseQuery,
+      limit(page * itemsPerPage)
+    );
+    
+    const snapshot = await getDocs(pageQuery);
+    const allDocs = snapshot.docs;
+
+    // Get the documents for the current page
+    const startIndex = (page - 1) * itemsPerPage;
+    const pageDocs = allDocs.slice(startIndex, startIndex + itemsPerPage);
+    
+    const songs = pageDocs.map(doc => ({
       id: doc.id,
-      ...doc.data(),
+      ...doc.data()
     })) as Song[];
 
     // Handle custom sorting
@@ -500,9 +532,12 @@ export const getSongs = async (
       });
     }
 
-    return songs;
+    return {
+      songs,
+      total
+    };
   } catch (error) {
-    console.error("Error getting songs:", error);
+    console.error('Error getting songs:', error);
     throw error;
   }
 };
