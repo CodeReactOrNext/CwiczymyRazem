@@ -33,7 +33,20 @@ export interface FirebaseLogsInterface {
   };
   points: number;
 }
-
+export type FirebaseLogsSongsStatuses =
+  | "learned"
+  | "wantToLearn"
+  | "learning"
+  | "added"
+  | "difficulty_rate";
+export interface FirebaseLogsSongsInterface {
+  uid: string;
+  data: string;
+  userName: string;
+  songTitle: string;
+  songArtist: string;
+  status: FirebaseLogsSongsStatuses;
+}
 export interface FirebaseEventsInteface {
   category: SkillsType;
   name: string;
@@ -74,7 +87,7 @@ export interface SongDifficulty {
   date: Timestamp;
 }
 
-export type SongStatus = 'wantToLearn' | 'learning' | 'learned';
+export type SongStatus = "wantToLearn" | "learning" | "learned";
 
 export interface Song {
   id: string;

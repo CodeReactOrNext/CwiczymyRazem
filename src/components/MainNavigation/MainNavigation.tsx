@@ -31,12 +31,10 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
         variant === "secondary" ? "lg:bg-main-opposed-500" : "lg:bg-second-500"
       }  lg:pl-16`}>
       <ul className='mr-11 hidden w-full items-center justify-evenly text-3xl lg:flex'>
+      <NavLink url='/songs' title={t("nav.songs")} />
+
         <NavLink url='/leaderboard' title={t("nav.leadboard")} />
-        <NavLink
-          url='https://discord.com/invite/pCHjCZx'
-          title={t("nav.discord")}
-          external
-        />
+
         <NavLink url='/faq' title={t("nav.faq")} />
       </ul>
 
