@@ -34,9 +34,10 @@ import {
   runTransaction,
 } from "firebase/firestore";
 import {
-  FirebaseDiscordEventsInteface,
   FirebaseEventsInteface,
   FirebaseLogsInterface,
+  FirebaseLogsSongsInterface,
+  FirebaseLogsSongsStatuses,
   FirebaseUserDataInterface,
   FirebaseUserExceriseLog,
   Song,
@@ -76,12 +77,36 @@ export const firebaseGetLogs = async () => {
   const logsDocRef = collection(db, "logs");
   const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(20));
   const logsDoc = await getDocs(sortLogs);
-  const logsArr: FirebaseLogsInterface[] = [];
+  const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[] = [];
   logsDoc.forEach((doc) => {
-    const log = doc.data() as FirebaseLogsInterface;
+    const log = doc.data() as
+      | FirebaseLogsInterface
+      | FirebaseLogsSongsInterface;
     logsArr.push(log);
   });
   return logsArr;
+};
+
+export const firebaseAddSongsLog = async (
+  uid: string,
+  data: string,
+  songTitle: string,
+  songArtist: string,
+  status: FirebaseLogsSongsStatuses
+) => {
+  const logsDocRef = doc(collection(db, "logs"));
+  const userDocRef = doc(db, "users", uid);
+  const userSnapshot = await getDoc(userDocRef);
+  const userName = userSnapshot.data()!.displayName;
+
+  await setDoc(logsDocRef, {
+    data,
+    uid,
+    userName,
+    songTitle,
+    songArtist,
+    status,
+  });
 };
 
 export const firebaseGetEvents = async () => {
@@ -156,7 +181,7 @@ export const firebaseGetUsersExceriseRaport = async (
 ) => {
   try {
     let q;
-    
+
     if (page === 1) {
       // First page query
       q = query(
@@ -170,7 +195,7 @@ export const firebaseGetUsersExceriseRaport = async (
         sortBy,
         (page - 1) * itemsPerPage
       );
-      
+
       if (!lastVisibleDoc) {
         throw new Error("Could not find the reference document");
       }
@@ -185,7 +210,7 @@ export const firebaseGetUsersExceriseRaport = async (
     }
 
     const querySnapshot = await getDocs(q);
-    
+
     const users = querySnapshot.docs.map((doc) => ({
       profileId: doc.id,
       ...doc.data(),
@@ -327,10 +352,7 @@ export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
   await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
 };
 
-export const getDocumentAtIndex = async (
-  sortBy: SortByType,
-  index: number
-) => {
+export const getDocumentAtIndex = async (sortBy: SortByType, index: number) => {
   try {
     // Get the document at the specified index
     const q = query(
@@ -339,7 +361,7 @@ export const getDocumentAtIndex = async (
       limit(1),
       ...(index > 0 ? [startAfter(index - 1)] : [])
     );
-    
+
     const snapshot = await getDocs(q);
     return snapshot.docs[0];
   } catch (error) {
@@ -348,7 +370,11 @@ export const getDocumentAtIndex = async (
   }
 };
 
-export const addSong = async (title: string, artist: string, userId: string) => {
+export const addSong = async (
+  title: string,
+  artist: string,
+  userId: string
+) => {
   try {
     const songsRef = collection(db, "songs");
     const newSong = {
@@ -357,10 +383,11 @@ export const addSong = async (title: string, artist: string, userId: string) => 
       difficulties: [],
       learningUsers: [],
       createdAt: Timestamp.now(),
-      createdBy: userId
+      createdBy: userId,
     };
-    
+
     const docRef = await addDoc(songsRef, newSong);
+    firebaseAddSongsLog(userId, new Date().toString(), title, artist, "added");
     return docRef.id;
   } catch (error) {
     console.error("Error adding song:", error);
@@ -368,116 +395,111 @@ export const addSong = async (title: string, artist: string, userId: string) => 
   }
 };
 
-export const rateSongDifficulty = async (songId: string, userId: string, rating: number) => {
+export const rateSongDifficulty = async (
+  songId: string,
+  userId: string,
+  rating: number,
+  title: string,
+  artist: string
+) => {
   try {
     const songRef = doc(db, "songs", songId);
     const songDoc = await getDoc(songRef);
-    
+
     if (!songDoc.exists()) {
       throw new Error("Song not found");
     }
 
     const song = songDoc.data() as Song;
     const difficulties = song.difficulties || [];
-    
+
     // Remove existing rating by this user if it exists
-    const filteredDifficulties = difficulties.filter(d => d.userId !== userId);
-    
+    const filteredDifficulties = difficulties.filter(
+      (d) => d.userId !== userId
+    );
+
     // Add new rating
-    const newDifficulties = [...filteredDifficulties, {
-      userId,
-      rating,
-      date: Timestamp.now()
-    }];
+    const newDifficulties = [
+      ...filteredDifficulties,
+      {
+        userId,
+        rating,
+        date: Timestamp.now(),
+      },
+    ];
 
     await updateDoc(songRef, {
-      difficulties: newDifficulties
+      difficulties: newDifficulties,
     });
+    firebaseAddSongsLog(
+      userId,
+      new Date().toString(),
+      title,
+      artist,
+      "difficulty_rate"
+    );
   } catch (error) {
     console.error("Error rating song:", error);
     throw error;
   }
 };
 
-export const toggleLearningSong = async (songId: string, userId: string) => {
-  try {
-    const songRef = doc(db, "songs", songId);
-    const songDoc = await getDoc(songRef);
-    
-    if (!songDoc.exists()) {
-      throw new Error("Song not found");
-    }
-
-    const song = songDoc.data() as Song;
-    const learningUsers = song.learningUsers || [];
-    
-    if (learningUsers.includes(userId)) {
-      await updateDoc(songRef, {
-        learningUsers: arrayRemove(userId)
-      });
-    } else {
-      await updateDoc(songRef, {
-        learningUsers: arrayUnion(userId)
-      });
-    }
-  } catch (error) {
-    console.error("Error toggling learning status:", error);
-    throw error;
-  }
-};
-
 export const getSongs = async (
-  sortBy: 'title' | 'artist' | 'avgDifficulty' | 'learners',
-  sortDirection: 'asc' | 'desc',
+  sortBy: "title" | "artist" | "avgDifficulty" | "learners",
+  sortDirection: "asc" | "desc",
   searchQuery: string,
   page: number,
   limitNumber: number
 ) => {
   try {
     let q = query(collection(db, "songs"));
-    
+
     // Apply search if provided
     if (searchQuery) {
-      q = query(q, 
-        where('title', '>=', searchQuery),
-        where('title', '<=', searchQuery + '\uf8ff')
+      q = query(
+        q,
+        where("title", ">=", searchQuery),
+        where("title", "<=", searchQuery + "\uf8ff")
       );
     }
-    
+
     // Apply sorting
-    if (sortBy !== 'avgDifficulty' && sortBy !== 'learners') {
+    if (sortBy !== "avgDifficulty" && sortBy !== "learners") {
       q = query(q, orderBy(sortBy, sortDirection));
     }
-    
+
     // Apply pagination
-    q = query(q, 
+    q = query(
+      q,
       limit(limitNumber ?? 15),
-      startAfter(((page - 1) * limitNumber) ?? 0)
+      startAfter((page - 1) * limitNumber)
     );
-    
+
     const snapshot = await getDocs(q);
-    const songs = snapshot.docs.map(doc => ({
+    const songs = snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     })) as Song[];
-    
+
     // Handle custom sorting
-    if (sortBy === 'avgDifficulty') {
+    if (sortBy === "avgDifficulty") {
       songs.sort((a, b) => {
-        const avgA = a.difficulties.reduce((acc, curr) => acc + curr.rating, 0) / 
-                    (a.difficulties.length || 1);
-        const avgB = b.difficulties.reduce((acc, curr) => acc + curr.rating, 0) / 
-                    (b.difficulties.length || 1);
-        return sortDirection === 'asc' ? avgA - avgB : avgB - avgA;
+        const avgA =
+          a.difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
+          (a.difficulties.length || 1);
+        const avgB =
+          b.difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
+          (b.difficulties.length || 1);
+        return sortDirection === "asc" ? avgA - avgB : avgB - avgA;
       });
-    } else if (sortBy === 'learners') {
+    } else if (sortBy === "learners") {
       songs.sort((a, b) => {
-        return sortDirection === 'asc' 
+        return sortDirection === "asc"
           ? (a.learningUsers?.length || 0) - (b.learningUsers?.length || 0)
           : (b.learningUsers?.length || 0) - (a.learningUsers?.length || 0);
       });
     }
-    
+
     return songs;
   } catch (error) {
     console.error("Error getting songs:", error);
@@ -485,30 +507,36 @@ export const getSongs = async (
   }
 };
 
-export const updateSongStatus = async (userId: string, songId: string, status: SongStatus) => {
+export const updateSongStatus = async (
+  userId: string,
+  songId: string,
+  title: string,
+  artist: string,
+  status: SongStatus
+) => {
   const db = getFirestore();
-  const userDocRef = doc(db, 'users', userId);
-  const songRef = doc(db, 'songs', songId);
+  const userDocRef = doc(db, "users", userId);
+  const songRef = doc(db, "songs", songId);
 
   try {
     await runTransaction(db, async (transaction) => {
       const userDoc = await transaction.get(userDocRef);
       const songDoc = await transaction.get(songRef);
-      
+
       if (!songDoc.exists()) {
         throw new Error("Song not found");
       }
 
       const userData = userDoc.data();
-      const songLists = userData.songLists || {
+      const songLists = userData?.songLists || {
         wantToLearn: [],
         learning: [],
         learned: [],
-        lastUpdated: Timestamp.now()
+        lastUpdated: Timestamp.now(),
       };
 
       // Remove song from all lists first
-      const allLists: SongStatus[] = ['wantToLearn', 'learning', 'learned'];
+      const allLists: SongStatus[] = ["wantToLearn", "learning", "learned"];
       let oldStatus: SongStatus | null = null;
 
       for (const list of allLists) {
@@ -539,19 +567,20 @@ export const updateSongStatus = async (userId: string, songId: string, status: S
       // Update both documents
       transaction.update(userDocRef, { songLists });
       transaction.update(songRef, { statusCounts });
+      firebaseAddSongsLog(userId, new Date().toString(), title, artist, status);
     });
 
     return true;
   } catch (error) {
-    console.error('Error updating song status:', error);
+    console.error("Error updating song status:", error);
     throw error;
   }
 };
 
 export const getUserSongs = async (userId: string) => {
   const db = getFirestore();
-  const userDocRef = doc(db, 'users', userId);
-  
+  const userDocRef = doc(db, "users", userId);
+
   try {
     const userDoc = await getDoc(userDocRef);
     if (!userDoc.exists()) {
@@ -562,19 +591,21 @@ export const getUserSongs = async (userId: string) => {
       wantToLearn: [],
       learning: [],
       learned: [],
-      lastUpdated: Timestamp.now()
+      lastUpdated: Timestamp.now(),
     };
 
     // Get all unique song IDs
-    const allSongIds = [...new Set([
-      ...songLists.wantToLearn,
-      ...songLists.learning,
-      ...songLists.learned
-    ])];
+    const allSongIds = [
+      ...new Set([
+        ...songLists.wantToLearn,
+        ...songLists.learning,
+        ...songLists.learned,
+      ]),
+    ];
 
     // Fetch all songs in parallel
     const songDocs = await Promise.all(
-      allSongIds.map(id => getDoc(doc(db, 'songs', id)))
+      allSongIds.map((id) => getDoc(doc(db, "songs", id)))
     );
 
     const songs = songDocs.reduce((acc, doc) => {
@@ -586,13 +617,13 @@ export const getUserSongs = async (userId: string) => {
 
     // Return organized lists with full song objects
     return {
-      wantToLearn: songLists.wantToLearn.map(id => songs[id]).filter(Boolean),
-      learning: songLists.learning.map(id => songs[id]).filter(Boolean),
-      learned: songLists.learned.map(id => songs[id]).filter(Boolean),
-      lastUpdated: songLists.lastUpdated
+      wantToLearn: songLists.wantToLearn.map((id) => songs[id]).filter(Boolean),
+      learning: songLists.learning.map((id) => songs[id]).filter(Boolean),
+      learned: songLists.learned.map((id) => songs[id]).filter(Boolean),
+      lastUpdated: songLists.lastUpdated,
     };
   } catch (error) {
-    console.error('Error getting user songs:', error);
+    console.error("Error getting user songs:", error);
     throw error;
   }
 };
@@ -600,8 +631,8 @@ export const getUserSongs = async (userId: string) => {
 // Helper function to get current status of a song for a user
 export const getUserSongStatus = async (userId: string, songId: string) => {
   const db = getFirestore();
-  const userDocRef = doc(db, 'users', userId);
-  
+  const userDocRef = doc(db, "users", userId);
+
   try {
     const userDoc = await getDoc(userDocRef);
     if (!userDoc.exists()) return null;
@@ -609,13 +640,13 @@ export const getUserSongStatus = async (userId: string, songId: string) => {
     const songLists = userDoc.data().songLists;
     if (!songLists) return null;
 
-    if (songLists.wantToLearn.includes(songId)) return 'wantToLearn';
-    if (songLists.learning.includes(songId)) return 'learning';
-    if (songLists.learned.includes(songId)) return 'learned';
+    if (songLists.wantToLearn.includes(songId)) return "wantToLearn";
+    if (songLists.learning.includes(songId)) return "learning";
+    if (songLists.learned.includes(songId)) return "learned";
 
     return null;
   } catch (error) {
-    console.error('Error getting song status:', error);
+    console.error("Error getting song status:", error);
     throw error;
   }
 };

@@ -17,7 +17,7 @@ export type NavPagesTypes =
   | "report"
   | "leadboard"
   | "faq"
-  | "discord"
+  | "songs"
   | null;
 
 interface AuthLayoutWrapperProps {
@@ -56,6 +56,7 @@ const AuthLayoutWrapper = ({
       { id: "report", name: t("nav.report"), href: "/report" },
     ],
     rightSideLinks: [
+      { id: "songs", name: t("nav.songs"), href: "/songs" },
       { id: "leadboard", name: t("nav.leadboard"), href: "/leaderboard" },
       { id: "faq", name: t("nav.faq"), href: "/faq" },
     ],

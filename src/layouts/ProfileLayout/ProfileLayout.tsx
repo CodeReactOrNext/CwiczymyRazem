@@ -17,6 +17,7 @@ import MainContainer from "components/MainContainer";
 import { getUserSongsWithStatus } from 'utils/firebase/client/firebase.utils';
 import { getUserSongs } from 'utils/firebase/client/firebase.utils';
 import { Timestamp } from 'firebase/firestore';
+import { Song } from "utils/firebase/client/firebase.types";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
