@@ -173,6 +173,10 @@ module.exports = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))'
         }
+      },
+      fontFamily: {
+        sans: ['var(--font-teko)', ...defaultTheme.fontFamily.sans],
+        openSans: ['var(--font-inter)', ...defaultTheme.fontFamily.sans],
       }
     },
     fontFamily: {

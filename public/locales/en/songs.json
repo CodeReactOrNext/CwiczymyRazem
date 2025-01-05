@@ -20,5 +20,19 @@
   "error_updating_learning": "Error updating learning status",
   "learning": "Learning",
   "learn": "Learn",
-  "avg": "Avg"
+  "avg": "Avg",
+  "subtitlebar_text": "Browse and manage songs",
+  
+  "filter_by_status": "Filter by Status",
+  "filter_by_difficulty": "Filter by Difficulty",
+  "all_statuses": "All Statuses",
+  "all_difficulties": "All Difficulties",
+  "want_to_learn": "Want to Learn",
+  "learned": "Learned",
+  "easy": "Easy",
+  "medium": "Medium",
+  "hard": "Hard",
+  "clear_filters": "Clear filters",
+  "no_songs_found": "No songs found in the database",
+  "no_songs_found_with_filters": "No songs match your current filters"
 } 
