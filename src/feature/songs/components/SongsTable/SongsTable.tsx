@@ -46,6 +46,7 @@ interface SongsTableProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onAddSong: () => void;
+  onStatusChange?: () => void;
 }
 
 const SongsTable = ({
@@ -55,6 +56,7 @@ const SongsTable = ({
   onPageChange,
   onAddSong,
   hasFilters,
+  onStatusChange,
 }: SongsTableProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -75,6 +77,7 @@ const SongsTable = ({
   const { handleStatusChange } = useSongsStatusChange({
     onChange: setUserSongs,
     userSongs,
+    onTableStatusChange: onStatusChange,
   });
 
   const allUserSongs = [
@@ -159,6 +162,36 @@ const SongsTable = ({
     );
   };
 
+  const getRowStyle = (songId: string) => {
+    const status = userSongs.wantToLearn.find((s) => s.id === songId)
+      ? { 
+          backgroundColor: 'rgba(0, 0, 98, 0.05)',
+          transition: 'background-color 0.2s',
+          ':hover': {
+            backgroundColor: 'rgba(0, 0, 98, 0.1)'
+          }
+        }
+      : userSongs.learning.find((s) => s.id === songId)
+      ? {
+          backgroundColor: 'rgba(255, 193, 7, 0.05)', 
+          transition: 'background-color 0.2s',
+          ':hover': {
+            backgroundColor: 'rgba(255, 193, 7, 0.1)'
+          }
+        }
+      : userSongs.learned.find((s) => s.id === songId)
+      ? {
+          backgroundColor: 'rgba(76, 175, 80, 0.05)',
+          transition: 'background-color 0.2s',
+          ':hover': {
+            backgroundColor: 'rgba(76, 175, 80, 0.1)'
+          }
+        }
+      : {};
+
+    return status;
+  };
+
   if (!userId) {
     return null;
   }
@@ -178,7 +211,7 @@ const SongsTable = ({
           <TableBody>
             {songs.length > 0 ? (
               songs.map((song) => (
-                <TableRow key={song.id}>
+                <TableRow key={song.id} style={getRowStyle(song.id)} className='transition-colors'>
                   <TableCell>{song.title}</TableCell>
                   <TableCell>{song.artist}</TableCell>
                   <TableCell>
@@ -353,3 +386,29 @@ const SongsTable = ({
 };
 
 export default SongsTable;
+
+const styles = `
+  .want-to-learn {
+    background-color: rgba(var(--primary-rgb), 0.05);
+  }
+
+  .learning {
+    background-color: rgba(var(--warning-rgb), 0.05);
+  }
+
+  .learned {
+    background-color: rgba(var(--success-rgb), 0.05);
+  }
+
+  .want-to-learn:hover {
+    background-color: rgba(var(--primary-rgb), 0.1);
+  }
+
+  .learning:hover {
+    background-color: rgba(var(--warning-rgb), 0.1);
+  }
+
+  .learned:hover {
+    background-color: rgba(var(--success-rgb), 0.1);
+  }
+`;

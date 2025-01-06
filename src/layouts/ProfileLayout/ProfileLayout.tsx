@@ -14,9 +14,8 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import { convertMsToHM } from "utils/converter";
 import { ProfileInterface } from "types/ProfileInterface";
 import MainContainer from "components/MainContainer";
-import { getUserSongsWithStatus } from 'utils/firebase/client/firebase.utils';
-import { getUserSongs } from 'utils/firebase/client/firebase.utils';
-import { Timestamp } from 'firebase/firestore';
+import { getUserSongs } from "utils/firebase/client/firebase.utils";
+import { Timestamp } from "firebase/firestore";
 import { Song } from "utils/firebase/client/firebase.types";
 
 export interface LandingLayoutProps {
@@ -62,7 +61,7 @@ const ProfileLayout = ({
         const songs = await getUserSongs(userAuth);
         setUserSongs(songs);
       } catch (error) {
-        console.error('Error loading user songs:', error);
+        console.error("Error loading user songs:", error);
       }
     };
 
@@ -166,52 +165,6 @@ const ProfileLayout = ({
         </div>
         <div className='col-span-2  p-2 '>
           <Calendar userAuth={userAuth} />
-        </div>
-        <div className="content-box z-10 row-span-1 m-4">
-          <h3 className="text-xl font-semibold mb-4">{t('my_songs')}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <h4 className="font-medium mb-2">
-                {t('want_to_learn')} ({userSongs.wantToLearn.length})
-              </h4>
-              <ul className="space-y-2">
-                {userSongs.wantToLearn.map(song => (
-                  <li key={song.id} className="text-sm">
-                    {song.title} - {song.artist}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">
-                {t('learning')} ({userSongs.learning.length})
-              </h4>
-              <ul className="space-y-2">
-                {userSongs.learning.map(song => (
-                  <li key={song.id} className="text-sm">
-                    {song.title} - {song.artist}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">
-                {t('learned')} ({userSongs.learned.length})
-              </h4>
-              <ul className="space-y-2">
-                {userSongs.learned.map(song => (
-                  <li key={song.id} className="text-sm">
-                    {song.title} - {song.artist}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          {userSongs.lastUpdated && (
-            <div className="text-sm text-muted-foreground mt-4">
-              {t('last_updated')}: {userSongs.lastUpdated.toDate().toLocaleString()}
-            </div>
-          )}
         </div>
       </div>
     </MainContainer>

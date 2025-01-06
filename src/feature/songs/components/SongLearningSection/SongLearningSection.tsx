@@ -23,15 +23,21 @@ interface SongLearningSectionProps {
     learning: Song[];
     learned: Song[];
   }) => void;
+  onStatusChange?: () => void;
 }
 
 export const SongLearningSection = ({
   userSongs,
   onChange,
+  onStatusChange,
 }: SongLearningSectionProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
-  const { handleStatusChange } = useSongsStatusChange({ onChange, userSongs });
+  const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({ 
+    onChange, 
+    userSongs,
+    onTableStatusChange: onStatusChange
+  });
 
   if (!userId) {
     return null;
@@ -105,18 +111,21 @@ export const SongLearningSection = ({
           songs={userSongs.wantToLearn}
           droppableId='wantToLearn'
           onStatusChange={handleStatusChange}
+          onSongRemove={handleSongRemoval}
         />
         <SongStatusCard
           title={t("learning")}
           songs={userSongs.learning}
           droppableId='learning'
           onStatusChange={handleStatusChange}
+          onSongRemove={handleSongRemoval}
         />
         <SongStatusCard
           title={t("learned")}
           songs={userSongs.learned}
           droppableId='learned'
           onStatusChange={handleStatusChange}
+          onSongRemove={handleSongRemoval}
         />
       </div>
     </DragDropContext>

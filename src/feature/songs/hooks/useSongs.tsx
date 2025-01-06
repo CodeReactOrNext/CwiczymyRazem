@@ -65,9 +65,11 @@ export const useSongs = () => {
     );
   };
 
-  const loadSongs = async () => {
+  const loadSongs = async (skipLoading = false) => {
     try {
-      setIsLoading(true);
+      if (!skipLoading) {
+        setIsLoading(true);
+      }
       const loadedSongs = await getSongs(
         "title",
         "desc",
@@ -88,13 +90,14 @@ export const useSongs = () => {
     loadSongs();
   }, [debouncedSearchQuery, page]);
 
+  const loadUserSongs = async () => {
+    if (currentUserId) {
+      const songs = await getUserSongs(currentUserId);
+      setUserSongs(songs);
+    }
+  };
+
   useEffect(() => {
-    const loadUserSongs = async () => {
-      if (currentUserId) {
-        const songs = await getUserSongs(currentUserId);
-        setUserSongs(songs);
-      }
-    };
     loadUserSongs();
   }, [currentUserId, statusFilter]);
 
@@ -137,6 +140,24 @@ export const useSongs = () => {
   const hasFilters =
     statusFilter !== "all" || difficultyFilter !== "all" || searchQuery !== "";
 
+  const refreshSongs = async () => {
+    if (!currentUserId) return;
+    const songs = await getUserSongs(currentUserId);
+    setUserSongs(songs);
+    await loadSongs();
+  };
+
+  const handleStatusUpdate = async () => {
+    await refreshSongs();
+  };
+
+  const getSongStatus = (songId: string) => {
+    if (userSongs.wantToLearn.some(song => song.id === songId)) return 'wantToLearn';
+    if (userSongs.learning.some(song => song.id === songId)) return 'learning';
+    if (userSongs.learned.some(song => song.id === songId)) return 'learned';
+    return null;
+  };
+
   return {
     page,
     userSongs,
@@ -156,5 +177,9 @@ export const useSongs = () => {
     handlePageChange,
     handleClearFilters,
     setDifficultyFilter,
+    loadUserSongs,
+    handleStatusUpdate,
+    getSongStatus,
+    refreshSongs,
   };
 };
