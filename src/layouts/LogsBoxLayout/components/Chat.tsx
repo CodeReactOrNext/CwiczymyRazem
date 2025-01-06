@@ -12,6 +12,7 @@ import { ChatMessage } from "types/chat.types";
 import { db } from "utils/firebase/client/firebase.utils";
 import { useAppSelector } from "store/hooks";
 import { selectUserAuth, selectUserAvatar, selectUserInfo, selectUserName } from "feature/user/store/userSlice";
+import Avatar from "components/Avatar";
 
 const Chat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -24,6 +25,7 @@ const Chat = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
 
   useEffect(() => {
     scrollToBottom();
@@ -76,12 +78,12 @@ const Chat = () => {
             }`}
           >
             <div className="chat-image avatar">
-              <div className="w-10 rounded-full">
-                <img
-                  src={msg.userPhotoURL || "/default-avatar.png"}
-                  alt="avatar"
-                />
-              </div>
+                <Avatar
+          avatarURL={msg.userPhotoURL }
+          name={msg.username!}
+          size="sm"
+        />
+               
             </div>
             <div className="chat-header">{msg.username}</div>
             <div className="chat-bubble">{msg.message}</div>
