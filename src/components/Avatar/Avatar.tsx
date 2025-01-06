@@ -5,25 +5,26 @@ interface AvatarProps {
   name: string;
   lvl?: number;
   avatarURL?: string;
+  size?: "sm" ;
 }
 
-const Avatar = ({ name, lvl, avatarURL }: AvatarProps) => {
+const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
   const imgPath = getRankImgPath(lvl ?? 0);
 
   return (
     <div className='relative '>
-      <div className='flex h-20 w-20 items-center justify-center bg-tertiary-400 radius-default'>
+      <div className={`flex h-20 w-20 items-center justify-center bg-tertiary-400 rounded-lg ${size === "sm" ? "h-10 w-10 rounded-full " : ""}`}>
         {avatarURL ? (
           <img
             referrerPolicy='no-referrer'
-            className='h-full w-full radius-default'
+            className={`h-full w-full rounded-fullt ${size === "sm" ? "h-10 w-10 rounded-full " : ""}`}
             src={avatarURL}
             alt={name}
           />
         ) : (
-          <p className='font-openSans text-4xl font-bold uppercase text-main-opposed'>
+          <p className={`font-openSans text-4xl font-bold uppercase text-main-opposed ${size === "sm" ? "text-[14px]" : ""}`}>
             {name?.[0]}
-          </p>
+          </p>  
         )}
       </div>
       {lvl && (
