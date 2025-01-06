@@ -21,6 +21,8 @@ import type not_found from "../../public/locales/en/404.json";
 import type yup_errors from "../../public/locales/en/yup_errors.json";
 import type settings from "../../public/locales/en/settings.json";
 import type toast from "../../public/locales/en/toast.json";
+import type songs from "../../public/locales/en/songs.json";
+
 interface I18nNamespaces {
   common: typeof common;
   profile: typeof profile;
@@ -29,6 +31,7 @@ interface I18nNamespaces {
   footer: typeof footer;
   faq: typeof faq;
   leadboard: typeof leadboard;
+  songs: typeof songs;
   report: typeof report;
   achievements: typeof achievements;
   "404": typeof not_found;

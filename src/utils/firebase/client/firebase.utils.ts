@@ -26,13 +26,22 @@ import {
   deleteDoc,
   getCountFromServer,
   startAfter,
+  addDoc,
+  arrayRemove,
+  arrayUnion,
+  where,
+  Timestamp,
+  runTransaction,
 } from "firebase/firestore";
 import {
-  FirebaseDiscordEventsInteface,
   FirebaseEventsInteface,
   FirebaseLogsInterface,
+  FirebaseLogsSongsInterface,
+  FirebaseLogsSongsStatuses,
   FirebaseUserDataInterface,
   FirebaseUserExceriseLog,
+  Song,
+  SongStatus,
 } from "./firebase.types";
 import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 import { firebaseApp } from "./firebase.cofig";
@@ -68,12 +77,36 @@ export const firebaseGetLogs = async () => {
   const logsDocRef = collection(db, "logs");
   const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(20));
   const logsDoc = await getDocs(sortLogs);
-  const logsArr: FirebaseLogsInterface[] = [];
+  const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[] = [];
   logsDoc.forEach((doc) => {
-    const log = doc.data() as FirebaseLogsInterface;
+    const log = doc.data() as
+      | FirebaseLogsInterface
+      | FirebaseLogsSongsInterface;
     logsArr.push(log);
   });
   return logsArr;
+};
+
+export const firebaseAddSongsLog = async (
+  uid: string,
+  data: string,
+  songTitle: string,
+  songArtist: string,
+  status: FirebaseLogsSongsStatuses
+) => {
+  const logsDocRef = doc(collection(db, "logs"));
+  const userDocRef = doc(db, "users", uid);
+  const userSnapshot = await getDoc(userDocRef);
+  const userName = userSnapshot.data()!.displayName;
+
+  await setDoc(logsDocRef, {
+    data,
+    uid,
+    userName,
+    songTitle,
+    songArtist,
+    status,
+  });
 };
 
 export const firebaseGetEvents = async () => {
@@ -148,7 +181,7 @@ export const firebaseGetUsersExceriseRaport = async (
 ) => {
   try {
     let q;
-    
+
     if (page === 1) {
       // First page query
       q = query(
@@ -162,7 +195,7 @@ export const firebaseGetUsersExceriseRaport = async (
         sortBy,
         (page - 1) * itemsPerPage
       );
-      
+
       if (!lastVisibleDoc) {
         throw new Error("Could not find the reference document");
       }
@@ -177,7 +210,7 @@ export const firebaseGetUsersExceriseRaport = async (
     }
 
     const querySnapshot = await getDocs(q);
-    
+
     const users = querySnapshot.docs.map((doc) => ({
       profileId: doc.id,
       ...doc.data(),
@@ -319,10 +352,7 @@ export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
   await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
 };
 
-export const getDocumentAtIndex = async (
-  sortBy: SortByType,
-  index: number
-) => {
+export const getDocumentAtIndex = async (sortBy: SortByType, index: number) => {
   try {
     // Get the document at the specified index
     const q = query(
@@ -331,11 +361,278 @@ export const getDocumentAtIndex = async (
       limit(1),
       ...(index > 0 ? [startAfter(index - 1)] : [])
     );
-    
+
     const snapshot = await getDocs(q);
     return snapshot.docs[0];
   } catch (error) {
     console.error("Error getting document at index:", error);
     return null;
+  }
+};
+
+export const checkSongExists = async (title: string, artist: string) => {
+  try {
+    const songsRef = collection(db, "songs");
+    const q = query(
+      songsRef,
+      where("title", "==", title),
+      where("artist", "==", artist)
+    );
+
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
+  } catch (error) {
+    console.error("Error checking for duplicate song:", error);
+    throw error;
+  }
+};
+
+export const addSong = async (
+  title: string,
+  artist: string,
+  userId: string
+) => {
+  try {
+    // Check for duplicate song first
+    const exists = await checkSongExists(title, artist);
+    if (exists) {
+      throw new Error("song_already_exists");
+    }
+
+    const songsRef = collection(db, "songs");
+    const newSong = {
+      title,
+      artist,
+      difficulties: [],
+      createdAt: Timestamp.now(),
+      createdBy: userId,
+    };
+
+    const docRef = await addDoc(songsRef, newSong);
+    firebaseAddSongsLog(userId, new Date().toString(), title, artist, "added");
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding song:", error);
+    throw error;
+  }
+};
+
+export const rateSongDifficulty = async (
+  songId: string,
+  userId: string,
+  rating: number,
+  title: string,
+  artist: string
+) => {
+  try {
+    const songRef = doc(db, "songs", songId);
+    const songDoc = await getDoc(songRef);
+
+    if (!songDoc.exists()) {
+      throw new Error("Song not found");
+    }
+
+    const song = songDoc.data() as Song;
+    const difficulties = song.difficulties || [];
+
+    // Remove existing rating by this user if it exists
+    const filteredDifficulties = difficulties.filter(
+      (d) => d.userId !== userId
+    );
+
+    // Add new rating
+    const newDifficulties = [
+      ...filteredDifficulties,
+      {
+        userId,
+        rating,
+        date: Timestamp.now(),
+      },
+    ];
+
+    await updateDoc(songRef, {
+      difficulties: newDifficulties,
+    });
+    firebaseAddSongsLog(
+      userId,
+      new Date().toString(),
+      title,
+      artist,
+      "difficulty_rate"
+    );
+  } catch (error) {
+    console.error("Error rating song:", error);
+    throw error;
+  }
+};
+
+export const getSongs = async (
+  sortBy: string,
+  sortDirection: "asc" | "desc",
+  searchQuery: string,
+  page: number,
+  itemsPerPage: number
+) => {
+  try {
+    let baseQuery = query(collection(db, "songs"));
+
+    // Apply search if provided
+    if (searchQuery) {
+      baseQuery = query(
+        baseQuery,
+        where("title", ">=", searchQuery),
+        where("title", "<=", searchQuery + "\uf8ff")
+      );
+    }
+
+    // Apply sorting
+    if (sortBy !== "avgDifficulty" && sortBy !== "learners") {
+      baseQuery = query(baseQuery, orderBy(sortBy, sortDirection));
+    }
+
+    // Get total count
+    const totalSnapshot = await getCountFromServer(baseQuery);
+    const total = totalSnapshot.data().count;
+
+    // Get all documents up to the start of the requested page
+    const pageQuery = query(baseQuery, limit(page * itemsPerPage));
+
+    const snapshot = await getDocs(pageQuery);
+    const allDocs = snapshot.docs;
+
+    // Get the documents for the current page
+    const startIndex = (page - 1) * itemsPerPage;
+    const pageDocs = allDocs.slice(startIndex, startIndex + itemsPerPage);
+
+    const songs = pageDocs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Song[];
+
+    // Handle custom sorting
+    if (sortBy === "avgDifficulty") {
+      songs.sort((a, b) => {
+        const avgA =
+          a.difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
+          (a.difficulties.length || 1);
+        const avgB =
+          b.difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
+          (b.difficulties.length || 1);
+        return sortDirection === "asc" ? avgA - avgB : avgB - avgA;
+      });
+    }
+
+    return {
+      songs,
+      total,
+    };
+  } catch (error) {
+    console.error("Error getting songs:", error);
+    throw error;
+  }
+};
+
+export const updateSongStatus = async (
+  userId: string,
+  songId: string,
+  title: string,
+  artist: string,
+  status: SongStatus
+) => {
+  const userDocRef = doc(db, "users", userId);
+  const userSongsRef = doc(userDocRef, "userSongs", songId);
+
+  try {
+    await setDoc(userSongsRef, {
+      songId,
+      status,
+      title,
+      artist,
+      lastUpdated: Timestamp.now(),
+    });
+
+    firebaseAddSongsLog(userId, new Date().toString(), title, artist, status);
+    return true;
+  } catch (error) {
+    console.error("Error updating song status:", error);
+    throw error;
+  }
+};
+
+export const getUserSongs = async (userId: string) => {
+  const userDocRef = doc(db, "users", userId);
+  const userSongsRef = collection(userDocRef, "userSongs");
+
+  try {
+    const userSongsSnapshot = await getDocs(userSongsRef);
+    const songLists = {
+      wantToLearn: [] as Song[],
+      learning: [] as Song[],
+      learned: [] as Song[],
+      lastUpdated: Timestamp.now(),
+    };
+
+    // Get all songs and their statuses
+    const userSongs = userSongsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.data().songId,
+    }));
+
+    // Organize songs by status
+    userSongs.forEach((song: { status?: SongStatus } & { id: any }) => {
+      if (song.status === "wantToLearn")
+        songLists.wantToLearn.push(song as Song);
+      if (song.status === "learning") songLists.learning.push(song as Song);
+      if (song.status === "learned") songLists.learned.push(song as Song);
+    });
+
+    return songLists;
+  } catch (error) {
+    console.error("Error getting user songs:", error);
+    throw error;
+  }
+};
+
+// Helper function to get current status of a song for a user
+export const getUserSongStatus = async (userId: string, songId: string) => {
+  const userDocRef = doc(db, "users", userId);
+  const userSongRef = doc(userDocRef, "userSongs", songId);
+
+  try {
+    const userSongDoc = await getDoc(userSongRef);
+    if (!userSongDoc.exists()) return null;
+
+    return userSongDoc.data().status as SongStatus;
+  } catch (error) {
+    console.error("Error getting song status:", error);
+    throw error;
+  }
+};
+
+export const removeUserSong = async (userId: string, songId: string) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userSongRef = doc(userDocRef, "userSongs", songId);
+    const songRef = doc(db, "songs", songId);
+
+    const songDoc = await getDoc(songRef);
+    const songData = songDoc.exists() ? songDoc.data() : null;
+
+    await deleteDoc(userSongRef);
+
+    if (songData) {
+      firebaseAddSongsLog(
+        userId,
+        new Date().toString(),
+        songData.title,
+        songData.artist,
+        "removed" as SongStatus
+      );
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error removing song:", error);
+    throw error;
   }
 };

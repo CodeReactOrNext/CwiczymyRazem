@@ -1,6 +1,4 @@
-
 @tailwind base;
-
 
 @tailwind components;
 @tailwind utilities;
@@ -14,7 +12,6 @@ body {
   position: relative;
   content-visibility: auto;
   @apply bg-tertiary-500;
-  
 }
 
 ::-webkit-scrollbar {
@@ -39,8 +36,6 @@ a {
 * {
   box-sizing: border-box;
 }
-
-
 
 @keyframes hover-effect {
   from {
@@ -154,8 +149,8 @@ a {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    
-    
+    --font-teko: "Teko", sans-serif;
+    --font-inter: "Inter", sans-serif;
   }
   .dark {
     --background: 0 0% 3.9%;

@@ -10,6 +10,7 @@ import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import {
   FirebaseEventsInteface,
   FirebaseLogsInterface,
+  FirebaseLogsSongsInterface,
 } from "utils/firebase/client/firebase.types";
 import {
   firebaseGetEvents,
@@ -17,7 +18,9 @@ import {
 } from "utils/firebase/client/firebase.utils";
 
 const LogsBoxView = () => {
-  const [logs, setLogs] = useState<FirebaseLogsInterface[] | null>(null);
+  const [logs, setLogs] = useState<
+    (FirebaseLogsSongsInterface | FirebaseLogsInterface)[] | null
+  >(null);
   const [events, setEvents] = useState<FirebaseEventsInteface[] | null>(null);
 
   const userAchievement = useAppSelector(selectCurrentUserStats)?.achievements;
