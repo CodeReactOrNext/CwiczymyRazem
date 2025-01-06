@@ -94,14 +94,8 @@ export interface Song {
   title: string;
   artist: string;
   difficulties: SongDifficulty[];
-  learningUsers: string[];
   createdAt: Timestamp;
   createdBy: string;
-  statusCounts: {
-    wantToLearn: number;
-    learning: number;
-    learned: number;
-  };
 }
 
 export interface UserSongStatus {

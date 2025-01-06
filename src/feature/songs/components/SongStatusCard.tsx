@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "assets/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "assets/components/ui/card";
 import { ScrollArea } from "assets/components/ui/scroll-area";
 import { Song, SongStatus } from "utils/firebase/client/firebase.types";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
@@ -14,57 +19,81 @@ interface SongStatusCardProps {
   title: string;
   songs: Song[];
   droppableId: SongStatus;
-  onStatusChange: (songId: string, status: SongStatus | null, title: string, artist: string) => Promise<void>;
+  onStatusChange: (
+    songId: string,
+    newStatus: SongStatus,
+    title: string,
+    artist: string
+  ) => Promise<void>;
 }
 
-export const SongStatusCard = ({ title, songs, droppableId, onStatusChange }: SongStatusCardProps) => (
-  <Card className="flex-1">
+export const SongStatusCard = ({
+  title,
+  songs,
+  droppableId,
+  onStatusChange,
+}: SongStatusCardProps) => (
+  <Card className='flex-1'>
     <CardHeader>
-      <CardTitle className="text-sm font-medium">
-        {title} ({songs.length})
+      <CardTitle className='text-sm font-medium'>
+        {title} ({songs?.length})
       </CardTitle>
     </CardHeader>
     <CardContent>
       <Droppable droppableId={droppableId}>
         {(provided, snapshot) => (
-          <ScrollArea 
-            className={`h-32 p-2 rounded-md ${snapshot.isDraggingOver ? 'bg-muted/50' : ''}`}
+          <ScrollArea
+            className={`h-32 rounded-md p-2 ${
+              snapshot.isDraggingOver ? "bg-muted/50" : ""
+            }`}
             {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            <div className="space-y-2">
-              {songs.map((song, index) => (
+            ref={provided.innerRef}>
+            <div className='space-y-2'>
+              {songs?.map((song, index) => (
                 <Draggable key={song.id} draggableId={song.id} index={index}>
                   {(provided, snapshot) => (
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className={`p-2 rounded-md border bg-card flex justify-between items-center ${
-                        snapshot.isDragging ? 'shadow-lg' : ''
-                      }`}
-                    >
-                      <span className="text-sm">
+                      className={`flex items-center justify-between rounded-md border bg-card p-2 ${
+                        snapshot.isDragging ? "shadow-lg" : ""
+                      }`}>
+                      <span className='text-sm'>
                         {song.title} - {song.artist}
                       </span>
                       <DropdownMenu>
-                        <DropdownMenuTrigger className="focus:outline-none">
-                          <MoreVertical className="h-4 w-4" />
+                        <DropdownMenuTrigger className='focus:outline-none'>
+                          <MoreVertical className='h-4 w-4' />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          {(['wantToLearn', 'learning', 'learned'] as const).map((status) => (
+                          {(
+                            ["wantToLearn", "learning", "learned"] as const
+                          ).map((status) => (
                             <DropdownMenuItem
                               key={status}
-                              onClick={() => onStatusChange(song.id, status, song.title, song.artist)}
-                              className="cursor-pointer"
-                            >
+                              onClick={() =>
+                                onStatusChange(
+                                  song.id,
+                                  status,
+                                  song.title,
+                                  song.artist
+                                )
+                              }
+                              className='cursor-pointer'>
                               Move to {status}
                             </DropdownMenuItem>
                           ))}
                           <DropdownMenuItem
-                            onClick={() => onStatusChange(song.id, null, song.title, song.artist)}
-                            className="cursor-pointer text-destructive"
-                          >
+                            onClick={() =>
+                              onStatusChange(
+                                song.id,
+                                null,
+                                song.title,
+                                song.artist
+                              )
+                            }
+                            className='cursor-pointer text-destructive'>
                             Remove
                           </DropdownMenuItem>
                         </DropdownMenuContent>
