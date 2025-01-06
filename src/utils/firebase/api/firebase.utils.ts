@@ -1,8 +1,17 @@
 import { AchievementList } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface, StatisticsTime } from "types/api.types";
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { db } from "../client/firebase.utils";
+import {
+  getFirestore,
+  runTransaction,
+  Timestamp,
+  where,
+  query,
+  getDocs,
+} from "firebase/firestore";
+import { SongStatus } from "utils/firebase/client/firebase.types";
 
 export const firebaseGetUserData = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
@@ -58,4 +67,55 @@ export const firebaseAddLogReport = async (
     newAchievements,
     newLevel,
   });
+};
+
+export const updateSongStatus = async (
+  userId: string,
+  songId: string,
+  status: SongStatus
+) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const songDocRef = doc(collection(userDocRef, "songs"), songId);
+    const songRef = doc(db, "songs", songId);
+
+    await runTransaction(db, async (transaction) => {
+      const songDoc = await transaction.get(songRef);
+
+      if (!songDoc.exists()) {
+        throw new Error("Song not found");
+      }
+
+      const songData = songDoc.data();
+      
+      // Update or create user's song document
+      await transaction.set(songDocRef, {
+        ...songData,
+        id: songId,
+        status,
+        lastUpdated: Timestamp.now()
+      });
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Error updating song status:", error);
+    throw error;
+  }
+};
+
+export const getUserSongStatuses = async (userId: string) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const songsCollectionRef = collection(userDocRef, "songs");
+    const querySnapshot = await getDocs(songsCollectionRef);
+    
+    return querySnapshot.docs.reduce((acc, doc) => {
+      acc[doc.id] = doc.data().status;
+      return acc;
+    }, {} as Record<string, SongStatus>);
+  } catch (error) {
+    console.error("Error getting user song statuses:", error);
+    throw error;
+  }
 };

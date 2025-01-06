@@ -10,6 +10,7 @@ import { AchievementList } from "assets/achievements/achievementsData";
 import {
   FirebaseEventsInteface,
   FirebaseLogsInterface,
+  FirebaseLogsSongsInterface,
 } from "utils/firebase/client/firebase.types";
 import { TbNews } from "react-icons/tb";
 import { FaGuitar, FaMedal, FaTasks } from "react-icons/fa";
@@ -19,7 +20,7 @@ import { IoChatboxEllipses } from "react-icons/io5";
 import Chat from "./components/Chat";
 
 export interface LogsBoxLayoutProps {
-  logs: FirebaseLogsInterface[];
+  logs: (FirebaseLogsSongsInterface | FirebaseLogsInterface)[];
   events: FirebaseEventsInteface[];
   userAchievements: AchievementList[];
 }
@@ -64,7 +65,8 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           onClick={() => setShowedCategory("discord")}
           Icon={TbNews}
         />
-      
+
+
       </div>
       {showedCategory === "achievements" && (
         <AchievementsMap userAchievements={userAchievements} />

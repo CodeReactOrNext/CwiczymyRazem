@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
 import Avatar from "components/Avatar";
 import Calendar from "components/Calendar";
@@ -13,6 +14,9 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import { convertMsToHM } from "utils/converter";
 import { ProfileInterface } from "types/ProfileInterface";
 import MainContainer from "components/MainContainer";
+import { getUserSongs } from "utils/firebase/client/firebase.utils";
+import { Timestamp } from "firebase/firestore";
+import { Song } from "utils/firebase/client/firebase.types";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -38,6 +42,31 @@ const ProfileLayout = ({
   const { time, achievements, lastReportDate } = statistics;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
+
+  const [userSongs, setUserSongs] = useState<{
+    wantToLearn: Song[];
+    learning: Song[];
+    learned: Song[];
+    lastUpdated?: Timestamp;
+  }>({
+    wantToLearn: [],
+    learning: [],
+    learned: [],
+  });
+
+  useEffect(() => {
+    const loadUserSongs = async () => {
+      if (!userAuth) return;
+      try {
+        const songs = await getUserSongs(userAuth);
+        setUserSongs(songs);
+      } catch (error) {
+        console.error("Error loading user songs:", error);
+      }
+    };
+
+    loadUserSongs();
+  }, [userAuth]);
 
   return (
     <MainContainer title={t("profile")}>

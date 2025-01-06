@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   collection,
   query,
@@ -18,9 +18,18 @@ const Chat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const currentUserId = useAppSelector(selectUserAuth);
-    const currentUserName = useAppSelector(selectUserName);
-    const avatar = useAppSelector(selectUserAvatar);
+  const currentUserName = useAppSelector(selectUserName);
+  const avatar = useAppSelector(selectUserAvatar);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     const q = query(
@@ -41,15 +50,13 @@ const Chat = () => {
   }, []);
 
   const sendMessage = async (e: React.FormEvent) => {
-   
-    
     e.preventDefault();
-    if (!newMessage.trim() ) return;
+    if (!newMessage.trim()) return;
 
     try {
       await addDoc(collection(db, "chats"), {
         userId: currentUserId,
-        username: currentUserName|| "Anonymous",
+        username: currentUserName || "Anonymous",
         message: newMessage,
         timestamp: serverTimestamp(),
         userPhotoURL: avatar,
@@ -82,6 +89,7 @@ const Chat = () => {
             <div className="chat-bubble">{msg.message}</div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <form onSubmit={sendMessage} className="p-4 border-t">
         <div className="join w-full">

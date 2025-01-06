@@ -12,6 +12,14 @@ export interface FirebaseUserDataInterface {
   youTubeLink?: string;
   band?: string;
   statistics: StatisticsDataInterface;
+  songLists: UserSongLists;
+}
+
+export interface UserSongLists {
+  wantToLearn: string[];
+  learning: string[];
+  learned: string[];
+  lastUpdated: Timestamp;
 }
 
 export interface FirebaseLogsInterface {
@@ -25,7 +33,20 @@ export interface FirebaseLogsInterface {
   };
   points: number;
 }
-
+export type FirebaseLogsSongsStatuses =
+  | "learned"
+  | "wantToLearn"
+  | "learning"
+  | "added"
+  | "difficulty_rate";
+export interface FirebaseLogsSongsInterface {
+  uid: string;
+  data: string;
+  userName: string;
+  songTitle: string;
+  songArtist: string;
+  status: FirebaseLogsSongsStatuses;
+}
 export interface FirebaseEventsInteface {
   category: SkillsType;
   name: string;
@@ -58,4 +79,28 @@ export interface FirebaseUserExceriseLog {
     creativityTime: number;
     sumTime: number;
   };
+}
+
+export interface SongDifficulty {
+  userId: string;
+  rating: number;
+  date: Timestamp;
+}
+
+export type SongStatus = "wantToLearn" | "learning" | "learned";
+
+export interface Song {
+  id: string;
+  title: string;
+  artist: string;
+  difficulties: SongDifficulty[];
+  createdAt: Timestamp;
+  createdBy: string;
+}
+
+export interface UserSongStatus {
+  userId: string;
+  songId: string;
+  status: SongStatus;
+  updatedAt: Timestamp;
 }

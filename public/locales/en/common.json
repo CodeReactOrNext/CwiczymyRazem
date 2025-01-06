@@ -31,7 +31,9 @@
     "discord": "Discord",
     "faq": "FAQ",
     "exercise": "Exercise",
-    "report": "Report"
+    "report": "Report",
+    "songs": "Songs"
+
   },
   "day_since": {
     "no_practice": "Player hasn't practiced",
