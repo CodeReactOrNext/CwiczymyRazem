@@ -164,28 +164,28 @@ const SongsTable = ({
 
   const getRowStyle = (songId: string) => {
     const status = userSongs.wantToLearn.find((s) => s.id === songId)
-      ? { 
-          backgroundColor: 'rgba(0, 0, 98, 0.05)',
-          transition: 'background-color 0.2s',
-          ':hover': {
-            backgroundColor: 'rgba(0, 0, 98, 0.1)'
-          }
+      ? {
+          backgroundColor: "rgba(0, 0, 98, 0.05)",
+          transition: "background-color 0.2s",
+          ":hover": {
+            backgroundColor: "rgba(0, 0, 98, 0.1)",
+          },
         }
       : userSongs.learning.find((s) => s.id === songId)
       ? {
-          backgroundColor: 'rgba(255, 193, 7, 0.05)', 
-          transition: 'background-color 0.2s',
-          ':hover': {
-            backgroundColor: 'rgba(255, 193, 7, 0.1)'
-          }
+          backgroundColor: "rgba(255, 193, 7, 0.05)",
+          transition: "background-color 0.2s",
+          ":hover": {
+            backgroundColor: "rgba(255, 193, 7, 0.1)",
+          },
         }
       : userSongs.learned.find((s) => s.id === songId)
       ? {
-          backgroundColor: 'rgba(76, 175, 80, 0.05)',
-          transition: 'background-color 0.2s',
-          ':hover': {
-            backgroundColor: 'rgba(76, 175, 80, 0.1)'
-          }
+          backgroundColor: "rgba(76, 175, 80, 0.05)",
+          transition: "background-color 0.2s",
+          ":hover": {
+            backgroundColor: "rgba(76, 175, 80, 0.1)",
+          },
         }
       : {};
 
@@ -211,7 +211,10 @@ const SongsTable = ({
           <TableBody>
             {songs.length > 0 ? (
               songs.map((song) => (
-                <TableRow key={song.id} style={getRowStyle(song.id)} className='transition-colors'>
+                <TableRow
+                  key={song.id}
+                  style={getRowStyle(song.id)}
+                  className='transition-colors'>
                   <TableCell>{song.title}</TableCell>
                   <TableCell>{song.artist}</TableCell>
                   <TableCell>
@@ -251,19 +254,25 @@ const SongsTable = ({
                                   ? "fill-primary text-primary"
                                   : "fill-transparent text-transparent"
                               }`}
-                              onClick={() =>
-                                handleRating(
-                                  song.id,
-                                  song.title,
-                                  song.artist,
-                                  i + 1
-                                )
+                              onClick={
+                                userRating
+                                  ? undefined
+                                  : () =>
+                                      handleRating(
+                                        song.id,
+                                        song.title,
+                                        song.artist,
+                                        i + 1
+                                      )
                               }
-                              onMouseEnter={() =>
-                                setRatingHover({
-                                  songId: song.id,
-                                  rating: i + 1,
-                                })
+                              onMouseEnter={
+                                userRating
+                                  ? undefined
+                                  : () =>
+                                      setRatingHover({
+                                        songId: song.id,
+                                        rating: i + 1,
+                                      })
                               }
                               onMouseLeave={() => setRatingHover(null)}
                             />
