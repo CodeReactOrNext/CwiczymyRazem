@@ -378,7 +378,7 @@ export const checkSongExists = async (title: string, artist: string) => {
       where("title", "==", title),
       where("artist", "==", artist)
     );
-    
+
     const querySnapshot = await getDocs(q);
     return !querySnapshot.empty;
   } catch (error) {
@@ -404,7 +404,6 @@ export const addSong = async (
       title,
       artist,
       difficulties: [],
-      learningUsers: [],
       createdAt: Timestamp.now(),
       createdBy: userId,
     };
@@ -469,7 +468,7 @@ export const rateSongDifficulty = async (
 
 export const getSongs = async (
   sortBy: string,
-  sortDirection: 'asc' | 'desc',
+  sortDirection: "asc" | "desc",
   searchQuery: string,
   page: number,
   itemsPerPage: number
@@ -496,21 +495,18 @@ export const getSongs = async (
     const total = totalSnapshot.data().count;
 
     // Get all documents up to the start of the requested page
-    const pageQuery = query(
-      baseQuery,
-      limit(page * itemsPerPage)
-    );
-    
+    const pageQuery = query(baseQuery, limit(page * itemsPerPage));
+
     const snapshot = await getDocs(pageQuery);
     const allDocs = snapshot.docs;
 
     // Get the documents for the current page
     const startIndex = (page - 1) * itemsPerPage;
     const pageDocs = allDocs.slice(startIndex, startIndex + itemsPerPage);
-    
-    const songs = pageDocs.map(doc => ({
+
+    const songs = pageDocs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     })) as Song[];
 
     // Handle custom sorting
@@ -524,20 +520,14 @@ export const getSongs = async (
           (b.difficulties.length || 1);
         return sortDirection === "asc" ? avgA - avgB : avgB - avgA;
       });
-    } else if (sortBy === "learners") {
-      songs.sort((a, b) => {
-        return sortDirection === "asc"
-          ? (a.learningUsers?.length || 0) - (b.learningUsers?.length || 0)
-          : (b.learningUsers?.length || 0) - (a.learningUsers?.length || 0);
-      });
     }
 
     return {
       songs,
-      total
+      total,
     };
   } catch (error) {
-    console.error('Error getting songs:', error);
+    console.error("Error getting songs:", error);
     throw error;
   }
 };
@@ -556,11 +546,6 @@ export const updateSongStatus = async (
   try {
     await runTransaction(db, async (transaction) => {
       const userDoc = await transaction.get(userDocRef);
-      const songDoc = await transaction.get(songRef);
-
-      if (!songDoc.exists()) {
-        throw new Error("Song not found");
-      }
 
       const userData = userDoc.data();
       const songLists = userData?.songLists || {
@@ -582,26 +567,10 @@ export const updateSongStatus = async (
         }
       }
 
-      // Add to new status list
       songLists[status].push(songId);
       songLists.lastUpdated = Timestamp.now();
 
-      // Update song status counts
-      const songData = songDoc.data();
-      const statusCounts = songData.statusCounts || {
-        wantToLearn: 0,
-        learning: 0,
-        learned: 0,
-      };
-
-      if (oldStatus) {
-        statusCounts[oldStatus]--;
-      }
-      statusCounts[status]++;
-
-      // Update both documents
       transaction.update(userDocRef, { songLists });
-      transaction.update(songRef, { statusCounts });
       firebaseAddSongsLog(userId, new Date().toString(), title, artist, status);
     });
 

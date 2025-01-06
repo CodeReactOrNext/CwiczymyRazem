@@ -22,7 +22,7 @@
   "learn": "Learn",
   "avg": "Avg",
   "subtitlebar_text": "Browse and manage songs",
-  
+  "select_status": "Select status",
   "filter_by_status": "Filter by Status",
   "filter_by_difficulty": "Filter by Difficulty",
   "all_statuses": "All Statuses",
@@ -34,5 +34,8 @@
   "hard": "Hard",
   "clear_filters": "Clear filters",
   "no_songs_found": "No songs found in the database",
-  "no_songs_found_with_filters": "No songs match your current filters"
-} 
+  "no_songs_found_with_filters": "No songs match your current filters",
+  "no_song_add_song": "If you couldn't find the track you're looking for, feel free to add it!",
+  "all_fields_required": "All fields all required"
+
+}
