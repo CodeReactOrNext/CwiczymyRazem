@@ -3,7 +3,7 @@
   "add_song": "Dodaj piosenkę",
   "search_songs": "Wyszukaj piosenki...",
   "title": "Tytuł",
-  "artist": "Artysta",
+  "artist": "Artysta", 
   "difficulty": "Trudność",
   "learners": "Uczący się",
   "actions": "Akcje",
@@ -36,5 +36,12 @@
   "no_songs_found": "Nie znaleziono piosenek w bazie danych",
   "no_songs_found_with_filters": "Żadne piosenki nie pasują do aktualnych filtrów",
   "no_song_add_song": "Jeśli nie udało Ci się znaleźć utworu, którego szukasz, możesz go dodać!",
-  "all_fields_required": "Wszystkie pola sa wymagane."
+  "all_fields_required": "Wszystkie pola sa wymagane.",
+  "status_updated": "Status pomyślnie zaktualizowany",
+  "error_updating_status": "Błąd podczas aktualizacji statusu",
+  "no_songs_in_status": "Brak piosenek",
+  "no_songs_in_status_desc": "Wybierz piosenkę z tabeli i zmień jej status, aby dodać",
+  "song_removed": "Piosenka została pomyślnie usunięta",
+  "error_removing_song": "Błąd podczas usuwania piosenki",
+  "song_already_exists": "Piosenka już istnieje"
 }

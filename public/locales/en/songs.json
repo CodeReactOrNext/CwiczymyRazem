@@ -36,6 +36,12 @@
   "no_songs_found": "No songs found in the database",
   "no_songs_found_with_filters": "No songs match your current filters",
   "no_song_add_song": "If you couldn't find the track you're looking for, feel free to add it!",
-  "all_fields_required": "All fields all required"
-
+  "all_fields_required": "All fields all required",
+  "status_updated": "Status updated successfully",
+  "error_updating_status": "Error updating status",
+  "no_songs_in_status": "No songs",
+  "no_songs_in_status_desc": "Choose song on table and change its status to add one",
+  "song_removed": "Song removed successfully",
+  "error_removing_song": "Error removing song",
+  "song_already_exists": "Song already exists"
 }

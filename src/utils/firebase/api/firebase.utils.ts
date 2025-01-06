@@ -1,6 +1,6 @@
 import { AchievementList } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface, StatisticsTime } from "types/api.types";
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { db } from "../client/firebase.utils";
 import {
@@ -74,17 +74,27 @@ export const updateSongStatus = async (
   songId: string,
   status: SongStatus
 ) => {
-  const db = getFirestore();
-  const userSongRef = doc(db, "userSongs", `${userId}_${songId}`);
-  const songRef = doc(db, "songs", songId);
-
   try {
+    const userDocRef = doc(db, "users", userId);
+    const songDocRef = doc(collection(userDocRef, "songs"), songId);
+    const songRef = doc(db, "songs", songId);
+
     await runTransaction(db, async (transaction) => {
       const songDoc = await transaction.get(songRef);
 
       if (!songDoc.exists()) {
         throw new Error("Song not found");
       }
+
+      const songData = songDoc.data();
+      
+      // Update or create user's song document
+      await transaction.set(songDocRef, {
+        ...songData,
+        id: songId,
+        status,
+        lastUpdated: Timestamp.now()
+      });
     });
 
     return true;
@@ -95,14 +105,17 @@ export const updateSongStatus = async (
 };
 
 export const getUserSongStatuses = async (userId: string) => {
-  const db = getFirestore();
-  const userSongsRef = collection(db, "userSongs");
-  const q = query(userSongsRef, where("userId", "==", userId));
-
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.reduce((acc, doc) => {
-    const data = doc.data();
-    acc[data.songId] = data.status;
-    return acc;
-  }, {} as Record<string, SongStatus>);
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const songsCollectionRef = collection(userDocRef, "songs");
+    const querySnapshot = await getDocs(songsCollectionRef);
+    
+    return querySnapshot.docs.reduce((acc, doc) => {
+      acc[doc.id] = doc.data().status;
+      return acc;
+    }, {} as Record<string, SongStatus>);
+  } catch (error) {
+    console.error("Error getting user song statuses:", error);
+    throw error;
+  }
 };

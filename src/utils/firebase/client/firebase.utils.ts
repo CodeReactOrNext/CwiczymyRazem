@@ -539,41 +539,19 @@ export const updateSongStatus = async (
   artist: string,
   status: SongStatus
 ) => {
-  const db = getFirestore();
   const userDocRef = doc(db, "users", userId);
-  const songRef = doc(db, "songs", songId);
+  const userSongsRef = doc(userDocRef, "userSongs", songId);
 
   try {
-    await runTransaction(db, async (transaction) => {
-      const userDoc = await transaction.get(userDocRef);
-
-      const userData = userDoc.data();
-      const songLists = userData?.songLists || {
-        wantToLearn: [],
-        learning: [],
-        learned: [],
-        lastUpdated: Timestamp.now(),
-      };
-
-      // Remove song from all lists first
-      const allLists: SongStatus[] = ["wantToLearn", "learning", "learned"];
-      let oldStatus: SongStatus | null = null;
-
-      for (const list of allLists) {
-        const index = songLists[list].indexOf(songId);
-        if (index > -1) {
-          oldStatus = list;
-          songLists[list].splice(index, 1);
-        }
-      }
-
-      songLists[status].push(songId);
-      songLists.lastUpdated = Timestamp.now();
-
-      transaction.update(userDocRef, { songLists });
-      firebaseAddSongsLog(userId, new Date().toString(), title, artist, status);
+    await setDoc(userSongsRef, {
+      songId,
+      status,
+      title,
+      artist,
+      lastUpdated: Timestamp.now(),
     });
 
+    firebaseAddSongsLog(userId, new Date().toString(), title, artist, status);
     return true;
   } catch (error) {
     console.error("Error updating song status:", error);
@@ -582,50 +560,33 @@ export const updateSongStatus = async (
 };
 
 export const getUserSongs = async (userId: string) => {
-  const db = getFirestore();
   const userDocRef = doc(db, "users", userId);
+  const userSongsRef = collection(userDocRef, "userSongs");
 
   try {
-    const userDoc = await getDoc(userDocRef);
-    if (!userDoc.exists()) {
-      throw new Error("User not found");
-    }
-
-    const songLists = userDoc.data().songLists || {
-      wantToLearn: [],
-      learning: [],
-      learned: [],
+    const userSongsSnapshot = await getDocs(userSongsRef);
+    const songLists = {
+      wantToLearn: [] as Song[],
+      learning: [] as Song[],
+      learned: [] as Song[],
       lastUpdated: Timestamp.now(),
     };
 
-    // Get all unique song IDs
-    const allSongIds = [
-      ...new Set([
-        ...songLists.wantToLearn,
-        ...songLists.learning,
-        ...songLists.learned,
-      ]),
-    ];
+    // Get all songs and their statuses
+    const userSongs = userSongsSnapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.data().songId,
+    }));
 
-    // Fetch all songs in parallel
-    const songDocs = await Promise.all(
-      allSongIds.map((id) => getDoc(doc(db, "songs", id)))
-    );
+    // Organize songs by status
+    userSongs.forEach((song: { status?: SongStatus } & { id: any }) => {
+      if (song.status === "wantToLearn")
+        songLists.wantToLearn.push(song as Song);
+      if (song.status === "learning") songLists.learning.push(song as Song);
+      if (song.status === "learned") songLists.learned.push(song as Song);
+    });
 
-    const songs = songDocs.reduce((acc, doc) => {
-      if (doc.exists()) {
-        acc[doc.id] = { id: doc.id, ...doc.data() } as Song;
-      }
-      return acc;
-    }, {} as Record<string, Song>);
-
-    // Return organized lists with full song objects
-    return {
-      wantToLearn: songLists.wantToLearn.map((id) => songs[id]).filter(Boolean),
-      learning: songLists.learning.map((id) => songs[id]).filter(Boolean),
-      learned: songLists.learned.map((id) => songs[id]).filter(Boolean),
-      lastUpdated: songLists.lastUpdated,
-    };
+    return songLists;
   } catch (error) {
     console.error("Error getting user songs:", error);
     throw error;
@@ -634,23 +595,44 @@ export const getUserSongs = async (userId: string) => {
 
 // Helper function to get current status of a song for a user
 export const getUserSongStatus = async (userId: string, songId: string) => {
-  const db = getFirestore();
   const userDocRef = doc(db, "users", userId);
+  const userSongRef = doc(userDocRef, "userSongs", songId);
 
   try {
-    const userDoc = await getDoc(userDocRef);
-    if (!userDoc.exists()) return null;
+    const userSongDoc = await getDoc(userSongRef);
+    if (!userSongDoc.exists()) return null;
 
-    const songLists = userDoc.data().songLists;
-    if (!songLists) return null;
-
-    if (songLists.wantToLearn.includes(songId)) return "wantToLearn";
-    if (songLists.learning.includes(songId)) return "learning";
-    if (songLists.learned.includes(songId)) return "learned";
-
-    return null;
+    return userSongDoc.data().status as SongStatus;
   } catch (error) {
     console.error("Error getting song status:", error);
+    throw error;
+  }
+};
+
+export const removeUserSong = async (userId: string, songId: string) => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userSongRef = doc(userDocRef, "userSongs", songId);
+    const songRef = doc(db, "songs", songId);
+
+    const songDoc = await getDoc(songRef);
+    const songData = songDoc.exists() ? songDoc.data() : null;
+
+    await deleteDoc(userSongRef);
+
+    if (songData) {
+      firebaseAddSongsLog(
+        userId,
+        new Date().toString(),
+        songData.title,
+        songData.artist,
+        "removed" as SongStatus
+      );
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error removing song:", error);
     throw error;
   }
 };

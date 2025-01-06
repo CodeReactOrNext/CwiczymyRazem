@@ -37,12 +37,17 @@ const SongsView = () => {
     handleClearFilters,
     setDifficultyFilter,
     setUserSongs,
+    refreshSongs,
   } = useSongs();
 
   return (
     <MainContainer title={t("songs")}>
       <div className='p-4 font-openSans'>
-        <SongLearningSection userSongs={userSongs} onChange={setUserSongs} />
+        <SongLearningSection
+          userSongs={userSongs}
+          onChange={setUserSongs}
+          onStatusChange={refreshSongs}
+        />
         <div className='mb-4 mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex flex-1 items-center gap-4'>
             <div className='flex-1'>
@@ -107,12 +112,14 @@ const SongsView = () => {
           </div>
         ) : (
           <SongsTable
+            key={filteredSongs.toString()}
             songs={filteredSongs}
             currentPage={page}
             totalPages={totalPages}
             onPageChange={handlePageChange}
             onAddSong={() => setIsModalOpen(true)}
             hasFilters={hasFilters}
+            onStatusChange={refreshSongs}
           />
         )}
 
