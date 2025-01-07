@@ -19,8 +19,6 @@ export const useSongs = () => {
     learned: [],
   });
 
-  console.log(userSongs);
-
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -152,9 +150,11 @@ export const useSongs = () => {
   };
 
   const getSongStatus = (songId: string) => {
-    if (userSongs.wantToLearn.some(song => song.id === songId)) return 'wantToLearn';
-    if (userSongs.learning.some(song => song.id === songId)) return 'learning';
-    if (userSongs.learned.some(song => song.id === songId)) return 'learned';
+    if (userSongs.wantToLearn.some((song) => song.id === songId))
+      return "wantToLearn";
+    if (userSongs.learning.some((song) => song.id === songId))
+      return "learning";
+    if (userSongs.learned.some((song) => song.id === songId)) return "learned";
     return null;
   };
 
