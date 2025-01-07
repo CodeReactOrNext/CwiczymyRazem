@@ -409,7 +409,13 @@ export const addSong = async (
     };
 
     const docRef = await addDoc(songsRef, newSong);
-    firebaseAddSongsLog(userId, new Date().toString(), title, artist, "added");
+    firebaseAddSongsLog(
+      userId,
+      new Date().toISOString(),
+      title,
+      artist,
+      "added"
+    );
     return docRef.id;
   } catch (error) {
     console.error("Error adding song:", error);
