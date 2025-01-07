@@ -44,7 +44,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
 
     try {
       setIsLoading(true);
-      await addSong(title.trim(), artist.trim(), userId);
+      await addSong(title.trim(), artist.trim(), userId, rating);
       toast.success(t("song_added"));
       onSuccess();
       onClose();
@@ -68,28 +68,28 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
         <DialogHeader>
           <DialogTitle>{t("add_new_song")}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="title">{t("song_title")}</Label>
+        <form onSubmit={handleSubmit} className='space-y-6'>
+          <div className='space-y-2'>
+            <Label htmlFor='title'>{t("song_title")}</Label>
             <Input
-              id="title"
+              id='title'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="artist">{t("artist")}</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='artist'>{t("artist")}</Label>
             <Input
-              id="artist"
+              id='artist'
               value={artist}
               onChange={(e) => setArtist(e.target.value)}
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Label>{t("difficulty")} (1-10)</Label>
-            <div className="flex gap-1">
+            <div className='flex gap-1'>
               {[...Array(10)].map((_, i) => (
                 <Star
                   key={i}
@@ -105,19 +105,19 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
           </div>
           <DialogFooter>
             <Button
-              type="button"
-              variant="outline"
+              type='button'
+              variant='outline'
               onClick={onClose}
-              disabled={isLoading}
-            >
+              disabled={isLoading}>
               {t("cancel")}
             </Button>
             <Button
-              type="submit"
-              disabled={isLoading || !title.trim() || !artist.trim() || !rating}
-            >
+              type='submit'
+              disabled={
+                isLoading || !title.trim() || !artist.trim() || !rating
+              }>
               {isLoading ? (
-                <span className="loading loading-spinner" />
+                <span className='loading loading-spinner' />
               ) : (
                 t("add")
               )}
