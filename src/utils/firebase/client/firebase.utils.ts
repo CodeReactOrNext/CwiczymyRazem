@@ -461,7 +461,7 @@ export const rateSongDifficulty = async (
     });
     firebaseAddSongsLog(
       userId,
-      new Date().toString(),
+      new Date().toISOString(),
       title,
       artist,
       "difficulty_rate"
@@ -557,7 +557,13 @@ export const updateSongStatus = async (
       lastUpdated: Timestamp.now(),
     });
 
-    firebaseAddSongsLog(userId, new Date().toString(), title, artist, status);
+    firebaseAddSongsLog(
+      userId,
+      new Date().toISOString(),
+      title,
+      artist,
+      status
+    );
     return true;
   } catch (error) {
     console.error("Error updating song status:", error);
@@ -629,7 +635,7 @@ export const removeUserSong = async (userId: string, songId: string) => {
     if (songData) {
       firebaseAddSongsLog(
         userId,
-        new Date().toString(),
+        new Date().toISOString(),
         songData.title,
         songData.artist,
         "removed" as SongStatus
