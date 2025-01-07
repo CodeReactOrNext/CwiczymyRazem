@@ -53,13 +53,13 @@ export const SongStatusCard = ({
         <Droppable droppableId={droppableId}>
           {(provided, snapshot) => (
             <ScrollArea
-              className={`h-32 rounded-md p-2 ${
+              className={`h-48 rounded-md p-2 ${
                 snapshot.isDraggingOver ? "bg-muted/50" : ""
               }`}
               {...provided.droppableProps}
               ref={provided.innerRef}>
               {songs?.length === 0 ? (
-                <div className='flex h-full flex-col items-center justify-center space-y-2 text-center'>
+                <div className='space-y-2p-4 flex h-full flex-col items-center justify-center text-center'>
                   <Music className='h-5 w-5 text-muted-foreground' />
                   <p className='text-sm  '>
                     {t("no_songs_in_status", { status: title })}
@@ -80,11 +80,12 @@ export const SongStatusCard = ({
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className={`flex items-center justify-between rounded-md border bg-card p-2 ${
+                          className={`flex items-center justify-between rounded-md border bg-card bg-second-700  p-2 ${
                             snapshot.isDragging ? "shadow-lg" : ""
                           }`}>
-                          <span className='text-sm'>
-                            {song.title} - {song.artist}
+                          <span className='text-sm '>
+                            <span className='capitalize'>{song.artist}</span> -{" "}
+                            <span className='capitalize'>{song.title}</span>
                           </span>
                           <DropdownMenu>
                             <DropdownMenuTrigger className='focus:outline-none'>

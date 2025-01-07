@@ -38,6 +38,8 @@ import {
 
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
+import { SongRating } from "feature/songs/components/SongsTable/components/SongRating";
+import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 
 interface SongsTableProps {
   songs: Song[];
@@ -60,10 +62,7 @@ const SongsTable = ({
 }: SongsTableProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
-  const [ratingHover, setRatingHover] = useState<{
-    songId: string;
-    rating: number;
-  } | null>(null);
+
   const [userSongs, setUserSongs] = useState<{
     wantToLearn: Song[];
     learning: Song[];
@@ -107,32 +106,6 @@ const SongsTable = ({
     loadUserSongs();
   }, [userId]);
 
-  const handleRating = async (
-    songId: string,
-    title: string,
-    artist: string,
-    rating: number
-  ) => {
-    if (!userId) {
-      return;
-    }
-
-    try {
-      await rateSongDifficulty(songId, userId, rating, title, artist);
-      toast.success(t("rating_updated"));
-    } catch (error) {
-      toast.error(t("error_rating"));
-    }
-  };
-
-  const getAverageDifficulty = (difficulties: Song["difficulties"]) => {
-    if (!difficulties?.length) return 0;
-    return (
-      difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
-      difficulties.length
-    );
-  };
-
   const getDifficultyRating = (rating: number) => {
     if (rating <= 2) {
       return { color: "#4CAF50", label: "Very Easy" };
@@ -157,7 +130,7 @@ const SongsTable = ({
         <div
           className='h-2 w-2 rounded-full'
           style={{ backgroundColor: color }}></div>
-        <span>{label}</span>
+        <span className='font-bold'>{rating}</span> {label}
       </div>
     );
   };
@@ -202,8 +175,9 @@ const SongsTable = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("title")}</TableHead>
               <TableHead>{t("artist")}</TableHead>
+
+              <TableHead>{t("title")}</TableHead>
               <TableHead>{t("difficulty")}</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -215,75 +189,11 @@ const SongsTable = ({
                   key={song.id}
                   style={getRowStyle(song.id)}
                   className='transition-colors'>
-                  <TableCell>{song.title}</TableCell>
                   <TableCell>{song.artist}</TableCell>
+                  <TableCell>{song.title}</TableCell>
+
                   <TableCell>
-                    <div className='flex gap-1'>
-                      {[...Array(10)].map((_, i) => {
-                        const avgRating = getAverageDifficulty(
-                          song.difficulties
-                        );
-
-                        const userRating = song?.difficulties?.find(
-                          (d) => d.userId === userId
-                        )?.rating;
-
-                        const isHovered =
-                          ratingHover?.songId === song.id &&
-                          ratingHover.rating >= i + 1;
-
-                        const showUserRating =
-                          !ratingHover?.songId &&
-                          userRating &&
-                          userRating >= i + 1;
-
-                        const showAvgRating = avgRating >= i + 1;
-
-                        return (
-                          <div key={i} className='relative'>
-                            <Star
-                              className={`h-4 w-4 ${
-                                showAvgRating
-                                  ? "fill-yellow-300 text-yellow-300"
-                                  : "fill-muted text-muted-foreground"
-                              }`}
-                            />
-                            <Star
-                              className={`absolute inset-0 h-4 w-4 cursor-pointer ${
-                                isHovered || showUserRating
-                                  ? "fill-primary text-primary"
-                                  : "fill-transparent text-transparent"
-                              }`}
-                              onClick={
-                                userRating
-                                  ? undefined
-                                  : () =>
-                                      handleRating(
-                                        song.id,
-                                        song.title,
-                                        song.artist,
-                                        i + 1
-                                      )
-                              }
-                              onMouseEnter={
-                                userRating
-                                  ? undefined
-                                  : () =>
-                                      setRatingHover({
-                                        songId: song.id,
-                                        rating: i + 1,
-                                      })
-                              }
-                              onMouseLeave={() => setRatingHover(null)}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div className='mt-1 text-sm text-muted-foreground'>
-                      {t("avg")}:{" "}
-                      {getAverageDifficulty(song.difficulties).toFixed(1)}
-                    </div>
+                    <SongRating song={song} />
                   </TableCell>
                   <TableCell>
                     <Badge variant='outline'>
