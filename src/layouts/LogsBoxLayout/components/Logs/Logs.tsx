@@ -9,8 +9,6 @@ import {
 } from "utils/firebase/client/firebase.types";
 import { IoMdMusicalNotes } from "react-icons/io";
 
-
-// Type guard to differentiate between FirebaseLogsInterface and FirebaseLogsSongsInterface
 const isFirebaseLogsSongs = (
   log: FirebaseLogsInterface | FirebaseLogsSongsInterface
 ): log is FirebaseLogsSongsInterface => {
@@ -39,7 +37,6 @@ const FirebaseLogsSongItem = ({ log }: { log: FirebaseLogsSongsInterface }) => {
 
   const date = new Date(data);
 
-  // Generowanie komunikatu na podstawie statusu
   let message = "";
 
   switch (status) {
