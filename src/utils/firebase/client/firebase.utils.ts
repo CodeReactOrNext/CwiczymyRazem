@@ -32,6 +32,7 @@ import {
   where,
   Timestamp,
   runTransaction,
+  onSnapshot,
 } from "firebase/firestore";
 import {
   FirebaseEventsInteface,
@@ -648,4 +649,25 @@ export const removeUserSong = async (userId: string, songId: string) => {
     console.error("Error removing song:", error);
     throw error;
   }
+};
+
+export const firebaseGetLogsStream = (
+  callback: (
+    logs: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[]
+  ) => void
+) => {
+  const logsDocRef = collection(db, "logs");
+  const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(20));
+
+  // Return the unsubscribe function 
+  return onSnapshot(sortLogs, (snapshot) => {
+    const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[] = [];
+    snapshot.forEach((doc) => {
+      const log = doc.data() as
+        | FirebaseLogsInterface
+        | FirebaseLogsSongsInterface;
+      logsArr.push(log);
+    });
+    callback(logsArr);
+  });
 };
