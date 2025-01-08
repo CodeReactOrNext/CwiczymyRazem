@@ -46,6 +46,11 @@ export interface StatisticsDataInterface {
   achievements: AchievementList[];
   actualDayWithoutBreak: number;
   lastReportDate: string;
+  songLists?: {
+    wantToLearn: string[];
+    learned: string[];
+    learning: string[];
+  };
 }
 
 export interface TimerInterface {
