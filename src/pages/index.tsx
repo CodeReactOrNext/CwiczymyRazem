@@ -36,6 +36,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
         "footer",
         "achievements",
         "toast",
+        "songs",
       ])),
     },
   };
