@@ -66,24 +66,26 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("add_new_song")}</DialogTitle>
+          <DialogTitle className='font-openSans'>
+            {t("add_new_song")}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className='space-y-6'>
-          <div className='space-y-2'>
-            <Label htmlFor='title'>{t("song_title")}</Label>
-            <Input
-              id='title'
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
           <div className='space-y-2'>
             <Label htmlFor='artist'>{t("artist")}</Label>
             <Input
               id='artist'
               value={artist}
               onChange={(e) => setArtist(e.target.value)}
+              required
+            />
+          </div>
+          <div className='space-y-2'>
+            <Label htmlFor='title'>{t("song_title")}</Label>
+            <Input
+              id='title'
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>

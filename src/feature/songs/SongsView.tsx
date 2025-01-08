@@ -44,6 +44,7 @@ const SongsView = () => {
     <MainContainer title={t("songs")}>
       <div className='p-4 font-openSans'>
         <SongLearningSection
+          isLanding={false}
           userSongs={userSongs}
           onChange={setUserSongs}
           onStatusChange={refreshSongs}

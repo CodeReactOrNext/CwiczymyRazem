@@ -8,6 +8,7 @@ import {
   FirebaseLogsSongsInterface,
 } from "utils/firebase/client/firebase.types";
 import { IoMdMusicalNotes } from "react-icons/io";
+import { useEffect, useRef } from "react";
 
 const isFirebaseLogsSongs = (
   log: FirebaseLogsInterface | FirebaseLogsSongsInterface
@@ -17,11 +18,32 @@ const isFirebaseLogsSongs = (
 
 interface LogsBoxLayoutProps {
   logs: (FirebaseLogsSongsInterface | FirebaseLogsInterface)[];
+  marksLogsAsRead: () => void;
 }
 
-const Logs = ({ logs }: LogsBoxLayoutProps) => {
+const Logs = ({ logs, marksLogsAsRead }: LogsBoxLayoutProps) => {
+  const spanRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          marksLogsAsRead();
+        }
+      },
+      { threshold: 1, rootMargin: "-400px" }
+    );
+
+    if (spanRef.current) {
+      observer.observe(spanRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [marksLogsAsRead]);
+
   return (
     <>
+      <span ref={spanRef} />
       {logs.map((log) =>
         isFirebaseLogsSongs(log) ? (
           <FirebaseLogsSongItem key={log.data + log.userName} log={log} />

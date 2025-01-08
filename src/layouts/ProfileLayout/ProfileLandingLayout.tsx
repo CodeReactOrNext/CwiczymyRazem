@@ -8,10 +8,16 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 
 import { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM, calculatePercent } from "utils/converter";
+import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
+import { useEffect, useState } from "react";
+import { getUserSongs } from "utils/firebase/client/firebase.utils";
+import { Song } from "utils/firebase/client/firebase.types";
+import { Timestamp } from "firebase/firestore";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
   userStats: StatisticsDataInterface;
+
   featSlot: React.ReactNode;
   userAuth: string;
 }
@@ -23,9 +29,18 @@ const ProfileLandingLayout = ({
   featSlot,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
+  const [songs, setSongs] = useState<{
+    wantToLearn: Song[];
+    learning: Song[];
+    learned: Song[];
+  }>();
   const { time, achievements } = userStats;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
+
+  useEffect(() => {
+    getUserSongs(userAuth).then((songs) => setSongs(songs));
+  }, []);
 
   return (
     <div className='bg-second-600 radius-default'>
@@ -68,6 +83,19 @@ const ProfileLandingLayout = ({
         </div>
         <div className='d-flex justify-content-center  '>
           <Calendar userAuth={userAuth} />
+        </div>
+        <div className='col-span-2 font-openSans'>
+          {songs && (
+            <SongLearningSection
+              isLanding
+              userSongs={{
+                learned: songs?.learned,
+                learning: songs?.learning,
+                wantToLearn: songs?.wantToLearn,
+              }}
+              onChange={(songs) => setSongs(songs)}
+            />
+          )}
         </div>
         <div className='col-span-2 '>{featSlot}</div>
       </div>

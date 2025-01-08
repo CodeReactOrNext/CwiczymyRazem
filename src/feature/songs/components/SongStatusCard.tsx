@@ -18,9 +18,12 @@ import { removeUserSong } from "utils/firebase/client/firebase.utils";
 import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
+import { Button } from "assets/components/ui/button";
+import { useRouter } from "next/router";
 
 interface SongStatusCardProps {
   title: string;
+  isLanding: boolean;
   songs: Song[];
   droppableId: SongStatus;
   onStatusChange: (
@@ -36,11 +39,13 @@ export const SongStatusCard = ({
   title,
   songs,
   droppableId,
+  isLanding,
   onStatusChange,
   onSongRemove,
 }: SongStatusCardProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
+  const router = useRouter();
 
   return (
     <Card className='flex-1'>
@@ -59,14 +64,21 @@ export const SongStatusCard = ({
               {...provided.droppableProps}
               ref={provided.innerRef}>
               {songs?.length === 0 ? (
-                <div className='space-y-2p-4 flex h-full flex-col items-center justify-center text-center'>
-                  <Music className='h-5 w-5 text-muted-foreground' />
-                  <p className='text-sm  '>
+                <div className='flex h-full flex-col items-center justify-center space-y-2 p-4 text-center'>
+                  <Music className='h-5 w-5  text-muted-foreground' />
+                  <p className=' text-sm '>
                     {t("no_songs_in_status", { status: title })}
                   </p>
-                  <p className='text-sm text-muted-foreground'>
-                    {t("no_songs_in_status_desc")}
-                  </p>
+                  {isLanding && (
+                    <Button size='sm' onClick={() => router.push("songs")}>
+                      Dodaj
+                    </Button>
+                  )}
+                  {!isLanding && (
+                    <p className='text-sm text-muted-foreground'>
+                      {t("no_songs_in_status_desc")}
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div className='space-y-2'>
