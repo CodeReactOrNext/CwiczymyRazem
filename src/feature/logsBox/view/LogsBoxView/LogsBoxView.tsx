@@ -14,7 +14,7 @@ import {
 } from "utils/firebase/client/firebase.types";
 import {
   firebaseGetEvents,
-  firebaseGetLogs,
+  firebaseGetLogsStream,
 } from "utils/firebase/client/firebase.utils";
 
 const LogsBoxView = () => {
@@ -27,13 +27,10 @@ const LogsBoxView = () => {
   const { t } = useTranslation("toast");
 
   useEffect(() => {
-    firebaseGetLogs()
-      .then((logsData) => {
-        setLogs(logsData);
-      })
-      .catch((error) => {
-        toast.error(t("errors.fetch_error"));
-      });
+    // Subscribe to real-time logs updates
+    const unsubscribe = firebaseGetLogsStream((logsData) => {
+      setLogs(logsData);
+    });
 
     firebaseGetEvents()
       .then((events) => {
@@ -42,6 +39,9 @@ const LogsBoxView = () => {
       .catch((error) => {
         toast.error(t("errors.fetch_error"));
       });
+
+    // Cleanup subscription on component unmount
+    return () => unsubscribe();
   }, [t]);
 
   return logs && events && userAchievement ? (
