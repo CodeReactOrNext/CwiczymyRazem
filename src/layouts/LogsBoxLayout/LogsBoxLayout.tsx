@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import Logs from "./components/Logs";
 import AchievementsMap from "./components/AchievementsMap";
-import LogsBoxButton from "./components/LogsBoxButton";
 import ExerciseBox from "../../feature/exercisePlan/view/ExerciseBox";
 
 import { AchievementList } from "assets/achievements/achievementsData";
@@ -18,6 +17,8 @@ import Changelog from "./components/Changelog";
 import { changelogEntries } from "changelogEntries";
 import { IoChatboxEllipses } from "react-icons/io5";
 import Chat from "./components/Chat";
+import { useUnreadMessages } from "hooks/useUnreadMessages";
+import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 
 export interface LogsBoxLayoutProps {
   logs: (FirebaseLogsSongsInterface | FirebaseLogsInterface)[];
@@ -30,38 +31,66 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
     "logs" | "achievements" | "discord" | "excerise" | "chat"
   >("logs");
 
+  const {
+    unreadCount: unreadChats,
+    hasNewMessages: hasNewChats,
+    markAsRead: markChatsAsRead,
+  } = useUnreadMessages("chats");
+
+  const {
+    unreadCount: unreadLogs,
+    hasNewMessages: hasNewLogs,
+    markAsRead: markLogsAsRead,
+  } = useUnreadMessages("logs");
+
+  console.log(unreadLogs);
+
   const { t } = useTranslation("common");
+
+  const handleCategoryChange = (category: typeof showedCategory) => {
+    setShowedCategory(category);
+    if (category === "chat") {
+      markChatsAsRead();
+    } else if (category === "logs") {
+      markLogsAsRead();
+    }
+  };
+
   return (
     <div className='relative m-auto mt-5 flex h-[600px] flex-col border border-second-400/60 bg-second-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]'>
       <div className='sticky top-0 left-0 flex flex-row  justify-around gap-4 p-2  font-bold'>
         <LogsBoxButton
           title={t("logsBox.logs")}
           active={showedCategory === "logs"}
-          onClick={() => setShowedCategory("logs")}
+          onClick={() => handleCategoryChange("logs")}
           Icon={FaGuitar}
+          notificationCount={unreadLogs}
+          hasNewMessages={hasNewLogs}
         />
         <LogsBoxButton
           title='Chat'
           active={showedCategory === "chat"}
-          onClick={() => setShowedCategory("chat")}
+          onClick={() => handleCategoryChange("chat")}
           Icon={IoChatboxEllipses}
+          notificationCount={unreadChats}
+          hasNewMessages={hasNewChats}
         />
         <LogsBoxButton
           title={t("logsBox.achievements_map")}
           active={showedCategory === "achievements"}
-          onClick={() => setShowedCategory("achievements")}
+          onClick={() => handleCategoryChange("achievements")}
           Icon={FaMedal}
         />
         <LogsBoxButton
           title={"Plany Ćwiczeń"}
           active={showedCategory === "excerise"}
-          onClick={() => setShowedCategory("excerise")}
+          onClick={() => handleCategoryChange("excerise")}
           Icon={FaTasks}
         />
         <LogsBoxButton
           title={"Changelog"}
           active={showedCategory === "discord"}
-          onClick={() => setShowedCategory("discord")}
+          onClick={() => handleCategoryChange("discord")}
           Icon={TbNews}
         />
       </div>
@@ -69,7 +98,11 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
         <AchievementsMap userAchievements={userAchievements} />
       )}
       <div className='h-full overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
-        {showedCategory === "logs" && logs && <Logs logs={logs} />}
+        {showedCategory === "logs" && logs && (
+          <div onClick={markLogsAsRead}>
+            <Logs logs={logs} />
+          </div>
+        )}
         {showedCategory === "excerise" && logs && <ExerciseBox />}
         {showedCategory === "discord" && logs && (
           <Changelog entries={changelogEntries} />
