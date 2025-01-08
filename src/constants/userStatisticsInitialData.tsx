@@ -19,4 +19,9 @@ export const statisticsInitial: StatisticsDataInterface = {
   achievements: [],
   actualDayWithoutBreak: 0,
   lastReportDate: "",
+  songLists: {
+    wantToLearn: [],
+    learned: [],
+    learning: []
+  }
 };

@@ -43,17 +43,15 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
     markAsRead: markLogsAsRead,
   } = useUnreadMessages("logs");
 
-  console.log(unreadLogs);
-
   const { t } = useTranslation("common");
 
   const handleCategoryChange = (category: typeof showedCategory) => {
-    setShowedCategory(category);
-    if (category === "chat") {
+    if (category === "chat" || showedCategory === "chat") {
       markChatsAsRead();
     } else if (category === "logs") {
       markLogsAsRead();
     }
+    setShowedCategory(category);
   };
 
   return (
@@ -64,8 +62,8 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           active={showedCategory === "logs"}
           onClick={() => handleCategoryChange("logs")}
           Icon={FaGuitar}
-          notificationCount={unreadLogs}
-          hasNewMessages={hasNewLogs}
+          notificationCount={showedCategory === "chat" ? 0 : unreadLogs}
+          hasNewMessages={showedCategory === "chat" ? false : hasNewLogs}
         />
         <LogsBoxButton
           title='Chat'
@@ -100,7 +98,7 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
       <div className='h-full overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
         {showedCategory === "logs" && logs && (
           <div onClick={markLogsAsRead}>
-            <Logs logs={logs} />
+            <Logs logs={logs} marksLogsAsRead={markLogsAsRead} />
           </div>
         )}
         {showedCategory === "excerise" && logs && <ExerciseBox />}

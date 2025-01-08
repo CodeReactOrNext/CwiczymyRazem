@@ -9,6 +9,7 @@ import { Song, SongStatus } from "utils/firebase/client/firebase.types";
 import { getUserSongs } from "utils/firebase/client/firebase.utils";
 
 interface SongLearningSectionProps {
+  isLanding: boolean;
   userSongs: {
     wantToLearn: Song[];
     learning: Song[];
@@ -29,14 +30,15 @@ interface SongLearningSectionProps {
 export const SongLearningSection = ({
   userSongs,
   onChange,
+  isLanding,
   onStatusChange,
 }: SongLearningSectionProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
-  const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({ 
-    onChange, 
+  const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
+    onChange,
     userSongs,
-    onTableStatusChange: onStatusChange
+    onTableStatusChange: onStatusChange,
   });
 
   if (!userId) {
@@ -107,6 +109,7 @@ export const SongLearningSection = ({
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
         <SongStatusCard
+          isLanding={isLanding}
           title={t("want_to_learn")}
           songs={userSongs.wantToLearn}
           droppableId='wantToLearn'
@@ -114,6 +117,7 @@ export const SongLearningSection = ({
           onSongRemove={handleSongRemoval}
         />
         <SongStatusCard
+          isLanding={isLanding}
           title={t("learning")}
           songs={userSongs.learning}
           droppableId='learning'
@@ -121,6 +125,7 @@ export const SongLearningSection = ({
           onSongRemove={handleSongRemoval}
         />
         <SongStatusCard
+          isLanding={isLanding}
           title={t("learned")}
           songs={userSongs.learned}
           droppableId='learned'
