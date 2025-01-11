@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import { getUserSongs } from "utils/firebase/client/firebase.utils";
 import { Song } from "utils/firebase/client/firebase.types";
 import { Timestamp } from "firebase/firestore";
+import { ActivityChart } from "components/Charts/ActivityChart";
+import { useCalendar } from "components/Calendar/useCalendar";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -34,6 +36,7 @@ const ProfileLandingLayout = ({
     learning: Song[];
     learned: Song[];
   }>();
+  const { reportList } = useCalendar(userAuth);
   const { time, achievements } = userStats;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
@@ -83,6 +86,9 @@ const ProfileLandingLayout = ({
         </div>
         <div className='d-flex justify-content-center  '>
           <Calendar userAuth={userAuth} />
+        </div>
+        <div className='col-span-2'>
+          <ActivityChart data={reportList} />
         </div>
         <div className='col-span-2 font-openSans'>
           {songs && (

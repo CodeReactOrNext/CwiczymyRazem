@@ -101,5 +101,21 @@
     "move_to": "Move to",
     "remove": "Remove",
     "add": "Add"
+  },
+  "chart": {
+    "activity_overview": "Activity overview",
+    "showing_activity": "Showing activity data for selected period",
+    "time_ranges": {
+      "all_time": "All time",
+      "last_3_months": "Last 3 months",
+      "last_30_days": "Last 30 days",
+      "last_7_days": "Last 7 days"
+    },
+    "categories": {
+      "technique": "Technique",
+      "theory": "Theory",
+      "hearing": "Hearing",
+      "creativity": "Creativity"
+    }
   }
 }

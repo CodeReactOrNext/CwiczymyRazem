@@ -142,7 +142,18 @@ export const useCalendar = (userAuth: string) => {
     }
   }, [userAuth, reportList]);
 
-  return { reportList, setYear, year, datasWithReports };
+  return {
+    reportList: reportList?.map(report => ({
+      date: report.date,
+      techniqueTime: report.timeSumary?.techniqueTime || 0,
+      theoryTime: report.timeSumary?.theoryTime || 0,
+      hearingTime: report.timeSumary?.hearingTime || 0,
+      creativityTime: report.timeSumary?.creativityTime || 0,
+    })) || [],
+    setYear,
+    year,
+    datasWithReports,
+  };
 };
 
 const getEmptyFiled = (dayWhenYearStart: number) => {

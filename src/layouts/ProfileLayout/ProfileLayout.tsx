@@ -17,6 +17,8 @@ import MainContainer from "components/MainContainer";
 import { getUserSongs } from "utils/firebase/client/firebase.utils";
 import { Timestamp } from "firebase/firestore";
 import { Song } from "utils/firebase/client/firebase.types";
+import { ActivityChart } from "components/Charts/ActivityChart";
+import { useCalendar } from "components/Calendar/useCalendar";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -40,6 +42,8 @@ const ProfileLayout = ({
     youTubeLink,
   } = userData;
   const { time, achievements, lastReportDate } = statistics;
+  const { reportList } = useCalendar(userAuth);
+
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
 
@@ -163,6 +167,10 @@ const ProfileLayout = ({
         <div className='row-cols-1 m-4  flex flex-col justify-between  '>
           <AchievementWrapper userAchievements={achievements} />
         </div>
+        <div className='col-span-2'>
+          <ActivityChart data={reportList} />
+        </div>
+
         <div className='col-span-2  p-2 '>
           <Calendar userAuth={userAuth} />
         </div>
