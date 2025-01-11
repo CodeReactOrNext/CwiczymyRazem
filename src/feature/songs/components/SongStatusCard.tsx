@@ -43,7 +43,7 @@ export const SongStatusCard = ({
   onStatusChange,
   onSongRemove,
 }: SongStatusCardProps) => {
-  const { t } = useTranslation("songs");
+  const { t } = useTranslation(["songs", "common"]);
   const userId = useAppSelector(selectUserAuth);
   const router = useRouter();
 
@@ -70,8 +70,11 @@ export const SongStatusCard = ({
                     {t("no_songs_in_status", { status: title })}
                   </p>
                   {isLanding && (
-                    <Button size='sm' variant='outline' onClick={() => router.push("songs")}>
-                      Dodaj
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      onClick={() => router.push("songs")}>
+                      {t("common:song_status.add")}
                     </Button>
                   )}
                   {!isLanding && (
@@ -118,13 +121,14 @@ export const SongStatusCard = ({
                                     )
                                   }
                                   className='cursor-pointer'>
-                                  Move to {status}
+                                  {t("common:song_status.move_to")}{" "}
+                                  {t(`songs:status.${status}`)}
                                 </DropdownMenuItem>
                               ))}
                               <DropdownMenuItem
                                 onClick={() => onSongRemove(song.id)}
                                 className='cursor-pointer text-destructive'>
-                                Remove
+                                {t("common:song_status.remove")}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

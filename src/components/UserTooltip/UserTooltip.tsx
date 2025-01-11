@@ -1,0 +1,145 @@
+import { useEffect, useState } from "react";
+import { firebaseGetUserTooltipData, UserTooltipData } from "utils/firebase/client/firebase.utils";
+import Image from "next/image";
+import { useTranslation } from "react-i18next";
+import {
+  Tooltip,
+  TooltipProvider,
+  TooltipTrigger,
+  TooltipContent,
+} from "assets/components/ui/tooltip";
+import Avatar from "components/Avatar";
+import IconBox from "components/IconBox";
+import {
+  FaClock,
+  FaStar,
+  FaTrophy,
+  FaFire,
+  FaMusic,
+  FaLeaf,
+} from "react-icons/fa";
+
+interface UserTooltipProps {
+  userId: string;
+  children: React.ReactNode;
+}
+
+export const UserTooltip = ({ userId, children }: UserTooltipProps) => {
+  const [userData, setUserData] = useState<UserTooltipData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { t } = useTranslation("common");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await firebaseGetUserTooltipData(userId);
+      setUserData(data);
+      setLoading(false);
+    };
+    fetchData();
+  }, [userId]);
+
+  const StatsBox = ({
+    Icon,
+    label,
+    value,
+  }: {
+    Icon: any;
+    label: string;
+    value: string | number;
+  }) => (
+    <div className='flex items-center gap-2 rounded-lg bg-gray-100 p-2'>
+      <IconBox small Icon={Icon} />
+      <div>
+        <p className='text-xs font-medium text-gray-500'>{label}</p>
+        <p className='text-sm font-bold text-gray-900'>{value}</p>
+      </div>
+    </div>
+  );
+
+  if (!userId) return <>{children}</>;
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={200}>
+        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipContent className='rounded-xl bg-white/90 p-4 shadow-2xl'>
+          {loading ? (
+            <div className='h-24 w-56 animate-pulse rounded-lg bg-gray-100' />
+          ) : userData ? (
+            <div className='flex flex-col gap-5 text-gray-900'>
+              <div className='flex items-center gap-8'>
+                {userData.avatar ? (
+                  <Avatar
+                    name={userData.displayName}
+                    avatarURL={userData.avatar}
+                    size='sm'
+                    lvl={userData.statistics.level}
+                  />
+                ) : (
+                  <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-900'>
+                    {userData.displayName[0]}
+                  </div>
+                )}
+                <div>
+                  <h3 className='text-base font-bold text-gray-900'>
+                    {userData.displayName}
+                  </h3>
+                </div>
+              </div>
+              <div className='grid grid-cols-2 gap-2'>
+                <StatsBox
+                  Icon={FaClock}
+                  label={t("tooltip.totalTime")}
+                  value={`${Math.round(
+                    userData.statistics.totalPracticeTime / 60
+                  )}h`}
+                />
+                <StatsBox
+                  Icon={FaStar}
+                  label={t("tooltip.points")}
+                  value={userData.statistics.totalPoints}
+                />
+                <StatsBox
+                  Icon={FaTrophy}
+                  label={t("header.lvl_short")}
+                  value={userData.statistics.level}
+                />
+                <StatsBox
+                  Icon={FaFire}
+                  label={t("day_since.actual_streak")}
+                  value={userData.statistics.actualDayWithoutBreak}
+                />
+                <StatsBox
+                  Icon={FaMusic}
+                  label={t("tooltip.sessions")}
+                  value={userData.statistics.sessionCount}
+                />
+                <StatsBox
+                  Icon={FaLeaf}
+                  label={t("tooltip.habits")}
+                  value={userData.statistics.habitCount}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className='flex items-center gap-2 text-gray-500'>
+              <svg
+                className='h-5 w-5'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke='currentColor'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+                />
+              </svg>
+              <p>{t("tooltip.userNotFound")}</p>
+            </div>
+          )}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};

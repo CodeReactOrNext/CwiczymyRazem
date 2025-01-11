@@ -90,5 +90,10 @@
     "points": "Punktów",
     "time": "Czasu",
     "session_count": "Ilości Sesji"
+  },
+  "song_status": {
+    "move_to": "Przenieś do",
+    "remove": "Usuń",
+    "add": "Dodaj"
   }
 }

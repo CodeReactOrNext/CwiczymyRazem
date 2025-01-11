@@ -4,17 +4,24 @@ import {
   collection,
   query,
   orderBy,
-  where,
-  Timestamp,
   limit,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 
+interface UnreadMessagesState {
+  unreadCount: number;
+  hasNewMessages: boolean;
+  lastReadTime: Date;
+}
+
 export const useUnreadMessages = (collectionName: "chats" | "logs") => {
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [hasNewMessages, setHasNewMessages] = useState(false);
+  const [state, setState] = useState<UnreadMessagesState>({
+    unreadCount: 0,
+    hasNewMessages: false,
+    lastReadTime: new Date(Date.now() - 3600000), // 1 hour ago default
+  });
   const currentUserId = useAppSelector(selectUserAuth);
 
   useEffect(() => {
@@ -22,13 +29,11 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
 
     const lastReadKey = `${collectionName}_lastRead_${currentUserId}`;
     const lastRead = localStorage.getItem(lastReadKey);
+    const lastReadTime = lastRead ? new Date(parseInt(lastRead)) : new Date(Date.now() - 3600000);
 
-    const lastReadTime = lastRead
-      ? new Date(parseInt(lastRead))
-      : new Date(Date.now() - 3600000); // 1 hour ago
+    setState(prev => ({ ...prev, lastReadTime }));
 
     const messagesRef = collection(db, collectionName);
-
     const limitedQuery = query(
       messagesRef,
       orderBy(collectionName === "logs" ? "data" : "timestamp", "desc"),
@@ -39,7 +44,6 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
       let count = 0;
 
       if (collectionName === "logs") {
-        // Sort docs by date for logs
         const sortedDocs = snapshot.docs.sort((a, b) => {
           const dateA = new Date(a.data().data);
           const dateB = new Date(b.data().data);
@@ -51,7 +55,6 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
           return logDate > lastReadTime;
         }).length;
       } else {
-        // Sort docs by timestamp for chats
         const sortedDocs = snapshot.docs.sort((a, b) => {
           const timestampA = a.data().timestamp.toDate();
           const timestampB = b.data().timestamp.toDate();
@@ -64,8 +67,11 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
         }).length;
       }
 
-      setUnreadCount(count);
-      setHasNewMessages(count > 0);
+      setState(prev => ({
+        ...prev,
+        unreadCount: count,
+        hasNewMessages: count > 0
+      }));
     });
 
     return () => unsubscribe();
@@ -73,12 +79,25 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
 
   const markAsRead = () => {
     if (!currentUserId) return;
-
     const lastReadKey = `${collectionName}_lastRead_${currentUserId}`;
-    localStorage.setItem(lastReadKey, Date.now().toString());
-    setUnreadCount(0);
-    setHasNewMessages(false);
+    const now = Date.now();
+    localStorage.setItem(lastReadKey, now.toString());
+    setState({
+      unreadCount: 0,
+      hasNewMessages: false,
+      lastReadTime: new Date(now)
+    });
   };
 
-  return { unreadCount, hasNewMessages, markAsRead };
+  const isNewMessage = (messageDate: string | Date) => {
+    const date = new Date(messageDate);
+    return date > state.lastReadTime;
+  };
+
+  return { 
+    unreadCount: state.unreadCount, 
+    hasNewMessages: state.hasNewMessages, 
+    markAsRead,
+    isNewMessage 
+  };
 };

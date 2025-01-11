@@ -659,7 +659,7 @@ export const firebaseGetLogsStream = (
   const logsDocRef = collection(db, "logs");
   const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(20));
 
-  // Return the unsubscribe function 
+  // Return the unsubscribe function
   return onSnapshot(sortLogs, (snapshot) => {
     const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[] = [];
     snapshot.forEach((doc) => {
@@ -670,4 +670,70 @@ export const firebaseGetLogsStream = (
     });
     callback(logsArr);
   });
+};
+export interface UserTooltipData {
+  displayName: string;
+  avatar: string | null;
+  band: string;
+  statistics: {
+    totalPracticeTime: number;
+    totalPoints: number;
+    level: number;
+    achievements: string[];
+    actualDayWithoutBreak: number;
+    currentLevelMaxPoints: number;
+    dayWithoutBreak: number;
+    habitCount: number;
+    lastReportDate: string;
+    lvl: number;
+    maxPoints: number;
+    points: number;
+    sessionCount: number;
+    time: {
+      creativity: number;
+      hearing: number;
+      longestSession: number;
+    };
+  };
+}
+
+export const firebaseGetUserTooltipData = async (
+  userId: string
+): Promise<UserTooltipData | null> => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userSnapshot = await getDoc(userDocRef);
+
+    if (!userSnapshot.exists()) return null;
+
+    const userData = userSnapshot.data();
+    return {
+      displayName: userData.displayName,
+      avatar: userData.avatar || null,
+      band: userData.band,
+      statistics: {
+        totalPracticeTime: userData.statistics.totalPracticeTime || 0,
+        totalPoints: userData.statistics.points || 0,
+        level: userData.statistics.lvl || 0,
+        achievements: userData.statistics.achievements || [],
+        actualDayWithoutBreak: userData.statistics.actualDayWithoutBreak || 0,
+        currentLevelMaxPoints: userData.statistics.currentLevelMaxPoints || 0,
+        dayWithoutBreak: userData.statistics.dayWithoutBreak || 0,
+        habitCount: userData.statistics.habitCount || 0,
+        lastReportDate: userData.statistics.lastReportDate || "",
+        lvl: userData.statistics.lvl || 0,
+        maxPoints: userData.statistics.maxPoints || 0,
+        points: userData.statistics.points || 0,
+        sessionCount: userData.statistics.sessionCount || 0,
+        time: {
+          creativity: userData.statistics.time?.creativity || 0,
+          hearing: userData.statistics.time?.hearing || 0,
+          longestSession: userData.statistics.time?.longestSession || 0,
+        },
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching user tooltip data:", error);
+    return null;
+  }
 };
