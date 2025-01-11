@@ -33,7 +33,6 @@
     "exercise": "Exercise",
     "report": "Report",
     "songs": "Songs"
-
   },
   "day_since": {
     "no_practice": "Player hasn't practiced",
@@ -90,5 +89,17 @@
     "points": "Points",
     "time": "Time",
     "session_count": "Session Count"
+  },
+  "tooltip": {
+    "totalTime": "Total Time",
+    "points": "Points",
+    "sessions": "Sessions",
+    "habits": "Habits",
+    "userNotFound": "User not found"
+  },
+  "song_status": {
+    "move_to": "Move to",
+    "remove": "Remove",
+    "add": "Add"
   }
 }

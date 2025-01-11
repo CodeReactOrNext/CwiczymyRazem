@@ -11,8 +11,15 @@ import {
 import { ChatMessage } from "types/chat.types";
 import { db } from "utils/firebase/client/firebase.utils";
 import { useAppSelector } from "store/hooks";
-import { selectUserAuth, selectUserAvatar, selectUserInfo, selectUserName } from "feature/user/store/userSlice";
+import {
+  selectUserAuth,
+  selectUserAvatar,
+  selectUserInfo,
+  selectUserName,
+} from "feature/user/store/userSlice";
 import Avatar from "components/Avatar";
+import { Button } from "assets/components/ui/button";
+import { Input } from "assets/components/ui/input";
 
 const Chat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -25,7 +32,6 @@ const Chat = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
 
   useEffect(() => {
     scrollToBottom();
@@ -68,41 +74,37 @@ const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className='flex h-full flex-col'>
+      <div className='flex-1 space-y-4 overflow-y-auto p-4'>
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={`chat ${
               msg.userId === currentUserId ? "chat-end" : "chat-start"
-            }`}
-          >
-            <div className="chat-image avatar">
-                <Avatar
-          avatarURL={msg.userPhotoURL }
-          name={msg.username!}
-          size="sm"
-        />
-               
+            }`}>
+            <div className='avatar chat-image'>
+              <Avatar
+                avatarURL={msg.userPhotoURL}
+                name={msg.username!}
+                size='sm'
+              />
             </div>
-            <div className="chat-header">{msg.username}</div>
-            <div className="chat-bubble">{msg.message}</div>
+            <div className='chat-header'>{msg.username}</div>
+            <div className='chat-bubble flex items-center'>{msg.message}</div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <form onSubmit={sendMessage} className="p-4 border-t">
-        <div className="join w-full">
-          <input
-            type="text"
+      <form onSubmit={sendMessage} className='border-t p-4'>
+        <div className='flex gap-2'>
+          <Input
+            type='text'
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            className="input input-bordered join-item w-full"
-            placeholder="Type a message..."
+            placeholder='Type a message...'
+            className='flex-1'
           />
-          <button type="submit" className="btn join-item">
-            Send
-          </button>
+          <Button type='submit'>Send</Button>
         </div>
       </form>
     </div>

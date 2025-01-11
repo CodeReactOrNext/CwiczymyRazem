@@ -14,7 +14,7 @@ interface AchievementsMapProps {
 
 const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
   return (
-    <div className='mt-4 flex flex-row flex-wrap items-center justify-center gap-5'>
+    <div className='mt-4 flex h-full flex-row flex-wrap items-center justify-center gap-5 overflow-auto'>
       <ToolTip />
       {achievementsData.map(({ Icon, id }, index) => {
         const isUnlocked = userAchievements?.includes(id);
