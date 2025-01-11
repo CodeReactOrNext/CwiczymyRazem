@@ -11,9 +11,9 @@ import {
 import ExerciseAdd from "../ExerciseAdd";
 import ExercisePlanLayout from "layouts/ExercisePlanLayout/ExercisePlanLayout";
 import ExerciseEdit from "../ExerciseAdd/ExerciseEdit";
-import { CircleSpinner, SpiralSpinner } from "react-spinners-kit";
 import { Button } from "assets/components/ui/button";
 import { IoIosReturnLeft } from "react-icons/io";
+import { Loader2 } from "lucide-react";
 
 interface ExercisesBoxShow {
   index?: number;
@@ -117,7 +117,7 @@ const ExerciseBox = () => {
 
   return (
     <div className='flex h-full w-full items-center justify-center'>
-      <CircleSpinner />
+      <Loader2 className='animate-spin' />
     </div>
   );
 };
