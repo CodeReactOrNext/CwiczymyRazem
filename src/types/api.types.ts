@@ -51,6 +51,12 @@ export interface StatisticsDataInterface {
     learned: string[];
     learning: string[];
   };
+  availablePoints: {
+    technique: number;
+    theory: number;
+    hearing: number;
+    creativity: number;
+  };
 }
 
 export interface TimerInterface {

@@ -15,6 +15,14 @@ import { Song } from "utils/firebase/client/firebase.types";
 import { Timestamp } from "firebase/firestore";
 import { ActivityChart } from "components/Charts/ActivityChart";
 import { useCalendar } from "components/Calendar/useCalendar";
+import { SkillTree } from "components/SkillTree/SkillTree";
+import { UserSkills } from "types/skills.types";
+import {
+  getUserSkills,
+  updateUserSkills,
+  canUpgradeSkill,
+} from "utils/firebase/client/firebase.utils";
+import { guitarSkills } from "src/data/guitarSkills";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -40,10 +48,39 @@ const ProfileLandingLayout = ({
   const { time, achievements } = userStats;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
+  const [userSkills, setUserSkills] = useState<UserSkills>();
 
   useEffect(() => {
     getUserSongs(userAuth).then((songs) => setSongs(songs));
   }, []);
+
+  useEffect(() => {
+    getUserSkills(userAuth).then((skills) => setUserSkills(skills));
+  }, [userAuth]);
+
+  const handleSkillUpgrade = async (skillId: string) => {
+    if (!userSkills) return;
+
+    const skill = guitarSkills.find((s) => s.id === skillId);
+    if (!skill) return;
+
+    // Check if upgrade is possible before making the API call
+    if (!canUpgradeSkill(skill, userSkills)) {
+      console.log("Cannot upgrade skill");
+      return;
+    }
+
+    const success = await updateUserSkills(userAuth, skillId);
+
+    if (success) {
+      // Refresh the skills data
+      const updatedSkills = await getUserSkills(userAuth);
+      setUserSkills(updatedSkills);
+    } else {
+      // Handle error - maybe show a notification to the user
+      console.error("Failed to upgrade skill");
+    }
+  };
 
   return (
     <div className='bg-second-600 radius-default'>
@@ -100,6 +137,14 @@ const ProfileLandingLayout = ({
                 wantToLearn: songs?.wantToLearn,
               }}
               onChange={(songs) => setSongs(songs)}
+            />
+          )}
+        </div>
+        <div className='col-span-2'>
+          {userSkills && (
+            <SkillTree
+              userSkills={userSkills}
+              onSkillUpgrade={handleSkillUpgrade}
             />
           )}
         </div>
