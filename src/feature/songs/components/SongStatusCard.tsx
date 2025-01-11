@@ -70,7 +70,7 @@ export const SongStatusCard = ({
                     {t("no_songs_in_status", { status: title })}
                   </p>
                   {isLanding && (
-                    <Button size='sm' onClick={() => router.push("songs")}>
+                    <Button size='sm' variant='outline' onClick={() => router.push("songs")}>
                       Dodaj
                     </Button>
                   )}
