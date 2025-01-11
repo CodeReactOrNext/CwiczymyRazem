@@ -27,6 +27,17 @@ import {
   uploadUserSocialData,
 } from "./userSlice.asyncThunk";
 
+interface SkillPointsGained {
+  technique: number;
+  theory: number;
+  hearing: number;
+  creativity: number;
+}
+
+interface RaitingData {
+  skillPointsGained: SkillPointsGained;
+}
+
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
@@ -120,7 +131,10 @@ export const userSlice = createSlice({
         state.timer.theory = 0;
         state.currentUserStats = payload.currentUserStats;
         state.previousUserStats = payload.previousUserStats;
-        state.raitingData = payload.raitingData;
+        state.raitingData = {
+          ...payload.raitingData,
+          skillPointsGained: payload.skillPointsGained,
+        };
         state.isFetching = null;
       })
       .addCase(restartUserStats.fulfilled, (state) => {

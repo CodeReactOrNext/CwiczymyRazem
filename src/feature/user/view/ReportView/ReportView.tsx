@@ -414,6 +414,9 @@ const ReportView = () => {
                         ratingData={raitingData}
                         currentUserStats={currentUserStats}
                         previousUserStats={previousUserStats}
+                        skillPointsGained={raitingData.skillPointsGained}
+                        userSkills={userSkills}
+                        onSkillUpgrade={onSkillUpgrade}
                       />
                     </motion.div>
                   </Backdrop>

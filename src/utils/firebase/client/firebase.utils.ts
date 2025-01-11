@@ -49,6 +49,8 @@ import { firebaseApp } from "./firebase.cofig";
 import { shuffleUid } from "utils/user/shuffleUid";
 import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import { SortByType } from "feature/leadboard/view/LeadboardView";
+import { UserSkills } from "types/skills.types";
+import { guitarSkills } from "src/data/guitarSkills";
 
 const provider = new GoogleAuthProvider();
 
@@ -736,4 +738,130 @@ export const firebaseGetUserTooltipData = async (
     console.error("Error fetching user tooltip data:", error);
     return null;
   }
+};
+
+export const getUserSkills = async (userId: string): Promise<UserSkills> => {
+  try {
+    const userRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userRef);
+
+    // Default skills structure with 0 points
+    const defaultSkills: UserSkills = {
+      availablePoints: {
+        technique: 0,
+        theory: 0,
+        hearing: 0,
+        creativity: 0,
+      },
+      unlockedSkills: {},
+    };
+
+    if (!userDoc.exists()) {
+      return defaultSkills;
+    }
+
+    const userData = userDoc.data();
+    // Get points from statistics.availablePoints
+    const availablePoints =
+      userData.statistics?.availablePoints || defaultSkills.availablePoints;
+    const unlockedSkills = userData.skills?.unlockedSkills || {};
+
+    return {
+      availablePoints,
+      unlockedSkills,
+    };
+  } catch (error) {
+    console.error("Error getting user skills:", error);
+    throw error;
+  }
+};
+
+export const updateUserSkills = async (
+  userId: string,
+  skillId: string
+): Promise<boolean> => {
+  try {
+    const userRef = doc(db, "users", userId);
+
+    const skill = guitarSkills.find((s) => s.id === skillId);
+    if (!skill) {
+      throw new Error("Skill not found");
+    }
+
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists()) {
+        throw new Error("User document does not exist!");
+      }
+
+      const userData = userDoc.data();
+      const availablePoints = userData.statistics?.availablePoints || {
+        technique: 0,
+        theory: 0,
+        hearing: 0,
+        creativity: 0,
+      };
+      const unlockedSkills = userData.skills?.unlockedSkills || {};
+
+      // Check if user has enough points
+      if (availablePoints[skill.category] < (skill.pointsCost || 1)) {
+        throw new Error(`Not enough ${skill.category} points available`);
+      }
+
+      // Update the skills and points
+      const updatedAvailablePoints = {
+        ...availablePoints,
+        [skill.category]:
+          availablePoints[skill.category] - (skill.pointsCost || 1),
+      };
+
+      const updatedUnlockedSkills = {
+        ...unlockedSkills,
+        [skillId]: (unlockedSkills[skillId] || 0) + 1,
+      };
+
+      // Update both statistics.availablePoints and skills
+      transaction.update(userRef, {
+        "statistics.availablePoints": updatedAvailablePoints,
+        "skills.unlockedSkills": updatedUnlockedSkills,
+      });
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Error updating skills:", error);
+    return false;
+  }
+};
+
+// Helper function to check if a skill can be upgraded
+export const canUpgradeSkill = (
+  skill: GuitarSkill,
+  userSkills: UserSkills
+): boolean => {
+  // Check if skill exists
+  if (!skill) return false;
+
+  const currentLevel = userSkills.unlockedSkills[skill.id] || 0;
+  const pointsCost = skill.pointsCost || 1;
+
+  // Check max level
+  if (skill.maxLevel && currentLevel >= skill.maxLevel) {
+    return false;
+  }
+
+  // Check available points
+  if (userSkills.availablePoints[skill.category] < pointsCost) {
+    return false;
+  }
+
+  // Check prerequisites
+  if (skill.prerequisites?.length > 0) {
+    return skill.prerequisites.every(
+      (prereqId) => userSkills.unlockedSkills[prereqId]
+    );
+  }
+
+  return true;
 };
