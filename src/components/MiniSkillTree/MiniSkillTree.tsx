@@ -68,7 +68,6 @@ export const MiniSkillTree = ({
     if (!skill) return;
 
     if (!canUpgradeSkill(skill)) {
-      console.log("Cannot upgrade skill");
       return;
     }
 

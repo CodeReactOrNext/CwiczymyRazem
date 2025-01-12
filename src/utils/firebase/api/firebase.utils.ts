@@ -19,6 +19,8 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { SongStatus } from "utils/firebase/client/firebase.types";
+import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
+import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
 
 export const firebaseGetUserData = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
@@ -77,6 +79,26 @@ export const firebaseAddLogReport = async (
     newAchievements,
     newLevel,
   });
+
+  const logData = {
+    data,
+    uid,
+    userName,
+    newAchievements,
+    newLevel,
+    points,
+    timestamp: new Date().toISOString(),
+  };
+
+  await setDoc(logsDocRef, logData);
+
+  // Add Discord notification
+  try {
+    const discordMessage = await formatDiscordMessage(logData);
+    await sendDiscordMessage(discordMessage);
+  } catch (error) {
+    console.error("Error sending Discord notification:", error);
+  }
 };
 
 export const updateSongStatus = async (
