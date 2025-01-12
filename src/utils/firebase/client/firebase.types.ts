@@ -23,6 +23,7 @@ export interface UserSongLists {
 }
 
 export interface FirebaseLogsInterface {
+  timestamp: string | number | Date;
   uid: string;
   data: string;
   userName: string;
