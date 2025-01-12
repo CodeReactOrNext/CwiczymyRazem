@@ -5,5 +5,11 @@
   "achievements": "Osiągnięcia",
   "empty": "Brak",
   "sort_by_points": "Sortuj według punktów",
-  "sort_by_sessions": "Sortuj według sesji"
+  "sort_by_sessions": "Sortuj według sesji",
+  "global_leaderboard": "Globalna",
+  "seasonal_leaderboard": "Sezonowa",
+  "current_season": "Aktualny Sezon",
+  "showing": "Pokazuje",
+  "of": "z",
+  "users": "użytkowników"
 }

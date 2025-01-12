@@ -5,5 +5,12 @@
   "achievements": "Achievements",
   "empty": "Empty",
   "sort_by_points": "Sort by points",
-  "sort_by_sessions": "Sort by session"
+  "sort_by_sessions": "Sort by session",
+  "global_leaderboard": "Global",
+  "seasonal_leaderboard": "Seasonal",
+  "current_season": "Current Season",
+  "showing": "Showing",
+  "of": "of",
+  "users": "users",
+  "no_data": "No data available for this season"
 }
