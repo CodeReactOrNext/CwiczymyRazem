@@ -5,7 +5,7 @@ interface DiscordMessage {
 }
 
 export const sendDiscordMessage = async (message: DiscordMessage) => {
-  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  const webhookUrl = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL;
   
   if (!webhookUrl) {
     console.error('Discord webhook URL not configured');

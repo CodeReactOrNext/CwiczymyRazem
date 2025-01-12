@@ -52,6 +52,8 @@ import { SortByType } from "feature/leadboard/view/LeadboardView";
 import { GuitarSkill, UserSkills } from "types/skills.types";
 import { guitarSkills } from "src/data/guitarSkills";
 import { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
+import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
+import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
 
 const provider = new GoogleAuthProvider();
 
@@ -103,14 +105,23 @@ export const firebaseAddSongsLog = async (
   const userSnapshot = await getDoc(userDocRef);
   const userName = userSnapshot.data()!.displayName;
 
-  await setDoc(logsDocRef, {
+  const logData = {
     data,
     uid,
     userName,
     songTitle,
     songArtist,
     status,
-  });
+  };
+
+  await setDoc(logsDocRef, logData);
+
+  try {
+    const discordMessage = await formatDiscordMessage(logData);
+    await sendDiscordMessage(discordMessage);
+  } catch (error) {
+    console.error("Error sending Discord notification:", error);
+  }
 };
 
 export const firebaseGetEvents = async () => {
@@ -991,4 +1002,37 @@ export const awardSeasonalBadges = async (seasonId: string) => {
       third: winners[2],
     },
   });
+};
+
+export const firebaseAddLogReport = async (
+  uid: string,
+  data: string,
+  newAchievements: AchievementList[],
+  newLevel: { isNewLevel: boolean; level: number },
+  points: number
+) => {
+  const logsDocRef = doc(collection(db, "logs"));
+  const userDocRef = doc(db, "users", uid);
+  const userSnapshot = await getDoc(userDocRef);
+  const userName = userSnapshot.data()!.displayName;
+
+  const logData = {
+    data,
+    uid,
+    userName,
+    newAchievements,
+    newLevel,
+    points,
+    timestamp: new Date().toISOString(),
+  };
+
+  await setDoc(logsDocRef, logData);
+
+  // Add Discord notification
+  try {
+    const discordMessage = await formatDiscordMessage(logData);
+    await sendDiscordMessage(discordMessage);
+  } catch (error) {
+    console.error("Error sending Discord notification:", error);
+  }
 };

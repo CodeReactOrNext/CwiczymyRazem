@@ -70,7 +70,6 @@ const ProfileLandingLayout = ({
     if (!skill) return;
 
     if (!canUpgradeSkill(skill, userSkills)) {
-      console.log("Cannot upgrade skill");
       return;
     }
 
