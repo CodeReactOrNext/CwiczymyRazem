@@ -132,7 +132,7 @@ const ProfileLandingLayout = ({
       case "activity":
         return (
           <>
-            <ActivityChart data={reportList} />
+            <ActivityChart data={reportList as any} />
             <div className='d-flex justify-content-center mt-6'>
               <Calendar userAuth={userAuth} />
             </div>

@@ -57,6 +57,8 @@
   "rating_popup": {
     "title": "YOU GOT",
     "points": "pts",
+    "skill_points_gained": "Skill Points Gained",
+    "spend_skill_points": "Spend Your Skill Points",
     "back": "Back",
     "regularity": "for regularity",
     "streak": "days in a row",
@@ -67,5 +69,21 @@
     "time_amount": "you practiced for",
     "new_level": "Level Up!",
     "new_achievements": "New achievements:"
+  },
+
+  "skills": {
+    "technique": "Technique",
+    "theory": "Theory",
+    "hearing": "Hearing",
+    "creativity": "Creativity"
+  },
+
+  "chart": {
+    "categories": {
+      "technique": "Technique",
+      "theory": "Theory",
+      "hearing": "Hearing",
+      "creativity": "Creativity"
+    }
   }
 }

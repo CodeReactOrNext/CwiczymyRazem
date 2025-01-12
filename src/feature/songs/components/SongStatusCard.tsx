@@ -78,7 +78,7 @@ export const SongStatusCard = ({
                 <div className='flex h-full flex-col items-center justify-center space-y-2 p-4 text-center'>
                   <Music className='h-5 w-5  text-muted-foreground' />
                   <p className=' text-sm '>
-                    {t("no_songs_in_status", { status: title })}
+                    {t("songs:no_songs_in_status", { status: title })}
                   </p>
                   {isLanding && (
                     <Button
@@ -90,7 +90,7 @@ export const SongStatusCard = ({
                   )}
                   {!isLanding && (
                     <p className='text-sm text-muted-foreground'>
-                      {t("no_songs_in_status_desc")}
+                      {t("no_songs_in_status_desc" as any)}
                     </p>
                   )}
                 </div>

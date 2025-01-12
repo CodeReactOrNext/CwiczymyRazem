@@ -49,7 +49,7 @@ import { firebaseApp } from "./firebase.cofig";
 import { shuffleUid } from "utils/user/shuffleUid";
 import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import { SortByType } from "feature/leadboard/view/LeadboardView";
-import { UserSkills } from "types/skills.types";
+import { GuitarSkill, UserSkills } from "types/skills.types";
 import { guitarSkills } from "src/data/guitarSkills";
 
 const provider = new GoogleAuthProvider();
@@ -855,9 +855,8 @@ export const canUpgradeSkill = (
   if (userSkills.availablePoints[skill.category] < pointsCost) {
     return false;
   }
-
   // Check prerequisites
-  if (skill.prerequisites?.length > 0) {
+  if (skill.prerequisites && skill.prerequisites.length > 0) {
     return skill.prerequisites.every(
       (prereqId) => userSkills.unlockedSkills[prereqId]
     );

@@ -28,17 +28,6 @@ import {
   upgradeSkill,
 } from "./userSlice.asyncThunk";
 
-interface SkillPointsGained {
-  technique: number;
-  theory: number;
-  hearing: number;
-  creativity: number;
-}
-
-interface RaitingData {
-  skillPointsGained: SkillPointsGained;
-}
-
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,
@@ -134,7 +123,6 @@ export const userSlice = createSlice({
         state.previousUserStats = payload.previousUserStats;
         state.raitingData = {
           ...payload.raitingData,
-          skillPointsGained: payload.skillPointsGained,
         };
         state.isFetching = null;
       })
@@ -169,12 +157,6 @@ export const userSlice = createSlice({
       .addCase(uploadUserAvatar.fulfilled, (state, action) => {
         state.isFetching = null;
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
-      })
-      .addCase(upgradeSkill.fulfilled, (state, action) => {
-        if (state.skills) {
-          state.skills.unlockedSkills = action.payload.unlockedSkills;
-          state.skills.availablePoints = action.payload.availablePoints;
-        }
       })
       .addMatcher(
         isAnyOf(
@@ -251,6 +233,5 @@ export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectUserAvatar = (state: RootState) =>
   state.user.userInfo?.avatar;
 export const selectIsLoggedOut = (state: RootState) => state.user.isLoggedOut;
-export const selectUserSkills = (state: RootState) => state.user.skills;
 
 export default userSlice.reducer;

@@ -69,7 +69,7 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
                       "border-2 px-3 py-1",
                       getCategoryColor(category)
                     )}>
-                    {points} {t(`skills:categories.${category}`)}
+                    {points} {t(`skills:categories.${category}` as any)}
                   </Badge>
                 </motion.div>
               )
@@ -81,7 +81,7 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
               <div key={category} className='space-y-3'>
                 <div className='text-center'>
                   <h2 className='text-lg font-bold capitalize'>
-                    {t(`skills:categories.${category}`)}
+                    {t(`skills:categories.${category}` as any)}
                   </h2>
                   <motion.div
                     key={getCategoryTotalLevel(skills)}
@@ -91,7 +91,7 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
                     <Badge
                       variant='outline'
                       className={cn("px-2 py-0.5", getCategoryColor(category))}>
-                      {t("skills:level")} {getCategoryTotalLevel(skills)}
+                      {t("skills:level" as any)} {getCategoryTotalLevel(skills)}
                     </Badge>
                   </motion.div>
                 </div>
@@ -122,11 +122,14 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
                                     )}
                                     <div className='flex flex-col'>
                                       <span className='text-sm font-medium'>
-                                        {t(`skills:skills.${skill.id}.name`)}
+                                        {t(
+                                          `skills:skills.${skill.id}.name` as any
+                                        )}
                                       </span>
                                       <div className='flex items-center gap-1'>
                                         <span className='text-xs text-gray-400'>
-                                          {t("skills:level")} {currentLevel}
+                                          {t("skills:level" as any)}{" "}
+                                          {currentLevel}
                                         </span>
                                       </div>
                                     </div>
@@ -164,7 +167,9 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p className='max-w-[200px] text-sm text-white'>
-                              {t(`skills:skills.${skill.id}.description`)}
+                              {t(
+                                `skills:skills.${skill.id}.description` as any
+                              )}
                             </p>
                           </TooltipContent>
                         </Tooltip>
