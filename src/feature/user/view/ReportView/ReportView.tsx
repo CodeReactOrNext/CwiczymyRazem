@@ -35,7 +35,6 @@ import {
   selectPreviousUserStats,
   selectRaitingData,
   selectTimerData,
-  selectUserSkills,
 } from "feature/user/store/userSlice";
 import { upgradeSkill } from "feature/user/store/userSlice.asyncThunk";
 
@@ -79,7 +78,6 @@ const ReportView = () => {
   const hearingTime = convertMsToHMObject(timerData.hearing);
   const creativityTime = convertMsToHMObject(timerData.creativity);
 
-  const userSkills = useAppSelector(selectUserSkills);
 
   const handleSkillUpgrade = async (skillId: string) => {
     if (!userAuth) return;
@@ -424,7 +422,6 @@ const ReportView = () => {
                         currentUserStats={currentUserStats}
                         previousUserStats={previousUserStats}
                         skillPointsGained={raitingData.skillPointsGained}
-                        userSkills={userSkills}
                         onSkillUpgrade={handleSkillUpgrade}
                       />
                     </motion.div>

@@ -64,7 +64,7 @@ export default async function handler(
 
     await firebaseSetUserExerciseRaprot(
       userUid,
-      { ...report.raitingData, ...report.reportDate },
+      { ...report.raitingData, ...report.reportDate, skillPointsGained },
       report.reportDate,
       inputData.reportTitle,
       report.isDateBackReport,

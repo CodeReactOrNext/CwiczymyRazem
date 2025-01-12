@@ -2,10 +2,10 @@
   "availablePoints": "available points",
   "level": "Level",
   "categories": {
-    "technique": "technique",
-    "theory": "theory",
-    "hearing": "hearing",
-    "creativity": "creativity"
+    "technique": "Technique",
+    "theory": "Theory",
+    "hearing": "Hearing",
+    "creativity": "Creativity"
   },
   "skills": {
     "alternate_picking": {
@@ -101,4 +101,4 @@
       "description": "Combine pick and fingerpicking techniques"
     }
   }
-} 
+}

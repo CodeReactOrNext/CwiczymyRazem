@@ -57,6 +57,8 @@
   "rating_popup": {
     "title": "Zdobyłeś:",
     "points": "pkt",
+    "skill_points_gained": "Zdobyte Punkty Umiejętności",
+    "spend_skill_points": "Wydaj Swoje Punkty Umiejętności",
     "back": "Wróć",
     "regularity": "za systematyczność",
     "streak": "dni ćwiczeń pod rząd",
@@ -69,5 +71,21 @@
     "time_amount": "ćwiczyłeś łącznie",
     "new_level": "Nowy poziom!",
     "new_achievements": "Nowe osiągnięcia:"
+  },
+
+  "skills": {
+    "technique": "Technika",
+    "theory": "Teoria",
+    "hearing": "Słuch",
+    "creativity": "Kreatywność"
+  },
+
+  "chart": {
+    "categories": {
+      "technique": "Technika",
+      "theory": "Teoria",
+      "hearing": "Słuch",
+      "creativity": "Kreatywność"
+    }
   }
 }
