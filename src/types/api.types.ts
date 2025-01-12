@@ -123,3 +123,19 @@ export interface updateSocialInterface {
   value: string;
   type: MediaType;
 }
+
+export interface SeasonDataInterface {
+  seasonId: string; // Format: "2024-03" for March 2024
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  winners?: {
+    first: string;
+    second: string;
+    third: string;
+  };
+}
+
+export interface SeasonalStatsInterface extends StatisticsDataInterface {
+  seasonId: string;
+}

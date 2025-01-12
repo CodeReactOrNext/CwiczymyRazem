@@ -1,8 +1,15 @@
 import { AchievementList } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface, StatisticsTime } from "types/api.types";
-import { collection, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { db } from "../client/firebase.utils";
+import { db, updateSeasonalStats } from "../client/firebase.utils";
 import {
   getFirestore,
   runTransaction,
@@ -24,7 +31,10 @@ export const firebaseUpdateUserStats = async (
   statistics: StatisticsDataInterface
 ) => {
   const userDocRef = doc(db, "users", userAuth);
-  await updateDoc(userDocRef, { statistics });
+  await Promise.all([
+    updateDoc(userDocRef, { statistics }),
+    updateSeasonalStats(userAuth, statistics),
+  ]);
 };
 
 export const firebaseSetUserExerciseRaprot = async (
@@ -87,13 +97,13 @@ export const updateSongStatus = async (
       }
 
       const songData = songDoc.data();
-      
+
       // Update or create user's song document
       await transaction.set(songDocRef, {
         ...songData,
         id: songId,
         status,
-        lastUpdated: Timestamp.now()
+        lastUpdated: Timestamp.now(),
       });
     });
 
@@ -109,7 +119,7 @@ export const getUserSongStatuses = async (userId: string) => {
     const userDocRef = doc(db, "users", userId);
     const songsCollectionRef = collection(userDocRef, "songs");
     const querySnapshot = await getDocs(songsCollectionRef);
-    
+
     return querySnapshot.docs.reduce((acc, doc) => {
       acc[doc.id] = doc.data().status;
       return acc;

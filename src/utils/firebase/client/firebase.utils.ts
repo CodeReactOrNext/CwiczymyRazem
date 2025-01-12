@@ -51,6 +51,7 @@ import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/Ex
 import { SortByType } from "feature/leadboard/view/LeadboardView";
 import { GuitarSkill, UserSkills } from "types/skills.types";
 import { guitarSkills } from "src/data/guitarSkills";
+import { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
 
 const provider = new GoogleAuthProvider();
 
@@ -863,4 +864,167 @@ export const canUpgradeSkill = (
   }
 
   return true;
+};
+
+// Get current season
+export const getCurrentSeason = async () => {
+  const now = new Date();
+  const seasonId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}`;
+  const seasonRef = doc(db, "seasons", seasonId);
+  const seasonDoc = await getDoc(seasonRef);
+
+  if (!seasonDoc.exists()) {
+    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const seasonData: SeasonDataInterface = {
+      seasonId,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      isActive: true,
+    };
+
+    await setDoc(seasonRef, seasonData);
+    return seasonData;
+  }
+
+  return seasonDoc.data() as SeasonDataInterface;
+};
+
+// Get all available seasons
+export const getAvailableSeasons = async () => {
+  const seasonsRef = collection(db, "seasons");
+  const seasonsSnapshot = await getDocs(seasonsRef);
+  const seasons: SeasonDataInterface[] = [];
+
+  seasonsSnapshot.forEach((doc) => {
+    seasons.push(doc.data() as SeasonDataInterface);
+  });
+
+  return seasons.sort((a, b) => b.startDate.localeCompare(a.startDate));
+};
+
+// Get seasonal leaderboard
+export const getSeasonalLeaderboard = async (
+  seasonId: string,
+  sortBy: SortByType,
+  page: number,
+  itemsPerPage: number
+) => {
+  try {
+    if (!seasonId) {
+      return { users: [], total: 0 };
+    }
+
+    const seasonalUsersRef = collection(db, "seasons", seasonId, "users");
+    const totalSnapshot = await getCountFromServer(seasonalUsersRef);
+    const total = totalSnapshot.data().count;
+
+    const q = query(
+      seasonalUsersRef,
+      orderBy("statistics.points", "desc"),
+      limit(itemsPerPage)
+    );
+
+    const querySnapshot = await getDocs(q);
+    const users = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        profileId: doc.id,
+        displayName: data.displayName,
+        avatar: data.avatar,
+        statistics: {
+          ...data.statistics,
+          points: data.statistics?.points || 0,
+          time: data.statistics?.time || {
+            technique: 0,
+            theory: 0,
+            hearing: 0,
+            creativity: 0,
+            longestSession: 0
+          }
+        }
+      } as FirebaseUserDataInterface;
+    });
+
+    return {
+      users,
+      total,
+    };
+  } catch (error) {
+    return {
+      users: [],
+      total: 0,
+    };
+  }
+};
+
+// Update user's seasonal stats when they submit a report
+export const updateSeasonalStats = async (
+  userId: string,
+  stats: StatisticsDataInterface
+) => {
+  try {
+    const season = await getCurrentSeason();
+    const userRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+
+    if (!userData) return;
+
+    const seasonalUserData = {
+      profileId: userId,
+      displayName: userData.displayName,
+      avatar: userData.avatar,
+      statistics: {
+        points: stats.points,
+        time: stats.time,
+        lvl: stats.lvl,
+        sessionCount: stats.sessionCount,
+        achievements: stats.achievements,
+      },
+      seasonId: season.seasonId,
+      lastUpdated: new Date().toISOString()
+    };
+
+    const userSeasonRef = doc(db, "seasons", season.seasonId, "users", userId);
+    await setDoc(userSeasonRef, seasonalUserData, { merge: true });
+  } catch (error) {
+    // Silent fail - errors will be handled by the calling function
+  }
+};
+
+// Award seasonal badges at the end of the month
+export const awardSeasonalBadges = async (seasonId: string) => {
+  const seasonRef = doc(db, "seasons", seasonId);
+  const seasonDoc = await getDoc(seasonRef);
+
+  if (!seasonDoc.exists() || !seasonDoc.data().isActive) return;
+
+  const usersRef = collection(db, "seasons", seasonId, "users");
+  const topUsers = await getDocs(
+    query(usersRef, orderBy("statistics.points", "desc"), limit(3))
+  );
+
+  const winners = topUsers.docs.map((doc) => doc.id);
+  const badges = ["season_first", "season_second", "season_third"];
+
+  for (let i = 0; i < winners.length; i++) {
+    const userRef = doc(db, "users", winners[i]);
+    await updateDoc(userRef, {
+      "statistics.achievements": arrayUnion(`${seasonId}_${badges[i]}`),
+    });
+  }
+
+  await updateDoc(seasonRef, {
+    isActive: false,
+    winners: {
+      first: winners[0],
+      second: winners[1],
+      third: winners[2],
+    },
+  });
 };
