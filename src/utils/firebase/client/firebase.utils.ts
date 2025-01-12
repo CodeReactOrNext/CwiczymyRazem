@@ -915,50 +915,31 @@ export const getSeasonalLeaderboard = async (
   itemsPerPage: number
 ) => {
   try {
-    if (!seasonId) {
-      return { users: [], total: 0 };
-    }
-
     const seasonalUsersRef = collection(db, "seasons", seasonId, "users");
-    const totalSnapshot = await getCountFromServer(seasonalUsersRef);
-    const total = totalSnapshot.data().count;
-
-    const q = query(
+    let q = query(
       seasonalUsersRef,
-      orderBy("statistics.points", "desc"),
-      limit(itemsPerPage)
+      orderBy(`statistics.${sortBy}`, "desc"),
+      limit(itemsPerPage),
+      ...(page > 1 ? [startAfter((page - 1) * itemsPerPage)] : [])
     );
 
-    const querySnapshot = await getDocs(q);
-    const users = querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        profileId: doc.id,
-        displayName: data.displayName,
-        avatar: data.avatar,
-        statistics: {
-          ...data.statistics,
-          points: data.statistics?.points || 0,
-          time: data.statistics?.time || {
-            technique: 0,
-            theory: 0,
-            hearing: 0,
-            creativity: 0,
-            longestSession: 0
-          }
-        }
-      } as FirebaseUserDataInterface;
-    });
+    const [querySnapshot, totalSnapshot] = await Promise.all([
+      getDocs(q),
+      getCountFromServer(seasonalUsersRef),
+    ]);
+
+    const users = querySnapshot.docs.map((doc) => ({
+      profileId: doc.id,
+      ...doc.data(),
+    })) as FirebaseUserDataInterface[];
 
     return {
       users,
-      total,
+      total: totalSnapshot.data().count,
     };
   } catch (error) {
-    return {
-      users: [],
-      total: 0,
-    };
+    console.error("Error fetching seasonal users:", error);
+    throw error;
   }
 };
 
@@ -967,34 +948,17 @@ export const updateSeasonalStats = async (
   userId: string,
   stats: StatisticsDataInterface
 ) => {
-  try {
-    const season = await getCurrentSeason();
-    const userRef = doc(db, "users", userId);
-    const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
+  const season = await getCurrentSeason();
+  const userSeasonRef = doc(db, "seasons", season.seasonId, "users", userId);
 
-    if (!userData) return;
-
-    const seasonalUserData = {
-      profileId: userId,
-      displayName: userData.displayName,
-      avatar: userData.avatar,
-      statistics: {
-        points: stats.points,
-        time: stats.time,
-        lvl: stats.lvl,
-        sessionCount: stats.sessionCount,
-        achievements: stats.achievements,
-      },
+  await setDoc(
+    userSeasonRef,
+    {
+      ...stats,
       seasonId: season.seasonId,
-      lastUpdated: new Date().toISOString()
-    };
-
-    const userSeasonRef = doc(db, "seasons", season.seasonId, "users", userId);
-    await setDoc(userSeasonRef, seasonalUserData, { merge: true });
-  } catch (error) {
-    // Silent fail - errors will be handled by the calling function
-  }
+    },
+    { merge: true }
+  );
 };
 
 // Award seasonal badges at the end of the month

@@ -60,73 +60,56 @@ const LeadboardView = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    if (isSeasonalView && selectedSeason) {
-      loadSeasonalUsers(selectedSeason, page);
-    } else {
-      loadUsers(page);
-    }
+    loadUsers(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const loadSeasonalUsers = async (seasonId: string, page: number = 1) => {
+  const loadSeasonalUsers = async (seasonId: string) => {
     try {
       setIsLoading(true);
-      if (!seasonId) return;
-
       const response = await getSeasonalLeaderboard(
         seasonId,
         sortBy,
-        page,
+        currentPage,
         ITEMS_PER_PAGE
       );
-
       setUsersData(response.users);
-      setTotalUsers(response.total);
     } catch (error) {
       toast(t("fetch_error"));
-      setUsersData([]);
-      setTotalUsers(0);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    const initializeData = async () => {
-      if (isSeasonalView && selectedSeason) {
-        await loadSeasonalUsers(selectedSeason, 1);
-      } else {
-        await loadUsers(1);
-        await loadTotalCount();
-      }
-    };
-
+    loadTotalCount();
     setCurrentPage(1);
-    initializeData();
-  }, [isSeasonalView, selectedSeason, sortBy]);
+    loadUsers(1);
+  }, [sortBy]);
 
   useEffect(() => {
     const loadSeasons = async () => {
-      try {
-        const seasonsData = await getAvailableSeasons();
-        if (seasonsData.length > 0) {
-          setSeasons(seasonsData);
-          const currentSeason = await getCurrentSeason();
-          setSelectedSeason(currentSeason.seasonId);
-        }
-      } catch (error) {
-        toast(t("fetch_error"));
-      }
+      const seasonsData = await getAvailableSeasons();
+      setSeasons(seasonsData);
+
+      const currentSeason = await getCurrentSeason();
+      setSelectedSeason(currentSeason.seasonId);
     };
 
     loadSeasons();
   }, []);
 
+  useEffect(() => {
+    if (isSeasonalView && selectedSeason) {
+      loadSeasonalUsers(selectedSeason);
+    } else {
+      loadUsers(currentPage);
+    }
+  }, [isSeasonalView, selectedSeason, sortBy, currentPage]);
+
   return (
     <>
-      {(!isLoading && usersData.length === 0 && !isSeasonalView) ? (
-        <PageLoadingLayout />
-      ) : (
+      {usersData.length > 0 || isLoading ? (
         <LeadboardLayout
           usersData={usersData}
           setSortBy={setSortBy}
@@ -143,6 +126,8 @@ const LeadboardView = () => {
           selectedSeason={selectedSeason}
           setSelectedSeason={setSelectedSeason}
         />
+      ) : (
+        <PageLoadingLayout />
       )}
     </>
   );

@@ -172,10 +172,6 @@ const LeadboardLayout = ({
             <div className='flex justify-center p-4'>
               <span className='loading loading-spinner loading-lg'></span>
             </div>
-          ) : usersData.length === 0 ? (
-            <div className='flex justify-center p-4 text-gray-500'>
-              {t("no_data")}
-            </div>
           ) : (
             <>
               {usersData.map((user, index) => (
@@ -192,11 +188,9 @@ const LeadboardLayout = ({
             </>
           )}
 
-          {usersData.length > 0 && (
-            <div className='flex justify-center py-4'>
-              <div className='join'>{renderPaginationButtons()}</div>
-            </div>
-          )}
+          <div className='flex justify-center py-4'>
+            <div className='join'>{renderPaginationButtons()}</div>
+          </div>
         </div>
       </ul>
     </MainContainer>
