@@ -5,6 +5,7 @@ import { Button } from "assets/components/ui/button";
 import { Plus } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 interface MiniSkillTreeProps {
   userSkills: UserSkills;
@@ -17,6 +18,8 @@ export const MiniSkillTree = ({
   onSkillUpgrade,
   highlightCategories = [],
 }: MiniSkillTreeProps) => {
+  const { t } = useTranslation();
+
   const getCategoryColor = (category: string) => {
     const colors = {
       technique: "from-red-500/10 to-red-500/5 border-red-500/10",
@@ -49,7 +52,7 @@ export const MiniSkillTree = ({
                   "border-2 px-3 py-1",
                   getCategoryColor(category)
                 )}>
-                {points} {category}
+                {points} {t(`skills:categories.${category}`)}
               </Badge>
             ))}
       </div>
@@ -67,7 +70,9 @@ export const MiniSkillTree = ({
             <div className='flex items-center justify-between gap-2'>
               <div className='flex items-center gap-2'>
                 {skill.icon && <skill.icon className='h-4 w-4' />}
-                <span className='text-sm'>{skill.name}</span>
+                <span className='text-sm'>
+                  {t(`skills:skills.${skill.id}.name`)}
+                </span>
               </div>
               <Button
                 size='sm'

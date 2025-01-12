@@ -27,27 +27,6 @@ import { Checkbox } from "assets/components/ui/checkbox"
 import { addZeroToTime, convertMsToHMObject } from "utils/converter"
 import { useTranslation } from "next-i18next"
 
-const chartConfig = {
-  activity: {
-    label: "Activity",
-  },
-  technique: {
-    label: "Technique",
-    color: "hsl(var(--chart-1))",
-  },
-  theory: {
-    label: "Theory",
-    color: "hsl(var(--chart-2))",
-  },
-  hearing: {
-    label: "Hearing",
-    color: "hsl(var(--chart-3))",
-  },
-  creativity: {
-    label: "Creativity",
-    color: "hsl(var(--chart-4))",
-  }
-} satisfies ChartConfig;
 
 interface ActivityChartProps {
   data: {
@@ -68,6 +47,28 @@ export function ActivityChart({ data }: ActivityChartProps) {
     hearing: true,
     creativity: true
   })
+  
+const chartConfig = {
+  activity: {
+    label: "Activity",
+  },
+  technique: {
+    label: t('chart.categories.technique'),
+    color: "hsl(var(--chart-1))",
+  },
+  theory: {
+    label: t('chart.categories.theory'),
+    color: "hsl(var(--chart-2))",
+  },
+  hearing: {
+    label: t('chart.categories.hearing'),
+    color: "hsl(var(--chart-3))",
+  },
+  creativity: {
+    label: t('chart.categories.creativity'),
+    color: "hsl(var(--chart-4))",
+  }
+} satisfies ChartConfig;
 
   const processedData = data?.map((report) => ({
     date: report.date.toISOString().split('T')[0],
@@ -107,7 +108,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
             {t('chart.showing_activity')}
           </CardDescription>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex gap-2">
             {Object.entries(visibleCategories).map(([category, isVisible]) => (
               <div key={category} className="flex items-center space-x-2">
@@ -117,7 +118,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
                   onCheckedChange={() => toggleCategory(category as keyof typeof visibleCategories)}
                 />
                 <label htmlFor={category} className="text-sm capitalize">
-                  {category}
+                  {t(`chart.categories.${category}`)}
                 </label>
               </div>
             ))}
@@ -202,7 +203,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
                           </span>
                           {payload.map((entry) => (
                             <span key={entry.name} className="font-bold">
-                              {entry.name}:   {convertMsToHMObject(entry.value as number).hours}:
+                              {t(`chart.categories.${entry.name}`)}: {convertMsToHMObject(entry.value as number).hours}:
             {addZeroToTime(convertMsToHMObject(entry.value as number).minutes)}
                             </span>
                           ))}

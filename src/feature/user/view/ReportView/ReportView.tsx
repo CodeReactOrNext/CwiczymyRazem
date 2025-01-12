@@ -35,7 +35,9 @@ import {
   selectPreviousUserStats,
   selectRaitingData,
   selectTimerData,
+  selectUserSkills,
 } from "feature/user/store/userSlice";
+import { upgradeSkill } from "feature/user/store/userSlice.asyncThunk";
 
 import { RaportSchema } from "./helpers/RaportShcema";
 import { ReportFormikInterface } from "./ReportView.types";
@@ -76,6 +78,13 @@ const ReportView = () => {
   const theoryTime = convertMsToHMObject(timerData.theory);
   const hearingTime = convertMsToHMObject(timerData.hearing);
   const creativityTime = convertMsToHMObject(timerData.creativity);
+
+  const userSkills = useAppSelector(selectUserSkills);
+
+  const handleSkillUpgrade = async (skillId: string) => {
+    if (!userAuth) return;
+    await dispatch(upgradeSkill({ skillId }));
+  };
 
   const formikInitialValues: ReportFormikInterface = {
     techniqueHours: techniqueTime.hours,
@@ -416,7 +425,7 @@ const ReportView = () => {
                         previousUserStats={previousUserStats}
                         skillPointsGained={raitingData.skillPointsGained}
                         userSkills={userSkills}
-                        onSkillUpgrade={onSkillUpgrade}
+                        onSkillUpgrade={handleSkillUpgrade}
                       />
                     </motion.div>
                   </Backdrop>

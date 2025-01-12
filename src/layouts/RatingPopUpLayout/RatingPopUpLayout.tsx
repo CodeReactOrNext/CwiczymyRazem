@@ -1,9 +1,3 @@
-import Image from "next/image";
-import FireSVG from "public/static/images/svg/Fire";
-import Lightning from "public/static/images/svg/Lightning";
-import blackGuitar from "public/static/images/guitar_black.png";
-
-import OldEffect from "components/OldEffect";
 import BonusPointsItem from "./components/BonusPointsItem";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -148,8 +142,21 @@ const RatingPopUp = ({
             </h3>
             <MiniSkillTree
               userSkills={{
-                availablePoints: skillPointsGained,
-                unlockedSkills: userSkills?.unlockedSkills,
+                availablePoints: {
+                  technique:
+                    (userSkills?.availablePoints?.technique || 0) +
+                    skillPointsGained.technique,
+                  theory:
+                    (userSkills?.availablePoints?.theory || 0) +
+                    skillPointsGained.theory,
+                  hearing:
+                    (userSkills?.availablePoints?.hearing || 0) +
+                    skillPointsGained.hearing,
+                  creativity:
+                    (userSkills?.availablePoints?.creativity || 0) +
+                    skillPointsGained.creativity,
+                },
+                unlockedSkills: userSkills?.unlockedSkills || [],
               }}
               onSkillUpgrade={onSkillUpgrade}
               highlightCategories={categoriesWithPoints}
