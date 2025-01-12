@@ -14,12 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { MoreVertical, Music } from "lucide-react";
-import { removeUserSong } from "utils/firebase/client/firebase.utils";
 import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
 import { Button } from "assets/components/ui/button";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 interface SongStatusCardProps {
   title: string;
@@ -46,9 +46,20 @@ export const SongStatusCard = ({
   const { t } = useTranslation(["songs", "common"]);
   const userId = useAppSelector(selectUserAuth);
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    handleResize(); // Check on initial render
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
-    <Card className='flex-1'>
+    <Card className='flex-1 '>
       <CardHeader>
         <CardTitle className='text-sm font-medium'>
           {title} ({songs?.length})
@@ -89,6 +100,7 @@ export const SongStatusCard = ({
                     <Draggable
                       key={song.id}
                       draggableId={song.id}
+                      isDragDisabled={isMobile}
                       index={index}>
                       {(provided, snapshot) => (
                         <div

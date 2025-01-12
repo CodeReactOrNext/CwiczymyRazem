@@ -28,5 +28,11 @@
     "longest_session": "Longest session",
     "consecutive days": "Max streak",
     "max_points": "Highest score"
+  },
+  "nav": {
+    "overview": "Overview",
+    "activity": "Activity",
+    "songs": "Songs",
+    "skills": "Skills"
   }
 }
