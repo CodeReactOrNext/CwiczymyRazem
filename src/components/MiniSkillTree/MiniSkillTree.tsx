@@ -39,7 +39,7 @@ export const MiniSkillTree = ({
   if (relevantSkills.length === 0) return null;
 
   return (
-    <div className='rounded-lg bg-second-500 p-4'>
+    <div className='rounded-lg bg-second-500 p-4 font-openSans'>
       <div className='mb-4 flex gap-2'>
         {userSkills?.availablePoints &&
           Object.entries(userSkills.availablePoints)
@@ -57,7 +57,7 @@ export const MiniSkillTree = ({
             ))}
       </div>
 
-      <div className='grid grid-cols-2 gap-2 md:grid-cols-3'>
+      <div className='grid grid-cols-2 gap-2 font-openSans md:grid-cols-3 '>
         {relevantSkills.map((skill) => (
           <motion.div
             key={skill.id}
