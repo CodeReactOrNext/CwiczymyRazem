@@ -54,6 +54,7 @@ import { guitarSkills } from "src/data/guitarSkills";
 import { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
 import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
 import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
+import { AchievementList } from "assets/achievements/achievementsData";
 
 const provider = new GoogleAuthProvider();
 
@@ -98,7 +99,8 @@ export const firebaseAddSongsLog = async (
   data: string,
   songTitle: string,
   songArtist: string,
-  status: FirebaseLogsSongsStatuses
+  status: FirebaseLogsSongsStatuses,
+  difficulty_rate?: number | undefined
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -117,7 +119,10 @@ export const firebaseAddSongsLog = async (
   await setDoc(logsDocRef, logData);
 
   try {
-    const discordMessage = await formatDiscordMessage(logData);
+    const discordMessage = await formatDiscordMessage({
+      ...logData,
+      difficulty_rate,
+    });
     await sendDiscordMessage(discordMessage);
   } catch (error) {
     console.error("Error sending Discord notification:", error);
@@ -430,7 +435,8 @@ export const addSong = async (
       new Date().toISOString(),
       title,
       artist,
-      "added"
+      "added",
+      rating
     );
     return docRef.id;
   } catch (error) {
@@ -480,7 +486,8 @@ export const rateSongDifficulty = async (
       new Date().toISOString(),
       title,
       artist,
-      "difficulty_rate"
+      "difficulty_rate",
+      rating
     );
   } catch (error) {
     console.error("Error rating song:", error);
@@ -972,7 +979,6 @@ export const updateSeasonalStats = async (
   );
 };
 
-// Award seasonal badges at the end of the month
 export const awardSeasonalBadges = async (seasonId: string) => {
   const seasonRef = doc(db, "seasons", seasonId);
   const seasonDoc = await getDoc(seasonRef);
@@ -1009,7 +1015,14 @@ export const firebaseAddLogReport = async (
   data: string,
   newAchievements: AchievementList[],
   newLevel: { isNewLevel: boolean; level: number },
-  points: number
+  points: number,
+  timeSumary: {
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+    sumTime: number;
+  }
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -1024,11 +1037,11 @@ export const firebaseAddLogReport = async (
     newLevel,
     points,
     timestamp: new Date().toISOString(),
+    timeSumary,
   };
 
   await setDoc(logsDocRef, logData);
 
-  // Add Discord notification
   try {
     const discordMessage = await formatDiscordMessage(logData);
     await sendDiscordMessage(discordMessage);

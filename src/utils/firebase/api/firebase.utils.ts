@@ -64,7 +64,14 @@ export const firebaseAddLogReport = async (
   data: string,
   points: number,
   newAchievements: AchievementList[],
-  newLevel: { isNewLevel: boolean; level: number }
+  newLevel: { isNewLevel: boolean; level: number },
+  timeSumary: {
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+    sumTime: number;
+  }
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -88,6 +95,7 @@ export const firebaseAddLogReport = async (
     newLevel,
     points,
     timestamp: new Date().toISOString(),
+    timeSumary,
   };
 
   await setDoc(logsDocRef, logData);
