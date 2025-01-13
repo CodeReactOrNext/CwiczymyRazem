@@ -9,7 +9,6 @@ import {
   firebaseSetUserExerciseRaprot,
   firebaseAddLogReport,
 } from "utils/firebase/api/firebase.utils";
-import { SkillsType } from "types/skillsTypes";
 
 interface SkillPointsGained {
   technique: number;
@@ -40,7 +39,7 @@ export default async function handler(
     const skillPointsGained: SkillPointsGained = {
       technique: Math.floor(report.timeSummary.techniqueTime / 1800000), // 30 minutes = 1 point
       theory: Math.floor(report.timeSummary.theoryTime / 1800000),
-      hearing: Math.floor(report.timeSummary.hearingTime / 1800000), 
+      hearing: Math.floor(report.timeSummary.hearingTime / 1800000),
       creativity: Math.floor(report.timeSummary.creativityTime / 1800000),
     };
 
@@ -82,7 +81,8 @@ export default async function handler(
         {
           isNewLevel: report.isNewLevel,
           level: report.currentUserStats.lvl,
-        }
+        },
+        report.timeSummary
       );
     }
 
