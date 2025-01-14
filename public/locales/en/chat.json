@@ -1,0 +1,6 @@
+{
+  "send": "Send",
+  "send_placeholder": "Type a message...",
+  "validation_too_long": "Message cannot exceed 2000 characters.",
+  "error": "Error sending message"
+}
