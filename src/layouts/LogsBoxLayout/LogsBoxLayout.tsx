@@ -16,7 +16,7 @@ import { FaGuitar, FaMedal, FaTasks } from "react-icons/fa";
 import Changelog from "./components/Changelog";
 import { changelogEntries } from "changelogEntries";
 import { IoChatboxEllipses } from "react-icons/io5";
-import Chat from "./components/Chat";
+import Chat from "../../feature/chat/Chat";
 import { useUnreadMessages } from "hooks/useUnreadMessages";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 
