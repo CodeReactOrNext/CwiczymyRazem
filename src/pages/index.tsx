@@ -38,6 +38,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
         "toast",
         "skills",
         "songs",
+        'chat'
       ])),
     },
   };
