@@ -14,12 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { MoreVertical, Music } from "lucide-react";
-import { removeUserSong } from "utils/firebase/client/firebase.utils";
 import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
 import { Button } from "assets/components/ui/button";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 interface SongStatusCardProps {
   title: string;
@@ -43,12 +43,23 @@ export const SongStatusCard = ({
   onStatusChange,
   onSongRemove,
 }: SongStatusCardProps) => {
-  const { t } = useTranslation("songs");
+  const { t } = useTranslation(["songs", "common"]);
   const userId = useAppSelector(selectUserAuth);
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    handleResize(); // Check on initial render
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
-    <Card className='flex-1'>
+    <Card className='flex-1 '>
       <CardHeader>
         <CardTitle className='text-sm font-medium'>
           {title} ({songs?.length})
@@ -67,16 +78,19 @@ export const SongStatusCard = ({
                 <div className='flex h-full flex-col items-center justify-center space-y-2 p-4 text-center'>
                   <Music className='h-5 w-5  text-muted-foreground' />
                   <p className=' text-sm '>
-                    {t("no_songs_in_status", { status: title })}
+                    {t("songs:no_songs_in_status", { status: title })}
                   </p>
                   {isLanding && (
-                    <Button size='sm' onClick={() => router.push("songs")}>
-                      Dodaj
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      onClick={() => router.push("songs")}>
+                      {t("common:song_status.add")}
                     </Button>
                   )}
                   {!isLanding && (
                     <p className='text-sm text-muted-foreground'>
-                      {t("no_songs_in_status_desc")}
+                      {t("no_songs_in_status_desc" as any)}
                     </p>
                   )}
                 </div>
@@ -86,6 +100,7 @@ export const SongStatusCard = ({
                     <Draggable
                       key={song.id}
                       draggableId={song.id}
+                      isDragDisabled={isMobile}
                       index={index}>
                       {(provided, snapshot) => (
                         <div
@@ -118,13 +133,14 @@ export const SongStatusCard = ({
                                     )
                                   }
                                   className='cursor-pointer'>
-                                  Move to {status}
+                                  {t("common:song_status.move_to")}{" "}
+                                  {t(`songs:status.${status}`)}
                                 </DropdownMenuItem>
                               ))}
                               <DropdownMenuItem
                                 onClick={() => onSongRemove(song.id)}
                                 className='cursor-pointer text-destructive'>
-                                Remove
+                                {t("common:song_status.remove")}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

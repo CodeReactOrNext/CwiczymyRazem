@@ -1,0 +1,104 @@
+{
+  "availablePoints": "available points",
+  "level": "Level",
+  "categories": {
+    "technique": "Technique",
+    "theory": "Theory",
+    "hearing": "Hearing",
+    "creativity": "Creativity"
+  },
+  "skills": {
+    "alternate_picking": {
+      "name": "Alternate Picking",
+      "description": "Master the art of alternating between downstrokes and upstrokes"
+    },
+    "legato": {
+      "name": "Legato",
+      "description": "Smooth playing technique using hammer-ons and pull-offs"
+    },
+    "sweep_picking": {
+      "name": "Sweep Picking",
+      "description": "Advanced picking technique for playing arpeggios"
+    },
+    "chord_theory": {
+      "name": "Chord Theory",
+      "description": "Understanding chord construction and progressions"
+    },
+    "scales": {
+      "name": "Scales Mastery",
+      "description": "Learn and master essential guitar scales"
+    },
+    "rhythm": {
+      "name": "Rhythm Mastery",
+      "description": "Develop precise timing and rhythm control"
+    },
+    "bending": {
+      "name": "String Bending",
+      "description": "Master the art of bending strings for expressive playing"
+    },
+    "tapping": {
+      "name": "Two-Hand Tapping",
+      "description": "Advanced technique using both hands on the fretboard"
+    },
+    "improvisation": {
+      "name": "Improvisation",
+      "description": "Create spontaneous musical ideas and solos"
+    },
+    "ear_training": {
+      "name": "Ear Training",
+      "description": "Develop the ability to recognize notes, intervals and chords by ear"
+    },
+    "sight_reading": {
+      "name": "Sight Reading",
+      "description": "Learn to read and play music notation fluently"
+    },
+    "fingerpicking": {
+      "name": "Fingerpicking",
+      "description": "Master fingerstyle guitar techniques"
+    },
+    "music_composition": {
+      "name": "Music Composition",
+      "description": "Learn to write and arrange your own music"
+    },
+    "pitch_recognition": {
+      "name": "Pitch Recognition",
+      "description": "Develop perfect pitch and relative pitch abilities"
+    },
+    "harmony": {
+      "name": "Advanced Harmony",
+      "description": "Master complex chord progressions and voice leading"
+    },
+    "vibrato": {
+      "name": "Vibrato Technique",
+      "description": "Master the art of adding expression through string vibration"
+    },
+    "music_theory": {
+      "name": "Advanced Music Theory",
+      "description": "Deep understanding of musical concepts and composition"
+    },
+    "rhythm_variations": {
+      "name": "Advanced Rhythm",
+      "description": "Master complex time signatures and polyrhythms"
+    },
+    "songwriting": {
+      "name": "Songwriting",
+      "description": "Create complete songs with lyrics and arrangements"
+    },
+    "slide_guitar": {
+      "name": "Slide Guitar",
+      "description": "Master the technique of playing with a guitar slide"
+    },
+    "modal_theory": {
+      "name": "Modal Theory",
+      "description": "Understanding and application of musical modes"
+    },
+    "audio_production": {
+      "name": "Audio Production",
+      "description": "Learn to record and produce guitar tracks"
+    },
+    "hybrid_picking": {
+      "name": "Hybrid Picking",
+      "description": "Combine pick and fingerpicking techniques"
+    }
+  }
+}

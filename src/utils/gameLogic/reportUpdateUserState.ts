@@ -29,6 +29,7 @@ export const reportUpdateUserStats = ({
     actualDayWithoutBreak,
     dayWithoutBreak,
     achievements,
+    availablePoints,
   } = currentUserStats;
   const isDateBackReport = inputData.countBackDays;
   const timeSummary = inputTimeConverter(inputData);
@@ -44,9 +45,17 @@ export const reportUpdateUserStats = ({
     userLastReportDate,
     didPracticeToday
   );
-  const raiting = isDateBackReport
-    ? makeRatingData(inputData, sumTime, 1)
-    : makeRatingData(inputData, sumTime, updatedActualDayWithoutBreak);
+  const raiting = {
+    ...(isDateBackReport
+      ? makeRatingData(inputData, sumTime, 1)
+      : makeRatingData(inputData, sumTime, updatedActualDayWithoutBreak)),
+    skillPointsGained: {
+      technique: techniqueTime > 0 ? 1 : 0,
+      theory: theoryTime > 0 ? 1 : 0,
+      hearing: hearingTime > 0 ? 1 : 0,
+      creativity: creativityTime > 0 ? 1 : 0,
+    },
+  };
   const updatedLevel = levelUpUser(lvl, points + raiting.totalPoints);
   const isNewLevel = updatedLevel > lvl;
 
@@ -59,6 +68,7 @@ export const reportUpdateUserStats = ({
       longestSession:
         time.longestSession < sumTime ? sumTime : time.longestSession,
     },
+    availablePoints: availablePoints,
     points: points + raiting.totalPoints,
     lvl: updatedLevel,
     currentLevelMaxPoints: getPointsToLvlUp(updatedLevel + 1),

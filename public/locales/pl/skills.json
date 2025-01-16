@@ -1,0 +1,104 @@
+{
+  "availablePoints": "dostępne punkty",
+  "level": "Poziom",
+  "categories": {
+    "technique": "technika",
+    "theory": "teoria",
+    "hearing": "słuch",
+    "creativity": "kreatywność"
+  },
+  "skills": {
+    "alternate_picking": {
+      "name": "Naprzemienne Kostki",
+      "description": "Opanuj sztukę naprzemiennego uderzania w dół i w górę"
+    },
+    "legato": {
+      "name": "Legato",
+      "description": "Płynna technika gry wykorzystująca hammer-ony i pull-offy"
+    },
+    "sweep_picking": {
+      "name": "Sweep Picking",
+      "description": "Zaawansowana technika kostki do grania arpeggio"
+    },
+    "chord_theory": {
+      "name": "Teoria Akordów",
+      "description": "Zrozumienie budowy akordów i progresji"
+    },
+    "scales": {
+      "name": "Mistrzostwo Skal",
+      "description": "Naucz się i opanuj podstawowe skale gitarowe"
+    },
+    "rhythm": {
+      "name": "Mistrzostwo Rytmu",
+      "description": "Rozwiń precyzyjne wyczucie czasu i kontrolę rytmu"
+    },
+    "bending": {
+      "name": "Podciąganie Strun",
+      "description": "Opanuj sztukę podciągania strun dla ekspresyjnej gry"
+    },
+    "tapping": {
+      "name": "Tapping Oburęczny",
+      "description": "Zaawansowana technika wykorzystująca obie ręce na gryfie"
+    },
+    "improvisation": {
+      "name": "Improwizacja",
+      "description": "Twórz spontaniczne pomysły muzyczne i sola"
+    },
+    "ear_training": {
+      "name": "Kształcenie Słuchu",
+      "description": "Rozwiń umiejętność rozpoznawania dźwięków, interwałów i akordów ze słuchu"
+    },
+    "sight_reading": {
+      "name": "Czytanie Nut",
+      "description": "Naucz się płynnie czytać i grać nuty"
+    },
+    "fingerpicking": {
+      "name": "Fingerpicking",
+      "description": "Opanuj techniki gry palcowej"
+    },
+    "music_composition": {
+      "name": "Kompozycja Muzyczna",
+      "description": "Naucz się pisać i aranżować własną muzykę"
+    },
+    "pitch_recognition": {
+      "name": "Rozpoznawanie Wysokości Dźwięków",
+      "description": "Rozwiń słuch absolutny i relatywny"
+    },
+    "harmony": {
+      "name": "Zaawansowana Harmonia",
+      "description": "Opanuj złożone progresje akordowe i prowadzenie głosów"
+    },
+    "vibrato": {
+      "name": "Technika Vibrato",
+      "description": "Opanuj sztukę dodawania ekspresji poprzez wibrację strun"
+    },
+    "music_theory": {
+      "name": "Zaawansowana Teoria Muzyki",
+      "description": "Głębokie zrozumienie koncepcji muzycznych i kompozycji"
+    },
+    "rhythm_variations": {
+      "name": "Zaawansowany Rytm",
+      "description": "Opanuj złożone metrum i polirytmię"
+    },
+    "songwriting": {
+      "name": "Pisanie Piosenek",
+      "description": "Twórz kompletne utwory z tekstem i aranżacją"
+    },
+    "slide_guitar": {
+      "name": "Gitara Slide",
+      "description": "Opanuj technikę gry sliderem"
+    },
+    "modal_theory": {
+      "name": "Teoria Modalna",
+      "description": "Zrozumienie i zastosowanie skal modalnych"
+    },
+    "audio_production": {
+      "name": "Produkcja Audio",
+      "description": "Naucz się nagrywać i produkować ścieżki gitarowe"
+    },
+    "hybrid_picking": {
+      "name": "Hybrid Picking",
+      "description": "Połącz techniki kostki i palcowania"
+    }
+  }
+} 

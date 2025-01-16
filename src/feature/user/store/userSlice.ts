@@ -25,6 +25,7 @@ import {
   updateUserStats,
   uploadUserAvatar,
   uploadUserSocialData,
+  upgradeSkill,
 } from "./userSlice.asyncThunk";
 
 const initialState: userSliceInitialState = {
@@ -120,7 +121,9 @@ export const userSlice = createSlice({
         state.timer.theory = 0;
         state.currentUserStats = payload.currentUserStats;
         state.previousUserStats = payload.previousUserStats;
-        state.raitingData = payload.raitingData;
+        state.raitingData = {
+          ...payload.raitingData,
+        };
         state.isFetching = null;
       })
       .addCase(restartUserStats.fulfilled, (state) => {

@@ -1,0 +1,6 @@
+{
+  "send": "Wyślij",
+  "send_placeholder": "Wpisz wiadomość...",
+  "validation_too_long": "Wiadomość nie może przekraczać 2000 znaków.",
+  "error": "Błąd podczas wysyłania wiadomości"
+}

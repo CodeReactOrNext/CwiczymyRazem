@@ -90,5 +90,26 @@
     "points": "Punktów",
     "time": "Czasu",
     "session_count": "Ilości Sesji"
+  },
+  "song_status": {
+    "move_to": "Przenieś do",
+    "remove": "Usuń",
+    "add": "Dodaj"
+  },
+  "chart": {
+    "activity_overview": "Przegląd aktywności",
+    "showing_activity": "Wyświetlanie danych aktywności dla wybranego okresu",
+    "time_ranges": {
+      "all_time": "Cały okres",
+      "last_3_months": "Ostatnie 3 miesiące",
+      "last_30_days": "Ostatnie 30 dni",
+      "last_7_days": "Ostatnie 7 dni"
+    },
+    "categories": {
+      "technique": "Technika",
+      "theory": "Teoria",
+      "hearing": "Słuch",
+      "creativity": "Kreatywność"
+    }
   }
 }

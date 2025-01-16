@@ -1,8 +1,15 @@
 import { AchievementList } from "assets/achievements/achievementsData";
 import { StatisticsDataInterface, StatisticsTime } from "types/api.types";
-import { collection, doc, getDoc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { db } from "../client/firebase.utils";
+import { db, updateSeasonalStats } from "../client/firebase.utils";
 import {
   getFirestore,
   runTransaction,
@@ -12,6 +19,8 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { SongStatus } from "utils/firebase/client/firebase.types";
+import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
+import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
 
 export const firebaseGetUserData = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
@@ -24,7 +33,10 @@ export const firebaseUpdateUserStats = async (
   statistics: StatisticsDataInterface
 ) => {
   const userDocRef = doc(db, "users", userAuth);
-  await updateDoc(userDocRef, { statistics });
+  await Promise.all([
+    updateDoc(userDocRef, { statistics }),
+    updateSeasonalStats(userAuth, statistics),
+  ]);
 };
 
 export const firebaseSetUserExerciseRaprot = async (
@@ -52,7 +64,14 @@ export const firebaseAddLogReport = async (
   data: string,
   points: number,
   newAchievements: AchievementList[],
-  newLevel: { isNewLevel: boolean; level: number }
+  newLevel: { isNewLevel: boolean; level: number },
+  timeSumary: {
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+    sumTime: number;
+  }
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -67,6 +86,27 @@ export const firebaseAddLogReport = async (
     newAchievements,
     newLevel,
   });
+
+  const logData = {
+    data,
+    uid,
+    userName,
+    newAchievements,
+    newLevel,
+    points,
+    timestamp: new Date().toISOString(),
+    timeSumary,
+  };
+
+  await setDoc(logsDocRef, logData);
+
+  // Add Discord notification
+  try {
+    const discordMessage = await formatDiscordMessage(logData);
+    await sendDiscordMessage(discordMessage);
+  } catch (error) {
+    console.error("Error sending Discord notification:", error);
+  }
 };
 
 export const updateSongStatus = async (
@@ -87,13 +127,13 @@ export const updateSongStatus = async (
       }
 
       const songData = songDoc.data();
-      
+
       // Update or create user's song document
       await transaction.set(songDocRef, {
         ...songData,
         id: songId,
         status,
-        lastUpdated: Timestamp.now()
+        lastUpdated: Timestamp.now(),
       });
     });
 
@@ -109,7 +149,7 @@ export const getUserSongStatuses = async (userId: string) => {
     const userDocRef = doc(db, "users", userId);
     const songsCollectionRef = collection(userDocRef, "songs");
     const querySnapshot = await getDocs(songsCollectionRef);
-    
+
     return querySnapshot.docs.reduce((acc, doc) => {
       acc[doc.id] = doc.data().status;
       return acc;

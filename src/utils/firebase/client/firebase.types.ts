@@ -23,6 +23,7 @@ export interface UserSongLists {
 }
 
 export interface FirebaseLogsInterface {
+  timestamp: string | number | Date;
   uid: string;
   data: string;
   userName: string;
@@ -32,7 +33,15 @@ export interface FirebaseLogsInterface {
     level: number;
   };
   points: number;
+  timeSumary: {
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+    sumTime: number;
+  };
 }
+
 export type FirebaseLogsSongsStatuses =
   | "learned"
   | "wantToLearn"
@@ -45,6 +54,7 @@ export interface FirebaseLogsSongsInterface {
   userName: string;
   songTitle: string;
   songArtist: string;
+  difficulty_rate?: number;
   status: FirebaseLogsSongsStatuses;
 }
 export interface FirebaseEventsInteface {

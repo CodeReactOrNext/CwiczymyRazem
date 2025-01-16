@@ -1,4 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
+import { useTranslation } from "react-i18next";
+import { SeasonDataInterface } from "types/api.types";
 
 import SortBySwitch from "./components/SortBySwitch";
 import LeadboardColumn from "./components/LeadboardRow";
@@ -17,6 +19,11 @@ interface LeadboardLayoutProps {
   currentPage: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
+  isSeasonalView: boolean;
+  setIsSeasonalView: Dispatch<SetStateAction<boolean>>;
+  seasons: SeasonDataInterface[];
+  selectedSeason: string;
+  setSelectedSeason: Dispatch<SetStateAction<string>>;
 }
 
 const LeadboardLayout = ({
@@ -29,16 +36,23 @@ const LeadboardLayout = ({
   currentPage,
   itemsPerPage,
   onPageChange,
+  isSeasonalView,
+  setIsSeasonalView,
+  seasons,
+  selectedSeason,
+  setSelectedSeason,
 }: LeadboardLayoutProps) => {
+  const { t } = useTranslation("leadboard");
+
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
 
   const renderPaginationButtons = () => {
     const buttons = [];
     const maxVisiblePages = 5; // Number of page buttons to show
-    
+
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     // Adjust start if we're near the end
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -47,21 +61,19 @@ const LeadboardLayout = ({
     // First page and previous
     buttons.push(
       <button
-        key="first"
+        key='first'
         onClick={() => onPageChange(1)}
         disabled={currentPage === 1}
-        className="btn btn-sm join-item"
-      >
+        className='btn join-item btn-sm'>
         «
       </button>
     );
     buttons.push(
       <button
-        key="prev"
+        key='prev'
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="btn btn-sm join-item"
-      >
+        className='btn join-item btn-sm'>
         ‹
       </button>
     );
@@ -72,10 +84,9 @@ const LeadboardLayout = ({
         <button
           key={i}
           onClick={() => onPageChange(i)}
-          className={`btn btn-sm join-item ${
+          className={`btn join-item btn-sm ${
             currentPage === i ? "btn-active" : ""
-          }`}
-        >
+          }`}>
           {i}
         </button>
       );
@@ -84,21 +95,19 @@ const LeadboardLayout = ({
     // Next and last page
     buttons.push(
       <button
-        key="next"
+        key='next'
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="btn btn-sm join-item"
-      >
+        className='btn join-item btn-sm'>
         ›
       </button>
     );
     buttons.push(
       <button
-        key="last"
+        key='last'
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage === totalPages}
-        className="btn btn-sm join-item"
-      >
+        className='btn join-item btn-sm'>
         »
       </button>
     );
@@ -109,20 +118,59 @@ const LeadboardLayout = ({
   return (
     <MainContainer title={"Leadboard"}>
       <ul className='min-h-screen'>
-        <div className='sticky top-0 z-10 flex w-full justify-between p-2 px-4 backdrop-blur-sm'>
-          <div className="text-sm text-gray-600">
-            {`Showing ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(
-              currentPage * itemsPerPage,
-              totalUsers
-            )} of ${totalUsers} users`}
+        <div className='sticky top-0 z-10 flex w-full flex-col gap-4 p-2 px-4 backdrop-blur-sm'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-4'>
+              <div className='join'>
+                <button
+                  className={`btn join-item btn-sm ${
+                    !isSeasonalView ? "btn-primary" : ""
+                  }`}
+                  onClick={() => setIsSeasonalView(false)}>
+                  {t("global_leaderboard")}
+                </button>
+                <button
+                  className={`btn join-item btn-sm ${
+                    isSeasonalView ? "btn-primary" : ""
+                  }`}
+                  onClick={() => setIsSeasonalView(true)}>
+                  {t("seasonal_leaderboard")}
+                </button>
+              </div>
+
+              {isSeasonalView && (
+                <select
+                  className='select select-bordered select-sm'
+                  value={selectedSeason}
+                  onChange={(e) => setSelectedSeason(e.target.value)}>
+                  {seasons.map((season) => (
+                    <option key={season.seasonId} value={season.seasonId}>
+                      {new Date(season.startDate).toLocaleDateString()} -{" "}
+                      {new Date(season.endDate).toLocaleDateString()}
+                      {season.isActive && ` (${t("current_season")})`}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div className='flex items-center gap-4'>
+              <div className='text-sm text-gray-600'>
+                {`${t("showing")} ${
+                  (currentPage - 1) * itemsPerPage + 1
+                }-${Math.min(currentPage * itemsPerPage, totalUsers)} ${t(
+                  "of"
+                )} ${totalUsers} ${t("users")}`}
+              </div>
+              <SortBySwitch setSortBy={setSortBy} sortBy={sortBy} />
+            </div>
           </div>
-          <SortBySwitch setSortBy={setSortBy} sortBy={sortBy} />
         </div>
 
         <div className='container mx-auto'>
           {isLoading ? (
-            <div className="flex justify-center p-4">
-              <span className="loading loading-spinner loading-lg"></span>
+            <div className='flex justify-center p-4'>
+              <span className='loading loading-spinner loading-lg'></span>
             </div>
           ) : (
             <>
@@ -139,9 +187,9 @@ const LeadboardLayout = ({
               ))}
             </>
           )}
-          
-          <div className="flex justify-center py-4">
-            <div className="join">{renderPaginationButtons()}</div>
+
+          <div className='flex justify-center py-4'>
+            <div className='join'>{renderPaginationButtons()}</div>
           </div>
         </div>
       </ul>
