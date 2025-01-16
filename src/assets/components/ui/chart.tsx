@@ -308,9 +308,6 @@ const ChartLegendContent = React.forwardRef<
 );
 ChartLegendContent.displayName = "ChartLegend";
 
-// Helper to extract item config from a payload.
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-ignore
 function getPayloadConfigFromPayload(
   config: ChartConfig,
   payload: unknown,
@@ -319,6 +316,7 @@ function getPayloadConfigFromPayload(
   if (typeof payload !== "object" || payload === null) {
     return undefined;
   }
+
   const payloadPayload =
     "payload" in payload &&
     typeof payload.payload === "object" &&
