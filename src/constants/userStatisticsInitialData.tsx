@@ -1,6 +1,5 @@
 import { StatisticsDataInterface } from "types/api.types";
 
-
 export const statisticsInitial: StatisticsDataInterface = {
   time: {
     technique: 0,
@@ -22,6 +21,12 @@ export const statisticsInitial: StatisticsDataInterface = {
   songLists: {
     wantToLearn: [],
     learned: [],
-    learning: []
-  }
+    learning: [],
+  },
+  availablePoints: {
+    technique: 0,
+    theory: 0,
+    hearing: 0,
+    creativity: 0,
+  },
 };

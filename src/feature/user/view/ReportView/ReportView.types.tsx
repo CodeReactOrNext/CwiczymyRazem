@@ -5,6 +5,13 @@ export type HabbitsType =
   | "metronome"
   | "recording";
 
+interface SkillPointsGained {
+  technique: number;
+  theory: number;
+  hearing: number;
+  creativity: number;
+}
+
 export interface ReportFormikInterface {
   techniqueHours: string;
   techniqueMinutes: string;
@@ -28,4 +35,5 @@ export interface ReportDataInterface {
     time: number;
     timePoints: number;
   };
+  skillPointsGained: SkillPointsGained;
 }

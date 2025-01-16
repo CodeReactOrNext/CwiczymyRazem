@@ -49,6 +49,12 @@ import { firebaseApp } from "./firebase.cofig";
 import { shuffleUid } from "utils/user/shuffleUid";
 import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import { SortByType } from "feature/leadboard/view/LeadboardView";
+import { GuitarSkill, UserSkills } from "types/skills.types";
+import { guitarSkills } from "src/data/guitarSkills";
+import { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
+import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
+import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
+import { AchievementList } from "assets/achievements/achievementsData";
 
 const provider = new GoogleAuthProvider();
 
@@ -93,21 +99,34 @@ export const firebaseAddSongsLog = async (
   data: string,
   songTitle: string,
   songArtist: string,
-  status: FirebaseLogsSongsStatuses
+  status: FirebaseLogsSongsStatuses,
+  difficulty_rate?: number | undefined
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
   const userSnapshot = await getDoc(userDocRef);
   const userName = userSnapshot.data()!.displayName;
 
-  await setDoc(logsDocRef, {
+  const logData = {
     data,
     uid,
     userName,
     songTitle,
     songArtist,
     status,
-  });
+  };
+
+  await setDoc(logsDocRef, logData);
+
+  try {
+    const discordMessage = await formatDiscordMessage({
+      ...logData,
+      difficulty_rate,
+    });
+    await sendDiscordMessage(discordMessage);
+  } catch (error) {
+    console.error("Error sending Discord notification:", error);
+  }
 };
 
 export const firebaseGetEvents = async () => {
@@ -416,7 +435,8 @@ export const addSong = async (
       new Date().toISOString(),
       title,
       artist,
-      "added"
+      "added",
+      rating
     );
     return docRef.id;
   } catch (error) {
@@ -466,7 +486,8 @@ export const rateSongDifficulty = async (
       new Date().toISOString(),
       title,
       artist,
-      "difficulty_rate"
+      "difficulty_rate",
+      rating
     );
   } catch (error) {
     console.error("Error rating song:", error);
@@ -659,7 +680,7 @@ export const firebaseGetLogsStream = (
   const logsDocRef = collection(db, "logs");
   const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(20));
 
-  // Return the unsubscribe function 
+  // Return the unsubscribe function
   return onSnapshot(sortLogs, (snapshot) => {
     const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[] = [];
     snapshot.forEach((doc) => {
@@ -670,4 +691,361 @@ export const firebaseGetLogsStream = (
     });
     callback(logsArr);
   });
+};
+export interface UserTooltipData {
+  displayName: string;
+  avatar: string | null;
+  band: string;
+  statistics: {
+    totalPracticeTime: number;
+    totalPoints: number;
+    level: number;
+    achievements: string[];
+    actualDayWithoutBreak: number;
+    currentLevelMaxPoints: number;
+    dayWithoutBreak: number;
+    habitCount: number;
+    lastReportDate: string;
+    lvl: number;
+    maxPoints: number;
+    points: number;
+    sessionCount: number;
+    time: {
+      creativity: number;
+      hearing: number;
+      longestSession: number;
+    };
+  };
+}
+
+export const firebaseGetUserTooltipData = async (
+  userId: string
+): Promise<UserTooltipData | null> => {
+  try {
+    const userDocRef = doc(db, "users", userId);
+    const userSnapshot = await getDoc(userDocRef);
+
+    if (!userSnapshot.exists()) return null;
+
+    const userData = userSnapshot.data();
+    return {
+      displayName: userData.displayName,
+      avatar: userData.avatar || null,
+      band: userData.band,
+      statistics: {
+        totalPracticeTime: userData.statistics.totalPracticeTime || 0,
+        totalPoints: userData.statistics.points || 0,
+        level: userData.statistics.lvl || 0,
+        achievements: userData.statistics.achievements || [],
+        actualDayWithoutBreak: userData.statistics.actualDayWithoutBreak || 0,
+        currentLevelMaxPoints: userData.statistics.currentLevelMaxPoints || 0,
+        dayWithoutBreak: userData.statistics.dayWithoutBreak || 0,
+        habitCount: userData.statistics.habitCount || 0,
+        lastReportDate: userData.statistics.lastReportDate || "",
+        lvl: userData.statistics.lvl || 0,
+        maxPoints: userData.statistics.maxPoints || 0,
+        points: userData.statistics.points || 0,
+        sessionCount: userData.statistics.sessionCount || 0,
+        time: {
+          creativity: userData.statistics.time?.creativity || 0,
+          hearing: userData.statistics.time?.hearing || 0,
+          longestSession: userData.statistics.time?.longestSession || 0,
+        },
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching user tooltip data:", error);
+    return null;
+  }
+};
+
+export const getUserSkills = async (userId: string): Promise<UserSkills> => {
+  try {
+    const userRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userRef);
+
+    // Default skills structure with 0 points
+    const defaultSkills: UserSkills = {
+      availablePoints: {
+        technique: 0,
+        theory: 0,
+        hearing: 0,
+        creativity: 0,
+      },
+      unlockedSkills: {},
+    };
+
+    if (!userDoc.exists()) {
+      return defaultSkills;
+    }
+
+    const userData = userDoc.data();
+    // Get points from statistics.availablePoints
+    const availablePoints =
+      userData.statistics?.availablePoints || defaultSkills.availablePoints;
+    const unlockedSkills = userData.skills?.unlockedSkills || {};
+
+    return {
+      availablePoints,
+      unlockedSkills,
+    };
+  } catch (error) {
+    console.error("Error getting user skills:", error);
+    throw error;
+  }
+};
+
+export const updateUserSkills = async (
+  userId: string,
+  skillId: string
+): Promise<boolean> => {
+  try {
+    const userRef = doc(db, "users", userId);
+
+    const skill = guitarSkills.find((s) => s.id === skillId);
+    if (!skill) {
+      throw new Error("Skill not found");
+    }
+
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists()) {
+        throw new Error("User document does not exist!");
+      }
+
+      const userData = userDoc.data();
+      const availablePoints = userData.statistics?.availablePoints || {
+        technique: 0,
+        theory: 0,
+        hearing: 0,
+        creativity: 0,
+      };
+      const unlockedSkills = userData.skills?.unlockedSkills || {};
+
+      // Check if user has enough points
+      if (availablePoints[skill.category] < (skill.pointsCost || 1)) {
+        throw new Error(`Not enough ${skill.category} points available`);
+      }
+
+      // Update the skills and points
+      const updatedAvailablePoints = {
+        ...availablePoints,
+        [skill.category]:
+          availablePoints[skill.category] - (skill.pointsCost || 1),
+      };
+
+      const updatedUnlockedSkills = {
+        ...unlockedSkills,
+        [skillId]: (unlockedSkills[skillId] || 0) + 1,
+      };
+
+      // Update both statistics.availablePoints and skills
+      transaction.update(userRef, {
+        "statistics.availablePoints": updatedAvailablePoints,
+        "skills.unlockedSkills": updatedUnlockedSkills,
+      });
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Error updating skills:", error);
+    return false;
+  }
+};
+
+// Helper function to check if a skill can be upgraded
+export const canUpgradeSkill = (
+  skill: GuitarSkill,
+  userSkills: UserSkills
+): boolean => {
+  // Check if skill exists
+  if (!skill) return false;
+
+  const currentLevel = userSkills.unlockedSkills[skill.id] || 0;
+  const pointsCost = skill.pointsCost || 1;
+
+  // Check max level
+  if (skill.maxLevel && currentLevel >= skill.maxLevel) {
+    return false;
+  }
+
+  // Check available points
+  if (userSkills.availablePoints[skill.category] < pointsCost) {
+    return false;
+  }
+  // Check prerequisites
+  if (skill.prerequisites && skill.prerequisites.length > 0) {
+    return skill.prerequisites.every(
+      (prereqId) => userSkills.unlockedSkills[prereqId]
+    );
+  }
+
+  return true;
+};
+
+// Get current season
+export const getCurrentSeason = async () => {
+  const now = new Date();
+  const seasonId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}`;
+  const seasonRef = doc(db, "seasons", seasonId);
+  const seasonDoc = await getDoc(seasonRef);
+
+  if (!seasonDoc.exists()) {
+    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const seasonData: SeasonDataInterface = {
+      seasonId,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      isActive: true,
+    };
+
+    await setDoc(seasonRef, seasonData);
+    return seasonData;
+  }
+
+  return seasonDoc.data() as SeasonDataInterface;
+};
+
+// Get all available seasons
+export const getAvailableSeasons = async () => {
+  const seasonsRef = collection(db, "seasons");
+  const seasonsSnapshot = await getDocs(seasonsRef);
+  const seasons: SeasonDataInterface[] = [];
+
+  seasonsSnapshot.forEach((doc) => {
+    seasons.push(doc.data() as SeasonDataInterface);
+  });
+
+  return seasons.sort((a, b) => b.startDate.localeCompare(a.startDate));
+};
+
+// Get seasonal leaderboard
+export const getSeasonalLeaderboard = async (
+  seasonId: string,
+  sortBy: SortByType,
+  page: number,
+  itemsPerPage: number
+) => {
+  try {
+    const seasonalUsersRef = collection(db, "seasons", seasonId, "users");
+    let q = query(
+      seasonalUsersRef,
+      orderBy(`statistics.${sortBy}`, "desc"),
+      limit(itemsPerPage),
+      ...(page > 1 ? [startAfter((page - 1) * itemsPerPage)] : [])
+    );
+
+    const [querySnapshot, totalSnapshot] = await Promise.all([
+      getDocs(q),
+      getCountFromServer(seasonalUsersRef),
+    ]);
+
+    const users = querySnapshot.docs.map((doc) => ({
+      profileId: doc.id,
+      ...doc.data(),
+    })) as FirebaseUserDataInterface[];
+
+    return {
+      users,
+      total: totalSnapshot.data().count,
+    };
+  } catch (error) {
+    console.error("Error fetching seasonal users:", error);
+    throw error;
+  }
+};
+
+// Update user's seasonal stats when they submit a report
+export const updateSeasonalStats = async (
+  userId: string,
+  stats: StatisticsDataInterface
+) => {
+  const season = await getCurrentSeason();
+  const userSeasonRef = doc(db, "seasons", season.seasonId, "users", userId);
+
+  await setDoc(
+    userSeasonRef,
+    {
+      ...stats,
+      seasonId: season.seasonId,
+    },
+    { merge: true }
+  );
+};
+
+export const awardSeasonalBadges = async (seasonId: string) => {
+  const seasonRef = doc(db, "seasons", seasonId);
+  const seasonDoc = await getDoc(seasonRef);
+
+  if (!seasonDoc.exists() || !seasonDoc.data().isActive) return;
+
+  const usersRef = collection(db, "seasons", seasonId, "users");
+  const topUsers = await getDocs(
+    query(usersRef, orderBy("statistics.points", "desc"), limit(3))
+  );
+
+  const winners = topUsers.docs.map((doc) => doc.id);
+  const badges = ["season_first", "season_second", "season_third"];
+
+  for (let i = 0; i < winners.length; i++) {
+    const userRef = doc(db, "users", winners[i]);
+    await updateDoc(userRef, {
+      "statistics.achievements": arrayUnion(`${seasonId}_${badges[i]}`),
+    });
+  }
+
+  await updateDoc(seasonRef, {
+    isActive: false,
+    winners: {
+      first: winners[0],
+      second: winners[1],
+      third: winners[2],
+    },
+  });
+};
+
+export const firebaseAddLogReport = async (
+  uid: string,
+  data: string,
+  newAchievements: AchievementList[],
+  newLevel: { isNewLevel: boolean; level: number },
+  points: number,
+  timeSumary: {
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+    sumTime: number;
+  }
+) => {
+  const logsDocRef = doc(collection(db, "logs"));
+  const userDocRef = doc(db, "users", uid);
+  const userSnapshot = await getDoc(userDocRef);
+  const userName = userSnapshot.data()!.displayName;
+
+  const logData = {
+    data,
+    uid,
+    userName,
+    newAchievements,
+    newLevel,
+    points,
+    timestamp: new Date().toISOString(),
+    timeSumary,
+  };
+
+  await setDoc(logsDocRef, logData);
+
+  try {
+    const discordMessage = await formatDiscordMessage(logData);
+    await sendDiscordMessage(discordMessage);
+  } catch (error) {
+    console.error("Error sending Discord notification:", error);
+  }
 };

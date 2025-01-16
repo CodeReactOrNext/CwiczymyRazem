@@ -43,5 +43,10 @@
   "no_songs_in_status_desc": "Choose song on table and change its status to add one",
   "song_removed": "Song removed successfully",
   "error_removing_song": "Error removing song",
-  "song_already_exists": "Song already exists"
+  "song_already_exists": "Song already exists",
+  "status": {
+    "wantToLearn": "want to learn",
+    "learning": "learning",
+    "learned": "learned"
+  }
 }

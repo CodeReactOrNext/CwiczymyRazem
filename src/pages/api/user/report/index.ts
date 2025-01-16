@@ -10,6 +10,13 @@ import {
   firebaseAddLogReport,
 } from "utils/firebase/api/firebase.utils";
 
+interface SkillPointsGained {
+  technique: number;
+  theory: number;
+  hearing: number;
+  creativity: number;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -29,15 +36,41 @@ export default async function handler(
       inputData,
     });
 
+    const skillPointsGained: SkillPointsGained = {
+      technique: Math.floor(report.timeSummary.techniqueTime / 1800000), // 30 minutes = 1 point
+      theory: Math.floor(report.timeSummary.theoryTime / 1800000),
+      hearing: Math.floor(report.timeSummary.hearingTime / 1800000),
+      creativity: Math.floor(report.timeSummary.creativityTime / 1800000),
+    };
+
+    const updatedStats = {
+      ...report.currentUserStats,
+      availablePoints: {
+        technique:
+          (currentUserStats.availablePoints?.technique || 0) +
+          skillPointsGained.technique,
+        theory:
+          (currentUserStats.availablePoints?.theory || 0) +
+          skillPointsGained.theory,
+        hearing:
+          (currentUserStats.availablePoints?.hearing || 0) +
+          skillPointsGained.hearing,
+        creativity:
+          (currentUserStats.availablePoints?.creativity || 0) +
+          skillPointsGained.creativity,
+      },
+    };
+
     await firebaseSetUserExerciseRaprot(
       userUid,
-      { ...report.raitingData, ...report.reportDate },
+      { ...report.raitingData, ...report.reportDate, skillPointsGained },
       report.reportDate,
       inputData.reportTitle,
       report.isDateBackReport,
       report.timeSummary
     );
-    await firebaseUpdateUserStats(userUid, report.currentUserStats);
+
+    await firebaseUpdateUserStats(userUid, updatedStats);
 
     if (!report.isDateBackReport) {
       await firebaseAddLogReport(
@@ -48,10 +81,15 @@ export default async function handler(
         {
           isNewLevel: report.isNewLevel,
           level: report.currentUserStats.lvl,
-        }
+        },
+        report.timeSummary
       );
     }
-    res.status(200).json(report);
+
+    res.status(200).json({
+      ...report,
+      skillPointsGained,
+    });
   }
   res.status(400);
 }

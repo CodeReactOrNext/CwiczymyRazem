@@ -1,4 +1,3 @@
-import Achievement from "components/Achievement";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { addZeroToTime } from "utils/converter";
@@ -9,7 +8,10 @@ import {
 } from "utils/firebase/client/firebase.types";
 import { IoMdMusicalNotes } from "react-icons/io";
 import { useEffect, useRef } from "react";
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { useUnreadMessages } from "hooks/useUnreadMessages";
 
+// Type guard
 const isFirebaseLogsSongs = (
   log: FirebaseLogsInterface | FirebaseLogsSongsInterface
 ): log is FirebaseLogsSongsInterface => {
@@ -21,7 +23,101 @@ interface LogsBoxLayoutProps {
   marksLogsAsRead: () => void;
 }
 
+// Reusable timestamp component
+const TimeStamp = ({ date }: { date: Date }) => (
+  <p className='mr-3 w-[23%] max-w-[8rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem] text-secondText lg:text-xs'>
+    {date.toLocaleDateString() +
+      " " +
+      addZeroToTime(date.getHours()) +
+      ":" +
+      addZeroToTime(date.getMinutes())}
+  </p>
+);
+
+// Reusable user link component
+const UserLink = ({ uid, userName }: { uid: string | undefined; userName: string }) => {
+  if (!uid) return <span>{userName}</span>;
+  
+  return (
+    <UserTooltip userId={uid}>
+      <Link className='text-white hover:underline' href={`/user/${uid}`}>
+        {userName}
+      </Link>
+    </UserTooltip>
+  );
+};
+
+const LogItem = ({ isNew, children }: { isNew: boolean; children: React.ReactNode }) => (
+  <div className={`my-4 flex flex-row flex-nowrap items-center bg-main-opposed-bg p-4 transition-all duration-300 radius-default ${
+    isNew ? "border border-white/30" : ""
+  }`}>
+    {children}
+  </div>
+);
+
+const getSongStatusMessage = (status: string): string => {
+  const messages = {
+    learned: " nauczył się utworu ",
+    wantToLearn: " dodał utwór ",
+    learning: " uczy się utworu ",
+    added: " dodał utwór ",
+    difficulty_rate: " ocenił trudność utworu ",
+  };
+  return messages[status as keyof typeof messages] ?? " zaktualizował swoje postępy w nauce utworu ";
+};
+
+const FirebaseLogsSongItem = ({ log, isNew }: { log: FirebaseLogsSongsInterface; isNew: boolean }) => {
+  const { userName, data, songArtist, songTitle, status, uid } = log;
+  const date = new Date(data);
+  const message = getSongStatusMessage(status);
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className='flex w-[80%] flex-wrap items-center gap-1'>
+        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
+          <IoMdMusicalNotes className='text-secondText' />
+          <UserLink uid={uid} userName={userName} />
+        </span>
+        <p className='text-secondText'>
+          {message}
+          <span className='text-white'>
+            {songArtist} {songTitle}
+          </span>
+          {status === "wantToLearn" && " do swojej listy utworów, które chce się nauczyć."}
+          {status === "added" && " do swojej listy utworów."}
+          {status === "learning" && "."}
+        </p>
+      </div>
+    </LogItem>
+  );
+};
+
+const FirebaseLogsItem = ({ log, isNew }: { log: FirebaseLogsInterface; isNew: boolean }) => {
+  const { t } = useTranslation("common");
+  const { userName, points, data, uid } = log;
+  const date = new Date(data);
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className='flex w-[80%] flex-wrap items-center gap-1'>
+        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
+          <IoPersonOutline className='text-secondText' />
+          <UserLink uid={uid} userName={userName} />
+        </span>{" "}
+        <span className='text-secondText'>{t("logsBox.get")}</span>
+        <span className='mr-1 text-main'>
+          +{points}
+          <span className='text-secondText'>{t("logsBox.points")}</span>
+        </span>
+      </div>
+    </LogItem>
+  );
+};
+
 const Logs = ({ logs, marksLogsAsRead }: LogsBoxLayoutProps) => {
+  const { isNewMessage } = useUnreadMessages("logs");
   const spanRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -43,93 +139,17 @@ const Logs = ({ logs, marksLogsAsRead }: LogsBoxLayoutProps) => {
 
   return (
     <>
-      <span ref={spanRef} />
-      {logs.map((log) =>
-        isFirebaseLogsSongs(log) ? (
-          <FirebaseLogsSongItem key={log.data + log.userName} log={log} />
-        ) : (
-          <FirebaseLogsItem key={log.data + log.userName} log={log} />
-        )
-      )}
+      <div ref={spanRef} className='h-1' />
+      {logs.map((log) => (
+        <div key={log.data + log.userName} className='mr-2'>
+          {isFirebaseLogsSongs(log) ? (
+            <FirebaseLogsSongItem log={log} isNew={isNewMessage(log.data)} />
+          ) : (
+            <FirebaseLogsItem log={log} isNew={isNewMessage(log.data)} />
+          )}
+        </div>
+      ))}
     </>
-  );
-};
-const FirebaseLogsSongItem = ({ log }: { log: FirebaseLogsSongsInterface }) => {
-  const { userName, data, songArtist, songTitle, status, uid } = log;
-
-  const date = new Date(data);
-
-  let message = "";
-
-  switch (status) {
-    case "learned":
-      message = ` nauczył się utworu "${songTitle}" autorstwa ${songArtist}.`;
-      break;
-    case "wantToLearn":
-      message = ` dodał utwór "${songTitle}" autorstwa ${songArtist} do swojej listy utworów, które chce się nauczyć.`;
-      break;
-    case "learning":
-      message = ` uczy się utworu "${songTitle}" autorstwa ${songArtist}.`;
-      break;
-    case "added":
-      message = ` dodał utwór "${songTitle}" autorstwa ${songArtist} do swojej listy utworów.`;
-      break;
-    case "difficulty_rate":
-      message = ` ocenił trudność utworu "${songTitle}" autorstwa ${songArtist}.`;
-      break;
-    default:
-      message = ` zaktualizował swoje postępy w nauce utworu "${songTitle}".`;
-      break;
-  }
-
-  return (
-    <div
-      key={data + userName}
-      className='my-4 flex flex-row flex-nowrap items-center bg-main-opposed-bg p-4 text-white radius-default'>
-      <p className='mr-3 w-[20%] max-w-[7rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem] text-secondText lg:text-xs'>
-        {date.toLocaleDateString() +
-          " " +
-          addZeroToTime(date.getHours()) +
-          ":" +
-          addZeroToTime(date.getMinutes())}
-      </p>
-      <div className='flex w-[80%] flex-wrap items-center gap-1 '>
-        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-          <IoMdMusicalNotes className='text-white' />
-          {uid ? <Link href={"/user/" + uid}>{userName}</Link> : userName}
-        </span>
-        <p>{message}</p>
-      </div>
-    </div>
-  );
-};
-const FirebaseLogsItem = ({ log }: { log: FirebaseLogsInterface }) => {
-  const { t } = useTranslation("common");
-  const { userName, points, data, uid } = log;
-
-  const date = new Date(data);
-
-  return (
-    <div
-      key={data + userName}
-      className='my-4 flex flex-row flex-nowrap items-center bg-main-opposed-bg p-4 text-white radius-default'>
-      <p className='mr-3 w-[20%] max-w-[7rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem] text-secondText lg:text-xs'>
-        {date.toLocaleDateString() +
-          " " +
-          addZeroToTime(date.getHours()) +
-          ":" +
-          addZeroToTime(date.getMinutes())}
-      </p>
-      <div className='flex w-[80%] flex-wrap items-center gap-1 '>
-        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-          <IoPersonOutline className='text-white' />
-          {uid ? <Link href={"/user/" + uid}>{userName}</Link> : userName}
-        </span>{" "}
-        {t("logsBox.get")}
-        <span className='m-1 text-main'>+{points}</span>
-        {t("logsBox.points")}
-      </div>
-    </div>
   );
 };
 

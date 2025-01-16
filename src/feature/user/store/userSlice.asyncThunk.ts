@@ -1,5 +1,6 @@
 import { createAsyncThunk, SerializedError } from "@reduxjs/toolkit";
 import { User } from "firebase/auth";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 
 import { SignUpCredentials } from "../view/SingupView/SingupView";
 
@@ -27,7 +28,8 @@ import {
   firebaseUpdateBand,
   firebaseUpdateYouTubeLink,
   firebaseUpdateSoundCloudLink,
-} from "utils/firebase/client/firebase.utils";;
+  db,
+} from "utils/firebase/client/firebase.utils";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 import { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 import {
@@ -49,6 +51,7 @@ import {
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
+import { guitarSkills } from "src/data/guitarSkills";
 
 export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
@@ -248,6 +251,71 @@ export const uploadUserSocialData = createAsyncThunk(
     } catch (error) {
       udpateDataErrorHandler(new Error());
       return Promise.reject();
+    }
+  }
+);
+
+export const upgradeSkill = createAsyncThunk(
+  "user/upgradeSkill",
+  async ({ skillId }: { skillId: string }, { rejectWithValue }) => {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+      const userRef = doc(db, "users", userId);
+      const userDoc = await getDoc(userRef);
+
+      if (!userDoc.exists()) {
+        throw new Error("User document not found");
+      }
+
+      const userData = userDoc.data();
+      const currentSkills = userData.skills?.unlockedSkills || {};
+      const currentPoints = userData.statistics?.availablePoints || {};
+
+      // Get the skill category from your skills data
+      const skillData = guitarSkills.find((skill) => skill.id === skillId);
+      if (!skillData) {
+        throw new Error("Skill not found");
+      }
+
+      // Check if user has enough points
+      if (
+        !currentPoints[skillData.category] ||
+        currentPoints[skillData.category] <= 0
+      ) {
+        throw new Error("Not enough skill points");
+      }
+
+      // Update the unlocked skills and decrease available points
+      await updateDoc(userRef, {
+        "skills.unlockedSkills": {
+          ...currentSkills,
+          [skillId]: true,
+        },
+        "statistics.availablePoints": {
+          ...currentPoints,
+          [skillData.category]: currentPoints[skillData.category] - 1,
+        },
+      });
+
+      // Return the updated skills data
+      return {
+        unlockedSkills: {
+          ...currentSkills,
+          [skillId]: true,
+        },
+        availablePoints: {
+          ...currentPoints,
+          [skillData.category]: currentPoints[skillData.category] - 1,
+        },
+      };
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to upgrade skill"
+      );
     }
   }
 );

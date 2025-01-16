@@ -33,7 +33,6 @@
     "exercise": "Exercise",
     "report": "Report",
     "songs": "Songs"
-
   },
   "day_since": {
     "no_practice": "Player hasn't practiced",
@@ -90,5 +89,33 @@
     "points": "Points",
     "time": "Time",
     "session_count": "Session Count"
+  },
+  "tooltip": {
+    "totalTime": "Total Time",
+    "points": "Points",
+    "sessions": "Sessions",
+    "habits": "Habits",
+    "userNotFound": "User not found"
+  },
+  "song_status": {
+    "move_to": "Move to",
+    "remove": "Remove",
+    "add": "Add"
+  },
+  "chart": {
+    "activity_overview": "Activity overview",
+    "showing_activity": "Showing activity data for selected period",
+    "time_ranges": {
+      "all_time": "All time",
+      "last_3_months": "Last 3 months",
+      "last_30_days": "Last 30 days",
+      "last_7_days": "Last 7 days"
+    },
+    "categories": {
+      "technique": "Technique",
+      "theory": "Theory",
+      "hearing": "Hearing",
+      "creativity": "Creativity"
+    }
   }
 }

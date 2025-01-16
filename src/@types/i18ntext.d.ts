@@ -22,6 +22,8 @@ import type yup_errors from "../../public/locales/en/yup_errors.json";
 import type settings from "../../public/locales/en/settings.json";
 import type toast from "../../public/locales/en/toast.json";
 import type songs from "../../public/locales/en/songs.json";
+import type skills from "../../public/locales/en/skills.json";
+import type chat from "../../public/locales/en/chat.json";
 
 interface I18nNamespaces {
   common: typeof common;
@@ -39,6 +41,8 @@ interface I18nNamespaces {
   settings: typeof settings;
   timer: typeof timer;
   toast: typeof toast;
+  skills: typeof skills;
+  chat: typeof chat;
 }
 
 declare module "i18next" {

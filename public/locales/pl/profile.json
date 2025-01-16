@@ -28,5 +28,11 @@
     "longest_session": "Najdłuższa sesja",
     "consecutive days": "Najdłuższy streak",
     "max_points": "Rekord punktów "
+  },
+  "nav": {
+    "overview": "Przegląd",
+    "activity": "Aktywność",
+    "songs": "Utwory",
+    "skills": "Umiejętności"
   }
 }

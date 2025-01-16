@@ -1,8 +1,8 @@
 import { FcGoogle } from "react-icons/fc";
-import { CircleSpinner } from "react-spinners-kit";
 
 import { useAppSelector } from "store/hooks";
 import { selectIsFetching } from "feature/user/store/userSlice";
+import { Loader2 } from "lucide-react";
 
 interface GoogleButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
@@ -18,7 +18,7 @@ const GoogleButton = ({ onClick, children }: GoogleButtonProps) => {
       className='active:click-behavio flex flex-row gap-3 bg-white p-3 font-medium tracking-wide text-googleButtonText radius-default'
       disabled={isFetching ? true : false}>
       {isFetching ? (
-        <CircleSpinner size={24} color='#555555' />
+        <Loader2 className='animate-spin' />
       ) : (
         <FcGoogle size='24' />
       )}
