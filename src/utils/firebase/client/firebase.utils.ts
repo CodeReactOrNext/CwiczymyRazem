@@ -123,7 +123,7 @@ export const firebaseAddSongsLog = async (
       ...logData,
       difficulty_rate,
     });
-    await sendDiscordMessage(discordMessage);
+    await sendDiscordMessage(discordMessage as any);
   } catch (error) {
     console.error("Error sending Discord notification:", error);
   }
