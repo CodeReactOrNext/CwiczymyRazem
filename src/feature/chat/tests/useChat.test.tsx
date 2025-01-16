@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, describe, it, vi, beforeEach } from "vitest";
-import { useChat } from "../useChat";
-import { sendChatMessage } from "../../services/chatService";
+import { useChat } from "../hooks/useChat";
+import { sendChatMessage } from "../services/chatService";
 
 vi.mock("../../services/chatService");
 vi.mock("store/hooks", () => ({
@@ -25,7 +25,7 @@ describe("useChat Hook", () => {
   it("should validate message length", async () => {
     const { result } = renderHook(() => useChat());
     const longMessage = "a".repeat(2001);
-    
+
     act(() => {
       result.current.setNewMessage(longMessage);
     });
@@ -40,7 +40,7 @@ describe("useChat Hook", () => {
 
   it("should send valid message", async () => {
     const { result } = renderHook(() => useChat());
-    
+
     act(() => {
       result.current.setNewMessage("Hello");
     });
@@ -52,4 +52,4 @@ describe("useChat Hook", () => {
     expect(sendChatMessage).toHaveBeenCalled();
     expect(result.current.error).toBeNull();
   });
-}); 
+});
