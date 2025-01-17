@@ -9,7 +9,7 @@ import { getPointsToLvlUp } from "utils/gameLogic";
 import LevelIndicator from "./components/LevelIndicator";
 import { Button } from "assets/components/ui/button";
 import { Badge } from "assets/components/ui/badge";
-import { MiniSkillTree } from "components/MiniSkillTree/MiniSkillTree";
+import { MiniSkillTree } from "feature/skills/MiniSkillTree";
 
 export interface BonusPointsInterface {
   timePoints: number;
@@ -32,7 +32,6 @@ interface RatingPopUpProps {
   previousUserStats: StatisticsDataInterface;
   skillPointsGained: SkillPointsGained;
   onClick: Dispatch<SetStateAction<boolean>>;
-  onSkillUpgrade: (skillId: string) => void;
 }
 
 const RatingPopUp = ({
@@ -41,7 +40,6 @@ const RatingPopUp = ({
   previousUserStats,
   skillPointsGained,
   onClick,
-  onSkillUpgrade,
 }: RatingPopUpProps) => {
   const [currentLevel, setCurrentLevel] = useState(previousUserStats.lvl);
 
@@ -82,7 +80,11 @@ const RatingPopUp = ({
       <div className='modal-box relative w-full bg-second-600 p-12 lg:min-w-[800px]'>
         <Button
           variant='outline'
-          className='btn btn-sm btn-circle absolute right-2 top-2'>
+          className='btn btn-sm btn-circle absolute right-2 top-2'
+          onClick={() => {
+            onClick(false);
+            Router.push("/");
+          }}>
           ✕
         </Button>
 
@@ -94,52 +96,12 @@ const RatingPopUp = ({
           <span className='text-4xl'>{t("rating_popup.points")}</span>
         </p>
 
-        <div className='my-6 rounded-lg bg-second-500 p-4 font-openSans'>
-          <h3 className='mb-4 text-lg font-semibold'>
-            {t("rating_popup.skill_points_gained")}
-          </h3>
-          <div className='grid grid-cols-2 gap-4 font-openSans md:grid-cols-4'>
-            {Object.entries(skillPointsGained).map(
-              ([skill, points]) =>
-                points > 0 && (
-                  <div key={skill} className='text-center'>
-                    <Badge
-                      variant='outline'
-                      className={`
-                        px-3 py-1 text-sm
-                        ${
-                          skill === "technique" &&
-                          "border-red-500/30 bg-red-500/5"
-                        }
-                        ${
-                          skill === "theory" &&
-                          "border-blue-500/30 bg-blue-500/5"
-                        }
-                        ${
-                          skill === "hearing" &&
-                          "border-green-500/30 bg-green-500/5"
-                        }
-                        ${
-                          skill === "creativity" &&
-                          "border-purple-500/30 bg-purple-500/5"
-                        }
-                      `}>
-                      +{points} {t(`skills.${skill}` as any)}
-                    </Badge>
-                  </div>
-                )
-            )}
-          </div>
-        </div>
-
         {categoriesWithPoints.length > 0 && (
           <div className='mt-6'>
             <h3 className='mb-4 font-openSans text-lg font-semibold'>
               {t("rating_popup.spend_skill_points")}
             </h3>
-            <MiniSkillTree
-              highlightCategories={categoriesWithPoints}
-            />
+            <MiniSkillTree highlightCategories={categoriesWithPoints} />
           </div>
         )}
 
