@@ -78,7 +78,6 @@ const ReportView = () => {
   const hearingTime = convertMsToHMObject(timerData.hearing);
   const creativityTime = convertMsToHMObject(timerData.creativity);
 
-
   const handleSkillUpgrade = async (skillId: string) => {
     if (!userAuth) return;
     await dispatch(upgradeSkill({ skillId }));
@@ -422,7 +421,6 @@ const ReportView = () => {
                         currentUserStats={currentUserStats}
                         previousUserStats={previousUserStats}
                         skillPointsGained={raitingData.skillPointsGained}
-                        onSkillUpgrade={handleSkillUpgrade}
                       />
                     </motion.div>
                   </Backdrop>

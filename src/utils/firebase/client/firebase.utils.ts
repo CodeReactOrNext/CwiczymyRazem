@@ -768,22 +768,11 @@ export const canUpgradeSkill = (
   if (!skill) return false;
 
   const currentLevel = userSkills.unlockedSkills[skill.id] || 0;
-  const pointsCost = skill.pointsCost || 1;
-
-  // Check max level
-  if (skill.maxLevel && currentLevel >= skill.maxLevel) {
-    return false;
-  }
+  const pointsCost = 1;
 
   // Check available points
   if (userSkills.availablePoints[skill.category] < pointsCost) {
     return false;
-  }
-  // Check prerequisites
-  if (skill.prerequisites && skill.prerequisites.length > 0) {
-    return skill.prerequisites.every(
-      (prereqId) => userSkills.unlockedSkills[prereqId]
-    );
   }
 
   return true;
