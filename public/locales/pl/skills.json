@@ -9,7 +9,7 @@
   },
   "skills": {
     "alternate_picking": {
-      "name": "Naprzemienne Kostki",
+      "name": "Alternate Picking",
       "description": "Opanuj sztukę naprzemiennego uderzania w dół i w górę"
     },
     "legato": {
@@ -25,19 +25,19 @@
       "description": "Zrozumienie budowy akordów i progresji"
     },
     "scales": {
-      "name": "Mistrzostwo Skal",
+      "name": "Skale",
       "description": "Naucz się i opanuj podstawowe skale gitarowe"
     },
     "rhythm": {
-      "name": "Mistrzostwo Rytmu",
+      "name": "Rytm",
       "description": "Rozwiń precyzyjne wyczucie czasu i kontrolę rytmu"
     },
     "bending": {
-      "name": "Podciąganie Strun",
+      "name": "Banding",
       "description": "Opanuj sztukę podciągania strun dla ekspresyjnej gry"
     },
     "tapping": {
-      "name": "Tapping Oburęczny",
+      "name": "Tapping",
       "description": "Zaawansowana technika wykorzystująca obie ręce na gryfie"
     },
     "improvisation": {
@@ -61,24 +61,20 @@
       "description": "Naucz się pisać i aranżować własną muzykę"
     },
     "pitch_recognition": {
-      "name": "Rozpoznawanie Wysokości Dźwięków",
+      "name": "Rozpoznawanie  Dźwięków",
       "description": "Rozwiń słuch absolutny i relatywny"
     },
     "harmony": {
-      "name": "Zaawansowana Harmonia",
+      "name": "Harmonia",
       "description": "Opanuj złożone progresje akordowe i prowadzenie głosów"
     },
     "vibrato": {
-      "name": "Technika Vibrato",
+      "name": "Vibrato",
       "description": "Opanuj sztukę dodawania ekspresji poprzez wibrację strun"
     },
     "music_theory": {
-      "name": "Zaawansowana Teoria Muzyki",
+      "name": "Teoria Muzyki",
       "description": "Głębokie zrozumienie koncepcji muzycznych i kompozycji"
-    },
-    "rhythm_variations": {
-      "name": "Zaawansowany Rytm",
-      "description": "Opanuj złożone metrum i polirytmię"
     },
     "songwriting": {
       "name": "Pisanie Piosenek",
@@ -88,10 +84,7 @@
       "name": "Gitara Slide",
       "description": "Opanuj technikę gry sliderem"
     },
-    "modal_theory": {
-      "name": "Teoria Modalna",
-      "description": "Zrozumienie i zastosowanie skal modalnych"
-    },
+
     "audio_production": {
       "name": "Produkcja Audio",
       "description": "Naucz się nagrywać i produkować ścieżki gitarowe"
@@ -99,6 +92,18 @@
     "hybrid_picking": {
       "name": "Hybrid Picking",
       "description": "Połącz techniki kostki i palcowania"
+    },
+    "rythm_recognition": {
+      "name": "Rozpoznawanie Rytmu",
+      "description": "Rozwiń umiejętność rozpoznawania i odtwarzania złożonych rytmów"
+    },
+    "transcription": {
+      "name": "Transkrypcja",
+      "description": "Naucz się zapisywać muzykę ze słuchu w formie nut lub tabulatury"
+    },
+    "picking": {
+      "name": "Kostkowanie",
+      "description": "Opanuj podstawowe techniki gry kostką i precyzyjne uderzanie strun"
     }
   }
-} 
+}

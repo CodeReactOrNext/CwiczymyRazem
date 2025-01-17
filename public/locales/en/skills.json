@@ -99,6 +99,18 @@
     "hybrid_picking": {
       "name": "Hybrid Picking",
       "description": "Combine pick and fingerpicking techniques"
+    },
+    "rythm_recognition": {
+      "name": "Rhythm Recognition",
+      "description": "Develop the ability to recognize and reproduce complex rhythms"
+    },
+    "transcription": {
+      "name": "Transcription",
+      "description": "Learn to write down music by ear in notation or tablature"
+    },
+    "picking": {
+      "name": "Picking",
+      "description": "Master basic picking techniques and precise string striking"
     }
   }
 }
