@@ -11,21 +11,21 @@ import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
 import { ActivityChart } from "components/Charts/ActivityChart";
 import { useCalendar } from "components/Calendar/useCalendar";
-import { SkillTree } from "components/SkillTree/SkillTree";
+import { SkillTree } from "feature/skills/SkillTree";
 
 import { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM, calculatePercent } from "utils/converter";
 import {
   getUserSongs,
-  getUserSkills,
-  updateUserSkills,
   canUpgradeSkill,
 } from "utils/firebase/client/firebase.utils";
 import { Song } from "utils/firebase/client/firebase.types";
-import { UserSkills } from "types/skills.types";
-import { guitarSkills } from "src/data/guitarSkills";
+import { UserSkills } from "feature/skills/skills.types";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { Button } from "assets/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { getUserSkills } from "feature/skills/services/getUserSkills";
+import { updateUserSkills } from "feature/skills/services/updateUserSkills";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];

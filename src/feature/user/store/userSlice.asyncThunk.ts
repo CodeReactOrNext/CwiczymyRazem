@@ -51,7 +51,7 @@ import {
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
-import { guitarSkills } from "src/data/guitarSkills";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
 
 export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",
