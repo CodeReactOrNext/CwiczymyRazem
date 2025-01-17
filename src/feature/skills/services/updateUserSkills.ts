@@ -31,15 +31,14 @@ export const updateUserSkills = async (
       const unlockedSkills = userData.skills?.unlockedSkills || {};
 
       // Check if user has enough points
-      if (availablePoints[skill.category] < (skill.pointsCost || 1)) {
+      if (availablePoints[skill.category] < 1) {
         throw new Error(`Not enough ${skill.category} points available`);
       }
 
       // Update the skills and points
       const updatedAvailablePoints = {
         ...availablePoints,
-        [skill.category]:
-          availablePoints[skill.category] - (skill.pointsCost || 1),
+        [skill.category]: availablePoints[skill.category] - 1,
       };
 
       const updatedUnlockedSkills = {
