@@ -24,8 +24,7 @@ const SeasonSelect = ({
       disabled={isLoading}>
       {seasons.map((season) => (
         <option key={season.seasonId} value={season.seasonId}>
-          {season.name ||
-            `${new Date(season.startDate).toLocaleDateString()} - 
+          {`${new Date(season.startDate).toLocaleDateString()} - 
              ${new Date(season.endDate).toLocaleDateString()}`}
           {season.isActive && ` (${t("current_season")})`}
         </option>
