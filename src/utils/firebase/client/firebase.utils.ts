@@ -27,11 +27,9 @@ import {
   getCountFromServer,
   startAfter,
   addDoc,
-  arrayRemove,
   arrayUnion,
   where,
   Timestamp,
-  runTransaction,
   onSnapshot,
 } from "firebase/firestore";
 import {
@@ -48,13 +46,12 @@ import { statisticsInitial as statistics } from "constants/userStatisticsInitial
 import { firebaseApp } from "./firebase.cofig";
 import { shuffleUid } from "utils/user/shuffleUid";
 import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
-import { SortByType } from "feature/leadboard/view/LeadboardView";
 import { GuitarSkill, UserSkills } from "feature/skills/skills.types";
-import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
 import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
 import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
 import { AchievementList } from "assets/achievements/achievementsData";
+import { SortByType } from "feature/leadboard/types";
 
 const provider = new GoogleAuthProvider();
 
@@ -895,7 +892,6 @@ export const getSeasonalLeaderboard = async (
       totalUsers: total,
     };
   } catch (error) {
-    console.error("🔴 Error in getSeasonalLeaderboard:", error);
     throw error;
   }
 };
