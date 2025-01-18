@@ -16,6 +16,7 @@ import {
   getAvailableSeasons,
 } from "utils/firebase/client/firebase.utils";
 import { SortByType } from "../../types";
+import { SeasonDataInterface } from "types/api.types";
 
 const ITEMS_PER_PAGE = 30;
 
@@ -64,19 +65,21 @@ const LeadboardView = () => {
         ITEMS_PER_PAGE
       );
       console.log("🟢 Seasonal response:", response);
-
       if (response) {
-        setUsersData(response.users || []);
-        setTotalUsers(response.totalUsers || 0);
-        console.log("✅ Updated seasonal data:", {
-          users: response.users?.length,
-          total: response.totalUsers,
-        });
-      } else {
-        console.log("⚠️ No response from seasonal leaderboard");
-        setUsersData([]);
-        setTotalUsers(0);
-        toast(t("no_seasonal_data"));
+        const mappedUsers = (response.users || []).map((user) => ({
+          ...user,
+          createdAt: new Date(),
+          songLists: [],
+        }));
+
+        if (response.users && response.users.length > 0) {
+          setUsersData(mappedUsers as any);
+          setTotalUsers(response.totalUsers || 0);
+        } else {
+          setUsersData([]);
+          setTotalUsers(0);
+          toast(t("no_seasonal_data"));
+        }
       }
     } catch (error) {
       console.error("🔴 Error in loadSeasonalLeaderboard:", error);
@@ -99,12 +102,6 @@ const LeadboardView = () => {
   };
 
   const handleViewChange = async (newIsSeasonalView: boolean) => {
-    console.log("🔵 View change:", {
-      newIsSeasonalView,
-      selectedSeason,
-      currentPage,
-    });
-
     try {
       setIsLoading(true);
       setIsSeasonalView(newIsSeasonalView);
@@ -116,7 +113,6 @@ const LeadboardView = () => {
         await loadGlobalLeaderboard(1);
       }
     } catch (error) {
-      console.error("🔴 Error in handleViewChange:", error);
       toast(t("view_change_error"));
     } finally {
       setIsLoading(false);
@@ -124,14 +120,8 @@ const LeadboardView = () => {
   };
 
   const handleSeasonChange = async (newSeasonId: string) => {
-    console.log("🔵 Season change:", {
-      newSeasonId,
-      currentSeason: selectedSeason,
-    });
-
     try {
       if (newSeasonId === selectedSeason) {
-        console.log("⚠️ Same season selected, skipping");
         return;
       }
 
@@ -140,7 +130,6 @@ const LeadboardView = () => {
       setCurrentPage(1);
       await loadSeasonalLeaderboard(newSeasonId, 1);
     } catch (error) {
-      console.error("🔴 Error in handleSeasonChange:", error);
       toast(t("season_change_error"));
     } finally {
       setIsLoading(false);
@@ -156,23 +145,16 @@ const LeadboardView = () => {
           getCurrentSeason(),
         ]);
 
-        console.log("✅ Seasons loaded:", {
-          seasonsCount: seasonsData.length,
-          currentSeason,
-        });
-
         if (seasonsData.length > 0) {
           setSeasons(seasonsData);
           const activeSeason = currentSeason.seasonId;
           setSelectedSeason(activeSeason);
 
           if (isSeasonalView) {
-            console.log("🔵 Loading initial seasonal data");
             await loadSeasonalLeaderboard(activeSeason, 1);
           }
         }
       } catch (error) {
-        console.error("🔴 Error in initializeSeasons:", error);
         toast(t("seasons_fetch_error"));
       }
     };
