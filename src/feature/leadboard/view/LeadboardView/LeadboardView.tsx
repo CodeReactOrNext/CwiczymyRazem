@@ -66,7 +66,6 @@ const LeadboardView = () => {
 
   const loadSeasonalUsers = async (seasonId: string) => {
     try {
-      setIsLoading(true);
       const response = await getSeasonalLeaderboard(
         seasonId,
         sortBy,
@@ -74,10 +73,9 @@ const LeadboardView = () => {
         ITEMS_PER_PAGE
       );
       setUsersData(response.users);
+
     } catch (error) {
       toast(t("fetch_error"));
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -93,6 +91,7 @@ const LeadboardView = () => {
       setSeasons(seasonsData);
 
       const currentSeason = await getCurrentSeason();
+      console.log(currentSeason, "ddd");
       setSelectedSeason(currentSeason.seasonId);
     };
 

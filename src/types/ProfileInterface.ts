@@ -10,6 +10,7 @@ export interface ProfileInterface {
   userAuth: string;
   statistics: StatisticsDataInterface;
   createdAt: Timestamp;
+  
   songLists: {
     wantToLearn: string[];
     learned: string[];
