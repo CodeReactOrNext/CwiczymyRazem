@@ -30,12 +30,20 @@ export const firebaseGetUserData = async (userAuth: string) => {
 
 export const firebaseUpdateUserStats = async (
   userAuth: string,
-  statistics: StatisticsDataInterface
+  statistics: StatisticsDataInterface,
+  sessionTime: {
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+    sumTime: number;
+  },
+  pointsGained: number
 ) => {
   const userDocRef = doc(db, "users", userAuth);
   await Promise.all([
     updateDoc(userDocRef, { statistics }),
-    updateSeasonalStats(userAuth, statistics),
+    updateSeasonalStats(userAuth, statistics, sessionTime, pointsGained),
   ]);
 };
 
@@ -78,22 +86,13 @@ export const firebaseAddLogReport = async (
   const userSnapshot = await getDoc(userDocRef);
   const userName = userSnapshot.data()!.displayName;
 
-  await setDoc(logsDocRef, {
-    data,
-    uid,
-    userName,
-    points,
-    newAchievements,
-    newLevel,
-  });
-
   const logData = {
     data,
     uid,
     userName,
+    points,
     newAchievements,
     newLevel,
-    points,
     timestamp: new Date().toISOString(),
     timeSumary,
   };

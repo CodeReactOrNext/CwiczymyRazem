@@ -2,15 +2,8 @@ import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import LeadboardView from "feature/leadboard/view/LeadboardView";
 import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
-import useAutoLogIn from "hooks/useAutoLogIn";
 
 const LeaderBoardPage: NextPage = () => {
-  const { isLoggedIn } = useAutoLogIn({
-    redirects: {
-      loggedOut: "/leaderboard",
-    },
-  });
-
   return (
     <AuthLayoutWrapper
       pageId={"leadboard"}
