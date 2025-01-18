@@ -17,6 +17,9 @@ import { getUserSongs } from "utils/firebase/client/firebase.utils";
 import { Timestamp } from "firebase/firestore";
 import { Song } from "utils/firebase/client/firebase.types";
 import { useCalendar } from "components/Calendar/useCalendar";
+import { SkillTreeCards } from "feature/skills/SkillTreeCards";
+import { UserSkills } from "feature/skills/skills.types";
+import { getUserSkills } from "feature/skills/services/getUserSkills";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -40,35 +43,14 @@ const ProfileLayout = ({
     youTubeLink,
   } = userData;
   const { time, achievements, lastReportDate } = statistics;
-  const { reportList } = useCalendar(userAuth);
+  const [userSkills, setUserSkills] = useState<UserSkills>();
 
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
 
-  const [userSongs, setUserSongs] = useState<{
-    wantToLearn: Song[];
-    learning: Song[];
-    learned: Song[];
-    lastUpdated?: Timestamp;
-  }>({
-    wantToLearn: [],
-    learning: [],
-    learned: [],
-  });
-
   useEffect(() => {
-    const loadUserSongs = async () => {
-      if (!userAuth) return;
-      try {
-        const songs = await getUserSongs(userAuth);
-        setUserSongs(songs);
-      } catch (error) {
-        console.error("Error loading user songs:", error);
-      }
-    };
-
-    loadUserSongs();
-  }, [userAuth]);
+    getUserSkills(userAuth).then((skills) => setUserSkills(skills));
+  });
 
   return (
     <MainContainer title={t("profile")}>
@@ -169,6 +151,12 @@ const ProfileLayout = ({
         <div className='col-span-2  p-2 '>
           <Calendar userAuth={userAuth} />
         </div>
+
+        {userSkills && (
+          <div className='col-span-2  p-2 '>
+            <SkillTreeCards userSkills={userSkills} />
+          </div>
+        )}
       </div>
     </MainContainer>
   );
