@@ -1,4 +1,3 @@
-import { ScrollArea } from "assets/components/ui/scroll-area";
 import { Badge } from "assets/components/ui/badge";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { GuitarSkill, UserSkills } from "feature/skills/skills.types";
@@ -12,6 +11,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
 import { cn } from "assets/lib/utils";
+import { SkillTreeCards } from "feature/skills/SkillTreeCards";
 
 type SkillsNamespace = Record<string, Record<string, string>>;
 
@@ -140,69 +140,42 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
   return (
     <div className='content-box relative  w-full overflow-hidden font-openSans'>
       <div className='absolute inset-0' />
-      <ScrollArea className='h-full'>
-        <div className='relative p-4'>
-          <div className='mb-12 '>
-            <div className='grid grid-cols-2 gap-4 sm:grid-cols-4'>
-              {Object.entries(categorizedSkills).map(([category, skills]) => (
-                <div
-                  key={category}
-                  className={cn(
-                    "rounded-md border p-4",
-                    "bg-gradient-to-b",
-                    CATEGORY_COLORS[category as keyof typeof CATEGORY_COLORS]
-                  )}>
-                  <h3 className='mb-4 font-semibold capitalize text-white'>
-                    {t(`skills:categories.${category}` as any)}
-                  </h3>
-                  {skills.map((skill) => (
-                    <div
-                      key={skill.id}
-                      className='mb-1 flex items-center justify-between gap-3 text-sm '>
-                      <span>{t(`skills:skills.${skill.id}.name` as any)}</span>
-                      <span className='font-semibold '>
-                        {userSkills.unlockedSkills[skill.id] || 0}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
 
-          <div className='mb-6 flex gap-4'>
-            {Object.entries(userSkills.availablePoints).some(
-              ([_, points]) => points > 0
-            ) && (
-              <>
-                <div className='text-lg font-semibold text-white'>
-                  Available Points:
-                </div>
-                {Object.entries(userSkills.availablePoints).map(
-                  ([category, points]) =>
-                    points > 0 && (
-                      <Badge>
-                        {points} {t(`skills:categories.${category}` as any)}
-                      </Badge>
-                    )
-                )}
-              </>
-            )}
-          </div>
+      <div className='relative p-4'>
+        <SkillTreeCards userSkills={userSkills} />
 
-          <div className='grid grid-cols-2 gap-x-4 sm:grid-cols-4 sm:gap-x-4'>
-            {Object.entries(categorizedSkills).map(([category, skills]) => (
-              <CategorySection
-                key={category}
-                skills={skills}
-                userSkills={userSkills}
-                onSkillUpgrade={onSkillUpgrade}
-                t={t}
-              />
-            ))}
-          </div>
+        <div className='mb-6 flex gap-4'>
+          {Object.entries(userSkills.availablePoints).some(
+            ([_, points]) => points > 0
+          ) && (
+            <>
+              <div className='text-lg font-semibold text-white'>
+                Available Points:
+              </div>
+              {Object.entries(userSkills.availablePoints).map(
+                ([category, points]) =>
+                  points > 0 && (
+                    <Badge>
+                      {points} {t(`skills:categories.${category}` as any)}
+                    </Badge>
+                  )
+              )}
+            </>
+          )}
         </div>
-      </ScrollArea>
+
+        <div className='grid grid-cols-2 gap-x-4 sm:grid-cols-4 sm:gap-x-4'>
+          {Object.entries(categorizedSkills).map(([category, skills]) => (
+            <CategorySection
+              key={category}
+              skills={skills}
+              userSkills={userSkills}
+              onSkillUpgrade={onSkillUpgrade}
+              t={t}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
