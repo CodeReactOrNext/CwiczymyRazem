@@ -11,5 +11,11 @@
   "current_season": "Current Season",
   "showing": "Showing",
   "of": "of",
-  "users": "users"
+  "users": "users",
+  "no_users_found": "No users found",
+  "no_seasonal_data": "No seasonal data available",
+  "no_seasonal_data_found": "No users found in this season",
+  "seasons_fetch_error": "Error loading seasons",
+  "season_change_error": "Error changing season",
+  "view_change_error": "Error changing view"
 }

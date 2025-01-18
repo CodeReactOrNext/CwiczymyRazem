@@ -37,7 +37,7 @@ export default async function handler(
     });
 
     const skillPointsGained: SkillPointsGained = {
-      technique: Math.floor(report.timeSummary.techniqueTime / 1800000), // 30 minutes = 1 point
+      technique: Math.floor(report.timeSummary.techniqueTime / 1800000),
       theory: Math.floor(report.timeSummary.theoryTime / 1800000),
       hearing: Math.floor(report.timeSummary.hearingTime / 1800000),
       creativity: Math.floor(report.timeSummary.creativityTime / 1800000),
@@ -61,6 +61,16 @@ export default async function handler(
       },
     };
 
+    // Calculate points gained in this session - use the points from current report only
+    const pointsGained = report.raitingData.totalPoints || 0; // Use points from current session only
+
+    await firebaseUpdateUserStats(
+      userUid,
+      updatedStats,
+      report.timeSummary,
+      pointsGained
+    );
+
     await firebaseSetUserExerciseRaprot(
       userUid,
       { ...report.raitingData, ...report.reportDate, skillPointsGained },
@@ -69,8 +79,6 @@ export default async function handler(
       report.isDateBackReport,
       report.timeSummary
     );
-
-    await firebaseUpdateUserStats(userUid, updatedStats);
 
     if (!report.isDateBackReport) {
       await firebaseAddLogReport(
