@@ -1,9 +1,9 @@
+import { SortByType } from "feature/leadboard/types";
 import { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
-import { SortByType } from "feature/leadboard/view/LeadboardView";
 
 interface SortBySwitchProps {
-  setSortBy: Dispatch<SetStateAction<SortByType>>;
+  setSortBy: (value: SortByType) => void;
   sortBy: SortByType;
 }
 
@@ -11,21 +11,19 @@ const SortBySwitch = ({ setSortBy, sortBy }: SortBySwitchProps) => {
   const { t } = useTranslation("leadboard");
 
   return (
-    <div className="join">
+    <div className='join'>
       <button
-        className={`btn btn-sm join-item ${
+        className={`btn join-item btn-sm ${
           sortBy === "points" ? "btn-active" : ""
         }`}
-        onClick={() => setSortBy("points")}
-      >
+        onClick={() => setSortBy("points")}>
         {t("sort_by_points")}
       </button>
       <button
-        className={`btn btn-sm join-item ${
+        className={`btn join-item btn-sm ${
           sortBy === "sessionCount" ? "btn-active" : ""
         }`}
-        onClick={() => setSortBy("sessionCount")}
-      >
+        onClick={() => setSortBy("sessionCount")}>
         {t("sort_by_sessions")}
       </button>
     </div>

@@ -27,11 +27,9 @@ import {
   getCountFromServer,
   startAfter,
   addDoc,
-  arrayRemove,
   arrayUnion,
   where,
   Timestamp,
-  runTransaction,
   onSnapshot,
 } from "firebase/firestore";
 import {
@@ -48,13 +46,12 @@ import { statisticsInitial as statistics } from "constants/userStatisticsInitial
 import { firebaseApp } from "./firebase.cofig";
 import { shuffleUid } from "utils/user/shuffleUid";
 import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
-import { SortByType } from "feature/leadboard/view/LeadboardView";
 import { GuitarSkill, UserSkills } from "feature/skills/skills.types";
-import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
 import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
 import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
 import { AchievementList } from "assets/achievements/achievementsData";
+import { SortByType } from "feature/leadboard/types";
 
 const provider = new GoogleAuthProvider();
 
@@ -780,30 +777,35 @@ export const canUpgradeSkill = (
 
 // Get current season
 export const getCurrentSeason = async () => {
-  const now = new Date();
-  const seasonId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}`;
-  const seasonRef = doc(db, "seasons", seasonId);
-  const seasonDoc = await getDoc(seasonRef);
+  try {
+    const now = new Date();
+    const seasonId = `${now.getFullYear()}-${String(
+      now.getMonth() + 1
+    ).padStart(2, "0")}`;
 
-  if (!seasonDoc.exists()) {
-    const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const seasonRef = doc(db, "seasons", seasonId);
+    const seasonDoc = await getDoc(seasonRef);
 
-    const seasonData: SeasonDataInterface = {
-      seasonId,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      isActive: true,
-    };
+    if (!seasonDoc.exists()) {
+      const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    await setDoc(seasonRef, seasonData);
-    return seasonData;
+      const seasonData = {
+        seasonId,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        isActive: true,
+        name: `Season ${seasonId}`,
+      };
+
+      await setDoc(seasonRef, seasonData);
+      return seasonData;
+    }
+
+    return { seasonId, ...seasonDoc.data() };
+  } catch (error) {
+    throw error;
   }
-
-  return seasonDoc.data() as SeasonDataInterface;
 };
 
 // Get all available seasons
@@ -826,31 +828,70 @@ export const getSeasonalLeaderboard = async (
   page: number,
   itemsPerPage: number
 ) => {
+  console.log("🔵 getSeasonalLeaderboard called:", { seasonId, sortBy, page });
   try {
     const seasonalUsersRef = collection(db, "seasons", seasonId, "users");
-    let q = query(
+
+    // First get total count
+    const totalSnapshot = await getCountFromServer(seasonalUsersRef);
+    const total = totalSnapshot.data().count;
+    console.log("✅ Total users in season:", total);
+
+    if (total === 0) {
+      console.log("⚠️ No users found in season");
+      return { users: [], totalUsers: 0 };
+    }
+
+    // Create query - sort by the field directly as it's at root level
+    const q = query(
       seasonalUsersRef,
-      orderBy(`statistics.${sortBy}`, "desc"),
-      limit(itemsPerPage),
-      ...(page > 1 ? [startAfter((page - 1) * itemsPerPage)] : [])
+      orderBy(sortBy, "desc"),
+      limit(itemsPerPage)
     );
 
-    const [querySnapshot, totalSnapshot] = await Promise.all([
-      getDocs(q),
-      getCountFromServer(seasonalUsersRef),
-    ]);
+    // Get documents
+    const querySnapshot = await getDocs(q);
 
-    const users = querySnapshot.docs.map((doc) => ({
-      profileId: doc.id,
-      ...doc.data(),
-    })) as FirebaseUserDataInterface[];
+    const users = querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      console.log("Processing user data:", data); // Debug log
+
+      // Transform the data to match FirebaseUserDataInterface
+      return {
+        profileId: doc.id,
+        displayName: data.displayName || "",
+        avatar: data.avatar || "",
+        statistics: {
+          points: data.points || 0,
+          sessionCount: data.sessionCount || 0,
+          time: {
+            creativity: data.time?.creativity || 0,
+            hearing: data.time?.hearing || 0,
+            technique: data.time?.technique || 0,
+            theory: data.time?.theory || 0,
+            longestSession: data.time?.longestSession || 0,
+          },
+          achievements: data.achievements || [],
+          lvl: data.lvl || 1,
+          lastReportDate: data.lastReportDate || "",
+        },
+      };
+    });
+
+    console.log("✅ Users fetched:", {
+      count: users.length,
+      firstUser: users[0]?.profileId,
+      firstUserStats: {
+        points: users[0]?.statistics.points,
+        time: users[0]?.statistics.time,
+      },
+    });
 
     return {
       users,
-      total: totalSnapshot.data().count,
+      totalUsers: total,
     };
   } catch (error) {
-    console.error("Error fetching seasonal users:", error);
     throw error;
   }
 };
@@ -858,19 +899,97 @@ export const getSeasonalLeaderboard = async (
 // Update user's seasonal stats when they submit a report
 export const updateSeasonalStats = async (
   userId: string,
-  stats: StatisticsDataInterface
+  stats: StatisticsDataInterface,
+  sessionTime: {
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+    sumTime: number;
+  },
+  pointsGained: number
 ) => {
   const season = await getCurrentSeason();
   const userSeasonRef = doc(db, "seasons", season.seasonId, "users", userId);
+  const userSeasonDoc = await getDoc(userSeasonRef);
 
-  await setDoc(
-    userSeasonRef,
-    {
-      ...stats,
-      seasonId: season.seasonId,
+  // Get user data to ensure we have displayName and avatar
+  const userDocRef = doc(db, "users", userId);
+  const userDoc = await getDoc(userDocRef);
+  const userData = userDoc.data();
+
+  const currentSeasonData = userSeasonDoc.exists()
+    ? userSeasonDoc.data()
+    : {
+        points: 0,
+        sessionCount: 0,
+        time: {
+          creativity: 0,
+          hearing: 0,
+          technique: 0,
+          theory: 0,
+          longestSession: 0,
+        },
+        achievements: [],
+      };
+
+  // Update only the seasonal stats
+  const updatedSeasonData = {
+    ...currentSeasonData,
+    // Add only the points gained in this session
+    points: (currentSeasonData.points || 0) + pointsGained,
+    sessionCount: (currentSeasonData.sessionCount || 0) + 1,
+    time: {
+      creativity:
+        (currentSeasonData.time?.creativity || 0) +
+        (sessionTime.creativityTime || 0),
+      hearing:
+        (currentSeasonData.time?.hearing || 0) + (sessionTime.hearingTime || 0),
+      technique:
+        (currentSeasonData.time?.technique || 0) +
+        (sessionTime.techniqueTime || 0),
+      theory:
+        (currentSeasonData.time?.theory || 0) + (sessionTime.theoryTime || 0),
+      longestSession: Math.max(
+        currentSeasonData.time?.longestSession || 0,
+        sessionTime.sumTime || 0
+      ),
     },
-    { merge: true }
-  );
+    achievements: stats.achievements || [],
+    lvl: stats.lvl || 1,
+    lastReportDate: stats.lastReportDate || new Date().toISOString(),
+    displayName: userData?.displayName || "Unknown User",
+    avatar: userData?.avatar || "",
+    seasonId: season.seasonId,
+  };
+
+  console.log("Updating seasonal stats:", {
+    currentPoints: currentSeasonData.points || 0,
+    pointsGained,
+    newTotalPoints: updatedSeasonData.points,
+    sessionTime,
+  });
+
+  await setDoc(userSeasonRef, updatedSeasonData, { merge: true });
+};
+
+export const firebaseUpdateUserStats = async (
+  userAuth: string,
+  statistics: StatisticsDataInterface,
+  sessionTime: {
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+    sumTime: number;
+  },
+  pointsGained: number
+) => {
+  const userDocRef = doc(db, "users", userAuth);
+  await Promise.all([
+    updateDoc(userDocRef, { statistics }),
+    updateSeasonalStats(userAuth, statistics, sessionTime, pointsGained),
+  ]);
 };
 
 export const awardSeasonalBadges = async (seasonId: string) => {
