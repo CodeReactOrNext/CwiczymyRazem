@@ -2,12 +2,11 @@ import { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { SeasonDataInterface } from "types/api.types";
 
-import SortBySwitch from "./components/SortBySwitch";
-import LeadboardColumn from "./components/LeadboardRow";
 
 import { SortByType } from "feature/leadboard/view/LeadboardView";
 import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 import MainContainer from "components/MainContainer";
+import SortBySwitch from "feature/leadboard/components/SortBySwitch";
 
 interface LeadboardLayoutProps {
   usersData: FirebaseUserDataInterface[];
