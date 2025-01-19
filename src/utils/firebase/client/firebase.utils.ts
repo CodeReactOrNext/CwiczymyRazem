@@ -730,7 +730,11 @@ export const firebaseGetUserTooltipData = async (
       avatar: userData.avatar || null,
       band: userData.band,
       statistics: {
-        totalPracticeTime: userData.statistics.totalPracticeTime || 0,
+        totalPracticeTime:
+          userData.statistics.time.creativity +
+            userData.statistics.time.hearing +
+            userData.statistics.time.technique +
+            userData.statistics.time.theory || 0,
         totalPoints: userData.statistics.points || 0,
         level: userData.statistics.lvl || 0,
         achievements: userData.statistics.achievements || [],
