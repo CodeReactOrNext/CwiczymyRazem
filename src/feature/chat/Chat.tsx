@@ -4,6 +4,7 @@ import { Input } from "assets/components/ui/input";
 import { useChat } from "feature/chat/hooks/useChat";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
 
 const Chat = () => {
   const {
@@ -32,14 +33,19 @@ const Chat = () => {
             className={`chat ${
               msg.userId === currentUserId ? "chat-end" : "chat-start"
             }`}>
-            <div className='chat-image'>
-              <Avatar
-                avatarURL={msg.userPhotoURL}
-                name={msg.username!}
-                size='sm'
-              />
-            </div>
-            <div className='chat-header'>{msg.username}</div>
+            <UserTooltip userId={msg.userId}>
+              <div className='chat-image'>
+                <Avatar
+                  avatarURL={msg.userPhotoURL}
+                  name={msg.username!}
+                  size='sm'
+                />
+              </div>
+            </UserTooltip>
+            <UserTooltip userId={msg.userId}>
+              <div className='chat-header'>{msg.username}</div>
+            </UserTooltip>
+
             <div className='chat-bubble flex items-center bg-second-400'>
               {msg.message}
             </div>

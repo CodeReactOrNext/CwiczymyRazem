@@ -95,7 +95,8 @@
     "points": "Points",
     "sessions": "Sessions",
     "habits": "Habits",
-    "userNotFound": "User not found"
+    "userNotFound": "User not found",
+        "actual_streak": "Streak"
   },
   "song_status": {
     "move_to": "Move to",
