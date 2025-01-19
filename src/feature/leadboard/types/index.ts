@@ -5,8 +5,6 @@ export type SortByType = "points" | "sessionCount";
 
 export interface LeaderboardProps {
   usersData: FirebaseUserDataInterface[];
-  setSortBy: (value: SortByType) => void;
-  sortBy: SortByType;
   currentUserId: string | null;
   isLoading: boolean;
   totalUsers: number;

@@ -4,7 +4,6 @@ import MainContainer from "components/MainContainer";
 import ViewToggle from "./components/ViewToggle/ViewToggle";
 import SeasonSelect from "./components/SeasonSelect/SeasonSelect";
 import UserStats from "./components/UserStats/UserStats";
-import SortBySwitch from "./components/SortBySwitch/SortBySwitch";
 import Pagination from "./components/Pagination/Pagination";
 import LeadboardRow from "./components/LeadboardRow/LeadboardRow";
 
@@ -12,9 +11,7 @@ import { LeaderboardProps } from "./types";
 
 const LeadboardLayout = ({
   usersData,
-  setSortBy,
   currentUserId,
-  sortBy,
   isLoading,
   totalUsers,
   currentPage,
@@ -74,10 +71,10 @@ const LeadboardLayout = ({
 
   return (
     <MainContainer title='Leadboard'>
-      <ul className='min-h-screen'>
+      <ul className='min-h-screen '>
         <div className='sticky top-0 z-10 flex w-full flex-col gap-4 p-2 px-4 backdrop-blur-sm'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-4'>
+          <div className='flex flex-col items-center  justify-between gap-2 md:flex-row'>
+            <div className='flex items-center gap-4 font-openSans '>
               <ViewToggle
                 isSeasonalView={isSeasonalView}
                 setIsSeasonalView={setIsSeasonalView}
@@ -99,7 +96,6 @@ const LeadboardLayout = ({
                 itemsPerPage={itemsPerPage}
                 totalUsers={totalUsers}
               />
-              <SortBySwitch setSortBy={setSortBy} sortBy={sortBy} />
             </div>
           </div>
         </div>
