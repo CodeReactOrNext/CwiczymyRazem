@@ -24,7 +24,7 @@ import {
 import { convertMsToHM } from "utils/converter";
 
 interface UserTooltipProps {
-  userId: string;
+  userId: string | null;
   children: React.ReactNode;
 }
 
@@ -34,6 +34,9 @@ export const UserTooltip = ({ userId, children }: UserTooltipProps) => {
   const { t } = useTranslation("common");
 
   useEffect(() => {
+    if (!userId) {
+      return;
+    }
     const fetchData = async () => {
       const data = await firebaseGetUserTooltipData(userId);
       setUserData(data);
