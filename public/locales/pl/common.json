@@ -96,6 +96,14 @@
     "remove": "Usuń",
     "add": "Dodaj"
   },
+  "tooltip": {
+    "totalTime": "Łączny czas",
+    "points": "Punkty",
+    "sessions": "Sesje",
+    "habits": "Nawyki",
+    "userNotFound": "Użytkownik nie znaleziony",
+    "actual_streak": "Aktualny streak"
+  },
   "chart": {
     "activity_overview": "Przegląd aktywności",
     "showing_activity": "Wyświetlanie danych aktywności dla wybranego okresu",

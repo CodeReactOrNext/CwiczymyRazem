@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { firebaseGetUserTooltipData, UserTooltipData } from "utils/firebase/client/firebase.utils";
+import {
+  firebaseGetUserTooltipData,
+  UserTooltipData,
+} from "utils/firebase/client/firebase.utils";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import {
@@ -18,6 +21,7 @@ import {
   FaMusic,
   FaLeaf,
 } from "react-icons/fa";
+import { convertMsToHM } from "utils/converter";
 
 interface UserTooltipProps {
   userId: string;
@@ -90,8 +94,8 @@ export const UserTooltip = ({ userId, children }: UserTooltipProps) => {
                 <StatsBox
                   Icon={FaClock}
                   label={t("tooltip.totalTime")}
-                  value={`${Math.round(
-                    userData.statistics.totalPracticeTime / 60
+                  value={`${convertMsToHM(
+                    userData.statistics.totalPracticeTime
                   )}h`}
                 />
                 <StatsBox
@@ -101,12 +105,12 @@ export const UserTooltip = ({ userId, children }: UserTooltipProps) => {
                 />
                 <StatsBox
                   Icon={FaTrophy}
-                  label={t("header.lvl_short")}
+                  label={"Lvl"}
                   value={userData.statistics.level}
                 />
                 <StatsBox
                   Icon={FaFire}
-                  label={t("day_since.actual_streak")}
+                  label={t("tooltip.actual_streak")}
                   value={userData.statistics.actualDayWithoutBreak}
                 />
                 <StatsBox
