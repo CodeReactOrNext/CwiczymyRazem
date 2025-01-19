@@ -16,7 +16,7 @@ const UserStats = ({
   if (!totalUsers) return null;
 
   return (
-    <div className='text-sm text-gray-600'>
+    <div className='font-openSans text-sm text-gray-600'>
       {`${t("showing")} ${(currentPage - 1) * itemsPerPage + 1}-${Math.min(
         currentPage * itemsPerPage,
         totalUsers
