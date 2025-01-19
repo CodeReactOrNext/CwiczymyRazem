@@ -15,7 +15,6 @@ interface WelcomeMessageProps {
 }
 
 const WelcomeMessage = ({
-  userName,
   points,
   lastReportDate,
   actualDayWithoutBreak,
