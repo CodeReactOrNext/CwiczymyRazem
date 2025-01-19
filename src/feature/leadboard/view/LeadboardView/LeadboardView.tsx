@@ -51,11 +51,6 @@ const LeadboardView = () => {
   };
 
   const loadSeasonalLeaderboard = async (seasonId: string, page: number) => {
-    console.log("🔵 Starting loadSeasonalLeaderboard:", {
-      seasonId,
-      page,
-      sortBy,
-    });
     try {
       setIsLoading(true);
       const response = await getSeasonalLeaderboard(
@@ -64,7 +59,6 @@ const LeadboardView = () => {
         page,
         ITEMS_PER_PAGE
       );
-      console.log("🟢 Seasonal response:", response);
       if (response) {
         const mappedUsers = (response.users || []).map((user) => ({
           ...user,
@@ -82,7 +76,6 @@ const LeadboardView = () => {
         }
       }
     } catch (error) {
-      console.error("🔴 Error in loadSeasonalLeaderboard:", error);
       toast(t("fetch_error"));
       setUsersData([]);
       setTotalUsers(0);
@@ -138,7 +131,6 @@ const LeadboardView = () => {
 
   useEffect(() => {
     const initializeSeasons = async () => {
-      console.log("🔵 Initializing seasons");
       try {
         const [seasonsData, currentSeason] = await Promise.all([
           getAvailableSeasons(),
@@ -178,8 +170,6 @@ const LeadboardView = () => {
   return (
     <LeadboardLayout
       usersData={usersData}
-      setSortBy={setSortBy}
-      sortBy={sortBy}
       currentUserId={currentUserId}
       isLoading={isLoading}
       totalUsers={totalUsers}
