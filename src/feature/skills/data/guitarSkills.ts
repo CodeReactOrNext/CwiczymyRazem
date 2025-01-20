@@ -29,7 +29,7 @@ export const guitarSkills: GuitarSkill[] = [
   },
   {
     id: "legato",
-    category: "technique", 
+    category: "technique",
     icon: GiMusicalNotes,
   },
   {
@@ -108,11 +108,6 @@ export const guitarSkills: GuitarSkill[] = [
     icon: GiBookmarklet,
   },
   {
-    id: "songwriting",
-    category: "creativity",
-    icon: GiPencilBrush,
-  },
-  {
     id: "slide_guitar",
     category: "technique",
     icon: GiSteelClaws,
@@ -142,5 +137,5 @@ export const guitarSkills: GuitarSkill[] = [
     id: "picking",
     category: "technique",
     icon: GiGuitarHead,
-  }
+  },
 ];
