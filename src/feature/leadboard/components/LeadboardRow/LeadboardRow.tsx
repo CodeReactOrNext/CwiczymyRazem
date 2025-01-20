@@ -68,7 +68,7 @@ const LeadboardRow = ({
           <div className='relative top-[-23px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
 
-            <div className='absolute top-[-10px] right-[-60px] flex items-center gap-x-1'>
+            <div className='absolute top-[-10px] right-[-70px] md:right-[-60px] flex items-center gap-x-1'>
               <p className='text-2xl uppercase text-gray-400 drop-shadow'>
                 Lvl{" "}
               </p>

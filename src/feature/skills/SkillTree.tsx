@@ -144,7 +144,7 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
       <div className='relative p-4'>
         <SkillTreeCards userSkills={userSkills} />
 
-        <div className='mb-6 flex gap-4'>
+        <div className='mb-6 flex flex-wrap gap-4'>
           {Object.entries(userSkills.availablePoints).some(
             ([_, points]) => points > 0
           ) && (
@@ -164,7 +164,7 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
           )}
         </div>
 
-        <div className='grid grid-cols-2 gap-x-4 sm:grid-cols-4 sm:gap-x-4'>
+        <div className='grid grid-cols-1 gap-x-4 sm:gap-x-4 md:grid-cols-4'>
           {Object.entries(categorizedSkills).map(([category, skills]) => (
             <CategorySection
               key={category}
