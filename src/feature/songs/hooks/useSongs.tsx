@@ -145,6 +145,13 @@ export const useSongs = () => {
     await loadSongs();
   };
 
+  const refreshSongsWithoutLoading = async () => {
+    if (!currentUserId) return;
+    const songs = await getUserSongs(currentUserId);
+    setUserSongs(songs);
+    await loadSongs(true);
+  };
+
   const handleStatusUpdate = async () => {
     await refreshSongs();
   };
@@ -181,5 +188,6 @@ export const useSongs = () => {
     handleStatusUpdate,
     getSongStatus,
     refreshSongs,
+    refreshSongsWithoutLoading,
   };
 };
