@@ -10,9 +10,10 @@ import { rateSongDifficulty } from "utils/firebase/client/firebase.utils";
 
 interface SongRatingInterface {
   song: Song;
+  refreshTable: () => void;
 }
 
-export const SongRating = ({ song }: SongRatingInterface) => {
+export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
   const userId = useAppSelector(selectUserAuth);
   const { t } = useTranslation("songs");
 
@@ -47,6 +48,7 @@ export const SongRating = ({ song }: SongRatingInterface) => {
 
     try {
       await rateSongDifficulty(songId, userId, rating, title, artist);
+      refreshTable();
       toast.success(t("rating_updated"));
     } catch (error) {
       toast.error(t("error_rating"));
