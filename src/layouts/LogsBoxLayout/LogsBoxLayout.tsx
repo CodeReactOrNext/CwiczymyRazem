@@ -73,12 +73,12 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           notificationCount={unreadChats}
           hasNewMessages={hasNewChats}
         />
-        <LogsBoxButton
+        {/* <LogsBoxButton
           title={t("logsBox.achievements_map")}
           active={showedCategory === "achievements"}
           onClick={() => handleCategoryChange("achievements")}
           Icon={FaMedal}
-        />
+        /> */}
         <LogsBoxButton
           title={"Plany Ćwiczeń"}
           active={showedCategory === "excerise"}
@@ -92,9 +92,9 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           Icon={TbNews}
         />
       </div>
-      {showedCategory === "achievements" && (
+      {/* {showedCategory === "achievements" && (
         <AchievementsMap userAchievements={userAchievements} />
-      )}
+      )} */}
       <div className='h-full overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
         {showedCategory === "logs" && logs && (
           <div onClick={markLogsAsRead}>
