@@ -42,7 +42,7 @@ interface SongsTableProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   onAddSong: () => void;
-  onStatusChange?: () => void;
+  onStatusChange: () => void;
 }
 
 const SongsTable = ({
@@ -187,7 +187,7 @@ const SongsTable = ({
                   <TableCell className='min-w-[200px]'>{song.title}</TableCell>
 
                   <TableCell>
-                    <SongRating song={song} />
+                    <SongRating song={song} refreshTable={onStatusChange} />
                   </TableCell>
                   <TableCell>
                     <Badge variant='outline'>

@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/discord/daily-season-update",
+      "schedule": "0 20 * * *"
+    }
+  ]
+} 
