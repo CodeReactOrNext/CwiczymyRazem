@@ -36,7 +36,7 @@ const formatWantToLearnMessage = async (log: FirebaseLogsSongsInterface) => {
   return {
     embeds: [
       {
-        title: "Chęć Nauki Utworu",
+        title: "Nauka Utworu",
         description: `**[${displayName}](<https://www.cwiczymy-razem.pl//user/${log.uid}> " ")** chce nauczyć się utworu **${log.songArtist} ${log.songTitle}**`,
         color: 0xf1c40f,
       },
@@ -49,7 +49,7 @@ const formatLearningMessage = async (log: FirebaseLogsSongsInterface) => {
   return {
     embeds: [
       {
-        title: "Uczenie się Utworu",
+        title: "Nauka Utworu",
         description: `**[${displayName}](<https://www.cwiczymy-razem.pl//user/${log.uid}> " ")** uczy się utworu **${log.songArtist} ${log.songTitle}**`,
         color: 0xe67e22,
       },
@@ -118,32 +118,32 @@ const formatGeneralLogMessage = async (log: FirebaseLogsInterface) => {
 
   if (log.timeSumary.creativityTime) {
     fields.push({
-      name: "Czas na kreatywność",
-      value: convertMsToHM(log.timeSumary.creativityTime),
+      name: "Kreatywność",
+      value:  `${convertMsToHM(log.timeSumary.creativityTime)}h`,
       inline: false,
     });
   }
 
   if (log.timeSumary.hearingTime) {
     fields.push({
-      name: "Czas na słuch",
-      value: convertMsToHM(log.timeSumary.hearingTime),
+      name: "Słuch",
+      value:  `${convertMsToHM(log.timeSumary.hearingTime)}h`,
       inline: false,
     });
   }
 
   if (log.timeSumary.techniqueTime) {
     fields.push({
-      name: "Czas na technikę",
-      value: convertMsToHM(log.timeSumary.techniqueTime),
+      name: "Technika",
+      value:  `${convertMsToHM(log.timeSumary.techniqueTime)}h`,
       inline: false,
     });
   }
 
   if (log.timeSumary.theoryTime) {
     fields.push({
-      name: "Czas na teorię",
-      value: convertMsToHM(log.timeSumary.theoryTime),
+      name: "Teoria",
+      value: `${convertMsToHM(log.timeSumary.theoryTime)}h`,
       inline: false,
     });
   }
