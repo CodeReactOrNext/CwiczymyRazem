@@ -741,7 +741,7 @@ export const firebaseGetUserTooltipData = async (
         actualDayWithoutBreak: userData.statistics.actualDayWithoutBreak || 0,
         currentLevelMaxPoints: userData.statistics.currentLevelMaxPoints || 0,
         dayWithoutBreak: userData.statistics.dayWithoutBreak || 0,
-        habitCount: userData.statistics.habitCount || 0,
+        habitCount: userData.habitsCount || 0,
         lastReportDate: userData.statistics.lastReportDate || "",
         lvl: userData.statistics.lvl || 0,
         maxPoints: userData.statistics.maxPoints || 0,

@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Song, SongStatus } from "utils/firebase/client/firebase.types";
-import {
-  getUserSongs,
-  rateSongDifficulty,
-} from "utils/firebase/client/firebase.utils";
-import { toast } from "sonner";
+import { getUserSongs } from "utils/firebase/client/firebase.utils";
 import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import {
@@ -16,8 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "assets/components/ui/table";
-import { Music, Star } from "lucide-react";
-
 import {
   Select,
   SelectContent,
@@ -189,8 +183,8 @@ const SongsTable = ({
                   key={song.id}
                   style={getRowStyle(song.id)}
                   className='transition-colors'>
-                  <TableCell>{song.artist}</TableCell>
-                  <TableCell>{song.title}</TableCell>
+                  <TableCell className='min-w-[200px]'>{song.artist}</TableCell>
+                  <TableCell className='min-w-[200px]'>{song.title}</TableCell>
 
                   <TableCell>
                     <SongRating song={song} />
