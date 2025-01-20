@@ -12,7 +12,6 @@ interface SongRatingInterface {
   song: Song;
   refreshTable: () => void;
 }
-
 export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
   const userId = useAppSelector(selectUserAuth);
   const { t } = useTranslation("songs");
@@ -21,6 +20,7 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
     songId: string;
     rating: number;
   } | null>(null);
+
   const handleRating = async (
     songId: string,
     title: string,
@@ -56,8 +56,8 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
   };
 
   return (
-    <>
-      <div className='flex items-center  gap-1'>
+    <div>
+      <div className='flex items-center gap-1'>
         {[...Array(10)].map((_, i) => {
           const avgRating = getAverageDifficulty(song.difficulties);
 
@@ -104,8 +104,11 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
         })}
         <div className='mt-1 text-sm text-muted-foreground'>
           ({song.difficulties.length})
+        </div>{" "}
+        <div className='mt-1 w-[30px] text-sm text-primary'>
+          {ratingHover?.songId === song.id && `${ratingHover.rating}/10`}
         </div>
       </div>
-    </>
+    </div>
   );
 };

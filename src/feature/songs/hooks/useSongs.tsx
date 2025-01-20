@@ -37,7 +37,7 @@ export const useSongs = () => {
     }
     debounceTimeout.current = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-    }, 500);
+    }, 800);
 
     return () => {
       if (debounceTimeout.current) {
