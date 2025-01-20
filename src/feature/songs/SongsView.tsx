@@ -38,6 +38,7 @@ const SongsView = () => {
     setDifficultyFilter,
     setUserSongs,
     refreshSongs,
+    refreshSongsWithoutLoading,
   } = useSongs();
 
   return (
@@ -120,7 +121,7 @@ const SongsView = () => {
             onPageChange={handlePageChange}
             onAddSong={() => setIsModalOpen(true)}
             hasFilters={hasFilters}
-            onStatusChange={refreshSongs}
+            onStatusChange={refreshSongsWithoutLoading}
           />
         )}
 
