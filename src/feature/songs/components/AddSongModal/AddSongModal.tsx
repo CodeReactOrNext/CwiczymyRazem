@@ -26,6 +26,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [rating, setRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -101,8 +102,15 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                       : "fill-muted text-muted-foreground"
                   }`}
                   onClick={() => setRating(i + 1)}
+                  onMouseEnter={() => setHoverRating(i + 1)}
+                  onMouseLeave={() => setHoverRating(null)}
                 />
               ))}
+              {hoverRating && (
+                <div className='mt-1 inline-block font-openSans text-sm text-primary'>
+                  {hoverRating} /10
+                </div>
+              )}
             </div>
           </div>
           <DialogFooter>
