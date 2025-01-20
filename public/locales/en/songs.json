@@ -45,6 +45,7 @@
   "error_removing_song": "Error removing song",
   "song_already_exists": "Song already exists",
   "wait_one_hour": "You can't rate a song in a short time. Wait 1 hour.",
+    "hovered_stars": "{{rating}}/10",
   "status": {
     "wantToLearn": "want to learn",
     "learning": "learning",
