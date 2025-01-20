@@ -27,7 +27,7 @@ export const SkillTreeCards = ({ userSkills }: SkillTreeProps) => {
 
   return (
     <div className='mb-12 font-openSans '>
-      <div className='grid grid-cols-2 gap-4 sm:grid-cols-4'>
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-4'>
         {Object.entries(categorizedSkills).map(([category, skills]) => (
           <div
             key={category}

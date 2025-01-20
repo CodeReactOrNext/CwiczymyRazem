@@ -89,7 +89,7 @@ const ProfileLandingLayout = ({
         return (
           <>
             <div className='flex flex-col lg:flex-row lg:gap-4'>
-              <div className='grid h-fit grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:flex-1'>
+              <div className='grid h-fit grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:flex-1 mb-4'>
                 {statsField.map(({ Icon, description, value }) => (
                   <StatsField
                     key={description}
@@ -167,7 +167,7 @@ const ProfileLandingLayout = ({
     <div className='bg-second-600 radius-default'>
       <HeadDecoration title={t("statistics")} />
 
-      <div className='relative z-10 flex flex-wrap gap-2 border-b border-second-500 p-4'>
+      <div className='relative z-10 flex flex-wrap justify-between gap-2 border-b border-second-500 p-4 md:justify-around'>
         <Button
           variant={activeSection === "overview" ? "default" : "ghost"}
           onClick={() => setActiveSection("overview")}>

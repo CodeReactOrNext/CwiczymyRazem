@@ -110,9 +110,9 @@ export function ActivityChart({ data }: ActivityChartProps) {
           <CardDescription>{t("chart.showing_activity")}</CardDescription>
         </div>
         <div className='flex flex-wrap items-center gap-4'>
-          <div className='flex gap-2'>
+          <div className='flex flex-wrap gap-4'>
             {Object.entries(visibleCategories).map(([category, isVisible]) => (
-              <div key={category} className='flex items-center space-x-2'>
+              <div key={category} className='flex  items-center space-x-2'>
                 <Checkbox
                   id={category}
                   checked={isVisible}
@@ -239,9 +239,17 @@ export function ActivityChart({ data }: ActivityChartProps) {
                               {t(
                                 `chart.categories.${entry.name as CategoryKey}`
                               )}
-                              : {convertMsToHMObject(Number(entry.value) ?? 0).hours}:
+                              :{" "}
+                              {
+                                convertMsToHMObject(Number(entry.value) ?? 0)
+                                  .hours
+                              }
+                              :
                               {addZeroToTime(
-                                Number(convertMsToHMObject(Number(entry.value) ?? 0).minutes)
+                                Number(
+                                  convertMsToHMObject(Number(entry.value) ?? 0)
+                                    .minutes
+                                )
                               )}
                             </span>
                           ))}
