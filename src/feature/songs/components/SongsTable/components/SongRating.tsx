@@ -20,7 +20,6 @@ export const SongRating = ({ song }: SongRatingInterface) => {
     songId: string;
     rating: number;
   } | null>(null);
-
   const handleRating = async (
     songId: string,
     title: string,
@@ -29,6 +28,21 @@ export const SongRating = ({ song }: SongRatingInterface) => {
   ) => {
     if (!userId) {
       return;
+    }
+
+    const userRating = song?.difficulties?.find((d) => d.userId === userId);
+
+    if (userRating) {
+      const lastRatedDate = new Date(userRating.date.toDate());
+      const now = new Date();
+
+      const timeDiff = now.getTime() - lastRatedDate.getTime();
+      const oneHour = 60 * 60 * 1000;
+
+      if (timeDiff < oneHour) {
+        toast.warning(t("wait_one_hour"));
+        return;
+      }
     }
 
     try {

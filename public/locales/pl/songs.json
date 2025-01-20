@@ -3,7 +3,7 @@
   "add_song": "Dodaj piosenkę",
   "search_songs": "Wyszukaj piosenki...",
   "title": "Tytuł",
-  "artist": "Artysta", 
+  "artist": "Artysta",
   "difficulty": "Trudność",
   "learners": "Uczący się",
   "actions": "Akcje",
@@ -44,6 +44,7 @@
   "song_removed": "Piosenka została pomyślnie usunięta",
   "error_removing_song": "Błąd podczas usuwania piosenki",
   "song_already_exists": "Piosenka już istnieje",
+  "wait_one_hour": "Nie możesz ocenić utworu tak szybko. Poczekaj godzinę.",
   "status": {
     "wantToLearn": "chcę się nauczyć",
     "learning": "uczę się",
