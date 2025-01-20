@@ -49,7 +49,7 @@ const SongsView = () => {
           onChange={setUserSongs}
           onStatusChange={refreshSongs}
         />
-        <div className='mb-4 mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='mb-4 mt-8 flex flex-col gap-4 sm:items-center sm:justify-between md:flex-row'>
           <div className='flex flex-1 items-center gap-4'>
             <div className='flex-1'>
               <Input
@@ -62,7 +62,7 @@ const SongsView = () => {
             </div>
           </div>
 
-          <div className='flex items-center gap-4'>
+          <div className='flex flex-wrap items-center gap-4'>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className='w-[180px]'>
                 <SelectValue placeholder={t("filter_by_status")} />

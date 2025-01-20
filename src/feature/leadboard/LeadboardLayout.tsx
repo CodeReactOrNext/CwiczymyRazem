@@ -73,8 +73,8 @@ const LeadboardLayout = ({
     <MainContainer title='Leadboard'>
       <ul className='min-h-screen '>
         <div className='sticky top-0 z-10 flex w-full flex-col gap-4 p-2 px-4 backdrop-blur-sm'>
-          <div className='flex flex-col items-center  justify-between gap-2 md:flex-row'>
-            <div className='flex items-center gap-4 font-openSans '>
+          <div className='flex flex-col justify-between  gap-2 md:flex-row md:items-center'>
+            <div className='flex flex-wrap items-center gap-4 font-openSans '>
               <ViewToggle
                 isSeasonalView={isSeasonalView}
                 setIsSeasonalView={setIsSeasonalView}
