@@ -5,7 +5,7 @@ import { getSongs, getUserSongs } from "utils/firebase/client/firebase.utils";
 import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 50;
 
 export const useSongs = () => {
   const [songs, setSongs] = useState<Song[]>([]);
