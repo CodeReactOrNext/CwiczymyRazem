@@ -50,7 +50,7 @@ const ProfileLayout = ({
 
   useEffect(() => {
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
-  });
+  }, []);
 
   return (
     <MainContainer title={t("profile")}>
