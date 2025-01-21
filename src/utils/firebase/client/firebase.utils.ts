@@ -407,8 +407,7 @@ export const checkSongExists = async (title: string, artist: string) => {
 export const addSong = async (
   title: string,
   artist: string,
-  userId: string,
-  rating: number
+  userId: string
 ) => {
   try {
     // Check for duplicate song first
@@ -423,7 +422,7 @@ export const addSong = async (
       artist,
       createdAt: Timestamp.now(),
       createdBy: userId,
-      difficulties: [{ date: Timestamp.now(), rating, userId }],
+      difficulties: [],
     };
 
     const docRef = await addDoc(songsRef, newSong);
@@ -432,8 +431,7 @@ export const addSong = async (
       new Date().toISOString(),
       title,
       artist,
-      "added",
-      rating
+      "added"
     );
     return docRef.id;
   } catch (error) {
