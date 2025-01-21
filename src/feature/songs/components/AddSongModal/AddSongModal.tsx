@@ -25,7 +25,6 @@ interface AddSongModalProps {
 const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
-  const [rating, setRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation("songs");
@@ -38,20 +37,19 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
       return;
     }
 
-    if (!title.trim() || !artist.trim() || !rating) {
+    if (!title.trim() || !artist.trim()) {
       toast.error(t("all_fields_required"));
       return;
     }
 
     try {
       setIsLoading(true);
-      await addSong(title.trim(), artist.trim(), userId, rating);
+      await addSong(title.trim(), artist.trim(), userId);
       toast.success(t("song_added"));
       onSuccess();
       onClose();
       setTitle("");
       setArtist("");
-      setRating(0);
     } catch (error) {
       if (error instanceof Error && error.message === "song_already_exists") {
         toast.error(t("song_already_exists"));
@@ -90,29 +88,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
               required
             />
           </div>
-          <div className='space-y-2'>
-            <Label>{t("difficulty")} (1-10)</Label>
-            <div className='flex gap-1'>
-              {[...Array(10)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-6 w-6 cursor-pointer ${
-                    rating >= i + 1
-                      ? "fill-primary text-primary"
-                      : "fill-muted text-muted-foreground"
-                  }`}
-                  onClick={() => setRating(i + 1)}
-                  onMouseEnter={() => setHoverRating(i + 1)}
-                  onMouseLeave={() => setHoverRating(null)}
-                />
-              ))}
-              {hoverRating && (
-                <div className='mt-1 inline-block font-openSans text-sm text-primary'>
-                  {hoverRating} /10
-                </div>
-              )}
-            </div>
-          </div>
+
           <DialogFooter>
             <Button
               type='button'
@@ -123,9 +99,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
             </Button>
             <Button
               type='submit'
-              disabled={
-                isLoading || !title.trim() || !artist.trim() || !rating
-              }>
+              disabled={isLoading || !title.trim() || !artist.trim()}>
               {isLoading ? (
                 <span className='loading loading-spinner' />
               ) : (
