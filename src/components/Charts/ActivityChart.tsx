@@ -17,7 +17,6 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import {
-  ChartConfig,
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
@@ -264,7 +263,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
             {visibleCategories.technique && (
               <Area
                 dataKey='technique'
-                type='natural'
+                type='linear'
                 fill='url(#fillTechnique)'
                 stroke='var(--color-technique)'
                 stackId='1'
@@ -273,7 +272,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
             {visibleCategories.theory && (
               <Area
                 dataKey='theory'
-                type='natural'
+                type='linear'
                 fill='url(#fillTheory)'
                 stroke='var(--color-theory)'
                 stackId='2'
@@ -282,7 +281,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
             {visibleCategories.hearing && (
               <Area
                 dataKey='hearing'
-                type='natural'
+                type='linear'
                 fill='url(#fillHearing)'
                 stroke='var(--color-hearing)'
                 stackId='3'
@@ -291,7 +290,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
             {visibleCategories.creativity && (
               <Area
                 dataKey='creativity'
-                type='natural'
+                type='linear'
                 fill='url(#fillCreativity)'
                 stroke='var(--color-creativity)'
                 stackId='4'
