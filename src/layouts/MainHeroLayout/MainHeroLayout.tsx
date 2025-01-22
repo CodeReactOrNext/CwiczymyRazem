@@ -1,9 +1,10 @@
-import Header from "./components/Header";
 import OldEffect from "components/OldEffect";
+
 import Background from "./components/Background";
 import ContentBox from "./components/ContentBox";
-import SubtitleBar from "./components/SubtitleBar";
+import Header from "./components/Header";
 import LightningDesktopDivider from "./components/LightningDesktopDivider";
+import SubtitleBar from "./components/SubtitleBar";
 
 export type layoutVariant = "primary" | "secondary" | "landing";
 

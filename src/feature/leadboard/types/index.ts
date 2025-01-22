@@ -1,5 +1,5 @@
-import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
-import { SeasonDataInterface } from "types/api.types";
+import type { SeasonDataInterface } from "types/api.types";
+import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 
 export type SortByType = "points" | "sessionCount";
 

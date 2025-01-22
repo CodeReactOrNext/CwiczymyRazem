@@ -1,5 +1,5 @@
+import type { UserSkills } from "feature/skills/skills.types";
 import { doc, getDoc } from "firebase/firestore";
-import { UserSkills } from "feature/skills/skills.types";
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const getUserSkills = async (userId: string): Promise<UserSkills> => {

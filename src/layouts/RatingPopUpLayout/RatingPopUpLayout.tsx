@@ -1,15 +1,16 @@
-import BonusPointsItem from "./components/BonusPointsItem";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import Router from "next/router";
-import { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { motion } from "framer-motion";
-import { StatisticsDataInterface } from "types/api.types";
-import { getPointsToLvlUp } from "utils/gameLogic";
-import LevelIndicator from "./components/LevelIndicator";
 import { Button } from "assets/components/ui/button";
-import { Badge } from "assets/components/ui/badge";
 import { MiniSkillTree } from "feature/skills/MiniSkillTree";
+import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
+import { motion } from "framer-motion";
+import Router from "next/router";
+import type { Dispatch, SetStateAction} from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { StatisticsDataInterface } from "types/api.types";
+import { getPointsToLvlUp } from "utils/gameLogic";
+
+import BonusPointsItem from "./components/BonusPointsItem";
+import LevelIndicator from "./components/LevelIndicator";
 
 export interface BonusPointsInterface {
   timePoints: number;

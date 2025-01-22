@@ -1,27 +1,27 @@
-import { useEffect, useState } from "react";
-import {
-  firebaseGetUserTooltipData,
-  UserTooltipData,
-} from "utils/firebase/client/firebase.utils";
-import Image from "next/image";
-import { useTranslation } from "react-i18next";
 import {
   Tooltip,
+  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-  TooltipContent,
 } from "assets/components/ui/tooltip";
 import Avatar from "components/Avatar";
 import IconBox from "components/IconBox";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FaClock,
+  FaFire,
+  FaLeaf,
+  FaMusic,
   FaStar,
   FaTrophy,
-  FaFire,
-  FaMusic,
-  FaLeaf,
 } from "react-icons/fa";
 import { convertMsToHM } from "utils/converter";
+import type {
+  UserTooltipData} from "utils/firebase/client/firebase.utils";
+import {
+  firebaseGetUserTooltipData
+} from "utils/firebase/client/firebase.utils";
 
 interface UserTooltipProps {
   userId: string | null;

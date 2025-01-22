@@ -1,4 +1,4 @@
-import { layoutVariant } from "layouts/MainLayout/MainLayout";
+import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 import LightningRevSVG from "public/static/images/svg/LightningRev";
 interface SubtitleBarProps {
   variant: layoutVariant;

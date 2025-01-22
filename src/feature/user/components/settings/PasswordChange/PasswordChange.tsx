@@ -1,18 +1,17 @@
-import { Form, Formik } from "formik";
-import { toast } from "sonner";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useAppDispatch, useAppSelector } from "store/hooks";
-
+import { Button } from "assets/components/ui/button";
 import { Input } from "components/UI";
-import ReauthForm from "../ReauthForm";
-
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { updateUserPassword } from "feature/user/store/userSlice.asyncThunk";
 import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
-import { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
-import { Button } from "assets/components/ui/button";
+import { Form, Formik } from "formik";
 import { Loader2 } from "lucide-react";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import type { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
+
+import ReauthForm from "../ReauthForm";
 
 const PasswordChangeView = () => {
   const { t } = useTranslation(["common", "toast", "settings"]);

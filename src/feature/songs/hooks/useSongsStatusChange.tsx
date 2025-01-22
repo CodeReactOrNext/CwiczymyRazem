@@ -2,10 +2,10 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import { Song, SongStatus } from "utils/firebase/client/firebase.types";
+import type { Song, SongStatus } from "utils/firebase/client/firebase.types";
 import {
-  updateSongStatus,
   removeUserSong,
+  updateSongStatus,
 } from "utils/firebase/client/firebase.utils";
 
 export const useSongsStatusChange = ({

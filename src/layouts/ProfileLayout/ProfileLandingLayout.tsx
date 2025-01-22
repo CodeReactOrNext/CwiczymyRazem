@@ -1,31 +1,30 @@
-import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import { Timestamp } from "firebase/firestore";
-import { LayoutDashboard, Activity, Music, Brain } from "lucide-react";
-
-import Calendar from "components/Calendar";
-import StatisticBar from "./components/StatisticBar";
-import HeadDecoration from "./components/HeadDecoration";
-import StatsField, { StatsFieldProps } from "./components/StatsField";
-import AchievementWrapper from "./components/Achievement/AchievementWrapper";
-import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
-import { ActivityChart } from "components/Charts/ActivityChart";
-import { useCalendar } from "components/Calendar/useCalendar";
-import { SkillTree } from "feature/skills/SkillTree";
-
-import { StatisticsDataInterface } from "types/api.types";
-import { convertMsToHM, calculatePercent } from "utils/converter";
-import {
-  getUserSongs,
-  canUpgradeSkill,
-} from "utils/firebase/client/firebase.utils";
-import { Song } from "utils/firebase/client/firebase.types";
-import { UserSkills } from "feature/skills/skills.types";
-import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { Button } from "assets/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import Calendar from "components/Calendar";
+import { useCalendar } from "components/Calendar/useCalendar";
+import { ActivityChart } from "components/Charts/ActivityChart";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import { updateUserSkills } from "feature/skills/services/updateUserSkills";
+import type { UserSkills } from "feature/skills/skills.types";
+import { SkillTree } from "feature/skills/SkillTree";
+import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
+import { AnimatePresence,motion } from "framer-motion";
+import { Activity, Brain,LayoutDashboard, Music } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { StatisticsDataInterface } from "types/api.types";
+import { calculatePercent,convertMsToHM } from "utils/converter";
+import type { Song } from "utils/firebase/client/firebase.types";
+import {
+  canUpgradeSkill,
+  getUserSongs,
+} from "utils/firebase/client/firebase.utils";
+
+import AchievementWrapper from "./components/Achievement/AchievementWrapper";
+import HeadDecoration from "./components/HeadDecoration";
+import StatisticBar from "./components/StatisticBar";
+import type { StatsFieldProps } from "./components/StatsField";
+import StatsField from "./components/StatsField";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];

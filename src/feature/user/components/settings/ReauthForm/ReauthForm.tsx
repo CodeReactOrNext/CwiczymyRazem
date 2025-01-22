@@ -1,17 +1,15 @@
-import { Form, Formik } from "formik";
-import { useAppSelector } from "store/hooks";
-import { FaAt, FaLock } from "react-icons/fa";
-import { useTranslation } from "react-i18next";
-
-import { Input } from "components/UI";
+import { Button } from "assets/components/ui/button";
 import Backdrop from "components/Backdrop";
-import FormLayout from "layouts/FormLayout";
-
+import { Input } from "components/UI";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
-import { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
+import { Form, Formik } from "formik";
+import FormLayout from "layouts/FormLayout";
 import { Loader2 } from "lucide-react";
-import { Button } from "assets/components/ui/button";
+import { useTranslation } from "react-i18next";
+import { FaAt, FaLock } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
+import type { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
 
 interface ReauthFormInteface {
   changeCredentialsHandler: (data: UpdatedUserCredentials) => Promise<void>;

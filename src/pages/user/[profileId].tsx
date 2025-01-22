@@ -1,7 +1,6 @@
+import ProfileView from "feature/profile/ProfileView";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-
-import ProfileView from "feature/profile/ProfileView";
 
 const Profile: NextPage = () => {
   return <ProfileView />;

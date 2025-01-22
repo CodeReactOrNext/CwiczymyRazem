@@ -1,4 +1,4 @@
-import { StatisticsDataInterface } from "types/api.types";
+import type { StatisticsDataInterface } from "types/api.types";
 
 export const statisticsInitial: StatisticsDataInterface = {
   time: {

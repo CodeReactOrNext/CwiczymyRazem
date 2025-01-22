@@ -1,15 +1,14 @@
-import { useEffect } from "react";
-import Router from "next/router";
-import { useAuthState } from "react-firebase-hooks/auth";
-
-import { auth } from "utils/firebase/client/firebase.utils";
-import { useAppDispatch, useAppSelector } from "store/hooks";
-import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
 import {
   selectIsLoggedOut,
   selectUserAuth,
   updateLocalTimer,
 } from "feature/user/store/userSlice";
+import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
+import Router from "next/router";
+import { useEffect } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { auth } from "utils/firebase/client/firebase.utils";
 
 type pagesToRedirectTo = "/" | "/login" | "/leaderboard" | "/faq";
 

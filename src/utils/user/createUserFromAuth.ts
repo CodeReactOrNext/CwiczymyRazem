@@ -1,7 +1,7 @@
-import { User } from "firebase/auth";
+import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
+import type { User } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 
 export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
   const userDocRef = doc(db, "users", user.uid);
@@ -17,7 +17,7 @@ export const firebaseCreateUserDocumentFromAuth = async (user: User) => {
         statistics,
         avatar,
       });
-    } catch (error) {
+    } catch {
       throw new Error();
     }
   }

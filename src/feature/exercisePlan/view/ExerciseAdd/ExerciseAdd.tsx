@@ -1,21 +1,20 @@
-import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
+import { Button } from "assets/components/ui/button";
+import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import { Field, FieldArray, Form, Formik } from "formik";
 import Input from "layouts/ExercisePlanLayout/Input";
 import InputTime from "layouts/ExercisePlanLayout/InputTime";
-import Select from "layouts/ExercisePlanLayout/Select";
 import {
-  FaGuitar,
   FaIndent,
+  FaLock,
+  FaLockOpen,
   FaPlus,
   FaRegClock,
   FaTimes,
-  FaLock,
-  FaLockOpen,
 } from "react-icons/fa";
-import { firebaseUploadExercisePlan } from "utils/firebase/client/firebase.utils";
-import { exerciseSchema } from "./ExerciseEdit.schema";
 import { toast } from "sonner";
-import { Button } from "assets/components/ui/button";
+import { firebaseUploadExercisePlan } from "utils/firebase/client/firebase.utils";
+
+import { exerciseSchema } from "./ExerciseEdit.schema";
 
 interface ExcerisePlanProps {
   backHandler: () => void;

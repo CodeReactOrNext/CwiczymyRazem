@@ -1,12 +1,10 @@
-import type { NextPage } from "next";
-import { useTranslation } from "react-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-
+import SingupView from "feature/user/view/SingupView";
+import useAutoLogIn from "hooks/useAutoLogIn";
 import MainLayout from "layouts/MainLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
-
-import useAutoLogIn from "hooks/useAutoLogIn";
-import SingupView from "feature/user/view/SingupView";
+import type { NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "react-i18next";
 
 const SignUpPage: NextPage = () => {
   const { t } = useTranslation("signup");

@@ -1,5 +1,5 @@
-import { StatisticsDataInterface } from "types/api.types";
-import { Timestamp } from "firebase/firestore";
+import type { Timestamp } from "firebase/firestore";
+import type { StatisticsDataInterface } from "types/api.types";
 
 export interface ProfileInterface {
   displayName: string;

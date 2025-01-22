@@ -1,18 +1,18 @@
-import { createAsyncThunk, SerializedError } from "@reduxjs/toolkit";
-import { User } from "firebase/auth";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
-
-import { SignUpCredentials } from "../view/SingupView/SingupView";
-
-import { fetchReport, fetchUserData } from "./services/userServices";
-import {
+import type { SerializedError } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
+import type { FirebaseError } from "firebase/app";
+import type { User } from "firebase/auth";
+import { doc, getDoc,updateDoc } from "firebase/firestore";
+import type {
   FetchedReportDataInterface,
-  UserDataInterface,
   updateSocialInterface,
   updateUserInterface,
+  UserDataInterface,
 } from "types/api.types";
 import {
   auth,
+  db,
   firebaseCheckUsersNameIsNotUnique,
   firebaseCreateAccountWithEmail,
   firebaseGetUserProviderData,
@@ -20,18 +20,20 @@ import {
   firebaseReauthenticateUser,
   firebaseRestartUserStats,
   firebaseSignInWithEmail,
-  firebaseUpdateUserDisplayName,
   firebaseSignInWithGooglePopup,
+  firebaseUpdateBand,
+  firebaseUpdateSoundCloudLink,
+  firebaseUpdateUserDisplayName,
   firebaseUpdateUserEmail,
   firebaseUpdateUserPassword,
-  firebaseUploadAvatar,
-  firebaseUpdateBand,
   firebaseUpdateYouTubeLink,
-  firebaseUpdateSoundCloudLink,
-  db,
+  firebaseUploadAvatar,
 } from "utils/firebase/client/firebase.utils";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
-import { ReportFormikInterface } from "../view/ReportView/ReportView.types";
+
+import type { ReportFormikInterface } from "../view/ReportView/ReportView.types";
+import type { SignUpCredentials } from "../view/SingupView/SingupView";
+import { fetchReport, fetchUserData } from "./services/userServices";
 import {
   avatarErrorHandler,
   createAccountErrorHandler,
@@ -39,7 +41,6 @@ import {
   loginViaGoogleErrorHandler,
   udpateDataErrorHandler,
 } from "./userSlice.errorsHandling";
-import { FirebaseError } from "firebase/app";
 import {
   logOutInfo,
   reportSuccess,
@@ -51,7 +52,6 @@ import {
   updateUserEmailSuccess,
   updateUserPasswordSuccess,
 } from "./userSlice.toast";
-import { guitarSkills } from "feature/skills/data/guitarSkills";
 
 export const logInViaGoogle = createAsyncThunk(
   "user/logInViaGoogle",

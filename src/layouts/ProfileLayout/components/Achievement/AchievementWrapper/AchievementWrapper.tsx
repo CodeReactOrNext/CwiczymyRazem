@@ -1,8 +1,10 @@
-import {
+import type {
   AchievementList,
-  achievementsData,
-  AchievementsDataInterface,
+  AchievementsDataInterface} from "assets/achievements/achievementsData";
+import {
+  achievementsData
 } from "assets/achievements/achievementsData";
+
 import AchievementBox from "../AchievementBox";
 
 const AchievementWrapper = ({

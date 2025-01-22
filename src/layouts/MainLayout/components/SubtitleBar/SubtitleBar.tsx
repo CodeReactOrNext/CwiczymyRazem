@@ -1,5 +1,4 @@
-import { layoutVariant } from "layouts/MainLayout/MainLayout";
-import LightningRevSVG from "public/static/images/svg/LightningRev";
+import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 interface SubtitleBarProps {
   variant: layoutVariant;
   children: React.ReactNode;

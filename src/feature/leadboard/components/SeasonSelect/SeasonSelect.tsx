@@ -1,5 +1,3 @@
-import { useTranslation } from "react-i18next";
-import { SeasonDataInterface } from "types/api.types";
 import {
   Select,
   SelectContent,
@@ -7,6 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
+import { useTranslation } from "react-i18next";
+import type { SeasonDataInterface } from "types/api.types";
 
 interface SeasonSelectProps {
   seasons: SeasonDataInterface[];

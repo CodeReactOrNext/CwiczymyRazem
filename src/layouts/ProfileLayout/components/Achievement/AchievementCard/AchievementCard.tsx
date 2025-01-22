@@ -1,15 +1,15 @@
-import { useTranslation } from "react-i18next";
+import type {
+  AchievementList} from "assets/achievements/achievementsData";
+import {
+  achievementsData,
+} from "assets/achievements/achievementsData";
 import {
   motion,
-  AnimatePresence,
   useMotionValue,
   useTransform,
 } from "framer-motion";
 import { useState } from "react";
-import {
-  AchievementList,
-  achievementsData,
-} from "assets/achievements/achievementsData";
+import { useTranslation } from "react-i18next";
 
 const AchievementCard = ({ id }: { id: AchievementList }) => {
   const { t } = useTranslation("achievements");

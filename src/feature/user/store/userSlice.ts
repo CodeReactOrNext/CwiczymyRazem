@@ -1,16 +1,15 @@
-import Router from "next/router";
-import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
-
-import { RootState } from "store/store";
-
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { statisticsInitial } from "constants/userStatisticsInitialData";
-
-import { SkillsType } from "types/skillsTypes";
-import {
+import Router from "next/router";
+import type { RootState } from "store/store";
+import type {
   StatisticsDataInterface,
   TimerInterface,
   userSliceInitialState,
 } from "types/api.types";
+import type { SkillsType } from "types/skillsTypes";
+
 import {
   autoLogIn,
   changeUserDisplayName,
@@ -25,7 +24,6 @@ import {
   updateUserStats,
   uploadUserAvatar,
   uploadUserSocialData,
-  upgradeSkill,
 } from "./userSlice.asyncThunk";
 
 const initialState: userSliceInitialState = {

@@ -1,4 +1,4 @@
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 
 const hoursToMs = (hours: number) => hours * 3600000;
 const minutesToMs = (minutes: number) => minutes * 60000;

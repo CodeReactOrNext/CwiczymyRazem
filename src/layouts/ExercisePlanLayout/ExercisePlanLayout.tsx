@@ -1,20 +1,18 @@
-import { useState, useEffect } from "react";
+import { updateTimerTime } from "feature/user/store/userSlice";
+import { motion } from "framer-motion";
+import { useEffect,useState } from "react";
 import {
   FaBrain,
   FaClock,
+  FaEllipsisH,
   FaHandPaper,
   FaMusic,
-  FaFire,
-  FaEllipsisH,
-  FaPlay,
   FaPause,
+  FaPlay,
 } from "react-icons/fa";
-import { SkillsType } from "types/skillsTypes";
-import { convertMsToHM } from "utils/converter";
-import { motion } from "framer-motion";
-import { useDispatch } from "react-redux";
-import { updateTimerTime } from "feature/user/store/userSlice";
 import { useAppDispatch } from "store/hooks";
+import type { SkillsType } from "types/skillsTypes";
+import { convertMsToHM } from "utils/converter";
 
 interface ExercisePlanLayoutProps {
   index: number;

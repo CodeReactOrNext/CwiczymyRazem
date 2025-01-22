@@ -1,5 +1,6 @@
 import router from "next/router";
-import { ChangeEvent, useEffect, useState } from "react";
+import type { ChangeEvent} from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 function LanguageSwitch() {
