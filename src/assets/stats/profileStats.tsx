@@ -8,6 +8,7 @@ import {
   FaGuitar,
   FaHeart,
   FaMedal,
+  FaMusic,
   FaStar,
   FaStarHalf,
 } from "react-icons/fa";
@@ -23,6 +24,7 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
     time,
     dayWithoutBreak,
     maxPoints,
+    songLists,
   } = userStats;
   return [
     {
@@ -66,6 +68,11 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
       Icon: FaMedal,
       description: i18n?.t("profile:stats.num_achievements"),
       value: achievements.length + "/" + achievementsData.length,
+    },
+    {
+      Icon: FaMusic,
+      description: i18n?.t("profile:stats.learned_music"),
+      value: songLists?.learned ? songLists.learned.length : 0,
     },
   ] as StatsFieldProps[];
 };
