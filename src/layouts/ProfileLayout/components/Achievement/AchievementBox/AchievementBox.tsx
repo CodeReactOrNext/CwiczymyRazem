@@ -1,11 +1,9 @@
-import { useTranslation } from "react-i18next";
-import { FaMedal } from "react-icons/fa";
-
+import type { AchievementsDataInterface } from "assets/achievements/achievementsData";
+import type { AchievementsRarityType } from "assets/achievements/achievementsRarity";
 import IconBox from "components/IconBox";
 import AchievementCard from "layouts/ProfileLayout/components/Achievement/AchievementCard";
-
-import { AchievementsDataInterface } from "assets/achievements/achievementsData";
-import { AchievementsRarityType } from "assets/achievements/achievementsRarity";
+import { useTranslation } from "react-i18next";
+import { FaMedal } from "react-icons/fa";
 
 export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];

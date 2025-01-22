@@ -1,24 +1,22 @@
-import { Formik } from "formik";
-import { UserInfo } from "firebase/auth";
-import { useTranslation } from "react-i18next";
-import React, { useEffect, useState } from "react";
-
 import { Divider } from "components/UI";
-import SettingsLayout from "layouts/SettingsLayout";
-import FieldBox from "layouts/SettingsLayout/components/FieldBox";
-import EmailChange from "feature/user/components/settings/EmailChange";
 import AvatarChange from "feature/user/components/settings/AvatarChange";
+import EmailChange from "feature/user/components/settings/EmailChange";
+import MediaLinks from "feature/user/components/settings/MediaLinks";
 import PasswordChange from "feature/user/components/settings/PasswordChange";
 import StatisticRestart from "feature/user/components/settings/StatisticsRestart";
-import MediaLinks from "feature/user/components/settings/MediaLinks";
-
-import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectIsFetching, selectUserName } from "feature/user/store/userSlice";
-import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
 import {
-  getUserProvider,
   changeUserDisplayName,
+  getUserProvider,
 } from "feature/user/store/userSlice.asyncThunk";
+import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
+import type { UserInfo } from "firebase/auth";
+import { Formik } from "formik";
+import SettingsLayout from "layouts/SettingsLayout";
+import FieldBox from "layouts/SettingsLayout/components/FieldBox";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings", "toast"]);

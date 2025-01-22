@@ -27,7 +27,8 @@
     "num_achievements": "Achievements",
     "longest_session": "Longest session",
     "consecutive days": "Max streak",
-    "max_points": "Highest score"
+    "max_points": "Highest score",
+    "learned_music": "Learned songs"
   },
   "nav": {
     "overview": "Overview",

@@ -1,12 +1,12 @@
-import { AchievementList } from "assets/achievements/achievementsData";
-import { MediaType } from "feature/user/components/settings/MediaLinks/MediaLinks";
-import {
+import type { AchievementList } from "assets/achievements/achievementsData";
+import type { MediaType } from "feature/user/components/settings/MediaLinks/MediaLinks";
+import type {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
-import { SignUpCredentials } from "feature/user/view/SingupView/SingupView";
-import { IdTokenResult } from "firebase/auth";
-import { Timestamp } from "firebase/firestore";
+import type { SignUpCredentials } from "feature/user/view/SingupView/SingupView";
+import type { IdTokenResult } from "firebase/auth";
+import type { Timestamp } from "firebase/firestore";
 
 export interface UserDataInterface {
   userInfo: {

@@ -5,9 +5,9 @@ import {
   selectUserName,
 } from "feature/user/store/userSlice";
 import MainLayout from "layouts/MainLayout";
-import { layoutVariant } from "layouts/MainLayout/MainLayout";
+import type { layoutVariant } from "layouts/MainLayout/MainLayout";
+import type { LandingNavObjectInterface } from "layouts/MainLoggedLayout/components/LandingNav";
 import MainLoggedLayout from "layouts/MainLoggedLayout/MainLoggedLayout";
-import { LandingNavObjectInterface } from "layouts/MainLoggedLayout/components/LandingNav";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 

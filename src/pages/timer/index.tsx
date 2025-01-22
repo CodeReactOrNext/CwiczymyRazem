@@ -1,10 +1,8 @@
+import TimerView from "feature/user/view/TimerView";
+import useAutoLogIn from "hooks/useAutoLogIn";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-
-import PageLoadingLayout from "layouts/PageLoadingLayout";
-
-import useAutoLogIn from "hooks/useAutoLogIn";
-import TimerView from "feature/user/view/TimerView";
 import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 
 const Timer: NextPage = () => {

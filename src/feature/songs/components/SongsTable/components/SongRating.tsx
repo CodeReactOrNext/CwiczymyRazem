@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import { Song } from "utils/firebase/client/firebase.types";
+import type { Song } from "utils/firebase/client/firebase.types";
 import { rateSongDifficulty } from "utils/firebase/client/firebase.utils";
 
 interface SongRatingInterface {
@@ -103,7 +103,7 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
           );
         })}
         <div className='mt-1 text-sm text-muted-foreground'>
-          ({song.difficulties.length})
+          ({song.difficulties?.length})
         </div>{" "}
         <div className='mt-1 w-[30px] text-sm text-primary'>
           {ratingHover?.songId === song.id && `${ratingHover.rating}/10`}

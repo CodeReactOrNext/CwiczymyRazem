@@ -1,6 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { firebaseGetUserDocument } from "utils/firebase/client/firebase.utils";
-
 import { firebaseCreateUserDocumentFromAuth } from "utils/user/createUserFromAuth";
 
 export default async function handler(

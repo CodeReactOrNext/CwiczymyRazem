@@ -1,11 +1,11 @@
-import { DragDropContext, DropResult } from "@hello-pangea/dnd";
+import type { DropResult } from "@hello-pangea/dnd";
+import { DragDropContext } from "@hello-pangea/dnd";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import { Song, SongStatus } from "utils/firebase/client/firebase.types";
+import type { Song, SongStatus } from "utils/firebase/client/firebase.types";
 import { getUserSongs } from "utils/firebase/client/firebase.utils";
 
 interface SongLearningSectionProps {

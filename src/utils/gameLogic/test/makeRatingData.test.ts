@@ -3,11 +3,12 @@ import {
   HABBITS_POINTS_VALUE,
   TIME_POINTS_VALUE,
 } from "constants/ratingValue";
-import {
+import type {
   HabbitsType,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
-import { expect, describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { makeRatingData } from "../makeRatingData";
 
 describe("makeRatingData", () => {

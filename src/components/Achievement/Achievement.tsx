@@ -1,12 +1,11 @@
-import { useTranslation } from "react-i18next";
-
-import { ToolTip } from "components/UI";
-
+import type {
+  AchievementList} from "assets/achievements/achievementsData";
 import {
-  AchievementList,
   achievementsData,
 } from "assets/achievements/achievementsData";
 import { achievementsRarity } from "assets/achievements/achievementsRarity";
+import { ToolTip } from "components/UI";
+import { useTranslation } from "react-i18next";
 
 const Achievement = ({ id }: { id: AchievementList }) => {
   const { t } = useTranslation("achievements");

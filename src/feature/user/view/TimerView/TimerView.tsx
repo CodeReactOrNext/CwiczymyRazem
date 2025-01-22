@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
-import Router from "next/router";
-
-import TimerLayout from "layouts/TimerLayout";
-
-import useTimer from "hooks/useTimer";
-import { SkillsType } from "types/skillsTypes";
-import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectTimerData, updateTimerTime } from "feature/user/store/userSlice";
+import useTimer from "hooks/useTimer";
+import TimerLayout from "layouts/TimerLayout";
+import Router from "next/router";
+import { useEffect,useState } from "react";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import type { SkillsType } from "types/skillsTypes";
 
 const TimerView = () => {
   const [chosenSkill, setChosenSkill] = useState<SkillsType | null>(null);

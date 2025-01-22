@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import {
   Card,
   CardContent,
@@ -8,14 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "assets/components/ui/card";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "assets/components/ui/select";
 import {
   ChartContainer,
   ChartLegend,
@@ -23,8 +14,17 @@ import {
   ChartTooltip,
 } from "assets/components/ui/chart";
 import { Checkbox } from "assets/components/ui/checkbox";
-import { addZeroToTime, convertMsToHMObject } from "utils/converter";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "assets/components/ui/select";
 import { useTranslation } from "next-i18next";
+import * as React from "react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { addZeroToTime, convertMsToHMObject } from "utils/converter";
 
 interface ActivityChartProps {
   data: {

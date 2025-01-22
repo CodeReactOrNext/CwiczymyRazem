@@ -4,7 +4,7 @@ import TechniqueIcon from "components/Icon/TechniqueIcon";
 import TheoryIcon from "components/Icon/TheoryIcon";
 import IconBox from "components/IconBox";
 import { Divider } from "components/UI";
-import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
+import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import { FaClipboardList, FaClock } from "react-icons/fa";
 import { convertMsToHM } from "utils/converter";
 

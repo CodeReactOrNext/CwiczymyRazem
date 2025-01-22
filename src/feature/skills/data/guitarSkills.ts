@@ -1,24 +1,21 @@
-import { GuitarSkill } from "feature/skills/skills.types";
+import type { GuitarSkill } from "feature/skills/skills.types";
 import {
-  GiMusicalScore,
-  GiMetronome,
-  GiMusicSpell,
-  GiSoundWaves,
-  GiMusicalNotes,
-  GiHandOk,
-  GiSpellBook,
-  GiHeadShot,
+  GiBookmarklet,
   GiCompactDisc,
   GiGuitarHead,
-  GiPencilBrush,
-  GiVibratingBall,
-  GiBookmarklet,
-  GiDrumKit,
-  GiQuillInk,
-  GiSteelClaws,
-  GiAbstract010,
-  GiSoundOn,
+  GiHandOk,
+  GiHeadShot,
+  GiMetronome,
   GiMusicalKeyboard,
+  GiMusicalNotes,
+  GiMusicalScore,
+  GiMusicSpell,
+  GiQuillInk,
+  GiSoundOn,
+  GiSoundWaves,
+  GiSpellBook,
+  GiSteelClaws,
+  GiVibratingBall,
 } from "react-icons/gi";
 
 export const guitarSkills: GuitarSkill[] = [

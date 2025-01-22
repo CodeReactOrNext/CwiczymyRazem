@@ -1,38 +1,49 @@
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import type { AchievementList } from "assets/achievements/achievementsData";
+import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
+import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
+import type { SortByType } from "feature/leadboard/types";
+import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import {
+  createUserWithEmailAndPassword,
+  EmailAuthProvider,
   getAuth,
   GoogleAuthProvider,
-  signInWithPopup,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  updateProfile,
-  updateEmail,
   reauthenticateWithCredential,
-  EmailAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateEmail,
   updatePassword,
+  updateProfile,
 } from "firebase/auth";
 import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc,
-  getDocs,
-  collection,
-  orderBy,
-  limit,
-  query,
-  setDoc,
-  deleteDoc,
-  getCountFromServer,
-  startAfter,
   addDoc,
   arrayUnion,
-  where,
-  Timestamp,
+  collection,
+  deleteDoc,
+  doc,
+  getCountFromServer,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
   onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  startAfter,
+  Timestamp,
+  updateDoc,
+  where,
 } from "firebase/firestore";
-import {
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import type { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
+import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
+import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
+import { shuffleUid } from "utils/user/shuffleUid";
+
+import { firebaseApp } from "./firebase.cofig";
+import type {
   FirebaseEventsInteface,
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
@@ -42,16 +53,6 @@ import {
   Song,
   SongStatus,
 } from "./firebase.types";
-import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
-import { firebaseApp } from "./firebase.cofig";
-import { shuffleUid } from "utils/user/shuffleUid";
-import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
-import { GuitarSkill, UserSkills } from "feature/skills/skills.types";
-import { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
-import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
-import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
-import { AchievementList } from "assets/achievements/achievementsData";
-import { SortByType } from "feature/leadboard/types";
 
 const provider = new GoogleAuthProvider();
 
@@ -490,71 +491,6 @@ export const rateSongDifficulty = async (
   }
 };
 
-export const getSongs = async (
-  sortBy: string,
-  sortDirection: "asc" | "desc",
-  searchQuery: string,
-  page: number,
-  itemsPerPage: number
-) => {
-  try {
-    let baseQuery = query(collection(db, "songs"));
-
-    // Apply search if provided
-    if (searchQuery) {
-      baseQuery = query(
-        baseQuery,
-        where("title", ">=", searchQuery),
-        where("title", "<=", searchQuery + "\uf8ff")
-      );
-    }
-
-    // Apply sorting
-    if (sortBy !== "avgDifficulty" && sortBy !== "learners") {
-      baseQuery = query(baseQuery, orderBy(sortBy, sortDirection));
-    }
-
-    // Get total count
-    const totalSnapshot = await getCountFromServer(baseQuery);
-    const total = totalSnapshot.data().count;
-
-    // Get all documents up to the start of the requested page
-    const pageQuery = query(baseQuery, limit(page * itemsPerPage));
-
-    const snapshot = await getDocs(pageQuery);
-    const allDocs = snapshot.docs;
-
-    // Get the documents for the current page
-    const startIndex = (page - 1) * itemsPerPage;
-    const pageDocs = allDocs.slice(startIndex, startIndex + itemsPerPage);
-
-    const songs = pageDocs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Song[];
-
-    // Handle custom sorting
-    if (sortBy === "avgDifficulty") {
-      songs.sort((a, b) => {
-        const avgA =
-          a.difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
-          (a.difficulties.length || 1);
-        const avgB =
-          b.difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
-          (b.difficulties.length || 1);
-        return sortDirection === "asc" ? avgA - avgB : avgB - avgA;
-      });
-    }
-
-    return {
-      songs,
-      total,
-    };
-  } catch (error) {
-    console.error("Error getting songs:", error);
-    throw error;
-  }
-};
 
 export const updateSongStatus = async (
   userId: string,
@@ -758,18 +694,14 @@ export const firebaseGetUserTooltipData = async (
   }
 };
 
-// Helper function to check if a skill can be upgraded
 export const canUpgradeSkill = (
   skill: GuitarSkill,
   userSkills: UserSkills
 ): boolean => {
-  // Check if skill exists
   if (!skill) return false;
 
-  const currentLevel = userSkills.unlockedSkills[skill.id] || 0;
   const pointsCost = 1;
 
-  // Check available points
   if (userSkills.availablePoints[skill.category] < pointsCost) {
     return false;
   }
@@ -777,7 +709,6 @@ export const canUpgradeSkill = (
   return true;
 };
 
-// Get current season
 export const getCurrentSeason = async () => {
   try {
     const now = new Date();

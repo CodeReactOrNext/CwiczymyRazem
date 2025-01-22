@@ -1,5 +1,6 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import { expect, describe, it, vi, beforeEach } from "vitest";
+import { fireEvent,render, screen } from "@testing-library/react";
+import { beforeEach,describe, expect, it, vi } from "vitest";
+
 import Chat from "../Chat";
 import { useChat } from "../hooks/useChat";
 

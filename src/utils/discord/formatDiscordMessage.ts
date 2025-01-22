@@ -1,10 +1,10 @@
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
-import {
+import { convertMsToHM } from "utils/converter";
+import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
 } from "utils/firebase/client/firebase.types";
-import { convertMsToHM } from "utils/converter";
+import { db } from "utils/firebase/client/firebase.utils";
 
 const getUserDisplayName = async (userId: string): Promise<string> => {
   try {
@@ -13,7 +13,7 @@ const getUserDisplayName = async (userId: string): Promise<string> => {
       return userDoc.data()?.displayName || userId;
     }
     return userId;
-  } catch (error) {
+  } catch  {
     return userId;
   }
 };

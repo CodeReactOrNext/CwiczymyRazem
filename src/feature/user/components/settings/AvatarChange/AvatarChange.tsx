@@ -1,16 +1,16 @@
-import { toast } from "sonner";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useAppDispatch, useAppSelector } from "store/hooks";
+import { Button } from "assets/components/ui/button";
 import Avatar from "components/Avatar";
-import { uploadUserAvatar } from "feature/user/store/userSlice.asyncThunk";
 import {
   selectIsFetching,
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
-import { Button } from "assets/components/ui/button";
+import { uploadUserAvatar } from "feature/user/store/userSlice.asyncThunk";
 import { Loader2 } from "lucide-react";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const AvatarChange = () => {
   const [avatarIsValid, setAvatarIsValid] = useState(false);

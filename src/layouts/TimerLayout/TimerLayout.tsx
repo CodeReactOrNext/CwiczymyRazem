@@ -1,21 +1,19 @@
-import Link from "next/link";
-import { useTranslation } from "react-i18next";
-
-import Stopwatch from "./components/Stopwatch";
+import { Button } from "assets/components/ui/button";
 import BeginnerMsg from "components/BeginnerMsg";
-import CategoryBox from "./components/CategoryBox";
-import { MdAccessTime } from "react-icons/md";
-
-import { SkillsType } from "types/skillsTypes";
-import { useTimerInterface } from "hooks/useTimer";
-import { convertMsToHM, calculatePercent } from "utils/converter";
-import { TimerInterface } from "types/api.types";
-import ExercisePlan from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
-import MainContainer from "components/MainContainer";
 import IconBox from "components/IconBox";
+import MainContainer from "components/MainContainer";
+import type { useTimerInterface } from "hooks/useTimer";
 import BlinkingDot from "layouts/TimerLayout/components/BlinkingDot";
 import { skillColors } from "layouts/TimerLayout/components/Stopwatch/Stopwatch";
-import { Button } from "assets/components/ui/button";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
+import { MdAccessTime } from "react-icons/md";
+import type { TimerInterface } from "types/api.types";
+import type { SkillsType } from "types/skillsTypes";
+import { calculatePercent,convertMsToHM } from "utils/converter";
+
+import CategoryBox from "./components/CategoryBox";
+import Stopwatch from "./components/Stopwatch";
 
 interface TimerLayoutProps {
   timer: useTimerInterface;

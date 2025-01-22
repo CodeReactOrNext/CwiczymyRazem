@@ -1,7 +1,7 @@
-import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { GuitarSkill, UserSkills } from "feature/skills/skills.types";
-import { useTranslation } from "react-i18next";
 import { cn } from "assets/lib/utils";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
+import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
+import { useTranslation } from "react-i18next";
 
 interface SkillTreeProps {
   userSkills: UserSkills;

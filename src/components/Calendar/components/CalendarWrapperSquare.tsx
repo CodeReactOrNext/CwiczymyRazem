@@ -1,9 +1,9 @@
 import { useState } from "react";
-
-import ExerciseShortInfo from "./ExerciseShortInfo";
 import ReactTooltip from "react-tooltip";
+import type { ReportListInterface } from "types/api.types";
+
 import CalendarSquare from "./CalendarSquare/CalendarSquare";
-import { ReportListInterface } from "types/api.types";
+import ExerciseShortInfo from "./ExerciseShortInfo";
 
 interface CalendarWrapperSquareProps {
   index: number;

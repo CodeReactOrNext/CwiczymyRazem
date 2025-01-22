@@ -1,14 +1,13 @@
 import OldEffect from "components/OldEffect";
-import MainLoggedWrapper from "./components/MainLoggedWrapper";
-import UserHeader from "./components/UserHeader/UserHeader";
+import type { StatisticsDataInterface } from "types/api.types";
+import type { NavPagesTypes } from "wrappers/AuthLayoutWrapper";
+
 import DesktopHeaderWrapper from "./components/DesktopHeaderWrapper";
-import MobileHeaderWrapper from "./components/MobileHeaderWrapper";
-
 import LandingNav from "./components/LandingNav";
-
-import { StatisticsDataInterface } from "types/api.types";
-import { NavPagesTypes } from "wrappers/AuthLayoutWrapper";
-import { LandingNavObjectInterface } from "./components/LandingNav/LandingNav";
+import type { LandingNavObjectInterface } from "./components/LandingNav/LandingNav";
+import MainLoggedWrapper from "./components/MainLoggedWrapper";
+import MobileHeaderWrapper from "./components/MobileHeaderWrapper";
+import UserHeader from "./components/UserHeader/UserHeader";
 
 interface LandingLayoutProps {
   navigation: LandingNavObjectInterface;

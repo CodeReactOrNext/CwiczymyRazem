@@ -1,24 +1,3 @@
-import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { Song, SongStatus } from "utils/firebase/client/firebase.types";
-import { getUserSongs } from "utils/firebase/client/firebase.utils";
-import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "assets/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "assets/components/ui/select";
 import { Badge } from "assets/components/ui/badge";
 import {
   Pagination,
@@ -29,11 +8,31 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "assets/components/ui/pagination";
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "assets/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "assets/components/ui/table";
+import { SongRating } from "feature/songs/components/SongsTable/components/SongRating";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
-import { SongRating } from "feature/songs/components/SongsTable/components/SongRating";
 import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { useEffect,useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppSelector } from "store/hooks";
+import type { Song, SongStatus } from "utils/firebase/client/firebase.types";
+import { getUserSongs } from "utils/firebase/client/firebase.utils";
 
 interface SongsTableProps {
   songs: Song[];

@@ -1,15 +1,15 @@
-import Head from "next/head";
-import { Provider } from "react-redux";
+import "styles/globals.css";
+
 import type { AppProps } from "next/app";
+import { Inter, Teko } from "next/font/google";
+import Head from "next/head";
+import Script from "next/script";
 import { appWithTranslation } from "next-i18next";
+import NextTopLoader from "nextjs-toploader";
+import { Provider } from "react-redux";
+import { Toaster } from "sonner";
 import { store } from "store/store";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
-import NextTopLoader from "nextjs-toploader";
-
-import { Toaster } from "sonner";
-import { Inter, Teko } from "next/font/google";
-import Script from "next/script";
-import "styles/globals.css";
 
 const inter = Inter({
   subsets: ["latin"],

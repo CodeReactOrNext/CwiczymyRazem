@@ -1,12 +1,12 @@
+import { LanguageSwitch } from "components/UI";
+import HamburgerLayout from "layouts/HamburgerLayout";
+import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBars } from "react-icons/fa";
 
 import NavLink from "./component/NavLink";
-import HamburgerLayout from "layouts/HamburgerLayout";
-import { layoutVariant } from "layouts/MainLayout/MainLayout";
-import { LanguageSwitch } from "components/UI";
 
 interface MainNavigationProps {
   variant: layoutVariant;

@@ -1,12 +1,13 @@
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { motion } from "framer-motion";
 import PlanRow from "layouts/ExercisePlanLayout/PlanRow";
 import { useEffect, useState } from "react";
+import { FaSpinner } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
-import { SkillsType } from "types/skillsTypes";
+import type { SkillsType } from "types/skillsTypes";
 import { firebaseGetExercisePlan } from "utils/firebase/client/firebase.utils";
+
 import ExerciseTodo from "../ExerciseTodo/ExerciseTodo";
-import { motion } from "framer-motion";
-import { FaDumbbell, FaSpinner } from "react-icons/fa";
 
 export interface exerciseInterface {
   title: string;

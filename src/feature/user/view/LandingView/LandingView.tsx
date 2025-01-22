@@ -1,16 +1,14 @@
-import { useTranslation } from "react-i18next";
-
-import HeroView from "feature/hero/HeroView";
-import { ProfileLandingLayout } from "layouts/ProfileLayout";
-
-import { useAppSelector } from "store/hooks";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
-import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import { getUserStatsField } from "assets/stats/profileStats";
+import HeroView from "feature/hero/HeroView";
+import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
+import { ProfileLandingLayout } from "layouts/ProfileLayout";
+import { useTranslation } from "react-i18next";
+import { useAppSelector } from "store/hooks";
+import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 
 const LandingView = () => {
   const { t } = useTranslation("profile");
