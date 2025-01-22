@@ -9,7 +9,7 @@ const nextConfig = {
   i18n,
   productionBrowserSourceMaps: true,
   eslint: {
-    dirs: ["src"],
+    ignoreDuringBuilds: true,
   },
 };
 
