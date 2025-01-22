@@ -1,10 +1,10 @@
-import Avatar from "components/Avatar";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
+import Avatar from "components/Avatar";
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChat } from "feature/chat/hooks/useChat";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { UserTooltip } from "components/UserTooltip/UserTooltip";
 
 const Chat = () => {
   const {

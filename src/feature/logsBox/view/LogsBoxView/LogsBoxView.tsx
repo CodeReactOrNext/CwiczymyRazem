@@ -1,13 +1,11 @@
-import { FaSpinner } from "react-icons/fa";
-import { useState, useEffect } from "react";
-import { useAppSelector } from "store/hooks";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-
-import LogsBoxLayout from "layouts/LogsBoxLayout";
-
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import {
+import LogsBoxLayout from "layouts/LogsBoxLayout";
+import { useEffect,useState } from "react";
+import { useTranslation } from "react-i18next";
+import { FaSpinner } from "react-icons/fa";
+import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
+import type {
   FirebaseEventsInteface,
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,

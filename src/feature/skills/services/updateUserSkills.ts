@@ -1,5 +1,5 @@
-import { doc, runTransaction } from "firebase/firestore";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { doc, runTransaction } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const updateUserSkills = async (

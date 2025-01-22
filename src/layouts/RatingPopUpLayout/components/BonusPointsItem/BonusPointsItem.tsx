@@ -1,10 +1,11 @@
+import type { AchievementList } from "assets/achievements/achievementsData";
 import Achievement from "components/Achievement";
-import { AchievementList } from "assets/achievements/achievementsData";
-import { convertMsToHM } from "utils/converter";
-import { useTranslation } from "react-i18next";
-import { BonusPointsInterface } from "../../RatingPopUpLayout";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { MdUpgrade } from "react-icons/md";
+import { convertMsToHM } from "utils/converter";
+
+import type { BonusPointsInterface } from "../../RatingPopUpLayout";
 
 
 interface BonusPointsItemProps {

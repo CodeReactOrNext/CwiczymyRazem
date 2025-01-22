@@ -1,4 +1,6 @@
-import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
+import type { Action,ThunkAction } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
+
 import usersSlice from "../feature/user/store/userSlice";
 import { localStorageMiddleware } from "./localStorageMiddleware";
 

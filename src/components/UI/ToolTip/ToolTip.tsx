@@ -1,4 +1,5 @@
 import ReactTooltip from "react-tooltip";
+
 import styles from "./tooltip.module.css";
 
 const ToolTip = () => {

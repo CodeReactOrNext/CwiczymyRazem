@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
-import { useTranslation } from "react-i18next";
 import OldEffect from "components/OldEffect";
 import Fire_double from "public/static/images/svg/Fire_double";
+import { useTranslation } from "react-i18next";
 
 const NotFoundLayout = () => {
   const { t } = useTranslation("404");

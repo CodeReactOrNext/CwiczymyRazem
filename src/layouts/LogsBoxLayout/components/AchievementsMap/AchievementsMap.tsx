@@ -1,11 +1,10 @@
-import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
-import { ToolTip } from "components/UI";
-
+import type {
+  AchievementList} from "assets/achievements/achievementsData";
 import {
-  AchievementList,
   achievementsData,
 } from "assets/achievements/achievementsData";
+import { ToolTip } from "components/UI";
+import { motion } from "framer-motion";
 import AchievementCard from "layouts/ProfileLayout/components/Achievement/AchievementCard";
 
 interface AchievementsMapProps {

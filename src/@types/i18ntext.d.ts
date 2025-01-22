@@ -7,23 +7,23 @@
  */
 import "i18next";
 
-import type common from "../../public/locales/en/common.json";
-import type profile from "../../public/locales/en/profile.json";
-import type login from "../../public/locales/en/login.json";
-import type signup from "../../public/locales/en/signup.json";
-import type footer from "../../public/locales/en/footer.json";
-import type faq from "../../public/locales/en/faq.json";
-import type timer from "../../public/locales/en/timer.json";
-import type leadboard from "../../public/locales/en/leadboard.json";
-import type report from "../../public/locales/en/report.json";
-import type achievements from "../../public/locales/en/achievements.json";
 import type not_found from "../../public/locales/en/404.json";
-import type yup_errors from "../../public/locales/en/yup_errors.json";
-import type settings from "../../public/locales/en/settings.json";
-import type toast from "../../public/locales/en/toast.json";
-import type songs from "../../public/locales/en/songs.json";
-import type skills from "../../public/locales/en/skills.json";
+import type achievements from "../../public/locales/en/achievements.json";
 import type chat from "../../public/locales/en/chat.json";
+import type common from "../../public/locales/en/common.json";
+import type faq from "../../public/locales/en/faq.json";
+import type footer from "../../public/locales/en/footer.json";
+import type leadboard from "../../public/locales/en/leadboard.json";
+import type login from "../../public/locales/en/login.json";
+import type profile from "../../public/locales/en/profile.json";
+import type report from "../../public/locales/en/report.json";
+import type settings from "../../public/locales/en/settings.json";
+import type signup from "../../public/locales/en/signup.json";
+import type skills from "../../public/locales/en/skills.json";
+import type songs from "../../public/locales/en/songs.json";
+import type timer from "../../public/locales/en/timer.json";
+import type toast from "../../public/locales/en/toast.json";
+import type yup_errors from "../../public/locales/en/yup_errors.json";
 
 interface I18nNamespaces {
   common: typeof common;

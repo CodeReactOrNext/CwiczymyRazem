@@ -1,10 +1,5 @@
-import { useTranslation } from "react-i18next";
-import MainContainer from "components/MainContainer";
-import SongsTable from "feature/songs/components/SongsTable/SongsTable";
-import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
-import { IoMdAddCircleOutline } from "react-icons/io";
 import {
   Select,
   SelectContent,
@@ -12,9 +7,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
-import { X } from "lucide-react";
-import { useSongs } from "feature/songs/hooks/useSongs";
+import MainContainer from "components/MainContainer";
+import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
+import SongsTable from "feature/songs/components/SongsTable/SongsTable";
+import { useSongs } from "feature/songs/hooks/useSongs";
+import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { IoMdAddCircleOutline } from "react-icons/io";
 
 const SongsView = () => {
   const { t } = useTranslation("songs");

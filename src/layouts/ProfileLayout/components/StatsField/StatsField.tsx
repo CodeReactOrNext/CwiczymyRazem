@@ -1,5 +1,5 @@
 import IconBox from "components/IconBox";
-import { IconType } from "react-icons/lib";
+import type { IconType } from "react-icons/lib";
 
 export interface StatsFieldProps {
   Icon: IconType;

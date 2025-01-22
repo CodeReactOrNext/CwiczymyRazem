@@ -1,11 +1,8 @@
-import type { NextPage } from "next";
-import { useTranslation } from "react-i18next";
-
 import FaqView from "feature/faq/view/FaqView";
-
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-
 import useAutoLogIn from "hooks/useAutoLogIn";
+import type { NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "react-i18next";
 import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 
 const FaqPage: NextPage = () => {

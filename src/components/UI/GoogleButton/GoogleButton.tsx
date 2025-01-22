@@ -1,8 +1,7 @@
-import { FcGoogle } from "react-icons/fc";
-
-import { useAppSelector } from "store/hooks";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { Loader2 } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { useAppSelector } from "store/hooks";
 
 interface GoogleButtonProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;

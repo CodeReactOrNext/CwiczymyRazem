@@ -1,9 +1,8 @@
+import { Button, buttonVariants } from "assets/components/ui/button";
+import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-
 import { useAppDispatch } from "store/hooks";
-import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
-import { Button, buttonVariants } from "assets/components/ui/button";
 
 interface UserNavProps {
   flexDirection?: "row" | "col";

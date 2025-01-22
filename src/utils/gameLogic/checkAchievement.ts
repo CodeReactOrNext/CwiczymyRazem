@@ -1,8 +1,9 @@
-import {
+import type { AchievementList } from "assets/achievements/achievementsData";
+import type {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "types/api.types";
+import type { StatisticsDataInterface } from "types/api.types";
 
 import {
   checkArtist,
@@ -39,7 +40,6 @@ import {
   time2Check,
   time3Check,
 } from "./achievementMethods";
-import { AchievementList } from "assets/achievements/achievementsData";
 
 export const checkAchievement = (
   statistics: StatisticsDataInterface,

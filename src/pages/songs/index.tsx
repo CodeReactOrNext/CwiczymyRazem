@@ -1,10 +1,10 @@
-import type { NextPage } from "next";
-import { useTranslation } from "react-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
-import useAutoLogIn from "hooks/useAutoLogIn";
 import SongsView from "feature/songs/SongsView";
+import useAutoLogIn from "hooks/useAutoLogIn";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
+import type { NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "react-i18next";
+import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 
 const SongsPage: NextPage = () => {
   const { t } = useTranslation("songs");

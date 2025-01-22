@@ -1,8 +1,9 @@
 import { statisticsInitial } from "constants/userStatisticsInitialData";
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "types/api.types";
+import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import type { StatisticsDataInterface } from "types/api.types";
 import { reportUpdateUserStats } from "utils/gameLogic/reportUpdateUserState";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { getPointsToLvlUp } from "../getPointsToLvlUp";
 
 describe("reportHandler", () => {

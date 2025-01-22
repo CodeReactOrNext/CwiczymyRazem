@@ -1,17 +1,17 @@
 import { Badge } from "assets/components/ui/badge";
-import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { Button } from "assets/components/ui/button";
-import { Plus } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
-import { useTranslation } from "react-i18next";
 import { cn } from "assets/lib/utils";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
+import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
+import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type SkillsNamespace = Record<string, Record<string, string>>;
 
@@ -153,9 +153,9 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
                 Available Points:
               </div>
               {Object.entries(userSkills.availablePoints).map(
-                ([category, points]) =>
+                ([category, points], index) =>
                   points > 0 && (
-                    <Badge>
+                    <Badge key={index}>
                       {points} {t(`skills:categories.${category}` as any)}
                     </Badge>
                   )

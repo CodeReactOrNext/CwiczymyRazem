@@ -1,6 +1,6 @@
 import Logo from "components/Logo";
 import MainNavigation from "components/MainNavigation";
-import { layoutVariant } from "layouts/MainLayout/MainLayout";
+import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 
 interface HeaderProps {
   variant: layoutVariant;

@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
+import { db } from "utils/firebase/client/firebase.utils";
 
 async function getTopSeasonalPlayers(seasonId: string, limit: number = 5) {
   const seasonalUsersRef = collection(db, "seasons", seasonId, "users");

@@ -1,10 +1,10 @@
+import { Button } from "assets/components/ui/button";
+import { selectIsFetching } from "feature/user/store/userSlice";
+import { restartUserStats } from "feature/user/store/userSlice.asyncThunk";
+import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { restartUserStats } from "feature/user/store/userSlice.asyncThunk";
-import { selectIsFetching } from "feature/user/store/userSlice";
-import { Button } from "assets/components/ui/button";
-import { Loader2 } from "lucide-react";
 
 const StatisticsRestart = () => {
   const { t } = useTranslation(["common", "toast", "settings"]);

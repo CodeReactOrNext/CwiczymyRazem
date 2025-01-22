@@ -1,14 +1,14 @@
-import Logo from "components/Logo";
 import Avatar from "components/Avatar";
-import UserNav from "components/UserNav";
+import CopyLinkProfile from "components/CopyLinkProfile";
 import LevelBar from "components/LevelBar";
+import Logo from "components/Logo";
+import { LanguageSwitch } from "components/UI";
+import UserNav from "components/UserNav";
+import type { StatisticsDataInterface } from "types/api.types";
+import { convertMsToHM } from "utils/converter";
+
 import NavDecoration from "./components/NavDecoration";
 import WelcomeMessage from "./components/WelcomeMessage";
-import { LanguageSwitch } from "components/UI";
-
-import { StatisticsDataInterface } from "types/api.types";
-import CopyLinkProfile from "components/CopyLinkProfile";
-import { convertMsToHM } from "utils/converter";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;

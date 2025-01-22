@@ -1,5 +1,5 @@
 import { useField } from "formik";
-import { IconType } from "react-icons";
+import type { IconType } from "react-icons";
 
 const InputTime = ({ name, Icon }: { Icon: IconType; name: string }) => {
   const [fieldHours, meta] = useField(name);

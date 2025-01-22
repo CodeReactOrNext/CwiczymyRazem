@@ -1,12 +1,10 @@
-import type { NextPage } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-
 import HeroView from "feature/hero/HeroView";
+import LandingView from "feature/user/view/LandingView";
+import useAutoLogIn from "hooks/useAutoLogIn";
 import MainLayout from "layouts/MainLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
-
-import useAutoLogIn from "hooks/useAutoLogIn";
-import LandingView from "feature/user/view/LandingView";
+import type { NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 const Home: NextPage = () => {
   const { isLoggedIn, isLoading } = useAutoLogIn({

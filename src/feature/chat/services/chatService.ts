@@ -1,15 +1,15 @@
+import { CHAT_LIMIT_MESSAGE } from "feature/chat/chat.setting";
+import type { ChatMessage } from "feature/chat/types/chat.types";
 import {
+  addDoc,
   collection,
-  query,
-  orderBy,
   limit,
   onSnapshot,
-  addDoc,
+  orderBy,
+  query,
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import { CHAT_LIMIT_MESSAGE } from "feature/chat/chat.setting";
-import { ChatMessage } from "feature/chat/types/chat.types";
 
 export const fetchChatMessages = (
   callback: (messages: ChatMessage[]) => void

@@ -1,9 +1,9 @@
-import { inputTimeConverter } from "utils/converter";
-import { StatisticsDataInterface } from "types/api.types";
-import {
+import type {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
+import type { StatisticsDataInterface } from "types/api.types";
+import { inputTimeConverter } from "utils/converter";
 
 export const time1Check = (statistics: StatisticsDataInterface) => {
   const { time } = statistics;
@@ -13,6 +13,8 @@ export const time1Check = (statistics: StatisticsDataInterface) => {
   if (totalTime >= 36000000) {
     return "time_1";
   }
+  
+  return undefined;
 };
 export const time2Check = (statistics: StatisticsDataInterface) => {
   const { time } = statistics;

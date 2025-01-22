@@ -1,8 +1,8 @@
-import Header from "./components/Header";
 import OldEffect from "components/OldEffect";
+
 import ContentBox from "./components/ContentBox";
+import Header from "./components/Header";
 import SubtitleBar from "./components/SubtitleBar";
-import MainLoggedWrapper from "layouts/MainLoggedLayout/components/MainLoggedWrapper";
 
 export type layoutVariant = "primary" | "secondary" | "landing";
 

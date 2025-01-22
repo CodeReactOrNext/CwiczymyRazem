@@ -1,25 +1,21 @@
-import { useTranslation } from "react-i18next";
-import { FaSoundcloud, FaYoutube } from "react-icons/fa";
-import { useState, useEffect } from "react";
-
 import Avatar from "components/Avatar";
 import Calendar from "components/Calendar";
-import LevelBar from "components/LevelBar";
 import DaySince from "components/DaySince/DaySince";
-import StatisticBar from "./components/StatisticBar";
-import StatsField, { StatsFieldProps } from "./components/StatsField";
-import AchievementWrapper from "./components/Achievement/AchievementWrapper";
-
-import { convertMsToHM } from "utils/converter";
-import { ProfileInterface } from "types/ProfileInterface";
+import LevelBar from "components/LevelBar";
 import MainContainer from "components/MainContainer";
-import { getUserSongs } from "utils/firebase/client/firebase.utils";
-import { Timestamp } from "firebase/firestore";
-import { Song } from "utils/firebase/client/firebase.types";
-import { useCalendar } from "components/Calendar/useCalendar";
-import { SkillTreeCards } from "feature/skills/SkillTreeCards";
-import { UserSkills } from "feature/skills/skills.types";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
+import type { UserSkills } from "feature/skills/skills.types";
+import { SkillTreeCards } from "feature/skills/SkillTreeCards";
+import { useEffect,useState } from "react";
+import { useTranslation } from "react-i18next";
+import { FaSoundcloud, FaYoutube } from "react-icons/fa";
+import type { ProfileInterface } from "types/ProfileInterface";
+import { convertMsToHM } from "utils/converter";
+
+import AchievementWrapper from "./components/Achievement/AchievementWrapper";
+import StatisticBar from "./components/StatisticBar";
+import type { StatsFieldProps } from "./components/StatsField";
+import StatsField from "./components/StatsField";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];

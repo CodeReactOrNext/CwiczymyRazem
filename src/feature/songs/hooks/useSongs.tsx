@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
-import { Song } from "utils/firebase/client/firebase.types";
-import { getSongs, getUserSongs } from "utils/firebase/client/firebase.utils";
-import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useEffect, useRef,useState } from "react";
+import { useAppSelector } from "store/hooks";
+import type { Song } from "utils/firebase/client/firebase.types";
+import { getSongs, getUserSongs } from "utils/firebase/client/firebase.utils";
 
 const ITEMS_PER_PAGE = 50;
 

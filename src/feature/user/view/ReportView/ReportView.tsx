@@ -1,55 +1,50 @@
-import { Formik } from "formik";
-import { toast } from "sonner";
-import { useEffect, useState } from "react";
-import { IoMdHand } from "react-icons/io";
-import { MdSchool } from "react-icons/md";
-import { FaBrain, FaMusic, FaTimesCircle } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
-
-import { useTranslation } from "react-i18next";
-import { i18n } from "next-i18next";
-
-import RatingPopUpLayout from "layouts/RatingPopUpLayout";
-import ReportFormLayout from "layouts/ReportFormLayout";
-import { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
-import { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
-import {
-  ErrorBox,
-  InputTime,
-  TimeInputBox,
-  HealthHabbitsBox,
-  AcceptExceedingPopUp,
-  ReportCategoryWrapper,
-} from "layouts/ReportFormLayout/components";
-
-import { Input } from "components/UI";
+import { Button } from "assets/components/ui/button";
 import Backdrop from "components/Backdrop";
 import BeginnerMsg from "components/BeginnerMsg";
-
-import { useAppDispatch, useAppSelector } from "store/hooks";
-import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
+import { Input } from "components/UI";
+import { MAX_DAYS_BACK } from "constants/gameSettings";
 import {
-  selectIsFetching,
-  selectUserAuth,
   selectCurrentUserStats,
+  selectIsFetching,
   selectPreviousUserStats,
   selectRaitingData,
   selectTimerData,
+  selectUserAuth,
 } from "feature/user/store/userSlice";
+import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { upgradeSkill } from "feature/user/store/userSlice.asyncThunk";
-
-import { RaportSchema } from "./helpers/RaportShcema";
-import { ReportFormikInterface } from "./ReportView.types";
-import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
+import { Formik } from "formik";
+import { AnimatePresence,motion } from "framer-motion";
+import RatingPopUpLayout from "layouts/RatingPopUpLayout";
+import ReportFormLayout from "layouts/ReportFormLayout";
 import {
-  getDateFromPast,
+  AcceptExceedingPopUp,
+  ErrorBox,
+  HealthHabbitsBox,
+  InputTime,
+  ReportCategoryWrapper,
+  TimeInputBox,
+} from "layouts/ReportFormLayout/components";
+import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
+import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
+import { Loader2 } from "lucide-react";
+import { i18n } from "next-i18next";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { FaBrain, FaMusic, FaTimesCircle } from "react-icons/fa";
+import { IoMdHand } from "react-icons/io";
+import { MdSchool } from "react-icons/md";
+import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import {
   convertMsToHMObject,
+  getDateFromPast,
   inputTimeConverter,
 } from "utils/converter";
 
-import { MAX_DAYS_BACK } from "constants/gameSettings";
-import { Button } from "assets/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
+import { RaportSchema } from "./helpers/RaportShcema";
+import type { ReportFormikInterface } from "./ReportView.types";
 
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 

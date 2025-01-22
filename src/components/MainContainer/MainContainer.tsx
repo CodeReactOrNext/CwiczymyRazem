@@ -1,6 +1,5 @@
-import React from "react";
-import { motion } from "framer-motion";
 import HeadDecoration from "layouts/ProfileLayout/components/HeadDecoration";
+import React from "react";
 
 interface MainContainerProps {
   children: React.ReactNode;

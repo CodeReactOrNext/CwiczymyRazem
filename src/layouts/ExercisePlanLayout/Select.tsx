@@ -1,5 +1,5 @@
-import { Field, useField } from "formik";
-import { IconType } from "react-icons";
+import { useField } from "formik";
+import type { IconType } from "react-icons";
 
 const Select = ({ name, Icon }: { name: string; Icon: IconType }) => {
   const [field] = useField(name);

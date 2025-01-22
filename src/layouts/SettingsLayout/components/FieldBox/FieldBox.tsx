@@ -1,9 +1,8 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "components/UI";
 import { Loader2 } from "lucide-react";
-
 import { useTranslation } from "react-i18next";
-import { IconType } from "react-icons";
+import type { IconType } from "react-icons";
 
 export interface FieldBoxProps {
   title: string;

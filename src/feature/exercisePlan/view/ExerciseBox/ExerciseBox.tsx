@@ -1,19 +1,20 @@
-import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
+import { Button } from "assets/components/ui/button";
+import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import ExercisePlanLayout from "layouts/ExercisePlanLayout/ExercisePlanLayout";
 import PlanRowEdit from "layouts/ExercisePlanLayout/LogBoxSection/PlanRowEdit";
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
+import { IoIosReturnLeft } from "react-icons/io";
 import { useAppSelector } from "store/hooks";
 import {
   firebaseDeleteExercisePlan,
   firebaseGetExercisePlan,
 } from "utils/firebase/client/firebase.utils";
+
 import ExerciseAdd from "../ExerciseAdd";
-import ExercisePlanLayout from "layouts/ExercisePlanLayout/ExercisePlanLayout";
 import ExerciseEdit from "../ExerciseAdd/ExerciseEdit";
-import { Button } from "assets/components/ui/button";
-import { IoIosReturnLeft } from "react-icons/io";
-import { Loader2 } from "lucide-react";
 
 interface ExercisesBoxShow {
   index?: number;

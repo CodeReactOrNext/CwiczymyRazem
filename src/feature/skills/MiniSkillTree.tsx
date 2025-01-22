@@ -1,17 +1,17 @@
 import { Badge } from "assets/components/ui/badge";
-import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { Button } from "assets/components/ui/button";
-import { Plus } from "lucide-react";
 import { cn } from "assets/lib/utils";
-import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
-import { useState } from "react";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import { updateUserSkills } from "feature/skills/services/updateUserSkills";
+import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
+import { useEffect } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppSelector } from "store/hooks";
 
 interface MiniSkillTreeProps {
   highlightCategories?: string[];
