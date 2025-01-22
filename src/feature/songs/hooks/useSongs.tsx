@@ -1,8 +1,9 @@
+import { getSongs } from "feature/songs/services/songService";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useEffect, useRef,useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { Song } from "utils/firebase/client/firebase.types";
-import { getSongs, getUserSongs } from "utils/firebase/client/firebase.utils";
+import { getUserSongs } from "utils/firebase/client/firebase.utils";
 
 const ITEMS_PER_PAGE = 50;
 
@@ -19,6 +20,8 @@ export const useSongs = () => {
   });
 
   const [isLoading, setIsLoading] = useState(true);
+  const [debounceLoading, setIsDebounceLoading] = useState(true);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
@@ -79,12 +82,14 @@ export const useSongs = () => {
     } catch (error) {
       console.error("Error loading songs:", error);
     } finally {
+      setIsDebounceLoading(false);
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadSongs();
+    setIsDebounceLoading(true);
+    loadSongs(true);
   }, [debouncedSearchQuery, page]);
 
   const loadUserSongs = async () => {
@@ -179,6 +184,7 @@ export const useSongs = () => {
     setSearchQuery,
     setIsModalOpen,
     setStatusFilter,
+    debounceLoading,
     difficultyFilter,
     handlePageChange,
     handleClearFilters,

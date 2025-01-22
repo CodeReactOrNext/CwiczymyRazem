@@ -12,7 +12,7 @@ import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
 import SongsTable from "feature/songs/components/SongsTable/SongsTable";
 import { useSongs } from "feature/songs/hooks/useSongs";
-import { X } from "lucide-react";
+import { LoaderCircle, Search, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
@@ -39,6 +39,7 @@ const SongsView = () => {
     setUserSongs,
     refreshSongs,
     refreshSongsWithoutLoading,
+    debounceLoading,
   } = useSongs();
 
   return (
@@ -52,11 +53,21 @@ const SongsView = () => {
         />
         <div className='mb-4 mt-8 flex flex-col gap-4 sm:items-center sm:justify-between md:flex-row'>
           <div className='flex flex-1 items-center gap-4'>
-            <div className='flex-1'>
+            <div className='max-w-xs flex-1'>
               <Input
                 type='text'
+                startIcon={
+                  <Search size={18} className='text-muted-foreground' />
+                }
+                endIcon={
+                  debounceLoading ? (
+                    <LoaderCircle
+                      size={18}
+                      className='animate-spin text-muted-foreground'
+                    />
+                  ) : undefined
+                }
                 placeholder={t("search_songs")}
-                className='w-full max-w-xs'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
