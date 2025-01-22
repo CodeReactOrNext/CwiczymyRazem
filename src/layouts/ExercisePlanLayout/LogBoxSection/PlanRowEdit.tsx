@@ -5,7 +5,7 @@ import TheoryIcon from "components/Icon/TheoryIcon";
 import IconBox from "components/IconBox";
 import { Divider } from "components/UI";
 import ButtonIcon from "components/UI/ButtonIcon";
-import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
+import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import {
   FaClipboardList,
   FaClock,

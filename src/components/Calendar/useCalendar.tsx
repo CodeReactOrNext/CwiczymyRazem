@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import type { ReportListInterface } from "types/api.types";
 import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";
-import { ReportListInterface } from "types/api.types";
 
 type PartiallyRequired<T, K extends keyof T> = Omit<T, K> &
   Required<Pick<T, K>>;

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import { Song } from "utils/firebase/client/firebase.types";
+import type { Song } from "utils/firebase/client/firebase.types";
 import { rateSongDifficulty } from "utils/firebase/client/firebase.utils";
 
 interface SongRatingInterface {

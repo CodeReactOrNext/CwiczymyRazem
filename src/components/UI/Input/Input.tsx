@@ -1,7 +1,7 @@
 import { useField } from "formik";
+import type { TFuncKey } from "i18next";
 import { useTranslation } from "react-i18next";
-import { IconType } from "react-icons/lib";
-import { TFuncKey } from "i18next";
+import type { IconType } from "react-icons/lib";
 
 export interface InputProps {
   Icon?: IconType;

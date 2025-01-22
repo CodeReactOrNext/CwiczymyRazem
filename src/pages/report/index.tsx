@@ -1,13 +1,10 @@
-import type { NextPage } from "next";
-import { useTranslation } from "react-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-
-import PageLoadingLayout from "layouts/PageLoadingLayout";
-
-import useAutoLogIn from "hooks/useAutoLogIn";
 import ReportView from "feature/user/view/ReportView";
+import useAutoLogIn from "hooks/useAutoLogIn";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
+import type { NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "react-i18next";
 import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
-import { i18n } from "next-i18next";
 
 const ReportPage: NextPage = () => {
   const { t } = useTranslation("report");

@@ -1,5 +1,5 @@
+import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 import React from "react";
-import { layoutVariant } from "layouts/MainLayout/MainLayout";
 interface ContentBoxProps {
   variant: layoutVariant;
   children: React.ReactNode;

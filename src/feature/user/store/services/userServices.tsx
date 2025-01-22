@@ -1,10 +1,9 @@
 import axios from "axios";
-import { User } from "firebase/auth";
-
-import {
+import type { User } from "firebase/auth";
+import type {
   FetchedReportDataInterface,
-  UserDataInterface,
   updateReprotInterface,
+  UserDataInterface,
 } from "types/api.types";
 
 export const fetchUserData = async (user: User) =>

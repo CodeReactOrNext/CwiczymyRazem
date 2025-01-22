@@ -1,24 +1,22 @@
-import { useState, useEffect } from "react";
+import type { AchievementList } from "assets/achievements/achievementsData";
+import { changelogEntries } from "changelogEntries";
+import { useUnreadMessages } from "hooks/useUnreadMessages";
+import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
+import {useState } from "react";
 import { useTranslation } from "react-i18next";
-
-import Logs from "./components/Logs";
-import AchievementsMap from "./components/AchievementsMap";
-import ExerciseBox from "../../feature/exercisePlan/view/ExerciseBox";
-
-import { AchievementList } from "assets/achievements/achievementsData";
-import {
+import { FaGuitar, FaTasks } from "react-icons/fa";
+import { IoChatboxEllipses } from "react-icons/io5";
+import { TbNews } from "react-icons/tb";
+import type {
   FirebaseEventsInteface,
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
 } from "utils/firebase/client/firebase.types";
-import { TbNews } from "react-icons/tb";
-import { FaGuitar, FaMedal, FaTasks } from "react-icons/fa";
-import Changelog from "./components/Changelog";
-import { changelogEntries } from "changelogEntries";
-import { IoChatboxEllipses } from "react-icons/io5";
+
 import Chat from "../../feature/chat/Chat";
-import { useUnreadMessages } from "hooks/useUnreadMessages";
-import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
+import ExerciseBox from "../../feature/exercisePlan/view/ExerciseBox";
+import Changelog from "./components/Changelog";
+import Logs from "./components/Logs";
 
 export interface LogsBoxLayoutProps {
   logs: (FirebaseLogsSongsInterface | FirebaseLogsInterface)[];

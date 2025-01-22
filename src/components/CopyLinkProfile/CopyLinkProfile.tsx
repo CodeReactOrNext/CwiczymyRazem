@@ -1,10 +1,9 @@
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { MdCopyAll } from "react-icons/md";
-
-import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
 import { Button } from "assets/components/ui/button";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "react-i18next";
+import { MdCopyAll } from "react-icons/md";
+import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
 
 const CopyLinkProfile = () => {
   const { t } = useTranslation(["common", "toast"]);

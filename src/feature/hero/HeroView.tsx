@@ -1,8 +1,7 @@
-import { useTranslation } from "react-i18next";
-
 import Footer from "components/Footer";
 import HeroLayout from "layouts/HeroLayout";
 import MainHeroLayout from "layouts/MainHeroLayout";
+import { useTranslation } from "react-i18next";
 
 const HeroView = () => {
   const { t } = useTranslation(["common", "footer", "profile"]);

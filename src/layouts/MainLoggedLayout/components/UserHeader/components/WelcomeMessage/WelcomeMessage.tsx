@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { FaClock, FaStar } from "react-icons/fa";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import {
   checkIsPracticeToday,

@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { ReportListInterface } from "types/api.types";
+import type { ReportListInterface } from "types/api.types";
 
 interface CalendarSquareProps {
   report: ReportListInterface | undefined;

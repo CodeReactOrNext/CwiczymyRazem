@@ -1,4 +1,4 @@
-import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
+import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import { Field, FieldArray, Form, Formik } from "formik";
 import Input from "layouts/ExercisePlanLayout/Input";
 import InputTime from "layouts/ExercisePlanLayout/InputTime";

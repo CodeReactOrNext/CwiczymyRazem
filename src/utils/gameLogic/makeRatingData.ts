@@ -1,6 +1,7 @@
-import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
 import { HABBITS_POINTS_VALUE, TIME_POINTS_VALUE } from "constants/ratingValue";
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+
+import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
 
 export const makeRatingData = (
   data: ReportFormikInterface,

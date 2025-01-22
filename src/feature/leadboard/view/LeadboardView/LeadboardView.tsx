@@ -1,22 +1,21 @@
-import { toast } from "sonner";
-import { useState, useEffect } from "react";
-import { useAppSelector } from "store/hooks";
-import { useTranslation } from "react-i18next";
-
-import PageLoadingLayout from "layouts/PageLoadingLayout";
-import LeadboardLayout from "../../LeadboardLayout";
-
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
+import type { SeasonDataInterface } from "types/api.types";
+import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 import {
   firebaseGetUsersExceriseRaport,
-  getTotalUsersCount,
-  getSeasonalLeaderboard,
-  getCurrentSeason,
   getAvailableSeasons,
+  getCurrentSeason,
+  getSeasonalLeaderboard,
+  getTotalUsersCount,
 } from "utils/firebase/client/firebase.utils";
-import { SortByType } from "../../types";
-import { SeasonDataInterface } from "types/api.types";
+
+import LeadboardLayout from "../../LeadboardLayout";
+import type { SortByType } from "../../types";
 
 const ITEMS_PER_PAGE = 30;
 
@@ -75,7 +74,7 @@ const LeadboardView = () => {
           toast(t("no_seasonal_data"));
         }
       }
-    } catch (error) {
+    } catch {
       toast(t("fetch_error"));
       setUsersData([]);
       setTotalUsers(0);
@@ -105,7 +104,7 @@ const LeadboardView = () => {
       } else {
         await loadGlobalLeaderboard(1);
       }
-    } catch (error) {
+    } catch {
       toast(t("view_change_error"));
     } finally {
       setIsLoading(false);
@@ -122,7 +121,7 @@ const LeadboardView = () => {
       setSelectedSeason(newSeasonId);
       setCurrentPage(1);
       await loadSeasonalLeaderboard(newSeasonId, 1);
-    } catch (error) {
+    } catch {
       toast(t("season_change_error"));
     } finally {
       setIsLoading(false);
@@ -146,7 +145,7 @@ const LeadboardView = () => {
             await loadSeasonalLeaderboard(activeSeason, 1);
           }
         }
-      } catch (error) {
+      } catch {
         toast(t("seasons_fetch_error"));
       }
     };

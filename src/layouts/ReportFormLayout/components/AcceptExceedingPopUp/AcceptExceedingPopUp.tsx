@@ -1,5 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import { SetStateAction } from "react";
+import type { SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { convertMsToHM } from "utils/converter";
 

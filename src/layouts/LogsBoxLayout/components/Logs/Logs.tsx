@@ -1,15 +1,15 @@
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { useUnreadMessages } from "hooks/useUnreadMessages";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { addZeroToTime } from "utils/converter";
+import { IoMdMusicalNotes } from "react-icons/io";
 import { IoPersonOutline } from "react-icons/io5";
-import {
+import { addZeroToTime } from "utils/converter";
+import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
 } from "utils/firebase/client/firebase.types";
-import { IoMdMusicalNotes } from "react-icons/io";
-import { useEffect, useRef } from "react";
-import { UserTooltip } from "components/UserTooltip/UserTooltip";
-import { useUnreadMessages } from "hooks/useUnreadMessages";
 
 // Type guard
 const isFirebaseLogsSongs = (

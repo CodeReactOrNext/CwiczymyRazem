@@ -1,14 +1,11 @@
-import { Formik } from "formik";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";
-
-import FieldBox from "layouts/SettingsLayout/components/FieldBox";
-
-import { mediaSchema } from "feature/user/view/SettingsView/Settings.schemas";
-import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { uploadUserSocialData } from "feature/user/store/userSlice.asyncThunk";
+import { mediaSchema } from "feature/user/view/SettingsView/Settings.schemas";
+import { Formik } from "formik";
+import FieldBox from "layouts/SettingsLayout/components/FieldBox";
+import { useTranslation } from "react-i18next";
+import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 export type MediaType = "youTubeLink" | "soundCloudLink" | "band";
 

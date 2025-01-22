@@ -1,7 +1,8 @@
-import ExercisePlanLayout from "layouts/ExercisePlanLayout/ExercisePlanLayout";
-import { exerciseInterface } from "../ExercisePlan/ExercisePlan";
-import { IoIosReturnLeft } from "react-icons/io";
 import { Button } from "assets/components/ui/button";
+import ExercisePlanLayout from "layouts/ExercisePlanLayout/ExercisePlanLayout";
+import { IoIosReturnLeft } from "react-icons/io";
+
+import type { exerciseInterface } from "../ExercisePlan/ExercisePlan";
 
 interface ExerciseTodoProps {
   exercisesArr: exerciseInterface[];

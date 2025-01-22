@@ -1,13 +1,12 @@
+import MainContainer from "components/MainContainer";
 import { useTranslation } from "react-i18next";
 
-import MainContainer from "components/MainContainer";
-import ViewToggle from "./components/ViewToggle/ViewToggle";
+import LeadboardRow from "./components/LeadboardRow/LeadboardRow";
+import Pagination from "./components/Pagination/Pagination";
 import SeasonSelect from "./components/SeasonSelect/SeasonSelect";
 import UserStats from "./components/UserStats/UserStats";
-import Pagination from "./components/Pagination/Pagination";
-import LeadboardRow from "./components/LeadboardRow/LeadboardRow";
-
-import { LeaderboardProps } from "./types";
+import ViewToggle from "./components/ViewToggle/ViewToggle";
+import type { LeaderboardProps } from "./types";
 
 const LeadboardLayout = ({
   usersData,

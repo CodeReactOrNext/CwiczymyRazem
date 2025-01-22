@@ -1,20 +1,18 @@
-import Link from "next/link";
-import { Form, Formik } from "formik";
-import { useTranslation } from "react-i18next";
-import { FaUserAlt, FaLock, FaAt, FaArrowLeft } from "react-icons/fa";
-
-import { Input, GoogleButton } from "components/UI";
-import FormLayout from "layouts/FormLayout";
-
-import { useAppDispatch, useAppSelector } from "store/hooks";
+import { Button } from "assets/components/ui/button";
+import { GoogleButton,Input } from "components/UI";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   createAccount,
   logInViaGoogle,
 } from "feature/user/store/userSlice.asyncThunk";
 import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
-import { Button } from "assets/components/ui/button";
+import { Form, Formik } from "formik";
+import FormLayout from "layouts/FormLayout";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
+import { FaArrowLeft,FaAt, FaLock, FaUserAlt } from "react-icons/fa";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 export interface SignUpCredentials {
   login: string;

@@ -1,4 +1,3 @@
-import { ToolTip } from "components/UI";
 import { RiQuestionLine } from "react-icons/ri";
 
 export interface QuestionMarkProps {

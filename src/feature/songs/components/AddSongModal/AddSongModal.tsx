@@ -1,20 +1,19 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { addSong } from "utils/firebase/client/firebase.utils";
-import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { Star } from "lucide-react";
+import { Button } from "assets/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "assets/components/ui/dialog";
-import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
+import { addSong } from "utils/firebase/client/firebase.utils";
 
 interface AddSongModalProps {
   isOpen: boolean;

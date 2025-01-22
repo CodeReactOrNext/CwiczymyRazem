@@ -1,8 +1,8 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { onSnapshot, collection, doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
-import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
+import { collection, doc, getDoc,onSnapshot } from "firebase/firestore";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
+import type { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
+import { db } from "utils/firebase/client/firebase.utils";
 
 const getUserDisplayName = async (userId: string): Promise<string> => {
   try {

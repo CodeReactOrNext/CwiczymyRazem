@@ -1,3 +1,5 @@
+import { achievementsData } from "assets/achievements/achievementsData";
+import type { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
 import { i18n } from "next-i18next";
 import {
   FaCalendarDay,
@@ -9,12 +11,8 @@ import {
   FaStar,
   FaStarHalf,
 } from "react-icons/fa";
-
-import { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
-
+import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
-import { StatisticsDataInterface } from "types/api.types";
-import { achievementsData } from "assets/achievements/achievementsData";
 
 export const getUserStatsField = (userStats: StatisticsDataInterface) => {
   const {

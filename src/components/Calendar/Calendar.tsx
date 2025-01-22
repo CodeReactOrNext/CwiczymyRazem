@@ -1,11 +1,9 @@
-import { FaSpinner } from "react-icons/fa";
-import { useEffect, useState } from "react";
-
-import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";
-import { useTranslation } from "react-i18next";
-
-import { ReportListInterface } from "types/api.types";
 import CalendarWrapperSquare from "components/Calendar/components/CalendarWrapperSquare";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { FaSpinner } from "react-icons/fa";
+import type { ReportListInterface } from "types/api.types";
+import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";
 
 type PartiallyRequired<T, K extends keyof T> = Omit<T, K> &
   Required<Pick<T, K>>;

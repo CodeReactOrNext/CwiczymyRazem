@@ -1,5 +1,5 @@
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import { StatisticsDataInterface } from "types/api.types";
+import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import type { StatisticsDataInterface } from "types/api.types";
 import { getDateFromPast, inputTimeConverter } from "utils/converter";
 import {
   checkAchievement,

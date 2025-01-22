@@ -1,4 +1,4 @@
-import { Middleware } from "@reduxjs/toolkit";
+import type { Middleware } from "@reduxjs/toolkit";
 
 export const localStorageMiddleware: Middleware =
   (store) => (next) => (action) => {

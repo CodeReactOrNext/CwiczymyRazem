@@ -1,38 +1,49 @@
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import type { AchievementList } from "assets/achievements/achievementsData";
+import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
+import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
+import type { SortByType } from "feature/leadboard/types";
+import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import {
+  createUserWithEmailAndPassword,
+  EmailAuthProvider,
   getAuth,
   GoogleAuthProvider,
-  signInWithPopup,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  updateProfile,
-  updateEmail,
   reauthenticateWithCredential,
-  EmailAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateEmail,
   updatePassword,
+  updateProfile,
 } from "firebase/auth";
 import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc,
-  getDocs,
-  collection,
-  orderBy,
-  limit,
-  query,
-  setDoc,
-  deleteDoc,
-  getCountFromServer,
-  startAfter,
   addDoc,
   arrayUnion,
-  where,
-  Timestamp,
+  collection,
+  deleteDoc,
+  doc,
+  getCountFromServer,
+  getDoc,
+  getDocs,
+  getFirestore,
+  limit,
   onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  startAfter,
+  Timestamp,
+  updateDoc,
+  where,
 } from "firebase/firestore";
-import {
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import type { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
+import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
+import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
+import { shuffleUid } from "utils/user/shuffleUid";
+
+import { firebaseApp } from "./firebase.cofig";
+import type {
   FirebaseEventsInteface,
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
@@ -42,16 +53,6 @@ import {
   Song,
   SongStatus,
 } from "./firebase.types";
-import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
-import { firebaseApp } from "./firebase.cofig";
-import { shuffleUid } from "utils/user/shuffleUid";
-import { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
-import { GuitarSkill, UserSkills } from "feature/skills/skills.types";
-import { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
-import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
-import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
-import { AchievementList } from "assets/achievements/achievementsData";
-import { SortByType } from "feature/leadboard/types";
 
 const provider = new GoogleAuthProvider();
 
@@ -758,18 +759,14 @@ export const firebaseGetUserTooltipData = async (
   }
 };
 
-// Helper function to check if a skill can be upgraded
 export const canUpgradeSkill = (
   skill: GuitarSkill,
   userSkills: UserSkills
 ): boolean => {
-  // Check if skill exists
   if (!skill) return false;
 
-  const currentLevel = userSkills.unlockedSkills[skill.id] || 0;
   const pointsCost = 1;
 
-  // Check available points
   if (userSkills.availablePoints[skill.category] < pointsCost) {
     return false;
   }
@@ -777,7 +774,6 @@ export const canUpgradeSkill = (
   return true;
 };
 
-// Get current season
 export const getCurrentSeason = async () => {
   try {
     const now = new Date();

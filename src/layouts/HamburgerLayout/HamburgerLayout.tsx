@@ -1,8 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
+import Logo from "components/Logo";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
-
-import Logo from "components/Logo";
 
 interface HamburgerProps {
   buttonOnClick: () => void;
