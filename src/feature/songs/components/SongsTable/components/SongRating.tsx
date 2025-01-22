@@ -103,7 +103,7 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
           );
         })}
         <div className='mt-1 text-sm text-muted-foreground'>
-          ({song.difficulties.length})
+          ({song.difficulties?.length})
         </div>{" "}
         <div className='mt-1 w-[30px] text-sm text-primary'>
           {ratingHover?.songId === song.id && `${ratingHover.rating}/10`}
