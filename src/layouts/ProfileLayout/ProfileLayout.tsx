@@ -6,16 +6,15 @@ import MainContainer from "components/MainContainer";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaSoundcloud, FaYoutube } from "react-icons/fa";
 import type { ProfileInterface } from "types/ProfileInterface";
-import { convertMsToHM } from "utils/converter";
-
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import StatisticBar from "./components/StatisticBar";
 import type { StatsFieldProps } from "./components/StatsField";
 import StatsField from "./components/StatsField";
+import { getYearsOfPlaying, convertMsToHM } from "utils/converter";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -37,12 +36,17 @@ const ProfileLayout = ({
     band,
     soundCloudLink,
     youTubeLink,
+    guitarStartDate,
   } = userData;
   const { time, achievements, lastReportDate } = statistics;
   const [userSkills, setUserSkills] = useState<UserSkills>();
 
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
+
+  const yearsOfPlaying = guitarStartDate
+    ? getYearsOfPlaying(guitarStartDate.toDate())
+    : null;
 
   useEffect(() => {
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
@@ -74,6 +78,12 @@ const ProfileLayout = ({
                 {createdAt.toDate().toLocaleDateString()}
               </span>
             </p>
+            {yearsOfPlaying && yearsOfPlaying > 0 && (
+              <p className='font-thin'>
+                {t("yearsOfPlaying")}{" "}
+                <span className='font-bold'>{yearsOfPlaying}</span>
+              </p>
+            )}
             {band && (
               <p className='font-thin'>
                 {t("band")} <span className='font-bold'>{band}</span>
