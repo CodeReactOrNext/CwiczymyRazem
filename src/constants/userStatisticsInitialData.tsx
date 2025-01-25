@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore";
 import type { StatisticsDataInterface } from "types/api.types";
 
 export const statisticsInitial: StatisticsDataInterface = {
@@ -23,6 +24,7 @@ export const statisticsInitial: StatisticsDataInterface = {
     learned: [],
     learning: [],
   },
+  guitarStartDate: Timestamp.now(),
   availablePoints: {
     technique: 0,
     theory: 0,

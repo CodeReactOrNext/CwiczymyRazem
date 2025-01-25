@@ -11,6 +11,7 @@ export interface FirebaseUserDataInterface {
   soundCloudLink?: string;
   youTubeLink?: string;
   band?: string;
+  guitarStartDate?: Timestamp;
   statistics: StatisticsDataInterface;
   songLists: UserSongLists;
 }

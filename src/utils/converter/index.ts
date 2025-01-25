@@ -1,3 +1,4 @@
+import { getYearsOfPlaying } from "utils/converter/getYearsOfPlaying";
 import { addZeroToTime } from "./addZeroToTime";
 import { calculatePercent } from "./calculatePercent";
 import { getDateFromPast } from "./getDateFromPast";
@@ -11,4 +12,5 @@ export {
   convertMsToHMObject,
   getDateFromPast,
   inputTimeConverter,
+  getYearsOfPlaying,
 };

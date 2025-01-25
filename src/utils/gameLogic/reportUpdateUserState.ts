@@ -65,8 +65,7 @@ export const reportUpdateUserStats = ({
       theory: time.theory + theoryTime,
       hearing: time.hearing + hearingTime,
       creativity: time.creativity + creativityTime,
-      longestSession:
-        time.longestSession < sumTime ? sumTime : time.longestSession,
+      longestSession: time.longestSession < sumTime ? sumTime : time.longestSession,
     },
     availablePoints: availablePoints,
     points: points + raiting.totalPoints,
@@ -74,12 +73,10 @@ export const reportUpdateUserStats = ({
     currentLevelMaxPoints: getPointsToLvlUp(updatedLevel + 1),
     sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
     habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
-    dayWithoutBreak:
-      dayWithoutBreak < updatedActualDayWithoutBreak
-        ? updatedActualDayWithoutBreak
-        : dayWithoutBreak,
-    maxPoints:
-      maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
+    dayWithoutBreak: dayWithoutBreak < updatedActualDayWithoutBreak
+      ? updatedActualDayWithoutBreak
+      : dayWithoutBreak,
+    maxPoints: maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
     actualDayWithoutBreak: isDateBackReport
       ? actualDayWithoutBreak
       : updatedActualDayWithoutBreak,
@@ -87,6 +84,7 @@ export const reportUpdateUserStats = ({
     lastReportDate: isDateBackReport
       ? lastReportDate
       : new Date().toISOString(),
+    guitarStartDate: null
   };
 
   const newAchievements = checkAchievement(updatedUserData, raiting, inputData);
