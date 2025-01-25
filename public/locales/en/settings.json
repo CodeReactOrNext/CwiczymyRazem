@@ -17,5 +17,16 @@
   "anonimity_info": "Do you want to hide your nickname in leaderboard?",
   "resolution_info": "Max resolution 250x250",
   "logged_in_via_google": "The password and email change option has been disabled because you logged in using Google.",
-  "bands": "Your bands"
+  "bands": "Your bands",
+  "guitarStartDate": {
+    "title": "When did you start playing guitar?",
+    "placeholder": "Pick a date",
+    "save": "Save",
+    "success": "Start date updated successfully!",
+    "error": "Failed to update start date"
+  },
+  "profile_settings": "Profile Settings",
+  "security": "Security Settings",
+  "additional_info": "Additional Information",
+  "danger_zone": "Danger Zone"
 }
