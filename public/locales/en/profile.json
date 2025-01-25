@@ -35,5 +35,6 @@
     "activity": "Activity",
     "songs": "Songs",
     "skills": "Skills"
-  }
+  },
+  "yearsOfPlaying": "Years of playing:"
 }

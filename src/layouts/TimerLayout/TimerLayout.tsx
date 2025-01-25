@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { MdAccessTime } from "react-icons/md";
 import type { TimerInterface } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
-import { calculatePercent,convertMsToHM } from "utils/converter";
+import { calculatePercent, convertMsToHMS } from "utils/converter";
 
 import CategoryBox from "./components/CategoryBox";
 import Stopwatch from "./components/Stopwatch";
@@ -66,7 +66,7 @@ const TimerLayout = ({
                 <IconBox Icon={MdAccessTime} small />
 
                 <span className=' m-1 font-sans text-2xl tracking-wider'>
-                  {convertMsToHM(sumTime)}
+                  {convertMsToHMS(sumTime)}
                 </span>
               </div>
             </div>

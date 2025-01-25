@@ -46,6 +46,7 @@ export interface StatisticsDataInterface {
   achievements: AchievementList[];
   actualDayWithoutBreak: number;
   lastReportDate: string;
+  guitarStartDate: Timestamp | null;
   songLists?: {
     wantToLearn: string[];
     learned: string[];

@@ -17,5 +17,16 @@
   "anonimity_info": "Czy chcesz aby twój nick pozostał anonimowy w ledbordzie?",
   "resolution_info": "Maks. rozdzielczość 250x250",
   "logged_in_via_google": "Opcja zmiany hasła i adresu mail została wyłączona ponieważ zalogowałeś się używając Google.",
-  "bands": "Twoje zespoły"
+  "bands": "Twoje zespoły",
+  "guitarStartDate": {
+    "title": "Kiedy zacząłeś grać na gitarze?",
+    "placeholder": "Wybierz datę",
+    "save": "Zapisz",
+    "success": "Data rozpoczęcia została zaktualizowana!",
+    "error": "Błąd podczas aktualizacji daty"
+  },
+  "profile_settings": "Ustawienia Profilu",
+  "security": "Ustawienia Bezpieczeństwa",
+  "additional_info": "Dodatkowe Informacje",
+  "danger_zone": "Strefa Zagrożenia"
 }

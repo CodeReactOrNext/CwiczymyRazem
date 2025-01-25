@@ -37,7 +37,10 @@ import {
   where,
 } from "firebase/firestore";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import type { SeasonDataInterface, StatisticsDataInterface } from "types/api.types";
+import type {
+  SeasonDataInterface,
+  StatisticsDataInterface,
+} from "types/api.types";
 import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
 import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
 import { shuffleUid } from "utils/user/shuffleUid";
@@ -490,7 +493,6 @@ export const rateSongDifficulty = async (
     throw error;
   }
 };
-
 
 export const updateSongStatus = async (
   userId: string,
@@ -994,4 +996,11 @@ export const firebaseAddLogReport = async (
   } catch (error) {
     console.error("Error sending Discord notification:", error);
   }
+};
+
+export const updateGuitarStartDate = async (date: Date) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  await updateDoc(userDocRef, {
+    guitarStartDate: Timestamp.fromDate(date),
+  });
 };

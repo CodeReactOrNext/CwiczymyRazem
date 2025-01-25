@@ -14,7 +14,7 @@ export default async function handler(
       const user = req.body.user;
       const userAuth = await firebaseCreateUserDocumentFromAuth(user);
       const userData = await firebaseGetUserDocument(userAuth);
-      
+
       res.status(200).json({
         userInfo: {
           displayName: userData!.displayName,
@@ -22,6 +22,7 @@ export default async function handler(
           youTubeLink: userData!.youTubeLink,
           soundCloudLink: userData!.soundCloudLink,
           band: userData!.band,
+          guitarStartDate: userData!.guitarStartDate,
         },
         userAuth,
         currentUserStats: userData!.statistics,
