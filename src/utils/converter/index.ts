@@ -3,7 +3,11 @@ import { addZeroToTime } from "./addZeroToTime";
 import { calculatePercent } from "./calculatePercent";
 import { getDateFromPast } from "./getDateFromPast";
 import { inputTimeConverter } from "./InputTimeConverter";
-import { convertMsToHM, convertMsToHMObject } from "./timeConverter";
+import {
+  convertMsToHM,
+  convertMsToHMObject,
+  convertMsToHMS,
+} from "./timeConverter";
 
 export {
   addZeroToTime,
@@ -13,4 +17,5 @@ export {
   getDateFromPast,
   inputTimeConverter,
   getYearsOfPlaying,
+  convertMsToHMS,
 };
