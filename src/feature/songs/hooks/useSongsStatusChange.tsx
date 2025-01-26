@@ -1,12 +1,10 @@
+import { removeUserSong } from "feature/songs/services/removeUserSong";
+import { updateSongStatus } from "feature/songs/services/udateSongStatus";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import type { Song, SongStatus } from "utils/firebase/client/firebase.types";
-import {
-  removeUserSong,
-  updateSongStatus,
-} from "utils/firebase/client/firebase.utils";
 
 export const useSongsStatusChange = ({
   onChange,
@@ -46,7 +44,6 @@ export const useSongsStatusChange = ({
     try {
       await updateSongStatus(userId, songId, title, artist, newStatus);
 
-      // Update local state first for immediate feedback
       const allSongs = [
         ...userSongs.wantToLearn,
         ...userSongs.learning,

@@ -1,3 +1,5 @@
+import { rateSongDifficulty } from "feature/songs/services/rateSongDifficulty";
+import type { Song } from "feature/songs/types/songs.type";
 import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { Star } from "lucide-react";
@@ -5,8 +7,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import type { Song } from "utils/firebase/client/firebase.types";
-import { rateSongDifficulty } from "utils/firebase/client/firebase.utils";
 
 interface SongRatingInterface {
   song: Song;

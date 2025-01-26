@@ -26,13 +26,13 @@ import {
 import { SongRating } from "feature/songs/components/SongsTable/components/SongRating";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
-import type { Song, SongStatus } from "utils/firebase/client/firebase.types";
-import { getUserSongs } from "utils/firebase/client/firebase.utils";
 
 interface SongsTableProps {
   songs: Song[];

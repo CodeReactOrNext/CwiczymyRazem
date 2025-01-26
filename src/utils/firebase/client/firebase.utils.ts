@@ -1,5 +1,6 @@
 import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
+import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
 import type { SortByType } from "feature/leadboard/types";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import {
@@ -16,12 +17,9 @@ import {
   updateProfile,
 } from "firebase/auth";
 import {
-  addDoc,
-  arrayUnion,
   collection,
   deleteDoc,
   doc,
-  getCountFromServer,
   getDoc,
   getDocs,
   getFirestore,
@@ -32,11 +30,9 @@ import {
   startAfter,
   Timestamp,
   updateDoc,
-  where,
 } from "firebase/firestore";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import type {
-  SeasonDataInterface,
   StatisticsDataInterface,
 } from "types/api.types";
 import { shuffleUid } from "utils/user/shuffleUid";
@@ -45,10 +41,7 @@ import { firebaseApp } from "./firebase.cofig";
 import type {
   FirebaseEventsInteface,
   FirebaseUserDataInterface,
-  Song,
-  SongStatus,
 } from "./firebase.types";
-import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
 
 const provider = new GoogleAuthProvider();
 
@@ -56,9 +49,11 @@ provider.setCustomParameters({
   prompt: "select_account",
 });
 
+export const auth = getAuth();
+
 export const firebaseSignInWithGooglePopup = () =>
   signInWithPopup(auth, provider);
-export const auth = getAuth();
+
 export const db = getFirestore(firebaseApp);
 export const storage = getStorage(firebaseApp);
 
@@ -85,6 +80,24 @@ export const firebaseGetEvents = async () => {
   return eventsArr;
 };
 
+
+const getDocumentAtIndex = async (sortBy: SortByType, index: number) => {
+  try {
+    // Get the document at the specified index
+    const q = query(
+      collection(db, "users"),
+      orderBy(`statistics.${sortBy}`, "desc"),
+      limit(1),
+      ...(index > 0 ? [startAfter(index - 1)] : [])
+    );
+
+    const snapshot = await getDocs(q);
+    return snapshot.docs[0];
+  } catch (error) {
+    console.error("Error getting document at index:", error);
+    return null;
+  }
+};
 
 export const firebaseGetUserAvatarURL = async () => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
@@ -123,11 +136,6 @@ export const firebaseUpdateUserPassword = async (newPassword: string) => {
   }
 };
 
-export const getTotalUsersCount = async () => {
-  const coll = collection(db, "users");
-  const snapshot = await getCountFromServer(coll);
-  return snapshot.data().count;
-};
 
 export const firebaseGetUsersExceriseRaport = async (
   sortBy: SortByType,
@@ -215,6 +223,14 @@ export const firebaseGetUserProviderData = async () => {
   };
 };
 
+export const firebaseDeleteExercisePlan = async (id: string) => {
+  const userAuth = auth.currentUser?.uid;
+  if (userAuth) {
+    const userDocRef = doc(db, "users", userAuth, "exercisePlan", id);
+    await deleteDoc(userDocRef);
+  }
+};
+
 export const firebaseUploadExercisePlan = async (
   exercise: exercisePlanInterface,
   id?: string
@@ -230,13 +246,9 @@ export const firebaseUploadExercisePlan = async (
     return;
   }
 };
-export const firebaseDeleteExercisePlan = async (id: string) => {
-  const userAuth = auth.currentUser?.uid;
-  if (userAuth) {
-    const userDocRef = doc(db, "users", userAuth, "exercisePlan", id);
-    await deleteDoc(userDocRef);
-  }
-};
+
+
+
 export const firebaseGetExercisePlan = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const exercisePlanDocRef = await getDocs(
@@ -307,237 +319,6 @@ export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
   await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
 };
 
-export const getDocumentAtIndex = async (sortBy: SortByType, index: number) => {
-  try {
-    // Get the document at the specified index
-    const q = query(
-      collection(db, "users"),
-      orderBy(`statistics.${sortBy}`, "desc"),
-      limit(1),
-      ...(index > 0 ? [startAfter(index - 1)] : [])
-    );
-
-    const snapshot = await getDocs(q);
-    return snapshot.docs[0];
-  } catch (error) {
-    console.error("Error getting document at index:", error);
-    return null;
-  }
-};
-
-export const checkSongExists = async (title: string, artist: string) => {
-  try {
-    const songsRef = collection(db, "songs");
-    const q = query(
-      songsRef,
-      where("title", "==", title),
-      where("artist", "==", artist)
-    );
-
-    const querySnapshot = await getDocs(q);
-    return !querySnapshot.empty;
-  } catch (error) {
-    console.error("Error checking for duplicate song:", error);
-    throw error;
-  }
-};
-
-export const addSong = async (
-  title: string,
-  artist: string,
-  userId: string
-) => {
-  try {
-    // Check for duplicate song first
-    const exists = await checkSongExists(title, artist);
-    if (exists) {
-      throw new Error("song_already_exists");
-    }
-
-    const songsRef = collection(db, "songs");
-    const newSong = {
-      title,
-      artist,
-      createdAt: Timestamp.now(),
-      createdBy: userId,
-      difficulties: [],
-    };
-
-    const docRef = await addDoc(songsRef, newSong);
-    firebaseAddSongsLog(
-      userId,
-      new Date().toISOString(),
-      title,
-      artist,
-      "added"
-    );
-    return docRef.id;
-  } catch (error) {
-    console.error("Error adding song:", error);
-    throw error;
-  }
-};
-
-export const rateSongDifficulty = async (
-  songId: string,
-  userId: string,
-  rating: number,
-  title: string,
-  artist: string
-) => {
-  try {
-    const songRef = doc(db, "songs", songId);
-    const songDoc = await getDoc(songRef);
-
-    if (!songDoc.exists()) {
-      throw new Error("Song not found");
-    }
-
-    const song = songDoc.data() as Song;
-    const difficulties = song.difficulties || [];
-
-    // Remove existing rating by this user if it exists
-    const filteredDifficulties = difficulties.filter(
-      (d) => d.userId !== userId
-    );
-
-    // Add new rating
-    const newDifficulties = [
-      ...filteredDifficulties,
-      {
-        userId,
-        rating,
-        date: Timestamp.now(),
-      },
-    ];
-
-    await updateDoc(songRef, {
-      difficulties: newDifficulties,
-    });
-    firebaseAddSongsLog(
-      userId,
-      new Date().toISOString(),
-      title,
-      artist,
-      "difficulty_rate",
-      rating
-    );
-  } catch (error) {
-    console.error("Error rating song:", error);
-    throw error;
-  }
-};
-
-export const updateSongStatus = async (
-  userId: string,
-  songId: string,
-  title: string,
-  artist: string,
-  status: SongStatus
-) => {
-  const userDocRef = doc(db, "users", userId);
-  const userSongsRef = doc(userDocRef, "userSongs", songId);
-
-  try {
-    await setDoc(userSongsRef, {
-      songId,
-      status,
-      title,
-      artist,
-      lastUpdated: Timestamp.now(),
-    });
-
-    firebaseAddSongsLog(
-      userId,
-      new Date().toISOString(),
-      title,
-      artist,
-      status
-    );
-    return true;
-  } catch (error) {
-    console.error("Error updating song status:", error);
-    throw error;
-  }
-};
-
-export const getUserSongs = async (userId: string) => {
-  const userDocRef = doc(db, "users", userId);
-  const userSongsRef = collection(userDocRef, "userSongs");
-
-  try {
-    const userSongsSnapshot = await getDocs(userSongsRef);
-    const songLists = {
-      wantToLearn: [] as Song[],
-      learning: [] as Song[],
-      learned: [] as Song[],
-      lastUpdated: Timestamp.now(),
-    };
-
-    // Get all songs and their statuses
-    const userSongs = userSongsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.data().songId,
-    }));
-
-    // Organize songs by status
-    userSongs.forEach((song: { status?: SongStatus } & { id: any }) => {
-      if (song.status === "wantToLearn")
-        songLists.wantToLearn.push(song as Song);
-      if (song.status === "learning") songLists.learning.push(song as Song);
-      if (song.status === "learned") songLists.learned.push(song as Song);
-    });
-
-    return songLists;
-  } catch (error) {
-    console.error("Error getting user songs:", error);
-    throw error;
-  }
-};
-
-// Helper function to get current status of a song for a user
-export const getUserSongStatus = async (userId: string, songId: string) => {
-  const userDocRef = doc(db, "users", userId);
-  const userSongRef = doc(userDocRef, "userSongs", songId);
-
-  try {
-    const userSongDoc = await getDoc(userSongRef);
-    if (!userSongDoc.exists()) return null;
-
-    return userSongDoc.data().status as SongStatus;
-  } catch (error) {
-    console.error("Error getting song status:", error);
-    throw error;
-  }
-};
-
-export const removeUserSong = async (userId: string, songId: string) => {
-  try {
-    const userDocRef = doc(db, "users", userId);
-    const userSongRef = doc(userDocRef, "userSongs", songId);
-    const songRef = doc(db, "songs", songId);
-
-    const songDoc = await getDoc(songRef);
-    const songData = songDoc.exists() ? songDoc.data() : null;
-
-    await deleteDoc(userSongRef);
-
-    if (songData) {
-      firebaseAddSongsLog(
-        userId,
-        new Date().toISOString(),
-        songData.title,
-        songData.artist,
-        "removed" as SongStatus
-      );
-    }
-
-    return true;
-  } catch (error) {
-    console.error("Error removing song:", error);
-    throw error;
-  }
-};
 
 export interface UserTooltipData {
   displayName: string;
@@ -625,127 +406,7 @@ export const canUpgradeSkill = (
   return true;
 };
 
-export const getCurrentSeason = async () => {
-  try {
-    const now = new Date();
-    const seasonId = `${now.getFullYear()}-${String(
-      now.getMonth() + 1
-    ).padStart(2, "0")}`;
 
-    const seasonRef = doc(db, "seasons", seasonId);
-    const seasonDoc = await getDoc(seasonRef);
-
-    if (!seasonDoc.exists()) {
-      const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-      const seasonData = {
-        seasonId,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        isActive: true,
-        name: `Season ${seasonId}`,
-      };
-
-      await setDoc(seasonRef, seasonData);
-      return seasonData;
-    }
-
-    return { seasonId, ...seasonDoc.data() };
-  } catch (error) {
-    throw error;
-  }
-};
-
-// Get all available seasons
-export const getAvailableSeasons = async () => {
-  const seasonsRef = collection(db, "seasons");
-  const seasonsSnapshot = await getDocs(seasonsRef);
-  const seasons: SeasonDataInterface[] = [];
-
-  seasonsSnapshot.forEach((doc) => {
-    seasons.push(doc.data() as SeasonDataInterface);
-  });
-
-  return seasons.sort((a, b) => b.startDate.localeCompare(a.startDate));
-};
-
-// Get seasonal leaderboard
-export const getSeasonalLeaderboard = async (
-  seasonId: string,
-  sortBy: SortByType,
-  page: number,
-  itemsPerPage: number
-) => {
-  console.log("🔵 getSeasonalLeaderboard called:", { seasonId, sortBy, page });
-  try {
-    const seasonalUsersRef = collection(db, "seasons", seasonId, "users");
-
-    // First get total count
-    const totalSnapshot = await getCountFromServer(seasonalUsersRef);
-    const total = totalSnapshot.data().count;
-    console.log("✅ Total users in season:", total);
-
-    if (total === 0) {
-      console.log("⚠️ No users found in season");
-      return { users: [], totalUsers: 0 };
-    }
-
-    // Create query - sort by the field directly as it's at root level
-    const q = query(
-      seasonalUsersRef,
-      orderBy(sortBy, "desc"),
-      limit(itemsPerPage)
-    );
-
-    // Get documents
-    const querySnapshot = await getDocs(q);
-
-    const users = querySnapshot.docs.map((doc) => {
-      const data = doc.data();
-      console.log("Processing user data:", data); // Debug log
-
-      // Transform the data to match FirebaseUserDataInterface
-      return {
-        profileId: doc.id,
-        displayName: data.displayName || "",
-        avatar: data.avatar || "",
-        statistics: {
-          points: data.points || 0,
-          sessionCount: data.sessionCount || 0,
-          time: {
-            creativity: data.time?.creativity || 0,
-            hearing: data.time?.hearing || 0,
-            technique: data.time?.technique || 0,
-            theory: data.time?.theory || 0,
-            longestSession: data.time?.longestSession || 0,
-          },
-          achievements: data.achievements || [],
-          lvl: data.lvl || 1,
-          lastReportDate: data.lastReportDate || "",
-        },
-      };
-    });
-
-    console.log("✅ Users fetched:", {
-      count: users.length,
-      firstUser: users[0]?.profileId,
-      firstUserStats: {
-        points: users[0]?.statistics.points,
-        time: users[0]?.statistics.time,
-      },
-    });
-
-    return {
-      users,
-      totalUsers: total,
-    };
-  } catch (error) {
-    throw error;
-  }
-};
-
-// Update user's seasonal stats when they submit a report
 export const updateSeasonalStats = async (
   userId: string,
   stats: StatisticsDataInterface,
@@ -782,10 +443,8 @@ export const updateSeasonalStats = async (
         achievements: [],
       };
 
-  // Update only the seasonal stats
   const updatedSeasonData = {
     ...currentSeasonData,
-    // Add only the points gained in this session
     points: (currentSeasonData.points || 0) + pointsGained,
     sessionCount: (currentSeasonData.sessionCount || 0) + 1,
     time: {
@@ -841,36 +500,6 @@ export const firebaseUpdateUserStats = async (
   ]);
 };
 
-export const awardSeasonalBadges = async (seasonId: string) => {
-  const seasonRef = doc(db, "seasons", seasonId);
-  const seasonDoc = await getDoc(seasonRef);
-
-  if (!seasonDoc.exists() || !seasonDoc.data().isActive) return;
-
-  const usersRef = collection(db, "seasons", seasonId, "users");
-  const topUsers = await getDocs(
-    query(usersRef, orderBy("statistics.points", "desc"), limit(3))
-  );
-
-  const winners = topUsers.docs.map((doc) => doc.id);
-  const badges = ["season_first", "season_second", "season_third"];
-
-  for (let i = 0; i < winners.length; i++) {
-    const userRef = doc(db, "users", winners[i]);
-    await updateDoc(userRef, {
-      "statistics.achievements": arrayUnion(`${seasonId}_${badges[i]}`),
-    });
-  }
-
-  await updateDoc(seasonRef, {
-    isActive: false,
-    winners: {
-      first: winners[0],
-      second: winners[1],
-      third: winners[2],
-    },
-  });
-};
 
 
 

@@ -1,12 +1,12 @@
 
 
+import type { Song } from "feature/songs/types/songs.type";
 import {
   collection,
   getDocs,
   query,
   where,
 } from "firebase/firestore";
-import type { Song } from "utils/firebase/client/firebase.types";
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const getSongs = async (
