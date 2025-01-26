@@ -1,4 +1,3 @@
-import type { AchievementList } from "assets/achievements/achievementsData";
 import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import type { SortByType } from "feature/leadboard/types";
@@ -27,7 +26,6 @@ import {
   getDocs,
   getFirestore,
   limit,
-  onSnapshot,
   orderBy,
   query,
   setDoc,
@@ -41,20 +39,15 @@ import type {
   SeasonDataInterface,
   StatisticsDataInterface,
 } from "types/api.types";
+import { shuffleUid } from "utils/user/shuffleUid";
+
 import { firebaseApp } from "./firebase.cofig";
 import type {
   FirebaseEventsInteface,
-  FirebaseLogsInterface,
-  FirebaseLogsSongsInterface,
-  FirebaseLogsSongsStatuses,
   FirebaseUserDataInterface,
-  FirebaseUserExceriseLog,
   Song,
   SongStatus,
 } from "./firebase.types";
-import { formatDiscordMessage } from "feature/discordBot/formatters";
-import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
-import { shuffleUid } from "utils/user/shuffleUid";
 
 const provider = new GoogleAuthProvider();
 
@@ -80,55 +73,6 @@ export const firebaseLogUserOut = async () => {
   await signOut(auth);
 };
 
-export const firebaseGetLogs = async () => {
-  const logsDocRef = collection(db, "logs");
-  const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(20));
-  const logsDoc = await getDocs(sortLogs);
-  const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[] = [];
-  logsDoc.forEach((doc) => {
-    const log = doc.data() as
-      | FirebaseLogsInterface
-      | FirebaseLogsSongsInterface;
-    logsArr.push(log);
-  });
-  return logsArr;
-};
-
-export const firebaseAddSongsLog = async (
-  uid: string,
-  data: string,
-  songTitle: string,
-  songArtist: string,
-  status: FirebaseLogsSongsStatuses,
-  difficulty_rate?: number | undefined
-) => {
-  const logsDocRef = doc(collection(db, "logs"));
-  const userDocRef = doc(db, "users", uid);
-  const userSnapshot = await getDoc(userDocRef);
-  const userName = userSnapshot.data()!.displayName;
-
-  const logData = {
-    data,
-    uid,
-    userName,
-    songTitle,
-    songArtist,
-    status,
-  };
-
-  await setDoc(logsDocRef, logData);
-
-  try {
-    const discordMessage = await formatDiscordMessage({
-      ...logData,
-      difficulty_rate,
-    });
-    await sendDiscordMessage(discordMessage as any);
-  } catch (error) {
-    console.error("Error sending Discord notification:", error);
-  }
-};
-
 export const firebaseGetEvents = async () => {
   const eventsDocRef = collection(db, "events");
   const eventsDoc = await getDocs(eventsDocRef);
@@ -140,16 +84,6 @@ export const firebaseGetEvents = async () => {
   return eventsArr;
 };
 
-export const firebaseGetUserRaprotsLogs = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth);
-  const exerciseDocRef = await getDocs(collection(userDocRef, "exerciseData"));
-  const exerciseArr: FirebaseUserExceriseLog[] = [];
-  exerciseDocRef.forEach((doc) => {
-    const log = doc.data() as FirebaseUserExceriseLog;
-    exerciseArr.push(log);
-  });
-  return exerciseArr;
-};
 
 export const firebaseGetUserAvatarURL = async () => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
@@ -604,26 +538,6 @@ export const removeUserSong = async (userId: string, songId: string) => {
   }
 };
 
-export const firebaseGetLogsStream = (
-  callback: (
-    logs: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[]
-  ) => void
-) => {
-  const logsDocRef = collection(db, "logs");
-  const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(20));
-
-  // Return the unsubscribe function
-  return onSnapshot(sortLogs, (snapshot) => {
-    const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[] = [];
-    snapshot.forEach((doc) => {
-      const log = doc.data() as
-        | FirebaseLogsInterface
-        | FirebaseLogsSongsInterface;
-      logsArr.push(log);
-    });
-    callback(logsArr);
-  });
-};
 export interface UserTooltipData {
   displayName: string;
   avatar: string | null;
@@ -957,45 +871,7 @@ export const awardSeasonalBadges = async (seasonId: string) => {
   });
 };
 
-export const firebaseAddLogReport = async (
-  uid: string,
-  data: string,
-  newAchievements: AchievementList[],
-  newLevel: { isNewLevel: boolean; level: number },
-  points: number,
-  timeSumary: {
-    techniqueTime: number;
-    theoryTime: number;
-    hearingTime: number;
-    creativityTime: number;
-    sumTime: number;
-  }
-) => {
-  const logsDocRef = doc(collection(db, "logs"));
-  const userDocRef = doc(db, "users", uid);
-  const userSnapshot = await getDoc(userDocRef);
-  const userName = userSnapshot.data()!.displayName;
 
-  const logData = {
-    data,
-    uid,
-    userName,
-    newAchievements,
-    newLevel,
-    points,
-    timestamp: new Date().toISOString(),
-    timeSumary,
-  };
-
-  await setDoc(logsDocRef, logData);
-
-  try {
-    const discordMessage = await formatDiscordMessage(logData);
-    await sendDiscordMessage(discordMessage as any);
-  } catch (error) {
-    console.error("Error sending Discord notification:", error);
-  }
-};
 
 export const updateGuitarStartDate = async (date: Date) => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
