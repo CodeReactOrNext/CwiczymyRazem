@@ -8,17 +8,15 @@ import { updateUserSkills } from "feature/skills/services/updateUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTree } from "feature/skills/SkillTree";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
-import { AnimatePresence,motion } from "framer-motion";
-import { Activity, Brain,LayoutDashboard, Music } from "lucide-react";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
+import type { Song } from "feature/songs/types/songs.type";
+import { AnimatePresence, motion } from "framer-motion";
+import { Activity, Brain, LayoutDashboard, Music } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
-import { calculatePercent,convertMsToHM } from "utils/converter";
-import type { Song } from "utils/firebase/client/firebase.types";
-import {
-  canUpgradeSkill,
-  getUserSongs,
-} from "utils/firebase/client/firebase.utils";
+import { calculatePercent, convertMsToHM } from "utils/converter";
+import { canUpgradeSkill } from "utils/firebase/client/firebase.utils";
 
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import HeadDecoration from "./components/HeadDecoration";
@@ -88,7 +86,7 @@ const ProfileLandingLayout = ({
         return (
           <>
             <div className='flex flex-col lg:flex-row lg:gap-4'>
-              <div className='grid h-fit grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:flex-1 mb-4'>
+              <div className='mb-4 grid h-fit grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:flex-1'>
                 {statsField.map(({ Icon, description, value }) => (
                   <StatsField
                     key={description}

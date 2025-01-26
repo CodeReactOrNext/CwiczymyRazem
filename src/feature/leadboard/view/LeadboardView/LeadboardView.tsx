@@ -1,3 +1,7 @@
+import { getAvailableSeasons } from "feature/leadboard/services/getAvailableSeasons";
+import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
+import { getSeasonalLeaderboard } from "feature/leadboard/services/getSeasonalLeaderboard";
+import { getTotalUsersCount } from "feature/leadboard/services/getTotalUsersCount";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useEffect, useState } from "react";
@@ -6,13 +10,7 @@ import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
-import {
-  firebaseGetUsersExceriseRaport,
-  getAvailableSeasons,
-  getCurrentSeason,
-  getSeasonalLeaderboard,
-  getTotalUsersCount,
-} from "utils/firebase/client/firebase.utils";
+import { firebaseGetUsersExceriseRaport } from "utils/firebase/client/firebase.utils";
 
 import LeadboardLayout from "../../LeadboardLayout";
 import type { SortByType } from "../../types";

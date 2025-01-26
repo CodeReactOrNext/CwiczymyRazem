@@ -1,8 +1,8 @@
+import { firebaseAddLogReport } from "feature/logs/services/addLogReport.service";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { auth } from "utils/firebase/api/firebase.config";
 import {
-  firebaseAddLogReport,
   firebaseGetUserData,
   firebaseSetUserExerciseRaprot,
   firebaseUpdateUserStats,

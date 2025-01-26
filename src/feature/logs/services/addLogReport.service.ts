@@ -12,9 +12,9 @@ import { db } from "utils/firebase/client/firebase.utils";
 export const firebaseAddLogReport = async (
   uid: string,
   data: string,
+  points: number,
   newAchievements: AchievementList[],
   newLevel: { isNewLevel: boolean; level: number },
-  points: number,
   timeSumary: {
     techniqueTime: number;
     theoryTime: number;
@@ -32,9 +32,9 @@ export const firebaseAddLogReport = async (
     data,
     uid,
     userName,
+    points,
     newAchievements,
     newLevel,
-    points,
     timestamp: new Date().toISOString(),
     timeSumary,
   };

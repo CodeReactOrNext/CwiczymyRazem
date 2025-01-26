@@ -1,9 +1,9 @@
-import { getSongs } from "feature/songs/services/songService";
+import { getSongs } from "feature/songs/services/getSongs";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
+import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
-import type { Song } from "utils/firebase/client/firebase.types";
-import { getUserSongs } from "utils/firebase/client/firebase.utils";
 
 const ITEMS_PER_PAGE = 50;
 
