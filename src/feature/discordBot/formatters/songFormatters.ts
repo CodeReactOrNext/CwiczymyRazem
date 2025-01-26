@@ -1,6 +1,7 @@
+import type { SongFormatter } from "feature/discordBot/types/formatter.types";
+import type { FirebaseLogsSongsInterface } from "feature/logs/types/logs.type";
+
 import { getUserDisplayName } from "../utils/userUtils";
-import { SongFormatter } from "../types/formatter.types";
-import { FirebaseLogsSongsInterface } from "utils/firebase/client/firebase.types";
 
 const getStars = (rate: number) => {
   const fullStar = "⭐";

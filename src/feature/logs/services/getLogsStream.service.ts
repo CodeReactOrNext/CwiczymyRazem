@@ -18,13 +18,14 @@ export const firebaseGetLogsStream = (
 
   return onSnapshot(sortLogs, (snapshot) => {
     const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface)[] = [];
-    
+
     snapshot.forEach((doc) => {
       const log = doc.data() as
         | FirebaseLogsInterface
         | FirebaseLogsSongsInterface;
       logsArr.push(log);
     });
+    
     callback(logsArr);
   });
 };
