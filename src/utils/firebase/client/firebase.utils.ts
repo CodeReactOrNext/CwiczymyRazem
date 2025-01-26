@@ -48,6 +48,7 @@ import type {
   Song,
   SongStatus,
 } from "./firebase.types";
+import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
 
 const provider = new GoogleAuthProvider();
 

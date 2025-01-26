@@ -1,8 +1,7 @@
-import {
-  FirebaseLogsInterface,
-  FirebaseLogsSongsInterface,
-} from "utils/firebase/client/firebase.types";
-import { DiscordEmbed } from "./discord.types";
+
+import type { FirebaseLogsInterface, FirebaseLogsSongsInterface } from "feature/logs/types/logs.type";
+
+import type { DiscordEmbed } from "./discord.types";
 
 export type SongStatus =
   | "learned"

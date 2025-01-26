@@ -1,19 +1,17 @@
+import { firebaseGetLogsStream } from "feature/logs/services/getLogsStream.service";
+import type {
+  FirebaseLogsInterface,
+  FirebaseLogsSongsInterface,
+} from "feature/logs/types/logs.type";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import LogsBoxLayout from "layouts/LogsBoxLayout";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import type {
-  FirebaseEventsInteface,
-  FirebaseLogsInterface,
-  FirebaseLogsSongsInterface,
-} from "utils/firebase/client/firebase.types";
-import {
-  firebaseGetEvents,
-  firebaseGetLogsStream,
-} from "utils/firebase/client/firebase.utils";
+import type { FirebaseEventsInteface } from "utils/firebase/client/firebase.types";
+import { firebaseGetEvents } from "utils/firebase/client/firebase.utils";
 
 const LogsBoxView = () => {
   const [logs, setLogs] = useState<
