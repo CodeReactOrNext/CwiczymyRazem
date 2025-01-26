@@ -41,10 +41,6 @@ import type {
   SeasonDataInterface,
   StatisticsDataInterface,
 } from "types/api.types";
-import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
-import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
-import { shuffleUid } from "utils/user/shuffleUid";
-
 import { firebaseApp } from "./firebase.cofig";
 import type {
   FirebaseEventsInteface,
@@ -56,6 +52,9 @@ import type {
   Song,
   SongStatus,
 } from "./firebase.types";
+import { formatDiscordMessage } from "feature/discordBot/formatters";
+import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
+import { shuffleUid } from "utils/user/shuffleUid";
 
 const provider = new GoogleAuthProvider();
 
