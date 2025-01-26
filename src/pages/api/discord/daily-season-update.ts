@@ -63,7 +63,7 @@ export default async function handler(
             text: `Do końca sezonu zostało ${daysLeft} dni.`,
           },
           thumbnail: {
-            url: "https://www.cwiczymy-razem.pl/discord/leadboard.png",
+            url: "https://www.cwiczymy-razem.pl/discord-leadboard.png",
           },
         },
         {
