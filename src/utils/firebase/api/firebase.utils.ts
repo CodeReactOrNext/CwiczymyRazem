@@ -1,23 +1,13 @@
 import type { AchievementList } from "assets/achievements/achievementsData";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import {
-  collection,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
-import {
-  getDocs,
-  runTransaction,
-  Timestamp,
-} from "firebase/firestore";
-import type { StatisticsDataInterface} from "types/api.types";
-import { formatDiscordMessage } from "utils/discord/formatDiscordMessage";
-import { sendDiscordMessage } from "utils/firebase/client/discord.utils";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { getDocs, runTransaction, Timestamp } from "firebase/firestore";
+import type { StatisticsDataInterface } from "types/api.types";
 import type { SongStatus } from "utils/firebase/client/firebase.types";
 
 import { db, updateSeasonalStats } from "../client/firebase.utils";
+import { formatDiscordMessage } from "feature/discordBot/formatters";
+import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
 
 export const firebaseGetUserData = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
