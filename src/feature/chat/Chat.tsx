@@ -34,7 +34,7 @@ const Chat = () => {
               msg.userId === currentUserId ? "chat-end" : "chat-start"
             }`}>
             <UserTooltip userId={msg.userId}>
-              <div className='chat-image'>
+              <div className='chat-image bg-transparent'>
                 <Avatar
                   avatarURL={msg.userPhotoURL}
                   name={msg.username!}
