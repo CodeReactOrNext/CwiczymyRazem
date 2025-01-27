@@ -6,7 +6,7 @@ import {
   getUserProvider,
   updateUserEmail,
 } from "feature/user/store/userSlice.asyncThunk";
-import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
+import { updateCredsSchema } from "feature/settings/SettingsView/Settings.schemas";
 import type { UserInfo } from "firebase-admin/lib/auth/user-record";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";

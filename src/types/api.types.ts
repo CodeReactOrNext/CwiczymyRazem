@@ -1,5 +1,5 @@
-import type { AchievementList } from "assets/achievements/achievementsData";
-import type { MediaType } from "feature/user/components/settings/MediaLinks/MediaLinks";
+import type { AchievementList } from "feature/achievements/achievementsData";
+import type { MediaType } from "feature/settings/components/MediaLinks/MediaLinks";
 import type {
   ReportDataInterface,
   ReportFormikInterface,

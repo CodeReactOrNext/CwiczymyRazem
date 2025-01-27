@@ -1,5 +1,5 @@
-import type { AchievementsDataInterface } from "assets/achievements/achievementsData";
-import type { AchievementsRarityType } from "assets/achievements/achievementsRarity";
+import type { AchievementsDataInterface } from "feature/achievements/achievementsData";
+import type { AchievementsRarityType } from "feature/achievements/achievementsRarity";
 import IconBox from "components/IconBox";
 import AchievementCard from "layouts/ProfileLayout/components/Achievement/AchievementCard";
 import { useTranslation } from "react-i18next";

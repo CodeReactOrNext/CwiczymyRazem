@@ -8,21 +8,21 @@ import {
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Separator } from "assets/components/ui/separator";
-import AvatarChange from "feature/user/components/settings/AvatarChange";
-import EmailChange from "feature/user/components/settings/EmailChange";
-import { GuitarStartDate } from "feature/user/components/settings/GuitarStartDate";
-import MediaLinks from "feature/user/components/settings/MediaLinks";
-import PasswordChange from "feature/user/components/settings/PasswordChange";
-import StatisticRestart from "feature/user/components/settings/StatisticsRestart";
+import AvatarChange from "feature/settings/components/AvatarChange";
+import EmailChange from "feature/settings/components/EmailChange";
+import { GuitarStartDate } from "feature/settings/components/GuitarStartDate";
+import MediaLinks from "feature/settings/components/MediaLinks";
+import PasswordChange from "feature/settings/components/PasswordChange";
+import StatisticRestart from "feature/settings/components/StatisticsRestart";
+import SettingsLayout from "feature/settings/SettingsLayout";
+import { updateCredsSchema } from "feature/settings/SettingsView/Settings.schemas";
 import { selectIsFetching, selectUserName } from "feature/user/store/userSlice";
 import {
   changeUserDisplayName,
   getUserProvider,
 } from "feature/user/store/userSlice.asyncThunk";
-import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
 import type { UserInfo } from "firebase/auth";
 import { Formik } from "formik";
-import SettingsLayout from "layouts/SettingsLayout";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";

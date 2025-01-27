@@ -1,17 +1,17 @@
-import type { AchievementList } from "assets/achievements/achievementsData";
 import { changelogEntries } from "changelogEntries";
+import type { AchievementList } from "feature/achievements/achievementsData";
+import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
 } from "feature/logs/types/logs.type";
-import { useUnreadMessages } from "hooks/useUnreadMessages";
+import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaGuitar, FaTasks } from "react-icons/fa";
+import { FaGuitar, FaMedal, FaTasks } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
 import { TbNews } from "react-icons/tb";
-import type { FirebaseEventsInteface } from "utils/firebase/client/firebase.types";
 
 import Chat from "../../feature/chat/Chat";
 import ExerciseBox from "../../feature/exercisePlan/view/ExerciseBox";
@@ -20,7 +20,6 @@ import Logs from "./components/Logs";
 
 export interface LogsBoxLayoutProps {
   logs: (FirebaseLogsSongsInterface | FirebaseLogsInterface)[];
-  events: FirebaseEventsInteface[];
   userAchievements: AchievementList[];
 }
 
@@ -71,12 +70,12 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           notificationCount={unreadChats}
           hasNewMessages={hasNewChats}
         />
-        {/* <LogsBoxButton
+        <LogsBoxButton
           title={t("logsBox.achievements_map")}
           active={showedCategory === "achievements"}
           onClick={() => handleCategoryChange("achievements")}
           Icon={FaMedal}
-        /> */}
+        />
         <LogsBoxButton
           title={"Plany Ćwiczeń"}
           active={showedCategory === "excerise"}
@@ -90,9 +89,9 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           Icon={TbNews}
         />
       </div>
-      {/* {showedCategory === "achievements" && (
+      {showedCategory === "achievements" && (
         <AchievementsMap userAchievements={userAchievements} />
-      )} */}
+      )}
       <div className='h-full overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
         {showedCategory === "logs" && logs && (
           <div onClick={markLogsAsRead}>

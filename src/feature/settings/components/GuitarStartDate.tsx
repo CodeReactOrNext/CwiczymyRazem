@@ -1,11 +1,4 @@
 import { Button } from "assets/components/ui/button";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { updateGuitarStartDate } from "utils/firebase/client/firebase.utils";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
-import { auth } from "utils/firebase/client/firebase.utils";
 import {
   Select,
   SelectContent,
@@ -13,6 +6,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
+import { doc, getDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { updateGuitarStartDate } from "utils/firebase/client/firebase.utils";
+import { db } from "utils/firebase/client/firebase.utils";
+import { auth } from "utils/firebase/client/firebase.utils";
 
 export const GuitarStartDate = () => {
   const { t } = useTranslation("settings");

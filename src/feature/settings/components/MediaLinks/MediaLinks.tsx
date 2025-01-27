@@ -3,7 +3,7 @@ import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { uploadUserSocialData } from "feature/user/store/userSlice.asyncThunk";
-import { mediaSchema } from "feature/user/view/SettingsView/Settings.schemas";
+import { mediaSchema } from "feature/settings/SettingsView/Settings.schemas";
 import { Formik } from "formik";
 import { useTranslation } from "react-i18next";
 import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";

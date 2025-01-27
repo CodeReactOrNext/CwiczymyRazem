@@ -1,4 +1,4 @@
-import type { AchievementList } from "assets/achievements/achievementsData";
+import type { AchievementList } from "feature/achievements/achievementsData";
 import { formatDiscordMessage } from "feature/discordBot/formatters";
 import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
 import {

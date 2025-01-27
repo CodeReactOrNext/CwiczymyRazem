@@ -1,4 +1,4 @@
-import type { AchievementList } from "assets/achievements/achievementsData";
+import type { AchievementList } from "feature/achievements/achievementsData";
 
 export type FirebaseLogsSongsStatuses =
   | "learned"
