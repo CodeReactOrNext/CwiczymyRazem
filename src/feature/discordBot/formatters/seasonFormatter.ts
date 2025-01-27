@@ -19,7 +19,7 @@ export class SeasonUpdateFormatter {
             text: `Do końca sezonu zostało ${seasonData.daysLeft} dni.`,
           },
           thumbnail: {
-            url: "https://www.cwiczymy-razem.pl/discord-leadboard.png",
+            url: "https://raw.githubusercontent.com/CodeReactOrNext/CwiczymyRazem/develop/discord-leadboard.png",
           },
         },
         {

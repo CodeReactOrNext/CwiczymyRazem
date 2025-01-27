@@ -1,8 +1,9 @@
+import type { FirebaseLogsInterface } from "feature/logs/types/logs.type";
 import { convertMsToHM } from "utils/converter";
-import { getUserDisplayName } from "../utils/userUtils";
-import { GeneralLogFormatter } from "../types/formatter.types";
+
 import { ACTIVITY_MESSAGES, JOKES } from "../constants/messages";
-import { FirebaseLogsInterface } from "utils/firebase/client/firebase.types";
+import type { GeneralLogFormatter } from "../types/formatter.types";
+import { getUserDisplayName } from "../utils/userUtils";
 
 export class ActivityLogFormatter implements GeneralLogFormatter {
   async format(log: FirebaseLogsInterface) {

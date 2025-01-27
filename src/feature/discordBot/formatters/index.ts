@@ -1,28 +1,17 @@
+
+
+import type { FirebaseLogsInterface, FirebaseLogsSongsInterface } from "feature/logs/types/logs.type";
+
+import type { SongFormatter } from "../types/formatter.types";
+import { ActivityLogFormatter } from "./generalLogFormatter";
 import {
-  FirebaseLogsInterface,
-  FirebaseLogsSongsInterface,
-} from "utils/firebase/client/firebase.types";
-import { SongFormatter } from "../types/formatter.types";
-import {
-  LearnedSongFormatter,
-  WantToLearnSongFormatter,
-  LearningSongFormatter,
   AddedSongFormatter,
   DifficultyRateSongFormatter,
+  LearnedSongFormatter,
+  LearningSongFormatter,
+  WantToLearnSongFormatter,
 } from "./songFormatters";
-import { ActivityLogFormatter } from "./generalLogFormatter";
 
-export const formatDiscordMessage = async (
-  log: FirebaseLogsInterface | FirebaseLogsSongsInterface
-) => {
-  if ("songTitle" in log) {
-    const formatter = getSongFormatter(log.status);
-    return formatter.format(log);
-  } else {
-    const formatter = new ActivityLogFormatter();
-    return formatter.format(log);
-  }
-};
 
 const getSongFormatter = (status: string): SongFormatter => {
   switch (status) {
@@ -40,3 +29,16 @@ const getSongFormatter = (status: string): SongFormatter => {
       throw new Error("Unknown log status");
   }
 };
+
+export const formatDiscordMessage = async (
+  log: FirebaseLogsInterface | FirebaseLogsSongsInterface
+) => {
+  if ("songTitle" in log) {
+    const formatter = getSongFormatter(log.status);
+    return formatter.format(log);
+  } else {
+    const formatter = new ActivityLogFormatter();
+    return formatter.format(log);
+  }
+};
+

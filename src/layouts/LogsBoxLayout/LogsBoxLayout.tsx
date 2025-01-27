@@ -1,17 +1,17 @@
-import type { AchievementList } from "assets/achievements/achievementsData";
 import { changelogEntries } from "changelogEntries";
-import { useUnreadMessages } from "hooks/useUnreadMessages";
-import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
-import {useState } from "react";
-import { useTranslation } from "react-i18next";
-import { FaGuitar, FaTasks } from "react-icons/fa";
-import { IoChatboxEllipses } from "react-icons/io5";
-import { TbNews } from "react-icons/tb";
+import type { AchievementList } from "feature/achievements/achievementsData";
+import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
-  FirebaseEventsInteface,
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
-} from "utils/firebase/client/firebase.types";
+} from "feature/logs/types/logs.type";
+import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
+import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { FaGuitar, FaMedal, FaTasks } from "react-icons/fa";
+import { IoChatboxEllipses } from "react-icons/io5";
+import { TbNews } from "react-icons/tb";
 
 import Chat from "../../feature/chat/Chat";
 import ExerciseBox from "../../feature/exercisePlan/view/ExerciseBox";
@@ -20,7 +20,6 @@ import Logs from "./components/Logs";
 
 export interface LogsBoxLayoutProps {
   logs: (FirebaseLogsSongsInterface | FirebaseLogsInterface)[];
-  events: FirebaseEventsInteface[];
   userAchievements: AchievementList[];
 }
 
@@ -53,8 +52,11 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
   };
 
   return (
-    <div className='relative m-auto mt-5 flex h-[600px] flex-col border border-second-400/60 bg-second-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]'>
-      <div className='sticky top-0 left-0 flex flex-row  justify-around gap-4 p-2  font-bold'>
+    <div
+      className={`relative m-auto mt-5 flex ${
+        showedCategory !== "achievements" && "h-[600px]"
+      } flex-col border border-second-400/60 bg-second-500/80 p-1 pb-3 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]`}>
+      <div className=' left-0 top-0 flex flex-row  justify-around gap-4 p-2  font-bold'>
         <LogsBoxButton
           title={t("logsBox.logs")}
           active={showedCategory === "logs"}
@@ -71,12 +73,12 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           notificationCount={unreadChats}
           hasNewMessages={hasNewChats}
         />
-        {/* <LogsBoxButton
+        <LogsBoxButton
           title={t("logsBox.achievements_map")}
           active={showedCategory === "achievements"}
           onClick={() => handleCategoryChange("achievements")}
           Icon={FaMedal}
-        /> */}
+        />
         <LogsBoxButton
           title={"Plany Ćwiczeń"}
           active={showedCategory === "excerise"}
@@ -90,9 +92,9 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           Icon={TbNews}
         />
       </div>
-      {/* {showedCategory === "achievements" && (
+      {showedCategory === "achievements" && (
         <AchievementsMap userAchievements={userAchievements} />
-      )} */}
+      )}
       <div className='h-full overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
         {showedCategory === "logs" && logs && (
           <div onClick={markLogsAsRead}>

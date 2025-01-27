@@ -1,9 +1,8 @@
 import type {
   AchievementList,
-  AchievementsDataInterface} from "assets/achievements/achievementsData";
-import {
-  achievementsData
-} from "assets/achievements/achievementsData";
+  AchievementsDataInterface,
+} from "feature/achievements/achievementsData";
+import { achievementsData } from "feature/achievements/achievementsData";
 
 import AchievementBox from "../AchievementBox";
 
