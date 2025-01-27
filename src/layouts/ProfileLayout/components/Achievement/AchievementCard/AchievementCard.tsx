@@ -101,10 +101,9 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
         <Icon className='relative z-10 text-lg drop-shadow-lg md:text-3xl' />{" "}
       </motion.div>
       {showTooltip && (
-        <div className='absolute bottom-full left-1/2 z-50 mb-6 w-max max-w-[200px] -translate-x-1/2 rounded-lg bg-black/90 p-3 text-white shadow-lg'>
+        <div className='absolute bottom-full left-1/2 z-50 mb-6 w-max max-w-[200px] -translate-x-1/2 rounded-lg bg-white/90 p-3 text-black shadow-lg'>
           <h3 className='mb-1 font-semibold'>{t(name) as string}</h3>
-          <p className='text-sm text-gray-300'>{t(description) as string}</p>
-          <div className='absolute -bottom-2 left-1/2 -translate-x-1/2 border-8 border-transparent border-t-black/90' />
+          <p className='text-sm text-black'>{t(description) as string}</p>
         </div>
       )}
     </div>

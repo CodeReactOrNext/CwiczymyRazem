@@ -1,4 +1,9 @@
-import { ToolTip } from "components/UI";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import type { AchievementList } from "feature/achievements/achievementsData";
 import { achievementsData } from "feature/achievements/achievementsData";
 import { achievementsRarity } from "feature/achievements/achievementsRarity";
@@ -10,15 +15,19 @@ const Achievement = ({ id }: { id: AchievementList }) => {
   const { Icon, rarity, description } = achievementData!;
 
   return (
-    <>
-      <ToolTip />
-      <div data-tip={t(description)}>
-        <Icon
-          className='text-md cursor-help	drop-shadow-md'
-          color={achievementsRarity[rarity].color}
-        />
-      </div>
-    </>
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger>
+          <div>
+            <Icon
+              className='text-md cursor-help drop-shadow-md'
+              color={achievementsRarity[rarity].color}
+            />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>{t(description as any)}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

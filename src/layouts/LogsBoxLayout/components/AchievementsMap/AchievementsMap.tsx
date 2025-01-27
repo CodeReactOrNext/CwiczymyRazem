@@ -1,6 +1,5 @@
 import type { AchievementList } from "feature/achievements/achievementsData";
 import { achievementsData } from "feature/achievements/achievementsData";
-import { ToolTip } from "components/UI";
 import { motion } from "framer-motion";
 import AchievementCard from "layouts/ProfileLayout/components/Achievement/AchievementCard";
 
@@ -11,7 +10,6 @@ interface AchievementsMapProps {
 const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
   return (
     <div className='mt-4 flex h-full flex-row flex-wrap items-center justify-center gap-5 overflow-y-scroll'>
-      <ToolTip />
       {achievementsData.map(({ Icon, id }, index) => {
         const isUnlocked = userAchievements?.includes(id);
 
