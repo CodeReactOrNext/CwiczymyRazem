@@ -38,7 +38,7 @@ const ExerciseShortInfo = ({
       {report.timeSumary && (
         <div className='p-2'>
           <div className='flex flex-row gap-1'>
-            <div className='content-box flex flex-col items-center text-xs'>
+            <div className='content-box flex flex-col items-center  text-xs'>
               <p className='text-sm font-bold'>
                 {convertMsToHM(report.timeSumary.techniqueTime) + "h"}
               </p>
