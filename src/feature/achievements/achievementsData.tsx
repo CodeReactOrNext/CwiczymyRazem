@@ -96,7 +96,7 @@ export const achievementsData: AchievementsDataInterface[] = [
   },
   {
     id: "points_1",
-    
+
     name: "points_1.title",
     Icon: FaCat,
     rarity: "common",

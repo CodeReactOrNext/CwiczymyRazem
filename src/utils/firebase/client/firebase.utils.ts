@@ -1,6 +1,4 @@
-import { statisticsInitial as statistics } from "constants/userStatisticsInitialData";
 import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
-import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
 import type { SortByType } from "feature/leadboard/types";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import {
@@ -12,9 +10,6 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  updateEmail,
-  updatePassword,
-  updateProfile,
 } from "firebase/auth";
 import {
   collection,
@@ -31,15 +26,10 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import type {
-  StatisticsDataInterface,
-} from "types/api.types";
-import { shuffleUid } from "utils/user/shuffleUid";
+import { getStorage, } from "firebase/storage";
 
 import { firebaseApp } from "./firebase.cofig";
 import type {
-  FirebaseEventsInteface,
   FirebaseUserDataInterface,
 } from "./firebase.types";
 
@@ -69,16 +59,6 @@ export const firebaseLogUserOut = async () => {
   await signOut(auth);
 };
 
-export const firebaseGetEvents = async () => {
-  const eventsDocRef = collection(db, "events");
-  const eventsDoc = await getDocs(eventsDocRef);
-  const eventsArr: FirebaseEventsInteface[] = [];
-  eventsDoc.forEach((doc) => {
-    const event = doc.data() as FirebaseEventsInteface;
-    eventsArr.push(event);
-  });
-  return eventsArr;
-};
 
 
 const getDocumentAtIndex = async (sortBy: SortByType, index: number) => {
@@ -103,37 +83,6 @@ export const firebaseGetUserAvatarURL = async () => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.avatar;
-};
-
-export const firebaseRestartUserStats = async () => {
-  if (auth.currentUser) {
-    const userDocRef = doc(db, "users", auth.currentUser?.uid!);
-    await updateDoc(userDocRef, { statistics });
-  }
-};
-
-export const firebaseUpdateUserDisplayName = async (
-  userAuth: string,
-  newDisplayName: string
-) => {
-  const userDocRef = doc(db, "users", userAuth);
-  if (auth.currentUser) {
-    updateProfile(auth.currentUser, { displayName: newDisplayName }).catch(
-      (error) => new Error(error)
-    );
-  }
-  await updateDoc(userDocRef, { displayName: newDisplayName });
-};
-
-export const firebaseUpdateUserEmail = async (newEmail: string) => {
-  if (auth.currentUser) {
-    return updateEmail(auth.currentUser, newEmail);
-  }
-};
-export const firebaseUpdateUserPassword = async (newPassword: string) => {
-  if (auth.currentUser) {
-    return updatePassword(auth.currentUser, newPassword);
-  }
 };
 
 
@@ -290,35 +239,6 @@ export const firebaseUpdateUserDocument = async (
   await updateDoc(userDocRef, { [key]: value });
 };
 
-export const firebaseUploadAvatar = async (image: Blob) => {
-  if (!image) return;
-  const imageRef = ref(
-    storage,
-    `avatars/${shuffleUid(auth.currentUser?.uid!)}`
-  );
-  const data = await uploadBytes(imageRef, image);
-  const fullPath = data.metadata.fullPath;
-  const avatarRef = ref(storage, fullPath);
-  const avatarUrl = await getDownloadURL(avatarRef);
-  await firebaseUpdateUserDocument("avatar", avatarUrl);
-  return { avatar: avatarUrl };
-};
-
-export const firebaseUpdateBand = async (band: string) => {
-  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
-  await updateDoc(userDocRef, { band: band });
-};
-
-export const firebaseUpdateYouTubeLink = async (youtubeLink: string) => {
-  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
-  await updateDoc(userDocRef, { youTubeLink: youtubeLink });
-};
-
-export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
-  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
-  await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
-};
-
 
 export interface UserTooltipData {
   displayName: string;
@@ -405,101 +325,6 @@ export const canUpgradeSkill = (
 
   return true;
 };
-
-
-export const updateSeasonalStats = async (
-  userId: string,
-  stats: StatisticsDataInterface,
-  sessionTime: {
-    techniqueTime: number;
-    theoryTime: number;
-    hearingTime: number;
-    creativityTime: number;
-    sumTime: number;
-  },
-  pointsGained: number
-) => {
-  const season = await getCurrentSeason();
-  const userSeasonRef = doc(db, "seasons", season.seasonId, "users", userId);
-  const userSeasonDoc = await getDoc(userSeasonRef);
-
-  // Get user data to ensure we have displayName and avatar
-  const userDocRef = doc(db, "users", userId);
-  const userDoc = await getDoc(userDocRef);
-  const userData = userDoc.data();
-
-  const currentSeasonData = userSeasonDoc.exists()
-    ? userSeasonDoc.data()
-    : {
-        points: 0,
-        sessionCount: 0,
-        time: {
-          creativity: 0,
-          hearing: 0,
-          technique: 0,
-          theory: 0,
-          longestSession: 0,
-        },
-        achievements: [],
-      };
-
-  const updatedSeasonData = {
-    ...currentSeasonData,
-    points: (currentSeasonData.points || 0) + pointsGained,
-    sessionCount: (currentSeasonData.sessionCount || 0) + 1,
-    time: {
-      creativity:
-        (currentSeasonData.time?.creativity || 0) +
-        (sessionTime.creativityTime || 0),
-      hearing:
-        (currentSeasonData.time?.hearing || 0) + (sessionTime.hearingTime || 0),
-      technique:
-        (currentSeasonData.time?.technique || 0) +
-        (sessionTime.techniqueTime || 0),
-      theory:
-        (currentSeasonData.time?.theory || 0) + (sessionTime.theoryTime || 0),
-      longestSession: Math.max(
-        currentSeasonData.time?.longestSession || 0,
-        sessionTime.sumTime || 0
-      ),
-    },
-    achievements: stats.achievements || [],
-    lvl: stats.lvl || 1,
-    lastReportDate: stats.lastReportDate || new Date().toISOString(),
-    displayName: userData?.displayName || "Unknown User",
-    avatar: userData?.avatar || "",
-    seasonId: season.seasonId,
-  };
-
-  console.log("Updating seasonal stats:", {
-    currentPoints: currentSeasonData.points || 0,
-    pointsGained,
-    newTotalPoints: updatedSeasonData.points,
-    sessionTime,
-  });
-
-  await setDoc(userSeasonRef, updatedSeasonData, { merge: true });
-};
-
-export const firebaseUpdateUserStats = async (
-  userAuth: string,
-  statistics: StatisticsDataInterface,
-  sessionTime: {
-    techniqueTime: number;
-    theoryTime: number;
-    hearingTime: number;
-    creativityTime: number;
-    sumTime: number;
-  },
-  pointsGained: number
-) => {
-  const userDocRef = doc(db, "users", userAuth);
-  await Promise.all([
-    updateDoc(userDocRef, { statistics }),
-    updateSeasonalStats(userAuth, statistics, sessionTime, pointsGained),
-  ]);
-};
-
 
 
 

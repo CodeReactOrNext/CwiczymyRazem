@@ -1,4 +1,4 @@
-import SettingsView from "feature/user/view/SettingsView";
+import SettingsView from "feature/settings/SettingsView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { NextPage } from "next";

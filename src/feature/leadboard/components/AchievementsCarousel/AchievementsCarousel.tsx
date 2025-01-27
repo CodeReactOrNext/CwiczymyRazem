@@ -1,9 +1,6 @@
-import type {
-  AchievementList} from "assets/achievements/achievementsData";
-import {
-  achievementsData,
-} from "assets/achievements/achievementsData";
-import Achievement from "components/Achievement";
+import type { AchievementList } from "feature/achievements/achievementsData";
+import { achievementsData } from "feature/achievements/achievementsData";
+import Achievement from "feature/achievements/components/Achievement";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";

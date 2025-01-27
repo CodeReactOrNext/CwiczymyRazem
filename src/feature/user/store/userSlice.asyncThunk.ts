@@ -1,5 +1,6 @@
 import type { SerializedError } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
@@ -18,16 +19,8 @@ import {
   firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseReauthenticateUser,
-  firebaseRestartUserStats,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
-  firebaseUpdateBand,
-  firebaseUpdateSoundCloudLink,
-  firebaseUpdateUserDisplayName,
-  firebaseUpdateUserEmail,
-  firebaseUpdateUserPassword,
-  firebaseUpdateYouTubeLink,
-  firebaseUploadAvatar,
 } from "utils/firebase/client/firebase.utils";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 

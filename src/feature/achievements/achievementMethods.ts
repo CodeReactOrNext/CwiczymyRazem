@@ -116,6 +116,7 @@ export const checkSession2 = (statistic: StatisticsDataInterface) => {
 export const checkSession3 = (statistic: StatisticsDataInterface) => {
   if (statistic.actualDayWithoutBreak >= 100) return "session_3";
 };
+
 export const checkRing = (statistic: StatisticsDataInterface) => {
   if (statistic.time.creativity <= 18000000) return;
   if (statistic.time.technique <= 18000000) return;
@@ -123,15 +124,18 @@ export const checkRing = (statistic: StatisticsDataInterface) => {
   if (statistic.time.hearing <= 18000000) return;
   return "ring";
 };
+
 export const checkShort = (statistic: StatisticsDataInterface) => {
   if (statistic.actualDayWithoutBreak < 10) return;
   if (statistic.points > 15) return;
   return "ring";
 };
+
 export const checkHeadphones = (statistic: StatisticsDataInterface) => {
   if (statistic.time.hearing <= 36000000) return;
   return "headphones";
 };
+
 export const checkNinja = (statistic: StatisticsDataInterface) => {
   if (statistic.time.theory <= 36000000) return;
   return "ninja";

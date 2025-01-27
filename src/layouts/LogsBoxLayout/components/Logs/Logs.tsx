@@ -3,7 +3,7 @@ import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
 } from "feature/logs/types/logs.type";
-import { useUnreadMessages } from "hooks/useUnreadMessages";
+import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";

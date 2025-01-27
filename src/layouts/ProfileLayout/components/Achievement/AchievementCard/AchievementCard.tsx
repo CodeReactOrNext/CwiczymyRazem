@@ -1,13 +1,6 @@
-import type {
-  AchievementList} from "assets/achievements/achievementsData";
-import {
-  achievementsData,
-} from "assets/achievements/achievementsData";
-import {
-  motion,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
+import type { AchievementList } from "feature/achievements/achievementsData";
+import { achievementsData } from "feature/achievements/achievementsData";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -108,10 +101,10 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
         <Icon className='relative z-10 text-lg drop-shadow-lg md:text-3xl' />{" "}
       </motion.div>
       {showTooltip && (
-        <div className='absolute left-1/2 bottom-full z-50 mb-6 w-max max-w-[200px] -translate-x-1/2 rounded-lg bg-black/90 p-3 text-white shadow-lg'>
+        <div className='absolute bottom-full left-1/2 z-50 mb-6 w-max max-w-[200px] -translate-x-1/2 rounded-lg bg-black/90 p-3 text-white shadow-lg'>
           <h3 className='mb-1 font-semibold'>{t(name) as string}</h3>
           <p className='text-sm text-gray-300'>{t(description) as string}</p>
-          <div className='absolute left-1/2 -bottom-2 -translate-x-1/2 border-8 border-transparent border-t-black/90' />
+          <div className='absolute -bottom-2 left-1/2 -translate-x-1/2 border-8 border-transparent border-t-black/90' />
         </div>
       )}
     </div>

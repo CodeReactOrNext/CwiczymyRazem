@@ -1,4 +1,4 @@
-import { checkAchievement } from "./checkAchievement";
+import { checkAchievement } from "../../feature/achievements/checkAchievement";
 import { checkIsPracticeToday } from "./checkIsPracticeToday";
 import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
 import { getPointsToLvlUp } from "./getPointsToLvlUp";

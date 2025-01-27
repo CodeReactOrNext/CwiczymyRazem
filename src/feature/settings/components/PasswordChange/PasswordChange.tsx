@@ -3,7 +3,7 @@ import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { updateUserPassword } from "feature/user/store/userSlice.asyncThunk";
-import { updateCredsSchema } from "feature/user/view/SettingsView/Settings.schemas";
+import { updateCredsSchema } from "feature/settings/SettingsView/Settings.schemas";
 import { Form, Formik } from "formik";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";

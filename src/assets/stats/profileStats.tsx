@@ -1,4 +1,4 @@
-import { achievementsData } from "assets/achievements/achievementsData";
+import { achievementsData } from "feature/achievements/achievementsData";
 import type { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
 import { i18n } from "next-i18next";
 import {
