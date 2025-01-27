@@ -52,8 +52,11 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
   };
 
   return (
-    <div className='relative m-auto mt-5 flex h-[600px] flex-col border border-second-400/60 bg-second-500/80 p-1 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]'>
-      <div className='sticky left-0 top-0 flex flex-row  justify-around gap-4 p-2  font-bold'>
+    <div
+      className={`relative m-auto mt-5 flex ${
+        showedCategory !== "achievements" && "h-[600px]"
+      } flex-col border border-second-400/60 bg-second-500/80 p-1 pb-3 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]`}>
+      <div className=' left-0 top-0 flex flex-row  justify-around gap-4 p-2  font-bold'>
         <LogsBoxButton
           title={t("logsBox.logs")}
           active={showedCategory === "logs"}

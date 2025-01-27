@@ -10,11 +10,12 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaSoundcloud, FaYoutube } from "react-icons/fa";
 import type { ProfileInterface } from "types/ProfileInterface";
+import { convertMsToHM, getYearsOfPlaying } from "utils/converter";
+
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import StatisticBar from "./components/StatisticBar";
 import type { StatsFieldProps } from "./components/StatsField";
 import StatsField from "./components/StatsField";
-import { getYearsOfPlaying, convertMsToHM } from "utils/converter";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
