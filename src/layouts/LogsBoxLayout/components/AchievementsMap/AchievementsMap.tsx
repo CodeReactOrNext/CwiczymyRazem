@@ -1,9 +1,5 @@
-import type {
-  AchievementList} from "assets/achievements/achievementsData";
-import {
-  achievementsData,
-} from "assets/achievements/achievementsData";
-import { ToolTip } from "components/UI";
+import type { AchievementList } from "feature/achievements/achievementsData";
+import { achievementsData } from "feature/achievements/achievementsData";
 import { motion } from "framer-motion";
 import AchievementCard from "layouts/ProfileLayout/components/Achievement/AchievementCard";
 
@@ -13,8 +9,7 @@ interface AchievementsMapProps {
 
 const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
   return (
-    <div className='mt-4 flex h-full flex-row flex-wrap items-center justify-center gap-5 overflow-y-scroll'>
-      <ToolTip />
+    <div className='mt-4 flex h-full flex-row flex-wrap items-center justify-center gap-5 '>
       {achievementsData.map(({ Icon, id }, index) => {
         const isUnlocked = userAchievements?.includes(id);
 

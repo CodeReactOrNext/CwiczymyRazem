@@ -2,11 +2,11 @@ import type { DropResult } from "@hello-pangea/dnd";
 import { DragDropContext } from "@hello-pangea/dnd";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
-import type { Song, SongStatus } from "utils/firebase/client/firebase.types";
-import { getUserSongs } from "utils/firebase/client/firebase.utils";
 
 interface SongLearningSectionProps {
   isLanding: boolean;

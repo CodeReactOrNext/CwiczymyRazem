@@ -1,4 +1,4 @@
-import { Draggable,Droppable } from "@hello-pangea/dnd";
+import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { Button } from "assets/components/ui/button";
 import {
   Card,
@@ -13,13 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 import { ScrollArea } from "assets/components/ui/scroll-area";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { MoreVertical, Music } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppSelector } from "store/hooks";
-import type { Song, SongStatus } from "utils/firebase/client/firebase.types";
 
 interface SongStatusCardProps {
   title: string;
@@ -44,7 +42,6 @@ export const SongStatusCard = ({
   onSongRemove,
 }: SongStatusCardProps) => {
   const { t } = useTranslation(["songs", "common"]);
-  const userId = useAppSelector(selectUserAuth);
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -53,7 +50,7 @@ export const SongStatusCard = ({
       setIsMobile(window.innerWidth <= 768);
     };
 
-    handleResize(); // Check on initial render
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);

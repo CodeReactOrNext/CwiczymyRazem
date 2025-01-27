@@ -1,4 +1,4 @@
-import type { Song } from "utils/firebase/client/firebase.types";
+import type { Song } from "feature/songs/types/songs.type";
 
 export const getAverageDifficulty = (difficulties: Song["difficulties"]) => {
   if (!difficulties?.length) return 0;

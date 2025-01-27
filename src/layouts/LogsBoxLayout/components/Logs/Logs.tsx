@@ -1,15 +1,15 @@
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
-import { useUnreadMessages } from "hooks/useUnreadMessages";
+import type {
+  FirebaseLogsInterface,
+  FirebaseLogsSongsInterface,
+} from "feature/logs/types/logs.type";
+import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { IoMdMusicalNotes } from "react-icons/io";
 import { IoPersonOutline } from "react-icons/io5";
 import { addZeroToTime } from "utils/converter";
-import type {
-  FirebaseLogsInterface,
-  FirebaseLogsSongsInterface,
-} from "utils/firebase/client/firebase.types";
 
 // Type guard
 const isFirebaseLogsSongs = (
@@ -23,7 +23,6 @@ interface LogsBoxLayoutProps {
   marksLogsAsRead: () => void;
 }
 
-// Reusable timestamp component
 const TimeStamp = ({ date }: { date: Date }) => (
   <p className='mr-3 w-[23%] max-w-[8rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem] text-secondText lg:text-xs'>
     {date.toLocaleDateString() +
@@ -34,10 +33,15 @@ const TimeStamp = ({ date }: { date: Date }) => (
   </p>
 );
 
-// Reusable user link component
-const UserLink = ({ uid, userName }: { uid: string | undefined; userName: string }) => {
+const UserLink = ({
+  uid,
+  userName,
+}: {
+  uid: string | undefined;
+  userName: string;
+}) => {
   if (!uid) return <span>{userName}</span>;
-  
+
   return (
     <UserTooltip userId={uid}>
       <Link className='text-white hover:underline' href={`/user/${uid}`}>
@@ -47,10 +51,17 @@ const UserLink = ({ uid, userName }: { uid: string | undefined; userName: string
   );
 };
 
-const LogItem = ({ isNew, children }: { isNew: boolean; children: React.ReactNode }) => (
-  <div className={`my-4 flex flex-row flex-nowrap items-center bg-main-opposed-bg p-4 transition-all duration-300 radius-default ${
-    isNew ? "border border-white/30" : ""
-  }`}>
+const LogItem = ({
+  isNew,
+  children,
+}: {
+  isNew: boolean;
+  children: React.ReactNode;
+}) => (
+  <div
+    className={`my-4 flex flex-row flex-nowrap items-center bg-main-opposed-bg p-4 transition-all duration-300 radius-default ${
+      isNew ? "border border-white/30" : ""
+    }`}>
     {children}
   </div>
 );
@@ -63,10 +74,19 @@ const getSongStatusMessage = (status: string): string => {
     added: " dodał utwór ",
     difficulty_rate: " ocenił trudność utworu ",
   };
-  return messages[status as keyof typeof messages] ?? " zaktualizował swoje postępy w nauce utworu ";
+  return (
+    messages[status as keyof typeof messages] ??
+    " zaktualizował swoje postępy w nauce utworu "
+  );
 };
 
-const FirebaseLogsSongItem = ({ log, isNew }: { log: FirebaseLogsSongsInterface; isNew: boolean }) => {
+const FirebaseLogsSongItem = ({
+  log,
+  isNew,
+}: {
+  log: FirebaseLogsSongsInterface;
+  isNew: boolean;
+}) => {
   const { userName, data, songArtist, songTitle, status, uid } = log;
   const date = new Date(data);
   const message = getSongStatusMessage(status);
@@ -84,7 +104,8 @@ const FirebaseLogsSongItem = ({ log, isNew }: { log: FirebaseLogsSongsInterface;
           <span className='text-white'>
             {songArtist} {songTitle}
           </span>
-          {status === "wantToLearn" && " do swojej listy utworów, które chce się nauczyć."}
+          {status === "wantToLearn" &&
+            " do swojej listy utworów, które chce się nauczyć."}
           {status === "added" && " do swojej listy utworów."}
           {status === "learning" && "."}
         </p>
@@ -93,7 +114,13 @@ const FirebaseLogsSongItem = ({ log, isNew }: { log: FirebaseLogsSongsInterface;
   );
 };
 
-const FirebaseLogsItem = ({ log, isNew }: { log: FirebaseLogsInterface; isNew: boolean }) => {
+const FirebaseLogsItem = ({
+  log,
+  isNew,
+}: {
+  log: FirebaseLogsInterface;
+  isNew: boolean;
+}) => {
   const { t } = useTranslation("common");
   const { userName, points, data, uid } = log;
   const date = new Date(data);

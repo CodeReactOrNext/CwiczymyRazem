@@ -1,14 +1,7 @@
-import type {
-  AchievementList} from "assets/achievements/achievementsData";
-import {
-  achievementsData,
-} from "assets/achievements/achievementsData";
-import {
-  motion,
-  useMotionValue,
-  useTransform,
-} from "framer-motion";
-import { useState } from "react";
+import type { AchievementList } from "feature/achievements/achievementsData";
+import { achievementsData } from "feature/achievements/achievementsData";
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const AchievementCard = ({ id }: { id: AchievementList }) => {
@@ -33,7 +26,19 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
   const handleMouseLeave = () => {
     x.set(0);
     y.set(0);
+    setShowTooltip(false);
   };
+
+  const handleCardClick = () => {
+    setShowTooltip((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (showTooltip) {
+      const timer = setTimeout(() => setShowTooltip(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showTooltip]);
 
   return (
     <div className='group relative'>
@@ -45,13 +50,12 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
           perspective: "1000px",
         }}
         whileHover={{ scale: 2 }}
-        onClick={() => setShowTooltip(!showTooltip)}
+        onClick={handleCardClick}
         onHoverStart={() => setShowTooltip(true)}
         onHoverEnd={() => setShowTooltip(false)}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         className={`
-          
        ${
          rarity === "common"
            ? "border-achievements-common bg-second-200 text-achievements-common"
@@ -105,13 +109,14 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
             duration: 1.8,
           }}
         />
-        <Icon className='relative z-10 text-lg drop-shadow-lg md:text-3xl' />{" "}
+        <Icon className='relative z-10 text-lg drop-shadow-lg md:text-3xl' />
       </motion.div>
       {showTooltip && (
-        <div className='absolute left-1/2 bottom-full z-50 mb-6 w-max max-w-[200px] -translate-x-1/2 rounded-lg bg-black/90 p-3 text-white shadow-lg'>
+        <div
+          onClick={() => setShowTooltip(false)}
+          className='absolute bottom-full left-1/2 z-50 mb-6 w-max max-w-[200px] -translate-x-1/2 rounded-lg bg-white/90 p-3 text-black shadow-lg'>
           <h3 className='mb-1 font-semibold'>{t(name) as string}</h3>
-          <p className='text-sm text-gray-300'>{t(description) as string}</p>
-          <div className='absolute left-1/2 -bottom-2 -translate-x-1/2 border-8 border-transparent border-t-black/90' />
+          <p className='text-sm text-black'>{t(description) as string}</p>
         </div>
       )}
     </div>

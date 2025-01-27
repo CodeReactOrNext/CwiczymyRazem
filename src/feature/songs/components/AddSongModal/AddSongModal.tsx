@@ -8,12 +8,12 @@ import {
 } from "assets/components/ui/dialog";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import { addSong } from "feature/songs/services/addSong";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import { addSong } from "utils/firebase/client/firebase.utils";
 
 interface AddSongModalProps {
   isOpen: boolean;
@@ -24,7 +24,6 @@ interface AddSongModalProps {
 const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
-  const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);

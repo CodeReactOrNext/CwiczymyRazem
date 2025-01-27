@@ -1,9 +1,9 @@
 import CalendarWrapperSquare from "components/Calendar/components/CalendarWrapperSquare";
+import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 import type { ReportListInterface } from "types/api.types";
-import { firebaseGetUserRaprotsLogs } from "utils/firebase/client/firebase.utils";
 
 type PartiallyRequired<T, K extends keyof T> = Omit<T, K> &
   Required<Pick<T, K>>;
@@ -164,11 +164,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
           <p>{t("calendar.sunday")}</p>
           {datasWithReports.map((date, index) => {
             return date ? (
-              <CalendarWrapperSquare
-                date={date.date}
-                index={index}
-                report={date.report}
-              />
+              <CalendarWrapperSquare date={date.date} report={date.report} />
             ) : (
               <div
                 key={index}

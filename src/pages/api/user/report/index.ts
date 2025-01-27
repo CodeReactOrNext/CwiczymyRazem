@@ -1,12 +1,12 @@
+import { firebaseAddLogReport } from "feature/logs/services/addLogReport.service";
+import {
+  firebaseGetUserData,
+  firebaseSetUserExerciseRaprot,
+} from "feature/report/services/setUserExerciseRaport";
+import { firebaseUpdateUserStats } from "feature/report/services/updateUserStats";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { auth } from "utils/firebase/api/firebase.config";
-import {
-  firebaseAddLogReport,
-  firebaseGetUserData,
-  firebaseSetUserExerciseRaprot,
-  firebaseUpdateUserStats,
-} from "utils/firebase/api/firebase.utils";
 import { reportUpdateUserStats } from "utils/gameLogic/reportUpdateUserState";
 
 interface SkillPointsGained {
