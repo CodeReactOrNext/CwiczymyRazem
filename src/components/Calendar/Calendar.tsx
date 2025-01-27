@@ -164,11 +164,7 @@ const Calendar = ({ userAuth }: { userAuth: string }) => {
           <p>{t("calendar.sunday")}</p>
           {datasWithReports.map((date, index) => {
             return date ? (
-              <CalendarWrapperSquare
-                date={date.date}
-                index={index}
-                report={date.report}
-              />
+              <CalendarWrapperSquare date={date.date} report={date.report} />
             ) : (
               <div
                 key={index}
