@@ -5,7 +5,7 @@ interface AvatarProps {
   name: string;
   lvl?: number;
   avatarURL?: string;
-  size?: "sm" ;
+  size?: "sm";
 }
 
 const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
@@ -13,18 +13,26 @@ const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
 
   return (
     <div className='relative '>
-      <div className={`flex h-20 w-20 items-center justify-center bg-tertiary-400 rounded-lg ${size === "sm" ? "h-10 w-10 rounded-full " : ""}`}>
+      <div
+        className={`flex  items-center justify-center rounded-lg  ${
+          size === "sm" ? "h-10 w-10 rounded-full " : "h-20 w-20"
+        }`}>
         {avatarURL ? (
           <img
             referrerPolicy='no-referrer'
-            className={`h-full w-full rounded-fullt ${size === "sm" ? "h-10 w-10 rounded-full " : ""}`}
+            className={`rounded-fullt h-full w-full ${
+              size === "sm" ? "h-10 w-10 rounded-full " : "h-20 w-20"
+            }`}
             src={avatarURL}
             alt={name}
           />
         ) : (
-          <p className={`font-openSans text-4xl font-bold uppercase text-main-opposed ${size === "sm" ? "text-[14px]" : ""}`}>
+          <p
+            className={`font-openSans text-4xl font-bold uppercase text-main-opposed ${
+              size === "sm" ? "text-[14px]" : ""
+            }`}>
             {name?.[0]}
-          </p>  
+          </p>
         )}
       </div>
       {lvl && (
