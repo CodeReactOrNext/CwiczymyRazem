@@ -12,7 +12,7 @@ const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
   const imgPath = getRankImgPath(lvl ?? 0);
 
   return (
-    <div className='relative '>
+    <div className='relative bg-tertiary-400'>
       <div
         className={`flex  items-center justify-center rounded-lg  ${
           size === "sm" ? "h-10 w-10 rounded-full " : "h-20 w-20"
@@ -28,7 +28,7 @@ const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
           />
         ) : (
           <p
-            className={`font-openSans text-4xl font-bold uppercase text-main-opposed ${
+            className={` font-openSans text-4xl font-bold uppercase text-main-opposed ${
               size === "sm" ? "text-[14px]" : ""
             }`}>
             {name?.[0]}
@@ -37,7 +37,7 @@ const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
       </div>
       {lvl && (
         <img
-          className='absolute bottom-[18px] left-[35px] -rotate-90'
+          className='absolute bottom-[18px] left-[35px] -rotate-90 '
           src={`/static/images/rank/${imgPath}.png`}
           alt={`gutiar rank image for level ${lvl ?? 0}`}
         />

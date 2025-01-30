@@ -28,9 +28,10 @@ const LevelBar = ({
         </span>
       </p>
       <div className=' flex w-full'>
-        <div className='relative  flex h-3 w-full items-center bg-main-opposed bg-opacity-80 radius-default'>
+        <div className='relative  flex h-3 w-full items-center bg-main-opposed bg-opacity-80  radius-default'>
           <div
-            className='relative h-3 bg-gradient-to-r from-main-600 to-main-200 radius-default '
+            className='relative h-3 bg-gradient-to-r from-main-600 to-main-200 shadow-[0_0_15px_rgba(255,0,0,0.2)] drop-shadow-lg 
+                     radius-default '
             style={{ width: progressPercent + "%" }}></div>
         </div>
       </div>
