@@ -1,4 +1,6 @@
 import OldEffect from "components/OldEffect";
+import { motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "wrappers/AuthLayoutWrapper";
 
@@ -52,8 +54,17 @@ const MainLoggedLayout = ({
               pageId={pageId}
             />
             <div
-              className={`z-20 m-4 mt-28 mb-12  flex w-full max-w-[1400px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 xl:mt-[170px] `}>
-              {children}
+              className={`z-20 m-4 mb-12 mt-28  flex w-full max-w-[1400px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 xl:mt-[170px] `}>
+              <AnimatePresence mode='wait'>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.2 }}
+                  className='relative z-10 col-span-2'>
+                  {children}
+                </motion.div>
+              </AnimatePresence>
             </div>
           </MainLoggedWrapper>
           <OldEffect />
