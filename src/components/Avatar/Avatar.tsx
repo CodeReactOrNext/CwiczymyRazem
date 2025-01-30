@@ -12,15 +12,15 @@ const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
   const imgPath = getRankImgPath(lvl ?? 0);
 
   return (
-    <div className='relative bg-tertiary-400'>
+    <div className='relative'>
       <div
-        className={`flex  items-center justify-center rounded-lg  ${
-          size === "sm" ? "h-10 w-10 rounded-full " : "h-20 w-20"
-        }`}>
+        className={`flex  items-center  justify-center rounded-lg ${
+          avatarURL ? "bg-transparent" : "bg-tertiary-400"
+        }  ${size === "sm" ? "h-10 w-10 rounded-full " : "h-20 w-20"}`}>
         {avatarURL ? (
           <img
             referrerPolicy='no-referrer'
-            className={`rounded-fullt h-full w-full ${
+            className={`h-full w-full  ${
               size === "sm" ? "h-10 w-10 rounded-full " : "h-20 w-20"
             }`}
             src={avatarURL}
