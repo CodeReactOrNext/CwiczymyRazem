@@ -38,28 +38,28 @@ const ExerciseShortInfo = ({
       {report.timeSumary && (
         <div className='p-2'>
           <div className='flex flex-row gap-1'>
-            <div className='content-box flex flex-col items-center  text-xs'>
+            <div className='content-box flex flex-col items-center !border-transparent  text-xs'>
               <p className='text-sm font-bold'>
                 {convertMsToHM(report.timeSumary.techniqueTime) + "h"}
               </p>
               <p>{t("calendar.technique")}</p>
             </div>
 
-            <div className='content-box flex flex-col items-center'>
+            <div className='content-box flex flex-col items-center  !border-transparent'>
               <p className='text-sm font-bold'>
                 {convertMsToHM(report.timeSumary.theoryTime) + "h"}
               </p>
               <p>{t("calendar.theory")}</p>
             </div>
 
-            <div className='content-box flex flex-col items-center'>
+            <div className='content-box flex flex-col items-center  !border-transparent'>
               <p className='text-sm font-bold'>
                 {convertMsToHM(report.timeSumary.hearingTime) + "h"}
               </p>
               <p>{t("calendar.hearing")}</p>
             </div>
 
-            <div className='content-box flex flex-col items-center'>
+            <div className='content-box flex flex-col items-center  !border-transparent'>
               <p className='text-sm font-bold'>
                 {convertMsToHM(report.timeSumary.creativityTime) + "h"}
               </p>
