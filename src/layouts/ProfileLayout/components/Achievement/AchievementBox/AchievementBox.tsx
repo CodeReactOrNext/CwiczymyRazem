@@ -1,22 +1,32 @@
+import IconBox from "components/IconBox";
 import type { AchievementsDataInterface } from "feature/achievements/achievementsData";
 import type { AchievementsRarityType } from "feature/achievements/achievementsRarity";
-import IconBox from "components/IconBox";
 import AchievementCard from "layouts/ProfileLayout/components/Achievement/AchievementCard";
 import { useTranslation } from "react-i18next";
 import { FaMedal } from "react-icons/fa";
 
 export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];
+  maxLenght: number;
 }
 
-const AchievementBox = ({ achievment, rarity }: AchievementBoxProps) => {
+const AchievementBox = ({
+  achievment,
+  rarity,
+  maxLenght,
+}: AchievementBoxProps) => {
   const { t } = useTranslation("achievements");
 
   return (
     <div className='content-box mb-4 flex flex-row font-openSans text-sm '>
       <IconBox Icon={FaMedal} medium />
       <div className='mx-2 self-center '>
-        <p className='text- mb-2  text-secondText '>{t(rarity)}</p>
+        <p className=' mb-2  text-secondText '>
+          {t(rarity)}
+          <span className='ml-1'>
+            ({achievment.length}/{maxLenght})
+          </span>
+        </p>
         <div className='flex w-full  flex-row flex-wrap md:gap-4'>
           {achievment.length === 0 ? (
             <p>{t("empty")}</p>
