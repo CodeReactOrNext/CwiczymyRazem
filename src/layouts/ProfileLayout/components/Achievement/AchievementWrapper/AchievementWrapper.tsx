@@ -23,6 +23,7 @@ const AchievementWrapper = ({
         const achievementData = achievementsData.find(
           (achiv) => achiv.id === userAchivId
         );
+
         switch (achievementData?.rarity) {
           case "common":
             common.push(achievementData);
@@ -34,16 +35,29 @@ const AchievementWrapper = ({
             veryRare.push(achievementData);
             break;
         }
+
         return { common, rare, veryRare };
       },
       { common: [], rare: [], veryRare: [] }
     );
 
+  const commonLenght = achievementsData.filter(
+    (achivement) => achivement.rarity === "common"
+  ).length;
+
+  const rareLenght = achievementsData.filter(
+    (achivement) => achivement.rarity === "rare"
+  ).length;
+
+  const veryRareLenght = achievementsData.filter(
+    (achivement) => achivement.rarity === "veryRare"
+  ).length;
+
   return (
     <>
-      <AchievementBox achievment={common} rarity='common' />
-      <AchievementBox achievment={rare} rarity='rare' />
-      <AchievementBox achievment={veryRare} rarity='veryRare' />
+      <AchievementBox achievment={common} maxLenght={commonLenght} rarity='common' />
+      <AchievementBox achievment={rare}  maxLenght={rareLenght} rarity='rare' />
+      <AchievementBox achievment={veryRare}  maxLenght={veryRareLenght} rarity='veryRare' />
     </>
   );
 };
