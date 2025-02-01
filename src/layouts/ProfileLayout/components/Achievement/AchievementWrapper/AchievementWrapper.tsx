@@ -54,11 +54,19 @@ const AchievementWrapper = ({
   ).length;
 
   return (
-    <>
-      <AchievementBox achievment={common} maxLenght={commonLenght} rarity='common' />
-      <AchievementBox achievment={rare}  maxLenght={rareLenght} rarity='rare' />
-      <AchievementBox achievment={veryRare}  maxLenght={veryRareLenght} rarity='veryRare' />
-    </>
+    <div className='content-box mb-4 flex flex-col gap-4 font-openSans text-sm '>
+      <AchievementBox
+        achievment={common}
+        maxLenght={commonLenght}
+        rarity='common'
+      />
+      <AchievementBox achievment={rare} maxLenght={rareLenght} rarity='rare' />
+      <AchievementBox
+        achievment={veryRare}
+        maxLenght={veryRareLenght}
+        rarity='veryRare'
+      />
+    </div>
   );
 };
 export default AchievementWrapper;
