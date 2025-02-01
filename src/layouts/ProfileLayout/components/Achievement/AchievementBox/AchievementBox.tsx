@@ -18,7 +18,7 @@ const AchievementBox = ({
   const { t } = useTranslation("achievements");
 
   return (
-    <div className='content-box mb-4 flex flex-row font-openSans text-sm '>
+    <div className="flex">
       <IconBox Icon={FaMedal} medium />
       <div className='mx-2 self-center '>
         <p className=' mb-2  text-secondText '>
