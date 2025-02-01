@@ -1,9 +1,9 @@
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
 } from "feature/logs/types/logs.type";
-import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -136,7 +136,7 @@ const FirebaseLogsItem = ({
         <span className='text-secondText'>{t("logsBox.get")}</span>
         <span className='mr-1 text-main'>
           +{points}
-          <span className='text-secondText'>{t("logsBox.points")}</span>
+          <span className='text-secondText'> {t("logsBox.points")}</span>
         </span>
       </div>
     </LogItem>
