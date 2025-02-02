@@ -37,7 +37,7 @@ const LevelBar = ({
       </div>
       <p className='mt-2 !font-semibold text-mainText'>
         {points - levelXpStart}/{levelXpEnd - levelXpStart}
-        <span className='text-sm'> {t("header.points_short")}</span>
+        <span className='text-sm'>{' '}{t("header.points_short")}</span>
       </p>
     </div>
   );

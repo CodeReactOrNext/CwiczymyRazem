@@ -36,5 +36,45 @@
     "songs": "Songs",
     "skills": "Skills"
   },
-  "yearsOfPlaying": "Years of playing:"
+  "yearsOfPlaying": "Years of playing:",
+  "practice_insights": "Practice Insights",
+  "insights": {
+    "avg_session": "Average Session Length",
+    "avg_session_desc": "Your typical practice session duration",
+    "points_per_hour": "Points per Hour",
+    "points_per_hour_desc": "Your practice efficiency score",
+    "strongest_area": "Strongest Area",
+    "strongest_area_desc": "Where you spend most time practicing",
+    "focus_suggestion": "Focus Suggestion",
+    "focus_suggestion_desc": "Area that might need more attention",
+    "focus_technique": "Focus on technique practice",
+    "focus_theory": "Focus on music theory",
+    "focus_hearing": "Focus on ear training",
+    "focus_creativity": "Focus on creative exercises",
+    "focus_balanced": "Maintain your balanced practice",
+    "advice": {
+      "first_steps": "Start tracking your practice time across all areas to get personalized insights",
+      "complement_technique": "With strong technical foundation, incorporate more theory and ear training",
+      "complement_theory": "Apply your theoretical knowledge through practical exercises and ear training",
+      "complement_hearing": "Connect your ear training skills with technical practice and theory",
+      "complement_creativity": "Balance your creative practice with technical exercises and theory study",
+      "balance_early_technique": "Include more technical practice in your routine to build a solid foundation",
+      "balance_early_theory": "Add some theory study to understand what you're practicing",
+      "balance_early_hearing": "Include ear training exercises in your practice routine",
+      "balance_early_creativity": "Add some creative exercises to your practice routine",
+      "increase_complexity": "Your practice is well-balanced. Try increasing the complexity in each area",
+      "build_foundation": "Good balance! Focus on consistency and gradually increase practice time",
+      "technical_foundation_needed": "Prioritize technical exercises to build a strong foundation",
+      "theory_basics_needed": "Include basic theory study to support your practice",
+      "steady_progress": "Maintain your current balanced approach while gradually increasing intensity",
+      "mastery_level": "You've achieved high proficiency across all areas. Focus on integrating these skills in complex musical projects",
+      "apply_knowledge_creatively": "You have strong technical and theoretical foundations. Channel these into creative expression",
+      "technical_to_theoretical": "Your technical skills are advanced. Understanding theory will help you utilize them more effectively",
+      "technical_specialist": "Your technical practice is impressive. Focus on applying these skills in more complex musical pieces",
+      "theory_specialist": "Your theoretical knowledge is advanced. Try composing or arranging to apply this knowledge",
+      "hearing_specialist": "Your ear training is exceptional. Consider transcription projects or ear-based teaching",
+      "creativity_specialist": "Your creative skills are strong. Focus on developing a unique style or composing original pieces",
+      "rapid_balanced_progress": "You're making excellent progress across all areas. Keep this balanced approach while increasing complexity"
+    }
+  }
 }

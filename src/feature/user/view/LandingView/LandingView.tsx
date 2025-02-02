@@ -6,6 +6,7 @@ import {
   selectUserAuth,
 } from "feature/user/store/userSlice";
 import { ProfileLandingLayout } from "layouts/ProfileLayout";
+import type { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
@@ -22,7 +23,7 @@ const LandingView = () => {
       subtitle={t("profile")}
       variant='secondary'>
       <ProfileLandingLayout
-        statsField={getUserStatsField(userStats)}
+        statsField={getUserStatsField(userStats) as StatsFieldProps[]}
         userStats={userStats}
         featSlot={<LogsBoxView />}
         userAuth={userAuth as string}

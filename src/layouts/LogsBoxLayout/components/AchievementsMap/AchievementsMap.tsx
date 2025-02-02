@@ -19,7 +19,9 @@ const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.1, delay: index * 0.01 }}
-            className={`rounded-xl p-3 ${isUnlocked ? "" : "bg-second-600"}`}>
+            className={`mb-4 rounded-xl p-3 ${
+              isUnlocked ? "" : "bg-second-600"
+            }`}>
             {isUnlocked && <AchievementCard id={id} />}
             {!isUnlocked && (
               <Icon
