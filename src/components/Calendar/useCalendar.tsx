@@ -45,7 +45,6 @@ export const useCalendar = (userAuth: string) => {
         .padStart(2, "0")}`;
     };
 
-    console.time("Create Datas With Reports");
     const newDatasWithReports = [];
     for (let month = 0; month < 12; month++) {
       const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -66,9 +65,7 @@ export const useCalendar = (userAuth: string) => {
     }
 
     setDatasWithReports(newDatasWithReports);
-
-    console.timeEnd("Total Processing Time");
-  }, [reportList, year, getEmptyFiled]);
+  }, [reportList, year]);
 
   useEffect(() => {
     if (userAuth && reportList === null) {
@@ -143,13 +140,14 @@ export const useCalendar = (userAuth: string) => {
   }, [userAuth, reportList]);
 
   return {
-    reportList: reportList?.map(report => ({
-      date: report.date,
-      techniqueTime: report.timeSumary?.techniqueTime || 0,
-      theoryTime: report.timeSumary?.theoryTime || 0,
-      hearingTime: report.timeSumary?.hearingTime || 0,
-      creativityTime: report.timeSumary?.creativityTime || 0,
-    })) || [],
+    reportList:
+      reportList?.map((report) => ({
+        date: report.date,
+        techniqueTime: report.timeSumary?.techniqueTime || 0,
+        theoryTime: report.timeSumary?.theoryTime || 0,
+        hearingTime: report.timeSumary?.hearingTime || 0,
+        creativityTime: report.timeSumary?.creativityTime || 0,
+      })) || [],
     setYear,
     year,
     datasWithReports,

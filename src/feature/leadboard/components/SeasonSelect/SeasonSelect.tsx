@@ -22,6 +22,8 @@ const SeasonSelect = ({
   isLoading,
 }: SeasonSelectProps) => {
   const { t } = useTranslation("leadboard");
+  const isCurrentSeason = (season: SeasonDataInterface) =>
+    new Date(season.endDate) > new Date();
 
   return (
     <Select
@@ -36,7 +38,7 @@ const SeasonSelect = ({
           <SelectItem key={season.seasonId} value={season.seasonId}>
             {`${new Date(season.startDate).toLocaleDateString()} - 
                ${new Date(season.endDate).toLocaleDateString()}`}
-            {season.isActive && ` (${t("current_season")})`}
+            {isCurrentSeason(season) && ` (${t("current_season")})`}
           </SelectItem>
         ))}
       </SelectContent>

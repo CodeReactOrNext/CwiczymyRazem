@@ -17,12 +17,26 @@ import {
   FaTrophy,
 } from "react-icons/fa";
 import { convertMsToHM } from "utils/converter";
-import type {
-  UserTooltipData} from "utils/firebase/client/firebase.utils";
-import {
-  firebaseGetUserTooltipData
-} from "utils/firebase/client/firebase.utils";
+import type { UserTooltipData } from "utils/firebase/client/firebase.utils";
+import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
 
+const StatsBox = ({
+  Icon,
+  label,
+  value,
+}: {
+  Icon: any;
+  label: string;
+  value: string | number;
+}) => (
+  <div className='flex items-center gap-2 rounded-lg bg-gray-100 p-2'>
+    <IconBox small Icon={Icon} />
+    <div>
+      <p className='text-xs font-medium text-gray-500'>{label}</p>
+      <p className='text-sm font-bold text-gray-900'>{value}</p>
+    </div>
+  </div>
+);
 interface UserTooltipProps {
   userId: string | null;
   children: React.ReactNode;
@@ -44,24 +58,6 @@ export const UserTooltip = ({ userId, children }: UserTooltipProps) => {
     };
     fetchData();
   }, [userId]);
-
-  const StatsBox = ({
-    Icon,
-    label,
-    value,
-  }: {
-    Icon: any;
-    label: string;
-    value: string | number;
-  }) => (
-    <div className='flex items-center gap-2 rounded-lg bg-gray-100 p-2'>
-      <IconBox small Icon={Icon} />
-      <div>
-        <p className='text-xs font-medium text-gray-500'>{label}</p>
-        <p className='text-sm font-bold text-gray-900'>{value}</p>
-      </div>
-    </div>
-  );
 
   if (!userId) return <>{children}</>;
 
