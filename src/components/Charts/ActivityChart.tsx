@@ -36,7 +36,6 @@ interface ActivityChartProps {
   }[];
 }
 
-// Add type for valid category keys
 type CategoryKey = "technique" | "theory" | "hearing" | "creativity";
 
 export function ActivityChart({ data }: ActivityChartProps) {
@@ -210,9 +209,10 @@ export function ActivityChart({ data }: ActivityChartProps) {
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
+              className='font-openSans'
               tickFormatter={(value) => {
                 const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
+                return date.toLocaleDateString("pl", {
                   month: "short",
                   day: "numeric",
                 });
@@ -228,7 +228,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
                       <div className='grid grid-cols-2 gap-2'>
                         <div className='flex flex-col'>
                           <span className='text-[0.70rem] uppercase'>
-                            {new Date(label).toLocaleDateString("en-US", {
+                            {new Date(label).toLocaleDateString("pl", {
                               month: "short",
                               day: "numeric",
                             })}

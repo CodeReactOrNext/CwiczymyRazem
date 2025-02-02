@@ -11,18 +11,17 @@ import { SongLearningSection } from "feature/songs/components/SongLearningSectio
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { AnimatePresence, motion } from "framer-motion";
+import { PracticeInsights } from "layouts/ProfileLayout/components/PracticeInsights/PracticeInsights";
 import { Activity, Brain, LayoutDashboard, Music } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
-import { calculatePercent, convertMsToHM } from "utils/converter";
 import { canUpgradeSkill } from "utils/firebase/client/firebase.utils";
 
 import AchievementWrapper from "./components/Achievement/AchievementWrapper";
 import HeadDecoration from "./components/HeadDecoration";
-import StatisticBar from "./components/StatisticBar";
 import type { StatsFieldProps } from "./components/StatsField";
-import StatsField from "./components/StatsField";
+import { StatsSection } from "./components/StatsSection/StatsSection";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -43,10 +42,8 @@ const ProfileLandingLayout = ({
     learning: Song[];
     learned: Song[];
   }>();
-  const { reportList } = useCalendar(userAuth);
-  const { time, achievements } = userStats;
-  const totalTime =
-    time.technique + time.theory + time.hearing + time.creativity;
+  const { reportList, datasWithReports } = useCalendar(userAuth);
+  const { achievements } = userStats;
   const [userSkills, setUserSkills] = useState<UserSkills>();
   const [activeSection, setActiveSection] = useState<
     "overview" | "activity" | "songs" | "skills"
@@ -85,41 +82,12 @@ const ProfileLandingLayout = ({
       case "overview":
         return (
           <>
-            <div className='flex flex-col lg:flex-row lg:gap-4'>
-              <div className='mb-4 grid h-fit grid-flow-row grid-cols-2 gap-4 md:grid-cols-3 lg:flex-1'>
-                {statsField.map(({ Icon, description, value }) => (
-                  <StatsField
-                    key={description}
-                    Icon={Icon}
-                    description={description}
-                    value={value}
-                  />
-                ))}
-              </div>
-              <div className='content-box relative z-20 mb-2  flex content-around justify-center lg:flex-1'>
-                <StatisticBar
-                  title={t("technique")}
-                  value={convertMsToHM(time.technique)}
-                  percent={calculatePercent(time.technique, totalTime)}
-                />
-                <StatisticBar
-                  title={t("theory")}
-                  value={convertMsToHM(time.theory)}
-                  percent={calculatePercent(time.theory, totalTime)}
-                />
-                <StatisticBar
-                  title={t("hearing")}
-                  value={convertMsToHM(time.hearing)}
-                  percent={calculatePercent(time.hearing, totalTime)}
-                />
-                <StatisticBar
-                  title={t("creativity")}
-                  value={convertMsToHM(time.creativity)}
-                  percent={calculatePercent(time.creativity, totalTime)}
-                />
-              </div>
-            </div>
-
+            <StatsSection
+              statsField={statsField}
+              statistics={userStats}
+              datasWithReports={datasWithReports}
+              t={t}
+            />
             <div className='my-2 mb-2 flex flex-col justify-between'>
               <AchievementWrapper userAchievements={achievements} />
             </div>
@@ -128,7 +96,10 @@ const ProfileLandingLayout = ({
       case "activity":
         return (
           <>
-            <ActivityChart data={reportList as any} />
+            <div className='flex flex-col gap-4 font-openSans'>
+              <PracticeInsights statistics={userStats} />
+              <ActivityChart data={reportList as any} />
+            </div>
             <div className='d-flex justify-content-center mt-6'>
               <Calendar userAuth={userAuth} />
             </div>
