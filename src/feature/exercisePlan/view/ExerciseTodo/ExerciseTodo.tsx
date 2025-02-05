@@ -1,5 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import ExercisePlanLayout from "layouts/ExercisePlanLayout/ExercisePlanLayout";
+import ExercisePlanLayout from "feature/exercisePlan/components/ExercisePlanLayout";
 import { IoIosReturnLeft } from "react-icons/io";
 
 import type { exerciseInterface } from "../ExercisePlan/ExercisePlan";

@@ -1,8 +1,8 @@
 import { Button } from "assets/components/ui/button";
+import ExercisePlanLayout from "feature/exercisePlan/components/ExercisePlanLayout";
+import PlanRowEdit from "feature/exercisePlan/components/PlanRowEdit";
 import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import ExercisePlanLayout from "layouts/ExercisePlanLayout/ExercisePlanLayout";
-import PlanRowEdit from "layouts/ExercisePlanLayout/LogBoxSection/PlanRowEdit";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";

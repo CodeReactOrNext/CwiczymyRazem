@@ -1,8 +1,8 @@
+import Input from "feature/exercisePlan/components/Input";
+import InputTime from "feature/exercisePlan/components/InputTime";
+import Select from "feature/exercisePlan/components/Select";
 import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import { Field, FieldArray, Form, Formik } from "formik";
-import Input from "layouts/ExercisePlanLayout/Input";
-import InputTime from "layouts/ExercisePlanLayout/InputTime";
-import Select from "layouts/ExercisePlanLayout/Select";
 import {
   FaGuitar,
   FaIndent,
