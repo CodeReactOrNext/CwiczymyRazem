@@ -1,6 +1,6 @@
+import PlanRow from "feature/exercisePlan/components/PlanRow";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
-import PlanRow from "layouts/ExercisePlanLayout/PlanRow";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
