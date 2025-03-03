@@ -9,12 +9,11 @@ import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaGuitar, FaMedal, FaTasks } from "react-icons/fa";
+import { FaGuitar, FaMedal } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
 import { TbNews } from "react-icons/tb";
 
 import Chat from "../../feature/chat/Chat";
-import ExerciseBox from "../../feature/exercisePlan/view/ExerciseBox";
 import Changelog from "./components/Changelog";
 import Logs from "./components/Logs";
 
@@ -79,12 +78,7 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           onClick={() => handleCategoryChange("achievements")}
           Icon={FaMedal}
         />
-        <LogsBoxButton
-          title={"Plany Ćwiczeń"}
-          active={showedCategory === "excerise"}
-          onClick={() => handleCategoryChange("excerise")}
-          Icon={FaTasks}
-        />
+
         <LogsBoxButton
           title={"Changelog"}
           active={showedCategory === "discord"}
@@ -101,7 +95,6 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
             <Logs logs={logs} marksLogsAsRead={markLogsAsRead} />
           </div>
         )}
-        {showedCategory === "excerise" && logs && <ExerciseBox />}
         {showedCategory === "discord" && logs && (
           <Changelog entries={changelogEntries} />
         )}

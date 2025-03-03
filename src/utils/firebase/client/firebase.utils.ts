@@ -1,4 +1,3 @@
-import type { exercisePlanInterface } from "feature/exercisePlan/view/ExercisePlan/ExercisePlan";
 import type { SortByType } from "feature/leadboard/types";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import {
@@ -21,7 +20,6 @@ import {
   limit,
   orderBy,
   query,
-  setDoc,
   startAfter,
   Timestamp,
   updateDoc,
@@ -180,36 +178,6 @@ export const firebaseDeleteExercisePlan = async (id: string) => {
   }
 };
 
-export const firebaseUploadExercisePlan = async (
-  exercise: exercisePlanInterface,
-  id?: string
-) => {
-  const userAuth = auth.currentUser?.uid;
-  const exerciseId = new Date().toISOString();
-  if (id && userAuth) {
-    firebaseDeleteExercisePlan(id);
-  }
-  if (userAuth) {
-    const userDocRef = doc(db, "users", userAuth, "exercisePlan", exerciseId);
-    await setDoc(userDocRef, exercise);
-    return;
-  }
-};
-
-
-
-export const firebaseGetExercisePlan = async (userAuth: string) => {
-  const userDocRef = doc(db, "users", userAuth);
-  const exercisePlanDocRef = await getDocs(
-    collection(userDocRef, "exercisePlan")
-  );
-  const exercisePlanArr: exercisePlanInterface[] = [];
-  exercisePlanDocRef.forEach((doc) => {
-    const log = doc.data() as exercisePlanInterface;
-    exercisePlanArr.push({ ...log, id: doc.id });
-  });
-  return exercisePlanArr;
-};
 
 export const firebaseReauthenticateUser = async ({
   email,

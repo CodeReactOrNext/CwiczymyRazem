@@ -1,4 +1,4 @@
-import type { GuitarSkill } from "feature/skills/skills.types";
+import type { GuitarSkill,  } from "feature/skills/skills.types";
 import {
   GiBookmarklet,
   GiCompactDisc,
