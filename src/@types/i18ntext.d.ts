@@ -11,6 +11,7 @@ import type not_found from "../../public/locales/en/404.json";
 import type achievements from "../../public/locales/en/achievements.json";
 import type chat from "../../public/locales/en/chat.json";
 import type common from "../../public/locales/en/common.json";
+import type exercises from "../../public/locales/en/exercises.json";
 import type faq from "../../public/locales/en/faq.json";
 import type footer from "../../public/locales/en/footer.json";
 import type leadboard from "../../public/locales/en/leadboard.json";
@@ -24,6 +25,7 @@ import type songs from "../../public/locales/en/songs.json";
 import type timer from "../../public/locales/en/timer.json";
 import type toast from "../../public/locales/en/toast.json";
 import type yup_errors from "../../public/locales/en/yup_errors.json";
+
 
 interface I18nNamespaces {
   common: typeof common;
@@ -43,6 +45,7 @@ interface I18nNamespaces {
   toast: typeof toast;
   skills: typeof skills;
   chat: typeof chat;
+  exercises: typeof exercises;
 }
 
 declare module "i18next" {

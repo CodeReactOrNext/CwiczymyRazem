@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import Calendar from "components/Calendar";
 import { useCalendar } from "components/Calendar/useCalendar";
 import { ActivityChart } from "components/Charts/ActivityChart";
+import { ExercisePlan } from "feature/exercisePlan/views/ExercisePlan/ExercisePlan";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import { updateUserSkills } from "feature/skills/services/updateUserSkills";
@@ -12,7 +13,7 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { AnimatePresence, motion } from "framer-motion";
 import { PracticeInsights } from "layouts/ProfileLayout/components/PracticeInsights/PracticeInsights";
-import { Activity, Brain, LayoutDashboard, Music } from "lucide-react";
+import { Activity, Brain, LayoutDashboard, Music, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -46,7 +47,7 @@ const ProfileLandingLayout = ({
   const { achievements } = userStats;
   const [userSkills, setUserSkills] = useState<UserSkills>();
   const [activeSection, setActiveSection] = useState<
-    "overview" | "activity" | "songs" | "skills"
+    "overview" | "activity" | "songs" | "skills" | "exercises"
   >("overview");
 
   useEffect(() => {
@@ -128,6 +129,12 @@ const ProfileLandingLayout = ({
             />
           )
         );
+      case "exercises":
+        return (
+          <div className='w-full'>
+            <ExercisePlan />
+          </div>
+        );
     }
   };
 
@@ -160,6 +167,12 @@ const ProfileLandingLayout = ({
           <Brain className='mr-2 h-4 w-4' />
           {t("nav.skills")}
         </Button>
+        <Button
+          variant={activeSection === "exercises" ? "default" : "ghost"}
+          onClick={() => setActiveSection("exercises")}>
+          <Timer className='mr-2 h-4 w-4' />
+          {t("nav.exercises")}
+        </Button>
       </div>
 
       <div className='grid-rows-auto grid-cols-1 items-start gap-6 p-3 md:grid-cols-2 md:!p-6 lg:grid'>
@@ -179,5 +192,23 @@ const ProfileLandingLayout = ({
     </div>
   );
 };
+
+interface StatCardProps {
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+}
+
+const StatCard = ({ icon, title, value }: StatCardProps) => (
+  <div className='rounded-lg border bg-card p-6 text-card-foreground shadow-sm'>
+    <div className='flex items-center gap-4'>
+      <div className='rounded-full bg-primary/10 p-3 text-primary'>{icon}</div>
+      <div>
+        <p className='text-sm text-muted-foreground'>{title}</p>
+        <p className='text-2xl font-bold'>{value}</p>
+      </div>
+    </div>
+  </div>
+);
 
 export default ProfileLandingLayout;

@@ -36,6 +36,9 @@ export async function getStaticProps({ locale }: { locale: string }) {
         "skills",
         "songs",
         "chat",
+        "my_plans",
+        "exercises",
+        "skills"
       ])),
     },
   };
