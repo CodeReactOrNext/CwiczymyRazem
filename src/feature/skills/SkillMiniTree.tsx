@@ -17,7 +17,7 @@ interface MiniSkillTreeProps {
   highlightCategories?: string[];
 }
 
-export const MiniSkillTree = ({
+export const SkillMiniTree = ({
   highlightCategories = [],
 }: MiniSkillTreeProps) => {
   const { t } = useTranslation(["skills", "common", "report"]);

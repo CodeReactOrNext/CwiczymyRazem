@@ -1,9 +1,9 @@
 import { Button } from "assets/components/ui/button";
-import { MiniSkillTree } from "feature/skills/MiniSkillTree";
+import { SkillMiniTree } from "feature/skills/SkillMiniTree";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
 import Router from "next/router";
-import type { Dispatch, SetStateAction} from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -81,7 +81,7 @@ const RatingPopUp = ({
       <div className='modal-box relative w-full bg-second-600 p-12 lg:min-w-[800px]'>
         <Button
           variant='outline'
-          className='btn btn-sm btn-circle absolute right-2 top-2'
+          className='btn btn-circle btn-sm absolute right-2 top-2'
           onClick={() => {
             onClick(false);
             Router.push("/");
@@ -102,7 +102,7 @@ const RatingPopUp = ({
             <h3 className='mb-4 font-openSans text-lg font-semibold'>
               {t("rating_popup.spend_skill_points")}
             </h3>
-            <MiniSkillTree highlightCategories={categoriesWithPoints} />
+            <SkillMiniTree highlightCategories={categoriesWithPoints} />
           </div>
         )}
 
