@@ -1,5 +1,6 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
-import spiderPermutation1324Image from "public/images/exercises/spiderPermutation1324.png";
+
+import spiderPermutation1324Image from "./image.png";
 
 export const spiderPermutation1324Exercise: Exercise = {
   id: "spider_permutation_1324",
@@ -13,7 +14,7 @@ export const spiderPermutation1324Exercise: Exercise = {
   },
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 8,
+  timeInMinutes: 5,
   instructions: [
     {
       pl: "Umieść palce lewej ręki na czterech kolejnych progach jednej struny (np. 1 palec na 5. progu, 2 na 6., 3 na 7., 4 na 8.).",
@@ -60,7 +61,7 @@ export const spiderPermutation1324Exercise: Exercise = {
   ],
   metronomeSpeed: {
     min: 60,
-    max: 160,
+    max: 180,
     recommended: 80
   },
   relatedSkills: ["finger_independence", "technique"],

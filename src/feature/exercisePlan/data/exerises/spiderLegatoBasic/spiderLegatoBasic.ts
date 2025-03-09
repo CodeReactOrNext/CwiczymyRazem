@@ -1,5 +1,6 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
-import spiderLegatoBasicImage from "public/images/exercises/spiderLegatoBasic.png";
+
+import spiderLegatoBasicImage from "./image.png";
 
 export const spiderLegatoBasicExercise: Exercise = {
   id: "spider_legato_basic",
