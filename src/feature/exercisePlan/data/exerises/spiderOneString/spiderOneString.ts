@@ -13,9 +13,9 @@ export const spiderOneStringExercise: Exercise = {
     pl: "Ćwiczenie chromatyczne na jednej strunie rozwijające niezależność palców i precyzję lewej ręki.",
     en: "Chromatic exercise on a single string developing finger independence and left hand precision.",
   },
-  difficulty: "beginner",
+  difficulty: "easy",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4,
   instructions: [
     {
       pl: "Zacznij od pierwszego progu na strunie E, używając palców 1-2-3-4.",
@@ -58,9 +58,9 @@ export const spiderOneStringExercise: Exercise = {
   ],
   metronomeSpeed: {
     min: 60,
-    max: 120,
+    max: 180,
     recommended: 80
   },
-  relatedSkills: ["alternate_picking", "picking"],
+  relatedSkills: ["alternate_picking",  "picking"],
   image: spiderBasicImage
 };

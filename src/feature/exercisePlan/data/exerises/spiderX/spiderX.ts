@@ -13,9 +13,9 @@ export const spiderXExercise: Exercise = {
     pl: "Ćwiczenie wykorzystujące wzór krzyżowy do rozwoju niezależności palców i koordynacji rąk.",
     en: "Exercise using X-pattern to develop finger independence and hand coordination.",
   },
-  difficulty: "intermediate",
+  difficulty: "medium",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 8,
   instructions: [
     {
       pl: "Ułóż palce w kształt litery X na dwóch sąsiednich strunach.",

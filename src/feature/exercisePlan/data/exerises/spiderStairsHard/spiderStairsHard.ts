@@ -13,9 +13,9 @@ export const spiderStairsHardExercise: Exercise = {
     pl: "Zaawansowana wersja ćwiczenia schodkowego z większymi odstępami między dźwiękami i szybszym tempem.",
     en: "Advanced version of the stairs exercise with wider note intervals and faster tempo.",
   },
-  difficulty: "intermediate",
+  difficulty: "medium",
   category: "technique",
-  timeInMinutes: 15,
+  timeInMinutes: 5,
   instructions: [
     {
       pl: "Zacznij od pierwszego progu na strunie E, używając układu palców 1-2-4.",
@@ -48,13 +48,10 @@ export const spiderStairsHardExercise: Exercise = {
       en: "Control pressure - it's easy to press too hard with wider stretches.",
     },
     {
-      pl: "Jeśli czujesz dyskomfort, zmniejsz tempo lub wróć do podstawowej wersji.",
-      en: "If you feel discomfort, reduce tempo or return to the basic version.",
+      pl: "Jeśli czujesz dyskomfort, zmniejsz tempo.",
+      en: "If you feel discomfort, reduce tempo.",
     },
-    {
-      pl: "Ćwicz naprzemiennie wersję podstawową i zaawansowaną.",
-      en: "Practice alternating between basic and advanced versions.",
-    }
+  
   ],
   metronomeSpeed: {
     min: 60,

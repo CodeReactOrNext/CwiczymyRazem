@@ -12,9 +12,9 @@ export const spiderStairsExercise: Exercise = {
     pl: "Ćwiczenie rozwijające koordynację palców poprzez przechodzenie między strunami w układzie schodkowym.",
     en: "Exercise developing finger coordination through string crossing in a stair-like pattern.",
   },
-  difficulty: "beginner",
+  difficulty: "easy",
   category: "technique",
-  timeInMinutes: 15,
+  timeInMinutes: 5,
   instructions: [
     {
       pl: "Zacznij od pierwszego progu na strunie E, używając palców 1-2-3-4.",
@@ -50,10 +50,7 @@ export const spiderStairsExercise: Exercise = {
       pl: "Pracuj nad równomiernym tempem, szczególnie podczas zmiany strun.",
       en: "Work on maintaining even tempo, especially during string changes.",
     },
-    {
-      pl: "Eksperymentuj z różnymi wariantami palcowania (1-2-3-4, 4-3-2-1).",
-      en: "Experiment with different fingering patterns (1-2-3-4, 4-3-2-1).",
-    },
+   
     {
       pl: "Zacznij od wolnego tempa i stopniowo zwiększaj prędkość.",
       en: "Start at a slow tempo and gradually increase speed.",
@@ -64,6 +61,6 @@ export const spiderStairsExercise: Exercise = {
     max: 160,
     recommended: 80,
   },
-  relatedSkills: ["alternate_picking", "picking", "legato"],
+  relatedSkills: ["alternate_picking", "picking",],
   image: spiderBasicImage,
 };
