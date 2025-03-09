@@ -13,9 +13,9 @@ export const spiderBasicExercise: Exercise = {
     pl: "Ćwiczenie rozwijające precyzję lewej ręki oraz synchronizację z prawą ręką.",
     en: "Exercise developing left hand precision and synchronization with right hand.",
   },
-  difficulty: "beginner",
+  difficulty: "easy",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 4,
   instructions: [
     {
       pl: "Wykonaj ćwiczenie 'pajączki' na gitarze, grając 4 dźwięki na jednym bicie (czyli szesnastki). Utrzymaj schemat pokazany na tabulaturze, przesuwając go co próg po wykonanym powtórzeniu.",
@@ -54,6 +54,6 @@ export const spiderBasicExercise: Exercise = {
     max: 180,
     recommended: 80,
   },
-  relatedSkills: ["alternate_picking", "picking"],
+  relatedSkills: ["alternate_picking", "finger_independence",  "picking"],
   image: spiderBasicImage,
 };

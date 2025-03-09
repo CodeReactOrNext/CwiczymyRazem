@@ -27,12 +27,15 @@ export type GuitarSkillId =
   | "tapping"
   | "music_composition"
   | "pitch_recognition"
+  
   | "harmony"
   | 'fingerpicking'
+  | 'phrasing'
   | "improvisation"
   | "ear_training"
   | "sight_reading"
   | "composition"
+  | 'articulation'
   | "music_theory";
 
 export interface GuitarSkill {

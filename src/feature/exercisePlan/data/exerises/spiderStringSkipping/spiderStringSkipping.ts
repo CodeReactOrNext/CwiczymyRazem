@@ -13,17 +13,17 @@ export const SpiderStringSkippingExercise: Exercise = {
     pl: "Ćwiczenie rozwijające koordynację przy przeskakiwaniu między strunami i precyzję prawej ręki.",
     en: "Exercise developing coordination in string skipping and right hand precision.",
   },
-  difficulty: "intermediate",
+  difficulty: "medium",
   category: "technique",
-  timeInMinutes: 12,
+  timeInMinutes: 5,
   instructions: [
     {
       pl: "Rozpocznij od pierwszego progu na strunie E, następnie przeskocz jedną strunę.",
       en: "Start from the first fret on the E string, then skip one string.",
     },
     {
-      pl: "Wykonuj wzór 1-2-3-4 na przemiennych strunach (np. E i G, lub A i B).",
-      en: "Perform the 1-2-3-4 pattern on alternating strings (e.g., E and G, or A and B).",
+      pl: "Wykonuj wzór 1-2-3-4 na przemiennych strunach.",
+      en: "Perform the 1-2-3-4 pattern on alternating strings.",
     },
     {
       pl: "Po każdym powtórzeniu przesuń się o jeden próg wyżej.",

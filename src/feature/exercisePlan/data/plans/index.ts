@@ -1,7 +1,7 @@
 // Tutaj będziemy importować kolejne ćwiczenia z innych planów
 
 import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
-import { Exercise } from "feature/exercisePlan/types/exercise.types";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 // Eksportujemy wszystkie ćwiczenia jako jeden agregat
 export const exercisesAgregat: Exercise[] = [

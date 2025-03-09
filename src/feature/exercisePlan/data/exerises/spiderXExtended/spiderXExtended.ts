@@ -13,7 +13,7 @@ export const spiderXExtendedExercise: Exercise = {
     pl: "Zaawansowana wersja ćwiczenia X z większymi rozpiętościami i złożonymi wzorami.",
     en: "Advanced version of X exercise with wider stretches and complex patterns.",
   },
-  difficulty: "advanced",
+  difficulty: "medium",
   category: "technique",
   timeInMinutes: 15,
   instructions: [
