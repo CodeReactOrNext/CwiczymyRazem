@@ -14,7 +14,7 @@ export const spiderLegatoBasicExercise: Exercise = {
   },
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 8,
+  timeInMinutes: 7,
   instructions: [
     {
       pl: "Umieść palce lewej ręki na czterech kolejnych progach jednej struny.",

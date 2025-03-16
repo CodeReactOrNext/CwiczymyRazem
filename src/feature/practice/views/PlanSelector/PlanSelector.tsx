@@ -4,7 +4,7 @@ import { Card } from "assets/components/ui/card";
 import MainContainer from "components/MainContainer";
 import { ExerciseDetailsDialog } from "feature/exercisePlan/components/ExerciseDetailsDialog/ExerciseDetailsDialog";
 import { categoryGradients } from "feature/exercisePlan/constants/categoryStyles";
-import { defaultPlans } from "feature/exercisePlan/data/plans/defaultPlans";
+import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type {
   Exercise,
   LocalizedContent,
@@ -30,6 +30,7 @@ export const PlanSelector = ({ onBack, onSelectPlan }: PlanSelectorProps) => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
     null
   );
+
 
   const handleStartPlan = (planId: string) => {
     const plan = defaultPlans.find((p) => p.id === planId);
@@ -93,7 +94,7 @@ export const PlanSelector = ({ onBack, onSelectPlan }: PlanSelectorProps) => {
                   </Badge>
                   <div className='flex items-center text-sm text-muted-foreground'>
                     <FaClock className='mr-2 h-4 w-4' />
-                    {plan.totalDuration} min
+                    {plan.exercises.reduce((sum, exercise) => sum + exercise.timeInMinutes, 0)} min
                   </div>
                 </div>
 

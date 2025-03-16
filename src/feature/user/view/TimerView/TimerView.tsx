@@ -1,5 +1,5 @@
 import MainContainer from "components/MainContainer";
-import { defaultPlans } from "feature/exercisePlan/data/plans/defaultPlans";
+import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PracticeModeSelector } from "feature/practice/components/PracticeModeSelector/PracticeModeSelector";

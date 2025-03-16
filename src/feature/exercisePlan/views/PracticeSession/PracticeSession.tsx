@@ -558,17 +558,15 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                 </AnimatePresence>
               </div>
 
-              {/* Panel prawy - Narzędzia i wskazówki */}
               <div className='space-y-4'>
-                {/* Metronom */}
-                <Metronome
-                  initialBpm={currentExercise.metronomeSpeed.recommended}
-                  minBpm={currentExercise.metronomeSpeed.min}
-                  maxBpm={currentExercise.metronomeSpeed.max}
-                  recommendedBpm={currentExercise.metronomeSpeed.recommended}
-                />
-
-                {/* Wskazówki */}
+                {currentExercise.metronomeSpeed && (
+                  <Metronome
+                    initialBpm={currentExercise.metronomeSpeed.recommended}
+                    minBpm={currentExercise.metronomeSpeed.min}
+                    maxBpm={currentExercise.metronomeSpeed.max}
+                    recommendedBpm={currentExercise.metronomeSpeed.recommended}
+                  />
+                )}
                 <Card className='overflow-hidden bg-card/50'>
                   <div className='border-b border-border/50 bg-muted/5 p-3'>
                     <h3 className='text-sm font-medium'>Wskazówki</h3>

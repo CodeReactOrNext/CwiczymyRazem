@@ -1,7 +1,7 @@
 // eslint-disable-next-line simple-import-sort/imports
 import { Button } from "assets/components/ui/button";
 import { ExerciseLayout } from "feature/exercisePlan/components/layout/ExerciseLayout";
-import { defaultPlans } from "feature/exercisePlan/data/plans/defaultPlans";
+import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "react-i18next";
 import { FaPlus } from "react-icons/fa";
 
@@ -91,9 +91,9 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
 
       // Determine difficulty level based on exercises
       const difficultyLevels = {
-        beginner: 1,
-        intermediate: 2,
-        advanced: 3,
+        easy: 1,
+        medium: 2,
+        hard: 3,
       };
 
       const avgDifficulty =
@@ -106,9 +106,9 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
           0
         ) / exercises.length;
 
-      let difficulty: "beginner" | "intermediate" | "advanced" = "beginner";
-      if (avgDifficulty > 2.3) difficulty = "advanced";
-      else if (avgDifficulty > 1.5) difficulty = "intermediate";
+      let difficulty: "easy" | "medium" | "hard" = "easy";
+      if (avgDifficulty > 2.3) difficulty = "hard";
+      else if (avgDifficulty > 1.5) difficulty = "medium";
 
       // Konwertujemy title i description na LocalizedContent, jeśli są stringami
       const localizedTitle: LocalizedContent =
@@ -142,7 +142,7 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
 
       setPlans((prevPlans) => [...prevPlans, newPlan]);
       setIsCreating(false);
-                                                                        
+
       toast.success(t("exercises:my_plans.create_success"));
     } catch (error) {
       console.error("Error creating plan:", error);

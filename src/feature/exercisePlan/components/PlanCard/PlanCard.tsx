@@ -22,12 +22,13 @@ const planGradients = {
     "from-purple-500/5 via-transparent to-pink-500/5 hover:from-purple-500/10 hover:to-pink-500/10",
   hearing:
     "from-orange-500/5 via-transparent to-amber-500/5 hover:from-orange-500/10 hover:to-amber-500/10",
+  mixed:
+    "from-red-500/5 via-transparent to-yellow-500/5 hover:from-red-500/10 hover:to-yellow-500/10",
 };
 
 export const PlanCard = ({ plan, onSelect, onStart }: PlanCardProps) => {
   const { t, i18n } = useTranslation("exercises");
 
-  // Pobierz odpowiednią wersję językową tytułu i opisu
   const title =
     typeof plan.title === "string"
       ? plan.title
@@ -39,7 +40,11 @@ export const PlanCard = ({ plan, onSelect, onStart }: PlanCardProps) => {
       : plan.description?.[i18n.language as keyof typeof plan.description] ||
         plan.description?.pl;
 
-  // Określ domyślną trudność, jeśli nie jest zdefiniowana
+  const totalDuration = plan.exercises.reduce(
+    (acc, exercise) => acc + exercise.timeInMinutes,
+    0
+  );
+
   const difficulty = (plan as any).difficulty || "beginner";
 
   return (
@@ -54,7 +59,7 @@ export const PlanCard = ({ plan, onSelect, onStart }: PlanCardProps) => {
       <div className='relative z-10 p-6'>
         <div className='flex justify-between'>
           <Badge variant='outline' className='rounded-full px-3 py-1 text-xs'>
-            {t(`categories.${plan.category}`)}
+            {t(`categories.${plan.category}` as any)}
           </Badge>
           <Badge variant='outline' className='rounded-full text-xs'>
             {t(`difficulty.${difficulty}` as any)}
@@ -69,7 +74,7 @@ export const PlanCard = ({ plan, onSelect, onStart }: PlanCardProps) => {
         <div className='mt-4 flex flex-wrap items-center gap-4'>
           <div className='flex items-center gap-2 text-sm text-muted-foreground/70'>
             <FaClock className='h-4 w-4' />
-            <span>{plan.totalDuration} min</span>
+            <span>{totalDuration} min</span>
           </div>
           <div className='flex items-center gap-2 text-sm text-muted-foreground/70'>
             <FaListUl className='h-4 w-4' />

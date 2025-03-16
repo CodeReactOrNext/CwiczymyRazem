@@ -52,7 +52,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
               {t(`exercises:categories.${exercise.category}`)}
             </Badge>
             <Badge variant='outline' className='rounded-full text-xs'>
-              {t(`exercises:difficulty.${exercise.difficulty}`)}
+              {t(`exercises:difficulty.${exercise.difficulty}` as any)}
             </Badge>
           </div>
 
