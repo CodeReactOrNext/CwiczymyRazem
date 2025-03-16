@@ -84,11 +84,9 @@ export const ExerciseLibrary = ({ onPlanSelect }: ExerciseLibraryProps) => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value='all'>{t("filters.all")}</SelectItem>
-            <SelectItem value='beginner'>{t("difficulty.beginner")}</SelectItem>
-            <SelectItem value='intermediate'>
-              {t("difficulty.intermediate")}
-            </SelectItem>
-            <SelectItem value='advanced'>{t("difficulty.advanced")}</SelectItem>
+            <SelectItem value='easy'>{t("difficulty.easy")}</SelectItem>
+            <SelectItem value='medium'>{t("difficulty.medium")}</SelectItem>
+            <SelectItem value='hard'>{t("difficulty.hard")}</SelectItem>
           </SelectContent>
         </Select>
 

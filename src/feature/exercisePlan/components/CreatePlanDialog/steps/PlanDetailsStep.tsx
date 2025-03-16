@@ -34,21 +34,15 @@ export const PlanDetailsStep = ({
         pl: data.title,
         en: data.title,
       },
-      
+
       description: {
         pl: data.description,
         en: data.description,
       },
       exercises: selectedExercises,
-      totalDuration: selectedExercises.reduce(
-        (acc, exercise) => acc + exercise.timeInMinutes,
-        0
-      ),
       category: "technique",
       userId: userAuth ?? "",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      difficulty: "beginner",
+      difficulty: "easy",
     });
   };
 

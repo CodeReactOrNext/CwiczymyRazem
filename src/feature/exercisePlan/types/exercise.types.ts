@@ -32,12 +32,9 @@ export interface ExercisePlan {
   id: string;
   title: string | LocalizedContent;
   difficulty: DifficultyLevel;
-  updatedAt: Date;
   description: string | LocalizedContent;
-  category: ExerciseCategory;
+  category: ExerciseCategory | 'mixed';
   exercises: Exercise[];
-  totalDuration: number;
-  createdAt: Date;
   userId: string;
 }
 

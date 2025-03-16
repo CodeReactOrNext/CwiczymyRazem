@@ -169,9 +169,6 @@ export const getUserExercisePlan = async (userId: string, planId: string): Promi
         title: exercise.title[i18n?.language as keyof typeof exercise.title] || exercise.title,
         description: exercise.description[i18n?.language as keyof typeof exercise.description] || exercise.description,
       })),
-      totalDuration: data.totalDuration,
-      createdAt: data.createdAt.toDate(),
-      updatedAt: data.updatedAt.toDate(),
       userId: data.userId,
     };
   } catch (error) {

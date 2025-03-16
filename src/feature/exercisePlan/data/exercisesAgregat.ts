@@ -25,6 +25,7 @@ import { spiderPermutation4213Exercise } from "feature/exercisePlan/data/exerise
 import { spiderPermutation4231Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4231/spiderPermutation4231";
 import { spiderPermutation4312Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4312/spiderPermutation4312";
 import { spiderPermutation4321Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4321/spiderPermutation4321";
+import { spiderRhythmicProgressionExercise } from "feature/exercisePlan/data/exerises/spiderRhythmicProgression/spiderRhythmicProgression";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
@@ -37,7 +38,6 @@ import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStai
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
-import { spiderRhythmicProgressionExercise } from "feature/exercisePlan/data/exerises/spiderRhythmicProgression/spiderRhythmicProgression";
 
 export const exercisesAgregat: Exercise[] = [
   spiderOneStringExercise,

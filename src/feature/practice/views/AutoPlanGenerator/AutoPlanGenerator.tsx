@@ -51,9 +51,9 @@ export const AutoPlanGenerator = ({
 
     // Determine difficulty level based on exercises
     const difficultyLevels = {
-      beginner: 1,
-      intermediate: 2,
-      advanced: 3,
+      easy: 1,
+      medium: 2,
+      hard: 3,
     };
 
     const avgDifficulty =
@@ -66,9 +66,9 @@ export const AutoPlanGenerator = ({
         0
       ) / selectedExercises.length;
 
-    let difficulty: DifficultyLevel = "beginner";
-    if (avgDifficulty > 2.3) difficulty = "advanced";
-    else if (avgDifficulty > 1.5) difficulty = "intermediate";
+    let difficulty: DifficultyLevel = "easy";
+    if (avgDifficulty > 2.3) difficulty = "hard";
+    else if (avgDifficulty > 1.5) difficulty = "medium";
 
     // Tworzymy tytuł i opis jako obiekty LocalizedContent
     const title: LocalizedContent = {
@@ -88,9 +88,6 @@ export const AutoPlanGenerator = ({
       difficulty,
       category: primaryCategory,
       exercises: selectedExercises,
-      totalDuration: time,
-      createdAt: new Date(),
-      updatedAt: new Date(),
       userId: "system",
     };
 

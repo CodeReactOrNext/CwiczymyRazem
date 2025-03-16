@@ -95,9 +95,9 @@
     "hearing": "Słuch"
   },
   "difficulty": {
-    "beginner": "Początkujący",
-    "intermediate": "Średniozaawansowany",
-    "advanced": "Zaawansowany"
+    "easy": "Łatwy",
+    "medium": "Średni",
+    "hard": "Trudny"
   },
   "common": {
     "duration": "{{minutes}} min",
