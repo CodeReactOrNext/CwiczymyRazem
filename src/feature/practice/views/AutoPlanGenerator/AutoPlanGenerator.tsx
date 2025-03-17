@@ -27,18 +27,28 @@ export const AutoPlanGenerator = ({
   const currentLang = i18n.language as keyof LocalizedContent;
   const [time, setTime] = useState(30);
   const [generatedPlan, setGeneratedPlan] = useState<ExercisePlan | null>(null);
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
-    null
-  );
+
+  // Helper function to display localized content
+  const getLocalizedText = (content: LocalizedContent | string): string => {
+    if (typeof content === "string") return content;
+    return content[currentLang] || content.en;
+  };
 
   const generatePlan = () => {
-    // Przykładowa logika generowania planu
-    const allExercises = exercisesAgregat;
-    const selectedExercises = allExercises
-      .sort(() => Math.random() - 0.5)
-      .slice(0, Math.floor(time / 15)); // Zakładamy, że każde ćwiczenie trwa około 15 minut
+    const allExercises = [...exercisesAgregat].sort(() => Math.random() - 0.5);
+    const selectedExercises: Exercise[] = [];
+    let totalTime = 0;
 
-    // Determine the primary category based on exercises
+    for (const exercise of allExercises) {
+      if (totalTime + exercise.timeInMinutes <= time) {
+        selectedExercises.push(exercise);
+        totalTime += exercise.timeInMinutes;
+      }
+
+      if (totalTime >= time * 0.9) break;
+    }
+
+    // Determine the primary category by finding the most common category
     const categoryCount: Record<string, number> = {};
     selectedExercises.forEach((exercise) => {
       categoryCount[exercise.category] =
@@ -49,8 +59,8 @@ export const AutoPlanGenerator = ({
       (a, b) => b[1] - a[1]
     )[0][0] as ExerciseCategory;
 
-    // Determine difficulty level based on exercises
-    const difficultyLevels = {
+    // Calculate average difficulty level
+    const difficultyValues = {
       easy: 1,
       medium: 2,
       hard: 3,
@@ -58,19 +68,20 @@ export const AutoPlanGenerator = ({
 
     const avgDifficulty =
       selectedExercises.reduce(
-        (acc, exercise) =>
-          acc +
-          difficultyLevels[
-            exercise.difficulty as keyof typeof difficultyLevels
+        (sum, exercise) =>
+          sum +
+          difficultyValues[
+            exercise.difficulty as keyof typeof difficultyValues
           ],
         0
       ) / selectedExercises.length;
 
+    // Determine overall difficulty based on average
     let difficulty: DifficultyLevel = "easy";
     if (avgDifficulty > 2.3) difficulty = "hard";
     else if (avgDifficulty > 1.5) difficulty = "medium";
 
-    // Tworzymy tytuł i opis jako obiekty LocalizedContent
+    // Create localized title and description
     const title: LocalizedContent = {
       pl: `Plan ${time} minut`,
       en: `${time} minute plan`,
@@ -81,6 +92,7 @@ export const AutoPlanGenerator = ({
       en: "Automatically generated practice plan",
     };
 
+    // Create the complete plan
     const newPlan: ExercisePlan = {
       id: "auto-" + Date.now(),
       title,
@@ -94,63 +106,8 @@ export const AutoPlanGenerator = ({
     setGeneratedPlan(newPlan);
   };
 
-  if (generatedPlan) {
-    return (
-      <div className='mx-auto mt-3 max-w-3xl space-y-6 font-openSans'>
-        <div className='mb-8 flex items-center justify-between'>
-          <h1 className='text-3xl font-bold'>
-            {t("exercises:auto_plan.generated_plan")}
-          </h1>
-          <div className='flex gap-2'>
-            <Button variant='outline' onClick={() => setGeneratedPlan(null)}>
-              {t("common:back")}
-            </Button>
-            <Button onClick={() => onSelectPlan?.(generatedPlan)}>
-              {t("common:start")}
-            </Button>
-          </div>
-        </div>
-
-        <Card className='p-6'>
-          <h2 className='mb-4 text-xl font-semibold'>
-            {typeof generatedPlan.title === "string"
-              ? generatedPlan.title
-              : generatedPlan.title[currentLang] || generatedPlan.title.en}
-          </h2>
-          <p className='mb-6 text-muted-foreground'>
-            {typeof generatedPlan.description === "string"
-              ? generatedPlan.description
-              : generatedPlan.description[currentLang] ||
-                generatedPlan.description.en}
-          </p>
-
-          <div className='space-y-4'>
-            {generatedPlan.exercises.map((exercise) => (
-              <Card
-                key={exercise.id}
-                className='cursor-pointer overflow-hidden border border-border/50 transition-all hover:border-primary/50'
-                onClick={() => setSelectedExercise(exercise)}>
-                <div className='flex items-center justify-between p-4'>
-                  <div>
-                    <h3 className='font-medium'>
-                      {typeof exercise.title === "string"
-                        ? exercise.title
-                        : exercise.title[currentLang] || exercise.title.en}
-                    </h3>
-                    <p className='text-sm text-muted-foreground'>
-                      {exercise.timeInMinutes} {t("common:min")}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  return (
+  // Render plan setup view (initial screen)
+  const renderPlanSetup = () => (
     <div className='mx-auto max-w-2xl space-y-8 py-12 font-openSans'>
       <div className='text-center'>
         <h1 className='text-3xl font-bold'>{t("exercises:auto_plan.title")}</h1>
@@ -193,4 +150,100 @@ export const AutoPlanGenerator = ({
       </Card>
     </div>
   );
+
+  // Render exercise card
+  const renderExerciseCard = (exercise: Exercise) => {
+    const difficultyClasses = {
+      easy: "bg-green-100 text-green-800",
+      medium: "bg-yellow-100 text-yellow-800",
+      hard: "bg-red-100 text-red-800",
+    };
+
+    return (
+      <Card
+        key={exercise.id}
+        className='cursor-pointer overflow-hidden border border-border/50 transition-all hover:border-primary/50'
+      >
+        <div className='p-4'>
+          <div className='flex items-center justify-between mb-2'>
+            <h3 className='font-medium text-lg'>{getLocalizedText(exercise.title)}</h3>
+            <div className='flex items-center gap-2'>
+              <span className='text-sm text-muted-foreground'>
+                <FaClock className='inline mr-1 h-3 w-3' /> 
+                {exercise.timeInMinutes} {t("common:min")}
+              </span>
+              <span className={`text-xs px-2 py-1 rounded-full ${difficultyClasses[exercise.difficulty as keyof typeof difficultyClasses]}`}>
+                {exercise.difficulty}
+              </span>
+            </div>
+          </div>
+          
+          <div className='text-sm mb-2'>
+            <span className='inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 text-xs'>
+              {exercise.category}
+            </span>
+          </div>
+          
+          {exercise.description && (
+            <p className='text-sm text-muted-foreground mt-2'>
+              {getLocalizedText(exercise.description)}
+            </p>
+          )}
+          
+          {exercise.goals && (
+            <div className='mt-2'>
+              <p className='text-xs font-medium'>Cele:</p>
+              <ul className='text-xs text-muted-foreground list-disc pl-4 mt-1'>
+                {exercise.goals.map((goal, idx) => (
+                  <li key={idx}>{getLocalizedText(goal)}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </Card>
+    );
+  };
+
+  // Render generated plan view
+  const renderGeneratedPlan = () => {
+    if (!generatedPlan) return null;
+
+    return (
+      <div className='mx-auto mt-3 max-w-3xl space-y-6 font-openSans'>
+        <div className='mb-8 flex items-center justify-between'>
+          <h1 className='text-3xl font-bold'>
+            {t("exercises:auto_plan.generated_plan")}
+          </h1>
+          <div className='flex gap-2'>
+            <Button variant='outline' onClick={() => setGeneratedPlan(null)}>
+              {t("common:back")}
+            </Button>
+            <Button variant='secondary' onClick={generatePlan}>
+              {t("common:regenerate")}
+            </Button>
+            <Button onClick={() => onSelectPlan?.(generatedPlan)}>
+              {t("common:start")}
+            </Button>
+          </div>
+        </div>
+
+        <Card className='p-6'>
+          <h2 className='mb-4 text-xl font-semibold'>
+            {getLocalizedText(generatedPlan.title)}
+          </h2>
+          <p className='mb-6 text-muted-foreground'>
+            {getLocalizedText(generatedPlan.description)}
+          </p>
+
+          <div className='space-y-4'>
+            {generatedPlan.exercises.map(renderExerciseCard)}
+          </div>
+        </Card>
+      </div>
+    );
+  };
+
+  // Main render logic
+  return generatedPlan ? renderGeneratedPlan() : renderPlanSetup();
 };
