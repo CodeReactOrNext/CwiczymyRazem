@@ -8,29 +8,17 @@ import {
 } from "assets/components/ui/select";
 import { ExerciseCard } from "feature/exercisePlan/components/ExerciseCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import type {
-  Exercise,
-  ExercisePlan,
-  LocalizedContent,
-} from "feature/exercisePlan/types/exercise.types";
-import { useRouter } from "next/router";
+import type { LocalizedContent } from "feature/exercisePlan/types/exercise.types";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { v4 as uuidv4 } from "uuid";
 
-interface ExerciseLibraryProps {
-  onPlanSelect?: (plan: ExercisePlan) => void;
-}
-
-export const ExerciseLibrary = ({ onPlanSelect }: ExerciseLibraryProps) => {
+export const ExerciseLibrary = () => {
   const { t, i18n } = useTranslation("exercises");
-  const router = useRouter();
   const currentLang = i18n.language as keyof LocalizedContent;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [isCreating, setIsCreating] = useState(false);
 
   const filteredExercises = exercisesAgregat.filter((exercise) => {
     if (!exercise || !exercise.title) return false;
@@ -46,21 +34,6 @@ export const ExerciseLibrary = ({ onPlanSelect }: ExerciseLibraryProps) => {
 
     return matchesSearch && matchesDifficulty && matchesCategory;
   });
-
-  const handleCreateExercise = async (exerciseData: Omit<Exercise, "id">) => {
-    try {
-      const newExercise: Exercise = {
-        ...exerciseData,
-        id: uuidv4(),
-      };
-
-      // Tutaj logika zapisywania do bazy danych
-
-      setIsCreating(false);
-    } catch (error) {
-      console.error("Error creating exercise:", error);
-    }
-  };
 
   return (
     <div className='space-y-6'>
@@ -97,37 +70,22 @@ export const ExerciseLibrary = ({ onPlanSelect }: ExerciseLibraryProps) => {
           <SelectContent>
             <SelectItem value='all'>{t("filters.all")}</SelectItem>
             <SelectItem value='technique'>
-              {t("filters.categories.technique")}
+              {t("categories.technique")}
             </SelectItem>
-            <SelectItem value='theory'>
-              {t("filters.categories.theory")}
-            </SelectItem>
+            <SelectItem value='theory'>{t("categories.theory")}</SelectItem>
             <SelectItem value='creativity'>
-              {t("filters.categories.creativity")}
+              {t("categories.creativity")}
             </SelectItem>
-            <SelectItem value='hearing'>
-              {t("filters.categories.hearing")}
-            </SelectItem>
+            <SelectItem value='hearing'>{t("categories.hearing")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
         {filteredExercises.map((exercise) => (
-          <ExerciseCard
-            key={exercise.id}
-            exercise={exercise}
-          />
+          <ExerciseCard key={exercise.id} exercise={exercise} />
         ))}
       </div>
-{/* 
-      {isCreating && (
-        <CreateExerciseDialog
-          isOpen={isCreating}
-          onClose={() => setIsCreating(false)}
-          onCreateExercise={handleCreateExercise}
-        />
-      )} */}
     </div>
   );
 };
