@@ -1,0 +1,362 @@
+{
+  "tabs": {
+    "library": "Biblioteka Ćwiczeń",
+    "my_plans": "Moje Plany",
+    "practice": "Ćwiczenia",
+    "progress": "Postęp"
+  },
+  "filters": {
+    "all": "Wszystkie",
+    "difficulty": "Poziom trudności",
+    "category": "Kategoria"
+  },
+  "library": {
+    "title": "Biblioteka Ćwiczeń",
+    "search_placeholder": "Szukaj ćwiczeń...",
+    "no_exercises": "Nie znaleziono ćwiczeń",
+    "add_exercise": "Dodaj Ćwiczenie",
+    "fetch_error": "Nie udało się załadować ćwiczeń",
+    "no_exercises_yet": "Nie utworzyłeś jeszcze żadnych ćwiczeń",
+    "create_first": "Utwórz Swoje Pierwsze Ćwiczenie",
+    "no_matches": "Żadne ćwiczenia nie pasują do filtrów"
+  },
+  "practice": {
+    "start": "Rozpocznij Ćwiczenie",
+    "pause": "Pauza",
+    "resume": "Wznów",
+    "next": "Następne Ćwiczenie",
+    "finish": "Zakończ Sesję",
+    "notes": "Notatki z Ćwiczeń",
+    "metronome": {
+      "title": "Metronom",
+      "bpm": "BPM",
+      "start": "Rozpocznij od",
+      "target": "Cel",
+      "max": "Maksimum"
+    }
+  },
+  "help": {
+    "title": "Pomoc i Wprowadzenie",
+    "description": "Dowiedz się, jak efektywnie korzystać z modułu ćwiczeń",
+    "need_help": "Potrzebujesz Pomocy?",
+    "watch_video": "Zobacz Poradnik",
+    "getting_started": {
+      "title": "Pierwsze Kroki",
+      "content": "Poznaj podstawy tworzenia i realizacji planów ćwiczeń"
+    },
+    "creating_plans": {
+      "title": "Tworzenie Planów Ćwiczeń",
+      "content": "Dowiedz się, jak tworzyć skuteczne plany ćwiczeń dopasowane do Twoich celów"
+    }
+  },
+  "my_plans": {
+    "title": "Moje Plany Ćwiczeń",
+    "create_new": "Stwórz Nowy Plan",
+    "start": "Rozpocznij",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "no_plans": "Nie masz jeszcze żadnych planów ćwiczeń",
+    "form": {
+      "title": "Tytuł Planu",
+      "title_placeholder": "Wprowadź tytuł planu...",
+      "description": "Opis",
+      "description_placeholder": "Opisz swój plan ćwiczeń...",
+      "difficulty": "Poziom Trudności",
+      "category": "Główny Fokus",
+      "create": "Stwórz Plan"
+    },
+    "create_dialog": {
+      "plan_title": "Tytuł Planu",
+      "plan_description": "Opis Planu",
+      "exercises": "Wybierz Ćwiczenia",
+      "order_exercises": "Kolejność ćwiczeń",
+      "order_description": "Przeciągnij ćwiczenia, aby zmienić ich kolejność. Zacznij od rozgrzewki i zakończ trudniejszymi ćwiczeniami.",
+      "total_duration": "Całkowity czas: {{duration}} min",
+      "select_exercises_description": "Wybierz ćwiczenia, które chcesz dodać do planu",
+      "selected_exercises": "Wybrane ćwiczenia ({{count}})"
+    },
+    "create_success": "Plan został utworzony",
+    "create_success_description": "Twój plan ćwiczeń został utworzony",
+    "create_error": "Nie udało się utworzyć planu",
+    "create_error_description": "Wystąpił problem podczas tworzenia planu. Spróbuj ponownie.",
+    "empty_state": "Nie masz jeszcze żadnych planów ćwiczeń",
+    "create_first": "Stwórz pierwszy plan",
+    "custom_plans": "Własne plany",
+    "custom_plans_description": "Twoje spersonalizowane plany ćwiczeń",
+    "predefined_plans": "Gotowe plany",
+    "predefined_plans_description": "Przygotowane przez nas plany ćwiczeń",
+    "create_plan": "Stwórz plan",
+    "no_custom_plans": "Nie masz jeszcze własnych planów ćwiczeń"
+  },
+  "categories": {
+    "technique": "Technika",
+    "theory": "Teoria",
+    "creativity": "Kreatywność",
+    "hearing": "Słuch"
+  },
+  "difficulty": {
+    "easy": "Łatwy",
+    "medium": "Średni",
+    "hard": "Trudny"
+  },
+  "common": {
+    "duration": "{{minutes}} min",
+    "exercises": "ćwiczenia",
+    "difficulty": "Poziom trudności",
+    "category": "Kategoria",
+    "skills": "Umiejętności",
+    "instructions": "Instrukcje",
+    "tips": "Wskazówki",
+    "min": "min",
+    "cancel": "Anuluj",
+    "create": "Stwórz",
+    "back": "Wstecz",
+    "selected": "wybrane",
+    "recommended": "Zalecane",
+    "more": "więcej",
+    "loading": "Ładowanie...",
+    "next": "Dalej"
+  },
+  "practice_session": {
+    "title": "Sesja ćwiczeń",
+    "current_exercise": "Aktualne ćwiczenie",
+    "next_up": "Następne",
+    "complete": "Zakończ ćwiczenie",
+    "skip": "Pomiń",
+    "finish": "Zakończ sesję",
+    "metronome": "Metronom",
+    "notes": "Notatki z ćwiczeń",
+    "save_note": "Zapisz notatkę",
+    "time_practiced": "Czas ćwiczeń",
+    "streak": "Aktualna seria",
+    "next_milestone": "Następny kamień milowy",
+    "no_exercise": "Nie znaleziono ćwiczenia",
+    "exit": "Wyjdź z sesji",
+    "load_error": "Nie udało się załadować planu ćwiczeń",
+    "plan_not_found": "Nie znaleziono planu ćwiczeń",
+    "total_progress": "Całkowity postęp",
+    "tablature": "Tabulatura",
+    "fullscreen": "Przełącz pełny ekran",
+    "zoom_in": "Powiększ",
+    "zoom_out": "Pomniejsz",
+    "reset_zoom": "Resetuj powiększenie",
+    "timer": "Czasomierz",
+    "start_timer": "Uruchom czasomierz",
+    "pause_timer": "Zatrzymaj czasomierz",
+    "time_left": "Pozostały czas"
+  },
+  "progress": {
+    "title": "Twój Postęp",
+    "total_time": "Całkowity Czas Ćwiczeń",
+    "completed_exercises": "Ukończone Ćwiczenia",
+    "favorite_category": "Ulubiona Kategoria",
+    "recent_activity": "Ostatnia Aktywność",
+    "achievements": "Osiągnięcia",
+    "coming_soon": "Śledzenie postępów wkrótce...",
+    "practice_dates": "Daty ćwiczeń"
+  },
+  "exercise_cards": {
+    "beginner_fingerpicking": {
+      "title": "Fingerpicking dla Początkujących",
+      "description": "Podstawowe wzory fingerpickingu dla początkujących"
+    },
+    "scale_mastery": {
+      "title": "Skale: Podstawy Pentatoniki",
+      "description": "Opanuj podstawowe wzory skali pentatonicznej"
+    },
+    "rhythm_mastery": {
+      "title": "Rytm: Wzory Strum",
+      "description": "Podstawowe wzory rytmiczne dla różnych gatunków"
+    },
+    "music_theory": {
+      "title": "Podstawy Teorii Muzyki",
+      "description": "Podstawowe koncepcje teorii muzyki dla gitarzystów"
+    }
+  },
+  "skills": {
+    "fingerpicking": "Fingerpicking",
+    "scales": "Skale",
+    "chords": "Akordy",
+    "rhythm": "Rytm",
+    "theory": "Teoria",
+    "ear_training": "Kształcenie słuchu",
+    "sight_reading": "Czytanie nut",
+    "improvisation": "Improwizacja",
+    "technique": "Technika",
+    "music_theory": "Teoria muzyki"
+  },
+  "exercise": {
+    "create_dialog": {
+      "title": "Stwórz Nowe Ćwiczenie",
+      "description": "Stwórz nowe ćwiczenie, które można dodać do planów ćwiczeń",
+      "details": "Szczegóły",
+      "start_practice": "Rozpocznij ćwiczenie",
+      "exercise_title": "Tytuł Ćwiczenia",
+      "exercise_description": "Opis Ćwiczenia",
+      "metronome_settings": "Ustawienia Metronomu",
+      "min_bpm": "Minimalne BPM",
+      "max_bpm": "Maksymalne BPM",
+      "recommended_bpm": "Zalecane BPM",
+      "tabs": {
+        "basic": "Podstawowe",
+        "details": "Szczegóły",
+        "media": "Media"
+      },
+      "instructions_placeholder": "Instrukcje krok po kroku...",
+      "tips_placeholder": "Pomocne wskazówki do ćwiczeń...",
+      "skills_select": "Wybierz umiejętności, które będą rozwijane podczas tego ćwiczenia",
+      "settings_description": "Skonfiguruj ustawienia ćwiczenia",
+      "metronome_description": "Ustaw zakres tempa dla tego ćwiczenia"
+    },
+    "create_success": "Pomyślnie utworzono ćwiczenie",
+    "create_error": "Nie udało się utworzyć ćwiczenia",
+    "create_success_description": "Twoje ćwiczenie zostało utworzone i dodane do biblioteki",
+    "create_error_description": "Wystąpił problem podczas tworzenia ćwiczenia. Spróbuj ponownie.",
+    "focus_areas": "Obszary skupienia",
+    "category": "Kategoria",
+    "related_skills": "Powiązane umiejętności",
+    "instructions": "Instrukcje",
+    "tips": "Wskazówki",
+    "practice_speed": "Tempo ćwiczenia",
+    "start_at": "Rozpocznij od",
+    "target": "Cel",
+    "max": "Maksimum",
+    "bpm": "BPM",
+    "start_practice": "Rozpocznij ćwiczenie",
+    "details": "Szczegóły",
+    "next": "Następne ćwiczenie",
+    "finish": "Zakończ sesję",
+    "go_to_report": "Przejdź do raportu",
+    "tab": "Tabulatura"
+  },
+  "empty_states": {
+    "no_exercises": {
+      "title": "Odkryj Ćwiczenia Gitarowe",
+      "description": "Rozpocznij swoją podróż z naszą kolekcją ćwiczeń gitarowych lub stwórz własne",
+      "browse": "Przeglądaj Bibliotekę",
+      "create": "Stwórz Ćwiczenie",
+      "features": {
+        "browse": "Przeglądaj Ćwiczenia",
+        "browse_desc": "Znajdź ćwiczenia dopasowane do swojego poziomu i zainteresowań",
+        "create": "Własne Ćwiczenia",
+        "create_desc": "Twórz i udostępniaj własne ćwiczenia"
+      }
+    },
+    "no_plans": {
+      "title": "Rozpocznij Swoją Gitarową Podróż",
+      "description": "Stwórz swój pierwszy plan ćwiczeń i rozwiń swoje umiejętności gry na gitarze",
+      "action": "Stwórz Swój Pierwszy Plan",
+      "features": {
+        "practice": "Ustrukturyzowane Ćwiczenia",
+        "practice_desc": "Zorganizuj swoją rutynę ćwiczeń z dostosowanymi planami",
+        "learn": "Śledź Postępy",
+        "learn_desc": "Monitoruj swój rozwój i pozostań zmotywowany dzięki śledzeniu postępów"
+      }
+    }
+  },
+  "quick_practice": {
+    "title": "Szybka Sesja Ćwiczeń",
+    "description": "Wygeneruj losowy plan ćwiczeń na podstawie dostępnego czasu",
+    "duration": "Dostępny Czas",
+    "difficulty": "Poziom Umiejętności",
+    "focus": "Obszar Ćwiczeń",
+    "generate": "Generuj Plan",
+    "no_exercises": "Nie znaleziono odpowiednich ćwiczeń dla tych kryteriów",
+    "shortcuts": {
+      "title": "Skróty Klawiszowe",
+      "duration": "Dostosuj czas",
+      "difficulty": "Wybierz poziom",
+      "category": "Wybierz kategorię",
+      "generate": "Generuj plan",
+      "close": "Zamknij okno"
+    }
+  },
+  "welcome": {
+    "title": "Witaj w Guitar Practice",
+    "description": "Twój osobisty asystent ćwiczeń, który pomoże Ci rozwinąć umiejętności gry na gitarze",
+    "quick_start": "Szybki Start",
+    "features": {
+      "library": {
+        "title": "Biblioteka Ćwiczeń",
+        "description": "Przeglądaj naszą kolekcję ćwiczeń dostosowanych do wszystkich poziomów",
+        "action": "Przeglądaj Bibliotekę"
+      },
+      "plans": {
+        "title": "Plany Ćwiczeń",
+        "description": "Twórz spersonalizowane rutyny ćwiczeń, aby osiągnąć swoje cele",
+        "action": "Stwórz Plan"
+      }
+    },
+    "steps": {
+      "browse": "Przeglądaj bibliotekę ćwiczeń i znajdź ćwiczenia dopasowane do swojego poziomu",
+      "create": "Stwórz plan ćwiczeń lub dodaj pojedyncze ćwiczenia do swojej rutyny",
+      "practice": "Rozpocznij ćwiczenia z wbudowanym metronomem i timerem",
+      "track": "Śledź swoje postępy i świętuj osiągnięcia"
+    },
+    "get_started": "Rozpocznij Teraz"
+  },
+  "plan": {
+    "create_title": "Stwórz Nowy Plan Ćwiczeń",
+    "create_description": "Stwórz spersonalizowany plan ćwiczeń wybierając ćwiczenia i układając je w odpowiedniej kolejności.",
+    "title": "Nazwa Planu",
+    "title_placeholder": "np. Codzienne Ćwiczenia Fingerpickingu",
+    "description": "Opis",
+    "description_placeholder": "Opisz swój plan ćwiczeń...",
+    "exercises": "Wybrane Ćwiczenia",
+    "add_exercise": "Dodaj Ćwiczenie",
+    "select_exercises": "Wybierz Ćwiczenia",
+    "create_success": "Plan ćwiczeń został utworzony",
+    "total_duration": "Całkowity czas: {{duration}} minut",
+    "steps": {
+      "details": "Szczegóły",
+      "exercises": "Wybór ćwiczeń",
+      "order": "Kolejność"
+    },
+    "summary": "Podsumowanie planu",
+    "total_exercises": "Liczba ćwiczeń",
+    "total_duration": "Całkowity czas",
+    "categories": "Kategorie",
+    "selected_exercises": "Wybrane ćwiczenia ({{count}})",
+    "tips": {
+      "good_description": "Dobry opis pomoże Ci później zrozumieć cel tego planu ćwiczeń",
+      "exercise_order": "Przeciągnij ćwiczenia, aby zmienić ich kolejność. Zacznij od rozgrzewki, a skończ na trudniejszych ćwiczeniach."
+    },
+    "create": "Stwórz Plan"
+  },
+  "errors": {
+    "auth_required": "Musisz być zalogowany, aby utworzyć plan",
+    "create_plan_failed": "Nie udało się utworzyć planu ćwiczeń",
+    "load_plan_failed": "Nie udało się załadować planu ćwiczeń",
+    "load_plans_failed": "Nie udało się załadować planów"
+  },
+  "plans": {
+    "title": "Wybierz plan ćwiczeń",
+    "description": "Wybierz plan, który najlepiej odpowiada Twoim potrzebom",
+    "exercises_count": "{{count}} ćwiczeń",
+    "exercises_count_one": "{{count}} ćwiczenie",
+    "exercises_count_few": "{{count}} ćwiczenia",
+    "exercises_count_many": "{{count}} ćwiczeń"
+  },
+  "exercise_complete": {
+    "title": "Ćwiczenie ukończone!",
+    "duration": "Czas trwania: {{duration}} minut",
+    "repeat": "Powtórz ćwiczenie",
+    "continue": "Kontynuuj"
+  },
+  "metronome": {
+    "recommended_tempo": "Zalecane tempo",
+    "start": "Start",
+    "stop": "Stop"
+  },
+  "instructions": "Instrukcje",
+  "auto_plan": {
+    "title": "Automatyczny plan ćwiczeń",
+    "description": "Wygeneruj losowy plan ćwiczeń na podstawie dostępnego czasu",
+    "duration": "Dostępny czas",
+    "difficulty": "Poziom umiejętności",
+    "focus": "Obszar ćwiczeń",
+    "generate": "Generuj plan",
+    "generated_plan": "Wygenerowany plan",
+    "no_exercises": "Nie znaleziono odpowiednich ćwiczeń dla tych kryteriów"
+  }
+}

@@ -26,6 +26,12 @@ import {
   uploadUserSocialData,
 } from "./userSlice.asyncThunk";
 
+interface UserAuth {
+  uid: string;
+  email: string | null;
+  // ... inne pola
+}
+
 const initialState: userSliceInitialState = {
   userInfo: null,
   userAuth: null,

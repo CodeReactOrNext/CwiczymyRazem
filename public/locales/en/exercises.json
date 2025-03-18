@@ -1,0 +1,412 @@
+{
+  "tabs": {
+    "my_plans": "My Plans",
+    "library": "Exercise Library",
+    "practice": "Practice"
+  },
+  "filters": {
+    "all": "All",
+    "difficulty": "Difficulty",
+    "category": "Category",
+    "categories": {
+      "technique": "Technique",
+      "theory": "Theory",
+      "creativity": "Creativity",
+      "hearing": "Hearing"
+    }
+  },
+  "library": {
+    "title": "Exercise Library",
+    "search_placeholder": "Search exercises...",
+    "no_exercises": "No exercises found",
+    "add_exercise": "Add Exercise",
+    "recommended": "Recommended for You",
+    "all_exercises": "All Exercises",
+    "fetch_error": "Failed to load exercises",
+    "no_exercises_yet": "You haven't created any exercises yet",
+    "create_first": "Create Your First Exercise",
+    "no_matches": "No exercises match your filters"
+  },
+  "practice": {
+    "start": "Start Practice",
+    "pause": "Pause",
+    "resume": "Resume",
+    "next": "Next Exercise",
+    "finish": "Finish Session",
+    "notes": "Practice Notes",
+    "metronome": {
+      "title": "Metronome",
+      "bpm": "BPM",
+      "start": "Start at",
+      "target": "Target",
+      "max": "Max"
+    }
+  },
+  "my_plans": {
+    "title": "My Practice Plans",
+    "create_new": "Create New Plan",
+    "start": "Start",
+    "edit": "Edit",
+    "delete": "Delete",
+    "no_plans": "You don't have any practice plans yet",
+    "create_dialog": {
+      "title": "Create New Exercise Plan",
+      "description": "Create a new exercise plan to organize your practice routine",
+      "plan_title": "Plan Title",
+      "plan_description": "Plan Description",
+      "exercises": "Select Exercises",
+      "add_exercise": "Add Exercise",
+      "exercise": "Exercise",
+      "exercise_title": "Exercise Title",
+      "exercise_description": "Exercise Description",
+      "duration": "Duration (minutes)",
+      "metronome": "Metronome Settings",
+      "min_bpm": "Min BPM",
+      "max_bpm": "Max BPM",
+      "recommended_bpm": "Recommended BPM",
+      "order_exercises": "Order Exercises",
+      "order_description": "Drag exercises to change their order. Start with warm-up and end with more challenging exercises.",
+      "selected_exercises": "Selected exercises ({{count}})",
+      "select_exercises_description": "Select exercises you want to add to your plan"
+    },
+    "form": {
+      "title": "Plan Title",
+      "title_placeholder": "Enter plan title...",
+      "description": "Description",
+      "description_placeholder": "Describe your practice plan...",
+      "difficulty": "Difficulty Level",
+      "category": "Main Focus",
+      "create": "Create Plan"
+    },
+    "create_success": "Plan created successfully",
+    "create_success_description": "Your practice plan has been created",
+    "create_error": "Failed to create plan",
+    "create_error_description": "There was a problem creating your plan. Please try again.",
+    "empty_state": "You don't have any practice plans yet",
+    "custom_plans": "Custom Plans",
+    "custom_plans_description": "Your personalized practice plans",
+    "predefined_plans": "Ready-made Plans",
+    "predefined_plans_description": "Practice plans prepared by us",
+    "create_plan": "Create Plan",
+    "create_first": "Create First Plan",
+    "no_custom_plans": "You don't have any custom practice plans yet"
+  },
+  "categories": {
+    "technique": "Technique",
+    "theory": "Theory",
+    "creativity": "Creativity",
+    "hearing": "Hearing"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "common": {
+    "duration": "{{minutes}} min",
+    "exercises": "Exercises",
+    "difficulty": "Difficulty",
+    "category": "Category",
+    "skills": "Skills",
+    "instructions": "Instructions",
+    "tips": "Tips",
+    "min": "min",
+    "cancel": "Cancel",
+    "create": "Create",
+    "edit": "Edit",
+    "preview": "Preview",
+    "save": "Save Changes",
+    "back_to_edit": "Back to Edit",
+    "back": "Back",
+    "selected": "selected",
+    "recommended": "Recommended",
+    "more": "more",
+    "loading": "Loading...",
+    "next": "Next"
+  },
+  "practice_session": {
+    "title": "Practice Session",
+    "current_exercise": "Current Exercise",
+    "next_up": "Next Up",
+    "complete": "Complete Exercise",
+    "skip": "Skip",
+    "finish": "Finish Session",
+    "metronome": "Metronome",
+    "notes": "Practice Notes",
+    "save_note": "Save Note",
+    "time_practiced": "Time Practiced",
+    "streak": "Current Streak",
+    "next_milestone": "Next Milestone",
+    "no_exercise": "No exercise found",
+    "exit": "Exit Session",
+    "load_error": "Failed to load practice plan",
+    "plan_not_found": "Practice plan not found",
+    "total_progress": "Total Progress",
+    "exercises": "exercises",
+    "session_time": "Session Time",
+    "total_duration": "Total Duration",
+    "tablature": "Tablature",
+    "fullscreen": "Toggle fullscreen",
+    "zoom_in": "Zoom in",
+    "zoom_out": "Zoom out",
+    "reset_zoom": "Reset zoom",
+    "timer": "Timer",
+    "start_timer": "Start timer",
+    "pause_timer": "Pause timer",
+    "time_left": "Time left"
+  },
+  "exercise_cards": {
+    "beginner_fingerpicking": {
+      "title": "Beginner Fingerpicking",
+      "description": "Essential fingerpicking patterns for beginners"
+    },
+    "scale_mastery": {
+      "title": "Scale Mastery: Pentatonic Foundations",
+      "description": "Master the essential pentatonic scale patterns"
+    },
+    "rhythm_mastery": {
+      "title": "Rhythm Mastery: Strumming Patterns",
+      "description": "Essential strumming patterns for various genres"
+    },
+    "music_theory": {
+      "title": "Music Theory Fundamentals",
+      "description": "Essential music theory concepts for guitarists"
+    }
+  },
+  "skills": {
+    "fingerpicking": "Fingerpicking",
+    "scales": "Scales",
+    "chords": "Chords",
+    "rhythm": "Rhythm",
+    "theory": "Theory",
+    "ear_training": "Ear Training",
+    "sight_reading": "Sight Reading",
+    "improvisation": "Improvisation",
+    "technique": "Technique",
+    "music_theory": "Music Theory"
+  },
+  "exercise": {
+    "create_dialog": {
+      "title": "Create New Exercise",
+      "description": "Create a new exercise that can be added to practice plans",
+      "details": "Details",
+      "start_practice": "Start Practice",
+      "exercise_title": "Exercise Title",
+      "exercise_description": "Exercise Description",
+      "metronome_settings": "Metronome Settings",
+      "min_bpm": "Minimum BPM",
+      "max_bpm": "Maximum BPM",
+      "recommended_bpm": "Recommended BPM",
+      "media": "Media",
+      "video_url": "Video URL (YouTube, Vimeo, etc.)",
+      "notation_url": "Sheet Music/Tab URL",
+      "attachments": "Attachments",
+      "tabs": {
+        "basic": "Basic Info",
+        "details": "Details",
+        "media": "Media"
+      },
+      "instructions_placeholder": "Step by step instructions for the exercise...",
+      "tips_placeholder": "Helpful tips for better practice...",
+      "skills_select": "Select skills that will be developed with this exercise",
+      "settings_description": "Configure exercise settings",
+      "metronome_description": "Set the tempo range for this exercise"
+    },
+    "edit_dialog": {
+      "title": "Edit Exercise",
+      "description": "Modify the exercise details"
+    },
+    "create_success": "Exercise created successfully",
+    "create_error": "Failed to create exercise",
+    "create_success_description": "Your exercise has been created and added to your library",
+    "create_error_description": "There was a problem creating your exercise. Please try again.",
+    "focus_areas": "Focus Areas",
+    "category": "Category",
+    "related_skills": "Related Skills",
+    "instructions": "Instructions",
+    "tips": "Tips",
+    "metronome": "Metronome Settings",
+    "min_bpm": "Minimum BPM",
+    "recommended_bpm": "Recommended BPM",
+    "max_bpm": "Maximum BPM",
+    "practice_speed": "Practice Speed",
+    "start_at": "Start at",
+    "target": "Target",
+    "max": "Max",
+    "bpm": "BPM",
+    "next": "Next exercise",
+    "finish": "Finish session",
+    "go_to_report": "Go to report",
+    "tab": "Tab"
+  },
+  "welcome": {
+    "title": "Welcome to Guitar Practice",
+    "description": "Your personal practice assistant to help you improve your guitar skills",
+    "quick_start": "Quick Start Guide",
+    "get_started": "Get Started Now",
+    "features": {
+      "library": {
+        "title": "Exercise Library",
+        "description": "Browse through our collection of exercises designed for all skill levels",
+        "action": "Browse Library"
+      },
+      "plans": {
+        "title": "Practice Plans",
+        "description": "Create personalized practice routines to achieve your goals",
+        "action": "Create Plan"
+      },
+      "progress": {
+        "title": "Track Progress",
+        "description": "Monitor your improvement and stay motivated",
+        "action": "View Progress"
+      }
+    },
+    "steps": {
+      "browse": "Browse the exercise library and find exercises that match your skill level",
+      "create": "Create a practice plan or add individual exercises to your routine",
+      "practice": "Start practicing with the built-in metronome and timer",
+      "track": "Track your progress and celebrate your improvements"
+    }
+  },
+  "tooltips": {
+    "metronome": "Use the metronome to maintain rhythm and gradually increase speed",
+    "timer": "Set practice duration to stay focused and track your practice time",
+    "difficulty": "Start with exercises matching your current skill level",
+    "skills": "Focus on exercises that help develop specific guitar techniques"
+  },
+  "empty_states": {
+    "no_exercises": {
+      "title": "Discover Guitar Exercises",
+      "description": "Start your journey with our curated collection of guitar exercises or create your own",
+      "browse": "Browse Library",
+      "create": "Create Exercise",
+      "features": {
+        "browse": "Explore Exercises",
+        "browse_desc": "Find exercises tailored to your skill level and interests",
+        "create": "Custom Exercises",
+        "create_desc": "Create and share your own practice exercises"
+      }
+    },
+    "no_plans": {
+      "title": "Start Your Guitar Journey",
+      "description": "Create your first practice plan and develop your guitar playing skills",
+      "action": "Create Your First Plan",
+      "features": {
+        "practice": "Structured Practice",
+        "practice_desc": "Organize your practice routine with customized plans",
+        "learn": "Track Progress",
+        "learn_desc": "Monitor your development and stay motivated with progress tracking"
+      }
+    }
+  },
+  "help": {
+    "title": "Help & Getting Started",
+    "description": "Learn how to use the exercise module effectively",
+    "need_help": "Need Help?",
+    "watch_video": "Watch Tutorial",
+    "getting_started": {
+      "title": "Getting Started",
+      "content": "Learn the basics of creating and following exercise plans"
+    },
+    "creating_plans": {
+      "title": "Creating Practice Plans",
+      "content": "Learn how to create effective practice plans that match your goals"
+    }
+  },
+  "goals": {
+    "current_streak": "Current Streak",
+    "best_streak": "Best Streak",
+    "days": "days",
+    "weekly_goal": "Weekly Goal",
+    "minutes": "minutes",
+    "keep_going": "Keep going! You're doing great!",
+    "almost_there": "Almost there!",
+    "goal_reached": "Goal reached! 🎉"
+  },
+  "progression": {
+    "level_up": "Level Up!",
+    "new_milestone": "New Milestone Reached",
+    "next_milestone": "Next Milestone",
+    "mastery": "Mastery Progress",
+    "difficulty": "Current Difficulty Level"
+  },
+  "quick_practice": {
+    "title": "Quick Practice Session",
+    "description": "Generate a random practice plan based on your available time",
+    "duration": "Available Time",
+    "difficulty": "Skill Level",
+    "focus": "Practice Focus",
+    "generate": "Generate Plan",
+    "no_exercises": "No suitable exercises found for these criteria",
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "duration": "Adjust duration",
+      "difficulty": "Select difficulty",
+      "category": "Select category",
+      "generate": "Generate plan",
+      "close": "Close dialog"
+    }
+  },
+  "plan": {
+    "create_title": "Create New Practice Plan",
+    "create_description": "Create a personalized practice plan by selecting exercises and arranging them in the desired order.",
+    "title": "Plan Title",
+    "title_placeholder": "e.g., Daily Fingerpicking Practice",
+    "description": "Plan Description",
+    "description_placeholder": "Describe your practice plan...",
+    "exercises": "Selected Exercises",
+    "add_exercise": "Add Exercise",
+    "select_exercises": "Select Exercises",
+    "create_success": "Practice plan created successfully",
+    "total_duration": "Total duration: {{duration}} minutes",
+    "steps": {
+      "details": "Details",
+      "exercises": "Select Exercises",
+      "order": "Order"
+    },
+    "categories": "Categories",
+    "selected_exercises": "Selected exercises: {{count}}",
+    "tips": {
+      "good_description": "A good description will help you understand the purpose of this practice plan later",
+      "exercise_order": "Drag exercises to change their order. Start with warm-up and end with more challenging exercises."
+    },
+    "summary": "Plan Summary",
+    "total_exercises": "Total Exercises",
+    "total_duration": "Total Duration",
+    "create": "Create Plan"
+  },
+  "errors": {
+    "auth_required": "You need to be logged in to create a plan",
+    "create_plan_failed": "Failed to create practice plan",
+    "load_plan_failed": "Failed to load practice plan",
+    "load_plans_failed": "Failed to load plans"
+  },
+  "exercise_complete": {
+    "title": "Exercise Completed!",
+    "duration": "Duration: {{duration}} minutes",
+    "repeat": "Repeat Exercise",
+    "continue": "Continue"
+  },
+  "metronome": {
+    "recommended_tempo": "Recommended tempo",
+    "start": "Start",
+    "stop": "Stop"
+  },
+  "instructions": "Instructions",
+  "auto_plan": {
+    "title": "Auto-Generated Practice Plan",
+    "description": "Generate a random practice plan based on your available time",
+    "duration": "Available Time",
+    "difficulty": "Skill Level",
+    "focus": "Practice Focus",
+    "generate": "Generate Plan",
+    "generated_plan": "Generated Plan",
+    "no_exercises": "No suitable exercises found for these criteria"
+  },
+  "plans": {
+    "title": "Choose a practice plan",
+    "description": "Select a plan that best suits your needs",
+    "exercises_count": "{{count}} exercises",
+    "exercises_count_one": "{{count}} exercise"
+  }
+}

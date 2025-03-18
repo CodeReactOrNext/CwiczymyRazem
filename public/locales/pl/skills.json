@@ -24,6 +24,14 @@
       "name": "Teoria Akordów",
       "description": "Zrozumienie budowy akordów i progresji"
     },
+    "finger_independence": {
+      "name": "Niezależność Palców",
+      "description": "Opanuj technikę gry niezależnymi palcami"
+    },
+    "phrasings": {
+      "name": "Phrasings",
+      "description": "Opanuj technikę gry złożoną z kilku dźwięków"
+    },
     "scales": {
       "name": "Skale",
       "description": "Naucz się i opanuj podstawowe skale gitarowe"
