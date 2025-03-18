@@ -53,10 +53,10 @@ const ProfileLayout = ({
 
   return (
     <MainContainer title={t("profile")}>
-      <div className='grid-rows-auto  grid-cols-1 px-5  xl:grid'>
+      <div className='grid-rows-auto grid-cols-1 px-5 xl:grid'>
         <div className='content-box relative z-10 row-span-1 mb-4 flex flex-col items-start gap-3 !p-6'>
-          <div className='flex w-full flex-row justify-between gap-4'>
-            <div className='flex w-full flex-col gap-4'>
+          <div className='flex w-full flex-col justify-between gap-6 lg:flex-row'>
+            <div className='flex w-full flex-col gap-4 lg:w-1/2'>
               <div className='flex flex-row items-center gap-6 p-4 pb-0'>
                 <Avatar
                   name={displayName}
@@ -64,10 +64,10 @@ const ProfileLayout = ({
                   avatarURL={avatar}
                 />
                 <div className='flex-col'>
-                  <p className='relative text-4xl'>{displayName}</p>
-                  <p className='relative text-xl font-thin'>
+                  <p className='relative text-2xl lg:text-4xl'>{displayName}</p>
+                  <p className='relative text-lg font-thin lg:text-xl'>
                     {t("points")}:{" "}
-                    <span className='text-2xl font-bold'>
+                    <span className='text-xl font-bold lg:text-2xl'>
                       {statistics.points}
                     </span>
                   </p>
@@ -76,7 +76,7 @@ const ProfileLayout = ({
 
               <div className='z-10 mt-2 gap-1 font-openSans text-sm'>
                 <DaySince date={new Date(lastReportDate)} />
-                <p className='my-1 font-thin '>
+                <p className='my-1 font-thin'>
                   {t("joined")}{" "}
                   <span className='font-semibold'>
                     {createdAt.toDate().toLocaleDateString()}
@@ -93,13 +93,14 @@ const ProfileLayout = ({
                     {t("band")} <span className='font-bold'>{band}</span>
                   </p>
                 )}
-                <div className='flex flex-row justify-evenly gap-4 p-2 text-sm'>
+
+                <div className='flex flex-row flex-wrap justify-start gap-4 p-2 text-sm'>
                   {youTubeLink && (
                     <a
                       target='_blank'
                       rel='noreferrer'
                       href={youTubeLink}
-                      className={"flex items-center gap-1"}>
+                      className='flex items-center gap-1 transition-colors hover:text-red-500'>
                       <FaYoutube size={30} />
                       YouTube
                     </a>
@@ -109,20 +110,24 @@ const ProfileLayout = ({
                       target='_blank'
                       rel='noreferrer'
                       href={soundCloudLink}
-                      className={"flex items-center gap-1"}>
+                      className='flex items-center gap-1 transition-colors hover:text-orange-500'>
                       <FaSoundcloud size={30} />
                       SoundCloud
                     </a>
                   )}
                 </div>
               </div>
-              <LevelBar
-                points={statistics.points}
-                lvl={statistics.lvl}
-                currentLevelMaxPoints={statistics.currentLevelMaxPoints}
-              />
+
+              <div className='w-fit'>
+                <LevelBar
+                  points={statistics.points}
+                  lvl={statistics.lvl}
+                  currentLevelMaxPoints={statistics.currentLevelMaxPoints}
+                />
+              </div>
             </div>
-            <div className='w-full font-openSans'>
+
+            <div className='mt-4 w-full font-openSans lg:mt-0 lg:w-1/2'>
               <PracticeInsights statistics={statistics} />
             </div>
           </div>

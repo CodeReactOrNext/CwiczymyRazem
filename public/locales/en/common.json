@@ -1,5 +1,7 @@
 {
   "or": "or",
+  "start": "Start",
+  "min": "min",
   "button": {
     "sign_in": "Log in",
     "sign_up": "Sign Up",
@@ -96,7 +98,7 @@
     "sessions": "Sessions",
     "habits": "Habits",
     "userNotFound": "User not found",
-        "actual_streak": "Streak"
+    "actual_streak": "Streak"
   },
   "song_status": {
     "move_to": "Move to",
@@ -118,5 +120,47 @@
       "hearing": "Hearing",
       "creativity": "Creativity"
     }
-  }
+  },
+  "duration": "{minutes} min",
+  "skills": {
+    "alternate_picking": "Alternate Picking",
+    "legato": "Legato",
+    "sweep_picking": "Sweep Picking",
+    "chord_theory": "Chord Theory",
+    "scales": "Scales",
+    "rhythm": "Rhythm",
+    "ear_training": "Ear Training",
+    "sight_reading": "Sight Reading",
+    "improvisation": "Improvisation",
+    "composition": "Composition",
+    "harmony": "Harmony",
+    "vibrato": "Vibrato",
+    "music_theory": "Music Theory",
+    "slide_guitar": "Slide Guitar",
+    "audio_production": "Audio Production",
+    "hybrid_picking": "Hybrid Picking",
+    "transcription": "Transcription",
+    "rythm_recognition": "Rhythm Recognition",
+    "picking": "Picking",
+    "finger_independence": "Finger Independence",
+    "string_skipping": "String Skipping",
+    "technique": "Technique"
+  },
+  "back": "Back",
+  "next": "Next",
+  "search": {
+    "placeholder": "Search..."
+  },
+  "filters": {
+    "category": "Category",
+    "all": "All"
+  },
+  "categories": {
+    "technique": "Technique",
+    "theory": "Theory",
+    "creativity": "Creativity",
+    "hearing": "Hearing"
+  },
+  "minutes": "minutes",
+  "cancel": "Cancel"
 }

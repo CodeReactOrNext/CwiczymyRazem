@@ -11,5 +11,21 @@
   "theory": "Teoria",
   "hearing": "Słuch",
   "creativity": "Kreatywność",
-  "choose": "Wybierz kategorię"
+  "choose": "Wybierz kategorię",
+  "select_practice_mode": "Wybierz tryb ćwiczeń",
+  "choose_practice_description": "Wybierz sposób ćwiczenia, który najbardziej Ci odpowiada",
+  "modes": {
+    "timer": {
+      "title": "Zwykłe ćwiczenie",
+      "description": "Ćwicz dowolnie wybrane umiejętności i śledź swój postęp"
+    },
+    "plan": {
+      "title": "Plan ćwiczeń",
+      "description": "Wybierz gotowy plan ćwiczeń i podążaj za nim"
+    },
+    "auto": {
+      "title": "Automatyczny plan",
+      "description": "Pozwól nam stworzyć plan dostosowany do Twojego czasu"
+    }
+  }
 }

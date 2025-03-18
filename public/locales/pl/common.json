@@ -1,6 +1,6 @@
 {
   "or": "lub",
-
+  "min": "min",
   "button": {
     "sign_in": "Loguj",
     "sign_up": "Zarejestruj się",
@@ -119,5 +119,49 @@
       "hearing": "Słuch",
       "creativity": "Kreatywność"
     }
-  }
+  },
+  "select": "Wybierz",
+  "back": "Wróć",
+  "start": "Rozpocznij",
+  "cancel": "Anuluj",
+  "next": "Dalej",
+  "skills": {
+    "alternate_picking": "Alternate Picking",
+    "legato": "Legato",
+    "sweep_picking": "Sweep Picking",
+    "chord_theory": "Teoria Akordów",
+    "scales": "Skale",
+    "rhythm": "Rytm",
+    "ear_training": "Trening Słuchu",
+    "sight_reading": "Czytanie Nut",
+    "improvisation": "Improwizacja",
+    "composition": "Kompozycja",
+    "harmony": "Harmonia",
+    "vibrato": "Vibrato",
+    "music_theory": "Teoria Muzyki",
+    "slide_guitar": "Slide Guitar",
+    "audio_production": "Produkcja Audio",
+    "hybrid_picking": "Hybrid Picking",
+    "transcription": "Transkrypcja",
+    "rythm_recognition": "Rozpoznawanie Rytmu",
+    "picking": "Picking",
+    "finger_independence": "Niezależność Palców",
+    "string_skipping": "String Skipping",
+    "technique": "Technika"
+  },
+  "duration": "{{minutes}} min",
+  "search": {
+    "placeholder": "Szukaj..."
+  },
+  "filters": {
+    "category": "Kategoria",
+    "all": "Wszystkie"
+  },
+  "categories": {
+    "technique": "Technika",
+    "theory": "Teoria",
+    "creativity": "Kreatywność",
+    "hearing": "Słuch"
+  },
+  "minutes": "minut"
 }

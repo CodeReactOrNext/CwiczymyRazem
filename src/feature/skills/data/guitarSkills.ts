@@ -1,8 +1,9 @@
-import type { GuitarSkill } from "feature/skills/skills.types";
+import type { GuitarSkill,  } from "feature/skills/skills.types";
 import {
   GiBookmarklet,
   GiCompactDisc,
   GiGuitarHead,
+  GiHand, 
   GiHandOk,
   GiHeadShot,
   GiMetronome,
@@ -15,14 +16,23 @@ import {
   GiSoundWaves,
   GiSpellBook,
   GiSteelClaws,
-  GiVibratingBall,
-} from "react-icons/gi";
+  GiVibratingBall} from "react-icons/gi";
 
 export const guitarSkills: GuitarSkill[] = [
   {
     id: "alternate_picking",
     category: "technique",
     icon: GiGuitarHead,
+  },
+  {
+    id: "phrasing",
+    category: "creativity",
+    icon: GiGuitarHead,
+  },
+  {
+    id: "finger_independence",
+    category: "technique",
+    icon: GiHand,
   },
   {
     id: "legato",
@@ -83,6 +93,11 @@ export const guitarSkills: GuitarSkill[] = [
     id: "music_composition",
     category: "creativity",
     icon: GiQuillInk,
+  },
+  {
+    id: "articulation",
+    category: "technique",
+    icon: GiSoundWaves,
   },
   {
     id: "pitch_recognition",
