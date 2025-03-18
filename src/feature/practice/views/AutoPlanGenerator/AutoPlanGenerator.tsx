@@ -151,7 +151,6 @@ export const AutoPlanGenerator = ({
     </div>
   );
 
-  // Render exercise card
   const renderExerciseCard = (exercise: Exercise) => {
     const difficultyClasses = {
       easy: "bg-green-100 text-green-800",
@@ -162,50 +161,44 @@ export const AutoPlanGenerator = ({
     return (
       <Card
         key={exercise.id}
-        className='cursor-pointer overflow-hidden border border-border/50 transition-all hover:border-primary/50'
-      >
+        className='cursor-pointer overflow-hidden border border-border/50 transition-all hover:border-primary/50'>
         <div className='p-4'>
-          <div className='flex items-center justify-between mb-2'>
-            <h3 className='font-medium text-lg'>{getLocalizedText(exercise.title)}</h3>
+          <div className='mb-2 flex items-center justify-between'>
+            <h3 className='text-lg font-medium'>
+              {getLocalizedText(exercise.title)}
+            </h3>
             <div className='flex items-center gap-2'>
               <span className='text-sm text-muted-foreground'>
-                <FaClock className='inline mr-1 h-3 w-3' /> 
+                <FaClock className='mr-1 inline h-3 w-3' />
                 {exercise.timeInMinutes} {t("common:min")}
               </span>
-              <span className={`text-xs px-2 py-1 rounded-full ${difficultyClasses[exercise.difficulty as keyof typeof difficultyClasses]}`}>
+              <span
+                className={`rounded-full px-2 py-1 text-xs ${
+                  difficultyClasses[
+                    exercise.difficulty as keyof typeof difficultyClasses
+                  ]
+                }`}>
                 {exercise.difficulty}
               </span>
             </div>
           </div>
-          
-          <div className='text-sm mb-2'>
-            <span className='inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 text-xs'>
+
+          <div className='mb-2 text-sm'>
+            <span className='inline-block rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-800'>
               {exercise.category}
             </span>
           </div>
-          
+
           {exercise.description && (
-            <p className='text-sm text-muted-foreground mt-2'>
+            <p className='mt-2 text-sm text-muted-foreground'>
               {getLocalizedText(exercise.description)}
             </p>
-          )}
-          
-          {exercise.goals && (
-            <div className='mt-2'>
-              <p className='text-xs font-medium'>Cele:</p>
-              <ul className='text-xs text-muted-foreground list-disc pl-4 mt-1'>
-                {exercise.goals.map((goal, idx) => (
-                  <li key={idx}>{getLocalizedText(goal)}</li>
-                ))}
-              </ul>
-            </div>
           )}
         </div>
       </Card>
     );
   };
 
-  // Render generated plan view
   const renderGeneratedPlan = () => {
     if (!generatedPlan) return null;
 
@@ -220,7 +213,7 @@ export const AutoPlanGenerator = ({
               {t("common:back")}
             </Button>
             <Button variant='secondary' onClick={generatePlan}>
-              {t("common:regenerate")}
+              Regenerate
             </Button>
             <Button onClick={() => onSelectPlan?.(generatedPlan)}>
               {t("common:start")}
@@ -244,6 +237,5 @@ export const AutoPlanGenerator = ({
     );
   };
 
-  // Main render logic
   return generatedPlan ? renderGeneratedPlan() : renderPlanSetup();
 };

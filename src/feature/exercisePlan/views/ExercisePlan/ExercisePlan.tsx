@@ -36,7 +36,7 @@ export const ExercisePlan = () => {
 
           <div className='mt-6'>
             <TabsContent value='library'>
-              <ExerciseLibrary onPlanSelect={handlePlanSelect} />
+              <ExerciseLibrary />
             </TabsContent>
 
             <TabsContent value='my_plans'>
