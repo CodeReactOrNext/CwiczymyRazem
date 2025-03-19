@@ -100,7 +100,7 @@ export interface userSliceInitialState {
     youTubeLink?: string;
     band?: string;
   } | null;
-  theme: "default-theme" | "dark-theme";
+  theme:  "dark-theme";
   timer: TimerInterface;
   isLoggedOut: true | null;
   currentUserStats: StatisticsDataInterface | null;
