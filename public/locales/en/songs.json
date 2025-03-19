@@ -45,7 +45,12 @@
   "error_removing_song": "Error removing song",
   "song_already_exists": "Song already exists",
   "wait_one_hour": "You can't rate a song in a short time. Wait 1 hour.",
-    "hovered_stars": "{{rating}}/10",
+  "hovered_stars": "{{rating}}/10",
+  "total_songs": "Total Songs",
+  "songs_in_your_library": "Songs in your library",
+  "completion_rate": "Completion Rate",
+  "out_of": "out of",
+  "songs_learned": "songs learned",
   "status": {
     "wantToLearn": "want to learn",
     "learning": "learning",

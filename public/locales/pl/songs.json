@@ -46,6 +46,11 @@
   "song_already_exists": "Piosenka już istnieje",
   "hovered_stars": "{{rating}}/10",
   "wait_one_hour": "Nie możesz ocenić utworu tak szybko. Poczekaj godzinę.",
+  "total_songs": "Łączna liczba utworów",
+  "songs_in_your_library": "Utworów w Twojej bibliotece",
+  "completion_rate": "Poziom ukończenia",
+  "out_of": "z",
+  "songs_learned": "utworów nauczonych",
   "status": {
     "wantToLearn": "chcę się nauczyć",
     "learning": "uczę się",
