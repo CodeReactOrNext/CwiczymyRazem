@@ -28,9 +28,13 @@
       "name": "Niezależność Palców",
       "description": "Opanuj technikę gry niezależnymi palcami"
     },
-    "phrasings": {
+    "phrasing": {
       "name": "Phrasings",
       "description": "Opanuj technikę gry złożoną z kilku dźwięków"
+    },
+    "articulation": {
+      "name": "Artykulacja",
+      "description": "Opanuj różne techniki artykulacji dźwięku dla większej ekspresji muzycznej"
     },
     "scales": {
       "name": "Skale",
