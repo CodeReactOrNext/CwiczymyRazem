@@ -1,17 +1,17 @@
 export const SKILL_CATEGORY_COLORS = {
   technique:
-    "from-red-950/50 via-red-900/30 to-red-950/20 border-red-800/20 shadow-md shadow-red-950/20 bg-black/20",
+    "from-red-950/60 via-red-900/25 to-red-950/10 border-red-900/30 shadow-lg shadow-red-950/30 bg-black/25 hover:from-red-900/40",
   theory:
-    "from-blue-950/50 via-blue-900/30 to-blue-950/20 border-blue-800/20 shadow-md shadow-blue-950/20 bg-black/20",
+    "from-blue-950/60 via-blue-900/25 to-blue-950/10 border-blue-900/30 shadow-lg shadow-blue-950/30 bg-black/25 hover:from-blue-900/40",
   hearing:
-    "from-green-950/50 via-green-900/30 to-green-950/20 border-green-800/20 shadow-md shadow-green-950/20 bg-black/20",
+    "from-emerald-950/60 via-emerald-900/25 to-emerald-950/10 border-emerald-900/30 shadow-lg shadow-emerald-950/30 bg-black/25 hover:from-emerald-900/40",
   creativity:
-    "from-purple-950/50 via-purple-900/30 to-purple-950/20 border-purple-800/20 shadow-md shadow-purple-950/20 bg-black/20",
+    "from-purple-950/60 via-purple-900/25 to-purple-950/10 border-purple-900/30 shadow-lg shadow-purple-950/30 bg-black/25 hover:from-purple-900/40",
 } as const;
 
 export const SKILL_CATEGORY_TEXT_COLORS = {
-  technique: "text-red-400",
-  theory: "text-blue-400",
-  hearing: "text-green-400",
-  creativity: "text-purple-400",
+  technique: "text-red-300",
+  theory: "text-blue-300",
+  hearing: "text-emerald-300",
+  creativity: "text-purple-300",
 } as const;
