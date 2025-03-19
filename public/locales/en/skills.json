@@ -36,9 +36,13 @@
       "name": "Finger Independence",
       "description": "Develop the ability to play independent finger movements"
     },
-    "phrasings": {
+    "phrasing": {
       "name": "Phrasings",
       "description": "Develop the ability to play independent finger movements"
+    },
+    "articulation": {
+      "name": "Articulation",
+      "description": "Master various sound articulation techniques for greater musical expression"
     },
     "bending": {
       "name": "String Bending",
