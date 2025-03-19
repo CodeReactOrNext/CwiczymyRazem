@@ -73,10 +73,10 @@ export const userSlice = createSlice({
 
     changeTheme: (
       state,
-      { payload }: PayloadAction<"dark-theme" | "default-theme" | undefined>
+      { payload }: PayloadAction<"dark-theme" | undefined>
     ) => {
       if (payload) {
-        state.theme = payload;
+        state.theme = "dark-theme";
         return;
       }
       state.theme = "dark-theme";
