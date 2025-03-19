@@ -92,6 +92,7 @@ const ProfileLandingLayout = ({
             <div className='my-2 mb-2 flex flex-col justify-between'>
               <AchievementWrapper userAchievements={achievements} />
             </div>
+            <div className='col-span-2'>{featSlot}</div>
           </>
         );
       case "activity":
@@ -187,28 +188,9 @@ const ProfileLandingLayout = ({
             {renderContent()}
           </motion.div>
         </AnimatePresence>
-        <div className='col-span-2'>{featSlot}</div>
       </div>
     </div>
   );
 };
-
-interface StatCardProps {
-  icon: React.ReactNode;
-  title: string;
-  value: string;
-}
-
-const StatCard = ({ icon, title, value }: StatCardProps) => (
-  <div className='rounded-lg border bg-card p-6 text-card-foreground shadow-sm'>
-    <div className='flex items-center gap-4'>
-      <div className='rounded-full bg-primary/10 p-3 text-primary'>{icon}</div>
-      <div>
-        <p className='text-sm text-muted-foreground'>{title}</p>
-        <p className='text-2xl font-bold'>{value}</p>
-      </div>
-    </div>
-  </div>
-);
 
 export default ProfileLandingLayout;

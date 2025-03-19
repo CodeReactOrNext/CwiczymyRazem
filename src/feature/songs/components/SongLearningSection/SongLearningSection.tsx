@@ -1,5 +1,6 @@
 import type { DropResult } from "@hello-pangea/dnd";
 import { DragDropContext } from "@hello-pangea/dnd";
+import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
@@ -107,6 +108,7 @@ export const SongLearningSection = ({
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
+      {isLanding && <SongLearningStats userSongs={userSongs} />}
       <div className='grid grid-cols-1 gap-5 font-openSans md:grid-cols-3'>
         <SongStatusCard
           isLanding={isLanding}

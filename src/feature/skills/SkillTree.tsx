@@ -21,10 +21,10 @@ interface SkillTreeProps {
 }
 
 const CATEGORY_COLORS = {
-  technique: "from-red-500/10 to-red-500/5 border-red-500/10",
-  theory: "from-blue-500/10 to-blue-500/5 border-blue-500/10",
-  hearing: "from-green-500/10 to-green-500/5 border-green-500/10",
-  creativity: "from-purple-500/10 to-purple-500/5 border-purple-500/10",
+  technique: "from-red-500/20 via-red-600/15 to-red-700/10 border-red-500/30 shadow-sm shadow-red-500/10",
+  theory: "from-blue-500/20 via-blue-600/15 to-blue-700/10 border-blue-500/30 shadow-sm shadow-blue-500/10",
+  hearing: "from-emerald-500/20 via-green-600/15 to-green-700/10 border-green-500/30 shadow-sm shadow-green-500/10",
+  creativity: "from-purple-500/20 via-purple-600/15 to-purple-700/10 border-purple-500/30 shadow-sm shadow-purple-500/10",
 } as const;
 
 const SkillCard = ({
@@ -50,9 +50,9 @@ const SkillCard = ({
           <div
             className={cn(
               "group relative rounded-md border p-2",
-              "bg-gradient-to-b",
+              "bg-gradient-to-br backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]",
               categoryColor,
-              !canUpgrade && "opacity-40"
+              canUpgrade ? "hover:brightness-110" : "opacity-50 saturate-50"
             )}>
             <div className='flex flex-col gap-2'>
               <div className='flex items-center justify-between gap-2 text-white'>
