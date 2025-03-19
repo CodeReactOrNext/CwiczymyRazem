@@ -26,11 +26,6 @@ import {
   uploadUserSocialData,
 } from "./userSlice.asyncThunk";
 
-interface UserAuth {
-  uid: string;
-  email: string | null;
-  // ... inne pola
-}
 
 const initialState: userSliceInitialState = {
   userInfo: null,
@@ -41,7 +36,6 @@ const initialState: userSliceInitialState = {
   isFetching: null,
   isLoggedOut: null,
   timer: { creativity: 0, hearing: 0, technique: 0, theory: 0 },
-  theme: "dark-theme",
   providerData: {
     providerId: null,
     uid: null,
@@ -71,16 +65,6 @@ export const userSlice = createSlice({
       state.currentUserStats = payload;
     },
 
-    changeTheme: (
-      state,
-      { payload }: PayloadAction<"dark-theme" | "default-theme" | undefined>
-    ) => {
-      if (payload) {
-        state.theme = payload;
-        return;
-      }
-      state.theme = "dark-theme";
-    },
 
     updateLocalTimer: (state, { payload }: PayloadAction<TimerInterface>) => {
       if (!payload) {
@@ -219,11 +203,9 @@ export const {
   addUserData,
   updateTimerTime,
   updateLocalTimer,
-  changeTheme,
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
-export const selectLayoutMode = (state: RootState) => state.user.theme;
 export const selectCurrentUserStats = (state: RootState) =>
   state.user.currentUserStats;
 export const selectPreviousUserStats = (state: RootState) =>
