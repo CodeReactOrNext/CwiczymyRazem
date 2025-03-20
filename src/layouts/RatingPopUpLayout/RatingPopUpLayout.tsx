@@ -97,21 +97,13 @@ const RatingPopUp = ({
           <span className='text-4xl'>{t("rating_popup.points")}</span>
         </p>
 
-        {categoriesWithPoints.length > 0 && (
-          <div className='mt-6'>
-            <h3 className='mb-4 font-openSans text-lg font-semibold'>
-              {t("rating_popup.spend_skill_points")}
-            </h3>
-            <SkillMiniTree highlightCategories={categoriesWithPoints} />
-          </div>
-        )}
-
         <BonusPointsItem
           bonusPoints={ratingData.bonusPoints}
           actualDayWithoutBreak={currentUserStats.actualDayWithoutBreak}
           achievements={newAchievements}
           isGetNewLevel={isGetNewLevel}
         />
+
         <div className=' mx-auto flex w-[80%] justify-center'>
           <LevelIndicator>{currentLevel}</LevelIndicator>
           <div className='relative mx-2 h-4 w-full bg-second-500'>
@@ -124,6 +116,15 @@ const RatingPopUp = ({
           </div>
           <LevelIndicator>{currentLevel + 1}</LevelIndicator>
         </div>
+
+        {categoriesWithPoints.length > 0 && (
+          <div className='mt-6'>
+            <h3 className='mb-4 font-openSans text-lg font-semibold'>
+              {t("rating_popup.spend_skill_points")}
+            </h3>
+            <SkillMiniTree highlightCategories={categoriesWithPoints} />
+          </div>
+        )}
 
         <div className='modal-action'>
           <Button
