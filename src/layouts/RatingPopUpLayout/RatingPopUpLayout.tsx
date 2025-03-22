@@ -78,7 +78,7 @@ const RatingPopUp = ({
 
   return (
     <div className='dialog relative '>
-      <div className='modal-box relative w-full bg-second-600 p-12 lg:min-w-[800px]'>
+      <div className='modal-box relative w-full bg-second-600 p-4 md:p-12 lg:min-w-[800px]'>
         <Button
           variant='outline'
           className='btn btn-circle btn-sm absolute right-2 top-2'
