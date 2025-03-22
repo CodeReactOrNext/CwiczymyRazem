@@ -4,7 +4,9 @@ import { spiderLegatoBasicExercise } from "feature/exercisePlan/data/exerises/sp
 import { spiderRhythmicProgressionExercise } from "feature/exercisePlan/data/exerises/spiderRhythmicProgression/spiderRhythmicProgression";
 import { spiderXExercise } from "feature/exercisePlan/data/exerises/spiderX/spiderX";
 
-import type { ExercisePlan } from "../../types/exercise.types";
+import type { ExercisePlan } from "../../../types/exercise.types";
+import warmUpImage from "./image.webp";
+
 
 export const warmUp30MinutesPlan: ExercisePlan = {
   id: "warm_up_30_minutes",
@@ -19,4 +21,5 @@ export const warmUp30MinutesPlan: ExercisePlan = {
     precisionBendingExercise
   ],
   userId: "system",
+  image: warmUpImage,
 }; 

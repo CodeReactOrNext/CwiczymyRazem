@@ -36,6 +36,7 @@ export interface ExercisePlan {
   category: ExerciseCategory | 'mixed';
   exercises: Exercise[];
   userId: string;
+  image: StaticImageData | null;
 }
 
 export interface ExerciseProgress {
