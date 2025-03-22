@@ -43,6 +43,7 @@ export const PlanDetailsStep = ({
       category: "technique",
       userId: userAuth ?? "",
       difficulty: "easy",
+      image: null,
     });
   };
 

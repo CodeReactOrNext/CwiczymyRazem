@@ -44,6 +44,7 @@ export const getUserExercisePlans = async (userId: string): Promise<ExercisePlan
         updatedAt: data.updatedAt.toDate(),
         userId: data.userId,
         completionHistory: data.completionHistory || [],
+        image: data.image,
       };
     });
   } catch (error) {
@@ -170,6 +171,7 @@ export const getUserExercisePlan = async (userId: string, planId: string): Promi
         description: exercise.description[i18n?.language as keyof typeof exercise.description] || exercise.description,
       })),
       userId: data.userId,
+      image: data.image,
     };
   } catch (error) {
     console.error("Error fetching plan:", error);

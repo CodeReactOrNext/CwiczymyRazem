@@ -129,6 +129,7 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
         userId: userAuth,
         createdAt: new Date(),
         updatedAt: new Date(),
+        image: null,
       };
 
       // Zapisz plan w Firebase
