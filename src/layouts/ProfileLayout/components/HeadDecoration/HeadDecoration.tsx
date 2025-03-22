@@ -3,15 +3,7 @@ import Fire from "public/static/images/svg/Fire";
 const HeadDecoration = ({ title }: { title?: string }) => {
   return (
     <>
-      <div className='relative z-0 flex h-0 justify-center sm:hidden '>
-        <Fire className='relative w-[85vw] self-center fill-second-600 ' />
-      </div>
-      {title && (
-        <p className='  p-2 text-center text-2xl text-main-opposed  sm:hidden '>
-          {title}
-        </p>
-      )}
-      <div className=' hidden justify-center sm:flex'>
+      <div className='hidden justify-center sm:flex'>
         <div className=' relative flex h-0 justify-center fill-second-600 md:w-full  '>
           <Fire className='  relative h-max w-full self-center xl:max-w-none' />
         </div>
