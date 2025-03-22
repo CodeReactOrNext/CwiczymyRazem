@@ -131,11 +131,20 @@ const CategoryBox = ({
     };
   };
 
+  // Handler for the whole card click
+  const handleCardClick = () => {
+    if (isActive) {
+      onStop();
+    } else {
+      onStart();
+    }
+  };
+
   return (
     <div
       className={`relative overflow-hidden rounded-xl border-[0.5px] bg-[#171717] p-5 text-white transition-all duration-300 hover:scale-[1.01] ${
         isActive ? "z-10" : ""
-      }`}
+      } cursor-pointer`}
       style={{
         borderColor: chosen ? `${skillColor}4D` : "rgba(255, 255, 255, 0.05)",
         boxShadow: isActive
@@ -148,6 +157,7 @@ const CategoryBox = ({
         transform: isHovered && !isActive ? "scale(1.01)" : "",
         ...getGradientStyle(),
       }}
+      onClick={handleCardClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
       {isActive && (
@@ -171,7 +181,7 @@ const CategoryBox = ({
           {renderCategoryIcon()}
         </div>
         <span
-          className={`text-base font-medium ${
+          className={`text-sm font-medium md:text-base ${
             isActive ? "text-white" : "text-gray-300"
           }`}>
           {title}
@@ -211,12 +221,15 @@ const CategoryBox = ({
       <Button
         variant={isActive ? "default" : "outline"}
         size='sm'
-        className={`relative z-10 h-10 w-full rounded-lg border text-sm font-medium transition-all duration-300 ${
+        className={`relative z-10 w-full transition-all duration-300 ${
           isActive
             ? "border-none shadow-md hover:shadow-lg"
             : "border-gray-700 bg-black/40 text-white hover:border-gray-600 hover:bg-black/60"
         }`}
-        onClick={isActive ? onStop : onStart}>
+        onClick={(e) => {
+          e.stopPropagation();
+          handleCardClick();
+        }}>
         {isActive ? (
           <>
             <VscDebugPause className='mr-2 h-4 w-4' />

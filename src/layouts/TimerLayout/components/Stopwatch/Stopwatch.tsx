@@ -34,7 +34,7 @@ const Stopwatch = ({ time, timerData, activeSkill = null }: StopwatchProps) => {
 
   const getStrokeOpacity = (skill: string) => {
     if (!activeSkill) return 1;
-    return skill === activeSkill ? 1 : 0.5;
+    return skill === activeSkill ? 1 : 0.2;
   };
 
   const getStrokeWidth = (skill: string) => {
