@@ -54,7 +54,7 @@ const MainLoggedLayout = ({
               pageId={pageId}
             />
             <div
-              className={`z-20 m-4 mb-12 mt-28  flex w-full max-w-[1400px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 xl:mt-[170px] `}>
+              className={`z-20 m-4 mb-12 mt-10  flex w-full max-w-[1400px] flex-col justify-center bg-opacity-75 radius-default sm:p-2 xl:mt-[170px] `}>
               <AnimatePresence mode='wait'>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
