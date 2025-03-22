@@ -8,6 +8,7 @@ import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
 import { selectTimerData, updateTimerTime } from "feature/user/store/userSlice";
 import useTimer from "hooks/useTimer";
 import TimerLayout from "layouts/TimerLayout";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -24,7 +25,8 @@ const TimerView = () => {
   const dispatch = useAppDispatch();
   const timerData = useAppSelector(selectTimerData);
   const { t } = useTranslation("timer");
-
+  const router = useRouter();
+  
   const handleModeSelect = (selectedMode: PracticeMode) => {
     setMode(selectedMode);
   };
@@ -58,7 +60,7 @@ const TimerView = () => {
       };
       dispatch(updateTimerTime(payload));
     }
-    setMode(null);
+    router.push("/report");
   };
 
   const choseSkillHandler = (chosenSkill: SkillsType) => {

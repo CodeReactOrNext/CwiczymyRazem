@@ -3,7 +3,8 @@ import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStr
 import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
 import { spiderLegatoBasicExercise } from "feature/exercisePlan/data/exerises/spiderLegatoBasic/spiderLegatoBasic";
 
-import type { ExercisePlan } from "../../types/exercise.types";
+import type { ExercisePlan } from "../../../types/exercise.types";
+import warmUpImage from "./image.webp";
 
 export const warmUp15MinutesPlan: ExercisePlan = {
   id: "warm_up_15_minutes",
@@ -17,4 +18,5 @@ export const warmUp15MinutesPlan: ExercisePlan = {
     spiderLegatoBasicExercise
   ],
   userId: "system",
+  image: warmUpImage,
 }; 

@@ -4,8 +4,8 @@ import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneCh
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 
-import type { ExercisePlan } from "../../types/exercise.types";
-
+import type { ExercisePlan } from "../../../types/exercise.types";
+import basicImprovisationPracticeImage from "./image.webp";
 export const basicImprovisationPractice: ExercisePlan = {
   id: "basic_improvisation_practice",
     title: "Podstawowe ćwiczenie rozwijające improwizację",
@@ -17,4 +17,5 @@ export const basicImprovisationPractice: ExercisePlan = {
   oneStringBackingExercise,
   triadImprovisationExercise],
   userId: "system",
+  image: basicImprovisationPracticeImage,
 }; 

@@ -1,12 +1,12 @@
 import { Button } from "assets/components/ui/button";
-import { GoogleButton,Input } from "components/UI";
+import { GoogleButton, Input } from "components/UI";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   logInViaEmail,
   logInViaGoogle,
 } from "feature/user/store/userSlice.asyncThunk";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
-import { Form,Formik } from "formik";
+import { Form, Formik } from "formik";
 import FormLayout from "layouts/FormLayout";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
