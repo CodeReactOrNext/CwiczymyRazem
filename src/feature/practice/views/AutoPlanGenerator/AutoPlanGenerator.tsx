@@ -101,6 +101,7 @@ export const AutoPlanGenerator = ({
       category: primaryCategory,
       exercises: selectedExercises,
       userId: "system",
+      image: null,
     };
 
     setGeneratedPlan(newPlan);

@@ -105,6 +105,7 @@ export const CreatePlanDialog = ({
         userId: userAuth,
         createdAt: new Date(),
         updatedAt: new Date(),
+        image: null,
       };
 
       const planId = await createExercisePlan(userAuth, newPlan);
