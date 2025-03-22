@@ -84,7 +84,7 @@ export const SkillMiniTree = ({
           <h3 className='mb-4 text-lg font-semibold'>
             {t("report:rating_popup.skill_points_gained")}
           </h3>
-          <div className='flex gap-8'>
+          <div className='flex flex-wrap gap-8'>
             {Object.entries(userSkills?.availablePoints).map(
               ([skill, points]) =>
                 points > 0 && (

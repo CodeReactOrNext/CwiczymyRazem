@@ -100,7 +100,7 @@ const TimerLayout = ({
 
             <div className='flex flex-row p-4 sm:flex-1 sm:flex-col sm:p-6'>
               <div className='flex-1 rounded-md bg-second-400/50 p-3 sm:mb-4 sm:p-4'>
-                <span className='block text-second-50'>
+                <span className='mb-3 hidden text-second-50 md:block'>
                   {t("currently_exercising")}
                 </span>
                 <div className='flex items-center gap-2'>
@@ -112,7 +112,7 @@ const TimerLayout = ({
               </div>
 
               <div className='ml-3 flex-1 rounded-md bg-second-400/50 p-3  sm:ml-0 sm:mt-4 sm:p-4'>
-                <span className='block text-second-50 sm:text-sm'>
+                <span className='mb-3 hidden  text-second-50 sm:text-sm md:block'>
                   {t("total_time")}
                 </span>
                 <div className='flex items-center'>
