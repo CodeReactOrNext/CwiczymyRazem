@@ -8,22 +8,38 @@ export interface StopwatchProps {
     technique: number;
     theory: number;
   };
+  activeSkill?: "creativity" | "hearing" | "technique" | "theory" | null;
 }
 export const skillColors = {
-  creativity: "#4CAF50",
-  hearing: "#2196F3",
-  technique: "#FFC107",
-  theory: "#9C27B0",
+  creativity: "#9C27B0",
+  hearing: "#4CAF50",
+  technique: "#FF5252",
+  theory: "#2196F3",
 };
 
-const Stopwatch = ({ time, timerData }: StopwatchProps) => {
+const Stopwatch = ({ time, timerData, activeSkill = null }: StopwatchProps) => {
   const radius = 120;
-  const strokeWidth = 3; 
+  const strokeWidth = 6;
   const circumference = 2 * Math.PI * radius;
-  const gap = 8;
+  const gap = 12;
   const getCircleOffset = (skillTime: number) => {
     const progress = (skillTime / (30 * 60 * 1000)) * 100;
     return circumference - (progress / 100) * circumference;
+  };
+
+  const getOpacity = (skill: string) => {
+    if (!activeSkill) return 0.2;
+    return skill === activeSkill ? 0.2 : 0.05;
+  };
+
+  const getStrokeOpacity = (skill: string) => {
+    if (!activeSkill) return 1;
+    return skill === activeSkill ? 1 : 0.5;
+  };
+
+  const getStrokeWidth = (skill: string) => {
+    if (!activeSkill) return strokeWidth;
+    return skill === activeSkill ? strokeWidth + 2 : strokeWidth - 1;
   };
 
   return (
@@ -37,23 +53,33 @@ const Stopwatch = ({ time, timerData }: StopwatchProps) => {
         {Object.keys(skillColors).map((skill, index) => {
           const color = skillColors[skill as keyof typeof skillColors];
           const r = radius - gap * index;
+          const isActive = skill === activeSkill;
+
+          const filterEffect =
+            isActive && activeSkill
+              ? `drop-shadow(0 0 2px ${color}80)`
+              : "none";
+
           return (
-            <g key={skill}>
+            <g key={skill} style={{ filter: filterEffect }}>
               <circle
                 cx='132'
                 cy='132'
                 r={r}
                 stroke={color}
-                strokeWidth={strokeWidth}
+                strokeWidth={getStrokeWidth(skill)}
                 fill='none'
-                opacity='0.2'
+                opacity={getOpacity(skill)}
+                style={{
+                  transition: "opacity 0.5s ease, stroke-width 0.5s ease",
+                }}
               />
               <circle
                 cx='132'
                 cy='132'
                 r={r}
                 stroke={color}
-                strokeWidth={strokeWidth}
+                strokeWidth={getStrokeWidth(skill)}
                 fill='none'
                 strokeLinecap='round'
                 style={{
@@ -61,7 +87,9 @@ const Stopwatch = ({ time, timerData }: StopwatchProps) => {
                   strokeDashoffset: getCircleOffset(
                     timerData[skill as keyof StopwatchProps["timerData"]]
                   ),
-                  transition: "stroke-dashoffset 0.5s ease",
+                  transition: "all 0.5s ease",
+                  opacity: getStrokeOpacity(skill),
+                  filter: isActive ? "brightness(1.1)" : "brightness(1)",
                 }}
               />
             </g>
@@ -69,9 +97,9 @@ const Stopwatch = ({ time, timerData }: StopwatchProps) => {
         })}
       </svg>
 
-      <div className='absolute inset-0 flex flex-col items-center justify-center rounded-full  text-white'>
+      <div className='absolute inset-0 flex flex-col items-center justify-center rounded-full text-white'>
         <div className='text-center'>
-          <p className='text-6xl font-semibold tracking-wider'>
+          <p className='font-sans text-6xl font-semibold tracking-wider'>
             {convertMsToHMObject(time).minutes}:
             {addZeroToTime(convertMsToHMObject(time).seconds)}
           </p>
