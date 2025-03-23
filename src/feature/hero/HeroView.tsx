@@ -1,4 +1,4 @@
-import Footer from "components/Footer";
+import { Footer } from "components/Footer/Footer";
 import HeroLayout from "layouts/HeroLayout";
 import MainHeroLayout from "layouts/MainHeroLayout";
 import { useTranslation } from "react-i18next";

@@ -1,4 +1,4 @@
-import IconBox from "components/IconBox";
+import { IconBox } from "components/IconBox/IconBox";
 import { useTranslation } from "react-i18next";
 import { FaClock, FaRegCalendarAlt, FaStar } from "react-icons/fa";
 import type { ReportListInterface } from "types/api.types";

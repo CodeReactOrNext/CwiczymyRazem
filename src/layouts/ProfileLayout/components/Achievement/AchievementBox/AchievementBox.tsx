@@ -1,4 +1,4 @@
-import IconBox from "components/IconBox";
+import { IconBox } from "components/IconBox/IconBox";
 import type { AchievementsDataInterface } from "feature/achievements/achievementsData";
 import type { AchievementsRarityType } from "feature/achievements/achievementsRarity";
 import AchievementCard from "layouts/ProfileLayout/components/Achievement/AchievementCard";
@@ -18,7 +18,7 @@ const AchievementBox = ({
   const { t } = useTranslation("achievements");
 
   return (
-    <div className="flex">
+    <div className='flex'>
       <IconBox Icon={FaMedal} medium />
       <div className='mx-2 self-center '>
         <p className=' mb-2  text-secondText '>

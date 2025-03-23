@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { BeginnerMsg } from "components/BeginnerMsg/BeginnerMsg";
-import IconBox from "components/IconBox";
+import { IconBox } from "components/IconBox/IconBox";
 import MainContainer from "components/MainContainer";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import type { useTimerInterface } from "hooks/useTimer";
