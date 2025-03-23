@@ -1,6 +1,6 @@
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
-import LevelBar from "components/LevelBar";
-import Logo from "components/Logo";
+import { LevelBar } from "components/LevelBar/LevelBar";
+import { Logo } from "components/Logo/Logo";
 import { LanguageSwitch } from "components/UI";
 import Avatar from "components/UI/Avatar";
 import UserNav from "components/UserNav";
