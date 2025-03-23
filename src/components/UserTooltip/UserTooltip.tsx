@@ -4,8 +4,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { IconBox } from "components/IconBox/IconBox";
 import Avatar from "components/UI/Avatar";
-import IconBox from "components/IconBox";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
