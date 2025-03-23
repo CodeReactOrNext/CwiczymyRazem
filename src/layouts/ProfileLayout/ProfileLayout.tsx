@@ -1,9 +1,9 @@
-import Avatar from "components/Avatar";
 import Calendar from "components/Calendar";
 import { useCalendar } from "components/Calendar/useCalendar";
 import DaySince from "components/DaySince/DaySince";
 import LevelBar from "components/LevelBar";
 import MainContainer from "components/MainContainer";
+import Avatar from "components/UI/Avatar";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";

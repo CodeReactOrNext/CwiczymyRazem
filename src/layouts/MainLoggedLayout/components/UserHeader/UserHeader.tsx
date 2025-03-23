@@ -1,4 +1,4 @@
-import Avatar from "components/Avatar";
+import Avatar from "components/UI/Avatar";
 import CopyLinkProfile from "components/CopyLinkProfile";
 import LevelBar from "components/LevelBar";
 import Logo from "components/Logo";
