@@ -1,9 +1,9 @@
-import Avatar from "components/Avatar";
-import Calendar from "components/Calendar";
-import { useCalendar } from "components/Calendar/useCalendar";
+import ActivityLog from "components/ActivityLog/ActivityLog";
+import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import DaySince from "components/DaySince/DaySince";
 import LevelBar from "components/LevelBar";
 import MainContainer from "components/MainContainer";
+import Avatar from "components/UI/Avatar";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
@@ -41,7 +41,7 @@ const ProfileLayout = ({
   } = userData;
   const { lastReportDate } = statistics;
   const [userSkills, setUserSkills] = useState<UserSkills>();
-  const { datasWithReports } = useCalendar(userAuth);
+  const { datasWithReports } = useActivityLog(userAuth);
 
   const yearsOfPlaying = guitarStartDate
     ? getYearsOfPlaying(guitarStartDate.toDate())
@@ -143,7 +143,7 @@ const ProfileLayout = ({
         </div>
 
         <div className='col-span-2 p-2'>
-          <Calendar userAuth={userAuth} />
+          <ActivityLog userAuth={userAuth} />
         </div>
 
         {userSkills && (

@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
-import Backdrop from "components/Backdrop";
-import BeginnerMsg from "components/BeginnerMsg";
+import { BeginnerMsg } from "components/BeginnerMsg/BeginnerMsg";
 import { Input } from "components/UI";
+import Backdrop from "components/UI/Backdrop";
 import { MAX_DAYS_BACK } from "constants/gameSettings";
 import {
   selectCurrentUserStats,
@@ -14,7 +14,7 @@ import {
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { upgradeSkill } from "feature/user/store/userSlice.asyncThunk";
 import { Formik } from "formik";
-import { AnimatePresence,motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import {
@@ -373,8 +373,9 @@ const ReportView = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-
-                <BeginnerMsg />
+                {(!currentUserStats || currentUserStats.points > 0) && (
+                  <BeginnerMsg />
+                )}
 
                 <Button size='lg' disabled={Object.keys(errors).length !== 0}>
                   {isFetching && <Loader2 className='animate-spin' />}

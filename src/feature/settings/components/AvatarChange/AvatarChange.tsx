@@ -1,5 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import Avatar from "components/Avatar";
+import Avatar from "components/UI/Avatar";
 import {
   selectIsFetching,
   selectUserAvatar,

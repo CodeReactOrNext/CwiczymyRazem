@@ -1,4 +1,4 @@
-import Avatar from "components/Avatar";
+import Avatar from "components/UI/Avatar";
 import DaySince from "components/DaySince";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
@@ -64,10 +64,10 @@ const LeadboardRow = ({
               : "border-second-400/60 bg-second hover:bg-gray-800/60"
           }
         `}>
-          <div className='relative top-[-23px] left-[-25px] block h-[65px] scale-75 justify-items-start md:hidden'>
+          <div className='relative left-[-25px] top-[-23px] block h-[65px] scale-75 justify-items-start md:hidden'>
             <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
 
-            <div className='absolute top-[-10px] right-[-70px] md:right-[-60px] flex items-center gap-x-1'>
+            <div className='absolute right-[-70px] top-[-10px] flex items-center gap-x-1 md:right-[-60px]'>
               <p className='text-2xl uppercase text-gray-400 drop-shadow'>
                 Lvl{" "}
               </p>
