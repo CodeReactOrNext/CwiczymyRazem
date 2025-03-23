@@ -62,26 +62,28 @@ export const PracticeModeSelector = ({
   ] as const;
 
   return (
-    <div className='container mx-auto max-w-5xl py-12 font-openSans'>
+    <div className='container mx-auto max-w-5xl px-4 py-8 font-openSans md:py-12'>
       <motion.div
         initial='hidden'
         animate='show'
         variants={container}
-        className='space-y-8'>
+        className='space-y-6 md:space-y-8'>
         <div className='text-center'>
           <motion.h1
-            className='text-4xl font-bold tracking-tight'
+            className='text-3xl font-bold tracking-tight md:text-4xl'
             variants={item}>
             {t("timer:select_practice_mode" as any)}
           </motion.h1>
           <motion.p
-            className='mt-3 text-lg text-muted-foreground'
+            className='mt-2 text-base text-muted-foreground md:mt-3 md:text-lg'
             variants={item}>
             {t("timer:choose_practice_description" as any)}
           </motion.p>
         </div>
 
-        <motion.div className='grid gap-6 md:grid-cols-3' variants={item}>
+        <motion.div
+          className='grid gap-4 md:grid-cols-3 md:gap-6'
+          variants={item}>
           {modes.map((mode) => (
             <Card
               key={mode.id}
@@ -91,7 +93,8 @@ export const PracticeModeSelector = ({
                 className={`absolute inset-0 bg-gradient-to-br ${mode.gradient} transition-all duration-300`}
               />
 
-              <div className='relative z-10 flex cursor-pointer flex-col items-center p-8'>
+              {/* Desktop version (hidden on mobile) */}
+              <div className='relative z-10 hidden cursor-pointer flex-col items-center p-8 md:flex'>
                 <div
                   className={`mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm transition-transform duration-300 group-hover:scale-110 ${mode.iconColor}`}>
                   <mode.icon className='h-8 w-8' />
@@ -110,6 +113,29 @@ export const PracticeModeSelector = ({
                   variant='outline'>
                   {t("common:select" as any)}
                 </Button>
+              </div>
+
+              {/* Mobile version (hidden on desktop) */}
+              <div className='relative z-10 flex cursor-pointer flex-row items-center justify-between p-4 md:hidden'>
+                <div className='flex flex-col'>
+                  <h2 className='text-xl font-semibold tracking-tight text-foreground'>
+                    {mode.title}
+                  </h2>
+                  <p className='mt-1 line-clamp-2 max-w-[200px] text-sm text-muted-foreground'>
+                    {mode.description}
+                  </p>
+                  <Button
+                    className='mt-3 bg-white text-slate-900 shadow-sm transition-all duration-300 group-hover:translate-y-1 hover:bg-white/90'
+                    variant='outline'
+                    size='sm'>
+                    {t("common:select" as any)}
+                  </Button>
+                </div>
+
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ${mode.iconColor}`}>
+                  <mode.icon className='h-6 w-6' />
+                </div>
               </div>
             </Card>
           ))}
