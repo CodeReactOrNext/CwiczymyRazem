@@ -1,13 +1,15 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
-import BeginnerMsg from "components/BeginnerMsg";
+import { BeginnerMsg } from "components/BeginnerMsg/BeginnerMsg";
 import IconBox from "components/IconBox";
 import MainContainer from "components/MainContainer";
+import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import type { useTimerInterface } from "hooks/useTimer";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { MdAccessTime } from "react-icons/md";
+import { useAppSelector } from "store/hooks";
 import type { TimerInterface } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
 import { calculatePercent, convertMsToHMS } from "utils/converter";
@@ -34,6 +36,7 @@ const TimerLayout = ({
 }: TimerLayoutProps) => {
   const { t } = useTranslation("timer");
   const { time, startTimer, stopTimer, timerEnabled } = timer;
+  const userStats = useAppSelector(selectCurrentUserStats);
 
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {
@@ -148,7 +151,7 @@ const TimerLayout = ({
         </div>
 
         <div className='mx-auto mt-4 w-full max-w-3xl space-y-6 px-4 sm:mt-6 sm:space-y-8'>
-          <BeginnerMsg />
+          {(!userStats || userStats.points > 0) && <BeginnerMsg />}
 
           <div className='flex justify-center py-2'>
             <Button

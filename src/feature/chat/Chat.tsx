@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
-import Avatar from "components/Avatar";
+import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChat } from "feature/chat/hooks/useChat";
 import { useEffect, useRef } from "react";

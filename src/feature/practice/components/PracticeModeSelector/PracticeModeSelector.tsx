@@ -93,6 +93,7 @@ export const PracticeModeSelector = ({
                 className={`absolute inset-0 bg-gradient-to-br ${mode.gradient} transition-all duration-300`}
               />
 
+              {/* Desktop version (hidden on mobile) */}
               <div className='relative z-10 hidden cursor-pointer flex-col items-center p-8 md:flex'>
                 <div
                   className={`mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm transition-transform duration-300 group-hover:scale-110 ${mode.iconColor}`}>
@@ -116,16 +117,11 @@ export const PracticeModeSelector = ({
 
               {/* Mobile version (hidden on desktop) */}
               <div className='relative z-10 flex cursor-pointer flex-row items-center justify-between p-4 md:hidden'>
-                <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ${mode.iconColor} mr-4`}>
-                  <mode.icon className='h-6 w-6' />
-                </div>
-
-                <div className='flex flex-1 flex-col'>
+                <div className='flex flex-col'>
                   <h2 className='text-xl font-semibold tracking-tight text-foreground'>
                     {mode.title}
                   </h2>
-                  <p className='mt-1 line-clamp-2 text-sm text-muted-foreground'>
+                  <p className='mt-1 line-clamp-2 max-w-[200px] text-sm text-muted-foreground'>
                     {mode.description}
                   </p>
                   <Button
@@ -134,6 +130,11 @@ export const PracticeModeSelector = ({
                     size='sm'>
                     {t("common:select" as any)}
                   </Button>
+                </div>
+
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm ${mode.iconColor}`}>
+                  <mode.icon className='h-6 w-6' />
                 </div>
               </div>
             </Card>
