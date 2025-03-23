@@ -1,5 +1,5 @@
+import { DaySinceMessage } from "components/DaySince/DaySince";
 import Avatar from "components/UI/Avatar";
-import DaySince from "components/DaySince";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaExternalLinkAlt } from "react-icons/fa";
@@ -84,7 +84,7 @@ const LeadboardRow = ({
               </p>
             </Link>
 
-            <DaySince date={new Date(statistics.lastReportDate)} />
+            <DaySinceMessage date={new Date(statistics.lastReportDate)} />
 
             <div className='absolute top-[-30px] hidden items-center gap-x-1 md:right-[-50px] md:flex lg:right-[-0px] xl:right-[-70px]'>
               <p className='text-xl uppercase text-gray-400 drop-shadow'>
