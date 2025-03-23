@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
-import Calendar from "components/Calendar";
-import { useCalendar } from "components/Calendar/useCalendar";
+import ActivityLog from "components/ActivityLog/ActivityLog";
+import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { ActivityChart } from "components/Charts/ActivityChart";
 import { ExercisePlan } from "feature/exercisePlan/views/ExercisePlan/ExercisePlan";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
@@ -43,7 +43,7 @@ const ProfileLandingLayout = ({
     learning: Song[];
     learned: Song[];
   }>();
-  const { reportList, datasWithReports } = useCalendar(userAuth);
+  const { reportList, datasWithReports } = useActivityLog(userAuth);
   const { achievements } = userStats;
   const [userSkills, setUserSkills] = useState<UserSkills>();
   const [activeSection, setActiveSection] = useState<
@@ -103,7 +103,7 @@ const ProfileLandingLayout = ({
               <ActivityChart data={reportList as any} />
             </div>
             <div className='d-flex justify-content-center mt-6'>
-              <Calendar userAuth={userAuth} />
+              <ActivityLog userAuth={userAuth} />
             </div>
           </>
         );
