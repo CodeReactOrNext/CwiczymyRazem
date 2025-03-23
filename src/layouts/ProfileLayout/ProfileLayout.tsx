@@ -1,7 +1,7 @@
 import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DaySinceMessage } from "components/DaySince/DaySince";
-import LevelBar from "components/LevelBar";
+import { LevelBar } from "components/LevelBar/LevelBar";
 import MainContainer from "components/MainContainer";
 import Avatar from "components/UI/Avatar";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
