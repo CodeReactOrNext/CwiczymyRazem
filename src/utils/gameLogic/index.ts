@@ -1,4 +1,5 @@
-import { checkAchievement } from "../../feature/achievements/checkAchievement";
+import { checkAchievements } from "feature/achievements/achievementAggregator";
+
 import { checkIsPracticeToday } from "./checkIsPracticeToday";
 import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
 import { getPointsToLvlUp } from "./getPointsToLvlUp";
@@ -7,7 +8,7 @@ import { levelUpUser } from "./levelUpUser";
 import { makeRatingData } from "./makeRatingData";
 
 export {
-  checkAchievement,
+  checkAchievements,
   checkIsPracticeToday,
   getDailyStreakMultiplier,
   getPointsToLvlUp,

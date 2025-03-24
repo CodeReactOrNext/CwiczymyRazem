@@ -2,7 +2,7 @@ import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportV
 import type { StatisticsDataInterface } from "types/api.types";
 import { getDateFromPast, inputTimeConverter } from "utils/converter";
 import {
-  checkAchievement,
+  checkAchievements,
   checkIsPracticeToday,
   getPointsToLvlUp,
   getUpdatedActualDayWithoutBreak,
@@ -87,7 +87,7 @@ export const reportUpdateUserStats = ({
     guitarStartDate: null
   };
 
-  const newAchievements = checkAchievement(updatedUserData, raiting, inputData);
+  const newAchievements = checkAchievements(updatedUserData, raiting, inputData);
   const updatedUserDataWithAchievements: StatisticsDataInterface = {
     ...updatedUserData,
     achievements: [...newAchievements, ...updatedUserData.achievements],
