@@ -1,5 +1,5 @@
 import { CHAT_LIMIT_MESSAGE } from "feature/chat/chat.setting";
-import type { ChatMessage } from "feature/chat/types/chat.types";
+import type { ChatMessageType } from "feature/chat/types/chat.types";
 import {
   addDoc,
   collection,
@@ -12,16 +12,17 @@ import {
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const fetchChatMessages = (
-  callback: (messages: ChatMessage[]) => void
+  callback: (messages: ChatMessageType[]) => void
 ) => {
   const chatQuery = query(
     collection(db, "chats"),
     orderBy("timestamp", "desc"),
     limit(CHAT_LIMIT_MESSAGE)
   );
+
   return onSnapshot(chatQuery, (snapshot) => {
     const messages = snapshot.docs.map(
-      (doc) => ({ id: doc.id, ...doc.data() } as ChatMessage)
+      (doc) => ({ id: doc.id, ...doc.data() } as ChatMessageType)
     );
     callback(messages.reverse());
   });
@@ -33,7 +34,8 @@ export const sendChatMessage = async (
   username: string,
   avatar: string | undefined
 ) => {
-  if (!message.trim()) return;
+  if (!message.trim()) return undefined
+  
   return addDoc(collection(db, "chats"), {
     userId,
     username,

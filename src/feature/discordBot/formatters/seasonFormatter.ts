@@ -1,4 +1,4 @@
-import { SeasonData } from "../types/season.types";
+import type { SeasonData } from "../types/season.types";
 
 export class SeasonUpdateFormatter {
   format(seasonData: SeasonData) {

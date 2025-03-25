@@ -1,4 +1,6 @@
-import { DiscordMessage } from "../types/discord.types";
+import {logger } from "feature/logger/Logger";
+
+import type { DiscordMessage } from "../types/discord.types";
 
 export const sendDiscordMessage = async (
   message: DiscordMessage
@@ -6,7 +8,7 @@ export const sendDiscordMessage = async (
   const webhookUrl = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL;
 
   if (!webhookUrl) {
-    console.error("Discord webhook URL not configured");
+    logger.error("Discord webhook URL not configured", { context: "sendDiscordMessage" });
     return false;
   }
 
@@ -21,7 +23,7 @@ export const sendDiscordMessage = async (
 
     return response.ok;
   } catch (error) {
-    console.error("Error sending Discord message:", error);
+    logger.error(error, { context: "sendDiscordMessage" });
     return false;
   }
 };
