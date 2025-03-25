@@ -47,7 +47,7 @@ export const ExerciseItem = ({
           <FaGripVertical />
         </div>
 
-        <div className='flex flex-col gap-1 text-muted-foreground md:hidden'>
+        <div className='flex flex-col gap-6 text-muted-foreground md:hidden'>
           <Button
             variant='ghost'
             size='icon'
