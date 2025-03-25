@@ -1,3 +1,4 @@
+import { logger } from "feature/logger/Logger";
 import {
   addDoc,
   collection,
@@ -48,7 +49,7 @@ export const getUserExercisePlans = async (userId: string): Promise<ExercisePlan
       };
     });
   } catch (error) {
-    console.error("Error fetching plans:", error);
+    logger.error(error, { context: "getUserExercisePlans" });
     throw error;
   }
 };
@@ -69,7 +70,7 @@ export const createExercisePlan = async (
     const docRef = await addDoc(collection(db, EXERCISE_PLANS_COLLECTION), planToSave);
     return docRef.id;
   } catch (error) {
-    console.error("Error creating plan:", error);
+    logger.error(error, { context: "createExercisePlan" });
     throw error;
   }
 };
@@ -85,7 +86,7 @@ export const updateExercisePlan = async (
       updatedAt: Timestamp.now(),
     });
   } catch (error) {
-    console.error("Error updating exercise plan:", error);
+    logger.error(error, { context: "updateExercisePlan" });
     throw error;
   }
 };
@@ -94,7 +95,7 @@ export const deleteExercisePlan = async (planId: string) => {
   try {
     await deleteDoc(doc(db, EXERCISE_PLANS_COLLECTION, planId));
   } catch (error) {
-    console.error("Error deleting exercise plan:", error);
+    logger.error(error, { context: "deleteExercisePlan" });
     throw error;
   }
 };
@@ -120,7 +121,7 @@ export const updateExerciseProgress = async (
       lastPracticed: Timestamp.now(),
     });
   } catch (error) {
-    console.error("Error updating exercise progress:", error);
+    logger.error(error, { context: "updateExerciseProgress" });
     throw error;
   }
 };
@@ -144,7 +145,7 @@ export const getUserExercises = async (userId: string): Promise<Exercise[]> => {
       updatedAt: doc.data().updatedAt.toDate(),
     })) as unknown as Exercise[];
   } catch (error) {
-    console.error("Error fetching exercises:", error);
+    logger.error(error, { context: "getUserExercises" });
     throw error;
   }
 };
@@ -174,7 +175,7 @@ export const getUserExercisePlan = async (userId: string, planId: string): Promi
       image: data.image,
     };
   } catch (error) {
-    console.error("Error fetching plan:", error);
+    logger.error(error, { context: "getUserExercisePlan" });
     throw error;
   }
 };

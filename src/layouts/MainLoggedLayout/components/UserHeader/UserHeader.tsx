@@ -1,8 +1,8 @@
-import Avatar from "components/UI/Avatar";
-import CopyLinkProfile from "components/CopyLinkProfile";
-import LevelBar from "components/LevelBar";
-import Logo from "components/Logo";
+import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
+import { LevelBar } from "components/LevelBar/LevelBar";
+import { Logo } from "components/Logo/Logo";
 import { LanguageSwitch } from "components/UI";
+import Avatar from "components/UI/Avatar";
 import UserNav from "components/UserNav";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";

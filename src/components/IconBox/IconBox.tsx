@@ -6,7 +6,7 @@ interface IconBoxProps {
   medium?: boolean;
 }
 
-const IconBox = ({ Icon, small, medium }: IconBoxProps) => {
+export const IconBox = ({ Icon, small, medium }: IconBoxProps) => {
   return (
     <div
       className={`${
@@ -21,4 +21,3 @@ const IconBox = ({ Icon, small, medium }: IconBoxProps) => {
     </div>
   );
 };
-export default IconBox;

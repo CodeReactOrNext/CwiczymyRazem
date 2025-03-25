@@ -6,11 +6,7 @@ interface LevelInterfaceProps {
   lvl: number;
   currentLevelMaxPoints: number;
 }
-const LevelBar = ({
-  points,
-  lvl,
-  currentLevelMaxPoints: pointsToNextLvl,
-}: LevelInterfaceProps) => {
+export const LevelBar = ({ points, lvl }: LevelInterfaceProps) => {
   const { t } = useTranslation("common");
 
   const levelXpStart = getPointsToLvlUp(lvl - 1);
@@ -37,10 +33,8 @@ const LevelBar = ({
       </div>
       <p className='mt-2 !font-semibold text-mainText'>
         {points - levelXpStart}/{levelXpEnd - levelXpStart}
-        <span className='text-sm'>{' '}{t("header.points_short")}</span>
+        <span className='text-sm'> {t("header.points_short")}</span>
       </p>
     </div>
   );
 };
-
-export default LevelBar;

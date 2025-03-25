@@ -1,7 +1,7 @@
 import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
-import DaySince from "components/DaySince/DaySince";
-import LevelBar from "components/LevelBar";
+import { DaySinceMessage } from "components/DaySince/DaySince";
+import { LevelBar } from "components/LevelBar/LevelBar";
 import MainContainer from "components/MainContainer";
 import Avatar from "components/UI/Avatar";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
@@ -75,7 +75,7 @@ const ProfileLayout = ({
               </div>
 
               <div className='z-10 mt-2 gap-1 font-openSans text-sm'>
-                <DaySince date={new Date(lastReportDate)} />
+                <DaySinceMessage date={new Date(lastReportDate)} />
                 <p className='my-1 font-thin'>
                   {t("joined")}{" "}
                   <span className='font-semibold'>

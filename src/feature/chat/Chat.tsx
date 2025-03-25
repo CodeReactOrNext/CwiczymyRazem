@@ -6,7 +6,7 @@ import { useChat } from "feature/chat/hooks/useChat";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
-const Chat = () => {
+export const Chat = () => {
   const {
     error,
     messages,
@@ -36,9 +36,9 @@ const Chat = () => {
             <UserTooltip userId={msg.userId}>
               <div className='chat-image bg-transparent'>
                 <Avatar
-                  avatarURL={msg.userPhotoURL}
-                  name={msg.username!}
                   size='sm'
+                  name={msg.username}
+                  avatarURL={msg.userPhotoURL}
                 />
               </div>
             </UserTooltip>
@@ -58,9 +58,9 @@ const Chat = () => {
           <Input
             type='text'
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
             placeholder={t("send_placeholder")}
             className='flex-1'
+            onChange={(e) => setNewMessage(e.target.value)}
           />
           <Button type='submit'>{t("send")}</Button>
         </div>
