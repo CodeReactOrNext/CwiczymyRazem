@@ -1,3 +1,6 @@
+import { OrderExercisesStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/OrderExercisesStep/OrderExercisesStep";
+import { PlanDetailsStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/PlanDetailsStep/PlanDetailsStep";
+import { SelectExercisesStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/SelectExercisesStep";
 import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
@@ -6,9 +9,6 @@ import type {
   ExercisePlan,
   LocalizedContent,
 } from "../../types/exercise.types";
-import { OrderExercisesStep } from "./steps/OrderExercisesStep";
-import { PlanDetailsStep } from "./steps/PlanDetailsStep";
-import { SelectExercisesStep } from "./steps/SelectExercisesStep";
 
 type Step = "select" | "order" | "details";
 
