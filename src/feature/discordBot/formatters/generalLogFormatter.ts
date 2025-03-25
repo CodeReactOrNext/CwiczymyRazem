@@ -1,7 +1,7 @@
 import type { FirebaseLogsInterface } from "feature/logs/types/logs.type";
 import { convertMsToHM } from "utils/converter";
 
-import { ACTIVITY_MESSAGES, JOKES } from "../constants/messages";
+import { ACTIVITY_MESSAGES, DISCORD_JOKES } from "../constants/messages";
 import type { GeneralLogFormatter } from "../types/formatter.types";
 import { getUserDisplayName } from "../utils/userUtils";
 
@@ -80,7 +80,7 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
   private getRandomMessage(log: FirebaseLogsInterface): string {
     const applicableMessages = [
       ...ACTIVITY_MESSAGES.filter((msg) => msg.condition(log)),
-      ...JOKES,
+      ...DISCORD_JOKES,
     ];
     return (
       applicableMessages[Math.floor(Math.random() * applicableMessages.length)]

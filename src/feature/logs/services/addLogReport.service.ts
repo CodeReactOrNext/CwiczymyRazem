@@ -1,5 +1,5 @@
 import type { AchievementList } from "feature/achievements/achievementsData";
-import { formatDiscordMessage } from "feature/discordBot/formatters";
+import { formatDiscordMessage } from "feature/discordBot/formatters/formatDiscordMessage";
 import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
 import {
   collection,

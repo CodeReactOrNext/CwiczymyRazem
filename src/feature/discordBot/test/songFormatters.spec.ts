@@ -3,7 +3,7 @@ import {
   WantToLearnSongFormatter,
 } from "feature/discordBot/formatters/songFormatters";
 import { getUserDisplayName } from "feature/discordBot/utils/userUtils";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("SongFormatters", () => {
   const mockLog = {

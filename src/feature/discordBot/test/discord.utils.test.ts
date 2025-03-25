@@ -1,4 +1,5 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { sendDiscordMessage } from "../utils/discord.utils";
 
 describe("sendDiscordMessage", () => {
