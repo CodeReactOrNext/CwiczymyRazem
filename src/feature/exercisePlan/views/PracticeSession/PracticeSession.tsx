@@ -30,8 +30,8 @@ import {
 import { useAppDispatch } from "store/hooks";
 import type { SkillsType } from "types/skillsTypes";
 
-import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog/ExerciseCompleteDialog";
-import { ExerciseDescription } from "../../components/ExerciseDescription/ExerciseDescription";
+import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
+import { ExerciseDescription } from "../../components/ExerciseDescription";
 import { Metronome } from "../../components/Metronome/Metronome";
 import { useExerciseTimer } from "../../hooks/useExerciseTimer";
 import type {
@@ -91,7 +91,7 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
       } else {
         handleNextExercise();
       }
-    }
+    },
   });
 
   const updateTime = useCallback(() => {

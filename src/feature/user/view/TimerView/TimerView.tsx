@@ -26,7 +26,7 @@ const TimerView = () => {
   const timerData = useAppSelector(selectTimerData);
   const { t } = useTranslation("timer");
   const router = useRouter();
-  
+
   const handleModeSelect = (selectedMode: PracticeMode) => {
     setMode(selectedMode);
   };
@@ -50,6 +50,7 @@ const TimerView = () => {
   const handlePlanFinish = () => {
     setSelectedPlan(null);
     setMode(null);
+    router.push("/report");
   };
 
   const timerSubmitHandler = () => {
