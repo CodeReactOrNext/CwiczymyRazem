@@ -1,3 +1,4 @@
+import { logger } from "feature/logger/Logger";
 import {
   collection,
   doc,
@@ -7,7 +8,8 @@ import {
   query,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import { SeasonData, SeasonPlayer } from "../types/season.types";
+
+import type { SeasonData, SeasonPlayer } from "../types/season.types";
 
 export class SeasonService {
   async getSeasonData(limit: number = 5): Promise<SeasonData | null> {
@@ -33,7 +35,7 @@ export class SeasonService {
         daysLeft,
       };
     } catch (error) {
-      console.error("Error fetching season data:", error);
+      logger.error(error, { context: "SeasonService" });
       return null;
     }
   }

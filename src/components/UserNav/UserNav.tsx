@@ -19,15 +19,13 @@ const UserNav = ({ flexDirection }: UserNavProps) => {
           ? "flex-col items-start justify-center"
           : "flex-row justify-around"
       }`}>
-      <Link
-        href='/settings'
-        className={buttonVariants({ variant: "outline", size: "sm" })}>
+      <Link href='/settings' className={buttonVariants({ size: "sm" })}>
         {t("button.edit")}
       </Link>
 
       <Button
-        variant='outline'
         size='sm'
+        variant='outline'
         onClick={() => dispatch(logUserOff())}>
         {t("button.logout")}
       </Button>

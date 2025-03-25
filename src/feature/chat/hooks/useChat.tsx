@@ -3,20 +3,20 @@ import {
   fetchChatMessages,
   sendChatMessage,
 } from "feature/chat/services/chatService";
-import type { ChatMessage } from "feature/chat/types/chat.types";
+import type { ChatMessageType } from "feature/chat/types/chat.types";
 import {
   selectUserAuth,
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
-import { useCallback,useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
 export const useChat = () => {
   const { t } = useTranslation("chat");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +36,7 @@ export const useChat = () => {
       if (!newMessage.trim() || !currentUserId) return;
 
       if (newMessage.length > CHAT_LIMIT_MESSAGE_LENGTH) {
-        setError(t('validation_too_long'));
+        setError(t("validation_too_long"));
         return;
       } else {
         setError(null);
@@ -49,6 +49,7 @@ export const useChat = () => {
           currentUserName,
           avatar
         );
+
         setNewMessage("");
       } catch (error) {
         toast.error(t("error"));

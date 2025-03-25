@@ -8,6 +8,13 @@ interface AvatarProps {
   size?: "sm";
 }
 
+const getRankImgPath = (lvl: number) => {
+  if (lvl >= IMG_RANKS_NUMBER) {
+    return IMG_RANKS_NUMBER;
+  }
+  return lvl;
+};
+
 const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
   const imgPath = getRankImgPath(lvl ?? 0);
 
@@ -47,10 +54,3 @@ const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
 };
 
 export default Avatar;
-
-const getRankImgPath = (lvl: number) => {
-  if (lvl >= IMG_RANKS_NUMBER) {
-    return IMG_RANKS_NUMBER;
-  }
-  return lvl;
-};

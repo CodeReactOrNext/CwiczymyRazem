@@ -1,4 +1,4 @@
-export interface ChatMessage {
+export interface ChatMessageType {
   id?: string;
   userId: string;
   username: string;
