@@ -8,13 +8,13 @@ export const categoryColors = {
 
 export const categoryGradients = {
   technique:
-    "from-blue-500/5 via-transparent to-indigo-500/5 hover:from-blue-500/10 hover:to-indigo-500/10",
+    "from-blue-500/10 to-indigo-500/10",
   theory:
-    "from-emerald-500/5 via-transparent to-green-500/5 hover:from-emerald-500/10 hover:to-green-500/10",
+    "from-emerald-500/10 to-green-500/10",
   creativity:
-    "from-purple-500/5 via-transparent to-pink-500/5 hover:from-purple-500/10 hover:to-pink-500/10",
+    "from-purple-500/10 to-pink-500/10",
   hearing:
-    "from-orange-500/5 via-transparent to-amber-500/5 hover:from-orange-500/10 hover:to-amber-500/10",
+    "from-orange-500/10 to-amber-500/10",
   mixed:
-    "from-red-500/5 via-transparent to-yellow-500/5 hover:from-red-500/10 hover:to-yellow-500/10",
+    "from-red-500/10 to-yellow-500/10",
 } as const; 
