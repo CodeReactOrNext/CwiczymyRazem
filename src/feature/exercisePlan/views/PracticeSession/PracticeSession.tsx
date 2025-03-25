@@ -85,6 +85,13 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
     reset: resetTimer,
   } = useExerciseTimer({
     duration: currentExercise.timeInMinutes * 60,
+    onComplete: () => {
+      if (isLastExercise) {
+        handleExerciseComplete();
+      } else {
+        handleNextExercise();
+      }
+    }
   });
 
   const updateTime = useCallback(() => {
@@ -610,7 +617,6 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
             </div>
           </div>
 
-          {/* Dialog zakończenia ćwiczenia */}
           <ExerciseCompleteDialog
             isOpen={showCompleteDialog}
             onClose={() => {
