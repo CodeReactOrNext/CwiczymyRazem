@@ -60,7 +60,7 @@ export const ExerciseDetailsDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='overflow-y-auto p-0 sm:max-w-[650px]'>
+      <DialogContent className='max-h-[70vh] overflow-y-auto p-0 sm:max-w-[650px]'>
         <div
           className={cn(
             "w-full rounded-t-lg bg-gradient-to-br p-6",
