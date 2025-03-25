@@ -43,7 +43,7 @@ export const ExerciseCard = ({
         <p className='mt-1 text-sm text-muted-foreground'>
           {exercise.description[currentLang]}
         </p>
-        <div className='mt-4 flex flex-wrap items-center gap-2'>
+        <div className='mb-4 mt-4 flex flex-wrap items-center gap-2'>
           <Badge variant='secondary'>
             {t(`common:categories.${exercise.category}`)}
           </Badge>
@@ -51,12 +51,12 @@ export const ExerciseCard = ({
             <FaClock className='h-3 w-3' />
             <span>{exercise.timeInMinutes} min</span>
           </div>
-          {skills.map((skill) => (
-            <Badge key={skill?.id} variant='outline' className='text-xs'>
-              {skill ? t(`common:skills.${skill.id}` as any) : ""}
-            </Badge>
-          ))}
         </div>
+        {skills.map((skill) => (
+          <Badge key={skill?.id} variant='outline' className='mr-2 text-xs'>
+            {skill ? t(`common:skills.${skill.id}` as any) : ""}
+          </Badge>
+        ))}
       </div>
     </Card>
   );
