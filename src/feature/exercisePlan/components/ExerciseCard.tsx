@@ -1,7 +1,7 @@
 import { Badge } from "assets/components/ui/badge";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
-import { ExerciseDetailsDialog } from "feature/exercisePlan/components/ExerciseDetailsDialog/ExerciseDetailsDialog";
+import { ExerciseDetailsDialog } from "feature/exercisePlan/components/ExerciseDetailsDialog";
 import type {
   Exercise,
   LocalizedContent,

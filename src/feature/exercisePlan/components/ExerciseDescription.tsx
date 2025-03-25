@@ -2,8 +2,8 @@ import { Badge } from "assets/components/ui/badge";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "react-i18next";
 
-import { categoryColors } from "../../constants/categoryStyles";
-import type { Exercise, LocalizedContent } from "../../types/exercise.types";
+import { categoryColors } from "../constants/categoryStyles";
+import type { Exercise, LocalizedContent } from "../types/exercise.types";
 
 interface ExerciseDescriptionProps {
   exercise: Exercise;
@@ -38,4 +38,4 @@ export const ExerciseDescription = ({ exercise }: ExerciseDescriptionProps) => {
       </div>
     </div>
   );
-}; 
+};
