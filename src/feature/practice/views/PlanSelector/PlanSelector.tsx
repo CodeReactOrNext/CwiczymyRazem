@@ -1,14 +1,9 @@
 import { Button } from "assets/components/ui/button";
 import MainContainer from "components/MainContainer";
-import { ExerciseDetailsDialog } from "feature/exercisePlan/components/ExerciseDetailsDialog/ExerciseDetailsDialog";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import type {
-  Exercise,
-  LocalizedContent,
-} from "feature/exercisePlan/types/exercise.types";
+import type { LocalizedContent } from "feature/exercisePlan/types/exercise.types";
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaArrowLeft } from "react-icons/fa";
 
@@ -25,32 +20,11 @@ const item = {
 export const PlanSelector = ({ onBack, onSelectPlan }: PlanSelectorProps) => {
   const { t, i18n } = useTranslation(["exercises", "common"]);
   const currentLang = i18n.language as keyof LocalizedContent;
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
-    null
-  );
 
   const handleStartPlan = (planId: string) => {
     const plan = defaultPlans.find((p) => p.id === planId);
     if (plan && onSelectPlan) {
       onSelectPlan(planId);
-    }
-  };
-
-  const handleSelectPlan = (planId: string) => {
-    const plan = defaultPlans.find((p) => p.id === planId);
-    if (plan) {
-      setSelectedExercise(plan.exercises[0]);
-    }
-  };
-
-  const handleStartExercise = () => {
-    if (selectedExercise) {
-      const plan = defaultPlans.find((p) =>
-        p.exercises.some((e) => e.id === selectedExercise.id)
-      );
-      if (plan && onSelectPlan) {
-        onSelectPlan(plan.id);
-      }
     }
   };
 
@@ -84,22 +58,13 @@ export const PlanSelector = ({ onBack, onSelectPlan }: PlanSelectorProps) => {
             <PlanCard
               key={plan.id}
               plan={plan}
-              onSelect={() => handleSelectPlan(plan.id)}
+              onSelect={() => handleStartPlan(plan.id)}
               onStart={() => handleStartPlan(plan.id)}
               startButtonText={t("common:start")}
             />
           ))}
         </motion.div>
       </motion.div>
-
-      {selectedExercise && (
-        <ExerciseDetailsDialog
-          exercise={selectedExercise}
-          isOpen={!!selectedExercise}
-          onClose={() => setSelectedExercise(null)}
-          onStart={handleStartExercise}
-        />
-      )}
     </MainContainer>
   );
 };
