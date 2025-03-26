@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "assets/components/ui/dialog";
 import { CreatePlan } from "feature/exercisePlan/components/CreatePlanDialog/CreatePlan";
-import { createExercisePlan } from "feature/exercisePlan/services/exerciseService";
+import { createExercisePlan } from "feature/exercisePlan/services/createExercisePlan";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";

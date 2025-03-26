@@ -6,6 +6,7 @@ import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/t
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 import basicImprovisationPracticeImage from "./image.webp";
+
 export const basicImprovisationPractice: ExercisePlan = {
   id: "basic_improvisation_practice",
     title: "Podstawowe ćwiczenie rozwijające improwizację",

@@ -1,6 +1,6 @@
 // eslint-disable-next-line simple-import-sort/imports
 import { Button } from "assets/components/ui/button";
-import { ExerciseLayout } from "feature/exercisePlan/components/layout/ExerciseLayout";
+import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "react-i18next";
 import { FaPlus } from "react-icons/fa";
@@ -12,15 +12,15 @@ import { useAppSelector } from "store/hooks";
 import { toast } from "sonner";
 import {
   getUserExercisePlans,
-  createExercisePlan,
-} from "../../services/exerciseService";
+} from "../../services/getUserExercisePlans";
 import type {
   Exercise,
   ExercisePlan,
   LocalizedContent,
 } from "../../types/exercise.types";
-import { PlanCard } from "../../components/PlanCard/PlanCard";
+import { PlanCard } from "../../components/PlanCard";
 import { CreatePlan } from "../../components/CreatePlanDialog/CreatePlan";
+import { createExercisePlan } from "feature/exercisePlan/services/createExercisePlan";
 
 interface MyPlansProps {
   onPlanSelect: (plan: ExercisePlan) => void;

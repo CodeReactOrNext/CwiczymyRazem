@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { ExerciseLayout } from "feature/exercisePlan/components/layout/ExerciseLayout";
+import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { updateTimerTime } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import useTimer from "hooks/useTimer";

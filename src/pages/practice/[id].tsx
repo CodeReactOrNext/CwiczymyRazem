@@ -1,4 +1,4 @@
-import { getUserExercisePlan } from "feature/exercisePlan/services/exerciseService";
+import { getUserExercisePlan } from "feature/exercisePlan/services/getUserExercisePlan";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { selectUserAuth } from "feature/user/store/userSlice";
