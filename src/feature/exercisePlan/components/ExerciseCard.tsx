@@ -2,6 +2,7 @@ import { Badge } from "assets/components/ui/badge";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { ExerciseDetailsDialog } from "feature/exercisePlan/components/ExerciseDetailsDialog";
+import { categoryGradientsWithHover } from "feature/exercisePlan/constants/categoryStyles";
 import type {
   Exercise,
   LocalizedContent,
@@ -15,17 +16,6 @@ interface ExerciseCardProps {
   exercise: Exercise;
   onSelect?: () => void;
 }
-
-const categoryGradients = {
-  technique:
-    "from-blue-500/5 via-transparent to-indigo-500/5 hover:from-blue-500/15 hover:to-indigo-500/10",
-  theory:
-    "from-emerald-500/5 via-transparent to-green-500/5 hover:from-emerald-500/15 hover:to-green-500/10",
-  creativity:
-    "from-purple-500/5 via-transparent to-pink-500/5 hover:from-purple-500/15 hover:to-pink-500/10",
-  hearing:
-    "from-orange-500/5 via-transparent to-amber-500/5 hover:from-orange-500/15 hover:to-amber-500/10",
-};
 
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
   const { t, i18n } = useTranslation(["exercises", "common"]);
@@ -43,7 +33,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
           "relative overflow-hidden transition-all duration-300 hover:shadow-md",
           "cursor-pointer border border-border/40",
           "before:absolute before:inset-0 before:bg-gradient-to-br",
-          categoryGradients[exercise.category]
+          categoryGradientsWithHover[exercise.category]
         )}
         onClick={() => setIsDetailsOpen(true)}>
         <div className='relative z-10 p-6'>
