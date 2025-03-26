@@ -8,10 +8,10 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { ExercisePlan as ExercisePlanType } from "../../types/exercise.types";
-import { ExerciseLibrary } from "../ExerciseLibrary/ExerciseLibrary";
-import { MyPlans } from "../MyPlans/MyPlans";
-import { PracticeSession } from "../PracticeSession/PracticeSession";
+import type { ExercisePlan as ExercisePlanType } from "../types/exercise.types";
+import { PracticeSession } from "../views/PracticeSession/PracticeSession";
+import { ExerciseLibrary } from "./ExerciseLibrary";
+import { MyPlans } from "./MyPlans";
 
 export const ExercisePlan = () => {
   const { t } = useTranslation("exercises");
@@ -26,15 +26,19 @@ export const ExercisePlan = () => {
   };
 
   return (
-    <div className='container mx-auto py-6 font-openSans'>
-      <Card className='p-6'>
+    <div className='container mx-auto  font-openSans sm:px-6 sm:py-6 md:px-4 md:py-4'>
+      <Card className='p-3 sm:p-6'>
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          <TabsList className='grid w-full grid-cols-3'>
-            <TabsTrigger value='my_plans'>{t("tabs.my_plans")}</TabsTrigger>
-            <TabsTrigger value='library'>{t("tabs.library")}</TabsTrigger>
+          <TabsList className='grid w-full grid-cols-2 md:grid-cols-3'>
+            <TabsTrigger value='my_plans' className='text-xs sm:text-sm'>
+              {t("tabs.my_plans")}
+            </TabsTrigger>
+            <TabsTrigger value='library' className='text-xs sm:text-sm'>
+              {t("tabs.library")}
+            </TabsTrigger>
           </TabsList>
 
-          <div className='mt-6'>
+          <div className='mt-4 sm:mt-6'>
             <TabsContent value='library'>
               <ExerciseLibrary />
             </TabsContent>

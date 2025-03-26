@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { ActivityChart } from "components/Charts/ActivityChart";
-import { ExercisePlan } from "feature/exercisePlan/views/ExercisePlan/ExercisePlan";
+import { ExercisePlan } from "feature/exercisePlan/components/ExercisePlan";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import { updateUserSkills } from "feature/skills/services/updateUserSkills";
