@@ -3,7 +3,7 @@ import type { StaticImageData } from "next/image";
 
 
 export type DifficultyLevel = "easy" | "medium" | "hard";
-export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing";
+export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing" | "mixed";
 
 export interface LocalizedContent {
   pl: string;

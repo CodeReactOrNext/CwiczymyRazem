@@ -10,32 +10,22 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 import { toast } from "sonner";
-import {
-  getUserExercisePlans,
-} from "../../services/getUserExercisePlans";
+import { getUserExercisePlans } from "../services/getUserExercisePlans";
 import type {
   Exercise,
   ExercisePlan,
   LocalizedContent,
-} from "../../types/exercise.types";
-import { PlanCard } from "../../components/PlanCard";
-import { CreatePlan } from "../../components/CreatePlanDialog/CreatePlan";
+} from "../types/exercise.types";
+import { PlanCard } from "./PlanCard";
+import { CreatePlan } from "./CreatePlanDialog/CreatePlan";
 import { createExercisePlan } from "feature/exercisePlan/services/createExercisePlan";
+import { logger } from "feature/logger/Logger";
+import { determinePlanDifficulty } from "feature/exercisePlan/utils/determinePlanDifficulty";
+import { determinePlanCategory } from "feature/exercisePlan/utils/deteminePlanCategory";
 
 interface MyPlansProps {
   onPlanSelect: (plan: ExercisePlan) => void;
 }
-
-const planGradients = {
-  technique:
-    "from-blue-500/5 via-transparent to-indigo-500/5 hover:from-blue-500/10 hover:to-indigo-500/10",
-  theory:
-    "from-emerald-500/5 via-transparent to-green-500/5 hover:from-emerald-500/10 hover:to-green-500/10",
-  creativity:
-    "from-purple-500/5 via-transparent to-pink-500/5 hover:from-purple-500/10 hover:to-pink-500/10",
-  hearing:
-    "from-orange-500/5 via-transparent to-amber-500/5 hover:from-orange-500/10 hover:to-amber-500/10",
-};
 
 export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
   const { t } = useTranslation(["exercises", "common"]);
@@ -47,20 +37,14 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
   useEffect(() => {
     const loadPlans = async () => {
       if (!userAuth) return;
-
-      try {
-        const userPlans = await getUserExercisePlans(userAuth);
-        setPlans(userPlans);
-      } catch (error) {
-        console.error("Error loading plans:", error);
-        toast.error(t("exercises:errors.load_plans_failed"));
-      } finally {
-        setIsLoading(false);
-      }
+      setIsLoading(true);
+      const userPlans = await getUserExercisePlans(userAuth);
+      setPlans(userPlans);
+      setIsLoading(false);
     };
 
     loadPlans();
-  }, [userAuth, t]);
+  }, [userAuth]);
 
   const handleCreatePlan = async (
     title: string | LocalizedContent,
@@ -69,75 +53,30 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
   ): Promise<void> => {
     try {
       if (!userAuth) {
-        console.error("User not authenticated");
+        logger.error("User not authenticated", {
+          context: "handleCreatePlan",
+        });
+
         return;
       }
 
-      const totalDuration = exercises.reduce(
-        (acc, exercise) => acc + exercise.timeInMinutes,
-        0
-      );
-
-      // Determine the primary category based on exercises
-      const categoryCount: Record<string, number> = {};
-      exercises.forEach((exercise) => {
-        categoryCount[exercise.category] =
-          (categoryCount[exercise.category] || 0) + 1;
-      });
-
-      const primaryCategory = Object.entries(categoryCount).sort(
-        (a, b) => b[1] - a[1]
-      )[0][0] as any;
-
-      // Determine difficulty level based on exercises
-      const difficultyLevels = {
-        easy: 1,
-        medium: 2,
-        hard: 3,
-      };
-
-      const avgDifficulty =
-        exercises.reduce(
-          (acc, exercise) =>
-            acc +
-            difficultyLevels[
-              exercise.difficulty as keyof typeof difficultyLevels
-            ],
-          0
-        ) / exercises.length;
-
-      let difficulty: "easy" | "medium" | "hard" = "easy";
-      if (avgDifficulty > 2.3) difficulty = "hard";
-      else if (avgDifficulty > 1.5) difficulty = "medium";
-
-      // Konwertujemy title i description na LocalizedContent, jeśli są stringami
-      const localizedTitle: LocalizedContent =
-        typeof title === "string" ? { pl: title, en: title } : title;
-
-      const localizedDescription: LocalizedContent =
-        typeof description === "string"
-          ? { pl: description, en: description }
-          : description;
-
-      const planData = {
-        title: localizedTitle,
-        description: localizedDescription,
-        category: primaryCategory,
-        difficulty,
+      const formattedPlanData = {
+        title: typeof title === "string" ? title : title.en,
+        description:
+          typeof description === "string" ? description : description.en,
+        category: determinePlanCategory(exercises),
+        difficulty: determinePlanDifficulty(exercises),
         exercises,
-        totalDuration,
         userId: userAuth,
         createdAt: new Date(),
         updatedAt: new Date(),
         image: null,
       };
 
-      // Zapisz plan w Firebase
-      const planId = await createExercisePlan(userAuth, planData);
+      const planId = await createExercisePlan(userAuth, formattedPlanData);
 
-      // Dodaj plan do lokalnego stanu
       const newPlan: ExercisePlan = {
-        ...planData,
+        ...formattedPlanData,
         id: planId,
       };
 
@@ -146,7 +85,7 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
 
       toast.success(t("exercises:my_plans.create_success"));
     } catch (error) {
-      console.error("Error creating plan:", error);
+      logger.error(error, { context: "handleCreatePlan" });
       toast.error(t("exercises:my_plans.create_error"));
     }
   };
@@ -166,9 +105,8 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
   return (
     <ExerciseLayout title={t("exercises:tabs.my_plans")}>
       <div className='space-y-8'>
-        {/* Sekcja własnych planów */}
         <div>
-          <div className='mb-6 flex items-center justify-between'>
+          <div className='mb-6 flex flex-col items-center justify-between gap-4 md:flex-row'>
             <div>
               <h2 className='text-2xl font-semibold'>
                 {t("exercises:my_plans.custom_plans")}
