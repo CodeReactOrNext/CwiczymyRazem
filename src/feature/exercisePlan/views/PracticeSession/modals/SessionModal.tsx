@@ -74,8 +74,8 @@ const SessionModal = ({
         </div>
 
         {/* Content with its own scrolling context */}
-        <div className='flex-1 overflow-y-auto overscroll-contain'>
-          <div className='p-4 pb-24'>
+        <div className='flex-1 overflow-y-auto overscroll-contain pb-[76px]'>
+          <div className='p-4'>
             {/* Exercise Image */}
             {currentExercise.image && (
               <div
