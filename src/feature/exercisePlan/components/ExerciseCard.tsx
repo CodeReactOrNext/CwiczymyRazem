@@ -39,7 +39,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         <div className='relative z-10 p-6'>
           <div className='flex justify-between'>
             <Badge variant='outline' className='rounded-full px-3 py-1 text-xs'>
-              {t(`exercises:categories.${exercise.category}`)}
+              {t(`exercises:categories.${exercise.category}` as any)}
             </Badge>
             <Badge variant='outline' className='rounded-full text-xs'>
               {t(`exercises:difficulty.${exercise.difficulty}` as any)}

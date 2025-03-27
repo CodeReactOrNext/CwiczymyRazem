@@ -94,7 +94,7 @@ export const ExerciseDetailsDialog = ({
               variant='secondary'
               className='flex items-center gap-2 px-3 py-1.5'>
               <FaGuitar className='h-3.5 w-3.5 text-muted-foreground' />
-              <span>{exerciseT(`categories.${exercise.category}`)}</span>
+              <span>{exerciseT(`categories.${exercise.category}` as any)}</span>
             </Badge>
           </div>
         </div>

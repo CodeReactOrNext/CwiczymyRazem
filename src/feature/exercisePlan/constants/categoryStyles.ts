@@ -29,4 +29,6 @@ export const categoryGradientsWithHover = {
     "from-purple-500/5 via-transparent to-pink-500/5 hover:from-purple-500/15 hover:to-pink-500/10",
   hearing:
     "from-orange-500/5 via-transparent to-amber-500/5 hover:from-orange-500/15 hover:to-amber-500/10",
+  mixed:
+    "from-red-500/5 via-transparent to-yellow-500/5 hover:from-red-500/15 hover:to-yellow-500/10",
 };

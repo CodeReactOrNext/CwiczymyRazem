@@ -77,7 +77,7 @@ export const ExerciseItem = ({
                 <span>{exercise.timeInMinutes} min</span>
               </div>
               <Badge variant='secondary'>
-                {t(`exercises:categories.${exercise.category}`)}
+                {t(`exercises:categories.${exercise.category}` as any)}
               </Badge>
             </div>
           </div>
