@@ -12,7 +12,6 @@ import {
 } from "firebase/auth";
 import {
   collection,
-  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -168,14 +167,6 @@ export const firebaseGetUserProviderData = async () => {
     email: null,
     photoURL: null,
   };
-};
-
-export const firebaseDeleteExercisePlan = async (id: string) => {
-  const userAuth = auth.currentUser?.uid;
-  if (userAuth) {
-    const userDocRef = doc(db, "users", userAuth, "exercisePlan", id);
-    await deleteDoc(userDocRef);
-  }
 };
 
 

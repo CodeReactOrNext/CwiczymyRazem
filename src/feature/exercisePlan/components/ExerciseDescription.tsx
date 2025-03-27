@@ -21,7 +21,7 @@ export const ExerciseDescription = ({ exercise }: ExerciseDescriptionProps) => {
             "rounded-full px-3 py-1 text-xs",
             categoryColors[exercise.category]
           )}>
-          {t(`categories.${exercise.category}`)}
+          {t(`categories.${exercise.category}` as any)}
         </Badge>
         <Badge variant='outline' className='rounded-full text-xs'>
           {t(`difficulty.${exercise.difficulty}`)}

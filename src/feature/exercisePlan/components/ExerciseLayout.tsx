@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { LocalizedContent } from "../../types/exercise.types";
+import type { LocalizedContent } from "../types/exercise.types";
 
 interface ExerciseLayoutProps {
   children: ReactNode;
@@ -26,7 +26,7 @@ export const ExerciseLayout = ({
   };
 
   return (
-    <div className='flex min-h-screen flex-col'>
+    <div className='flex min-h-screen flex-col '>
       <header className='border-b '>
         <div className='container py-4'>
           <div className='flex items-center justify-between'>

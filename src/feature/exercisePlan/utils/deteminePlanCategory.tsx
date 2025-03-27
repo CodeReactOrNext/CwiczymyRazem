@@ -1,6 +1,8 @@
-import type { Exercise } from "../types/exercise.types";
+import type { Exercise, ExerciseCategory } from "../types/exercise.types";
 
-export const determinePlanCategory = (selectedExercises: Exercise[]) => {
+export const determinePlanCategory = (
+  selectedExercises: Exercise[]
+): ExerciseCategory => {
   const categories = new Set(
     selectedExercises.map((exercise) => exercise.category)
   );

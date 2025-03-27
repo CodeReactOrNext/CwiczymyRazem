@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import { FaClock, FaListUl } from "react-icons/fa";
 
-import type { DifficultyLevel, ExercisePlan } from "../../types/exercise.types";
+import type { DifficultyLevel, ExercisePlan } from "../types/exercise.types";
 
 interface PlanCardProps {
   plan: ExercisePlan;
@@ -65,7 +65,6 @@ export const PlanCard = ({
         planGradients[plan.category]
       )}
       onClick={onSelect}>
-      {/* Only render the image section if there's an image */}
       {plan.image && (
         <div className='relative h-40 overflow-hidden'>
           <Image
@@ -96,7 +95,6 @@ export const PlanCard = ({
         </div>
       )}
 
-      {/* If no image, display badges in the content section */}
       {!plan.image && (
         <div className='flex justify-between p-3'>
           <Badge
@@ -112,7 +110,6 @@ export const PlanCard = ({
         </div>
       )}
 
-      {/* Content section - now transparent to let card gradient show through */}
       <div className='relative p-5'>
         <div>
           <h3 className='text-xl font-semibold text-foreground'>{title}</h3>
