@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import MainContainer from "components/MainContainer";
-import { PlanCard } from "feature/exercisePlan/components/PlanCard/PlanCard";
+import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { LocalizedContent } from "feature/exercisePlan/types/exercise.types";
 import { motion } from "framer-motion";

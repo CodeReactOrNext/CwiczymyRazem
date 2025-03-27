@@ -3,7 +3,7 @@ import type { StaticImageData } from "next/image";
 
 
 export type DifficultyLevel = "easy" | "medium" | "hard";
-export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing";
+export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing" | "mixed";
 
 export interface LocalizedContent {
   pl: string;
@@ -31,6 +31,8 @@ export interface Exercise {
 export interface ExercisePlan {
   id: string;
   title: string | LocalizedContent;
+  createdAt?: Date;
+  updatedAt?: Date;
   difficulty: DifficultyLevel;
   description: string | LocalizedContent;
   category: ExerciseCategory | 'mixed';
@@ -38,20 +40,3 @@ export interface ExercisePlan {
   userId: string;
   image: StaticImageData | null;
 }
-
-export interface ExerciseProgress {
-  exerciseId: string;
-  bestSpeed: number;
-  lastSpeed: number;
-  timeSpent: number;
-  lastPracticed: Date;
-  notes: string;
-  rating: number;
-  difficultyLevel: number; // 1-10 scale
-  masteryProgress: number; // 0-100%
-  nextMilestone: {
-    type: 'speed' | 'accuracy' | 'duration';
-    target: number;
-    current: number;
-  };
-} 

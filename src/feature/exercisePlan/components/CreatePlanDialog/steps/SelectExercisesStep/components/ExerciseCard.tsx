@@ -45,7 +45,7 @@ export const ExerciseCard = ({
         </p>
         <div className='mb-4 mt-4 flex flex-wrap items-center gap-2'>
           <Badge variant='secondary'>
-            {t(`common:categories.${exercise.category}`)}
+            {t(`common:categories.${exercise.category}` as any)}
           </Badge>
           <div className='flex min-w-4 items-center gap-1 text-sm text-muted-foreground'>
             <FaClock className='h-3 w-3' />

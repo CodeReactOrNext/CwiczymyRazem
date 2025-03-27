@@ -30,6 +30,8 @@ export const usePlanDetailsForm = ({ selectedExercises, onSubmit }: UsePlanDetai
         en: data.description,
       },
       image: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       userId: userAuth ?? "",
       exercises: selectedExercises,
       category: determinePlanCategory(selectedExercises),
