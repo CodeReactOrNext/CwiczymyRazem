@@ -21,7 +21,7 @@ const ModalWrapper = ({ children, zIndex }: ModalWrapperProps) => {
         top: 0,
         left: 0,
         width: "100vw",
-        height: "100vh",
+        height: "100dvh",
         backgroundColor: "black",
         willChange: "transform",
         isolation: "isolate",
