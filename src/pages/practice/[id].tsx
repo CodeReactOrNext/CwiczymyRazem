@@ -43,5 +43,7 @@ export default function PracticePage() {
     );
   }
 
-  return <PracticeSession plan={plan} />;
+  return (
+    <PracticeSession plan={plan} onFinish={() => router.push("/report")} />
+  );
 }
