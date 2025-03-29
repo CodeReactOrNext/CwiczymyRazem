@@ -128,7 +128,14 @@ const SessionModal = ({
 
                 {currentExercise.metronomeSpeed && (
                   <div className='mb-20'>
-                    <Metronome />
+                    <Metronome
+                      initialBpm={currentExercise.metronomeSpeed.recommended}
+                      minBpm={currentExercise.metronomeSpeed.min}
+                      maxBpm={currentExercise.metronomeSpeed.max}
+                      recommendedBpm={
+                        currentExercise.metronomeSpeed.recommended
+                      }
+                    />
                   </div>
                 )}
               </div>
