@@ -14,6 +14,7 @@ interface MainTimerSectionProps {
   formattedTimeLeft: string;
   toggleTimer: () => void;
   handleNextExercise: () => void;
+  timeLeft: number;
 }
 
 export const MainTimerSection = ({
@@ -25,6 +26,7 @@ export const MainTimerSection = ({
   formattedTimeLeft,
   toggleTimer,
   handleNextExercise,
+  timeLeft,
 }: MainTimerSectionProps) => {
   return (
     <AnimatePresence mode='wait'>
@@ -58,7 +60,7 @@ export const MainTimerSection = ({
                     damping: 20,
                   }}>
                   <TimerDisplay
-                    value={timerProgressValue}
+                    value={timeLeft}
                     text={formattedTimeLeft}
                     isPlaying={isPlaying}
                     size='lg'
