@@ -1,22 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useUIState = () => {
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [showCompleteDialog, setShowCompleteDialog] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isFullSessionModalOpen, setIsFullSessionModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
-  const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    }
-  }, []);
+
   
   useEffect(() => {
     const checkMobile = () => {
@@ -44,16 +35,12 @@ export const useUIState = () => {
   }, []);
   
   return {
-    isFullscreen,
-    setIsFullscreen,
     showCompleteDialog,
     setShowCompleteDialog,
     isMobileView,
     isFullSessionModalOpen, 
-    setIsFullSessionModalOpen,
     isImageModalOpen,
     setIsImageModalOpen,
     isMounted,
-    toggleFullscreen
   };
 }; 
