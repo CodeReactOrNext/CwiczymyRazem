@@ -68,7 +68,6 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
     startTimer,
     resetTimer,
     showSuccessView,
-    setShowSuccessView,
     resetSuccessView,
   } = usePracticeSessionState({ plan });
 
