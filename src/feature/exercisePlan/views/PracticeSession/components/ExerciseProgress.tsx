@@ -7,14 +7,12 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 interface ExerciseProgressProps {
   plan: ExercisePlan;
   currentExerciseIndex: number;
-  timeLeft: number;
   formattedTimeLeft: string;
 }
 
 export const ExerciseProgress = ({
   plan,
   currentExerciseIndex,
-  timeLeft,
   formattedTimeLeft,
 }: ExerciseProgressProps) => {
   const currentExercise = plan.exercises[currentExerciseIndex];
@@ -51,17 +49,6 @@ export const ExerciseProgress = ({
                       idx === currentExerciseIndex &&
                         "after:absolute after:inset-0 after:animate-pulse after:bg-primary/20"
                     )}
-                    style={{
-                      left: `${left}%`,
-                      width: `${width}%`,
-                      ...(idx === currentExerciseIndex && {
-                        clipPath: `inset(0 ${
-                          100 -
-                          (timeLeft / (currentExercise.timeInMinutes * 60)) *
-                            100
-                        }% 0 0)`,
-                      }),
-                    }}
                   />
                 );
               })}

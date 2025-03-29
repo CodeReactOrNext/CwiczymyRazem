@@ -1,12 +1,8 @@
 import { useState } from 'react';
 
-interface ImageHandlingOptions {
-  containerRef: React.RefObject<HTMLDivElement>;
-  initialScale?: number;
-}
 
-export const useImageHandling = ({ containerRef, initialScale = 1 }: ImageHandlingOptions) => {
-  const [imageScale, setImageScale] = useState(initialScale);
+export const useImageHandling = () => {
+  const [imageScale, setImageScale] = useState(1);
   
   const handleZoomIn = () => {
     setImageScale((prev) => Math.min(prev + 0.5, 5));
@@ -17,7 +13,7 @@ export const useImageHandling = ({ containerRef, initialScale = 1 }: ImageHandli
   };
 
   const resetImagePosition = () => {
-    setImageScale(initialScale);
+    setImageScale(1);
   };
 
   return {
