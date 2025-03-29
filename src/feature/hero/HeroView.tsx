@@ -30,3 +30,4 @@ const HeroView = () => {
 };
 
 export default HeroView;
+ 
