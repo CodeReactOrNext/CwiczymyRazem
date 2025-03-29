@@ -1,8 +1,8 @@
 import "react-circular-progressbar/dist/styles.css";
 
 import { cn } from "assets/lib/utils";
-import { AnimatePresence, motion, useMotionValue } from "framer-motion";
-import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
 
 interface TimerDisplayProps {
@@ -31,28 +31,26 @@ export const TimerDisplay = ({
     return "hsl(0, 90%, 60%)";
   };
 
-  const [progressColor, setProgressColor] = useState(getProgressColor(value));
-  const [prevIsPlaying, setPrevIsPlaying] = useState(isPlaying);
-  const playStateAnimProgress = useMotionValue(isPlaying ? 1 : 0);
-
-  useEffect(() => {
-    if (prevIsPlaying !== isPlaying) {
-      setPrevIsPlaying(isPlaying);
-    }
-  }, [isPlaying, prevIsPlaying]);
-
-  useEffect(() => {
-    const targetValue = isPlaying ? 1 : 0;
-    playStateAnimProgress.set(targetValue);
-  }, [isPlaying, playStateAnimProgress]);
-
-  useEffect(() => {
-    setProgressColor(getProgressColor(value));
-  }, [value]);
-
+  // Use useMemo to avoid recalculating progress color on every render
+  const progressColor = useMemo(() => getProgressColor(value), [value]);
   const mutedColor = "hsl(var(--muted))";
   const glowColor = isPlaying ? progressColor : mutedColor;
   const textSize = size === "sm" ? "24px" : size === "md" ? "28px" : "32px";
+
+  // Detect if on mobile for performance optimizations
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Check if on mobile
+    setIsMobile(window.innerWidth < 768);
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className='relative font-sans'>
@@ -61,115 +59,128 @@ export const TimerDisplay = ({
           "relative rounded-full backdrop-blur-sm",
           sizeClasses[size]
         )}>
-        <AnimatePresence>
-          <motion.div
-            key={`glow-${isPlaying}-${progressColor}`}
-            className='absolute inset-[-2px] rounded-full'
-            initial={{
-              background: `conic-gradient(
-                from ${isPlaying ? 0 : 180}deg, 
-                transparent, 
-                ${isPlaying ? mutedColor : glowColor}, 
-                transparent
-              )`,
-            }}
-            animate={{
-              rotate: isPlaying ? 360 : 0,
-              background: `conic-gradient(
-                from ${isPlaying ? 0 : 180}deg, 
-                transparent, 
-                ${glowColor}, 
-                transparent
-              )`,
-              opacity: 0.6,
-            }}
-            exit={{
-              opacity: 0,
-              transition: { duration: 0.3 },
-            }}
-            transition={{
-              rotate: {
-                duration: 8,
-                repeat: Infinity,
-                ease: "linear",
-              },
-              background: {
-                duration: 0.6,
-                ease: "easeInOut",
-              },
-              opacity: {
-                duration: 0.6,
-                ease: "easeInOut",
-              },
-            }}
-          />
-        </AnimatePresence>
-
-        <div className='absolute inset-0 p-[3px]'>
-          <AnimatePresence mode='wait'>
+        {!isMobile && (
+          <AnimatePresence>
             <motion.div
-              key={`progress-${progressColor}-${isPlaying}`}
-              initial={{ opacity: 0.7 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0.7 }}
-              transition={{ duration: 0.5 }}>
-              <CircularProgressbar
-                value={value}
-                text={text}
-                styles={buildStyles({
-                  pathColor: progressColor,
-                  textColor: "hsl(var(--foreground))",
-                  trailColor: "hsl(var(--muted)/0.1)",
-                  pathTransition: isPlaying
-                    ? "stroke-dashoffset 0.5s linear"
-                    : "none",
-                  textSize: textSize,
-                  strokeLinecap: "round",
-                })}
-              />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        <AnimatePresence>
-          {isPlaying && (
-            <motion.div
-              key='pulse-border'
-              className='absolute inset-0 rounded-full border-2'
+              key={`glow-${isPlaying}-${progressColor}`}
+              className='absolute inset-[-2px] rounded-full'
               initial={{
-                scale: 1,
-                opacity: 0,
-                borderColor: mutedColor,
+                background: `conic-gradient(
+                  from ${isPlaying ? 0 : 180}deg, 
+                  transparent, 
+                  ${isPlaying ? mutedColor : glowColor}, 
+                  transparent
+                )`,
               }}
               animate={{
-                scale: [1, 1.03, 1],
-                opacity: [0.2, 0.4, 0.2],
-                borderColor: progressColor,
+                rotate: isPlaying ? 360 : 0,
+                background: `conic-gradient(
+                  from ${isPlaying ? 0 : 180}deg, 
+                  transparent, 
+                  ${glowColor}, 
+                  transparent
+                )`,
+                opacity: 0.6,
               }}
               exit={{
-                scale: 1,
                 opacity: 0,
                 transition: { duration: 0.3 },
               }}
               transition={{
-                scale: {
-                  duration: 2,
+                rotate: {
+                  duration: 8,
                   repeat: Infinity,
+                  ease: "linear",
+                },
+                background: {
+                  duration: 0.6,
                   ease: "easeInOut",
                 },
                 opacity: {
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                },
-                borderColor: {
                   duration: 0.6,
                   ease: "easeInOut",
                 },
               }}
             />
-          )}
-        </AnimatePresence>
+          </AnimatePresence>
+        )}
+
+        {/* Simpler background for mobile */}
+        {isMobile && isPlaying && (
+          <div
+            className='absolute inset-[-2px] rounded-full opacity-60'
+            style={{
+              background: `conic-gradient(
+                from 0deg, 
+                transparent, 
+                ${glowColor}, 
+                transparent
+              )`,
+            }}
+          />
+        )}
+
+        <div className='absolute inset-0 p-[3px]'>
+          <CircularProgressbar
+            value={value}
+            text={text}
+            styles={buildStyles({
+              pathColor: progressColor,
+              textColor: "hsl(var(--foreground))",
+              trailColor: "hsl(var(--muted)/0.1)",
+              pathTransition:
+                isPlaying && !isMobile
+                  ? "stroke-dashoffset 0.5s linear"
+                  : "none",
+              textSize: textSize,
+              strokeLinecap: "round",
+            })}
+          />
+        </div>
+
+        {isPlaying && !isMobile && (
+          <motion.div
+            key='pulse-border'
+            className='absolute inset-0 rounded-full border-2'
+            initial={{
+              scale: 1,
+              opacity: 0,
+              borderColor: mutedColor,
+            }}
+            animate={{
+              scale: [1, 1.03, 1],
+              opacity: [0.2, 0.4, 0.2],
+              borderColor: progressColor,
+            }}
+            transition={{
+              scale: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+              opacity: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+              borderColor: {
+                duration: 0.6,
+                ease: "easeInOut",
+              },
+            }}
+          />
+        )}
+
+        {/* Simpler border pulse for mobile */}
+        {isPlaying && isMobile && (
+          <div
+            className='absolute inset-0 rounded-full border-2'
+            style={{
+              borderColor: progressColor,
+              opacity: 0.3,
+            }}
+          />
+        )}
       </div>
     </div>
   );
