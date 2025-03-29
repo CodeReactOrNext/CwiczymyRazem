@@ -17,6 +17,7 @@ import type {
 } from "../../types/exercise.types";
 import { ExerciseImage } from "./components/ExerciseImage";
 import { ExerciseProgress } from "./components/ExerciseProgress";
+import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
 import { InstructionsCard } from "./components/InstructionsCard";
 import { MainTimerSection } from "./components/MainTimerSection";
 import { NextExerciseCard } from "./components/NextExerciseCard";
@@ -66,6 +67,9 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
     toggleTimer,
     startTimer,
     resetTimer,
+    showSuccessView,
+    setShowSuccessView,
+    resetSuccessView,
   } = usePracticeSessionState({ plan });
 
   const {
@@ -82,13 +86,25 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
 
   return (
     <>
+      {showSuccessView && (
+        <ExerciseSuccessView
+          planTitle={plan.title as string}
+          onFinish={onFinish}
+          onRestart={() => {
+            resetSuccessView();
+            resetTimer();
+            startTimer();
+          }}
+        />
+      )}
+
       {isMobileView && (
         <>
           <ImageModal
             isOpen={isImageModalOpen}
             onClose={() => setIsImageModalOpen(false)}
             imageSrc={currentExercise.image || ""}
-            imageAlt={currentExercise.title[currentLang]}
+            imageAlt={currentExercise.title[currentLang] as string}
           />
 
           <SessionModal
