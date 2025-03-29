@@ -8,62 +8,71 @@ interface UseExerciseTimerProps {
 export const useExerciseTimer = ({ duration, onComplete }: UseExerciseTimerProps) => {
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isPlaying, setIsPlaying] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const requestRef = useRef<number | null>(null);
+  const previousTimeRef = useRef<number | null>(null);
+  const remainingTimeRef = useRef(duration);
   const durationRef = useRef(duration);
   
   useEffect(() => {
     durationRef.current = duration;
     setTimeLeft(duration);
+    remainingTimeRef.current = duration;
   }, [duration]);
 
-  const handleTick = useCallback(() => {
-    setTimeLeft(prev => {
-      if (prev <= 0) {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
+  const animate = useCallback((time: number) => {
+    if (previousTimeRef.current === null) {
+      previousTimeRef.current = time;
+      requestRef.current = requestAnimationFrame(animate);
+      return;
+    }
+    
+    const deltaTime = time - previousTimeRef.current;
+    
+    // Only update if at least 1000ms (1 second) has passed
+    if (deltaTime >= 1000) {
+      const secondsToDecrease = Math.floor(deltaTime / 1000);
+      previousTimeRef.current = time - (deltaTime % 1000); // Account for leftover time
+      
+      // Update remaining time
+      const newRemainingTime = Math.max(0, remainingTimeRef.current - secondsToDecrease);
+      remainingTimeRef.current = newRemainingTime;
+      
+      // Update state (throttled to reduce renders)
+      setTimeLeft(newRemainingTime);
+      
+      // Check if timer completed
+      if (newRemainingTime <= 0) {
+        stopAnimation();
         setIsPlaying(false);
-        return 0;
+        onComplete?.();
+        return;
       }
-      
-      const newTime = prev - 1;
-      
-      if (newTime === 0) {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-        setIsPlaying(false);
-        
-        requestAnimationFrame(() => {
-          onComplete?.();
-        });
-      }
-      
-      return newTime;
-    });
-  }, [onComplete, timeLeft]);
-
+    }
+    
+    // Continue animation loop
+    requestRef.current = requestAnimationFrame(animate);
+  }, [onComplete]);
+  
+  const stopAnimation = useCallback(() => {
+    if (requestRef.current) {
+      cancelAnimationFrame(requestRef.current);
+      requestRef.current = null;
+      previousTimeRef.current = null;
+    }
+  }, []);
+  
   useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+    if (isPlaying) {
+      previousTimeRef.current = null;
+      requestRef.current = requestAnimationFrame(animate);
+    } else {
+      stopAnimation();
     }
-
-    if (isPlaying && timeLeft > 0) {
-      intervalRef.current = setInterval(() => {
-        handleTick();
-      }, 1000);
-    }
-
+    
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+      stopAnimation();
     };
-  }, [isPlaying, handleTick, timeLeft]);
+  }, [isPlaying, animate, stopAnimation]);
 
   const start = useCallback(() => {
     if (timeLeft > 0) {
@@ -77,16 +86,14 @@ export const useExerciseTimer = ({ duration, onComplete }: UseExerciseTimerProps
 
   const reset = useCallback(() => {
     setIsPlaying(false);
-    
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
+    stopAnimation();
     
     const newDuration = durationRef.current;
+    remainingTimeRef.current = newDuration;
     setTimeLeft(newDuration);
-  }, []);
+  }, [stopAnimation]);
 
+  // Calculate progress percentage
   const progress = Math.max(0, Math.min(100, ((durationRef.current - timeLeft) / durationRef.current) * 100)) || 0;
 
   return {

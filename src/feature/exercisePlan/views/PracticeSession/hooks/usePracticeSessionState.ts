@@ -116,7 +116,6 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
     startTimer,
     pauseTimer,
     resetTimer,
-    
     currentLang,
     plan
   };
