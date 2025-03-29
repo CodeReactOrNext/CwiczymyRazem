@@ -1,12 +1,12 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { Minus, Plus } from "lucide-react";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
-import { useEffect,useRef } from "react";
+import { useEffect, useRef } from "react";
 import { FaCompress } from "react-icons/fa";
 
-import ModalWrapper from "../components/ModalWrapper";
 import { useImageHandling } from "../hooks/useImageHandling";
 
 interface ImageModalProps {
@@ -26,18 +26,10 @@ const ImageModal = ({
 
   const {
     imageScale,
-    imagePosition,
-    isDragging,
+
     handleZoomIn,
     handleZoomOut,
     resetImagePosition,
-    handleDragStart,
-    handleDragMove,
-    handleDragEnd,
-    handleImageLoad,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
     setImageScale,
   } = useImageHandling({ containerRef });
 
@@ -67,20 +59,12 @@ const ImageModal = ({
           ref={containerRef}
           className={cn(
             "h-full w-full select-none overflow-hidden",
-            isDragging ? "cursor-grabbing" : "cursor-grab",
-            "touch-none" // Disable browser's default touch actions
-          )}
-          onMouseDown={handleDragStart}
-          onMouseMove={handleDragMove}
-          onMouseUp={handleDragEnd}
-          onMouseLeave={handleDragEnd}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}>
+            "touch-none" 
+          )}>
           <div
             className='flex h-full w-full items-center justify-center transition-all duration-100 ease-out'
             style={{
-              transform: `translate3d(${imagePosition.x}px, ${imagePosition.y}px, 0) scale(${imageScale})`,
+              transform: ` scale(${imageScale})`,
               transformOrigin: "center center",
               height: "100%",
               width: "100%",
@@ -95,7 +79,6 @@ const ImageModal = ({
               priority
               quality={100}
               draggable={false}
-              onLoad={handleImageLoad}
             />
           </div>
         </div>
@@ -125,11 +108,6 @@ const ImageModal = ({
             className='h-12 w-12 rounded-full bg-background/40 backdrop-blur-sm'>
             <FaCompress className='h-5 w-5' />
           </Button>
-        </div>
-
-        {/* Instructions */}
-        <div className='absolute bottom-24 left-4 right-4 rounded-lg bg-background/40 p-2 text-center text-xs backdrop-blur-sm'>
-          <p>Pinch to zoom • Double-tap to toggle zoom • Drag to move</p>
         </div>
       </div>
     </ModalWrapper>
