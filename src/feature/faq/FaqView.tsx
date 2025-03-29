@@ -1,10 +1,10 @@
-import type { faqQuestionInterface } from "layouts/FaqLayout/FaqLayout";
-import FaqLayout from "layouts/FaqLayout/FaqLayout";
+import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
+import { FaqLayout } from "feature/faq/components/FaqLayout";
 import { useTranslation } from "react-i18next";
 
 const FaqView = () => {
   const { t } = useTranslation("faq");
-  const faqQuestion: faqQuestionInterface[] = [
+  const faqQuestions: faqQuestionInterface[] = [
     {
       title: t("about_title"),
       message: t("about_description"),
@@ -27,7 +27,7 @@ const FaqView = () => {
     },
   ];
 
-  return <FaqLayout faqQuestion={faqQuestion} />;
+  return <FaqLayout faqQuestions={faqQuestions} />;
 };
 
 export default FaqView;
