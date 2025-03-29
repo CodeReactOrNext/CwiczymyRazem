@@ -10,6 +10,7 @@ export const useExerciseNavigation = (plan: ExercisePlan) => {
   const nextExercise = currentExerciseIndex < plan.exercises.length - 1 
     ? plan.exercises[currentExerciseIndex + 1] 
     : null;
+    
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
   
   const handleNextExercise = useCallback((resetTimerFn: () => void) => {

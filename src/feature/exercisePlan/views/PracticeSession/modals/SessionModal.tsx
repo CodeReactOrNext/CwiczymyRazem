@@ -1,7 +1,10 @@
 import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
+import { Metronome } from "feature/exercisePlan/components/Metronome/Metronome";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
+import { i18n } from "next-i18next";
 import { FaExpand } from "react-icons/fa";
 
 import { categoryGradients } from "../../../constants/categoryStyles";
@@ -21,7 +24,6 @@ interface SessionModalProps {
   isMounted: boolean;
   currentExercise: any;
   nextExercise: any | null;
-  currentLang: keyof LocalizedContent;
   currentExerciseIndex: number;
   totalExercises: number;
   isLastExercise: boolean;
@@ -40,7 +42,6 @@ const SessionModal = ({
   isMounted,
   currentExercise,
   nextExercise,
-  currentLang,
   currentExerciseIndex,
   totalExercises,
   isLastExercise,
@@ -53,6 +54,8 @@ const SessionModal = ({
   if (!isOpen || !isMounted) return null;
 
   const category = currentExercise.category || "mixed";
+  const currentLang = i18n?.language as keyof LocalizedContent;
+
   const gradientClasses =
     categoryGradients[category as keyof typeof categoryGradients];
 
@@ -64,19 +67,19 @@ const SessionModal = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className='flex h-full flex-col overflow-hidden'>
-            {/* Header */}
+            className={cn(
+              "flex h-full flex-col overflow-hidden",
+              gradientClasses
+            )}>
             <SessionModalHeader
               exerciseTitle={currentExercise.title[currentLang]}
               currentExerciseIndex={currentExerciseIndex}
               totalExercises={totalExercises}
               onClose={onClose}
-              currentLang={currentLang}
             />
 
             <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5 pb-[76px]'>
               <div className='space-y-4 p-4'>
-                {/* Exercise Image */}
                 {currentExercise.image && (
                   <div
                     className='relative mb-4 w-full cursor-pointer overflow-hidden rounded-xl border border-muted/30 bg-white/5 shadow-md backdrop-blur-[1px] transition-all duration-200 hover:shadow-lg'
@@ -103,42 +106,34 @@ const SessionModal = ({
                   </div>
                 )}
 
-                {/* Timer Display */}
                 <MobileTimerDisplay
                   timerProgressValue={timerProgressValue}
                   formattedTimeLeft={formattedTimeLeft}
                   isPlaying={isPlaying}
                 />
 
-                {/* Instructions */}
                 <InstructionsCard
                   instructions={currentExercise.instructions}
-                  currentLang={currentLang}
                   title='Instrukcje'
                 />
 
-                {/* Tips */}
-                <TipsCard
-                  tips={currentExercise.tips}
-                  currentLang={currentLang}
-                />
+                <TipsCard tips={currentExercise.tips} />
 
-                {/* Next Exercise */}
                 {nextExercise && (
                   <NextExerciseCard
                     nextExercise={nextExercise}
-                    currentLang={currentLang}
                     isMobile={true}
                   />
                 )}
 
                 {currentExercise.metronomeSpeed && (
-                  <div className='mb-20'></div>
+                  <div className='mb-20'>
+                    <Metronome />
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* Controls */}
             <SessionModalControls
               isPlaying={isPlaying}
               isLastExercise={isLastExercise}

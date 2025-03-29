@@ -4,14 +4,11 @@ import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 
-import type { LocalizedContent } from "../../../types/exercise.types";
-
 interface SessionModalHeaderProps {
   exerciseTitle: string;
   currentExerciseIndex: number;
   totalExercises: number;
   onClose: () => void;
-  currentLang: keyof LocalizedContent;
 }
 
 export const SessionModalHeader = ({

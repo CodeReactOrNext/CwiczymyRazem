@@ -1,21 +1,20 @@
 import "react-circular-progressbar/dist/styles.css";
 
 import { Button } from "assets/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "assets/components/ui/tooltip";
+import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
+import { useRouter } from "next/router";
+import { i18n } from "next-i18next";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { FaCompress, FaExpand } from "react-icons/fa";
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
 import { Metronome } from "../../components/Metronome/Metronome";
-import type { ExercisePlan } from "../../types/exercise.types";
+import type {
+  ExercisePlan,
+  LocalizedContent,
+} from "../../types/exercise.types";
 import { ExerciseImage } from "./components/ExerciseImage";
 import { ExerciseProgress } from "./components/ExerciseProgress";
 import { InstructionsCard } from "./components/InstructionsCard";
@@ -26,7 +25,6 @@ import { useImageHandling } from "./hooks/useImageHandling";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
 import ImageModal from "./modals/ImageModal";
 import SessionModal from "./modals/SessionModal";
-import { useRouter } from "next/router";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
@@ -34,28 +32,22 @@ interface PracticeSessionProps {
 }
 
 const headerGradients = {
-  technique:
-    "from-blue-500/30 to-indigo-500/20 hover:from-blue-500/40 hover:to-indigo-500/30",
-  theory:
-    "from-emerald-500/30 to-green-500/20 hover:from-emerald-500/40 hover:to-green-500/30",
-  creativity:
-    "from-purple-500/30 to-pink-500/20 hover:from-purple-500/40 hover:to-pink-500/30",
-  hearing:
-    "from-orange-500/30 to-amber-500/20 hover:from-orange-500/40 hover:to-amber-500/30",
-  mixed:
-    "from-red-500/30 to-yellow-500/20 hover:from-red-500/40 hover:to-yellow-500/30",
+  technique: "from-blue-500/30 to-indigo-500/20 hover:from-blue-500/40 ",
+  theory: "from-emerald-500/30 to-green-500/20 hover:from-emerald-500/40 ",
+  creativity: "from-purple-500/30 to-pink-500/20 hover:from-purple-500/40",
+  hearing: "from-orange-500/30 to-amber-500/20 hover:from-orange-500/40",
+  mixed: "from-red-500/30 to-yellow-500/20 hover:from-red-500/40",
 };
 
 export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
   const { t } = useTranslation(["exercises", "common"]);
+  const currentLang = i18n?.language as keyof LocalizedContent;
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const sessionState = usePracticeSessionState({ plan, onFinish });
   const {
     currentExerciseIndex,
     exerciseKey,
-    isFullscreen,
     showCompleteDialog,
     isMobileView,
     isFullSessionModalOpen,
@@ -64,21 +56,17 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
     currentExercise,
     nextExercise,
     isLastExercise,
-    timeLeft,
     isPlaying,
     formattedTimeLeft,
     timerProgressValue,
     setShowCompleteDialog,
-    setIsFullSessionModalOpen,
     setIsImageModalOpen,
-    handleExerciseComplete,
     handleNextExercise,
+    timeLeft,
     toggleTimer,
-    toggleFullscreen,
     startTimer,
     resetTimer,
-    currentLang,
-  } = sessionState;
+  } = usePracticeSessionState({ plan });
 
   const {
     imageScale,
@@ -86,26 +74,14 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
     handleZoomIn,
     handleZoomOut,
     resetImagePosition,
-  } = useImageHandling({ containerRef });
+  } = useImageHandling();
 
   const category = currentExercise.category || "mixed";
   const headerGradientClass =
     headerGradients[category as keyof typeof headerGradients];
 
-  if (!plan) {
-    return (
-      <div className='flex h-64 flex-col items-center justify-center'>
-        <p className='mb-4 text-lg text-muted-foreground'>
-          {t("exercises:practice_session.plan_not_found")}
-        </p>
-        <Button onClick={onFinish}>{t("common:back")}</Button>
-      </div>
-    );
-  }
-
   return (
     <>
-      {/* Mobile Modals */}
       {isMobileView && (
         <>
           <ImageModal
@@ -118,12 +94,11 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
           <SessionModal
             isOpen={isFullSessionModalOpen}
             onClose={() => router.push("/report")}
-            onFinish={onFinish || (() => {})}
+            onFinish={onFinish}
             onImageClick={() => setIsImageModalOpen(true)}
             isMounted={isMounted}
             currentExercise={currentExercise}
             nextExercise={nextExercise}
-            currentLang={currentLang}
             currentExerciseIndex={currentExerciseIndex}
             totalExercises={plan.exercises.length}
             isLastExercise={isLastExercise}
@@ -131,7 +106,7 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
             timerProgressValue={timerProgressValue}
             formattedTimeLeft={formattedTimeLeft}
             toggleTimer={toggleTimer}
-            handleNextExercise={handleNextExercise}
+            handleNextExercise={() => handleNextExercise(resetTimer)}
           />
         </>
       )}
@@ -143,26 +118,6 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
             title={plan.title}
             actions={
               <div className='flex items-center gap-2'>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      size='icon'
-                      className='transition-all duration-200 hover:bg-background/80'
-                      onClick={toggleFullscreen}>
-                      {isFullscreen ? (
-                        <FaCompress className='h-4 w-4' />
-                      ) : (
-                        <FaExpand className='h-4 w-4' />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {isFullscreen
-                      ? "Wyjdź z trybu pełnoekranowego"
-                      : "Tryb pełnoekranowy"}
-                  </TooltipContent>
-                </Tooltip>
                 <Button
                   variant='outline'
                   onClick={onFinish}
@@ -194,13 +149,11 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                   <ExerciseProgress
                     plan={plan}
                     currentExerciseIndex={currentExerciseIndex}
-                    timeLeft={timeLeft}
                     formattedTimeLeft={formattedTimeLeft}
                   />
 
                   <InstructionsCard
                     instructions={currentExercise.instructions}
-                    currentLang={currentLang}
                     title={t("exercises:instructions")}
                   />
                 </div>
@@ -214,7 +167,8 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                     timerProgressValue={timerProgressValue}
                     formattedTimeLeft={formattedTimeLeft}
                     toggleTimer={toggleTimer}
-                    handleNextExercise={handleNextExercise}
+                    timeLeft={timeLeft}
+                    handleNextExercise={() => handleNextExercise(resetTimer)}
                   />
                 </div>
 
@@ -230,16 +184,10 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                     />
                   )}
 
-                  <TipsCard
-                    tips={currentExercise.tips}
-                    currentLang={currentLang}
-                  />
+                  <TipsCard tips={currentExercise.tips} />
 
                   {nextExercise && (
-                    <NextExerciseCard
-                      nextExercise={nextExercise}
-                      currentLang={currentLang}
-                    />
+                    <NextExerciseCard nextExercise={nextExercise} />
                   )}
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/compone
 import { Minus, Plus } from "lucide-react";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { FaCompress } from "react-icons/fa";
 
 import { useImageHandling } from "../hooks/useImageHandling";
@@ -22,8 +22,6 @@ const ImageModal = ({
   imageSrc,
   imageAlt,
 }: ImageModalProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const {
     imageScale,
 
@@ -31,9 +29,8 @@ const ImageModal = ({
     handleZoomOut,
     resetImagePosition,
     setImageScale,
-  } = useImageHandling({ containerRef });
+  } = useImageHandling();
 
-  // Set initial zoom when modal opens
   useEffect(() => {
     if (isOpen) {
       setImageScale(4.5);
@@ -56,10 +53,9 @@ const ImageModal = ({
         </div>
 
         <div
-          ref={containerRef}
           className={cn(
             "h-full w-full select-none overflow-hidden",
-            "touch-none" 
+            "touch-none"
           )}>
           <div
             className='flex h-full w-full items-center justify-center transition-all duration-100 ease-out'

@@ -7,6 +7,7 @@ import {
 } from "assets/components/ui/card";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
+import { i18n } from "next-i18next";
 
 import type { LocalizedContent } from "../../../types/exercise.types";
 
@@ -16,15 +17,15 @@ interface NextExerciseCardProps {
     image?: string | StaticImageData;
     timeInMinutes: number;
   } | null;
-  currentLang: keyof LocalizedContent;
   isMobile?: boolean;
 }
 
 export const NextExerciseCard = ({
   nextExercise,
-  currentLang,
   isMobile = false,
 }: NextExerciseCardProps) => {
+  const currentLang = i18n?.language as keyof LocalizedContent;
+
   if (!nextExercise) return null;
 
   const formatTime = (timeInMinutes: number): string => {
