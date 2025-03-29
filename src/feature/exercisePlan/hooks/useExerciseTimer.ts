@@ -8,90 +8,114 @@ interface UseExerciseTimerProps {
 export const useExerciseTimer = ({ duration, onComplete }: UseExerciseTimerProps) => {
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isPlaying, setIsPlaying] = useState(false);
-  const requestRef = useRef<number | null>(null);
-  const previousTimeRef = useRef<number | null>(null);
-  const remainingTimeRef = useRef(duration);
+  
+  // Use refs to track the actual time
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+  const pausedTimeLeftRef = useRef<number>(duration);
   const durationRef = useRef(duration);
   
   useEffect(() => {
     durationRef.current = duration;
     setTimeLeft(duration);
-    remainingTimeRef.current = duration;
+    pausedTimeLeftRef.current = duration;
   }, [duration]);
 
-  const animate = useCallback((time: number) => {
-    if (previousTimeRef.current === null) {
-      previousTimeRef.current = time;
-      requestRef.current = requestAnimationFrame(animate);
-      return;
+  // Clear any existing interval
+  const clearTimerInterval = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
+  }, []);
+
+  // Update timer based on elapsed time since start
+  const updateTimer = useCallback(() => {
+    if (startTimeRef.current === null) return;
     
-    const deltaTime = time - previousTimeRef.current;
+    const elapsedMs = Date.now() - startTimeRef.current;
+    const elapsedSeconds = Math.floor(elapsedMs / 1000);
+    const newTimeLeft = Math.max(0, pausedTimeLeftRef.current - elapsedSeconds);
     
-    // Only update if at least 1000ms (1 second) has passed
-    if (deltaTime >= 1000) {
-      const secondsToDecrease = Math.floor(deltaTime / 1000);
-      previousTimeRef.current = time - (deltaTime % 1000); // Account for leftover time
-      
-      // Update remaining time
-      const newRemainingTime = Math.max(0, remainingTimeRef.current - secondsToDecrease);
-      remainingTimeRef.current = newRemainingTime;
-      
-      // Update state (throttled to reduce renders)
-      setTimeLeft(newRemainingTime);
+    // Only update state if the time has actually changed
+    if (newTimeLeft !== timeLeft) {
+      setTimeLeft(newTimeLeft);
       
       // Check if timer completed
-      if (newRemainingTime <= 0) {
-        stopAnimation();
+      if (newTimeLeft <= 0) {
+        clearTimerInterval();
         setIsPlaying(false);
+        startTimeRef.current = null;
         onComplete?.();
-        return;
       }
     }
-    
-    // Continue animation loop
-    requestRef.current = requestAnimationFrame(animate);
-  }, [onComplete]);
-  
-  const stopAnimation = useCallback(() => {
-    if (requestRef.current) {
-      cancelAnimationFrame(requestRef.current);
-      requestRef.current = null;
-      previousTimeRef.current = null;
-    }
-  }, []);
-  
-  useEffect(() => {
-    if (isPlaying) {
-      previousTimeRef.current = null;
-      requestRef.current = requestAnimationFrame(animate);
-    } else {
-      stopAnimation();
-    }
-    
-    return () => {
-      stopAnimation();
-    };
-  }, [isPlaying, animate, stopAnimation]);
+  }, [timeLeft, clearTimerInterval, onComplete]);
 
+  // Start the timer
   const start = useCallback(() => {
-    if (timeLeft > 0) {
-      setIsPlaying(true);
-    }
-  }, [timeLeft]);
+    if (timeLeft <= 0) return;
+    
+    clearTimerInterval();
+    setIsPlaying(true);
+    
+    // Record exact start time
+    startTimeRef.current = Date.now() - ((pausedTimeLeftRef.current - timeLeft) * 1000);
+    
+    // Use both setInterval (for reliable background updates) and requestAnimationFrame (for smooth UI)
+    intervalRef.current = setInterval(() => {
+      updateTimer();
+    }, 250); // Update 4 times per second to ensure we don't miss seconds
+  }, [timeLeft, clearTimerInterval, updateTimer]);
 
+  // Pause the timer
   const pause = useCallback(() => {
+    if (!isPlaying) return;
+    
+    clearTimerInterval();
     setIsPlaying(false);
-  }, []);
+    
+    // Store the exact time left when paused
+    if (startTimeRef.current !== null) {
+      const elapsedMs = Date.now() - startTimeRef.current;
+      const elapsedSeconds = Math.floor(elapsedMs / 1000);
+      pausedTimeLeftRef.current = Math.max(0, pausedTimeLeftRef.current - elapsedSeconds);
+    }
+    
+    startTimeRef.current = null;
+  }, [isPlaying, clearTimerInterval]);
 
+  // Reset the timer
   const reset = useCallback(() => {
+    clearTimerInterval();
     setIsPlaying(false);
-    stopAnimation();
+    startTimeRef.current = null;
     
     const newDuration = durationRef.current;
-    remainingTimeRef.current = newDuration;
+    pausedTimeLeftRef.current = newDuration;
     setTimeLeft(newDuration);
-  }, [stopAnimation]);
+  }, [clearTimerInterval]);
+
+  // Ensure clean up on component unmount
+  useEffect(() => {
+    return () => {
+      clearTimerInterval();
+    };
+  }, [clearTimerInterval]);
+
+  // Handle play/pause changes
+  useEffect(() => {
+    if (isPlaying) {
+      // Only start if not already running
+      if (startTimeRef.current === null) {
+        start();
+      }
+    } else {
+      // Make sure timer is paused
+      if (startTimeRef.current !== null) {
+        pause();
+      }
+    }
+  }, [isPlaying, start, pause]);
 
   // Calculate progress percentage
   const progress = Math.max(0, Math.min(100, ((durationRef.current - timeLeft) / durationRef.current) * 100)) || 0;
