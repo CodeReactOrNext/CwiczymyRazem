@@ -1,24 +1,27 @@
+import type { DateWithReport } from "components/ActivityLog/activityLog.types";
+import { StatisticBar } from "feature/profile/components/StatisticBar";
+import {
+  StatsField,
+  type StatsFieldProps,
+} from "feature/profile/components/StatsField";
+import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { calculatePercent, convertMsToHM } from "utils/converter";
 
-import { getTrendData } from "../../utils/getTrendData";
-import StatisticBar from "../StatisticBar";
-import type { StatsFieldProps } from "../StatsField";
-import StatsField from "../StatsField";
+import { getTrendData } from "../utils/getTrendData";
 
 interface StatsSectionProps {
   statsField: StatsFieldProps[];
   statistics: StatisticsDataInterface;
-  datasWithReports: any; // Replace with proper type
-  t: (key: string) => string;
+  datasWithReports: DateWithReport[];
 }
 
 export const StatsSection = ({
   statsField,
   statistics,
   datasWithReports,
-  t,
 }: StatsSectionProps) => {
+  const { t } = useTranslation("profile");
   const { time } = statistics;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;

@@ -1,12 +1,12 @@
 import { getUserStatsField } from "assets/stats/profileStats";
 import { HeroView } from "feature/hero/HeroView";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
+import type { StatsFieldProps } from "feature/profile/components/StatsField";
+import ProfileLandingLayout from "feature/profile/ProfileLandingLayout";
 import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
-import { ProfileLandingLayout } from "layouts/ProfileLayout";
-import type { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
