@@ -42,7 +42,7 @@
     "firebase": "9.13.0",
     "firebase-admin": "^11.4.1",
     "formik": "^2.4.6",
-    "framer-motion": "^8.2.4",
+    "framer-motion": "^8.5.5",
     "i18next": "22.0.6",
     "i18next-browser-languagedetector": "7.0.1",
     "lucide-react": "^0.469.0",

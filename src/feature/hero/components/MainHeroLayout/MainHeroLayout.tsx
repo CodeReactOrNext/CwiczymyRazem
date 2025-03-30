@@ -15,7 +15,7 @@ interface MainLayoutProps {
   minHeightLimit?: boolean;
 }
 
-const MainLayout = ({
+export const MainHeroLayout = ({
   children,
   subtitle,
   variant,
@@ -44,4 +44,3 @@ const MainLayout = ({
   );
 };
 
-export default MainLayout;
