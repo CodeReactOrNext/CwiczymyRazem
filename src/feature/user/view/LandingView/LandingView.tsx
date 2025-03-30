@@ -1,5 +1,5 @@
 import { getUserStatsField } from "assets/stats/profileStats";
-import HeroView from "feature/hero/HeroView";
+import { HeroView } from "feature/hero/HeroView";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import {
   selectCurrentUserStats,

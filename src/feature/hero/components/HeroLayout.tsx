@@ -1,26 +1,25 @@
 /* eslint-disable @next/next/no-img-element */
 import { Button } from "assets/components/ui/button";
 import OldEffect from "components/OldEffect";
+import Guitar from "feature/hero/components/Guitar";
+import { HeroSlogan } from "feature/hero/components/HeroSlogan";
 import Link from "next/link";
 import FireDoubleSVG from "public/static/images/svg/Fire_double";
 import { useTranslation } from "react-i18next";
-
-import Guitar from "./components/Guitar";
-import HeroSlogan from "./components/HeroSlogan";
 
 interface HeroProps {
   children: React.ReactElement;
   buttonOnClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
+export const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
   const { t } = useTranslation(["profile", "common"]);
 
   return (
     <div className='grid h-full w-full grid-cols-1 grid-rows-2 gap-[20%] lg:grid-cols-[4fr_5fr] lg:grid-rows-1'>
       <div className='relative h-full w-full'>
-        <div className='absolute top-0 bottom-0 h-full w-full'>
-          <FireDoubleSVG className='absolute top-[60%] left-0 right-0 w-[110%] -translate-x-[7%] fill-second-500 sm:top-[50%] md:top-[50%] lg:-bottom-[45%] lg:top-auto lg:h-full xl:-bottom-[50%]' />
+        <div className='absolute bottom-0 top-0 h-full w-full '>
+          <FireDoubleSVG className='absolute left-0 right-0 top-[60%] w-[110%] -translate-x-[7%] fill-second-600 sm:top-[50%] md:top-[50%] lg:-bottom-[45%] lg:top-auto lg:h-full xl:-bottom-[50%]' />
         </div>
         <HeroSlogan />
         <OldEffect />
@@ -51,5 +50,3 @@ const HeroLayout = ({ children, buttonOnClick }: HeroProps) => {
     </div>
   );
 };
-
-export default HeroLayout;
