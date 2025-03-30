@@ -1,12 +1,11 @@
 import { DaySinceMessage } from "components/DaySince/DaySince";
 import Avatar from "components/UI/Avatar";
+import { AchievementsCarousel } from "feature/leadboard/components/AchievementsCarousel";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
-
-import AchievementsCarousel from "../AchievementsCarousel";
 
 interface LeadboardColumnProps {
   place: number;
@@ -17,7 +16,7 @@ interface LeadboardColumnProps {
   currentUserId: string | null;
 }
 
-const LeadboardRow = ({
+export const LeadboardRow = ({
   place,
   nick,
   statistics,
@@ -30,7 +29,9 @@ const LeadboardRow = ({
 
   const shortenNick = (nick: string) => {
     const MAX_SHOW_NICK_LENGTH = 16;
-    if (!nick) return;
+    if (!nick) {
+      return null;
+    }
     if (nick.length > MAX_SHOW_NICK_LENGTH) {
       return (
         <span data-tip={nick}>
@@ -45,7 +46,7 @@ const LeadboardRow = ({
     <li className='flex w-full justify-center p-4 pb-8 pt-8 text-xs xs:text-base md:p-8'>
       <p
         className={`flex items-center justify-end font-semibold xxs:text-lg xs:text-4xl lg:text-5xl xl:w-[100px] xl:text-6xl
-         ${profileId === currentUserId ? "text-blue-400" : "text-gray-400"}`}>
+         ${profileId === currentUserId ? "text-blue-300" : "text-gray-400"}`}>
         {place + "."}
       </p>
       <div className='ml-2 flex w-full max-w-[800px] items-center md:h-16 xl:ml-5'>
@@ -124,5 +125,3 @@ const LeadboardRow = ({
     </li>
   );
 };
-
-export default LeadboardRow;
