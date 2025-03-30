@@ -1,4 +1,4 @@
-import type { SortByType } from "feature/leadboard/types";
+import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import {
   createUserWithEmailAndPassword,

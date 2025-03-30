@@ -1,14 +1,14 @@
-import { Footer } from "components/Footer/Footer";
-import HeroLayout from "layouts/HeroLayout";
-import MainHeroLayout from "layouts/MainHeroLayout";
+import { Footer } from "feature/hero/components/Footer";
+import { HeroLayout } from "feature/hero/components/HeroLayout";
+import { MainHeroLayout } from "feature/hero/components/MainHeroLayout/MainHeroLayout";
 import { useTranslation } from "react-i18next";
 
-const HeroView = () => {
+export const HeroView = () => {
   const { t } = useTranslation(["common", "footer", "profile"]);
 
   return (
     <MainHeroLayout
-      variant={"landing"}
+      variant='landing'
       subtitle={t("profile:subtitlebar_text")}
       minHeightLimit>
       <HeroLayout>
@@ -19,14 +19,17 @@ const HeroView = () => {
           <p>{t("profile:hero_line_4")}</p>
         </>
       </HeroLayout>
+
       <Footer>
         {t("footer:disclaimer")}
-        <a href='https://www.freepik.com/'> Freepik</a>
+        <a
+          href='https://www.freepik.com/'
+          className='text-main-500 hover:underline'>
+          Freepik
+        </a>
         <br />
         {t("footer:authors")}: Michał Jabłoński, Damian Sobieraj
       </Footer>
     </MainHeroLayout>
   );
 };
-
-export default HeroView;

@@ -1,4 +1,4 @@
-import HeroView from "feature/hero/HeroView";
+import { HeroView } from "feature/hero/HeroView";
 import LandingView from "feature/user/view/LandingView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import MainLayout from "layouts/MainLayout";
