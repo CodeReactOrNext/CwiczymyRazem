@@ -1,14 +1,32 @@
 import MainContainer from "components/MainContainer";
+import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
+import { Pagination } from "feature/leadboard/components/Pagination";
 import { useTranslation } from "react-i18next";
+import type { SeasonDataInterface } from "types/api.types";
+import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 
-import LeadboardRow from "./components/LeadboardRow/LeadboardRow";
-import Pagination from "./components/Pagination/Pagination";
-import SeasonSelect from "./components/SeasonSelect/SeasonSelect";
-import UserStats from "./components/UserStats/UserStats";
-import ViewToggle from "./components/ViewToggle/ViewToggle";
-import type { LeaderboardProps } from "./types";
+import SeasonSelect from "./SeasonSelect";
+import UserStats from "./UserStats";
+import ViewToggle from "./ViewToggle";
 
-const LeadboardLayout = ({
+export type SortByType = "points" | "sessionCount";
+
+export interface LeaderboardProps {
+  usersData: FirebaseUserDataInterface[];
+  currentUserId: string | null;
+  isLoading: boolean;
+  totalUsers: number;
+  currentPage: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void;
+  isSeasonalView: boolean;
+  setIsSeasonalView: (value: boolean) => void;
+  seasons: SeasonDataInterface[];
+  selectedSeason: string;
+  setSelectedSeason: (value: string) => void;
+}
+
+export const LeadboardLayout = ({
   usersData,
   currentUserId,
   isLoading,
@@ -104,5 +122,3 @@ const LeadboardLayout = ({
     </MainContainer>
   );
 };
-
-export default LeadboardLayout;

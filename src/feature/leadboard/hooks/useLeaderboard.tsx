@@ -1,28 +1,41 @@
-import { getAvailableSeasons } from "feature/leadboard/services/getAvailableSeasons";
-import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
-import { getSeasonalLeaderboard } from "feature/leadboard/services/getSeasonalLeaderboard";
-import { getTotalUsersCount } from "feature/leadboard/services/getTotalUsersCount";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
+import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
+import { logger } from "feature/logger/Logger";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
-import { firebaseGetUsersExceriseRaport } from "utils/firebase/client/firebase.utils";
 
-import LeadboardLayout from "../../LeadboardLayout";
-import type { SortByType } from "../../types";
+import { getAvailableSeasons } from "../services/getAvailableSeasons";
+import { getCurrentSeason } from "../services/getCurrentSeason";
+import { getGlobalLeaderboard } from "../services/getGlobalLeaderboard";
+import { getSeasonalLeaderboard } from "../services/getSeasonalLeaderboard";
 
-const ITEMS_PER_PAGE = 30;
+interface UseLeaderboardProps {
+  initialSortBy?: SortByType;
+  itemsPerPage: number;
+}
 
-const LeadboardView = () => {
+interface UseLeaderboardReturn {
+  usersData: FirebaseUserDataInterface[];
+  isLoading: boolean;
+  totalUsers: number;
+  currentPage: number;
+  isSeasonalView: boolean;
+  seasons: SeasonDataInterface[];
+  selectedSeason: string;
+  handlePageChange: (page: number) => void;
+  handleViewChange: (isSeasonalView: boolean) => Promise<void>;
+  handleSeasonChange: (seasonId: string) => Promise<void>;
+}
+
+export const useLeaderboard = ({
+  initialSortBy = "points",
+  itemsPerPage,
+}: UseLeaderboardProps): UseLeaderboardReturn => {
   const { t } = useTranslation("leadboard");
-  const currentUserId = useAppSelector(selectUserAuth);
 
   const [usersData, setUsersData] = useState<FirebaseUserDataInterface[]>([]);
-  const [sortBy, setSortBy] = useState<SortByType>("points");
   const [isLoading, setIsLoading] = useState(false);
   const [totalUsers, setTotalUsers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,15 +46,18 @@ const LeadboardView = () => {
   const loadGlobalLeaderboard = async (page: number) => {
     try {
       setIsLoading(true);
-      const [usersResponse, totalCount] = await Promise.all([
-        firebaseGetUsersExceriseRaport(sortBy, page, ITEMS_PER_PAGE),
-        getTotalUsersCount(),
-      ]);
-      setUsersData(usersResponse.users);
-      setTotalUsers(totalCount);
+      const response = await getGlobalLeaderboard(
+        initialSortBy,
+        page,
+        itemsPerPage
+      );
+      setUsersData(response.users);
+      setTotalUsers(response.totalUsers);
     } catch (error) {
-      console.error("Error loading global leaderboard:", error);
-      toast(t("fetch_error"));
+      logger.error(error, {
+        context: "loadGlobalLeaderboard",
+      });
+      toast.error(t("fetch_error"));
     } finally {
       setIsLoading(false);
     }
@@ -52,10 +68,11 @@ const LeadboardView = () => {
       setIsLoading(true);
       const response = await getSeasonalLeaderboard(
         seasonId,
-        sortBy,
+        initialSortBy,
         page,
-        ITEMS_PER_PAGE
+        itemsPerPage
       );
+
       if (response) {
         const mappedUsers = (response.users || []).map((user) => ({
           ...user,
@@ -158,28 +175,18 @@ const LeadboardView = () => {
     } else {
       loadGlobalLeaderboard(1);
     }
-  }, [sortBy]);
+  }, []);
 
-  if (!usersData.length && !isLoading) {
-    return <PageLoadingLayout />;
-  }
-
-  return (
-    <LeadboardLayout
-      usersData={usersData}
-      currentUserId={currentUserId}
-      isLoading={isLoading}
-      totalUsers={totalUsers}
-      currentPage={currentPage}
-      itemsPerPage={ITEMS_PER_PAGE}
-      onPageChange={handlePageChange}
-      isSeasonalView={isSeasonalView}
-      setIsSeasonalView={handleViewChange}
-      seasons={seasons}
-      selectedSeason={selectedSeason}
-      setSelectedSeason={handleSeasonChange}
-    />
-  );
+  return {
+    usersData,
+    isLoading,
+    totalUsers,
+    currentPage,
+    isSeasonalView,
+    seasons,
+    selectedSeason,
+    handlePageChange,
+    handleViewChange,
+    handleSeasonChange,
+  };
 };
-
-export default LeadboardView;

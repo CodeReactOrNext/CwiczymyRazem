@@ -1,4 +1,4 @@
-import LeadboardView from "feature/leadboard/view/LeadboardView";
+import { LeadboardView } from "feature/leadboard/LeadboardView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { NextPage } from "next";

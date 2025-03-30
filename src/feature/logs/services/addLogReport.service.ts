@@ -1,7 +1,8 @@
 import type { AchievementList } from "feature/achievements/achievementsData";
 import { formatDiscordMessage } from "feature/discordBot/formatters/formatDiscordMessage";
 import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
-import {
+import { logger } from "feature/logger/Logger";
+    import {
   collection,
   doc,
   getDoc,
@@ -45,6 +46,8 @@ export const firebaseAddLogReport = async (
     const discordMessage = await formatDiscordMessage(logData);
     await sendDiscordMessage(discordMessage as any);
   } catch (error) {
-    console.error("Error sending Discord notification:", error);
+    logger.error(error, {
+      context: "addLogReport",
+    });
   }
 };

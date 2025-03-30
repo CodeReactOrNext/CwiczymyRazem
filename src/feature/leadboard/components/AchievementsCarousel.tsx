@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
-const AchievementsCarousel = ({
+export const AchievementsCarousel = ({
   achievements,
 }: {
   achievements: AchievementList[];
@@ -17,8 +17,8 @@ const AchievementsCarousel = ({
   const rightMax = index + itemsShow >= achievements.length;
   const leftMax = index === 0;
 
-  const displayItems = (index: number) => {
-    return achievements.slice(index, itemsShow + index);
+  const displayItems = (itemsIndex: number) => {
+    return achievements.slice(itemsIndex, itemsShow + itemsIndex);
   };
 
   const handleNext = () => {
@@ -73,5 +73,3 @@ const AchievementsCarousel = ({
     </div>
   );
 };
-
-export default AchievementsCarousel;
