@@ -22,6 +22,6 @@ export const getUserExercises = async (userId: string): Promise<Exercise[]> => {
     })) as unknown as Exercise[];
   } catch (error) {
     logger.error(error, { context: "getUserExercises" });
-    throw error;
+    return [];
   }
 }; 

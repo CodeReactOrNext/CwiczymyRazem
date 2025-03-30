@@ -1,4 +1,4 @@
-import HeadDecoration from "layouts/ProfileLayout/components/HeadDecoration";
+import { HeadDecoration } from "components/HeadDecoration";
 import React from "react";
 
 interface MainContainerProps {

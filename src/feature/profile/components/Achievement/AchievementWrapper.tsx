@@ -3,10 +3,9 @@ import type {
   AchievementsDataInterface,
 } from "feature/achievements/achievementsData";
 import { achievementsData } from "feature/achievements/achievementsData";
+import { AchievementBox } from "feature/profile/components/Achievement/AchievementBox";
 
-import AchievementBox from "../AchievementBox";
-
-const AchievementWrapper = ({
+export const AchievementWrapper = ({
   userAchievements,
 }: {
   userAchievements: AchievementList[];
@@ -69,4 +68,3 @@ const AchievementWrapper = ({
     </div>
   );
 };
-export default AchievementWrapper;

@@ -1,7 +1,7 @@
 import type { AchievementList } from "feature/achievements/achievementsData";
 import { achievementsData } from "feature/achievements/achievementsData";
+import { AchievementCard } from "feature/achievements/components/AchievementCard";
 import { motion } from "framer-motion";
-import AchievementCard from "layouts/ProfileLayout/components/Achievement/AchievementCard";
 
 interface AchievementsMapProps {
   userAchievements: AchievementList[];

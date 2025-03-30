@@ -4,7 +4,7 @@ import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const AchievementCard = ({ id }: { id: AchievementList }) => {
+export const AchievementCard = ({ id }: { id: AchievementList }) => {
   const { t } = useTranslation("achievements");
   const achievementData = achievementsData.find((achiv) => achiv.id === id);
   const { Icon, rarity, description, name } = achievementData!;
@@ -122,5 +122,3 @@ const AchievementCard = ({ id }: { id: AchievementList }) => {
     </div>
   );
 };
-
-export default AchievementCard;
