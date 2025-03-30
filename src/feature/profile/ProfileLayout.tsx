@@ -4,6 +4,7 @@ import { DaySinceMessage } from "components/DaySince/DaySince";
 import { LevelBar } from "components/LevelBar/LevelBar";
 import MainContainer from "components/MainContainer";
 import Avatar from "components/UI/Avatar";
+import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
@@ -14,8 +15,7 @@ import type { ProfileInterface } from "types/ProfileInterface";
 import { getYearsOfPlaying } from "utils/converter";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
-import type { StatsFieldProps } from "./components/StatsField";
-import { StatsSection } from "./components/StatsSection/StatsSection";
+import { StatsSection } from "./components/StatsSection";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -138,7 +138,6 @@ const ProfileLayout = ({
             statsField={statsField}
             statistics={statistics}
             datasWithReports={datasWithReports}
-            t={t}
           />
         </div>
 

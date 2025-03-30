@@ -21,10 +21,10 @@ const getValueFromReport = (report: ReportListInterface | undefined, key: TrendD
   if (!report) return 0;
 
   if (key === 'time') {
-    return report.totalTime / 3600000; // Convert totalTime to hours
+    return report.totalTime / 3600000;
   }
 
-  return report.points; // Return points directly
+  return report.points; 
 };
 
 export const getTrendData = (
@@ -37,7 +37,6 @@ export const getTrendData = (
   const { days = 14 } = options;
   const now = new Date();
   
-  // Create a map of dates to reports
   const reportMap = datasWithReports.reduce((acc, dayReport) => {
     if (dayReport && dayReport.date) {
       acc[getDayKey(dayReport.date)] = dayReport.report;
@@ -45,7 +44,6 @@ export const getTrendData = (
     return acc;
   }, {} as Record<string, ReportListInterface | undefined>);
 
-  // Generate data for the last N days
   return Array.from({ length: days }).map((_, index) => {
     const date = new Date(now);
     date.setDate(date.getDate() - (days - 1 - index));
