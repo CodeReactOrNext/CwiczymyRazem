@@ -1,9 +1,8 @@
 import { Card } from "assets/components/ui/card";
+import { MiniTrendChart } from "feature/profile/components/MiniTrendChart";
+import { calculateTrend } from "feature/profile/utils/calculateTrend";
 import type { LucideIcon } from "lucide-react";
 import { ArrowDown, ArrowUp } from "lucide-react";
-
-import { calculateTrend } from "../../utils/calculateTrend";
-import MiniTrendChart from "../MiniTrendChart/MiniTrendChart";
 
 export interface StatsFieldProps {
   Icon?: LucideIcon;
@@ -16,7 +15,7 @@ export interface StatsFieldProps {
   id?: string;
 }
 
-const StatsField = ({
+export const StatsField = ({
   Icon,
   description,
   value,
@@ -24,21 +23,18 @@ const StatsField = ({
 }: StatsFieldProps) => {
   const shouldShowTrend = !description.toLowerCase().includes("rekord");
   const trend = shouldShowTrend && trendData ? calculateTrend(trendData) : null;
+  const DATA_LENGTH_FOR_CHART = 7;
 
-  // Don't show chart if value is 0 or "00:00"
   const shouldShowChart =
     shouldShowTrend &&
     value !== 0 &&
     value !== "0" &&
     value !== "00:00" &&
     trendData &&
-    trendData.length >= 14; // Make sure we have enough data
+    trendData.length >= DATA_LENGTH_FOR_CHART;
 
-  // Determine chart color based on trend direction
   const chartColor =
-    trend?.direction === "up"
-      ? "rgb(34, 197, 94)" // green-500 for positive trend
-      : "rgb(239, 68, 68)"; // red-500 for negative trend
+    trend?.direction === "up" ? "rgb(34, 197, 94)" : "rgb(239, 68, 68)";
 
   return (
     <Card className='bg-second p-4 font-openSans transition-all hover:shadow-md'>
@@ -72,5 +68,3 @@ const StatsField = ({
     </Card>
   );
 };
-
-export default StatsField;

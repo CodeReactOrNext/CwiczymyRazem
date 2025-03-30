@@ -1,6 +1,6 @@
 import Fire from "public/static/images/svg/Fire";
 
-const HeadDecoration = ({ title }: { title?: string }) => {
+export const HeadDecoration = ({ title }: { title?: string }) => {
   return (
     <>
       <div className='hidden justify-center sm:flex'>
@@ -20,5 +20,3 @@ const HeadDecoration = ({ title }: { title?: string }) => {
     </>
   );
 };
-
-export default HeadDecoration;

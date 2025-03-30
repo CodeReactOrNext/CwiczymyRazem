@@ -5,7 +5,7 @@ interface MiniTrendChartProps {
   color?: string;
 }
 
-const MiniTrendChart = ({
+export const MiniTrendChart = ({
   data,
   color = "rgb(99, 102, 241)",
 }: MiniTrendChartProps) => {
@@ -39,5 +39,3 @@ const MiniTrendChart = ({
     </div>
   );
 };
-
-export default MiniTrendChart;

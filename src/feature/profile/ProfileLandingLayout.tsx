@@ -2,7 +2,12 @@ import { Button } from "assets/components/ui/button";
 import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { ActivityChart } from "components/Charts/ActivityChart";
+import { HeadDecoration } from "components/HeadDecoration";
 import { ExercisePlan } from "feature/exercisePlan/components/ExercisePlan";
+import { logger } from "feature/logger/Logger";
+import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
+import { PracticeInsights } from "feature/profile/components/PracticeInsights/PracticeInsights";
+import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import { updateUserSkills } from "feature/skills/services/updateUserSkills";
@@ -12,17 +17,13 @@ import { SongLearningSection } from "feature/songs/components/SongLearningSectio
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { AnimatePresence, motion } from "framer-motion";
-import { PracticeInsights } from "layouts/ProfileLayout/components/PracticeInsights/PracticeInsights";
 import { Activity, Brain, LayoutDashboard, Music, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { canUpgradeSkill } from "utils/firebase/client/firebase.utils";
 
-import AchievementWrapper from "./components/Achievement/AchievementWrapper";
-import HeadDecoration from "./components/HeadDecoration";
-import type { StatsFieldProps } from "./components/StatsField";
-import { StatsSection } from "./components/StatsSection/StatsSection";
+import { StatsSection } from "./components/StatsSection";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -74,7 +75,7 @@ const ProfileLandingLayout = ({
       const updatedSkills = await getUserSkills(userAuth);
       setUserSkills(updatedSkills);
     } else {
-      console.error("Failed to upgrade skill");
+      logger.error("Failed to upgrade skill");
     }
   };
 
@@ -87,7 +88,6 @@ const ProfileLandingLayout = ({
               statsField={statsField}
               statistics={userStats}
               datasWithReports={datasWithReports}
-              t={t}
             />
             <div className='my-2 mb-2 flex flex-col justify-between'>
               <AchievementWrapper userAchievements={achievements} />

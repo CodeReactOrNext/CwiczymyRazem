@@ -1,7 +1,7 @@
 import { getUserStatsField } from "assets/stats/profileStats";
+import type { StatsFieldProps } from "feature/profile/components/StatsField";
+import ProfileLayout from "feature/profile/ProfileLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
-import { ProfileLayout } from "layouts/ProfileLayout";
-import type { StatsFieldProps } from "layouts/ProfileLayout/components/StatsField";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { ProfileInterface } from "types/ProfileInterface";

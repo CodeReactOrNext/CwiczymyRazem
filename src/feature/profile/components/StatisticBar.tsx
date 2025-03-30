@@ -3,7 +3,7 @@ interface StatisticBarProps {
   value: string;
   percent: number;
 }
-const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
+export const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
   const percentValue = percent ? percent : 0;
 
   return (
@@ -25,5 +25,3 @@ const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
     </div>
   );
 };
-
-export default StatisticBar;
