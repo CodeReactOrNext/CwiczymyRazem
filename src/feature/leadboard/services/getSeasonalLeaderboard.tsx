@@ -1,4 +1,5 @@
-import type { SortByType } from "feature/leadboard/types";
+import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
+import { logger } from "feature/logger/Logger";
 import {
   collection,
   getCountFromServer,
@@ -22,7 +23,9 @@ export const getSeasonalLeaderboard = async (
     const total = totalSnapshot.data().count;
 
     if (total === 0) {
-      console.log("⚠️ No users found in season");
+      logger.error("No users found in season", {
+        context: "getSeasonalLeaderboard",
+      });
       return { users: [], totalUsers: 0 };
     }
 

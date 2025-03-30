@@ -1,4 +1,4 @@
-import FaqView from "feature/faq/view/FaqView";
+import FaqView from "feature/faq/FaqView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
