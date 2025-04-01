@@ -75,11 +75,8 @@ export const Pagination = ({
       result.push(
         <PaginationItem key={i}>
           <PaginationLink
-            href='#'
             onClick={(e) => handlePageClick(e, i)}
-            isActive={currentPage === i}
-            aria-label={`Go to page ${i}`}
-            aria-current={currentPage === i ? "page" : undefined}>
+            isActive={currentPage === i}>
             {i}
           </PaginationLink>
         </PaginationItem>
@@ -97,10 +94,7 @@ export const Pagination = ({
 
       result.push(
         <PaginationItem key='last-page'>
-          <PaginationLink
-            href='#'
-            onClick={(e) => handlePageClick(e, totalPages)}
-            aria-label={`Go to page ${totalPages}`}>
+          <PaginationLink onClick={(e) => handlePageClick(e, totalPages)}>
             {totalPages}
           </PaginationLink>
         </PaginationItem>
@@ -130,7 +124,6 @@ export const Pagination = ({
 
         <PaginationItem>
           <PaginationNext
-            href='#'
             onClick={handleNext}
             className={
               currentPage === totalPages ? "pointer-events-none opacity-50" : ""
