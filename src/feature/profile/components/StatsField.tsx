@@ -42,7 +42,9 @@ export const StatsField = ({
         <div className='space-y-2'>
           <div className='flex items-center gap-2'>
             {Icon && <Icon className='h-4 w-4 text-muted-foreground' />}
-            <span className='text-sm text-muted-foreground'>{description}</span>
+            <span className='text-[12px] text-muted-foreground md:text-sm'>
+              {description}
+            </span>
           </div>
           <p className='font-sans text-2xl font-bold'>{value}</p>
         </div>
