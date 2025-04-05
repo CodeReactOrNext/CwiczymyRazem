@@ -4,11 +4,11 @@ import { Logo } from "components/Logo/Logo";
 import { LanguageSwitch } from "components/UI";
 import Avatar from "components/UI/Avatar";
 import UserNav from "components/UserNav";
+import { WelcomeMessage } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/WelcomeMessage";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 
 import NavDecoration from "./components/NavDecoration";
-import WelcomeMessage from "./components/WelcomeMessage";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
@@ -16,7 +16,11 @@ interface UserHeaderProps {
   avatar?: string;
 }
 
-const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
+export const UserHeader = ({
+  userStats,
+  userName,
+  avatar,
+}: UserHeaderProps) => {
   const {
     points,
     lvl,
@@ -39,9 +43,9 @@ const UserHeader = ({ userStats, userName, avatar }: UserHeaderProps) => {
             </div>
           </div>
           <WelcomeMessage
+            points={points}
             userName={userName}
             lastReportDate={lastReportDate}
-            points={points}
             actualDayWithoutBreak={actualDayWithoutBreak}
             totalPracticeTime={convertMsToHM(
               time.technique + time.theory + time.creativity + time.hearing
