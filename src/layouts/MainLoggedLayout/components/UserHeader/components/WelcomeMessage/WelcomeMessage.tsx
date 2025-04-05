@@ -50,7 +50,7 @@ export const WelcomeMessage = ({
         </div>
 
         <div className='stat min-w-[150px] !p-3 font-openSans text-white'>
-          <StreakDisplay dayWithoutBreak={32} />
+          <StreakDisplay dayWithoutBreak={dayWithoutBreak} />
         </div>
       </div>
 
