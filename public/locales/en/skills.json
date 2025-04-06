@@ -1,6 +1,37 @@
 {
   "availablePoints": "available points",
   "level": "Level",
+  "progress": "Progress",
+  "maxed": "MAXED",
+  "click_for_details": "Click for details",
+  "upgrade_skill": "Upgrade this skill",
+  "upgrade": "Upgrade",
+  "current_level": "Current Level",
+  "points_to_distribute": "points to distribute",
+  "skill_categories": "Skill Categories",
+  "categories_description": "Select a category below to allocate your skill points",
+  "no_skills_unlocked": "No {{category}} skills unlocked yet",
+  "unlock_skills_hint": "Gain points through practice to unlock skills",
+  "no_skills_unlocked_yet": "You haven't unlocked any skills yet",
+  "show_all_skills": "Show all available skills",
+  "available_points": "Available Points",
+  "point_usage_hint": "Click the + button to upgrade skills in these categories",
+  "show_unlocked": "Show only unlocked skills",
+  "show_all": "Show all skills",
+  "category_description": {
+    "technique": "Allocate points here to improve your playing technique. Points earned from exercises help you track your technical development.",
+    "theory": "Distribute points to enhance your music theory knowledge. Balance this with other areas for well-rounded growth.",
+    "hearing": "Assign points to improve your ear training abilities. Monitor your progress to avoid neglecting this important skill.",
+    "creativity": "Use points to boost your creative expression skills. Track which areas you're developing and which need attention."
+  },
+  "intro": {
+    "title": "Guitar Skill Development",
+    "description": "Distribute skill points earned from your practice sessions to develop specific areas of your playing.",
+    "point1": "Earn skill points by completing practice exercises",
+    "point2": "Allocate points according to which areas you want to develop",
+    "point3": "Track your progress to see which skills you're developing and which you're neglecting",
+    "got_it": "Got it"
+  },
   "categories": {
     "technique": "Technique",
     "theory": "Theory",
@@ -123,6 +154,90 @@
     "picking": {
       "name": "Picking",
       "description": "Master basic picking techniques and precise string striking"
+    },
+    "basic_chords": {
+      "name": "Basic Chords",
+      "description": "Open and power chords foundation"
+    },
+    "intermediate_chords": {
+      "name": "Intermediate Chords",
+      "description": "Barre chords and complex voicings"
+    },
+    "advanced_chords": {
+      "name": "Advanced Chords",
+      "description": "Extended and altered chord voicings"
+    },
+    "basic_scales": {
+      "name": "Basic Scales",
+      "description": "Major, minor and pentatonic scales"
+    },
+    "intermediate_scales": {
+      "name": "Intermediate Scales",
+      "description": "Modal scales and additional patterns"
+    },
+    "advanced_scales": {
+      "name": "Advanced Scales",
+      "description": "Exotic and complex scale systems"
+    },
+    "rhythm_basics": {
+      "name": "Rhythm Basics",
+      "description": "Basic strumming and timing patterns"
+    },
+    "rhythm_intermediate": {
+      "name": "Intermediate Rhythm",
+      "description": "Complex strumming and syncopation"
+    },
+    "rhythm_advanced": {
+      "name": "Advanced Rhythm",
+      "description": "Polyrhythms and advanced timing concepts"
+    },
+    "music_theory_basics": {
+      "name": "Theory Basics",
+      "description": "Fundamentals of musical notation and harmony"
+    },
+    "music_theory_intermediate": {
+      "name": "Intermediate Theory",
+      "description": "Chord progressions and advanced harmony"
+    },
+    "music_theory_advanced": {
+      "name": "Advanced Theory",
+      "description": "Complex harmonic systems and analysis"
+    },
+    "ear_training_basic": {
+      "name": "Basic Ear Training",
+      "description": "Identifying notes and simple intervals"
+    },
+    "ear_training_intermediate": {
+      "name": "Intermediate Ear Training",
+      "description": "Chord recognition and transcription skills"
+    },
+    "ear_training_advanced": {
+      "name": "Advanced Ear Training",
+      "description": "Complex harmonic and rhythmic transcription"
+    },
+    "improvisation_basic": {
+      "name": "Basic Improvisation",
+      "description": "Simple melodic improvisation over basic progressions"
+    },
+    "improvisation_intermediate": {
+      "name": "Intermediate Improvisation",
+      "description": "Phrasing and more complex improvisational concepts"
+    },
+    "improvisation_advanced": {
+      "name": "Advanced Improvisation",
+      "description": "Developing unique voice and advanced techniques"
+    },
+    "composition_basic": {
+      "name": "Basic Composition",
+      "description": "Simple songwriting and melodic development"
+    },
+    "composition_intermediate": {
+      "name": "Intermediate Composition",
+      "description": "More complex song structures and arrangements"
+    },
+    "composition_advanced": {
+      "name": "Advanced Composition",
+      "description": "Sophisticated compositional techniques"
     }
   }
 }
