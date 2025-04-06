@@ -37,6 +37,26 @@
     "skills": "Skills",
     "exercises": "Exercises"
   },
+  "cards": {
+    "practice": {
+      "title": "Practice",
+      "description": "Practice regularly to improve your guitar playing skills.",
+      "choose": "Choose exercise",
+      "report": "Report"
+    },
+    "songs": {
+      "title": "Songs",
+      "description": "Manage songs you're learning or want to learn."
+    },
+    "skills": {
+      "title": "Skills",
+      "description": "Track your progress and develop your guitar playing skills."
+    },
+    "library": {
+      "title": "Exercise Library",
+      "description": "Discover various exercises that will help you learn to play the guitar."
+    }
+  },
   "yearsOfPlaying": "Years of playing:",
   "practice_insights": "Practice Insights",
   "insights": {

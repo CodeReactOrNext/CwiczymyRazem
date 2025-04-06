@@ -6,6 +6,7 @@ import { HeadDecoration } from "components/HeadDecoration";
 import { ExercisePlan } from "feature/exercisePlan/components/ExercisePlan";
 import { logger } from "feature/logger/Logger";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
+import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
 import { PracticeInsights } from "feature/profile/components/PracticeInsights/PracticeInsights";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
@@ -175,6 +176,10 @@ const ProfileLandingLayout = ({
           {t("nav.exercises")}
         </Button>
       </div>
+
+      {activeSection === "overview" && (
+        <NavigationCards setActiveSection={setActiveSection} />
+      )}
 
       <div className='grid-rows-auto grid-cols-1 items-start gap-6 p-3 md:grid-cols-2 md:!p-6 lg:grid'>
         <AnimatePresence mode='wait'>
