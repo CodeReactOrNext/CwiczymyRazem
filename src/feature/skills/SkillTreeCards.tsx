@@ -1,3 +1,4 @@
+import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { SkillCategoryCard } from "feature/skills/components/SkillCategoryCard";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
@@ -73,9 +74,7 @@ export const SkillTreeCards = ({
         <h2 className='text-lg font-semibold text-white'>
           {t("skill_categories")}
         </h2>
-        <p className='text-xs text-gray-400'>
-          {t("categories_description")}
-        </p>
+        <p className='text-xs text-gray-400'>{t("categories_description")}</p>
       </div>
       <motion.div
         initial={{ opacity: 0 }}
@@ -88,7 +87,7 @@ export const SkillTreeCards = ({
           return (
             <SkillCategoryCard
               key={category}
-              category={category}
+              category={category as CategoryKeys}
               skills={skills}
               userSkills={userSkills}
               index={index}
