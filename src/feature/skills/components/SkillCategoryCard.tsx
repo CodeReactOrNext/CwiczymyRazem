@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { SkillCategoryBadge } from "feature/skills/components/SkillCategoryBadge";
 import { SkillCategoryTitle } from "feature/skills/components/SkillCategoryTitle";
 import { SkillsList } from "feature/skills/components/SkillsList";
@@ -8,7 +9,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 interface SkillCategoryCardProps {
-  category: string;
+  category: CategoryKeys;
   skills: GuitarSkill[];
   userSkills: UserSkills;
   index: number;

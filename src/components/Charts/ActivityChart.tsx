@@ -119,7 +119,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
                   }
                 />
                 <label htmlFor={category} className='text-sm capitalize'>
-                  {t(`chart.categories.${category as CategoryKey}`)}
+                  {t(`chart.categories.${category as CategoryKeys}`)}
                 </label>
               </div>
             ))}
@@ -236,7 +236,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
                           {payload.map((entry) => (
                             <span key={entry.name} className='font-bold'>
                               {t(
-                                `chart.categories.${entry.name as CategoryKey}`
+                                `chart.categories.${entry.name as CategoryKeys}`
                               )}
                               :{" "}
                               {
