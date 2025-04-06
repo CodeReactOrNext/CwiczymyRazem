@@ -37,6 +37,26 @@
     "skills": "Umiejętności",
     "exercises": "Ćwiczenia"
   },
+  "cards": {
+    "practice": {
+      "title": "Ćwicz",
+      "description": "Ćwicz regularnie, aby doskonalić swoje umiejętności gry na gitarze.",
+      "choose": "Wybierz ćwiczenie",
+      "report": "Raport"
+    },
+    "songs": {
+      "title": "Utwory",
+      "description": "Zarządzaj utworami, których się uczysz lub chcesz się nauczyć."
+    },
+    "skills": {
+      "title": "Umiejętności",
+      "description": "Śledź swój postęp i rozwijaj umiejętności gry na gitarze."
+    },
+    "library": {
+      "title": "Biblioteka ćwiczeń",
+      "description": "Odkryj różnorodne ćwiczenia, które pomogą Ci w nauce gry na gitarze."
+    }
+  },
   "yearsOfPlaying": "Lata gry:",
   "practice_insights": "Analiza Ćwiczeń",
   "insights": {
