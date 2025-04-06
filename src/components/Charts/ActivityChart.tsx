@@ -36,7 +36,7 @@ interface ActivityChartProps {
   }[];
 }
 
-type CategoryKey = "technique" | "theory" | "hearing" | "creativity";
+export type CategoryKeys = "technique" | "theory" | "hearing" | "creativity";
 
 export function ActivityChart({ data }: ActivityChartProps) {
   const { t } = useTranslation();

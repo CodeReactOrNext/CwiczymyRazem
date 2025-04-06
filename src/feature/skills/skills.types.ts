@@ -1,3 +1,4 @@
+import type { CategoryKeys } from "components/Charts/ActivityChart";
 import type { IconType } from "react-icons";
 
 export type GuitarSkillId = 
@@ -40,18 +41,13 @@ export type GuitarSkillId =
 
 export interface GuitarSkill {
   id: GuitarSkillId;
-  category: "technique" | "theory" | "hearing" | "creativity";
+  category: CategoryKeys
   icon?: IconType;
   name?: string;
 }
 
 export interface UserSkills {
-  availablePoints: {
-    technique: number;
-    theory: number;
-    hearing: number;
-    creativity: number;
-  };
+  availablePoints: Record<CategoryKeys, number>;
   unlockedSkills: {
     [skillId in GuitarSkillId]?: number;
   };
