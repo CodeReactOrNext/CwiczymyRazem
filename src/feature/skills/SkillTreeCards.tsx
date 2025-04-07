@@ -67,7 +67,6 @@ export const SkillTreeCards = ({
       progressColorClass: "bg-purple-600/70",
     },
   };
-
   return (
     <div className='mb-12 font-openSans'>
       <div className='mb-4 flex items-center justify-between'>
@@ -83,7 +82,6 @@ export const SkillTreeCards = ({
         {Object.entries(categorizedSkills).map(([category, skills], index) => {
           const stats = categoryTotals[category];
           const info = categoryInfo[category] || {};
-
           return (
             <SkillCategoryCard
               key={category}
