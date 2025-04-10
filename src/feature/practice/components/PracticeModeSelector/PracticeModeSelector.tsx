@@ -1,26 +1,10 @@
 import { Button } from "assets/components/ui/button";
-import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { FaClock, FaList, FaRandom } from "react-icons/fa";
 
 interface PracticeModeSelectorProps {
   onSelectMode: (mode: "timer" | "plan" | "auto") => void;
 }
-
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 },
-};
 
 export const PracticeModeSelector = ({
   onSelectMode,
@@ -82,29 +66,19 @@ export const PracticeModeSelector = ({
   ] as const;
 
   return (
-    <div className=' w-full'>
+    <div className='mb-6 w-full'>
       <div className='container mx-auto max-w-6xl px-3 py-4 font-openSans sm:px-6 sm:py-8'>
-        <motion.div
-          initial='hidden'
-          animate='show'
-          variants={container}
-          className='space-y-4 sm:space-y-8'>
+        <div className='space-y-4 sm:space-y-8'>
           <div className='text-center'>
-            <motion.h1
-              className='text-xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl'
-              variants={item}>
+            <h1 className='text-xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl'>
               {t("timer:select_practice_mode" as any)}
-            </motion.h1>
-            <motion.p
-              className='mt-1.5 text-sm text-gray-400 sm:mt-3 sm:text-lg'
-              variants={item}>
+            </h1>
+            <p className='mt-1.5 text-sm text-gray-400 sm:mt-3 sm:text-lg'>
               {t("timer:choose_practice_description" as any)}
-            </motion.p>
+            </p>
           </div>
 
-          <motion.div
-            className='flex flex-col gap-3 sm:gap-6 md:grid md:grid-cols-3'
-            variants={item}>
+          <div className='flex flex-col gap-3 sm:gap-6 md:grid md:grid-cols-3'>
             {modes.map((mode) => (
               <div
                 key={mode.id}
@@ -153,8 +127,8 @@ export const PracticeModeSelector = ({
                   className={`${mode.colors.blur} absolute -bottom-4 -left-4 h-20 w-20 rounded-full opacity-20 blur-3xl sm:-bottom-8 sm:-left-8 sm:h-36 sm:w-36`}></div>
               </div>
             ))}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   );

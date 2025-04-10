@@ -1,9 +1,13 @@
+import "react-circular-progressbar/dist/styles.css";
+
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
 import { BeginnerMsg } from "components/BeginnerMsg/BeginnerMsg";
 import { IconBox } from "components/IconBox/IconBox";
 import MainContainer from "components/MainContainer";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { AnimatePresence, motion } from "framer-motion";
 import type { useTimerInterface } from "hooks/useTimer";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -16,7 +20,6 @@ import { calculatePercent, convertMsToHMS } from "utils/converter";
 
 import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
-import Stopwatch from "./components/Stopwatch";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
 
 interface TimerLayoutProps {
@@ -26,6 +29,249 @@ interface TimerLayoutProps {
   timerSubmitHandler: () => void;
   choseSkillHandler: (chosenSkill: SkillsType) => void;
 }
+
+// Komponent łączący animowaną tarczę z pierścieniami umiejętności
+const AnimatedTimerDisplay = ({
+  value,
+  text,
+  isPlaying,
+  size = "lg",
+  activeSkill,
+  timerData,
+}: {
+  value: number;
+  text: string;
+  isPlaying: boolean;
+  size?: "sm" | "md" | "lg";
+  activeSkill?: SkillsType | null;
+  timerData: {
+    creativity: number;
+    hearing: number;
+    technique: number;
+    theory: number;
+  };
+}) => {
+  const sizeClasses = {
+    sm: "h-40 w-40",
+    md: "h-52 w-52",
+    lg: "h-64 w-64",
+  };
+
+  const getProgressColor = () => {
+    if (activeSkill) {
+      return skillColors[activeSkill];
+    }
+
+    if (value > 75) return "hsl(210, 90%, 60%)";
+    if (value > 50) return "hsl(260, 90%, 60%)";
+    if (value > 25) return "hsl(330, 90%, 60%)";
+    return "hsl(0, 90%, 60%)";
+  };
+
+  const progressColor = getProgressColor();
+  const glowColor = isPlaying ? progressColor : "hsl(var(--muted))";
+
+  // Parametry dla pierścieni umiejętności
+  const radius = 120;
+  const strokeWidth = 5;
+  const circumference = 2 * Math.PI * radius;
+  const gap = 12;
+
+  const getCircleOffset = (skillTime: number) => {
+    const progress = (skillTime / (30 * 60 * 1000)) * 100;
+    return circumference - (progress / 100) * circumference;
+  };
+
+  const getOpacity = (skill: string) => {
+    if (!activeSkill) return 0.2;
+    return skill === activeSkill ? 0.15 : 0.05;
+  };
+
+  const getStrokeOpacity = (skill: string) => {
+    if (!activeSkill) return 0.7;
+    return skill === activeSkill ? 1 : 0.2;
+  };
+
+  const getStrokeWidth = (skill: string) => {
+    if (!activeSkill) return strokeWidth;
+    return skill === activeSkill ? strokeWidth + 2 : strokeWidth - 2;
+  };
+
+  return (
+    <div className='relative mb-6 h-64 w-64'>
+      {/* Ciemne tło timera z kolorowym gradientem */}
+      <div
+        className='absolute inset-0 rounded-full bg-black/80'
+        style={{
+          background: activeSkill
+            ? `radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.95) 100%)`
+            : "black",
+          boxShadow: activeSkill
+            ? `0 0 40px 5px ${progressColor}30, inset 0 0 20px 0px ${progressColor}20`
+            : "none",
+        }}
+      />
+
+      {/* Efekt blasku pod tarczą */}
+      <div
+        className={cn(
+          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[30px] transition-all duration-700",
+          sizeClasses[size]
+        )}
+        style={{
+          background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
+          opacity: isPlaying ? 0.15 : 0.05,
+        }}
+      />
+
+      {/* Pierścienie umiejętności */}
+      <svg
+        className='absolute inset-0 -rotate-90 transform'
+        width='100%'
+        height='100%'
+        viewBox='0 0 264 264'
+        style={{ zIndex: 10 }}>
+        {Object.keys(skillColors).map((skill, index) => {
+          const color = skillColors[skill as keyof typeof skillColors];
+          const r = radius - gap * index;
+          const isActive = skill === activeSkill;
+
+          const filterEffect =
+            isActive && activeSkill ? `drop-shadow(0 0 5px ${color})` : "none";
+
+          return (
+            <g key={skill} style={{ filter: filterEffect }}>
+              <circle
+                cx='132'
+                cy='132'
+                r={r}
+                stroke={color}
+                strokeWidth={getStrokeWidth(skill)}
+                fill='none'
+                opacity={getOpacity(skill)}
+                style={{
+                  transition: "opacity 0.5s ease, stroke-width 0.5s ease",
+                }}
+              />
+              <circle
+                cx='132'
+                cy='132'
+                r={r}
+                stroke={color}
+                strokeWidth={getStrokeWidth(skill)}
+                fill='none'
+                strokeLinecap='round'
+                style={{
+                  strokeDasharray: circumference,
+                  strokeDashoffset: getCircleOffset(
+                    timerData[skill as keyof typeof timerData]
+                  ),
+                  transition: "all 0.5s ease",
+                  opacity: getStrokeOpacity(skill),
+                  filter: isActive ? "brightness(1.3)" : "brightness(0.8)",
+                }}
+              />
+            </g>
+          );
+        })}
+      </svg>
+
+      {/* Animowane elementy */}
+      <div
+        className={cn(
+          "relative rounded-full backdrop-blur-sm",
+          sizeClasses[size]
+        )}>
+        <AnimatePresence>
+          {isPlaying && (
+            <div className='absolute inset-0 z-20 overflow-hidden rounded-full'>
+              {[...Array(12)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className='absolute h-1 w-1 rounded-full bg-white'
+                  initial={{
+                    x: "50%",
+                    y: "50%",
+                    opacity: 0,
+                    scale: 0,
+                  }}
+                  animate={{
+                    x: `${50 + 45 * Math.cos(i * (Math.PI / 6))}%`,
+                    y: `${50 + 45 * Math.sin(i * (Math.PI / 6))}%`,
+                    opacity: [0, 0.8, 0],
+                    scale: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    delay: i * 0.15,
+                    ease: "easeInOut",
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
+
+        <motion.div
+          className='absolute inset-[-2px] z-0 rounded-full'
+          style={{
+            background: `conic-gradient(
+              from ${isPlaying ? 0 : 180}deg, 
+              transparent, 
+              ${glowColor}, 
+              transparent
+            )`,
+            opacity: 0.2,
+          }}
+          animate={{
+            rotate: isPlaying ? 360 : 0,
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+
+        {/* Główny czas w środku */}
+        <div className='absolute inset-0 z-20 flex flex-col items-center justify-center rounded-full text-white'>
+          <div className='text-center'>
+            <p
+              className='font-sans text-6xl font-semibold tracking-wider'
+              style={{
+                textShadow: activeSkill
+                  ? `0 0 10px ${progressColor}50`
+                  : "none",
+              }}>
+              {text}
+            </p>
+          </div>
+        </div>
+
+        {isPlaying && (
+          <motion.div
+            className='absolute inset-0 z-10 rounded-full border-[3px]'
+            style={{
+              borderColor: progressColor,
+              opacity: 0.5,
+              boxShadow: `0 0 5px ${progressColor}, inset 0 0 5px ${progressColor}`,
+            }}
+            animate={{
+              scale: [1, 1.02, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
 
 const TimerLayout = ({
   timer,
@@ -88,16 +334,25 @@ const TimerLayout = ({
     },
   ];
 
+  // Obliczamy czas w formacie mm:ss
+  const formatTime = (ms: number) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
   return (
     <MainContainer title={"Ćwicz"}>
-      <div className='h-full space-y-6 pb-8 font-openSans sm:space-y-8 sm:pb-12'>
+      <div className='h-full space-y-6 pb-8 font-openSans sm:space-y-8 sm:pb-12 md:p-8'>
         <Card className='rounded-none border-none bg-second-500/80 shadow-xl'>
           <div className='flex flex-col sm:flex-row'>
             <div className='flex justify-center p-4 pb-0 sm:flex-1 sm:py-6'>
-              <Stopwatch
-                time={time}
-                timerData={timerData}
+              <AnimatedTimerDisplay
+                value={100 - (time / (30 * 60 * 1000)) * 100}
+                text={formatTime(time)}
+                isPlaying={timerEnabled}
                 activeSkill={chosenSkill}
+                timerData={timerData}
               />
             </div>
 
@@ -151,8 +406,6 @@ const TimerLayout = ({
         </div>
 
         <div className='mx-auto mt-4 w-full max-w-3xl space-y-6 px-4 sm:mt-6 sm:space-y-8'>
-          {(!userStats || userStats.points > 0) && <BeginnerMsg />}
-
           <div className='flex justify-center py-2'>
             <Button
               onClick={timerSubmitHandler}
@@ -163,6 +416,7 @@ const TimerLayout = ({
               <ArrowRight />
             </Button>
           </div>
+          {(!userStats || userStats.points > 0) && <BeginnerMsg />}
 
           <p className='text-center text-xs text-muted-foreground sm:text-sm'>
             {t("info_about_repot ")}{" "}
