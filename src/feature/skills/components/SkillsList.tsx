@@ -18,16 +18,11 @@ export const SkillsList = ({
 }: SkillsListProps) => {
   const { t } = useTranslation("skills");
 
-  const hasAvailablePoints =
-    userSkills.availablePoints[
-      category as keyof typeof userSkills.availablePoints
-    ] > 0;
-
   const unlockedSkills = skills.filter(
     (skill) => (userSkills.unlockedSkills[skill.id] || 0) > 0
   );
 
-  if (!hasAvailablePoints || unlockedSkills.length === 0) {
+  if (unlockedSkills.length === 0) {
     return (
       <div className='rounded-md border border-second-400/30 bg-second-500/20 p-3 text-center'>
         <p className='text-sm text-gray-300'>
