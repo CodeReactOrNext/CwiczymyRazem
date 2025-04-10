@@ -146,7 +146,7 @@ export const NavigationCards = ({ setActiveSection }: NavigationCardsProps) => {
         title={t("cards.practice.title")}
         description={t("cards.practice.description")}
         icon={<Dumbbell className='h-6 w-6' />}
-        onClick={() => setActiveSection("exercises")}
+        onClick={() => router.push("/timer")}
         primaryAction={{
           label: t("cards.practice.choose"),
           onClick: () => router.push("/timer"),
