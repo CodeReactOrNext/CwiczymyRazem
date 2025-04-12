@@ -4,6 +4,7 @@ import { DaySinceMessage } from "components/DaySince/DaySince";
 import { LevelBar } from "components/LevelBar/LevelBar";
 import MainContainer from "components/MainContainer";
 import Avatar from "components/UI/Avatar";
+import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
@@ -39,7 +40,7 @@ const ProfileLayout = ({
     youTubeLink,
     guitarStartDate,
   } = userData;
-  const { lastReportDate } = statistics;
+  const { lastReportDate, achievements } = statistics;
   const [userSkills, setUserSkills] = useState<UserSkills>();
   const { datasWithReports } = useActivityLog(userAuth);
 
@@ -144,7 +145,9 @@ const ProfileLayout = ({
         <div className='col-span-2 p-2'>
           <ActivityLog userAuth={userAuth} />
         </div>
-
+        <div className='my-2 mb-2 flex flex-col justify-between'>
+          <AchievementWrapper userAchievements={achievements} />
+        </div>
         {userSkills && (
           <div className='col-span-2 p-2'>
             <SkillTreeCards userSkills={userSkills} />
