@@ -9,4 +9,6 @@ export const achievementsRarity = {
   },
   rare: { name: "rare", color: "#b1f9ff" },
   veryRare: { name: "veryRare", color: "#ffe54c" },
+  epic: { name: "epic", color: "#ff9900" },
+
 };
