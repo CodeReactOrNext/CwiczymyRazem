@@ -3,6 +3,7 @@
   "rare": "Rare",
   "veryRare": "Very Rare",
   "empty": "Empty",
+  "epic": "Epic",
 
   "time_1": {
     "title": "Hard Work Pays Off",
@@ -147,5 +148,25 @@
   "event": {
     "title": "Event",
     "description": "This player take part in discord event"
+  },
+  "lvl100": {
+    "title": "Legendary Pick",
+    "description": "This player reached 100 lvl"
+  },
+  "fireSession": {
+    "title": "Fire Session",
+    "description": "This player completed a perfect report"
+  },
+  "batteryHearth": {
+    "title": "Battery Heart",
+    "description": "This player has 2000 habits"
+  },
+  "100days": {
+    "title": "100 days",
+    "description": "This player has practiced for 100 days"
+  },
+  "drowning": {
+    "title": "Dużo na głowie",
+    "description": "This player wanted to learn a lot of songs"
   }
 }

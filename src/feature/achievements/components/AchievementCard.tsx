@@ -40,6 +40,18 @@ export const AchievementCard = ({ id }: { id: AchievementList }) => {
     }
   }, [showTooltip]);
 
+  const getEpicCardStyle = () => {
+    if (rarity !== "epic") return {};
+
+    return {
+      background: "linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 100%)",
+      boxShadow: "0 0 15px rgba(156, 39, 176, 0.5)",
+    };
+  };
+
+  const baseCardClasses =
+    "relative cursor-help overflow-hidden border-2 border-opacity-20 p-2 shadow-inset-cool radius-default";
+
   return (
     <div className='group relative'>
       <motion.div
@@ -48,6 +60,7 @@ export const AchievementCard = ({ id }: { id: AchievementList }) => {
           rotateY,
           transformStyle: "preserve-3d",
           perspective: "1000px",
+          ...(rarity === "epic" ? getEpicCardStyle() : {}),
         }}
         whileHover={{ scale: 2 }}
         onClick={handleCardClick}
@@ -55,23 +68,28 @@ export const AchievementCard = ({ id }: { id: AchievementList }) => {
         onHoverEnd={() => setShowTooltip(false)}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className={`
-       ${
-         rarity === "common"
-           ? "border-achievements-common bg-second-200 text-achievements-common"
-           : ""
-       }
-        ${
-          rarity === "rare"
+        className={`${baseCardClasses} ${
+          rarity === "common"
+            ? "border-achievements-common bg-second-200 text-achievements-common"
+            : rarity === "rare"
             ? "border-achievements-rare bg-achievements-rare text-main-opposed-800"
+            : rarity === "veryRare"
+            ? "border-achievements-veryRare bg-achievements-veryRare text-main-opposed-800"
+            : rarity === "epic"
+            ? "border-achievements-epic text-white"
             : ""
-        }
-        ${
-          rarity === "veryRare"
-            ? " border-achievements-veryRare bg-achievements-veryRare text-main-opposed-800"
-            : ""
-        }
-        relative cursor-help overflow-hidden border-2 border-opacity-20 p-2 shadow-inset-cool radius-default`}>
+        }`}>
+        {rarity === "epic" && (
+          <div
+            className='absolute inset-0 h-full w-full opacity-60 mix-blend-soft-light'
+            style={{
+              backgroundImage: 'url("/static/images/sparkles.gif")',
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              zIndex: 0,
+            }}
+          />
+        )}
         <motion.div
           className='absolute inset-0 opacity-0 group-hover:opacity-100'
           style={{
@@ -99,14 +117,9 @@ export const AchievementCard = ({ id }: { id: AchievementList }) => {
                 ? "radial-gradient(circle, rgba(255,229,76,0.6) 0%, transparent 70%)"
                 : rarity === "rare"
                 ? "radial-gradient(circle, rgba(177,249,255,0.6) 0%, transparent 70%)"
+                : rarity === "epic"
+                ? "radial-gradient(circle, rgba(147, 51, 234, 0.6) 0%, transparent 70%)"
                 : "radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%)",
-          }}
-          animate={{
-            scale: [1, 1.5, 1],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 1.8,
           }}
         />
         <Icon className='relative z-10 text-lg drop-shadow-lg md:text-3xl' />
