@@ -50,3 +50,13 @@ export const checkTired = (inputData: ReportFormikInterface): AchievementChecker
   
   return undefined;
 }; 
+
+export const check100days = (statistics: StatisticsDataInterface): AchievementCheckerReturnType => {
+  const { time } = statistics;
+  const totalTime =
+    time.technique + time.theory + time.hearing + time.creativity;
+
+  if (totalTime >=  8640000000 ) return "100days";
+
+  return undefined;
+}; 

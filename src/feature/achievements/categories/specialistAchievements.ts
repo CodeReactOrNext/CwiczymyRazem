@@ -1,8 +1,16 @@
 import type { AchievementCheckerReturnType } from "feature/achievements/types";
+import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import type { StatisticsDataInterface } from "types/api.types";
+import { inputTimeConverter } from "utils/converter";
 
 export const checkDiamond = (statistic: StatisticsDataInterface): AchievementCheckerReturnType => {
   if (statistic.lvl >= 28) return "diamond";
+  
+  return undefined;
+};
+
+export const checkLvl100 = (statistic: StatisticsDataInterface): AchievementCheckerReturnType => {
+  if (statistic.lvl >= 100) return "lvl100";
   
   return undefined;
 };
@@ -54,3 +62,21 @@ export const checkMedal = (statistic: StatisticsDataInterface): AchievementCheck
   
   return undefined;
 }; 
+
+export const checkFireSession = (inputData: ReportFormikInterface): AchievementCheckerReturnType => {
+
+ const { techniqueTime, theoryTime, hearingTime, creativityTime } = inputTimeConverter(inputData)
+ const isTitleExist = inputData.reportTitle
+ const isAllHabbits = inputData.habbits.length >= 5
+
+ const isEveryCategoryTime = techniqueTime && theoryTime && hearingTime && creativityTime
+ 
+
+  if (isEveryCategoryTime && isTitleExist && isAllHabbits) return "fireSession";
+  
+  return undefined;
+};
+
+
+
+
