@@ -1,4 +1,3 @@
-import { changelogEntries } from "changelogEntries";
 import type { AchievementList } from "feature/achievements/achievementsData";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
@@ -11,10 +10,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaGuitar, FaMedal } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
-import { TbNews } from "react-icons/tb";
 
 import Chat from "../../feature/chat/Chat";
-import Changelog from "./components/Changelog";
 import Logs from "./components/Logs";
 
 export interface LogsBoxLayoutProps {
@@ -78,13 +75,6 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
           onClick={() => handleCategoryChange("achievements")}
           Icon={FaMedal}
         />
-
-        <LogsBoxButton
-          title={"Changelog"}
-          active={showedCategory === "discord"}
-          onClick={() => handleCategoryChange("discord")}
-          Icon={TbNews}
-        />
       </div>
       {showedCategory === "achievements" && (
         <AchievementsMap userAchievements={userAchievements} />
@@ -95,9 +85,7 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
             <Logs logs={logs} marksLogsAsRead={markLogsAsRead} />
           </div>
         )}
-        {showedCategory === "discord" && logs && (
-          <Changelog entries={changelogEntries} />
-        )}
+
         {showedCategory === "chat" && <Chat />}
       </div>
     </div>

@@ -58,3 +58,19 @@ export interface FirebaseLogsInterface {
     sumTime: number;
   };
 }
+
+export interface FirebaseLogsAchievementsInterface {
+  uid: string;
+  userName: string;
+  achievements: AchievementList[];
+  timestamp: string | number | Date;
+  data?: string;
+}
+
+export interface FirebaseLogsLvlInterface {
+  uid: string;
+  userName: string;
+  lvl: number;
+  timestamp: string | number | Date;
+  data?: string;
+}
