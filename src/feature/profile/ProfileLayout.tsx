@@ -54,7 +54,7 @@ const ProfileLayout = ({
 
   return (
     <MainContainer title={t("profile")}>
-      <div className='grid-rows-auto grid-cols-1 px-5 xl:grid'>
+      <div className='grid-rows-auto grid-cols-1 px-5 xl:grid max-w-screen-2xl m-auto'>
         <div className='content-box relative z-10 row-span-1 mb-4 flex flex-col items-start gap-3 !p-6'>
           <div className='flex w-full flex-col justify-between gap-6 lg:flex-row'>
             <div className='flex w-full flex-col gap-4 lg:w-1/2'>
