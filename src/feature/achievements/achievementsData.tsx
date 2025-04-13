@@ -37,7 +37,11 @@ import {
   FaUserNinja,
   FaWrench,
 } from "react-icons/fa";
+import { GiCelebrationFire } from "react-icons/gi";
+import { GiHeartBattery } from "react-icons/gi";
+import { GiExtraTime } from "react-icons/gi";
 import type { IconType } from "react-icons/lib";
+import { TbGuitarPick } from "react-icons/tb";
 
 import type { AchievementsRarityType } from "./achievementsRarity";
 
@@ -77,8 +81,11 @@ export type AchievementList =
   | "dumbbel"
   | "vip"
   | "short"
-  | "event";
-
+  | "event"
+  | "lvl100"
+  | "fireSession"
+  | "batteryHearth"
+  | "100days";
 export interface AchievementsDataInterface extends AchievementsRarityType {
   id: AchievementList;
   name: TFuncKey<"achievements">;
@@ -347,5 +354,33 @@ export const achievementsData: AchievementsDataInterface[] = [
     Icon: FaTrophy,
     rarity: "veryRare",
     description: "event.description",
+  },
+  {
+    id: "lvl100",
+    name: "lvl100.title",
+    Icon: TbGuitarPick,
+    rarity: "epic",
+    description: "lvl100.description",
+  },
+  {
+    id: "fireSession",
+    name: "fireSession.title",
+    Icon: GiCelebrationFire,
+    rarity: "epic",
+    description: "fireSession.description",
+  },
+  {
+    id: "batteryHearth",
+    name: "batteryHearth.title",
+    Icon: GiHeartBattery,
+    rarity: "epic",
+    description: "batteryHearth.description",
+  },
+  {
+    id: "100days",
+    name: "100days.title",
+    Icon: GiExtraTime,
+    rarity: "epic",
+    description: "100days.description",
   },
 ];

@@ -14,11 +14,12 @@ export const AchievementWrapper = ({
     common: AchievementsDataInterface[];
     rare: AchievementsDataInterface[];
     veryRare: AchievementsDataInterface[];
+    epic: AchievementsDataInterface[];
   }
 
-  const { common, rare, veryRare } =
+  const { common, rare, veryRare, epic } =
     userAchievements.reduce<grupedAchievements>(
-      ({ common, rare, veryRare }, userAchivId) => {
+      ({ common, rare, veryRare, epic }, userAchivId) => {
         const achievementData = achievementsData.find(
           (achiv) => achiv.id === userAchivId
         );
@@ -33,11 +34,14 @@ export const AchievementWrapper = ({
           case "veryRare":
             veryRare.push(achievementData);
             break;
+          case "epic":
+            epic.push(achievementData);
+            break;
         }
 
-        return { common, rare, veryRare };
+        return { common, rare, veryRare, epic };
       },
-      { common: [], rare: [], veryRare: [] }
+      { common: [], rare: [], veryRare: [], epic: [] }
     );
 
   const commonLenght = achievementsData.filter(
@@ -50,6 +54,10 @@ export const AchievementWrapper = ({
 
   const veryRareLenght = achievementsData.filter(
     (achivement) => achivement.rarity === "veryRare"
+  ).length;
+
+  const epicLenght = achievementsData.filter(
+    (achivement) => achivement.rarity === "epic"
   ).length;
 
   return (
@@ -65,6 +73,7 @@ export const AchievementWrapper = ({
         maxLenght={veryRareLenght}
         rarity='veryRare'
       />
+      <AchievementBox achievment={epic} maxLenght={epicLenght} rarity='epic' />
     </div>
   );
 };

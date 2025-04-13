@@ -3,6 +3,7 @@
   "rare": "Rzadkie",
   "veryRare": "Bardzo Rzadkie",
   "empty": "Brak",
+  "epic": "Epickie",
   "time_1": {
     "title": "Ciężka praca popłaca",
     "description": "Przekrocz próg 10 godzin ćwiczeń."
@@ -147,5 +148,25 @@
   "event": {
     "title": "Event",
     "description": "Ten gracz wział udział w discordowym evencie"
+  },
+  "lvl100": {
+    "title": "Legendara kostka",
+    "description": "Ten gracz osiągnął 100 poziom"
+  },
+  "fireSession": {
+    "title": "Ognisty raport",
+    "description": "Ten gracz wykonał idealny raport"
+  },
+  "batteryHearth": {
+    "title": "Bateria serca",
+    "description": "Ten gracz ma 2000 zdrowych nawyków"
+  },
+  "100days": {
+    "title": "100 dni",
+    "description": "Ten gracz ćwiczył przez 100 dni"
+  },
+  "drowning": {
+    "title": "Dużo na głowie",
+    "description": "Ten gracz chciał nauczyć się dużo piosenek"
   }
 }

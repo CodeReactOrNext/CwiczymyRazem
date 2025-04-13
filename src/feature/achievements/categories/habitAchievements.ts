@@ -54,3 +54,9 @@ export const checkYolo = (inputData: ReportFormikInterface) : AchievementChecker
   
   return undefined;
 }; 
+
+export const checkBatteryHearth = (statistic: StatisticsDataInterface): AchievementCheckerReturnType => {
+  if (statistic.habitsCount >= 2000) return "batteryHearth";
+  
+  return undefined;
+};
