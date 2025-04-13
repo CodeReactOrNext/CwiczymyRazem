@@ -69,6 +69,7 @@
     "events": "Events",
     "lvl_up": "Lvl up to",
     "lvl": "lvl",
+    "achievement": "Achievement",
     "achievements": "Achievements:",
     "get": "get",
     "points": "pt"
@@ -103,7 +104,13 @@
   "song_status": {
     "move_to": "Move to",
     "remove": "Remove",
-    "add": "Add"
+    "add": "Add",
+    "learned": "learned the song",
+    "learning": "learning the song",
+    "wantToLearn": "added the song to his list of songs to learn",
+    "added": "added the song to his list of songs",
+    "difficulty_rate": "rated the song difficulty",
+    "updated": "updated his song progress"
   },
   "chart": {
     "activity_overview": "Activity overview",
@@ -162,5 +169,6 @@
     "hearing": "Hearing"
   },
   "minutes": "minutes",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "select": "Select"
 }

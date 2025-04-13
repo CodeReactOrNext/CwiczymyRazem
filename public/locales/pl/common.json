@@ -57,6 +57,7 @@
     "events": "Eventy",
     "lvl_up": "Awansował na",
     "lvl": "Poziom",
+    "achievement": "Osiągnięcie",
     "achievements": "Osiągnięcia:",
     "get": "zdobył",
     "points": "pkt"
@@ -94,7 +95,13 @@
   "song_status": {
     "move_to": "Przenieś do",
     "remove": "Usuń",
-    "add": "Dodaj"
+    "add": "Dodaj",
+    "learned": "nauczył się utworu",
+    "learning": "uczy się utworu",
+    "wantToLearn": "dodał utwór do swojej listy utworów, które chce się nauczyć",
+    "added": "dodał utwór do swojej listy utworów",
+    "difficulty_rate": "ocenił trudność utworu",
+    "updated": "zaktualizował swoje postępy w nauce utworu"
   },
   "tooltip": {
     "totalTime": "Łączny czas",

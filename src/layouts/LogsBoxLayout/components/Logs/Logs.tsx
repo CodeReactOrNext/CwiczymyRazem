@@ -1,4 +1,5 @@
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import Achievement from "feature/achievements/components/Achievement";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
   FirebaseLogsInterface,
@@ -66,18 +67,8 @@ const LogItem = ({
   </div>
 );
 
-const getSongStatusMessage = (status: string): string => {
-  const messages = {
-    learned: " nauczył się utworu ",
-    wantToLearn: " dodał utwór ",
-    learning: " uczy się utworu ",
-    added: " dodał utwór ",
-    difficulty_rate: " ocenił trudność utworu ",
-  };
-  return (
-    messages[status as keyof typeof messages] ??
-    " zaktualizował swoje postępy w nauce utworu "
-  );
+const getSongStatusMessage = (status: string, t: any): string => {
+  return t(`song_status.${status}`);
 };
 
 const FirebaseLogsSongItem = ({
@@ -87,9 +78,10 @@ const FirebaseLogsSongItem = ({
   log: FirebaseLogsSongsInterface;
   isNew: boolean;
 }) => {
+  const { t } = useTranslation("common");
   const { userName, data, songArtist, songTitle, status, uid } = log;
   const date = new Date(data);
-  const message = getSongStatusMessage(status);
+  const message = getSongStatusMessage(status, t);
 
   return (
     <LogItem isNew={isNew}>
@@ -100,14 +92,11 @@ const FirebaseLogsSongItem = ({
           <UserLink uid={uid} userName={userName} />
         </span>
         <p className='text-secondText'>
-          {message}
+          {message}{" "}
           <span className='text-white'>
             {songArtist} {songTitle}
           </span>
-          {status === "wantToLearn" &&
-            " do swojej listy utworów, które chce się nauczyć."}
-          {status === "added" && " do swojej listy utworów."}
-          {status === "learning" && "."}
+          {status !== "difficulty_rate" && "."}
         </p>
       </div>
     </LogItem>
@@ -122,7 +111,7 @@ const FirebaseLogsItem = ({
   isNew: boolean;
 }) => {
   const { t } = useTranslation("common");
-  const { userName, points, data, uid } = log;
+  const { userName, points, data, uid, newLevel, newAchievements } = log;
   const date = new Date(data);
 
   return (
@@ -138,6 +127,23 @@ const FirebaseLogsItem = ({
           +{points}
           <span className='text-secondText'> {t("logsBox.points")}</span>
         </span>
+        {newLevel.isNewLevel && (
+          <span className='text-secondText'>
+            {" "}
+            {t("logsBox.lvl_up")}{" "}
+            <span className='text-main'>{newLevel.level}</span>
+          </span>
+        )}
+        {newAchievements.length > 0 && (
+          <span className='inline-flex items-center gap-2'>
+            {t("logsBox.achievements")}{" "}
+            {newAchievements.map((achievement, index) => (
+              <span key={index} className='inline-flex items-center gap-2'>
+                <Achievement id={achievement} />
+              </span>
+            ))}
+          </span>
+        )}
       </div>
     </LogItem>
   );
