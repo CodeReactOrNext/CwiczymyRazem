@@ -1,5 +1,5 @@
 export interface AchievementsRarityType {
-  rarity: "common" | "rare" | "veryRare";
+  rarity: "common" | "rare" | "veryRare" | "epic";
 }
 
 export const achievementsRarity = {
@@ -9,6 +9,6 @@ export const achievementsRarity = {
   },
   rare: { name: "rare", color: "#b1f9ff" },
   veryRare: { name: "veryRare", color: "#ffe54c" },
-  epic: { name: "epic", color: "#ff9900" },
+  epic: { name: "epic", color: "#9932CC" },
 
 };

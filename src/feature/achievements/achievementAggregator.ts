@@ -11,6 +11,7 @@ import {
   checkRing 
 } from "./categories/balanceAchievements";
 import { 
+  checkBatteryHearth, 
   checkDoctor, 
   checkHealthHabits, 
   checkRecord, 
@@ -30,7 +31,9 @@ import {
   checkBigear, 
   checkBook, 
   checkDiamond, 
+  checkFireSession, 
   checkHeadphones, 
+  checkLvl100, 
   checkMedal, 
   checkNinja, 
   checkScientist, 
@@ -46,6 +49,7 @@ import {
   checkSession3 
 } from "./categories/streakAchievements";
 import { 
+  check100days,
   checkTime1, 
   checkTime2, 
   checkTime3, 
@@ -63,6 +67,7 @@ export const checkAchievements = (
     checkTime2(statistics),
     checkTime3(statistics),
     checkTired(inputData),
+    check100days(statistics),
     
     // Points achievements
     checkFire(reportData),
@@ -86,6 +91,9 @@ export const checkAchievements = (
     checkHeadphones(statistics),
     checkNinja(statistics),
     checkMedal(statistics),
+    checkLvl100(statistics),
+    checkFireSession(inputData),
+
     
     // Streak & Session achievements
     checkDay1(statistics),
@@ -103,6 +111,9 @@ export const checkAchievements = (
     checkVinyl(inputData),
     checkRightway(inputData),
     checkYolo(inputData),
+    checkBatteryHearth(statistics),
+
+
   ];
 
   const isAchievements = (

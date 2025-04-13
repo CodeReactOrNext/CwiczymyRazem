@@ -265,6 +265,7 @@ module.exports = {
               common: "#fff",
               rare: "#b1f9ff",
               veryRare: "#ffe54c",
+              epic: "rgb(110 70 255 / 1)",
             },
             mainText: {
               DEFAULT: "#ffff"
