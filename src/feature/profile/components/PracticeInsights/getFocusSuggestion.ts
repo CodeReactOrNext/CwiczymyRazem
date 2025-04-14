@@ -123,7 +123,7 @@ export function getFocusSuggestion(areas: PracticeArea[]): FocusSuggestion {
   if (needsTechnicalFoundation) {
     return {
       area: "technique",
-      advice: "technical_foundation_needed",
+      advice: "technique_foundation_needed",
     };
   }
 
