@@ -59,7 +59,7 @@ export function getFocusSuggestion(areas: PracticeArea[]): FocusSuggestion {
   if (consistencyCheck.highTechnique && !consistencyCheck.highTheory) {
     return {
       area: "theory",
-      advice: "technical_to_theoretical",
+      advice: "technique_to_theoretical",
     };
   }
 
