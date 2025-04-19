@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import type { Song } from "feature/songs/types/songs.type";
 import { Award, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -13,8 +14,6 @@ interface SongLearningStatsProps {
 export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
   const { t } = useTranslation("songs");
 
-  console.log(userSongs, "userSongs");
-
   const totalSongs =
     userSongs.wantToLearn.length +
     userSongs.learning.length +
@@ -25,22 +24,24 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
     : 0;
 
   return (
-    <div className='mb-6 grid grid-cols-1 gap-4 font-openSans md:grid-cols-2 lg:grid-cols-2'>
-      <div className='rounded-md bg-[#121212] p-4'>
+    <div className='grid grid-cols-1 gap-4 font-openSans md:grid-cols-2 lg:grid-cols-2'>
+      <Card className='bg-second p-4'>
         <div className='mb-3 flex items-center'>
           <Clock className='mr-2 h-5 w-5 text-gray-400' />
           <h3 className='text-sm text-gray-400'>{t("total_songs")}</h3>
         </div>
-        <p className='mb-1 text-2xl font-bold text-white'>{totalSongs}</p>
+        <p className='mb-1 font-sans text-2xl font-bold text-white'>
+          {totalSongs}
+        </p>
         <p className='text-xs text-gray-500'>{t("songs_in_your_library")}</p>
-      </div>
+      </Card>
 
-      <div className='rounded-md bg-[#121212] p-4'>
+      <Card className='bg-second p-4'>
         <div className='mb-3 flex items-center'>
           <Award className='mr-2 h-5 w-5 text-gray-400' />
           <h3 className='text-sm text-gray-400'>{t("completion_rate")}</h3>
         </div>
-        <p className='mb-1 text-2xl font-bold text-white'>
+        <p className='mb-1 font-sans text-2xl font-bold text-white'>
           {learnedPercentage.toFixed(0)}%
         </p>
         <p className='text-xs text-gray-500'>
@@ -53,7 +54,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
             className='h-1.5 rounded-full bg-[#42f584]'
             style={{ width: `${learnedPercentage}%` }}></div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

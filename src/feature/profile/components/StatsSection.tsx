@@ -4,6 +4,8 @@ import {
   StatsField,
   type StatsFieldProps,
 } from "feature/profile/components/StatsField";
+import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
+import type { Song } from "feature/songs/types/songs.type";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { calculatePercent, convertMsToHM } from "utils/converter";
@@ -14,12 +16,20 @@ interface StatsSectionProps {
   statsField: StatsFieldProps[];
   statistics: StatisticsDataInterface;
   datasWithReports: DateWithReport[];
+  userSongs:
+    | {
+        wantToLearn: Song[];
+        learning: Song[];
+        learned: Song[];
+      }
+    | undefined;
 }
 
 export const StatsSection = ({
   statsField,
   statistics,
   datasWithReports,
+  userSongs,
 }: StatsSectionProps) => {
   const { t } = useTranslation("profile");
   const { time } = statistics;
@@ -87,6 +97,7 @@ export const StatsSection = ({
                 />
               ))}
           </div>
+          {userSongs && <SongLearningStats userSongs={userSongs} />}
 
           <div className='grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-3'>
             {statsWithTrends
