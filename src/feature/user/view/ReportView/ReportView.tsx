@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
-import { BeginnerMsg } from "components/BeginnerMsg/BeginnerMsg";
-import { Input } from "components/UI";
+import { Card } from "assets/components/ui/card";
+import { Input } from "assets/components/ui/input";
 import Backdrop from "components/UI/Backdrop";
 import { MAX_DAYS_BACK } from "constants/gameSettings";
 import {
@@ -12,7 +12,6 @@ import {
   selectUserAuth,
 } from "feature/user/store/userSlice";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
-import { upgradeSkill } from "feature/user/store/userSlice.asyncThunk";
 import { Formik } from "formik";
 import { AnimatePresence, motion } from "framer-motion";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
@@ -21,7 +20,6 @@ import {
   AcceptExceedingPopUp,
   ErrorBox,
   HealthHabbitsBox,
-  InputTime,
   ReportCategoryWrapper,
   TimeInputBox,
 } from "layouts/ReportFormLayout/components";
@@ -32,8 +30,9 @@ import { i18n } from "next-i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaBrain, FaMusic, FaTimesCircle } from "react-icons/fa";
+import { GrDocumentUpload } from "react-icons/gr";
 import { IoMdHand } from "react-icons/io";
-import { MdSchool } from "react-icons/md";
+import { MdSchool, MdTitle } from "react-icons/md";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
@@ -72,11 +71,6 @@ const ReportView = () => {
   const theoryTime = convertMsToHMObject(timerData.theory);
   const hearingTime = convertMsToHMObject(timerData.hearing);
   const creativityTime = convertMsToHMObject(timerData.creativity);
-
-  const handleSkillUpgrade = async (skillId: string) => {
-    if (!userAuth) return;
-    await dispatch(upgradeSkill({ skillId }));
-  };
 
   const formikInitialValues: ReportFormikInterface = {
     techniqueHours: techniqueTime.hours,
@@ -222,146 +216,179 @@ const ReportView = () => {
   }, [sumTime, t]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}>
-      <Formik
-        initialValues={formikInitialValues}
-        validationSchema={RaportSchema}
-        validateOnBlur={false}
-        onSubmit={reportOnSubmit}>
-        {({ errors, handleSubmit, values }) => (
-          <>
-            <ReportFormLayout>
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5 }}>
-                <ReportCategoryWrapper title={t("exercise_type_title")}>
-                  <div className='my-5 mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 2xl:gap-12'>
-                    {timeInputList.map(
-                      (
-                        {
-                          title,
-                          questionMarkProps,
-                          Icon,
-                          hoursName,
-                          minutesName,
-                        },
-                        index
-                      ) => (
-                        <motion.div
-                          key={index}
-                          initial={{ scale: 0.9, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ delay: index * 0.1 }}>
-                          <TimeInputBox
-                            errors={errors}
-                            title={title}
-                            questionMarkProps={questionMarkProps}
-                            Icon={Icon}
-                            hoursName={hoursName}
-                            minutesName={minutesName}
-                          />
-                        </motion.div>
-                      )
-                    )}
-                  </div>
-                </ReportCategoryWrapper>
-              </motion.div>
-
-              <div className='mt-10 flex w-full flex-col gap-8 px-8 lg:flex-row lg:justify-between'>
-                <motion.div
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className='lg:w-1/2'>
-                  <ReportCategoryWrapper title={t("healthy_habits_title")}>
-                    <div className='mt-6 flex flex-col  gap-4'>
-                      {healthHabbitsList.map(
-                        ({ name, questionMarkProps, title }, index) => (
-                          <motion.div
-                            key={name + index}
-                            whileHover={{ scale: 1.02 }}
-                            transition={{ type: "spring", stiffness: 300 }}>
-                            <HealthHabbitsBox
-                              name={name}
-                              title={title}
-                              questionMarkProps={questionMarkProps}
-                            />
-                          </motion.div>
-                        )
-                      )}
-                    </div>
-                  </ReportCategoryWrapper>
-                </motion.div>
-
-                <motion.div
-                  initial={{ x: 20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className='font-openSans lg:w-[45%]'>
-                  <div className='mb-4 rounded-lg border border-second-400/60 bg-second p-6'>
-                    <div className='space-y-4'>
-                      <div>
-                        <h3 className='mb-2 text-lg font-semibold'>
-                          {t("sesion_title")}
-                        </h3>
-                        <p className='text-sm text-secondText'>
-                          {t("optional")}*
-                        </p>
-                        <Input name='reportTitle' />
-                        <p className='text-secondTitle mt-2 text-sm'>
-                          {t("description.sesion_title")}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className='rounded-lg border border-second-400/60 bg-second  p-6 '>
-                    <div>
-                      <h3 className='m-2 text-lg font-semibold'>
-                        {t("date_back")}
-                      </h3>
-                      <div className='flex  gap-4'>
-                        <InputTime
-                          name={"countBackDays"}
-                          description={t("days")}
+    <Formik
+      initialValues={formikInitialValues}
+      validationSchema={RaportSchema}
+      validateOnBlur={false}
+      onSubmit={reportOnSubmit}>
+      {({ errors, handleSubmit, values, setFieldValue }) => (
+        <>
+          <ReportFormLayout>
+            <ReportCategoryWrapper title='Raport'>
+              {/* Exercise Time Section */}
+              <div className='mb-8'>
+                <h3 className='mb-4 text-sm  font-openSans font-medium text-white'>
+                  {t("exercise_type_title")}
+                </h3>
+                <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                  {timeInputList.map(
+                    (
+                      {
+                        title,
+                        questionMarkProps,
+                        Icon,
+                        hoursName,
+                        minutesName,
+                      },
+                      index
+                    ) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          delay: index * 0.1,
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 20,
+                        }}>
+                        <TimeInputBox
+                          errors={errors}
+                          title={title}
+                          questionMarkProps={questionMarkProps}
+                          Icon={Icon}
+                          hoursName={hoursName}
+                          minutesName={minutesName}
                         />
-                        <div className='text-sm'>
-                          <p>{t("add_report_to_day")}</p>
-                          <p
-                            className={`font-medium ${
-                              errors.countBackDays
-                                ? "text-error-200"
-                                : "text-mainText"
-                            }`}>
-                            {getDateFromPast(
-                              values.countBackDays
-                            ).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      {errors.countBackDays && (
-                        <motion.p
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className='mt-2  text-sm text-red-400'>
-                          <FaTimesCircle className='mr-1 inline' />
-                          {t("max_days", { days: MAX_DAYS_BACK })}
-                        </motion.p>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
+                      </motion.div>
+                    )
+                  )}
+                </div>
               </div>
 
+              {/* Healthy Habits Section */}
+              <div className='mb-8'>
+                <h3 className='mb-4 text-lg font-openSans  font-medium text-white'>
+                  {t("healthy_habits_title")}
+                </h3>
+                <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+                  {healthHabbitsList.map(
+                    ({ name, questionMarkProps, title }, index) => (
+                      <motion.div
+                        key={name + index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          delay: index * 0.05,
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 20,
+                        }}>
+                        <HealthHabbitsBox
+                          name={name}
+                          title={title}
+                          questionMarkProps={questionMarkProps}
+                        />
+                      </motion.div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Session Title Section */}
+              <div className='mb-8'>
+                <h3 className='mb-4 font-openSans  text-lg font-medium text-white'>
+                  {t("sesion_title")}
+                </h3>
+                <div className='space-y-3'>
+                  <div className='relative max-w-[600px]'>
+                    <Input
+                      name='reportTitle'
+                      startIcon={
+                        <MdTitle className='text-lg text-[#4a7edd]/50' />
+                      }
+                      placeholder='Zatytułuj swoją sesję'
+                      className='border-gray-700/50 bg-[#0a0a0c]/60 py-2.5 text-base text-white placeholder:text-gray-500 focus:border-[#4a7edd]/40 hover:border-gray-600'
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Date Selection Section */}
+              <div className='mb-8'>
+                <h3 className='mb-4 font-openSans  text-lg font-medium text-white'>
+                  Kiedy ćwiczyłeś?
+                </h3>
+                <div className='flex flex-col gap-4'>
+                  <div className='flex flex-wrap items-start justify-start gap-3'>
+                    {[0, 1, 2, 3, 4].map((days) => {
+                      const isSelected = values.countBackDays === days;
+                      let label =
+                        days === 0
+                          ? "Dzisiaj"
+                          : days === 1
+                          ? "Wczoraj"
+                          : `${days} dni temu`;
+
+                      return (
+                        <motion.div
+                          key={days}
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.97 }}>
+                          <Button
+                            type='button'
+                            variant={isSelected ? "default" : "outline"}
+                            onClick={() => {
+                              setFieldValue("countBackDays", days);
+                            }}
+                            className={`relative rounded-full border px-5 py-2 ${
+                              isSelected
+                                ? "border-transparent bg-gradient-to-r from-[#3a6ecc]/90 to-[#4a7edd]/90 text-white shadow-sm backdrop-blur-sm"
+                                : "border-gray-700/30 bg-[#0a0a0c]/60 text-gray-300 hover:bg-[#4a7edd]/10 hover:text-white"
+                            }`}>
+                            {isSelected && (
+                              <motion.span
+                                className='absolute inset-0 rounded-full bg-[#4a7edd]/20 blur-sm'
+                                layoutId='dateSelection'
+                              />
+                            )}
+                            <span className='relative z-10'>{label}</span>
+                          </Button>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+
+                  <div className='flex items-start justify-start'>
+                    <Card className='border-0 bg-gradient-to-r from-[#4a7edd]/5 to-transparent px-4 py-2 text-left shadow-sm backdrop-blur-sm transition-all duration-300'>
+                      <p className='font-openSans text-sm text-gray-400'>
+                        Wybrana data:{" "}
+                        <span className='text-base font-medium text-white'>
+                          {getDateFromPast(
+                            values.countBackDays
+                          ).toLocaleDateString()}
+                        </span>
+                      </p>
+                    </Card>
+                  </div>
+                </div>
+                {errors.countBackDays && (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className='mt-2 text-center text-sm text-red-400'>
+                    <FaTimesCircle className='mr-1 inline' />
+                    {t("max_days", { days: MAX_DAYS_BACK })}
+                  </motion.p>
+                )}
+              </div>
+
+              {/* Submit Button Section */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className='mt-8 flex flex-col items-center'>
+                className='mt-6 flex flex-col items-center'>
                 <AnimatePresence>
                   {Object.keys(errors).length !== 0 && (
                     <motion.div
@@ -373,59 +400,73 @@ const ReportView = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-                {(!currentUserStats || currentUserStats.points > 0) && (
-                  <BeginnerMsg />
-                )}
 
-                <Button size='lg' disabled={Object.keys(errors).length !== 0}>
-                  {isFetching && <Loader2 className='animate-spin' />}
-                  {t("report_button")}
-                </Button>
+                <div className='flex flex-col items-center gap-4'>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className='relative'>
+                    <Button
+                      size='lg'
+                      disabled={Object.keys(errors).length !== 0}
+                      className='relative'
+                      onClick={() => handleSubmit()}>
+                      {isFetching ? (
+                        <Loader2 className='mr-2 h-5 w-5 animate-spin' />
+                      ) : (
+                        <GrDocumentUpload className='mr-2 h-5 w-5' />
+                      )}
+
+                      {t("report_button")}
+                    </Button>
+                  </motion.div>
+                </div>
               </motion.div>
-            </ReportFormLayout>
+            </ReportCategoryWrapper>
+          </ReportFormLayout>
 
-            <AnimatePresence>
-              {acceptPopUpVisible && exceedingTime && (
+          <AnimatePresence>
+            {acceptPopUpVisible && exceedingTime && (
+              <Backdrop selector='overlays'>
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}>
+                  <AcceptExceedingPopUp
+                    exceedingTime={exceedingTime}
+                    handleSubmit={handleSubmit}
+                    isFetching={isFetching}
+                    setAcceptExceedingTime={setAcceptExceedingTime}
+                    setAcceptPopUpVisible={setAcceptPopUpVisible}
+                  />
+                </motion.div>
+              </Backdrop>
+            )}
+
+            {ratingSummaryVisible &&
+              raitingData &&
+              currentUserStats &&
+              previousUserStats && (
                 <Backdrop selector='overlays'>
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.9, opacity: 0 }}>
-                    <AcceptExceedingPopUp
-                      exceedingTime={exceedingTime}
-                      handleSubmit={handleSubmit}
-                      isFetching={isFetching}
-                      setAcceptExceedingTime={setAcceptExceedingTime}
-                      setAcceptPopUpVisible={setAcceptPopUpVisible}
+                    <RatingPopUpLayout
+                      onClick={setRatingSummaryVisible}
+                      ratingData={raitingData}
+                      currentUserStats={currentUserStats}
+                      previousUserStats={previousUserStats}
+                      skillPointsGained={raitingData.skillPointsGained}
                     />
                   </motion.div>
                 </Backdrop>
               )}
-
-              {ratingSummaryVisible &&
-                raitingData &&
-                currentUserStats &&
-                previousUserStats && (
-                  <Backdrop selector='overlays'>
-                    <motion.div
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.9, opacity: 0 }}>
-                      <RatingPopUpLayout
-                        onClick={setRatingSummaryVisible}
-                        ratingData={raitingData}
-                        currentUserStats={currentUserStats}
-                        previousUserStats={previousUserStats}
-                        skillPointsGained={raitingData.skillPointsGained}
-                      />
-                    </motion.div>
-                  </Backdrop>
-                )}
-            </AnimatePresence>
-          </>
-        )}
-      </Formik>
-    </motion.div>
+          </AnimatePresence>
+        </>
+      )}
+    </Formik>
   );
 };
 
