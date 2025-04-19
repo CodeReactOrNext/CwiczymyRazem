@@ -14,11 +14,10 @@ import { getUserSkills } from "feature/skills/services/getUserSkills";
 import { updateUserSkills } from "feature/skills/services/updateUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTree } from "feature/skills/SkillTree";
-import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { AnimatePresence, motion } from "framer-motion";
-import { Activity, Brain, LayoutDashboard, Music, Timer } from "lucide-react";
+import { Activity, Brain, LayoutDashboard, Timer } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -49,7 +48,7 @@ const ProfileLandingLayout = ({
   const { achievements } = userStats;
   const [userSkills, setUserSkills] = useState<UserSkills>();
   const [activeSection, setActiveSection] = useState<
-    "overview" | "activity" | "songs" | "skills" | "exercises"
+    "overview" | "activity" | "skills" | "exercises"
   >("overview");
 
   useEffect(() => {
@@ -89,6 +88,7 @@ const ProfileLandingLayout = ({
               statsField={statsField}
               statistics={userStats}
               datasWithReports={datasWithReports}
+              userSongs={songs}
             />
             <div className='my-2 mb-2 flex flex-col justify-between'>
               <AchievementWrapper userAchievements={achievements} />
@@ -108,20 +108,7 @@ const ProfileLandingLayout = ({
             </div>
           </>
         );
-      case "songs":
-        return (
-          songs && (
-            <SongLearningSection
-              isLanding
-              userSongs={{
-                learned: songs?.learned,
-                learning: songs?.learning,
-                wantToLearn: songs?.wantToLearn,
-              }}
-              onChange={(songs) => setSongs(songs)}
-            />
-          )
-        );
+
       case "skills":
         return (
           userSkills && (
@@ -156,12 +143,6 @@ const ProfileLandingLayout = ({
           onClick={() => setActiveSection("activity")}>
           <Activity className='mr-2 h-4 w-4' />
           {t("nav.activity")}
-        </Button>
-        <Button
-          variant={activeSection === "songs" ? "default" : "ghost"}
-          onClick={() => setActiveSection("songs")}>
-          <Music className='mr-2 h-4 w-4' />
-          {t("nav.songs")}
         </Button>
         <Button
           variant={activeSection === "skills" ? "default" : "ghost"}

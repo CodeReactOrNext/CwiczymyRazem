@@ -108,7 +108,9 @@ export const SongLearningSection = ({
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      {isLanding && <SongLearningStats userSongs={userSongs} />}
+      <div className='mb-4'>
+        <SongLearningStats userSongs={userSongs} />
+      </div>
       <div className='grid grid-cols-1 gap-5 font-openSans md:grid-cols-3'>
         <SongStatusCard
           isLanding={isLanding}
