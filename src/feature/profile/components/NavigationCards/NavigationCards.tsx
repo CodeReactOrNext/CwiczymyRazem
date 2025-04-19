@@ -132,7 +132,7 @@ export const NavigationCard = ({
 
 interface NavigationCardsProps {
   setActiveSection: (
-    section: "overview" | "activity" | "songs" | "skills" | "exercises"
+    section: "overview" | "activity" | "skills" | "exercises"
   ) => void;
 }
 
