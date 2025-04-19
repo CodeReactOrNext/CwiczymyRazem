@@ -1,4 +1,5 @@
 import { useField } from "formik";
+import { motion } from "framer-motion";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { addZeroToTime } from "utils/converter";
 
@@ -46,42 +47,64 @@ const InputTime = ({
     }
   };
 
+  const isError = meta.touched && meta.error;
+  const hasValue = parseInt(field.value, 10) > 0;
+
   return (
-    <div className='flex flex-col items-center gap-y-2 rounded-lg bg-gray-800 p-4 shadow-lg'>
-      <label className='mb-2 text-center text-sm text-gray-300' htmlFor={name}>
-        {description}
-      </label>
-      <div className='flex flex-col items-center'>
-        <button
-          type='button'
-          onClick={() =>
-            addZero
-              ? helpers.setValue(addZeroToTime(addValue(field.value)))
-              : helpers.setValue(addValue(field.value))
-          }
-          className='btn btn-circle btn-sm mb-2 bg-gray-700 text-white hover:bg-gray-600'>
-          <FaChevronUp />
-        </button>
-        <input
-          id={name}
-          className='w-16 rounded-md bg-gray-900 py-2 text-center text-xl font-bold text-white focus:outline-none focus:ring-2 focus:ring-second-100'
-          type='text'
-          placeholder='00'
-          value={field.value}
-          onChange={handleInputChange}
-          onBlur={handleInputBlur}
-        />
-        <button
-          type='button'
-          onClick={() =>
-            addZero
-              ? helpers.setValue(addZeroToTime(minusValue(field.value)))
-              : helpers.setValue(minusValue(field.value))
-          }
-          className='btn btn-circle btn-sm mt-2 bg-gray-700 text-white hover:bg-gray-600'>
-          <FaChevronDown />
-        </button>
+    <div className='flex flex-col items-center font-openSans'>
+      <motion.button
+        type='button'
+        onClick={() =>
+          addZero
+            ? helpers.setValue(addZeroToTime(addValue(field.value)))
+            : helpers.setValue(addValue(field.value))
+        }
+        whileHover={{ scale: 1.1, y: -1 }}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 400, damping: 15 }}
+        className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#1c1c22]/80 to-[#15151a]/80 text-white shadow-sm transition-all hover:from-[#25252a]/80 hover:to-[#1a1a1f]/80 hover:shadow'>
+        <FaChevronUp className='text-xs text-[#4a7edd]/80' />
+      </motion.button>
+
+      <div className='relative my-2'>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          <input
+            id={name}
+            className={`w-16 rounded-lg bg-gradient-to-b from-[#0c0c0e]/80 to-[#0a0a0c]/80 py-2 text-center text-xl font-medium outline-none backdrop-blur-sm transition-all ${
+              isError
+                ? "border-error-300 border shadow-[0_0_5px_0_rgba(239,68,68,0.2)]"
+                : hasValue
+                ? "border border-gray-700/30 text-white shadow-sm"
+                : "border border-gray-800/20 text-gray-400 hover:border-gray-700/30"
+            }`}
+            type='text'
+            placeholder='00'
+            value={field.value}
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
+            aria-label={description}
+          />
+          <div className='mt-1 text-center text-xs font-medium text-gray-500'>
+            {description}
+          </div>
+        </motion.div>
       </div>
+
+      <motion.button
+        type='button'
+        onClick={() =>
+          addZero
+            ? helpers.setValue(addZeroToTime(minusValue(field.value)))
+            : helpers.setValue(minusValue(field.value))
+        }
+        whileHover={{ scale: 1.1, y: 1 }}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 400, damping: 15 }}
+        className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#1c1c22]/80 to-[#15151a]/80 text-white shadow-sm transition-all hover:from-[#25252a]/80 hover:to-[#1a1a1f]/80 hover:shadow'>
+        <FaChevronDown className='text-xs text-[#4a7edd]/80' />
+      </motion.button>
     </div>
   );
 };
