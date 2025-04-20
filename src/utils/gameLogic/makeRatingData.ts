@@ -1,5 +1,6 @@
 import { HABBITS_POINTS_VALUE, TIME_POINTS_VALUE } from "constants/ratingValue";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import { getDateFromPast } from "utils/converter";
 
 import { getDailyStreakMultiplier } from "./getDailyStreakMultiplier";
 
@@ -19,7 +20,9 @@ export const makeRatingData = (
     Math.floor((additionalPoints + timePoints) * multipler);
   return {
     totalPoints: totalPoints,
-    reportDate: new Date(),
+    reportDate: data.countBackDays
+    ? getDateFromPast(data.countBackDays)
+    : new Date(),
     bonusPoints: {
       streak: streak,
       multiplier: multipler,
