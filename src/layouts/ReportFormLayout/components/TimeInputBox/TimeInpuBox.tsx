@@ -130,13 +130,19 @@ const TimeInputBox = ({
               }`}>
               {title}
             </span>
-            <QuestionMark description={questionMarkProps.description} />
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}>
+              <QuestionMark description={questionMarkProps.description} />
+            </div>
           </div>
         </div>
 
         <div className='mt-4 flex items-center justify-center gap-3'>
           <InputTime name={hoursName} description={"HH"} addZero />
-          <p className='text-2xl font-medium'>:</p>
+          <p className='mb-[18px] text-2xl font-medium'>:</p>
           <InputTime name={minutesName} description={"MM"} addZero />
         </div>
       </div>
