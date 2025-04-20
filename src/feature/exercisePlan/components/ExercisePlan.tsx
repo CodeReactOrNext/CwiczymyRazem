@@ -1,4 +1,3 @@
-import { Card } from "assets/components/ui/card";
 import {
   Tabs,
   TabsContent,
@@ -27,40 +26,38 @@ export const ExercisePlan = () => {
 
   return (
     <div className='container mx-auto  font-openSans sm:px-6 sm:py-6 md:px-4 md:py-4'>
-      <Card className='p-3 sm:p-6'>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          <TabsList className='grid w-full grid-cols-2 md:grid-cols-3'>
-            <TabsTrigger value='my_plans' className='text-xs sm:text-sm'>
-              {t("tabs.my_plans")}
-            </TabsTrigger>
-            <TabsTrigger value='library' className='text-xs sm:text-sm'>
-              {t("tabs.library")}
-            </TabsTrigger>
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
+        <TabsList className='grid w-full grid-cols-2 md:grid-cols-3'>
+          <TabsTrigger value='my_plans' className='text-xs sm:text-sm'>
+            {t("tabs.my_plans")}
+          </TabsTrigger>
+          <TabsTrigger value='library' className='text-xs sm:text-sm'>
+            {t("tabs.library")}
+          </TabsTrigger>
+        </TabsList>
 
-          <div className='mt-4 sm:mt-6'>
-            <TabsContent value='library'>
-              <ExerciseLibrary />
-            </TabsContent>
+        <div className='mt-4 sm:mt-6'>
+          <TabsContent value='library'>
+            <ExerciseLibrary />
+          </TabsContent>
 
-            <TabsContent value='my_plans'>
-              <MyPlans onPlanSelect={handlePlanSelect} />
-            </TabsContent>
+          <TabsContent value='my_plans'>
+            <MyPlans onPlanSelect={handlePlanSelect} />
+          </TabsContent>
 
-            <TabsContent value='practice'>
-              {selectedPlan && (
-                <PracticeSession
-                  plan={selectedPlan}
-                  onFinish={() => {
-                    setSelectedPlan(null);
-                    setActiveTab("my_plans");
-                  }}
-                />
-              )}
-            </TabsContent>
-          </div>
-        </Tabs>
-      </Card>
+          <TabsContent value='practice'>
+            {selectedPlan && (
+              <PracticeSession
+                plan={selectedPlan}
+                onFinish={() => {
+                  setSelectedPlan(null);
+                  setActiveTab("my_plans");
+                }}
+              />
+            )}
+          </TabsContent>
+        </div>
+      </Tabs>
     </div>
   );
 };
