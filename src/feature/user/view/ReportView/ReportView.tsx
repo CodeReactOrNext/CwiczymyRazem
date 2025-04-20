@@ -227,7 +227,7 @@ const ReportView = () => {
             <ReportCategoryWrapper title='Raport'>
               {/* Exercise Time Section */}
               <div className='mb-8'>
-                <h3 className='mb-4 text-sm  font-openSans font-medium text-white'>
+                <h3 className='mb-4 font-openSans  text-sm font-medium text-white'>
                   {t("exercise_type_title")}
                 </h3>
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
@@ -268,7 +268,7 @@ const ReportView = () => {
 
               {/* Healthy Habits Section */}
               <div className='mb-8'>
-                <h3 className='mb-4 text-lg font-openSans  font-medium text-white'>
+                <h3 className='mb-4 font-openSans text-lg  font-medium text-white'>
                   {t("healthy_habits_title")}
                 </h3>
                 <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'>
@@ -309,6 +309,10 @@ const ReportView = () => {
                       }
                       placeholder='Zatytułuj swoją sesję'
                       className='border-gray-700/50 bg-[#0a0a0c]/60 py-2.5 text-base text-white placeholder:text-gray-500 focus:border-[#4a7edd]/40 hover:border-gray-600'
+                      value={values.reportTitle}
+                      onChange={(e) =>
+                        setFieldValue("reportTitle", e.target.value)
+                      }
                     />
                   </div>
                 </div>
@@ -409,9 +413,9 @@ const ReportView = () => {
                     className='relative'>
                     <Button
                       size='lg'
+                      type='submit'
                       disabled={Object.keys(errors).length !== 0}
-                      className='relative'
-                      onClick={() => handleSubmit()}>
+                      className='relative'>
                       {isFetching ? (
                         <Loader2 className='mr-2 h-5 w-5 animate-spin' />
                       ) : (
@@ -435,7 +439,7 @@ const ReportView = () => {
                   exit={{ scale: 0.9, opacity: 0 }}>
                   <AcceptExceedingPopUp
                     exceedingTime={exceedingTime}
-                    handleSubmit={handleSubmit}
+                    onAccept={() => reportOnSubmit(values)}
                     isFetching={isFetching}
                     setAcceptExceedingTime={setAcceptExceedingTime}
                     setAcceptPopUpVisible={setAcceptPopUpVisible}
