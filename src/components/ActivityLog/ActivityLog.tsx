@@ -58,7 +58,7 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
             dateItem ? (
               <CalendarWrapperSquare
                 key={`activity-item-${index}`}
-                date={dateItem.date}
+                date={dateItem.report?.date ?? dateItem.date}
                 report={dateItem.report}
               />
             ) : (

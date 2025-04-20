@@ -70,12 +70,11 @@ export default async function handler(
       pointsGained
     );
 
-    console.log(report.reportDate,inputData, 'ddd' );
+
 
     await firebaseSetUserExerciseRaprot(
       userUid,
-      { ...report.raitingData, ...report.reportDate, skillPointsGained },
-      report.reportDate,
+      { ...report.raitingData, skillPointsGained },
       inputData.reportTitle,
       report.isDateBackReport,
       report.timeSummary
