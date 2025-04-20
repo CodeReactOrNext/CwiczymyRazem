@@ -96,6 +96,7 @@ export const reportUpdateUserStats = ({
     ? getDateFromPast(isDateBackReport)
     : new Date();
 
+
   return {
     currentUserStats: updatedUserDataWithAchievements,
     previousUserStats: currentUserStats,
