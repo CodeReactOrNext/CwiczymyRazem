@@ -135,6 +135,7 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
         )}
 
         <SkillTreeCards
+          isUserProfile={false}
           userSkills={userSkills}
           onSkillUpgrade={onSkillUpgrade}
         />

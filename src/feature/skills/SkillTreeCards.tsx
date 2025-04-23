@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 interface SkillTreeProps {
   userSkills: UserSkills;
   onSkillUpgrade?: (skillId: string) => void;
+  isUserProfile: boolean;
 }
 
 interface CategoryInfo {
@@ -20,6 +21,7 @@ interface CategoryInfo {
 export const SkillTreeCards = ({
   userSkills,
   onSkillUpgrade,
+  isUserProfile,
 }: SkillTreeProps) => {
   const { t } = useTranslation("skills");
 
@@ -73,7 +75,9 @@ export const SkillTreeCards = ({
         <h2 className='text-lg font-semibold text-white'>
           {t("skill_categories")}
         </h2>
-        <p className='text-xs text-gray-400'>{t("categories_description")}</p>
+        {!isUserProfile && (
+          <p className='text-xs text-gray-400'>{t("categories_description")}</p>
+        )}
       </div>
       <motion.div
         initial={{ opacity: 0 }}

@@ -54,3 +54,17 @@ export const checkDumbbel = (
   
   return undefined;
 }; 
+
+export const checkBomb = (
+  inputData: ReportFormikInterface,
+  statistic: StatisticsDataInterface
+) : AchievementCheckerReturnType=> {
+  const { techniqueTime, theoryTime, hearingTime, creativityTime } =
+    inputTimeConverter(inputData);
+    
+  const totalTime = techniqueTime + theoryTime + hearingTime + creativityTime;
+
+  if (totalTime >= 600000 && statistic.dayWithoutBreak >= 15  ) return "bomb";
+  
+  return undefined;
+}; 
