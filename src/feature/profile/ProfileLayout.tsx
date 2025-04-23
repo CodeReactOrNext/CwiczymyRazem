@@ -151,7 +151,7 @@ const ProfileLayout = ({
         </div>
         {userSkills && (
           <div className='col-span-2 p-2'>
-            <SkillTreeCards userSkills={userSkills} />
+            <SkillTreeCards isUserProfile userSkills={userSkills} />
           </div>
         )}
       </div>
