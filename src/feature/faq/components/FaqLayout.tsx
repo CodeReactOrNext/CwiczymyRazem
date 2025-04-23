@@ -24,10 +24,10 @@ export const FaqLayout = ({ faqQuestions }: FaqLayoutProps) => {
           <div className='mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10'>
             <HelpCircle className='h-10 w-10 text-primary' />
           </div>
-          <h1 className='text-4xl font-bold text-foreground/90'>
+          <h1 className='text-xl font-bold text-foreground/90 md:text-4xl'>
             Często zadawane pytania
           </h1>
-          <p className='mx-auto mt-2 max-w-2xl text-lg text-muted-foreground'>
+          <p className='mx-auto mt-2 max-w-xl text-base text-muted-foreground md:text-lg'>
             Znajdź odpowiedzi na najczęściej zadawane pytania dotyczące naszej
             platformy.
           </p>
@@ -36,10 +36,10 @@ export const FaqLayout = ({ faqQuestions }: FaqLayoutProps) => {
         <Accordion type='single' collapsible className='w-full space-y-4'>
           {faqQuestions.map((faq, index) => (
             <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className='rounded-md px-3 py-5 text-left text-lg font-medium transition-all hover:bg-muted/30'>
+              <AccordionTrigger className='rounded-md px-3 py-4 text-left text-base font-medium transition-all hover:bg-muted/30 md:py-5 md:text-lg'>
                 {faq.title}
               </AccordionTrigger>
-              <AccordionContent className='px-3 py-4 text-base text-muted-foreground'>
+              <AccordionContent className='px-3 py-3 text-sm text-muted-foreground md:py-4 md:text-base'>
                 <p>{faq.message}</p>
               </AccordionContent>
             </AccordionItem>
@@ -49,4 +49,3 @@ export const FaqLayout = ({ faqQuestions }: FaqLayoutProps) => {
     </div>
   );
 };
-

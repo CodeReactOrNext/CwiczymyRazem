@@ -40,6 +40,7 @@ import {
 import { GiCelebrationFire } from "react-icons/gi";
 import { GiHeartBattery } from "react-icons/gi";
 import { GiExtraTime } from "react-icons/gi";
+import { GiRollingBomb } from "react-icons/gi";
 import type { IconType } from "react-icons/lib";
 import { TbGuitarPick } from "react-icons/tb";
 
@@ -85,7 +86,8 @@ export type AchievementList =
   | "lvl100"
   | "fireSession"
   | "batteryHearth"
-  | "100days";
+  | "100days"
+  | "bomb";
 export interface AchievementsDataInterface extends AchievementsRarityType {
   id: AchievementList;
   name: TFuncKey<"achievements">;
@@ -382,5 +384,12 @@ export const achievementsData: AchievementsDataInterface[] = [
     Icon: GiExtraTime,
     rarity: "epic",
     description: "100days.description",
+  },
+  {
+    id: "bomb",
+    name: "bomb.title",
+    Icon: GiRollingBomb,
+    rarity: "veryRare",
+    description: "bomb.description",
   },
 ];

@@ -168,5 +168,9 @@
   "drowning": {
     "title": "Dużo na głowie",
     "description": "Ten gracz chciał nauczyć się dużo piosenek"
+  },
+  "bomb": {
+    "title": "Sytuacja krytyczna",
+    "description": "Ten gracz uratował swój streak"
   }
 }
