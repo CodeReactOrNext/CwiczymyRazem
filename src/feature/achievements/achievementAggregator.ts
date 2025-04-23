@@ -40,6 +40,7 @@ import {
   checkWizard 
 } from "./categories/specialistAchievements";
 import { 
+  checkBomb,
   checkDay1, 
   checkDay2, 
   checkDay3, 
@@ -103,6 +104,7 @@ export const checkAchievements = (
     checkSession2(statistics),
     checkSession3(statistics),
     checkDumbbel(inputData, statistics),
+    checkBomb(inputData, statistics),
     
     // Habit achievements
     checkHealthHabits(reportData),
