@@ -64,7 +64,7 @@ export const checkBomb = (
     
   const totalTime = techniqueTime + theoryTime + hearingTime + creativityTime;
 
-  if (totalTime >= 600000 && statistic.dayWithoutBreak >= 15  ) return "bomb";
+  if (totalTime <= 600000 && statistic.dayWithoutBreak >= 15  ) return "bomb";
   
   return undefined;
 }; 
