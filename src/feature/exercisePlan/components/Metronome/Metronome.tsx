@@ -3,7 +3,7 @@ import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
 import { FaPause, FaPlay } from "react-icons/fa";
 
-import { useMetronome } from "./hooks/useMetronome";
+import { useDeviceMetronome } from "./hooks/useDeviceMetronome";
 
 interface MetronomeProps {
   initialBpm?: number;
@@ -22,7 +22,7 @@ export const Metronome = (props: MetronomeProps) => {
     toggleMetronome,
     handleSetRecommendedBpm,
     recommendedBpm,
-  } = useMetronome(props);
+  } = useDeviceMetronome(props);
 
   return (
     <Card className='overflow-hidden rounded-xl border bg-card/80 p-4 shadow-md'>
@@ -50,7 +50,9 @@ export const Metronome = (props: MetronomeProps) => {
         <Button
           variant={isPlaying ? "default" : "outline"}
           size='sm'
-          onClick={toggleMetronome}>
+          onClick={toggleMetronome}
+          aria-label={isPlaying ? "Stop metronome" : "Start metronome"}
+          tabIndex={0}>
           {isPlaying ? (
             <>
               <FaPause className='mr-2 h-3 w-3' />
@@ -65,7 +67,12 @@ export const Metronome = (props: MetronomeProps) => {
         </Button>
 
         {recommendedBpm !== bpm && (
-          <Button variant='ghost' size='sm' onClick={handleSetRecommendedBpm}>
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={handleSetRecommendedBpm}
+            aria-label={`Set recommended tempo (${recommendedBpm} BPM)`}
+            tabIndex={0}>
             Zalecane tempo ({recommendedBpm})
           </Button>
         )}

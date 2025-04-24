@@ -18,7 +18,7 @@ export const ExerciseProgress = ({
   const currentExercise = plan.exercises[currentExerciseIndex];
 
   return (
-    <Card className='overflow-hidden '>
+    <Card className='overflow-hidden'>
       <div className='p-4'>
         <div className='space-y-4'>
           <div className='flex items-center justify-between text-sm'>
@@ -39,6 +39,10 @@ export const ExerciseProgress = ({
                 return (
                   <div
                     key={idx}
+                    style={{
+                      width: `${width}%`,
+                      left: `${left}%`
+                    }}
                     className={cn(
                       "absolute h-full transition-all duration-500",
                       idx < currentExerciseIndex
