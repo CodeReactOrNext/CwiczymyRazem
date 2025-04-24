@@ -157,6 +157,7 @@ export const useMobileMetronome = ({
       } else if (!document.hidden && isPlaying) {
         resumeAudioContext();
       }
+       
     };
     
     document.addEventListener("visibilitychange", handleVisibilityChange);
