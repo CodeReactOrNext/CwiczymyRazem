@@ -36,10 +36,10 @@ export default async function handler(
     });
 
     const skillPointsGained: SkillPointsGained = {
-      technique: Math.floor(report.timeSummary.techniqueTime / 1800000),
-      theory: Math.floor(report.timeSummary.theoryTime / 1800000),
-      hearing: Math.floor(report.timeSummary.hearingTime / 1800000),
-      creativity: Math.floor(report.timeSummary.creativityTime / 1800000),
+      technique: Math.floor(report.timeSummary.techniqueTime / 3600000),
+      theory: Math.floor(report.timeSummary.theoryTime / 3600000),
+      hearing: Math.floor(report.timeSummary.hearingTime / 3600000),
+      creativity: Math.floor(report.timeSummary.creativityTime / 3600000),
     };
 
     const updatedStats = {

@@ -4,7 +4,7 @@ import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/compone
 import { Minus, Plus } from "lucide-react";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaCompress } from "react-icons/fa";
 
 import { useImageHandling } from "../hooks/useImageHandling";
@@ -24,18 +24,43 @@ const ImageModal = ({
 }: ImageModalProps) => {
   const {
     imageScale,
-
     handleZoomIn,
     handleZoomOut,
     resetImagePosition,
     setImageScale,
   } = useImageHandling();
 
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
   useEffect(() => {
     if (isOpen) {
       setImageScale(4.5);
+      setPosition({ x: 0, y: 0 });
     }
   }, [isOpen, setImageScale]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setDragStart({
+      x: e.touches[0].clientX - position.x,
+      y: e.touches[0].clientY - position.y
+    });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    
+    const newX = e.touches[0].clientX - dragStart.x;
+    const newY = e.touches[0].clientY - dragStart.y;
+    
+    setPosition({ x: newX, y: newY });
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
 
   if (!isOpen) return null;
 
@@ -60,11 +85,14 @@ const ImageModal = ({
           <div
             className='flex h-full w-full items-center justify-center transition-all duration-100 ease-out'
             style={{
-              transform: ` scale(${imageScale})`,
+              transform: `translate(${position.x}px, ${position.y}px) scale(${imageScale})`,
               transformOrigin: "center center",
               height: "100%",
               width: "100%",
-            }}>
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}>
             <Image
               src={imageSrc}
               alt={imageAlt}
@@ -100,7 +128,10 @@ const ImageModal = ({
           <Button
             variant='secondary'
             size='sm'
-            onClick={resetImagePosition}
+            onClick={() => {
+              resetImagePosition();
+              setPosition({ x: 0, y: 0 });
+            }}
             className='h-12 w-12 rounded-full bg-background/40 backdrop-blur-sm'>
             <FaCompress className='h-5 w-5' />
           </Button>

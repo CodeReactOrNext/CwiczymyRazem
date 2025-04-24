@@ -34,10 +34,7 @@ export const NextExerciseCard = ({
   };
 
   return (
-    <Card
-      className={`border-border/40 bg-card/30 backdrop-blur-sm ${
-        isMobile ? "mb-4" : "h-full"
-      }`}>
+    <Card className={`mb-4 border-border/40 bg-card/30 backdrop-blur-sm`}>
       <CardHeader className='pb-2'>
         <CardTitle className='text-base font-medium'>
           Następne ćwiczenie
@@ -53,9 +50,7 @@ export const NextExerciseCard = ({
               fill
             />
           ) : (
-            <div className='flex h-full w-full items-center justify-center bg-muted/30 text-muted-foreground'>
-              No img
-            </div>
+            <div className='flex h-full w-full items-center justify-center bg-muted/30 text-muted-foreground'></div>
           )}
         </div>
         <div className='flex flex-1 flex-col gap-1'>
