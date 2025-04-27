@@ -1,15 +1,16 @@
+import type { ReactNode } from "react";
+
 interface LevelIndicatorProps {
-  children: number;
+  children: ReactNode;
 }
+
 const LevelIndicator = ({ children }: LevelIndicatorProps) => {
   return (
-    <div
-      className={` flex items-end gap-1
-      `}>
-      <p className='text-2xl font-medium leading-[0.8]  text-mainText md:text-5xl'>
+    <div className='flex items-end gap-1'>
+      <p className='text-xl font-medium leading-[0.8] text-mainText md:text-2xl lg:text-5xl'>
         {children}
       </p>
-      <p className='font-medium text-tertiary-500 text-lg'>LVL</p>
+      <p className='text-sm font-medium text-tertiary-500 md:text-lg'>LVL</p>
     </div>
   );
 };
