@@ -37,10 +37,20 @@ import {
   FaUserNinja,
   FaWrench,
 } from "react-icons/fa";
-import { GiCelebrationFire } from "react-icons/gi";
+import { GiCelebrationFire, GiMisdirection, GiMoebiusTriangle, GiMuscularTorso, GiNotebook, GiPush, GiSwordman, GiSwordsPower, GiWeight, GiWeightLiftingUp } from "react-icons/gi";
 import { GiHeartBattery } from "react-icons/gi";
 import { GiExtraTime } from "react-icons/gi";
 import { GiRollingBomb } from "react-icons/gi";
+import { GiRearAura } from "react-icons/gi";
+import { GiCard2Hearts } from "react-icons/gi";
+import { GiCard3Diamonds } from "react-icons/gi";
+import { GiCard4Diamonds } from "react-icons/gi";
+import { GiCard5Diamonds } from "react-icons/gi";
+import { GiCard6Diamonds } from "react-icons/gi";
+import { GiCardAceDiamonds } from "react-icons/gi";
+import { GiCardKingDiamonds } from "react-icons/gi";
+import { GiCardJackDiamonds } from "react-icons/gi";
+import { GiMultipleTargets } from "react-icons/gi";
 import type { IconType } from "react-icons/lib";
 import { TbGuitarPick } from "react-icons/tb";
 
@@ -87,7 +97,28 @@ export type AchievementList =
   | "fireSession"
   | "batteryHearth"
   | "100days"
-  | "bomb";
+  | "bomb"
+  | "wannaLearn1"
+  | "wannaLearn2"
+  | "wannaLearn3"
+  | "wannaLearn10"
+  | "wannaLearn30"
+  | "learning1"
+  | "learning3"
+  | "learning5"
+  | "learning10"
+  | "learning20"
+  | "learning30"
+  | "learning50"
+  | "learned1"
+  | "learned3"
+  | "learned5"
+  | "learned10"
+  | "learned20"
+  | "learned30"
+  | "learned50"
+  | "learned100";
+
 export interface AchievementsDataInterface extends AchievementsRarityType {
   id: AchievementList;
   name: TFuncKey<"achievements">;
@@ -105,7 +136,6 @@ export const achievementsData: AchievementsDataInterface[] = [
   },
   {
     id: "points_1",
-
     name: "points_1.title",
     Icon: FaCat,
     rarity: "common",
@@ -160,7 +190,6 @@ export const achievementsData: AchievementsDataInterface[] = [
     rarity: "common",
     description: "session_1.description",
   },
-
   {
     id: "ninja",
     name: "ninja.title",
@@ -266,7 +295,6 @@ export const achievementsData: AchievementsDataInterface[] = [
     rarity: "veryRare",
     description: "time_3.description",
   },
-
   {
     id: "fire",
     name: "fire.title",
@@ -274,7 +302,6 @@ export const achievementsData: AchievementsDataInterface[] = [
     rarity: "veryRare",
     description: "fire.description",
   },
-
   {
     id: "points_3",
     name: "points_3.title",
@@ -282,7 +309,6 @@ export const achievementsData: AchievementsDataInterface[] = [
     rarity: "veryRare",
     description: "points_3.description",
   },
-
   {
     id: "scientist",
     name: "scientist.title",
@@ -290,7 +316,6 @@ export const achievementsData: AchievementsDataInterface[] = [
     rarity: "veryRare",
     description: "scientist.description",
   },
-
   {
     id: "bigear",
     name: "bigear.title",
@@ -312,7 +337,6 @@ export const achievementsData: AchievementsDataInterface[] = [
     rarity: "veryRare",
     description: "medal.description",
   },
-
   {
     id: "day_3",
     name: "day_3.title",
@@ -320,7 +344,6 @@ export const achievementsData: AchievementsDataInterface[] = [
     rarity: "veryRare",
     description: "day_3.description",
   },
-
   {
     id: "session_3",
     name: "session_3.title",
@@ -328,7 +351,6 @@ export const achievementsData: AchievementsDataInterface[] = [
     rarity: "veryRare",
     description: "session_3.description",
   },
-
   {
     id: "dumbbel",
     name: "dumbbel.title",
@@ -391,5 +413,139 @@ export const achievementsData: AchievementsDataInterface[] = [
     Icon: GiRollingBomb,
     rarity: "veryRare",
     description: "bomb.description",
+  },
+
+  {
+    id: "wannaLearn1",
+    name: "wannaLearn1.title",
+    Icon: GiSwordman ,
+    rarity: "common",
+    description: "wannaLearn1.description",
+  },
+  {
+    id: "wannaLearn2",
+    name: "wannaLearn2.title",
+    Icon: GiSwordsPower ,
+    rarity: "common",
+    description: "wannaLearn2.description",
+  },
+  {
+    id: "wannaLearn3",
+    name: "wannaLearn3.title",
+    Icon: GiNotebook ,
+    rarity: "common",
+    description: "wannaLearn3.description",
+  },
+  {
+    id: "wannaLearn10",
+    name: "wannaLearn10.title",
+    Icon: GiMisdirection ,
+    rarity: "rare",
+    description: "wannaLearn10.description",
+  },
+  {
+    id: "wannaLearn30",
+    name: "wannaLearn30.title",
+    Icon: GiMoebiusTriangle ,
+    rarity: "veryRare",
+    description: "wannaLearn30.description",
+  },
+  {
+    id: "learning1",
+    name: "learning1.title",
+    Icon: GiWeight,
+    rarity: "common",
+    description: "learning1.description",
+  },
+  {
+    id: "learning3",
+    name: "learning3.title",
+    Icon: GiWeightLiftingUp ,
+    rarity: "common",
+    description: "learning3.description",
+  },
+  {
+    id: "learning5",
+    name: "learning5.title",
+    Icon: GiPush ,
+    rarity: "common",
+    description: "learning5.description",
+  },
+  {
+    id: "learning10",
+    name: "learning10.title",
+    Icon: GiMuscularTorso,
+    rarity: "rare",
+    description: "learning10.description",
+  },
+  {
+    id: "learning20",
+    name: "learning20.title",
+    Icon: GiMultipleTargets,
+    rarity: "veryRare",
+    description: "learning20.description",
+  },
+  {
+    id: "learning30",
+    name: "learning30.title",
+    Icon: GiRearAura,
+    rarity: "epic",
+    description: "learning30.description",
+  },
+  {
+    id: "learned1",
+    name: "learned1.title",
+    Icon: GiCard2Hearts,
+    rarity: "common",
+    description: "learned1.description",
+  },
+  {
+    id: "learned3",
+    name: "learned3.title",
+    Icon: GiCard3Diamonds,
+    rarity: "common",
+    description: "learned3.description",
+  },
+  {
+    id: "learned5",
+    name: "learned5.title",
+    Icon: GiCard4Diamonds,
+    rarity: "common",
+    description: "learned5.description",
+  },
+  {
+    id: "learned10",
+    name: "learned10.title",
+    Icon: GiCard5Diamonds,
+    rarity: "rare",
+    description: "learned10.description",
+  },
+  {
+    id: "learned20",
+    name: "learned20.title",
+    Icon: GiCard6Diamonds,
+    rarity: "veryRare",
+    description: "learned20.description",
+  },
+  {
+    id: "learned30",
+    name: "learned30.title",
+    Icon: GiCardJackDiamonds,
+    rarity: "veryRare",
+    description: "learned30.description",
+  },
+  {
+    id: "learned50",
+    name: "learned50.title",
+    Icon: GiCardKingDiamonds,
+    rarity: "epic",
+    description: "learned50.description",
+  },
+  {
+    id: "learned100",
+    name: "learned100.title",
+    Icon: GiCardAceDiamonds,
+    rarity: "epic",
+    description: "learned100.description",
   },
 ];

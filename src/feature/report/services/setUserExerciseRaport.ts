@@ -6,7 +6,7 @@ import { db } from "../../../utils/firebase/client/firebase.utils";
 export const firebaseGetUserData = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
   const userSnapshot = await getDoc(userDocRef);
-  return userSnapshot.data()!.statistics;
+  return userSnapshot.data();
 };
 
 
@@ -24,6 +24,7 @@ export const firebaseSetUserExerciseRaprot = async (
   }
 ) => {
   const dataRaport = { ...raport, exceriseTitle, timeSumary, isDateBackReport };
+
   const userDocRef = doc(db, "users", userAuth, "exerciseData", raport.reportDate.toISOString());
 
 

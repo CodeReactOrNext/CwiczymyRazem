@@ -1,8 +1,11 @@
 import type { AchievementList } from "feature/achievements/achievementsData";
+import { checkLearned1, checkLearned3, checkLearned5, checkLearned10, checkLearned20, checkLearned30, checkLearned50, checkLearned100,checkLearning1, checkLearning3, checkLearning5, checkLearning10, checkWannaLearn3, checkWannaLearn5, checkWannaLearn10, checkWannaLearn30 } from "feature/achievements/categories/songsAchievements";
+import { checkWannaLearn1 } from "feature/achievements/categories/songsAchievements";
 import type {
   ReportDataInterface,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
+import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface } from "types/api.types";
 
 import { 
@@ -60,7 +63,8 @@ import {
 export const checkAchievements = (
   statistics: StatisticsDataInterface,
   reportData: ReportDataInterface,
-  inputData: ReportFormikInterface
+  inputData: ReportFormikInterface,
+  currentUserSongLists: SongListInterface
 ) => {
   const achievedAchievements: (AchievementList | undefined)[] = [
     // Time achievements
@@ -115,6 +119,24 @@ export const checkAchievements = (
     checkYolo(inputData),
     checkBatteryHearth(statistics),
 
+    // Songs achievements
+    checkWannaLearn1(currentUserSongLists),
+    checkWannaLearn3(currentUserSongLists),
+    checkWannaLearn5(currentUserSongLists),
+    checkWannaLearn10(currentUserSongLists),
+    checkWannaLearn30(currentUserSongLists),
+    checkLearning1(currentUserSongLists),       
+    checkLearning3(currentUserSongLists),
+    checkLearning5(currentUserSongLists),
+    checkLearning10(currentUserSongLists),
+    checkLearned1(currentUserSongLists),
+    checkLearned3(currentUserSongLists),
+    checkLearned5(currentUserSongLists),  
+    checkLearned10(currentUserSongLists),
+    checkLearned20(currentUserSongLists),
+    checkLearned30(currentUserSongLists),
+    checkLearned50(currentUserSongLists),
+    checkLearned100(currentUserSongLists),
 
   ];
 

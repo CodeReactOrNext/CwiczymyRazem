@@ -72,7 +72,6 @@
     "title": "Czarodziej",
     "description": "Przekrocz 50 godzin w pracy kreatywnej"
   },
-
   "medal": {
     "title": "Odznaczony",
     "description": "Zdobądź 20 osiągnięć"
@@ -172,5 +171,81 @@
   "bomb": {
     "title": "Sytuacja krytyczna",
     "description": "Ten gracz uratował swój streak"
+  },
+  "wannaLearn1": {
+    "title": "Samotny Wojownik",
+    "description": "Chcesz nauczyć się pierwszej piosenki"
+  },
+  "wannaLearn2": {
+    "title": "Podwójna Moc",
+    "description": "Chcesz nauczyć się dwóch piosenek"
+  },
+  "wannaLearn3": {
+    "title": "Notatnik Zapełniony",
+    "description": "Chcesz nauczyć się trzech piosenek"
+  },
+  "wannaLearn10": {
+    "title": "Zagubiony w Nutach",
+    "description": "Chcesz nauczyć się dziesięciu piosenek"
+  },
+  "wannaLearn30": {
+    "title": "Nieskończona Pętla",
+    "description": "Chcesz nauczyć się trzydziestu piosenek"
+  },
+  "learning1": {
+    "title": "Pierwszy Ciężar",
+    "description": "Uczysz się pierwszej piosenki"
+  },
+  "learning3": {
+    "title": "Podnoszenie Poprzeczki",
+    "description": "Uczysz się trzech piosenek jednocześnie"
+  },
+  "learning5": {
+    "title": "Pchnięcie Do Przodu",
+    "description": "Uczysz się pięciu piosenek jednocześnie"
+  },
+  "learning10": {
+    "title": "Mięśnie Muzyczne",
+    "description": "Uczysz się dziesięciu piosenek jednocześnie"
+  },
+  "learning20": {
+    "title": "Multi-Instrumentalista",
+    "description": "Uczysz się dwudziestu piosenek jednocześnie"
+  },
+  "learning30": {
+    "title": "Muzyczna Aura",
+    "description": "Uczysz się trzydziestu piosenek jednocześnie"
+  },
+  "learned1": {
+    "title": "Dwójka Serc",
+    "description": "Nauczyłeś się pierwszej piosenki"
+  },
+  "learned3": {
+    "title": "Trójka Diamentów",
+    "description": "Nauczyłeś się trzech piosenek"
+  },
+  "learned5": {
+    "title": "Czwórka Diamentów",
+    "description": "Nauczyłeś się pięciu piosenek"
+  },
+  "learned10": {
+    "title": "Piątka Diamentów",
+    "description": "Nauczyłeś się dziesięciu piosenek"
+  },
+  "learned20": {
+    "title": "Szóstka Diamentów",
+    "description": "Nauczyłeś się dwudziestu piosenek"
+  },
+  "learned30": {
+    "title": "Walet Diamentowy",
+    "description": "Nauczyłeś się trzydziestu piosenek"
+  },
+  "learned50": {
+    "title": "Król Diamentów",
+    "description": "Nauczyłeś się pięćdziesięciu piosenek"
+  },
+  "learned100": {
+    "title": "As Diamentowy",
+    "description": "Nauczyłeś się stu piosenek - jesteś prawdziwym asem!"
   }
 }
