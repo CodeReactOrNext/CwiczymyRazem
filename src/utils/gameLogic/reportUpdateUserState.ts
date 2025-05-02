@@ -1,4 +1,5 @@
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getDateFromPast, inputTimeConverter } from "utils/converter";
 import {
@@ -13,10 +14,12 @@ import {
 interface updateUserStatsProps {
   currentUserStats: StatisticsDataInterface;
   inputData: ReportFormikInterface;
+  currentUserSongLists: SongListInterface;
 }
 export const reportUpdateUserStats = ({
   currentUserStats,
   inputData,
+  currentUserSongLists
 }: updateUserStatsProps) => {
   const {
     time,
@@ -87,7 +90,7 @@ export const reportUpdateUserStats = ({
     guitarStartDate: null
   };
 
-  const newAchievements = checkAchievements(updatedUserData, raiting, inputData);
+  const newAchievements = checkAchievements(updatedUserData, raiting, inputData, currentUserSongLists);
   const updatedUserDataWithAchievements: StatisticsDataInterface = {
     ...updatedUserData,
     achievements: [...newAchievements, ...updatedUserData.achievements],
