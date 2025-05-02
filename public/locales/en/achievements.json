@@ -172,5 +172,82 @@
   "bomb": {
     "title": "Critical Situation",
     "description": "This player saved their streak"
+  },
+
+  "wannaLearn1": {
+    "title": "Lone Warrior",
+    "description": "You want to learn your first song"
+  },
+  "wannaLearn2": {
+    "title": "Double Power",
+    "description": "You want to learn two songs"
+  },
+  "wannaLearn3": {
+    "title": "Notebook Filled",
+    "description": "You want to learn three songs"
+  },
+  "wannaLearn10": {
+    "title": "Lost in Notes",
+    "description": "You want to learn ten songs"
+  },
+  "wannaLearn30": {
+    "title": "Infinite Loop",
+    "description": "You want to learn thirty songs"
+  },
+  "learning1": {
+    "title": "First Weight",
+    "description": "You are learning your first song"
+  },
+  "learning3": {
+    "title": "Raising the Bar",
+    "description": "You are learning three songs simultaneously"
+  },
+  "learning5": {
+    "title": "Push Forward",
+    "description": "You are learning five songs simultaneously"
+  },
+  "learning10": {
+    "title": "Musical Muscles",
+    "description": "You are learning ten songs simultaneously"
+  },
+  "learning20": {
+    "title": "Multi-Instrumentalist",
+    "description": "You are learning twenty songs simultaneously"
+  },
+  "learning30": {
+    "title": "Musical Aura",
+    "description": "You are learning thirty songs simultaneously"
+  },
+  "learned1": {
+    "title": "Two of Hearts",
+    "description": "You have learned your first song"
+  },
+  "learned3": {
+    "title": "Three of Diamonds",
+    "description": "You have learned three songs"
+  },
+  "learned5": {
+    "title": "Four of Diamonds",
+    "description": "You have learned five songs"
+  },
+  "learned10": {
+    "title": "Five of Diamonds",
+    "description": "You have learned ten songs"
+  },
+  "learned20": {
+    "title": "Six of Diamonds",
+    "description": "You have learned twenty songs"
+  },
+  "learned30": {
+    "title": "Jack of Diamonds",
+    "description": "You have learned thirty songs"
+  },
+  "learned50": {
+    "title": "King of Diamonds",
+    "description": "You have learned fifty songs"
+  },
+  "learned100": {
+    "title": "Ace of Diamonds",
+    "description": "You have learned one hundred songs - you are a true ace!"
   }
 }
