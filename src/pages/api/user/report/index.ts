@@ -4,6 +4,7 @@ import {
   firebaseSetUserExerciseRaprot,
 } from "feature/report/services/setUserExerciseRaport";
 import { firebaseUpdateUserStats } from "feature/report/services/updateUserStats";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { auth } from "utils/firebase/api/firebase.config";
@@ -14,6 +15,12 @@ interface SkillPointsGained {
   theory: number;
   hearing: number;
   creativity: number;
+}
+
+export interface SongListInterface {
+  wantToLearn: string[];
+  learned: string[];
+  learning: string[];
 }
 
 export default async function handler(
@@ -27,13 +34,23 @@ export default async function handler(
     const { uid } = await auth.verifyIdToken(req.body.token.token);
     const userUid = uid;
     const { inputData } = req.body;
-    const currentUserStats = (await firebaseGetUserData(
+
+    const userData = (await firebaseGetUserData(
       userUid
-    )) as StatisticsDataInterface;
+    ))
+    const userSongLists = await getUserSongs(userUid);
+
+
+    const currentUserStats = userData?.statistics as StatisticsDataInterface;
+    const currentUserSongLists = userSongLists as unknown as SongListInterface;
+
+
     const report = reportUpdateUserStats({
       currentUserStats,
       inputData,
+      currentUserSongLists
     });
+
 
     const skillPointsGained: SkillPointsGained = {
       technique: Math.floor(report.timeSummary.techniqueTime / 3600000),
