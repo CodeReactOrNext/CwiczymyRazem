@@ -60,7 +60,10 @@
     "achievement": "Osiągnięcie",
     "achievements": "Osiągnięcia:",
     "get": "zdobył",
-    "points": "pkt"
+    "points": "pkt",
+    "top_players": "Ranking Sezonowy",
+    "level": "Poziom",
+    "days_left": "dni pozostało"
   },
   "discord_event": {
     "active": "Aktywne",

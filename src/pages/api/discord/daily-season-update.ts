@@ -1,6 +1,6 @@
-import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
-import { SeasonService } from "feature/discordBot/services/seasonService";
 import { SeasonUpdateFormatter } from "feature/discordBot/formatters/seasonFormatter";
+import { SeasonService } from "feature/discordBot/services/seasonService";
+import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(

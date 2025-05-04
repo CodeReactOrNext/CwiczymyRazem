@@ -72,7 +72,10 @@
     "achievement": "Achievement",
     "achievements": "Achievements:",
     "get": "get",
-    "points": "pt"
+    "points": "pt",
+    "top_players": "Season Ranking",
+    "level": "Level",
+    "days_left": "days left"
   },
   "calendar": {
     "title": "Activity Calendar",

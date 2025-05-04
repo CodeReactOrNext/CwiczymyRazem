@@ -3,6 +3,7 @@ import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
+  FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
@@ -15,7 +16,11 @@ import Chat from "../../feature/chat/Chat";
 import Logs from "./components/Logs";
 
 export interface LogsBoxLayoutProps {
-  logs: (FirebaseLogsSongsInterface | FirebaseLogsInterface)[];
+  logs: (
+    | FirebaseLogsSongsInterface
+    | FirebaseLogsInterface
+    | FirebaseLogsTopPlayersInterface
+  )[];
   userAchievements: AchievementList[];
 }
 
