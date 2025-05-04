@@ -7,7 +7,6 @@ import type {
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -210,7 +209,7 @@ const PlayerAvatar = ({
 }) => (
   <div className='relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-second-400/30 bg-second-500/50 sm:h-8 sm:w-8'>
     {player.avatar ? (
-      <Image
+      <img
         src={player.avatar}
         alt={player.displayName}
         width={32}
