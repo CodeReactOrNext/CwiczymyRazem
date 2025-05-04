@@ -90,6 +90,9 @@ const ProfileLandingLayout = ({
               datasWithReports={datasWithReports}
               userSongs={songs}
             />
+            <div className='col-span-2 p-2'>
+              <ActivityLog userAuth={userAuth} />
+            </div>
             <div className='my-2 mb-2 flex flex-col justify-between'>
               <AchievementWrapper userAchievements={achievements} />
             </div>
