@@ -2,6 +2,7 @@ import { firebaseGetLogsStream } from "feature/logs/services/getLogsStream.servi
 import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
+  FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import LogsBoxLayout from "layouts/LogsBoxLayout";
@@ -11,14 +12,14 @@ import { useAppSelector } from "store/hooks";
 
 const LogsBoxView = () => {
   const [logs, setLogs] = useState<
-    (FirebaseLogsSongsInterface | FirebaseLogsInterface)[] | null
+    (FirebaseLogsSongsInterface | FirebaseLogsInterface | FirebaseLogsTopPlayersInterface)[] | null
   >(null);
 
   const userAchievement = useAppSelector(selectCurrentUserStats)?.achievements;
 
   useEffect(() => {
     const unsubscribe = firebaseGetLogsStream((logsData) => {
-      setLogs(logsData);
+      return setLogs(logsData);
     });
 
     return () => unsubscribe();

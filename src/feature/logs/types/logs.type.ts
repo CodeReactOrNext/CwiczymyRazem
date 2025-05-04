@@ -1,4 +1,5 @@
 import type { AchievementList } from "feature/achievements/achievementsData";
+import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 
 export type FirebaseLogsSongsStatuses =
   | "learned"
@@ -73,4 +74,12 @@ export interface FirebaseLogsLvlInterface {
   lvl: number;
   timestamp: string | number | Date;
   data?: string;
+}
+
+export interface FirebaseLogsTopPlayersInterface {
+  type: "top_players_update";
+  data: string;
+  topPlayers: TopPlayerData[];
+  message: string;
+  daysLeftInSeason?: number;
 }
