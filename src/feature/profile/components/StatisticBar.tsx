@@ -9,10 +9,10 @@ export const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
   return (
     <div className='m-1 flex flex-col items-center font-openSans sm:text-xl'>
       <p className='m-2 text-[14px]'>{percentValue}%</p>
-      <div className='flex h-full  min-h-32 w-2 bg-main-opposed/30 radius-default sm:h-56 sm:w-6 '>
+      <div className='flex h-full min-h-32 w-2 bg-main-opposed/30 rounded-t-lg sm:h-56 sm:w-6'>
         <div
-          className='w-3  self-end bg-gradient-to-t from-main-700 to-main-300 shadow-[0_0_15px_rgba(255,0,0,0.2)] 
-                     drop-shadow-lg radius-default sm:w-6'
+          className='w-3 self-end bg-gradient-to-t from-main-700 to-main-300 shadow-[0_0_15px_rgba(255,0,0,0.2)] 
+                     drop-shadow-lg rounded-t-lg sm:w-6'
           style={{ height: percentValue + "%" }}
         />
       </div>
