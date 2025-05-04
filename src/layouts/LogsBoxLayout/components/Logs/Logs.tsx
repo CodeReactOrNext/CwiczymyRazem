@@ -130,7 +130,7 @@ const FirebaseLogsItem = ({
         {newLevel.isNewLevel && (
           <span className='text-secondText'>
             {" "}
-            {t("logsBox.lvl_up")}{" "}
+            {t("logsBox.lvl_up")}{" lvl"}
             <span className='text-main'>{newLevel.level}</span>
           </span>
         )}
