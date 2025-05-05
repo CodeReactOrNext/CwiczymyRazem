@@ -155,8 +155,10 @@ const FirebaseLogsItem = ({
           <span className='text-secondText'>
             {" "}
             {t("logsBox.lvl_up")}
-            {" lvl"}
-            <span className='text-main'>{newLevel.level}</span>
+            <span className='text-main'>
+              {newLevel.level}
+              {" lvl"}
+            </span>
           </span>
         )}
         {newAchievements.length > 0 && (
