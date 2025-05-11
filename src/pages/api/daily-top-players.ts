@@ -130,7 +130,6 @@ const checkSeasonEndAndAssignAchievements = async (
   const assignedCount = await assignSeasonalAchievements(
     topPlayers, 
     seasonId,
-    seasonName
   );
   
   logger.info(`Assigned ${assignedCount} seasonal achievements`, {

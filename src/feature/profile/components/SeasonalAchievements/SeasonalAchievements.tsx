@@ -33,18 +33,38 @@ const SeasonalAchievements = ({
     if (parts.length === 2) {
       const [year, month] = parts;
       const monthNumber = parseInt(month);
-      
+
       const monthNamesEn = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-      ];
-      
-      const monthNamesPl = [
-        "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
-        "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
       ];
 
-      const monthNames = i18n.language === 'pl' ? monthNamesPl : monthNamesEn;
+      const monthNamesPl = [
+        "Styczeń",
+        "Luty",
+        "Marzec",
+        "Kwiecień",
+        "Maj",
+        "Czerwiec",
+        "Lipiec",
+        "Sierpień",
+        "Wrzesień",
+        "Październik",
+        "Listopad",
+        "Grudzień",
+      ];
+
+      const monthNames = i18n.language === "pl" ? monthNamesPl : monthNamesEn;
       const monthName = monthNames[monthNumber - 1];
 
       return `${monthName} ${year}`;
@@ -221,7 +241,7 @@ const SeasonalAchievements = ({
         {t("seasonal_achievements.title", "Osiągnięcia Sezonowe")}
       </h3>
 
-      <div className='flex w-full justify-between p-2'>
+      <div className='flex w-full p-2'>
         {visibleAchievements.map((achievement, idx) => {
           const styles = getAchievementStyles(achievement.place);
           const displaySeasonName = formatSeasonId(achievement.seasonId);
