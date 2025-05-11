@@ -1,4 +1,5 @@
 import type { DateWithReport } from "components/ActivityLog/activityLog.types";
+import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import { StatisticBar } from "feature/profile/components/StatisticBar";
 import {
   StatsField,
@@ -16,6 +17,7 @@ interface StatsSectionProps {
   statsField: StatsFieldProps[];
   statistics: StatisticsDataInterface;
   datasWithReports: DateWithReport[];
+  userAuth: string;
   userSongs:
     | {
         wantToLearn: Song[];
@@ -30,6 +32,7 @@ export const StatsSection = ({
   statistics,
   datasWithReports,
   userSongs,
+  userAuth,
 }: StatsSectionProps) => {
   const { t } = useTranslation("profile");
   const { time } = statistics;
@@ -115,27 +118,32 @@ export const StatsSection = ({
           </div>
         </div>
       </div>
-      <div className='content-box relative z-20 mb-2 flex content-around justify-center lg:flex-1'>
-        <StatisticBar
-          title={t("technique")}
-          value={convertMsToHM(time.technique)}
-          percent={calculatePercent(time.technique, totalTime)}
-        />
-        <StatisticBar
-          title={t("theory")}
-          value={convertMsToHM(time.theory)}
-          percent={calculatePercent(time.theory, totalTime)}
-        />
-        <StatisticBar
-          title={t("hearing")}
-          value={convertMsToHM(time.hearing)}
-          percent={calculatePercent(time.hearing, totalTime)}
-        />
-        <StatisticBar
-          title={t("creativity")}
-          value={convertMsToHM(time.creativity)}
-          percent={calculatePercent(time.creativity, totalTime)}
-        />
+      <div className='flex flex-col lg:flex-1'>
+        <div className='content-box relative z-20 mb-2 flex content-around justify-center'>
+          <StatisticBar
+            title={t("technique")}
+            value={convertMsToHM(time.technique)}
+            percent={calculatePercent(time.technique, totalTime)}
+          />
+          <StatisticBar
+            title={t("theory")}
+            value={convertMsToHM(time.theory)}
+            percent={calculatePercent(time.theory, totalTime)}
+          />
+          <StatisticBar
+            title={t("hearing")}
+            value={convertMsToHM(time.hearing)}
+            percent={calculatePercent(time.hearing, totalTime)}
+          />
+          <StatisticBar
+            title={t("creativity")}
+            value={convertMsToHM(time.creativity)}
+            percent={calculatePercent(time.creativity, totalTime)}
+          />
+        </div>
+        <div className='mb-2 mt-2'>
+          <SeasonalAchievements userId={userAuth} />
+        </div>
       </div>
     </div>
   );

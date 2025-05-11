@@ -89,8 +89,10 @@ const ProfileLandingLayout = ({
               statistics={userStats}
               datasWithReports={datasWithReports}
               userSongs={songs}
+              userAuth={userAuth}
             />
-            <div className='col-span-2 p-2'>
+
+            <div className='col-span-2 p-2 md:col-span-1'>
               <ActivityLog userAuth={userAuth} />
             </div>
             <div className='my-2 mb-2 flex flex-col justify-between'>

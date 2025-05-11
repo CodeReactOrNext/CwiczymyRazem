@@ -97,5 +97,10 @@
       "creativity_specialist": "Your creative skills are strong. Focus on developing a unique style or composing original pieces",
       "rapid_balanced_progress": "You're making excellent progress across all areas. Keep this balanced approach while increasing complexity"
     }
+  },
+  "seasonal_achievements": {
+    "title": "Seasonal Achievements",
+    "points": "points",
+    "no_achievements": "No seasonal achievements yet"
   }
 }

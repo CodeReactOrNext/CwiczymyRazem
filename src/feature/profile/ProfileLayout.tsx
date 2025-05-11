@@ -9,6 +9,8 @@ import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
+import type { Song } from "feature/songs/types/songs.type";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaSoundcloud, FaYoutube } from "react-icons/fa";
@@ -30,6 +32,11 @@ const ProfileLayout = ({
   userAuth,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
+  const [songs, setSongs] = useState<{
+    wantToLearn: Song[];
+    learning: Song[];
+    learned: Song[];
+  }>();
   const {
     statistics,
     displayName,
@@ -47,6 +54,10 @@ const ProfileLayout = ({
   const yearsOfPlaying = guitarStartDate
     ? getYearsOfPlaying(guitarStartDate.toDate())
     : null;
+
+  useEffect(() => {
+    getUserSongs(userAuth).then((songs) => setSongs(songs));
+  }, []);
 
   useEffect(() => {
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
@@ -139,7 +150,8 @@ const ProfileLayout = ({
             statsField={statsField}
             statistics={statistics}
             datasWithReports={datasWithReports}
-            userSongs={undefined}
+            userSongs={songs}
+            userAuth={userAuth}
           />
         </div>
 
