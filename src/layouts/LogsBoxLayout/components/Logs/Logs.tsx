@@ -385,15 +385,10 @@ const FirebaseLogsTopPlayersItem = ({
   const { data, topPlayers, daysLeftInSeason } = log;
   const date = new Date(data);
 
-  // Formatuje datę do postaci "MM.YYYY"
-  const formatSeasonDate = (date: Date): string => {
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const year = date.getFullYear();
-    return `${month}.${year}`;
-  };
-
-  // Przygotuj formatowaną nazwę sezonu
-  const seasonName = formatSeasonDate(date);
+  // Get current season information
+  const currentMonth = date.toLocaleString("default", { month: "long" });
+  const currentYear = date.getFullYear();
+  const seasonName = `${currentMonth} ${currentYear}`;
 
   // Handle case where topPlayers might not be available
   if (!topPlayers || !Array.isArray(topPlayers) || topPlayers.length === 0) {
@@ -420,13 +415,19 @@ const FirebaseLogsTopPlayersItem = ({
     </div>
   );
 };
-
 const Logs = ({ logs, marksLogsAsRead }: LogsBoxLayoutProps) => {
   const { isNewMessage } = useUnreadMessages("logs");
   const spanRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    if (!spanRef.current) return;
+
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    observerRef.current = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           marksLogsAsRead();
@@ -435,12 +436,14 @@ const Logs = ({ logs, marksLogsAsRead }: LogsBoxLayoutProps) => {
       { threshold: 1, rootMargin: "-400px" }
     );
 
-    if (spanRef.current) {
-      observer.observe(spanRef.current);
-    }
+    observerRef.current.observe(spanRef.current);
 
-    return () => observer.disconnect();
-  }, [marksLogsAsRead]);
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []); // Empty dependency array since we handle cleanup manually
 
   return (
     <>
