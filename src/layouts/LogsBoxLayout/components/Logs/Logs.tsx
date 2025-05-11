@@ -385,10 +385,15 @@ const FirebaseLogsTopPlayersItem = ({
   const { data, topPlayers, daysLeftInSeason } = log;
   const date = new Date(data);
 
-  // Get current season information
-  const currentMonth = date.toLocaleString("default", { month: "long" });
-  const currentYear = date.getFullYear();
-  const seasonName = `${currentMonth} ${currentYear}`;
+  // Formatuje datę do postaci "MM.YYYY"
+  const formatSeasonDate = (date: Date): string => {
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${month}.${year}`;
+  };
+
+  // Przygotuj formatowaną nazwę sezonu
+  const seasonName = formatSeasonDate(date);
 
   // Handle case where topPlayers might not be available
   if (!topPlayers || !Array.isArray(topPlayers) || topPlayers.length === 0) {

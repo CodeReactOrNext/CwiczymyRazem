@@ -1,7 +1,18 @@
 import { SeasonService } from "feature/discordBot/services/seasonService";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { logger } from "feature/logger/Logger";
-import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { 
+  assignSeasonalAchievements,
+  hasSeasonalAchievement
+} from "feature/profile/services/seasonalAchievementsService";
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -73,6 +84,63 @@ const createLogData = (
   });
 };
 
+
+const checkSeasonEndAndAssignAchievements = async (
+  topPlayers: TopPlayerData[],
+  seasonData: { daysLeft: number }
+): Promise<void> => {
+  if (false) {
+    return;
+  }
+
+  const now = new Date();
+  const seasonId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const seasonName = seasonId;
+  
+  logger.info("Season is ending, assigning achievements", {
+    context: "dailyTopPlayersUpdate",
+    extra: {
+      seasonId,
+      topPlayersCount: topPlayers.length
+    }
+  });
+
+  const topFivePlayers = topPlayers.slice(0, 5);
+  const playersWithoutAchievements = [];
+  
+  for (const player of topFivePlayers) {
+    if (!player.uid || player.uid.startsWith('player-')) {
+      continue;
+    }
+    
+    const hasAchievement = await hasSeasonalAchievement(player.uid, seasonId);
+    if (!hasAchievement) {
+      playersWithoutAchievements.push(player);
+    }
+  }
+  
+  if (playersWithoutAchievements.length === 0) {
+    logger.info("All top players already have achievements for this season", {
+      context: "dailyTopPlayersUpdate",
+      extra: { seasonId }
+    });
+    return;
+  }
+
+  const assignedCount = await assignSeasonalAchievements(
+    topPlayers, 
+    seasonId,
+    seasonName
+  );
+  
+  logger.info(`Assigned ${assignedCount} seasonal achievements`, {
+    context: "dailyTopPlayersUpdate",
+    extra: {
+      seasonId
+    }
+  });
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -99,10 +167,11 @@ export default async function handler(
       })
     );
 
-    const logsDocRef = doc(collection(db, "logs"));
-    const logData = createLogData(topPlayers,  seasonData.daysLeft);
-    await setDoc(logsDocRef, logData);
+    await checkSeasonEndAndAssignAchievements(topPlayers, seasonData);
 
+    const logsDocRef = doc(collection(db, "logs"));
+    const logData = createLogData(topPlayers, seasonData.daysLeft);
+    await setDoc(logsDocRef, logData);
 
     res.status(200).json({ message: "Daily top players update sent" });
   } catch (error) {
