@@ -18,6 +18,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
         "achievements",
         "toast",
         "skills",
+        "songs",
       ])),
     },
   };
