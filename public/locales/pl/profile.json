@@ -112,5 +112,10 @@
       "creativity_specialist": "Twoje umiejętności kreatywne są mocne. Skup się na rozwoju unikalnego stylu lub komponowaniu",
       "rapid_balanced_progress": "Robisz świetne postępy we wszystkich obszarach. Utrzymuj to zbalansowane podejście zwiększając poziom trudności"
     }
+  },
+  "seasonal_achievements": {
+    "title": "Osiągnięcia Sezonowe",
+    "points": "punktów",
+    "no_achievements": "Brak osiągnięć sezonowych"
   }
 }
