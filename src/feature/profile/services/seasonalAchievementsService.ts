@@ -11,9 +11,7 @@ import {
 import { db } from "utils/firebase/client/firebase.utils";
 
 export interface SeasonalAchievement {
-  userId: string;
   seasonId: string;
-  seasonName: string;
   place: number;
   points: number;
   achievedAt: Timestamp;
@@ -42,7 +40,6 @@ export const getUserSeasonalAchievements = async (userId: string): Promise<Seaso
 export const assignSeasonalAchievements = async (
   topPlayers: TopPlayerData[],
   seasonId: string,
-  seasonName: string
 ): Promise<number> => {
   try {
     const now = Timestamp.now();
@@ -67,9 +64,7 @@ export const assignSeasonalAchievements = async (
       const achievementRef = doc(db, "users", player.uid, "seasonalAchievements", achievementId);
       
       const achievement: SeasonalAchievement = {
-        userId: player.uid,
         seasonId,
-        seasonName,
         place,
         points: player.points || 0,
         achievedAt: now
