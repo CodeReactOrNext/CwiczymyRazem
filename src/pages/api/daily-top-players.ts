@@ -89,13 +89,13 @@ const checkSeasonEndAndAssignAchievements = async (
   topPlayers: TopPlayerData[],
   seasonData: { daysLeft: number }
 ): Promise<void> => {
-  if (false) {
+  if (seasonData.daysLeft > 0) {
     return;
   }
 
+
   const now = new Date();
   const seasonId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const seasonName = seasonId;
   
   logger.info("Season is ending, assigning achievements", {
     context: "dailyTopPlayersUpdate",
@@ -114,6 +114,7 @@ const checkSeasonEndAndAssignAchievements = async (
     }
     
     const hasAchievement = await hasSeasonalAchievement(player.uid, seasonId);
+
     if (!hasAchievement) {
       playersWithoutAchievements.push(player);
     }
