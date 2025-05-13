@@ -249,7 +249,7 @@ const SeasonalAchievements = ({
           return (
             <div
               key={`${achievement.seasonId}-${idx}`}
-              className={`relative flex items-center rounded-md p-3 ${styles.background} border-l-4 ${styles.borderAccent} shadow-lg ${styles.glow} transition-all duration-300`}>
+              className={`relative mr-3 flex items-center rounded-md p-3 ${styles.background} border-l-4 ${styles.borderAccent} shadow-lg ${styles.glow} transition-all duration-300`}>
               <div className='relative mr-3'>
                 <div
                   className={`flex h-9 w-9 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconGlow} ${styles.iconColor}`}>
