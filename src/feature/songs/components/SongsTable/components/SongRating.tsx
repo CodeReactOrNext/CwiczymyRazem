@@ -1,7 +1,7 @@
 import { rateSongDifficulty } from "feature/songs/services/rateSongDifficulty";
 import type { Song } from "feature/songs/types/songs.type";
 import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { Star } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ interface SongRatingInterface {
 }
 export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
   const userId = useAppSelector(selectUserAuth);
+  const avatar = useAppSelector(selectUserAvatar);
   const { t } = useTranslation("songs");
 
   const [ratingHover, setRatingHover] = useState<{
@@ -47,7 +48,7 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
     }
 
     try {
-      await rateSongDifficulty(songId, userId, rating, title, artist);
+      await rateSongDifficulty(songId, userId, rating, title, artist, avatar);
       refreshTable();
       toast.success(t("rating_updated"));
     } catch (error) {

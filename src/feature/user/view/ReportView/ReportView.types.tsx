@@ -24,6 +24,7 @@ export interface ReportFormikInterface {
   countBackDays: number;
   reportTitle: string;
   habbits: HabbitsType[];
+  avatarUrl: string | null;
 }
 export interface ReportDataInterface {
   reportDate: Date;
