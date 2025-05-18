@@ -1,3 +1,9 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@radix-ui/react-tooltip";
 import type { AchievementList } from "feature/achievements/achievementsData";
 import { achievementsData } from "feature/achievements/achievementsData";
 import { AchievementCard } from "feature/achievements/components/AchievementCard";
@@ -10,7 +16,7 @@ interface AchievementsMapProps {
 const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
   return (
     <div className='mt-4 flex h-full flex-row flex-wrap items-center justify-center gap-5 '>
-      {achievementsData.map(({ Icon, id }, index) => {
+      {achievementsData.map(({ Icon, id, name, description }, index) => {
         const isUnlocked = userAchievements?.includes(id);
 
         return (
@@ -23,12 +29,21 @@ const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
               isUnlocked ? "" : "bg-second-600"
             }`}>
             {isUnlocked && <AchievementCard id={id} />}
-            {!isUnlocked && (
-              <Icon
-                className={`text-3xl transition-all duration-300 ${"text-gray-600 grayscale"}`}
-                data-tip={"Achievement Locked"}
-              />
-            )}
+            <TooltipProvider>
+              {!isUnlocked && (
+                <>
+                  <Tooltip >
+                    <TooltipContent>{description}</TooltipContent>
+                    <TooltipTrigger>
+                      <Icon
+                        className={`text-3xl transition-all duration-300 ${"text-gray-600 grayscale"}`}
+                        data-tip={"Achievement Locked"}
+                      />
+                    </TooltipTrigger>
+                  </Tooltip>
+                </>
+              )}
+            </TooltipProvider>
           </motion.div>
         );
       })}

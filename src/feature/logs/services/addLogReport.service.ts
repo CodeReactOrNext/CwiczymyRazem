@@ -22,7 +22,8 @@ export const firebaseAddLogReport = async (
     hearingTime: number;
     creativityTime: number;
     sumTime: number;
-  }
+  },
+  avatarUrl: string | undefined,
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -38,6 +39,7 @@ export const firebaseAddLogReport = async (
     newLevel,
     timestamp: new Date().toISOString(),
     timeSumary,
+    avatarUrl: avatarUrl ?? null ,
   };
 
   await setDoc(logsDocRef, logData);

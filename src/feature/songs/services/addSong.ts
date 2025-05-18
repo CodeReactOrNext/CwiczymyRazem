@@ -23,7 +23,9 @@ import { db } from "utils/firebase/client/firebase.utils";
 export const addSong = async (
   title: string,
   artist: string,
-  userId: string
+  userId: string,
+  avatarUrl: string | undefined,
+  difficulty_rate: number | undefined
 ) => {
   try {
     const exists = await checkSongExists(title, artist);
@@ -46,7 +48,9 @@ export const addSong = async (
       new Date().toISOString(),
       title,
       artist,
-      "added"
+      "added",
+      avatarUrl,
+      difficulty_rate
     );
     return docRef.id;
   } catch (error) {
