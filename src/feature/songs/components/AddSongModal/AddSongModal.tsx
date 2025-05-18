@@ -9,7 +9,7 @@ import {
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { addSong } from "feature/songs/services/addSong";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
+  const avatar = useAppSelector(selectUserAvatar);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +43,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
 
     try {
       setIsLoading(true);
-      await addSong(title.trim(), artist.trim(), userId);
+      await addSong(title.trim(), artist.trim(), userId, avatar, undefined);
       toast.success(t("song_added"));
       onSuccess();
       onClose();

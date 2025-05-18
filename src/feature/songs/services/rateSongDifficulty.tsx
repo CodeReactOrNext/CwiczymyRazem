@@ -8,7 +8,8 @@ export const rateSongDifficulty = async (
   userId: string,
   rating: number,
   title: string,
-  artist: string
+  artist: string,
+  avatarUrl: string | undefined,
 ) => {
   try {
     const songRef = doc(db, "songs", songId);
@@ -44,7 +45,8 @@ export const rateSongDifficulty = async (
       title,
       artist,
       "difficulty_rate",
-      rating
+      avatarUrl,
+      rating,
     );
   } catch (error) {
     console.error("Error rating song:", error);

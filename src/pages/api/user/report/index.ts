@@ -107,7 +107,8 @@ export default async function handler(
           isNewLevel: report.isNewLevel,
           level: report.currentUserStats.lvl,
         },
-        report.timeSummary
+        report.timeSummary,
+        inputData.avatarUrl ?? null
       );
     }
 

@@ -18,7 +18,9 @@ export const firebaseAddSongsLog = async (
   songTitle: string,
   songArtist: string,
   status: FirebaseLogsSongsStatuses,
-  difficulty_rate?: number | undefined
+  avatarUrl: string | undefined,
+  difficulty_rate: number | undefined,
+
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -32,6 +34,7 @@ export const firebaseAddSongsLog = async (
     songTitle,
     songArtist,
     status,
+    avatarUrl,
   };
 
   await setDoc(logsDocRef, logData);

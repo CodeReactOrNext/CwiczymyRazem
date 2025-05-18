@@ -1,7 +1,7 @@
 import { removeUserSong } from "feature/songs/services/removeUserSong";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
@@ -29,6 +29,7 @@ export const useSongsStatusChange = ({
 }) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
+  const avatar = useAppSelector(selectUserAvatar);
 
   const handleStatusChange = async (
     songId: string,
@@ -42,7 +43,7 @@ export const useSongsStatusChange = ({
     }
 
     try {
-      await updateSongStatus(userId, songId, title, artist, newStatus);
+      await updateSongStatus(userId, songId, title, artist, newStatus, avatar);
 
       const allSongs = [
         ...userSongs.wantToLearn,

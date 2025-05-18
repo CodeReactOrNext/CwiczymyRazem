@@ -17,7 +17,6 @@ import {
   FaRegStar,
   FaTrophy,
 } from "react-icons/fa";
-import { IoMdMusicalNotes } from "react-icons/io";
 import { IoCalendarOutline, IoPersonOutline } from "react-icons/io5";
 import { addZeroToTime } from "utils/converter";
 
@@ -61,15 +60,28 @@ const TimeStamp = ({ date }: { date: Date }) => (
 const UserLink = ({
   uid,
   userName,
+  avatarUrl,
 }: {
   uid: string | undefined;
   userName: string;
+  avatarUrl?: string;
 }) => {
   if (!uid) return <span>{userName}</span>;
 
   return (
     <UserTooltip userId={uid}>
-      <Link className='text-white hover:underline' href={`/user/${uid}`}>
+      <Link
+        className='flex items-center gap-2 text-white hover:underline'
+        href={`/user/${uid}`}>
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt={userName}
+            className='h-6 w-6 rounded-full'
+          />
+        ) : (
+          <IoPersonOutline className='text-secondText' />
+        )}
         {userName}
       </Link>
     </UserTooltip>
@@ -103,7 +115,7 @@ const FirebaseLogsSongItem = ({
   isNew: boolean;
 }) => {
   const { t } = useTranslation("common");
-  const { userName, data, songArtist, songTitle, status, uid } = log;
+  const { userName, data, songArtist, songTitle, status, uid, avatarUrl } = log;
   const date = new Date(data);
   const message = getSongStatusMessage(status, t);
 
@@ -112,8 +124,7 @@ const FirebaseLogsSongItem = ({
       <TimeStamp date={date} />
       <div className='flex w-[80%] flex-wrap items-center gap-1'>
         <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-          <IoMdMusicalNotes className='text-secondText' />
-          <UserLink uid={uid} userName={userName} />
+          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} />
         </span>
         <p className='text-secondText'>
           {message}{" "}
@@ -135,7 +146,8 @@ const FirebaseLogsItem = ({
   isNew: boolean;
 }) => {
   const { t } = useTranslation("common");
-  const { userName, points, data, uid, newLevel, newAchievements } = log;
+  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl } =
+    log;
   const date = new Date(data);
 
   return (
@@ -143,8 +155,11 @@ const FirebaseLogsItem = ({
       <TimeStamp date={date} />
       <div className='flex w-[80%] flex-wrap items-center gap-1'>
         <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-          <IoPersonOutline className='text-secondText' />
-          <UserLink uid={uid} userName={userName} />
+          <UserLink
+            uid={uid}
+            userName={userName}
+            avatarUrl={avatarUrl ?? undefined}
+          />
         </span>{" "}
         <span className='text-secondText'>{t("logsBox.get")}</span>
         <span className='mr-1 text-main'>
