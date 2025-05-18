@@ -16,6 +16,7 @@ export interface FirebaseLogsSongsInterface {
   songArtist: string;
   difficulty_rate?: number;
   status: FirebaseLogsSongsStatuses;
+  avatarUrl: string | undefined;
 }
 
 export interface FirebaseUserExceriseLog {
@@ -38,6 +39,7 @@ export interface FirebaseUserExceriseLog {
     creativityTime: number;
     sumTime: number;
   };
+  avatarUrl: string | undefined;
 }
 
 export interface FirebaseLogsInterface {
@@ -58,6 +60,7 @@ export interface FirebaseLogsInterface {
     creativityTime: number;
     sumTime: number;
   };
+  avatarUrl: string | null;
 }
 
 export interface FirebaseLogsAchievementsInterface {
@@ -66,6 +69,7 @@ export interface FirebaseLogsAchievementsInterface {
   achievements: AchievementList[];
   timestamp: string | number | Date;
   data?: string;
+  avatarUrl: string | null;
 }
 
 export interface FirebaseLogsLvlInterface {
@@ -74,6 +78,7 @@ export interface FirebaseLogsLvlInterface {
   lvl: number;
   timestamp: string | number | Date;
   data?: string;
+  avatarUrl: string | null;
 }
 
 export interface FirebaseLogsTopPlayersInterface {

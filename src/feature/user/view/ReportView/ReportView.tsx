@@ -10,6 +10,7 @@ import {
   selectRaitingData,
   selectTimerData,
   selectUserAuth,
+  selectUserAvatar,
 } from "feature/user/store/userSlice";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { Formik } from "formik";
@@ -58,6 +59,7 @@ const ReportView = () => {
   const currentUserStats = useAppSelector(selectCurrentUserStats);
   const previousUserStats = useAppSelector(selectPreviousUserStats);
   const raitingData = useAppSelector(selectRaitingData);
+  const avatar = useAppSelector(selectUserAvatar);
   const userAuth = useAppSelector(selectUserAuth);
   const timerData = useAppSelector(selectTimerData);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
@@ -84,6 +86,7 @@ const ReportView = () => {
     habbits: [],
     countBackDays: 0,
     reportTitle: "",
+    avatarUrl: avatar ?? null,
   };
 
   const timeInputList: TimeInputProps[] = [

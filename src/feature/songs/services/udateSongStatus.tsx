@@ -8,7 +8,8 @@ export const updateSongStatus = async (
   songId: string,
   title: string,
   artist: string,
-  status: SongStatus
+  status: SongStatus,
+  avatarUrl: string | undefined
 ) => {
   const userDocRef = doc(db, "users", userId);
   const userSongsRef = doc(userDocRef, "userSongs", songId);
@@ -27,7 +28,9 @@ export const updateSongStatus = async (
       new Date().toISOString(),
       title,
       artist,
-      status
+      status,
+      avatarUrl,
+      undefined
     );
     return true;
   } catch (error) {
