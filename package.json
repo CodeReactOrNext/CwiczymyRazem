@@ -35,6 +35,7 @@
     "@tremor/react": "^3.18.6",
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "axios": "^1.2.2",
+    "babel-plugin-react-compiler": "^19.1.0-rc.2",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
