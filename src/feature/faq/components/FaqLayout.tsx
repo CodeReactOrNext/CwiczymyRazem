@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/accordion";
 import { Card } from "assets/components/ui/card";
 import { HelpCircle } from "lucide-react";
+import { useTranslation } from "next-i18next";
 
 export interface faqQuestionInterface {
   title: string;
@@ -17,6 +18,8 @@ interface FaqLayoutProps {
 }
 
 export const FaqLayout = ({ faqQuestions }: FaqLayoutProps) => {
+  const { t } = useTranslation("faq");
+
   return (
     <div className='mx-auto w-full max-w-4xl space-y-8 p-4 font-openSans md:p-8'>
       <Card className='rounded-xl border border-border/40 bg-card/80 p-6 shadow-md backdrop-blur-sm'>
@@ -25,12 +28,8 @@ export const FaqLayout = ({ faqQuestions }: FaqLayoutProps) => {
             <HelpCircle className='h-10 w-10 text-primary' />
           </div>
           <h1 className='text-xl font-bold text-foreground/90 md:text-4xl'>
-            Często zadawane pytania
+            {t("faq")}
           </h1>
-          <p className='mx-auto mt-2 max-w-xl text-base text-muted-foreground md:text-lg'>
-            Znajdź odpowiedzi na najczęściej zadawane pytania dotyczące naszej
-            platformy.
-          </p>
         </div>
 
         <Accordion type='single' collapsible className='w-full space-y-4'>
