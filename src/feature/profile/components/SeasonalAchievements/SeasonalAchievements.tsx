@@ -25,7 +25,7 @@ const SeasonalAchievements = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [achievements, setAchievements] = useState<SeasonalAchievement[]>([]);
   const [loading, setLoading] = useState(true);
-  const maxVisibleItems = 3;
+  const maxVisibleItems = 6;
   const totalItems = achievements.length;
 
   const formatSeasonId = (seasonId: string): string => {
@@ -237,11 +237,14 @@ const SeasonalAchievements = ({
 
   return (
     <div className={`content-box   font-openSans ${className}`}>
-      <h3 className='mb-4 text-sm font-semibold text-zinc-200'>
-        {t("seasonal_achievements.title", "Osiągnięcia Sezonowe")}
-      </h3>
+      <div className='mb-3 flex items-center gap-2'>
+        <h4 className='text-sm font-medium text-zinc-300'>
+          {t("seasonal_achievements.title", "Osiągnięcia Sezonowe")}
+        </h4>
+        <div className='h-px flex-1 bg-second-400/20'></div>
+      </div>
 
-      <div className='flex w-full p-2'>
+      <div className='flex flex-wrap gap-2'>
         {visibleAchievements.map((achievement, idx) => {
           const styles = getAchievementStyles(achievement.place);
           const displaySeasonName = formatSeasonId(achievement.seasonId);
@@ -249,30 +252,31 @@ const SeasonalAchievements = ({
           return (
             <div
               key={`${achievement.seasonId}-${idx}`}
-              className={`relative mr-3 flex items-center rounded-md p-3 ${styles.background} border-l-4 ${styles.borderAccent} shadow-lg ${styles.glow} transition-all duration-300`}>
-              <div className='relative mr-3'>
+              className='inline-flex items-center gap-2 rounded-md border border-second-400/15 bg-second-500/15 px-3 py-2 text-xs transition-all duration-200 hover:bg-second-500/25'>
+              <div className='relative'>
                 <div
-                  className={`flex h-9 w-9 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconGlow} ${styles.iconColor}`}>
+                  className={`flex h-6 w-6 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
                   {getAchievementIcon(achievement.place)}
                 </div>
                 {styles.crown && (
                   <FaCrown
-                    className='absolute -right-1 -top-2 animate-pulse text-yellow-300'
-                    size={12}
+                    className='absolute -right-0.5 -top-0.5 text-yellow-400'
+                    size={8}
                   />
                 )}
               </div>
 
-              <div className='min-w-0 flex-1'>
-                <div className='flex items-center'>
-                  <span className={`text-sm font-bold ${styles.iconColor}`}>
-                    {achievement.place}
-                    <sup>{getOrdinalSuffix(achievement.place)}</sup>
-                  </span>
-                  <span className='ml-2 text-sm font-medium text-zinc-100'>
-                    {displaySeasonName}
-                  </span>
-                </div>
+              <div className='flex items-center gap-1.5'>
+                <span className={`font-semibold ${styles.iconColor}`}>
+                  {achievement.place}
+                  <sup className='text-[10px]'>
+                    {getOrdinalSuffix(achievement.place)}
+                  </sup>
+                </span>
+                <span className='text-zinc-400'>•</span>
+                <span className='max-w-20 truncate font-medium text-zinc-200'>
+                  {displaySeasonName}
+                </span>
               </div>
             </div>
           );
@@ -280,16 +284,16 @@ const SeasonalAchievements = ({
       </div>
 
       {totalItems > maxVisibleItems && (
-        <div className='mt-4 flex justify-center gap-2'>
+        <div className='mt-6 flex justify-center gap-3'>
           <button
             onClick={handlePrev}
-            className='rounded-md bg-zinc-800/80 p-1.5 text-zinc-400 shadow-md transition-all'>
-            <FaChevronLeft size={12} />
+            className='rounded-lg border border-second-400/30 bg-second-500/20 p-2.5 text-zinc-300 shadow-sm transition-all duration-200 hover:bg-second-500/40 hover:text-white'>
+            <FaChevronLeft size={14} />
           </button>
           <button
             onClick={handleNext}
-            className='rounded-md bg-zinc-800/80 p-1.5 text-zinc-400 shadow-md transition-all'>
-            <FaChevronRight size={12} />
+            className='rounded-lg border border-second-400/30 bg-second-500/20 p-2.5 text-zinc-300 shadow-sm transition-all duration-200 hover:bg-second-500/40 hover:text-white'>
+            <FaChevronRight size={14} />
           </button>
         </div>
       )}
