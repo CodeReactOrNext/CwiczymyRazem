@@ -136,7 +136,7 @@ const ProfileLandingLayout = ({
     <div className='bg-second-600 radius-default'>
       <HeadDecoration title={t("statistics")} />
 
-      <div className='relative z-10 flex flex-wrap justify-between gap-2 border-b border-second-500 p-4 md:justify-around'>
+      <div className='relative z-10 flex flex-wrap justify-between gap-3 border-b border-second-500 p-6 md:justify-around'>
         <Button
           variant={activeSection === "overview" ? "default" : "ghost"}
           onClick={() => setActiveSection("overview")}>
@@ -167,7 +167,7 @@ const ProfileLandingLayout = ({
         <NavigationCards setActiveSection={setActiveSection} />
       )}
 
-      <div className='grid-rows-auto grid-cols-1 items-start gap-6 p-3 md:grid-cols-2 md:!p-6 lg:grid'>
+      <div className='grid-rows-auto mt-8 grid-cols-1 items-start gap-8 p-6 md:grid-cols-2 md:!p-8 lg:grid'>
         <AnimatePresence mode='wait'>
           <motion.div
             key={activeSection}

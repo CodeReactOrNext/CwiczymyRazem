@@ -119,27 +119,29 @@ export const StatsSection = ({
         </div>
       </div>
       <div className='flex flex-col lg:flex-1'>
-        <div className='content-box relative z-20 mb-2 flex content-around justify-center'>
-          <StatisticBar
-            title={t("technique")}
-            value={convertMsToHM(time.technique)}
-            percent={calculatePercent(time.technique, totalTime)}
-          />
-          <StatisticBar
-            title={t("theory")}
-            value={convertMsToHM(time.theory)}
-            percent={calculatePercent(time.theory, totalTime)}
-          />
-          <StatisticBar
-            title={t("hearing")}
-            value={convertMsToHM(time.hearing)}
-            percent={calculatePercent(time.hearing, totalTime)}
-          />
-          <StatisticBar
-            title={t("creativity")}
-            value={convertMsToHM(time.creativity)}
-            percent={calculatePercent(time.creativity, totalTime)}
-          />
+        <div className='content-box relative z-20 mb-2'>
+          <div className='space-y-3'>
+            <StatisticBar
+              title={t("technique")}
+              value={convertMsToHM(time.technique)}
+              percent={calculatePercent(time.technique, totalTime)}
+            />
+            <StatisticBar
+              title={t("theory")}
+              value={convertMsToHM(time.theory)}
+              percent={calculatePercent(time.theory, totalTime)}
+            />
+            <StatisticBar
+              title={t("hearing")}
+              value={convertMsToHM(time.hearing)}
+              percent={calculatePercent(time.hearing, totalTime)}
+            />
+            <StatisticBar
+              title={t("creativity")}
+              value={convertMsToHM(time.creativity)}
+              percent={calculatePercent(time.creativity, totalTime)}
+            />
+          </div>
         </div>
         <div className='mb-2 mt-2'>
           <SeasonalAchievements userId={userAuth} />
