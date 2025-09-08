@@ -6,6 +6,7 @@ interface LevelInterfaceProps {
   lvl: number;
   currentLevelMaxPoints: number;
 }
+
 export const LevelBar = ({ points, lvl }: LevelInterfaceProps) => {
   const { t } = useTranslation("common");
 
@@ -13,28 +14,38 @@ export const LevelBar = ({ points, lvl }: LevelInterfaceProps) => {
   const levelXpEnd = getPointsToLvlUp(lvl);
   const pointsInThisLevel = points - levelXpStart;
   const levelXpDifference = levelXpEnd - levelXpStart;
-  const progressPercent = (pointsInThisLevel / levelXpDifference) * 100;
+  const progressPercent = Math.min(
+    (pointsInThisLevel / levelXpDifference) * 100,
+    100
+  );
 
   return (
-    <div className='relative z-30 flex w-full flex-col items-center text-lg text-tertiary-400 sm:text-xl md:w-52 lg:w-64 lg:justify-self-end xl:w-80 '>
-      <p>
-        {t("header.your_level")}{" "}
-        <span className='text-3xl font-bold text-mainText sm:text-4xl'>
-          {lvl}
-        </span>
-      </p>
-      <div className=' flex w-full'>
-        <div className='relative  flex h-3 w-full items-center bg-main-opposed bg-opacity-80  radius-default'>
+    <div className='flex w-full items-center gap-3 rounded-lg bg-white/5 px-3 py-2 transition-all duration-200 hover:bg-white/10'>
+      {/* Compact Level Badge */}
+      <div className='flex h-8 w-8 items-center justify-center rounded-md bg-white/10 text-sm font-bold text-white'>
+        {lvl}
+      </div>
+
+      {/* Progress Bar */}
+      <div className='flex-1'>
+        <div className='mb-1 flex items-center justify-between text-xs'>
+          <span className='text-white/80'>Level {lvl}</span>
+          <span className='text-white/60'>{Math.round(progressPercent)}%</span>
+        </div>
+        <div className='h-1.5 w-full overflow-hidden rounded-full bg-white/10'>
           <div
-            className='relative h-3 bg-gradient-to-r from-main-600 to-main-200 shadow-[0_0_15px_rgba(255,0,0,0.2)] drop-shadow-lg 
-                     radius-default '
+            className='h-full rounded-full bg-white/60 transition-all duration-500'
             style={{ width: progressPercent + "%" }}></div>
         </div>
       </div>
-      <p className='mt-2 !font-semibold text-mainText'>
-        {points - levelXpStart}/{levelXpEnd - levelXpStart}
-        <span className='text-sm'> {t("header.points_short")}</span>
-      </p>
+
+      {/* Compact Stats */}
+      <div className='text-right text-xs text-white/70'>
+        <div className='font-medium'>
+          {pointsInThisLevel}/{levelXpDifference}
+        </div>
+        <div className='text-white/50'>{levelXpEnd - points} to go</div>
+      </div>
     </div>
   );
 };

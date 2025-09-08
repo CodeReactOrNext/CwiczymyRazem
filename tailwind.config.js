@@ -176,8 +176,10 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['var(--font-teko)', ...defaultTheme.fontFamily.sans],
-        openSans: ['var(--font-inter)', ...defaultTheme.fontFamily.sans],
+        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
+        body: ['Inter', 'system-ui', 'sans-serif'],
+        teko: ['var(--font-teko)', ...defaultTheme.fontFamily.sans],
       },
       keyframes: {
         "accordion-down": {
@@ -230,12 +232,10 @@ module.exports = {
       },
     },
     fontFamily: {
-      sans: [
-        'var(--font-teko)'
-      ],
-      openSans: [
-        'var(--font-inter)'
-      ]
+      sans: ['Inter', 'system-ui', 'sans-serif'],
+      display: ['Inter', 'system-ui', 'sans-serif'],
+      body: ['Inter', 'system-ui', 'sans-serif'],
+      teko: ['var(--font-teko)', 'sans-serif']
     }
   },
   daisyui: {

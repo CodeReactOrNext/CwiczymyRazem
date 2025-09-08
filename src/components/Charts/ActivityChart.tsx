@@ -101,24 +101,31 @@ export function ActivityChart({ data }: ActivityChartProps) {
   };
 
   return (
-    <Card>
-      <CardHeader className='flex items-center gap-2 space-y-0 border-b py-5 font-openSans sm:flex-row'>
+    <Card className='border-white/10 bg-zinc-900/70 backdrop-blur-xl'>
+      <CardHeader className='flex items-center gap-2 space-y-0 border-b border-white/10 py-5 sm:flex-row'>
         <div className='grid flex-1 gap-1 text-center sm:text-left'>
-          <CardTitle>{t("chart.activity_overview")}</CardTitle>
-          <CardDescription>{t("chart.showing_activity")}</CardDescription>
+          <CardTitle className='text-lg font-bold text-white'>
+            {t("chart.activity_overview")}
+          </CardTitle>
+          <CardDescription className='text-white/70'>
+            {t("chart.showing_activity")}
+          </CardDescription>
         </div>
         <div className='flex flex-wrap items-center gap-4'>
-          <div className='flex flex-wrap gap-4'>
+          <div className='flex flex-wrap gap-3'>
             {Object.entries(visibleCategories).map(([category, isVisible]) => (
-              <div key={category} className='flex  items-center space-x-2'>
+              <div key={category} className='flex items-center space-x-2'>
                 <Checkbox
                   id={category}
                   checked={isVisible}
                   onCheckedChange={() =>
                     toggleCategory(category as keyof typeof visibleCategories)
                   }
+                  className='border-white/30 data-[state=checked]:bg-white data-[state=checked]:text-black'
                 />
-                <label htmlFor={category} className='text-sm capitalize'>
+                <label
+                  htmlFor={category}
+                  className='text-xs capitalize text-white/70'>
                   {t(`chart.categories.${category as CategoryKeys}`)}
                 </label>
               </div>
@@ -126,21 +133,29 @@ export function ActivityChart({ data }: ActivityChartProps) {
           </div>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
-              className='w-[160px] rounded-lg sm:ml-auto'
+              className='w-[160px] rounded-lg border-white/10 bg-white/5 text-white sm:ml-auto'
               aria-label={t("chart.time_ranges.all_time")}>
               <SelectValue placeholder={t("chart.time_ranges.all_time")} />
             </SelectTrigger>
-            <SelectContent className='rounded-xl'>
-              <SelectItem value='all' className='rounded-lg'>
+            <SelectContent className='rounded-xl border-white/10 bg-zinc-900/90 backdrop-blur-xl'>
+              <SelectItem
+                value='all'
+                className='rounded-lg text-white hover:bg-white/10'>
                 {t("chart.time_ranges.all_time")}
               </SelectItem>
-              <SelectItem value='90d' className='rounded-lg'>
+              <SelectItem
+                value='90d'
+                className='rounded-lg text-white hover:bg-white/10'>
                 {t("chart.time_ranges.last_3_months")}
               </SelectItem>
-              <SelectItem value='30d' className='rounded-lg'>
+              <SelectItem
+                value='30d'
+                className='rounded-lg text-white hover:bg-white/10'>
                 {t("chart.time_ranges.last_30_days")}
               </SelectItem>
-              <SelectItem value='7d' className='rounded-lg'>
+              <SelectItem
+                value='7d'
+                className='rounded-lg text-white hover:bg-white/10'>
                 {t("chart.time_ranges.last_7_days")}
               </SelectItem>
             </SelectContent>
@@ -224,7 +239,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
                 const { active, payload, label } = props;
                 if (active && payload && payload.length) {
                   return (
-                    <div className='rounded-lg border bg-white p-2 font-openSans text-black shadow-sm'>
+                    <div className='rounded-lg border border-white/10 bg-zinc-900/90 p-2 text-white shadow-sm backdrop-blur-xl'>
                       <div className='grid grid-cols-2 gap-2'>
                         <div className='flex flex-col'>
                           <span className='text-[0.70rem] uppercase'>
