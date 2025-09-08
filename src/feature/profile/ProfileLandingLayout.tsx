@@ -59,109 +59,9 @@ const ProfileLandingLayout = ({
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
   }, [userAuth]);
 
-  const handleSkillUpgrade = async (skillId: string) => {
-    if (!userSkills) return;
-
-    const skill = guitarSkills.find((s) => s.id === skillId);
-    if (!skill) return;
-
-    if (!canUpgradeSkill(skill, userSkills)) {
-      return;
-    }
-
-    const success = await updateUserSkills(userAuth, skillId);
-
-    if (success) {
-      const updatedSkills = await getUserSkills(userAuth);
-      setUserSkills(updatedSkills);
-    } else {
-      logger.error("Failed to upgrade skill");
-    }
-  };
-
-  const renderContent = () => {
-    switch (activeSection) {
-      case "overview":
-        return (
-          <>
-            <StatsSection
-              statsField={statsField}
-              statistics={userStats}
-              datasWithReports={datasWithReports}
-              userSongs={songs}
-              userAuth={userAuth}
-            />
-
-            <div className='col-span-2 p-2 md:col-span-1'>
-              <ActivityLog userAuth={userAuth} />
-            </div>
-            <div className='my-2 mb-2 flex flex-col justify-between'>
-              <AchievementWrapper userAchievements={achievements} />
-            </div>
-            <div className='col-span-2'>{featSlot}</div>
-          </>
-        );
-      case "activity":
-        return (
-          <>
-            <div className='font-openSans flex flex-col gap-4'>
-              <PracticeInsights statistics={userStats} />
-              <ActivityChart data={reportList as any} />
-            </div>
-            <div className='d-flex justify-content-center mt-6'>
-              <ActivityLog userAuth={userAuth} />
-            </div>
-          </>
-        );
-
-      case "skills":
-        return (
-          userSkills && (
-            <SkillTree
-              userSkills={userSkills}
-              onSkillUpgrade={handleSkillUpgrade}
-            />
-          )
-        );
-      case "exercises":
-        return (
-          <div className='w-full'>
-            <ExercisePlan />
-          </div>
-        );
-    }
-  };
-
   return (
     <div className='bg-second-600 radius-default'>
       <HeadDecoration title={t("statistics")} />
-
-      <div className='relative z-10 flex flex-wrap justify-between gap-3 border-b border-second-500 p-6 md:justify-around'>
-        <Button
-          variant={activeSection === "overview" ? "default" : "ghost"}
-          onClick={() => setActiveSection("overview")}>
-          <LayoutDashboard className='mr-2 h-4 w-4' />
-          {t("nav.overview")}
-        </Button>
-        <Button
-          variant={activeSection === "activity" ? "default" : "ghost"}
-          onClick={() => setActiveSection("activity")}>
-          <Activity className='mr-2 h-4 w-4' />
-          {t("nav.activity")}
-        </Button>
-        <Button
-          variant={activeSection === "skills" ? "default" : "ghost"}
-          onClick={() => setActiveSection("skills")}>
-          <Brain className='mr-2 h-4 w-4' />
-          {t("nav.skills")}
-        </Button>
-        <Button
-          variant={activeSection === "exercises" ? "default" : "ghost"}
-          onClick={() => setActiveSection("exercises")}>
-          <Timer className='mr-2 h-4 w-4' />
-          {t("nav.exercises")}
-        </Button>
-      </div>
 
       {activeSection === "overview" && (
         <NavigationCards setActiveSection={setActiveSection} />
@@ -176,7 +76,23 @@ const ProfileLandingLayout = ({
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
             className='relative z-10 col-span-2'>
-            {renderContent()}
+            <>
+              <StatsSection
+                statsField={statsField}
+                statistics={userStats}
+                datasWithReports={datasWithReports}
+                userSongs={songs}
+                userAuth={userAuth}
+              />
+
+              <div className='col-span-2 p-2 md:col-span-1'>
+                <ActivityLog userAuth={userAuth} />
+              </div>
+              <div className='my-2 mb-2 flex flex-col justify-between'>
+                <AchievementWrapper userAchievements={achievements} />
+              </div>
+              <div className='col-span-2'>{featSlot}</div>
+            </>
           </motion.div>
         </AnimatePresence>
       </div>

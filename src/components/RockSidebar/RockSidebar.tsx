@@ -25,8 +25,10 @@ import {
   selectUserName,
   selectUserAvatar,
 } from "feature/user/store/userSlice";
+import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 
 import type { NavPagesTypes } from "wrappers/AuthLayoutWrapper";
+import Avatar from "components/UI/Avatar";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
@@ -51,6 +53,14 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
 
+  // Get rank image path
+  const getRankImgPath = (lvl: number) => {
+    if (lvl >= IMG_RANKS_NUMBER) {
+      return IMG_RANKS_NUMBER;
+    }
+    return lvl;
+  };
+
   // Get current route to determine active profile section
   const getActiveProfileSection = () => {
     if (router.pathname === "/profile") return "overview";
@@ -71,7 +81,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
     {
       id: "profile" as NavPagesTypes,
       name: "Profil",
-      href: "/profile",
+      href: "/",
       icon: <User size={18} />,
     },
     {
@@ -90,12 +100,6 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
   // Profile subsections
   const profileSections = [
-    {
-      id: "overview",
-      name: "Przegląd",
-      href: "/profile",
-      icon: <LayoutDashboard size={16} />,
-    },
     {
       id: "activity",
       name: "Aktywność",
@@ -155,45 +159,23 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
       {/* Desktop Sidebar - Clean & Minimal */}
       <aside className='hidden h-full border-r border-zinc-800 bg-zinc-900 lg:flex lg:w-64 lg:flex-col'>
-        {/* Logo Section - Simplified */}
-        <div className='border-b border-zinc-800 p-5'>
-          <div className='flex items-center gap-3'>
-            <Guitar size={18} className='text-white/60' />
-            <span className='text-base font-medium text-white'>
-              Ćwiczymy Razem
-            </span>
-          </div>
-        </div>
-
         {/* User Profile Section */}
         {userStats && userName && (
           <div className='border-b border-zinc-800 p-4'>
-            <div className='flex items-center gap-3'>
-              {/* Avatar */}
-              <div className='flex h-10 w-10 items-center justify-center rounded-lg border border-red-500/30 bg-gradient-to-br from-red-600/20 to-red-500/20'>
-                {userAvatar ? (
-                  <img
-                    src={userAvatar}
-                    alt={userName}
-                    className='h-8 w-8 rounded-md object-cover'
-                  />
-                ) : (
-                  <User size={16} className='text-red-400' />
-                )}
+            <div className='flex items-center gap-4'>
+              <div className='relative'>
+                <Avatar
+                  avatarURL={userAvatar}
+                  name={userName}
+                  lvl={userStats.lvl}
+                />
               </div>
 
-              {/* User Info */}
               <div className='min-w-0 flex-1'>
                 <div className='flex items-center gap-2'>
-                  <span className='truncate text-sm font-medium text-white'>
+                  <span className='truncate text-[12px] font-semibold text-white'>
                     {userName}
                   </span>
-                  <Guitar size={12} className='flex-shrink-0 text-red-400' />
-                </div>
-                <div className='flex items-center gap-1 text-xs text-zinc-400'>
-                  <span>Level {userStats.lvl || 100}</span>
-                  <span>•</span>
-                  <span>{userStats.points || 2659} practiced</span>
                 </div>
               </div>
             </div>
@@ -323,35 +305,42 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               {/* User Profile Section - Mobile */}
               {userStats && userName && (
                 <div className='border-b border-zinc-800 p-4'>
-                  <div className='flex items-center gap-3'>
-                    {/* Avatar */}
-                    <div className='flex h-10 w-10 items-center justify-center rounded-lg border border-red-500/30 bg-gradient-to-br from-red-600/20 to-red-500/20'>
-                      {userAvatar ? (
+                  <div className='flex items-center gap-4'>
+                    {/* Enhanced Avatar with Rank - Mobile */}
+                    <div className='relative'>
+                      <div className='flex h-14 w-14 items-center justify-center rounded-xl border border-red-500/30 bg-gradient-to-br from-red-600/20 to-red-500/20'>
+                        {userAvatar ? (
+                          <img
+                            src={userAvatar}
+                            alt={userName}
+                            className='h-12 w-12 rounded-lg object-cover'
+                          />
+                        ) : (
+                          <User size={20} className='text-red-400' />
+                        )}
+                      </div>
+                      {/* Rank Badge - Mobile */}
+                      {userStats.lvl && (
                         <img
-                          src={userAvatar}
-                          alt={userName}
-                          className='h-8 w-8 rounded-md object-cover'
+                          className='absolute -bottom-1 -right-1 h-5 w-5 -rotate-12'
+                          src={`/static/images/rank/${getRankImgPath(
+                            userStats.lvl
+                          )}.png`}
+                          alt={`Rank ${userStats.lvl}`}
                         />
-                      ) : (
-                        <User size={16} className='text-red-400' />
                       )}
                     </div>
 
                     {/* User Info */}
                     <div className='min-w-0 flex-1'>
                       <div className='flex items-center gap-2'>
-                        <span className='truncate text-sm font-medium text-white'>
+                        <span className='truncate text-sm font-semibold text-white'>
                           {userName}
                         </span>
                         <Guitar
                           size={12}
                           className='flex-shrink-0 text-red-400'
                         />
-                      </div>
-                      <div className='flex items-center gap-1 text-xs text-zinc-400'>
-                        <span>Level {userStats.lvl || 100}</span>
-                        <span>•</span>
-                        <span>{userStats.points || 2659} practiced</span>
                       </div>
                     </div>
                   </div>
