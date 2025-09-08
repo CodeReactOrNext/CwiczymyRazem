@@ -3,6 +3,7 @@ import { HeroView } from "feature/hero/HeroView";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import ProfileLandingLayout from "feature/profile/ProfileLandingLayout";
+
 import {
   selectCurrentUserStats,
   selectUserAuth,

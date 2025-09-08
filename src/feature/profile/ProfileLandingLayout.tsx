@@ -104,7 +104,7 @@ const ProfileLandingLayout = ({
       case "activity":
         return (
           <>
-            <div className='flex flex-col gap-4 font-openSans'>
+            <div className='font-openSans flex flex-col gap-4'>
               <PracticeInsights statistics={userStats} />
               <ActivityChart data={reportList as any} />
             </div>

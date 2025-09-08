@@ -1,6 +1,6 @@
 import type { DateWithReport } from "components/ActivityLog/activityLog.types";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
-import { StatisticBar } from "feature/profile/components/StatisticBar";
+import SkillsRadarChart from "feature/profile/components/SkillsRadarChart/SkillsRadarChart";
 import {
   StatsField,
   type StatsFieldProps,
@@ -82,10 +82,10 @@ export const StatsSection = ({
   });
 
   return (
-    <div className='flex flex-col lg:flex-row lg:gap-4'>
-      <div className='mb-4 lg:flex-1'>
-        <div className='grid gap-4'>
-          <div className='grid w-full grid-cols-1 gap-4 sm:grid-cols-2'>
+    <div className='flex flex-col gap-6 lg:flex-row'>
+      <div className='lg:flex-1'>
+        <div className='space-y-4'>
+          <div className='grid w-full grid-cols-1 gap-3 sm:grid-cols-2'>
             {statsWithTrends
               .filter(
                 (stat) => stat.id === "total-time" || stat.id === "points"
@@ -102,7 +102,7 @@ export const StatsSection = ({
           </div>
           {userSongs && <SongLearningStats userSongs={userSongs} />}
 
-          <div className='grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-3'>
+          <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
             {statsWithTrends
               .filter(
                 (stat) => stat.id !== "total-time" && stat.id !== "points"
@@ -118,32 +118,9 @@ export const StatsSection = ({
           </div>
         </div>
       </div>
-      <div className='flex flex-col lg:flex-1'>
-        <div className='content-box relative z-20 mb-2'>
-          <div className='space-y-3'>
-            <StatisticBar
-              title={t("technique")}
-              value={convertMsToHM(time.technique)}
-              percent={calculatePercent(time.technique, totalTime)}
-            />
-            <StatisticBar
-              title={t("theory")}
-              value={convertMsToHM(time.theory)}
-              percent={calculatePercent(time.theory, totalTime)}
-            />
-            <StatisticBar
-              title={t("hearing")}
-              value={convertMsToHM(time.hearing)}
-              percent={calculatePercent(time.hearing, totalTime)}
-            />
-            <StatisticBar
-              title={t("creativity")}
-              value={convertMsToHM(time.creativity)}
-              percent={calculatePercent(time.creativity, totalTime)}
-            />
-          </div>
-        </div>
-        <div className='mb-2 mt-2'>
+      <div className='lg:flex-1'>
+        <div className='space-y-4'>
+          <SkillsRadarChart statistics={statistics} />
           <SeasonalAchievements userId={userAuth} />
         </div>
       </div>
