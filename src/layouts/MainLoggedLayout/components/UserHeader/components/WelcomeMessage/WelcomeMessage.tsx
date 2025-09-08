@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { FaCheck, FaTimes, FaClock, FaTrophy } from "react-icons/fa";
 import {
   checkIsPracticeToday,
   getUpdatedActualDayWithoutBreak,
 } from "utils/gameLogic";
 
-import StreakDisplay from "./components/StreakDisplay";
+import WeeklyStreakBox from "./components/WeeklyStreakBox";
 
 interface WelcomeMessageProps {
   userName: string;
@@ -35,34 +35,30 @@ export const WelcomeMessage = ({
 
   return (
     <div className='flex items-center gap-4'>
-      <div className='flex items-center gap-2'>
-        <div className='flex items-center gap-1'>
-          <span className='text-xs text-zinc-400'>
-            {t("header.practice_today")}
-          </span>
-          {didPracticeToday ? (
-            <FaCheck className='text-xs text-green-500' />
-          ) : (
-            <FaTimes className='text-xs text-red-500' />
-          )}
-        </div>
+      {/* Today's Practice Status */}
+      <div className='flex items-center gap-2 rounded-lg border border-zinc-600/30 bg-zinc-800/50 px-3 py-2'>
+        <span className='text-xs font-medium text-zinc-400'>Today</span>
+        {didPracticeToday ? (
+          <FaCheck className='text-sm text-green-400' />
+        ) : (
+          <FaTimes className='text-sm text-red-400' />
+        )}
       </div>
 
-      <div className='flex items-center gap-2 border-l border-zinc-600/30 pl-4'>
-        <StreakDisplay dayWithoutBreak={dayWithoutBreak} />
-      </div>
+      {/* Weekly Streak Box */}
+      <WeeklyStreakBox dayWithoutBreak={dayWithoutBreak} />
 
-      <div className='hidden items-center gap-2 border-l border-zinc-600/30 pl-4 sm:flex'>
-        <span className='text-xs text-zinc-400'>
-          {t("header.earned_points")}
+      {/* Points - Icon Based */}
+      <div className='hidden items-center gap-2 rounded-lg border border-zinc-600/30 bg-zinc-800/50 px-3 py-2 sm:flex'>
+        <FaTrophy className='text-sm text-yellow-400' />
+        <span className='text-sm font-bold text-white'>
+          {points.toLocaleString()}
         </span>
-        <span className='text-sm font-bold text-white'>{points}</span>
       </div>
 
-      <div className='hidden items-center gap-2 border-l border-zinc-600/30 pl-4 lg:flex'>
-        <span className='text-xs text-zinc-400'>
-          {t("header.total_practice_time")}
-        </span>
+      {/* Time - Icon Based */}
+      <div className='hidden items-center gap-2 rounded-lg border border-zinc-600/30 bg-zinc-800/50 px-3 py-2 lg:flex'>
+        <FaClock className='text-sm text-cyan-400' />
         <span className='text-sm font-bold text-white'>
           {totalPracticeTime}
         </span>
