@@ -29,14 +29,17 @@ export const UserHeader = ({
   } = userStats;
   return (
     <>
-      {/* Modern Header with LevelBar as main element */}
-      <div className='relative overflow-hidden border-b border-white/10 bg-zinc-900/90 shadow-2xl backdrop-blur-xl'>
-        {/* Subtle background effects */}
-        <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/20 via-transparent to-zinc-800/20'></div>
+      {/* Enhanced Modern Header */}
+      <header className='sticky top-0 z-50 border-b border-zinc-800/50 bg-zinc-950/95 backdrop-blur-xl'>
+        {/* Subtle gradient overlay */}
+        <div className='absolute inset-0 bg-gradient-to-r from-zinc-900/30 via-zinc-800/20 to-zinc-900/30'></div>
 
-        <div className='relative px-4 py-2 sm:px-6 sm:py-3'>
-          <div className='flex w-full items-center justify-between gap-4'>
-            {/* Left section - Progress Bar */}
+        {/* Top accent line */}
+        <div className='absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent'></div>
+
+        <div className='relative w-full'>
+          <div className='flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8'>
+            {/* Left Section - Level Progress (Far Left) */}
             <div className='flex items-center'>
               <LevelBar
                 points={points}
@@ -45,8 +48,8 @@ export const UserHeader = ({
               />
             </div>
 
-            {/* Center - Streak and Practice Info */}
-            <div className='hidden flex-1 justify-center md:flex'>
+            {/* Center Section - Compact Stats */}
+            <div className='hidden flex-1 justify-center px-4 md:flex'>
               <WelcomeMessage
                 userName={userName}
                 lastReportDate={lastReportDate}
@@ -58,18 +61,25 @@ export const UserHeader = ({
               />
             </div>
 
-            {/* Right section - Navigation and Actions */}
+            {/* Right Section - User Actions (Far Right) */}
             <div className='flex items-center gap-3'>
-              <div className='hidden sm:block'>
+              <div className='hidden items-center gap-3 sm:flex'>
                 <CopyLinkProfile />
+                <div className='h-6 w-px bg-zinc-700/50'></div>
               </div>
-              <UserNav />
-              <div className='h-4 w-px bg-white/20'></div>
-              <LanguageSwitch />
+
+              <div className='flex items-center gap-2'>
+                <UserNav />
+                <div className='h-6 w-px bg-zinc-700/50'></div>
+                <LanguageSwitch />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Bottom shadow */}
+        <div className='absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-700/30 to-transparent'></div>
+      </header>
     </>
   );
 };

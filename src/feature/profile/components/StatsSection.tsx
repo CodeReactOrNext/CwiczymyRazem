@@ -85,6 +85,7 @@ export const StatsSection = ({
     <div className='flex flex-col gap-6 lg:flex-row'>
       <div className='lg:flex-1'>
         <div className='space-y-4'>
+          {/* Essential Stats with Charts - Only Time and Points */}
           <div className='grid w-full grid-cols-1 gap-3 sm:grid-cols-2'>
             {statsWithTrends
               .filter(
@@ -100,12 +101,13 @@ export const StatsSection = ({
                 />
               ))}
           </div>
-          {userSongs && <SongLearningStats userSongs={userSongs} />}
 
-          <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
+          {/* Basic Stats - Only Session Count and Habits */}
+          <div className='grid grid-cols-2 gap-3'>
             {statsWithTrends
               .filter(
-                (stat) => stat.id !== "total-time" && stat.id !== "points"
+                (stat) =>
+                  stat.id === "session-count" || stat.id === "habits-count"
               )
               .map(({ id, Icon, description, value }) => (
                 <StatsField

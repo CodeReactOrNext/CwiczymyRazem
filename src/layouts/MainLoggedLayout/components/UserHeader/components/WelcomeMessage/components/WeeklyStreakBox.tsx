@@ -29,25 +29,28 @@ const WeeklyStreakBox = ({ dayWithoutBreak }: WeeklyStreakBoxProps) => {
   const filledDays = getFilledDays();
 
   return (
-    <div className='flex items-center gap-3 rounded-xl border border-zinc-600/30 bg-zinc-800/50 p-3 backdrop-blur-sm'>
-      {/* Streak info */}
-      <div className='flex flex-col items-center'>
-        <span className='text-xs font-medium text-zinc-400'>Streak</span>
-        <span className='text-lg font-bold text-cyan-400'>
-          {dayWithoutBreak}
-        </span>
+    <div className='flex h-full items-center gap-3 px-4 py-2.5'>
+      {/* Streak info - Enhanced */}
+      <div className='flex flex-col items-center gap-1'>
+        <span className='text-xs font-medium text-zinc-300'>Streak</span>
+        <div className='flex items-center gap-1'>
+          <span className='text-lg font-bold text-cyan-300'>
+            {dayWithoutBreak}
+          </span>
+          <span className='text-xs text-zinc-500'>days</span>
+        </div>
       </div>
 
-      {/* Week visualization */}
-      <div className='flex items-center gap-1.5'>
+      {/* Week visualization - Enhanced */}
+      <div className='flex items-center gap-2'>
         {daysOfWeek.map((day, index) => (
-          <div key={index} className='flex flex-col items-center gap-1'>
-            <span className='text-xs font-medium text-zinc-500'>{day}</span>
+          <div key={index} className='flex flex-col items-center gap-1.5'>
+            <span className='text-xs font-medium text-zinc-400'>{day}</span>
             <div
-              className={`h-2 w-2 rounded-full transition-all duration-300 ${
+              className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
                 filledDays[index]
-                  ? "scale-110 bg-cyan-400 shadow-lg shadow-cyan-400/50"
-                  : "bg-zinc-600/50 hover:bg-zinc-500/50"
+                  ? "scale-110 bg-cyan-400 shadow-lg shadow-cyan-400/50 ring-2 ring-cyan-400/20"
+                  : "bg-zinc-600/50 hover:scale-105 hover:bg-zinc-500/50"
               }`}
             />
           </div>
@@ -58,4 +61,3 @@ const WeeklyStreakBox = ({ dayWithoutBreak }: WeeklyStreakBoxProps) => {
 };
 
 export default WeeklyStreakBox;
-
