@@ -7,6 +7,7 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
@@ -76,3 +77,4 @@ const ProfileSkillsPage = () => {
 };
 
 export default ProfileSkillsPage;
+

@@ -43,83 +43,122 @@ export const LeadboardRow = ({
   };
 
   return (
-    <li className='flex w-full justify-center p-4 pb-8 pt-8 text-xs xs:text-base md:p-8'>
-      <p
-        className={`flex items-center justify-end font-semibold xxs:text-lg xs:text-4xl lg:text-5xl xl:w-[100px] xl:text-6xl
-         ${profileId === currentUserId ? "text-blue-300" : "text-gray-400"}`}>
-        {place + "."}
-      </p>
-      <div className='ml-2 flex w-full max-w-[800px] items-center md:h-16 xl:ml-5'>
-        <div className='hidden md:block'>
-          <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
+    <li className='mb-3 w-full'>
+      <div
+        className={`group relative overflow-hidden border backdrop-blur-sm transition-all duration-200 hover:bg-opacity-90 ${
+          profileId === currentUserId
+            ? "border-cyan-500/50 bg-gradient-to-r from-cyan-900/20 via-zinc-900/50 to-cyan-900/20 shadow-lg shadow-cyan-500/10"
+            : "border-zinc-700/50 bg-gradient-to-r from-zinc-900/40 to-zinc-800/30 hover:border-zinc-600/50 hover:bg-zinc-800/50"
+        }`}>
+        {/* Background Pattern */}
+        <div className='absolute inset-0 opacity-5'>
+          <div
+            className={`h-full w-full bg-gradient-to-br ${
+              profileId === currentUserId
+                ? "from-cyan-500 to-blue-600"
+                : "from-zinc-500 to-zinc-600"
+            }`}
+          />
         </div>
 
-        <div
-          className={`md:h-18 group mr-5 grid w-full grid-cols-3 grid-rows-2 
-          justify-items-center rounded-md border bg-opacity-75 transition-all 
-          duration-200 hover:bg-opacity-90 sm:grid-rows-3 md:grid-rows-1 lg:px-2
-        
-          ${
-            profileId === currentUserId
-              ? "border-blue-500 bg-blue-900/20 shadow-lg shadow-blue-500/20 hover:bg-blue-900/40"
-              : "border-second-400/60 bg-second hover:bg-gray-800/60"
-          }
-        `}>
-          <div className='relative left-[-25px] top-[-23px] block h-[65px] scale-75 justify-items-start md:hidden'>
-            <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
-
-            <div className='absolute right-[-70px] top-[-10px] flex items-center gap-x-1 md:right-[-60px]'>
-              <p className='text-2xl uppercase text-gray-400 drop-shadow'>
-                Lvl{" "}
-              </p>
-              <p className='text-4xl font-extrabold text-gray-300 drop-shadow-3xl md:text-5xl'>
-                {statistics.lvl}
-              </p>
-            </div>
-          </div>
-          <div className='relative col-span-2 self-center justify-self-start md:col-span-1'>
-            <Link href={`/user/${profileId}`}>
-              <p className='flex cursor-pointer flex-row whitespace-nowrap text-lg hover:text-slate-100 active:click-behavior xs:text-2xl lg:text-xl xl:text-2xl'>
-                {shortenNick(nick)}
-                <FaExternalLinkAlt className='ml-2 text-xs opacity-0 group-hover:opacity-100' />
-              </p>
-            </Link>
-
-            <DaySinceMessage date={new Date(statistics.lastReportDate)} />
-
-            <div className='absolute top-[-30px] hidden items-center gap-x-1 md:right-[-50px] md:flex lg:right-[-0px] xl:right-[-70px]'>
-              <p className='text-xl uppercase text-gray-400 drop-shadow'>
-                Lvl{" "}
-              </p>
-              <p className='text-4xl font-extrabold text-gray-300 drop-shadow-3xl md:text-5xl'>
-                {statistics.lvl}
-              </p>
-            </div>
-          </div>
-
+        <div className='relative flex items-center gap-3 p-4 sm:gap-4 sm:p-5 lg:gap-6 lg:p-6'>
+          {/* Rank Number - Smaller and responsive */}
           <div
-            className='col-span-3 flex h-full w-full items-center justify-evenly 
-            border-y-2 border-gray-800/30 bg-black/20
-            md:col-span-1 md:w-[300px] md:justify-center md:border-y-0 md:bg-transparent'>
-            <div className='flex flex-col items-center md:justify-end md:px-2'>
-              <p className='text-xl xxs:text-3xl'>{statistics.points}</p>
-              <p className='font-openSans text-xs  leading-[15px] text-secondText'>
-                {t("points")}
-              </p>
+            className={`flex h-10 w-10 flex-shrink-0 items-center justify-center border text-lg font-bold sm:h-12 sm:w-12 sm:text-xl lg:h-14 lg:w-14 lg:text-2xl ${
+              profileId === currentUserId
+                ? "border-cyan-400/50 bg-cyan-500/20 text-cyan-300 shadow-md shadow-cyan-500/25"
+                : "border-zinc-600/50 bg-zinc-800/50 text-zinc-400"
+            }`}>
+            {place}
+          </div>
+
+          {/* Avatar - Responsive */}
+          <div className='hidden flex-shrink-0 sm:block'>
+            <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
+          </div>
+
+          {/* User Info - Responsive */}
+          <div className='min-w-0 flex-1'>
+            <div className='mb-1 flex flex-col gap-2 sm:mb-2 sm:flex-row sm:items-center sm:gap-3'>
+              <Link href={`/user/${profileId}`}>
+                <h3
+                  className={`text-base font-semibold transition-colors hover:text-white sm:text-lg lg:text-xl ${
+                    profileId === currentUserId
+                      ? "text-cyan-300"
+                      : "text-zinc-200"
+                  }`}>
+                  {shortenNick(nick)}
+                  <FaExternalLinkAlt className='ml-2 inline text-xs opacity-0 transition-opacity group-hover:opacity-60 sm:text-sm' />
+                </h3>
+              </Link>
+
+              {/* Level Badge - Responsive */}
+              <div
+                className={`flex w-fit items-center gap-1 border px-2 py-1 sm:px-3 ${
+                  profileId === currentUserId
+                    ? "border-cyan-400/50 bg-cyan-500/20 text-cyan-300"
+                    : "border-zinc-600/50 bg-zinc-800/50 text-zinc-400"
+                }`}>
+                <span className='text-xs font-medium uppercase'>LVL</span>
+                <span className='text-sm font-bold sm:text-base lg:text-lg'>
+                  {statistics.lvl}
+                </span>
+              </div>
             </div>
-            <div className='flex flex-col items-center md:justify-end md:px-2'>
-              <p className='text-xl xxs:text-3xl'>
+
+            <div className='hidden sm:block'>
+              <DaySinceMessage date={new Date(statistics.lastReportDate)} />
+            </div>
+          </div>
+
+          {/* Stats - Responsive */}
+          <div className='flex items-center gap-4 sm:gap-6 lg:gap-8'>
+            <div className='text-center'>
+              <div
+                className={`text-lg font-bold sm:text-xl lg:text-2xl ${
+                  profileId === currentUserId ? "text-cyan-300" : "text-white"
+                }`}>
+                {statistics.points.toLocaleString()}
+              </div>
+              <div className='text-xs font-medium uppercase tracking-wide text-zinc-400'>
+                {t("points")}
+              </div>
+            </div>
+
+            <div className='text-center'>
+              <div
+                className={`font-mono text-lg font-bold sm:text-xl lg:text-2xl ${
+                  profileId === currentUserId ? "text-cyan-300" : "text-white"
+                }`}>
                 {convertMsToHM(
                   time.creativity + time.hearing + time.technique + time.theory
                 )}
-              </p>
-              <p className='font-openSans text-xs  leading-[15px] text-secondText'>
+              </div>
+              <div className='text-xs font-medium uppercase tracking-wide text-zinc-400'>
                 {t("exercise_time")}
-              </p>
+              </div>
             </div>
           </div>
 
-          <AchievementsCarousel achievements={statistics.achievements} />
+          {/* Achievements - Hidden on mobile */}
+          <div className='hidden flex-shrink-0 lg:block'>
+            <AchievementsCarousel achievements={statistics.achievements} />
+          </div>
+        </div>
+
+        {/* Mobile-only bottom section */}
+        <div className='border-t border-zinc-700/30 p-3 sm:hidden'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-3'>
+              <div className='h-8 w-8'>
+                <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
+              </div>
+              <DaySinceMessage date={new Date(statistics.lastReportDate)} />
+            </div>
+            <div className='flex-shrink-0'>
+              <AchievementsCarousel achievements={statistics.achievements} />
+            </div>
+          </div>
         </div>
       </div>
     </li>

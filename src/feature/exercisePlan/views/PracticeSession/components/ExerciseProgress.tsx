@@ -16,22 +16,29 @@ export const ExerciseProgress = ({
   formattedTimeLeft,
 }: ExerciseProgressProps) => {
   const currentExercise = plan.exercises[currentExerciseIndex];
+  const progressPercentage =
+    ((currentExerciseIndex + 1) / plan.exercises.length) * 100;
 
   return (
-    <Card className='overflow-hidden'>
+    <Card className='border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
       <div className='p-4'>
-        <div className='space-y-4'>
-          <div className='flex items-center justify-between text-sm'>
-            <Badge variant='outline'>
-              {currentExerciseIndex + 1} z {plan.exercises.length}
-            </Badge>
-            <span className='text-muted-foreground'>
-              {formattedTimeLeft} pozostało
-            </span>
+        {/* Compact horizontal layout */}
+        <div className='flex items-center gap-6'>
+          {/* Progress info */}
+          <div className='flex items-center gap-4'>
+            <div>
+              <h3 className='text-sm font-medium text-white'>
+                Ćwiczenie {currentExerciseIndex + 1}/{plan.exercises.length}
+              </h3>
+              <p className='text-xs text-zinc-400'>
+                {Math.round(progressPercentage)}% ukończone
+              </p>
+            </div>
           </div>
 
-          <div className='space-y-1'>
-            <div className='relative h-2 w-full overflow-hidden rounded-full bg-muted/30'>
+          {/* Progress bar - takes remaining space */}
+          <div className='flex-1 space-y-2'>
+            <div className='relative h-2 w-full overflow-hidden rounded-full bg-zinc-800'>
               {plan.exercises.map((exercise, idx) => {
                 const width = (1 / plan.exercises.length) * 100;
                 const left = (idx / plan.exercises.length) * 100;
@@ -41,35 +48,41 @@ export const ExerciseProgress = ({
                     key={idx}
                     style={{
                       width: `${width}%`,
-                      left: `${left}%`
+                      left: `${left}%`,
                     }}
                     className={cn(
                       "absolute h-full transition-all duration-500",
                       idx < currentExerciseIndex
-                        ? "bg-green-600/80"
+                        ? "bg-white"
                         : idx === currentExerciseIndex
-                        ? "bg-primary"
-                        : "bg-muted/20",
-                      idx === currentExerciseIndex &&
-                        "after:absolute after:inset-0 after:animate-pulse after:bg-primary/20"
+                        ? "bg-white/70"
+                        : "bg-zinc-700"
                     )}
                   />
                 );
               })}
-
-              {plan.exercises.map(
-                (_, idx) =>
-                  idx < plan.exercises.length - 1 && (
-                    <div
-                      key={`separator-${idx}`}
-                      className='absolute top-0 h-full w-px bg-background/50'
-                      style={{
-                        left: `${((idx + 1) / plan.exercises.length) * 100}%`,
-                      }}
-                    />
-                  )
-              )}
             </div>
+
+            {/* Exercise dots below progress bar */}
+            <div className='flex justify-between px-1'>
+              {plan.exercises.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={cn(
+                    "h-1 w-1 rounded-full transition-all duration-300",
+                    idx <= currentExerciseIndex ? "bg-white" : "bg-zinc-600"
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Time info - compact */}
+          <div className='text-right'>
+            <div className='font-mono text-sm font-medium text-white'>
+              {formattedTimeLeft}
+            </div>
+            <div className='text-xs text-zinc-400'>pozostało</div>
           </div>
         </div>
       </div>

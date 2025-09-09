@@ -48,6 +48,7 @@ export const PracticeModeSelector = ({
       title: t("timer:modes.timer.title" as any),
       description: t("timer:modes.timer.description" as any),
       colors: colorClasses.indigo,
+      features: ["Elastyczny czas", "Wybór umiejętności", "Śledzenie postępu"],
     },
     {
       id: "plan" as const,
@@ -55,6 +56,11 @@ export const PracticeModeSelector = ({
       title: t("timer:modes.plan.title" as any),
       description: t("timer:modes.plan.description" as any),
       colors: colorClasses.amber,
+      features: [
+        "Gotowe plany",
+        "Strukturalne ćwiczenia",
+        "Przewodnik krok po kroku",
+      ],
     },
     {
       id: "auto" as const,
@@ -62,12 +68,13 @@ export const PracticeModeSelector = ({
       title: t("timer:modes.auto.title" as any),
       description: t("timer:modes.auto.description" as any),
       colors: colorClasses.rose,
+      features: ["AI-generowane", "Dostosowane do czasu", "Personalizowane"],
     },
   ] as const;
 
   return (
     <div className='mb-6 w-full'>
-      <div className='container mx-auto max-w-6xl px-3 py-4 font-openSans sm:px-6 sm:py-8'>
+      <div className='font-openSans container mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-8'>
         <div className='space-y-4 sm:space-y-8'>
           <div className='text-center'>
             <h1 className='text-xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl'>
@@ -82,7 +89,7 @@ export const PracticeModeSelector = ({
             {modes.map((mode) => (
               <div
                 key={mode.id}
-                className={`${mode.colors.ring} relative flex h-24 transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-second-500 via-second-500/95 to-second-600 p-3 font-openSans shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2 sm:h-full sm:p-6`}
+                className={`${mode.colors.ring} font-openSans relative flex h-24 transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-second-500 via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2 sm:h-full sm:p-6`}
                 onClick={() => onSelectMode(mode.id)}
                 tabIndex={0}
                 role='button'
@@ -111,6 +118,17 @@ export const PracticeModeSelector = ({
                       <p className='mt-1 hidden text-xs text-gray-300 sm:mt-2 sm:block sm:text-sm'>
                         {mode.description}
                       </p>
+                      {/* Features list - only visible on desktop */}
+                      <div className='mt-3 hidden sm:block'>
+                        <ul className='space-y-1 text-xs text-gray-400'>
+                          {mode.features.map((feature, i) => (
+                            <li key={i} className='flex items-center gap-1'>
+                              <div className='h-1 w-1 rounded-full bg-gray-500'></div>
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </div>
 

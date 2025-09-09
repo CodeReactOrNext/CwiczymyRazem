@@ -109,7 +109,7 @@ const MainLoggedLayout = ({
               />
             </MobileHeaderWrapper>
 
-            <div className='z-20 mx-auto w-full max-w-7xl px-6 py-8 lg:px-8'>
+            <div className='z-20 mx-auto w-full max-w-[1490px] px-6 py-8 lg:px-8'>
               <AnimatePresence mode='wait'>
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
