@@ -15,6 +15,7 @@ interface MainTimerSectionProps {
   toggleTimer: () => void;
   handleNextExercise: () => void;
   timeLeft: number;
+  showExerciseInfo?: boolean;
 }
 
 export const MainTimerSection = ({
@@ -27,6 +28,7 @@ export const MainTimerSection = ({
   toggleTimer,
   handleNextExercise,
   timeLeft,
+  showExerciseInfo = true,
 }: MainTimerSectionProps) => {
   return (
     <AnimatePresence mode='wait'>
@@ -37,47 +39,73 @@ export const MainTimerSection = ({
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.3 }}
         className='space-y-6'>
-        <Card className='relative overflow-hidden rounded-xl border-2 border-primary/20 bg-card/80 shadow-lg backdrop-blur-sm transition-all duration-200'>
-          <div className='absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent' />
-          <div className='relative'>
-            <ExerciseDescription exercise={currentExercise} />
-
-            <div className='flex flex-col items-center gap-8 p-8 pt-0'>
-              <div className='relative'>
-                <div
-                  className='absolute -inset-10 -z-20 rounded-full opacity-10 blur-xl'
-                  style={{
-                    background: `radial-gradient(circle, var(--tw-gradient-from) 0%, transparent 70%)`,
-                  }}
-                />
-
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 20,
-                  }}>
-                  <TimerDisplay
-                    value={timeLeft}
-                    text={formattedTimeLeft}
-                    isPlaying={isPlaying}
-                    size='lg'
-                  />
-                </motion.div>
-              </div>
-
-              <ExerciseControls
-                isPlaying={isPlaying}
-                isLastExercise={isLastExercise}
-                toggleTimer={toggleTimer}
-                handleNextExercise={handleNextExercise}
-                size='lg'
-              />
+        {/* Conditionally render Exercise Information Card */}
+        {showExerciseInfo && (
+          <Card className='border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
+            <div className='bg-gradient-to-r from-zinc-800/30 to-zinc-800/10'>
+              <ExerciseDescription exercise={currentExercise} />
             </div>
-          </div>
-        </Card>
+          </Card>
+        )}
+
+        {/* Timer Card - Always render when showExerciseInfo is false */}
+        {!showExerciseInfo && (
+          <Card className='border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
+            <div className='flex flex-col items-center gap-8 p-8'>
+              {/* CRITICAL: Timer section - most important element */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 20,
+                }}
+                className='relative'>
+                {/* Subtle glow for timer importance */}
+                <div className='via-cyan-500/8 absolute inset-0 rounded-full bg-gradient-to-r from-transparent to-transparent blur-xl'></div>
+                <TimerDisplay
+                  value={timeLeft}
+                  text={formattedTimeLeft}
+                  isPlaying={isPlaying}
+                  size='lg'
+                />
+              </motion.div>
+
+              {/* SECONDARY: Action controls */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
+                className='w-full'>
+                <ExerciseControls
+                  isPlaying={isPlaying}
+                  isLastExercise={isLastExercise}
+                  toggleTimer={toggleTimer}
+                  handleNextExercise={handleNextExercise}
+                  size='lg'
+                />
+              </motion.div>
+
+              {/* TERTIARY: Status indicator - least important */}
+              <div className='flex items-center gap-2 rounded-full border border-zinc-700/30 bg-zinc-800/40 px-3 py-1.5'>
+                <div
+                  className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                    isPlaying
+                      ? "animate-pulse bg-emerald-400 shadow-sm shadow-emerald-400/50"
+                      : "bg-amber-400 shadow-sm shadow-amber-400/30"
+                  }`}
+                />
+                <span
+                  className={`text-xs font-medium ${
+                    isPlaying ? "text-emerald-300" : "text-amber-300"
+                  }`}>
+                  {isPlaying ? "Aktywne" : "Wstrzymane"}
+                </span>
+              </div>
+            </div>
+          </Card>
+        )}
       </motion.div>
     </AnimatePresence>
   );

@@ -116,74 +116,98 @@ export const SkillCard = ({
   return (
     <div
       className={cn(
-        "group relative rounded-md border p-3",
-        "bg-gradient-to-br backdrop-blur-sm transition-all duration-200",
+        "group relative rounded-lg border p-4 transition-all duration-300 hover:scale-[1.02]",
+        "bg-gradient-to-br shadow-sm backdrop-blur-sm hover:shadow-md",
         getEnhancedGradient(),
         isUpgraded && `animate-skill-upgraded shadow-lg ${getGlowColor()}`
       )}>
-      <div className='flex flex-col gap-1.5'>
+      <div className='flex flex-col gap-3'>
+        {/* Header Section */}
         <div className='flex items-start justify-between'>
-          <div className='flex items-center gap-2'>
+          <div className='flex flex-1 items-center gap-3'>
             {skill.icon && (
-              <skill.icon
+              <div
                 className={cn(
-                  "h-5 w-5 flex-shrink-0 transition-transform duration-300",
+                  "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-300",
                   isUpgraded && "scale-125",
                   hasPoints
-                    ? `text-${
-                        skill.category === "hearing"
-                          ? "emerald"
-                          : skill.category
-                      }-300`
-                    : "text-white/60"
-                )}
-              />
+                    ? cn(
+                        skill.category === "technique" &&
+                          "border border-red-500/30 bg-red-500/20",
+                        skill.category === "theory" &&
+                          "border border-blue-500/30 bg-blue-500/20",
+                        skill.category === "hearing" &&
+                          "border border-emerald-500/30 bg-emerald-500/20",
+                        skill.category === "creativity" &&
+                          "border border-purple-500/30 bg-purple-500/20"
+                      )
+                    : "border border-zinc-700/30 bg-zinc-800/50"
+                )}>
+                <skill.icon
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-300",
+                    hasPoints
+                      ? cn(
+                          skill.category === "technique" && "text-red-300",
+                          skill.category === "theory" && "text-blue-300",
+                          skill.category === "hearing" && "text-emerald-300",
+                          skill.category === "creativity" && "text-purple-300"
+                        )
+                      : "text-zinc-500"
+                  )}
+                />
+              </div>
             )}
-            <div>
-              <h3 className='text-sm font-medium leading-tight tracking-wide text-white'>
+            <div className='flex-1'>
+              <h3 className='mb-1 text-sm font-semibold leading-tight text-white'>
                 {t(`skills:skills.${skill.id}.name` as any)}
               </h3>
+              <p className='text-xs leading-relaxed text-zinc-400'>
+                {t(`skills:skills.${skill.id}.description` as any)}
+              </p>
             </div>
           </div>
 
-          <div className='flex-shrink-0'>
+          <div className='ml-3 flex-shrink-0'>
             <Badge
               variant='outline'
               className={cn(
-                "px-2 py-0.5 text-xs font-medium shadow-sm transition-all duration-300",
+                "border px-3 py-1 text-xs font-semibold shadow-sm transition-all duration-300",
                 isUpgraded && "scale-110 font-bold",
                 getBadgeColors()
               )}>
-              {t("skills:level" as any)} {currentLevel}
+              Lvl {currentLevel}
             </Badge>
           </div>
         </div>
 
+        {/* Action Section */}
         {canUpgrade && (
-          <div className='mt-1.5 flex justify-end'>
+          <div className='flex justify-end border-t border-zinc-700/30 pt-2'>
             <Button
               size='sm'
               onClick={handleUpgrade}
               title={t("skills:upgrade_skill" as any)}
               className={cn(
-                "h-6 rounded-md border px-2.5 py-0 text-[11px]",
-                "font-medium shadow-sm transition-colors duration-200",
+                "h-8 rounded-lg border px-4 py-0 text-xs font-semibold",
+                "shadow-sm transition-all duration-200 hover:scale-105",
                 getButtonColors()
               )}>
-              <Plus className='mr-1 h-2.5 w-2.5' />
+              <Plus className='mr-1.5 h-3 w-3' />
               {t("skills:upgrade" as any)}
             </Button>
           </div>
         )}
       </div>
 
+      {/* Upgrade Animation Effects */}
       {isUpgraded && (
         <>
-          <div className='absolute inset-0 animate-ping-slow rounded-md border-2 border-white/20 opacity-30'></div>
-          <div className='absolute right-1 top-1'>
+          <div className='absolute inset-0 animate-ping-slow rounded-lg border-2 border-white/20 opacity-30'></div>
+          <div className='absolute right-2 top-2'>
             <Sparkles
               className={cn(
-                "h-6 w-6 animate-pulse",
+                "h-5 w-5 animate-pulse",
                 skill.category === "technique" && "text-red-400",
                 skill.category === "theory" && "text-blue-400",
                 skill.category === "hearing" && "text-emerald-400",

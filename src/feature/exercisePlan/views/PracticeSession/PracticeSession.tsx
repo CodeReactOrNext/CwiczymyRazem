@@ -127,7 +127,7 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
       )}
 
       <div
-        className={cn("space-y-6 p-6 font-openSans", isMobileView && "hidden")}>
+        className={cn("font-openSans space-y-6 p-6", isMobileView && "hidden")}>
         <TooltipProvider>
           <ExerciseLayout
             title={plan.title}
@@ -159,21 +159,17 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                 />
               )}
 
-              <div className='grid gap-6 md:grid-cols-[1fr,2fr,1fr]'>
-                <div className='space-y-4'>
-                  <ExerciseProgress
-                    plan={plan}
-                    currentExerciseIndex={currentExerciseIndex}
-                    formattedTimeLeft={formattedTimeLeft}
-                  />
+              {/* Improved Layout - Mobile First */}
+              <div className='space-y-6'>
+                {/* Progress Bar - Always on Top */}
+                <ExerciseProgress
+                  plan={plan}
+                  currentExerciseIndex={currentExerciseIndex}
+                  formattedTimeLeft={formattedTimeLeft}
+                />
 
-                  <InstructionsCard
-                    instructions={currentExercise.instructions}
-                    title={t("exercises:instructions")}
-                  />
-                </div>
-
-                <div className='space-y-6'>
+                {/* Exercise Info - Full Width */}
+                <div className='w-full'>
                   <MainTimerSection
                     exerciseKey={exerciseKey}
                     currentExercise={currentExercise}
@@ -184,26 +180,55 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                     toggleTimer={toggleTimer}
                     timeLeft={timeLeft}
                     handleNextExercise={() => handleNextExercise(resetTimer)}
+                    showExerciseInfo={true}
                   />
                 </div>
 
-                <div className='space-y-4'>
-                  {currentExercise.metronomeSpeed && (
-                    <Metronome
-                      initialBpm={currentExercise.metronomeSpeed.recommended}
-                      minBpm={currentExercise.metronomeSpeed.min}
-                      maxBpm={currentExercise.metronomeSpeed.max}
-                      recommendedBpm={
-                        currentExercise.metronomeSpeed.recommended
-                      }
+                {/* Main Content Area - Timer and Sidebars */}
+                <div className='grid gap-6 lg:grid-cols-[350px,1fr,300px]'>
+                  {/* Left Sidebar - Instructions */}
+                  <div className='order-2 lg:order-1'>
+                    <InstructionsCard
+                      instructions={currentExercise.instructions}
+                      title={t("exercises:instructions")}
                     />
-                  )}
+                  </div>
 
-                  <TipsCard tips={currentExercise.tips} />
+                  {/* Center - Timer Only */}
+                  <div className='order-1 lg:order-2'>
+                    <MainTimerSection
+                      exerciseKey={exerciseKey}
+                      currentExercise={currentExercise}
+                      isLastExercise={isLastExercise}
+                      isPlaying={isPlaying}
+                      timerProgressValue={timerProgressValue}
+                      formattedTimeLeft={formattedTimeLeft}
+                      toggleTimer={toggleTimer}
+                      timeLeft={timeLeft}
+                      handleNextExercise={() => handleNextExercise(resetTimer)}
+                      showExerciseInfo={false}
+                    />
+                  </div>
 
-                  {nextExercise && (
-                    <NextExerciseCard nextExercise={nextExercise} />
-                  )}
+                  {/* Right Sidebar - Tools & Tips */}
+                  <div className='order-3 space-y-4'>
+                    {currentExercise.metronomeSpeed && (
+                      <Metronome
+                        initialBpm={currentExercise.metronomeSpeed.recommended}
+                        minBpm={currentExercise.metronomeSpeed.min}
+                        maxBpm={currentExercise.metronomeSpeed.max}
+                        recommendedBpm={
+                          currentExercise.metronomeSpeed.recommended
+                        }
+                      />
+                    )}
+
+                    <TipsCard tips={currentExercise.tips} />
+
+                    {nextExercise && (
+                      <NextExerciseCard nextExercise={nextExercise} />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

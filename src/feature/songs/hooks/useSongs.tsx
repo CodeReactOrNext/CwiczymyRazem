@@ -1,6 +1,7 @@
 import { getSongs } from "feature/songs/services/getSongs";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -30,6 +31,7 @@ export const useSongs = () => {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
+  const [tierFilter, setTierFilter] = useState<string>("all");
   const currentUserId = useAppSelector(selectUserAuth);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -110,11 +112,13 @@ export const useSongs = () => {
   const handleClearFilters = () => {
     setStatusFilter("all");
     setDifficultyFilter("all");
+    setTierFilter("all");
   };
 
   const filteredSongs = songs.filter((song) => {
     let matchesStatus = true;
     let matchesDifficulty = true;
+    let matchesTier = true;
 
     if (statusFilter !== "all") {
       const songStatus = getStatus(userSongs, song.id);
@@ -136,11 +140,20 @@ export const useSongs = () => {
       }
     }
 
-    return matchesStatus && matchesDifficulty;
+    if (tierFilter !== "all") {
+      const avgDifficulty = getAverageDifficulty(song.difficulties);
+      const songTier = getSongTier(avgDifficulty);
+      matchesTier = songTier.tier === tierFilter;
+    }
+
+    return matchesStatus && matchesDifficulty && matchesTier;
   });
 
   const hasFilters =
-    statusFilter !== "all" || difficultyFilter !== "all" || searchQuery !== "";
+    statusFilter !== "all" ||
+    difficultyFilter !== "all" ||
+    tierFilter !== "all" ||
+    searchQuery !== "";
 
   const refreshSongs = async () => {
     if (!currentUserId) return;
@@ -189,6 +202,8 @@ export const useSongs = () => {
     handlePageChange,
     handleClearFilters,
     setDifficultyFilter,
+    tierFilter,
+    setTierFilter,
     loadUserSongs,
     handleStatusUpdate,
     getSongStatus,

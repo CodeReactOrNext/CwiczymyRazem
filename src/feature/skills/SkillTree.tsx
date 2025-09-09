@@ -100,7 +100,7 @@ export const SkillTree = ({ userSkills, onSkillUpgrade }: SkillTreeProps) => {
   );
 
   return (
-    <div className='content-box relative w-full overflow-hidden font-openSans'>
+    <div className='content-box font-openSans relative w-full overflow-hidden'>
       <div className='absolute inset-0' />
 
       <div className='relative p-4'>
