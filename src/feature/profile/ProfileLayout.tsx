@@ -65,72 +65,99 @@ const ProfileLayout = ({
 
   return (
     <MainContainer title={t("profile")}>
-      <div className='grid-rows-auto m-auto max-w-screen-2xl grid-cols-1 px-5 xl:grid'>
-        <div className='content-box relative z-10 row-span-1 mb-4 flex flex-col items-start gap-3 !p-6'>
-          <div className='flex w-full flex-col justify-between gap-6 lg:flex-row'>
-            <div className='flex w-full flex-col gap-4 lg:w-1/2'>
-              <div className='flex flex-row items-center gap-6 p-4 pb-0'>
-                <Avatar
-                  name={displayName}
-                  lvl={statistics.lvl}
-                  avatarURL={avatar}
-                />
+      <div className='m-auto max-w-screen-2xl space-y-8 px-5'>
+        {/* Enhanced Profile Header */}
+        <div className='relative overflow-hidden rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900/90 to-zinc-800/50 p-8 shadow-2xl backdrop-blur-xl'>
+          {/* Background decoration */}
+          <div className='absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-purple-500/5'></div>
+          <div className='absolute -right-20 -top-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl'></div>
+          <div className='absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-purple-500/10 blur-3xl'></div>
+
+          <div className='relative z-10 flex w-full flex-col justify-between gap-8 lg:flex-row'>
+            {/* Left Side - User Info */}
+            <div className='flex w-full flex-col gap-6 lg:w-1/2'>
+              <div className='flex flex-row items-center gap-8'>
+                <div className='relative'>
+                  <Avatar
+                    name={displayName}
+                    lvl={statistics.lvl}
+                    avatarURL={avatar}
+                  />
+                  <div className='absolute -bottom-2 -right-2 rounded-full border-2 border-zinc-800 bg-gradient-to-r from-cyan-500 to-purple-500 px-3 py-1 text-xs font-bold text-white shadow-lg'>
+                    Lvl {statistics.lvl}
+                  </div>
+                </div>
                 <div className='flex-col'>
-                  <p className='relative text-2xl lg:text-4xl'>{displayName}</p>
-                  <p className='relative text-lg font-thin lg:text-xl'>
-                    {t("points")}:{" "}
-                    <span className='text-xl font-bold lg:text-2xl'>
-                      {statistics.points}
-                    </span>
-                  </p>
+                  <h1 className='relative bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-3xl font-bold text-transparent lg:text-5xl'>
+                    {displayName}
+                  </h1>
+                  <div className='mt-2 flex items-center gap-3'>
+                    <div className='rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-3 py-1'>
+                      <span className='text-sm text-yellow-300'>
+                        {statistics.points.toLocaleString()} {t("points")}
+                      </span>
+                    </div>
+                    {band && (
+                      <div className='rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-1'>
+                        <span className='text-sm text-purple-300'>{band}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className='z-10 mt-2 gap-1 font-openSans text-sm'>
-                <DaySinceMessage date={new Date(lastReportDate)} />
-                <p className='my-1 font-thin'>
-                  {t("joined")}{" "}
-                  <span className='font-semibold'>
-                    {createdAt.toDate().toLocaleDateString()}
-                  </span>
-                </p>
-                {yearsOfPlaying && yearsOfPlaying > 0 && (
-                  <p className='font-thin'>
-                    {t("yearsOfPlaying")}{" "}
-                    <span className='font-bold'>{yearsOfPlaying}</span>
-                  </p>
-                )}
-                {band && (
-                  <p className='font-thin'>
-                    {t("band")} <span className='font-bold'>{band}</span>
-                  </p>
-                )}
-
-                <div className='flex flex-row flex-wrap justify-start gap-4 p-2 text-sm'>
-                  {youTubeLink && (
-                    <a
-                      target='_blank'
-                      rel='noreferrer'
-                      href={youTubeLink}
-                      className='flex items-center gap-1 transition-colors hover:text-red-500'>
-                      <FaYoutube size={30} />
-                      YouTube
-                    </a>
-                  )}
-                  {soundCloudLink && (
-                    <a
-                      target='_blank'
-                      rel='noreferrer'
-                      href={soundCloudLink}
-                      className='flex items-center gap-1 transition-colors hover:text-orange-500'>
-                      <FaSoundcloud size={30} />
-                      SoundCloud
-                    </a>
-                  )}
+              {/* Enhanced Info Section */}
+              <div className='rounded-xl border border-zinc-700/30 bg-zinc-800/20 p-6 backdrop-blur-sm'>
+                <div className='font-openSans space-y-3'>
+                  <DaySinceMessage date={new Date(lastReportDate)} />
+                  <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+                    <div className='flex items-center gap-2 text-sm text-zinc-300'>
+                      <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
+                      <span>
+                        Dołączył: {createdAt.toDate().toLocaleDateString()}
+                      </span>
+                    </div>
+                    {yearsOfPlaying && yearsOfPlaying > 0 && (
+                      <div className='flex items-center gap-2 text-sm text-zinc-300'>
+                        <div className='h-2 w-2 rounded-full bg-green-400'></div>
+                        <span>Gra od {yearsOfPlaying} lat</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+                {/* Social Links */}
+                {(youTubeLink || soundCloudLink) && (
+                  <div className='mt-4 flex flex-row flex-wrap justify-start gap-3 border-t border-zinc-700/30 pt-4'>
+                    {youTubeLink && (
+                      <a
+                        target='_blank'
+                        rel='noreferrer'
+                        href={youTubeLink}
+                        className='flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm transition-all hover:border-red-500/50 hover:bg-red-500/20'>
+                        <FaYoutube size={16} />
+                        YouTube
+                      </a>
+                    )}
+                    {soundCloudLink && (
+                      <a
+                        target='_blank'
+                        rel='noreferrer'
+                        href={soundCloudLink}
+                        className='flex items-center gap-2 rounded-lg border border-orange-500/30 bg-orange-500/10 px-3 py-2 text-sm transition-all hover:border-orange-500/50 hover:bg-orange-500/20'>
+                        <FaSoundcloud size={16} />
+                        SoundCloud
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
 
-              <div className='w-fit'>
+              {/* Enhanced Level Bar */}
+              <div className='rounded-xl border border-zinc-700/30 bg-zinc-800/20 p-6 backdrop-blur-sm'>
+                <h3 className='mb-4 text-lg font-semibold text-white'>
+                  Postęp poziomu
+                </h3>
                 <LevelBar
                   points={statistics.points}
                   lvl={statistics.lvl}
@@ -139,33 +166,53 @@ const ProfileLayout = ({
               </div>
             </div>
 
-            <div className='mt-4 w-full font-openSans lg:mt-0 lg:w-1/2'>
+            {/* Right Side - Practice Insights */}
+            <div className='font-openSans w-full lg:w-1/2'>
               <PracticeInsights statistics={statistics} />
             </div>
           </div>
         </div>
 
-        <div className='grid-rows-auto col-span-2'>
-          <StatsSection
-            statsField={statsField}
-            statistics={statistics}
-            datasWithReports={datasWithReports}
-            userSongs={songs}
-            userAuth={userAuth}
-          />
+        {/* Enhanced Stats and Charts Section */}
+        <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
+          {/* Stats Section - 2/3 width */}
+          <div className='lg:col-span-2'>
+            <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+              <h2 className='mb-6 text-2xl font-bold text-white'>Statystyki</h2>
+              <StatsSection
+                statsField={statsField}
+                statistics={statistics}
+                datasWithReports={datasWithReports}
+                userSongs={songs}
+                userAuth={userAuth}
+              />
+            </div>
+          </div>
+
+          {/* Achievements - 1/3 width */}
+          <div className='space-y-6'>
+            <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+              <h2 className='mb-6 text-xl font-bold text-white'>Osiągnięcia</h2>
+              <AchievementWrapper userAchievements={achievements} />
+            </div>
+          </div>
         </div>
 
-        <div className='col-span-2 p-2'>
-          <ActivityLog userAuth={userAuth} />
-        </div>
-        <div className='my-2 mb-2 flex flex-col justify-between'>
-          <AchievementWrapper userAchievements={achievements} />
-        </div>
+        {/* Skills Section */}
         {userSkills && (
-          <div className='col-span-2 p-2'>
+          <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+            <h2 className='mb-6 text-2xl font-bold text-white'>Umiejętności</h2>
             <SkillTreeCards isUserProfile userSkills={userSkills} />
           </div>
         )}
+
+        {/* Activity Log */}
+        <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+          <h2 className='mb-6 text-2xl font-bold text-white'>
+            Ostatnia aktywność
+          </h2>
+          <ActivityLog userAuth={userAuth} />
+        </div>
       </div>
     </MainContainer>
   );

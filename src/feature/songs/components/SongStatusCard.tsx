@@ -88,18 +88,18 @@ export const SongStatusCard = ({
   }, []);
 
   return (
-    <Card className='flex-1 overflow-hidden border-zinc-700/30 bg-zinc-900/10 backdrop-blur-sm'>
-      <CardHeader className='border-b border-zinc-700/30 bg-zinc-800/20 p-3'>
+    <Card className='flex-1 overflow-hidden border-zinc-700/30 bg-zinc-900/5 backdrop-blur-sm transition-all duration-300 hover:border-zinc-600/50 hover:shadow-lg'>
+      <CardHeader className='border-b border-zinc-700/30 bg-zinc-800/10 p-5'>
         <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <div className={cn("rounded-md p-2", config.bgColor)}>
-              <StatusIcon className={cn("h-4 w-4", config.color)} />
+          <div className='flex items-center gap-3'>
+            <div className={cn("rounded-lg p-3 shadow-lg transition-transform duration-300 hover:scale-110", config.bgColor)}>
+              <StatusIcon className={cn("h-6 w-6", config.color)} />
             </div>
             <div>
-              <CardTitle className='text-sm font-bold text-white'>
+              <CardTitle className='text-lg font-bold text-white'>
                 {title}
               </CardTitle>
-              <p className='text-xs text-zinc-500'>
+              <p className='text-sm text-zinc-400'>
                 {songs?.length === 0
                   ? "Brak utworów"
                   : `${songs?.length} ${
@@ -110,7 +110,7 @@ export const SongStatusCard = ({
           </div>
           <div
             className={cn(
-              "flex h-7 w-7 items-center justify-center rounded-md border text-xs font-bold",
+              "flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-bold shadow-lg transition-all duration-300 hover:scale-110",
               config.color,
               config.lightBgColor
             )}
@@ -119,35 +119,44 @@ export const SongStatusCard = ({
           </div>
         </div>
       </CardHeader>
-      <CardContent className='p-3'>
+      <CardContent className='p-5'>
         <Droppable droppableId={droppableId}>
           {(provided, snapshot) => (
             <ScrollArea
               className={cn(
-                "h-40 rounded-md border border-zinc-700/20 bg-zinc-800/5 p-2",
+                "h-64 rounded-lg border border-zinc-700/20 bg-zinc-800/5 p-4 transition-all duration-300",
                 snapshot.isDraggingOver &&
-                  "border-2 border-dashed border-cyan-400/50 bg-cyan-500/5"
+                  "border-2 border-dashed border-cyan-400/50 bg-cyan-500/5 shadow-lg shadow-cyan-500/10"
               )}
               {...provided.droppableProps}
               ref={provided.innerRef}>
               {songs?.length === 0 ? (
-                <div className='flex h-full flex-col items-center justify-center space-y-2 p-3 text-center'>
-                  <div className={cn("rounded-full p-2", config.lightBgColor)}>
-                    <StatusIcon className={cn("h-6 w-6", config.color)} />
+                <div className='flex h-full flex-col items-center justify-center space-y-4 p-6 text-center'>
+                  <div className={cn("rounded-full p-4 shadow-lg", config.lightBgColor)}>
+                    <StatusIcon className={cn("h-8 w-8", config.color)} />
                   </div>
                   <div>
-                    <p className='text-xs font-medium text-zinc-400'>
+                    <p className='text-base font-medium text-zinc-300'>
                       Brak utworów
                     </p>
+                    {!isLanding && (
+                      <p className='mt-2 max-w-[200px] text-sm text-zinc-500'>
+                        Przeciągnij utwory tutaj aby zmienić ich status
+                      </p>
+                    )}
                   </div>
-                  {!isLanding && (
-                    <p className='max-w-[150px] text-xs text-zinc-600'>
-                      Przeciągnij tutaj
-                    </p>
+                  {snapshot.isDraggingOver && (
+                    <div className='absolute inset-0 rounded-lg bg-cyan-500/10 backdrop-blur-sm'>
+                      <div className='flex h-full items-center justify-center'>
+                        <p className='text-lg font-semibold text-cyan-300'>
+                          Upuść tutaj
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </div>
               ) : (
-                <div className='space-y-2'>
+                <div className='space-y-3'>
                   {songs?.map((song, index) => (
                     <Draggable
                       key={song.id}
@@ -161,15 +170,15 @@ export const SongStatusCard = ({
                           {...provided.dragHandleProps}
                           className={cn(
                             "group flex items-center justify-between",
-                            "rounded-md border border-zinc-700/30 bg-zinc-800/20 p-2",
-                            "transition-all duration-200 hover:border-zinc-600/50 hover:bg-zinc-700/30",
+                            "rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-3 transition-all duration-200",
+                            "hover:border-zinc-600/50 hover:bg-zinc-700/30 hover:shadow-md",
                             snapshot.isDragging &&
-                              "scale-105 border-cyan-400/50 bg-cyan-500/10 shadow-lg"
+                              "scale-105 border-cyan-400/50 bg-cyan-500/10 shadow-xl shadow-cyan-500/20 rotate-2"
                           )}>
-                          <div className='flex flex-1 items-center gap-2 overflow-hidden'>
+                          <div className='flex flex-1 items-center gap-3 overflow-hidden'>
                             <div
                               className={cn(
-                                "h-2 w-1 flex-shrink-0 rounded-full",
+                                "h-3 w-1.5 flex-shrink-0 rounded-full shadow-sm",
                                 config.bgColor
                               )}
                               style={{
@@ -180,21 +189,21 @@ export const SongStatusCard = ({
                               }}
                             />
                             <div className='overflow-hidden'>
-                              <p className='truncate text-xs font-medium text-white'>
+                              <p className='truncate text-sm font-medium text-white'>
                                 {song.title}
                               </p>
-                              <p className='truncate text-xs text-zinc-500'>
+                              <p className='truncate text-xs text-zinc-400'>
                                 {song.artist}
                               </p>
                             </div>
                           </div>
                           <DropdownMenu>
-                            <DropdownMenuTrigger className='ml-1 opacity-0 transition-opacity focus:outline-none group-hover:opacity-100'>
-                              <div className='rounded p-1 transition-colors hover:bg-zinc-600/30'>
-                                <MoreVertical className='h-3 w-3 text-zinc-500' />
+                            <DropdownMenuTrigger className='ml-2 opacity-0 transition-all duration-200 focus:outline-none group-hover:opacity-100 hover:scale-110'>
+                              <div className='rounded-lg p-2 transition-colors hover:bg-zinc-600/30'>
+                                <MoreVertical className='h-4 w-4 text-zinc-400' />
                               </div>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className='border-zinc-600/50 bg-zinc-800/90 backdrop-blur-xl'>
+                            <DropdownMenuContent className='border-zinc-600/50 bg-zinc-800/95 backdrop-blur-xl'>
                               {(
                                 ["wantToLearn", "learning", "learned"] as const
                               ).map((status) => (
@@ -208,9 +217,9 @@ export const SongStatusCard = ({
                                       song.artist
                                     )
                                   }
-                                  className='flex cursor-pointer items-center gap-2 py-1.5 text-xs hover:bg-zinc-700/50'>
-                                  <ArrowRight className='h-3 w-3' />
-                                  <span>Do:</span>
+                                  className='flex cursor-pointer items-center gap-3 py-2 text-sm hover:bg-zinc-700/50'>
+                                  <ArrowRight className='h-4 w-4' />
+                                  <span>Przenieś do:</span>
                                   <span
                                     className={cn(
                                       "font-medium",
@@ -222,8 +231,8 @@ export const SongStatusCard = ({
                               ))}
                               <DropdownMenuItem
                                 onClick={() => onSongRemove(song.id)}
-                                className='cursor-pointer py-1.5 text-xs text-red-400 hover:bg-red-500/10'>
-                                Usuń
+                                className='cursor-pointer py-2 text-sm text-red-400 hover:bg-red-500/10'>
+                                Usuń utwór
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

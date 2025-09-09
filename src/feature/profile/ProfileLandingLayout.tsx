@@ -63,11 +63,9 @@ const ProfileLandingLayout = ({
     <div className='bg-second-600 radius-default'>
       <HeadDecoration title={t("statistics")} />
 
-      {activeSection === "overview" && (
-        <NavigationCards setActiveSection={setActiveSection} />
-      )}
+      {activeSection === "overview" && <NavigationCards />}
 
-      <div className='grid-rows-auto mt-8 grid-cols-1 items-start gap-8 p-6 md:grid-cols-2 md:!p-8 lg:grid'>
+      <div className='mt-8 space-y-8 p-6 md:!p-8'>
         <AnimatePresence mode='wait'>
           <motion.div
             key={activeSection}
@@ -75,24 +73,56 @@ const ProfileLandingLayout = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className='relative z-10 col-span-2'>
-            <>
-              <StatsSection
-                statsField={statsField}
-                statistics={userStats}
-                datasWithReports={datasWithReports}
-                userSongs={songs}
-                userAuth={userAuth}
-              />
-
-              <div className='col-span-2 p-2 md:col-span-1'>
-                <ActivityLog userAuth={userAuth} />
+            className='relative z-10'>
+            {/* Full Width Layout */}
+            <div className='space-y-8'>
+              {/* Stats Section - Full Width */}
+              <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+                <h2 className='mb-6 text-2xl font-bold text-white'>
+                  Statystyki
+                </h2>
+                <StatsSection
+                  statsField={statsField}
+                  statistics={userStats}
+                  datasWithReports={datasWithReports}
+                  userSongs={songs}
+                  userAuth={userAuth}
+                />
               </div>
-              <div className='my-2 mb-2 flex flex-col justify-between'>
+
+              {/* Achievements - Full Width */}
+              <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+                <h2 className='mb-6 text-2xl font-bold text-white'>
+                  Osiągnięcia
+                </h2>
                 <AchievementWrapper userAchievements={achievements} />
               </div>
-              <div className='col-span-2'>{featSlot}</div>
-            </>
+
+              {/* Featured Content - Full Width */}
+              {featSlot && (
+                <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+                  <h2 className='mb-6 text-2xl font-bold text-white'>
+                    Plan ćwiczeń
+                  </h2>
+                  {featSlot}
+                </div>
+              )}
+
+              {/* Activity Log - Full Width - Na sam koniec */}
+              <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+                <div className='mb-6 flex items-center justify-between'>
+                  <h2 className='text-2xl font-bold text-white'>
+                    Ostatnia aktywność
+                  </h2>
+                  <a
+                    href='/profile/activity'
+                    className='text-sm text-cyan-400 transition-colors hover:text-cyan-300'>
+                    Zobacz więcej →
+                  </a>
+                </div>
+                <ActivityLog userAuth={userAuth} />
+              </div>
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>
