@@ -85,7 +85,8 @@ const SongsView = () => {
                     Zarządzanie utworami
                   </h2>
                   <p className='text-lg text-zinc-300'>
-                    Przeciągnij utwory między kategoriami aby zmienić ich status nauki
+                    Przeciągnij utwory między kategoriami aby zmienić ich status
+                    nauki
                   </p>
                   <div className='mt-4 flex items-center gap-4 text-sm text-zinc-400'>
                     <div className='flex items-center gap-2'>

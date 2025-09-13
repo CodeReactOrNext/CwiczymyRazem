@@ -92,7 +92,11 @@ export const SongStatusCard = ({
       <CardHeader className='border-b border-zinc-700/30 bg-zinc-800/10 p-5'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-3'>
-            <div className={cn("rounded-lg p-3 shadow-lg transition-transform duration-300 hover:scale-110", config.bgColor)}>
+            <div
+              className={cn(
+                "rounded-lg p-3 shadow-lg transition-transform duration-300 hover:scale-110",
+                config.bgColor
+              )}>
               <StatusIcon className={cn("h-6 w-6", config.color)} />
             </div>
             <div>
@@ -132,7 +136,11 @@ export const SongStatusCard = ({
               ref={provided.innerRef}>
               {songs?.length === 0 ? (
                 <div className='flex h-full flex-col items-center justify-center space-y-4 p-6 text-center'>
-                  <div className={cn("rounded-full p-4 shadow-lg", config.lightBgColor)}>
+                  <div
+                    className={cn(
+                      "rounded-full p-4 shadow-lg",
+                      config.lightBgColor
+                    )}>
                     <StatusIcon className={cn("h-8 w-8", config.color)} />
                   </div>
                   <div>
@@ -173,7 +181,7 @@ export const SongStatusCard = ({
                             "rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-3 transition-all duration-200",
                             "hover:border-zinc-600/50 hover:bg-zinc-700/30 hover:shadow-md",
                             snapshot.isDragging &&
-                              "scale-105 border-cyan-400/50 bg-cyan-500/10 shadow-xl shadow-cyan-500/20 rotate-2"
+                              "rotate-2 scale-105 border-cyan-400/50 bg-cyan-500/10 shadow-xl shadow-cyan-500/20"
                           )}>
                           <div className='flex flex-1 items-center gap-3 overflow-hidden'>
                             <div
