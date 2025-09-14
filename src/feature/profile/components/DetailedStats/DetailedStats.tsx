@@ -39,10 +39,10 @@ export const DetailedStats = ({
       {/* Enhanced Header */}
       <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
         <h3 className='mb-2 text-xl font-bold text-white'>
-          Szczegółowe statystyki
+          {t("detailed_stats.title")}
         </h3>
         <p className='text-sm text-zinc-400'>
-          Kompletny przegląd Twoich osiągnięć i postępów w nauce gry
+          {t("detailed_stats.description")}
         </p>
       </div>
 
@@ -50,9 +50,11 @@ export const DetailedStats = ({
       {userSongs && (
         <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/20 p-6 backdrop-blur-sm'>
           <div className='mb-4'>
-            <h4 className='text-lg font-semibold text-white'>Utwory</h4>
+            <h4 className='text-lg font-semibold text-white'>
+              {t("detailed_stats.songs_title")}
+            </h4>
             <p className='text-sm text-zinc-400'>
-              Status nauki utworów w Twojej bibliotece
+              {t("detailed_stats.songs_description")}
             </p>
           </div>
           <SongLearningStats userSongs={userSongs} />
@@ -63,10 +65,10 @@ export const DetailedStats = ({
       <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/20 p-6 backdrop-blur-sm'>
         <div className='mb-4'>
           <h4 className='text-lg font-semibold text-white'>
-            Rekordy i osiągnięcia
+            {t("detailed_stats.records_title")}
           </h4>
           <p className='text-sm text-zinc-400'>
-            Twoje najlepsze wyniki i długoterminowe statystyki
+            {t("detailed_stats.records_description")}
           </p>
         </div>
 

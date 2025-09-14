@@ -117,5 +117,14 @@
     "title": "Osiągnięcia Sezonowe",
     "points": "punktów",
     "no_achievements": "Brak osiągnięć sezonowych"
+  },
+  "activity": "Aktywność",
+  "detailed_stats": {
+    "title": "Szczegółowe statystyki",
+    "description": "Kompletny przegląd Twoich osiągnięć i postępów w nauce gry",
+    "songs_title": "Utwory",
+    "songs_description": "Status nauki utworów w Twojej bibliotece",
+    "records_title": "Rekordy i osiągnięcia",
+    "records_description": "Twoje najlepsze wyniki i długoterminowe statystyki"
   }
 }

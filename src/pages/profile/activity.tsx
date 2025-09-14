@@ -9,13 +9,15 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
+import type { NextPage } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 import { StatisticsDataInterface } from "types/api.types";
 import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 
-const ProfileActivityPage = () => {
+const ProfileActivityPage: NextPage = () => {
   const { t } = useTranslation("profile");
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
@@ -40,10 +42,7 @@ const ProfileActivityPage = () => {
       <>
         <div className='font-openSans flex flex-col gap-6'>
           {/* Practice Insights */}
-          <PracticeInsights
-            userAuth={userAuth as string}
-            statistics={userStats as StatisticsDataInterface}
-          />
+          <PracticeInsights statistics={userStats} />
 
           {/* Detailed Statistics */}
           {userStats && (
@@ -67,3 +66,17 @@ const ProfileActivityPage = () => {
 };
 
 export default ProfileActivityPage;
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "pl", [
+        "common",
+        "profile",
+        "skills",
+        "achievements",
+        "songs",
+      ])),
+    },
+  };
+}

@@ -57,9 +57,9 @@ const SongsView = () => {
     <MainContainer title={t("songs")}>
       <div className='font-openSans p-6'>
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          {/* Enhanced Tab Navigation */}
-          <div className='mb-8 rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-2 backdrop-blur-sm'>
-            <TabsList className='grid w-full grid-cols-2 bg-transparent p-1'>
+          {/* Simple Tab Navigation */}
+          <div className='mb-6'>
+            <TabsList className='grid w-full grid-cols-2 bg-zinc-800/60 p-1'>
               <TabsTrigger
                 value='management'
                 className='flex items-center gap-3 rounded-lg border border-transparent px-6 py-3 text-sm font-medium text-zinc-400 transition-all data-[state=active]:border-cyan-500/50 data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-300 data-[state=active]:shadow-lg data-[state=active]:shadow-cyan-500/20 hover:text-zinc-200'>
@@ -77,66 +77,42 @@ const SongsView = () => {
 
           {/* Management Tab Content */}
           <TabsContent value='management' className='mt-0'>
-            <div className='space-y-8'>
-              {/* Enhanced Song Management Section */}
-              <div className='rounded-xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900/50 to-zinc-800/30 p-8 shadow-2xl backdrop-blur-sm'>
-                <div className='mb-8'>
-                  <h2 className='mb-3 text-3xl font-bold text-white'>
-                    Zarządzanie utworami
-                  </h2>
-                  <p className='text-lg text-zinc-300'>
-                    Przeciągnij utwory między kategoriami aby zmienić ich status
-                    nauki
-                  </p>
-                  <div className='mt-4 flex items-center gap-4 text-sm text-zinc-400'>
-                    <div className='flex items-center gap-2'>
-                      <div className='h-2 w-2 rounded-full bg-blue-400'></div>
-                      <span>Chcę się nauczyć</span>
-                    </div>
-                    <div className='flex items-center gap-2'>
-                      <div className='h-2 w-2 rounded-full bg-amber-400'></div>
-                      <span>Uczę się</span>
-                    </div>
-                    <div className='flex items-center gap-2'>
-                      <div className='h-2 w-2 rounded-full bg-green-400'></div>
-                      <span>Nauczone</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Enhanced Song Learning Section with better UX */}
-                <div className='rounded-xl border border-zinc-600/30 bg-zinc-800/10 p-8 backdrop-blur-sm'>
-                  <SongLearningSection
-                    isLanding={false}
-                    userSongs={userSongs}
-                    onChange={setUserSongs}
-                    onStatusChange={refreshSongs}
-                  />
-                </div>
+            <div className='space-y-6'>
+              {/* Simple header */}
+              <div className='mb-6'>
+                <h2 className='mb-2 text-2xl font-bold text-white'>
+                  Zarządzanie utworami
+                </h2>
+                <p className='text-zinc-400'>
+                  Przeciągnij utwory między kategoriami aby zmienić ich status
+                  nauki
+                </p>
               </div>
+
+              {/* Direct Song Learning Section */}
+              <SongLearningSection
+                isLanding={false}
+                userSongs={userSongs}
+                onChange={setUserSongs}
+                onStatusChange={refreshSongs}
+              />
             </div>
           </TabsContent>
 
           {/* Table Tab Content */}
           <TabsContent value='table' className='mt-0'>
             <div className='space-y-6'>
-              {/* Enhanced Filters Section */}
-              <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+              {/* Simple Filters Section */}
+              <div className='rounded-lg border border-zinc-600/50 bg-zinc-900/60 p-4'>
                 <div className='mb-4 flex items-center justify-between'>
-                  <div>
-                    <h3 className='text-lg font-semibold text-white'>
-                      Filtry i wyszukiwanie
-                    </h3>
-                    <p className='text-sm text-zinc-400'>
-                      Znajdź utwory według różnych kryteriów
-                    </p>
-                  </div>
+                  <h3 className='text-lg font-semibold text-white'>
+                    Filtry i wyszukiwanie
+                  </h3>
                   <Button
                     onClick={() => setIsModalOpen(true)}
-                    size='lg'
-                    className='bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-3 font-semibold text-white shadow-xl shadow-purple-500/25 transition-all hover:from-purple-400 hover:to-purple-500 hover:shadow-2xl hover:shadow-purple-500/30'>
-                    <IoMdAddCircleOutline className='mr-3 h-5 w-5' />
-                    Dodaj nowy utwór
+                    className='bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500'>
+                    <IoMdAddCircleOutline className='mr-2 h-4 w-4' />
+                    Dodaj utwór
                   </Button>
                 </div>
 
@@ -261,8 +237,8 @@ const SongsView = () => {
                 </div>
               </div>
 
-              {/* Enhanced Table Section */}
-              <div className='overflow-hidden rounded-xl border border-zinc-700/50 bg-zinc-900/20 backdrop-blur-sm'>
+              {/* Table Section */}
+              <div className='overflow-hidden rounded-lg border border-zinc-600/50 bg-zinc-900/60'>
                 {isLoading ? (
                   <div className='flex h-[500px] items-center justify-center'>
                     <div className='text-center'>
