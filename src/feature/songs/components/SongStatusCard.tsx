@@ -16,6 +16,8 @@ import {
 import { ScrollArea } from "assets/components/ui/scroll-area";
 import { cn } from "assets/lib/utils";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { getSongTier } from "feature/songs/utils/getSongTier";
+import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import {
   ArrowRight,
   BookOpen,
@@ -46,6 +48,28 @@ const STATUS_CONFIG = {
     bgColor: "bg-green-900/20",
     lightBgColor: "bg-green-500/10",
   },
+};
+
+const TierBadge = ({ song }: { song: Song }) => {
+  const avgRating = getAverageDifficulty(song.difficulties);
+
+  if (avgRating === 0) return null; // Brak ocen
+
+  const tier = getSongTier(avgRating);
+
+  return (
+    <div
+      className={cn(
+        "flex h-6 w-6 items-center justify-center rounded text-xs font-bold",
+        tier.bgColor,
+        tier.borderColor,
+        "border"
+      )}
+      style={{ color: tier.color }}
+      title={`${tier.description} (${avgRating.toFixed(1)}/10)`}>
+      {tier.tier}
+    </div>
+  );
 };
 
 interface SongStatusCardProps {
@@ -88,80 +112,66 @@ export const SongStatusCard = ({
   }, []);
 
   return (
-    <Card className='flex-1 overflow-hidden border-zinc-700/30 bg-zinc-900/5 backdrop-blur-sm transition-all duration-300 hover:border-zinc-600/50 hover:shadow-lg'>
-      <CardHeader className='border-b border-zinc-700/30 bg-zinc-800/10 p-5'>
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-3'>
-            <div
-              className={cn(
-                "rounded-lg p-3 shadow-lg transition-transform duration-300 hover:scale-110",
-                config.bgColor
-              )}>
-              <StatusIcon className={cn("h-6 w-6", config.color)} />
-            </div>
-            <div>
-              <CardTitle className='text-lg font-bold text-white'>
-                {title}
-              </CardTitle>
-              <p className='text-sm text-zinc-400'>
-                {songs?.length === 0
-                  ? "Brak utworów"
-                  : `${songs?.length} ${
-                      songs?.length === 1 ? "utwór" : "utworów"
-                    }`}
-              </p>
-            </div>
+    <div className='flex-1'>
+      {/* Elegant Header */}
+      <div className='mb-4 flex items-center justify-between'>
+        <div className='flex items-center gap-3'>
+          <div className={cn("rounded-full p-2", config.lightBgColor)}>
+            <StatusIcon className={cn("h-5 w-5", config.color)} />
           </div>
-          <div
-            className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-bold shadow-lg transition-all duration-300 hover:scale-110",
-              config.color,
-              config.lightBgColor
-            )}
-            style={{ borderColor: config.color.replace("text-", "") }}>
-            <span>{songs?.length}</span>
+          <div>
+            <h3 className='text-lg font-semibold text-white'>{title}</h3>
+            <p className='text-sm text-zinc-500'>
+              {songs?.length === 0
+                ? "Brak utworów"
+                : `${songs?.length} ${
+                    songs?.length === 1 ? "utwór" : "utworów"
+                  }`}
+            </p>
           </div>
         </div>
-      </CardHeader>
-      <CardContent className='p-5'>
+        <div
+          className={cn(
+            "rounded-full px-3 py-1 text-sm font-medium",
+            config.lightBgColor,
+            config.color
+          )}>
+          {songs?.length}
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div>
         <Droppable droppableId={droppableId}>
           {(provided, snapshot) => (
-            <ScrollArea
+            <div
               className={cn(
-                "h-64 rounded-lg border border-zinc-700/20 bg-zinc-800/5 p-4 transition-all duration-300",
-                snapshot.isDraggingOver &&
-                  "border-2 border-dashed border-cyan-400/50 bg-cyan-500/5 shadow-lg shadow-cyan-500/10"
+                "relative min-h-[300px] rounded-xl border-2 border-dashed p-4 transition-all duration-300",
+                snapshot.isDraggingOver
+                  ? "border-cyan-400 bg-cyan-500/10"
+                  : "border-zinc-600/30 bg-zinc-800/20"
               )}
               {...provided.droppableProps}
-              ref={provided.innerRef}>
+              ref={provided.innerRef}
+              style={{
+                position: "relative",
+                zIndex: snapshot.isDraggingOver ? 1 : 0,
+              }}>
               {songs?.length === 0 ? (
-                <div className='flex h-full flex-col items-center justify-center space-y-4 p-6 text-center'>
-                  <div
-                    className={cn(
-                      "rounded-full p-4 shadow-lg",
-                      config.lightBgColor
-                    )}>
-                    <StatusIcon className={cn("h-8 w-8", config.color)} />
-                  </div>
+                <div className='flex h-full flex-col items-center justify-center space-y-3 text-center'>
+                  <StatusIcon
+                    className={cn("h-12 w-12 opacity-40", config.color)}
+                  />
                   <div>
-                    <p className='text-base font-medium text-zinc-300'>
-                      Brak utworów
+                    <p className='text-zinc-400'>
+                      {snapshot.isDraggingOver ? "Upuść tutaj" : "Brak utworów"}
                     </p>
-                    {!isLanding && (
-                      <p className='mt-2 max-w-[200px] text-sm text-zinc-500'>
-                        Przeciągnij utwory tutaj aby zmienić ich status
+                    {!isLanding && !snapshot.isDraggingOver && (
+                      <p className='mt-1 text-xs text-zinc-600'>
+                        Przeciągnij utwory lub użyj przycisków
                       </p>
                     )}
                   </div>
-                  {snapshot.isDraggingOver && (
-                    <div className='absolute inset-0 rounded-lg bg-cyan-500/10 backdrop-blur-sm'>
-                      <div className='flex h-full items-center justify-center'>
-                        <p className='text-lg font-semibold text-cyan-300'>
-                          Upuść tutaj
-                        </p>
-                      </div>
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className='space-y-3'>
@@ -178,11 +188,21 @@ export const SongStatusCard = ({
                           {...provided.dragHandleProps}
                           className={cn(
                             "group flex items-center justify-between",
-                            "rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-3 transition-all duration-200",
-                            "hover:border-zinc-600/50 hover:bg-zinc-700/30 hover:shadow-md",
-                            snapshot.isDragging &&
-                              "rotate-2 scale-105 border-cyan-400/50 bg-cyan-500/10 shadow-xl shadow-cyan-500/20"
-                          )}>
+                            "rounded-lg border p-3 transition-all duration-200",
+                            snapshot.isDragging
+                              ? "border-cyan-400 bg-cyan-500/30 shadow-2xl shadow-cyan-500/50 backdrop-blur-sm"
+                              : "border-transparent bg-zinc-800/60 hover:bg-zinc-700/80"
+                          )}
+                          style={{
+                            transform: snapshot.isDragging
+                              ? "rotate(3deg) scale(1.1)"
+                              : undefined,
+                            zIndex: snapshot.isDragging ? 9999 : "auto",
+                            position: snapshot.isDragging
+                              ? "relative"
+                              : undefined,
+                            opacity: snapshot.isDragging ? 0.95 : 1,
+                          }}>
                           <div className='flex flex-1 items-center gap-3 overflow-hidden'>
                             <div
                               className={cn(
@@ -196,14 +216,87 @@ export const SongStatusCard = ({
                                 ),
                               }}
                             />
-                            <div className='overflow-hidden'>
-                              <p className='truncate text-sm font-medium text-white'>
-                                {song.title}
-                              </p>
-                              <p className='truncate text-xs text-zinc-400'>
+                            <div className='flex-1 overflow-hidden'>
+                              <div className='flex items-center gap-2'>
+                                <p
+                                  className={cn(
+                                    "truncate text-sm font-medium transition-colors",
+                                    snapshot.isDragging
+                                      ? "text-cyan-100"
+                                      : "text-white"
+                                  )}>
+                                  {song.title}
+                                </p>
+                                <TierBadge song={song} />
+                              </div>
+                              <p
+                                className={cn(
+                                  "truncate text-xs transition-colors",
+                                  snapshot.isDragging
+                                    ? "text-cyan-200"
+                                    : "text-zinc-400"
+                                )}>
                                 {song.artist}
                               </p>
                             </div>
+                          </div>
+
+                          {/* Quick Actions - visible on hover */}
+                          <div className='flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
+                            {droppableId !== "wantToLearn" && (
+                              <Button
+                                size='sm'
+                                variant='ghost'
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onStatusChange(
+                                    song.id,
+                                    "wantToLearn",
+                                    song.title,
+                                    song.artist
+                                  );
+                                }}
+                                className='h-6 w-6 p-0 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300'
+                                title='Chcę się nauczyć'>
+                                <Music className='h-3 w-3' />
+                              </Button>
+                            )}
+                            {droppableId !== "learning" && (
+                              <Button
+                                size='sm'
+                                variant='ghost'
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onStatusChange(
+                                    song.id,
+                                    "learning",
+                                    song.title,
+                                    song.artist
+                                  );
+                                }}
+                                className='h-6 w-6 p-0 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300'
+                                title='Uczę się'>
+                                <BookOpen className='h-3 w-3' />
+                              </Button>
+                            )}
+                            {droppableId !== "learned" && (
+                              <Button
+                                size='sm'
+                                variant='ghost'
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onStatusChange(
+                                    song.id,
+                                    "learned",
+                                    song.title,
+                                    song.artist
+                                  );
+                                }}
+                                className='h-6 w-6 p-0 text-green-400 hover:bg-green-500/20 hover:text-green-300'
+                                title='Nauczone'>
+                                <CheckCircle className='h-3 w-3' />
+                              </Button>
+                            )}
                           </div>
                           <DropdownMenu>
                             <DropdownMenuTrigger className='ml-2 opacity-0 transition-all duration-200 focus:outline-none group-hover:opacity-100 hover:scale-110'>
@@ -251,10 +344,10 @@ export const SongStatusCard = ({
                 </div>
               )}
               {provided.placeholder}
-            </ScrollArea>
+            </div>
           )}
         </Droppable>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

@@ -9,6 +9,21 @@ import type { InsightItem, PracticeInsightsProps } from "./types";
 
 export const PracticeInsights = ({ statistics }: PracticeInsightsProps) => {
   const { t } = useTranslation("profile");
+
+  // Early return if statistics is null
+  if (!statistics) {
+    return (
+      <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+        <h3 className='mb-2 text-xl font-bold text-white'>
+          {t("practice_insights")}
+        </h3>
+        <p className='text-sm text-zinc-400'>
+          {t("insights.advice.first_steps")}
+        </p>
+      </div>
+    );
+  }
+
   const { time, points, sessionCount } = statistics;
 
   const { avgSessionLength, avgPointsPerHour, strongestArea, focusSuggestion } =

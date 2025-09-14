@@ -25,7 +25,8 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
 
   return (
     <div className='grid grid-cols-1 gap-4 font-openSans md:grid-cols-2 lg:grid-cols-2'>
-      <Card className='bg-second p-4'>
+      {/* Total Songs - bez Card wrapper */}
+      <div className='bg-zinc-800/60 p-4 rounded-lg'>
         <div className='mb-3 flex items-center'>
           <Clock className='mr-2 h-5 w-5 text-gray-400' />
           <h3 className='text-sm text-gray-400'>{t("total_songs")}</h3>
@@ -34,9 +35,10 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
           {totalSongs}
         </p>
         <p className='text-xs text-gray-500'>{t("songs_in_your_library")}</p>
-      </Card>
+      </div>
 
-      <Card className='bg-second p-4'>
+      {/* Completion Rate - bez Card wrapper */}
+      <div className='bg-zinc-800/60 p-4 rounded-lg'>
         <div className='mb-3 flex items-center'>
           <Award className='mr-2 h-5 w-5 text-gray-400' />
           <h3 className='text-sm text-gray-400'>{t("completion_rate")}</h3>
@@ -49,12 +51,12 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
           {t("songs_learned")}
         </p>
 
-        <div className='mt-3 h-1.5 w-full rounded-full bg-[#2a2a2a]'>
+        <div className='mt-3 h-1.5 w-full rounded-full bg-zinc-700'>
           <div
-            className='h-1.5 rounded-full bg-[#42f584]'
+            className='h-1.5 rounded-full bg-green-500'
             style={{ width: `${learnedPercentage}%` }}></div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };

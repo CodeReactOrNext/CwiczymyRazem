@@ -1,7 +1,8 @@
 import type { StatisticsDataInterface } from "types/api.types";
 
 export interface PracticeInsightsProps {
-  statistics: StatisticsDataInterface;
+  statistics: StatisticsDataInterface | null;
+  userAuth?: string;
 }
 
 export interface PracticeArea {

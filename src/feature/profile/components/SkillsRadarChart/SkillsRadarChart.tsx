@@ -89,22 +89,15 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
   const skills = generateSkillsData();
 
   return (
-    <div className='hover:shadow-3xl group relative overflow-hidden rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900/90 to-zinc-800/50 p-6 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:border-zinc-600/50'>
+    <div className='group relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900/70 p-5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:bg-zinc-900/80 hover:shadow-xl'>
       {/* Enhanced Background Effects */}
       <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/10 via-transparent to-zinc-900/20'></div>
       <div className='pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-gradient-to-br from-cyan-500/5 to-blue-500/5 blur-3xl'></div>
 
-      {/* Enhanced Header */}
-      <div className='relative mb-8'>
-        <div className='mb-2 flex items-center gap-3'>
-          <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 shadow-lg'>
-            <div className='h-4 w-4 rounded-full bg-gradient-to-br from-cyan-400 to-blue-400'></div>
-          </div>
-          <h3 className='text-2xl font-bold tracking-tight text-white'>
-            Umiejętności
-          </h3>
-        </div>
-        <p className='text-sm text-zinc-400'>
+      {/* Header */}
+      <div className='relative mb-6'>
+        <h3 className='text-xl font-bold text-white'>Umiejętności</h3>
+        <p className='text-xs text-zinc-400'>
           Rozkład czasu ćwiczeń według kategorii
         </p>
       </div>

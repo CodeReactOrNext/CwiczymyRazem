@@ -229,7 +229,7 @@ const SeasonalAchievements = ({
           </div>
         </div>
 
-        <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6'>
+        <div className='grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-8'>
           {visibleAchievements.map((achievement, idx) => {
             const styles = getAchievementStyles(achievement.place);
             const displaySeasonName = formatSeasonId(achievement.seasonId);
@@ -237,29 +237,55 @@ const SeasonalAchievements = ({
             return (
               <div
                 key={`${achievement.seasonId}-${idx}`}
-                className='flex flex-col items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-3 text-xs transition-all duration-200 hover:bg-white/10'>
-                <div className='relative'>
-                  <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-full ${styles.iconBg} ${styles.iconColor}`}>
-                    {getAchievementIcon(achievement.place)}
-                  </div>
-                  {styles.crown && (
-                    <FaCrown
-                      className='absolute -right-0.5 -top-0.5 text-yellow-400'
-                      size={10}
-                    />
-                  )}
-                </div>
+                className='group relative overflow-hidden rounded-lg border border-zinc-700/30 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 p-2 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-zinc-600/40 hover:shadow-lg'>
+                {/* Background gradient based on place */}
+                <div
+                  className={`pointer-events-none absolute inset-0 opacity-15 ${
+                    achievement.place === 1
+                      ? "bg-gradient-to-br from-yellow-500/20 to-amber-500/20"
+                      : achievement.place === 2
+                      ? "bg-gradient-to-br from-gray-400/20 to-slate-400/20"
+                      : achievement.place === 3
+                      ? "bg-gradient-to-br from-amber-600/20 to-orange-600/20"
+                      : "bg-gradient-to-br from-blue-500/10 to-purple-500/10"
+                  }`}></div>
 
-                <div className='text-center'>
-                  <div className={`font-bold ${styles.iconColor}`}>
-                    {achievement.place}
-                    <sup className='text-[10px]'>
-                      {getOrdinalSuffix(achievement.place)}
-                    </sup>
+                <div className='relative flex flex-col items-center gap-1'>
+                  <div className='relative'>
+                    <div
+                      className={`flex h-8 w-8 items-center justify-center rounded-full shadow-md ${styles.iconBg} ${styles.iconColor} transition-transform duration-300 group-hover:scale-110`}>
+                      {getAchievementIcon(achievement.place)}
+                    </div>
+                    {styles.crown && (
+                      <FaCrown
+                        className='absolute -right-0.5 -top-0.5 text-yellow-400 drop-shadow-sm'
+                        size={10}
+                      />
+                    )}
+                    {/* Glow effect for top 3 */}
+                    {achievement.place <= 3 && (
+                      <div
+                        className={`absolute inset-0 rounded-full opacity-20 blur-sm ${
+                          achievement.place === 1
+                            ? "bg-yellow-400"
+                            : achievement.place === 2
+                            ? "bg-gray-300"
+                            : "bg-amber-500"
+                        }`}></div>
+                    )}
                   </div>
-                  <div className='truncate text-xs font-medium text-white/70'>
-                    {displaySeasonName}
+
+                  <div className='text-center'>
+                    <div
+                      className={`text-sm font-bold ${styles.iconColor} drop-shadow-sm`}>
+                      {achievement.place}
+                      <sup className='text-[10px] opacity-80'>
+                        {getOrdinalSuffix(achievement.place)}
+                      </sup>
+                    </div>
+                    <div className='truncate text-[10px] font-medium text-white/70 drop-shadow-sm'>
+                      {displaySeasonName}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -268,15 +294,15 @@ const SeasonalAchievements = ({
         </div>
 
         {totalItems > maxVisibleItems && (
-          <div className='mt-6 flex justify-center gap-2'>
+          <div className='mt-4 flex justify-center gap-2'>
             <button
               onClick={handlePrev}
-              className='rounded-lg border border-white/10 bg-white/5 p-2 text-white/70 transition-all duration-200 hover:bg-white/10 hover:text-white'>
+              className='flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700/40 bg-gradient-to-br from-zinc-800/60 to-zinc-900/60 text-white/70 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-zinc-600/50 hover:bg-gradient-to-br hover:from-zinc-700/60 hover:to-zinc-800/60 hover:text-white'>
               <FaChevronLeft size={12} />
             </button>
             <button
               onClick={handleNext}
-              className='rounded-lg border border-white/10 bg-white/5 p-2 text-white/70 transition-all duration-200 hover:bg-white/10 hover:text-white'>
+              className='flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-700/40 bg-gradient-to-br from-zinc-800/60 to-zinc-900/60 text-white/70 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-zinc-600/50 hover:bg-gradient-to-br hover:from-zinc-700/60 hover:to-zinc-800/60 hover:text-white'>
               <FaChevronRight size={12} />
             </button>
           </div>

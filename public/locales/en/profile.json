@@ -102,5 +102,14 @@
     "title": "Seasonal Achievements",
     "points": "points",
     "no_achievements": "No seasonal achievements yet"
+  },
+  "activity": "Activity",
+  "detailed_stats": {
+    "title": "Detailed Statistics",
+    "description": "Complete overview of your achievements and learning progress",
+    "songs_title": "Songs",
+    "songs_description": "Learning status of songs in your library",
+    "records_title": "Records and Achievements",
+    "records_description": "Your best results and long-term statistics"
   }
 }
