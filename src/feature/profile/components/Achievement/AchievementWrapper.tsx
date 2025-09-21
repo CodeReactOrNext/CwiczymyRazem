@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import type {
   AchievementList,
   AchievementsDataInterface,
@@ -61,7 +62,7 @@ export const AchievementWrapper = ({
   ).length;
 
   return (
-    <div className='content-box mb-4 flex flex-col gap-4 font-openSans text-sm '>
+    <Card>
       <AchievementBox
         achievment={common}
         maxLenght={commonLenght}
@@ -74,6 +75,6 @@ export const AchievementWrapper = ({
         rarity='veryRare'
       />
       <AchievementBox achievment={epic} maxLenght={epicLenght} rarity='epic' />
-    </div>
+    </Card>
   );
 };

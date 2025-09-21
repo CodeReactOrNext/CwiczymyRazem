@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import { ReactNode } from "react";
 
 interface StatsCardProps {
@@ -26,8 +27,7 @@ export const StatsCard = ({
   const valueSize = compact ? "text-xl" : "text-2xl";
 
   return (
-    <div
-      className={`rounded-lg border border-white/10 bg-zinc-900/70 ${padding} backdrop-blur-xl transition-all duration-300 hover:bg-zinc-900/80 ${className}`}>
+    <Card>
       {/* Header with icon */}
       {(icon || title) && (
         <div className='mb-2 flex items-center gap-2'>
@@ -51,6 +51,6 @@ export const StatsCard = ({
 
       {/* Subtitle */}
       {subtitle && <p className='mt-1 text-xs text-zinc-500'>{subtitle}</p>}
-    </div>
+    </Card>
   );
 };

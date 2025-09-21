@@ -49,7 +49,7 @@ export const UserHeader = ({
   );
 
   return (
-    <header className='sticky top-0 z-50 border-b border-white/10 bg-zinc-900/95 backdrop-blur-xl'>
+    <header className='sticky top-0 z-50 border-b border-white/10 bg-card backdrop-blur-xl'>
       {/* Subtle top accent */}
       <div className='absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent'></div>
 

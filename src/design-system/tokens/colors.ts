@@ -4,7 +4,6 @@
  */
 
 export const colors = {
-  // Base Colors - Neutral Scale
   white: '#FFFFFF',
   black: '#000000',
   

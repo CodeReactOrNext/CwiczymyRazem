@@ -3,11 +3,11 @@
  * Centralized design tokens for consistent, minimal design
  */
 
-export { colors, type Colors } from './colors';
-export { typography, type Typography } from './typography';
-export { spacing, type Spacing } from './spacing';
-export { animation, type Animation } from './animation';
-export { effects, type Effects } from './effects';
+export { type Animation,animation } from './animation';
+export { type Colors,colors } from './colors';
+export { type Effects,effects } from './effects';
+export { type Spacing,spacing } from './spacing';
+export { type Typography,typography } from './typography';
 
 // Combined design tokens
 export const designTokens = {
@@ -29,8 +29,8 @@ export const theme = {
   color: {
     // Backgrounds
     bg: {
-      primary: '#0F172A',
-      secondary: '#1E293B', 
+      primary: '#0d0d0c',
+      secondary: '#141414', 
       tertiary: '#334155',
     },
     

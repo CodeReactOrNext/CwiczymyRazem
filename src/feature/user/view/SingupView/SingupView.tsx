@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import Image from "next/image";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   createAccount,
@@ -193,7 +194,13 @@ const SingupView = () => {
                 className='mb-6 flex justify-center'>
                 <div className='relative'>
                   <div className='flex h-16 w-16 items-center justify-center rounded-xl border border-emerald-400/40 bg-gradient-to-br from-emerald-400/25 to-cyan-900/20 shadow-2xl'>
-                    <Guitar className='h-8 w-8 text-emerald-400' />
+                    <Image
+                      src='/images/logo.svg'
+                      alt='Logo'
+                      width={32}
+                      height={32}
+                      className='h-8 w-8'
+                    />
                   </div>
                   <div className='absolute -inset-2 rounded-xl bg-gradient-to-r from-emerald-400/30 via-cyan-400/15 to-transparent blur-lg' />
                 </div>

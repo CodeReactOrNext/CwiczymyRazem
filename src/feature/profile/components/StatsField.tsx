@@ -37,7 +37,7 @@ export const StatsField = ({
     trend?.direction === "up" ? "rgb(34, 197, 94)" : "rgb(239, 68, 68)";
 
   return (
-    <Card className='border-white/10 bg-zinc-800/50 p-4 backdrop-blur-xl transition-all hover:bg-zinc-800/70'>
+    <Card>
       <div className='flex items-start justify-between'>
         <div className='space-y-2'>
           <div className='flex items-center gap-2'>

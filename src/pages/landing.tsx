@@ -278,7 +278,14 @@ const LandingPage: NextPage = () => {
                   <div className='mb-6 flex items-center gap-3 sm:mb-8 sm:gap-4'>
                     <div className='relative'>
                       <div className='flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-400/40 bg-gradient-to-br from-cyan-400/25 to-cyan-900/20 shadow-2xl backdrop-blur-xl sm:h-14 sm:w-14'>
-                        <Guitar className='h-6 w-6 text-cyan-400 sm:h-7 sm:w-7' />
+                        <Image
+                          src='/images/logo.svg'
+                          alt='Logo'
+                          width={28}
+                          height={28}
+                          className='h-6 w-6 sm:h-7 sm:w-7'
+                          priority
+                        />
                       </div>
                       <div className='absolute -inset-2 rounded-xl bg-gradient-to-r from-cyan-400/30 via-cyan-400/15 to-transparent blur-lg'></div>
                       <div className='absolute -inset-1 rounded-xl bg-cyan-400/20 blur-sm'></div>
@@ -768,7 +775,13 @@ const LandingPage: NextPage = () => {
               {/* Logo */}
               <div className='flex items-center gap-4'>
                 <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-lg'>
-                  <Guitar className='h-6 w-6 text-white' />
+                  <Image
+                    src='/images/logo.svg'
+                    alt='Logo'
+                    width={24}
+                    height={24}
+                    className='h-6 w-6 text-white'
+                  />
                 </div>
                 <div>
                   <span className='text-xl font-bold text-white'>

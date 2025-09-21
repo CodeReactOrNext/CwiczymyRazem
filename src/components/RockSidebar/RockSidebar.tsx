@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "assets/components/ui/button";
 import { Badge } from "assets/components/ui/badge";
 import { Separator } from "assets/components/ui/separator";
+import Image from "next/image";
 import {
   User,
   Music,
@@ -160,17 +161,23 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
         variant='outline'
         size='icon'
         onClick={() => setIsMobileOpen(true)}
-        className='fixed left-4 top-4 z-50 border-white/20 bg-zinc-900/90 text-white backdrop-blur-sm hover:bg-zinc-800 lg:hidden'>
+        className='fixed left-4 top-4 z-50 border-white/20 bg-card text-white backdrop-blur-sm hover:bg-zinc-800 lg:hidden'>
         <Menu size={18} />
       </Button>
 
       {/* Desktop Sidebar */}
-      <aside className='hidden h-full border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:flex lg:w-64 lg:flex-col'>
+      <aside className='hidden h-full border-r border-white/10 bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col'>
         {/* Brand Header */}
         <div className='border-b border-white/10 p-4'>
           <div className='flex items-center gap-3'>
             <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-lg'>
-              <Code className='h-4 w-4' />
+              <Image
+                src='/images/logo-optimized.svg'
+                alt='Logo'
+                width={16}
+                height={16}
+                className='h-4 w-4 brightness-0 invert'
+              />
             </div>
             <div>
               <h2 className='text-sm font-semibold text-white'>
@@ -331,7 +338,13 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               <div className='flex items-center justify-between border-b border-white/10 p-4'>
                 <div className='flex items-center gap-3'>
                   <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-lg'>
-                    <Code className='h-4 w-4' />
+                    <Image
+                      src='/images/logo-optimized.svg'
+                      alt='Logo'
+                      width={16}
+                      height={16}
+                      className='h-4 w-4 brightness-0 invert'
+                    />
                   </div>
                   <div>
                     <h2 className='text-sm font-semibold text-white'>

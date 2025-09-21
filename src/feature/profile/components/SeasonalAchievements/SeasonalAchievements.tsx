@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import type { SeasonalAchievement } from "feature/profile/services/seasonalAchievementsService";
 import { getUserSeasonalAchievements } from "feature/profile/services/seasonalAchievementsService";
 import { useEffect, useState } from "react";
@@ -178,8 +179,7 @@ const SeasonalAchievements = ({
 
   if (!loading && achievements.length === 0) {
     return (
-      <div
-        className={`relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900/70 p-6 shadow-lg backdrop-blur-xl ${className}`}>
+      <Card>
         <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/20 via-transparent to-zinc-800/20'></div>
         <div className='relative'>
           <h3 className='mb-4 text-lg font-bold text-white'>
@@ -192,7 +192,7 @@ const SeasonalAchievements = ({
             )}
           </div>
         </div>
-      </div>
+      </Card>
     );
   }
 
@@ -214,11 +214,7 @@ const SeasonalAchievements = ({
   }
 
   return (
-    <div
-      className={`relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900/70 p-6 shadow-lg backdrop-blur-xl ${className}`}>
-      {/* Background effects */}
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/20 via-transparent to-zinc-800/20'></div>
-
+    <Card>
       <div className='relative'>
         <div className='mb-6 flex items-center justify-between'>
           <h4 className='text-lg font-bold text-white'>
@@ -308,7 +304,7 @@ const SeasonalAchievements = ({
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 

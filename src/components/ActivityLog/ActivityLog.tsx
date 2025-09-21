@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
 import { useActivityLog } from "./hooks/useActivityLog";
+import { Card } from "assets/components/ui/card";
 
 const ActivityLog = ({ userAuth }: { userAuth: string }) => {
   const { t } = useTranslation("common");
@@ -31,10 +32,7 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
   }
 
   return (
-    <div className='relative w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-900/70 p-6 shadow-lg backdrop-blur-xl'>
-      {/* Background effects */}
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/20 via-transparent to-zinc-800/20'></div>
-
+    <Card className='relative w-full overflow-hidden rounded-xl'>
       <div className='relative'>
         <div className='mb-6 flex items-center justify-between'>
           <h3 className='text-lg font-bold text-white'>Activity Log</h3>
@@ -97,7 +95,7 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
