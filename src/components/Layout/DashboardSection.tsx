@@ -21,25 +21,25 @@ interface DashboardSectionProps {
 
 const colorConfig = {
   cyan: {
-    gradient: "from-cyan-500/15 via-transparent to-blue-500/15",
+    gradient: "from-zinc-800/5 via-transparent to-zinc-700/5",
   },
   yellow: {
-    gradient: "from-yellow-500/15 via-transparent to-orange-500/15",
+    gradient: "from-zinc-800/5 via-transparent to-zinc-700/5",
   },
   green: {
-    gradient: "from-green-500/15 via-transparent to-emerald-500/15",
+    gradient: "from-zinc-800/5 via-transparent to-zinc-700/5",
   },
   violet: {
-    gradient: "from-violet-500/15 via-transparent to-purple-500/15",
+    gradient: "from-zinc-800/5 via-transparent to-zinc-700/5",
   },
   purple: {
-    gradient: "from-purple-500/15 via-transparent to-pink-500/15",
+    gradient: "from-zinc-800/5 via-transparent to-zinc-700/5",
   },
   blue: {
-    gradient: "from-blue-500/15 via-transparent to-indigo-500/15",
+    gradient: "from-zinc-800/5 via-transparent to-zinc-700/5",
   },
   red: {
-    gradient: "from-red-500/15 via-transparent to-rose-500/15",
+    gradient: "from-zinc-800/5 via-transparent to-zinc-700/5",
   },
 };
 
@@ -58,7 +58,7 @@ export const DashboardSection = ({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900/70 ${padding} shadow-lg backdrop-blur-xl transition-all duration-300 hover:bg-zinc-900/80 hover:shadow-xl ${className}`}>
+      className={`relative overflow-hidden rounded-xl border border-white/10 bg-zinc-800/50 ${padding} shadow-lg backdrop-blur-xl transition-all duration-300 hover:bg-zinc-800/70 hover:shadow-xl ${className}`}>
       {/* Subtle background gradient */}
       <div
         className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${colors.gradient}`}
