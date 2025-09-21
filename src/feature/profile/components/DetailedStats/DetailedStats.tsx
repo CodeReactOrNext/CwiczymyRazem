@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import { getUserStatsField } from "assets/stats/profileStats";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { StatsField } from "feature/profile/components/StatsField";
@@ -36,19 +37,9 @@ export const DetailedStats = ({
 
   return (
     <div className='space-y-6'>
-      {/* Enhanced Header */}
-      <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
-        <h3 className='mb-2 text-xl font-bold text-white'>
-          {t("detailed_stats.title")}
-        </h3>
-        <p className='text-sm text-zinc-400'>
-          {t("detailed_stats.description")}
-        </p>
-      </div>
-
       {/* Song Learning Stats */}
       {userSongs && (
-        <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/20 p-6 backdrop-blur-sm'>
+        <Card>
           <div className='mb-4'>
             <h4 className='text-lg font-semibold text-white'>
               {t("detailed_stats.songs_title")}
@@ -58,11 +49,11 @@ export const DetailedStats = ({
             </p>
           </div>
           <SongLearningStats userSongs={userSongs} />
-        </div>
+        </Card>
       )}
 
       {/* Detailed Statistics Grid */}
-      <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/20 p-6 backdrop-blur-sm'>
+      <Card>
         <div className='mb-4'>
           <h4 className='text-lg font-semibold text-white'>
             {t("detailed_stats.records_title")}
@@ -82,7 +73,7 @@ export const DetailedStats = ({
             />
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

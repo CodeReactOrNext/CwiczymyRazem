@@ -110,11 +110,6 @@ export const SkillCategoryAccordion = ({
   });
 
   const handleSkillUpgrade = async (skillId: string) => {
-    console.log(
-      "SkillCategoryAccordion: handleSkillUpgrade called with:",
-      skillId
-    );
-
     // Start upgrade animation
     setUpgradingSkill(skillId);
     setShowPlusOne(skillId);
@@ -351,10 +346,6 @@ export const SkillCategoryAccordion = ({
                           {canUpgrade && (
                             <motion.button
                               onClick={(e) => {
-                                console.log(
-                                  "Button clicked for skill:",
-                                  skill.id
-                                );
                                 e.stopPropagation();
                                 handleSkillUpgrade(skill.id);
                               }}

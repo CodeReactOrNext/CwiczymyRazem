@@ -10,7 +10,6 @@ import type { InsightItem, PracticeInsightsProps } from "./types";
 export const PracticeInsights = ({ statistics }: PracticeInsightsProps) => {
   const { t } = useTranslation("profile");
 
-  // Early return if statistics is null
   if (!statistics) {
     return (
       <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>

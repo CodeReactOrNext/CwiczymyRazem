@@ -28,20 +28,12 @@ const ProfileSkillsPage: NextPage = () => {
   }, [userAuth]);
 
   const handleUpgradeSkill = async (skillId: string) => {
-    console.log("ProfileSkillsPage: handleUpgradeSkill called with:", skillId);
-    console.log("userAuth:", userAuth);
-    console.log("userStats:", userStats);
-    console.log("userSkills:", userSkills);
-
     if (!userAuth || !userStats || !userSkills) {
-      console.log("Missing required data, returning early");
       return;
     }
 
     const skill = guitarSkills.find((s) => s.id === skillId);
-    console.log("Found skill:", skill);
     if (!skill) {
-      console.log("Skill not found, returning");
       return;
     }
 
@@ -50,30 +42,11 @@ const ProfileSkillsPage: NextPage = () => {
         skill.category as keyof typeof userSkills.availablePoints
       ] > 0;
 
-    console.log(
-      "Available points for category",
-      skill.category,
-      ":",
-      userSkills.availablePoints[
-        skill.category as keyof typeof userSkills.availablePoints
-      ]
-    );
-    console.log("hasPoints:", hasPoints);
-
     if (hasPoints) {
-      try {
-        console.log("Calling updateUserSkills...");
-        await updateUserSkills(userAuth, skillId);
-        console.log("updateUserSkills completed, refreshing skills...");
-        // Refresh skills data
-        const updatedSkills = await getUserSkills(userAuth);
-        console.log("Updated skills:", updatedSkills);
-        setUserSkills(updatedSkills);
-      } catch (error) {
-        console.error("Error upgrading skill:", error);
-      }
-    } else {
-      console.log("No points available for upgrade");
+      await updateUserSkills(userAuth, skillId);
+      // Refresh skills data
+      const updatedSkills = await getUserSkills(userAuth);
+      setUserSkills(updatedSkills);
     }
   };
 
