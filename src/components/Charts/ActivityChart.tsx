@@ -101,7 +101,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
   };
 
   return (
-    <Card className='border-white/10 bg-zinc-900/70 backdrop-blur-xl'>
+    <Card>
       <CardHeader className='flex items-center gap-2 space-y-0 border-b border-white/10 py-5 sm:flex-row'>
         <div className='grid flex-1 gap-1 text-center sm:text-left'>
           <CardTitle className='text-lg font-bold text-white'>

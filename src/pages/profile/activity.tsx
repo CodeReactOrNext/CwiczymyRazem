@@ -1,6 +1,7 @@
 import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { ActivityChart } from "components/Charts/ActivityChart";
+import MainContainer from "components/MainContainer";
 import { DetailedStats } from "feature/profile/components/DetailedStats/DetailedStats";
 import { PracticeInsights } from "feature/profile/components/PracticeInsights/PracticeInsights";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
@@ -39,28 +40,26 @@ const ProfileActivityPage: NextPage = () => {
       pageId={"profile"}
       subtitle={t("activity", "Activity")}
       variant='secondary'>
-      <>
-        <div className='font-openSans flex flex-col gap-6'>
-          {/* Practice Insights */}
-          <PracticeInsights statistics={userStats} />
+      <MainContainer title={"Activity"}>
+        <div className='p-4'>
+          <div className='font-openSans flex flex-col gap-6'>
+            <PracticeInsights statistics={userStats} />
 
-          {/* Detailed Statistics */}
-          {userStats && (
-            <DetailedStats
-              statistics={userStats as StatisticsDataInterface}
-              userSongs={songs}
-            />
-          )}
+            {userStats && (
+              <DetailedStats
+                statistics={userStats as StatisticsDataInterface}
+                userSongs={songs}
+              />
+            )}
 
-          {/* Activity Chart */}
-          <ActivityChart data={reportList as any} />
+            <ActivityChart data={reportList as any} />
+          </div>
+
+          <div className='mt-8'>
+            <ActivityLog userAuth={userAuth as string} />
+          </div>
         </div>
-
-        {/* Activity Log */}
-        <div className='mt-8'>
-          <ActivityLog userAuth={userAuth} />
-        </div>
-      </>
+      </MainContainer>
     </AuthLayoutWrapper>
   );
 };
