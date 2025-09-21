@@ -12,6 +12,7 @@ import type { StatisticsDataInterface } from "types/api.types";
 import { calculatePercent, convertMsToHM } from "utils/converter";
 
 import { getTrendData } from "../utils/getTrendData";
+import { Card } from "assets/components/ui/card";
 
 interface StatsSectionProps {
   statsField: StatsFieldProps[];
@@ -83,11 +84,8 @@ export const StatsSection = ({
 
   return (
     <div className='space-y-6'>
-      {/* Main Grid - Stats and Skills */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
-        {/* Left Column - Stats */}
         <div className='space-y-6 lg:col-span-2'>
-          {/* Top Row - Main Stats */}
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             {statsWithTrends
               .filter(
@@ -104,7 +102,6 @@ export const StatsSection = ({
               ))}
           </div>
 
-          {/* Second Row - Secondary Stats */}
           <div className='grid grid-cols-2 gap-4'>
             {statsWithTrends
               .filter(
@@ -122,38 +119,20 @@ export const StatsSection = ({
               ))}
           </div>
 
-          {/* Song Learning Progress - Premium */}
           {userSongs && (
-            <div className='group relative overflow-hidden rounded-xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900/90 to-zinc-800/50 p-5 backdrop-blur-xl transition-all duration-300 hover:border-zinc-600/60'>
-              {/* Subtle background effect */}
-              <div className='from-purple-500/3 to-pink-500/3 pointer-events-none absolute inset-0 bg-gradient-to-br via-transparent'></div>
-
+            <Card className='p- group  relative  transition-all duration-300 '>
               <div className='relative'>
                 <div className='mb-5 flex items-center justify-between'>
                   <div className='flex items-center gap-3'>
-                    <div className='relative'>
-                      <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 shadow-lg'>
-                        <svg
-                          className='h-5 w-5 text-purple-400'
-                          fill='currentColor'
-                          viewBox='0 0 24 24'>
-                          <path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z' />
-                        </svg>
-                      </div>
-                      <div className='absolute -right-1 -top-1 h-3 w-3 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 shadow-sm'></div>
-                    </div>
                     <div>
                       <h4 className='text-lg font-bold text-white'>
                         Biblioteka piosenek
                       </h4>
-                      <p className='text-xs text-zinc-400'>
-                        Twój postęp muzyczny
-                      </p>
                     </div>
                   </div>
                   <a
                     href='/songs'
-                    className='group/btn flex items-center gap-2 rounded-lg bg-zinc-800/50 px-4 py-2 text-sm font-medium text-purple-400 shadow-sm transition-all duration-300 hover:bg-zinc-800/70 hover:text-purple-300 hover:shadow-md'>
+                    className='group/btn flex items-center gap-2 rounded-lg  px-4 py-2 text-sm font-medium text-purple-400 shadow-sm transition-all duration-300 hover:bg-zinc-800/70 hover:text-purple-300 hover:shadow-md'>
                     <span>Przeglądaj</span>
                     <svg
                       className='h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-0.5'
@@ -184,7 +163,7 @@ export const StatsSection = ({
 
                   if (totalSongs === 0) {
                     return (
-                      <div className='rounded-lg border border-white/10 bg-zinc-800/30 p-6 text-center'>
+                      <div className='rounded-lg  bg-zinc-800/30 p-6 text-center'>
                         <div className='mb-3'>
                           <svg
                             className='mx-auto h-12 w-12 text-zinc-400'
@@ -212,7 +191,7 @@ export const StatsSection = ({
                   return (
                     <div className='space-y-5'>
                       {/* Main Progress Card */}
-                      <div className='rounded-xl border border-white/10 bg-zinc-800/30 p-5 shadow-inner'>
+                      <div className='rounded-xl bg-zinc-800/30 p-5 shadow-inner'>
                         <div className='mb-4 flex items-center justify-between'>
                           <div>
                             <h5 className='font-semibold text-white'>
@@ -265,7 +244,7 @@ export const StatsSection = ({
 
                       {/* Category Stats */}
                       <div className='grid grid-cols-3 gap-3'>
-                        <div className='rounded-lg border border-white/10 bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
+                        <div className='rounded-lg bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
                           <div className='mb-2 text-xl font-semibold text-white'>
                             {userSongs.wantToLearn.length}
                           </div>
@@ -274,7 +253,7 @@ export const StatsSection = ({
                           </div>
                         </div>
 
-                        <div className='rounded-lg border border-white/10 bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
+                        <div className='rounded-lg bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
                           <div className='mb-2 text-xl font-semibold text-white'>
                             {userSongs.learning.length}
                           </div>
@@ -283,7 +262,7 @@ export const StatsSection = ({
                           </div>
                         </div>
 
-                        <div className='rounded-lg border border-white/10 bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
+                        <div className='rounded-lg  bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
                           <div className='mb-2 text-xl font-semibold text-white'>
                             {userSongs.learned.length}
                           </div>
@@ -296,7 +275,7 @@ export const StatsSection = ({
                   );
                 })()}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Skills Chart - Mobile */}

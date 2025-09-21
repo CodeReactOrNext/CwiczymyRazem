@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import { useTranslation } from "react-i18next";
 
 interface Skill {
@@ -89,7 +90,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
   const skills = generateSkillsData();
 
   return (
-    <div className='group relative overflow-hidden rounded-xl border border-white/10 bg-zinc-800/50 p-5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:bg-zinc-800/70 hover:shadow-xl'>
+    <Card className='group relative overflow-hidden rounded-xl  p-4'>
       {/* Subtle Background Effects */}
       <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/5 via-transparent to-zinc-700/5'></div>
 
@@ -101,21 +102,11 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
         </p>
       </div>
 
-      {/* Enhanced Bar Chart */}
       <div className='relative space-y-6'>
         {skills.map((skill, index) => (
           <div key={skill.name} className='group/item space-y-3'>
-            {/* Skill Header */}
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-4'>
-                <div className='relative'>
-                  <div
-                    className='h-4 w-4 rounded-full shadow-lg transition-all duration-300 group-hover/item:scale-110'
-                    style={{
-                      backgroundColor: skill.color,
-                      boxShadow: `0 0 20px ${skill.color}40`,
-                    }}></div>
-                </div>
                 <span className='text-base font-semibold text-white transition-colors duration-300'>
                   {skill.name}
                 </span>
@@ -138,7 +129,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
             </div>
 
             {/* Enhanced Progress Bar */}
-            <div className='relative h-3 w-full overflow-hidden rounded-full bg-zinc-800/50 shadow-inner'>
+            <div className='relative h-2 w-full overflow-hidden rounded-full bg-zinc-800/50 shadow-inner'>
               <div
                 className='h-full rounded-full shadow-lg transition-all duration-1000 ease-out'
                 style={{
@@ -146,26 +137,13 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
                   background: `linear-gradient(90deg, ${skill.color}, ${skill.color}dd)`,
                   boxShadow: `0 0 10px ${skill.color}60, inset 0 1px 0 rgba(255,255,255,0.2)`,
                 }}></div>
-
-              {/* Animated shine effect */}
-              <div
-                className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover/item:opacity-100'
-                style={{
-                  animation: "shine 2s ease-in-out infinite",
-                  animationDelay: `${index * 0.2}s`,
-                }}></div>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Summary */}
-      <div className='relative mt-8 overflow-hidden rounded-xl border border-white/10 bg-zinc-800/30 p-5 backdrop-blur-sm'>
+      <div className='relative mt-8 overflow-hidden rounded-xl  bg-zinc-800/30 p-2'>
         <div className='relative flex items-center justify-between'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700/50'>
-              <div className='h-2 w-2 rounded-full bg-zinc-400'></div>
-            </div>
             <span className='text-base font-semibold text-zinc-300'>
               Całkowity czas ćwiczeń
             </span>
@@ -197,7 +175,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
           }
         }
       `}</style>
-    </div>
+    </Card>
   );
 };
 

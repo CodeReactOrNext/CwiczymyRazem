@@ -132,8 +132,8 @@ module.exports = {
       },
       colors: {
         primary: '#fff',
-        foreground: '#1a1a1a',
-        card: '#1a1a1a',
+        foreground: '#1f1f20',
+        card: '#1f1f20',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -292,15 +292,15 @@ module.exports = {
               900: "#d7020f",
             },
             second: {
-              DEFAULT: "#1A1A1A",
-              special: "#1A1A1A",
+              DEFAULT: "#1f1f20",
+              special: "#1f1f20",
               text: "#ffa39b",
               50: "#757575",
               100: "#6B6B6B",
               200: "#575757",
               300: "#424242",
               400: "#2E2E2E",
-              500: "#1A1A1A",
+              500: "#1f1f20",
               600: "#141414",
               700: "#0F0F0F",
               800: "#0A0A0A",
@@ -309,7 +309,7 @@ module.exports = {
             "main-opposed": {
               DEFAULT: "#54575F",
               bg: "#212121",
-              text: "#1A1A1A",
+              text: "#1f1f20",
               50: "#747983",
               100: "#71767F",
               200: "#696E77",

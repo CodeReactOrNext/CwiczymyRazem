@@ -51,8 +51,6 @@ const ProfileLandingLayout = ({
 
   return (
     <DashboardContainer>
-      <HeadDecoration title={t("statistics")} />
-
       {activeSection === "overview" && <NavigationCards />}
 
       {/* Statistics Section */}
@@ -78,18 +76,6 @@ const ProfileLandingLayout = ({
         compact>
         <AchievementWrapper userAchievements={achievements} />
       </DashboardSection>
-
-      {/* Exercise Plan Section */}
-      {featSlot && (
-        <DashboardSection
-          title='Plan ćwiczeń'
-          subtitle='Twój spersonalizowany program'
-          color='green'
-          compact>
-          {featSlot}
-        </DashboardSection>
-      )}
-
       {/* Activity Log Section */}
       <DashboardSection
         title='Ostatnia aktywność'
@@ -105,6 +91,8 @@ const ProfileLandingLayout = ({
         }>
         <ActivityLog userAuth={userAuth} />
       </DashboardSection>
+
+      {featSlot && featSlot}
     </DashboardContainer>
   );
 };

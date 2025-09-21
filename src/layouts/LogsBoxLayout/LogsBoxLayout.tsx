@@ -14,6 +14,7 @@ import { IoChatboxEllipses } from "react-icons/io5";
 
 import Chat from "../../feature/chat/Chat";
 import Logs from "./components/Logs";
+import { Card } from "assets/components/ui/card";
 
 export interface LogsBoxLayoutProps {
   logs: (
@@ -53,11 +54,11 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
   };
 
   return (
-    <div
-      className={`relative m-auto mt-5 flex ${
+    <Card
+      className={`relative m-auto  flex ${
         showedCategory !== "achievements" && "h-[600px]"
-      } flex-col border border-second-400/60 bg-second-500/80 p-1 pb-3 font-openSans text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]`}>
-      <div className=' left-0 top-0 flex flex-row  justify-around gap-4 p-2  font-bold'>
+      } font-openSans flex-col p-1 pb-3 text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]`}>
+      <div className=' left-0 top-0 flex flex-row  justify-around gap-4  font-bold'>
         <LogsBoxButton
           title={t("logsBox.logs")}
           active={showedCategory === "logs"}
@@ -93,7 +94,7 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
 
         {showedCategory === "chat" && <Chat />}
       </div>
-    </div>
+    </Card>
   );
 };
 
