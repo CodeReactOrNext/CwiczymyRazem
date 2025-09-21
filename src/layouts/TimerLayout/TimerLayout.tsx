@@ -343,7 +343,7 @@ const TimerLayout = ({
 
   return (
     <MainContainer title={"Ćwicz"}>
-      <div className='h-full space-y-6 pb-8 font-openSans sm:space-y-8 sm:pb-12 md:p-8'>
+      <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
         <Card className='rounded-none border-none bg-second-500/80 shadow-xl'>
           <div className='flex flex-col sm:flex-row'>
             <div className='flex justify-center p-4 pb-0 sm:flex-1 sm:py-6'>

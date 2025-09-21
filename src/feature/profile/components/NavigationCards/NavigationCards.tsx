@@ -30,28 +30,28 @@ export const NavigationCard = ({
 }: NavigationCardProps) => {
   const colorClasses = {
     cyan: {
-      iconBg: "bg-cyan-500/20",
+      iconBg: "bg-zinc-800/50",
       iconText: "text-cyan-400",
-      blur: "bg-cyan-500/25",
-      ring: "hover:ring-cyan-500/40",
+      blur: "bg-cyan-500/10",
+      ring: "hover:ring-cyan-500/20",
     },
     purple: {
-      iconBg: "bg-purple-500/20",
+      iconBg: "bg-zinc-800/50",
       iconText: "text-purple-400",
-      blur: "bg-purple-500/25",
-      ring: "hover:ring-purple-500/40",
+      blur: "bg-purple-500/10",
+      ring: "hover:ring-purple-500/20",
     },
     green: {
-      iconBg: "bg-emerald-500/20",
+      iconBg: "bg-zinc-800/50",
       iconText: "text-emerald-400",
-      blur: "bg-emerald-500/25",
-      ring: "hover:ring-emerald-500/40",
+      blur: "bg-emerald-500/10",
+      ring: "hover:ring-emerald-500/20",
     },
     amber: {
-      iconBg: "bg-amber-500/20",
+      iconBg: "bg-zinc-800/50",
       iconText: "text-amber-400",
-      blur: "bg-amber-500/25",
-      ring: "hover:ring-amber-500/40",
+      blur: "bg-amber-500/10",
+      ring: "hover:ring-amber-500/20",
     },
   };
 
@@ -59,28 +59,29 @@ export const NavigationCard = ({
 
   return (
     <div
-      className='group relative flex h-full cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-zinc-900/70 p-4 shadow-lg backdrop-blur-xl transition-all duration-200 hover:bg-zinc-900/80'
+      className='group relative flex h-full cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-zinc-800/50 p-4 shadow-lg backdrop-blur-xl transition-all duration-200 hover:bg-zinc-800/70'
       onClick={onClick}
       tabIndex={0}
       aria-label={title}
       onKeyDown={(e) => e.key === "Enter" && onClick?.()}>
       {/* Subtle background */}
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/20 via-transparent to-zinc-800/20'></div>
+      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-700/10 via-transparent to-zinc-700/10'></div>
 
       <div className='relative flex flex-1 flex-col justify-between'>
         <div className='mb-3'>
           <h3 className='mb-1 line-clamp-1 text-sm font-semibold text-white'>
             {title}
           </h3>
-          <p className='line-clamp-2 text-xs text-white/70'>{description}</p>
+          <p className='line-clamp-2 text-xs text-zinc-400'>{description}</p>
         </div>
 
         <div className='flex items-center justify-between'>
-          <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-white/10'>
-            <div className='text-white'>{icon}</div>
+          <div
+            className={`flex h-8 w-8 items-center justify-center rounded-lg ${colors.iconBg}`}>
+            <div className={colors.iconText}>{icon}</div>
           </div>
 
-          <div className='flex items-center gap-1 text-xs text-white/60'>
+          <div className='flex items-center gap-1 text-xs text-zinc-400'>
             <span>View</span>
             <svg
               width='12'

@@ -26,7 +26,13 @@
     "error": "Failed to update start date"
   },
   "profile_settings": "Profile Settings",
+  "manage_your_profile_information": "Manage your profile information",
   "security": "Security Settings",
+  "manage_your_account_security": "Manage your account security",
+  "google_account_notice": "Google Account - Limited Options",
   "additional_info": "Additional Information",
-  "danger_zone": "Danger Zone"
+  "customize_your_experience": "Customize your experience",
+  "danger_zone": "Danger Zone",
+  "irreversible_actions": "Irreversible actions - proceed with caution",
+  "danger_zone_warning": "The following actions are irreversible. Make sure you understand the consequences."
 }

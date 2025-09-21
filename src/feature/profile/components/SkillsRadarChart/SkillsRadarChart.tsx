@@ -89,14 +89,13 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
   const skills = generateSkillsData();
 
   return (
-    <div className='group relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900/70 p-5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:bg-zinc-900/80 hover:shadow-xl'>
-      {/* Enhanced Background Effects */}
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/10 via-transparent to-zinc-900/20'></div>
-      <div className='pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-gradient-to-br from-cyan-500/5 to-blue-500/5 blur-3xl'></div>
+    <div className='group relative overflow-hidden rounded-xl border border-white/10 bg-zinc-800/50 p-5 shadow-lg backdrop-blur-xl transition-all duration-300 hover:bg-zinc-800/70 hover:shadow-xl'>
+      {/* Subtle Background Effects */}
+      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/5 via-transparent to-zinc-700/5'></div>
 
       {/* Header */}
       <div className='relative mb-6'>
-        <h3 className='text-xl font-bold text-white'>Umiejętności</h3>
+        <h3 className='text-xl font-semibold text-white'>Umiejętności</h3>
         <p className='text-xs text-zinc-400'>
           Rozkład czasu ćwiczeń według kategorii
         </p>
@@ -117,15 +116,15 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
                       boxShadow: `0 0 20px ${skill.color}40`,
                     }}></div>
                 </div>
-                <span className='text-base font-semibold text-white transition-colors duration-300 group-hover/item:text-cyan-300'>
+                <span className='text-base font-semibold text-white transition-colors duration-300'>
                   {skill.name}
                 </span>
               </div>
               <div className='flex items-center gap-2'>
-                <span className='text-lg font-bold text-white'>
+                <span className='text-lg font-semibold text-white'>
                   {skill.percent}%
                 </span>
-                <div className='text-xs text-zinc-500'>
+                <div className='text-xs text-zinc-400'>
                   {(() => {
                     const minutes = Math.round(
                       (skill.percent / 100) * (totalTime / 60000)
@@ -160,20 +159,19 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
         ))}
       </div>
 
-      {/* Enhanced Summary */}
-      <div className='relative mt-8 overflow-hidden rounded-xl border border-zinc-700/30 bg-gradient-to-r from-zinc-800/30 to-zinc-700/20 p-5 backdrop-blur-sm'>
-        <div className='absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5'></div>
+      {/* Summary */}
+      <div className='relative mt-8 overflow-hidden rounded-xl border border-white/10 bg-zinc-800/30 p-5 backdrop-blur-sm'>
         <div className='relative flex items-center justify-between'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20'>
-              <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
+            <div className='flex h-6 w-6 items-center justify-center rounded-full bg-zinc-700/50'>
+              <div className='h-2 w-2 rounded-full bg-zinc-400'></div>
             </div>
             <span className='text-base font-semibold text-zinc-300'>
               Całkowity czas ćwiczeń
             </span>
           </div>
           <div className='text-right'>
-            <div className='text-xl font-bold text-white'>
+            <div className='text-xl font-semibold text-white'>
               {(() => {
                 const totalMinutes = Math.round(totalTime / 60000);
                 const hours = Math.floor(totalMinutes / 60);
@@ -181,7 +179,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
                 return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
               })()}
             </div>
-            <div className='text-xs text-zinc-500'>
+            <div className='text-xs text-zinc-400'>
               {Math.round(totalTime / 60000)} minut całkowicie
             </div>
           </div>

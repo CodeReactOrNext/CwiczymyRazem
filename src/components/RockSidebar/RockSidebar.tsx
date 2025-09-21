@@ -1,4 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "assets/components/ui/button";
+import { Badge } from "assets/components/ui/badge";
+import { Separator } from "assets/components/ui/separator";
 import {
   User,
   Music,
@@ -14,6 +17,8 @@ import {
   Dumbbell,
   Settings,
   Calendar,
+  Home,
+  Code,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -150,121 +155,156 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
   return (
     <>
-      {/* Mobile Hamburger Button - Minimalist */}
-      <button
+      {/* Mobile Hamburger Button */}
+      <Button
+        variant='outline'
+        size='icon'
         onClick={() => setIsMobileOpen(true)}
-        className='fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-900/90 backdrop-blur-sm transition-all duration-200 hover:bg-zinc-800 lg:hidden'>
-        <Menu size={18} className='text-white/80' />
-      </button>
+        className='fixed left-4 top-4 z-50 border-white/20 bg-zinc-900/90 text-white backdrop-blur-sm hover:bg-zinc-800 lg:hidden'>
+        <Menu size={18} />
+      </Button>
 
-      {/* Desktop Sidebar - Clean & Minimal */}
-      <aside className='hidden h-full border-r border-zinc-800 bg-zinc-900 lg:flex lg:w-64 lg:flex-col'>
+      {/* Desktop Sidebar */}
+      <aside className='hidden h-full border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:flex lg:w-64 lg:flex-col'>
+        {/* Brand Header */}
+        <div className='border-b border-white/10 p-4'>
+          <div className='flex items-center gap-3'>
+            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-lg'>
+              <Code className='h-4 w-4' />
+            </div>
+            <div>
+              <h2 className='text-sm font-semibold text-white'>
+                Ćwiczymy Razem
+              </h2>
+              <p className='text-xs text-zinc-400'>Guitar Learning</p>
+            </div>
+          </div>
+        </div>
+
         {/* User Profile Section */}
         {userStats && userName && (
-          <div className='border-b border-zinc-800 p-4'>
-            <div className='flex items-center gap-4'>
+          <div className='border-b border-white/10 p-4'>
+            <div className='flex items-center gap-3'>
               <div className='relative'>
-                <Avatar
-                  avatarURL={userAvatar}
-                  name={userName}
-                  lvl={userStats.lvl}
-                />
+                <div className='rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 p-1'>
+                  <Avatar
+                    avatarURL={userAvatar}
+                    name={userName}
+                    lvl={userStats.lvl}
+                  />
+                </div>
               </div>
 
               <div className='min-w-0 flex-1'>
-                <div className='flex items-center gap-2'>
-                  <span className='truncate text-[12px] font-semibold text-white'>
-                    {userName}
-                  </span>
-                </div>
+                <span className='truncate text-sm font-semibold text-white'>
+                  {userName}
+                </span>
               </div>
             </div>
           </div>
         )}
 
         {/* Navigation */}
-        <nav className='flex-1 p-4'>
+        <nav className='flex-1 space-y-6 p-4'>
           {/* Main Navigation */}
-          <div className='mb-6'>
-            <ul className='space-y-1'>
+          <div>
+            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+              Main
+            </div>
+            <div className='space-y-1'>
               {mainNavigation.map(({ id, name, href, icon }) => {
                 const isActive = id === pageId;
                 return (
-                  <li key={id}>
-                    <Link
-                      href={href}
-                      className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors ${
-                        isActive
-                          ? "bg-zinc-800 text-white"
-                          : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-300"
-                      }`}>
+                  <Link
+                    key={id}
+                    href={href}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                    }`}>
+                    <span
+                      className={isActive ? "text-cyan-400" : "text-zinc-500"}>
                       {icon}
-                      <span>{name}</span>
-                    </Link>
-                  </li>
+                    </span>
+                    <span>{name}</span>
+                    {isActive && (
+                      <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
+                    )}
+                  </Link>
                 );
               })}
-            </ul>
+            </div>
           </div>
 
-          {/* Separator */}
-          <div className='mb-4 h-px bg-zinc-800'></div>
+          <Separator className='bg-white/10' />
 
           {/* Profile Section */}
-          <div className='mb-6'>
-            <div className='mb-2 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+          <div>
+            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
               Profil
             </div>
-            <ul className='space-y-1'>
+            <div className='space-y-1'>
               {profileSections.map(({ id, name, href, icon }) => {
                 const isActiveSection =
                   activeProfileSection === id ||
                   (id === "songs" && pageId === "songs");
                 return (
-                  <li key={id}>
-                    <Link
-                      href={href}
-                      className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors ${
-                        isActiveSection
-                          ? "bg-zinc-800 text-white"
-                          : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-300"
-                      }`}>
+                  <Link
+                    key={id}
+                    href={href}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                      isActiveSection
+                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                    }`}>
+                    <span
+                      className={
+                        isActiveSection ? "text-cyan-400" : "text-zinc-500"
+                      }>
                       {icon}
-                      <span>{name}</span>
-                    </Link>
-                  </li>
+                    </span>
+                    <span>{name}</span>
+                    {isActiveSection && (
+                      <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
+                    )}
+                  </Link>
                 );
               })}
-            </ul>
+            </div>
           </div>
 
-          {/* Separator */}
-          <div className='mb-4 h-px bg-zinc-800'></div>
+          <Separator className='bg-white/10' />
 
           {/* Other Section */}
           <div>
-            <div className='mb-2 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
               Inne
             </div>
-            <ul className='space-y-1'>
+            <div className='space-y-1'>
               {otherSections.map(({ id, name, href, icon }) => {
                 const isActive = id === pageId;
                 return (
-                  <li key={id}>
-                    <Link
-                      href={href}
-                      className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors ${
-                        isActive
-                          ? "bg-zinc-800 text-white"
-                          : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-300"
-                      }`}>
+                  <Link
+                    key={id}
+                    href={href}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                    }`}>
+                    <span
+                      className={isActive ? "text-cyan-400" : "text-zinc-500"}>
                       {icon}
-                      <span>{name}</span>
-                    </Link>
-                  </li>
+                    </span>
+                    <span>{name}</span>
+                    {isActive && (
+                      <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
+                    )}
+                  </Link>
                 );
               })}
-            </ul>
+            </div>
           </div>
         </nav>
       </aside>
@@ -278,7 +318,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileOpen(false)}
-              className='fixed inset-0 z-40 bg-black/50 lg:hidden'
+              className='fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden'
             />
 
             <motion.aside
@@ -286,153 +326,162 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className='fixed left-0 top-0 z-50 h-full w-72 border-r border-zinc-800 bg-zinc-900 lg:hidden'>
+              className='fixed left-0 top-0 z-50 h-full w-72 border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden'>
               {/* Header */}
-              <div className='flex items-center justify-between border-b border-zinc-800 p-4'>
-                <div className='flex items-center gap-2'>
-                  <Guitar size={16} className='text-white/60' />
-                  <span className='text-sm font-medium text-white'>
-                    Ćwiczymy Razem
-                  </span>
+              <div className='flex items-center justify-between border-b border-white/10 p-4'>
+                <div className='flex items-center gap-3'>
+                  <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-lg'>
+                    <Code className='h-4 w-4' />
+                  </div>
+                  <div>
+                    <h2 className='text-sm font-semibold text-white'>
+                      Ćwiczymy Razem
+                    </h2>
+                    <p className='text-xs text-zinc-400'>Guitar Learning</p>
+                  </div>
                 </div>
-                <button
+                <Button
+                  variant='ghost'
+                  size='icon'
                   onClick={() => setIsMobileOpen(false)}
-                  className='flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-800 hover:text-white'>
+                  className='text-zinc-400 hover:bg-white/10 hover:text-white'>
                   <X size={16} />
-                </button>
+                </Button>
               </div>
 
               {/* User Profile Section - Mobile */}
               {userStats && userName && (
-                <div className='border-b border-zinc-800 p-4'>
-                  <div className='flex items-center gap-4'>
-                    {/* Enhanced Avatar with Rank - Mobile */}
+                <div className='border-b border-white/10 p-4'>
+                  <div className='flex items-center gap-3'>
                     <div className='relative'>
-                      <div className='flex h-14 w-14 items-center justify-center rounded-xl border border-red-500/30 bg-gradient-to-br from-red-600/20 to-red-500/20'>
-                        {userAvatar ? (
-                          <img
-                            src={userAvatar}
-                            alt={userName}
-                            className='h-12 w-12 rounded-lg object-cover'
-                          />
-                        ) : (
-                          <User size={20} className='text-red-400' />
-                        )}
-                      </div>
-                      {/* Rank Badge - Mobile */}
-                      {userStats.lvl && (
-                        <img
-                          className='absolute -bottom-1 -right-1 h-5 w-5 -rotate-12'
-                          src={`/static/images/rank/${getRankImgPath(
-                            userStats.lvl
-                          )}.png`}
-                          alt={`Rank ${userStats.lvl}`}
+                      <div className='rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 p-1'>
+                        <Avatar
+                          avatarURL={userAvatar}
+                          name={userName}
+                          lvl={userStats.lvl}
                         />
-                      )}
+                      </div>
                     </div>
 
-                    {/* User Info */}
                     <div className='min-w-0 flex-1'>
-                      <div className='flex items-center gap-2'>
-                        <span className='truncate text-sm font-semibold text-white'>
-                          {userName}
-                        </span>
-                        <Guitar
-                          size={12}
-                          className='flex-shrink-0 text-red-400'
-                        />
-                      </div>
+                      <span className='truncate text-sm font-semibold text-white'>
+                        {userName}
+                      </span>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Navigation */}
-              <nav className='flex-1 p-4'>
+              {/* Navigation - Mobile */}
+              <nav className='flex-1 space-y-6 p-4'>
                 {/* Main Navigation */}
-                <div className='mb-6'>
-                  <ul className='space-y-1'>
+                <div>
+                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+                    Main
+                  </div>
+                  <div className='space-y-1'>
                     {mainNavigation.map(({ id, name, href, icon }) => {
                       const isActive = id === pageId;
                       return (
-                        <li key={id}>
-                          <Link
-                            href={href}
-                            onClick={handleLinkClick}
-                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors ${
-                              isActive
-                                ? "bg-zinc-800 text-white"
-                                : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-300"
-                            }`}>
+                        <Link
+                          key={id}
+                          href={href}
+                          onClick={handleLinkClick}
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                            isActive
+                              ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                          }`}>
+                          <span
+                            className={
+                              isActive ? "text-cyan-400" : "text-zinc-500"
+                            }>
                             {icon}
-                            <span>{name}</span>
-                          </Link>
-                        </li>
+                          </span>
+                          <span>{name}</span>
+                          {isActive && (
+                            <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
+                          )}
+                        </Link>
                       );
                     })}
-                  </ul>
+                  </div>
                 </div>
 
-                {/* Separator */}
-                <div className='mb-4 h-px bg-zinc-800'></div>
+                <Separator className='bg-white/10' />
 
                 {/* Profile Section */}
-                <div className='mb-6'>
-                  <div className='mb-2 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+                <div>
+                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
                     Profil
                   </div>
-                  <ul className='space-y-1'>
+                  <div className='space-y-1'>
                     {profileSections.map(({ id, name, href, icon }) => {
                       const isActiveSection =
                         activeProfileSection === id ||
                         (id === "songs" && pageId === "songs");
                       return (
-                        <li key={id}>
-                          <Link
-                            href={href}
-                            onClick={handleLinkClick}
-                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors ${
+                        <Link
+                          key={id}
+                          href={href}
+                          onClick={handleLinkClick}
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                            isActiveSection
+                              ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                          }`}>
+                          <span
+                            className={
                               isActiveSection
-                                ? "bg-zinc-800 text-white"
-                                : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-300"
-                            }`}>
+                                ? "text-cyan-400"
+                                : "text-zinc-500"
+                            }>
                             {icon}
-                            <span>{name}</span>
-                          </Link>
-                        </li>
+                          </span>
+                          <span>{name}</span>
+                          {isActiveSection && (
+                            <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
+                          )}
+                        </Link>
                       );
                     })}
-                  </ul>
+                  </div>
                 </div>
 
-                {/* Separator */}
-                <div className='mb-4 h-px bg-zinc-800'></div>
+                <Separator className='bg-white/10' />
 
                 {/* Other Section */}
                 <div>
-                  <div className='mb-2 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
                     Inne
                   </div>
-                  <ul className='space-y-1'>
+                  <div className='space-y-1'>
                     {otherSections.map(({ id, name, href, icon }) => {
                       const isActive = id === pageId;
                       return (
-                        <li key={id}>
-                          <Link
-                            href={href}
-                            onClick={handleLinkClick}
-                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors ${
-                              isActive
-                                ? "bg-zinc-800 text-white"
-                                : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-300"
-                            }`}>
+                        <Link
+                          key={id}
+                          href={href}
+                          onClick={handleLinkClick}
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                            isActive
+                              ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                          }`}>
+                          <span
+                            className={
+                              isActive ? "text-cyan-400" : "text-zinc-500"
+                            }>
                             {icon}
-                            <span>{name}</span>
-                          </Link>
-                        </li>
+                          </span>
+                          <span>{name}</span>
+                          {isActive && (
+                            <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
+                          )}
+                        </Link>
                       );
                     })}
-                  </ul>
+                  </div>
                 </div>
               </nav>
             </motion.aside>

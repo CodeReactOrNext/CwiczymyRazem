@@ -26,7 +26,13 @@
     "error": "Błąd podczas aktualizacji daty"
   },
   "profile_settings": "Ustawienia Profilu",
+  "manage_your_profile_information": "Zarządzaj informacjami o swoim profilu",
   "security": "Ustawienia Bezpieczeństwa",
+  "manage_your_account_security": "Zarządzaj bezpieczeństwem swojego konta",
+  "google_account_notice": "Konto Google - ograniczone opcje",
   "additional_info": "Dodatkowe Informacje",
-  "danger_zone": "Strefa Zagrożenia"
+  "customize_your_experience": "Dostosuj swoje doświadczenie",
+  "danger_zone": "Strefa Zagrożenia",
+  "irreversible_actions": "Akcje nieodwracalne - zachowaj ostrożność",
+  "danger_zone_warning": "Poniższe akcje są nieodwracalne. Upewnij się, że rozumiesz konsekwencje."
 }

@@ -35,63 +35,53 @@ export const WelcomeMessage = ({
 
   return (
     <div className='flex items-center gap-4'>
-      {/* Today's Practice Status - Enhanced */}
-      <div
-        className={`flex h-16 items-center gap-3 rounded-xl border px-4 py-2.5 shadow-sm backdrop-blur-sm transition-all duration-300 ${
-          didPracticeToday
-            ? "border-green-500/30 bg-green-500/10 hover:bg-green-500/15"
-            : "border-red-500/30 bg-red-500/10 hover:bg-red-500/15"
-        }`}>
-        <div className='flex flex-col items-center gap-1'>
-          <span className='text-xs font-medium text-zinc-300'>Today</span>
-          {didPracticeToday ? (
-            <FaCheck className='text-green-400' />
-          ) : (
-            <FaTimes className='text-red-400' />
-          )}
-        </div>
-        <div className='text-center'>
-          <div
-            className={`text-sm font-bold ${
-              didPracticeToday ? "text-green-300" : "text-red-300"
-            }`}>
-            {didPracticeToday ? "Done" : "Pending"}
-          </div>
-          <div className='text-xs text-zinc-500'>Practice</div>
-        </div>
+      {/* Today's Practice Status - Compact */}
+      <div className='flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-zinc-800/50 px-3 py-2 shadow-sm backdrop-blur-sm'>
+        {didPracticeToday ? (
+          <FaCheck className='text-xs text-white' />
+        ) : (
+          <FaTimes className='text-xs text-zinc-400' />
+        )}
+        <span className='text-xs font-semibold text-white'>
+          {didPracticeToday ? "Done" : "Pending"}
+        </span>
       </div>
 
-      {/* Weekly Streak Box - Enhanced */}
-      <div className='h-16 rounded-xl border border-cyan-500/30 bg-cyan-500/10 shadow-sm backdrop-blur-sm'>
-        <WeeklyStreakBox dayWithoutBreak={dayWithoutBreak} />
+      {/* Weekly Streak - Horizontal Days */}
+      <div className='flex h-10 items-center gap-1 rounded-lg border border-white/10 bg-zinc-800/50 px-3 py-2 shadow-sm backdrop-blur-sm'>
+        {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => {
+          const isActive = index < dayWithoutBreak;
+          return (
+            <div
+              key={index}
+              className={`flex h-6 w-6 items-center justify-center rounded text-xs font-medium ${
+                isActive
+                  ? "bg-white text-zinc-800"
+                  : "bg-zinc-700 text-zinc-400"
+              }`}>
+              {day}
+            </div>
+          );
+        })}
+        <span className='ml-2 text-xs font-semibold text-white'>
+          {dayWithoutBreak}
+        </span>
       </div>
 
-      {/* Points - Enhanced Card */}
-      <div className='hidden h-16 items-center gap-3 rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-4 py-2.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-yellow-500/15 sm:flex'>
-        <div className='flex flex-col items-center gap-1'>
-          <FaTrophy className='text-yellow-400' />
-          <span className='text-xs font-medium text-zinc-300'>Points</span>
-        </div>
-        <div className='text-center'>
-          <div className='text-sm font-bold text-yellow-300'>
-            {points.toLocaleString()}
-          </div>
-          <div className='text-xs text-zinc-500'>Total</div>
-        </div>
+      {/* Points - Compact Card */}
+      <div className='hidden h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-zinc-800/50 px-3 py-2 shadow-sm backdrop-blur-sm sm:flex'>
+        <FaTrophy className='text-xs text-white' />
+        <span className='text-xs font-semibold text-white'>
+          {points.toLocaleString()}
+        </span>
       </div>
 
-      {/* Time - Enhanced Card */}
-      <div className='hidden h-16 items-center gap-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-2.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:bg-cyan-500/15 lg:flex'>
-        <div className='flex flex-col items-center gap-1'>
-          <FaClock className='text-cyan-400' />
-          <span className='text-xs font-medium text-zinc-300'>Time</span>
-        </div>
-        <div className='text-center'>
-          <div className='font-mono text-sm font-bold text-cyan-300'>
-            {totalPracticeTime}
-          </div>
-          <div className='text-xs text-zinc-500'>Practice</div>
-        </div>
+      {/* Time - Compact Card */}
+      <div className='hidden h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-zinc-800/50 px-3 py-2 shadow-sm backdrop-blur-sm lg:flex'>
+        <FaClock className='text-xs text-white' />
+        <span className='font-mono text-xs font-semibold text-white'>
+          {totalPracticeTime}
+        </span>
       </div>
     </div>
   );

@@ -153,7 +153,7 @@ export const StatsSection = ({
                   </div>
                   <a
                     href='/songs'
-                    className='group/btn flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 px-4 py-2 text-sm font-medium text-purple-400 shadow-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 hover:text-purple-300 hover:shadow-md'>
+                    className='group/btn flex items-center gap-2 rounded-lg bg-zinc-800/50 px-4 py-2 text-sm font-medium text-purple-400 shadow-sm transition-all duration-300 hover:bg-zinc-800/70 hover:text-purple-300 hover:shadow-md'>
                     <span>Przeglądaj</span>
                     <svg
                       className='h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-0.5'
@@ -184,10 +184,10 @@ export const StatsSection = ({
 
                   if (totalSongs === 0) {
                     return (
-                      <div className='rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-6 text-center'>
+                      <div className='rounded-lg border border-white/10 bg-zinc-800/30 p-6 text-center'>
                         <div className='mb-3'>
                           <svg
-                            className='mx-auto h-12 w-12 text-zinc-500'
+                            className='mx-auto h-12 w-12 text-zinc-400'
                             fill='none'
                             stroke='currentColor'
                             viewBox='0 0 24 24'>
@@ -212,7 +212,7 @@ export const StatsSection = ({
                   return (
                     <div className='space-y-5'>
                       {/* Main Progress Card */}
-                      <div className='rounded-xl border border-zinc-700/30 bg-gradient-to-br from-zinc-800/40 to-zinc-900/40 p-5 shadow-inner'>
+                      <div className='rounded-xl border border-white/10 bg-zinc-800/30 p-5 shadow-inner'>
                         <div className='mb-4 flex items-center justify-between'>
                           <div>
                             <h5 className='font-semibold text-white'>
@@ -223,7 +223,7 @@ export const StatsSection = ({
                             </p>
                           </div>
                           <div className='text-right'>
-                            <div className='text-2xl font-bold text-white'>
+                            <div className='text-2xl font-semibold text-white'>
                               {learnedPercentage.toFixed(0)}%
                             </div>
                             <div className='text-xs text-zinc-400'>
@@ -232,7 +232,7 @@ export const StatsSection = ({
                           </div>
                         </div>
 
-                        {/* Elegant Progress Bar */}
+                        {/* Progress Bar */}
                         <div className='relative mb-3 h-2 w-full overflow-hidden rounded-full bg-zinc-700/50'>
                           <div
                             className='absolute left-0 top-0 h-full bg-white transition-all duration-700'
@@ -263,10 +263,10 @@ export const StatsSection = ({
                         </div>
                       </div>
 
-                      {/* Category Stats - Elegant */}
+                      {/* Category Stats */}
                       <div className='grid grid-cols-3 gap-3'>
-                        <div className='rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-4 text-center transition-all duration-300 hover:bg-zinc-800/30'>
-                          <div className='mb-2 text-xl font-bold text-white'>
+                        <div className='rounded-lg border border-white/10 bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
+                          <div className='mb-2 text-xl font-semibold text-white'>
                             {userSongs.wantToLearn.length}
                           </div>
                           <div className='text-xs font-medium text-zinc-400'>
@@ -274,8 +274,8 @@ export const StatsSection = ({
                           </div>
                         </div>
 
-                        <div className='rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-4 text-center transition-all duration-300 hover:bg-zinc-800/30'>
-                          <div className='mb-2 text-xl font-bold text-white'>
+                        <div className='rounded-lg border border-white/10 bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
+                          <div className='mb-2 text-xl font-semibold text-white'>
                             {userSongs.learning.length}
                           </div>
                           <div className='text-xs font-medium text-zinc-400'>
@@ -283,8 +283,8 @@ export const StatsSection = ({
                           </div>
                         </div>
 
-                        <div className='rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-4 text-center transition-all duration-300 hover:bg-zinc-800/30'>
-                          <div className='mb-2 text-xl font-bold text-white'>
+                        <div className='rounded-lg border border-white/10 bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
+                          <div className='mb-2 text-xl font-semibold text-white'>
                             {userSongs.learned.length}
                           </div>
                           <div className='text-xs font-medium text-zinc-400'>
