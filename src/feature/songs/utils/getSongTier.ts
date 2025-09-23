@@ -12,46 +12,46 @@ export const getSongTier = (rating: number): SongTier => {
     return {
       tier: 'S',
       label: 'S-Tier',
-      color: '#FFD700', // Gold
-      bgColor: 'bg-yellow-500/20',
-      borderColor: 'border-yellow-500/50',
-      description: 'Legendarny'
+      color: '#F59E0B', // Dark amber (warning)
+      bgColor: 'bg-amber-500/15',
+      borderColor: 'border-amber-400/30',
+      description: 'tier.legendary'
     };
   } else if (rating >= 7.5) {
     return {
       tier: 'A',
       label: 'A-Tier',
-      color: '#FF6B6B', // Red
-      bgColor: 'bg-red-500/20',
-      borderColor: 'border-red-500/50',
-      description: 'Ekspertowy'
+      color: '#EF4444', // Dark red (error)
+      bgColor: 'bg-red-500/15',
+      borderColor: 'border-red-400/30',
+      description: 'tier.expert'
     };
   } else if (rating >= 6) {
     return {
       tier: 'B',
       label: 'B-Tier',
-      color: '#4ECDC4', // Teal
-      bgColor: 'bg-teal-500/20',
-      borderColor: 'border-teal-500/50',
-      description: 'Zaawansowany'
+      color: '#22D3EE', // Dark cyan (info)
+      bgColor: 'bg-cyan-500/15',
+      borderColor: 'border-cyan-400/30',
+      description: 'tier.advanced'
     };
   } else if (rating >= 4) {
     return {
       tier: 'C',
       label: 'C-Tier',
-      color: '#45B7D1', // Blue
-      bgColor: 'bg-blue-500/20',
-      borderColor: 'border-blue-500/50',
-      description: 'Średniozaawansowany'
+      color: '#06B6D4', // Darker cyan (primary)
+      bgColor: 'bg-cyan-600/15',
+      borderColor: 'border-cyan-500/30',
+      description: 'tier.intermediate'
     };
   } else {
     return {
       tier: 'D',
       label: 'D-Tier',
-      color: '#96CEB4', // Green
-      bgColor: 'bg-green-500/20',
-      borderColor: 'border-green-500/50',
-      description: 'Początkujący'
+      color: '#10B981', // Dark emerald (success)
+      bgColor: 'bg-emerald-500/15',
+      borderColor: 'border-emerald-400/30',
+      description: 'tier.beginner'
     };
   }
 };

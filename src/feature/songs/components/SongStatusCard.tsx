@@ -50,23 +50,26 @@ const STATUS_CONFIG = {
   },
 };
 
-const TierBadge = ({ song }: { song: Song }) => {
+const TierBadge = ({ song, t }: { song: Song; t: any }) => {
   const avgRating = getAverageDifficulty(song.difficulties);
 
-  if (avgRating === 0) return null; // Brak ocen
+  /profile/skills  if (avgRating === 0) return null;
 
   const tier = getSongTier(avgRating);
 
   return (
     <div
       className={cn(
-        "flex h-6 w-6 items-center justify-center rounded text-xs font-bold",
+        "flex h-5 w-5 items-center justify-center rounded-sm text-xs font-bold",
         tier.bgColor,
         tier.borderColor,
-        "border"
+        "border shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-110"
       )}
-      style={{ color: tier.color }}
-      title={`${tier.description} (${avgRating.toFixed(1)}/10)`}>
+      style={{
+        color: tier.color,
+        boxShadow: `0 1px 3px ${tier.color}20`,
+      }}
+      title={`${t(tier.description as any)} - ${avgRating.toFixed(1)}/10`}>
       {tier.tier}
     </div>
   );
@@ -121,7 +124,7 @@ export const SongStatusCard = ({
           </div>
           <div>
             <h3 className='text-lg font-semibold text-white'>{title}</h3>
-            <p className='text-sm text-zinc-500'>
+            <p className='text-sm text-slate-500'>
               {songs?.length === 0
                 ? "Brak utworów"
                 : `${songs?.length} ${
@@ -148,14 +151,14 @@ export const SongStatusCard = ({
               className={cn(
                 "relative min-h-[300px] rounded-xl border-2 border-dashed p-4 transition-all duration-300",
                 snapshot.isDraggingOver
-                  ? "border-cyan-400 bg-cyan-500/10"
-                  : "border-zinc-600/30 bg-zinc-800/20"
+                  ? "border-slate-400 bg-slate-500/15"
+                  : "border-slate-600/30 bg-slate-800/20"
               )}
               {...provided.droppableProps}
               ref={provided.innerRef}
               style={{
                 position: "relative",
-                zIndex: snapshot.isDraggingOver ? 1 : 0,
+                zIndex: snapshot.isDraggingOver ? 1000 : 0,
               }}>
               {songs?.length === 0 ? (
                 <div className='flex h-full flex-col items-center justify-center space-y-3 text-center'>
@@ -163,11 +166,11 @@ export const SongStatusCard = ({
                     className={cn("h-12 w-12 opacity-40", config.color)}
                   />
                   <div>
-                    <p className='text-zinc-400'>
+                    <p className='text-slate-400'>
                       {snapshot.isDraggingOver ? "Upuść tutaj" : "Brak utworów"}
                     </p>
                     {!isLanding && !snapshot.isDraggingOver && (
-                      <p className='mt-1 text-xs text-zinc-600'>
+                      <p className='mt-1 text-xs text-slate-600'>
                         Przeciągnij utwory lub użyj przycisków
                       </p>
                     )}
@@ -190,18 +193,20 @@ export const SongStatusCard = ({
                             "group flex items-center justify-between",
                             "rounded-lg border p-3 transition-all duration-200",
                             snapshot.isDragging
-                              ? "border-cyan-400 bg-cyan-500/30 shadow-2xl shadow-cyan-500/50 backdrop-blur-sm"
-                              : "border-transparent bg-zinc-800/60 hover:bg-zinc-700/80"
+                              ? "border-slate-400 bg-slate-500/30 shadow-2xl shadow-slate-500/60 ring-2 ring-slate-400/50 backdrop-blur-sm"
+                              : "border-transparent bg-slate-800/60 hover:bg-slate-700/80"
                           )}
                           style={{
                             transform: snapshot.isDragging
                               ? "rotate(3deg) scale(1.1)"
                               : undefined,
                             zIndex: snapshot.isDragging ? 9999 : "auto",
-                            position: snapshot.isDragging
-                              ? "relative"
-                              : undefined,
+                            position: snapshot.isDragging ? "fixed" : undefined,
                             opacity: snapshot.isDragging ? 0.95 : 1,
+                            pointerEvents: snapshot.isDragging
+                              ? "none"
+                              : "auto",
+                            ...provided.draggableProps.style,
                           }}>
                           <div className='flex flex-1 items-center gap-3 overflow-hidden'>
                             <div
@@ -222,19 +227,29 @@ export const SongStatusCard = ({
                                   className={cn(
                                     "truncate text-sm font-medium transition-colors",
                                     snapshot.isDragging
-                                      ? "text-cyan-100"
+                                      ? "text-slate-100"
                                       : "text-white"
                                   )}>
                                   {song.title}
                                 </p>
-                                <TierBadge song={song} />
+                                <div className='flex items-center gap-1'>
+                                  <TierBadge song={song} t={t} />
+                                  {getAverageDifficulty(song.difficulties) >
+                                    0 && (
+                                    <span className='text-xs font-medium text-slate-500'>
+                                      {getAverageDifficulty(
+                                        song.difficulties
+                                      ).toFixed(1)}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <p
                                 className={cn(
                                   "truncate text-xs transition-colors",
                                   snapshot.isDragging
-                                    ? "text-cyan-200"
-                                    : "text-zinc-400"
+                                    ? "text-slate-300"
+                                    : "text-slate-400"
                                 )}>
                                 {song.artist}
                               </p>
@@ -300,11 +315,11 @@ export const SongStatusCard = ({
                           </div>
                           <DropdownMenu>
                             <DropdownMenuTrigger className='ml-2 opacity-0 transition-all duration-200 focus:outline-none group-hover:opacity-100 hover:scale-110'>
-                              <div className='rounded-lg p-2 transition-colors hover:bg-zinc-600/30'>
-                                <MoreVertical className='h-4 w-4 text-zinc-400' />
+                              <div className='rounded-lg p-2 transition-colors hover:bg-slate-600/30'>
+                                <MoreVertical className='h-4 w-4 text-slate-400' />
                               </div>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className='border-zinc-600/50 bg-zinc-800/95 backdrop-blur-xl'>
+                            <DropdownMenuContent className='border-slate-600/50 bg-slate-800/95 backdrop-blur-xl'>
                               {(
                                 ["wantToLearn", "learning", "learned"] as const
                               ).map((status) => (
@@ -318,7 +333,7 @@ export const SongStatusCard = ({
                                       song.artist
                                     )
                                   }
-                                  className='flex cursor-pointer items-center gap-3 py-2 text-sm hover:bg-zinc-700/50'>
+                                  className='flex cursor-pointer items-center gap-3 py-2 text-sm hover:bg-slate-700/50'>
                                   <ArrowRight className='h-4 w-4' />
                                   <span>Przenieś do:</span>
                                   <span
@@ -332,7 +347,7 @@ export const SongStatusCard = ({
                               ))}
                               <DropdownMenuItem
                                 onClick={() => onSongRemove(song.id)}
-                                className='cursor-pointer py-2 text-sm text-red-400 hover:bg-red-500/10'>
+                                className='cursor-pointer py-2 text-sm text-red-400 hover:bg-red-500/15'>
                                 Usuń utwór
                               </DropdownMenuItem>
                             </DropdownMenuContent>

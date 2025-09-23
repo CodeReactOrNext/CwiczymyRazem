@@ -168,46 +168,44 @@ const SongsTable = ({
   return (
     <div className='space-y-6'>
       {/* Enhanced Table Container */}
-      <div className='overflow-hidden rounded-lg border border-zinc-700/30 bg-zinc-900/10 backdrop-blur-sm'>
+      <div className='overflow-hidden rounded-xl border border-slate-700/40 bg-slate-900/20 shadow-lg backdrop-blur-sm'>
         <Table>
           {/* Enhanced Table Header */}
-          <TableHeader className='bg-gradient-to-r from-zinc-800/50 to-zinc-700/30 backdrop-blur-sm'>
-            <TableRow className='border-b border-zinc-600/30 hover:bg-transparent'>
-              <TableHead className='h-14 px-6 text-sm font-semibold text-zinc-200'>
+          <TableHeader className='bg-gradient-to-r from-slate-800/60 to-slate-700/40 backdrop-blur-sm'>
+            <TableRow className='border-b border-slate-600/30 hover:bg-transparent'>
+              <TableHead className='h-14 px-6 text-sm font-semibold text-slate-200'>
                 <div className='flex items-center gap-2'>
-                  <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
+                  <div className='h-2 w-2 rounded-full bg-cyan-500'></div>
                   {t("artist")}
                 </div>
               </TableHead>
-              <TableHead className='h-14 px-6 text-sm font-semibold text-zinc-200'>
+              <TableHead className='h-14 px-6 text-sm font-semibold text-slate-200'>
                 <div className='flex items-center gap-2'>
-                  <div className='h-2 w-2 rounded-full bg-purple-400'></div>
+                  <div className='h-2 w-2 rounded-full bg-blue-500'></div>
                   {t("title")}
                 </div>
               </TableHead>
-              <TableHead className='h-14 px-6 text-sm font-semibold text-zinc-200'>
+              <TableHead className='h-14 px-6 text-sm font-semibold text-slate-200'>
                 <div className='flex items-center gap-2'>
-                  <div className='h-2 w-2 rounded-full bg-amber-400'></div>
+                  <div className='h-2 w-2 rounded-full bg-amber-500'></div>
                   {t("difficulty")}
                 </div>
               </TableHead>
-              <TableHead className='h-14 px-6 text-sm font-semibold text-zinc-200'>
+              <TableHead className='h-14 px-6 text-sm font-semibold text-slate-200'>
                 <div className='flex items-center gap-2'>
-                  <div className='h-2 w-2 rounded-full bg-emerald-400'></div>
+                  <div className='h-2 w-2 rounded-full bg-emerald-500'></div>
                   Ocena
                 </div>
               </TableHead>
-              {tierFilter !== "all" && (
-                <TableHead className='h-14 px-6 text-sm font-semibold text-zinc-200'>
-                  <div className='flex items-center gap-2'>
-                    <div className='h-2 w-2 rounded-full bg-yellow-400'></div>
-                    Tier
-                  </div>
-                </TableHead>
-              )}
-              <TableHead className='h-14 px-6 text-sm font-semibold text-zinc-200'>
+              <TableHead className='h-14 px-6 text-sm font-semibold text-slate-200'>
                 <div className='flex items-center gap-2'>
-                  <div className='h-2 w-2 rounded-full bg-blue-400'></div>
+                  <div className='h-2 w-2 rounded-full bg-amber-600'></div>
+                  Tier
+                </div>
+              </TableHead>
+              <TableHead className='h-14 px-6 text-sm font-semibold text-slate-200'>
+                <div className='flex items-center gap-2'>
+                  <div className='h-2 w-2 rounded-full bg-cyan-600'></div>
                   Status
                 </div>
               </TableHead>
@@ -259,41 +257,67 @@ const SongsTable = ({
                     {/* Title Cell */}
                     <TableCell className='px-6 py-4'>
                       <div className='flex items-center gap-3'>
-                        <div>
+                        <div className='flex-1'>
                           <p className='font-semibold text-white transition-colors group-hover:text-cyan-300'>
                             {song.title}
                           </p>
                         </div>
+                        {(() => {
+                          const avgDifficulty = getAverageDifficulty(
+                            song.difficulties
+                          );
+                          const tier = getSongTier(avgDifficulty);
+                          return (
+                            <div
+                              className={`flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs backdrop-blur-sm transition-all duration-200 hover:scale-105 ${tier.borderColor} ${tier.bgColor} hover:shadow-md`}
+                              style={{
+                                boxShadow: `0 1px 4px ${tier.color}15`,
+                              }}>
+                              <div
+                                className='h-2 w-2 rounded-full border'
+                                style={{
+                                  backgroundColor: tier.color,
+                                  borderColor: tier.color,
+                                  boxShadow: `0 0 2px ${tier.color}40`,
+                                }}></div>
+                              <span
+                                className='font-bold'
+                                style={{ color: tier.color }}>
+                                {tier.tier}
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </TableCell>
 
                     {/* Difficulty Cell */}
                     <TableCell className='px-6 py-4'>
-                      <div className='flex items-center gap-3'>
+                      <div className='flex items-center gap-2'>
                         <Badge
                           variant='outline'
-                          className={`border-zinc-600/50 bg-zinc-800/30 text-zinc-300 backdrop-blur-sm ${
+                          className={`border-slate-600/50 bg-slate-800/30 text-slate-300 backdrop-blur-sm ${
                             getDifficultyRating(
                               getAverageDifficulty(song.difficulties)
                             ).color === "#4CAF50"
-                              ? "border-green-500/30 bg-green-500/10 text-green-300"
+                              ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-300"
                               : getDifficultyRating(
                                   getAverageDifficulty(song.difficulties)
                                 ).color === "#8BC34A"
-                              ? "border-green-400/30 bg-green-400/10 text-green-300"
+                              ? "border-emerald-400/30 bg-emerald-400/15 text-emerald-300"
                               : getDifficultyRating(
                                   getAverageDifficulty(song.difficulties)
                                 ).color === "#FFC107"
-                              ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                              ? "border-amber-500/30 bg-amber-500/15 text-amber-300"
                               : getDifficultyRating(
                                   getAverageDifficulty(song.difficulties)
                                 ).color === "#FF9800"
-                              ? "border-orange-500/30 bg-orange-500/10 text-orange-300"
+                              ? "border-orange-500/30 bg-orange-500/15 text-orange-300"
                               : getDifficultyRating(
                                   getAverageDifficulty(song.difficulties)
                                 ).color === "#FF5722"
-                              ? "border-red-500/30 bg-red-500/10 text-red-300"
-                              : "border-red-600/30 bg-red-600/10 text-red-300"
+                              ? "border-red-500/30 bg-red-500/15 text-red-300"
+                              : "border-red-600/30 bg-red-600/15 text-red-300"
                           }`}>
                           {renderDifficulty(
                             getAverageDifficulty(song.difficulties)
@@ -309,38 +333,40 @@ const SongsTable = ({
                       </div>
                     </TableCell>
 
-                    {/* Tier Cell - Only show when tier filter is active */}
-                    {tierFilter !== "all" && (
-                      <TableCell className='px-6 py-4'>
-                        {(() => {
-                          const avgDifficulty = getAverageDifficulty(
-                            song.difficulties
-                          );
-                          const tier = getSongTier(avgDifficulty);
-                          return (
-                            <div className='flex items-center gap-3'>
+                    {/* Tier Cell */}
+                    <TableCell className='px-6 py-4'>
+                      {(() => {
+                        const avgDifficulty = getAverageDifficulty(
+                          song.difficulties
+                        );
+                        const tier = getSongTier(avgDifficulty);
+                        return (
+                          <div className='flex items-center gap-2'>
+                            <div
+                              className={`flex items-center gap-2 rounded-lg border px-3 py-2 backdrop-blur-sm transition-all duration-200 hover:scale-105 ${tier.borderColor} ${tier.bgColor} hover:shadow-lg`}
+                              style={{
+                                boxShadow: `0 2px 8px ${tier.color}15`,
+                              }}>
                               <div
-                                className={`flex items-center gap-2 rounded-lg border px-3 py-2 backdrop-blur-sm ${tier.borderColor} ${tier.bgColor}`}>
-                                <div
-                                  className='h-3 w-3 rounded-full border'
-                                  style={{
-                                    backgroundColor: tier.color,
-                                    borderColor: tier.color,
-                                  }}></div>
-                                <span
-                                  className='text-lg font-bold'
-                                  style={{ color: tier.color }}>
-                                  {tier.tier}
-                                </span>
-                                <span className='text-xs text-zinc-400'>
-                                  {tier.description}
-                                </span>
-                              </div>
+                                className='h-3 w-3 rounded-full border shadow-sm'
+                                style={{
+                                  backgroundColor: tier.color,
+                                  borderColor: tier.color,
+                                  boxShadow: `0 0 4px ${tier.color}40`,
+                                }}></div>
+                              <span
+                                className='text-lg font-bold'
+                                style={{ color: tier.color }}>
+                                {tier.tier}
+                              </span>
+                              <span className='text-xs font-medium text-zinc-400'>
+                                {t(tier.description as any)}
+                              </span>
                             </div>
-                          );
-                        })()}
-                      </TableCell>
-                    )}
+                          </div>
+                        );
+                      })()}
+                    </TableCell>
 
                     {/* Status Cell */}
                     <TableCell className='px-6 py-4'>
@@ -355,18 +381,18 @@ const SongsTable = ({
                           )
                         }>
                         <SelectTrigger
-                          className={`w-[140px] border-zinc-600/50 bg-zinc-800/30 backdrop-blur-sm transition-colors hover:bg-zinc-700/50 ${
+                          className={`w-[140px] border-slate-600/50 bg-slate-800/30 backdrop-blur-sm transition-colors hover:bg-slate-700/50 ${
                             status === "wantToLearn"
-                              ? "border-blue-500/30 bg-blue-500/10"
+                              ? "border-blue-500/30 bg-blue-500/15"
                               : status === "learning"
-                              ? "border-amber-500/30 bg-amber-500/10"
+                              ? "border-amber-500/30 bg-amber-500/15"
                               : status === "learned"
-                              ? "border-emerald-500/30 bg-emerald-500/10"
+                              ? "border-emerald-500/30 bg-emerald-500/15"
                               : ""
                           }`}>
                           <SelectValue placeholder={t("select_status")} />
                         </SelectTrigger>
-                        <SelectContent className='border-zinc-600/50 bg-zinc-800/90 backdrop-blur-xl'>
+                        <SelectContent className='border-slate-600/50 bg-slate-800/90 backdrop-blur-xl'>
                           <SelectItem
                             value='wantToLearn'
                             className='font-openSans focus:bg-blue-500/20 focus:text-blue-300'>
@@ -413,7 +439,7 @@ const SongsTable = ({
                 <PaginationItem>
                   <PaginationPrevious
                     onClick={() => onPageChange(currentPage - 1)}
-                    className={`border border-zinc-600/50 bg-zinc-800/30 hover:bg-zinc-700/50 ${
+                    className={`border border-slate-600/50 bg-slate-800/30 hover:bg-slate-700/50 ${
                       currentPage <= 1
                         ? "pointer-events-none opacity-50"
                         : "cursor-pointer hover:border-cyan-500/50 hover:text-cyan-300"
@@ -434,9 +460,9 @@ const SongsTable = ({
                         <PaginationLink
                           onClick={() => onPageChange(pageNumber)}
                           isActive={currentPage === pageNumber}
-                          className={`border border-zinc-600/50 bg-zinc-800/30 hover:border-cyan-500/50 hover:bg-zinc-700/50 hover:text-cyan-300 ${
+                          className={`border border-slate-600/50 bg-slate-800/30 hover:border-cyan-500/50 hover:bg-slate-700/50 hover:text-cyan-300 ${
                             currentPage === pageNumber
-                              ? "border-cyan-500/50 bg-cyan-500/20 text-cyan-300"
+                              ? "border-cyan-500/50 bg-cyan-500/25 text-cyan-300"
                               : ""
                           }`}>
                           {pageNumber}
@@ -459,7 +485,7 @@ const SongsTable = ({
                 <PaginationItem>
                   <PaginationNext
                     onClick={() => onPageChange(currentPage + 1)}
-                    className={`border border-zinc-600/50 bg-zinc-800/30 hover:bg-zinc-700/50 ${
+                    className={`border border-slate-600/50 bg-slate-800/30 hover:bg-slate-700/50 ${
                       currentPage >= totalPages
                         ? "pointer-events-none opacity-50"
                         : "cursor-pointer hover:border-cyan-500/50 hover:text-cyan-300"

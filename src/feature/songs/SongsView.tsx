@@ -57,18 +57,18 @@ const SongsView = () => {
     <MainContainer title={t("songs")}>
       <div className='font-openSans p-6'>
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          {/* Simple Tab Navigation */}
-          <div className='mb-6'>
-            <TabsList className='grid w-full grid-cols-2 bg-zinc-800/60 p-1'>
+          {/* Enhanced Tab Navigation */}
+          <div className='mb-8'>
+            <TabsList className='grid h-14 w-full grid-cols-2 rounded-xl border border-slate-700/50 bg-slate-800/40 p-1 backdrop-blur-sm'>
               <TabsTrigger
                 value='management'
-                className='flex items-center gap-3 rounded-lg border border-transparent px-6 py-3 text-sm font-medium text-zinc-400 transition-all data-[state=active]:border-cyan-500/50 data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-300 data-[state=active]:shadow-lg data-[state=active]:shadow-cyan-500/20 hover:text-zinc-200'>
+                className='flex h-full w-full items-center justify-center gap-2.5 rounded-lg border border-transparent px-6 py-3 text-sm font-semibold text-slate-400 transition-all duration-300 data-[state=active]:border-cyan-400/40 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-blue-500/15 data-[state=active]:text-cyan-300 data-[state=active]:shadow-lg data-[state=active]:shadow-cyan-500/25 data-[state=active]:backdrop-blur-sm hover:bg-slate-700/30 hover:text-slate-200'>
                 <Library size={18} />
                 <span>Zarządzanie utworami</span>
               </TabsTrigger>
               <TabsTrigger
                 value='table'
-                className='flex items-center gap-3 rounded-lg border border-transparent px-6 py-3 text-sm font-medium text-zinc-400 transition-all data-[state=active]:border-purple-500/50 data-[state=active]:bg-purple-500/10 data-[state=active]:text-purple-300 data-[state=active]:shadow-lg data-[state=active]:shadow-purple-500/20 hover:text-zinc-200'>
+                className='flex h-full w-full items-center justify-center gap-2.5 rounded-lg border border-transparent px-6 py-3 text-sm font-semibold text-slate-400 transition-all duration-300 data-[state=active]:border-purple-400/40 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-pink-500/15 data-[state=active]:text-purple-300 data-[state=active]:shadow-lg data-[state=active]:shadow-purple-500/25 data-[state=active]:backdrop-blur-sm hover:bg-slate-700/30 hover:text-slate-200'>
                 <Table size={18} />
                 <span>Tabela utworów</span>
               </TabsTrigger>
@@ -77,13 +77,13 @@ const SongsView = () => {
 
           {/* Management Tab Content */}
           <TabsContent value='management' className='mt-0'>
-            <div className='space-y-6'>
-              {/* Simple header */}
-              <div className='mb-6'>
-                <h2 className='mb-2 text-2xl font-bold text-white'>
+            <div className='space-y-8'>
+              {/* Enhanced header */}
+              <div className='mb-8'>
+                <h2 className='mb-3 text-2xl font-bold text-slate-100'>
                   Zarządzanie utworami
                 </h2>
-                <p className='text-zinc-400'>
+                <p className='text-base leading-relaxed text-slate-300'>
                   Przeciągnij utwory między kategoriami aby zmienić ich status
                   nauki
                 </p>
@@ -101,16 +101,16 @@ const SongsView = () => {
 
           {/* Table Tab Content */}
           <TabsContent value='table' className='mt-0'>
-            <div className='space-y-6'>
-              {/* Simple Filters Section */}
-              <div className='rounded-lg border border-zinc-600/50 bg-zinc-900/60 p-4'>
-                <div className='mb-4 flex items-center justify-between'>
-                  <h3 className='text-lg font-semibold text-white'>
+            <div className='space-y-8'>
+              {/* Enhanced Filters Section */}
+              <div className='rounded-xl border border-slate-700/50 bg-slate-800/40 p-6 shadow-lg backdrop-blur-sm'>
+                <div className='mb-6 flex items-center justify-between'>
+                  <h3 className='text-xl font-semibold text-slate-100'>
                     Filtry i wyszukiwanie
                   </h3>
                   <Button
                     onClick={() => setIsModalOpen(true)}
-                    className='bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500'>
+                    className='rounded-lg border border-cyan-500/30 bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-2.5 font-semibold text-white transition-all duration-300 hover:from-cyan-500 hover:to-blue-500 hover:shadow-lg hover:shadow-cyan-500/25'>
                     <IoMdAddCircleOutline className='mr-2 h-4 w-4' />
                     Dodaj utwór
                   </Button>
@@ -120,7 +120,7 @@ const SongsView = () => {
                   {/* Search & Basic Filters Row */}
                   <div className='grid gap-4 lg:grid-cols-4'>
                     <div className='lg:col-span-2'>
-                      <label className='mb-2 block text-sm font-medium text-zinc-300'>
+                      <label className='mb-2 block text-sm font-medium text-slate-300'>
                         Wyszukiwanie
                       </label>
                       <Input
@@ -139,11 +139,11 @@ const SongsView = () => {
                         placeholder={t("search_songs")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className='h-10 border-zinc-600/50 bg-zinc-800/50'
+                        className='h-10 border-slate-600/50 bg-slate-800/50'
                       />
                     </div>
                     <div>
-                      <label className='mb-2 block text-sm font-medium text-zinc-300'>
+                      <label className='mb-2 block text-sm font-medium text-slate-300'>
                         Status
                       </label>
                       <Select
@@ -163,7 +163,7 @@ const SongsView = () => {
                       </Select>
                     </div>
                     <div>
-                      <label className='mb-2 block text-sm font-medium text-zinc-300'>
+                      <label className='mb-2 block text-sm font-medium text-slate-300'>
                         Trudność
                       </label>
                       <Select
@@ -184,7 +184,7 @@ const SongsView = () => {
 
                   {/* Tier Filters Row */}
                   <div>
-                    <label className='mb-3 block text-sm font-medium text-zinc-300'>
+                    <label className='mb-3 block text-sm font-medium text-slate-300'>
                       Poziom trudności (Tier)
                     </label>
                     <div className='flex flex-wrap items-center gap-3'>
@@ -193,8 +193,8 @@ const SongsView = () => {
                         onClick={() => setTierFilter("all")}
                         className={`h-9 px-4 text-sm transition-all ${
                           tierFilter === "all"
-                            ? "border border-cyan-500/50 bg-cyan-500/20 text-cyan-300"
-                            : "border border-zinc-600/50 bg-zinc-800/30 text-zinc-400 hover:bg-zinc-700/50"
+                            ? "border border-cyan-500/50 bg-cyan-500/25 text-cyan-300"
+                            : "border border-slate-600/50 bg-slate-800/30 text-slate-400 hover:bg-slate-700/50"
                         }`}>
                         Wszystkie
                       </Button>
@@ -205,15 +205,15 @@ const SongsView = () => {
                           onClick={() => setTierFilter(tier.tier)}
                           className={`h-9 px-3 text-sm transition-all ${
                             tierFilter === tier.tier
-                              ? "border-2 shadow-md"
-                              : "border border-zinc-600/50 bg-zinc-800/30 hover:bg-zinc-700/50"
+                              ? "border-2 shadow-lg backdrop-blur-sm"
+                              : "border border-slate-600/50 bg-slate-800/30 hover:bg-slate-700/50"
                           }`}
                           style={{
                             borderColor:
                               tierFilter === tier.tier ? tier.color : undefined,
                             backgroundColor:
                               tierFilter === tier.tier
-                                ? tier.color + "20"
+                                ? tier.color + "25"
                                 : undefined,
                             color:
                               tierFilter === tier.tier ? tier.color : undefined,
@@ -227,7 +227,7 @@ const SongsView = () => {
                         <Button
                           variant='ghost'
                           onClick={handleClearFilters}
-                          className='h-9 border border-zinc-600/50 px-4 text-sm text-zinc-400 hover:bg-zinc-700/50'>
+                          className='h-9 border border-slate-600/50 px-4 text-sm text-slate-400 hover:bg-slate-700/50'>
                           <X className='mr-2 h-4 w-4' />
                           Wyczyść filtry
                         </Button>
@@ -237,16 +237,16 @@ const SongsView = () => {
                 </div>
               </div>
 
-              {/* Table Section */}
-              <div className='overflow-hidden rounded-lg border border-zinc-600/50 bg-zinc-900/60'>
+              {/* Enhanced Table Section */}
+              <div className='overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/40 shadow-lg backdrop-blur-sm'>
                 {isLoading ? (
                   <div className='flex h-[500px] items-center justify-center'>
                     <div className='text-center'>
-                      <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-zinc-600 border-t-purple-400'></div>
-                      <p className='text-lg font-medium text-zinc-300'>
+                      <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-slate-600 border-t-cyan-400'></div>
+                      <p className='text-lg font-semibold text-slate-300'>
                         Ładowanie utworów...
                       </p>
-                      <p className='text-sm text-zinc-500'>
+                      <p className='text-sm text-slate-400'>
                         Pobieranie biblioteki muzycznej
                       </p>
                     </div>
