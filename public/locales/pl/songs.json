@@ -55,5 +55,12 @@
     "wantToLearn": "chcę się nauczyć",
     "learning": "uczę się",
     "learned": "nauczone"
+  },
+  "tier": {
+    "legendary": "Legendarny",
+    "expert": "Ekspertowy",
+    "advanced": "Zaawansowany",
+    "intermediate": "Średniozaawansowany",
+    "beginner": "Początkujący"
   }
 }

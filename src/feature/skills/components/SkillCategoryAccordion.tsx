@@ -35,43 +35,43 @@ const getCategoryColors = (category: CategoryKeys) => {
   switch (category) {
     case "technique":
       return {
-        bg: "from-red-950/30 to-red-900/20 border-red-700/30",
+        bg: "bg-slate-800/40 border-red-600/30",
         text: "text-red-300",
-        badge: "bg-red-900/50 border-red-600/50 text-red-200",
+        badge: "bg-slate-800/60 border-red-600/50 text-red-300",
         currency: "text-red-400",
         progress: "bg-red-600/70",
       };
     case "theory":
       return {
-        bg: "from-blue-950/30 to-blue-900/20 border-blue-700/30",
+        bg: "bg-slate-800/40 border-blue-600/30",
         text: "text-blue-300",
-        badge: "bg-blue-900/50 border-blue-600/50 text-blue-200",
+        badge: "bg-slate-800/60 border-blue-600/50 text-blue-300",
         currency: "text-blue-400",
         progress: "bg-blue-600/70",
       };
     case "hearing":
       return {
-        bg: "from-emerald-950/30 to-emerald-900/20 border-emerald-700/30",
+        bg: "bg-slate-800/40 border-emerald-600/30",
         text: "text-emerald-300",
-        badge: "bg-emerald-900/50 border-emerald-600/50 text-emerald-200",
+        badge: "bg-slate-800/60 border-emerald-600/50 text-emerald-300",
         currency: "text-emerald-400",
         progress: "bg-emerald-600/70",
       };
     case "creativity":
       return {
-        bg: "from-purple-950/30 to-purple-900/20 border-purple-700/30",
+        bg: "bg-slate-800/40 border-purple-600/30",
         text: "text-purple-300",
-        badge: "bg-purple-900/50 border-purple-600/50 text-purple-200",
+        badge: "bg-slate-800/60 border-purple-600/50 text-purple-300",
         currency: "text-purple-400",
         progress: "bg-purple-600/70",
       };
     default:
       return {
-        bg: "from-zinc-950/30 to-zinc-900/20 border-zinc-700/30",
-        text: "text-zinc-300",
-        badge: "bg-zinc-900/50 border-zinc-600/50 text-zinc-200",
-        currency: "text-zinc-400",
-        progress: "bg-zinc-600/70",
+        bg: "bg-slate-800/40 border-slate-700/30",
+        text: "text-slate-300",
+        badge: "bg-slate-800/60 border-slate-600/50 text-slate-300",
+        currency: "text-slate-400",
+        progress: "bg-slate-600/70",
       };
   }
 };
@@ -132,7 +132,7 @@ export const SkillCategoryAccordion = ({
   return (
     <div
       className={cn(
-        "rounded-lg border bg-gradient-to-br backdrop-blur-sm transition-all duration-300",
+        "rounded-lg border backdrop-blur-sm transition-all duration-300",
         colors.bg,
         isExpanded ? "shadow-lg" : "shadow-sm hover:shadow-md"
       )}>
@@ -145,7 +145,7 @@ export const SkillCategoryAccordion = ({
             setIsExpanded(!isExpanded);
           }
         }}
-        className='w-full p-4 text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-zinc-500/50 hover:bg-white/5'
+        className='w-full p-4 text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-500/50 hover:bg-slate-700/20'
         aria-expanded={isExpanded}
         aria-controls={`skills-${category}`}>
         <div className='flex items-center justify-between'>
@@ -178,12 +178,12 @@ export const SkillCategoryAccordion = ({
                   {t(`categories.${category}`)}
                 </h3>
                 {/* Simple Level Badge */}
-                <div className='flex h-6 min-w-[1.5rem] items-center justify-center rounded border border-zinc-600 bg-zinc-700 px-2 text-xs font-medium text-zinc-200'>
+                <div className='flex h-6 min-w-[1.5rem] items-center justify-center rounded border border-slate-600 bg-slate-700 px-2 text-xs font-medium text-slate-200'>
                   {categoryLevel}
                 </div>
 
                 {/* Total Points Display */}
-                <div className='flex items-center gap-1 text-xs text-zinc-400'>
+                <div className='flex items-center gap-1 text-xs text-slate-400'>
                   <span className='font-medium'>{totalLevels}</span>
                   <span className='opacity-60'>pts total</span>
                 </div>
@@ -191,13 +191,13 @@ export const SkillCategoryAccordion = ({
 
               {/* Enhanced Progress Bar */}
               <div className='mt-2 flex items-center gap-3'>
-                <div className='h-1 w-24 rounded bg-zinc-800'>
+                <div className='h-1 w-24 rounded bg-slate-800'>
                   <div
-                    className='h-full rounded bg-zinc-600 transition-all duration-300'
+                    className='h-full rounded bg-slate-600 transition-all duration-300'
                     style={{ width: `${(progressToNextLevel / 10) * 100}%` }}
                   />
                 </div>
-                <span className='text-xs text-zinc-500'>
+                <span className='text-xs text-slate-500'>
                   {progressToNextLevel}/10
                 </span>
               </div>
@@ -214,7 +214,7 @@ export const SkillCategoryAccordion = ({
             )}
 
             {/* Skills Count - Simple */}
-            <div className='text-xs text-zinc-500'>
+            <div className='text-xs text-slate-500'>
               {
                 allSkills.filter(
                   (skill) => (userSkills.unlockedSkills[skill.id] || 0) > 0
@@ -226,7 +226,7 @@ export const SkillCategoryAccordion = ({
             {/* Expand Arrow - Simple */}
             <ChevronDown
               className={cn(
-                "h-4 w-4 text-zinc-500 transition-transform duration-200",
+                "h-4 w-4 text-slate-500 transition-transform duration-200",
                 isExpanded && "rotate-180"
               )}
             />
@@ -244,7 +244,7 @@ export const SkillCategoryAccordion = ({
             transition={{ duration: 0.2, ease: "easeInOut" }}
             className='overflow-hidden'
             id={`skills-${category}`}>
-            <div className='border-t border-white/10 p-4'>
+            <div className='border-t border-slate-700/30 p-4'>
               <div className='grid gap-3 sm:grid-cols-2'>
                 {allSkills.map((skill) => {
                   const level = userSkills.unlockedSkills[skill.id] || 0;
@@ -257,8 +257,8 @@ export const SkillCategoryAccordion = ({
                       className={cn(
                         "group rounded-lg border p-3 transition-colors duration-200",
                         hasPoints
-                          ? "border-zinc-700/50 bg-zinc-900/50 hover:bg-zinc-800/60"
-                          : "border-zinc-800/30 bg-zinc-950/30 hover:bg-zinc-900/40",
+                          ? "border-slate-700/50 bg-slate-900/50 hover:bg-slate-800/60"
+                          : "border-slate-800/30 bg-slate-950/30 hover:bg-slate-900/40",
                         canUpgrade && "border-l-2 border-l-emerald-500/60"
                       )}>
                       {/* Skill Content */}
@@ -266,11 +266,11 @@ export const SkillCategoryAccordion = ({
                         <div className='flex min-w-0 flex-1 items-center gap-3'>
                           {/* Skill Icon - Larger */}
                           {skill.icon && (
-                            <div className='rounded-md bg-zinc-800/40 p-2'>
+                            <div className='rounded-md bg-slate-800/40 p-2'>
                               <skill.icon
                                 className={cn(
                                   "h-5 w-5",
-                                  hasPoints ? colors.text : "text-zinc-500"
+                                  hasPoints ? colors.text : "text-slate-500"
                                 )}
                               />
                             </div>
@@ -280,16 +280,16 @@ export const SkillCategoryAccordion = ({
                             <span
                               className={cn(
                                 "block truncate text-sm font-medium",
-                                hasPoints ? "text-white" : "text-zinc-400"
+                                hasPoints ? "text-white" : "text-slate-400"
                               )}>
-                              {t(`skills.${skill.id}.name`)}
+                              {t(`skills.${skill.id}.name` as any)}
                             </span>
                             <p
                               className={cn(
                                 "mt-1 text-xs leading-relaxed",
-                                hasPoints ? "text-zinc-400" : "text-zinc-500"
+                                hasPoints ? "text-slate-400" : "text-slate-500"
                               )}>
-                              {t(`skills.${skill.id}.description`)}
+                              {t(`skills.${skill.id}.description` as any)}
                             </p>
                           </div>
                         </div>
@@ -316,8 +316,8 @@ export const SkillCategoryAccordion = ({
                               className={cn(
                                 "flex h-7 min-w-[1.75rem] items-center justify-center rounded border px-2 text-xs font-medium",
                                 hasPoints
-                                  ? "border-zinc-600 bg-zinc-700 text-zinc-200"
-                                  : "border-zinc-700 bg-zinc-800 text-zinc-400"
+                                  ? "border-slate-600 bg-slate-700 text-slate-200"
+                                  : "border-slate-700 bg-slate-800 text-slate-400"
                               )}>
                               {level}
                             </motion.div>

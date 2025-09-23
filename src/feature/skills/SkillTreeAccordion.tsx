@@ -52,31 +52,31 @@ export const SkillTreeAccordion = ({
   );
 
   return (
-    <div className='content-box font-openSans relative w-full overflow-hidden'>
-      <div className='relative space-y-6 p-4'>
+    <div className='font-openSans relative w-full overflow-hidden'>
+      <div className='relative space-y-8 p-6'>
         {/* Intro Card */}
         {showIntro && (
-          <div className='rounded-lg border border-zinc-700/50 bg-zinc-900/30 p-4 backdrop-blur-sm'>
+          <div className='rounded-xl border border-slate-700/50 bg-slate-800/40 p-6 shadow-lg backdrop-blur-sm'>
             <div className='flex items-start gap-3'>
-              <Info className='mt-0.5 h-5 w-5 flex-shrink-0 text-blue-400' />
+              <Info className='mt-0.5 h-5 w-5 flex-shrink-0 text-cyan-400' />
               <div className='flex-1'>
-                <h3 className='mb-1 text-base font-medium text-white'>
+                <h3 className='mb-2 text-lg font-semibold text-slate-100'>
                   {t("intro.title")}
                 </h3>
-                <p className='mb-2 text-sm text-zinc-300'>
+                <p className='mb-3 text-sm text-slate-300'>
                   {t("intro.description")}
                 </p>
-                <ul className='ml-1 list-inside list-disc space-y-1 text-xs text-zinc-400'>
+                <ul className='ml-1 list-inside list-disc space-y-1 text-sm text-slate-400'>
                   <li>{t("intro.point1")}</li>
                   <li>{t("intro.point2")}</li>
                   <li>{t("intro.point3")}</li>
                 </ul>
-                <div className='mt-3 flex justify-end'>
+                <div className='mt-4 flex justify-end'>
                   <Button
                     variant='ghost'
                     size='sm'
                     onClick={() => setShowIntro(false)}
-                    className='text-xs hover:bg-white/10'>
+                    className='text-sm text-slate-300 hover:bg-slate-700/50 hover:text-slate-100'>
                     {t("intro.got_it")}
                   </Button>
                 </div>
@@ -87,30 +87,30 @@ export const SkillTreeAccordion = ({
 
         {/* Available Points Summary - Enhanced */}
         {totalAvailablePoints > 0 && (
-          <div className='relative overflow-hidden rounded-xl border border-emerald-700/30 bg-gradient-to-br from-emerald-950/40 to-emerald-900/20 p-5 shadow-xl backdrop-blur-sm'>
-            {/* Background glow */}
-            <div className='absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-emerald-600/5' />
+          <div className='relative overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/40 p-6 shadow-xl backdrop-blur-sm'>
+            {/* Subtle accent glow */}
+            <div className='to-emerald-600/3 absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent' />
 
             <div className='relative'>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-4'>
-                  <div className='relative rounded-xl bg-emerald-900/60 p-3 shadow-lg ring-1 ring-emerald-500/20'>
+                  <div className='relative rounded-xl border border-emerald-600/30 bg-slate-800/60 p-3 shadow-lg ring-1 ring-emerald-500/20'>
                     <Sparkles className='h-6 w-6 text-emerald-300' />
                     {/* Icon glow */}
-                    <div className='absolute inset-0 animate-pulse rounded-xl bg-emerald-500/20 blur-sm' />
+                    <div className='absolute inset-0 animate-pulse rounded-xl bg-emerald-500/10 blur-sm' />
                   </div>
                   <div>
-                    <h3 className='text-lg font-bold text-emerald-300'>
+                    <h3 className='text-lg font-bold text-slate-100'>
                       {t("available_points")}
                     </h3>
-                    <p className='text-sm text-emerald-400/80'>
+                    <p className='text-sm text-slate-300'>
                       {t("point_usage_hint")}
                     </p>
                   </div>
                 </div>
 
                 <div className='flex items-center gap-3'>
-                  <Badge className='border-emerald-600/50 bg-emerald-900/60 px-4 py-2 text-emerald-200 shadow-lg ring-1 ring-emerald-500/20'>
+                  <Badge className='border-emerald-500/50 bg-slate-800/60 px-4 py-2 text-emerald-300 shadow-lg ring-1 ring-emerald-500/30'>
                     <Sparkles className='mr-2 h-4 w-4 animate-pulse' />
                     <span className='text-lg font-bold'>
                       {totalAvailablePoints}
@@ -129,13 +129,13 @@ export const SkillTreeAccordion = ({
                         className={cn(
                           "relative flex items-center gap-2 rounded-full border-2 px-3 py-2 text-sm font-semibold shadow-md transition-all duration-300 hover:scale-105",
                           category === "technique" &&
-                            "border-red-600/50 bg-red-900/40 text-red-200 ring-1 ring-red-500/20",
+                            "border-red-500/50 bg-slate-800/60 text-red-300 ring-1 ring-red-500/20",
                           category === "theory" &&
-                            "border-blue-600/50 bg-blue-900/40 text-blue-200 ring-1 ring-blue-500/20",
+                            "border-blue-500/50 bg-slate-800/60 text-blue-300 ring-1 ring-blue-500/20",
                           category === "hearing" &&
-                            "border-emerald-600/50 bg-emerald-900/40 text-emerald-200 ring-1 ring-emerald-500/20",
+                            "border-emerald-500/50 bg-slate-800/60 text-emerald-300 ring-1 ring-emerald-500/20",
                           category === "creativity" &&
-                            "border-purple-600/50 bg-purple-900/40 text-purple-200 ring-1 ring-purple-500/20"
+                            "border-purple-500/50 bg-slate-800/60 text-purple-300 ring-1 ring-purple-500/20"
                         )}>
                         <div className='animate-pulse'>
                           {getCurrencyIcon(category as CategoryKeys)}
@@ -144,14 +144,14 @@ export const SkillTreeAccordion = ({
                         <span className='opacity-90'>
                           {t(`categories.${category}`)}
                         </span>
-                        {/* Currency glow */}
+                        {/* Subtle glow */}
                         <div
                           className={cn(
-                            "absolute inset-0 rounded-full opacity-30 blur-sm",
-                            category === "technique" && "bg-red-500/20",
-                            category === "theory" && "bg-blue-500/20",
-                            category === "hearing" && "bg-emerald-500/20",
-                            category === "creativity" && "bg-purple-500/20"
+                            "absolute inset-0 rounded-full opacity-10 blur-sm",
+                            category === "technique" && "bg-red-500/30",
+                            category === "theory" && "bg-blue-500/30",
+                            category === "hearing" && "bg-emerald-500/30",
+                            category === "creativity" && "bg-purple-500/30"
                           )}
                         />
                       </div>
@@ -163,11 +163,11 @@ export const SkillTreeAccordion = ({
         )}
 
         {/* Skill Categories Accordion */}
-        <div className='space-y-3'>
-          <h2 className='text-lg font-semibold text-white'>
+        <div className='space-y-4'>
+          <h2 className='text-xl font-semibold text-slate-100'>
             {t("skill_categories")}
           </h2>
-          <div className='space-y-3'>
+          <div className='space-y-4'>
             {Object.entries(categorizedSkills).map(([category, skills]) => (
               <SkillCategoryAccordion
                 key={category}
