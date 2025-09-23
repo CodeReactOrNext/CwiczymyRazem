@@ -53,7 +53,7 @@ const STATUS_CONFIG = {
 const TierBadge = ({ song, t }: { song: Song; t: any }) => {
   const avgRating = getAverageDifficulty(song.difficulties);
 
-  /profile/skills  if (avgRating === 0) return null;
+  if (avgRating === 0) return null;
 
   const tier = getSongTier(avgRating);
 
