@@ -14,6 +14,7 @@ import { getSeasonalLeaderboard } from "../services/getSeasonalLeaderboard";
 interface UseLeaderboardProps {
   initialSortBy?: SortByType;
   itemsPerPage: number;
+  defaultView?: "all-time" | "seasonal";
 }
 
 interface UseLeaderboardReturn {
@@ -32,6 +33,7 @@ interface UseLeaderboardReturn {
 export const useLeaderboard = ({
   initialSortBy = "points",
   itemsPerPage,
+  defaultView = "all-time",
 }: UseLeaderboardProps): UseLeaderboardReturn => {
   const { t } = useTranslation("leadboard");
 
@@ -39,7 +41,9 @@ export const useLeaderboard = ({
   const [isLoading, setIsLoading] = useState(false);
   const [totalUsers, setTotalUsers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isSeasonalView, setIsSeasonalView] = useState(false);
+  const [isSeasonalView, setIsSeasonalView] = useState(
+    defaultView === "seasonal"
+  );
   const [seasons, setSeasons] = useState<SeasonDataInterface[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<string>("");
 
