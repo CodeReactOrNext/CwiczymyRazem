@@ -11,7 +11,7 @@ const LoginPage: NextPage = () => {
 
   if (isLoggedIn || isLoading) {
     return (
-      <div className='flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-gray-900 to-black'>
+      <div className='flex min-h-screen items-center justify-center bg-zinc-950'>
         <PageLoadingLayout />
       </div>
     );
