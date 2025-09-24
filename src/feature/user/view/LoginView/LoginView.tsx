@@ -54,7 +54,7 @@ const LoginView = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black'>
+    <div className='min-h-screen bg-zinc-950'>
       {/* Animated Background */}
       <div className='pointer-events-none fixed inset-0 overflow-hidden'>
         <div className='absolute inset-0 opacity-10'>

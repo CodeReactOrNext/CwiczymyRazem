@@ -63,7 +63,7 @@ const SingupView = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black'>
+    <div className='min-h-screen bg-zinc-950'>
       {/* Animated Background - Same as Login */}
       <div className='pointer-events-none fixed inset-0 overflow-hidden'>
         <div className='absolute inset-0 opacity-10'>
@@ -132,7 +132,7 @@ const SingupView = () => {
 
         {/* Gradient Orbs */}
         <motion.div
-          className='left-1/6 absolute top-1/3 h-72 w-72 rounded-full bg-gradient-to-r from-emerald-400/10 to-cyan-400/10 blur-3xl'
+          className='left-1/6 absolute top-1/3 h-72 w-72 rounded-full bg-gradient-to-r from-cyan-400/10 to-cyan-400/10 blur-3xl'
           animate={{
             scale: [1, 1.3, 1],
             opacity: [0.3, 0.7, 0.3],
@@ -182,8 +182,8 @@ const SingupView = () => {
           {/* Signup Card */}
           <div className='group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-900/95 to-zinc-800/95 p-8 shadow-2xl backdrop-blur-xl transition-all duration-500 hover:border-cyan-400/30 hover:shadow-cyan-400/20'>
             {/* Multiple Glow Layers */}
-            <div className='pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-400/20 via-cyan-400/10 to-purple-400/20 blur-xl transition-opacity duration-500 group-hover:opacity-100' />
-            <div className='pointer-events-none absolute -inset-2 rounded-2xl bg-gradient-to-r from-cyan-400/10 via-transparent to-emerald-400/10 blur-2xl' />
+            <div className='pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-400/20 via-cyan-400/10 to-purple-400/20 blur-xl transition-opacity duration-500 group-hover:opacity-100' />
+            <div className='pointer-events-none absolute -inset-2 rounded-2xl bg-gradient-to-r from-cyan-400/10 via-transparent to-cyan-400/10 blur-2xl' />
 
             {/* Header */}
             <div className='relative mb-8 text-center'>
@@ -193,7 +193,7 @@ const SingupView = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className='mb-6 flex justify-center'>
                 <div className='relative'>
-                  <div className='flex h-16 w-16 items-center justify-center rounded-xl border border-emerald-400/40 bg-gradient-to-br from-emerald-400/25 to-cyan-900/20 shadow-2xl'>
+                  <div className='flex h-16 w-16 items-center justify-center rounded-xl border border-cyan-400/40 bg-gradient-to-br from-cyan-400/25 to-cyan-900/20 shadow-2xl'>
                     <Image
                       src='/images/logo.svg'
                       alt='Logo'
@@ -202,7 +202,7 @@ const SingupView = () => {
                       className='h-8 w-8'
                     />
                   </div>
-                  <div className='absolute -inset-2 rounded-xl bg-gradient-to-r from-emerald-400/30 via-cyan-400/15 to-transparent blur-lg' />
+                  <div className='absolute -inset-2 rounded-xl bg-gradient-to-r from-cyan-400/30 via-cyan-400/15 to-transparent blur-lg' />
                 </div>
               </motion.div>
 
@@ -250,7 +250,7 @@ const SingupView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='twoja_nazwa'
-                        className='w-full border-white/20 bg-zinc-800/50 pl-10 text-white placeholder:text-zinc-500 focus:border-emerald-400 focus:ring-emerald-400'
+                        className='w-full border-white/20 bg-zinc-800/50 pl-10 text-white placeholder:text-zinc-500 focus:border-cyan-400 focus:ring-cyan-400'
                       />
                     </div>
                     {errors.login && touched.login && (
@@ -280,7 +280,7 @@ const SingupView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='twoj@email.com'
-                        className='w-full border-white/20 bg-zinc-800/50 pl-10 text-white placeholder:text-zinc-500 focus:border-emerald-400 focus:ring-emerald-400'
+                        className='w-full border-white/20 bg-zinc-800/50 pl-10 text-white placeholder:text-zinc-500 focus:border-cyan-400 focus:ring-cyan-400'
                       />
                     </div>
                     {errors.email && touched.email && (
@@ -310,7 +310,7 @@ const SingupView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='••••••••'
-                        className='w-full border-white/20 bg-zinc-800/50 pl-10 pr-10 text-white placeholder:text-zinc-500 focus:border-emerald-400 focus:ring-emerald-400'
+                        className='w-full border-white/20 bg-zinc-800/50 pl-10 pr-10 text-white placeholder:text-zinc-500 focus:border-cyan-400 focus:ring-cyan-400'
                       />
                       <button
                         type='button'
@@ -350,7 +350,7 @@ const SingupView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='••••••••'
-                        className='w-full border-white/20 bg-zinc-800/50 pl-10 pr-10 text-white placeholder:text-zinc-500 focus:border-emerald-400 focus:ring-emerald-400'
+                        className='w-full border-white/20 bg-zinc-800/50 pl-10 pr-10 text-white placeholder:text-zinc-500 focus:border-cyan-400 focus:ring-cyan-400'
                       />
                       <button
                         type='button'
@@ -381,7 +381,7 @@ const SingupView = () => {
                     <Button
                       type='submit'
                       disabled={isFetching}
-                      className='group relative w-full overflow-hidden rounded-lg border-2 border-emerald-400 bg-gradient-to-r from-emerald-400 to-emerald-300 py-3 text-base font-bold text-black shadow-xl transition-all duration-300 disabled:opacity-50 hover:scale-[1.02] hover:from-emerald-300 hover:to-emerald-200 hover:shadow-emerald-400/50'>
+                      className='group relative w-full overflow-hidden rounded-lg border-2 border-cyan-400 bg-gradient-to-r from-cyan-400 to-cyan-300 py-3 text-base font-bold text-black shadow-xl transition-all duration-300 disabled:opacity-50 hover:scale-[1.02] hover:from-cyan-300 hover:to-cyan-200 hover:shadow-cyan-400/50'>
                       <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100' />
                       <span className='relative z-10 flex items-center justify-center gap-2'>
                         {isFetching ? (
@@ -443,7 +443,7 @@ const SingupView = () => {
                 Masz już konto?{" "}
                 <Link
                   href='/login'
-                  className='font-semibold text-emerald-400 transition-colors hover:text-emerald-300 hover:underline'>
+                  className='font-semibold text-cyan-400 transition-colors hover:text-cyan-300 hover:underline'>
                   Zaloguj się
                 </Link>
               </p>
@@ -457,11 +457,11 @@ const SingupView = () => {
             transition={{ duration: 0.8, delay: 1.3 }}
             className='mt-8 flex items-center justify-center gap-8 text-center'>
             <div className='flex items-center gap-2'>
-              <Music className='h-4 w-4 text-emerald-400' />
+              <Music className='h-4 w-4 text-cyan-400' />
               <span className='text-sm text-zinc-400'>Darmowe konto</span>
             </div>
             <div className='flex items-center gap-2'>
-              <Sparkles className='h-4 w-4 text-emerald-400' />
+              <Sparkles className='h-4 w-4 text-cyan-400' />
               <span className='text-sm text-zinc-400'>Pełny dostęp</span>
             </div>
           </motion.div>
