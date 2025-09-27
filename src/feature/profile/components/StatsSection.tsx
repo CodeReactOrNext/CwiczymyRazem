@@ -6,6 +6,7 @@ import {
   StatsField,
   type StatsFieldProps,
 } from "feature/profile/components/StatsField";
+import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import type { Song } from "feature/songs/types/songs.type";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -15,6 +16,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { getTrendData } from "../utils/getTrendData";
 import { Card } from "assets/components/ui/card";
+import ActivityLog from "components/ActivityLog/ActivityLog";
 
 interface StatsSectionProps {
   statsField: StatsFieldProps[];
@@ -28,6 +30,7 @@ interface StatsSectionProps {
         learned: Song[];
       }
     | undefined;
+  achievements?: any[];
 }
 
 export const StatsSection = ({
@@ -36,11 +39,13 @@ export const StatsSection = ({
   datasWithReports,
   userSongs,
   userAuth,
+  achievements,
 }: StatsSectionProps) => {
   const { t } = useTranslation("profile");
   const { time } = statistics;
   const [isSeasonalAchievementsExpanded, setIsSeasonalAchievementsExpanded] =
     useState(false);
+  const [isAchievementsExpanded, setIsAchievementsExpanded] = useState(false);
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
 
@@ -233,28 +238,34 @@ export const StatsSection = ({
           </div>
         </div>
       </div>
+      <ActivityLog userAuth={userAuth} />
 
       {/* Seasonal Achievements - Collapsible */}
-      <div className='space-y-4'>
+      <div className='space-y-2'>
         <button
           onClick={() =>
             setIsSeasonalAchievementsExpanded(!isSeasonalAchievementsExpanded)
           }
-          className='flex w-full items-center justify-between rounded-lg bg-white/5 p-4 backdrop-blur-sm transition-all duration-200 hover:bg-white/10'
+          className='group flex w-full items-center justify-between rounded-lg p-3 transition-all duration-200 hover:bg-white/5'
           aria-expanded={isSeasonalAchievementsExpanded}>
           <div className='text-left'>
-            <h3 className='text-lg font-semibold text-white'>
-              Osiągnięcia Sezonowe
-            </h3>
+            <div className='flex items-center gap-2'>
+              <h3 className='text-lg font-semibold text-white'>
+                Osiągnięcia Sezonowe
+              </h3>
+              <span className='rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/70'>
+                {/* TODO: Replace with actual count */}3
+              </span>
+            </div>
             <p className='text-sm text-zinc-400'>
               Specjalne nagrody i trofea sezonowe
             </p>
           </div>
-          <div className='text-white transition-transform duration-200'>
+          <div className='text-white/60 transition-colors duration-200 group-hover:text-white'>
             {isSeasonalAchievementsExpanded ? (
-              <ChevronUp size={20} />
+              <ChevronUp size={18} />
             ) : (
-              <ChevronDown size={20} />
+              <ChevronDown size={18} />
             )}
           </div>
         </button>
@@ -266,6 +277,40 @@ export const StatsSection = ({
               : "max-h-0 opacity-0"
           }`}>
           <SeasonalAchievements userId={userAuth} />
+        </div>
+      </div>
+
+      {/* Regular Achievements - Collapsible */}
+      <div className='space-y-2'>
+        <button
+          onClick={() => setIsAchievementsExpanded(!isAchievementsExpanded)}
+          className='group flex w-full items-center justify-between rounded-lg p-3 transition-all duration-200 hover:bg-white/5'
+          aria-expanded={isAchievementsExpanded}>
+          <div className='text-left'>
+            <div className='flex items-center gap-2'>
+              <h3 className='text-lg font-semibold text-white'>Osiągnięcia</h3>
+              <span className='rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/70'>
+                {achievements?.length || 0}
+              </span>
+            </div>
+            <p className='text-sm text-zinc-400'>Twoje trofea i nagrody</p>
+          </div>
+          <div className='text-white/60 transition-colors duration-200 group-hover:text-white'>
+            {isAchievementsExpanded ? (
+              <ChevronUp size={18} />
+            ) : (
+              <ChevronDown size={18} />
+            )}
+          </div>
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            isAchievementsExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0"
+          }`}>
+          <AchievementWrapper userAchievements={achievements} />
         </div>
       </div>
     </div>
