@@ -90,58 +90,61 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
   const skills = generateSkillsData();
 
   return (
-    <Card className='group relative overflow-hidden rounded-xl  p-4'>
-      {/* Subtle Background Effects */}
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-800/5 via-transparent to-zinc-700/5'></div>
-
-      {/* Header */}
-      <div className='relative mb-6'>
-        <h3 className='text-xl font-semibold text-white'>Umiejętności</h3>
-        <p className='text-xs text-zinc-400'>
-          Rozkład czasu ćwiczeń według kategorii
-        </p>
-      </div>
-
-      <div className='relative space-y-6'>
-        {skills.map((skill, index) => (
-          <div key={skill.name} className='group/item space-y-3'>
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center gap-4'>
-                <span className='text-base font-semibold text-white transition-colors duration-300'>
-                  {skill.name}
-                </span>
-              </div>
-              <div className='flex items-center gap-2'>
-                <span className='text-lg font-semibold text-white'>
-                  {skill.percent}%
-                </span>
-                <div className='text-xs text-zinc-400'>
-                  {(() => {
-                    const minutes = Math.round(
-                      (skill.percent / 100) * (totalTime / 60000)
-                    );
-                    const hours = Math.floor(minutes / 60);
-                    const mins = minutes % 60;
-                    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-                  })()}
+    <>
+      <Card className='group relative  mb-5 overflow-hidden rounded-xl p-4'>
+        <div className='relative space-y-6'>
+          {skills.map((skill, index) => (
+            <div key={skill.name} className='group/item space-y-3'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-4'>
+                  <span className='text-base font-semibold text-white transition-colors duration-300'>
+                    {skill.name}
+                  </span>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <span className='text-lg font-semibold text-white'>
+                    {skill.percent}%
+                  </span>
+                  <div className='text-xs text-zinc-400'>
+                    {(() => {
+                      const minutes = Math.round(
+                        (skill.percent / 100) * (totalTime / 60000)
+                      );
+                      const hours = Math.floor(minutes / 60);
+                      const mins = minutes % 60;
+                      return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                    })()}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Enhanced Progress Bar */}
-            <div className='relative h-2 w-full overflow-hidden rounded-full bg-zinc-800/50 shadow-inner'>
-              <div
-                className='h-full rounded-full shadow-lg transition-all duration-1000 ease-out'
-                style={{
-                  width: `${skill.percent}%`,
-                  background: `linear-gradient(90deg, ${skill.color}, ${skill.color}dd)`,
-                  boxShadow: `0 0 10px ${skill.color}60, inset 0 1px 0 rgba(255,255,255,0.2)`,
-                }}></div>
+              {/* Enhanced Progress Bar */}
+              <div className='relative h-2 w-full overflow-hidden rounded-full bg-zinc-800/50 shadow-inner'>
+                <div
+                  className='h-full rounded-full shadow-lg transition-all duration-1000 ease-out'
+                  style={{
+                    width: `${skill.percent}%`,
+                    background: `linear-gradient(90deg, ${skill.color}, ${skill.color}dd)`,
+                    boxShadow: `0 0 10px ${skill.color}60, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                  }}></div>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      <div className='relative mt-8 overflow-hidden rounded-xl  bg-zinc-800/30 p-2'>
+          ))}
+        </div>
+
+        {/* CSS for shine animation */}
+        <style jsx>{`
+          @keyframes shine {
+            0% {
+              transform: translateX(-100%);
+            }
+            100% {
+              transform: translateX(100%);
+            }
+          }
+        `}</style>
+      </Card>
+      <Card>
         <div className='relative flex items-center justify-between'>
           <div className='flex items-center gap-3'>
             <span className='text-base font-semibold text-zinc-300'>
@@ -157,25 +160,10 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
                 return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
               })()}
             </div>
-            <div className='text-xs text-zinc-400'>
-              {Math.round(totalTime / 60000)} minut całkowicie
-            </div>
           </div>
         </div>
-      </div>
-
-      {/* CSS for shine animation */}
-      <style jsx>{`
-        @keyframes shine {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
-        }
-      `}</style>
-    </Card>
+      </Card>
+    </>
   );
 };
 
