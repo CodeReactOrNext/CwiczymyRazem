@@ -12,6 +12,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { StatsSection } from "./components/StatsSection";
 
@@ -40,6 +41,7 @@ const ProfileLandingLayout = ({
   const [activeSection, setActiveSection] = useState<
     "overview" | "activity" | "skills" | "exercises"
   >("overview");
+  const [isAchievementsExpanded, setIsAchievementsExpanded] = useState(false);
 
   useEffect(() => {
     getUserSongs(userAuth).then((songs) => setSongs(songs));
@@ -54,11 +56,7 @@ const ProfileLandingLayout = ({
       {activeSection === "overview" && <NavigationCards />}
 
       {/* Statistics Section */}
-      <DashboardSection
-        title='Statystyki'
-        subtitle='Twój postęp w nauce gitary'
-        color='cyan'
-        compact>
+      <DashboardSection color='cyan' compact>
         <StatsSection
           statsField={statsField}
           statistics={userStats}
@@ -68,13 +66,35 @@ const ProfileLandingLayout = ({
         />
       </DashboardSection>
 
-      {/* Achievements Section */}
-      <DashboardSection
-        title='Osiągnięcia'
-        subtitle='Twoje trofea i nagrody'
-        color='yellow'
-        compact>
-        <AchievementWrapper userAchievements={achievements} />
+      {/* Achievements Section - Collapsible */}
+      <DashboardSection color='yellow' compact>
+        <div className='space-y-4'>
+          <button
+            onClick={() => setIsAchievementsExpanded(!isAchievementsExpanded)}
+            className='flex w-full items-center justify-between rounded-lg bg-white/5 p-4 backdrop-blur-sm transition-all duration-200 hover:bg-white/10'
+            aria-expanded={isAchievementsExpanded}>
+            <div className='text-left'>
+              <h3 className='text-lg font-semibold text-white'>Osiągnięcia</h3>
+              <p className='text-sm text-zinc-400'>Twoje trofea i nagrody</p>
+            </div>
+            <div className='text-white transition-transform duration-200'>
+              {isAchievementsExpanded ? (
+                <ChevronUp size={20} />
+              ) : (
+                <ChevronDown size={20} />
+              )}
+            </div>
+          </button>
+
+          <div
+            className={`overflow-hidden transition-all duration-300 ${
+              isAchievementsExpanded
+                ? "max-h-[1000px] opacity-100"
+                : "max-h-0 opacity-0"
+            }`}>
+            <AchievementWrapper userAchievements={achievements} />
+          </div>
+        </div>
       </DashboardSection>
       {/* Activity Log Section */}
       <DashboardSection

@@ -59,14 +59,11 @@ export const NavigationCard = ({
 
   return (
     <div
-      className='group relative flex h-full cursor-pointer overflow-hidden rounded-lg border border-white/10 bg-zinc-800/50 p-4 shadow-lg backdrop-blur-xl transition-all duration-200 hover:bg-zinc-800/70'
+      className='group relative flex h-full cursor-pointer overflow-hidden rounded-lg  bg-zinc-800/50 p-4  transition-all duration-100 hover:bg-zinc-800/70'
       onClick={onClick}
       tabIndex={0}
       aria-label={title}
       onKeyDown={(e) => e.key === "Enter" && onClick?.()}>
-      {/* Subtle background */}
-      <div className='pointer-events-none absolute inset-0 bg-gradient-to-br from-zinc-700/10 via-transparent to-zinc-700/10'></div>
-
       <div className='relative flex flex-1 flex-col justify-between'>
         <div className='mb-3'>
           <h3 className='mb-1 line-clamp-1 text-sm font-semibold text-white'>
@@ -134,40 +131,38 @@ export const NavigationCards = () => {
   const router = useRouter();
 
   return (
-    <div className='border-b border-white/10 p-4'>
-      <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4'>
-        <NavigationCard
-          title='Ćwicz'
-          description='Rozpocznij sesję ćwiczeń'
-          icon={<Dumbbell size={16} />}
-          onClick={() => router.push("/timer")}
-          colorAccent='cyan'
-        />
+    <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4'>
+      <NavigationCard
+        title='Ćwicz'
+        description='Rozpocznij sesję ćwiczeń'
+        icon={<Dumbbell size={16} />}
+        onClick={() => router.push("/timer")}
+        colorAccent='cyan'
+      />
 
-        <NavigationCard
-          title='Utwory'
-          description='Zarządzaj swoimi utworami'
-          icon={<Music size={16} />}
-          onClick={() => router.push("/songs")}
-          colorAccent='purple'
-        />
+      <NavigationCard
+        title='Utwory'
+        description='Zarządzaj swoimi utworami'
+        icon={<Music size={16} />}
+        onClick={() => router.push("/songs")}
+        colorAccent='purple'
+      />
 
-        <NavigationCard
-          title='Umiejętności'
-          description='Przeglądaj swoje umiejętności'
-          icon={<Brain size={16} />}
-          onClick={() => router.push("/profile/skills")}
-          colorAccent='green'
-        />
+      <NavigationCard
+        title='Umiejętności'
+        description='Przeglądaj swoje umiejętności'
+        icon={<Brain size={16} />}
+        onClick={() => router.push("/profile/skills")}
+        colorAccent='green'
+      />
 
-        <NavigationCard
-          title='Ćwiczenia'
-          description='Plan ćwiczeń'
-          icon={<Library size={16} />}
-          onClick={() => router.push("/profile/exercises")}
-          colorAccent='amber'
-        />
-      </div>
+      <NavigationCard
+        title='Ćwiczenia'
+        description='Plan ćwiczeń'
+        icon={<Library size={16} />}
+        onClick={() => router.push("/profile/exercises")}
+        colorAccent='amber'
+      />
     </div>
   );
 };

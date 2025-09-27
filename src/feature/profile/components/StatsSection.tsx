@@ -10,6 +10,8 @@ import type { Song } from "feature/songs/types/songs.type";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { calculatePercent, convertMsToHM } from "utils/converter";
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { getTrendData } from "../utils/getTrendData";
 import { Card } from "assets/components/ui/card";
@@ -37,6 +39,8 @@ export const StatsSection = ({
 }: StatsSectionProps) => {
   const { t } = useTranslation("profile");
   const { time } = statistics;
+  const [isSeasonalAchievementsExpanded, setIsSeasonalAchievementsExpanded] =
+    useState(false);
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
 
@@ -86,6 +90,12 @@ export const StatsSection = ({
     <div className='space-y-6'>
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
         <div className='space-y-6 lg:col-span-2'>
+          <div className='relative mb-6'>
+            <h3 className='text-xl font-semibold text-white'>Statystyki</h3>
+            <p className='text-xs text-zinc-400'>
+              Najważniejsze liczby dotyczące twojego postępu
+            </p>
+          </div>
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             {statsWithTrends
               .filter(
@@ -122,33 +132,6 @@ export const StatsSection = ({
           {userSongs && (
             <Card className='p- group  relative  transition-all duration-300 '>
               <div className='relative'>
-                <div className='mb-5 flex items-center justify-between'>
-                  <div className='flex items-center gap-3'>
-                    <div>
-                      <h4 className='text-lg font-bold text-white'>
-                        Biblioteka piosenek
-                      </h4>
-                    </div>
-                  </div>
-                  <a
-                    href='/songs'
-                    className='group/btn flex items-center gap-2 rounded-lg  px-4 py-2 text-sm font-medium text-purple-400 shadow-sm transition-all duration-300 hover:bg-zinc-800/70 hover:text-purple-300 hover:shadow-md'>
-                    <span>Przeglądaj</span>
-                    <svg
-                      className='h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-0.5'
-                      fill='none'
-                      stroke='currentColor'
-                      viewBox='0 0 24 24'>
-                      <path
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth={2}
-                        d='M9 5l7 7-7 7'
-                      />
-                    </svg>
-                  </a>
-                </div>
-
                 {(() => {
                   const totalSongs =
                     userSongs.wantToLearn.length +
@@ -190,86 +173,33 @@ export const StatsSection = ({
 
                   return (
                     <div className='space-y-5'>
-                      {/* Main Progress Card */}
-                      <div className='rounded-xl bg-zinc-800/30 p-5 shadow-inner'>
-                        <div className='mb-4 flex items-center justify-between'>
-                          <div>
-                            <h5 className='font-semibold text-white'>
-                              Ogólny postęp
-                            </h5>
-                            <p className='text-xs text-zinc-400'>
-                              {totalSongs} piosenek w bibliotece
-                            </p>
-                          </div>
-                          <div className='text-right'>
-                            <div className='text-2xl font-semibold text-white'>
-                              {learnedPercentage.toFixed(0)}%
-                            </div>
-                            <div className='text-xs text-zinc-400'>
-                              ukończone
-                            </div>
-                          </div>
+                      <div className='flex items-center justify-between'>
+                        <div>
+                          <h5 className='font-semibold text-white'>
+                            Ogólny postęp
+                          </h5>
+                          <p className='text-xs text-zinc-400'>
+                            {totalSongs} piosenek w bibliotece
+                          </p>
                         </div>
-
-                        {/* Progress Bar */}
-                        <div className='relative mb-3 h-2 w-full overflow-hidden rounded-full bg-zinc-700/50'>
-                          <div
-                            className='absolute left-0 top-0 h-full bg-white transition-all duration-700'
-                            style={{ width: `${learnedPercentage}%` }}></div>
-                          <div
-                            className='absolute top-0 h-full bg-white/40 transition-all duration-700'
-                            style={{
-                              left: `${learnedPercentage}%`,
-                              width: `${learningPercentage}%`,
-                            }}></div>
-                        </div>
-
-                        <div className='flex items-center justify-between text-xs'>
-                          <div className='flex items-center gap-4'>
-                            <div className='flex items-center gap-1.5'>
-                              <div className='h-2 w-2 rounded-full bg-white'></div>
-                              <span className='text-zinc-400'>Opanowane</span>
-                            </div>
-                            <div className='flex items-center gap-1.5'>
-                              <div className='h-2 w-2 rounded-full bg-white/40'></div>
-                              <span className='text-zinc-400'>W trakcie</span>
-                            </div>
-                            <div className='flex items-center gap-1.5'>
-                              <div className='h-2 w-2 rounded-full bg-zinc-600'></div>
-                              <span className='text-zinc-400'>Planowane</span>
-                            </div>
+                        <div className='text-right'>
+                          <div className='text-2xl font-semibold text-white'>
+                            {learnedPercentage.toFixed(0)}%
                           </div>
+                          <div className='text-xs text-zinc-400'>ukończone</div>
                         </div>
                       </div>
 
-                      {/* Category Stats */}
-                      <div className='grid grid-cols-3 gap-3'>
-                        <div className='rounded-lg bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
-                          <div className='mb-2 text-xl font-semibold text-white'>
-                            {userSongs.wantToLearn.length}
-                          </div>
-                          <div className='text-xs font-medium text-zinc-400'>
-                            Chcę się nauczyć
-                          </div>
-                        </div>
-
-                        <div className='rounded-lg bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
-                          <div className='mb-2 text-xl font-semibold text-white'>
-                            {userSongs.learning.length}
-                          </div>
-                          <div className='text-xs font-medium text-zinc-400'>
-                            Uczę się
-                          </div>
-                        </div>
-
-                        <div className='rounded-lg  bg-zinc-800/30 p-4 text-center transition-all duration-300 hover:bg-zinc-800/50'>
-                          <div className='mb-2 text-xl font-semibold text-white'>
-                            {userSongs.learned.length}
-                          </div>
-                          <div className='text-xs font-medium text-zinc-400'>
-                            Opanowane
-                          </div>
-                        </div>
+                      <div className='relative mb-3 h-2 w-full overflow-hidden rounded-full bg-zinc-700/50'>
+                        <div
+                          className='absolute left-0 top-0 h-full bg-white transition-all duration-700'
+                          style={{ width: `${learnedPercentage}%` }}></div>
+                        <div
+                          className='absolute top-0 h-full bg-white/40 transition-all duration-700'
+                          style={{
+                            left: `${learnedPercentage}%`,
+                            width: `${learningPercentage}%`,
+                          }}></div>
                       </div>
                     </div>
                   );
@@ -280,6 +210,12 @@ export const StatsSection = ({
 
           {/* Skills Chart - Mobile */}
           <div className='lg:hidden'>
+            <div className='relative mb-6'>
+              <h3 className='text-xl font-semibold text-white'>Umiejętności</h3>
+              <p className='text-xs text-zinc-400'>
+                Rozkład czasu ćwiczeń według kategorii
+              </p>
+            </div>
             <SkillsRadarChart statistics={statistics} />
           </div>
         </div>
@@ -287,13 +223,51 @@ export const StatsSection = ({
         {/* Right Column - Skills */}
         <div className='space-y-6'>
           <div className='hidden lg:block'>
+            <div className='relative mb-6'>
+              <h3 className='text-xl font-semibold text-white'>Umiejętności</h3>
+              <p className='text-xs text-zinc-400'>
+                Rozkład czasu ćwiczeń według kategorii
+              </p>
+            </div>
             <SkillsRadarChart statistics={statistics} />
           </div>
         </div>
       </div>
 
-      {/* Seasonal Achievements - Full Width */}
-      <SeasonalAchievements userId={userAuth} />
+      {/* Seasonal Achievements - Collapsible */}
+      <div className='space-y-4'>
+        <button
+          onClick={() =>
+            setIsSeasonalAchievementsExpanded(!isSeasonalAchievementsExpanded)
+          }
+          className='flex w-full items-center justify-between rounded-lg bg-white/5 p-4 backdrop-blur-sm transition-all duration-200 hover:bg-white/10'
+          aria-expanded={isSeasonalAchievementsExpanded}>
+          <div className='text-left'>
+            <h3 className='text-lg font-semibold text-white'>
+              Osiągnięcia Sezonowe
+            </h3>
+            <p className='text-sm text-zinc-400'>
+              Specjalne nagrody i trofea sezonowe
+            </p>
+          </div>
+          <div className='text-white transition-transform duration-200'>
+            {isSeasonalAchievementsExpanded ? (
+              <ChevronUp size={20} />
+            ) : (
+              <ChevronDown size={20} />
+            )}
+          </div>
+        </button>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ${
+            isSeasonalAchievementsExpanded
+              ? "max-h-[1000px] opacity-100"
+              : "max-h-0 opacity-0"
+          }`}>
+          <SeasonalAchievements userId={userAuth} />
+        </div>
+      </div>
     </div>
   );
 };
