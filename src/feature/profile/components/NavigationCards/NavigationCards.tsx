@@ -59,7 +59,7 @@ export const NavigationCard = ({
 
   return (
     <div
-      className={`${colors.ring} font-openSans relative flex h-full transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-second-500 via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-100 hover:shadow-xl hover:ring-2 sm:p-4`}
+      className={`${colors.ring} font-openSans relative flex h-full transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-card via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-100 hover:shadow-xl hover:ring-2 sm:p-4`}
       onClick={onClick}
       tabIndex={0}
       aria-label={title}
