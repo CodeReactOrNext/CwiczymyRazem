@@ -17,9 +17,10 @@ const CalendarSquare = ({ report }: CalendarSquareProps) => {
       if (context) {
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw background
+        // Draw rounded background
         context.fillStyle = getRaitingColor(raiting);
-        context.fillRect(0, 0, canvas.width, canvas.height);
+        drawRoundedRect(context, 0, 0, canvas.width, canvas.height, 2);
+        context.fill();
 
         // Add dot indicator for title or back date
         if (report?.exceriseTitle || report?.isDateBackReport) {
@@ -27,11 +28,11 @@ const CalendarSquare = ({ report }: CalendarSquareProps) => {
           context.beginPath();
           if (report.isDateBackReport) {
             // Draw a ring for back date reports
-            context.arc(canvas.width/2, canvas.height/2, 3, 0, 2 * Math.PI);
+            context.arc(canvas.width / 2, canvas.height / 2, 3, 0, 2 * Math.PI);
             context.stroke();
           } else {
             // Draw a filled dot for regular reports with title
-            context.arc(canvas.width/2, canvas.height/2, 2, 0, 2 * Math.PI);
+            context.arc(canvas.width / 2, canvas.height / 2, 2, 0, 2 * Math.PI);
             context.fill();
           }
         }
@@ -39,8 +40,16 @@ const CalendarSquare = ({ report }: CalendarSquareProps) => {
         // Add hover effect
         if (isHovered && report) {
           context.strokeStyle = "#ffffff";
-          context.lineWidth = 2;
-          context.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
+          context.lineWidth = 1;
+          drawRoundedRect(
+            context,
+            1,
+            1,
+            canvas.width - 2,
+            canvas.height - 2,
+            2
+          );
+          context.stroke();
         }
       }
     }
@@ -67,6 +76,27 @@ const CalendarSquare = ({ report }: CalendarSquareProps) => {
 
 export default memo(CalendarSquare);
 
+const drawRoundedRect = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number
+) => {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+};
+
 const getPointRaitings = (report: ReportListInterface | undefined) => {
   if (!report) return null;
   const { points } = report;
@@ -81,16 +111,16 @@ const getPointRaitings = (report: ReportListInterface | undefined) => {
 const getRaitingColor = (raiting: string | null) => {
   switch (raiting) {
     case "super":
-      return "#EF4444"; // A vibrant red
+      return "#0891B2"; // A vibrant turquoise
     case "great":
-      return "#F87171"; // A lighter red
+      return "#06B6D4"; // A lighter turquoise
     case "nice":
-      return "#FCA5A5"; // An even lighter red
+      return "#67E8F9"; // An even lighter turquoise
     case "ok":
-      return "#FEE2E2"; // A very light red
+      return "#A7F3D0"; // A very light turquoise
     case "zero":
-      return "#FEF2F2"; // The lightest red tint
+      return "#ECFDF5"; // The lightest turquoise tint
     default:
-      return "#1F2937"; // A dark gray for empty squares
+      return "#292929"; // A dark gray for empty squares
   }
 };
