@@ -96,9 +96,9 @@ export const StatsSection = ({
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
         <div className='space-y-6 lg:col-span-2'>
           <div className='relative mb-6'>
-            <h3 className='text-xl font-semibold text-white'>Statystyki</h3>
+            <h3 className='text-xl font-semibold text-white'>Statistics</h3>
             <p className='text-xs text-zinc-400'>
-              Najważniejsze liczby dotyczące twojego postępu
+              Most important numbers about your progress
             </p>
           </div>
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
@@ -167,10 +167,10 @@ export const StatsSection = ({
                           </svg>
                         </div>
                         <h5 className='mb-2 font-semibold text-white'>
-                          Brak piosenek
+                          No songs
                         </h5>
                         <p className='text-sm text-zinc-400'>
-                          Dodaj swoje pierwsze piosenki do biblioteki
+                          Add your first songs to the library
                         </p>
                       </div>
                     );
@@ -181,17 +181,17 @@ export const StatsSection = ({
                       <div className='flex items-center justify-between'>
                         <div>
                           <h5 className='font-semibold text-white'>
-                            Ogólny postęp
+                            Overall progress
                           </h5>
                           <p className='text-xs text-zinc-400'>
-                            {totalSongs} piosenek w bibliotece
+                            {totalSongs} songs in the library
                           </p>
                         </div>
                         <div className='text-right'>
                           <div className='text-2xl font-semibold text-white'>
                             {learnedPercentage.toFixed(0)}%
                           </div>
-                          <div className='text-xs text-zinc-400'>ukończone</div>
+                          <div className='text-xs text-zinc-400'>completed</div>
                         </div>
                       </div>
 
@@ -216,22 +216,21 @@ export const StatsSection = ({
           {/* Skills Chart - Mobile */}
           <div className='lg:hidden'>
             <div className='relative mb-6'>
-              <h3 className='text-xl font-semibold text-white'>Umiejętności</h3>
+              <h3 className='text-xl font-semibold text-white'>Skills</h3>
               <p className='text-xs text-zinc-400'>
-                Rozkład czasu ćwiczeń według kategorii
+                Distribution of exercise time by category{" "}
               </p>
             </div>
             <SkillsRadarChart statistics={statistics} />
           </div>
         </div>
 
-        {/* Right Column - Skills */}
         <div className='space-y-6'>
           <div className='hidden lg:block'>
             <div className='relative mb-6'>
-              <h3 className='text-xl font-semibold text-white'>Umiejętności</h3>
+              <h3 className='text-xl font-semibold text-white'>Skills</h3>
               <p className='text-xs text-zinc-400'>
-                Rozkład czasu ćwiczeń według kategorii
+                Distribution of exercise time by category
               </p>
             </div>
             <SkillsRadarChart statistics={statistics} />
@@ -240,7 +239,6 @@ export const StatsSection = ({
       </div>
       <ActivityLog userAuth={userAuth} />
 
-      {/* Seasonal Achievements - Collapsible */}
       <div className='space-y-2'>
         <button
           onClick={() =>
@@ -251,14 +249,14 @@ export const StatsSection = ({
           <div className='text-left'>
             <div className='flex items-center gap-2'>
               <h3 className='text-lg font-semibold text-white'>
-                Osiągnięcia Sezonowe
+                Seasonal Achievements
               </h3>
               <span className='rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/70'>
-                {/* TODO: Replace with actual count */}3
+                {achievements?.length || 0}
               </span>
             </div>
             <p className='text-sm text-zinc-400'>
-              Specjalne nagrody i trofea sezonowe
+              Special seasonal prizes and trophies
             </p>
           </div>
           <div className='text-white/60 transition-colors duration-200 group-hover:text-white'>
@@ -288,12 +286,12 @@ export const StatsSection = ({
           aria-expanded={isAchievementsExpanded}>
           <div className='text-left'>
             <div className='flex items-center gap-2'>
-              <h3 className='text-lg font-semibold text-white'>Osiągnięcia</h3>
+              <h3 className='text-lg font-semibold text-white'>Achievements</h3>
               <span className='rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/70'>
                 {achievements?.length || 0}
               </span>
             </div>
-            <p className='text-sm text-zinc-400'>Twoje trofea i nagrody</p>
+            <p className='text-sm text-zinc-400'>Your trophies and rewards</p>
           </div>
           <div className='text-white/60 transition-colors duration-200 group-hover:text-white'>
             {isAchievementsExpanded ? (
