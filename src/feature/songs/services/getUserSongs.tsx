@@ -22,8 +22,8 @@ export const getUserSongs = async (userId: string) => {
     };
 
     const userSongs = userSongsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
       id: doc.data().songId,
+      status: doc.data().status as SongStatus,
     }));
 
     // Pobierz pełne dane utworów z kolekcji songs

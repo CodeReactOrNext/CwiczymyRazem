@@ -50,7 +50,7 @@ const ProfileLandingLayout = ({
 
   return (
     <DashboardContainer>
-      {activeSection === "overview" && <NavigationCards />}
+      {activeSection === "overview" && <NavigationCards setActiveSection={setActiveSection} />}
 
       {/* Statistics Section */}
       <DashboardSection color='cyan' compact>

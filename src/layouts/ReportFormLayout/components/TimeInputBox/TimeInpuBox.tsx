@@ -1,17 +1,14 @@
 import { Card } from "assets/components/ui/card";
-import {
-  WheelPicker,
-  WheelPickerWrapper,
-} from "assets/components/wheel-picker";
-import type { WheelPickerOption } from "assets/components/wheel-picker";
 import type { QuestionMarkProps } from "components/UI/QuestionMark";
 import QuestionMark from "components/UI/QuestionMark";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import type { FormikErrors } from "formik";
 import { useFormikContext } from "formik";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { IconType } from "react-icons/lib";
+
+import InputTime from "../InputTime/InputTime";
 
 export interface TimeInputBoxProps {
   title?: string;
@@ -22,18 +19,6 @@ export interface TimeInputBoxProps {
   errors: FormikErrors<ReportFormikInterface>;
 }
 
-const createArray = (length: number, add = 0): WheelPickerOption[] =>
-  Array.from({ length }, (_, i) => {
-    const value = i + add;
-    return {
-      label: value.toString().padStart(2, "0"),
-      value: value.toString(),
-    };
-  });
-
-const hourOptions = createArray(24);
-const minuteOptions = createArray(60);
-
 const TimeInputBox = ({
   title,
   Icon,
@@ -42,37 +27,26 @@ const TimeInputBox = ({
   minutesName,
   errors,
 }: TimeInputBoxProps) => {
-  const { values, setFieldValue } = useFormikContext<ReportFormikInterface>();
+  const { values } = useFormikContext<ReportFormikInterface>();
   const [isHovered, setIsHovered] = useState(false);
-  
-  const hasError =
+  const error =
     errors.hasOwnProperty(hoursName) || errors.hasOwnProperty(minutesName);
 
-  // Initialize with 0 if undefined/null
-  useEffect(() => {
-    if (values[hoursName as keyof ReportFormikInterface] === undefined || values[hoursName as keyof ReportFormikInterface] === null) {
-       setFieldValue(hoursName, 0);
-    }
-    if (values[minutesName as keyof ReportFormikInterface] === undefined || values[minutesName as keyof ReportFormikInterface] === null) {
-       setFieldValue(minutesName, 0);
-    }
-  }, [hoursName, minutesName, setFieldValue, values]);
-
-  // Get current values from formik
-  const currentHours = (values[hoursName as keyof ReportFormikInterface] || "0").toString();
-  const currentMinutes = (values[minutesName as keyof ReportFormikInterface] || "0").toString();
-
-  // Always show colors as per user request
-  const hasValue = true;
+  // Check if this time input has any value entered
+  const hasValue =
+    parseInt(values[hoursName as keyof ReportFormikInterface] as string, 10) >
+      0 ||
+    parseInt(values[minutesName as keyof ReportFormikInterface] as string, 10) >
+      0;
 
   // Determine the skill color based on title
   const getSkillColor = () => {
     const lowerTitle = title?.toLowerCase() || "";
-    if (lowerTitle.includes("kreatywn") || lowerTitle.includes("creative")) return "#37b874"; // Green
-    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch") || lowerTitle.includes("hearing"))
+    if (lowerTitle.includes("kreatywn")) return "#37b874"; // Green
+    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch"))
       return "#4a7edd"; // Blue
-    if (lowerTitle.includes("technik") || lowerTitle.includes("technique")) return "#e04c3b"; // Red
-    if (lowerTitle.includes("teori") || lowerTitle.includes("theory")) return "#a44aed"; // Purple
+    if (lowerTitle.includes("technik")) return "#e04c3b"; // Red
+    if (lowerTitle.includes("teori")) return "#a44aed"; // Purple
     return "#888888";
   };
 
@@ -80,51 +54,43 @@ const TimeInputBox = ({
 
   // Get gradient style for the card based on whether there's a value
   const getGradientStyle = () => {
+    // If no value is entered, return a neutral background
     if (!hasValue) {
       return "from-gray-900/20 to-transparent";
     }
 
     const lowerTitle = title?.toLowerCase() || "";
-    if (lowerTitle.includes("kreatywn") || lowerTitle.includes("creative")) {
+    if (lowerTitle.includes("kreatywn")) {
       return "from-[#37b87410] via-[#37b87420] to-transparent";
     }
-    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch") || lowerTitle.includes("hearing")) {
+    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch")) {
       return "from-[#4a7edd10] via-[#4a7edd20] to-transparent";
     }
-    if (lowerTitle.includes("technik") || lowerTitle.includes("technique")) {
+    if (lowerTitle.includes("technik")) {
       return "from-[#e04c3b10] via-[#e04c3b20] to-transparent";
     }
-    if (lowerTitle.includes("teori") || lowerTitle.includes("theory")) {
+    if (lowerTitle.includes("teori")) {
       return "from-[#a44aed10] via-[#a44aed20] to-transparent";
     }
     return "from-gray-800 via-gray-900 to-transparent";
   };
 
-  // Delayed render to fix animation issues
-  const [isReady, setIsReady] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => setIsReady(true), 600);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <Card
-      className={`p-0 transition-all duration-300 hover:shadow-lg ${
-        hasError
+      className={`overflow-hidden p-0 transition-all duration-300 hover:shadow-lg ${
+        error
           ? "ring-error-300 ring-1"
           : hasValue
           ? "ring-1 ring-gray-700/30"
           : "hover:ring-1 hover:ring-gray-700/40"
       }`}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+      onMouseLeave={() => setIsHovered(false)}>
       <div
         className={`relative bg-gradient-to-br p-5 transition-all duration-300 ${getGradientStyle()}`}
         style={{
-          boxShadow: hasError ? "0 0 5px 0 var(--error-200)" : "none",
-        }}
-      >
+          boxShadow: error ? "0 0 5px 0 var(--error-200)" : "none",
+        }}>
         {/* Apple-style glass gradient bar at top - only show when has value */}
         {hasValue && (
           <div
@@ -151,8 +117,7 @@ const TimeInputBox = ({
                 : "1px solid #33333330",
               boxShadow:
                 isHovered && hasValue ? `0 0 15px ${skillColor}30` : "none",
-            }}
-          >
+            }}>
             <Icon
               className='text-2xl'
               style={{ color: hasValue ? skillColor : "#666666" }}
@@ -162,46 +127,23 @@ const TimeInputBox = ({
             <span
               className={`md:text-md font-openSans text-sm ${
                 hasValue ? "text-white" : "text-gray-400"
-              }`}
-            >
+              }`}>
               {title}
             </span>
             <div
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
-              }}
-            >
+              }}>
               <QuestionMark description={questionMarkProps.description} />
             </div>
           </div>
         </div>
 
-        <div className='mt-0 flex w-full flex-col items-center justify-center gap-1'>
-          <div className="flex w-full justify-around text-xs font-medium text-gray-500/80 uppercase tracking-widest px-8">
-             <span>Godz</span>
-             <span>Min</span>
-          </div>
-          <WheelPickerWrapper className="w-full justify-center gap-2 rounded-lg border-2 border-gray-700/20 bg-transparent">
-            <WheelPicker
-              key={isReady ? "h-ready" : "h-init"}
-              visibleCount={12}
-              options={hourOptions}
-              value={currentHours}
-              onValueChange={(val) => setFieldValue(hoursName, val)}
-              infinite
-              classNames={{ highlightWrapper: "bg-white/10" }}
-            />
-            <WheelPicker
-              key={isReady ? "m-ready" : "m-init"}
-              visibleCount={12}
-              options={minuteOptions}
-              value={currentMinutes}
-              onValueChange={(val) => setFieldValue(minutesName, val)}
-              infinite
-              classNames={{ highlightWrapper: "bg-white/10" }}
-            />
-          </WheelPickerWrapper>
+        <div className='mt-4 flex items-center justify-center gap-3'>
+          <InputTime name={hoursName} description={"HH"} addZero />
+          <p className='mb-[18px] text-2xl font-medium'>:</p>
+          <InputTime name={minutesName} description={"MM"} addZero />
         </div>
       </div>
     </Card>

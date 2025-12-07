@@ -308,7 +308,7 @@ export const StatsSection = ({
               ? "max-h-[1000px] opacity-100"
               : "max-h-0 opacity-0"
           }`}>
-          <AchievementWrapper userAchievements={achievements} />
+          <AchievementWrapper userAchievements={achievements ?? []} />
         </div>
       </div>
     </div>

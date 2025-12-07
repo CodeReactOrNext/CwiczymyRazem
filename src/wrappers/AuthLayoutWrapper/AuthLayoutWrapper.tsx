@@ -18,6 +18,8 @@ export type NavPagesTypes =
   | "leadboard"
   | "faq"
   | "songs"
+  | "seasons"
+  | "timer"
   | null;
 
 interface AuthLayoutWrapperProps {
