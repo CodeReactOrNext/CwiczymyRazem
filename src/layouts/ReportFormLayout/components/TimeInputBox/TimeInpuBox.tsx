@@ -62,17 +62,17 @@ const TimeInputBox = ({
   const currentHours = (values[hoursName as keyof ReportFormikInterface] || "0").toString();
   const currentMinutes = (values[minutesName as keyof ReportFormikInterface] || "0").toString();
 
-  // Check if this time input has any value entered (for styling)
-  const hasValue = parseInt(currentHours, 10) > 0 || parseInt(currentMinutes, 10) > 0;
+  // Always show colors as per user request
+  const hasValue = true;
 
   // Determine the skill color based on title
   const getSkillColor = () => {
     const lowerTitle = title?.toLowerCase() || "";
-    if (lowerTitle.includes("kreatywn")) return "#37b874"; // Green
-    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch"))
+    if (lowerTitle.includes("kreatywn") || lowerTitle.includes("creative")) return "#37b874"; // Green
+    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch") || lowerTitle.includes("hearing"))
       return "#4a7edd"; // Blue
-    if (lowerTitle.includes("technik")) return "#e04c3b"; // Red
-    if (lowerTitle.includes("teori")) return "#a44aed"; // Purple
+    if (lowerTitle.includes("technik") || lowerTitle.includes("technique")) return "#e04c3b"; // Red
+    if (lowerTitle.includes("teori") || lowerTitle.includes("theory")) return "#a44aed"; // Purple
     return "#888888";
   };
 
@@ -85,16 +85,16 @@ const TimeInputBox = ({
     }
 
     const lowerTitle = title?.toLowerCase() || "";
-    if (lowerTitle.includes("kreatywn")) {
+    if (lowerTitle.includes("kreatywn") || lowerTitle.includes("creative")) {
       return "from-[#37b87410] via-[#37b87420] to-transparent";
     }
-    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch")) {
+    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch") || lowerTitle.includes("hearing")) {
       return "from-[#4a7edd10] via-[#4a7edd20] to-transparent";
     }
-    if (lowerTitle.includes("technik")) {
+    if (lowerTitle.includes("technik") || lowerTitle.includes("technique")) {
       return "from-[#e04c3b10] via-[#e04c3b20] to-transparent";
     }
-    if (lowerTitle.includes("teori")) {
+    if (lowerTitle.includes("teori") || lowerTitle.includes("theory")) {
       return "from-[#a44aed10] via-[#a44aed20] to-transparent";
     }
     return "from-gray-800 via-gray-900 to-transparent";
