@@ -142,7 +142,7 @@ export const SkillTreeAccordion = ({
                         </div>
                         <span className='font-bold'>{points}</span>
                         <span className='opacity-90'>
-                          {t(`categories.${category}`)}
+                          {(t as any)(`categories.${category}`)}
                         </span>
                         {/* Subtle glow */}
                         <div

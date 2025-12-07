@@ -38,19 +38,19 @@ const MainLoggedLayout = ({
   const sidebarLinks: SidebarLinkInterface[] = [
     {
       id: "profile" as NavPagesTypes,
-      name: t("nav.profile", "Profil"),
+      name: (t as any)("nav.profile", "Profil"),
       href: "/profile",
       icon: <Home size={20} />,
     },
     {
       id: "timer" as NavPagesTypes,
-      name: t("nav.practice", "Ćwicz"),
+      name: (t as any)("nav.practice", "Ćwicz"),
       href: "/timer",
       icon: <Timer size={20} />,
     },
     {
       id: "report" as NavPagesTypes,
-      name: t("nav.report", "Raporty"),
+      name: (t as any)("nav.report", "Raporty"),
       href: "/report",
       icon: <FileText size={20} />,
     },

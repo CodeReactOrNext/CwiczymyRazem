@@ -11,11 +11,11 @@ import { designTokens, theme } from '../tokens';
 export function getColor(path: string): string {
   const keys = path.split('.');
   let value: any = designTokens.colors;
-  
+
   for (const key of keys) {
     value = value?.[key];
   }
-  
+
   return value || '#000000';
 }
 
@@ -29,9 +29,9 @@ export function getSpacing(key: keyof typeof designTokens.spacing.space): string
 /**
  * Get a typography value from the design tokens
  */
-export function getTypography(category: string, variant: string) {
-  const typography = designTokens.typography.textStyles;
-  return typography[category as keyof typeof typography]?.[variant as any];
+export function getTypography(category: string, variant: string): any {
+  const typography = designTokens.typography.textStyles as any;
+  return typography?.[category]?.[variant];
 }
 
 /**
@@ -49,24 +49,26 @@ export function createTransition(
  * Create a box shadow string
  */
 export function createShadow(
-  size: keyof typeof designTokens.effects.shadow = 'md',
+  size: string = 'md',
   isDark: boolean = true
 ): string {
-  if (isDark && designTokens.effects.shadow.dark[size as keyof typeof designTokens.effects.shadow.dark]) {
-    return designTokens.effects.shadow.dark[size as keyof typeof designTokens.effects.shadow.dark];
+  const shadows = designTokens.effects.shadow as any;
+  if (isDark && shadows.dark?.[size]) {
+    return shadows.dark[size];
   }
-  return designTokens.effects.shadow[size];
+  return shadows[size] || '';
 }
 
 /**
  * Create a border string
  */
 export function createBorder(
-  width: keyof typeof designTokens.effects.border.width = '1',
-  style: keyof typeof designTokens.effects.border.style = 'solid',
+  width: string = '1',
+  style: string = 'solid',
   color: string = theme.color.border.primary
 ): string {
-  return `${designTokens.effects.border.width[width]} ${designTokens.effects.border.style[style]} ${color}`;
+  const border = designTokens.effects.border as any;
+  return `${border.width?.[width] || '1px'} ${border.style?.[style] || 'solid'} ${color}`;
 }
 
 /**
@@ -81,7 +83,7 @@ export function breakpoint(size: keyof typeof designTokens.spacing.breakpoints):
  */
 export function generateCSSVariables(): Record<string, string> {
   const variables: Record<string, string> = {};
-  
+
   // Colors
   Object.entries(theme.color).forEach(([category, values]) => {
     if (typeof values === 'object') {
@@ -92,27 +94,27 @@ export function generateCSSVariables(): Record<string, string> {
       variables[`--color-${category}`] = values;
     }
   });
-  
+
   // Spacing
   Object.entries(theme.space).forEach(([key, value]) => {
     variables[`--space-${key}`] = value;
   });
-  
+
   // Typography
   Object.entries(theme.text).forEach(([key, value]) => {
     variables[`--text-${key}`] = value;
   });
-  
+
   // Radius
   Object.entries(theme.radius).forEach(([key, value]) => {
     variables[`--radius-${key}`] = value;
   });
-  
+
   // Shadows
   Object.entries(theme.shadow).forEach(([key, value]) => {
     variables[`--shadow-${key}`] = value;
   });
-  
+
   return variables;
 }
 
@@ -123,11 +125,11 @@ export const tokens = {
   color: (path: string) => getColor(path),
   space: (key: keyof typeof designTokens.spacing.space) => getSpacing(key),
   typography: (category: string, variant: string) => getTypography(category, variant),
-  transition: (property?: string, duration?: keyof typeof designTokens.animation.duration, easing?: keyof typeof designTokens.animation.easing) => 
+  transition: (property?: string, duration?: keyof typeof designTokens.animation.duration, easing?: keyof typeof designTokens.animation.easing) =>
     createTransition(property, duration, easing),
-  shadow: (size?: keyof typeof designTokens.effects.shadow, isDark?: boolean) => 
+  shadow: (size?: string, isDark?: boolean) =>
     createShadow(size, isDark),
-  border: (width?: keyof typeof designTokens.effects.border.width, style?: keyof typeof designTokens.effects.border.style, color?: string) => 
+  border: (width?: string, style?: string, color?: string) =>
     createBorder(width, style, color),
   breakpoint: (size: keyof typeof designTokens.spacing.breakpoints) => breakpoint(size),
 } as const;

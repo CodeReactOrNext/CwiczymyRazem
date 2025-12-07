@@ -20,7 +20,7 @@ const ProfileExercisesPage: NextPage = () => {
   return (
     <AuthLayoutWrapper
       pageId={"profile"}
-      subtitle={t("exercises", "Exercises")}
+      subtitle={(t as any)("exercises", "Exercises")}
       variant='secondary'>
       <div className='w-full'>
         <ExercisePlan />

@@ -52,17 +52,17 @@ export default function WidgetDemo() {
       </WidgetContent>
       <WidgetFooter>
         <Button
-          size="icon-sm"
+          size="icon"
           variant="outline"
-          className="rounded-full"
+          className="rounded-full w-8 h-8"
           aria-label="Reset stopwatch"
         >
           <XIcon className="stroke-destructive size-4 stroke-3" />
         </Button>
         <Button
-          size="icon-sm"
+          size="icon"
           variant="outline"
-          className="rounded-full"
+          className="rounded-full w-8 h-8"
           aria-label={"Start stopwatch"}
         >
           <CheckIcon className="stroke-productive size-4 stroke-3" />
