@@ -43,7 +43,6 @@ interface SongsTableProps {
   onPageChange: (page: number) => void;
   onAddSong: () => void;
   onStatusChange: () => void;
-  onStatusChange: () => void;
 }
 
 const SongsTable = ({
