@@ -261,7 +261,6 @@ const SongsView = () => {
                     onAddSong={() => setIsModalOpen(true)}
                     hasFilters={hasFilters}
                     onStatusChange={refreshSongsWithoutLoading}
-                    tierFilter={tierFilter}
                   />
                 )}
               </div>
