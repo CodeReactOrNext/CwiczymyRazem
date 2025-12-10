@@ -43,84 +43,94 @@ export const LeadboardRow = ({
   };
 
   return (
-    <li className='mb-3 w-full'>
+    <li className='w-full'>
       <div
-        className={`group relative overflow-hidden border backdrop-blur-sm transition-all duration-200 hover:bg-opacity-90 ${
+        className={`relative overflow-hidden rounded-2xl border backdrop-blur-md ${
           profileId === currentUserId
-            ? "border-cyan-500/50 bg-gradient-to-r from-cyan-900/20 via-zinc-900/50 to-cyan-900/20 shadow-lg shadow-cyan-500/10"
-            : "border-zinc-700/50 bg-gradient-to-r from-zinc-900/40 to-zinc-800/30 hover:border-zinc-600/50 hover:bg-zinc-800/50"
+            ? "border-cyan-500/30 bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20 shadow-lg shadow-cyan-500/10"
+            : "border-white/5 bg-zinc-900/40 shadow-xl shadow-black/20"
         }`}>
         {/* Background Pattern */}
-        <div className='absolute inset-0 opacity-5'>
+        <div className='absolute inset-0 opacity-[0.03] transition-opacity duration-300 group-hover:opacity-[0.06]'>
           <div
             className={`h-full w-full bg-gradient-to-br ${
               profileId === currentUserId
-                ? "from-cyan-500 to-blue-600"
-                : "from-zinc-500 to-zinc-600"
+                ? "from-cyan-400 to-blue-500"
+                : "from-white to-zinc-400"
             }`}
           />
         </div>
 
-        <div className='relative flex items-center gap-3 p-4 sm:gap-4 sm:p-5 lg:gap-6 lg:p-6'>
-          {/* Rank Number - Smaller and responsive */}
+        <div className='relative flex items-center gap-3 p-4 sm:gap-5 sm:p-5 lg:gap-8 lg:p-6'>
+          {/* Rank Number - Cleaner, no box */}
           <div
-            className={`flex h-10 w-10 flex-shrink-0 items-center justify-center border text-lg font-bold sm:h-12 sm:w-12 sm:text-xl lg:h-14 lg:w-14 lg:text-2xl ${
+            className={`flex h-10 w-10 flex-shrink-0 items-center justify-center text-lg font-black italic tracking-tighter sm:h-12 sm:w-12 sm:text-xl lg:h-14 lg:w-14 lg:text-2xl ${
               profileId === currentUserId
-                ? "border-cyan-400/50 bg-cyan-500/20 text-cyan-300 shadow-md shadow-cyan-500/25"
-                : "border-zinc-600/50 bg-zinc-800/50 text-zinc-400"
+                ? "text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]"
+                : place <= 3
+                ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+                : "text-zinc-500 group-hover:text-zinc-400"
             }`}>
-            {place}
+            #{place}
           </div>
 
           {/* Avatar - Responsive */}
           <div className='hidden flex-shrink-0 sm:block'>
-            <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
+            <div className='relative transition-transform duration-300 group-hover:scale-105'>
+              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
+            </div>
           </div>
 
           {/* User Info - Responsive */}
           <div className='min-w-0 flex-1'>
-            <div className='mb-1 flex flex-col gap-2 sm:mb-2 sm:flex-row sm:items-center sm:gap-3'>
+            <div className='mb-1.5 flex flex-col gap-2 sm:mb-2 sm:flex-row sm:items-center sm:gap-4'>
               <Link href={`/user/${profileId}`}>
                 <h3
-                  className={`text-base font-semibold transition-colors hover:text-white sm:text-lg lg:text-xl ${
+                  className={`text-base font-bold tracking-tight transition-colors sm:text-lg lg:text-xl ${
                     profileId === currentUserId
                       ? "text-cyan-300"
-                      : "text-zinc-200"
+                      : "text-zinc-200 group-hover:text-white"
                   }`}>
                   {shortenNick(nick)}
-                  <FaExternalLinkAlt className='ml-2 inline text-xs opacity-0 transition-opacity group-hover:opacity-60 sm:text-sm' />
+                  <FaExternalLinkAlt className='ml-2 inline -translate-y-0.5 text-xs opacity-0 transition-all duration-300 group-hover:opacity-40 sm:text-sm' />
                 </h3>
               </Link>
 
-              {/* Level Badge - Responsive */}
+              {/* Level Badge - Pill Style */}
               <div
-                className={`flex w-fit items-center gap-1 border px-2 py-1 sm:px-3 ${
+                className={`flex w-fit items-center gap-1.5 rounded-full px-2.5 py-0.5 sm:px-3 sm:py-1 ${
                   profileId === currentUserId
-                    ? "border-cyan-400/50 bg-cyan-500/20 text-cyan-300"
-                    : "border-zinc-600/50 bg-zinc-800/50 text-zinc-400"
+                    ? "bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-500/30"
+                    : "bg-zinc-800 text-zinc-400 ring-1 ring-white/5"
                 }`}>
-                <span className='text-xs font-medium uppercase'>LVL</span>
-                <span className='text-sm font-bold sm:text-base lg:text-lg'>
+                <span className='text-[10px] font-bold uppercase tracking-wider opacity-70'>
+                  LVL
+                </span>
+                <span className='text-sm font-bold sm:text-base'>
                   {statistics.lvl}
                 </span>
               </div>
             </div>
 
             <div className='hidden sm:block'>
-              <DaySinceMessage date={new Date(statistics.lastReportDate)} />
+              <div className='text-xs font-medium text-zinc-500 group-hover:text-zinc-400'>
+                <DaySinceMessage date={new Date(statistics.lastReportDate)} />
+              </div>
             </div>
           </div>
 
           {/* Stats - Responsive */}
-          <div className='flex items-center gap-4 sm:gap-6 lg:gap-8'>
+          <div className='flex items-center gap-6 sm:gap-8 lg:gap-12'>
             <div className='text-center'>
               <div
-                className={`text-lg font-bold sm:text-xl lg:text-2xl ${
-                  profileId === currentUserId ? "text-cyan-300" : "text-white"
+                className={`text-lg font-black tracking-tight sm:text-xl lg:text-2xl ${
+                  profileId === currentUserId
+                    ? "text-cyan-300"
+                    : "text-white group-hover:scale-105 transition-transform duration-300"
                 }`}>
                 {statistics.points.toLocaleString()}
               </div>
-              <div className='text-xs font-medium uppercase tracking-wide text-zinc-400'>
+              <div className='text-[10px] font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                 {t("points")}
               </div>
             </div>
@@ -128,34 +138,38 @@ export const LeadboardRow = ({
             <div className='text-center'>
               <div
                 className={`font-mono text-lg font-bold sm:text-xl lg:text-2xl ${
-                  profileId === currentUserId ? "text-cyan-300" : "text-white"
+                  profileId === currentUserId
+                    ? "text-cyan-300"
+                    : "text-zinc-300 group-hover:text-white"
                 }`}>
                 {convertMsToHM(
                   time.creativity + time.hearing + time.technique + time.theory
                 )}
               </div>
-              <div className='text-xs font-medium uppercase tracking-wide text-zinc-400'>
+              <div className='text-[10px] font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                 {t("exercise_time")}
               </div>
             </div>
           </div>
 
           {/* Achievements - Hidden on mobile */}
-          <div className='hidden flex-shrink-0 lg:block'>
+          <div className='hidden flex-shrink-0 lg:block opacity-80 transition-opacity duration-300 group-hover:opacity-100'>
             <AchievementsCarousel achievements={statistics.achievements} />
           </div>
         </div>
 
         {/* Mobile-only bottom section */}
-        <div className='border-t border-zinc-700/30 p-3 sm:hidden'>
+        <div className='border-t border-white/5 bg-zinc-900/20 p-3 sm:hidden'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-3'>
               <div className='h-8 w-8'>
                 <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
               </div>
-              <DaySinceMessage date={new Date(statistics.lastReportDate)} />
+              <div className='text-xs font-medium text-zinc-500'>
+                <DaySinceMessage date={new Date(statistics.lastReportDate)} />
+              </div>
             </div>
-            <div className='flex-shrink-0'>
+            <div className='flex-shrink-0 scale-90'>
               <AchievementsCarousel achievements={statistics.achievements} />
             </div>
           </div>
