@@ -96,7 +96,7 @@ export const LeadboardLayout = ({
 
         {/* Clean Pagination */}
         <div className='mt-8 flex justify-center'>
-          <div className='bg-zinc-900/30 p-4 backdrop-blur-sm'>
+          <div className='rounded-2xl bg-zinc-900/30 p-4 backdrop-blur-sm'>
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -146,7 +146,7 @@ export const LeadboardLayout = ({
 
         {/* Enhanced Content Container */}
         <div className='mx-auto max-w-7xl px-4'>
-          <ul className='space-y-0'>{renderLeaderboardContent()}</ul>
+          <ul className='flex flex-col gap-6'>{renderLeaderboardContent()}</ul>
         </div>
       </div>
     </MainContainer>
