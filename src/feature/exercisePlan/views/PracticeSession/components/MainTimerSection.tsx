@@ -16,6 +16,7 @@ interface MainTimerSectionProps {
   handleNextExercise: () => void;
   timeLeft: number;
   showExerciseInfo?: boolean;
+  variant?: "default" | "compact";
 }
 
 export const MainTimerSection = ({
@@ -29,7 +30,44 @@ export const MainTimerSection = ({
   handleNextExercise,
   timeLeft,
   showExerciseInfo = true,
+  variant = "default",
 }: MainTimerSectionProps) => {
+  if (variant === "compact") {
+    return (
+      <div className="flex w-full items-center justify-center gap-6 md:gap-12">
+          {/* Compact Timer */}
+          <div className="relative shrink-0">
+             <TimerDisplay
+                value={timeLeft}
+                text={formattedTimeLeft}
+                isPlaying={isPlaying}
+                size="xs"
+              />
+          </div>
+
+          {/* Compact Inline Controls */}
+          <div className="flex items-center gap-6">
+               <ExerciseControls
+                  isPlaying={isPlaying}
+                  isLastExercise={isLastExercise}
+                  toggleTimer={toggleTimer}
+                  handleNextExercise={handleNextExercise}
+                  size="md"
+                  variant="centered"
+                />
+               
+               {/* Status Pill (Compact) */}
+               <div className={`hidden md:flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 ${isPlaying ? "border-emerald-500/20 bg-emerald-500/10" : "border-amber-500/20 bg-amber-500/10"}`}>
+                   <div className={`h-1.5 w-1.5 rounded-full ${isPlaying ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
+                   <span className={`text-[10px] uppercase tracking-wider font-bold ${isPlaying ? "text-emerald-400" : "text-amber-400"}`}>
+                        {isPlaying ? "ON" : "PAUSED"}
+                   </span>
+               </div>
+          </div>
+      </div>
+    );
+  }
+
   return (
     <AnimatePresence mode='wait'>
       <motion.div

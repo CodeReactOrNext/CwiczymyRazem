@@ -1,6 +1,7 @@
 {
   "or": "or",
   "start": "Start",
+  "finish": "Finish",
   "min": "min",
   "button": {
     "sign_in": "Log in",

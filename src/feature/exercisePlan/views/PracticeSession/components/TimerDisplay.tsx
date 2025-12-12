@@ -8,7 +8,7 @@ interface TimerDisplayProps {
   value: number;
   text: string;
   isPlaying: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
 }
 
 export const TimerDisplay = ({
@@ -18,6 +18,7 @@ export const TimerDisplay = ({
   size = "md",
 }: TimerDisplayProps) => {
   const sizeClasses = {
+    xs: "h-24 w-24",
     sm: "h-40 w-40",
     md: "h-44 w-44",
     lg: "h-48 w-48",
@@ -32,7 +33,7 @@ export const TimerDisplay = ({
 
   const progressColor = getProgressColor();
   const glowColor = isPlaying ? progressColor : "hsl(var(--muted))";
-  const textSize = size === "sm" ? "24px" : size === "md" ? "28px" : "32px";
+  const textSize = size === "xs" ? "18px" : size === "sm" ? "24px" : size === "md" ? "28px" : "32px";
 
   return (
     <div className='relative'>
