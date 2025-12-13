@@ -38,11 +38,13 @@ const ProfileSkillsPage: NextPage = () => {
     }
 
       // Optimistic update with proper immutability
+      const skillKey = skill.id as keyof typeof userSkills.unlockedSkills;
+      
       const updatedSkills = { 
         ...userSkills,
         unlockedSkills: {
             ...userSkills.unlockedSkills,
-            [skill.id]: (userSkills.unlockedSkills[skill.id as GuitarSkillId] || 0) + points
+            [skillKey]: (userSkills.unlockedSkills[skillKey] || 0) + points
         },
         availablePoints: {
             ...userSkills.availablePoints,
