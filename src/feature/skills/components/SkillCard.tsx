@@ -1,12 +1,8 @@
-import { ActionTooltip } from "assets/components/ActionTooltip";
-import { Button } from "assets/components/ui/button";
-import { Progress } from "assets/components/ui/progress";
 import { cn } from "assets/lib/utils";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import type { GuitarSkill, GuitarSkillId } from "feature/skills/skills.types";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 
 interface SkillCardProps {
   skill: GuitarSkill;
@@ -26,6 +22,13 @@ export const SkillCard = ({
   const Icon = skill.icon;
 
   // Level logic (assuming max 100 for visual bar, or maybe 50?)
+  // Let's assume infinite or high cap for now, visual bar fills to next "Milestone" vs simple linear?
+  // For dashboard, simple linear 0-100 or relative to some max is fine.
+  // Let's settle on a visual max of 100 for the bar segment, but allow infinite points.
+  // Or maybe relative to current points + 10?
+  // Let's just visually cap at 100 for now or cycle. 
+  // User screenshot shows "Technika 4% 108h 42m". This implies time tracking.
+  // But here we are spending points. Let's just show raw points.
   const visualMax = 50; 
   const progress = Math.min((currentPoints / visualMax) * 100, 100);
 
@@ -75,28 +78,19 @@ export const SkillCard = ({
          {[1, 5, 10].map((amount) => {
             const canAfford = availableCategoryPoints >= amount;
             return (
-                <TooltipProvider key={amount}>
-                    <Tooltip delayDuration={300}>
-                        <TooltipTrigger asChild>
-                            <button
-                                onClick={() => handleUpgrade(amount)}
-                                disabled={!canAfford}
-                                className={cn(
-                                    "py-2 rounded-lg text-xs font-bold border transition-all flex items-center justify-center gap-1",
-                                    canAfford 
-                                        ? `bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white hover:border-zinc-700 active:scale-95`
-                                        : "bg-zinc-950/50 border-zinc-900 text-zinc-700 cursor-not-allowed opacity-50"
-                                )}
-                            >
-                                <Plus className="w-3 h-3" />
-                                {amount}
-                            </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Spend {amount} point{amount > 1 ? 's' : ''}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                    <button
+                        onClick={() => handleUpgrade(amount)}
+                        disabled={!canAfford}
+                        className={cn(
+                            "py-2 rounded-lg text-xs font-bold border transition-all flex items-center justify-center gap-1",
+                            canAfford 
+                                ? `bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white hover:border-zinc-700 active:scale-95`
+                                : "bg-zinc-950/50 border-zinc-900 text-zinc-700 cursor-not-allowed opacity-50"
+                        )}
+                    >
+                        <Plus className="w-3 h-3" />
+                        {amount}
+                    </button>
             );
          })}
       </div>
