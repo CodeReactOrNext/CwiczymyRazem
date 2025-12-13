@@ -12,14 +12,14 @@ export const Logo = () => {
           alt='Logo'
           width={48}
           height={48}
-          className='h-12 w-12'
+          className='h-12 w-auto brightness-0 invert'
           priority
         />
-        <div className='flex flex-col items-start justify-center leading-4'>
-          <p className='font-bold tracking-wider text-mainText'>
+        <div className='flex flex-col items-start justify-center leading-none'>
+          <p className='font-bold tracking-wider text-white text-lg'>
             {t("slogan.line_1")}
           </p>
-          <p className='font-bold tracking-wider text-main-300'>
+          <p className='font-bold tracking-wider text-main-300 text-lg'>
             {t("slogan.line_2")}
           </p>
         </div>

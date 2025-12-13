@@ -1,6 +1,9 @@
 "use client";
 
 import { Brain, Timer, Clock, Zap, BarChart3, TrendingUp, Music2, BookOpen } from "lucide-react";
+import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
+import { AchievementCard } from "feature/achievements/components/AchievementCard";
+import { MiniTrendChart } from "feature/profile/components/MiniTrendChart";
 
 export const FeaturesSection = () => {
   const skillCategories = [
@@ -23,7 +26,9 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section id='features' className='relative py-24 sm:py-32 bg-[#0d0d0c]'>
+    <section id='features' className='relative py-24 sm:py-32 bg-[#0d0d0c] overflow-hidden'>
+      {/* Global Background Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none"></div>
       <div className='mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='mx-auto max-w-2xl text-center mb-20'>
           <h2 className='text-base font-semibold leading-7 text-cyan-500 tracking-wider uppercase'>Features</h2>
@@ -35,212 +40,327 @@ export const FeaturesSection = () => {
           </p>
         </div>
 
-        {/* Feature 1 - Smart Timer (matching actual app UI) */}
-        <div className='mb-16 overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-br from-zinc-900/80 via-zinc-900/60 to-zinc-950'>
-          <div className='p-6 border-b border-zinc-800/50'>
-            <div className='flex items-center gap-2'>
-              <Timer className="w-5 h-5 text-cyan-500" />
-              <span className='text-lg font-semibold text-cyan-500'>Ćwicz</span>
+        <div className="space-y-32">
+          {/* GROUP 1: PRACTICE TOOLS */}
+          <div>
+            <div className="text-center mb-12">
+               <h3 className="text-2xl font-bold text-white mb-2">Smart Practice Tools</h3>
+               <p className="text-zinc-400">Track every second of your progress with our intelligent timer system.</p>
             </div>
-          </div>
-          
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 p-8'>
-            {/* Timer Circle - matching screenshot */}
-            <div className='flex flex-col items-center justify-center'>
-              <div className='relative w-56 h-56'>
-                {/* Outer glow rings */}
-                <div className='absolute inset-0 rounded-full bg-cyan-500/10 blur-xl'></div>
-                <div className='absolute inset-2 rounded-full bg-cyan-500/5 blur-lg'></div>
-                
-                {/* Main circle */}
-                <div className='absolute inset-4 rounded-full border-4 border-cyan-500/30 bg-zinc-950 flex items-center justify-center'>
-                  <div className='text-center'>
-                    <div className='text-5xl font-mono font-bold text-white tracking-tight'>0:03</div>
-                  </div>
-                </div>
-                
-                {/* Animated ring */}
-                <svg className='absolute inset-0 -rotate-90 w-full h-full' viewBox='0 0 100 100'>
-                  <circle cx='50' cy='50' r='46' fill='none' stroke='#06b6d4' strokeWidth='2' strokeDasharray='289' strokeDashoffset='72' strokeLinecap='round' opacity='0.8' />
-                  <circle cx='50' cy='50' r='42' fill='none' stroke='#06b6d4' strokeWidth='1' strokeDasharray='264' strokeDashoffset='132' strokeLinecap='round' opacity='0.4' />
-                </svg>
-              </div>
-
-              {/* Status info */}
-              <div className='mt-6 text-center bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 w-full max-w-xs'>
-                <div className='text-xs text-zinc-500 mb-1'>You are currently exercising:</div>
-                <div className='text-lg font-semibold text-white'>Theory</div>
-                <div className='mt-3 pt-3 border-t border-zinc-800'>
-                  <div className='text-xs text-zinc-500'>Total time:</div>
-                  <div className='flex items-center justify-center gap-1 text-white'>
-                    <Clock className='w-4 h-4' />
-                    <span className='font-mono'>00:06</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Skill Categories - matching screenshot layout */}
-            <div className='grid grid-cols-2 gap-4'>
-              {skillCategories.map((cat, i) => (
-                <div 
-                  key={i} 
-                  className={`relative rounded-xl border-2 ${cat.active ? 'border-blue-500/50 bg-zinc-900/80' : 'border-zinc-800 bg-zinc-900/30'} p-4 transition-all hover:border-zinc-700`}
-                >
-                  {cat.active && <div className='absolute top-2 right-2 w-2 h-2 rounded-full bg-green-500'></div>}
-                  <div className='flex items-center gap-2 mb-3'>
-                    <div className={`w-2.5 h-2.5 rounded-full ${cat.dot}`}></div>
-                    <span className='text-sm text-zinc-300'>{cat.name}</span>
-                  </div>
-                  <div className='flex items-end justify-between'>
-                    <div className='text-3xl font-mono font-bold text-white'>{cat.time}</div>
-                    <div className='text-sm text-zinc-500'>{cat.percent}</div>
-                  </div>
-                  <button className={`w-full mt-4 py-2 rounded-lg border ${cat.active ? 'border-zinc-600 text-zinc-400' : 'border-zinc-700 text-zinc-400 hover:border-zinc-600'} text-sm flex items-center justify-center gap-2 transition-colors`}>
-                    {cat.active ? (
-                      <><span className='w-2 h-2 border-l-2 border-r-2 border-zinc-400'></span> pause</>
-                    ) : (
-                      <><span className='w-0 h-0 border-l-4 border-l-zinc-400 border-y-4 border-y-transparent'></span> start</>
-                    )}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Feature 2 - Statistics & Skills (matching profile page) */}
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16'>
-          {/* Statistics Cards */}
-          <div className='lg:col-span-2 space-y-4'>
-            <div className='flex items-center gap-2 mb-4'>
-              <BarChart3 className="w-5 h-5 text-white" />
-              <span className='text-lg font-semibold text-white'>Statistics</span>
-            </div>
-            <p className='text-sm text-zinc-500 mb-6'>Most important numbers about your progress</p>
             
-            <div className='grid grid-cols-2 gap-4'>
-              {stats.map((stat, i) => (
-                <div key={i} className='rounded-xl border border-zinc-800 bg-gradient-to-br from-zinc-900/80 to-zinc-950 p-6'>
-                  <div className='flex items-center gap-2 mb-2'>
-                    <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                    <span className='text-sm text-zinc-400'>{stat.label}</span>
-                    <span className='ml-auto text-xs text-green-500'>{stat.trend}</span>
-                  </div>
-                  <div className='text-3xl font-bold text-white font-mono'>{stat.value}</div>
-                  <div className='mt-4 h-1 bg-zinc-800 rounded-full overflow-hidden'>
-                    <div className={`h-full ${stat.color === 'text-cyan-400' ? 'bg-cyan-500' : 'bg-amber-500'} rounded-full`} style={{ width: '75%' }}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Mini stats */}
-            <div className='grid grid-cols-2 gap-4'>
-              <div className='rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 flex items-center gap-4'>
-                <Zap className='w-5 h-5 text-amber-400' />
-                <div>
-                  <div className='text-xs text-zinc-500'>Sessions</div>
-                  <div className='text-xl font-bold text-white'>43</div>
-                </div>
-              </div>
-              <div className='rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 flex items-center gap-4'>
-                <TrendingUp className='w-5 h-5 text-pink-400' />
-                <div>
-                  <div className='text-xs text-zinc-500'>Healthy habits</div>
-                  <div className='text-xl font-bold text-white'>2146</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Skills Distribution */}
-          <div className='rounded-xl border border-zinc-800 bg-gradient-to-br from-zinc-900/80 to-zinc-950 p-6'>
-            <div className='flex items-center gap-2 mb-2'>
-              <Brain className="w-5 h-5 text-white" />
-              <span className='text-lg font-semibold text-white'>Skills</span>
-            </div>
-            <p className='text-xs text-zinc-500 mb-6'>Distribution of exercise time by category</p>
-            
-            <div className='space-y-4'>
-              {skills.map((skill, i) => (
-                <div key={i} className='flex items-center gap-3'>
-                  <div className='flex-1'>
-                    <div className='flex items-center justify-between mb-1'>
-                      <span className='text-sm text-zinc-300'>{skill.name}</span>
-                      <span className='text-sm text-white font-semibold'>{skill.percent}%</span>
+            <div className='overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-br from-zinc-900/80 via-zinc-900/60 to-zinc-950 p-8'>
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'>
+                {/* Timer Circle */}
+                <div className='flex flex-col items-center justify-center'>
+                  <div className='relative w-64 h-64'>
+                    <div className='absolute inset-0 rounded-full bg-cyan-500/10 blur-xl'></div>
+                    <div className='absolute inset-4 rounded-full border-4 border-cyan-500/30 bg-zinc-950 flex items-center justify-center'>
+                      <div className='text-center'>
+                        <div className='text-6xl font-mono font-bold text-white tracking-tight'>0:03</div>
+                        <div className='text-sm text-cyan-500 mt-2 font-medium uppercase tracking-widest'>Technique</div>
+                      </div>
                     </div>
-                    <div className='h-1.5 bg-zinc-800 rounded-full overflow-hidden'>
-                      <div className={`h-full ${skill.color} rounded-full transition-all`} style={{ width: `${skill.percent}%` }}></div>
-                    </div>
+                    <svg className='absolute inset-0 -rotate-90 w-full h-full' viewBox='0 0 100 100'>
+                      <circle cx='50' cy='50' r='46' fill='none' stroke='#06b6d4' strokeWidth='2' strokeDasharray='289' strokeDashoffset='72' strokeLinecap='round' opacity='0.8' />
+                    </svg>
                   </div>
-                  <span className='text-xs text-zinc-500 w-20 text-right'>{skill.time}</span>
                 </div>
-              ))}
-            </div>
 
-            <div className='mt-6 pt-6 border-t border-zinc-800'>
-              <div className='flex items-center justify-between'>
-                <span className='text-sm text-zinc-400'>Całkowity czas ćwiczeń</span>
-                <span className='text-lg font-bold text-white'>2693h 18m</span>
+                {/* Categories */}
+                <div className='grid grid-cols-2 gap-4'>
+                  {skillCategories.map((cat, i) => (
+                    <div 
+                      key={i} 
+                      className={`relative rounded-xl border-2 ${cat.active ? 'border-cyan-500/40 bg-cyan-900/10' : 'border-zinc-800 bg-zinc-900/30'} p-5 transition-all outline-none`}
+                    >
+                      <div className='flex items-center gap-3 mb-3'>
+                        <div className={`w-3 h-3 rounded-full ${cat.dot}`}></div>
+                        <span className='font-medium text-zinc-200'>{cat.name}</span>
+                      </div>
+                      <div className='text-2xl font-mono font-bold text-white'>{cat.time}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Feature 3 - Activity Heatmap */}
-        <div className='rounded-2xl border border-zinc-800/50 bg-gradient-to-br from-zinc-900/80 via-zinc-900/60 to-zinc-950 p-8'>
-          <div className='flex items-center justify-between mb-6'>
-            <div>
-              <h3 className='text-lg font-semibold text-white'>Aktywność</h3>
-              <p className='text-sm text-zinc-500'>Your practice activity over time</p>
+          {/* GROUP 2: TRACKING & ANALYTICS */}
+          <div className="relative">
+             {/* Background glow for analytics */}
+             <div className="absolute -top-24 -left-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none opacity-50"></div>
+             
+            <div className="text-center mb-12 relative z-10">
+               <h3 className="text-2xl font-bold text-white mb-2">Detailed Analytics</h3>
+               <p className="text-zinc-400">Visualize your consistency and breakdown your improvements.</p>
             </div>
-            <div className='flex gap-2'>
-              {['2023', '2024', '2025'].map((year, i) => (
-                <button key={i} className={`px-3 py-1 rounded-lg text-sm ${i === 2 ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                  {year}
-                </button>
-              ))}
-            </div>
-          </div>
 
-          {/* Simplified Heatmap Grid */}
-          <div className='overflow-x-auto'>
-            <div className='grid grid-rows-7 grid-flow-col gap-1 min-w-[700px]'>
-              {['Mon', '', 'Wed', '', 'Fri', '', 'Sun'].map((day, dayIndex) => (
-                <div key={dayIndex} className='flex items-center gap-1'>
-                  <span className='text-xs text-zinc-500 w-8'>{day}</span>
-                  <div className='flex gap-1'>
-                    {Array.from({ length: 52 }).map((_, weekIndex) => {
-                      const intensity = Math.random();
-                      let bgColor = 'bg-zinc-800/50';
-                      if (intensity > 0.8) bgColor = 'bg-cyan-500';
-                      else if (intensity > 0.6) bgColor = 'bg-cyan-500/70';
-                      else if (intensity > 0.4) bgColor = 'bg-cyan-500/40';
-                      else if (intensity > 0.2) bgColor = 'bg-cyan-500/20';
+            <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10'>
+              {/* Heatmap Card */}
+              <div className='lg:col-span-2 rounded-2xl border border-white/5 bg-gradient-to-b from-zinc-900/80 to-zinc-950/80 backdrop-blur-xl p-8 hover:border-cyan-500/20 transition-colors duration-500 group'>
+                <div className="flex items-center gap-3 mb-6">
+                   <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:text-cyan-300 transition-colors">
+                     <Clock className="w-5 h-5"/>
+                   </div>
+                   <h4 className="font-semibold text-white group-hover:text-cyan-100 transition-colors">Activity History</h4>
+                </div>
+                <div className='w-full mb-8 overflow-hidden'>
+                   <div className="flex gap-2">
+                      {/* Day Labels */}
+                      <div className="flex flex-col justify-between py-[2px] pr-2 text-xs text-zinc-600 font-medium">
+                         <span>Mon</span>
+                         <span>Wed</span>
+                         <span>Fri</span>
+                      </div>
                       
-                      return (
-                        <div 
-                          key={weekIndex} 
-                          className={`w-3 h-3 rounded-sm ${bgColor} hover:ring-1 hover:ring-cyan-400 transition-all cursor-pointer`}
-                          title={`Week ${weekIndex + 1}`}
-                        ></div>
-                      );
-                    })}
-                  </div>
+                      {/* The Grid */}
+                      <div className="flex-1 flex gap-[3px] overflow-hidden mask-linear-fade">
+                         {Array.from({ length: 30 }).map((_, weekIndex) => (
+                            <div key={weekIndex} className="flex flex-col gap-[3px]">
+                               {Array.from({ length: 7 }).map((_, dayIndex) => {
+                                  // Mock randomized activity
+                                  const intensity = Math.random() > 0.7 ? Math.floor(Math.random() * 4) : 0;
+                                  const colors = [
+                                     'bg-zinc-800/50', // 0: empty
+                                     'bg-cyan-900/40', // 1: light
+                                     'bg-cyan-700/60', // 2: medium
+                                     'bg-cyan-500',    // 3: high
+                                  ];
+                                  
+                                  // Create a nice pattern manually for demo purposes instead of pure random if needed, 
+                                  // but random weighted is usually fine for "looks like git chart".
+                                  // Let's force some specific nice pattern later if needed, mostly random is fine.
+                                  return (
+                                     <div 
+                                        key={dayIndex} 
+                                        className={`w-3 h-3 rounded-sm ${colors[intensity]} transition-colors duration-300 hover:opacity-80`}
+                                     ></div>
+                                  );
+                               })}
+                            </div>
+                         ))}
+                      </div>
+                   </div>
+                   <div className="flex items-center gap-2 mt-4 text-xs text-zinc-500 justify-end">
+                      <span>Less</span>
+                      <div className="flex gap-1">
+                         <div className="w-3 h-3 rounded-sm bg-zinc-800/50"></div>
+                         <div className="w-3 h-3 rounded-sm bg-cyan-900/40"></div>
+                         <div className="w-3 h-3 rounded-sm bg-cyan-700/60"></div>
+                         <div className="w-3 h-3 rounded-sm bg-cyan-500"></div>
+                      </div>
+                      <span>More</span>
+                   </div>
                 </div>
-              ))}
+
+                {/* Additional Stats / Focus Areas */}
+                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/5">
+                   {skills.slice(0, 4).map((skill, i) => (
+                      <div key={i} className="bg-zinc-900/40 rounded-lg p-3">
+                         <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">{skill.name}</span>
+                            <span className="text-xs text-white">{skill.percent}%</span>
+                         </div>
+                         <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                            <div className={`h-full ${skill.color} opacity-80`} style={{ width: `${skill.percent * 10}%` }}></div>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+              </div>
+
+              {/* Stats Card */}
+              <div className='rounded-2xl border border-white/5 bg-gradient-to-b from-zinc-900/80 to-zinc-950/80 backdrop-blur-xl p-8 flex flex-col justify-between hover:border-amber-500/20 transition-colors duration-500 gap-6'>
+                 
+                 {/* Stat 1 */}
+                 <div className="bg-zinc-900/40 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1 font-medium uppercase tracking-wider">
+                      <Clock className="w-3 h-3" />
+                      Avg Session
+                    </div>
+                    <div className="text-2xl font-bold text-white tracking-tight">60:23</div>
+                    <div className="text-xs text-zinc-500 mt-1">Typical practice duration</div>
+                 </div>
+
+                 {/* Stat 2 */}
+                 <div className="bg-zinc-900/40 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1 font-medium uppercase tracking-wider">
+                      <Brain className="w-3 h-3" />
+                      Strongest Area
+                    </div>
+                    <div className="text-2xl font-bold text-teal-400 tracking-tight">Hearing</div>
+                    <div className="text-xs text-zinc-500 mt-1">Most improved skill this week</div>
+                 </div>
+                 
+                 {/* Stat 3 */}
+                 <div className="bg-zinc-900/40 rounded-xl p-4 border border-white/5">
+                     <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1 font-medium uppercase tracking-wider">
+                      <Zap className="w-3 h-3" />
+                      Points / Hour
+                    </div>
+                    <div className="text-2xl font-bold text-amber-400 tracking-tight">197</div>
+                    <div className="text-xs text-zinc-500 mt-1">Efficiency score</div>
+                 </div>
+
+                 {/* Stat 4 */}
+                 <div className="bg-zinc-900/40 rounded-xl p-4 border border-white/5">
+                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1 font-medium uppercase tracking-wider">
+                      <TrendingUp className="w-3 h-3" />
+                      Current Streak
+                    </div>
+                    <div className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                       12 <span className="text-sm text-zinc-600 font-normal">days</span>
+                    </div>
+                 </div>
+              </div>
             </div>
           </div>
 
-          <div className='flex items-center gap-4 mt-4 text-xs text-zinc-500'>
-            <div className='flex items-center gap-1'>
-              <div className='w-3 h-3 rounded-sm bg-cyan-500'></div>
-              <span>Report with title</span>
+          {/* GROUP 3: SONGS & PROGRESSION */}
+          <div className="relative">
+             {/* Background glow for songs */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-gradient-to-b from-purple-500/5 to-amber-500/5 blur-3xl rounded-[100px] pointer-events-none -z-10 opacity-60"></div>
+
+            <div className="text-center mb-16 relative z-10">
+               <h3 className="text-2xl font-bold text-white mb-2">Songs & Achievements</h3>
+               <p className="text-zinc-400">Master your favorite tracks and earn rewards for your dedication.</p>
             </div>
-            <div className='flex items-center gap-1'>
-              <div className='w-3 h-3 rounded-sm bg-amber-500'></div>
-              <span>Backdated report</span>
+
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-start relative z-10'>
+               {/* Songs Column */}
+               <div className='space-y-8'>
+                  <div className="flex items-center gap-3 mb-2 px-2">
+                    <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
+                      <Music2 className="w-5 h-5" />
+                    </div>
+                    <h4 className="font-semibold text-xl text-white">Song Library</h4>
+                  </div>
+                  
+                  <div className="grid gap-6">
+                     {/* MOCK SONG CARD 1 */}
+                     <div className="transform hover:scale-[1.02] transition-transform duration-300">
+                       <SongCard 
+                         song={{
+                           id: "1",
+                           title: "Master of Puppets",
+                           artist: "Metallica",
+                           difficulties: [{ rating: 9 }, { rating: 10 }, { rating: 9 }, { rating: 10 }] as any,
+                           createdAt: {} as any,
+                           createdBy: "1"
+                         }}
+                         status="learning"
+                         readonly={true}
+                         onStatusChange={() => {}}
+                         onRatingChange={() => {}}
+                       />
+                     </div>
+                     {/* MOCK SONG CARD 2 */}
+                     <div className="transform hover:scale-[1.02] transition-transform duration-300">
+                       <SongCard 
+                         song={{
+                           id: "2",
+                           title: "Time",
+                           artist: "Pink Floyd",
+                           difficulties: [{ rating: 4 }, { rating: 5 }, { rating: 3 }, { rating: 4 }] as any,
+                           createdAt: {} as any,
+                           createdBy: "1"
+                         }}
+                         status="wantToLearn"
+                         readonly={true}
+                         onStatusChange={() => {}}
+                         onRatingChange={() => {}}
+                       />
+                     </div>
+                  </div>
+               </div>
+
+               {/* Achievements Column */}
+               <div className='space-y-8'>
+                  <div className="flex items-center gap-3 mb-2 px-2">
+                    <div className="p-2 bg-amber-500/10 rounded-lg text-amber-400">
+                       <TrendingUp className="w-5 h-5" />
+                    </div>
+                    <h4 className="font-semibold text-xl text-white">Recent Achievements</h4>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-5 p-6 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm mb-12">
+                     {/* REAL ACHIEVEMENT COMPONENTS */}
+                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="lvl100" /></div>
+                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="fireSession" /></div>
+                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="time_3" /></div>
+                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="points_3" /></div>
+                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="diamond" /></div>
+                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="scientist" /></div>
+                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="wizard" /></div>
+                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="medal" /></div>
+                  </div>
+               </div>
+            </div>
+          </div>
+
+          {/* GROUP 4: PROGRESSION FLOW */}
+          <div className="relative pb-20">
+             <div className="text-center mb-16">
+               <h3 className="text-2xl font-bold text-white mb-2">Your Path to Mastery</h3>
+               <p className="text-zinc-400">A gamified experience that keeps you motivated every single day.</p>
+            </div>
+
+            <div className='relative'>
+                 {/* Connection Line (Desktop) with Animated Beam */}
+                 <div className="hidden lg:block absolute top-[2.5rem] left-0 w-full h-0.5 bg-zinc-800/50 overflow-hidden rounded-full">
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent w-[50%] animate-beam"></div>
+                 </div>
+                 {/* Inject animation styles locally since we can't touch tailwind config easily */}
+                 <style dangerouslySetInnerHTML={{__html: `
+                    @keyframes beam {
+                      0% { transform: translateX(-100%); }
+                      100% { transform: translateX(200%); }
+                    }
+                    .animate-beam {
+                      animation: beam 3s infinite linear;
+                    }
+                 `}} />
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+                    {/* Step 1: Practice */}
+                    <div className="relative group">
+                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-900/20 group-hover:border-cyan-500/30 transition-all duration-300">
+                           <BookOpen className="w-8 h-8 text-cyan-400" />
+                       </div>
+                       <h4 className="text-lg font-bold text-white mb-2">1. Practice</h4>
+                       <p className="text-sm text-zinc-400 px-4">Creating your own <span className="text-cyan-400">Custom Plans</span> or choosing from our library of exercises.</p>
+                    </div>
+
+                    {/* Step 2: Points */}
+                    <div className="relative group">
+                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-900/20 group-hover:border-amber-500/30 transition-all duration-300">
+                           <Zap className="w-8 h-8 text-amber-400" />
+                       </div>
+                       <h4 className="text-lg font-bold text-white mb-2">2. Earn Points</h4>
+                       <p className="text-sm text-zinc-400 px-4">Every minute of practice rewards you with XP, tracking your dedication.</p>
+                    </div>
+
+                    {/* Step 3: Level Up */}
+                    <div className="relative group">
+                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-900/20 group-hover:border-purple-500/30 transition-all duration-300">
+                           <TrendingUp className="w-8 h-8 text-purple-400" />
+                       </div>
+                       <h4 className="text-lg font-bold text-white mb-2">3. Level Up</h4>
+                       <p className="text-sm text-zinc-400 px-4">Unlock new ranks and watch your profile grow as you improve.</p>
+                    </div>
+
+                    {/* Step 4: Compete */}
+                     <div className="relative group">
+                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-900/20 group-hover:border-emerald-500/30 transition-all duration-300">
+                           <div className="relative">
+                             <BarChart3 className="w-8 h-8 text-emerald-400" />
+                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                           </div>
+                       </div>
+                       <h4 className="text-lg font-bold text-white mb-2">4. Compete</h4>
+                       <p className="text-sm text-zinc-400 px-4">Join <span className="text-emerald-400">Seasonal Leaderboards</span> and compare your progress with others.</p>
+                    </div>
+                 </div>
             </div>
           </div>
         </div>
