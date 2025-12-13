@@ -9,7 +9,6 @@ import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 // Import new modular components
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { FeaturesSection } from "feature/landing/components/FeaturesSection";
-import { TestimonialsSection } from "feature/landing/components/TestimonialsSection";
 import { PricingSection } from "feature/landing/components/PricingSection";
 import { FaqSection } from "feature/landing/components/FaqSection";
 import { Footer } from "feature/landing/components/Footer";
@@ -58,7 +57,6 @@ const LandingPage: NextPage = () => {
       <div className='min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30'>
         <HeroSection />
         <FeaturesSection />
-        <TestimonialsSection />
         <PricingSection />
         <FaqSection questions={faqQuestions} />
         <Footer />

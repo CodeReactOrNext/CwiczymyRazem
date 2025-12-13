@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
+import { Logo } from "components/Logo/Logo";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,9 +14,9 @@ export const HeroSection = () => {
       <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/50 via-[#0d0d0c] to-[#0d0d0c]'></div>
       
       {/* Hero Image */}
-      <div className='absolute right-0 top-0 h-full w-full sm:w-2/3 lg:w-3/5 select-none pointer-events-none opacity-30'>
-        <div className='absolute inset-0 bg-gradient-to-r from-[#0d0d0c] via-[#0d0d0c]/60 to-transparent z-10'></div>
-        <div className='absolute inset-0 bg-gradient-to-b from-[#0d0d0c]/30 via-transparent to-[#0d0d0c] z-10'></div>
+      <div className='absolute right-0 top-0 h-full w-full sm:w-2/3 lg:w-3/5 select-none pointer-events-none opacity-60'>
+        <div className='absolute inset-0 bg-gradient-to-r from-[#0d0d0c] via-[#0d0d0c]/30 to-transparent z-10'></div>
+        <div className='absolute inset-0 bg-gradient-to-b from-[#0d0d0c]/10 via-transparent to-[#0d0d0c] z-10'></div>
         <Image
           src='/images/hero-image.png'
           alt='Guitarist'
@@ -27,21 +28,9 @@ export const HeroSection = () => {
 
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8 w-full'>
         {/* Top bar - matching app header */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className='flex items-center gap-4 mb-12'
-        >
-          <div className='flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800'>
-            <Trophy className='w-4 h-4 text-amber-400' />
-            <span className='text-sm font-semibold text-white'>Level 100</span>
+          <div className='flex items-center gap-4 mb-12'>
+            <Logo />
           </div>
-          <div className='h-2 flex-1 max-w-[200px] bg-zinc-800 rounded-full overflow-hidden'>
-            <div className='h-full bg-gradient-to-r from-green-500 to-green-400 rounded-full' style={{ width: '49%' }}></div>
-          </div>
-          <span className='text-sm text-green-400'>+4910%</span>
-        </motion.div>
 
         <div className='max-w-2xl lg:max-w-3xl'>
           {/* Brand Badge */}
@@ -62,7 +51,7 @@ export const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className='text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6'>
             Track your guitar <br />
-            <span className='text-cyan-500'>journey like a pro</span>
+            <span className='bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent'>journey like a pro</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -110,7 +99,7 @@ export const HeroSection = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
             className='flex flex-col sm:flex-row gap-4'>
             <Link href='/signup'>
-              <Button className='h-12 px-8 rounded-xl bg-cyan-500 text-zinc-950 hover:bg-cyan-400 font-semibold text-base transition-colors shadow-lg shadow-cyan-500/25'>
+              <Button className='h-12 px-8 rounded-xl bg-cyan-500 text-zinc-950 hover:bg-cyan-400 font-semibold text-base transition-colors shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70'>
                 Start for Free
               </Button>
             </Link>

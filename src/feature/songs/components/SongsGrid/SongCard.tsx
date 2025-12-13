@@ -17,6 +17,7 @@ interface SongCardProps {
   status?: SongStatus;
   onStatusChange: (status: SongStatus) => void;
   onRatingChange: () => void;
+  readonly?: boolean;
 }
 
 export const SongCard = ({
@@ -24,6 +25,7 @@ export const SongCard = ({
   status,
   onStatusChange,
   onRatingChange,
+  readonly = false,
 }: SongCardProps) => {
   const { t } = useTranslation("songs");
   const avgDifficulty = getAverageDifficulty(song.difficulties);
@@ -111,38 +113,40 @@ export const SongCard = ({
       </div>
 
       {/* Bottom Section: Status Selector */}
-      <div className='relative z-10 mt-auto'>
-        <Select value={status} onValueChange={onStatusChange}>
-          <SelectTrigger
-            className={`w-full border-t border-x-0 border-b-0 border-white/5 bg-black/20 backdrop-blur-sm transition-all hover:bg-black/40 text-xs font-bold uppercase tracking-wider focus:ring-0 ${
-               status === "wantToLearn" ? "text-blue-400" :
-               status === "learning" ? "text-amber-400" :
-               status === "learned" ? "text-emerald-400" : "text-zinc-500"
-            }`}>
-            <SelectValue placeholder={t("select_status")} />
-          </SelectTrigger>
-          <SelectContent className='border-zinc-800 bg-zinc-900/95 backdrop-blur-xl'>
-            <SelectItem value='wantToLearn' className='focus:bg-zinc-800'>
-              <span className='flex items-center gap-2 text-blue-400'>
-                <span className='h-1.5 w-1.5 rounded-full bg-blue-400' />
-                {t("want_to_learn")}
-              </span>
-            </SelectItem>
-            <SelectItem value='learning' className='focus:bg-zinc-800'>
-              <span className='flex items-center gap-2 text-amber-400'>
-                <span className='h-1.5 w-1.5 rounded-full bg-amber-400' />
-                {t("learning")}
-              </span>
-            </SelectItem>
-            <SelectItem value='learned' className='focus:bg-zinc-800'>
-              <span className='flex items-center gap-2 text-emerald-400'>
-                <span className='h-1.5 w-1.5 rounded-full bg-emerald-400' />
-                {t("learned")}
-              </span>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      {!readonly && (
+        <div className='relative z-10 mt-auto'>
+          <Select value={status} onValueChange={onStatusChange}>
+            <SelectTrigger
+              className={`w-full border-t border-x-0 border-b-0 border-white/5 bg-black/20 backdrop-blur-sm transition-all hover:bg-black/40 text-xs font-bold uppercase tracking-wider focus:ring-0 ${
+                status === "wantToLearn" ? "text-blue-400" :
+                status === "learning" ? "text-amber-400" :
+                status === "learned" ? "text-emerald-400" : "text-zinc-500"
+              }`}>
+              <SelectValue placeholder={t("select_status")} />
+            </SelectTrigger>
+            <SelectContent className='border-zinc-800 bg-zinc-900/95 backdrop-blur-xl'>
+              <SelectItem value='wantToLearn' className='focus:bg-zinc-800'>
+                <span className='flex items-center gap-2 text-blue-400'>
+                  <span className='h-1.5 w-1.5 rounded-full bg-blue-400' />
+                  {t("want_to_learn")}
+                </span>
+              </SelectItem>
+              <SelectItem value='learning' className='focus:bg-zinc-800'>
+                <span className='flex items-center gap-2 text-amber-400'>
+                  <span className='h-1.5 w-1.5 rounded-full bg-amber-400' />
+                  {t("learning")}
+                </span>
+              </SelectItem>
+              <SelectItem value='learned' className='focus:bg-zinc-800'>
+                <span className='flex items-center gap-2 text-emerald-400'>
+                  <span className='h-1.5 w-1.5 rounded-full bg-emerald-400' />
+                  {t("learned")}
+                </span>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
     </div>
   );
 };

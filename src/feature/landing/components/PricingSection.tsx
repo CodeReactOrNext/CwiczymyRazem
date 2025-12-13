@@ -27,13 +27,13 @@ export const PricingSection = () => {
                 <div>
                   <div className='flex items-center gap-2 mb-1'>
                     <Trophy className='w-5 h-5 text-amber-400' />
-                    <h3 className='text-xl font-bold text-white'>Full Access</h3>
+                    <h3 className='text-xl font-bold text-white'>Unlimited Access</h3>
                   </div>
-                  <p className='text-zinc-400 text-sm'>All features included</p>
+                  <p className='text-zinc-400 text-sm'>Join our community</p>
                 </div>
                 <div className='text-right'>
-                  <div className='text-4xl font-bold text-white'>$0</div>
-                  <div className='text-zinc-500 text-sm'>forever free</div>
+                  <div className='text-4xl font-bold text-white'>Free</div>
+                  <div className='text-zinc-500 text-sm'>forever</div>
                 </div>
               </div>
 
