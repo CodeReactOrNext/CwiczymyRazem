@@ -4,7 +4,8 @@ import { db } from "utils/firebase/client/firebase.utils";
 
 export const updateUserSkills = async (
   userId: string,
-  skillId: string
+  skillId: string,
+  pointsAmount: number = 1
 ): Promise<boolean> => {
   try {
     const userRef = doc(db, "users", userId);
@@ -31,19 +32,19 @@ export const updateUserSkills = async (
       const unlockedSkills = userData.skills?.unlockedSkills || {};
 
       // Check if user has enough points
-      if (availablePoints[skill.category] < 1) {
+      if (availablePoints[skill.category] < pointsAmount) {
         throw new Error(`Not enough ${skill.category} points available`);
       }
 
       // Update the skills and points
       const updatedAvailablePoints = {
         ...availablePoints,
-        [skill.category]: availablePoints[skill.category] - 1,
+        [skill.category]: availablePoints[skill.category] - pointsAmount,
       };
 
       const updatedUnlockedSkills = {
         ...unlockedSkills,
-        [skillId]: (unlockedSkills[skillId] || 0) + 1,
+        [skillId]: (unlockedSkills[skillId] || 0) + pointsAmount,
       };
 
       // Update both statistics.availablePoints and skills
