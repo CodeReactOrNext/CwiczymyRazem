@@ -2,7 +2,7 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import { updateUserSkills } from "feature/skills/services/updateUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
-import { SkillTreeAccordion } from "feature/skills/SkillTreeAccordion";
+import { SkillDashboard } from "feature/skills/components/SkillDashboard";
 import {
   selectCurrentUserStats,
   selectUserAuth,
@@ -27,7 +27,7 @@ const ProfileSkillsPage: NextPage = () => {
     }
   }, [userAuth]);
 
-  const handleUpgradeSkill = async (skillId: string) => {
+  const handleUpgradeSkill = async (skillId: string, points: number) => {
     if (!userAuth || !userStats || !userSkills) {
       return;
     }
@@ -37,35 +37,32 @@ const ProfileSkillsPage: NextPage = () => {
       return;
     }
 
-    const hasPoints =
-      userSkills.availablePoints[
-        skill.category as keyof typeof userSkills.availablePoints
-      ] > 0;
-
-    if (hasPoints) {
-      await updateUserSkills(userAuth, skillId);
-      // Refresh skills data
-      const updatedSkills = await getUserSkills(userAuth);
+      // Optimistic update with proper immutability
+      const updatedSkills = { 
+        ...userSkills,
+        unlockedSkills: {
+            ...userSkills.unlockedSkills,
+            [skill.id]: (userSkills.unlockedSkills[skill.id as GuitarSkillId] || 0) + points
+        },
+        availablePoints: {
+            ...userSkills.availablePoints,
+            [skill.category]: userSkills.availablePoints[skill.category] - points
+        }
+      };
       setUserSkills(updatedSkills);
-    }
-  };
 
-  const handleSkillUpgrade = async (skillId: string) => {
-    if (!userSkills) return;
-
-    const skill = guitarSkills.find((s) => s.id === skillId);
-    if (!skill) return;
-
-    if (!canUpgradeSkill(skill, userSkills)) {
-      return;
-    }
+      await updateUserSkills(userAuth, skill.id, points);
+      // We can fetch in background to sync, but optimistic should be enough for UI responsiveness
+      getUserSkills(userAuth).then((serverSkills) => {
+          if (serverSkills) setUserSkills(serverSkills);
+      });
   };
 
   if (!userSkills) return null;
 
   return (
     <AuthLayoutWrapper pageId={"profile"} subtitle='Skills' variant='secondary'>
-      <SkillTreeAccordion
+      <SkillDashboard
         userSkills={userSkills as UserSkills}
         onSkillUpgrade={handleUpgradeSkill}
       />
