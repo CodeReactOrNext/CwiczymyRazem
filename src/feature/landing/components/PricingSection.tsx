@@ -39,7 +39,7 @@ export const PricingSection = () => {
 
               <ul className='space-y-4 mb-8'>
                 {[
-                  { text: 'Smart Timer with 4 skill categories', icon: Zap },
+                  { text: 'Timer with 4 skill categories', icon: Zap },
                   { text: 'Detailed statistics & analytics', icon: Star },
                   { text: 'Activity heatmap tracking', icon: Check },
                   { text: 'Gamification & achievements', icon: Trophy },
