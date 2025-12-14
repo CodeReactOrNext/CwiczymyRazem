@@ -105,6 +105,19 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
             <span>{t("calendar.backDate")}</span>
           </div>
         </div>
+        
+        <div className="mt-4 flex w-full items-center justify-end gap-2 text-xs text-zinc-500">
+            <span>Less</span>
+            <div className="flex gap-1">
+              <div className="h-3 w-3 rounded-[3px] bg-[#3f3f46]" />
+              <div className="h-3 w-3 rounded-[3px] bg-[#A5F3FC]" />
+              <div className="h-3 w-3 rounded-[3px] bg-[#67E8F9]" />
+              <div className="h-3 w-3 rounded-[3px] bg-[#22D3EE]" />
+              <div className="h-3 w-3 rounded-[3px] bg-[#06B6D4]" />
+              <div className="h-3 w-3 rounded-[3px] bg-[#0891B2]" />
+            </div>
+            <span>More</span>
+        </div>
       </div>
 
       {hoveredItem?.report && (
