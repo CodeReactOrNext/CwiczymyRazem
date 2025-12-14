@@ -45,16 +45,16 @@ export const PracticeModeSelector = ({
     {
       id: "timer" as const,
       icon: FaClock,
-      title: t("timer:modes.timer.title" as any),
-      description: t("timer:modes.timer.description" as any),
+      title: t("timer:modes.timer.title"),
+      description: t("timer:modes.timer.description"),
       colors: colorClasses.indigo,
       features: ["Flexible time", "Skill selection", "Progress tracking"],
     },
     {
       id: "plan" as const,
       icon: FaList,
-      title: t("timer:modes.plan.title" as any),
-      description: t("timer:modes.plan.description" as any),
+      title: t("timer:modes.plan.title"),
+      description: t("timer:modes.plan.description"),
       colors: colorClasses.amber,
       features: [
         "Ready-made plans",
@@ -65,8 +65,8 @@ export const PracticeModeSelector = ({
     {
       id: "auto" as const,
       icon: FaRandom,
-      title: t("timer:modes.auto.title" as any),
-      description: t("timer:modes.auto.description" as any),
+      title: t("timer:modes.auto.title"),
+      description: t("timer:modes.auto.description"),
       colors: colorClasses.rose,
       features: [ "Time adjusted", "Personalized"],
     },
@@ -78,10 +78,10 @@ export const PracticeModeSelector = ({
         <div className='space-y-4 sm:space-y-8'>
           <div className='text-center'>
             <h1 className='text-xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl'>
-              {t("timer:select_practice_mode" as any)}
+              {t("timer:select_practice_mode")}
             </h1>
             <p className='mt-1.5 text-sm text-gray-400 sm:mt-3 sm:text-lg'>
-              {t("timer:choose_practice_description" as any)}
+              {t("timer:choose_practice_description")}
             </p>
           </div>
 

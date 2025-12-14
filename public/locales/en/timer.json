@@ -11,5 +11,21 @@
   "theory": "Theory",
   "hearing": "Hearing",
   "creativity": "Creative work",
-  "choose": "Choose category"
+  "choose": "Choose category",
+  "select_practice_mode": "Select practice mode",
+  "choose_practice_description": "Choose the practice method that suits you best",
+  "modes": {
+    "timer": {
+      "title": "Standard Practice",
+      "description": "Practice chosen skills freely and track your progress"
+    },
+    "plan": {
+      "title": "Exercise Plan",
+      "description": "Choose a ready-made plan and follow it"
+    },
+    "auto": {
+      "title": "Auto Plan",
+      "description": "Let us create a plan adjusted to your time"
+    }
+  }
 }
