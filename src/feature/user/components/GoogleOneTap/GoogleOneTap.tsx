@@ -35,7 +35,8 @@ export const GoogleOneTap = () => {
             client_id: GOOGLE_CLIENT_ID,
             callback: handleCredentialResponse,
             auto_select: false, 
-            cancel_on_tap_outside: false
+            cancel_on_tap_outside: false,
+            use_fedcm_for_prompt: true,
           });
           window.google.accounts.id.prompt((notification: any) => {
              // console.log("Google One Tap notification:", notification);
