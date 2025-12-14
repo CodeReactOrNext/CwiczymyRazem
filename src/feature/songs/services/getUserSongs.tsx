@@ -1,5 +1,11 @@
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { collection, doc, getDocs, Timestamp } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  Timestamp,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const getUserSongs = async (userId: string) => {
@@ -16,16 +22,35 @@ export const getUserSongs = async (userId: string) => {
     };
 
     const userSongs = userSongsSnapshot.docs.map((doc) => ({
-      ...doc.data(),
       id: doc.data().songId,
+      status: doc.data().status as SongStatus,
     }));
 
-    userSongs.forEach((song: { status?: SongStatus } & { id: any }) => {
-      if (song.status === "wantToLearn")
-        songLists.wantToLearn.push(song as Song);
-      if (song.status === "learning") songLists.learning.push(song as Song);
-      if (song.status === "learned") songLists.learned.push(song as Song);
-    });
+    // Pobierz pełne dane utworów z kolekcji songs
+    for (const userSong of userSongs) {
+      try {
+        const songDocRef = doc(db, "songs", userSong.id);
+        const songDoc = await getDoc(songDocRef);
+
+        if (songDoc.exists()) {
+          const fullSongData = {
+            ...songDoc.data(),
+            id: songDoc.id,
+          } as Song;
+
+          // Dodaj do odpowiedniej listy na podstawie statusu
+          if (userSong.status === "wantToLearn") {
+            songLists.wantToLearn.push(fullSongData);
+          } else if (userSong.status === "learning") {
+            songLists.learning.push(fullSongData);
+          } else if (userSong.status === "learned") {
+            songLists.learned.push(fullSongData);
+          }
+        }
+      } catch (error) {
+        console.error(`Error fetching song ${userSong.id}:`, error);
+      }
+    }
 
     return songLists;
   } catch (error) {

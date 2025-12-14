@@ -1,4 +1,4 @@
-import { Badge } from "assets/components/ui/badge";
+
 import {
   Pagination,
   PaginationContent,
@@ -29,6 +29,7 @@ import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -115,48 +116,7 @@ const SongsTable = ({
     }
   };
 
-  const renderDifficulty = (rating: number) => {
-    const { color, label } = getDifficultyRating(rating);
 
-    return (
-      <div className='flex items-center gap-2'>
-        <div
-          className='h-2 w-2 rounded-full'
-          style={{ backgroundColor: color }}></div>
-        <span className='font-bold'>{rating}</span> {label}
-      </div>
-    );
-  };
-
-  const getRowStyle = (songId: string) => {
-    const status = userSongs.wantToLearn.find((s) => s.id === songId)
-      ? {
-          backgroundColor: "rgba(0, 0, 98, 0.05)",
-          transition: "background-color 0.2s",
-          ":hover": {
-            backgroundColor: "rgba(0, 0, 98, 0.1)",
-          },
-        }
-      : userSongs.learning.find((s) => s.id === songId)
-      ? {
-          backgroundColor: "rgba(255, 193, 7, 0.05)",
-          transition: "background-color 0.2s",
-          ":hover": {
-            backgroundColor: "rgba(255, 193, 7, 0.1)",
-          },
-        }
-      : userSongs.learned.find((s) => s.id === songId)
-      ? {
-          backgroundColor: "rgba(76, 175, 80, 0.05)",
-          transition: "background-color 0.2s",
-          ":hover": {
-            backgroundColor: "rgba(76, 175, 80, 0.1)",
-          },
-        }
-      : {};
-
-    return status;
-  };
 
   if (!userId) {
     return null;
@@ -164,69 +124,158 @@ const SongsTable = ({
 
   return (
     <div className='space-y-6'>
-      <div className='w-full'>
+      {/* Enhanced Table Container */}
+      {/* Enhanced Table Container */}
+      <div className='overflow-hidden rounded-xl border border-slate-700/40 bg-slate-900/20 shadow-lg backdrop-blur-sm'>
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t("artist")}</TableHead>
-
-              <TableHead>{t("title")}</TableHead>
-              <TableHead>{t("difficulty")}</TableHead>
-              <TableHead>Status</TableHead>
+          {/* Enhanced Table Header */}
+          <TableHeader className='bg-gradient-to-r from-slate-800/60 to-slate-700/40 backdrop-blur-sm'>
+            <TableRow className='border-b border-slate-600/30 hover:bg-transparent'>
+              <TableHead className='h-12 px-6 text-sm font-semibold text-slate-300'>
+                {t("artist")}
+              </TableHead>
+              <TableHead className='h-12 px-6 text-sm font-semibold text-slate-300'>
+                {t("title")}
+              </TableHead>
+              <TableHead className='h-12 px-6 text-sm font-semibold text-slate-300'>
+                {t("difficulty")}
+              </TableHead>
+              <TableHead className='h-12 px-6 text-sm font-semibold text-slate-300'>
+                Ocena
+              </TableHead>
+              <TableHead className='h-12 px-6 text-sm font-semibold text-slate-300'>
+                Tier
+              </TableHead>
+              <TableHead className='h-12 px-6 text-sm font-semibold text-slate-300'>
+                Status
+              </TableHead>
             </TableRow>
           </TableHeader>
+
+          {/* Enhanced Table Body */}
           <TableBody>
             {songs.length > 0 ? (
-              songs.map((song) => (
-                <TableRow
-                  key={song.id}
-                  style={getRowStyle(song.id)}
-                  className='transition-colors'>
-                  <TableCell className='min-w-[200px]'>{song.artist}</TableCell>
-                  <TableCell className='min-w-[200px]'>{song.title}</TableCell>
+              songs.map((song, index) => {
+                const userSong = allUserSongs.find(
+                  (userSong) => song.id === userSong.id
+                );
+                const status = userSong?.status;
 
-                  <TableCell>
-                    <SongRating song={song} refreshTable={onStatusChange} />
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant='outline'>
-                      {renderDifficulty(
-                        getAverageDifficulty(song.difficulties)
-                      )}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Select
-                      value={
-                        allUserSongs.find((userSong) => song.id === userSong.id)
-                          ?.status
-                      }
-                      onValueChange={(value) =>
-                        handleStatusChange(
-                          song.id,
-                          value as SongStatus,
-                          song.title,
-                          song.artist
-                        )
-                      }>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("select_status")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem
-                          value='wantToLearn'
-                          className='font-openSans'>
-                          {t("want_to_learn")}
-                        </SelectItem>
-                        <SelectItem value='learning'>
-                          {t("learning")}
-                        </SelectItem>
-                        <SelectItem value='learned'>{t("learned")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                </TableRow>
-              ))
+                return (
+                  <TableRow
+                    key={song.id}
+                    className='group border-b border-zinc-700/20 transition-all duration-200 hover:bg-zinc-800/40'>
+                    {/* Artist Cell */}
+                    <TableCell className='px-6 py-4'>
+                      <div className='flex items-center gap-3'>
+                        <p className='font-medium text-zinc-300 transition-colors group-hover:text-white'>
+                          {song.artist}
+                        </p>
+                      </div>
+                    </TableCell>
+
+                    {/* Title Cell */}
+                    <TableCell className='px-6 py-4'>
+                      <p className='font-semibold text-white transition-colors group-hover:text-cyan-300'>
+                        {song.title}
+                      </p>
+                    </TableCell>
+
+                    {/* Difficulty Cell */}
+                    <TableCell className='px-6 py-4'>
+                      <div className='flex items-center gap-2'>
+                        {(() => {
+                           const { color, label } = getDifficultyRating(
+                            getAverageDifficulty(song.difficulties)
+                          );
+                          return (
+                            <div className="flex items-center gap-2 rounded-md border border-slate-700/50 bg-slate-800/30 px-2.5 py-1 text-xs font-medium backdrop-blur-sm transition-colors"
+                                 style={{ color: color, borderColor: `${color}40` }}>
+                                <span className="font-bold">{getAverageDifficulty(song.difficulties)}</span>
+                                <span className="text-slate-400">|</span>
+                                <span>{label}</span>
+                            </div>
+                          )
+                        })()}
+                      </div>
+                    </TableCell>
+
+                    {/* Rating Cell */}
+                    <TableCell className='px-6 py-4'>
+                      <div className='w-fit rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-2 backdrop-blur-sm'>
+                        <SongRating song={song} refreshTable={onStatusChange} />
+                      </div>
+                    </TableCell>
+
+                    {/* Tier Cell */}
+                    <TableCell className='px-6 py-4'>
+                      {(() => {
+                        const avgDifficulty = getAverageDifficulty(
+                          song.difficulties
+                        );
+                        const tier = getSongTier(avgDifficulty);
+                        return (
+                          <div 
+                            className='inline-flex items-center gap-2 rounded px-2.5 py-1 text-sm font-bold border'
+                            style={{ 
+                              color: tier.color,
+                              borderColor: `${tier.color}40`,
+                              backgroundColor: `${tier.color}10`
+                            }}
+                          >
+                            {tier.tier}
+                          </div>
+                        );
+                      })()}
+                    </TableCell>
+
+                    {/* Status Cell */}
+                    <TableCell className='px-6 py-4'>
+                      <Select
+                        value={status}
+                        onValueChange={(value) =>
+                          handleStatusChange(
+                            song.id,
+                            value as SongStatus,
+                            song.title,
+                            song.artist
+                          )
+                        }>
+                        <SelectTrigger
+                          className='w-[140px] border-slate-700/50 bg-slate-800/30 text-slate-300 backdrop-blur-sm transition-colors hover:bg-slate-700/50 focus:ring-slate-700'>
+                          <SelectValue placeholder={t("select_status")} />
+                        </SelectTrigger>
+                        <SelectContent className='border-slate-600/50 bg-slate-800/90 backdrop-blur-xl'>
+                          <SelectItem
+                            value='wantToLearn'
+                            className='font-openSans focus:bg-blue-500/20 focus:text-blue-300'>
+                            <div className='flex items-center gap-2'>
+                              <div className='h-2 w-2 rounded-full bg-blue-400'></div>
+                              {t("want_to_learn")}
+                            </div>
+                          </SelectItem>
+                          <SelectItem
+                            value='learning'
+                            className='focus:bg-amber-500/20 focus:text-amber-300'>
+                            <div className='flex items-center gap-2'>
+                              <div className='h-2 w-2 rounded-full bg-amber-400'></div>
+                              {t("learning")}
+                            </div>
+                          </SelectItem>
+                          <SelectItem
+                            value='learned'
+                            className='focus:bg-emerald-500/20 focus:text-emerald-300'>
+                            <div className='flex items-center gap-2'>
+                              <div className='h-2 w-2 rounded-full bg-emerald-400'></div>
+                              {t("learned")}
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <SongsTableEmpty hasFilters={hasFilters} onAddSong={onAddSong} />
             )}
@@ -234,63 +283,71 @@ const SongsTable = ({
         </Table>
       </div>
 
+      {/* Enhanced Pagination */}
       {songs.length > 0 && (
-        <div className='mt-4 flex justify-center'>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => onPageChange(currentPage - 1)}
-                  className={
-                    currentPage <= 1
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
+        <div className='flex justify-center'>
+          <div className='rounded-lg border border-zinc-700/50 bg-zinc-900/30 p-4 backdrop-blur-sm'>
+            <Pagination>
+              <PaginationContent className='gap-2'>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => onPageChange(currentPage - 1)}
+                    className={`border border-slate-600/50 bg-slate-800/30 hover:bg-slate-700/50 ${
+                      currentPage <= 1
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer hover:border-cyan-500/50 hover:text-cyan-300"
+                    }`}
+                  />
+                </PaginationItem>
 
-              {[...Array(totalPages)].map((_, index) => {
-                const pageNumber = index + 1;
-                if (
-                  pageNumber === 1 ||
-                  pageNumber === totalPages ||
-                  (pageNumber >= currentPage - 1 &&
-                    pageNumber <= currentPage + 1)
-                ) {
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink
-                        onClick={() => onPageChange(pageNumber)}
-                        isActive={currentPage === pageNumber}>
-                        {pageNumber}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                } else if (
-                  pageNumber === currentPage - 2 ||
-                  pageNumber === currentPage + 2
-                ) {
-                  return (
-                    <PaginationItem key={pageNumber}>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  );
-                }
-                return null;
-              })}
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => onPageChange(currentPage + 1)}
-                  className={
-                    currentPage >= totalPages
-                      ? "pointer-events-none opacity-50"
-                      : "cursor-pointer"
+                {[...Array(totalPages)].map((_, index) => {
+                  const pageNumber = index + 1;
+                  if (
+                    pageNumber === 1 ||
+                    pageNumber === totalPages ||
+                    (pageNumber >= currentPage - 1 &&
+                      pageNumber <= currentPage + 1)
+                  ) {
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          onClick={() => onPageChange(pageNumber)}
+                          isActive={currentPage === pageNumber}
+                          className={`border border-slate-600/50 bg-slate-800/30 hover:border-cyan-500/50 hover:bg-slate-700/50 hover:text-cyan-300 ${
+                            currentPage === pageNumber
+                              ? "border-cyan-500/50 bg-cyan-500/25 text-cyan-300"
+                              : ""
+                          }`}>
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  } else if (
+                    pageNumber === currentPage - 2 ||
+                    pageNumber === currentPage + 2
+                  ) {
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationEllipsis className='text-zinc-500' />
+                      </PaginationItem>
+                    );
                   }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+                  return null;
+                })}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => onPageChange(currentPage + 1)}
+                    className={`border border-slate-600/50 bg-slate-800/30 hover:bg-slate-700/50 ${
+                      currentPage >= totalPages
+                        ? "pointer-events-none opacity-50"
+                        : "cursor-pointer hover:border-cyan-500/50 hover:text-cyan-300"
+                    }`}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
         </div>
       )}
     </div>
@@ -299,28 +356,4 @@ const SongsTable = ({
 
 export default SongsTable;
 
-const styles = `
-  .want-to-learn {
-    background-color: rgba(var(--primary-rgb), 0.05);
-  }
 
-  .learning {
-    background-color: rgba(var(--warning-rgb), 0.05);
-  }
-
-  .learned {
-    background-color: rgba(var(--success-rgb), 0.05);
-  }
-
-  .want-to-learn:hover {
-    background-color: rgba(var(--primary-rgb), 0.1);
-  }
-
-  .learning:hover {
-    background-color: rgba(var(--warning-rgb), 0.1);
-  }
-
-  .learned:hover {
-    background-color: rgba(var(--success-rgb), 0.1);
-  }
-`;

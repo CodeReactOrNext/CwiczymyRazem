@@ -7,7 +7,13 @@ import { useLeaderboard } from "./hooks/useLeaderboard";
 
 const ITEMS_PER_PAGE = 30;
 
-export const LeadboardView = () => {
+interface LeadboardViewProps {
+  defaultView?: "all-time" | "seasonal";
+}
+
+export const LeadboardView = ({
+  defaultView = "all-time",
+}: LeadboardViewProps = {}) => {
   const { t } = useTranslation("leadboard");
   const { currentUserId } = useCurrentUser();
 
@@ -24,6 +30,7 @@ export const LeadboardView = () => {
     handleSeasonChange,
   } = useLeaderboard({
     itemsPerPage: ITEMS_PER_PAGE,
+    defaultView,
   });
 
   if (!usersData.length && !isLoading) {

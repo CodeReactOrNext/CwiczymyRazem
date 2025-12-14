@@ -1,10 +1,16 @@
 import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
-import { cn } from "assets/lib/utils";
-import Image from "next/image";
 import { useTranslation } from "react-i18next";
-import { FaClock, FaListUl } from "react-icons/fa";
+import { 
+  FaClock, 
+  FaListUl, 
+  FaPlay, 
+  FaGuitar, 
+  FaBrain, 
+  FaMusic, 
+  FaLayerGroup 
+} from "react-icons/fa";
 
 import type { DifficultyLevel, ExercisePlan } from "../types/exercise.types";
 
@@ -15,17 +21,42 @@ interface PlanCardProps {
   startButtonText?: string;
 }
 
-const planGradients = {
-  technique:
-    "from-blue-500/30 via-blue-500/10 to-indigo-500/30 hover:from-blue-500/40 hover:to-indigo-500/40",
-  theory:
-    "from-emerald-500/30 via-emerald-500/10 to-green-500/30 hover:from-emerald-500/40 hover:to-green-500/40",
-  creativity:
-    "from-purple-500/30 via-purple-500/10 to-pink-500/30 hover:from-purple-500/40 hover:to-pink-500/40",
-  hearing:
-    "from-orange-500/30 via-orange-500/10 to-amber-500/30 hover:from-orange-500/40 hover:to-amber-500/40",
-  mixed:
-    "from-red-500/30 via-red-500/10 to-yellow-500/30 hover:from-red-500/40 hover:to-yellow-500/40",
+const categoryStyles = {
+  technique: {
+    gradient: "from-blue-500/10 via-zinc-950/50 to-zinc-950",
+    border: "border-blue-500/20",
+    icon: FaGuitar,
+    text: "text-blue-500",
+    badge: "bg-blue-500/10 text-blue-200 border-blue-500/20",
+  },
+  theory: {
+    gradient: "from-emerald-500/10 via-zinc-950/50 to-zinc-950",
+    border: "border-emerald-500/20",
+    icon: FaBrain,
+    text: "text-emerald-500",
+    badge: "bg-emerald-500/10 text-emerald-200 border-emerald-500/20",
+  },
+  creativity: {
+    gradient: "from-purple-500/10 via-zinc-950/50 to-zinc-950",
+    border: "border-purple-500/20",
+    icon: FaMusic,
+    text: "text-purple-500",
+    badge: "bg-purple-500/10 text-purple-200 border-purple-500/20",
+  },
+  hearing: {
+    gradient: "from-amber-500/10 via-zinc-950/50 to-zinc-950",
+    border: "border-amber-500/20",
+    icon: FaMusic,
+    text: "text-amber-500",
+    badge: "bg-amber-500/10 text-amber-200 border-amber-500/20",
+  },
+  mixed: {
+    gradient: "from-red-500/10 via-zinc-950/50 to-zinc-950",
+    border: "border-red-500/20",
+    icon: FaLayerGroup,
+    text: "text-red-500",
+    badge: "bg-red-500/10 text-red-200 border-red-500/20",
+  },
 };
 
 export const PlanCard = ({
@@ -56,88 +87,64 @@ export const PlanCard = ({
     | DifficultyLevel
     | "beginner";
 
+  const style = categoryStyles[plan.category] || categoryStyles.mixed;
+  const Icon = style.icon;
+
   return (
     <Card
-      className={cn(
-        "relative overflow-hidden transition-all duration-300 hover:shadow-md",
-        "cursor-pointer border border-border/40",
-        "bg-gradient-to-br",
-        planGradients[plan.category]
-      )}
+      className={`group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 p-6 ${style.border} ${style.gradient}`}
       onClick={onSelect}>
-      {plan.image && (
-        <div className='relative h-40 overflow-hidden'>
-          <Image
-            src={plan.image.src}
-            alt=''
-            fill
-            className='object-cover object-center'
-            aria-hidden='true'
-          />
-          <div className='absolute inset-0 bg-gradient-to-b from-transparent to-background' />
-
-          {/* Badges positioned within the image area */}
-          <div className='absolute left-3 top-3'>
-            <Badge
-              variant='outline'
-              className='rounded-full bg-background/40 px-3 py-1 text-xs backdrop-blur-sm'>
-              {t(`exercises:categories.${plan.category}` as any)}
+      
+      {/* Header: Category Icon & Badges */}
+      <div className="mb-5 flex items-start justify-between">
+        <div className="flex items-center gap-3">
+            <div className={`flex h-8 w-8 items-center justify-center rounded-lg border bg-zinc-950/50 shadow-sm ${style.border}`}>
+                <Icon className={`h-4 w-4 ${style.text}`} />
+            </div>
+            <Badge variant="secondary" className={`capitalize tracking-wide ${style.badge}`}>
+                {t(`exercises:categories.${plan.category}` as any)}
             </Badge>
-          </div>
-
-          <div className='absolute right-3 top-3'>
-            <Badge
-              variant='outline'
-              className='rounded-full bg-background/40 px-3 py-1 text-xs backdrop-blur-sm'>
-              {t(`exercises:difficulty.${difficulty}` as any)}
-            </Badge>
-          </div>
         </div>
-      )}
+        <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+             {t(`exercises:difficulty.${difficulty}` as any)}
+        </Badge>
+      </div>
 
-      {!plan.image && (
-        <div className='flex justify-between p-3'>
-          <Badge
-            variant='outline'
-            className='rounded-full bg-background/40 px-3 py-1 text-xs backdrop-blur-sm'>
-            {t(`exercises:categories.${plan.category}` as any)}
-          </Badge>
-          <Badge
-            variant='outline'
-            className='rounded-full bg-background/40 px-3 py-1 text-xs backdrop-blur-sm'>
-            {t(`exercises:difficulty.${difficulty}` as any)}
-          </Badge>
-        </div>
-      )}
+      {/* Main Content */}
+      <div className="flex-1 space-y-3">
+        <h3 className="text-xl font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+            {title}
+        </h3>
+        <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground/80">
+            {description}
+        </p>
+      </div>
 
-      <div className='relative p-5'>
-        <div>
-          <h3 className='text-xl font-semibold text-foreground'>{title}</h3>
-          <p className='mt-2 text-sm text-foreground/90'>{description}</p>
-        </div>
-
-        <div className='mt-4 flex flex-wrap items-center gap-4'>
-          <div className='flex items-center gap-2 text-sm text-foreground/80'>
-            <FaClock className='h-4 w-4' />
-            <span>{totalDuration} min</span>
-          </div>
-          <div className='flex items-center gap-2 text-sm text-foreground/80'>
-            <FaListUl className='h-4 w-4' />
-            <span>
-              {plan.exercises.length} {t("exercises:common.exercises")}
-            </span>
-          </div>
+      {/* Footer: Stats & Action */}
+      <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4">
+        <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <FaClock className="h-3.5 w-3.5" />
+                <span>{totalDuration} min</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <FaListUl className="h-3.5 w-3.5" />
+                <span>{plan.exercises.length}</span>
+            </div>
         </div>
 
         {onStart && (
-          <Button
-            className='mt-4 w-full shadow-sm'
+           <Button 
+            size="sm" 
+            className="h-9 px-4 text-xs font-semibold shadow-sm transition-all hover:scale-105"
             onClick={(e) => {
-              e.stopPropagation();
-              onStart();
-            }}>
-            {startButtonText || t("common:start")}
-          </Button>
+                e.stopPropagation();
+                onStart();
+            }}
+           >
+            {startButtonText || t("common:start")} 
+            <FaPlay className="ml-2 h-2.5 w-2.5" />
+           </Button>
         )}
       </div>
     </Card>

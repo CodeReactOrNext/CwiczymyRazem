@@ -16,6 +16,8 @@ import {
 import { ScrollArea } from "assets/components/ui/scroll-area";
 import { cn } from "assets/lib/utils";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { getSongTier } from "feature/songs/utils/getSongTier";
+import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import {
   ArrowRight,
   BookOpen,
@@ -48,6 +50,31 @@ const STATUS_CONFIG = {
   },
 };
 
+const TierBadge = ({ song, t }: { song: Song; t: any }) => {
+  const avgRating = getAverageDifficulty(song.difficulties);
+
+  if (avgRating === 0) return null;
+
+  const tier = getSongTier(avgRating);
+
+  return (
+    <div
+      className={cn(
+        "flex h-5 w-5 items-center justify-center rounded-sm text-xs font-bold",
+        tier.bgColor,
+        tier.borderColor,
+        "border shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-110"
+      )}
+      style={{
+        color: tier.color,
+        boxShadow: `0 1px 3px ${tier.color}20`,
+      }}
+      title={`${t(tier.description as any)} - ${avgRating.toFixed(1)}/10`}>
+      {tier.tier}
+    </div>
+  );
+};
+
 interface SongStatusCardProps {
   title: string;
   isLanding: boolean;
@@ -60,6 +87,7 @@ interface SongStatusCardProps {
     artist: string
   ) => Promise<void>;
   onSongRemove: (songId: string) => Promise<void>;
+  isMobile?: boolean;
 }
 
 export const SongStatusCard = ({
@@ -69,82 +97,102 @@ export const SongStatusCard = ({
   isLanding,
   onStatusChange,
   onSongRemove,
+  isMobile = false,
 }: SongStatusCardProps) => {
   const { t } = useTranslation(["songs", "common"]);
-  const router = useRouter();
-  const [isMobile, setIsMobile] = useState(false);
-
+  const StatusIcon = STATUS_CONFIG[droppableId as keyof typeof STATUS_CONFIG]?.icon || Music;
   const config = STATUS_CONFIG[droppableId as keyof typeof STATUS_CONFIG];
-  const StatusIcon = config?.icon || Music;
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+  const getNextStatus = (currentStatus: SongStatus): SongStatus | null => {
+    if (currentStatus === "wantToLearn") return "learning";
+    if (currentStatus === "learning") return "learned";
+    // For learned, maybe loop back or no primary action?
+    return null;
+  };
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const nextStatus = getNextStatus(droppableId);
+
+  const getPrimaryActionText = (status: SongStatus) => {
+    switch (status) {
+      case "wantToLearn":
+        return t("songs:start_learning");
+      case "learning":
+        return t("songs:mark_as_learned");
+      case "learned":
+        return t("songs:learn_again");
+      default:
+        return "";
+    }
+  };
 
   return (
-    <Card className='flex-1'>
-      <CardHeader className='border-b pb-3'>
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center'>
-            <div className={cn("mr-3 rounded-md p-2", config.bgColor)}>
+    <div className='flex-1'>
+      {/* Elegant Header */}
+      {!isMobile && (
+        <div className='mb-4 flex items-center justify-between'>
+          <div className='flex items-center gap-3'>
+            <div className={cn("rounded-full p-2", config.lightBgColor)}>
               <StatusIcon className={cn("h-5 w-5", config.color)} />
             </div>
-            <CardTitle className='text-base font-semibold tracking-wide'>
-              {title}
-            </CardTitle>
+            <div>
+              <h3 className='text-lg font-semibold text-white'>{title}</h3>
+              <p className='text-sm text-slate-500'>
+                {songs?.length === 0
+                  ? t("songs:no_songs_in_list")
+                  : `${songs?.length} ${t("songs:song_count", {
+                      count: songs?.length,
+                    })}`}
+              </p>
+            </div>
           </div>
-          <Badge
+          <div
             className={cn(
-              "font-mono ml-auto px-2.5 py-1",
-              config.color,
+              "rounded-full px-3 py-1 text-sm font-medium",
               config.lightBgColor,
-              "border-0"
+              config.color
             )}>
             {songs?.length}
-          </Badge>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent className='p-3'>
+      )}
+
+      {/* Content Area */}
+      <div>
         <Droppable droppableId={droppableId}>
           {(provided, snapshot) => (
-            <ScrollArea
+            <div
               className={cn(
-                "h-52 rounded-md p-2",
-                snapshot.isDraggingOver && "border border-dashed bg-muted/30"
+                "relative min-h-[300px] rounded-xl border-2 border-dashed p-4 transition-all duration-300",
+                snapshot.isDraggingOver
+                  ? "border-slate-400 bg-slate-500/15"
+                  : isMobile ? "border-transparent px-0" : "border-slate-600/30 bg-slate-800/20"
               )}
               {...provided.droppableProps}
-              ref={provided.innerRef}>
+              ref={provided.innerRef}
+              style={{
+                position: "relative",
+                zIndex: snapshot.isDraggingOver ? 1000 : 0,
+              }}>
               {songs?.length === 0 ? (
-                <div className='flex h-full flex-col items-center justify-center space-y-3 p-4 text-center'>
+                <div className='flex h-full flex-col items-center justify-center space-y-3 text-center'>
                   <StatusIcon
-                    className={cn("h-8 w-8 opacity-60", config.color)}
+                    className={cn("h-12 w-12 opacity-40", config.color)}
                   />
-                  <p className='text-sm text-muted-foreground'>
-                    {t("songs:no_songs_in_status", { status: title })}
-                  </p>
-                  {isLanding && (
-                    <Button
-                      size='sm'
-                      variant='outline'
-                      className='mt-1 h-auto px-3 py-1 text-xs'
-                      onClick={() => router.push("songs")}>
-                      {t("common:song_status.add")}
-                    </Button>
-                  )}
-                  {!isLanding && (
-                    <p className='max-w-[200px] text-xs text-muted-foreground/70'>
-                      {t("no_songs_in_status_desc" as any)}
+                  <div>
+                    <p className='text-slate-400'>
+                      {snapshot.isDraggingOver
+                        ? t("songs:drop_here")
+                        : t("songs:no_songs_in_list")}
                     </p>
-                  )}
+                    {!isLanding && !snapshot.isDraggingOver && !isMobile && (
+                      <p className='mt-1 text-xs text-slate-600'>
+                        {t("songs:drag_or_use_buttons")}
+                      </p>
+                    )}
+                  </div>
                 </div>
               ) : (
-                <div className='space-y-2.5'>
+                <div className='space-y-3'>
                   {songs?.map((song, index) => (
                     <Draggable
                       key={song.id}
@@ -157,65 +205,200 @@ export const SongStatusCard = ({
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                           className={cn(
-                            "flex items-center justify-between",
-                            "rounded-md border p-2.5",
-                            "transition-all duration-200",
-                            snapshot.isDragging && "shadow-lg"
-                          )}>
-                          <div className='flex items-center gap-2 overflow-hidden'>
-                            <div
-                              className={cn(
-                                "w-1 self-stretch rounded-full",
-                                config.bgColor
-                              )}
-                            />
-                            <span className='truncate text-sm leading-tight'>
-                              <span className='font-medium capitalize'>
-                                {song.artist}
-                              </span>
-                              <span className='mx-1 opacity-60'>-</span>
-                              <span className='capitalize'>{song.title}</span>
-                            </span>
-                          </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger className='ml-1.5 focus:outline-none'>
-                              <div className='rounded-full p-1.5 transition-colors hover:bg-muted/30'>
-                                <MoreVertical className='h-3.5 w-3.5' />
-                              </div>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              {(
-                                ["wantToLearn", "learning", "learned"] as const
-                              ).map((status) => (
-                                <DropdownMenuItem
-                                  key={status}
-                                  onClick={() =>
-                                    onStatusChange(
-                                      song.id,
-                                      status,
-                                      song.title,
-                                      song.artist
-                                    )
-                                  }
-                                  className='flex cursor-pointer items-center gap-2 py-1.5 text-sm'>
-                                  <ArrowRight className='h-3 w-3' />
-                                  {t("common:song_status.move_to")}{" "}
-                                  <span
+                            "group flex justify-between",
+                            "rounded-lg border p-3 transition-all duration-200",
+                            isMobile ? "flex-col gap-3" : "items-center",
+                            snapshot.isDragging
+                              ? "border-slate-400 bg-slate-500/30 shadow-2xl shadow-slate-500/60 ring-2 ring-slate-400/50 backdrop-blur-sm"
+                              : "border-transparent bg-slate-800/60 hover:bg-slate-700/80"
+                          )}
+                          style={{
+                            transform: snapshot.isDragging
+                              ? "rotate(3deg) scale(1.1)"
+                              : undefined,
+                            zIndex: snapshot.isDragging ? 9999 : "auto",
+                            position: snapshot.isDragging ? "fixed" : undefined,
+                            opacity: snapshot.isDragging ? 0.95 : 1,
+                            pointerEvents: snapshot.isDragging
+                              ? "none"
+                              : "auto",
+                            ...provided.draggableProps.style,
+                          }}>
+                          {/* Main Row: content + menu */}
+                          <div className="flex w-full items-center justify-between gap-3">
+                              <div className='flex flex-1 items-center gap-3 overflow-hidden'>
+                                <div
+                                  className={cn(
+                                    "h-3 w-1.5 flex-shrink-0 rounded-full shadow-sm",
+                                    config.bgColor
+                                  )}
+                                  style={{
+                                    backgroundColor: config.color.replace(
+                                      "text-",
+                                      ""
+                                    ),
+                                  }}
+                                />
+                                <div className='flex-1 overflow-hidden'>
+                                  <div className='flex items-center gap-2'>
+                                    <p
+                                      className={cn(
+                                        "truncate text-sm font-medium transition-colors",
+                                        snapshot.isDragging
+                                          ? "text-slate-100"
+                                          : "text-white"
+                                      )}>
+                                      {song.title}
+                                    </p>
+                                    <div className='flex items-center gap-1'>
+                                      <TierBadge song={song} t={t} />
+                                      {getAverageDifficulty(song.difficulties) >
+                                        0 && (
+                                        <span className='text-xs font-medium text-slate-500'>
+                                          {getAverageDifficulty(
+                                            song.difficulties
+                                          ).toFixed(1)}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <p
                                     className={cn(
-                                      "font-medium",
-                                      STATUS_CONFIG[status].color
+                                      "truncate text-xs transition-colors",
+                                      snapshot.isDragging
+                                        ? "text-slate-300"
+                                        : "text-slate-400"
                                     )}>
-                                    {t(`songs:status.${status}`)}
-                                  </span>
-                                </DropdownMenuItem>
-                              ))}
-                              <DropdownMenuItem
-                                onClick={() => onSongRemove(song.id)}
-                                className='cursor-pointer py-1.5 text-sm text-destructive'>
-                                {t("common:song_status.remove")}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                                    {song.artist}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Quick Actions (Desktop Hover) */}
+                              <div
+                                className={cn(
+                                  "flex items-center gap-1 transition-opacity duration-200",
+                                   isMobile ? "hidden" : "opacity-0 group-hover:opacity-100"
+                                )}>
+                                {droppableId !== "wantToLearn" && (
+                                  <Button
+                                    size='sm'
+                                    variant='ghost'
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onStatusChange(
+                                        song.id,
+                                        "wantToLearn",
+                                        song.title,
+                                        song.artist
+                                      );
+                                    }}
+                                    className='h-6 w-6 p-0 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300'
+                                    title={t("songs:status.wantToLearn")}>
+                                    <Music className='h-3 w-3' />
+                                  </Button>
+                                )}
+                                {droppableId !== "learning" && (
+                                  <Button
+                                    size='sm'
+                                    variant='ghost'
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onStatusChange(
+                                        song.id,
+                                        "learning",
+                                        song.title,
+                                        song.artist
+                                      );
+                                    }}
+                                    className='h-6 w-6 p-0 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300'
+                                    title={t("songs:status.learning")}>
+                                    <BookOpen className='h-3 w-3' />
+                                  </Button>
+                                )}
+                                {droppableId !== "learned" && (
+                                  <Button
+                                    size='sm'
+                                    variant='ghost'
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onStatusChange(
+                                        song.id,
+                                        "learned",
+                                        song.title,
+                                        song.artist
+                                      );
+                                    }}
+                                    className='h-6 w-6 p-0 text-green-400 hover:bg-green-500/20 hover:text-green-300'
+                                    title={t("songs:status.learned")}>
+                                    <CheckCircle className='h-3 w-3' />
+                                  </Button>
+                                )}
+                              </div>
+                              
+                              <DropdownMenu>
+                                <DropdownMenuTrigger
+                                  className={cn(
+                                    "ml-2 transition-all duration-200 focus:outline-none",
+                                     isMobile ? "opacity-100" : "opacity-0 group-hover:opacity-100 hover:scale-110" 
+                                  )}>
+                                  <div className='rounded-lg p-2 transition-colors hover:bg-slate-600/30'>
+                                    <MoreVertical className='h-4 w-4 text-slate-400' />
+                                  </div>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className='border-slate-600/50 bg-slate-800/95 backdrop-blur-xl'>
+                                  {(
+                                    ["wantToLearn", "learning", "learned"] as const
+                                  ).map((status) => (
+                                    <DropdownMenuItem
+                                      key={status}
+                                      onClick={() =>
+                                        onStatusChange(
+                                          song.id,
+                                          status,
+                                          song.title,
+                                          song.artist
+                                        )
+                                      }
+                                      className='flex cursor-pointer items-center gap-3 py-2 text-sm hover:bg-slate-700/50'>
+                                      <ArrowRight className='h-4 w-4' />
+                                      <span>{t("songs:move_to")}</span>
+                                      <span
+                                        className={cn(
+                                          "font-medium",
+                                          STATUS_CONFIG[status].color
+                                        )}>
+                                        {t(`songs:status.${status}`)}
+                                      </span>
+                                    </DropdownMenuItem>
+                                  ))}
+                                  <DropdownMenuItem
+                                    onClick={() => onSongRemove(song.id)}
+                                    className='cursor-pointer py-2 text-sm text-red-400 hover:bg-red-500/15'>
+                                    {t("songs:remove_song")}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                          </div>
+
+                          {/* Mobile Main Action Button - Full Width Row */}
+                          {isMobile && nextStatus ? (
+                            <Button 
+                              size="sm"
+                              className={cn(
+                                "w-full text-xs h-8 font-semibold shadow-sm transition-all active:scale-95",
+                                droppableId === "wantToLearn" && "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/20 hover:shadow-blue-500/40",
+                                droppableId === "learning" && "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-500/20 hover:shadow-amber-500/40",
+                                droppableId === "learned" && "bg-green-600 hover:bg-green-500 text-white shadow-green-500/20 hover:shadow-green-500/40"
+                              )}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onStatusChange(song.id, nextStatus, song.title, song.artist);
+                              }}
+                            >
+                              {getPrimaryActionText(droppableId)}
+                            </Button>
+                          ) : null}
                         </div>
                       )}
                     </Draggable>
@@ -223,10 +406,10 @@ export const SongStatusCard = ({
                 </div>
               )}
               {provided.placeholder}
-            </ScrollArea>
+            </div>
           )}
         </Droppable>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

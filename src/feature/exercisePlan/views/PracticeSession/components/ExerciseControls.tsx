@@ -44,19 +44,21 @@ const ExerciseControls = ({
         className={cn(
           variant === "centered" ? btnSizes[size] : "flex-1",
           variant === "centered" ? "rounded-full" : "",
-          isPlaying ? "bg-primary/90 hover:bg-primary/80" : ""
+          isPlaying 
+            ? "bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.4)]" 
+            : "bg-zinc-800 hover:bg-zinc-700 text-white border border-white/10"
         )}>
         {isPlaying ? (
           <FaPause className={iconSizes[size]} />
         ) : (
-          <FaPlay className={iconSizes[size]} />
+          <FaPlay className={cn(iconSizes[size], "ml-1")} />
         )}
       </Button>
 
       {!isLastExercise && (
         <Button
           size={size === "lg" ? "lg" : "default"}
-          variant='outline'
+          variant='ghost'
           onClick={handleNextExercise}
           className={cn(
             variant === "centered" ? btnSizes[size] : "flex-1",

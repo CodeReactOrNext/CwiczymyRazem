@@ -14,6 +14,7 @@
   "date_back": "Data Wstecz",
   "max_days": "Maksymalnie {{days}} dni",
   "add_report_to_day": "Dodasz raport do dnia:",
+  "total_time": "Łączny czas",
 
   "toast": {
     "24h_error": "Nie da się ćwiczyć więcej niż 24 godziny dziennie",

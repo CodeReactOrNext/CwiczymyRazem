@@ -6,6 +6,7 @@ interface LevelInterfaceProps {
   lvl: number;
   currentLevelMaxPoints: number;
 }
+
 export const LevelBar = ({ points, lvl }: LevelInterfaceProps) => {
   const { t } = useTranslation("common");
 
@@ -13,28 +14,71 @@ export const LevelBar = ({ points, lvl }: LevelInterfaceProps) => {
   const levelXpEnd = getPointsToLvlUp(lvl);
   const pointsInThisLevel = points - levelXpStart;
   const levelXpDifference = levelXpEnd - levelXpStart;
-  const progressPercent = (pointsInThisLevel / levelXpDifference) * 100;
+  const progressPercent = Math.min(
+    (pointsInThisLevel / levelXpDifference) * 100,
+    100
+  );
+
+  // Calculate segments (10 segments for better visual feedback)
+  const totalSegments = 10;
+  const filledSegments = Math.floor((progressPercent / 100) * totalSegments);
+  const partialSegment = ((progressPercent / 100) * totalSegments) % 1;
 
   return (
-    <div className='relative z-30 flex w-full flex-col items-center text-lg text-tertiary-400 sm:text-xl md:w-52 lg:w-64 lg:justify-self-end xl:w-80 '>
-      <p>
-        {t("header.your_level")}{" "}
-        <span className='text-3xl font-bold text-mainText sm:text-4xl'>
+    <div className='flex items-center gap-4'>
+      {/* Level Badge */}
+      <div className='flex h-10 w-10 items-center justify-center rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/20 to-cyan-600/30 shadow-lg'>
+        <span className='text-sm font-bold text-white drop-shadow-sm'>
           {lvl}
         </span>
-      </p>
-      <div className=' flex w-full'>
-        <div className='relative  flex h-3 w-full items-center bg-main-opposed bg-opacity-80  radius-default'>
-          <div
-            className='relative h-3 bg-gradient-to-r from-main-600 to-main-200 shadow-[0_0_15px_rgba(255,0,0,0.2)] drop-shadow-lg 
-                     radius-default '
-            style={{ width: progressPercent + "%" }}></div>
+      </div>
+
+      {/* Segmented Progress Bar */}
+      <div className='flex flex-col gap-2'>
+        <div className='flex items-center gap-2 text-sm'>
+          <span className='font-semibold text-white'>Level {lvl}</span>
+          <span className='font-bold text-cyan-400'>
+            {Math.round(progressPercent)}%
+          </span>
+        </div>
+
+        {/* Segments Container */}
+        <div className='flex gap-1'>
+          {Array.from({ length: totalSegments }, (_, index) => {
+            let segmentFill = 0;
+
+            if (index < filledSegments) {
+              segmentFill = 100; // Fully filled
+            } else if (index === filledSegments && partialSegment > 0) {
+              segmentFill = partialSegment * 100; // Partially filled
+            }
+
+            return (
+              <div
+                key={index}
+                className='relative h-3 w-8 overflow-hidden rounded border border-zinc-600/30 bg-zinc-800/60'>
+                {/* Segment fill */}
+                <div
+                  className='h-full bg-gradient-to-b from-cyan-400 to-cyan-500 transition-all duration-700 ease-out'
+                  style={{ width: `${segmentFill}%` }}>
+                  {/* Subtle inner highlight */}
+                  {segmentFill > 0 && (
+                    <div className='absolute inset-0 bg-gradient-to-b from-white/20 to-transparent'></div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Stats */}
+        <div className='text-sm text-white/80'>
+          <span>
+            {pointsInThisLevel.toLocaleString()}/
+            {levelXpDifference.toLocaleString()}
+          </span>
         </div>
       </div>
-      <p className='mt-2 !font-semibold text-mainText'>
-        {points - levelXpStart}/{levelXpEnd - levelXpStart}
-        <span className='text-sm'> {t("header.points_short")}</span>
-      </p>
     </div>
   );
 };

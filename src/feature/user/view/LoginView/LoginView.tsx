@@ -1,5 +1,7 @@
 import { Button } from "assets/components/ui/button";
-import { GoogleButton, Input } from "components/UI";
+import { Input } from "assets/components/ui/input";
+import { Label } from "assets/components/ui/label";
+import Image from "next/image";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   logInViaEmail,
@@ -7,11 +9,19 @@ import {
 } from "feature/user/store/userSlice.asyncThunk";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { Form, Formik } from "formik";
-import FormLayout from "layouts/FormLayout";
-import { Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Mail,
+  Lock,
+  Loader2,
+  Eye,
+  EyeOff,
+  ChevronRight,
+} from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaAt, FaLock } from "react-icons/fa";
+import { FcGoogle } from "react-icons/fc";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 export interface logInCredentials {
@@ -22,12 +32,14 @@ export interface logInCredentials {
 const LoginView = () => {
   const { t } = useTranslation(["common", "login"]);
   const dispatch = useAppDispatch();
+  const [showPassword, setShowPassword] = useState(false);
 
   const googleLogInHandler = () => {
     dispatch(logInViaGoogle());
   };
 
   const isFetching = useAppSelector(selectIsFetching) === "email";
+  const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
 
   function onSubmit(credentials: logInCredentials) {
     dispatch(logInViaEmail(credentials));
@@ -39,42 +51,174 @@ const LoginView = () => {
   };
 
   return (
-    <Formik
-      initialValues={formikInitialValues}
-      validationSchema={loginSchema}
-      onSubmit={onSubmit}>
-      <Form>
-        <FormLayout>
-          <>
-            <Input
-              name='email'
-              Icon={FaAt}
-              placeholder={t("common:input.email")}
-            />
-            <Input
-              name='password'
-              type='password'
-              Icon={FaLock}
-              placeholder={t("common:input.password")}
-            />
-            <div className='flex space-x-1 '>
-              <Button size='lg' type='submit'>
-                {isFetching && <Loader2 className='animate-spin' />}
-                {t("common:button.sign_in")}
-              </Button>
-              <Link href='/signup'>
-                <Button variant='secondary' size='lg'>
-                  {t("common:button.sign_up")}
-                </Button>
-              </Link>
+    <div className='relative min-h-screen w-full overflow-hidden bg-zinc-950 text-foreground flex items-center justify-center'>
+      {/* Premium Background */}
+      <div className='absolute inset-0 overflow-hidden'>
+        <div className='absolute -left-[10%] -top-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-500/10 blur-[120px]' />
+        <div className='absolute -right-[10%] -bottom-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-800/10 blur-[120px]' />
+      </div>
+
+      <div className='relative z-10 w-full max-w-md p-6'>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="flex flex-col gap-6"
+        >
+          {/* Header Section */}
+          <div className="text-center">
+             <div className="flex justify-center mb-6">
+                 <div className="relative p-3 rounded-2xl bg-zinc-900/50 border border-white/10 shadow-2xl shadow-cyan-500/10">
+                    <Image
+                      src='/images/logo.svg'
+                      alt='Logo'
+                      width={48}
+                      height={48}
+                      className='h-12 w-12'
+                    />
+                 </div>
+             </div>
+             <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+               Witaj ponownie
+             </h1>
+             <p className="text-zinc-400 text-sm">
+               Zaloguj się, aby kontynuować naukę
+             </p>
+          </div>
+
+          {/* Card */}
+          <div className="bg-zinc-900/40 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl">
+            <Formik
+              initialValues={formikInitialValues}
+              validationSchema={loginSchema}
+              onSubmit={onSubmit}>
+              {({ values, errors, touched, handleChange, handleBlur }) => (
+                <Form className='space-y-4'>
+                  {/* Email Field */}
+                    <div className="space-y-2">
+                        <Label
+                          htmlFor='email'
+                          className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
+                          Email
+                        </Label>
+                        <div className='relative group'>
+                          <Mail className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
+                          <Input
+                            id='email'
+                            name='email'
+                            type='email'
+                            value={values.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            placeholder='name@example.com'
+                            className='pl-10 h-10 bg-zinc-900/50 border-white/10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all duration-200 text-white placeholder:text-zinc-600'
+                          />
+                        </div>
+                        {errors.email && touched.email && (
+                          <p className='text-xs text-red-400 font-medium'>
+                            {errors.email}
+                          </p>
+                        )}
+                    </div>
+
+                  {/* Password Field */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                         <Label
+                          htmlFor='password'
+                          className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
+                          Hasło
+                        </Label>
+                    </div>
+
+                    <div className='relative group'>
+                      <Lock className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
+                      <Input
+                        id='password'
+                        name='password'
+                        type={showPassword ? "text" : "password"}
+                        value={values.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder='••••••••'
+                        className='pl-10 pr-10 h-10 bg-zinc-900/50 border-white/10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all duration-200 text-white placeholder:text-zinc-600'
+                      />
+                      <button
+                        type='button'
+                        onClick={() => setShowPassword(!showPassword)}
+                        className='absolute right-3 top-2.5 text-zinc-500 hover:text-zinc-300 transition-colors'>
+                        {showPassword ? (
+                          <EyeOff className='h-5 w-5' />
+                        ) : (
+                          <Eye className='h-5 w-5' />
+                        )}
+                      </button>
+                    </div>
+                    {errors.password && touched.password && (
+                      <p className='text-xs text-red-400 font-medium'>
+                        {errors.password}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Login Button */}
+                  <div className="pt-2">
+                    <Button
+                      type='submit'
+                      disabled={isFetching}
+                      className='w-full bg-cyan-500 hover:bg-cyan-600 text-black font-bold h-10 shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.01] active:scale-[0.99]'>
+                        {isFetching ? (
+                          <Loader2 className='h-5 w-5 animate-spin' />
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            Zaloguj się <ChevronRight className="w-4 h-4" />
+                          </span>
+                        )}
+                    </Button>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+
+            <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/10"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-zinc-900 px-2 text-zinc-500">lub kontynuuj z</span>
+                </div>
             </div>
-            <GoogleButton onClick={googleLogInHandler}>
-              {t("common:google_button.sign_in")}
-            </GoogleButton>
-          </>
-        </FormLayout>
-      </Form>
-    </Formik>
+
+            <Button
+                type='button'
+                onClick={googleLogInHandler}
+                disabled={isGoogleFetching}
+                variant='outline'
+                className='w-full border-white/10 bg-zinc-900/50 hover:bg-zinc-800 hover:text-white transition-colors h-10 text-zinc-300'>
+                <span className='flex items-center justify-center gap-2'>
+                  {isGoogleFetching ? (
+                    <Loader2 className='h-5 w-5 animate-spin' />
+                  ) : (
+                    <FcGoogle className='h-5 w-5' />
+                  )}
+                  Google
+                </span>
+              </Button>
+          </div>
+
+          <div className='text-center'>
+              <p className='text-sm text-zinc-400'>
+                Nie masz jeszcze konta?{" "}
+                <Link
+                  href='/signup'
+                  className='font-bold text-cyan-400 hover:text-cyan-300 transition-colors'>
+                  Zarejestruj się
+                </Link>
+              </p>
+            </div>
+        </motion.div>
+      </div>
+    </div>
   );
 };
 

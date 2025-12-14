@@ -8,9 +8,14 @@ interface MainContainerProps {
 
 const MainContainer = ({ children, title }: MainContainerProps) => {
   return (
-    <div className='bg-second-600 pb-6 radius-default'>
-      <HeadDecoration title={title} />
-      <div className='relative z-20'>{children}</div>
+    <div className='relative mt-16 overflow-hidden rounded-md bg-second-600'>
+      <div className='absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent'></div>
+
+      <div className='relative pb-2 pt-8'>
+        <HeadDecoration title={title} />
+      </div>
+
+      <div className='relative '>{children}</div>
     </div>
   );
 };

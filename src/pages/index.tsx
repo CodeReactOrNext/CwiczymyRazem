@@ -1,10 +1,10 @@
-import { HeroView } from "feature/hero/HeroView";
 import LandingView from "feature/user/view/LandingView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import MainLayout from "layouts/MainLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import LandingPage from "./landing";
 
 const Home: NextPage = () => {
   const { isLoggedIn, isLoading } = useAutoLogIn({
@@ -18,7 +18,7 @@ const Home: NextPage = () => {
   ) : isLoggedIn ? (
     <LandingView />
   ) : (
-    <HeroView />
+    <LandingPage />
   );
 };
 
@@ -38,7 +38,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
         "chat",
         "my_plans",
         "exercises",
-        "skills"
+        "skills",
       ])),
     },
   };

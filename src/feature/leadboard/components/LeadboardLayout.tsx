@@ -47,7 +47,15 @@ export const LeadboardLayout = ({
     if (isLoading) {
       return (
         <div className='flex h-[50vh] items-center justify-center'>
-          <span className='loading loading-spinner loading-lg'></span>
+          <div className='text-center'>
+            <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-zinc-600 border-t-cyan-400'></div>
+            <p className='text-lg font-medium text-zinc-300'>
+              Ładowanie rankingu...
+            </p>
+            <p className='text-sm text-zinc-500'>
+              Pobieranie danych użytkowników
+            </p>
+          </div>
         </div>
       );
     }
@@ -55,9 +63,19 @@ export const LeadboardLayout = ({
     if (!usersData.length) {
       return (
         <div className='flex h-[50vh] items-center justify-center'>
-          <p className='text-lg text-gray-500'>
-            {isSeasonalView ? t("no_seasonal_data_found") : t("no_users_found")}
-          </p>
+          <div className='text-center'>
+            <div className='mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/50'>
+              <span className='text-2xl'>📊</span>
+            </div>
+            <h3 className='mb-2 text-xl font-semibold text-zinc-300'>
+              {isSeasonalView ? "Brak danych sezonowych" : "Brak użytkowników"}
+            </h3>
+            <p className='text-sm text-zinc-500'>
+              {isSeasonalView
+                ? t("no_seasonal_data_found")
+                : t("no_users_found")}
+            </p>
+          </div>
         </div>
       );
     }
@@ -75,12 +93,16 @@ export const LeadboardLayout = ({
             currentUserId={currentUserId}
           />
         ))}
-        <div className='flex justify-center py-4'>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-          />
+
+        {/* Clean Pagination */}
+        <div className='mt-8 flex justify-center'>
+          <div className='rounded-2xl bg-zinc-900/30 p-4 backdrop-blur-sm'>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </div>
         </div>
       </>
     );
@@ -88,37 +110,45 @@ export const LeadboardLayout = ({
 
   return (
     <MainContainer title='Leadboard'>
-      <ul className='min-h-screen '>
-        <div className='sticky top-0 z-10 flex w-full flex-col gap-4 p-2 px-4 backdrop-blur-sm'>
-          <div className='flex flex-col justify-between  gap-2 md:flex-row md:items-center'>
-            <div className='flex flex-wrap items-center gap-4 font-openSans '>
-              <ViewToggle
-                isSeasonalView={isSeasonalView}
-                setIsSeasonalView={setIsSeasonalView}
-                isLoading={isLoading}
-              />
-              {isSeasonalView && (
-                <SeasonSelect
-                  seasons={seasons}
-                  selectedSeason={selectedSeason}
-                  setSelectedSeason={setSelectedSeason}
+      <div className='min-h-screen'>
+        {/* Enhanced Header */}
+        <div className='sticky top-0 z-10 mb-8 rounded-xl border border-zinc-700/50 bg-zinc-900/80 shadow-2xl backdrop-blur-xl'>
+          <div className='p-6'>
+            <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
+              {/* Left Section - Controls */}
+              <div className='flex flex-wrap items-center gap-4'>
+                <ViewToggle
+                  isSeasonalView={isSeasonalView}
+                  setIsSeasonalView={setIsSeasonalView}
                   isLoading={isLoading}
                 />
-              )}
-            </div>
+                {isSeasonalView && (
+                  <SeasonSelect
+                    seasons={seasons}
+                    selectedSeason={selectedSeason}
+                    setSelectedSeason={setSelectedSeason}
+                    isLoading={isLoading}
+                  />
+                )}
+              </div>
 
-            <div className='flex items-center gap-4'>
-              <UserStats
-                currentPage={currentPage}
-                itemsPerPage={itemsPerPage}
-                totalUsers={totalUsers}
-              />
+              {/* Right Section - Stats */}
+              <div className='flex items-center gap-4'>
+                <UserStats
+                  currentPage={currentPage}
+                  itemsPerPage={itemsPerPage}
+                  totalUsers={totalUsers}
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        <div className='container mx-auto'>{renderLeaderboardContent()}</div>
-      </ul>
+        {/* Enhanced Content Container */}
+        <div className='mx-auto max-w-7xl px-4'>
+          <ul className='flex flex-col gap-6'>{renderLeaderboardContent()}</ul>
+        </div>
+      </div>
     </MainContainer>
   );
 };

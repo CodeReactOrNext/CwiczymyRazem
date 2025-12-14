@@ -59,7 +59,7 @@ export const NavigationCard = ({
 
   return (
     <div
-      className={`${colors.ring} relative flex h-full transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-second-500 via-second-500/95 to-second-600 p-3 font-openSans shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2 sm:p-4`}
+      className={`${colors.ring} font-openSans relative flex h-full transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-card via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-100 hover:shadow-xl hover:ring-2 sm:p-4`}
       onClick={onClick}
       tabIndex={0}
       aria-label={title}
@@ -131,7 +131,7 @@ export const NavigationCard = ({
 };
 
 interface NavigationCardsProps {
-  setActiveSection: (
+  setActiveSection?: (
     section: "overview" | "activity" | "skills" | "exercises"
   ) => void;
 }
@@ -140,45 +140,61 @@ export const NavigationCards = ({ setActiveSection }: NavigationCardsProps) => {
   const { t } = useTranslation("profile");
   const router = useRouter();
 
+  const handleSkillsClick = () => {
+    if (setActiveSection) {
+      setActiveSection("skills");
+    } else {
+      router.push("/profile/skills");
+    }
+  };
+
+  const handleExercisesClick = () => {
+    if (setActiveSection) {
+      setActiveSection("exercises");
+    } else {
+      router.push("/profile/exercises");
+    }
+  };
+
   return (
-    <div className='grid grid-cols-1 gap-3 p-3 sm:gap-4 sm:p-4 md:grid-cols-2 lg:grid-cols-4'>
+    <div className='grid grid-cols-1 gap-3  sm:gap-4  md:grid-cols-2 lg:grid-cols-4'>
       <NavigationCard
-        title={t("cards.practice.title")}
-        description={t("cards.practice.description")}
+        title={(t as any)("cards.practice.title")}
+        description={(t as any)("cards.practice.description")}
         icon={<Dumbbell className='h-6 w-6' />}
         onClick={() => router.push("/timer")}
         primaryAction={{
-          label: t("cards.practice.choose"),
+          label: (t as any)("cards.practice.choose"),
           onClick: () => router.push("/timer"),
         }}
         secondaryAction={{
-          label: t("cards.practice.report"),
+          label: (t as any)("cards.practice.report"),
           onClick: () => router.push("/report"),
         }}
         colorAccent='cyan'
       />
 
       <NavigationCard
-        title={t("cards.songs.title")}
-        description={t("cards.songs.description")}
+        title={(t as any)("cards.songs.title")}
+        description={(t as any)("cards.songs.description")}
         icon={<Music className='h-6 w-6' />}
         onClick={() => router.push("/songs")}
         colorAccent='purple'
       />
 
       <NavigationCard
-        title={t("cards.skills.title")}
-        description={t("cards.skills.description")}
+        title={(t as any)("cards.skills.title")}
+        description={(t as any)("cards.skills.description")}
         icon={<Brain className='h-6 w-6' />}
-        onClick={() => setActiveSection("skills")}
+        onClick={handleSkillsClick}
         colorAccent='green'
       />
 
       <NavigationCard
-        title={t("cards.library.title")}
-        description={t("cards.library.description")}
+        title={(t as any)("cards.library.title")}
+        description={(t as any)("cards.library.description")}
         icon={<Library className='h-6 w-6' />}
-        onClick={() => setActiveSection("exercises")}
+        onClick={handleExercisesClick}
         colorAccent='amber'
       />
     </div>

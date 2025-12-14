@@ -1,0 +1,18 @@
+{
+  "select_practice_mode": "Select practice mode",
+  "select": "Select",
+  "modes": {
+    "timer": {
+      "title": "Regular practice",
+      "description": "Practice freely chosen skills and track your progress"
+    },
+    "plan": {
+      "title": "Exercise plan",
+      "description": "Choose a ready-made exercise plan and follow it"
+    },
+    "auto": {
+      "title": "Automatic plan",
+      "description": "Let us create a plan tailored to your time"
+    }
+  }
+}

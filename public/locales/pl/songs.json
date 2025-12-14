@@ -55,5 +55,22 @@
     "wantToLearn": "chcę się nauczyć",
     "learning": "uczę się",
     "learned": "nauczone"
-  }
+  },
+  "tier": {
+    "legendary": "Legendarny",
+    "expert": "Ekspertowy",
+    "advanced": "Zaawansowany",
+    "intermediate": "Średniozaawansowany",
+    "beginner": "Początkujący"
+  },
+  "song_count_one": "utwór",
+  "song_count_other": "utworów",
+  "no_songs_in_list": "Brak utworów",
+  "drag_or_use_buttons": "Przeciągnij utwory lub użyj przycisków",
+  "move_to": "Przenieś do:",
+  "remove_song": "Usuń utwór",
+  "drop_here": "Upuść tutaj",
+  "start_learning": "Ucz się",
+  "mark_as_learned": "Umiem",
+  "learn_again": "Powtórz"
 }

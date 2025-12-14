@@ -6,7 +6,6 @@ import type { StatisticsDataInterface } from "types/api.types";
 import { inputTimeConverter } from "utils/converter";
 
 export const checkTime1 = (statistics: StatisticsDataInterface): AchievementCheckerReturnType => {
-  console.log("checkTime1",statistics);
   const { time } = statistics;
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
