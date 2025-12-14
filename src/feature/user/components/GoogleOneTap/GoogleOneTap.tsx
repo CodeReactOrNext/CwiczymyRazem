@@ -36,10 +36,14 @@ export const GoogleOneTap = () => {
             callback: handleCredentialResponse,
             auto_select: false, 
             cancel_on_tap_outside: false,
-            use_fedcm_for_prompt: true,
+            use_fedcm_for_prompt: false,
           });
           window.google.accounts.id.prompt((notification: any) => {
-             // console.log("Google One Tap notification:", notification);
+             if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                 console.log("Google One Tap skipped/not displayed reason:", notification.getNotDisplayedReason());
+             } else if (notification.isDismissedMoment()) {
+                 console.log("Google One Tap dismissed reason:", notification.getDismissedReason());
+             }
           });
         }
       }}
