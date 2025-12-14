@@ -33,12 +33,12 @@ function MyApp({ Component, pageProps }: AppProps) {
           name='google-signin-client_id'
           content={process.env.NEXT_PUBLIC_GOOGLE_QAUTH}
         />
-        <title>Ćwiczymy Razem</title>
+        <title>Practice Together</title>
         <meta
           name='description'
-          content='Ćwicz, zapisuj postęp, rywalizuj! Gitary w dłoń! 🎸'
+          content='Practice, track progress, compete! Guitar in hand! 🎸'
         />
-        <meta name='keywords' content='ćwiczenie, gitara' />
+        <meta name='keywords' content='practice, guitar' />
       </Head>
       <Script id='microsoft-clarity-analytics'>
         {`

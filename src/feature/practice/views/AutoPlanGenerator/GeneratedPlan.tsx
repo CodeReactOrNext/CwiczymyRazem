@@ -30,12 +30,12 @@ export const GeneratedPlan = ({
   onReplaceExercise,
   onRemoveExercise,
 }: GeneratedPlanProps) => {
-  const { t, i18n } = useTranslation(["exercises", "common"]);
-  const currentLang = i18n.language as keyof LocalizedContent;
+  const { t } = useTranslation(["exercises", "common"]);
+  /* Removed currentLang setup */
 
   const getLocalizedText = (content: LocalizedContent | string): string => {
     if (typeof content === "string") return content;
-    return content[currentLang] || content.en;
+    return content.en;
   };
 
   return (

@@ -334,7 +334,6 @@ const TimerLayout = ({
     },
   ];
 
-  // Obliczamy czas w formacie mm:ss
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -342,9 +341,9 @@ const TimerLayout = ({
   };
 
   return (
-    <MainContainer title={"Ćwicz"}>
-      <div className='h-full space-y-6 pb-8 font-openSans sm:space-y-8 sm:pb-12 md:p-8'>
-        <Card className='rounded-none border-none bg-second-500/80 shadow-xl'>
+    <MainContainer title={"Practice"}>
+      <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
+        <Card>
           <div className='flex flex-col sm:flex-row'>
             <div className='flex justify-center p-4 pb-0 sm:flex-1 sm:py-6'>
               <AnimatedTimerDisplay
@@ -364,7 +363,7 @@ const TimerLayout = ({
                 <div className='flex items-center gap-2'>
                   <BlinkingDot isActive={timerEnabled} />
                   <span className=' font-medium text-white sm:text-base'>
-                    {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
+                    {chosenSkill ? getSkillName(chosenSkill) : "Not selected"}
                   </span>
                 </div>
               </div>
@@ -389,6 +388,7 @@ const TimerLayout = ({
             {skillsData.map((skill) => (
               <CategoryBox
                 key={skill.id}
+                skillId={skill.id}
                 title={skill.title}
                 time={skill.time}
                 skillColor={skill.color}

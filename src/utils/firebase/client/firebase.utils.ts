@@ -243,9 +243,9 @@ export const firebaseGetUserTooltipData = async (
       statistics: {
         totalPracticeTime:
           userData.statistics.time.creativity +
-            userData.statistics.time.hearing +
-            userData.statistics.time.technique +
-            userData.statistics.time.theory || 0,
+          userData.statistics.time.hearing +
+          userData.statistics.time.technique +
+          userData.statistics.time.theory || 0,
         totalPoints: userData.statistics.points || 0,
         level: userData.statistics.lvl || 0,
         achievements: userData.statistics.achievements || [],
@@ -273,13 +273,12 @@ export const firebaseGetUserTooltipData = async (
 
 export const canUpgradeSkill = (
   skill: GuitarSkill,
-  userSkills: UserSkills
+  userSkills: UserSkills,
+  cost: number = 1
 ): boolean => {
   if (!skill) return false;
 
-  const pointsCost = 1;
-
-  if (userSkills.availablePoints[skill.category] < pointsCost) {
+  if (userSkills.availablePoints[skill.category] < cost) {
     return false;
   }
 

@@ -1,4 +1,8 @@
 import { Card } from "assets/components/ui/card";
+import {
+  WheelPicker,
+  WheelPickerOption,
+} from "assets/components/wheel-picker";
 import type { QuestionMarkProps } from "components/UI/QuestionMark";
 import QuestionMark from "components/UI/QuestionMark";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
@@ -8,16 +12,26 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import type { IconType } from "react-icons/lib";
 
-import InputTime from "../InputTime/InputTime";
-
 export interface TimeInputBoxProps {
   title?: string;
   Icon: IconType;
   questionMarkProps: QuestionMarkProps;
   hoursName: string;
   minutesName: string;
+  skillId?: string;
   errors: FormikErrors<ReportFormikInterface>;
 }
+
+const createArray = (length: number): WheelPickerOption[] =>
+  Array.from({ length }, (_, i) => {
+    return {
+      label: i.toString().padStart(2, "0"),
+      value: i.toString(),
+    };
+  });
+
+const hourOptions = createArray(24);
+const minuteOptions = createArray(60);
 
 const TimeInputBox = ({
   title,
@@ -25,54 +39,56 @@ const TimeInputBox = ({
   questionMarkProps,
   hoursName,
   minutesName,
+  skillId,
   errors,
 }: TimeInputBoxProps) => {
-  const { values } = useFormikContext<ReportFormikInterface>();
+  const { values, setFieldValue } = useFormikContext<ReportFormikInterface>();
   const [isHovered, setIsHovered] = useState(false);
   const error =
     errors.hasOwnProperty(hoursName) || errors.hasOwnProperty(minutesName);
 
-  // Check if this time input has any value entered
-  const hasValue =
-    parseInt(values[hoursName as keyof ReportFormikInterface] as string, 10) >
-      0 ||
-    parseInt(values[minutesName as keyof ReportFormikInterface] as string, 10) >
-      0;
+  const hoursValue =
+    (values[hoursName as keyof ReportFormikInterface] as number) || 0;
+  const minutesValue =
+    (values[minutesName as keyof ReportFormikInterface] as number) || 0;
 
-  // Determine the skill color based on title
+  // Check if this time input has any value entered
+  const hasValue = hoursValue > 0 || minutesValue > 0;
+
   const getSkillColor = () => {
-    const lowerTitle = title?.toLowerCase() || "";
-    if (lowerTitle.includes("kreatywn")) return "#37b874"; // Green
-    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch"))
-      return "#4a7edd"; // Blue
-    if (lowerTitle.includes("technik")) return "#e04c3b"; // Red
-    if (lowerTitle.includes("teori")) return "#a44aed"; // Purple
-    return "#888888";
+    switch (skillId) {
+      case "creativity":
+        return "#37b874";
+      case "hearing":
+        return "#4a7edd";
+      case "technique":
+        return "#e04c3b";
+      case "theory":
+        return "#a44aed";
+      default:
+        return "#888888";
+    }
   };
 
   const skillColor = getSkillColor();
 
-  // Get gradient style for the card based on whether there's a value
   const getGradientStyle = () => {
-    // If no value is entered, return a neutral background
     if (!hasValue) {
       return "from-gray-900/20 to-transparent";
     }
 
-    const lowerTitle = title?.toLowerCase() || "";
-    if (lowerTitle.includes("kreatywn")) {
-      return "from-[#37b87410] via-[#37b87420] to-transparent";
+    switch (skillId) {
+      case "creativity":
+        return "from-[#37b87410] via-[#37b87420] to-transparent";
+      case "hearing":
+        return "from-[#4a7edd10] via-[#4a7edd20] to-transparent";
+      case "technique":
+        return "from-[#e04c3b10] via-[#e04c3b20] to-transparent";
+      case "theory":
+        return "from-[#a44aed10] via-[#a44aed20] to-transparent";
+      default:
+        return "from-gray-800 via-gray-900 to-transparent";
     }
-    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch")) {
-      return "from-[#4a7edd10] via-[#4a7edd20] to-transparent";
-    }
-    if (lowerTitle.includes("technik")) {
-      return "from-[#e04c3b10] via-[#e04c3b20] to-transparent";
-    }
-    if (lowerTitle.includes("teori")) {
-      return "from-[#a44aed10] via-[#a44aed20] to-transparent";
-    }
-    return "from-gray-800 via-gray-900 to-transparent";
   };
 
   return (
@@ -87,7 +103,7 @@ const TimeInputBox = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}>
       <div
-        className={`relative bg-gradient-to-br p-5 transition-all duration-300 ${getGradientStyle()}`}
+        className={`relative flex h-full flex-col bg-gradient-to-br p-5 transition-all duration-300 ${getGradientStyle()}`}
         style={{
           boxShadow: error ? "0 0 5px 0 var(--error-200)" : "none",
         }}>
@@ -140,10 +156,54 @@ const TimeInputBox = ({
           </div>
         </div>
 
-        <div className='mt-4 flex items-center justify-center gap-3'>
-          <InputTime name={hoursName} description={"HH"} addZero />
-          <p className='mb-[18px] text-2xl font-medium'>:</p>
-          <InputTime name={minutesName} description={"MM"} addZero />
+        <div className='mt-auto flex w-full items-center justify-center gap-3'>
+          <div className='mx-auto flex w-full max-w-[300px] items-center justify-center gap-4'>
+            {/* Hours */}
+            <div className='flex flex-1 flex-col items-center gap-2'>
+              <div className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm">
+                <WheelPicker
+                  options={hourOptions}
+                  value={hoursValue.toString()}
+                  onValueChange={(value) =>
+                    setFieldValue(hoursName, parseInt(value, 10))
+                  }
+                  infinite
+                  classNames={{
+                      optionItem: "text-zinc-500 text-lg font-medium cursor-pointer transition-colors",
+                      highlightWrapper: "bg-white/5 text-white text-xl font-bold backdrop-blur-md"
+                  }}
+                />
+              </div>
+              <span className='text-[10px] font-bold tracking-wider text-slate-500'>
+                GODZ
+              </span>
+            </div>
+
+            <span className='mb-6 text-2xl font-medium text-slate-500/50'>
+              :
+            </span>
+
+            {/* Minutes */}
+            <div className='flex flex-1 flex-col items-center gap-2'>
+              <div className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm">
+                <WheelPicker
+                  options={minuteOptions}
+                  value={minutesValue.toString()}
+                  onValueChange={(value) =>
+                    setFieldValue(minutesName, parseInt(value, 10))
+                  }
+                  infinite
+                    classNames={{
+                      optionItem: "text-zinc-500 text-lg font-medium cursor-pointer transition-colors",
+                      highlightWrapper: "bg-white/5 text-white text-xl font-bold backdrop-blur-md"
+                  }}
+                />
+              </div>
+              <span className='text-[10px] font-bold tracking-wider text-slate-500'>
+                MIN
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </Card>

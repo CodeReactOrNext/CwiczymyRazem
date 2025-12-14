@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { FaCheck, FaTimes, FaClock, FaTrophy } from "react-icons/fa";
 import {
   checkIsPracticeToday,
   getUpdatedActualDayWithoutBreak,
 } from "utils/gameLogic";
 
-import StreakDisplay from "./components/StreakDisplay";
+import WeeklyStreakBox from "./components/WeeklyStreakBox";
 
 interface WelcomeMessageProps {
   userName: string;
@@ -34,42 +34,54 @@ export const WelcomeMessage = ({
     (isStreak === 1 ? 0 : actualDayWithoutBreak) + +didPracticeToday;
 
   return (
-    <div className='flex flex-col '>
-      <div className='stats bg-second'>
-        <div className='stat hidden min-w-[150px] !p-3 font-openSans text-white sm:block'>
-          <div className='flex flex-row items-center gap-2'>
-            <div className='stat-title text-[12px] text-secondText'>
-              {t("header.practice_today")}
-            </div>
-            {didPracticeToday ? (
-              <FaCheck className='text-green-500' />
-            ) : (
-              <FaTimes className='text-red-500' />
-            )}
-          </div>
-        </div>
-
-        <div className='stat min-w-[150px] !p-3 font-openSans text-white'>
-          <StreakDisplay dayWithoutBreak={dayWithoutBreak} />
-        </div>
+    <div className='flex items-center gap-4'>
+      {/* Today's Practice Status - Compact */}
+      <div className='flex h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-zinc-800/50 px-3 py-2 shadow-sm backdrop-blur-sm'>
+        {didPracticeToday ? (
+          <FaCheck className='text-xs text-white' />
+        ) : (
+          <FaTimes className='text-xs text-zinc-400' />
+        )}
+        <span className='text-xs font-semibold text-white'>
+          {didPracticeToday ? "Done" : "Pending"}
+        </span>
       </div>
 
-      <div className='stats bg-second'>
-        <div className='stat min-w-[150px] !p-3 font-openSans text-white'>
-          <div className='stat-title text-[12px] text-secondText'>
-            {t("header.earned_points")}
-          </div>
-          <div className='stat-value font-sans text-2xl'>{points}</div>
-        </div>
+      {/* Weekly Streak - Horizontal Days */}
+      <div className='flex h-10 items-center gap-1 rounded-lg border border-white/10 bg-zinc-800/50 px-3 py-2 shadow-sm backdrop-blur-sm'>
+        {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => {
+          const isActive = index < dayWithoutBreak;
+          return (
+            <div
+              key={index}
+              className={`flex h-6 w-6 items-center justify-center rounded text-xs font-medium ${
+                isActive
+                  ? "bg-white text-zinc-800"
+                  : "bg-zinc-700 text-zinc-400"
+              }`}>
+              {day}
+            </div>
+          );
+        })}
+        <span className='ml-2 text-xs font-semibold text-white'>
+          {dayWithoutBreak}
+        </span>
+      </div>
 
-        <div className='stat hidden min-w-[150px] !p-3 font-openSans text-white xl:block'>
-          <div className='stat-title text-[12px] text-secondText'>
-            {t("header.total_practice_time")}
-          </div>
-          <div className='stat-value font-sans text-2xl'>
-            {totalPracticeTime}
-          </div>
-        </div>
+      {/* Points - Compact Card */}
+      <div className='hidden h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-zinc-800/50 px-3 py-2 shadow-sm backdrop-blur-sm sm:flex'>
+        <FaTrophy className='text-xs text-white' />
+        <span className='text-xs font-semibold text-white'>
+          {points.toLocaleString()}
+        </span>
+      </div>
+
+      {/* Time - Compact Card */}
+      <div className='hidden h-10 items-center justify-center gap-2 rounded-lg border border-white/10 bg-zinc-800/50 px-3 py-2 shadow-sm backdrop-blur-sm lg:flex'>
+        <FaClock className='text-xs text-white' />
+        <span className='font-mono text-xs font-semibold text-white'>
+          {totalPracticeTime}
+        </span>
       </div>
     </div>
   );

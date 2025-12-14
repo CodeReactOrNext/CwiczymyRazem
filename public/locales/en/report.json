@@ -14,6 +14,7 @@
   "date_back": "Date back",
   "max_days": "Max {{days}} days",
   "add_report_to_day": "You add report do day:",
+  "total_time": "Total time",
 
   "toast": {
     "24h_error": "It is not possible to exercise more than 24 hours per day",

@@ -1,6 +1,8 @@
+import { DashboardContainer } from "components/Layout/DashboardContainer";
+
 const SettingsLayout = ({ children }: { children: React.ReactNode }) => (
-  <div className='m-auto flex w-full flex-col bg-second-500 font-openSans p-4 radius-default sm:w-[640px] '>
-    {children}
+  <div className='font-openSans mx-auto w-full max-w-6xl'>
+    <DashboardContainer className='mx-4 sm:mx-8'>{children}</DashboardContainer>
   </div>
 );
 

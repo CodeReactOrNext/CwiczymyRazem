@@ -1,6 +1,7 @@
 {
   "or": "or",
   "start": "Start",
+  "finish": "Finish",
   "min": "min",
   "button": {
     "sign_in": "Log in",
@@ -173,5 +174,10 @@
   },
   "minutes": "minutes",
   "cancel": "Cancel",
-  "select": "Select"
+  "select": "Select",
+  "details": "Details",
+  "timer_status": {
+    "active": "Active",
+    "paused": "Paused"
+  }
 }

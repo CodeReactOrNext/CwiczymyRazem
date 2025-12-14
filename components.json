@@ -10,6 +10,7 @@
     "cssVariables": true,
     "prefix": ""
   },
+  "iconLibrary": "lucide",
   "aliases": {
     "components": "assets/components",
     "utils": "assets/lib/utils",
@@ -17,5 +18,8 @@
     "lib": "assets/lib",
     "hooks": "assets/hooks"
   },
-  "iconLibrary": "lucide"
+  "registries": {
+    "@wigggle-ui": "https://wigggle-ui.vercel.app/r/{name}.json",
+    "@ncdai": "https://chanhdai.com/r/{name}.json"
+  }
 }

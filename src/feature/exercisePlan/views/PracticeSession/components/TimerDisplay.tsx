@@ -8,7 +8,7 @@ interface TimerDisplayProps {
   value: number;
   text: string;
   isPlaying: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
 }
 
 export const TimerDisplay = ({
@@ -18,21 +18,22 @@ export const TimerDisplay = ({
   size = "md",
 }: TimerDisplayProps) => {
   const sizeClasses = {
+    xs: "h-24 w-24",
     sm: "h-40 w-40",
     md: "h-44 w-44",
     lg: "h-48 w-48",
   };
 
   const getProgressColor = () => {
-    if (value > 75) return "hsl(210, 90%, 60%)";
-    if (value > 50) return "hsl(260, 90%, 60%)";
-    if (value > 25) return "hsl(330, 90%, 60%)";
-    return "hsl(0, 90%, 60%)";
+    // Theme consistency: Use Cyan/Teal range
+    if (value > 66) return "#06b6d4"; // cyan-500
+    if (value > 33) return "#22d3ee"; // cyan-400
+    return "#67e8f9"; // cyan-300
   };
 
   const progressColor = getProgressColor();
   const glowColor = isPlaying ? progressColor : "hsl(var(--muted))";
-  const textSize = size === "sm" ? "24px" : size === "md" ? "28px" : "32px";
+  const textSize = size === "xs" ? "18px" : size === "sm" ? "24px" : size === "md" ? "28px" : "32px";
 
   return (
     <div className='relative'>
@@ -108,10 +109,11 @@ export const TimerDisplay = ({
           <CircularProgressbar
             value={value}
             text={text}
+            strokeWidth={10}
             styles={buildStyles({
               pathColor: progressColor,
-              textColor: "hsl(var(--foreground))",
-              trailColor: "hsl(var(--muted)/0.1)",
+              textColor: "white",
+              trailColor: "rgba(255,255,255, 0.1)",
               pathTransition: isPlaying
                 ? "stroke-dashoffset 0.5s linear"
                 : "none",

@@ -1,4 +1,3 @@
-import { LanguageSwitch } from "components/UI";
 import HamburgerLayout from "layouts/HamburgerLayout";
 import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 import Link from "next/link";
@@ -61,14 +60,10 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
           <li className=' active:click-behavior'>
             <Link href='/faq'>{t("nav.faq")}</Link>
           </li>
-          <li className=' right-0 m-1 flex flex-col items-center gap-4'>
-            <LanguageSwitch />
-          </li>
+
         </HamburgerLayout>
       )}
-      <div className='absolute right-2 top-2 hidden flex-col items-end gap-3 lg:flex'>
-        <LanguageSwitch />
-      </div>
+
     </nav>
   );
 };

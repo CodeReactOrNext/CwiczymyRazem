@@ -38,7 +38,7 @@ export const AchievementsCarousel = ({
   };
 
   return (
-    <div className='col-span-3 hidden h-full w-full flex-col items-center justify-center bg-opacity-80 sm:flex md:col-span-1 md:w-fit md:justify-end'>
+    <div className='flex flex-col items-center justify-center bg-opacity-80 w-fit'>
       <div className='flex rounded-lg p-2 text-base backdrop-blur-sm xxs:text-2xl lg:text-xl xl:text-2xl'>
         <button onClick={handlePrev}>
           <FaAngleLeft

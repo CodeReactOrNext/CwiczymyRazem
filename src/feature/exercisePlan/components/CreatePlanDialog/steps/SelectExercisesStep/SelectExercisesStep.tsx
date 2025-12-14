@@ -19,8 +19,8 @@ export const SelectExercisesStep = ({
   onExercisesSelect,
   onNext,
 }: SelectExercisesStepProps) => {
-  const { t, i18n } = useTranslation(["exercises", "common"]);
-  const currentLang = i18n.language as "pl" | "en";
+  const { t } = useTranslation(["exercises", "common"]);
+  /* Removed currentLang setup */
 
   const {
     searchQuery,
@@ -33,7 +33,7 @@ export const SelectExercisesStep = ({
   } = useExerciseSelection({
     selectedExercises,
     onExercisesSelect,
-    currentLang,
+    /* Removed currentLang */
   });
 
   return (
@@ -63,7 +63,7 @@ export const SelectExercisesStep = ({
 
       <SelectedExercisesList
         selectedExercises={selectedExercises}
-        currentLang={currentLang}
+        /* Removed currentLang */
         onToggleExercise={handleExerciseToggle}
       />
 
@@ -79,7 +79,7 @@ export const SelectExercisesStep = ({
         exercises={filteredExercises}
         selectedExercises={selectedExercises}
         onToggleExercise={handleExerciseToggle}
-        currentLang={currentLang}
+        /* Removed currentLang */
       />
 
       <Button

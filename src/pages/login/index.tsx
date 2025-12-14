@@ -1,22 +1,23 @@
 import LoginView from "feature/user/view/LoginView";
 import useAutoLogIn from "hooks/useAutoLogIn";
-import MainLayout from "layouts/MainLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useTranslation } from "react-i18next";
 
 const LoginPage: NextPage = () => {
-  const { t } = useTranslation("login");
   const { isLoggedIn, isLoading } = useAutoLogIn({
     redirects: { loggedIn: "/" },
   });
 
-  return (
-    <MainLayout subtitle={t("subtitlebar_text")} variant='primary'>
-      {isLoggedIn || isLoading ? <PageLoadingLayout /> : <LoginView />}
-    </MainLayout>
-  );
+  if (isLoggedIn || isLoading) {
+    return (
+      <div className='flex min-h-screen items-center justify-center bg-zinc-950'>
+        <PageLoadingLayout />
+      </div>
+    );
+  }
+
+  return <LoginView />;
 };
 
 export default LoginPage;

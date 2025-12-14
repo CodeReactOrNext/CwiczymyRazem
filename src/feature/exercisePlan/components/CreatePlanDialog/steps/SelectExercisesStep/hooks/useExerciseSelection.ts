@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 interface UseExerciseSelectionProps {
   selectedExercises: Exercise[];
   onExercisesSelect: (exercises: Exercise[]) => void;
-  currentLang: "pl" | "en";
+  /* Removed currentLang */
 }
 
 interface UseExerciseSelectionReturn {
@@ -21,13 +21,13 @@ interface UseExerciseSelectionReturn {
 export const useExerciseSelection = ({
   selectedExercises,
   onExercisesSelect,
-  currentLang,
+  /* Removed currentLang */
 }: UseExerciseSelectionProps): UseExerciseSelectionReturn => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const exercises = exercisesAgregat;
-  
+
   const groupedExercises = useMemo(() => {
     return exercises.reduce((acc, exercise) => {
       const category = exercise.category;
@@ -49,7 +49,7 @@ export const useExerciseSelection = ({
 
   const filteredExercises = useMemo(() => {
     return exercises.filter((exercise) => {
-      const matchesSearch = exercise.title[currentLang]
+      const matchesSearch = exercise.title.en
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 
@@ -57,7 +57,7 @@ export const useExerciseSelection = ({
         selectedCategory === "all" || exercise.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [exercises, searchQuery, selectedCategory, currentLang]);
+  }, [exercises, searchQuery, selectedCategory]);
 
   return {
     searchQuery,

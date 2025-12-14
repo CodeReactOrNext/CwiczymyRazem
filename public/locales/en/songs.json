@@ -55,5 +55,22 @@
     "wantToLearn": "want to learn",
     "learning": "learning",
     "learned": "learned"
-  }
+  },
+  "tier": {
+    "legendary": "Legendary",
+    "expert": "Expert",
+    "advanced": "Advanced",
+    "intermediate": "Intermediate",
+    "beginner": "Beginner"
+  },
+  "song_count_one": "song",
+  "song_count_other": "songs",
+  "no_songs_in_list": "No songs",
+  "drag_or_use_buttons": "Drag songs or use buttons",
+  "move_to": "Move to:",
+  "remove_song": "Remove song",
+  "drop_here": "Drop here",
+  "start_learning": "Learn",
+  "mark_as_learned": "Finish",
+  "learn_again": "Review"
 }

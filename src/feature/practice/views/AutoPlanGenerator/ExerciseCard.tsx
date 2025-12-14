@@ -33,8 +33,8 @@ export const ExerciseCard = ({
   onReplace,
   onRemove,
 }: ExerciseCardProps) => {
-  const { t, i18n } = useTranslation(["exercises", "common"]);
-  const currentLang = i18n.language as keyof LocalizedContent;
+  const { t } = useTranslation(["exercises", "common"]);
+  /* Removed currentLang setup */
 
   const difficultyClasses = {
     easy: "bg-green-100 text-green-800",
@@ -44,7 +44,7 @@ export const ExerciseCard = ({
 
   const getLocalizedText = (content: LocalizedContent | string): string => {
     if (typeof content === "string") return content;
-    return content[currentLang] || content.en;
+    return content.en;
   };
 
   return (

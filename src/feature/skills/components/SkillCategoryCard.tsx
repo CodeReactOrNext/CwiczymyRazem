@@ -1,6 +1,5 @@
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
-import { SkillCategoryBadge } from "feature/skills/components/SkillCategoryBadge";
 import { SkillCategoryTitle } from "feature/skills/components/SkillCategoryTitle";
 import { SkillsList } from "feature/skills/components/SkillsList";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
@@ -49,38 +48,53 @@ export const SkillCategoryCard = ({
       category as keyof typeof userSkills.availablePoints
     ] || 0;
 
-  const getEnhancedGradient = () => {
+  const getCategoryColors = () => {
     switch (category) {
       case "technique":
-        return "from-red-950/25 to-red-900/20 border-red-700/20";
+        return {
+          border: "border-red-500/20",
+          iconBg: "bg-red-500/10",
+          iconText: "text-red-400",
+          progress: "bg-red-500",
+          glow: "from-red-500/5",
+        };
       case "theory":
-        return "from-blue-950/25 to-blue-900/20 border-blue-700/20";
+        return {
+          border: "border-blue-500/20",
+          iconBg: "bg-blue-500/10",
+          iconText: "text-blue-400",
+          progress: "bg-blue-500",
+          glow: "from-blue-500/5",
+        };
       case "hearing":
-        return "from-emerald-950/25 to-emerald-900/20 border-emerald-700/20";
+        return {
+          border: "border-emerald-500/20",
+          iconBg: "bg-emerald-500/10",
+          iconText: "text-emerald-400",
+          progress: "bg-emerald-500",
+          glow: "from-emerald-500/5",
+        };
       case "creativity":
-        return "from-purple-950/25 to-purple-900/20 border-purple-700/20";
+        return {
+          border: "border-purple-500/20",
+          iconBg: "bg-purple-500/10",
+          iconText: "text-purple-400",
+          progress: "bg-purple-500",
+          glow: "from-purple-500/5",
+        };
       default:
-        return "from-slate-950/25 to-slate-900/20 border-slate-700/20";
+        return {
+          border: "border-zinc-500/20",
+          iconBg: "bg-zinc-500/10",
+          iconText: "text-zinc-400",
+          progress: "bg-zinc-500",
+          glow: "from-zinc-500/5",
+        };
     }
   };
 
-  const getProgressColor = () => {
-    switch (category) {
-      case "technique":
-        return "bg-red-600/60";
-      case "theory":
-        return "bg-blue-600/60";
-      case "hearing":
-        return "bg-emerald-600/60";
-      case "creativity":
-        return "bg-purple-600/60";
-      default:
-        return "bg-gray-600/60";
-    }
-  };
-
-  const enhancedGradient = getEnhancedGradient();
-  const progressColor = progressColorClass || getProgressColor();
+  const colors = getCategoryColors();
+  const progressColor = progressColorClass || colors.progress;
 
   return (
     <motion.div
@@ -88,48 +102,65 @@ export const SkillCategoryCard = ({
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: index * 0.1 }}
       className={cn(
-        "relative mt-5 rounded-md border p-4 pt-12",
-        "bg-gradient-to-br backdrop-blur-sm transition-all duration-300",
-        "hover:bg-second-500/10",
-        enhancedGradient
+        "relative rounded-2xl border bg-zinc-900/40 p-6 backdrop-blur-sm transition-all duration-300",
+        "hover:border-white/10",
+        colors.border
       )}>
-      <SkillCategoryBadge
-        category={category}
-        icon={CategoryIcon}
-        level={categoryLevel}
-        availablePoints={availablePoints}
-        totalLevels={displayTotalLevels}
-      />
-      <SkillCategoryTitle
-        category={category}
-        title={t(`skills:categories.${category}` as any)}
-      />
+      <div className={cn("absolute inset-0 rounded-2xl bg-gradient-to-br opacity-50", colors.glow, "to-transparent")}></div>
 
-      <div className='mb-3 mt-3'>
-        <div className='mb-1 flex justify-between text-xs'>
-          <span className='text-white/70'>{t("skills:progress" as any)}</span>
-          <span className='font-medium text-white/80'>
-            {displayTotalLevels % POINTS_PER_LEVEL} / {POINTS_PER_LEVEL}
-          </span>
+      <div className="relative z-10 space-y-4">
+        <div className="flex items-start justify-between">
+          <div className={cn("rounded-xl p-3", colors.iconBg)}>
+            <CategoryIcon className={cn("h-6 w-6", colors.iconText)} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            {availablePoints > 0 && (
+              <div className="rounded-lg bg-emerald-500/20 border border-emerald-500/30 px-2.5 py-1">
+                <span className="text-xs font-bold text-emerald-400">
+                  +{availablePoints}
+                </span>
+              </div>
+            )}
+            <div className={cn("rounded-lg border px-3 py-1", colors.border, colors.iconBg)}>
+              <span className={cn("text-sm font-bold", colors.iconText)}>
+                {categoryLevel}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className='h-1 overflow-hidden rounded-full bg-black/10'>
-          <div
-            className={`h-full ${progressColor} rounded-full`}
-            style={{
-              width: `${
-                (displayTotalLevels % POINTS_PER_LEVEL) *
-                (100 / POINTS_PER_LEVEL)
-              }%`,
-            }}></div>
+
+        <SkillCategoryTitle
+          category={category}
+          title={t(`skills:categories.${category}` as any)}
+        />
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs">
+            <span className="text-zinc-400">{t("skills:progress" as any)}</span>
+            <span className="font-medium text-white">
+              {displayTotalLevels % POINTS_PER_LEVEL} / {POINTS_PER_LEVEL}
+            </span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-black/40">
+            <div
+              className={cn("h-full rounded-full transition-all duration-500", progressColor)}
+              style={{
+                width: `${
+                  (displayTotalLevels % POINTS_PER_LEVEL) *
+                  (100 / POINTS_PER_LEVEL)
+                }%`,
+              }}></div>
+          </div>
         </div>
+
+        <SkillsList
+          skills={skills}
+          userSkills={userSkills}
+          category={category}
+          onSkillUpgrade={onSkillUpgrade || (() => {})}
+        />
       </div>
-
-      <SkillsList
-        skills={skills}
-        userSkills={userSkills}
-        category={category}
-        onSkillUpgrade={onSkillUpgrade || (() => {})}
-      />
     </motion.div>
   );
 };
