@@ -48,7 +48,7 @@ export const PracticeModeSelector = ({
       title: t("timer:modes.timer.title" as any),
       description: t("timer:modes.timer.description" as any),
       colors: colorClasses.indigo,
-      features: ["Elastyczny czas", "Wybór umiejętności", "Śledzenie postępu"],
+      features: ["Flexible time", "Skill selection", "Progress tracking"],
     },
     {
       id: "plan" as const,
@@ -57,9 +57,9 @@ export const PracticeModeSelector = ({
       description: t("timer:modes.plan.description" as any),
       colors: colorClasses.amber,
       features: [
-        "Gotowe plany",
-        "Strukturalne ćwiczenia",
-        "Przewodnik krok po kroku",
+        "Ready-made plans",
+        "Structured exercises",
+        "Step-by-step guide",
       ],
     },
     {
@@ -68,7 +68,7 @@ export const PracticeModeSelector = ({
       title: t("timer:modes.auto.title" as any),
       description: t("timer:modes.auto.description" as any),
       colors: colorClasses.rose,
-      features: ["AI-generowane", "Dostosowane do czasu", "Personalizowane"],
+      features: [ "Time adjusted", "Personalized"],
     },
   ] as const;
 

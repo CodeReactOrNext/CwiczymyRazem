@@ -86,19 +86,19 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
   const mainNavigation = [
     {
       id: "profile" as NavPagesTypes,
-      name: "Profil",
+      name: "Profile",
       href: "/",
       icon: <User size={18} />,
     },
     {
       id: "timer" as NavPagesTypes,
-      name: "Ćwicz",
+      name: "Practice",
       href: "/timer",
       icon: <Timer size={18} />,
     },
     {
       id: "report" as NavPagesTypes,
-      name: "Raporty",
+      name: "Reports",
       href: "/report",
       icon: <FileText size={18} />,
     },
@@ -108,25 +108,25 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
   const profileSections = [
     {
       id: "activity",
-      name: "Aktywność",
+      name: "Activity",
       href: "/profile/activity",
       icon: <Activity size={16} />,
     },
     {
       id: "skills",
-      name: "Umiejętności",
+      name: "Skills",
       href: "/profile/skills",
       icon: <Brain size={16} />,
     },
     {
       id: "exercises",
-      name: "Ćwiczenia",
+      name: "Exercises",
       href: "/profile/exercises",
       icon: <Dumbbell size={16} />,
     },
     {
       id: "songs" as NavPagesTypes,
-      name: "Utwory",
+      name: "Songs",
       href: "/songs",
       icon: <Music size={16} />,
     },
@@ -142,13 +142,13 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
     },
     {
       id: "seasons" as NavPagesTypes,
-      name: "Sezony",
+      name: "Seasons",
       href: "/seasons",
       icon: <Calendar size={16} />,
     },
     {
       id: "settings" as NavPagesTypes,
-      name: "Ustawienia",
+      name: "Settings",
       href: "/settings",
       icon: <Settings size={16} />,
     },
@@ -181,7 +181,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             </div>
             <div>
               <h2 className='text-sm font-semibold text-white'>
-                Ćwiczymy Razem
+                Practice Together
               </h2>
               <p className='text-xs text-zinc-400'>Guitar Learning</p>
             </div>
@@ -249,7 +249,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
           {/* Profile Section */}
           <div>
             <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-              Profil
+              Profile
             </div>
             <div className='space-y-1'>
               {profileSections.map(({ id, name, href, icon }) => {
@@ -286,7 +286,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
           {/* Other Section */}
           <div>
             <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-              Inne
+              Other
             </div>
             <div className='space-y-1'>
               {otherSections.map(({ id, name, href, icon }) => {
@@ -348,7 +348,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                   </div>
                   <div>
                     <h2 className='text-sm font-semibold text-white'>
-                      Ćwiczymy Razem
+                      Practice Together
                     </h2>
                     <p className='text-xs text-zinc-400'>Guitar Learning</p>
                   </div>
@@ -426,7 +426,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                 {/* Profile Section */}
                 <div>
                   <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-                    Profil
+                    Profile
                   </div>
                   <div className='space-y-1'>
                     {profileSections.map(({ id, name, href, icon }) => {
@@ -466,7 +466,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                 {/* Other Section */}
                 <div>
                   <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-                    Inne
+                    Other
                   </div>
                   <div className='space-y-1'>
                     {otherSections.map(({ id, name, href, icon }) => {

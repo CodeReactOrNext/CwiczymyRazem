@@ -37,6 +37,7 @@ import { MdSchool, MdTitle } from "react-icons/md";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
+  convertMsToHM,
   convertMsToHMObject,
   getDateFromPast,
   inputTimeConverter,
@@ -259,6 +260,16 @@ const ReportView = () => {
                     </motion.div>
                   )
                 )}
+              </div>
+              <div className='mt-4 flex justify-end'>
+                <div className='flex items-center rounded-lg border border-white/10 bg-zinc-900/50 px-4 py-2 backdrop-blur-sm'>
+                  <span className='mr-2 text-sm text-zinc-400'>
+                    {t("total_time")}:
+                  </span>
+                  <span className='font-mono text-lg font-bold text-cyan-400'>
+                    {convertMsToHM(getSumTime(values))}
+                  </span>
+                </div>
               </div>
             </div>
 

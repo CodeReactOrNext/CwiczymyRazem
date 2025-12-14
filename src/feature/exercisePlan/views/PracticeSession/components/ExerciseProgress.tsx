@@ -28,10 +28,10 @@ export const ExerciseProgress = ({
           <div className='flex items-center gap-4'>
             <div>
               <h3 className='text-sm font-medium text-white'>
-                Ćwiczenie {currentExerciseIndex + 1}/{plan.exercises.length}
+                Exercise {currentExerciseIndex + 1}/{plan.exercises.length}
               </h3>
               <p className='text-xs text-zinc-400'>
-                {Math.round(progressPercentage)}% ukończone
+                {Math.round(progressPercentage)}% completed
               </p>
             </div>
           </div>
@@ -82,7 +82,7 @@ export const ExerciseProgress = ({
             <div className='font-mono text-sm font-medium text-white'>
               {formattedTimeLeft}
             </div>
-            <div className='text-xs text-zinc-400'>pozostało</div>
+            <div className='text-xs text-zinc-400'>remaining</div>
           </div>
         </div>
       </div>

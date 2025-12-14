@@ -8,7 +8,7 @@ import { FaCheck, FaClock } from "react-icons/fa";
 interface ExerciseCardProps {
   exercise: Exercise;
   isSelected: boolean;
-  currentLang: "pl" | "en";
+  /* Removed currentLang */
   onToggle: (exercise: Exercise) => void;
 }
 
@@ -16,7 +16,7 @@ export const ExerciseCard = ({
   exercise,
   isSelected,
   onToggle,
-  currentLang,
+  /* Removed currentLang */
 }: ExerciseCardProps) => {
   const { t } = useTranslation(["common"]);
 
@@ -39,9 +39,9 @@ export const ExerciseCard = ({
             <FaCheck className='h-4 w-4 text-primary' />
           </div>
         )}
-        <h3 className='font-medium'>{exercise.title[currentLang]}</h3>
+        <h3 className='font-medium'>{exercise.title.en}</h3>
         <p className='mt-1 text-sm text-muted-foreground'>
-          {exercise.description[currentLang]}
+          {exercise.description.en}
         </p>
         <div className='mb-4 mt-4 flex flex-wrap items-center gap-2'>
           <Badge variant='secondary'>
