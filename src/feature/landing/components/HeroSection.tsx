@@ -34,15 +34,7 @@ export const HeroSection = () => {
 
         <div className='max-w-2xl lg:max-w-3xl'>
           {/* Brand Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className='inline-flex items-center rounded-full border border-zinc-800 bg-zinc-900/80 px-4 py-2 mb-8'>
-            <span className='flex h-2 w-2 rounded-full bg-cyan-500 mr-2 animate-pulse'></span>
-            <span className='text-zinc-300 font-medium text-sm'>Practice Together</span>
-            <span className='ml-2 text-xs text-zinc-500'>Guitar Learning</span>
-          </motion.div>
+
 
           {/* Headline */}
           <motion.h1

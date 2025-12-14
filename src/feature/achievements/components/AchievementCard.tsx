@@ -15,7 +15,7 @@ export const AchievementCard = ({ id }: { id: AchievementList }) => {
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-100, 100], [45, -45]);
+  const rotateX = useTransform(y, [-100, 100], [20, -20]);
   const rotateY = useTransform(x, [-100, 100], [-45, 45]);
 
   // const [cssVars, setCssVars] = useState<React.CSSProperties>({}); // REMOVED for performance
@@ -42,7 +42,7 @@ export const AchievementCard = ({ id }: { id: AchievementList }) => {
     
     // Move background twice as fast for parallax feel
     const backgroundX = 50 + (xPct - 0.5) * 100; 
-    const backgroundY = 50 + (yPct - 0.5) * 100;
+    const backgroundY = 50 + (yPct - 0.5) * 15;
 
     ref.current.style.setProperty("--pointer-x", `${pointerX}%`);
     ref.current.style.setProperty("--pointer-y", `${pointerY}%`);

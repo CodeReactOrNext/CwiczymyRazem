@@ -4,13 +4,15 @@ import { Brain, Timer, Clock, Zap, BarChart3, TrendingUp, Music2, BookOpen } fro
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { AchievementCard } from "feature/achievements/components/AchievementCard";
 import { MiniTrendChart } from "feature/profile/components/MiniTrendChart";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 
 export const FeaturesSection = () => {
   const skillCategories = [
-    { name: 'Technique', time: '00:00', percent: '50%', color: 'border-red-500/50 text-red-400', dot: 'bg-red-500' },
-    { name: 'Theory', time: '00:00', percent: '49%', color: 'border-blue-500/50 text-blue-400', dot: 'bg-blue-500', active: true },
-    { name: 'Hearing', time: '00:00', percent: '0%', color: 'border-teal-500/50 text-teal-400', dot: 'bg-teal-500' },
-    { name: 'Creative work', time: '00:00', percent: '0%', color: 'border-purple-500/50 text-purple-400', dot: 'bg-purple-500' },
+    { name: 'Technique', time: '12:30', percent: '50%', color: 'border-red-500/50 text-red-400', dot: 'bg-red-500', active: true },
+    { name: 'Theory', time: '45:00', percent: '49%', color: 'border-blue-500/50 text-blue-400', dot: 'bg-blue-500' },
+    { name: 'Hearing', time: '20:15', percent: '0%', color: 'border-teal-500/50 text-teal-400', dot: 'bg-teal-500' },
+    { name: 'Creative work', time: '10:00', percent: '0%', color: 'border-purple-500/50 text-purple-400', dot: 'bg-purple-500' },
   ];
 
   const stats = [
@@ -24,6 +26,86 @@ export const FeaturesSection = () => {
     { name: 'Creativity', percent: 2, time: '53h 52m', color: 'bg-purple-500' },
     { name: 'Hearing', percent: 90, time: '2423h 58m', color: 'bg-teal-500' },
   ];
+
+  const MOCK_SONGS = [
+    {
+      id: "1",
+      title: "Master of Puppets",
+      artist: "Metallica",
+      difficulties: Array(124).fill({ rating: 10 }),
+      status: "learning"
+    },
+    {
+      id: "2",
+      title: "Time",
+      artist: "Pink Floyd",
+      difficulties: Array(45).fill({ rating: 4 }),
+      status: "wantToLearn"
+    },
+    {
+      id: "7",
+      title: "Tornado of Souls",
+      artist: "Megadeth",
+      difficulties: Array(89).fill({ rating: 9 }),
+      status: "learned"
+    },
+    {
+      id: "3",
+      title: "Stairway to Heaven",
+      artist: "Led Zeppelin",
+      difficulties: Array(230).fill({ rating: 7 }),
+      status: "learned"
+    },
+    {
+      id: "8",
+      title: "Nothing Else Matters",
+      artist: "Metallica",
+      difficulties: Array(15).fill({ rating: 2 }),
+      status: "learning"
+    },
+    {
+      id: "4",
+      title: "Sweet Child O' Mine",
+      artist: "Guns N' Roses",
+      difficulties: Array(67).fill({ rating: 7 }),
+      status: "learning"
+    },
+    {
+      id: "9",
+      title: "Eruption",
+      artist: "Van Halen",
+      difficulties: Array(12).fill({ rating: 10 }),
+      status: "wantToLearn"
+    },
+    {
+      id: "5",
+      title: "Comfortably Numb",
+      artist: "Pink Floyd",
+      difficulties: Array(56).fill({ rating: 8 }),
+      status: "wantToLearn"
+    },
+    {
+      id: "6",
+      title: "Paranoid",
+      artist: "Black Sabbath",
+      difficulties: Array(34).fill({ rating: 4 }),
+      status: "learned"
+    }
+  ];
+
+  const [startIndex, setStartIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setStartIndex((prev) => (prev + 1) % MOCK_SONGS.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const visibleSongs = [];
+  for (let i = 0; i < 3; i++) {
+    visibleSongs.push(MOCK_SONGS[(startIndex + i) % MOCK_SONGS.length]);
+  }
 
   return (
     <section id='features' className='relative py-24 sm:py-32 bg-[#0d0d0c] overflow-hidden'>
@@ -56,7 +138,7 @@ export const FeaturesSection = () => {
                     <div className='absolute inset-0 rounded-full bg-cyan-500/10 blur-xl'></div>
                     <div className='absolute inset-4 rounded-full border-4 border-cyan-500/30 bg-zinc-950 flex items-center justify-center'>
                       <div className='text-center'>
-                        <div className='text-6xl font-mono font-bold text-white tracking-tight'>0:03</div>
+                        <div className='text-6xl font-mono font-bold text-white tracking-tight'>12:30</div>
                         <div className='text-sm text-cyan-500 mt-2 font-medium uppercase tracking-widest'>Technique</div>
                       </div>
                     </div>
@@ -236,41 +318,35 @@ export const FeaturesSection = () => {
                     <h4 className="font-semibold text-xl text-white">Song Library</h4>
                   </div>
                   
-                  <div className="grid gap-6">
-                     {/* MOCK SONG CARD 1 */}
-                     <div className="transform hover:scale-[1.02] transition-transform duration-300">
-                       <SongCard 
-                         song={{
-                           id: "1",
-                           title: "Master of Puppets",
-                           artist: "Metallica",
-                           difficulties: [{ rating: 9 }, { rating: 10 }, { rating: 9 }, { rating: 10 }] as any,
-                           createdAt: {} as any,
-                           createdBy: "1"
-                         }}
-                         status="learning"
-                         readonly={true}
-                         onStatusChange={() => {}}
-                         onRatingChange={() => {}}
-                       />
-                     </div>
-                     {/* MOCK SONG CARD 2 */}
-                     <div className="transform hover:scale-[1.02] transition-transform duration-300">
-                       <SongCard 
-                         song={{
-                           id: "2",
-                           title: "Time",
-                           artist: "Pink Floyd",
-                           difficulties: [{ rating: 4 }, { rating: 5 }, { rating: 3 }, { rating: 4 }] as any,
-                           createdAt: {} as any,
-                           createdBy: "1"
-                         }}
-                         status="wantToLearn"
-                         readonly={true}
-                         onStatusChange={() => {}}
-                         onRatingChange={() => {}}
-                       />
-                     </div>
+                  <div className="h-[750px] overflow-hidden relative flex flex-col gap-4 p-4 [mask-image:linear-gradient(to_bottom,black_80%,transparent)]">
+                     <AnimatePresence mode='popLayout'>
+                        {visibleSongs.map((song) => (
+                           <motion.div
+                              key={song.id}
+                              layout
+                              initial={{ opacity: 0, x: -50, scale: 0.9 }}
+                              animate={{ opacity: 1, x: 0, scale: 1 }}
+                              exit={{ opacity: 0, x: 50, scale: 0.9 }}
+                              transition={{ duration: 0.6, ease: "easeInOut" }}
+                              className="transform"
+                           >
+                              <SongCard 
+                                 song={{
+                                    id: song.id,
+                                    title: song.title,
+                                    artist: song.artist,
+                                    difficulties: song.difficulties,
+                                    createdAt: {} as any,
+                                    createdBy: "1"
+                                 }}
+                                 status={song.status as any}
+                                 readonly={true}
+                                 onStatusChange={() => {}}
+                                 onRatingChange={() => {}}
+                              />
+                           </motion.div>
+                        ))}
+                     </AnimatePresence>
                   </div>
                </div>
 
@@ -283,7 +359,7 @@ export const FeaturesSection = () => {
                     <h4 className="font-semibold text-xl text-white">Recent Achievements</h4>
                   </div>
                   
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-5 p-6 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm mb-12">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-x-5 gap-y-10 p-6 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm mb-12">
                      {/* REAL ACHIEVEMENT COMPONENTS */}
                      <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="lvl100" /></div>
                      <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="fireSession" /></div>
