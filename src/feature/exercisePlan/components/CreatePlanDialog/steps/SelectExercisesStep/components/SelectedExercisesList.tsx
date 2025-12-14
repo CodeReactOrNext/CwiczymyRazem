@@ -4,13 +4,13 @@ import { FaClock, FaTimes } from "react-icons/fa";
 
 interface SelectedExercisesListProps {
   selectedExercises: Exercise[];
-  currentLang: "pl" | "en";
+  /* Removed currentLang */
   onToggleExercise: (exercise: Exercise) => void;
 }
 
 export const SelectedExercisesList = ({
   selectedExercises,
-  currentLang,
+  /* Removed currentLang */
   onToggleExercise,
 }: SelectedExercisesListProps) => {
   const { t } = useTranslation(["exercises"]);
@@ -48,7 +48,7 @@ export const SelectedExercisesList = ({
             key={exercise.id}
             className='group flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-sm'>
             <span className='max-w-[150px] truncate'>
-              {exercise.title[currentLang]}
+              {exercise.title.en}
             </span>
             <div className='flex min-w-[60px] items-center gap-1 text-muted-foreground'>
               <FaClock className='h-3 w-3' />

@@ -38,22 +38,22 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
       // Jeśli nie ma danych, zwróć domyślne wartości
       return [
         {
-          name: t("categories.technique", "Technika"),
+          name: t("categories.technique", "Technique"),
           percent: 25,
           color: "#ef4444",
         },
         {
-          name: t("categories.theory", "Teoria"),
+          name: t("categories.theory", "Theory"),
           percent: 25,
           color: "#3b82f6",
         },
         {
-          name: t("categories.creativity", "Kreatywność"),
+          name: t("categories.creativity", "Creativity"),
           percent: 25,
           color: "#8b5cf6",
         },
         {
-          name: t("categories.hearing", "Słuch"),
+          name: t("categories.hearing", "Hearing"),
           percent: 25,
           color: "#10b981",
         },
@@ -63,22 +63,22 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
     // Oblicz procent dla każdej umiejętności na podstawie czasu
     const skillsData: Skill[] = [
       {
-        name: t("categories.technique", "Technika"),
+        name: t("categories.technique", "Technique"),
         percent: Math.round((statistics.time.technique / totalTime) * 100),
         color: "#ef4444", // Red-500 - vibrant red for technique
       },
       {
-        name: t("categories.theory", "Teoria"),
+        name: t("categories.theory", "Theory"),
         percent: Math.round((statistics.time.theory / totalTime) * 100),
         color: "#3b82f6", // Blue-500 - vibrant blue for theory
       },
       {
-        name: t("categories.creativity", "Kreatywność"),
+        name: t("categories.creativity", "Creativity"),
         percent: Math.round((statistics.time.creativity / totalTime) * 100),
         color: "#8b5cf6", // Violet-500 - vibrant purple for creativity
       },
       {
-        name: t("categories.hearing", "Słuch"),
+        name: t("categories.hearing", "Hearing"),
         percent: Math.round((statistics.time.hearing / totalTime) * 100),
         color: "#10b981", // Emerald-500 - vibrant green for hearing
       },
@@ -148,7 +148,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
         <div className='relative flex items-center justify-between'>
           <div className='flex items-center gap-3'>
             <span className='text-base font-semibold text-zinc-300'>
-              Całkowity czas ćwiczeń
+              Total Practice Time
             </span>
           </div>
           <div className='text-right'>

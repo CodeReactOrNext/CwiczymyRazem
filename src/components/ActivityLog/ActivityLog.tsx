@@ -50,7 +50,7 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
     <Card className="relative w-full overflow-hidden rounded-xl">
       <div className="relative">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-white">Aktywność</h3>
+          <h3 className="text-xl font-semibold text-white">Activity</h3>
 
           <div className="flex gap-1 rounded-lg bg-white/10 p-1">
             {yearButtons.map((yearValue) => (

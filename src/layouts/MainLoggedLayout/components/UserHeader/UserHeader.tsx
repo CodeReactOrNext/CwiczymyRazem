@@ -3,8 +3,6 @@ import { Badge } from "assets/components/ui/badge";
 import { Separator } from "assets/components/ui/separator";
 import { Progress } from "assets/components/ui/progress";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
-import { LevelBar } from "components/LevelBar/LevelBar";
-import { LanguageSwitch } from "components/UI";
 import UserNav from "components/UserNav";
 import { WelcomeMessage } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/WelcomeMessage";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -99,8 +97,6 @@ export const UserHeader = ({
 
             <div className='flex items-center gap-2'>
               <UserNav />
-              <Separator orientation='vertical' className='h-6 bg-white/10' />
-              <LanguageSwitch />
             </div>
           </div>
         </div>

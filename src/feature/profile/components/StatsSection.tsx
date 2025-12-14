@@ -251,12 +251,10 @@ export const StatsSection = ({
               <h3 className='text-lg font-semibold text-white'>
                 Seasonal Achievements
               </h3>
-              <span className='rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/70'>
-                {achievements?.length || 0}
-              </span>
+           
             </div>
             <p className='text-sm text-zinc-400'>
-              Special seasonal prizes and trophies
+          z    Special seasonal prizes and trophies
             </p>
           </div>
           <div className='text-white/60 transition-colors duration-200 group-hover:text-white'>

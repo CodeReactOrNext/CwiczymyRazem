@@ -174,5 +174,10 @@
     "creativity": "Kreatywność",
     "hearing": "Słuch"
   },
-  "minutes": "minut"
+  "minutes": "minut",
+  "details": "Szczegóły",
+  "timer_status": {
+    "active": "Aktywne",
+    "paused": "Wstrzymane"
+  }
 }

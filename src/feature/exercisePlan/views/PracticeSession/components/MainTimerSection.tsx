@@ -1,5 +1,6 @@
 import { Card } from "assets/components/ui/card";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 import { ExerciseDescription } from "../../../components/ExerciseDescription";
 import ExerciseControls from "./ExerciseControls";
@@ -32,13 +33,17 @@ export const MainTimerSection = ({
   showExerciseInfo = true,
   variant = "default",
 }: MainTimerSectionProps) => {
+  const { t } = useTranslation(["common"]);
+
   if (variant === "compact") {
     return (
       <div className="flex w-full items-center justify-center gap-6 md:gap-12">
           {/* Compact Timer */}
           <div className="relative shrink-0">
+             {/* Subtle timer glow */}
+             <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-xl transition-all duration-500" style={{ opacity: isPlaying ? 0.6 : 0 }}></div>
              <TimerDisplay
-                value={timeLeft}
+                value={timerProgressValue}
                 text={formattedTimeLeft}
                 isPlaying={isPlaying}
                 size="xs"
@@ -56,11 +61,19 @@ export const MainTimerSection = ({
                   variant="centered"
                 />
                
-               {/* Status Pill (Compact) */}
-               <div className={`hidden md:flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 ${isPlaying ? "border-emerald-500/20 bg-emerald-500/10" : "border-amber-500/20 bg-amber-500/10"}`}>
-                   <div className={`h-1.5 w-1.5 rounded-full ${isPlaying ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
-                   <span className={`text-[10px] uppercase tracking-wider font-bold ${isPlaying ? "text-emerald-400" : "text-amber-400"}`}>
-                        {isPlaying ? "ON" : "PAUSED"}
+               {/* Status Pill (Compact) - Refined */}
+               <div className={`hidden md:flex items-center gap-2 rounded-full border px-3 py-1 transition-colors ${
+                   isPlaying 
+                     ? "border-cyan-500/20 bg-cyan-500/10" 
+                     : "border-zinc-700/50 bg-zinc-800/50"
+               }`}>
+                   <div className={`h-1.5 w-1.5 rounded-full shadow-[0_0_8px_currentColor] transition-all ${
+                       isPlaying ? "bg-cyan-400 animate-pulse" : "bg-zinc-500"
+                   }`} />
+                   <span className={`text-[10px] uppercase tracking-wider font-bold transition-colors ${
+                       isPlaying ? "text-cyan-400" : "text-zinc-500"
+                   }`}>
+                        {isPlaying ? t("common:timer_status.active") : t("common:timer_status.paused")}
                    </span>
                </div>
           </div>
@@ -103,7 +116,7 @@ export const MainTimerSection = ({
                 {/* Subtle glow for timer importance */}
                 <div className='via-cyan-500/8 absolute inset-0 rounded-full bg-gradient-to-r from-transparent to-transparent blur-xl'></div>
                 <TimerDisplay
-                  value={timeLeft}
+                  value={timerProgressValue}
                   text={formattedTimeLeft}
                   isPlaying={isPlaying}
                   size='lg'
@@ -126,19 +139,23 @@ export const MainTimerSection = ({
               </motion.div>
 
               {/* TERTIARY: Status indicator - least important */}
-              <div className='flex items-center gap-2 rounded-full border border-zinc-700/30 bg-zinc-800/40 px-3 py-1.5'>
+              <div className={`flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors ${
+                  isPlaying 
+                    ? "border-cyan-500/20 bg-cyan-500/10" 
+                    : "border-zinc-700/30 bg-zinc-800/40"
+              }`}>
                 <div
-                  className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                  className={`h-2 w-2 rounded-full shadow-[0_0_8px_currentColor] transition-all duration-300 ${
                     isPlaying
-                      ? "animate-pulse bg-emerald-400 shadow-sm shadow-emerald-400/50"
-                      : "bg-amber-400 shadow-sm shadow-amber-400/30"
+                      ? "animate-pulse bg-cyan-400"
+                      : "bg-zinc-500"
                   }`}
                 />
                 <span
                   className={`text-xs font-medium ${
-                    isPlaying ? "text-emerald-300" : "text-amber-300"
+                    isPlaying ? "text-cyan-300" : "text-zinc-400"
                   }`}>
-                  {isPlaying ? "Aktywne" : "Wstrzymane"}
+                  {isPlaying ? t("common:timer_status.active") : t("common:timer_status.paused")}
                 </span>
               </div>
             </div>

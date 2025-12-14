@@ -114,13 +114,13 @@ const ProfileLayout = ({
                     <div className='flex items-center gap-2 text-sm text-zinc-300'>
                       <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
                       <span>
-                        Dołączył: {createdAt.toDate().toLocaleDateString()}
+                        Joined: {createdAt.toDate().toLocaleDateString()}
                       </span>
                     </div>
                     {yearsOfPlaying && yearsOfPlaying > 0 && (
                       <div className='flex items-center gap-2 text-sm text-zinc-300'>
                         <div className='h-2 w-2 rounded-full bg-green-400'></div>
-                        <span>Gra od {yearsOfPlaying} lat</span>
+                        <span>Playing for {yearsOfPlaying} years</span>
                       </div>
                     )}
                   </div>
@@ -156,7 +156,7 @@ const ProfileLayout = ({
               {/* Enhanced Level Bar */}
               <div className='rounded-xl border border-zinc-700/30 bg-zinc-800/20 p-6 backdrop-blur-sm'>
                 <h3 className='mb-4 text-lg font-semibold text-white'>
-                  Postęp poziomu
+                  Level Progress
                 </h3>
                 <LevelBar
                   points={statistics.points}
@@ -178,7 +178,7 @@ const ProfileLayout = ({
           {/* Stats Section - 2/3 width */}
           <div className='lg:col-span-2'>
             <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
-              <h2 className='mb-6 text-2xl font-bold text-white'>Statystyki</h2>
+              <h2 className='mb-6 text-2xl font-bold text-white'>Statistics</h2>
               <StatsSection
                 statsField={statsField}
                 statistics={statistics}
@@ -192,7 +192,7 @@ const ProfileLayout = ({
           {/* Achievements - 1/3 width */}
           <div className='space-y-6'>
             <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
-              <h2 className='mb-6 text-xl font-bold text-white'>Osiągnięcia</h2>
+              <h2 className='mb-6 text-xl font-bold text-white'>Achievements</h2>
               <AchievementWrapper userAchievements={achievements} />
             </div>
           </div>
@@ -201,7 +201,7 @@ const ProfileLayout = ({
         {/* Skills Section */}
         {userSkills && (
           <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
-            <h2 className='mb-6 text-2xl font-bold text-white'>Umiejętności</h2>
+            <h2 className='mb-6 text-2xl font-bold text-white'>Skills</h2>
             <SkillTreeCards isUserProfile userSkills={userSkills} />
           </div>
         )}
@@ -209,7 +209,7 @@ const ProfileLayout = ({
         {/* Activity Log */}
         <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
           <h2 className='mb-6 text-2xl font-bold text-white'>
-            Ostatnia aktywność
+            Recent Activity
           </h2>
           <ActivityLog userAuth={userAuth} />
         </div>

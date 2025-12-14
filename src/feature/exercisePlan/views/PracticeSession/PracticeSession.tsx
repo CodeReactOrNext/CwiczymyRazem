@@ -139,8 +139,9 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
             actions={
               <Button
                 variant='ghost'
+                size='sm'
                 onClick={onFinish}
-                className='text-zinc-500 hover:text-white hover:bg-white/10'>
+                className='rounded-full border border-white/5 bg-zinc-900/50 px-4 text-xs font-medium text-zinc-400 backdrop-blur-md transition-all hover:border-white/20 hover:bg-white/10 hover:text-white'>
                 {t("common:finish")}
               </Button>
             }
@@ -275,7 +276,7 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                          <div className="hidden lg:block">
                             <Button
                                 size="lg"
-                                className="h-14 px-8 rounded-2xl bg-white text-black hover:bg-zinc-200 font-bold text-base shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all hover:scale-105"
+                                className="h-14 min-w-[140px] px-8 rounded-2xl bg-cyan-500 text-black font-bold text-base shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 hover:bg-cyan-400 hover:shadow-cyan-500/40"
                                 onClick={() => handleNextExercise(resetTimer)}
                             >
                                 {isLastExercise ? (

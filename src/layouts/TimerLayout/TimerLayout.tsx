@@ -341,7 +341,7 @@ const TimerLayout = ({
   };
 
   return (
-    <MainContainer title={"Ćwicz"}>
+    <MainContainer title={"Practice"}>
       <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
         <Card>
           <div className='flex flex-col sm:flex-row'>
@@ -363,7 +363,7 @@ const TimerLayout = ({
                 <div className='flex items-center gap-2'>
                   <BlinkingDot isActive={timerEnabled} />
                   <span className=' font-medium text-white sm:text-base'>
-                    {chosenSkill ? getSkillName(chosenSkill) : "Nie wybrano"}
+                    {chosenSkill ? getSkillName(chosenSkill) : "Not selected"}
                   </span>
                 </div>
               </div>

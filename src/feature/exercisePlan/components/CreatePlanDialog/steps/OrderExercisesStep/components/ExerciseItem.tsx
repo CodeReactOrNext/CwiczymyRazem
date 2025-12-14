@@ -29,8 +29,8 @@ export const ExerciseItem = ({
   onMoveUp,
   onMoveDown,
 }: ExerciseItemProps) => {
-  const { t, i18n } = useTranslation(["exercises", "common"]);
-  const currentLang = i18n.language as "pl" | "en";
+  const { t } = useTranslation(["exercises", "common"]);
+  /* Removed currentLang logic */
 
   const handleMoveUp = () => onMoveUp(index);
   const handleMoveDown = () => onMoveDown(index);
@@ -70,7 +70,7 @@ export const ExerciseItem = ({
 
         <div className='flex-1'>
           <div className='flex flex-col items-start justify-between gap-2 md:flex-row md:items-center'>
-            <h3 className='font-medium'>{exercise.title[currentLang]}</h3>
+            <h3 className='font-medium'>{exercise.title.en}</h3>
             <div className='flex items-center gap-2'>
               <div className='flex items-center gap-1 text-sm text-muted-foreground'>
                 <FaClock className='h-3 w-3' />
@@ -82,7 +82,7 @@ export const ExerciseItem = ({
             </div>
           </div>
           <p className='mt-4 text-sm text-muted-foreground md:mt-1'>
-            {exercise.description[currentLang]}
+            {exercise.description.en}
           </p>
         </div>
       </div>

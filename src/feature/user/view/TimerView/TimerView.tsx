@@ -84,11 +84,11 @@ const TimerView = () => {
     if (timer.timerEnabled && chosenSkill) {
       document.title = `${convertMsToHMS(timer.time)} - ${t(chosenSkill)}`;
     } else {
-      document.title = "Timer - Ćwiczymy Razem";
+      document.title = "Timer - Practice Together";
     }
 
     return () => {
-      document.title = "Ćwiczymy Razem";
+      document.title = "Practice Together";
     };
   }, [timer.time, timer.timerEnabled, chosenSkill, t]);
 

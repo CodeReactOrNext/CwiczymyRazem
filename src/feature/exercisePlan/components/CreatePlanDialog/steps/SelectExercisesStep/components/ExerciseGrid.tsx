@@ -5,14 +5,14 @@ interface ExerciseGridProps {
   exercises: Exercise[];
   selectedExercises: Exercise[];
   onToggleExercise: (exercise: Exercise) => void;
-  currentLang: "pl" | "en";
+  /* Removed currentLang */
 }
 
 export const ExerciseGrid = ({
   exercises,
   selectedExercises,
   onToggleExercise,
-  currentLang,
+  /* Removed currentLang */
 }: ExerciseGridProps) => {
   return (
     <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
@@ -27,7 +27,7 @@ export const ExerciseGrid = ({
             exercise={exercise}
             isSelected={isSelected}
             onToggle={onToggleExercise}
-            currentLang={currentLang}
+            /* Removed currentLang */
           />
         );
       })}
