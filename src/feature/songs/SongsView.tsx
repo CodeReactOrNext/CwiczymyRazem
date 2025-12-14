@@ -59,18 +59,12 @@ const SongsView = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
           {/* Enhanced Tab Navigation */}
           <div className='mb-8 lg:mb-12'>
-            <TabsList className='grid h-16 w-full grid-cols-2 rounded-2xl border border-white/5 bg-zinc-900/60 p-1.5 backdrop-blur-xl'>
-              <TabsTrigger
-                value='management'
-                className='flex h-full w-full items-center justify-center gap-3 rounded-xl border border-transparent px-6 text-sm font-bold text-zinc-400 transition-all duration-300 data-[state=active]:border-cyan-500/30 data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-300 data-[state=active]:shadow-lg data-[state=active]:shadow-cyan-500/10 hover:bg-zinc-800/50 hover:text-zinc-200'>
-                <Library size={20} />
-                <span>Management</span>
+            <TabsList className='grid w-full grid-cols-2'>
+              <TabsTrigger value='management'>
+                Management
               </TabsTrigger>
-              <TabsTrigger
-                value='table'
-                className='flex h-full w-full items-center justify-center gap-3 rounded-xl border border-transparent px-6 text-sm font-bold text-zinc-400 transition-all duration-300 data-[state=active]:border-purple-500/30 data-[state=active]:bg-purple-500/10 data-[state=active]:text-purple-300 data-[state=active]:shadow-lg data-[state=active]:shadow-purple-500/10 hover:bg-zinc-800/50 hover:text-zinc-200'>
-                <Grid size={20} />
-                <span>Library</span>
+              <TabsTrigger value='table'>
+                Library
               </TabsTrigger>
             </TabsList>
           </div>
