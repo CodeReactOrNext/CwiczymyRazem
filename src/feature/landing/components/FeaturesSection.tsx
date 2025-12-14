@@ -305,7 +305,7 @@ export const FeaturesSection = () => {
 
             <div className="text-center mb-16 relative z-10">
                <h3 className="text-2xl font-bold text-white mb-2">Songs & Achievements</h3>
-               <p className="text-zinc-400">Master your favorite tracks and earn rewards for your dedication.</p>
+               <p className="text-zinc-400">Master your favorite tracks and add them to your library.</p>
             </div>
 
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-start relative z-10'>
