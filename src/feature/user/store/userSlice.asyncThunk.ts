@@ -4,7 +4,8 @@ import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateSoundCloudL
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
-import { doc, getDoc,updateDoc } from "firebase/firestore";
+import { GoogleAuthProvider } from "firebase/auth";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import type {
   FetchedReportDataInterface,
   updateSocialInterface,
@@ -21,6 +22,7 @@ import {
   firebaseReauthenticateUser,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
+  firebaseSignInWithCredential,
 } from "utils/firebase/client/firebase.utils";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 
@@ -51,6 +53,21 @@ export const logInViaGoogle = createAsyncThunk(
   async () => {
     try {
       const { user } = await firebaseSignInWithGooglePopup();
+      const userData = await fetchUserData(user);
+      return userData as UserDataInterface;
+    } catch (error) {
+      loginViaGoogleErrorHandler(error as FirebaseError);
+      return Promise.reject();
+    }
+  }
+);
+
+export const logInViaGoogleCredential = createAsyncThunk(
+  "user/logInViaGoogleCredential",
+  async (credentialId: string) => {
+    try {
+      const credential = GoogleAuthProvider.credential(credentialId);
+      const { user } = await firebaseSignInWithCredential(credential);
       const userData = await fetchUserData(user);
       return userData as UserDataInterface;
     } catch (error) {

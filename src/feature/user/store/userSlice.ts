@@ -17,6 +17,7 @@ import {
   getUserProvider,
   logInViaEmail,
   logInViaGoogle,
+  logInViaGoogleCredential,
   logUserOff,
   restartUserStats,
   updateUserEmail,
@@ -94,6 +95,9 @@ export const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(logInViaGoogle.pending, (state) => {
+        state.isFetching = "google";
+      })
+      .addCase(logInViaGoogleCredential.pending, (state) => {
         state.isFetching = "google";
       })
       .addCase(logInViaEmail.pending, (state) => {
@@ -174,6 +178,7 @@ export const userSlice = createSlice({
           uploadUserAvatar.rejected,
           logInViaEmail.rejected,
           logInViaGoogle.rejected,
+          logInViaGoogleCredential.rejected,
           createAccount.rejected,
           uploadUserSocialData.rejected
         ),
@@ -184,6 +189,7 @@ export const userSlice = createSlice({
       .addMatcher(
         isAnyOf(
           logInViaGoogle.fulfilled,
+          logInViaGoogleCredential.fulfilled,
           logInViaEmail.fulfilled,
           createAccount.fulfilled,
           autoLogIn.fulfilled
