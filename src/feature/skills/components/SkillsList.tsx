@@ -22,18 +22,6 @@ export const SkillsList = ({
     (skill) => (userSkills.unlockedSkills[skill.id] || 0) > 0
   );
 
-  if (unlockedSkills.length === 0) {
-    return (
-      <div className='rounded-md border border-second-400/30 bg-second-500/20 p-3 text-center'>
-        <p className='text-sm text-gray-300'>
-          {t("no_skills_unlocked", {
-            category: t(`categories.${category}`),
-          })}
-        </p>
-        <p className='mt-1 text-xs text-gray-400'>{t("unlock_skills_hint")}</p>
-      </div>
-    );
-  }
 
   const getCategoryColor = () => {
     switch (category) {

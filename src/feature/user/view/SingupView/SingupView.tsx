@@ -77,7 +77,7 @@ const SingupView = () => {
               href='/login'
               className='group inline-flex items-center gap-2 text-sm text-zinc-400 transition-all duration-300 hover:text-cyan-400'>
               <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-              Powrót do logowania
+              {t("signup:back_to_login")}
             </Link>
           </motion.div>
 
@@ -101,10 +101,10 @@ const SingupView = () => {
                  </div>
              </div>
              <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
-               Dołącz do nas
+               {t("signup:title")}
              </h1>
              <p className="text-zinc-400 text-sm">
-               Stwórz konto i rozpocznij swoją podróż
+               {t("signup:subtitle")}
              </p>
           </div>
 
@@ -121,7 +121,7 @@ const SingupView = () => {
                         <Label
                           htmlFor='login'
                           className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
-                          Nazwa użytkownika
+                          {t("signup:username_label")}
                         </Label>
                         <div className='relative group'>
                           <User className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
@@ -132,7 +132,7 @@ const SingupView = () => {
                             value={values.login}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            placeholder='Twój nick'
+                            placeholder={t("signup:username_placeholder")}
                             className='pl-10 h-10 bg-zinc-900/50 border-white/10 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all duration-200 text-white placeholder:text-zinc-600'
                           />
                         </div>
@@ -148,7 +148,7 @@ const SingupView = () => {
                         <Label
                           htmlFor='email'
                           className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
-                          Email
+                          {t("signup:email_label")}
                         </Label>
                         <div className='relative group'>
                           <Mail className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
@@ -175,7 +175,7 @@ const SingupView = () => {
                          <Label
                           htmlFor='password'
                           className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
-                          Hasło
+                          {t("signup:password_label")}
                         </Label>
 
                     <div className='relative group'>
@@ -213,7 +213,7 @@ const SingupView = () => {
                          <Label
                           htmlFor='repeat_password'
                           className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
-                          Powtórz hasło
+                          {t("signup:repeat_password_label")}
                         </Label>
 
                     <div className='relative group'>
@@ -260,7 +260,7 @@ const SingupView = () => {
                         ) : (
                           <span className="flex items-center gap-2">
                             <CheckCircle className="w-4 h-4" />
-                            Stwórz konto
+                            {t("signup:submit_button")}
                             <ChevronRight className="w-4 h-4" />
                           </span>
                         )}
@@ -275,7 +275,7 @@ const SingupView = () => {
                     <div className="w-full border-t border-white/10"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-zinc-900 px-2 text-zinc-500">lub kontynuuj z</span>
+                    <span className="bg-zinc-900 px-2 text-zinc-500">{t("signup:or_continue_with")}</span>
                 </div>
             </div>
 
@@ -291,18 +291,18 @@ const SingupView = () => {
                   ) : (
                     <FcGoogle className='h-5 w-5' />
                   )}
-                  Google
+                  {t("signup:google_button")}
                 </span>
               </Button>
           </div>
 
           <div className='text-center'>
               <p className='text-sm text-zinc-400'>
-                Masz już konto?{" "}
+                {t("signup:already_have_account")}{" "}
                 <Link
                   href='/login'
                   className='font-bold text-cyan-400 hover:text-cyan-300 transition-colors'>
-                  Zaloguj się
+                  {t("signup:login_link")}
                 </Link>
               </p>
             </div>
