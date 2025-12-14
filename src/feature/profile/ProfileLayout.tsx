@@ -173,29 +173,17 @@ const ProfileLayout = ({
           </div>
         </div>
 
-        {/* Enhanced Stats and Charts Section */}
-        <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
-          {/* Stats Section - 2/3 width */}
-          <div className='lg:col-span-2'>
-            <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
-              <h2 className='mb-6 text-2xl font-bold text-white'>Statistics</h2>
-              <StatsSection
-                statsField={statsField}
-                statistics={statistics}
-                datasWithReports={datasWithReports}
-                userSongs={songs}
-                userAuth={userAuth}
-              />
-            </div>
-          </div>
-
-          {/* Achievements - 1/3 width */}
-          <div className='space-y-6'>
-            <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
-              <h2 className='mb-6 text-xl font-bold text-white'>Achievements</h2>
-              <AchievementWrapper userAchievements={achievements} />
-            </div>
-          </div>
+        {/* Enhanced Stats Section */}
+        <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+          <h2 className='mb-6 text-2xl font-bold text-white'>Statistics</h2>
+          <StatsSection
+            statsField={statsField}
+            statistics={statistics}
+            datasWithReports={datasWithReports}
+            userSongs={songs}
+            userAuth={userAuth}
+            achievements={achievements}
+          />
         </div>
 
         {/* Skills Section */}
@@ -206,13 +194,7 @@ const ProfileLayout = ({
           </div>
         )}
 
-        {/* Activity Log */}
-        <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
-          <h2 className='mb-6 text-2xl font-bold text-white'>
-            Recent Activity
-          </h2>
-          <ActivityLog userAuth={userAuth} />
-        </div>
+
       </div>
     </MainContainer>
   );

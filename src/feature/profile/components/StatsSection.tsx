@@ -95,12 +95,6 @@ export const StatsSection = ({
     <div className='space-y-6'>
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
         <div className='space-y-6 lg:col-span-2'>
-          <div className='relative mb-6'>
-            <h3 className='text-xl font-semibold text-white'>Statistics</h3>
-            <p className='text-xs text-zinc-400'>
-              Most important numbers about your progress
-            </p>
-          </div>
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             {statsWithTrends
               .filter(
@@ -237,7 +231,6 @@ export const StatsSection = ({
           </div>
         </div>
       </div>
-      <ActivityLog userAuth={userAuth} />
 
       <div className='space-y-2'>
         <button
