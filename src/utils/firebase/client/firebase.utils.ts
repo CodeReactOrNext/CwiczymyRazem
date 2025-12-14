@@ -8,6 +8,7 @@ import {
   reauthenticateWithCredential,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithCredential,
   signOut,
 } from "firebase/auth";
 import {
@@ -40,6 +41,9 @@ export const auth = getAuth();
 
 export const firebaseSignInWithGooglePopup = () =>
   signInWithPopup(auth, provider);
+
+export const firebaseSignInWithCredential = (credential: any) =>
+  signInWithCredential(auth, credential);
 
 export const db = getFirestore(firebaseApp);
 export const storage = getStorage(firebaseApp);

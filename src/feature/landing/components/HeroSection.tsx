@@ -6,10 +6,24 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Zap, Calendar, Trophy, Star } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
+import { selectIsFetching } from "feature/user/store/userSlice";
+import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
+import { Loader2 } from "lucide-react";
 
 export const HeroSection = () => {
+  const dispatch = useAppDispatch();
+  const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
+
+  const handleGoogleLogin = () => {
+    dispatch(logInViaGoogle());
+  };
+
   return (
     <section className='relative min-h-screen flex items-center overflow-hidden bg-[#0d0d0c]'>
+      <GoogleOneTap />
       {/* Subtle background gradient */}
       <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/50 via-[#0d0d0c] to-[#0d0d0c]'></div>
       
@@ -96,10 +110,32 @@ export const HeroSection = () => {
               </Button>
             </Link>
             <Link href='#features'>
-              <Button variant="outline" className='h-12 px-8 rounded-xl border-zinc-700 bg-zinc-900/50 text-white hover:bg-zinc-800 font-medium text-base'>
+              <Button variant="outline" className='h-12 px-8 rounded-xl border-zinc-700 bg-zinc-900/50 text-white hover:bg-zinc-800 font-medium text-base w-full sm:w-auto'>
                 See Features
               </Button>
             </Link>
+          </motion.div>
+
+          {/* Google Login Button (Separate Row or distinct) */}
+          <motion.div
+             initial={{ opacity: 0, y: 10 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.5, delay: 0.4 }}
+             className="mt-4 flex justify-start"
+          >
+             <Button
+                onClick={handleGoogleLogin}
+                disabled={isGoogleFetching}
+                variant="outline"
+                className="h-12 px-8 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white transition-all w-full sm:w-auto flex items-center gap-2"
+             >
+                {isGoogleFetching ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <FcGoogle className="h-5 w-5" />
+                )}
+                Continue with Google
+             </Button>
           </motion.div>
         </div>
       </div>
