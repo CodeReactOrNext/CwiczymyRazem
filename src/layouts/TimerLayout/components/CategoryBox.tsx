@@ -15,6 +15,7 @@ interface CategoryBox {
   percent: number;
   timerEnabled: boolean;
   skillColor: string;
+  skillId: string;
   onStart: () => void;
   onStop: () => void;
 }
@@ -27,6 +28,7 @@ const CategoryBox = ({
   onStart,
   onStop,
   skillColor,
+  skillId,
   timerEnabled,
 }: CategoryBox) => {
   const { t } = useTranslation("timer");
@@ -80,37 +82,38 @@ const CategoryBox = ({
   const shadowBlur = shadowIntensity * 2;
 
   const renderCategoryIcon = () => {
-    const lowerTitle = title.toLowerCase();
-    if (lowerTitle.includes("kreatywn")) {
-      return (
-        <CreativityIcon
-          className={`h-5 w-5 ${!chosen ? "text-gray-400" : ""}`}
-          size='large'
-        />
-      );
-    } else if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch")) {
-      return (
-        <HearingIcon
-          className={`h-5 w-5 ${!chosen ? "text-gray-400" : ""}`}
-          size='large'
-        />
-      );
-    } else if (lowerTitle.includes("technik")) {
-      return (
-        <TechniqueIcon
-          className={`h-5 w-5 ${!chosen ? "text-gray-400" : ""}`}
-          size='large'
-        />
-      );
-    } else if (lowerTitle.includes("teori")) {
-      return (
-        <TheoryIcon
-          className={`h-5 w-5 ${!chosen ? "text-gray-400" : ""}`}
-          size='large'
-        />
-      );
+    switch (skillId) {
+      case "creativity":
+        return (
+          <CreativityIcon
+            className={`h-5 w-5 ${!chosen ? "text-gray-400" : ""}`}
+            size='large'
+          />
+        );
+      case "hearing":
+        return (
+          <HearingIcon
+            className={`h-5 w-5 ${!chosen ? "text-gray-400" : ""}`}
+            size='large'
+          />
+        );
+      case "technique":
+        return (
+          <TechniqueIcon
+            className={`h-5 w-5 ${!chosen ? "text-gray-400" : ""}`}
+            size='large'
+          />
+        );
+      case "theory":
+        return (
+          <TheoryIcon
+            className={`h-5 w-5 ${!chosen ? "text-gray-400" : ""}`}
+            size='large'
+          />
+        );
+      default:
+        return null;
     }
-    return null;
   };
 
   const formatTime = () => {

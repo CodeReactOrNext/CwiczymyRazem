@@ -24,10 +24,10 @@ export const SkillCategoryGroup = ({
 
   return (
     <div className="mb-12 last:mb-0">
-      <div className="flex items-center justify-between mb-6 sticky top-0 z-20 bg-[#050505]/80 backdrop-blur-md py-4 border-b border-zinc-900">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sticky top-0 z-20 bg-[#050505]/80 backdrop-blur-md py-4 border-b border-zinc-900">
          <div className="flex items-center gap-3">
              <div className={cn("w-2 h-8 rounded-full", theme.glow)} />
-             <h2 className={cn("text-2xl font-bold uppercase tracking-wider", theme.primary)}>
+             <h2 className={cn("text-xl sm:text-2xl font-bold uppercase tracking-wider", theme.primary)}>
                 {t(`categories.${category}` as any)}
              </h2>
          </div>

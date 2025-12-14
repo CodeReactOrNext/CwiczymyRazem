@@ -18,6 +18,7 @@ export interface TimeInputBoxProps {
   questionMarkProps: QuestionMarkProps;
   hoursName: string;
   minutesName: string;
+  skillId?: string;
   errors: FormikErrors<ReportFormikInterface>;
 }
 
@@ -38,6 +39,7 @@ const TimeInputBox = ({
   questionMarkProps,
   hoursName,
   minutesName,
+  skillId,
   errors,
 }: TimeInputBoxProps) => {
   const { values, setFieldValue } = useFormikContext<ReportFormikInterface>();
@@ -53,40 +55,40 @@ const TimeInputBox = ({
   // Check if this time input has any value entered
   const hasValue = hoursValue > 0 || minutesValue > 0;
 
-  // Determine the skill color based on title
   const getSkillColor = () => {
-    const lowerTitle = title?.toLowerCase() || "";
-    if (lowerTitle.includes("kreatywn")) return "#37b874"; // Green
-    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch"))
-      return "#4a7edd"; // Blue
-    if (lowerTitle.includes("technik")) return "#e04c3b"; // Red
-    if (lowerTitle.includes("teori")) return "#a44aed"; // Purple
-    return "#888888";
+    switch (skillId) {
+      case "creativity":
+        return "#37b874";
+      case "hearing":
+        return "#4a7edd";
+      case "technique":
+        return "#e04c3b";
+      case "theory":
+        return "#a44aed";
+      default:
+        return "#888888";
+    }
   };
 
   const skillColor = getSkillColor();
 
-  // Get gradient style for the card based on whether there's a value
   const getGradientStyle = () => {
-    // If no value is entered, return a neutral background
     if (!hasValue) {
       return "from-gray-900/20 to-transparent";
     }
 
-    const lowerTitle = title?.toLowerCase() || "";
-    if (lowerTitle.includes("kreatywn")) {
-      return "from-[#37b87410] via-[#37b87420] to-transparent";
+    switch (skillId) {
+      case "creativity":
+        return "from-[#37b87410] via-[#37b87420] to-transparent";
+      case "hearing":
+        return "from-[#4a7edd10] via-[#4a7edd20] to-transparent";
+      case "technique":
+        return "from-[#e04c3b10] via-[#e04c3b20] to-transparent";
+      case "theory":
+        return "from-[#a44aed10] via-[#a44aed20] to-transparent";
+      default:
+        return "from-gray-800 via-gray-900 to-transparent";
     }
-    if (lowerTitle.includes("słuch") || lowerTitle.includes("sluch")) {
-      return "from-[#4a7edd10] via-[#4a7edd20] to-transparent";
-    }
-    if (lowerTitle.includes("technik")) {
-      return "from-[#e04c3b10] via-[#e04c3b20] to-transparent";
-    }
-    if (lowerTitle.includes("teori")) {
-      return "from-[#a44aed10] via-[#a44aed20] to-transparent";
-    }
-    return "from-gray-800 via-gray-900 to-transparent";
   };
 
   return (
