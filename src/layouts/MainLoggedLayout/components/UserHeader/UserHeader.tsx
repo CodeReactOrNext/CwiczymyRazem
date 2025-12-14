@@ -1,13 +1,11 @@
 import { Button } from "assets/components/ui/button";
-import { Badge } from "assets/components/ui/badge";
 import { Separator } from "assets/components/ui/separator";
-import { Progress } from "assets/components/ui/progress";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
+import { LevelBar } from "components/LevelBar/LevelBar";
 import UserNav from "components/UserNav";
 import { WelcomeMessage } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/WelcomeMessage";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
-import { Target } from "lucide-react";
 
 import NavDecoration from "./components/NavDecoration";
 
@@ -36,16 +34,6 @@ export const UserHeader = ({
     time.technique + time.theory + time.creativity + time.hearing
   );
 
-  // Calculate level progress for progress bar
-  const levelXpStart = lvl > 1 ? Math.pow(lvl - 1, 2) * 100 : 0;
-  const levelXpEnd = Math.pow(lvl, 2) * 100;
-  const pointsInThisLevel = points - levelXpStart;
-  const levelXpDifference = levelXpEnd - levelXpStart;
-  const progressPercent = Math.min(
-    (pointsInThisLevel / levelXpDifference) * 100,
-    100
-  );
-
   return (
     <header className='sticky top-0 z-50 border-b border-white/10 bg-card backdrop-blur-xl'>
       {/* Subtle top accent */}
@@ -55,26 +43,14 @@ export const UserHeader = ({
         <div className='flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8'>
           {/* Left Section - Level & Progress */}
           <div className='flex items-center gap-4 pl-16 lg:pl-0'>
-            {/* Level Badge - Minimalist with Icon */}
-            <div className='flex items-center gap-3'>
-              <Badge
-                variant='outline'
-                className='h-10 border-white/10 bg-zinc-800/50 px-3 text-white backdrop-blur-sm'>
-                <Target className='mr-2 h-4 w-4' />
-                Level {lvl}
-              </Badge>
-
-              {/* Progress Bar */}
-              <div className='hidden items-center gap-2 sm:flex'>
-                <Progress
-                  value={progressPercent}
-                  className='w-24 bg-zinc-800 [&>div]:bg-gradient-to-r [&>div]:from-cyan-500 [&>div]:to-cyan-600'
-                />
-                <span className='text-xs font-medium text-cyan-400'>
-                  {Math.round(progressPercent)}%
-                </span>
-              </div>
-            </div>
+            <LevelBar
+              points={points}
+              lvl={lvl}
+              currentLevelMaxPoints={currentLevelMaxPoints}
+              size='mini'
+              showStats={false}
+              className="mt-1"
+            />
           </div>
 
           {/* Center Section - Welcome Message with Weekly Progress */}
