@@ -64,13 +64,13 @@ const SongsView = () => {
                 value='management'
                 className='flex h-full w-full items-center justify-center gap-3 rounded-xl border border-transparent px-6 text-sm font-bold text-zinc-400 transition-all duration-300 data-[state=active]:border-cyan-500/30 data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-300 data-[state=active]:shadow-lg data-[state=active]:shadow-cyan-500/10 hover:bg-zinc-800/50 hover:text-zinc-200'>
                 <Library size={20} />
-                <span>Zarządzanie</span>
+                <span>Management</span>
               </TabsTrigger>
               <TabsTrigger
                 value='table'
                 className='flex h-full w-full items-center justify-center gap-3 rounded-xl border border-transparent px-6 text-sm font-bold text-zinc-400 transition-all duration-300 data-[state=active]:border-purple-500/30 data-[state=active]:bg-purple-500/10 data-[state=active]:text-purple-300 data-[state=active]:shadow-lg data-[state=active]:shadow-purple-500/10 hover:bg-zinc-800/50 hover:text-zinc-200'>
                 <Grid size={20} />
-                <span>Biblioteka</span>
+                <span>Library</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -81,11 +81,10 @@ const SongsView = () => {
               {/* Enhanced header */}
               <div className='mb-8'>
                 <h2 className='mb-2 text-2xl font-black text-white lg:text-3xl'>
-                  Zarządzanie utworami
+                  Song Management
                 </h2>
                 <p className='text-base font-medium text-zinc-400'>
-                  Przeciągnij utwory między kategoriami aby zmienić ich status
-                  nauki
+                  Drag songs between categories to change their learning status
                 </p>
               </div>
 
@@ -106,13 +105,13 @@ const SongsView = () => {
               <div className='rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl lg:p-8'>
                 <div className='mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                   <h3 className='text-xl font-bold text-white lg:text-2xl'>
-                    Biblioteka i Filtry
+                    Library & Filters
                   </h3>
                   <Button
                     onClick={() => setIsModalOpen(true)}
                     className='h-12 rounded-xl border border-cyan-500/20 bg-gradient-to-r from-cyan-600 to-blue-600 px-6 font-bold text-white shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 hover:from-cyan-500 hover:to-blue-500 hover:shadow-cyan-500/30'>
                     <IoMdAddCircleOutline className='mr-2 h-5 w-5' />
-                    Dodaj nowy utwór
+                    Add New Song
                   </Button>
                 </div>
 
@@ -121,7 +120,7 @@ const SongsView = () => {
                   <div className='grid gap-6 lg:grid-cols-4'>
                     <div className='lg:col-span-2'>
                       <label className='mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500'>
-                        Wyszukiwanie
+                        Search
                       </label>
                       <Input
                         type='text'
@@ -153,34 +152,34 @@ const SongsView = () => {
                           <SelectValue placeholder='Status' />
                         </SelectTrigger>
                         <SelectContent className='border-zinc-800 bg-zinc-900'>
-                          <SelectItem value='all'>Wszystkie</SelectItem>
+                          <SelectItem value='all'>All</SelectItem>
                           <SelectItem value='wantToLearn' className='text-blue-400'>
-                            Chcę nauczyć
+                            Want to Learn
                           </SelectItem>
                           <SelectItem value='learning' className='text-amber-400'>
-                            Uczę się
+                            Learning
                           </SelectItem>
                           <SelectItem value='learned' className='text-emerald-400'>
-                            Nauczone
+                            Learned
                           </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
                       <label className='mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500'>
-                        Trudność
+                        Difficulty
                       </label>
                       <Select
                         value={difficultyFilter}
                         onValueChange={setDifficultyFilter}>
                         <SelectTrigger className='h-12 rounded-xl border-white/5 bg-zinc-800/50 text-zinc-300 transition-all hover:bg-zinc-800 focus:ring-0'>
-                          <SelectValue placeholder='Trudność' />
+                          <SelectValue placeholder='Difficulty' />
                         </SelectTrigger>
                         <SelectContent className='border-zinc-800 bg-zinc-900'>
-                          <SelectItem value='all'>Wszystkie</SelectItem>
-                          <SelectItem value='easy'>Łatwe</SelectItem>
-                          <SelectItem value='medium'>Średnie</SelectItem>
-                          <SelectItem value='hard'>Trudne</SelectItem>
+                          <SelectItem value='all'>All</SelectItem>
+                          <SelectItem value='easy'>Easy</SelectItem>
+                          <SelectItem value='medium'>Medium</SelectItem>
+                          <SelectItem value='hard'>Hard</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -189,7 +188,7 @@ const SongsView = () => {
                   {/* Tier Filters Row */}
                   <div>
                     <label className='mb-3 block text-xs font-bold uppercase tracking-wider text-zinc-500'>
-                      Poziom trudności (Tier)
+                      Difficulty Tier
                     </label>
                     <div className='flex flex-wrap items-center gap-3'>
                       <Button
@@ -200,7 +199,7 @@ const SongsView = () => {
                             ? "border border-cyan-500/50 bg-cyan-500/20 text-cyan-300 shadow-lg shadow-cyan-500/10"
                             : "border border-white/5 bg-zinc-800/30 text-zinc-500 hover:bg-zinc-800 hover:text-white"
                         }`}>
-                        Wszystkie
+                        All
                       </Button>
                       {getAllTiers().map((tier) => (
                         <Button
@@ -233,7 +232,7 @@ const SongsView = () => {
                           onClick={handleClearFilters}
                           className='h-10 rounded-lg border border-red-500/20 px-5 text-xs font-bold uppercase tracking-wide text-red-400 hover:bg-red-500/10 hover:text-red-300'>
                           <X className='mr-2 h-3 w-3' />
-                          Wyczyść
+                          Clear
                         </Button>
                       )}
                     </div>
@@ -248,7 +247,7 @@ const SongsView = () => {
                     <div className='text-center'>
                       <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-zinc-700 border-t-cyan-500'></div>
                       <p className='text-lg font-bold text-white'>
-                        Ładowanie biblioteki...
+                        Loading library...
                       </p>
                     </div>
                   </div>

@@ -254,7 +254,7 @@ export const StatsSection = ({
            
             </div>
             <p className='text-sm text-zinc-400'>
-          z    Special seasonal prizes and trophies
+             Special seasonal prizes and trophies
             </p>
           </div>
           <div className='text-white/60 transition-colors duration-200 group-hover:text-white'>
