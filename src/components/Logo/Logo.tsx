@@ -10,16 +10,16 @@ export const Logo = () => {
         <Image
           src='/images/logo-optimized.svg'
           alt='Logo'
-          width={48}
-          height={48}
+          width={52}
+          height={52}
           className='h-12 w-auto brightness-0 invert'
           priority
         />
-        <div className='flex flex-col items-start justify-center leading-none'>
+        <div className='flex flex-col items-start justify-center leading-tight'>
           <p className='font-bold tracking-wider text-white text-lg'>
             {t("slogan.line_1")}
           </p>
-          <p className='font-bold tracking-wider text-main-300 text-lg'>
+          <p className='font-bold tracking-wider text-cyan-500 text-lg'>
             {t("slogan.line_2")}
           </p>
         </div>
