@@ -99,6 +99,7 @@ const ReportView = () => {
       Icon: IoMdHand,
       hoursName: "techniqueHours",
       minutesName: "techniqueMinutes",
+      skillId: "technique",
     },
     {
       title: i18n?.t("report:theory"),
@@ -108,6 +109,7 @@ const ReportView = () => {
       Icon: MdSchool,
       hoursName: "theoryHours",
       minutesName: "theoryMinutes",
+      skillId: "theory",
     },
     {
       title: i18n?.t("report:hearing"),
@@ -117,6 +119,7 @@ const ReportView = () => {
       Icon: FaMusic,
       hoursName: "hearingHours",
       minutesName: "hearingMinutes",
+      skillId: "hearing",
     },
     {
       title: i18n?.t("report:creativity"),
@@ -126,6 +129,7 @@ const ReportView = () => {
       Icon: FaBrain,
       hoursName: "creativityHours",
       minutesName: "creativityMinutes",
+      skillId: "creativity",
     },
   ];
 
@@ -236,7 +240,7 @@ const ReportView = () => {
               <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
                 {timeInputList.map(
                   (
-                    { title, questionMarkProps, Icon, hoursName, minutesName },
+                    { title, questionMarkProps, Icon, hoursName, minutesName, skillId },
                     index
                   ) => (
                     <motion.div
@@ -256,6 +260,7 @@ const ReportView = () => {
                         Icon={Icon}
                         hoursName={hoursName}
                         minutesName={minutesName}
+                        skillId={skillId}
                       />
                     </motion.div>
                   )
@@ -314,7 +319,7 @@ const ReportView = () => {
                     startIcon={
                       <MdTitle className='text-lg text-[#4a7edd]/50' />
                     }
-                    placeholder='Zatytułuj swoją sesję'
+                    placeholder='Title your session'
                     className='border-gray-700/50 bg-[#0a0a0c]/60 py-2.5 text-base text-white placeholder:text-gray-500 focus:border-[#4a7edd]/40 hover:border-gray-600'
                     value={values.reportTitle}
                     onChange={(e) =>
@@ -328,7 +333,7 @@ const ReportView = () => {
             {/* Date Selection Section */}
             <div className='mb-8'>
               <h3 className='font-openSans mb-4  text-lg font-medium text-white'>
-                Kiedy ćwiczyłeś?
+                When did you practice?
               </h3>
               <div className='flex flex-col gap-4'>
                 <div className='flex flex-wrap items-start justify-start gap-3'>
@@ -336,10 +341,10 @@ const ReportView = () => {
                     const isSelected = values.countBackDays === days;
                     let label =
                       days === 0
-                        ? "Dzisiaj"
+                        ? "Today"
                         : days === 1
-                        ? "Wczoraj"
-                        : `${days} dni temu`;
+                        ? "Yesterday"
+                        : `${days} days ago`;
 
                     return (
                       <motion.div
@@ -373,7 +378,7 @@ const ReportView = () => {
                 <div className='flex items-start justify-start'>
                   <Card className='border-0 bg-gradient-to-r from-[#4a7edd]/5 to-transparent px-4 py-2 text-left shadow-sm backdrop-blur-sm transition-all duration-300'>
                     <p className='font-openSans text-sm text-gray-400'>
-                      Wybrana data:{" "}
+                      Selected date:{" "}
                       <span className='text-base font-medium text-white'>
                         {getDateFromPast(
                           values.countBackDays

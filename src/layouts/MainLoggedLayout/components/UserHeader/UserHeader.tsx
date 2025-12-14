@@ -54,7 +54,7 @@ export const UserHeader = ({
       <div className='relative w-full'>
         <div className='flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8'>
           {/* Left Section - Level & Progress */}
-          <div className='flex items-center gap-4'>
+          <div className='flex items-center gap-4 pl-16 lg:pl-0'>
             {/* Level Badge - Minimalist with Icon */}
             <div className='flex items-center gap-3'>
               <Badge

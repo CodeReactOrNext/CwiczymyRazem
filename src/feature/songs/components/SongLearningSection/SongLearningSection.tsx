@@ -1,11 +1,18 @@
 import type { DropResult } from "@hello-pangea/dnd";
 import { DragDropContext } from "@hello-pangea/dnd";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "assets/components/ui/tabs";
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 
@@ -45,6 +52,18 @@ export const SongLearningSection = ({
   if (!userId) {
     return null;
   }
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleDragEnd = async (result: DropResult) => {
     const { source, destination, draggableId } = result;
@@ -106,38 +125,89 @@ export const SongLearningSection = ({
     }
   };
 
+  const MobileView = () => (
+    <Tabs defaultValue="wantToLearn" className="w-full">
+      <TabsList className="mb-4 grid w-full grid-cols-3 bg-slate-800/50">
+        <TabsTrigger value="wantToLearn">{t("want_to_learn") as string}</TabsTrigger>
+        <TabsTrigger value="learning">{t("learning") as string}</TabsTrigger>
+        <TabsTrigger value="learned">{t("learned") as string}</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="wantToLearn">
+        <SongStatusCard
+          isLanding={isLanding}
+          title={t("want_to_learn") as string}
+          songs={userSongs.wantToLearn}
+          droppableId='wantToLearn'
+          onStatusChange={handleStatusChange}
+          onSongRemove={handleSongRemoval}
+          isMobile={true}
+        />
+      </TabsContent>
+      <TabsContent value="learning">
+        <SongStatusCard
+          isLanding={isLanding}
+          title={t("learning") as string}
+          songs={userSongs.learning}
+          droppableId='learning'
+          onStatusChange={handleStatusChange}
+          onSongRemove={handleSongRemoval}
+          isMobile={true}
+        />
+      </TabsContent>
+      <TabsContent value="learned">
+        <SongStatusCard
+          isLanding={isLanding}
+          title={t("learned") as string}
+          songs={userSongs.learned}
+          droppableId='learned'
+          onStatusChange={handleStatusChange}
+          onSongRemove={handleSongRemoval}
+          isMobile={true}
+        />
+      </TabsContent>
+    </Tabs>
+  );
+
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className='mb-6'>
         <SongLearningStats userSongs={userSongs} />
       </div>
 
-      <div className='font-openSans grid grid-cols-1 gap-6 md:grid-cols-3'>
-        <SongStatusCard
-          isLanding={isLanding}
-          title={t("want_to_learn")}
-          songs={userSongs.wantToLearn}
-          droppableId='wantToLearn'
-          onStatusChange={handleStatusChange}
-          onSongRemove={handleSongRemoval}
-        />
-        <SongStatusCard
-          isLanding={isLanding}
-          title={t("learning")}
-          songs={userSongs.learning}
-          droppableId='learning'
-          onStatusChange={handleStatusChange}
-          onSongRemove={handleSongRemoval}
-        />
-        <SongStatusCard
-          isLanding={isLanding}
-          title={t("learned")}
-          songs={userSongs.learned}
-          droppableId='learned'
-          onStatusChange={handleStatusChange}
-          onSongRemove={handleSongRemoval}
-        />
-      </div>
+      {isMobile ? (
+        <MobileView />
+      ) : (
+        <div className='font-openSans grid grid-cols-1 gap-6 md:grid-cols-3'>
+          <SongStatusCard
+            isLanding={isLanding}
+            title={t("want_to_learn") as string}
+            songs={userSongs.wantToLearn}
+            droppableId='wantToLearn'
+            onStatusChange={handleStatusChange}
+            onSongRemove={handleSongRemoval}
+            isMobile={false}
+          />
+          <SongStatusCard
+            isLanding={isLanding}
+            title={t("learning") as string}
+            songs={userSongs.learning}
+            droppableId='learning'
+            onStatusChange={handleStatusChange}
+            onSongRemove={handleSongRemoval}
+            isMobile={false}
+          />
+          <SongStatusCard
+            isLanding={isLanding}
+            title={t("learned") as string}
+            songs={userSongs.learned}
+            droppableId='learned'
+            onStatusChange={handleStatusChange}
+            onSongRemove={handleSongRemoval}
+            isMobile={false}
+          />
+        </div>
+      )}
     </DragDropContext>
   );
 };

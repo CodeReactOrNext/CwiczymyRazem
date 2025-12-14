@@ -388,6 +388,7 @@ const TimerLayout = ({
             {skillsData.map((skill) => (
               <CategoryBox
                 key={skill.id}
+                skillId={skill.id}
                 title={skill.title}
                 time={skill.time}
                 skillColor={skill.color}

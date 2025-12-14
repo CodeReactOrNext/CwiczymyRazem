@@ -60,8 +60,6 @@ export const PricingSection = () => {
                   Create Free Account
                 </Button>
               </Link>
-              
-              <p className='text-center text-xs text-zinc-500 mt-4'>No credit card required</p>
             </div>
           </div>
         </div>

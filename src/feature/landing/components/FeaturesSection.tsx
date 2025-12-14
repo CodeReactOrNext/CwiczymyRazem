@@ -359,7 +359,7 @@ export const FeaturesSection = () => {
                     <h4 className="font-semibold text-xl text-white">Recent Achievements</h4>
                   </div>
                   
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-x-5 gap-y-10 p-6 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm mb-12">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-x-5 gap-y-10 p-6 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm mb-12 justify-items-center">
                      {/* REAL ACHIEVEMENT COMPONENTS */}
                      <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="lvl100" /></div>
                      <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="fireSession" /></div>

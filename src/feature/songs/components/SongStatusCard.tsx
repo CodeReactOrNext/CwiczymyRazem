@@ -87,6 +87,7 @@ interface SongStatusCardProps {
     artist: string
   ) => Promise<void>;
   onSongRemove: (songId: string) => Promise<void>;
+  isMobile?: boolean;
 }
 
 export const SongStatusCard = ({
@@ -96,52 +97,64 @@ export const SongStatusCard = ({
   isLanding,
   onStatusChange,
   onSongRemove,
+  isMobile = false,
 }: SongStatusCardProps) => {
   const { t } = useTranslation(["songs", "common"]);
-  const router = useRouter();
-  const [isMobile, setIsMobile] = useState(false);
-
+  const StatusIcon = STATUS_CONFIG[droppableId as keyof typeof STATUS_CONFIG]?.icon || Music;
   const config = STATUS_CONFIG[droppableId as keyof typeof STATUS_CONFIG];
-  const StatusIcon = config?.icon || Music;
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+  const getNextStatus = (currentStatus: SongStatus): SongStatus | null => {
+    if (currentStatus === "wantToLearn") return "learning";
+    if (currentStatus === "learning") return "learned";
+    // For learned, maybe loop back or no primary action?
+    return null;
+  };
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const nextStatus = getNextStatus(droppableId);
+
+  const getPrimaryActionText = (status: SongStatus) => {
+    switch (status) {
+      case "wantToLearn":
+        return t("songs:start_learning");
+      case "learning":
+        return t("songs:mark_as_learned");
+      case "learned":
+        return t("songs:learn_again");
+      default:
+        return "";
+    }
+  };
 
   return (
     <div className='flex-1'>
       {/* Elegant Header */}
-      <div className='mb-4 flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <div className={cn("rounded-full p-2", config.lightBgColor)}>
-            <StatusIcon className={cn("h-5 w-5", config.color)} />
+      {!isMobile && (
+        <div className='mb-4 flex items-center justify-between'>
+          <div className='flex items-center gap-3'>
+            <div className={cn("rounded-full p-2", config.lightBgColor)}>
+              <StatusIcon className={cn("h-5 w-5", config.color)} />
+            </div>
+            <div>
+              <h3 className='text-lg font-semibold text-white'>{title}</h3>
+              <p className='text-sm text-slate-500'>
+                {songs?.length === 0
+                  ? t("songs:no_songs_in_list")
+                  : `${songs?.length} ${t("songs:song_count", {
+                      count: songs?.length,
+                    })}`}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className='text-lg font-semibold text-white'>{title}</h3>
-            <p className='text-sm text-slate-500'>
-              {songs?.length === 0
-                ? "Brak utworów"
-                : `${songs?.length} ${
-                    songs?.length === 1 ? "utwór" : "utworów"
-                  }`}
-            </p>
+          <div
+            className={cn(
+              "rounded-full px-3 py-1 text-sm font-medium",
+              config.lightBgColor,
+              config.color
+            )}>
+            {songs?.length}
           </div>
         </div>
-        <div
-          className={cn(
-            "rounded-full px-3 py-1 text-sm font-medium",
-            config.lightBgColor,
-            config.color
-          )}>
-          {songs?.length}
-        </div>
-      </div>
+      )}
 
       {/* Content Area */}
       <div>
@@ -152,7 +165,7 @@ export const SongStatusCard = ({
                 "relative min-h-[300px] rounded-xl border-2 border-dashed p-4 transition-all duration-300",
                 snapshot.isDraggingOver
                   ? "border-slate-400 bg-slate-500/15"
-                  : "border-slate-600/30 bg-slate-800/20"
+                  : isMobile ? "border-transparent px-0" : "border-slate-600/30 bg-slate-800/20"
               )}
               {...provided.droppableProps}
               ref={provided.innerRef}
@@ -167,11 +180,13 @@ export const SongStatusCard = ({
                   />
                   <div>
                     <p className='text-slate-400'>
-                      {snapshot.isDraggingOver ? "Upuść tutaj" : "Brak utworów"}
+                      {snapshot.isDraggingOver
+                        ? t("songs:drop_here")
+                        : t("songs:no_songs_in_list")}
                     </p>
-                    {!isLanding && !snapshot.isDraggingOver && (
+                    {!isLanding && !snapshot.isDraggingOver && !isMobile && (
                       <p className='mt-1 text-xs text-slate-600'>
-                        Przeciągnij utwory lub użyj przycisków
+                        {t("songs:drag_or_use_buttons")}
                       </p>
                     )}
                   </div>
@@ -190,8 +205,9 @@ export const SongStatusCard = ({
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                           className={cn(
-                            "group flex items-center justify-between",
+                            "group flex justify-between",
                             "rounded-lg border p-3 transition-all duration-200",
+                            isMobile ? "flex-col gap-3" : "items-center",
                             snapshot.isDragging
                               ? "border-slate-400 bg-slate-500/30 shadow-2xl shadow-slate-500/60 ring-2 ring-slate-400/50 backdrop-blur-sm"
                               : "border-transparent bg-slate-800/60 hover:bg-slate-700/80"
@@ -208,150 +224,181 @@ export const SongStatusCard = ({
                               : "auto",
                             ...provided.draggableProps.style,
                           }}>
-                          <div className='flex flex-1 items-center gap-3 overflow-hidden'>
-                            <div
-                              className={cn(
-                                "h-3 w-1.5 flex-shrink-0 rounded-full shadow-sm",
-                                config.bgColor
-                              )}
-                              style={{
-                                backgroundColor: config.color.replace(
-                                  "text-",
-                                  ""
-                                ),
-                              }}
-                            />
-                            <div className='flex-1 overflow-hidden'>
-                              <div className='flex items-center gap-2'>
-                                <p
+                          {/* Main Row: content + menu */}
+                          <div className="flex w-full items-center justify-between gap-3">
+                              <div className='flex flex-1 items-center gap-3 overflow-hidden'>
+                                <div
                                   className={cn(
-                                    "truncate text-sm font-medium transition-colors",
-                                    snapshot.isDragging
-                                      ? "text-slate-100"
-                                      : "text-white"
-                                  )}>
-                                  {song.title}
-                                </p>
-                                <div className='flex items-center gap-1'>
-                                  <TierBadge song={song} t={t} />
-                                  {getAverageDifficulty(song.difficulties) >
-                                    0 && (
-                                    <span className='text-xs font-medium text-slate-500'>
-                                      {getAverageDifficulty(
-                                        song.difficulties
-                                      ).toFixed(1)}
-                                    </span>
+                                    "h-3 w-1.5 flex-shrink-0 rounded-full shadow-sm",
+                                    config.bgColor
                                   )}
+                                  style={{
+                                    backgroundColor: config.color.replace(
+                                      "text-",
+                                      ""
+                                    ),
+                                  }}
+                                />
+                                <div className='flex-1 overflow-hidden'>
+                                  <div className='flex items-center gap-2'>
+                                    <p
+                                      className={cn(
+                                        "truncate text-sm font-medium transition-colors",
+                                        snapshot.isDragging
+                                          ? "text-slate-100"
+                                          : "text-white"
+                                      )}>
+                                      {song.title}
+                                    </p>
+                                    <div className='flex items-center gap-1'>
+                                      <TierBadge song={song} t={t} />
+                                      {getAverageDifficulty(song.difficulties) >
+                                        0 && (
+                                        <span className='text-xs font-medium text-slate-500'>
+                                          {getAverageDifficulty(
+                                            song.difficulties
+                                          ).toFixed(1)}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <p
+                                    className={cn(
+                                      "truncate text-xs transition-colors",
+                                      snapshot.isDragging
+                                        ? "text-slate-300"
+                                        : "text-slate-400"
+                                    )}>
+                                    {song.artist}
+                                  </p>
                                 </div>
                               </div>
-                              <p
+
+                              {/* Quick Actions (Desktop Hover) */}
+                              <div
                                 className={cn(
-                                  "truncate text-xs transition-colors",
-                                  snapshot.isDragging
-                                    ? "text-slate-300"
-                                    : "text-slate-400"
+                                  "flex items-center gap-1 transition-opacity duration-200",
+                                   isMobile ? "hidden" : "opacity-0 group-hover:opacity-100"
                                 )}>
-                                {song.artist}
-                              </p>
-                            </div>
+                                {droppableId !== "wantToLearn" && (
+                                  <Button
+                                    size='sm'
+                                    variant='ghost'
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onStatusChange(
+                                        song.id,
+                                        "wantToLearn",
+                                        song.title,
+                                        song.artist
+                                      );
+                                    }}
+                                    className='h-6 w-6 p-0 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300'
+                                    title={t("songs:status.wantToLearn")}>
+                                    <Music className='h-3 w-3' />
+                                  </Button>
+                                )}
+                                {droppableId !== "learning" && (
+                                  <Button
+                                    size='sm'
+                                    variant='ghost'
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onStatusChange(
+                                        song.id,
+                                        "learning",
+                                        song.title,
+                                        song.artist
+                                      );
+                                    }}
+                                    className='h-6 w-6 p-0 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300'
+                                    title={t("songs:status.learning")}>
+                                    <BookOpen className='h-3 w-3' />
+                                  </Button>
+                                )}
+                                {droppableId !== "learned" && (
+                                  <Button
+                                    size='sm'
+                                    variant='ghost'
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onStatusChange(
+                                        song.id,
+                                        "learned",
+                                        song.title,
+                                        song.artist
+                                      );
+                                    }}
+                                    className='h-6 w-6 p-0 text-green-400 hover:bg-green-500/20 hover:text-green-300'
+                                    title={t("songs:status.learned")}>
+                                    <CheckCircle className='h-3 w-3' />
+                                  </Button>
+                                )}
+                              </div>
+                              
+                              <DropdownMenu>
+                                <DropdownMenuTrigger
+                                  className={cn(
+                                    "ml-2 transition-all duration-200 focus:outline-none",
+                                     isMobile ? "opacity-100" : "opacity-0 group-hover:opacity-100 hover:scale-110" 
+                                  )}>
+                                  <div className='rounded-lg p-2 transition-colors hover:bg-slate-600/30'>
+                                    <MoreVertical className='h-4 w-4 text-slate-400' />
+                                  </div>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className='border-slate-600/50 bg-slate-800/95 backdrop-blur-xl'>
+                                  {(
+                                    ["wantToLearn", "learning", "learned"] as const
+                                  ).map((status) => (
+                                    <DropdownMenuItem
+                                      key={status}
+                                      onClick={() =>
+                                        onStatusChange(
+                                          song.id,
+                                          status,
+                                          song.title,
+                                          song.artist
+                                        )
+                                      }
+                                      className='flex cursor-pointer items-center gap-3 py-2 text-sm hover:bg-slate-700/50'>
+                                      <ArrowRight className='h-4 w-4' />
+                                      <span>{t("songs:move_to")}</span>
+                                      <span
+                                        className={cn(
+                                          "font-medium",
+                                          STATUS_CONFIG[status].color
+                                        )}>
+                                        {t(`songs:status.${status}`)}
+                                      </span>
+                                    </DropdownMenuItem>
+                                  ))}
+                                  <DropdownMenuItem
+                                    onClick={() => onSongRemove(song.id)}
+                                    className='cursor-pointer py-2 text-sm text-red-400 hover:bg-red-500/15'>
+                                    {t("songs:remove_song")}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                           </div>
 
-                          {/* Quick Actions - visible on hover */}
-                          <div className='flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
-                            {droppableId !== "wantToLearn" && (
-                              <Button
-                                size='sm'
-                                variant='ghost'
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onStatusChange(
-                                    song.id,
-                                    "wantToLearn",
-                                    song.title,
-                                    song.artist
-                                  );
-                                }}
-                                className='h-6 w-6 p-0 text-blue-400 hover:bg-blue-500/20 hover:text-blue-300'
-                                title='Chcę się nauczyć'>
-                                <Music className='h-3 w-3' />
-                              </Button>
-                            )}
-                            {droppableId !== "learning" && (
-                              <Button
-                                size='sm'
-                                variant='ghost'
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onStatusChange(
-                                    song.id,
-                                    "learning",
-                                    song.title,
-                                    song.artist
-                                  );
-                                }}
-                                className='h-6 w-6 p-0 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300'
-                                title='Uczę się'>
-                                <BookOpen className='h-3 w-3' />
-                              </Button>
-                            )}
-                            {droppableId !== "learned" && (
-                              <Button
-                                size='sm'
-                                variant='ghost'
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onStatusChange(
-                                    song.id,
-                                    "learned",
-                                    song.title,
-                                    song.artist
-                                  );
-                                }}
-                                className='h-6 w-6 p-0 text-green-400 hover:bg-green-500/20 hover:text-green-300'
-                                title='Nauczone'>
-                                <CheckCircle className='h-3 w-3' />
-                              </Button>
-                            )}
-                          </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger className='ml-2 opacity-0 transition-all duration-200 focus:outline-none group-hover:opacity-100 hover:scale-110'>
-                              <div className='rounded-lg p-2 transition-colors hover:bg-slate-600/30'>
-                                <MoreVertical className='h-4 w-4 text-slate-400' />
-                              </div>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className='border-slate-600/50 bg-slate-800/95 backdrop-blur-xl'>
-                              {(
-                                ["wantToLearn", "learning", "learned"] as const
-                              ).map((status) => (
-                                <DropdownMenuItem
-                                  key={status}
-                                  onClick={() =>
-                                    onStatusChange(
-                                      song.id,
-                                      status,
-                                      song.title,
-                                      song.artist
-                                    )
-                                  }
-                                  className='flex cursor-pointer items-center gap-3 py-2 text-sm hover:bg-slate-700/50'>
-                                  <ArrowRight className='h-4 w-4' />
-                                  <span>Przenieś do:</span>
-                                  <span
-                                    className={cn(
-                                      "font-medium",
-                                      STATUS_CONFIG[status].color
-                                    )}>
-                                    {t(`songs:status.${status}`)}
-                                  </span>
-                                </DropdownMenuItem>
-                              ))}
-                              <DropdownMenuItem
-                                onClick={() => onSongRemove(song.id)}
-                                className='cursor-pointer py-2 text-sm text-red-400 hover:bg-red-500/15'>
-                                Usuń utwór
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          {/* Mobile Main Action Button - Full Width Row */}
+                          {isMobile && nextStatus ? (
+                            <Button 
+                              size="sm"
+                              className={cn(
+                                "w-full text-xs h-8 font-semibold shadow-sm transition-all active:scale-95",
+                                droppableId === "wantToLearn" && "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/20 hover:shadow-blue-500/40",
+                                droppableId === "learning" && "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-500/20 hover:shadow-amber-500/40",
+                                droppableId === "learned" && "bg-green-600 hover:bg-green-500 text-white shadow-green-500/20 hover:shadow-green-500/40"
+                              )}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onStatusChange(song.id, nextStatus, song.title, song.artist);
+                              }}
+                            >
+                              {getPrimaryActionText(droppableId)}
+                            </Button>
+                          ) : null}
                         </div>
                       )}
                     </Draggable>

@@ -161,7 +161,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
         variant='outline'
         size='icon'
         onClick={() => setIsMobileOpen(true)}
-        className='fixed left-4 top-4 z-50 border-white/20 bg-card text-white backdrop-blur-sm hover:bg-zinc-800 lg:hidden'>
+        className='fixed left-4 top-4 z-[60] border-white/20 bg-card text-white backdrop-blur-sm hover:bg-zinc-800 lg:hidden'>
         <Menu size={18} />
       </Button>
 
