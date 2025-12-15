@@ -212,7 +212,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
         )}
 
         {/* Navigation */}
-        <nav className='flex-1 space-y-6 p-4'>
+        <nav className='flex-1 space-y-6 overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent'>
           {/* Main Navigation */}
           <div>
             <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
@@ -333,7 +333,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className='fixed left-0 top-0 z-50 flex h-full w-72 flex-col border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden'>
+              className='fixed left-0 top-0 z-50 flex h-[100dvh] w-72 flex-col border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden'>
               {/* Header */}
               <div className='flex items-center justify-between border-b border-white/10 p-4'>
                 <div className='flex items-center gap-3'>
@@ -386,7 +386,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               )}
 
               {/* Navigation - Mobile */}
-              <nav className='flex-1 space-y-6 overflow-y-auto p-4'>
+              <nav className='flex-1 space-y-6 overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent'>
                 {/* Main Navigation */}
                 <div>
                   <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
