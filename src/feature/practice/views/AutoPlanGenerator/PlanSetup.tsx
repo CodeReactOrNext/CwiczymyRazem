@@ -2,10 +2,15 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
 import { useTranslation } from "react-i18next";
+import type { DifficultyLevel, ExerciseCategory } from "feature/exercisePlan/types/exercise.types";
 
 interface PlanSetupProps {
   time: number;
   setTime: (time: number) => void;
+  selectedCategories: ExerciseCategory[];
+  setSelectedCategories: (categories: ExerciseCategory[]) => void;
+  selectedDifficulty: DifficultyLevel | "all";
+  setSelectedDifficulty: (difficulty: DifficultyLevel | "all") => void;
   onBack: () => void;
   onGenerate: () => void;
 }
@@ -13,10 +18,32 @@ interface PlanSetupProps {
 export const PlanSetup = ({
   time,
   setTime,
+  selectedCategories,
+  setSelectedCategories,
+  selectedDifficulty,
+  setSelectedDifficulty,
   onBack,
   onGenerate,
 }: PlanSetupProps) => {
   const { t } = useTranslation(["exercises", "common"]);
+
+  const toggleCategory = (category: ExerciseCategory) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter((c) => c !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  const categories: ExerciseCategory[] = [
+    "technique",
+    "theory",
+    "creativity",
+    "hearing",
+    "mixed",
+  ];
+
+  const difficulties: (DifficultyLevel | "all")[] = ["easy", "medium", "hard", "all"];
 
   return (
     <div className='mx-auto max-w-2xl space-y-8 py-12 font-openSans'>
@@ -27,8 +54,9 @@ export const PlanSetup = ({
         </p>
       </div>
 
-      <Card className='p-6'>
-        <div className='mb-6 space-y-4'>
+      <Card className='p-6 space-y-8'>
+        {/* Duration Section */}
+        <div className='space-y-4'>
           <h2 className='text-xl font-semibold'>
             {t("exercises:auto_plan.duration")}
           </h2>
@@ -71,7 +99,44 @@ export const PlanSetup = ({
           </div>
         </div>
 
-        <div className='flex justify-end'>
+        {/* Categories Section */}
+        <div className='space-y-4'>
+          <h2 className='text-xl font-semibold'>Categories (Optional)</h2>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <Button
+                key={cat}
+                variant={selectedCategories.includes(cat) ? "default" : "outline"}
+                size="sm"
+                onClick={() => toggleCategory(cat)}
+                className="capitalize"
+              >
+                {cat}
+              </Button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">Select specific categories to focus on, or leave empty for all.</p>
+        </div>
+
+        {/* Difficulty Section */}
+        <div className='space-y-4'>
+          <h2 className='text-xl font-semibold'>Difficulty</h2>
+          <div className="flex flex-wrap gap-2">
+            {difficulties.map((diff) => (
+              <Button
+                key={diff}
+                variant={selectedDifficulty === diff ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedDifficulty(diff)}
+                className="capitalize"
+              >
+                {diff}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className='flex justify-end pt-4'>
           <div className='space-x-2'>
             <Button variant='outline' onClick={onBack}>
               {t("common:back")}
