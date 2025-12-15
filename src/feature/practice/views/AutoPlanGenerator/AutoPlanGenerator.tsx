@@ -21,10 +21,28 @@ export const AutoPlanGenerator = ({
   onSelectPlan,
 }: AutoPlanGeneratorProps) => {
   const [time, setTime] = useState(30);
+  const [selectedCategories, setSelectedCategories] = useState<ExerciseCategory[]>([]);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<DifficultyLevel | "all">("all");
   const [generatedPlan, setGeneratedPlan] = useState<ExercisePlan | null>(null);
 
   const generatePlan = () => {
-    const allExercises = [...exercisesAgregat].sort(() => Math.random() - 0.5);
+    let filteredExercises = [...exercisesAgregat];
+
+    // Filter by categories if any selected
+    if (selectedCategories.length > 0) {
+      filteredExercises = filteredExercises.filter((ex) =>
+        selectedCategories.includes(ex.category)
+      );
+    }
+
+    // Filter by difficulty if specific one selected
+    if (selectedDifficulty !== "all") {
+      filteredExercises = filteredExercises.filter(
+        (ex) => ex.difficulty === selectedDifficulty
+      );
+    }
+
+    const allExercises = filteredExercises.sort(() => Math.random() - 0.5);
     const selectedExercises: Exercise[] = [];
     let totalTime = 0;
 
@@ -37,15 +55,19 @@ export const AutoPlanGenerator = ({
       if (totalTime >= time * 0.9) break;
     }
 
+    // If no exercises found (e.g. strict filters), just return to avoid crash or empty plan if unwanted
+    // But better to generate an empty plan or handle it. 
+    // For now, let's keep the logic even if empty, the user will see 0 exercises.
+
     const categoryCount: Record<string, number> = {};
     selectedExercises.forEach((exercise) => {
       categoryCount[exercise.category] =
         (categoryCount[exercise.category] || 0) + 1;
     });
 
-    const primaryCategory = Object.entries(categoryCount).sort(
+    const primaryCategory = (Object.entries(categoryCount).sort(
       (a, b) => b[1] - a[1]
-    )[0][0] as ExerciseCategory;
+    )[0]?.[0] as ExerciseCategory) || "mixed";
 
     const difficultyValues = {
       easy: 1,
@@ -54,14 +76,16 @@ export const AutoPlanGenerator = ({
     };
 
     const avgDifficulty =
-      selectedExercises.reduce(
-        (sum, exercise) =>
-          sum +
-          difficultyValues[
-            exercise.difficulty as keyof typeof difficultyValues
-          ],
-        0
-      ) / selectedExercises.length;
+      selectedExercises.length > 0
+        ? selectedExercises.reduce(
+            (sum, exercise) =>
+              sum +
+              difficultyValues[
+                exercise.difficulty as keyof typeof difficultyValues
+              ],
+            0
+          ) / selectedExercises.length
+        : 1;
 
     let difficulty: DifficultyLevel = "easy";
     if (avgDifficulty > 2.3) difficulty = "hard";
@@ -135,6 +159,10 @@ export const AutoPlanGenerator = ({
   const replaceExercise = (index: number) => {
     if (!generatedPlan) return;
 
+    // Filter available exercises based on current filters too? 
+    // Ideally yes, but maybe user wants to swap with anything. 
+    // Let's stick to filters if possible, or all if too restrictive.
+    // For now, let's use all aggregate to allow variety when replacing manually.
     const availableExercises = exercisesAgregat.filter(
       (e) => !generatedPlan.exercises.some((ge) => ge.id === e.id)
     );
@@ -176,6 +204,10 @@ export const AutoPlanGenerator = ({
     <PlanSetup
       time={time}
       setTime={setTime}
+      selectedCategories={selectedCategories}
+      setSelectedCategories={setSelectedCategories}
+      selectedDifficulty={selectedDifficulty}
+      setSelectedDifficulty={setSelectedDifficulty}
       onBack={onBack}
       onGenerate={generatePlan}
     />
