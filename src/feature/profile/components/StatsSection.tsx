@@ -43,8 +43,6 @@ export const StatsSection = ({
 }: StatsSectionProps) => {
   const { t } = useTranslation("profile");
   const { time } = statistics;
-  const [isSeasonalAchievementsExpanded, setIsSeasonalAchievementsExpanded] =
-    useState(false);
   const [isAchievementsExpanded, setIsAchievementsExpanded] = useState(false);
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
@@ -233,40 +231,7 @@ export const StatsSection = ({
       </div>
 
       <div className='space-y-2'>
-        <button
-          onClick={() =>
-            setIsSeasonalAchievementsExpanded(!isSeasonalAchievementsExpanded)
-          }
-          className='group flex w-full items-center justify-between rounded-lg p-3 transition-all duration-200 hover:bg-white/5'
-          aria-expanded={isSeasonalAchievementsExpanded}>
-          <div className='text-left'>
-            <div className='flex items-center gap-2'>
-              <h3 className='text-lg font-semibold text-white'>
-                Seasonal Achievements
-              </h3>
-           
-            </div>
-            <p className='text-sm text-zinc-400'>
-             Special seasonal prizes and trophies
-            </p>
-          </div>
-          <div className='text-white/60 transition-colors duration-200 group-hover:text-white'>
-            {isSeasonalAchievementsExpanded ? (
-              <ChevronUp size={18} />
-            ) : (
-              <ChevronDown size={18} />
-            )}
-          </div>
-        </button>
-
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            isSeasonalAchievementsExpanded
-              ? "max-h-[1000px] opacity-100"
-              : "max-h-0 opacity-0"
-          }`}>
-          <SeasonalAchievements userId={userAuth} />
-        </div>
+        <SeasonalAchievements userId={userAuth} />
       </div>
 
       {/* Regular Achievements - Collapsible */}
