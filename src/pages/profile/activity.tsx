@@ -60,7 +60,7 @@ const ProfileActivityPage: NextPage = () => {
           </div>
         </div>
       </MainContainer>
-    </>
+    </AppLayout>
   );
 };
 
