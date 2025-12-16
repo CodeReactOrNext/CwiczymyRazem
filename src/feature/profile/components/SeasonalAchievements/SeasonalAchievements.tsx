@@ -233,7 +233,7 @@ const SeasonalAchievements = ({
             return (
               <div
                 key={`${achievement.seasonId}-${idx}`}
-                className='group relative overflow-hidden rounded-lg border border-zinc-700/30 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 p-2 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-zinc-600/40 hover:shadow-lg'>
+                className='group relative overflow-hidden rounded-lg border border-zinc-700/30 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50 p-2 shadow-md backdrop-blur-sm'>
                 {/* Background gradient based on place */}
                 <div
                   className={`pointer-events-none absolute inset-0 opacity-15 ${
@@ -249,7 +249,7 @@ const SeasonalAchievements = ({
                 <div className='relative flex flex-col items-center gap-1'>
                   <div className='relative'>
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full shadow-md ${styles.iconBg} ${styles.iconColor} transition-transform duration-300 group-hover:scale-110`}>
+                      className={`flex h-8 w-8 items-center justify-center rounded-full shadow-md ${styles.iconBg} ${styles.iconColor}`}>
                       {getAchievementIcon(achievement.place)}
                     </div>
                     {styles.crown && (
