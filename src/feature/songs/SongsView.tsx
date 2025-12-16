@@ -102,8 +102,7 @@ const SongsView = () => {
                     Library & Filters
                   </h3>
                   <Button
-                    onClick={() => setIsModalOpen(true)}
-                    className='h-12 rounded-xl border border-cyan-500/20 bg-gradient-to-r from-cyan-600 to-blue-600 px-6 font-bold text-white shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 hover:from-cyan-500 hover:to-blue-500 hover:shadow-cyan-500/30'>
+                    onClick={() => setIsModalOpen(true)}>
                     <IoMdAddCircleOutline className='mr-2 h-5 w-5' />
                     Add New Song
                   </Button>
