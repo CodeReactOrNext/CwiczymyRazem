@@ -110,6 +110,7 @@ const TimerView = () => {
             choseSkillHandler={choseSkillHandler}
             chosenSkill={chosenSkill}
             timer={timer}
+            onBack={handleBack}
           />
         );
       case "plan":
@@ -118,12 +119,10 @@ const TimerView = () => {
         );
       case "auto":
         return (
-          <MainContainer>
             <AutoPlanGenerator
               onBack={handleBack}
               onSelectPlan={handleAutoPlanSelect}
             />
-          </MainContainer>
         );
       default:
         return <PracticeModeSelector onSelectMode={handleModeSelect} />;

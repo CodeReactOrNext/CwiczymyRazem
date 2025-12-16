@@ -20,6 +20,7 @@ import { calculatePercent, convertMsToHMS } from "utils/converter";
 
 import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
+import { PageHeader } from "components/PageHeader";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
 
 interface TimerLayoutProps {
@@ -28,6 +29,7 @@ interface TimerLayoutProps {
   chosenSkill: SkillsType | null;
   timerSubmitHandler: () => void;
   choseSkillHandler: (chosenSkill: SkillsType) => void;
+  onBack: () => void;
 }
 
 // Komponent łączący animowaną tarczę z pierścieniami umiejętności
@@ -279,6 +281,7 @@ const TimerLayout = ({
   timerSubmitHandler,
   chosenSkill,
   choseSkillHandler,
+  onBack,
 }: TimerLayoutProps) => {
   const { t } = useTranslation("timer");
   const { time, startTimer, stopTimer, timerEnabled } = timer;
@@ -341,8 +344,9 @@ const TimerLayout = ({
   };
 
   return (
-    <MainContainer title={"Practice"}>
+    <MainContainer>
       <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
+        <PageHeader title='Practice' onBack={onBack} />
         <Card>
           <div className='flex flex-col sm:flex-row'>
             <div className='flex justify-center p-4 pb-0 sm:flex-1 sm:py-6'>
