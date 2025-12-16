@@ -33,8 +33,8 @@ import {
 } from "feature/user/store/userSlice";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 
-import type { NavPagesTypes } from "wrappers/AuthLayoutWrapper";
 import Avatar from "components/UI/Avatar";
+import { NavPagesTypes } from "types/layout.types";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
