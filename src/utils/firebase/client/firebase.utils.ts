@@ -190,8 +190,16 @@ export const firebaseReauthenticateUser = async ({
   return null;
 };
 
-export const firebaseGetCurrentUser = async () => {
-  return auth.currentUser;
+export const firebaseGetCurrentUser = (): Promise<import("firebase/auth").User | null> => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = auth.onAuthStateChanged(
+      (userAuth) => {
+        unsubscribe();
+        resolve(userAuth);
+      },
+      reject
+    );
+  });
 };
 
 export const firebaseUpdateUserDocument = async (
