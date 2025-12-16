@@ -92,7 +92,7 @@ export const SongCard = ({
             <span className='text-[10px] font-bold uppercase tracking-wider text-zinc-500'>
               {t("difficulty")}
             </span>
-            <span className='text-sm font-bold text-white'>{avgDifficulty}</span>
+            <span className='text-sm font-bold text-white'>{avgDifficulty.toFixed(2)}</span>
           </div>
           <div className='h-1.5 w-full overflow-hidden rounded-full bg-black/40'>
             <div
