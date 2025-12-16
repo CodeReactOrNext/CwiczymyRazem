@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 import { StatisticsDataInterface } from "types/api.types";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
+import AppLayout from "layouts/AppLayout";
 
 const ProfileActivityPage: NextPage = () => {
   const { t } = useTranslation("profile");
@@ -36,7 +36,7 @@ const ProfileActivityPage: NextPage = () => {
   }, [userAuth]);
 
   return (
-    <AuthLayoutWrapper
+    <AppLayout
       pageId={"profile"}
       subtitle={t("activity", "Activity")}
       variant='secondary'>
@@ -60,7 +60,7 @@ const ProfileActivityPage: NextPage = () => {
           </div>
         </div>
       </MainContainer>
-    </AuthLayoutWrapper>
+    </>
   );
 };
 

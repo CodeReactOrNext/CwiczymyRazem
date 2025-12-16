@@ -1,10 +1,8 @@
 import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
-import useAutoLogIn from "hooks/useAutoLogIn";
-import PageLoadingLayout from "layouts/PageLoadingLayout/PageLoadingLayout";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper/AuthLayoutWrapper";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import AppLayout from "layouts/AppLayout";
+import { withAuth } from "utils/auth/serverAuth";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { useState } from "react";
@@ -12,12 +10,6 @@ import MainContainer from "components/MainContainer";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 
 const TimerPlans: NextPage = () => {
-  const { isLoggedIn } = useAutoLogIn({
-    redirects: {
-      loggedOut: "/login",
-    },
-  });
-
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
 
@@ -42,31 +34,21 @@ const TimerPlans: NextPage = () => {
   };
 
   return (
-    <AuthLayoutWrapper pageId={"exercise"} subtitle='Timer' variant='secondary'>
-      {!isLoggedIn ? (
-        <PageLoadingLayout />
-      ) : selectedPlan ? (
+    <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
+      {selectedPlan ? (
         <MainContainer>
           <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} />
         </MainContainer>
       ) : (
         <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} />
       )}
-    </AuthLayoutWrapper>
+    </AppLayout>
   );
 };
 
 export default TimerPlans;
 
-export async function getStaticProps({ locale }: { locale: string }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale ?? "pl", [
-        "common",
-        "timer",
-        "toast",
-        "exercises",
-      ])),
-    },
-  };
-}
+export const getServerSideProps = withAuth({
+  redirectIfUnauthenticated: "/login",
+  translations: ["common", "timer", "toast", "exercises"],
+});
