@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { firebaseGetUserDocument } from "utils/firebase/client/firebase.utils";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
+import AppLayout from "layouts/AppLayout";
 
 const ProfileView = () => {
   const [userData, setUserData] = useState<ProfileInterface | undefined>(
@@ -26,7 +26,7 @@ const ProfileView = () => {
   }, [profileId]);
 
   return (
-    <AuthLayoutWrapper pageId={null} subtitle='Profile' variant='secondary'>
+    <AppLayout pageId={null} subtitle='Profile' variant='secondary'>
       {userData ? (
         <ProfileLayout
           statsField={
@@ -38,7 +38,7 @@ const ProfileView = () => {
       ) : (
         <PageLoadingLayout />
       )}
-    </AuthLayoutWrapper>
+    </AppLayout>
   );
 };
 

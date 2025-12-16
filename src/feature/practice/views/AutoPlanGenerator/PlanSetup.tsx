@@ -1,8 +1,10 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
-import { useTranslation } from "react-i18next";
+import MainContainer from "components/MainContainer";
+import { PageHeader } from "components/PageHeader";
 import type { DifficultyLevel, ExerciseCategory } from "feature/exercisePlan/types/exercise.types";
+import { useTranslation } from "react-i18next";
 
 interface PlanSetupProps {
   time: number;
@@ -46,15 +48,15 @@ export const PlanSetup = ({
   const difficulties: (DifficultyLevel | "all")[] = ["easy", "medium", "hard", "all"];
 
   return (
-    <div className='mx-auto max-w-2xl space-y-8 py-12 font-openSans'>
-      <div className='text-center'>
-        <h1 className='text-3xl font-bold'>{t("exercises:auto_plan.title")}</h1>
-        <p className='mt-2 text-muted-foreground'>
-          {t("exercises:auto_plan.description")}
-        </p>
-      </div>
+    <MainContainer>
+      <div className='mx-auto max-w-3xl space-y-8 p-8 font-openSans'>
+        <PageHeader
+          title={t("exercises:auto_plan.title")}
+          description={t("exercises:auto_plan.description")}
+          onBack={onBack}
+        />
 
-      <Card className='p-6 space-y-8'>
+        <Card className='space-y-8 p-6'>
         {/* Duration Section */}
         <div className='space-y-4'>
           <h2 className='text-xl font-semibold'>
@@ -137,16 +139,12 @@ export const PlanSetup = ({
         </div>
 
         <div className='flex justify-end pt-4'>
-          <div className='space-x-2'>
-            <Button variant='outline' onClick={onBack}>
-              {t("common:back")}
-            </Button>
-            <Button onClick={onGenerate}>
-              {t("exercises:auto_plan.generate")}
-            </Button>
-          </div>
+          <Button onClick={onGenerate}>
+            {t("exercises:auto_plan.generate")}
+          </Button>
         </div>
       </Card>
-    </div>
+      </div>
+    </MainContainer>
   );
 };

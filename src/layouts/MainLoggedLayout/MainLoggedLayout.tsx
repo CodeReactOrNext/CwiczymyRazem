@@ -5,7 +5,7 @@ import { AnimatePresence } from "framer-motion";
 import { Home, Music, Trophy, HelpCircle, Timer, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
-import type { NavPagesTypes } from "wrappers/AuthLayoutWrapper";
+import type { NavPagesTypes } from "types/layout.types";
 
 import DesktopHeaderWrapper from "./components/DesktopHeaderWrapper";
 import LandingNav from "./components/LandingNav";

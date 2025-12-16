@@ -9,7 +9,7 @@ import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
+import AppLayout from "layouts/AppLayout";
 import { ExercisePlan } from "feature/exercisePlan/components/ExercisePlan";
 
 const ProfileExercisesPage: NextPage = () => {
@@ -18,14 +18,14 @@ const ProfileExercisesPage: NextPage = () => {
   const userAuth = useAppSelector(selectUserAuth);
 
   return (
-    <AuthLayoutWrapper
+    <AppLayout
       pageId={"profile"}
       subtitle={(t as any)("exercises", "Exercises")}
       variant='secondary'>
       <div className='w-full'>
         <ExercisePlan />
       </div>
-    </AuthLayoutWrapper>
+    </AppLayout>
   );
 };
 

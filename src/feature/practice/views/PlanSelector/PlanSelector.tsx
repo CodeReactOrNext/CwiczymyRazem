@@ -1,11 +1,10 @@
-import { Button } from "assets/components/ui/button";
 import MainContainer from "components/MainContainer";
+import { PageHeader } from "components/PageHeader";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { LocalizedContent } from "feature/exercisePlan/types/exercise.types";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { FaArrowLeft } from "react-icons/fa";
 
 interface PlanSelectorProps {
   onBack: () => void;
@@ -34,22 +33,11 @@ export const PlanSelector = ({ onBack, onSelectPlan }: PlanSelectorProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className='space-y-8 p-8 font-openSans'>
-        <div className='flex items-center justify-between'>
-          <div>
-            <motion.h1
-              variants={item}
-              className='text-4xl font-bold tracking-tight'>
-              {t("exercises:plans.title")}
-            </motion.h1>
-            <motion.p variants={item} className='mt-2 text-muted-foreground'>
-              {t("exercises:plans.description")}
-            </motion.p>
-          </div>
-          <Button variant='outline' onClick={onBack}>
-            <FaArrowLeft className='mr-2 h-4 w-4' />
-            {t("common:back")}
-          </Button>
-        </div>
+        <PageHeader
+          title={t("exercises:plans.title")}
+          description={t("exercises:plans.description")}
+          onBack={onBack}
+        />
 
         <motion.div
           variants={item}
