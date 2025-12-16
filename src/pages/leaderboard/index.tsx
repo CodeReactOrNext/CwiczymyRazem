@@ -1,9 +1,9 @@
 import { LeadboardView } from "feature/leadboard/LeadboardView";
 import useAutoLogIn from "hooks/useAutoLogIn";
+import AppLayout from "layouts/AppLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
 
 const LeaderBoardPage: NextPage = () => {
   const { isLoggedIn } = useAutoLogIn({
@@ -13,12 +13,9 @@ const LeaderBoardPage: NextPage = () => {
   });
 
   return (
-    <AuthLayoutWrapper
-      pageId={"leadboard"}
-      subtitle='Leaderboard'
-      variant='secondary'>
+    <AppLayout pageId={"leadboard"} subtitle='Leaderboard' variant='secondary'>
       {isLoggedIn ? <LeadboardView /> : <PageLoadingLayout />}
-    </AuthLayoutWrapper>
+    </AppLayout>
   );
 };
 

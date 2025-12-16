@@ -7,14 +7,14 @@ import {
 } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
+import AppLayout from "layouts/AppLayout";
 
 const ProfileOverviewPage = () => {
   const { t } = useTranslation("profile");
   const userStats = useAppSelector(selectCurrentUserStats);
 
   return userStats ? (
-    <AuthLayoutWrapper
+    <AppLayout
       pageId={"profile"}
       subtitle={(t as any)("profile")}
       variant='secondary'>
@@ -37,7 +37,7 @@ const ProfileOverviewPage = () => {
           <LogsBoxView />
         </div>
       </div>
-    </AuthLayoutWrapper>
+    </AppLayout>
   ) : (
     <HeroView />
   );

@@ -10,7 +10,8 @@ import {
 } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
+import AppLayout from "layouts/AppLayout";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 const LandingView = () => {
   const { t } = useTranslation("profile");
@@ -18,8 +19,16 @@ const LandingView = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
 
-  return userStats ? (
-    <AuthLayoutWrapper
+  if (!userStats ) {
+    return (
+      <div className='flex min-h-screen items-center justify-center bg-zinc-950'>
+        <PageLoadingLayout />
+      </div>
+    );
+  }
+
+  return (
+    <AppLayout
       pageId={"profile"}
       subtitle={t("profile")}
       variant='secondary'>
@@ -29,9 +38,7 @@ const LandingView = () => {
         featSlot={<LogsBoxView />}
         userAuth={userAuth as string}
       />
-    </AuthLayoutWrapper>
-  ) : (
-    <HeroView />
+    </AppLayout>
   );
 };
 

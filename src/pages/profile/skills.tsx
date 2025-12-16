@@ -12,8 +12,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
-import { canUpgradeSkill } from "utils/firebase/client/firebase.utils";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
+import AppLayout from "layouts/AppLayout";
 
 const ProfileSkillsPage: NextPage = () => {
   const { t } = useTranslation("profile");
@@ -63,12 +62,12 @@ const ProfileSkillsPage: NextPage = () => {
   if (!userSkills) return null;
 
   return (
-    <AuthLayoutWrapper pageId={"profile"} subtitle='Skills' variant='secondary'>
+    <AppLayout pageId={"profile"} subtitle='Skills' variant='secondary'>
       <SkillDashboard
         userSkills={userSkills as UserSkills}
         onSkillUpgrade={handleUpgradeSkill}
       />
-    </AuthLayoutWrapper>
+    </AppLayout>
   );
 };
 

@@ -1,13 +1,25 @@
-import type { DropResult } from "@hello-pangea/dnd";
-import { DragDropContext } from "@hello-pangea/dnd";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCorners,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
+import { cn } from "assets/lib/utils";
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
+import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
@@ -48,6 +60,19 @@ export const SongLearningSection = ({
     userSongs,
     onTableStatusChange: onStatusChange,
   });
+  
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+         distance: 8,
+      }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   if (!userId) {
     return null;
@@ -65,65 +90,108 @@ export const SongLearningSection = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleDragEnd = async (result: DropResult) => {
-    const { source, destination, draggableId } = result;
-    const newStatus = destination?.droppableId;
-    const allSongs = userSongs.wantToLearn.concat(
-      userSongs.learning,
-      userSongs.learned
-    );
+  const findContainer = (id: string): SongStatus | undefined => {
+    if (userSongs.wantToLearn.find((s) => s.id === id)) return "wantToLearn";
+    if (userSongs.learning.find((s) => s.id === id)) return "learning";
+    if (userSongs.learned.find((s) => s.id === id)) return "learned";
+    // Check if id matches a container ID directly (for dropped-on-empty)
+    if (id === "wantToLearn" || id === "learning" || id === "learned") return id as SongStatus;
+    
+    return undefined;
+  };
 
-    if (!destination || !newStatus) {
-      return;
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    const activeId = active.id as string;
+    const overId = over?.id as string;
+
+    setActiveId(null);
+
+    if (!overId) return;
+
+    const activeContainer = findContainer(activeId);
+    let overContainer = findContainer(overId);
+
+    // If still undefined, maybe it's dropping over the container itself (handled in findContainer but just to be safe)
+    if (!overContainer) {
+        if (["wantToLearn", "learning", "learned"].includes(overId)) {
+             overContainer = overId as SongStatus;
+        } else {
+             return;
+        }
     }
 
-    if (
-      source.droppableId === destination.droppableId &&
-      source.index === destination.index
-    ) {
-      return;
+    if (!activeContainer || !overContainer) return;
+
+    const activeItems = userSongs[activeContainer];
+    const overItems = userSongs[overContainer];
+    
+    const activeIndex = activeItems.findIndex((s) => s.id === activeId);
+    const overIndex = overItems.findIndex((s) => s.id === overId);
+
+    let newIndex;
+    if (overIndex >= 0) {
+        newIndex = overIndex;
+    } else {
+        // Dropped on container
+        newIndex = overItems.length + 1;
     }
 
-    const songToMove = allSongs.find((song) => song.id === draggableId);
-    if (!songToMove) {
-      return;
-    }
+    if (activeContainer !== overContainer) {
+        // Moving between containers
+        const activeSong = activeItems[activeIndex];
+        const newActiveItems = [...activeItems];
+        newActiveItems.splice(activeIndex, 1);
+        
+        const newOverItems = [...overItems];
+        newOverItems.splice(newIndex > newOverItems.length ? newOverItems.length : newIndex, 0, activeSong);
 
-    const updatedSong = allSongs.find((song) => song.id === draggableId);
+        onChange({
+            ...userSongs,
+            [activeContainer]: newActiveItems,
+            [overContainer]: newOverItems,
+        });
 
-    if (!updatedSong) {
-      return;
-    }
+        // API Update
+        try {
+            await handleStatusChange(
+              activeId,
+              overContainer,
+              activeSong.title,
+              activeSong.artist
+            );
+          } catch (error) {
+            const songs = await getUserSongs(userId);
+            onChange(songs);
+          }
 
-    const oldStatus = Object.keys(userSongs).find((status) =>
-      userSongs[status as SongStatus].some((song) => song.id === draggableId)
-    );
-    if (oldStatus) {
-      const updatedOldField = userSongs[oldStatus as SongStatus].filter(
-        (song) => song.id !== draggableId
-      );
-      userSongs[oldStatus as SongStatus] = updatedOldField;
-    }
-
-    const updatedNewField = [...userSongs[newStatus as SongStatus]];
-
-    updatedNewField.splice(destination.index, 0, updatedSong);
-
-    const newUserSongs = { ...userSongs, [newStatus]: updatedNewField };
-    onChange(newUserSongs);
-
-    try {
-      await handleStatusChange(
-        draggableId,
-        destination.droppableId as SongStatus,
-        songToMove.title,
-        songToMove.artist
-      );
-    } catch (error) {
-      const songs = await getUserSongs(userId);
-      onChange(songs);
+    } else {
+        // Reordering in same container
+        if (activeIndex !== overIndex) {
+             const newItems = arrayMove(activeItems, activeIndex, overIndex);
+             onChange({
+                ...userSongs,
+                [activeContainer]: newItems
+             });
+             // Note: Persisting reorder within same status might need API support if order matters in DB.
+             // For now we just update UI state.
+        }
     }
   };
+
+  const getActiveSong = () => {
+      if (!activeId) return null;
+      const allSongs = [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned];
+      return allSongs.find(s => s.id === activeId);
+  }
+  
+  const activeSong = getActiveSong();
+  const activeContainer = activeId ? findContainer(activeId) : null;
+  const activeConfig = activeContainer ? STATUS_CONFIG[activeContainer] : null;
 
   const MobileView = () => (
     <Tabs defaultValue="wantToLearn" className="w-full">
@@ -170,7 +238,12 @@ export const SongLearningSection = ({
   );
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
+    <DndContext 
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+    >
       <div className='mb-6'>
         <SongLearningStats userSongs={userSongs} />
       </div>
@@ -208,6 +281,20 @@ export const SongLearningSection = ({
           />
         </div>
       )}
-    </DragDropContext>
+      
+      <DragOverlay>
+        {activeSong && activeConfig ? (
+             <div className="group relative flex flex-col gap-2 rounded-lg border border-white/5 bg-zinc-900/90 pointer-events-none p-3 shadow-2xl ring-2 ring-cyan-500/50 opacity-90 rotate-2 cursor-grabbing w-[300px]">
+                 <div className="flex items-start gap-3 pr-8">
+                    <activeConfig.icon className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", activeConfig.color)} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-white">{activeSong.title}</p>
+                      <p className="truncate text-xs text-zinc-400">{activeSong.artist}</p>
+                    </div>
+                  </div>
+             </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 };

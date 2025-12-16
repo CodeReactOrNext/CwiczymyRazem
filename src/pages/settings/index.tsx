@@ -1,40 +1,31 @@
 import SettingsView from "feature/settings/SettingsView";
-import useAutoLogIn from "hooks/useAutoLogIn";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { NextPage } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
-import AuthLayoutWrapper from "wrappers/AuthLayoutWrapper";
+import AppLayout from "layouts/AppLayout";
+import { withAuth } from "utils/auth/serverAuth";
 
 const Settings: NextPage = () => {
   const { t } = useTranslation("settings");
-  const { isLoggedIn } = useAutoLogIn({
-    redirects: {
-      loggedOut: "/login",
-    },
-  });
+
 
   return (
-    <AuthLayoutWrapper
+    <AppLayout
       pageId={null}
       subtitle={t("settings_subtilte")}
       variant='secondary'>
-      {!isLoggedIn ? <PageLoadingLayout /> : <SettingsView />}
-    </AuthLayoutWrapper>
+      <SettingsView />
+    </AppLayout>
   );
 };
 
 export default Settings;
 
-export async function getStaticProps({ locale }: { locale: string }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale ?? "pl", [
+export const getServerSideProps = withAuth({
+  redirectIfUnauthenticated: "/login",
+  translations: [
         "common",
         "settings",
         "yup_errors",
         "toast",
-      ])),
-    },
-  };
-}
+  ],
+});

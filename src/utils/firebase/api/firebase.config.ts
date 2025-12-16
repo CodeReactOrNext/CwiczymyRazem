@@ -5,10 +5,9 @@ if (!admin.apps.length) {
     credential: admin.credential.cert({
       projectId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_PROJECTID,
       clientEmail: process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.NEXT_PUBLIC_FIREBASE_PRIVATEKEY!.replace(
-        /\\n/g,
-        "\n"
-      ),
+      privateKey: (process.env.NEXT_PUBLIC_FIREBASE_PRIVATEKEY || "")
+        .replace(/\\n/g, "\n")
+        .replace(/^"|"$/g, ""),
     }),
     databaseURL: process.env.NEXT_PUBLIC_DATABASE_URL,
   });
@@ -17,4 +16,4 @@ if (!admin.apps.length) {
 const firestore = admin.firestore();
 const auth = admin.auth();
 
-export { auth,firestore };
+export { auth, firestore };

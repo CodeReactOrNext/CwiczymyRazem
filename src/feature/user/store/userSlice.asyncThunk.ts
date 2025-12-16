@@ -1,5 +1,6 @@
 import type { SerializedError } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { signIn, signOut } from "next-auth/react";
 import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { FirebaseError } from "firebase/app";
@@ -53,6 +54,8 @@ export const logInViaGoogle = createAsyncThunk(
   async () => {
     try {
       const { user } = await firebaseSignInWithGooglePopup();
+      const token = await user.getIdToken();
+      await signIn("credentials", { idToken: token, callbackUrl: "/dashboard" });
       const userData = await fetchUserData(user);
       return userData as UserDataInterface;
     } catch (error) {
@@ -68,6 +71,8 @@ export const logInViaGoogleCredential = createAsyncThunk(
     try {
       const credential = GoogleAuthProvider.credential(credentialId);
       const { user } = await firebaseSignInWithCredential(credential);
+      const token = await user.getIdToken();
+      await signIn("credentials", { idToken: token, callbackUrl: "/dashboard" });
       const userData = await fetchUserData(user);
       return userData as UserDataInterface;
     } catch (error) {
@@ -82,6 +87,8 @@ export const logInViaEmail = createAsyncThunk(
   async ({ email, password }: { email: string; password: string }) => {
     try {
       const { user } = await firebaseSignInWithEmail(email, password);
+      const token = await user.getIdToken();
+      await signIn("credentials", { idToken: token, callbackUrl: "/dashboard" });
       const userData = await fetchUserData(user);
       return userData as UserDataInterface;
     } catch (error) {
@@ -189,6 +196,7 @@ export const getUserProvider = createAsyncThunk(
 
 export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   try {
+    await signOut({ redirect: false });
     await firebaseLogUserOut();
     logOutInfo();
   } catch (error) {

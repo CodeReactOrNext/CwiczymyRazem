@@ -1,4 +1,4 @@
-import type { NavPagesTypes } from "wrappers/AuthLayoutWrapper";
+import type { NavPagesTypes } from "types/layout.types";
 
 import NavLink from "../NavLink";
 

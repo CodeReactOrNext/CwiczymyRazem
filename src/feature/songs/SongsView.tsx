@@ -19,10 +19,10 @@ import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
 import { useSongs } from "feature/songs/hooks/useSongs";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
-import { LoaderCircle, Search, X, Library, Grid } from "lucide-react";
+import { LoaderCircle, Search, X, Plus, Filter, LayoutGrid, ListMusic } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { IoMdAddCircleOutline } from "react-icons/io";
 import { useState } from "react";
+import { cn } from "assets/lib/utils";
 
 const SongsView = () => {
   const { t } = useTranslation("songs");
@@ -55,195 +55,154 @@ const SongsView = () => {
 
   return (
     <MainContainer title={t("songs")}>
-      <div className='font-openSans p-4 lg:p-8'>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-          {/* Enhanced Tab Navigation */}
-          <div className='mb-8 lg:mb-12'>
-            <TabsList className='grid w-full grid-cols-2'>
-              <TabsTrigger value='management'>
+      <div className='font-openSans flex flex-col gap-6 p-4 lg:p-8 min-h-screen'>
+        
+        {/* Top Control Bar & Tabs */}
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
+            <TabsList className="grid h-12 w-full grid-cols-2 gap-2 rounded-2xl bg-zinc-900/50 p-1 md:w-[300px] md:grid-cols-2">
+              <TabsTrigger 
+                value="management"
+                className="rounded-xl data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-400"
+              >
+                <LayoutGrid className="mr-2 h-4 w-4" />
                 Management
               </TabsTrigger>
-              <TabsTrigger value='table'>
+              <TabsTrigger 
+                value="table"
+                className="rounded-xl data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-400"
+              >
+                <ListMusic className="mr-2 h-4 w-4" />
                 Library
               </TabsTrigger>
             </TabsList>
-          </div>
+          </Tabs>
 
-          {/* Management Tab Content */}
-          <TabsContent value='management' className='mt-0'>
-            <div className='space-y-8'>
-              {/* Enhanced header */}
-              <div className='mb-8'>
-                <h2 className='mb-2 text-2xl font-black text-white lg:text-3xl'>
-                  Song Management
-                </h2>
-                <p className='text-base font-medium text-zinc-400'>
-                  Drag songs between categories to change their learning status
-                </p>
-              </div>
+          <Button onClick={() => setIsModalOpen(true)}>
+            <Plus className="mr-2 h-5 w-5" />
+            {t("add_new_song")}
+          </Button>
+        </div>
 
-              {/* Direct Song Learning Section */}
-              <SongLearningSection
+        {/* Content Area */}
+        <div className="flex-1">
+          <Tabs value={activeTab} className="h-full w-full">
+            
+            {/* MANAGEMENT TAB */}
+            <TabsContent value="management" className="mt-0 space-y-6 animate-in fade-in-50 duration-300">
+               <div className="flex flex-col gap-2">
+                  <h2 className="text-lg font-bold tracking-tight text-white">Your Progress</h2>
+                  <p className="text-sm text-zinc-400 max-w-2xl">
+                    Drag and drop songs to track your learning journey. Move items between columns to update their status.
+                  </p>
+               </div>
+               
+               <SongLearningSection
                 isLanding={false}
                 userSongs={userSongs}
                 onChange={setUserSongs}
                 onStatusChange={refreshSongs}
               />
-            </div>
-          </TabsContent>
+            </TabsContent>
 
-          {/* Grid Tab Content */}
-          <TabsContent value='table' className='mt-0'>
-            <div className='space-y-8'>
-              {/* Enhanced Filters Section */}
-              <div className='rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl lg:p-8'>
-                <div className='mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-                  <h3 className='text-xl font-bold text-white lg:text-2xl'>
-                    Library & Filters
-                  </h3>
-                  <Button
-                    onClick={() => setIsModalOpen(true)}
-                    className='h-12 rounded-xl border border-cyan-500/20 bg-gradient-to-r from-cyan-600 to-blue-600 px-6 font-bold text-white shadow-lg shadow-cyan-500/20 transition-all duration-300 hover:scale-105 hover:from-cyan-500 hover:to-blue-500 hover:shadow-cyan-500/30'>
-                    <IoMdAddCircleOutline className='mr-2 h-5 w-5' />
-                    Add New Song
-                  </Button>
+            {/* LIBRARY TAB */}
+            <TabsContent value="table" className="mt-0 space-y-6 animate-in fade-in-50 duration-300">
+              
+              {/* Compact Search & Filter Bar */}
+              <div className="sticky top-0 z-30 -mx-4 px-4 py-4 backdrop-blur-xl md:static md:mx-0 md:p-0 md:backdrop-blur-none">
+                <div className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-zinc-900/60 p-4 shadow-xl backdrop-blur-md md:flex-row md:items-center">
+                  
+                  {/* Search Input */}
+                  <div className="relative flex-1">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                      <Search className="h-5 w-5 text-zinc-500" />
+                    </div>
+                    <Input
+                      placeholder={t("search_songs")}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="h-11 w-full rounded-xl border-white/5 bg-zinc-800/50 pl-10 text-white placeholder:text-zinc-500 focus:border-cyan-500/50 focus:bg-zinc-800 focus:ring-4 focus:ring-cyan-500/10"
+                    />
+                     {debounceLoading && (
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                          <LoaderCircle className="h-5 w-5 animate-spin text-cyan-500" />
+                        </div>
+                      )}
+                  </div>
+
+                  <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+                    {/* Status Filter */}
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="h-11 min-w-[140px] rounded-xl border-white/5 bg-zinc-800/50 text-zinc-300 hover:bg-zinc-800 focus:ring-0">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent className="border-zinc-800 bg-zinc-900 font-medium">
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="wantToLearn" className="text-blue-400">Want to Learn</SelectItem>
+                        <SelectItem value="learning" className="text-amber-400">Learning</SelectItem>
+                        <SelectItem value="learned" className="text-emerald-400">Learned</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {/* Difficulty Filter */}
+                    <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+                      <SelectTrigger className="h-11 min-w-[140px] rounded-xl border-white/5 bg-zinc-800/50 text-zinc-300 hover:bg-zinc-800 focus:ring-0">
+                        <SelectValue placeholder="Difficulty" />
+                      </SelectTrigger>
+                      <SelectContent className="border-zinc-800 bg-zinc-900 font-medium">
+                        <SelectItem value="all">All Difficulties</SelectItem>
+                        <SelectItem value="easy">Easy</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="hard">Hard</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {/* Clear Filters */}
+                    {(hasFilters) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleClearFilters}
+                        className="h-11 w-11 shrink-0 rounded-xl border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                        title="Clear filters"
+                      >
+                        <X className="h-5 w-5" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
-                <div className='space-y-6'>
-                  {/* Search & Basic Filters Row */}
-                  <div className='grid gap-6 lg:grid-cols-4'>
-                    <div className='lg:col-span-2'>
-                      <label className='mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500'>
-                        Search
-                      </label>
-                      <Input
-                        type='text'
-                        startIcon={
-                          <Search size={18} className='text-zinc-500' />
-                        }
-                        endIcon={
-                          debounceLoading ? (
-                            <LoaderCircle
-                              size={18}
-                              className='animate-spin text-cyan-500'
-                            />
-                          ) : undefined
-                        }
-                        placeholder={t("search_songs")}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className='h-12 rounded-xl border-white/5 bg-zinc-800/50 text-white placeholder-zinc-500 transition-all focus:border-cyan-500/50 focus:bg-zinc-800 focus:ring-4 focus:ring-cyan-500/10'
-                      />
-                    </div>
-                    <div>
-                      <label className='mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500'>
-                        Status
-                      </label>
-                      <Select
-                        value={statusFilter}
-                        onValueChange={setStatusFilter}>
-                        <SelectTrigger className='h-12 rounded-xl border-white/5 bg-zinc-800/50 text-zinc-300 transition-all hover:bg-zinc-800 focus:ring-0'>
-                          <SelectValue placeholder='Status' />
-                        </SelectTrigger>
-                        <SelectContent className='border-zinc-800 bg-zinc-900'>
-                          <SelectItem value='all'>All</SelectItem>
-                          <SelectItem value='wantToLearn' className='text-blue-400'>
-                            Want to Learn
-                          </SelectItem>
-                          <SelectItem value='learning' className='text-amber-400'>
-                            Learning
-                          </SelectItem>
-                          <SelectItem value='learned' className='text-emerald-400'>
-                            Learned
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className='mb-2 block text-xs font-bold uppercase tracking-wider text-zinc-500'>
-                        Difficulty
-                      </label>
-                      <Select
-                        value={difficultyFilter}
-                        onValueChange={setDifficultyFilter}>
-                        <SelectTrigger className='h-12 rounded-xl border-white/5 bg-zinc-800/50 text-zinc-300 transition-all hover:bg-zinc-800 focus:ring-0'>
-                          <SelectValue placeholder='Difficulty' />
-                        </SelectTrigger>
-                        <SelectContent className='border-zinc-800 bg-zinc-900'>
-                          <SelectItem value='all'>All</SelectItem>
-                          <SelectItem value='easy'>Easy</SelectItem>
-                          <SelectItem value='medium'>Medium</SelectItem>
-                          <SelectItem value='hard'>Hard</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {/* Tier Filters Row */}
-                  <div>
-                    <label className='mb-3 block text-xs font-bold uppercase tracking-wider text-zinc-500'>
-                      Difficulty Tier
-                    </label>
-                    <div className='flex flex-wrap items-center gap-3'>
-                      <Button
-                        variant='ghost'
-                        onClick={() => setTierFilter("all")}
-                        className={`h-10 rounded-lg px-5 text-xs font-bold uppercase tracking-wide transition-all ${
-                          tierFilter === "all"
-                            ? "border border-cyan-500/50 bg-cyan-500/20 text-cyan-300 shadow-lg shadow-cyan-500/10"
-                            : "border border-white/5 bg-zinc-800/30 text-zinc-500 hover:bg-zinc-800 hover:text-white"
-                        }`}>
-                        All
-                      </Button>
-                      {getAllTiers().map((tier) => (
-                        <Button
-                          key={tier.tier}
-                          variant='ghost'
-                          onClick={() => setTierFilter(tier.tier)}
-                          className={`h-10 px-4 text-xs font-bold transition-all ${
-                            tierFilter === tier.tier
-                              ? "border-2 opacity-100 shadow-lg"
-                              : "border border-white/5 bg-zinc-800/30 opacity-70 hover:opacity-100"
-                          }`}
-                          style={{
-                            borderColor:
-                              tierFilter === tier.tier ? tier.color : undefined,
-                            backgroundColor:
-                              tierFilter === tier.tier
-                                ? tier.color + "15"
-                                : undefined,
-                            color:
-                              tierFilter === tier.tier ? tier.color : "#71717a",
-                          }}>
-                          {tier.tier}
-                        </Button>
-                      ))}
-                      {(statusFilter !== "all" ||
-                        difficultyFilter !== "all" ||
-                        tierFilter !== "all") && (
-                        <Button
-                          variant='ghost'
-                          onClick={handleClearFilters}
-                          className='h-10 rounded-lg border border-red-500/20 px-5 text-xs font-bold uppercase tracking-wide text-red-400 hover:bg-red-500/10 hover:text-red-300'>
-                          <X className='mr-2 h-3 w-3' />
-                          Clear
-                        </Button>
-                      )}
-                    </div>
-                  </div>
+                {/* Tier Tags Row - Optional expansion */}
+                <div className="mt-4 flex flex-wrap gap-2">
+                    {getAllTiers().map((tier) => (
+                      <button
+                        key={tier.tier}
+                        onClick={() => setTierFilter(tierFilter === tier.tier ? "all" : tier.tier)}
+                        className={cn(
+                          "flex h-8 items-center rounded-lg border px-3 text-xs font-bold uppercase tracking-wider transition-all",
+                          tierFilter === tier.tier 
+                            ? "opacity-100 shadow-md transform scale-105" 
+                            : "border-white/5 bg-zinc-800/30 text-zinc-500 opacity-60 hover:opacity-100 hover:bg-zinc-800/80"
+                        )}
+                        style={{
+                          borderColor: tierFilter === tier.tier ? tier.color : undefined,
+                          backgroundColor: tierFilter === tier.tier ? `${tier.color}15` : undefined,
+                          color: tierFilter === tier.tier ? tier.color : undefined,
+                          boxShadow: tierFilter === tier.tier ? `0 2px 10px ${tier.color}20` : undefined,
+                        }}
+                      >
+                        {tier.tier}
+                      </button>
+                    ))}
                 </div>
               </div>
 
-              {/* Grid Section */}
-              <div className='min-h-[500px]'>
+              {/* Grid Content */}
+              <div className="min-h-[500px] rounded-2xl bg-zinc-900/20 p-1">
                 {isLoading ? (
-                  <div className='flex h-[400px] items-center justify-center'>
-                    <div className='text-center'>
-                      <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-zinc-700 border-t-cyan-500'></div>
-                      <p className='text-lg font-bold text-white'>
-                        Loading library...
-                      </p>
-                    </div>
+                  <div className="flex h-[400px] flex-col items-center justify-center gap-4">
+                    <LoaderCircle className="h-12 w-12 animate-spin text-cyan-500" />
+                    <p className="font-medium text-zinc-400">Loading library...</p>
                   </div>
                 ) : (
                   <SongsGrid
@@ -258,9 +217,9 @@ const SongsView = () => {
                   />
                 )}
               </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
 
         <AddSongModal
           isOpen={isModalOpen}

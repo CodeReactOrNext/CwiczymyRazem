@@ -63,7 +63,7 @@ export const LeadboardRow = ({
         </div>
 
         {/* --- Mobile Layout (<640px) --- */}
-        <div className='flex flex-col gap-4 p-4 sm:hidden'>
+        <div className='relative z-10 flex flex-col gap-4 p-4 sm:hidden'>
            {/* Card Header: Rank, Avatar, Name */}
            <div className="flex items-center gap-3">
               {/* Rank Badge */}
@@ -80,21 +80,22 @@ export const LeadboardRow = ({
 
               {/* Avatar & Identity */}
               <div className="flex flex-1 items-center gap-3 overflow-hidden">
-                 <div className="relative flex-shrink-0">
+                 <Link href={`/user/${profileId}`} className="relative flex-shrink-0">
                     <div className="h-10 w-10 flex items-center justify-center overflow-hidden rounded-full bg-zinc-800 ring-2 ring-white/5">
                        <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
                     </div>
-                 </div>
+                 </Link>
 
                  <div className="flex flex-col min-w-0 gap-0.5">
                     <Link href={`/user/${profileId}`} className="block truncate">
                        <span 
                          className={cn(
-                           "block truncate text-sm font-bold tracking-tight",
+                           "flex items-center gap-2 truncate text-sm font-bold tracking-tight hover:underline",
                             profileId === currentUserId ? "text-cyan-400" : "text-white"
                          )}
                        >
                          {nick}
+                         <FaExternalLinkAlt className="h-3 w-3 opacity-50" />
                        </span>
                     </Link>
                     
@@ -155,7 +156,7 @@ export const LeadboardRow = ({
         </div>
 
         {/* --- Desktop Layout (>=640px) --- */}
-        <div className='hidden items-center gap-3 p-4 sm:flex sm:gap-5 sm:p-5 lg:gap-8 lg:p-6'>
+        <div className='relative z-10 hidden items-center gap-3 p-4 sm:flex sm:gap-5 sm:p-5 lg:gap-8 lg:p-6'>
           {/* Rank Number */}
           <div
             className={`flex h-10 w-10 flex-shrink-0 items-center justify-center text-lg font-black italic tracking-tighter sm:h-12 sm:w-12 sm:text-xl lg:h-14 lg:w-14 lg:text-2xl ${
@@ -169,25 +170,25 @@ export const LeadboardRow = ({
           </div>
 
           {/* Avatar */}
-          <div className='flex-shrink-0'>
+          <Link href={`/user/${profileId}`} className='flex-shrink-0'>
             <div className='relative transition-transform duration-300 group-hover:scale-105'>
               <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
             </div>
-          </div>
+          </Link>
 
           {/* User Info */}
           <div className='min-w-0 flex-1'>
             <div className='mb-1.5 flex items-center gap-4'>
-              <Link href={`/user/${profileId}`}>
+              <Link href={`/user/${profileId}`} className="flex items-center gap-2 group/link">
                 <h3
-                  className={`text-lg font-bold tracking-tight transition-colors lg:text-xl ${
+                  className={`text-lg font-bold tracking-tight transition-colors lg:text-xl group-hover/link:underline ${
                     profileId === currentUserId
                       ? "text-cyan-300"
                       : "text-zinc-200 group-hover:text-white"
                   }`}>
                   {shortenNick(nick)}
-                  <FaExternalLinkAlt className='ml-2 inline -translate-y-0.5 text-xs opacity-0 transition-all duration-300 group-hover:opacity-40 sm:text-sm' />
                 </h3>
+                <FaExternalLinkAlt className='text-xs opacity-30 transition-all duration-300 group-hover/link:opacity-100 sm:text-sm' />
               </Link>
 
               <div
