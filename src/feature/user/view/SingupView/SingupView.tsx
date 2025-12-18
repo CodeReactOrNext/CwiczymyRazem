@@ -73,12 +73,19 @@ const SingupView = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className='mb-6'>
-            <Link
-              href='/login'
-              className='group inline-flex items-center gap-2 text-sm text-zinc-400 transition-all duration-300 hover:text-cyan-400'>
-              <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-              {t("signup:back_to_login")}
-            </Link>
+            <div className='flex items-center justify-between'>
+              <Link
+                href='/login'
+                className='group inline-flex items-center gap-2 text-sm text-zinc-400 transition-all duration-300 hover:text-cyan-400'>
+                <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
+                {t("signup:back_to_login")}
+              </Link>
+              <Link
+                href='/'
+                className='text-sm text-zinc-500 hover:text-zinc-300 transition-colors'>
+                {t("common:back")}
+              </Link>
+            </div>
           </motion.div>
 
         <motion.div
@@ -96,7 +103,7 @@ const SingupView = () => {
                       alt='Logo'
                       width={48}
                       height={48}
-                      className='h-12 w-12'
+                      className='h-12 w-12 brightness-0 invert'
                     />
                  </div>
              </div>
