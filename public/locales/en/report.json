@@ -17,6 +17,7 @@
   "total_time": "Total time",
 
   "toast": {
+    "log_out": "Log out successfully",
     "24h_error": "It is not possible to exercise more than 24 hours per day",
     "input_time": "Enter time",
     "not_logged": "You are not logged in",
