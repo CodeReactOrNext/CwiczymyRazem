@@ -15,11 +15,10 @@ export const SkillDashboard = ({
   onSkillUpgrade,
 }: SkillDashboardProps) => {
   return (
-    <div className="w-full min-h-screen bg-[#050505] p-6 lg:p-12 pb-32">
+    <div className="w-full p-4 lg:p-8 pb-24">
         <div className="max-w-7xl mx-auto">
              <div className="mb-12">
-                 <h1 className="text-4xl font-bold text-white mb-2">Skill Dashboard</h1>
-                 <p className="text-zinc-400">Manage your abilities and spend points to progress.</p>
+                  <p className="text-zinc-400">Manage your abilities and spend points to progress.</p>
              </div>
 
              {CATEGORIES.map((category) => {

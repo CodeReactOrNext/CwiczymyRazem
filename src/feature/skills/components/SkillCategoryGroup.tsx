@@ -24,7 +24,7 @@ export const SkillCategoryGroup = ({
 
   return (
     <div className="mb-12 last:mb-0">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sticky top-0 z-20 bg-[#050505]/80 backdrop-blur-md py-4 border-b border-zinc-900">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sticky top-[-1px] z-20 bg-second-600/95 backdrop-blur-md py-4 border-b border-zinc-800 -mx-4 px-4 lg:-mx-8 lg:px-8">
          <div className="flex items-center gap-3">
              <div className={cn("w-2 h-8 rounded-full", theme.glow)} />
              <h2 className={cn("text-xl sm:text-2xl font-bold uppercase tracking-wider", theme.primary)}>
