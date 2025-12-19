@@ -10,10 +10,10 @@ export const Footer = () => {
               {/* Logo */}
               <div className='flex items-center gap-3'>
                 <div className='w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center'>
-                  <span className='text-white font-bold text-lg'>P</span>
+                  <span className='text-white font-bold text-lg'>R</span>
                 </div>
                 <div>
-                  <span className='text-lg font-bold text-white'>Practice Together</span>
+                  <span className='text-lg font-bold text-white'>RiffQuest</span>
                   <p className='text-xs text-zinc-500'>Guitar Learning Platform</p>
                 </div>
               </div>
@@ -21,7 +21,7 @@ export const Footer = () => {
 
             <div className='mt-12 pt-8 border-t border-zinc-800/50 text-center'>
               <p className='text-sm text-zinc-600'>
-                © 2024 Practice Together. Made with ❤️ for guitarists everywhere.
+                © 2025 RiffQuest. Made with ❤️ for guitarists everywhere.
               </p>
             </div>
           </div>

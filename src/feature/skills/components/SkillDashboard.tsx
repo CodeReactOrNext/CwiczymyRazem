@@ -17,10 +17,7 @@ export const SkillDashboard = ({
   return (
     <div className="w-full p-4 lg:p-8 pb-24">
         <div className="max-w-7xl mx-auto">
-             <div className="mb-12">
-                  <p className="text-zinc-400">Manage your abilities and spend points to progress.</p>
-             </div>
-
+        
              {CATEGORIES.map((category) => {
                  const categorySkills = guitarSkills.filter(s => s.category === category);
                  if (categorySkills.length === 0) return null;
