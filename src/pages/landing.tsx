@@ -18,9 +18,9 @@ const LandingPage: NextPage = () => {
 
   const faqQuestions: faqQuestionInterface[] = [
     {
-      title: "Is Practice Together really free?",
+      title: "Is RiffQuest really free?",
       message:
-        "Yes! Practice Together is mostly free. Core features, progress tracking, exercises and gamification are available without any fees.",
+        "Yes! RiffQuest is mostly free. Core features, progress tracking, exercises and gamification are available without any fees.",
     },
     {
       title: "How does progress tracking work?",
@@ -40,27 +40,89 @@ const LandingPage: NextPage = () => {
     {
       title: "Do I need special equipment?",
       message:
-        "No! Just a guitar and a device with internet access. Practice Together works on phones, tablets and computers.",
+        "No! Just a guitar and a device with internet access. RiffQuest works on phones, tablets and computers.",
     },
   ];
+
+  const siteUrl = "https://riff.quest";
+  const ogImageUrl = `${siteUrl}/promo.png`;
 
   return (
     <>
       <Head>
-        <title>Practice Together - Learn to play guitar</title>
-        <meta
-          name='description'
-          content='Intelligent guitar learning platform with progress system, community and thousands of songs.'
+        <title>{t("common:seo.title") as string}</title>
+        <meta name='description' content={t("common:seo.description") as string} />
+        <meta name='keywords' content={t("common:seo.keywords") as string} />
+
+        {/* Open Graph / Facebook */}
+        <meta property='og:type' content='website' />
+        <meta property='og:url' content={siteUrl} />
+        <meta property='og:title' content={t("common:seo.title") as string} />
+        <meta property='og:description' content={t("common:seo.description") as string} />
+        <meta property='og:image' content={ogImageUrl} />
+
+        {/* Twitter */}
+        <meta name='twitter:card' content='summary_large_image' />
+        <meta name='twitter:url' content={siteUrl} />
+        <meta name='twitter:title' content={t("common:seo.title") as string} />
+        <meta name='twitter:description' content={t("common:seo.description") as string} />
+        <meta name='twitter:image' content={ogImageUrl} />
+
+        <link rel='canonical' href={siteUrl} />
+
+        {/* Structured Data */}
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "RiffQuest",
+              "url": siteUrl,
+              "description": t("common:seo.description") as string,
+            }),
+          }}
+        />
+
+
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "RiffQuest",
+              "url": siteUrl,
+              "logo": `${siteUrl}/favicon/apple-touch-icon.png`,
+            }),
+          }}
+        />
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": faqQuestions.map((q) => ({
+                "@type": "Question",
+                "name": q.title,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": q.message,
+                },
+              })),
+            }),
+          }}
         />
       </Head>
 
-      <div className='min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30'>
+      <main className='min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30'>
         <HeroSection />
         <FeaturesSection />
         <PricingSection />
         <FaqSection questions={faqQuestions} />
         <Footer />
-      </div>
+      </main>
     </>
   );
 };

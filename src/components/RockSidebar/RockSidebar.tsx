@@ -181,7 +181,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             </div>
             <div>
               <h2 className='text-sm font-semibold text-white'>
-                Practice Together
+                RiffQuest
               </h2>
               <p className='text-xs text-zinc-400'>Guitar Learning</p>
             </div>
@@ -348,7 +348,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                   </div>
                   <div>
                     <h2 className='text-sm font-semibold text-white'>
-                      Practice Together
+                      RiffQuest
                     </h2>
                     <p className='text-xs text-zinc-400'>Guitar Learning</p>
                   </div>
