@@ -1,5 +1,14 @@
 {
   "subtitlebar_text": "Practice, report, earn points!",
   "slogan_line_1": "PRACTICE",
-  "slogan_line_2": "TOGETHER"
+  "slogan_line_2": "TOGETHER",
+  "title": "Welcome back",
+  "subtitle": "Log in to continue your progress",
+  "email_label": "Email",
+  "password_label": "Password",
+  "google_button": "Google",
+  "or_continue_with": "or continue with",
+  "not_have_account": "Don't have an account yet?",
+  "signup_link": "Sign up",
+  "submit_button": "Log in"
 }

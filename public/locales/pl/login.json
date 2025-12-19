@@ -1,5 +1,14 @@
 {
   "subtitlebar_text": "Ćwicz, raportuj, zdobywaj punkty!",
   "slogan_line_1": "ĆWICZYMY",
-  "slogan_line_2": "RAZEM"
+  "slogan_line_2": "RAZEM",
+  "title": "Witaj ponownie",
+  "subtitle": "Zaloguj się, aby kontynuować naukę",
+  "email_label": "Email",
+  "password_label": "Hasło",
+  "google_button": "Google",
+  "or_continue_with": "lub kontynuuj z",
+  "not_have_account": "Nie masz jeszcze konta?",
+  "signup_link": "Zarejestruj się",
+  "submit_button": "Zaloguj się"
 }

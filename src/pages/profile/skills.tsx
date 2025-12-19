@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 import AppLayout from "layouts/AppLayout";
+import MainContainer from "components/MainContainer";
 
 const ProfileSkillsPage: NextPage = () => {
   const { t } = useTranslation("profile");
@@ -63,10 +64,12 @@ const ProfileSkillsPage: NextPage = () => {
 
   return (
     <AppLayout pageId={"profile"} subtitle='Skills' variant='secondary'>
-      <SkillDashboard
-        userSkills={userSkills as UserSkills}
-        onSkillUpgrade={handleUpgradeSkill}
-      />
+      <MainContainer title={"Skills"}>
+        <SkillDashboard
+          userSkills={userSkills as UserSkills}
+          onSkillUpgrade={handleUpgradeSkill}
+        />
+      </MainContainer>
     </AppLayout>
   );
 };
