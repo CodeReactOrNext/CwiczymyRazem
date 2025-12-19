@@ -141,19 +141,11 @@ export const NavigationCards = ({ setActiveSection }: NavigationCardsProps) => {
   const router = useRouter();
 
   const handleSkillsClick = () => {
-    if (setActiveSection) {
-      setActiveSection("skills");
-    } else {
-      router.push("/profile/skills");
-    }
+    router.push("/profile/skills");
   };
 
   const handleExercisesClick = () => {
-    if (setActiveSection) {
-      setActiveSection("exercises");
-    } else {
-      router.push("/profile/exercises");
-    }
+    router.push("/profile/exercises");
   };
 
   return (

@@ -219,12 +219,7 @@ export const StatsSection = ({
 
         <div className='space-y-6'>
           <div className='hidden lg:block'>
-            <div className='relative mb-6'>
-              <h3 className='text-xl font-semibold text-white'>Skills</h3>
-              <p className='text-xs text-zinc-400'>
-                Distribution of exercise time by category
-              </p>
-            </div>
+          
             <SkillsRadarChart statistics={statistics} />
           </div>
         </div>

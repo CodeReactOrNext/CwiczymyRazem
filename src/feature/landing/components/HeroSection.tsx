@@ -55,9 +55,9 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className='text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6'>
-            Track your guitar <br />
-            <span className='bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent'>journey like a pro</span>
+            className='text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6 uppercase'>
+            The ultimate <br />
+            <span className='bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent'>guitar practice tracker</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -66,7 +66,7 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className='text-lg sm:text-xl text-zinc-400 leading-relaxed mb-10 max-w-lg'>
-            The intelligent platform for modern guitarists. Track practice time by skill, earn points, and visualize your progress with detailed analytics.
+            The intelligent guitar practice app for guitarists. Build your guitar practice routine, track time by skill, and visualize your guitar progress tracking with detailed analytics.
           </motion.p>
 
           {/* Stats preview */}
