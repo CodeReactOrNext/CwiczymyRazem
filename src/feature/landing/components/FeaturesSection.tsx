@@ -115,7 +115,7 @@ export const FeaturesSection = () => {
         <div className='mx-auto max-w-2xl text-center mb-20'>
           <h2 className='text-base font-semibold leading-7 text-cyan-500 tracking-wider uppercase'>Features</h2>
           <p className='mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl'>
-            Everything you need to master guitar
+            The complete system to track guitar practice effectively
           </p>
           <p className='mt-6 text-lg leading-8 text-zinc-400'>
             A complete ecosystem designed to make your practice structured and effective.
@@ -126,8 +126,8 @@ export const FeaturesSection = () => {
           {/* GROUP 1: PRACTICE TOOLS */}
           <div>
             <div className="text-center mb-12">
-               <h3 className="text-2xl font-bold text-white mb-2">Smart Practice Tools</h3>
-               <p className="text-zinc-400">Track every second of your progress with our intelligent timer system.</p>
+               <h3 className="text-2xl font-bold text-white mb-2">Effective Guitar Practice Tools</h3>
+               <p className="text-zinc-400">Track guitar practice every second with our intelligent timer system.</p>
             </div>
             
             <div className='overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-br from-zinc-900/80 via-zinc-900/60 to-zinc-950 p-8'>
@@ -173,8 +173,8 @@ export const FeaturesSection = () => {
              <div className="absolute -top-24 -left-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none opacity-50"></div>
              
             <div className="text-center mb-12 relative z-10">
-               <h3 className="text-2xl font-bold text-white mb-2">Detailed Analytics</h3>
-               <p className="text-zinc-400">Visualize your consistency and breakdown your improvements.</p>
+               <h3 className="text-2xl font-bold text-white mb-2">Guitar Practice Statistics</h3>
+               <p className="text-zinc-400">Visualize your consistency and guitar progress tracking with detailed analytics.</p>
             </div>
 
             <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10'>
@@ -377,8 +377,8 @@ export const FeaturesSection = () => {
           {/* GROUP 4: PROGRESSION FLOW */}
           <div className="relative pb-20">
              <div className="text-center mb-16">
-               <h3 className="text-2xl font-bold text-white mb-2">Your Path to Mastery</h3>
-               <p className="text-zinc-400">A gamified experience that keeps you motivated every single day.</p>
+               <h3 className="text-2xl font-bold text-white mb-2">Your Guitar Learning System</h3>
+               <p className="text-zinc-400">A gamified guitar practice planner that keeps you motivated every single day.</p>
             </div>
 
             <div className='relative'>
