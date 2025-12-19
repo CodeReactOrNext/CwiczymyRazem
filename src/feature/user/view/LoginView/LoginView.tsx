@@ -17,6 +17,7 @@ import {
   Eye,
   EyeOff,
   ChevronRight,
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -60,6 +61,19 @@ const LoginView = () => {
 
       <div className='relative z-10 w-full max-w-md p-6'>
         <motion.div
+           initial={{ opacity: 0, x: -20 }}
+           animate={{ opacity: 1, x: 0 }}
+           transition={{ duration: 0.6, delay: 0.1 }}
+           className='mb-6'>
+           <Link
+             href='/'
+             className='group inline-flex items-center gap-2 text-sm text-zinc-400 transition-all duration-300 hover:text-cyan-400'>
+             <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
+             {t("common:back")}
+           </Link>
+        </motion.div>
+
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -74,15 +88,15 @@ const LoginView = () => {
                       alt='Logo'
                       width={48}
                       height={48}
-                      className='h-12 w-12'
+                      className='h-12 w-12 brightness-0 invert'
                     />
                  </div>
              </div>
              <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
-               Witaj ponownie
+               {t("login:title")}
              </h1>
              <p className="text-zinc-400 text-sm">
-               Zaloguj się, aby kontynuować naukę
+               {t("login:subtitle")}
              </p>
           </div>
 
@@ -99,7 +113,7 @@ const LoginView = () => {
                         <Label
                           htmlFor='email'
                           className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
-                          Email
+                          {t("login:email_label")}
                         </Label>
                         <div className='relative group'>
                           <Mail className='absolute left-3 top-2.5 h-5 w-5 text-zinc-500 transition-colors group-focus-within:text-cyan-400' />
@@ -127,7 +141,7 @@ const LoginView = () => {
                          <Label
                           htmlFor='password'
                           className='text-xs font-semibold text-zinc-400 uppercase tracking-wider'>
-                          Hasło
+                          {t("login:password_label")}
                         </Label>
                     </div>
 
@@ -171,7 +185,7 @@ const LoginView = () => {
                           <Loader2 className='h-5 w-5 animate-spin' />
                         ) : (
                           <span className="flex items-center gap-2">
-                            Zaloguj się <ChevronRight className="w-4 h-4" />
+                            {t("login:submit_button")} <ChevronRight className="w-4 h-4" />
                           </span>
                         )}
                     </Button>
@@ -185,7 +199,7 @@ const LoginView = () => {
                     <div className="w-full border-t border-white/10"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-zinc-900 px-2 text-zinc-500">lub kontynuuj z</span>
+                    <span className="bg-zinc-900 px-2 text-zinc-500">{t("login:or_continue_with")}</span>
                 </div>
             </div>
 
@@ -201,18 +215,18 @@ const LoginView = () => {
                   ) : (
                     <FcGoogle className='h-5 w-5' />
                   )}
-                  Google
+                  {t("login:google_button")}
                 </span>
               </Button>
           </div>
 
           <div className='text-center'>
               <p className='text-sm text-zinc-400'>
-                Nie masz jeszcze konta?{" "}
+                {t("login:not_have_account")}{" "}
                 <Link
                   href='/signup'
                   className='font-bold text-cyan-400 hover:text-cyan-300 transition-colors'>
-                  Zarejestruj się
+                  {t("login:signup_link")}
                 </Link>
               </p>
             </div>
