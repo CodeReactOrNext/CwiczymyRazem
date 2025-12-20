@@ -163,9 +163,9 @@ const TimeInputBox = ({
               <div className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm">
                 <WheelPicker
                   options={hourOptions}
-                  value={hoursValue.toString()}
+                  value={parseInt(hoursValue.toString(), 10).toString()}
                   onValueChange={(value) =>
-                    setFieldValue(hoursName, parseInt(value, 10))
+                    setFieldValue(hoursName, value)
                   }
                   infinite
                   classNames={{
@@ -188,9 +188,9 @@ const TimeInputBox = ({
               <div className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm">
                 <WheelPicker
                   options={minuteOptions}
-                  value={minutesValue.toString()}
+                  value={parseInt(minutesValue.toString(), 10).toString()}
                   onValueChange={(value) =>
-                    setFieldValue(minutesName, parseInt(value, 10))
+                    setFieldValue(minutesName, value)
                   }
                   infinite
                     classNames={{
