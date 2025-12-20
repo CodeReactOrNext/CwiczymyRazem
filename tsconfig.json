@@ -2,7 +2,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -13,20 +17,42 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "paths": {
-      "assets/*": ["./src/assets/*"],
-      "components/*": ["src/components/*"],
-      "constants/*": ["./src/constants/*"],
-      "feature/*": ["./src/feature/*"],
-      "hooks/*": ["./src/hooks/*"],
-      "layouts/*": ["./src/layouts/*"],
-      "store/*": ["./src/store/*"],
-      "styles/*": ["./src/styles/*"],
-      "types/*": ["./src/types/*"],
-      "utils/*": ["./src/utils/*"],
-      "wrappers/*": ["./src/wrappers/*"]
+      "assets/*": [
+        "./src/assets/*"
+      ],
+      "components/*": [
+        "src/components/*"
+      ],
+      "constants/*": [
+        "./src/constants/*"
+      ],
+      "feature/*": [
+        "./src/feature/*"
+      ],
+      "hooks/*": [
+        "./src/hooks/*"
+      ],
+      "layouts/*": [
+        "./src/layouts/*"
+      ],
+      "store/*": [
+        "./src/store/*"
+      ],
+      "styles/*": [
+        "./src/styles/*"
+      ],
+      "types/*": [
+        "./src/types/*"
+      ],
+      "utils/*": [
+        "./src/utils/*"
+      ],
+      "wrappers/*": [
+        "./src/wrappers/*"
+      ]
     }
   },
   "include": [
@@ -34,7 +60,9 @@
     "tailwind.config.js",
     "next-env.d.ts",
     "next-i18next.config.js",
-    "**/*.ts",
+    "**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

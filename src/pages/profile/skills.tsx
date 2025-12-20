@@ -10,6 +10,7 @@ import {
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useEffect, useState } from "react";
+import nextI18nextConfig from "../../../next-i18next.config";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 import AppLayout from "layouts/AppLayout";
@@ -79,11 +80,11 @@ export default ProfileSkillsPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", [
-        "common",
-        "profile",
-        "skills",
-      ])),
+      ...(await serverSideTranslations(
+        locale ?? "pl",
+        ["common", "profile", "skills"],
+        nextI18nextConfig
+      )),
     },
   };
 }

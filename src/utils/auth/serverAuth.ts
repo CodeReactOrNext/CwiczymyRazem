@@ -1,6 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { getSession } from "next-auth/react";
+import nextI18nextConfig from "../../../next-i18next.config";
 
 type WithAuthOptions = {
   redirectIfAuthenticated?: string;
@@ -34,10 +35,11 @@ export function withAuth(options: WithAuthOptions = {}) {
       }
     }
 
-    const translations = await serverSideTranslations(locale ?? "pl", [
-      "common",
-      ...(options.translations || []),
-    ]);
+    const translations = await serverSideTranslations(
+      locale ?? "pl",
+      ["common", ...(options.translations || [])],
+      nextI18nextConfig
+    );
 
     return {
       props: {

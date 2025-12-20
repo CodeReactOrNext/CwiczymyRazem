@@ -5,20 +5,22 @@ const {
 
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   i18n,
   productionBrowserSourceMaps: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  experimental: {
-    reactCompiler: true,
-  },
+  reactCompiler: true,
+  turbopack: {},
+  bundlePagesRouterDependencies: true,
   webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
       path: false,
+    };
+    // Suppress "expression is too dynamic" warnings
+    config.module = {
+      ...config.module,
+      exprContextCritical: false,
+      unknownContextCritical: false,
     };
     return config;
   },

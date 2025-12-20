@@ -24,6 +24,7 @@ describe("makeRatingData", () => {
     countBackDays: 0,
     reportTitle: "0",
     habbits: [],
+    avatarUrl: null,
   };
 
   it("return 'zeros' in object if you send 'nothing'(not added time, habbits, etc.)", () => {
