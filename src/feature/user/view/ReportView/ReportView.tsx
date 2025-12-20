@@ -228,6 +228,7 @@ const ReportView = () => {
       initialValues={formikInitialValues}
       validationSchema={RaportSchema}
       validateOnBlur={false}
+      enableReinitialize={true}
       onSubmit={reportOnSubmit}>
       {({ errors, handleSubmit, values, setFieldValue }) => (
         <>
