@@ -8,6 +8,7 @@ const nextConfig = {
   i18n,
   productionBrowserSourceMaps: true,
   reactCompiler: true,
+  turbopack: {},
   bundlePagesRouterDependencies: true,
   webpack: (config) => {
     config.resolve.fallback = {
