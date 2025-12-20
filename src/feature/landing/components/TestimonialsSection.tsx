@@ -7,7 +7,7 @@ export const TestimonialsSection = () => {
     {
       name: "Mike K.",
       level: "Level 47",
-      text: "Thanks to RiffQuest my guitar playing improved significantly. The points system motivates me to practice daily!",
+      text: "Thanks to Riff Quest my guitar playing improved significantly. The points system motivates me to practice daily!",
       initial: "MK",
       stats: { hours: 156, points: 1234 }
     },
