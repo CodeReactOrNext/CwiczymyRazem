@@ -170,20 +170,19 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
         {/* Brand Header */}
         <div className='border-b border-white/10 p-4'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-lg'>
+            <div className='flex h-9 w-9 items-center justify-center'>
               <Image
-                src='/images/logo-optimized.svg'
+                src='/images/logolight.svg'
                 alt='Logo'
-                width={16}
-                height={16}
-                className='h-4 w-4 brightness-0 invert'
+                width={32}
+                height={32}
+                className='h-8 w-8'
               />
             </div>
             <div>
               <h2 className='text-sm font-semibold text-white'>
-                RiffQuest
+                Rifff Quest
               </h2>
-              <p className='text-xs text-zinc-400'>Guitar Learning</p>
             </div>
           </div>
         </div>
@@ -337,20 +336,19 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               {/* Header */}
               <div className='flex items-center justify-between border-b border-white/10 p-4'>
                 <div className='flex items-center gap-3'>
-                  <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-lg'>
+                  <div className='flex h-9 w-9 items-center justify-center'>
                     <Image
-                      src='/images/logo-optimized.svg'
+                      src='/images/logolight.svg'
                       alt='Logo'
-                      width={16}
-                      height={16}
-                      className='h-4 w-4 brightness-0 invert'
+                      width={32}
+                      height={32}
+                      className='h-8 w-8'
                     />
                   </div>
                   <div>
                     <h2 className='text-sm font-semibold text-white'>
-                      RiffQuest
+                      Rifff Quest
                     </h2>
-                    <p className='text-xs text-zinc-400'>Guitar Learning</p>
                   </div>
                 </div>
                 <Button

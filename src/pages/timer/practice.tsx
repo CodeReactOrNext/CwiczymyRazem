@@ -56,11 +56,11 @@ const TimerPractice: NextPage = () => {
     if (timer.timerEnabled && chosenSkill) {
       document.title = `${convertMsToHMS(timer.time)} - ${t(chosenSkill)}`;
     } else {
-      document.title = "Timer - RiffQuest";
+      document.title = "Timer - Riff Quest";
     }
 
     return () => {
-      document.title = "RiffQuest";
+      document.title = "Riff Quest";
     };
   }, [timer.time, timer.timerEnabled, chosenSkill, t]);
 

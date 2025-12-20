@@ -17,6 +17,11 @@ class MyDocument extends Document {
             rel='stylesheet'
           />
           <link
+            rel='icon'
+            type='image/svg+xml'
+            href='/images/logolight.svg'
+          />
+          <link
             rel='apple-touch-icon'
             sizes='180x180'
             href='favicon/apple-touch-icon.png'
@@ -34,7 +39,7 @@ class MyDocument extends Document {
             href='favicon/favicon-16x16.png'
           />
           <link rel='manifest' href='/site.webmanifest' />
-          <link rel='mask-icon' href='/safari-pinned-tab.svg' color='#5bbad5' />
+          <link rel='mask-icon' href='/images/logolight.svg' color='#06b6d4' />
           <meta name='msapplication-TileColor' content='#da532c' />
           <meta name='theme-color' content='#ffffff' />
         </Head>
