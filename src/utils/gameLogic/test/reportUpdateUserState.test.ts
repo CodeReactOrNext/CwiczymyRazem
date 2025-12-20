@@ -29,6 +29,7 @@ describe("reportHandler", () => {
     countBackDays: 0,
     reportTitle: "0",
     habbits: [],
+    avatarUrl: null,
   };
   const raitingData = {
     totalPoints: 0,
@@ -73,6 +74,11 @@ describe("reportHandler", () => {
     const result = reportUpdateUserStats({
       currentUserStats,
       inputData: emptyInputData,
+      currentUserSongLists: {
+        wantToLearn: [],
+        learned: [],
+        learning: [],
+      }
     });
     expect(deafultExpectedDate).toStrictEqual(result);
   });
@@ -96,6 +102,11 @@ describe("reportHandler", () => {
     const result = reportUpdateUserStats({
       currentUserStats,
       inputData,
+      currentUserSongLists: {
+        wantToLearn: [],
+        learned: [],
+        learning: [],
+      }
     });
     expect(expectedDate).toStrictEqual(result);
   });

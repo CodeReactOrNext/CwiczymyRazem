@@ -4,6 +4,7 @@ import AppLayout from "layouts/AppLayout";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
+import nextI18nextConfig from "../../../next-i18next.config";
 
 const FaqPage: NextPage = () => {
   const { t } = useTranslation("faq");
@@ -25,11 +26,11 @@ export default FaqPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", [
-        "common",
-        "faq",
-        "toast",
-      ])),
+      ...(await serverSideTranslations(
+        locale ?? "pl",
+        ["common", "faq", "toast"],
+        nextI18nextConfig
+      )),
     },
   };
 }

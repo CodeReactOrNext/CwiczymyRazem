@@ -26,7 +26,7 @@ export const useSongs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
-  const debounceTimeout = useRef<NodeJS.Timeout>();
+  const debounceTimeout = useRef<NodeJS.Timeout>(null);
 
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string>("all");

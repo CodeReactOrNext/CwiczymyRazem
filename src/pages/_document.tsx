@@ -1,7 +1,7 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
 
 class MyDocument extends Document {
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     return (
       <Html lang='en' className='dark'>
         <Head>

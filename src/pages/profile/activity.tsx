@@ -13,6 +13,7 @@ import {
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useEffect, useState } from "react";
+import nextI18nextConfig from "../../../next-i18next.config";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 import { StatisticsDataInterface } from "types/api.types";
@@ -69,13 +70,11 @@ export default ProfileActivityPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", [
-        "common",
-        "profile",
-        "skills",
-        "achievements",
-        "songs",
-      ])),
+      ...(await serverSideTranslations(
+        locale ?? "pl",
+        ["common", "profile", "skills", "achievements", "songs"],
+        nextI18nextConfig
+      )),
     },
   };
 }
