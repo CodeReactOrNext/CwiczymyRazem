@@ -10,7 +10,7 @@ interface ExerciseImageProps {
   title: string;
   isMobileView: boolean;
   imageScale: number;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   setImageModalOpen: (isOpen: boolean) => void;
   handleZoomIn: () => void;
   handleZoomOut: () => void;

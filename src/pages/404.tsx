@@ -4,6 +4,7 @@ import NotFoundLayout from "layouts/NotFoundLayout";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
+import nextI18nextConfig from "../../next-i18next.config";
 
 const NotFoundPage: NextPage = () => {
   const { t } = useTranslation("404");
@@ -20,11 +21,11 @@ export default NotFoundPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", [
-        "common",
-        "404",
-        "toast",
-      ])),
+      ...(await serverSideTranslations(
+        locale ?? "pl",
+        ["common", "404", "toast"],
+        nextI18nextConfig
+      )),
     },
   };
 }

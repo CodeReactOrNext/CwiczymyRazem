@@ -4,6 +4,7 @@ import AppLayout from "layouts/AppLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import nextI18nextConfig from "../../../next-i18next.config";
 
 const LeaderBoardPage: NextPage = () => {
   const { isLoggedIn } = useAutoLogIn({
@@ -24,12 +25,11 @@ export default LeaderBoardPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", [
-        "common",
-        "leadboard",
-        "achievements",
-        "toast",
-      ])),
+      ...(await serverSideTranslations(
+        locale ?? "pl",
+        ["common", "leadboard", "achievements", "toast"],
+        nextI18nextConfig
+      )),
     },
   };
 }
