@@ -43,7 +43,7 @@ export const HeroSection = () => {
       <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8 w-full'>
         {/* Top bar - matching app header */}
           <div className='flex items-center gap-4 mb-12'>
-            <Logo />
+            <Logo large />
           </div>
 
         <div className='max-w-2xl lg:max-w-3xl'>

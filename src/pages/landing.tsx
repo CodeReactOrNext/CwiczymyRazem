@@ -19,9 +19,9 @@ const LandingPage: NextPage = () => {
 
   const faqQuestions: faqQuestionInterface[] = [
     {
-      title: "Is RiffQuest really free?",
+      title: "Is Riff Quest really free?",
       message:
-        "Yes! RiffQuest is mostly free. Core features, progress tracking, exercises and gamification are available without any fees.",
+        "Yes! Riff Quest is mostly free. Core features, progress tracking, exercises and gamification are available without any fees.",
     },
     {
       title: "How does progress tracking work?",
@@ -41,7 +41,7 @@ const LandingPage: NextPage = () => {
     {
       title: "Do I need special equipment?",
       message:
-        "No! Just a guitar and a device with internet access. RiffQuest works on phones, tablets and computers.",
+        "No! Just a guitar and a device with internet access. Riff Quest works on phones, tablets and computers.",
     },
   ];
 
@@ -78,7 +78,7 @@ const LandingPage: NextPage = () => {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "name": "RiffQuest",
+              "name": "Riff Quest",
               "url": siteUrl,
               "description": t("common:seo.description") as string,
             }),
@@ -92,7 +92,7 @@ const LandingPage: NextPage = () => {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "name": "RiffQuest",
+              "name": "Riff Quest",
               "url": siteUrl,
               "logo": `${siteUrl}/favicon/apple-touch-icon.png`,
             }),
