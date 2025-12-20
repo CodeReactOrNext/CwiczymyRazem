@@ -8,20 +8,20 @@ export const Footer = () => {
         <footer className='relative bg-[#0d0d0c] py-16 border-t border-zinc-800'>
           <div className='mx-auto max-w-7xl px-6 lg:px-8'>
               {/* Logo */}
-              <div className='flex items-center gap-3'>
-                <div className='w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center'>
-                  <span className='text-white font-bold text-lg'>R</span>
-                </div>
-                <div>
-                  <span className='text-lg font-bold text-white'>RiffQuest</span>
-                  <p className='text-xs text-zinc-500'>Guitar Learning Platform</p>
-                </div>
+              <div className='flex items-center'>
+                <Image
+                  src='/images/longlightlogo.svg'
+                  alt='Riff Quest'
+                  width={150}
+                  height={32}
+                  className='h-8 w-auto opacity-80 hover:opacity-100 transition-opacity'
+                />
               </div>
 
 
             <div className='mt-12 pt-8 border-t border-zinc-800/50 text-center'>
               <p className='text-sm text-zinc-600'>
-                © 2025 RiffQuest. Made with ❤️ for guitarists everywhere.
+                © 2025 Riff Quest. Made with ❤️ for guitarists everywhere.
               </p>
             </div>
           </div>

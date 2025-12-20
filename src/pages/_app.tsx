@@ -42,7 +42,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppProps) =>
             name='google-signin-client_id'
             content={process.env.NEXT_PUBLIC_GOOGLE_QAUTH}
           />
-          <title>RiffQuest</title>
+          <title>Riff Quest</title>
           <meta
             name='description'
             content='Practice, track progress, compete! Guitar in hand! 🎸'
