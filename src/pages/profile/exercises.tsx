@@ -8,6 +8,7 @@ import {
 import type { NextPage } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
+import nextI18nextConfig from "../../../next-i18next.config";
 import { useAppSelector } from "store/hooks";
 import AppLayout from "layouts/AppLayout";
 import { ExercisePlan } from "feature/exercisePlan/components/ExercisePlan";
@@ -34,11 +35,11 @@ export default ProfileExercisesPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", [
-        "common",
-        "profile",
-        "exercises",
-      ])),
+      ...(await serverSideTranslations(
+        locale ?? "pl",
+        ["common", "profile", "exercises"],
+        nextI18nextConfig
+      )),
     },
   };
 }

@@ -3,8 +3,8 @@ import * as React from "react";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
-  startIcon?: JSX.Element;
-  endIcon?: JSX.Element;
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(

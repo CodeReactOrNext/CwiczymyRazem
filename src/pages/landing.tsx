@@ -4,6 +4,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
+import nextI18nextConfig from "../../next-i18next.config";
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 
 // Import new modular components
@@ -132,7 +133,11 @@ export default LandingPage;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? "pl", ["common", "profile"])),
+      ...(await serverSideTranslations(
+        locale ?? "pl",
+        ["common", "profile"],
+        nextI18nextConfig
+      )),
     },
   };
 }
