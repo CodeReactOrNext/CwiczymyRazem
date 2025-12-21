@@ -23,62 +23,83 @@ export const getSongs = async (
   searchQuery: string,
   page: number,
   itemsPerPage: number,
-  tier?: string,
-  difficultyFilter?: string
+  tierFilters?: string[],
+  difficultyFilter?: string,
+  genreFilters?: string[]
 ) => {
   try {
     const songsRef = collection(db, "songs");
     let q = query(songsRef);
 
-    // 1. Firestore-Native Search (prefix search on lowercase field)
-    if (searchQuery) {
-      const lowerSearch = searchQuery.toLowerCase();
-      q = query(
-        q,
-        where("title_lowercase", ">=", lowerSearch),
-        where("title_lowercase", "<=", lowerSearch + "\uf8ff")
-      );
-    }
-
-    // 2. Firestore-Native Tier Filtering
-    if (tier && tier !== "all") {
-      if (tier === "S") q = query(q, where("avgDifficulty", ">=", 9));
-      else if (tier === "A") q = query(q, where("avgDifficulty", ">=", 7.5), where("avgDifficulty", "<", 9));
-      else if (tier === "B") q = query(q, where("avgDifficulty", ">=", 6), where("avgDifficulty", "<", 7.5));
-      else if (tier === "C") q = query(q, where("avgDifficulty", ">=", 4), where("avgDifficulty", "<", 6));
-      else if (tier === "D") q = query(q, where("avgDifficulty", "<", 4));
-    }
-
-    // 3. Firestore-Native Difficulty Filtering
+    // 0. Base Filtering (Firestore-Native)
+    // We only do simple filters on DB to avoid complex index requirements for multi-select
     if (difficultyFilter && difficultyFilter !== "all") {
       if (difficultyFilter === "easy") q = query(q, where("avgDifficulty", "<=", 4));
       else if (difficultyFilter === "medium") q = query(q, where("avgDifficulty", ">", 4), where("avgDifficulty", "<=", 7));
       else if (difficultyFilter === "hard") q = query(q, where("avgDifficulty", ">", 7));
     }
 
-    // Note: Combining multiple range/inequality filters in Firestore requires composite indexes.
-    // If the query fails due to missing index, it will throw an error with a link to create it.
-
+    // 1. Fetch Candidates
     const snapshot = await getDocs(q);
     let songs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Song));
 
-    // Background Hydration: update documents missing helper fields
+    // 2. Client-side Multi-select Filtering (Tier)
+    if (tierFilters && tierFilters.length > 0) {
+      songs = songs.filter(song => {
+        const diff = song.avgDifficulty ?? 0;
+        return tierFilters.some(tier => {
+          if (tier === "S") return diff >= 9;
+          if (tier === "A") return diff >= 7.5 && diff < 9;
+          if (tier === "B") return diff >= 6 && diff < 7.5;
+          if (tier === "C") return diff >= 4 && diff < 6;
+          if (tier === "D") return diff < 4;
+          return false;
+        });
+      });
+    }
+
+    // 3. Client-side Multi-select Filtering (Genre)
+    if (genreFilters && genreFilters.length > 0) {
+      songs = songs.filter(song => {
+        if (!song.genres || !song.genres.length) return false;
+        // Check if item has ANY of the selected genres
+        return genreFilters.some(g => song.genres?.includes(g));
+      });
+    }
+
+    // Background Hydration: update documents missing helper fields or search_string
     songs.forEach((song) => {
-      if (song.avgDifficulty === undefined || song.title_lowercase === undefined) {
+      const title = song.title || "";
+      const artist = song.artist || "";
+      const searchStr = `${title} ${artist}`.toLowerCase();
+
+      if (song.avgDifficulty === undefined || song.title_lowercase === undefined || song.search_string === undefined) {
         const avg = getAverageDifficulty(song.difficulties || []);
         updateDoc(doc(db, "songs", song.id), {
           avgDifficulty: avg,
-          title_lowercase: song.title.toLowerCase(),
-          artist_lowercase: song.artist.toLowerCase(),
+          title_lowercase: title.toLowerCase(),
+          artist_lowercase: artist.toLowerCase(),
+          search_string: searchStr
         }).catch(err => console.error("Hyration failure:", err));
 
-        // Update current object for immediate correct sorting/display
+        // Update current object
         song.avgDifficulty = avg;
-        song.title_lowercase = song.title.toLowerCase();
+        song.title_lowercase = title.toLowerCase();
+        song.search_string = searchStr;
       }
     });
 
-    // 4. Client-side Sorting & Paging (on the filtered result set)
+    // 4. Client-side Search Filtering
+    if (searchQuery) {
+      const lowerSearch = searchQuery.toLowerCase();
+      songs = songs.filter(song => {
+        const titleMatch = (song.title || "").toLowerCase().includes(lowerSearch);
+        const artistMatch = (song.artist || "").toLowerCase().includes(lowerSearch);
+        return titleMatch || artistMatch;
+      });
+    }
+
+    // 5. Client-side Sorting & Paging
     // We do sorting here to handle cases where we can't do it on DB (e.g. combined filters without index)
     songs.sort((a: any, b: any) => {
       let valA = a[sortBy];

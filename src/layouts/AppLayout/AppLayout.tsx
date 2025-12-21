@@ -53,7 +53,8 @@ const AppLayout = ({
       { id: "report", name: t("nav.report"), href: "/report" },
     ],
     rightSideLinks: [
-      { id: "songs", name: t("nav.songs"), href: "/songs" },
+      { id: "library", name: "Library", href: "/songs?view=library" },
+      { id: "my_songs", name: "My Songs", href: "/songs?view=management" },
       { id: "leadboard", name: t("nav.leadboard"), href: "/leaderboard" },
       { id: "faq", name: t("nav.faq"), href: "/faq" },
     ],

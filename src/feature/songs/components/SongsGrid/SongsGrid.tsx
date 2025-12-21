@@ -11,6 +11,7 @@ import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
+import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
@@ -24,6 +25,11 @@ interface SongsGridProps {
   onPageChange: (page: number) => void;
   onAddSong: () => void;
   onStatusChange: () => void;
+  userSongs: {
+    wantToLearn: Song[];
+    learning: Song[];
+    learned: Song[];
+  };
 }
 
 export const SongsGrid = ({
@@ -34,51 +40,18 @@ export const SongsGrid = ({
   onAddSong,
   hasFilters,
   onStatusChange,
+  userSongs,
 }: SongsGridProps) => {
   const userId = useAppSelector(selectUserAuth);
 
-  const [userSongs, setUserSongs] = useState<{
-    wantToLearn: Song[];
-    learning: Song[];
-    learned: Song[];
-  }>({
-    wantToLearn: [],
-    learning: [],
-    learned: [],
-  });
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  const { handleStatusChange } = useSongsStatusChange({
-    onChange: setUserSongs,
+  const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
+    onChange: () => {}, // Handled by refreshSongs in SongsView
     userSongs,
     onTableStatusChange: onStatusChange,
   });
-
-  const allUserSongs = [
-    ...userSongs.wantToLearn.map((song) => ({
-      ...song,
-      status: "wantToLearn",
-    })),
-    ...userSongs.learning.map((song) => ({ ...song, status: "learning" })),
-    ...userSongs.learned.map((song) => ({ ...song, status: "learned" })),
-  ];
-
-  useEffect(() => {
-    const loadUserSongs = async () => {
-      if (!userId) return;
-      try {
-        const songs = await getUserSongs(userId);
-        setUserSongs({
-          wantToLearn: songs.wantToLearn,
-          learning: songs.learning,
-          learned: songs.learned,
-        });
-      } catch (error) {
-        console.error("Error loading user songs:", error);
-      }
-    };
-
-    loadUserSongs();
-  }, [userId]);
 
   if (songs.length === 0) {
     return <SongsTableEmpty hasFilters={hasFilters} onAddSong={onAddSong} />;
@@ -89,27 +62,50 @@ export const SongsGrid = ({
       {/* Grid Container */}
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {songs.map((song) => {
-          const userSong = allUserSongs.find((u) => u.id === song.id);
-          const status = userSong?.status as SongStatus | undefined;
+          const isPracticing = 
+            userSongs.wantToLearn.some(s => s.id === song.id) ||
+            userSongs.learning.some(s => s.id === song.id) ||
+            userSongs.learned.some(s => s.id === song.id);
 
           return (
             <SongCard
               key={song.id}
               song={song}
-              status={status}
-              onStatusChange={(newStatus) =>
-                handleStatusChange(
-                  song.id,
-                  newStatus,
-                  song.title,
-                  song.artist
-                )
-              }
-              onRatingChange={onStatusChange}
+              onOpenDetails={() => {
+                setSelectedSong(song);
+                setIsDetailsOpen(true);
+              }}
             />
           );
         })}
       </div>
+
+      <SongSheet
+        song={songs.find((s) => s.id === selectedSong?.id) || selectedSong}
+        isOpen={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+        onStatusChange={async (newStatus) => {
+          if (selectedSong) {
+            if (newStatus === undefined) {
+              await handleSongRemoval(selectedSong.id);
+            } else {
+              await handleStatusChange(
+                selectedSong.id,
+                newStatus,
+                selectedSong.title,
+                selectedSong.artist
+              );
+            }
+          }
+        }}
+        onRatingChange={onStatusChange}
+        status={
+          userSongs.wantToLearn.some(s => s.id === selectedSong?.id) ? "wantToLearn" :
+          userSongs.learning.some(s => s.id === selectedSong?.id) ? "learning" :
+          userSongs.learned.some(s => s.id === selectedSong?.id) ? "learned" : 
+          undefined
+        }
+      />
 
       {/* Pagination */}
       {songs.length > 0 && (

@@ -2,7 +2,7 @@ import { rateSongDifficulty } from "feature/songs/services/rateSongDifficulty";
 import type { Song } from "feature/songs/types/songs.type";
 import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
-import { Star } from "lucide-react";
+import { Star, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -11,8 +11,9 @@ import { useAppSelector } from "store/hooks";
 interface SongRatingInterface {
   song: Song;
   refreshTable: () => void;
+  tierColor?: string;
 }
-export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
+export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterface) => {
   const userId = useAppSelector(selectUserAuth);
   const avatar = useAppSelector(selectUserAvatar);
   const { t } = useTranslation("songs");
@@ -21,6 +22,7 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
     songId: string;
     rating: number;
   } | null>(null);
+  const [isRatingLoading, setIsRatingLoading] = useState(false);
 
   const handleRating = async (
     songId: string,
@@ -48,11 +50,14 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
     }
 
     try {
+      setIsRatingLoading(true);
       await rateSongDifficulty(songId, userId, rating, title, artist, avatar);
       refreshTable();
       toast.success(t("rating_updated"));
     } catch (error) {
       toast.error(t("error_rating"));
+    } finally {
+      setIsRatingLoading(false);
     }
   };
 
@@ -79,21 +84,23 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
               <Star
                 className={`h-4 w-4 ${
                   showAvgRating
-                    ? "fill-yellow-300 text-yellow-300"
-                    : "fill-muted text-muted-foreground"
+                    ? "opacity-100"
+                    : "fill-muted text-muted-foreground opacity-30"
                 }`}
+                style={showAvgRating ? { fill: tierColor, color: tierColor } : {}}
               />
               <Star
-                className={`absolute inset-0 h-4 w-4 cursor-pointer ${
+                className={`absolute inset-0 h-4 w-4 transition-all ${
                   isHovered || showUserRating
-                    ? "scale-110 fill-primary text-primary "
-                    : "fill-transparent text-transparent"
-                }`}
+                    ? "scale-125 opacity-100"
+                    : "fill-transparent text-transparent opacity-0"
+                } ${isRatingLoading ? "cursor-not-allowed" : "cursor-pointer"}`}
+                style={(isHovered || showUserRating) ? { fill: tierColor, color: tierColor, filter: `drop-shadow(0 0 5px ${tierColor}40)` } : {}}
                 onClick={() =>
-                  handleRating(song.id, song.title, song.artist, i + 1)
+                  !isRatingLoading && handleRating(song.id, song.title, song.artist, i + 1)
                 }
                 onMouseEnter={() =>
-                  setRatingHover({
+                  !isRatingLoading && setRatingHover({
                     songId: song.id,
                     rating: i + 1,
                   })
@@ -103,6 +110,7 @@ export const SongRating = ({ song, refreshTable }: SongRatingInterface) => {
             </div>
           );
         })}
+        {isRatingLoading && <Loader2 className="h-4 w-4 animate-spin text-cyan-500 ml-2" />}
         <div className='mt-1 text-sm text-muted-foreground'>
           ({song.difficulties?.length})
         </div>{" "}

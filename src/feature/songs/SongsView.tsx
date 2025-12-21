@@ -17,17 +17,39 @@ import MainContainer from "components/MainContainer";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
+import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
 import { useSongs } from "feature/songs/hooks/useSongs";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
-import { LoaderCircle, Search, X, Plus, Filter, LayoutGrid, ListMusic } from "lucide-react";
+import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
+import { 
+  LoaderCircle, 
+  Search, 
+  X, 
+  Plus, 
+  Filter,  
+  LayoutGrid,
+  SlidersHorizontal,
+  ListMusic,
+  Music,
+  LayoutDashboard,
+  Activity,
+  Brain,
+  Dumbbell,
+  Settings,
+  Calendar,
+  Home,
+  Code,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "assets/lib/utils";
+import { useRouter } from "next/router";
 
 
 const SongsView = () => {
   const { t } = useTranslation("songs");
-  const [activeTab, setActiveTab] = useState("management");
+  const router = useRouter();
+  const activeTab = (router.query.view as string) || "management";
   const {
     page,
     isLoading,
@@ -37,54 +59,48 @@ const SongsView = () => {
     hasFilters,
     searchQuery,
     isModalOpen,
-    statusFilter,
     filteredSongs,
     setSearchQuery,
     setIsModalOpen,
-    setStatusFilter,
     difficultyFilter,
     handlePageChange,
     handleClearFilters,
     setDifficultyFilter,
-    tierFilter,
-    setTierFilter,
+    tierFilters,
+    setTierFilters,
     setUserSongs,
     refreshSongs,
     refreshSongsWithoutLoading,
     debounceLoading,
+    genreFilters,
+    setGenreFilters,
+    sortBy,
+    setSortBy,
+    sortDirection,
+    setSortDirection,
   } = useSongs();
+  const [availableGenres, setAvailableGenres] = useState<string[]>([]);
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      const genres = await getGlobalGenres();
+      setAvailableGenres(genres);
+    };
+    fetchGenres();
+  }, []);
 
 
   return (
     <MainContainer title={t("songs")}>
       <div className='font-openSans flex flex-col gap-6 p-4 lg:p-8 min-h-screen'>
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
-            <TabsList className="grid h-12 w-full grid-cols-2 gap-2 rounded-2xl bg-zinc-900/50 p-1 md:w-[300px] md:grid-cols-2">
-              <TabsTrigger 
-                value="management"
-                className="rounded-xl data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-400"
-              >
-                <LayoutGrid className="mr-2 h-4 w-4" />
-                Management
-              </TabsTrigger>
-              <TabsTrigger 
-                value="table"
-                className="rounded-xl data-[state=active]:bg-cyan-500/10 data-[state=active]:text-cyan-400"
-              >
-                <ListMusic className="mr-2 h-4 w-4" />
-                Library
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-        </div>
         {/* Content Area */}
         <div className="flex-1">
-          <Tabs value={activeTab} className="h-full w-full">
+          <div className="h-full w-full">
             
-            {/* MANAGEMENT TAB */}
-            <TabsContent value="management" className="mt-0 space-y-6 animate-in fade-in-50 duration-300">
+            {/* MANAGEMENT SECTION */}
+            {activeTab === "management" && (
+              <div className="space-y-6 animate-in fade-in-50 duration-300">
                <div className="flex flex-col gap-2">
                   <h2 className="text-lg font-bold tracking-tight text-white">Your Progress</h2>
                   <p className="text-sm text-zinc-400 max-w-2xl">
@@ -98,122 +114,142 @@ const SongsView = () => {
                 onChange={setUserSongs}
                 onStatusChange={refreshSongs}
               />
-            </TabsContent>
+              </div>
+            )}
 
-            {/* LIBRARY TAB */}
-            <TabsContent value="table" className="mt-0 space-y-6 animate-in fade-in-50 duration-300">
+            {/* LIBRARY SECTION */}
+            {(activeTab === "library" || activeTab === "table") && (
+              <div className="space-y-6 animate-in fade-in-50 duration-300">
               
-              {/* Compact Search & Filter Bar */}
-              <div className="sticky top-0 z-30 -mx-4 px-4 py-4 backdrop-blur-xl md:static md:mx-0 md:p-0 md:backdrop-blur-none">
-                <div className="flex flex-col gap-4 rounded-2xl border border-white/5 bg-zinc-900/60 p-4 shadow-xl backdrop-blur-md md:flex-row md:items-center">
-                  
-                  {/* Search Input */}
-                  <div className="relative flex-1">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                      <Search className="h-5 w-5 text-zinc-500" />
-                    </div>
-                    <Input
-                      placeholder={t("search_songs")}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-11 w-full rounded-xl border-white/5 bg-zinc-800/50 pl-10 text-white placeholder:text-zinc-500 focus:border-cyan-500/50 focus:bg-zinc-800 focus:ring-4 focus:ring-cyan-500/10"
-                    />
-                     {debounceLoading && (
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                          <LoaderCircle className="h-5 w-5 animate-spin text-cyan-500" />
-                        </div>
-                      )}
-                  </div>
-
-                  <div className="flex items-center gap-3 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
-                    {/* Status Filter */}
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="h-11 min-w-[140px] rounded-xl border-white/5 bg-zinc-800/50 text-zinc-300 hover:bg-zinc-800 focus:ring-0">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent className="border-zinc-800 bg-zinc-900 font-medium">
-                        <SelectItem value="all">All Statuses</SelectItem>
-                        <SelectItem value="wantToLearn" className="text-blue-400">Want to Learn</SelectItem>
-                        <SelectItem value="learning" className="text-amber-400">Learning</SelectItem>
-                        <SelectItem value="learned" className="text-emerald-400">Learned</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    {/* Difficulty Filter */}
-                    <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-                      <SelectTrigger className="h-11 min-w-[140px] rounded-xl border-white/5 bg-zinc-800/50 text-zinc-300 hover:bg-zinc-800 focus:ring-0">
-                        <SelectValue placeholder="Difficulty" />
-                      </SelectTrigger>
-                      <SelectContent className="border-zinc-800 bg-zinc-900 font-medium">
-                        <SelectItem value="all">All Difficulties</SelectItem>
-                        <SelectItem value="easy">Easy</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="hard">Hard</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    {/* Clear Filters */}
-                    {(hasFilters) && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={handleClearFilters}
-                        className="h-11 w-11 shrink-0 rounded-xl border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-                        title="Clear filters"
-                      >
-                        <X className="h-5 w-5" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Tier Tags Row - Optional expansion */}
-                <div className="mt-4 flex flex-wrap gap-2">
-                    {getAllTiers().map((tier) => (
+                {/* Tier Selection Grid - New Requirement */}
+                <div className="flex flex-wrap gap-2">
+                  {getAllTiers().map((tier) => {
+                    const isActive = tierFilters.includes(tier.tier);
+                    return (
                       <button
                         key={tier.tier}
-                        onClick={() => setTierFilter(tierFilter === tier.tier ? "all" : tier.tier)}
+                        onClick={() => {
+                          if (isActive) {
+                            setTierFilters(tierFilters.filter(t => t !== tier.tier));
+                          } else {
+                            setTierFilters([...tierFilters, tier.tier]);
+                          }
+                        }}
                         className={cn(
-                          "flex h-8 items-center rounded-lg border px-3 text-xs font-bold uppercase tracking-wider transition-all",
-                          tierFilter === tier.tier 
-                            ? "opacity-100 shadow-md transform scale-105" 
-                            : "border-white/5 bg-zinc-800/30 text-zinc-500 opacity-60 hover:opacity-100 hover:bg-zinc-800/80"
+                          "flex h-10 w-10 items-center justify-center rounded-xl border-2 font-black transition-all active:scale-90",
+                          isActive 
+                            ? "shadow-lg" 
+                            : "border-white/5 bg-zinc-900 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
                         )}
                         style={{
-                          borderColor: tierFilter === tier.tier ? tier.color : undefined,
-                          backgroundColor: tierFilter === tier.tier ? `${tier.color}15` : undefined,
-                          color: tierFilter === tier.tier ? tier.color : undefined,
-                          boxShadow: tierFilter === tier.tier ? `0 2px 10px ${tier.color}20` : undefined,
+                          borderColor: isActive ? tier.color : "transparent",
+                          backgroundColor: isActive ? `${tier.color}15` : "",
+                          color: isActive ? tier.color : "inherit",
+                          boxShadow: isActive ? `0 0 15px ${tier.color}30` : ""
                         }}
                       >
                         {tier.tier}
                       </button>
-                    ))}
+                    );
+                  })}
+                </div>
+
+                {/* Enhanced Search & Filter Bar */}
+                <div className="sticky top-0 z-30 -mx-4 px-4 py-4 backdrop-blur-xl md:static md:mx-0 md:p-0 md:backdrop-blur-none">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center">
+                    
+                    {/* Search Input */}
+                    <div className="relative flex-1">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                        <Search className="h-4 w-4 text-zinc-500" />
+                      </div>
+                      <Input
+                        placeholder={t("search_songs")}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="h-12 w-full rounded-2xl border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                      />
+                       {debounceLoading && (
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-4">
+                            <LoaderCircle className="h-5 w-5 animate-spin text-cyan-500" />
+                          </div>
+                        )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {/* Filter Toggle Button */}
+                      <Button
+                        variant="outline"
+                        onClick={() => setIsFilterSheetOpen(true)}
+                        className={cn(
+                          "relative h-12 flex-1 rounded-2xl border-white/5 bg-zinc-900/60 px-6 font-bold text-zinc-300 shadow-lg hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
+                          hasFilters && "border-cyan-500/30 bg-cyan-500/5 text-cyan-400"
+                        )}
+                      >
+                        <SlidersHorizontal className="mr-2.5 h-4 w-4" />
+                        Filters & Sort
+                        {hasFilters && (
+                          <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.5)] border-2 border-zinc-950" />
+                        )}
+                      </Button>
+
+                      {hasFilters && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleClearFilters}
+                          className="h-12 w-12 shrink-0 rounded-2xl border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                          title="Clear all filters"
+                        >
+                          <X className="h-5 w-5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <FilterSheet 
+                  isOpen={isFilterSheetOpen}
+                  onClose={() => setIsFilterSheetOpen(false)}
+                  difficultyFilter={difficultyFilter}
+                  setDifficultyFilter={setDifficultyFilter}
+                  tierFilters={tierFilters}
+                  setTierFilters={setTierFilters}
+                  genreFilters={genreFilters}
+                  setGenreFilters={setGenreFilters}
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                  sortDirection={sortDirection}
+                  setSortDirection={setSortDirection}
+                  availableGenres={availableGenres}
+                  onClearFilters={handleClearFilters}
+                  hasFilters={hasFilters}
+                />
+
+                {/* Grid Content */}
+                <div className="min-h-[500px] rounded-2xl bg-zinc-900/20 p-1">
+                  {isLoading ? (
+                    <div className="flex h-[400px] flex-col items-center justify-center gap-4">
+                      <LoaderCircle className="h-12 w-12 animate-spin text-cyan-500" />
+                      <p className="font-medium text-zinc-400">Loading library...</p>
+                    </div>
+                  ) : (
+                    <SongsGrid
+                      key={filteredSongs.toString()}
+                      songs={filteredSongs}
+                      currentPage={page}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                      onAddSong={() => setIsModalOpen(true)}
+                      hasFilters={hasFilters}
+                      onStatusChange={refreshSongsWithoutLoading}
+                      userSongs={userSongs}
+                    />
+                  )}
                 </div>
               </div>
-
-              {/* Grid Content */}
-              <div className="min-h-[500px] rounded-2xl bg-zinc-900/20 p-1">
-                {isLoading ? (
-                  <div className="flex h-[400px] flex-col items-center justify-center gap-4">
-                    <LoaderCircle className="h-12 w-12 animate-spin text-cyan-500" />
-                    <p className="font-medium text-zinc-400">Loading library...</p>
-                  </div>
-                ) : (
-                  <SongsGrid
-                    key={filteredSongs.toString()}
-                    songs={filteredSongs}
-                    currentPage={page}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                    onAddSong={() => setIsModalOpen(true)}
-                    hasFilters={hasFilters}
-                    onStatusChange={refreshSongsWithoutLoading}
-                  />
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
+            )}
+          </div>
         </div>
 
         <AddSongModal
