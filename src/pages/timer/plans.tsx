@@ -5,13 +5,20 @@ import AppLayout from "layouts/AppLayout";
 import { withAuth } from "utils/auth/serverAuth";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MainContainer from "components/MainContainer";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 
 const TimerPlans: NextPage = () => {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
+
+  useEffect(() => {
+    if (router.isReady && router.query.planId) {
+      const planId = router.query.planId as string;
+      handlePlanSelect(planId);
+    }
+  }, [router.isReady, router.query.planId]);
 
   const handleBack = () => {
     if (selectedPlan) {

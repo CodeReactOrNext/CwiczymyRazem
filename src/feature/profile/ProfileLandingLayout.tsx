@@ -40,9 +40,13 @@ const ProfileLandingLayout = ({
     "overview" | "activity" | "skills" | "exercises"
   >("overview");
 
-  useEffect(() => {
+  const refreshSongs = () => {
     getUserSongs(userAuth).then((songs) => setSongs(songs));
-  }, []);
+  };
+
+  useEffect(() => {
+    refreshSongs();
+  }, [userAuth]);
 
   useEffect(() => {
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
@@ -59,6 +63,7 @@ const ProfileLandingLayout = ({
           statistics={userStats}
           datasWithReports={datasWithReports}
           userSongs={songs}
+          onSongsChange={refreshSongs}
           userAuth={userAuth}
           achievements={achievements}
         />

@@ -2,7 +2,6 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import { enrichSong } from "feature/songs/services/enrichment.service";
-import { migrateSongsSchema } from "feature/songs/services/migrateSongs";
 import type { Song } from "feature/songs/types/songs.type";
 
 export const useAdminBulkActions = (
@@ -91,33 +90,6 @@ export const useAdminBulkActions = (
     onFetchSongs();
   };
 
-  const handleMigrate = async () => {
-    setIsBulkProcessing(true);
-    try {
-      const count = await migrateSongsSchema();
-      toast.success(`Schema migration complete. Updated ${count} songs.`);
-      onFetchSongs();
-    } catch (err) {
-      toast.error("Migration failed.");
-      console.error(err);
-    } finally {
-      setIsBulkProcessing(false);
-    }
-  };
-
-  const handleMigratePopularity = async () => {
-    setIsBulkProcessing(true);
-    try {
-      const res = await axios.post("/api/admin/migrate-popularity", { password });
-      toast.success(res.data.message);
-      onFetchSongs();
-    } catch (err) {
-      toast.error("Popularity migration failed.");
-      console.error(err);
-    } finally {
-      setIsBulkProcessing(false);
-    }
-  };
 
   return {
     isBulkProcessing,
@@ -125,8 +97,6 @@ export const useAdminBulkActions = (
     isEnrichingBySong,
     handleEnrich,
     verifyAll,
-    handleMassEnrich,
-    handleMigrate,
-    handleMigratePopularity
+    handleMassEnrich
   };
 };

@@ -8,9 +8,10 @@ import { useUIState } from './useUIState';
 
 interface UsePracticeSessionStateProps {
   plan: ExercisePlan;
+  onFinish?: () => void;
 }
 
-export const usePracticeSessionState = ({ plan }: UsePracticeSessionStateProps) => {
+export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionStateProps) => {
   const {
     currentExerciseIndex,
     setCurrentExerciseIndex,
@@ -19,29 +20,29 @@ export const usePracticeSessionState = ({ plan }: UsePracticeSessionStateProps) 
     currentExercise,
     nextExercise,
     isLastExercise,
-    handleNextExercise
+    handleNextExercise: baseHandleNextExercise
   } = useExerciseNavigation(plan);
-  
+
   const {
     showCompleteDialog,
     setShowCompleteDialog,
     isMobileView,
-    isFullSessionModalOpen, 
+    isFullSessionModalOpen,
     isImageModalOpen,
     setIsImageModalOpen,
     isMounted,
   } = useUIState();
-  
+
   const timer = useTimer();
-  
+
   const [showSuccessView, setShowSuccessView] = useState(false);
-  
+
   useTimeTracking(currentExercise);
 
   const toggleTimer = () => {
     if (timer.timerEnabled) {
-     timer.stopTimer();
-    } else { 
+      timer.stopTimer();
+    } else {
       timer.startTimer();
     }
   }
@@ -81,7 +82,7 @@ export const usePracticeSessionState = ({ plan }: UsePracticeSessionStateProps) 
     timerProgressValue,
     setShowCompleteDialog,
     setIsImageModalOpen,
-    handleNextExercise,
+    handleNextExercise: (resetTimerFn: () => void) => baseHandleNextExercise(resetTimerFn, onFinish),
     toggleTimer,
     startTimer: timer.startTimer,
     resetTimer: timer.restartTime,
