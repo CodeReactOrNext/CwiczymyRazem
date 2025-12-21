@@ -24,6 +24,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { cn } from "assets/lib/utils";
 
+
 const SongsView = () => {
   const { t } = useTranslation("songs");
   const [activeTab, setActiveTab] = useState("management");
@@ -53,11 +54,10 @@ const SongsView = () => {
     debounceLoading,
   } = useSongs();
 
+
   return (
     <MainContainer title={t("songs")}>
       <div className='font-openSans flex flex-col gap-6 p-4 lg:p-8 min-h-screen'>
-        
-        {/* Top Control Bar & Tabs */}
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
             <TabsList className="grid h-12 w-full grid-cols-2 gap-2 rounded-2xl bg-zinc-900/50 p-1 md:w-[300px] md:grid-cols-2">
@@ -78,12 +78,7 @@ const SongsView = () => {
             </TabsList>
           </Tabs>
 
-          <Button onClick={() => setIsModalOpen(true)}>
-            <Plus className="mr-2 h-5 w-5" />
-            {t("add_new_song")}
-          </Button>
         </div>
-
         {/* Content Area */}
         <div className="flex-1">
           <Tabs value={activeTab} className="h-full w-full">

@@ -209,5 +209,6 @@ export const useSongs = () => {
     getSongStatus,
     refreshSongs,
     refreshSongsWithoutLoading,
+    songs,
   };
 };

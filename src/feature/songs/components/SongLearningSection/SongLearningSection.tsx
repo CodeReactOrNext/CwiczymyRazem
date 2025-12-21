@@ -284,9 +284,17 @@ export const SongLearningSection = ({
       
       <DragOverlay>
         {activeSong && activeConfig ? (
-             <div className="group relative flex flex-col gap-2 rounded-lg border border-white/5 bg-zinc-900/90 pointer-events-none p-3 shadow-2xl ring-2 ring-cyan-500/50 opacity-90 rotate-2 cursor-grabbing w-[300px]">
-                 <div className="flex items-start gap-3 pr-8">
-                    <activeConfig.icon className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", activeConfig.color)} />
+             <div className="group relative flex flex-col gap-2 rounded-lg border border-white/10 bg-zinc-900/95 pointer-events-none p-3 shadow-2xl ring-2 ring-cyan-500/50 opacity-95 rotate-1 cursor-grabbing w-[280px]">
+                 <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md border border-white/10 shadow-lg">
+                      {activeSong.coverUrl ? (
+                        <img src={activeSong.coverUrl} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-zinc-800">
+                           <activeConfig.icon className={cn("h-4 w-4", activeConfig.color)} />
+                        </div>
+                      )}
+                    </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold text-white">{activeSong.title}</p>
                       <p className="truncate text-xs text-zinc-400">{activeSong.artist}</p>
