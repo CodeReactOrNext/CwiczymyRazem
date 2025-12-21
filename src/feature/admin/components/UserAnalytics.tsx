@@ -29,7 +29,7 @@ export const UserAnalytics = ({ totalUsers, recentUsers }: UserAnalyticsProps) =
       icon: Star,
       color: "text-amber-500",
       bgColor: "bg-amber-500/10",
-      description: "Daily active avg"
+      description: ""
     },
   ];
 

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "utils/firebase/client/firebase.utils";
-import { collection, getDocs, doc, updateDoc, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, doc, updateDoc, query, orderBy, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,7 +29,56 @@ export default async function handler(
     }
 
     if (req.method === "POST") {
-      const { songId, data } = req.body;
+      const { songId, data, bulkSongs } = req.body;
+
+      if (bulkSongs && Array.isArray(bulkSongs)) {
+        const songsRef = collection(db, "songs");
+        const existingSnapshot = await getDocs(songsRef);
+        const existingMap = new Set(
+          existingSnapshot.docs.map(doc => {
+            const d = doc.data();
+            return `${d.artist?.toLowerCase().trim()}|${d.title?.toLowerCase().trim()}`;
+          })
+        );
+
+        const results = [];
+        let skipped = 0;
+
+        for (const s of bulkSongs) {
+          const normalizedKey = `${s.artist?.toLowerCase().trim()}|${s.title?.toLowerCase().trim()}`;
+
+          if (existingMap.has(normalizedKey)) {
+            skipped++;
+            continue;
+          }
+
+          const newSong = {
+            title: s.title || "Unknown Title",
+            artist: s.artist || "Unknown Artist",
+            createdAt: serverTimestamp(),
+            createdBy: "admin",
+            isVerified: true,
+            difficulties: s.difficulty ? [{
+              userId: "admin_system",
+              rating: typeof s.difficulty === 'string' ? parseInt(s.difficulty) : s.difficulty,
+              date: new Date()
+            }] : []
+          };
+          const docRef = await addDoc(songsRef, newSong);
+          results.push({ id: docRef.id, ...newSong });
+
+          // Add to map to prevent duplicates within the same batch
+          existingMap.add(normalizedKey);
+        }
+
+        return res.status(200).json({
+          success: true,
+          count: results.length,
+          skipped,
+          message: `Added ${results.length} songs. Skipped ${skipped} duplicates.`
+        });
+      }
+
       if (!songId || !data) {
         return res.status(400).json({ error: "Missing songId or data" });
       }
