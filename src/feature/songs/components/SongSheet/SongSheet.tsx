@@ -11,7 +11,6 @@ import { Button } from "assets/components/ui/button";
 import { SongRating } from "feature/songs/components/SongsTable/components/SongRating";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import { 
   Music, 
   BookOpen, 
@@ -132,7 +131,7 @@ const SongSheet = ({
 
   if (!song) return null;
 
-  const avgDifficulty = getAverageDifficulty(song.difficulties);
+  const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty);
 
   return (

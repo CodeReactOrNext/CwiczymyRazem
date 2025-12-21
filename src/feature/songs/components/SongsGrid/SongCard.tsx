@@ -1,6 +1,5 @@
 import { Button } from "assets/components/ui/button";
 import type { Song } from "feature/songs/types/songs.type";
-import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { 
   Music, 
@@ -27,7 +26,7 @@ export const SongCard = ({
   onOpenDetails,
 }: SongCardProps) => {
   const { t } = useTranslation("songs");
-  const avgDifficulty = getAverageDifficulty(song.difficulties);
+  const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty);
 
   return (

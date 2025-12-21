@@ -1,6 +1,5 @@
 import { rateSongDifficulty } from "feature/songs/services/rateSongDifficulty";
 import type { Song } from "feature/songs/types/songs.type";
-import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { Star, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -65,7 +64,7 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
     <div>
       <div className='flex items-center gap-1'>
         {[...Array(10)].map((_, i) => {
-          const avgRating = getAverageDifficulty(song.difficulties);
+          const avgRating = song.avgDifficulty || 0;
 
           const userRating = song?.difficulties?.find(
             (d) => d.userId === userId

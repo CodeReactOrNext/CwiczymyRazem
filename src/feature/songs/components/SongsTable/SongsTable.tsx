@@ -28,7 +28,6 @@ import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
@@ -185,13 +184,12 @@ const SongsTable = ({
                     <TableCell className='px-6 py-4'>
                       <div className='flex items-center gap-2'>
                         {(() => {
-                           const { color, label } = getDifficultyRating(
-                            getAverageDifficulty(song.difficulties)
-                          );
+                           const avgDiff = song.avgDifficulty || 0;
+                           const { color, label } = getDifficultyRating(avgDiff);
                           return (
                             <div className="flex items-center gap-2 rounded-md border border-slate-700/50 bg-slate-800/30 px-2.5 py-1 text-xs font-medium backdrop-blur-sm transition-colors"
                                  style={{ color: color, borderColor: `${color}40` }}>
-                                <span className="font-bold">{getAverageDifficulty(song.difficulties)}</span>
+                                <span className="font-bold">{avgDiff.toFixed(1)}</span>
                                 <span className="text-slate-400">|</span>
                                 <span>{label}</span>
                             </div>
@@ -210,9 +208,7 @@ const SongsTable = ({
                     {/* Tier Cell */}
                     <TableCell className='px-6 py-4'>
                       {(() => {
-                        const avgDifficulty = getAverageDifficulty(
-                          song.difficulties
-                        );
+                        const avgDifficulty = song.avgDifficulty || 0;
                         const tier = getSongTier(avgDifficulty);
                         return (
                           <div 
