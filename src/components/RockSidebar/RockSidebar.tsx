@@ -94,7 +94,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
     {
       id: "profile" as NavPagesTypes,
       name: "Profile",
-      href: "/",
+      href: "/dashboard",
       icon: <User size={18} />,
     },
     {

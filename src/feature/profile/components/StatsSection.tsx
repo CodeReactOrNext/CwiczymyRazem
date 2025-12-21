@@ -17,6 +17,18 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { getTrendData } from "../utils/getTrendData";
 import { Card } from "assets/components/ui/card";
 import ActivityLog from "components/ActivityLog/ActivityLog";
+import { DailyRecommendation } from "feature/songs/components/DailyRecommendation/DailyRecommendation";
+import { DailyPlanRecommendation } from "feature/songs/components/DailyRecommendation/DailyPlanRecommendation";
+import { RecommendationSkeleton } from "feature/songs/components/DailyRecommendation/RecommendationSkeleton";
+import { getDailyRecommendation } from "feature/songs/services/getRecommendation";
+import { getDailyExerciseRecommendation } from "feature/exercisePlan/services/getDailyRecommendation";
+import { useEffect } from "react";
+import SongSheet from "feature/songs/components/SongSheet/SongSheet";
+import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { useAppSelector } from "store/hooks";
+import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 
 interface StatsSectionProps {
   statsField: StatsFieldProps[];
@@ -31,6 +43,7 @@ interface StatsSectionProps {
       }
     | undefined;
   achievements?: any[];
+  onSongsChange?: () => void;
 }
 
 export const StatsSection = ({
@@ -40,10 +53,60 @@ export const StatsSection = ({
   userSongs,
   userAuth,
   achievements,
+  onSongsChange,
 }: StatsSectionProps) => {
   const { t } = useTranslation("profile");
   const { time } = statistics;
   const [isAchievementsExpanded, setIsAchievementsExpanded] = useState(false);
+  const [dailyPick, setDailyPick] = useState<Song | null>(null);
+  const [dailyExercisePick, setDailyExercisePick] = useState<ExercisePlan | null>(null);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const currentUserId = useAppSelector(selectUserAuth);
+  const isOwnProfile = currentUserId === userAuth;
+
+  const refreshSongs = async () => {
+    if (onSongsChange) {
+      onSongsChange();
+    } else {
+      fetchRecommendations();
+    }
+  };
+
+  const { handleStatusChange, handleSongRemoval } = useSongsStatusChange({
+    onChange: () => {},
+    userSongs: userSongs || { wantToLearn: [], learning: [], learned: [] },
+    onTableStatusChange: refreshSongs,
+  });
+
+  const fetchRecommendations = async () => {
+    if (!isOwnProfile) return;
+    setIsLoadingRecommendations(true);
+    try {
+      // Song recommendation
+      if (userSongs) {
+        const ownedIds = [
+          ...userSongs.wantToLearn.map(s => s.id),
+          ...userSongs.learning.map(s => s.id),
+          ...userSongs.learned.map(s => s.id)
+        ];
+        const pick = await getDailyRecommendation(ownedIds);
+        setDailyPick(pick);
+      }
+
+      // Exercise recommendation
+      const exPick = getDailyExerciseRecommendation();
+      setDailyExercisePick(exPick);
+    } finally {
+      setIsLoadingRecommendations(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecommendations();
+  }, [userSongs, isOwnProfile]);
+
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
 
@@ -126,7 +189,25 @@ export const StatsSection = ({
               ))}
           </div>
 
-          {userSongs && (
+          {isOwnProfile && isLoadingRecommendations && (
+            <RecommendationSkeleton type="song" />
+          )}
+
+          {isOwnProfile && !isLoadingRecommendations && dailyPick && (
+            <DailyRecommendation 
+              song={dailyPick} 
+              userSongs={userSongs || { wantToLearn: [], learning: [], learned: [] }} 
+              onRefreshSongs={refreshSongs}
+              onOpenDetails={(song) => {
+                setSelectedSong(song);
+                setIsSheetOpen(true);
+              }}
+            />
+          )}
+
+          {!userSongs ? (
+            <RecommendationSkeleton type="progress" />
+          ) : (
             <Card className='p- group  relative  transition-all duration-300 '>
               <div className='relative'>
                 {(() => {
@@ -175,15 +256,29 @@ export const StatsSection = ({
                           <h5 className='font-semibold text-white'>
                             Overall progress
                           </h5>
-                          <p className='text-xs text-zinc-400'>
-                            {totalSongs} songs in the library
-                          </p>
+                          <div className='flex flex-wrap items-center gap-x-3 gap-y-1 mt-1'>
+                            <p className='text-[10px] font-bold text-zinc-400'>
+                              {totalSongs} songs
+                            </p>
+                            <span className="h-1 w-1 rounded-full bg-zinc-600 hidden sm:block" />
+                            <p className='text-[10px] font-bold text-purple-400'>
+                              {userSongs.wantToLearn.length} want to learn
+                            </p>
+                            <span className="h-1 w-1 rounded-full bg-zinc-600 hidden sm:block" />
+                            <p className='text-[10px] font-bold text-cyan-400'>
+                              {userSongs.learning.length} learning
+                            </p>
+                            <span className="h-1 w-1 rounded-full bg-zinc-600 hidden sm:block" />
+                            <p className='text-[10px] font-bold text-emerald-400'>
+                              {userSongs.learned.length} learned
+                            </p>
+                          </div>
                         </div>
                         <div className='text-right'>
-                          <div className='text-2xl font-semibold text-white'>
+                          <div className='text-2xl font-black text-white'>
                             {learnedPercentage.toFixed(0)}%
                           </div>
-                          <div className='text-xs text-zinc-400'>completed</div>
+                          <div className='text-[10px] font-bold uppercase tracking-tight text-zinc-500'>Completed</div>
                         </div>
                       </div>
 
@@ -214,13 +309,27 @@ export const StatsSection = ({
               </p>
             </div>
             <SkillsRadarChart statistics={statistics} />
+            {isOwnProfile && (
+              <div className="mt-4">
+                {isLoadingRecommendations ? (
+                  <RecommendationSkeleton type="exercise" />
+                ) : dailyExercisePick ? (
+                  <DailyPlanRecommendation plan={dailyExercisePick} />
+                ) : null}
+              </div>
+            )}
           </div>
         </div>
 
         <div className='space-y-6'>
-          <div className='hidden lg:block'>
-          
+          <div className='hidden lg:block space-y-4'>
             <SkillsRadarChart statistics={statistics} />
+            {isOwnProfile && isLoadingRecommendations && (
+               <RecommendationSkeleton type="exercise" />
+            )}
+            {isOwnProfile && !isLoadingRecommendations && dailyExercisePick && (
+              <DailyPlanRecommendation plan={dailyExercisePick} />
+            )}
           </div>
         </div>
       </div>
@@ -262,6 +371,33 @@ export const StatsSection = ({
           <AchievementWrapper userAchievements={achievements ?? []} />
         </div>
       </div>
+
+      <SongSheet
+        song={selectedSong}
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        onStatusChange={async (newStatus) => {
+          if (selectedSong) {
+            if (newStatus === undefined) {
+              await handleSongRemoval(selectedSong.id);
+            } else {
+              await handleStatusChange(
+                selectedSong.id,
+                newStatus,
+                selectedSong.title,
+                selectedSong.artist
+              );
+            }
+          }
+        }}
+        onRatingChange={refreshSongs}
+        status={
+          userSongs?.wantToLearn.some(s => s.id === selectedSong?.id) ? "wantToLearn" :
+          userSongs?.learning.some(s => s.id === selectedSong?.id) ? "learning" :
+          userSongs?.learned.some(s => s.id === selectedSong?.id) ? "learned" : 
+          undefined
+        }
+      />
     </div>
   );
 };
