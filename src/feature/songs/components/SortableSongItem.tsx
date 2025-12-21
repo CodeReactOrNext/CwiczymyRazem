@@ -61,11 +61,25 @@ export const SortableSongItem = ({
         isDragging && "shadow-2xl ring-2 ring-cyan-500/50 z-[9999] bg-zinc-900 opacity-100 placeholder-shown:opacity-100" // active state
       )}
     >
-      <div className="flex items-start gap-3 pr-8"> {/* Added pr-8 for menu space */}
-        <StatusIcon className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", config.color)} />
+      <div className="flex items-center gap-3 pr-8"> {/* Added pr-8 for menu space */}
+        {/* Small Cover Image */}
+        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-md border border-white/5 bg-zinc-950/40">
+          {song.coverUrl ? (
+            <img 
+              src={song.coverUrl} 
+              alt={song.title}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <StatusIcon className={cn("h-4 w-4 opacity-20", config.color)} />
+            </div>
+          )}
+        </div>
+
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold text-white">{song.title}</p>
-          <p className="truncate text-xs text-zinc-400">{song.artist}</p>
+          <p className="truncate text-sm font-bold text-white leading-snug">{song.title}</p>
+          <p className="truncate text-[10px] font-medium text-zinc-500">{song.artist}</p>
         </div>
         <TierBadge song={song} />
       </div>

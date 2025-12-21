@@ -47,11 +47,11 @@ export interface StatisticsDataInterface {
   actualDayWithoutBreak: number;
   lastReportDate: string;
   guitarStartDate: Timestamp | null;
-    songLists?: {
-      wantToLearn: string[];
-      learned: string[];
-      learning: string[];
-    };
+  songLists?: {
+    wantToLearn: string[];
+    learned: string[];
+    learning: string[];
+  };
   availablePoints: {
     technique: number;
     theory: number;
@@ -99,6 +99,7 @@ export interface userSliceInitialState {
     soundCloudLink?: string;
     youTubeLink?: string;
     band?: string;
+    role?: "admin" | "user";
   } | null;
   timer: TimerInterface;
   isLoggedOut: true | null;
