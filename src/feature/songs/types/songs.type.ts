@@ -22,6 +22,9 @@ export interface Song {
   difficulties: SongDifficulty[];
   createdAt: Timestamp;
   createdBy: string;
+  coverUrl?: string;
+  coverAttempted?: boolean;
+  isVerified?: boolean;
 }
 
 export interface UserSongStatus {

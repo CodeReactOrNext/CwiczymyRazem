@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       // Send token id to the client
       if (session.user) {
-        // session.user.id = token.sub; // requires augmentation if strictly typed
+        (session.user as any).id = token.sub;
       }
       return session;
     },
