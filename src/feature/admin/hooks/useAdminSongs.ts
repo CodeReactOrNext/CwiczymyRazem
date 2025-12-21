@@ -55,6 +55,22 @@ export const useAdminSongs = (password: string) => {
     }
   };
 
+  const handleBulkAdd = async (bulkSongs: any[]) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post("/api/admin/songs", {
+        password,
+        bulkSongs
+      });
+      toast.success(response.data.message || `Bulk add successful: ${bulkSongs.length} songs`);
+      await fetchSongs();
+    } catch (error) {
+      toast.error("Bulk add failed");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleUpdateCover = async (songId: string, coverUrl: string) => {
     try {
       await axios.post("/api/admin/songs", {
@@ -101,6 +117,7 @@ export const useAdminSongs = (password: string) => {
     handleSave,
     handleManualVerify,
     handleUpdateCover,
+    handleBulkAdd,
     filteredSongs,
     stats
   };

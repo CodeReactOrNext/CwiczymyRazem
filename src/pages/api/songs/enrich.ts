@@ -19,7 +19,7 @@ export default async function handler(
     const data = await fetchEnrichmentData(artist, title);
 
     if (!data.isVerified && data.source === "none") {
-      return res.status(404).json({ error: "Not found", coverUrl: null, isVerified: false });
+      return res.status(200).json({ ...data, message: "No enrichment data found" });
     }
 
     return res.status(200).json(data);
