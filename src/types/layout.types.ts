@@ -5,6 +5,8 @@ export type NavPagesTypes =
   | "leadboard"
   | "faq"
   | "songs"
+  | "library"
+  | "my_songs"
   | "seasons"
   | "timer"
   | null;

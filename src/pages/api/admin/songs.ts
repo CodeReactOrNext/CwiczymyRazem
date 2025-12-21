@@ -89,7 +89,13 @@ export default async function handler(
       }
 
       const songRef = doc(db, "songs", songId);
-      await updateDoc(songRef, data);
+
+      // Automatically sync lowercase fields if title/artist are updated
+      const updates = { ...data };
+      if (data.title) updates.title_lowercase = data.title.toLowerCase();
+      if (data.artist) updates.artist_lowercase = data.artist.toLowerCase();
+
+      await updateDoc(songRef, updates);
 
       return res.status(200).json({ success: true });
     }

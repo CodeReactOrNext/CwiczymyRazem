@@ -26,7 +26,7 @@ export async function fetchEnrichmentData(artist: string, title: string) {
   // 2. Search Spotify (Track first for better song matching)
   const searchTerm = encodeURIComponent(`track:${title} artist:${artist}`);
   const searchResponse = await axios.get(
-    `https://api.spotify.com/v1/search?q=${searchTerm}&type=track&limit=5`,
+    `https://api.spotify.com/v1/search?q=${searchTerm}&type=track&limit=5&market=PL`,
     { headers: { Authorization: `Bearer ${accessToken}` } }
   );
 
@@ -38,13 +38,29 @@ export async function fetchEnrichmentData(artist: string, title: string) {
       artist: track.artists.map((a: any) => a.name).join(", "),
       title: track.name,
       albumName: track.album?.name,
-      source: "spotify"
+      source: "spotify",
+      artistId: track.artists[0]?.id // Store for genre fetching
     })).filter((c: any) => c.coverUrl);
 
     if (candidates.length > 0) {
+      // Fetch genres for the primary candidate
+      let genres: string[] = [];
+      if (candidates[0].artistId) {
+        try {
+          const artistResponse = await axios.get(
+            `https://api.spotify.com/v1/artists/${candidates[0].artistId}`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+          genres = artistResponse.data.genres || [];
+        } catch (err) {
+          console.error("Error fetching Spotify genres:", err);
+        }
+      }
+
       // For automated enrichment, we still return the best match
       return {
         coverUrl: candidates[0].coverUrl,
+        genres,
         isVerified: true,
         source: "spotify",
         candidates: candidates // Include candidates for manual selection
@@ -66,12 +82,27 @@ export async function fetchEnrichmentData(artist: string, title: string) {
       artist: album.artists.map((a: any) => a.name).join(", "),
       title: album.name,
       albumName: album.name,
-      source: "spotify-album"
+      source: "spotify-album",
+      artistId: album.artists[0]?.id
     })).filter((c: any) => c.coverUrl);
 
     if (candidates.length > 0) {
+      let genres: string[] = [];
+      if (candidates[0].artistId) {
+        try {
+          const artistResponse = await axios.get(
+            `https://api.spotify.com/v1/artists/${candidates[0].artistId}`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+          genres = artistResponse.data.genres || [];
+        } catch (err) {
+          console.error("Error fetching Spotify genres (album):", err);
+        }
+      }
+
       return {
         coverUrl: candidates[0].coverUrl,
+        genres,
         isVerified: true,
         source: "spotify-album",
         candidates: candidates

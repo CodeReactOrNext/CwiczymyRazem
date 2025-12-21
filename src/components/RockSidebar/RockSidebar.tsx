@@ -20,6 +20,7 @@ import {
   Calendar,
   Home,
   Code,
+  LayoutGrid,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -73,6 +74,12 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
     if (router.pathname === "/profile/activity") return "activity";
     if (router.pathname === "/profile/skills") return "skills";
     if (router.pathname === "/profile/exercises") return "exercises";
+    if (router.pathname.startsWith("/songs")) {
+      const view = router.query.view;
+      if (view === "library") return "library";
+      if (view === "management") return "my_songs";
+      return "songs";
+    }
     return null;
   };
 
@@ -124,11 +131,21 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
       href: "/profile/exercises",
       icon: <Dumbbell size={16} />,
     },
+  ];
+
+  // Songs Section
+  const songsSections = [
     {
-      id: "songs" as NavPagesTypes,
-      name: "Songs",
-      href: "/songs",
+      id: "library" as NavPagesTypes,
+      name: "Library",
+      href: "/songs?view=library",
       icon: <Music size={16} />,
+    },
+    {
+      id: "my_songs" as NavPagesTypes,
+      name: "My Songs",
+      href: "/songs?view=management",
+      icon: <LayoutGrid size={16} />,
     },
   ];
 
@@ -252,9 +269,42 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             </div>
             <div className='space-y-1'>
               {profileSections.map(({ id, name, href, icon }) => {
-                const isActiveSection =
-                  activeProfileSection === id ||
-                  (id === "songs" && pageId === "songs");
+                const isActiveSection = activeProfileSection === id;
+                return (
+                  <Link
+                    key={id}
+                    href={href}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                      isActiveSection
+                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                    }`}>
+                    <span
+                      className={
+                        isActiveSection ? "text-cyan-400" : "text-zinc-500"
+                      }>
+                      {icon}
+                    </span>
+                    <span>{name}</span>
+                    {isActiveSection && (
+                      <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          <Separator className='bg-white/10' />
+
+          {/* Songs Section */}
+          <div>
+            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+              Songs
+            </div>
+            <div className='space-y-1'>
+              {songsSections.map(({ id, name, href, icon }) => {
+                const isActiveSection = activeProfileSection === id;
                 return (
                   <Link
                     key={id}
@@ -430,7 +480,46 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                     {profileSections.map(({ id, name, href, icon }) => {
                       const isActiveSection =
                         activeProfileSection === id ||
-                        (id === "songs" && pageId === "songs");
+                        (id === "library" && activeProfileSection === "library") ||
+                        (id === "my_songs" && activeProfileSection === "my_songs");
+                      return (
+                        <Link
+                          key={id}
+                          href={href}
+                          onClick={handleLinkClick}
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                            isActiveSection
+                              ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                          }`}>
+                          <span
+                            className={
+                              isActiveSection
+                                ? "text-cyan-400"
+                                : "text-zinc-500"
+                            }>
+                            {icon}
+                          </span>
+                          <span>{name}</span>
+                          {isActiveSection && (
+                            <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <Separator className='bg-white/10' />
+
+                {/* Songs Section - Mobile */}
+                <div>
+                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+                    Songs
+                  </div>
+                  <div className='space-y-1'>
+                    {songsSections.map(({ id, name, href, icon }) => {
+                      const isActiveSection = activeProfileSection === id;
                       return (
                         <Link
                           key={id}
