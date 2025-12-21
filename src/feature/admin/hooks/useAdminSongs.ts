@@ -9,7 +9,7 @@ export const useAdminSongs = (password: string) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"all" | "unverified" | "no-cover">("all");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ title: "", artist: "" });
+  const [editForm, setEditForm] = useState({ title: "", artist: "", avgDifficulty: 0 });
 
   const fetchSongs = useCallback(async (pass = password) => {
     if (!pass) return;

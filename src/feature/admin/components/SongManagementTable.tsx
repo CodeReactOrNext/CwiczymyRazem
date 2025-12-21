@@ -8,7 +8,7 @@ import { useState } from "react";
 interface SongManagementTableProps {
   songs: Song[];
   editingId: string | null;
-  editForm: { title: string; artist: string };
+  editForm: { title: string; artist: string; avgDifficulty: number };
   onEdit: (song: Song) => void;
   onSave: (songId: string) => void;
   onManualVerify: (songId: string) => void;
@@ -16,7 +16,7 @@ interface SongManagementTableProps {
   onOpenCoverPicker?: (song: any) => void;
   isEnrichingBySong: Record<string, boolean>;
   onCancel: () => void;
-  onFieldChange: (field: "title" | "artist", value: string) => void;
+  onFieldChange: (field: "title" | "artist" | "avgDifficulty", value: string) => void;
   isLoading?: boolean;
 }
 
@@ -52,10 +52,11 @@ export const SongManagementTable = ({
       <div className="overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/20 backdrop-blur-sm shadow-xl">
         <div className="grid grid-cols-12 gap-4 border-b border-white/5 bg-white/[0.02] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
           <div className="col-span-1">Img</div>
-          <div className="col-span-5">Song / Artist</div>
-          <div className="col-span-2 text-center">Cover Status</div>
-          <div className="col-span-2 text-center">Verification</div>
-          <div className="col-span-2 text-right">Actions</div>
+          <div className="col-span-5 uppercase">Song / Artist</div>
+          <div className="col-span-1 text-center uppercase">Rating</div>
+          <div className="col-span-2 text-center uppercase tracking-normal">Cover</div>
+          <div className="col-span-2 text-center uppercase">Status</div>
+          <div className="col-span-1 text-right uppercase">Actions</div>
         </div>
         
         <div className="max-h-[60vh] overflow-y-auto divide-y divide-white/[0.03] scrollbar-thin scrollbar-track-zinc-900/40 scrollbar-thumb-zinc-700">
@@ -119,6 +120,26 @@ export const SongManagementTable = ({
                     </div>
                   )}
                 </div>
+                <div className="col-span-1 flex flex-col items-center justify-center">
+                  {editingId === song.id ? (
+                    <div className="w-14">
+                      <Input 
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="10"
+                        value={editForm.avgDifficulty} 
+                        onChange={(e) => onFieldChange("avgDifficulty", e.target.value)}
+                        className="h-8 border-cyan-500/30 bg-black/40 text-xs font-bold text-center text-white focus:ring-1 focus:ring-cyan-500 p-1"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center">
+                       <span className="text-xs font-black text-cyan-400">{song.avgDifficulty?.toFixed(1) || "0.0"}</span>
+                       <span className="text-[7px] font-bold text-zinc-600 uppercase">Rating</span>
+                    </div>
+                  )}
+                </div>
                 <div className="col-span-2 flex justify-center">
                   {song.coverUrl ? (
                     <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-[9px] font-black text-emerald-500 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
@@ -144,28 +165,27 @@ export const SongManagementTable = ({
                     </div>
                   )}
                 </div>
-                <div className="col-span-2 flex justify-end gap-2">
+                <div className="col-span-1 flex justify-end gap-1">
                   {editingId === song.id ? (
                     <div className="flex gap-1 animate-in zoom-in-95 duration-200">
                       <Button 
                         onClick={() => onSave(song.id)}
-                        size="sm" 
-                        className="h-8 bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-500/20"
+                        size="icon" 
+                        className="h-8 w-8 bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-500/20"
                       >
-                        <Save className="h-3.5 w-3.5 mr-1" />
-                        Save
+                        <Save className="h-4 w-4" />
                       </Button>
                       <Button 
                         onClick={onCancel}
-                        size="sm" 
+                        size="icon" 
                         variant="ghost" 
-                        className="h-8 text-zinc-500 hover:text-white"
+                        className="h-8 w-8 text-zinc-500 hover:text-white"
                       >
-                        Cancel
+                        <XCircle className="h-4 w-4" />
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex gap-1.5">
+                    <div className="flex gap-1">
                       {!song.isVerified && (
                         <Button 
                           onClick={() => onManualVerify(song.id)}
@@ -204,7 +224,7 @@ export const SongManagementTable = ({
                         onClick={() => onEdit(song)}
                         variant="ghost" 
                         size="icon" 
-                        className="h-8 w-8 rounded-full transition-colors hover:bg-cyan-500/10 hover:text-cyan-500"
+                        className="h-8 w-8 rounded-full transition-colors hover:bg-white/10 hover:text-white"
                       >
                         <Edit2 className="h-3.5 w-3.5" />
                       </Button>

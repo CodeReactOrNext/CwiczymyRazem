@@ -74,7 +74,7 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
     resetTimer,
     showSuccessView,
     resetSuccessView,
-  } = usePracticeSessionState({ plan });
+  } = usePracticeSessionState({ plan, onFinish });
 
   const {
     imageScale,
@@ -280,9 +280,9 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                                 onClick={() => handleNextExercise(resetTimer)}
                             >
                                 {isLastExercise ? (
-                                    <span className="flex items-center gap-2"><FaCheck /> Zakończ</span>
+                                    <span className="flex items-center gap-2"><FaCheck /> {t("common:finish")}</span>
                                 ) : (
-                                    <span className="flex items-center gap-2">Dalej <FaStepForward /></span>
+                                    <span className="flex items-center gap-2">{t("common:next")} <FaStepForward /></span>
                                 )}
                             </Button>
                          </div>
