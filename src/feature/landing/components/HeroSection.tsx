@@ -9,13 +9,15 @@ import { Zap, Calendar, Trophy, Star } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
-import { selectIsFetching } from "feature/user/store/userSlice";
+import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
 import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronRight } from "lucide-react";
 
 export const HeroSection = () => {
   const dispatch = useAppDispatch();
   const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
+  const userAuth = useAppSelector(selectUserAuth);
+  const isLoggedIn = !!userAuth;
 
   const handleGoogleLogin = () => {
     dispatch(logInViaGoogle());
@@ -40,16 +42,15 @@ export const HeroSection = () => {
         />
       </div>
 
-      <div className='relative z-10 mx-auto max-w-7xl px-6 lg:px-8 w-full'>
-        {/* Top bar - matching app header */}
-          <div className='flex items-center gap-4 mb-12'>
+      <div className='relative z-20 mx-auto max-w-7xl px-6 lg:px-8 w-full'>
+        {/* Top bar - Navigation */}
+        <nav className='absolute top-0 left-0 right-0 py-8 px-6 lg:px-8 z-30'>
+          <div className='max-w-7xl mx-auto flex items-center justify-between'>
             <Logo large />
           </div>
+        </nav>
 
-        <div className='max-w-2xl lg:max-w-3xl'>
-          {/* Brand Badge */}
-
-
+        <div className='max-w-2xl lg:max-w-3xl pt-32 sm:pt-40'>
           {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
@@ -103,39 +104,49 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className='flex flex-col sm:flex-row gap-4'>
-            <Link href='/signup'>
-              <Button className='h-12 px-8 rounded-xl bg-cyan-500 text-zinc-950 hover:bg-cyan-400 font-semibold text-base transition-colors shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70'>
-                Start for Free
-              </Button>
-            </Link>
-            <Link href='#features'>
-              <Button variant="outline" className='h-12 px-8 rounded-xl border-zinc-700 bg-zinc-900/50 text-white hover:bg-zinc-800 font-medium text-base w-full sm:w-auto'>
-                See Features
-              </Button>
-            </Link>
-          </motion.div>
-
-          {/* Google Login Button (Separate Row or distinct) */}
-          <motion.div
-             initial={{ opacity: 0, y: 10 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.5, delay: 0.4 }}
-             className="mt-4 flex justify-start"
-          >
-             <Button
-                onClick={handleGoogleLogin}
-                disabled={isGoogleFetching}
-                variant="outline"
-                className="h-12 px-8 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white transition-all w-full sm:w-auto flex items-center gap-2"
-             >
-                {isGoogleFetching ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <FcGoogle className="h-5 w-5" />
-                )}
-                Continue with Google
-             </Button>
+            className='flex flex-wrap gap-4 items-center'>
+            
+            {isLoggedIn ? (
+              <Link href='/dashboard' className='w-full sm:w-auto'>
+                <Button className='h-12 px-10 rounded-xl bg-cyan-500 text-zinc-950 hover:bg-cyan-400 font-bold text-lg transition-all shadow-lg shadow-cyan-500/40 w-full'>
+                  Go to Dashboard <ChevronRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href='/signup' className='w-full sm:w-auto'>
+                  <Button className='h-12 px-10 rounded-xl bg-cyan-500 text-zinc-950 hover:bg-cyan-400 font-bold text-lg transition-all shadow-lg shadow-cyan-500/40 w-full sm:w-auto'>
+                    Join Now
+                  </Button>
+                </Link>
+                <Link href='/login' className='w-full sm:w-auto'>
+                  <Button variant="outline" className='h-12 px-10 rounded-xl border-zinc-700 bg-zinc-900/50 text-white hover:bg-zinc-800 font-bold text-lg transition-all w-full sm:w-auto'>
+                    Sign In
+                  </Button>
+                </Link>
+                <Button
+                    onClick={handleGoogleLogin}
+                    disabled={isGoogleFetching}
+                    variant="outline"
+                    className="h-12 px-8 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white transition-all w-full sm:w-auto flex items-center gap-2"
+                >
+                    {isGoogleFetching ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <FcGoogle className="h-5 w-5" />
+                    )}
+                    Google
+                </Button>
+              </>
+            )}
+            
+            {!isLoggedIn && (
+               <Link href='#features' className="ml-2 hidden sm:block">
+                <span className='text-zinc-500 hover:text-zinc-300 text-sm font-medium transition-colors cursor-pointer'>
+                  Learn how it works
+                </span>
+              </Link>
+            )}
           </motion.div>
         </div>
       </div>
