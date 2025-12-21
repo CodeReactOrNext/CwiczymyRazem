@@ -32,15 +32,10 @@ const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
             <TooltipProvider>
               {!isUnlocked && (
                 <>
-                  <Tooltip >
-                    <TooltipContent>{description}</TooltipContent>
-                    <TooltipTrigger>
                       <Icon
                         className={`text-3xl transition-all duration-300 ${"text-gray-600 grayscale"}`}
                         data-tip={"Achievement Locked"}
                       />
-                    </TooltipTrigger>
-                  </Tooltip>
                 </>
               )}
             </TooltipProvider>

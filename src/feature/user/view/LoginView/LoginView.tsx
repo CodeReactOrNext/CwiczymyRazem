@@ -84,11 +84,11 @@ const LoginView = () => {
              <div className="flex justify-center mb-6">
                  <div className="relative p-3 rounded-2xl bg-zinc-900/50 border border-white/10 shadow-2xl shadow-cyan-500/10">
                     <Image
-                      src='/images/logo.svg'
+                      src='/images/logolight.svg'
                       alt='Logo'
                       width={48}
                       height={48}
-                      className='h-12 w-12 brightness-0 invert'
+                      className='h-12 w-12'
                     />
                  </div>
              </div>
