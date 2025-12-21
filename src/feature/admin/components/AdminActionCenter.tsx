@@ -12,6 +12,7 @@ interface AdminActionCenterProps {
   onMassVerify: () => void;
   onMassEnrich: () => void;
   onBulkAdd: () => void;
+  onMigrate: () => void;
   isBulkProcessing: boolean;
   isLoading: boolean;
 }
@@ -25,6 +26,7 @@ const AdminActionCenter = ({
   onMassVerify,
   onMassEnrich,
   onBulkAdd,
+  onMigrate,
   isBulkProcessing,
   isLoading
 }: AdminActionCenterProps) => {
@@ -93,6 +95,14 @@ const AdminActionCenter = ({
         >
           <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
           Mass Enrich
+        </Button>
+        <Button 
+          onClick={onMigrate} 
+          disabled={isBulkProcessing || isLoading}
+          className="h-10 bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
+        >
+          <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
+          Migrate Schema
         </Button>
         <Button 
           onClick={onBulkAdd} 
