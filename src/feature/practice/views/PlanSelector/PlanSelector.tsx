@@ -1,5 +1,5 @@
 import MainContainer from "components/MainContainer";
-import { PageHeader } from "components/PageHeader";
+import { PageHeader } from "constants/PageHeader";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { LocalizedContent } from "feature/exercisePlan/types/exercise.types";

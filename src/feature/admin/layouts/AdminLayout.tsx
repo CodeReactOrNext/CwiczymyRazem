@@ -28,6 +28,8 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
 
   const menuItems = [
     { name: "Inventory", href: "/admin", icon: Music },
+    { name: "Users", href: "/admin/users", icon: Users },
+    { name: "Activity", href: "/admin/activity", icon: Zap },
   ];
 
   return (
