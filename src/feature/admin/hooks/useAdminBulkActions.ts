@@ -105,6 +105,20 @@ export const useAdminBulkActions = (
     }
   };
 
+  const handleMigratePopularity = async () => {
+    setIsBulkProcessing(true);
+    try {
+      const res = await axios.post("/api/admin/migrate-popularity", { password });
+      toast.success(res.data.message);
+      onFetchSongs();
+    } catch (err) {
+      toast.error("Popularity migration failed.");
+      console.error(err);
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  };
+
   return {
     isBulkProcessing,
     progress,
@@ -112,6 +126,7 @@ export const useAdminBulkActions = (
     handleEnrich,
     verifyAll,
     handleMassEnrich,
-    handleMigrate
+    handleMigrate,
+    handleMigratePopularity
   };
 };
