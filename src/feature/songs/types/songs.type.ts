@@ -25,6 +25,10 @@ export interface Song {
   coverUrl?: string;
   coverAttempted?: boolean;
   isVerified?: boolean;
+  genres?: string[];
+  popularity?: number;
+  practicingUsers?: string[];
+  search_string?: string;
   avgDifficulty?: number;
   title_lowercase?: string;
   artist_lowercase?: string;

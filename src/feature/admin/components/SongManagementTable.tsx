@@ -101,6 +101,21 @@ export const SongManagementTable = ({
                     <div className="space-y-0.5">
                       <p className="truncate text-sm font-bold text-white leading-tight">{song.title}</p>
                       <p className="truncate text-[11px] font-medium text-zinc-500 tracking-wide">{song.artist}</p>
+                      {song.genres && song.genres.length > 0 && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {song.genres.slice(0, 2).map((genre) => (
+                            <span 
+                              key={genre} 
+                              className="rounded bg-white/5 px-1 py-0.5 text-[7px] font-bold uppercase tracking-tight text-zinc-500 border border-white/5"
+                            >
+                              {genre}
+                            </span>
+                          ))}
+                          {song.genres.length > 2 && (
+                            <span className="text-[7px] font-bold text-zinc-700">+{song.genres.length - 2}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

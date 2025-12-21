@@ -1,5 +1,5 @@
 import axios from "axios";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const enrichSong = async (songId: string, artist: string, title: string) => {
@@ -14,11 +14,22 @@ export const enrichSong = async (songId: string, artist: string, title: string) 
     const isVerified = response.data.isVerified;
     const songRef = doc(db, "songs", songId);
 
+    const genres = response.data.genres || [];
+
     await updateDoc(songRef, {
       coverUrl: coverUrl || null,
       isVerified: !!isVerified,
       coverAttempted: true,
+      genres,
     });
+
+    // Maintain global unique genres list for filtering
+    if (genres.length > 0) {
+      const globalMetaRef = doc(db, "metadata", "global");
+      await setDoc(globalMetaRef, {
+        genres: arrayUnion(...genres)
+      }, { merge: true }).catch(err => console.error("Error updating global genres:", err));
+    }
 
     return { coverUrl, isVerified };
   } catch (error: any) {
