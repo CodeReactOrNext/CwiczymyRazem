@@ -3,20 +3,20 @@ import * as yup from "yup";
 export const signupSchema = yup.object().shape({
   login: yup
     .string()
-    .min(3, "yup_errors:username_char_number")
-    .max(28, "yup_errors:username_char_max_number")
-    .matches(/^[^\s]+(\s+[^\s]+)*$/, "yup_errors:no_ends_whitespace")
-    .required("yup_errors:required"),
+    .min(3, "Username must be at least 3 characters")
+    .max(28, "Username must be at most 28 characters")
+    .matches(/^[^\s]+(\s+[^\s]+)*$/, "Username can't start or end with empty space")
+    .required("Required"),
   email: yup
     .string()
-    .email("yup_errors:valid_email")
-    .required("yup_errors:required"),
+    .email("Enter a valid email")
+    .required("Required"),
   password: yup
     .string()
-    .min(8, "yup_errors:password_char_number")
-    .required("yup_errors:required"),
+    .min(8, "Password must be at least 8 characters")
+    .required("Required"),
   repeat_password: yup
     .string()
-    .oneOf([yup.ref("password"), null], "yup_errors:same_passwords")
-    .required("yup_errors:required"),
+    .oneOf([yup.ref("password"), null], "Passwords must be the same")
+    .required("Required"),
 });
