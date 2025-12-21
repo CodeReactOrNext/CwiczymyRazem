@@ -55,6 +55,20 @@ export const useAdminSongs = (password: string) => {
     }
   };
 
+  const handleUpdateCover = async (songId: string, coverUrl: string) => {
+    try {
+      await axios.post("/api/admin/songs", {
+        password,
+        songId,
+        data: { coverUrl, isVerified: true }
+      });
+      setSongs(prev => prev.map(s => s.id === songId ? { ...s, coverUrl, isVerified: true } : s));
+      toast.success("Cover updated successfully");
+    } catch (error) {
+      toast.error("Failed to update cover");
+    }
+  };
+
   const filteredSongs = songs.filter(s => {
     const matchesSearch = s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.artist.toLowerCase().includes(searchTerm.toLowerCase());
@@ -86,6 +100,7 @@ export const useAdminSongs = (password: string) => {
     fetchSongs,
     handleSave,
     handleManualVerify,
+    handleUpdateCover,
     filteredSongs,
     stats
   };
