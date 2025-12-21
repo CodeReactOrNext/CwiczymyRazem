@@ -63,17 +63,19 @@ export const useAdminBulkActions = (
   };
 
   const handleMassEnrich = async () => {
-    const unverified = songs.filter(s => !s.isVerified);
-    if (unverified.length === 0) {
-      toast.info("All songs are already enriched and verified.");
+    // Process all songs that don't have a cover, regardless of verification status
+    const targetSongs = songs.filter(s => !s.coverUrl);
+
+    if (targetSongs.length === 0) {
+      toast.info("All songs in the current view already have covers.");
       return;
     }
 
     setIsBulkProcessing(true);
-    setProgress({ current: 0, total: unverified.length });
+    setProgress({ current: 0, total: targetSongs.length });
 
-    for (let i = 0; i < unverified.length; i++) {
-      const song = unverified[i];
+    for (let i = 0; i < targetSongs.length; i++) {
+      const song = targetSongs[i];
       try {
         await handleEnrich(song.id, song.artist, song.title, true);
         setProgress(prev => ({ ...prev, current: i + 1 }));
@@ -85,6 +87,7 @@ export const useAdminBulkActions = (
 
     setIsBulkProcessing(false);
     toast.success("Mass enrichment complete!");
+    onFetchSongs();
   };
 
   return {
