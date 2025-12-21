@@ -339,10 +339,7 @@ export const FeaturesSection = () => {
                                     createdAt: {} as any,
                                     createdBy: "1"
                                  }}
-                                 status={song.status as any}
-                                 readonly={true}
-                                 onStatusChange={() => {}}
-                                 onRatingChange={() => {}}
+                                 onOpenDetails={() => {}}
                               />
                            </motion.div>
                         ))}
