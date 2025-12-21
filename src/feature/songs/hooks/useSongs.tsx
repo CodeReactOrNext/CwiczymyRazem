@@ -77,7 +77,9 @@ export const useSongs = () => {
         "desc",
         debouncedSearchQuery,
         page,
-        ITEMS_PER_PAGE
+        ITEMS_PER_PAGE,
+        tierFilter,
+        difficultyFilter
       );
       setSongs(loadedSongs.songs);
       setTotalPages(Math.ceil(loadedSongs.total / ITEMS_PER_PAGE));
@@ -92,7 +94,7 @@ export const useSongs = () => {
   useEffect(() => {
     setIsDebounceLoading(true);
     loadSongs(true);
-  }, [debouncedSearchQuery, page]);
+  }, [debouncedSearchQuery, page, tierFilter, difficultyFilter]);
 
   const loadUserSongs = async () => {
     if (currentUserId) {
@@ -103,7 +105,7 @@ export const useSongs = () => {
 
   useEffect(() => {
     loadUserSongs();
-  }, [currentUserId, statusFilter]);
+  }, [currentUserId]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -117,36 +119,13 @@ export const useSongs = () => {
 
   const filteredSongs = songs.filter((song) => {
     let matchesStatus = true;
-    let matchesDifficulty = true;
-    let matchesTier = true;
 
     if (statusFilter !== "all") {
       const songStatus = getStatus(userSongs, song.id);
       matchesStatus = songStatus === statusFilter;
     }
 
-    if (difficultyFilter !== "all") {
-      const avgDifficulty = getAverageDifficulty(song.difficulties);
-      switch (difficultyFilter) {
-        case "easy":
-          matchesDifficulty = avgDifficulty <= 4;
-          break;
-        case "medium":
-          matchesDifficulty = avgDifficulty > 4 && avgDifficulty <= 7;
-          break;
-        case "hard":
-          matchesDifficulty = avgDifficulty > 7;
-          break;
-      }
-    }
-
-    if (tierFilter !== "all") {
-      const avgDifficulty = getAverageDifficulty(song.difficulties);
-      const songTier = getSongTier(avgDifficulty);
-      matchesTier = songTier.tier === tierFilter;
-    }
-
-    return matchesStatus && matchesDifficulty && matchesTier;
+    return matchesStatus;
   });
 
   const hasFilters =

@@ -25,6 +25,9 @@ export interface Song {
   coverUrl?: string;
   coverAttempted?: boolean;
   isVerified?: boolean;
+  avgDifficulty?: number;
+  title_lowercase?: string;
+  artist_lowercase?: string;
 }
 
 export interface UserSongStatus {

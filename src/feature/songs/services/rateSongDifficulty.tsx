@@ -35,8 +35,13 @@ export const rateSongDifficulty = async (
       },
     ];
 
+    const avgDifficulty =
+      newDifficulties.reduce((acc, curr) => acc + curr.rating, 0) /
+      (newDifficulties.length || 1);
+
     await updateDoc(songRef, {
       difficulties: newDifficulties,
+      avgDifficulty: avgDifficulty,
     });
 
     firebaseAddSongsLog(
