@@ -52,7 +52,7 @@ export default async function handler(
             continue;
           }
 
-          const difficulty = s.difficulty ? (typeof s.difficulty === 'string' ? parseInt(s.difficulty) : s.difficulty) : null;
+          const difficulty = s.difficulty ? (typeof s.difficulty === 'string' ? parseFloat(s.difficulty) : s.difficulty) : null;
 
           const newSong = {
             title: s.title || "Unknown Title",

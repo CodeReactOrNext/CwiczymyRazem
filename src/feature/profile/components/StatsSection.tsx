@@ -29,6 +29,7 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
+import { DashboardSection } from "components/Layout";
 
 interface StatsSectionProps {
   statsField: StatsFieldProps[];
@@ -333,6 +334,8 @@ export const StatsSection = ({
           </div>
         </div>
       </div>
+
+      <ActivityLog userAuth={userAuth as string} />
 
       <div className='space-y-2'>
         <SeasonalAchievements userId={userAuth} />

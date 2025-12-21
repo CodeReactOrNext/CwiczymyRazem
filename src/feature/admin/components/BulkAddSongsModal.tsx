@@ -33,7 +33,7 @@ export const BulkAddSongsModal = ({ isOpen, onClose, onConfirm, isLoading }: Bul
           return {
             title: parts[0],
             artist: parts[1],
-            difficulty: parseInt(parts[2]) || 3
+            difficulty: parseFloat(parts[2]) || 0
           };
         }
         return null;
