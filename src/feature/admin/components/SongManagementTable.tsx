@@ -1,7 +1,7 @@
 import { Song } from "feature/songs/types/songs.type";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
-import { Music, CheckCircle2, ShieldCheck, XCircle, Edit2, Loader2, Save, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { Music, CheckCircle2, ShieldCheck, XCircle, Edit2, Loader2, Save, ChevronLeft, ChevronRight, RefreshCw, Search } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { useState } from "react";
 
@@ -13,6 +13,7 @@ interface SongManagementTableProps {
   onSave: (songId: string) => void;
   onManualVerify: (songId: string) => void;
   onEnrich: (songId: string, artist: string, title: string) => void;
+  onOpenCoverPicker?: (song: any) => void;
   isEnrichingBySong: Record<string, boolean>;
   onCancel: () => void;
   onFieldChange: (field: "title" | "artist", value: string) => void;
@@ -27,6 +28,7 @@ export const SongManagementTable = ({
   onSave,
   onManualVerify,
   onEnrich,
+  onOpenCoverPicker,
   isEnrichingBySong,
   onCancel,
   onFieldChange,
@@ -165,14 +167,23 @@ export const SongManagementTable = ({
                         variant="ghost" 
                         size="icon" 
                         disabled={isEnrichingBySong[song.id]}
-                        title="Enrich Metadata"
-                        className="h-8 w-8 rounded-full transition-colors hover:bg-amber-500/10 hover:text-amber-500"
+                        title="Auto Enrich"
+                        className="h-8 w-8 rounded-full transition-colors hover:bg-cyan-500/10 hover:text-cyan-400 text-cyan-500"
                       >
                         {isEnrichingBySong[song.id] ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
                         ) : (
                           <RefreshCw className="h-3.5 w-3.5" />
                         )}
+                      </Button>
+                      <Button 
+                        onClick={() => onOpenCoverPicker?.(song)}
+                        variant="ghost" 
+                        size="icon" 
+                        title="Manual Cover Select"
+                        className="h-8 w-8 rounded-full transition-colors hover:bg-amber-500/10 hover:text-amber-500 text-amber-500"
+                      >
+                        <Search className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         onClick={() => onEdit(song)}

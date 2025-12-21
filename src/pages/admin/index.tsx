@@ -1,9 +1,11 @@
+import { useState } from "react";
 import AdminLayout from "feature/admin/layouts/AdminLayout";
 import { DashboardStats } from "feature/admin/components/DashboardStats";
 import { SongManagementTable } from "feature/admin/components/SongManagementTable";
 import AdminLogin from "feature/admin/components/AdminLogin";
 import AdminActionCenter from "feature/admin/components/AdminActionCenter";
 import MassActionProgress from "feature/admin/components/MassActionProgress";
+import CoverPickerModal from "feature/admin/components/CoverPickerModal";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
 import { useAdminSongs } from "feature/admin/hooks/useAdminSongs";
 import { useAdminBulkActions } from "feature/admin/hooks/useAdminBulkActions";
@@ -14,6 +16,8 @@ import { doc, getDoc } from "firebase/firestore";
 import type { GetServerSideProps } from "next";
 
 const AdminDashboard = () => {
+  const [selectedSongForCover, setSelectedSongForCover] = useState<{ id: string; artist: string; title: string } | null>(null);
+
   const {
     password,
     setPassword,
@@ -37,6 +41,7 @@ const AdminDashboard = () => {
     fetchSongs,
     handleSave,
     handleManualVerify,
+    handleUpdateCover,
     filteredSongs,
     stats
   } = useAdminSongs(password);
@@ -94,6 +99,7 @@ const AdminDashboard = () => {
             onSave={handleSave}
             onManualVerify={handleManualVerify}
             onEnrich={handleEnrich}
+            onOpenCoverPicker={(song) => setSelectedSongForCover({ id: song.id, artist: song.artist, title: song.title })}
             isEnrichingBySong={isEnrichingBySong}
             onCancel={() => setEditingId(null)}
             onFieldChange={(field, value) => setEditForm(prev => ({ ...prev, [field]: value }))}
@@ -101,6 +107,19 @@ const AdminDashboard = () => {
           />
         </div>
       </div>
+      
+      <CoverPickerModal 
+        isOpen={!!selectedSongForCover}
+        onClose={() => setSelectedSongForCover(null)}
+        song={selectedSongForCover}
+        password={password}
+        onSelect={(url) => {
+          if (selectedSongForCover) {
+            handleUpdateCover(selectedSongForCover.id, url);
+            setSelectedSongForCover(null);
+          }
+        }}
+      />
     </AdminLayout>
   );
 };
