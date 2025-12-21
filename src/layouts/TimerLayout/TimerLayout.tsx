@@ -20,7 +20,7 @@ import { calculatePercent, convertMsToHMS } from "utils/converter";
 
 import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
-import { PageHeader } from "components/PageHeader";
+import { PageHeader } from "constants/PageHeader";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
 
 interface TimerLayoutProps {
