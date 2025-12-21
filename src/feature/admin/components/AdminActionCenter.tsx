@@ -1,4 +1,4 @@
-import { Search, RefreshCw, ShieldCheck } from "lucide-react";
+import { Search, RefreshCw, ShieldCheck, Plus } from "lucide-react";
 import { Input } from "assets/components/ui/input";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
@@ -11,6 +11,7 @@ interface AdminActionCenterProps {
   onSync: () => void;
   onMassVerify: () => void;
   onMassEnrich: () => void;
+  onBulkAdd: () => void;
   isBulkProcessing: boolean;
   isLoading: boolean;
 }
@@ -23,6 +24,7 @@ const AdminActionCenter = ({
   onSync,
   onMassVerify,
   onMassEnrich,
+  onBulkAdd,
   isBulkProcessing,
   isLoading
 }: AdminActionCenterProps) => {
@@ -79,7 +81,7 @@ const AdminActionCenter = ({
         <Button 
           onClick={onMassVerify} 
           disabled={isBulkProcessing}
-          className="h-10 bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
+          className="h-10 border-white/5 bg-zinc-900/60 hover:bg-white/5 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em]"
         >
           <ShieldCheck className="mr-2 h-3.5 w-3.5" />
           Mass Verify
@@ -87,10 +89,18 @@ const AdminActionCenter = ({
         <Button 
           onClick={onMassEnrich} 
           disabled={isBulkProcessing}
-          className="h-10 bg-amber-600 hover:bg-amber-500 shadow-lg shadow-amber-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
+          className="h-10 border-white/5 bg-zinc-900/60 hover:bg-white/5 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em]"
         >
           <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
           Mass Enrich
+        </Button>
+        <Button 
+          onClick={onBulkAdd} 
+          disabled={isLoading}
+          className="h-10 bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
+        >
+          <Plus className="mr-2 h-3.5 w-3.5" />
+          Bulk Add Songs
         </Button>
       </div>
     </div>
