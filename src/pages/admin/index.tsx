@@ -9,6 +9,7 @@ import CoverPickerModal from "feature/admin/components/CoverPickerModal";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
 import { useAdminSongs } from "feature/admin/hooks/useAdminSongs";
 import { useAdminBulkActions } from "feature/admin/hooks/useAdminBulkActions";
+import { BulkAddSongsModal } from "feature/admin/components/BulkAddSongsModal";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../api/auth/[...nextauth]";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -17,6 +18,7 @@ import type { GetServerSideProps } from "next";
 
 const AdminDashboard = () => {
   const [selectedSongForCover, setSelectedSongForCover] = useState<{ id: string; artist: string; title: string } | null>(null);
+  const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
 
   const {
     password,
@@ -42,6 +44,7 @@ const AdminDashboard = () => {
     handleSave,
     handleManualVerify,
     handleUpdateCover,
+    handleBulkAdd,
     filteredSongs,
     stats
   } = useAdminSongs(password);
@@ -82,6 +85,7 @@ const AdminDashboard = () => {
             onSync={() => fetchSongs()}
             onMassVerify={verifyAll}
             onMassEnrich={handleMassEnrich}
+            onBulkAdd={() => setIsBulkAddOpen(true)}
             isBulkProcessing={isBulkProcessing}
             isLoading={isLoading}
           />
@@ -118,6 +122,16 @@ const AdminDashboard = () => {
             handleUpdateCover(selectedSongForCover.id, url);
             setSelectedSongForCover(null);
           }
+        }}
+      />
+
+      <BulkAddSongsModal 
+        isOpen={isBulkAddOpen}
+        onClose={() => setIsBulkAddOpen(false)}
+        isLoading={isLoading}
+        onConfirm={async (songs) => {
+          await handleBulkAdd(songs);
+          setIsBulkAddOpen(false);
         }}
       />
     </AdminLayout>
