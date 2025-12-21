@@ -98,7 +98,7 @@ const AdminDashboard = () => {
             editForm={editForm}
             onEdit={(song) => {
               setEditingId(song.id);
-              setEditForm({ title: song.title, artist: song.artist });
+              setEditForm({ title: song.title, artist: song.artist, avgDifficulty: song.avgDifficulty || 0 });
             }}
             onSave={handleSave}
             onManualVerify={handleManualVerify}
@@ -106,7 +106,12 @@ const AdminDashboard = () => {
             onOpenCoverPicker={(song) => setSelectedSongForCover({ id: song.id, artist: song.artist, title: song.title })}
             isEnrichingBySong={isEnrichingBySong}
             onCancel={() => setEditingId(null)}
-            onFieldChange={(field, value) => setEditForm(prev => ({ ...prev, [field]: value }))}
+            onFieldChange={(field, value) => {
+              setEditForm(prev => ({ 
+                ...prev, 
+                [field]: field === "avgDifficulty" ? parseFloat(value) || 0 : value 
+              }))
+            }}
             isLoading={isLoading}
           />
         </div>
