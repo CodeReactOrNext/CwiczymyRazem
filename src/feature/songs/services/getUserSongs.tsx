@@ -5,8 +5,20 @@ import {
   getDocs,
   Timestamp,
   getDoc,
+  query,
+  where,
+  documentId,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+
+const getAverageDifficulty = (difficulties: { rating: number }[]) => {
+  if (!difficulties?.length) return 0;
+  return (
+    difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
+    difficulties.length
+  );
+};
 
 export const getUserSongs = async (userId: string) => {
   const userDocRef = doc(db, "users", userId);
@@ -21,36 +33,62 @@ export const getUserSongs = async (userId: string) => {
       lastUpdated: Timestamp.now(),
     };
 
-    const userSongs = userSongsSnapshot.docs.map((doc) => ({
-      id: doc.data().songId,
-      status: doc.data().status as SongStatus,
+    const userSongs = userSongsSnapshot.docs.map((docSnap) => ({
+      id: docSnap.data().songId,
+      status: docSnap.data().status as SongStatus,
     }));
 
-    // Pobierz pełne dane utworów z kolekcji songs
-    for (const userSong of userSongs) {
-      try {
-        const songDocRef = doc(db, "songs", userSong.id);
-        const songDoc = await getDoc(songDocRef);
+    if (userSongs.length === 0) return songLists;
 
-        if (songDoc.exists()) {
-          const fullSongData = {
-            ...songDoc.data(),
-            id: songDoc.id,
-          } as Song;
-
-          // Dodaj do odpowiedniej listy na podstawie statusu
-          if (userSong.status === "wantToLearn") {
-            songLists.wantToLearn.push(fullSongData);
-          } else if (userSong.status === "learning") {
-            songLists.learning.push(fullSongData);
-          } else if (userSong.status === "learned") {
-            songLists.learned.push(fullSongData);
-          }
-        }
-      } catch (error) {
-        console.error(`Error fetching song ${userSong.id}:`, error);
-      }
+    // Batched fetching of song details
+    const songIds = userSongs.map((us) => us.id);
+    const CHUNK_SIZE = 10;
+    const songChunks = [];
+    for (let i = 0; i < songIds.length; i += CHUNK_SIZE) {
+      songChunks.push(songIds.slice(i, i + CHUNK_SIZE));
     }
+
+    const songsRef = collection(db, "songs");
+    const fullSongsPromises = songChunks.map((chunk) => {
+      const q = query(songsRef, where(documentId(), "in", chunk));
+      return getDocs(q);
+    });
+
+    const fullSongsSnapshots = await Promise.all(fullSongsPromises);
+    const idToSongMap = new Map<string, Song>();
+
+    fullSongsSnapshots.forEach((snap) => {
+      snap.docs.forEach((docSnap) => {
+        const data = docSnap.data() as Song;
+        const avgDifficulty = data.avgDifficulty !== undefined 
+          ? data.avgDifficulty 
+          : getAverageDifficulty(data.difficulties || []);
+
+        idToSongMap.set(docSnap.id, { 
+          ...data,
+          id: docSnap.id,
+          avgDifficulty 
+        } as Song);
+
+        // Optional: Hydrate on database if fields are missing
+        if (data.avgDifficulty === undefined || data.title_lowercase === undefined) {
+          updateDoc(doc(db, "songs", docSnap.id), {
+            avgDifficulty: avgDifficulty,
+            title_lowercase: data.title.toLowerCase(),
+            artist_lowercase: data.artist.toLowerCase(),
+          }).catch((err: any) => console.error("Hydration failure in getUserSongs:", err));
+        }
+      });
+    });
+
+    userSongs.forEach((us) => {
+      const fullSong = idToSongMap.get(us.id);
+      if (fullSong) {
+        if (us.status === "wantToLearn") songLists.wantToLearn.push(fullSong);
+        else if (us.status === "learning") songLists.learning.push(fullSong);
+        else if (us.status === "learned") songLists.learned.push(fullSong);
+      }
+    });
 
     return songLists;
   } catch (error) {

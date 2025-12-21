@@ -52,17 +52,22 @@ export default async function handler(
             continue;
           }
 
+          const difficulty = s.difficulty ? (typeof s.difficulty === 'string' ? parseInt(s.difficulty) : s.difficulty) : null;
+
           const newSong = {
             title: s.title || "Unknown Title",
             artist: s.artist || "Unknown Artist",
+            title_lowercase: (s.title || "Unknown Title").toLowerCase(),
+            artist_lowercase: (s.artist || "Unknown Artist").toLowerCase(),
             createdAt: serverTimestamp(),
             createdBy: "admin",
             isVerified: true,
-            difficulties: s.difficulty ? [{
+            difficulties: difficulty !== null ? [{
               userId: "admin_system",
-              rating: typeof s.difficulty === 'string' ? parseInt(s.difficulty) : s.difficulty,
+              rating: difficulty,
               date: new Date()
-            }] : []
+            }] : [],
+            avgDifficulty: difficulty !== null ? difficulty : 0
           };
           const docRef = await addDoc(songsRef, newSong);
           results.push({ id: docRef.id, ...newSong });
