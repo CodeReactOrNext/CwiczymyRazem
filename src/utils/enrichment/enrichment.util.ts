@@ -23,22 +23,60 @@ export async function fetchEnrichmentData(artist: string, title: string) {
 
   const accessToken = tokenResponse.data.access_token;
 
-  // 2. Search Spotify
-  const searchTerm = encodeURIComponent(`album:${title} artist:${artist}`);
+  // 2. Search Spotify (Track first for better song matching)
+  const searchTerm = encodeURIComponent(`track:${title} artist:${artist}`);
   const searchResponse = await axios.get(
-    `https://api.spotify.com/v1/search?q=${searchTerm}&type=album&limit=1`,
+    `https://api.spotify.com/v1/search?q=${searchTerm}&type=track&limit=5`,
     { headers: { Authorization: `Bearer ${accessToken}` } }
   );
 
-  const album = searchResponse.data.albums?.items[0];
+  const tracks = searchResponse.data.tracks?.items || [];
 
-  if (album && album.images && album.images.length > 0) {
-    const image = album.images[1] || album.images[0];
-    return {
-      coverUrl: image.url,
-      isVerified: true,
+  if (tracks.length > 0) {
+    const candidates = tracks.map((track: any) => ({
+      coverUrl: track.album?.images[0]?.url || null,
+      artist: track.artists.map((a: any) => a.name).join(", "),
+      title: track.name,
+      albumName: track.album?.name,
       source: "spotify"
-    };
+    })).filter((c: any) => c.coverUrl);
+
+    if (candidates.length > 0) {
+      // For automated enrichment, we still return the best match
+      return {
+        coverUrl: candidates[0].coverUrl,
+        isVerified: true,
+        source: "spotify",
+        candidates: candidates // Include candidates for manual selection
+      };
+    }
+  }
+
+  // 2b. Fallback to Album search if Track search failed
+  const albumSearchTerm = encodeURIComponent(`album:${title} artist:${artist}`);
+  const albumSearchResponse = await axios.get(
+    `https://api.spotify.com/v1/search?q=${albumSearchTerm}&type=album&limit=5`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+
+  const albums = albumSearchResponse.data.albums?.items || [];
+  if (albums.length > 0) {
+    const candidates = albums.map((album: any) => ({
+      coverUrl: album.images[0]?.url || null,
+      artist: album.artists.map((a: any) => a.name).join(", "),
+      title: album.name,
+      albumName: album.name,
+      source: "spotify-album"
+    })).filter((c: any) => c.coverUrl);
+
+    if (candidates.length > 0) {
+      return {
+        coverUrl: candidates[0].coverUrl,
+        isVerified: true,
+        source: "spotify-album",
+        candidates: candidates
+      };
+    }
   }
 
   // 3. Fallback to MusicBrainz
