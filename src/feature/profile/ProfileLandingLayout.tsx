@@ -1,5 +1,6 @@
 import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { ActivityChart } from "components/Charts/ActivityChart";
 import { HeadDecoration } from "components/HeadDecoration";
 import { DashboardContainer, DashboardSection } from "components/Layout";
 import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
@@ -68,6 +69,9 @@ const ProfileLandingLayout = ({
           achievements={achievements}
         />
       </DashboardSection>
+
+      {/* Activity Chart Section */}
+
 
       {featSlot && featSlot}
     </DashboardContainer>
