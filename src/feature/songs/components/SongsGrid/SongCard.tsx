@@ -9,7 +9,7 @@ import { SongRating } from "feature/songs/components/SongsTable/components/SongR
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getAverageDifficulty } from "feature/songs/utils/getAvgRaiting";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { BookOpen, CheckCircle, ChevronDown, Music, Play } from "lucide-react";
+import { BookOpen, CheckCircle, ChevronDown, Music, Play, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "assets/lib/utils";
 
@@ -83,52 +83,97 @@ export const SongCard = ({
       />
 
       {/* Header Section */}
-      <div className="relative z-10 mb-4 flex gap-3">
-        {/* Tier Badge / Cover Placeholder */}
-        <div 
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-xs font-black shadow-lg"
-            style={{
-                borderColor: `${tier.color}30`,
-                backgroundColor: `${tier.color}10`,
-                color: tier.color,
-                boxShadow: `0 4px 12px ${tier.color}15`
-            }}
-        >
-            {tier.tier}
+      <div className="relative z-10 mb-4 flex items-start gap-4">
+        {/* Cover Image / Placeholder Wrapper */}
+        <div className="relative shrink-0">
+          {song.coverUrl ? (
+            <div className="relative h-20 w-20 overflow-hidden rounded-xl border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-cyan-500/30 group-hover:shadow-cyan-500/10">
+              <img 
+                src={song.coverUrl} 
+                alt={`${song.title} cover`}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+            </div>
+          ) : (
+            <div 
+              className="flex h-20 w-20 items-center justify-center rounded-xl border-2 border-dashed border-white/5 bg-zinc-950/40 text-zinc-700 transition-colors group-hover:border-white/10"
+            >
+              <Music className="h-8 w-8 opacity-20" />
+            </div>
+          )}
+          
+          {/* Tier Badge Overlay - Always Visible */}
+          <div 
+              className="absolute -bottom-2 -right-2 z-20 flex h-8 w-8 items-center justify-center rounded-lg border text-[11px] font-black shadow-lg backdrop-blur-md transition-transform duration-300 group-hover:scale-110"
+              style={{
+                  borderColor: `${tier.color}40`,
+                  backgroundColor: `${tier.color}15`,
+                  color: tier.color,
+                  boxShadow: `0 4px 12px ${tier.color}30`
+              }}
+          >
+              {tier.tier}
+          </div>
         </div>
         
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base font-bold text-white group-hover:text-cyan-400 transition-colors">
-            {song.title}
-          </h3>
-          <p className="truncate text-xs font-medium text-zinc-500 group-hover:text-zinc-400">
-            {song.artist}
-          </p>
+        <div className="min-w-0 flex-1 pt-1">
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-1.5">
+              <h3 className="line-clamp-2 text-base font-bold leading-tight text-white group-hover:text-cyan-400 transition-colors">
+                {song.title}
+              </h3>
+              {song.isVerified && (
+                <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-cyan-400/70" />
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <p className="truncate text-xs font-medium text-zinc-500 group-hover:text-zinc-400">
+                {song.artist}
+              </p>
+              {song.coverAttempted && !song.coverUrl && !song.isVerified && (
+                <div 
+                  className="h-1 w-1 rounded-full bg-zinc-700 shadow-sm" 
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Stats Section */}
       <div className="relative z-10 mb-4 space-y-3">
         {/* Difficulty Meter */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-             <span>Difficulty</span>
-             <span style={{ color: tier.color }} className="opacity-90">{avgDifficulty.toFixed(1)}</span>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-widest text-zinc-400">
+             <span className="flex items-center gap-1.5">
+               <div className="h-1 w-3 rounded-full" style={{ backgroundColor: tier.color }} />
+               Difficulty
+             </span>
+             <span 
+               style={{ 
+                 color: tier.color,
+                 textShadow: `0 0 10px ${tier.color}40`
+               }} 
+               className="text-sm font-black"
+             >
+               {avgDifficulty.toFixed(1)}
+             </span>
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-950/50">
+          <div className="h-2.5 w-full overflow-hidden rounded-full bg-zinc-950/80 p-0.5 border border-white/5">
             <div
-              className="h-full rounded-full transition-all duration-500"
+              className="h-full rounded-full transition-all duration-700 ease-out"
               style={{
                 width: `${Math.min(avgDifficulty * 10, 100)}%`,
                 backgroundColor: tier.color,
-                boxShadow: `0 0 8px ${tier.color}40`,
+                boxShadow: `0 0 15px ${tier.color}60, inset 0 0 4px rgba(255,255,255,0.2)`,
               }}
             />
           </div>
         </div>
 
         {/* User Rating */}
-        <div className="flex items-center justify-center rounded-lg bg-black/20 px-3 py-2">
+        <div className="flex items-center justify-center rounded-xl bg-white/[0.03] border border-white/5 px-3 py-2.5 backdrop-blur-sm transition-colors hover:bg-white/[0.05]">
            <SongRating song={song} refreshTable={onRatingChange} />
         </div>
       </div>
