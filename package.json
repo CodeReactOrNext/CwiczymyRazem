@@ -72,6 +72,7 @@
     "react-use": "^17.6.0",
     "recharts": "^2.15.0",
     "sonner": "^1.7.1",
+    "vaul": "^1.1.2",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.1.0",
