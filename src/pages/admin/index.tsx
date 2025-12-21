@@ -56,8 +56,6 @@ const AdminDashboard = () => {
     handleEnrich,
     verifyAll,
     handleMassEnrich,
-    handleMigrate,
-    handleMigratePopularity
   } = useAdminBulkActions(songs, password, setSongs, fetchSongs);
 
   if (!isAuth) {
@@ -87,8 +85,6 @@ const AdminDashboard = () => {
             onSync={() => fetchSongs()}
             onMassVerify={verifyAll}
             onMassEnrich={handleMassEnrich}
-            onMigrate={handleMigrate}
-            onMigratePopularity={handleMigratePopularity}
             onBulkAdd={() => setIsBulkAddOpen(true)}
             isBulkProcessing={isBulkProcessing}
             isLoading={isLoading}

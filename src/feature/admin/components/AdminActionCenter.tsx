@@ -1,4 +1,4 @@
-import { Search, RefreshCw, ShieldCheck, Plus, Users } from "lucide-react";
+import { Search, RefreshCw, ShieldCheck, Plus } from "lucide-react";
 import { Input } from "assets/components/ui/input";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
@@ -12,8 +12,6 @@ interface AdminActionCenterProps {
   onMassVerify: () => void;
   onMassEnrich: () => void;
   onBulkAdd: () => void;
-  onMigrate: () => void;
-  onMigratePopularity: () => void;
   isBulkProcessing: boolean;
   isLoading: boolean;
 }
@@ -27,8 +25,6 @@ const AdminActionCenter = ({
   onMassVerify,
   onMassEnrich,
   onBulkAdd,
-  onMigrate,
-  onMigratePopularity,
   isBulkProcessing,
   isLoading
 }: AdminActionCenterProps) => {
@@ -97,22 +93,6 @@ const AdminActionCenter = ({
         >
           <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
           Mass Enrich
-        </Button>
-        <Button 
-          onClick={onMigrate} 
-          disabled={isBulkProcessing || isLoading}
-          className="h-10 bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
-        >
-          <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
-          Migrate Schema
-        </Button>
-        <Button 
-          onClick={onMigratePopularity} 
-          disabled={isBulkProcessing || isLoading}
-          className="h-10 bg-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
-        >
-          <Users className="mr-2 h-3.5 w-3.5" />
-          Sync Popularity
         </Button>
         <Button 
           onClick={onBulkAdd} 
