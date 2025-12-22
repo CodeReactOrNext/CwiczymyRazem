@@ -11,7 +11,9 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
 import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
 import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
-import { Loader2, ChevronRight } from "lucide-react";
+import { Loader2, ChevronRight, Check } from "lucide-react";
+import { FaFire } from "react-icons/fa";
+import { cn } from "assets/lib/utils";
 
 export const HeroSection = () => {
   const dispatch = useAppDispatch();
@@ -87,15 +89,40 @@ export const HeroSection = () => {
               <span className='text-white font-semibold'>2693h</span>
               <span className='text-zinc-500 text-sm'>practiced</span>
             </div>
-            <div className='flex items-center gap-1'>
-              {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-                <div 
-                  key={i} 
-                  className={`w-6 h-6 rounded text-xs flex items-center justify-center font-medium ${i < 5 ? 'bg-zinc-800 text-zinc-400' : 'bg-cyan-500/20 text-cyan-400'}`}
-                >
-                  {d}
+            <div className='flex items-center gap-1.5'>
+              <div className="flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 shadow-sm backdrop-blur-sm transition-all duration-500 text-emerald-400">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white">
+                    <Check className="w-3 h-3" />
                 </div>
-              ))}
+                <span className='text-[10px] font-bold uppercase tracking-wider'>
+                  Goal met
+                </span>
+              </div>
+              
+              <div className='flex h-10 items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm'>
+                <div className="flex items-center gap-1.5 shrink-0 px-1">
+                    <FaFire className="text-xl text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
+                    <span className="text-sm font-black text-white">1</span>
+                </div>
+                <div className='flex items-center gap-1 border-l border-white/5 pl-2'>
+                    {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => {
+                        const isActive = index === 0;
+                        return (
+                            <div
+                                key={index}
+                                className={cn(
+                                    "flex h-5 w-5 items-center justify-center rounded-[4px] text-[9px] font-bold transition-all duration-300",
+                                    isActive
+                                        ? "bg-white text-zinc-900 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
+                                        : "bg-zinc-800 text-zinc-600"
+                                )}
+                            >
+                                {day}
+                            </div>
+                        );
+                    })}
+                </div>
+              </div>
             </div>
           </motion.div>
 
