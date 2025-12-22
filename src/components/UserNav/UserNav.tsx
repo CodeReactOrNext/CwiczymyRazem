@@ -3,12 +3,15 @@ import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "store/hooks";
+import { LogOut } from "lucide-react";
+import { cn } from "assets/lib/utils";
 
 interface UserNavProps {
   flexDirection?: "row" | "col";
+  showOnlyLogout?: boolean;
 }
 
-const UserNav = ({ flexDirection }: UserNavProps) => {
+const UserNav = ({ flexDirection, showOnlyLogout }: UserNavProps) => {
   const { t } = useTranslation("common");
   const dispatch = useAppDispatch();
 
@@ -19,15 +22,18 @@ const UserNav = ({ flexDirection }: UserNavProps) => {
           ? "flex-col items-start justify-center"
           : "flex-row justify-around"
       }`}>
-      <Link href='/settings' className={buttonVariants({ size: "sm" })}>
-        {t("button.edit")}
-      </Link>
+      {!showOnlyLogout && (
+        <Link href='/settings' className={buttonVariants({ size: "sm" })}>
+          {t("button.edit")}
+        </Link>
+      )}
 
       <Button
-        size='sm'
+        size={showOnlyLogout ? 'icon' : 'sm'}
         variant='outline'
+        className={cn(showOnlyLogout && "h-8 w-8 border-white/10 bg-zinc-800/40")}
         onClick={() => dispatch(logUserOff())}>
-        {t("button.logout")}
+        {showOnlyLogout ? <LogOut size={14} className="text-zinc-400" /> : t("button.logout")}
       </Button>
     </div>
   );

@@ -24,7 +24,7 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className='relative min-h-screen flex items-center overflow-hidden bg-[#0d0d0c]'>
+    <section className='relative min-h-screen flex items-center overflow-hidden bg-[#000]'>
       <GoogleOneTap />
       {/* Subtle background gradient */}
       <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/50 via-[#0d0d0c] to-[#0d0d0c]'></div>
@@ -56,9 +56,9 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className='text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6 uppercase'>
+            className='text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6'>
             The ultimate <br />
-            <span className='bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent'>guitar practice tracker</span>
+            <span className='bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent'>guitar practice tracker</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -66,8 +66,8 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className='text-lg sm:text-xl text-zinc-400 leading-relaxed mb-10 max-w-lg'>
-            The intelligent guitar practice app for guitarists. Build your guitar practice routine, track time by skill, and visualize your guitar progress tracking with detailed analytics.
+            className='text-lg sm:text-xl text-zinc-400 leading-relaxed mb-10 max-w-xl'>
+            The intelligent guitar practice app for guitarists. Build your guitar practice routine, track time by skill, and visualize your progress with detailed analytics.
           </motion.p>
 
           {/* Stats preview */}
@@ -99,7 +99,6 @@ export const HeroSection = () => {
             </div>
           </motion.div>
 
-          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -108,19 +107,19 @@ export const HeroSection = () => {
             
             {isLoggedIn ? (
               <Link href='/dashboard' className='w-full sm:w-auto'>
-                <Button className='h-12 px-10 rounded-xl bg-cyan-500 text-zinc-950 hover:bg-cyan-400 font-bold text-lg transition-all shadow-lg shadow-cyan-500/40 w-full'>
-                  Go to Dashboard <ChevronRight className="ml-2 w-5 h-5" />
+                <Button className='h-12 px-10  bg-white text-black hover:bg-zinc-200 font-semibold text-base transition-all w-full'>
+                  Go to Dashboard <ChevronRight className="ml-1 w-4 h-4" />
                 </Button>
               </Link>
             ) : (
               <>
                 <Link href='/signup' className='w-full sm:w-auto'>
-                  <Button className='h-12 px-10 rounded-xl bg-cyan-500 text-zinc-950 hover:bg-cyan-400 font-bold text-lg transition-all shadow-lg shadow-cyan-500/40 w-full sm:w-auto'>
+                  <Button className='h-12 px-10 bg-white text-black hover:bg-zinc-200 font-semibold text-base transition-all w-full sm:w-auto'>
                     Join Now
                   </Button>
                 </Link>
                 <Link href='/login' className='w-full sm:w-auto'>
-                  <Button variant="outline" className='h-12 px-10 rounded-xl border-zinc-700 bg-zinc-900/50 text-white hover:bg-zinc-800 font-bold text-lg transition-all w-full sm:w-auto'>
+                  <Button variant="outline" className='h-12 px-10 border-zinc-800 bg-white/5 text-white hover:bg-white/10 font-semibold text-base transition-all w-full sm:w-auto'>
                     Sign In
                   </Button>
                 </Link>
@@ -128,10 +127,10 @@ export const HeroSection = () => {
                     onClick={handleGoogleLogin}
                     disabled={isGoogleFetching}
                     variant="outline"
-                    className="h-12 px-8 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white transition-all w-full sm:w-auto flex items-center gap-2"
+                    className="h-12 px-8 border-zinc-800 bg-white/5 text-white hover:bg-white/10 font-semibold text-base transition-all w-full sm:w-auto flex items-center gap-2"
                 >
                     {isGoogleFetching ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <FcGoogle className="h-5 w-5" />
                     )}

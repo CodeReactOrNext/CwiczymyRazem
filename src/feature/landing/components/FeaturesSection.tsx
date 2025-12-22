@@ -1,11 +1,11 @@
 "use client";
 
 import { Brain, Timer, Clock, Zap, BarChart3, TrendingUp, Music2, BookOpen } from "lucide-react";
-import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
+import { LandingSongCard } from "./LandingSongCard";
 import { AchievementCard } from "feature/achievements/components/AchievementCard";
 import { MiniTrendChart } from "feature/profile/components/MiniTrendChart";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 export const FeaturesSection = () => {
   const skillCategories = [
@@ -32,64 +32,36 @@ export const FeaturesSection = () => {
       id: "1",
       title: "Master of Puppets",
       artist: "Metallica",
-      difficulties: Array(124).fill({ rating: 10 }),
-      status: "learning"
+      avgDifficulty: 8.9,
+      coverUrl: "https://i.scdn.co/image/ab67616d0000b273668e3aca3167e6e569a9aa20"
     },
     {
       id: "2",
-      title: "Time",
+      title: "Wish You Were Here",
       artist: "Pink Floyd",
-      difficulties: Array(45).fill({ rating: 4 }),
-      status: "wantToLearn"
-    },
-    {
-      id: "7",
-      title: "Tornado of Souls",
-      artist: "Megadeth",
-      difficulties: Array(89).fill({ rating: 9 }),
-      status: "learned"
+      avgDifficulty: 3.5,
+      coverUrl: "https://i.scdn.co/image/ab67616d0000b273828e52cfb7bf22869349799e"
     },
     {
       id: "3",
-      title: "Stairway to Heaven",
-      artist: "Led Zeppelin",
-      difficulties: Array(230).fill({ rating: 7 }),
-      status: "learned"
-    },
-    {
-      id: "8",
-      title: "Nothing Else Matters",
-      artist: "Metallica",
-      difficulties: Array(15).fill({ rating: 2 }),
-      status: "learning"
+      title: "Scarlet",
+      artist: "Periphery",
+      avgDifficulty: 9.2,
+      coverUrl: "https://i.scdn.co/image/ab67616d0000b2735e07ee269b03adc236d0d6ae"
     },
     {
       id: "4",
-      title: "Sweet Child O' Mine",
-      artist: "Guns N' Roses",
-      difficulties: Array(67).fill({ rating: 7 }),
-      status: "learning"
-    },
-    {
-      id: "9",
-      title: "Eruption",
-      artist: "Van Halen",
-      difficulties: Array(12).fill({ rating: 10 }),
-      status: "wantToLearn"
+      title: "Nothing Else Matters",
+      artist: "Metallica",
+      avgDifficulty: 4.2,
+      coverUrl: "https://i.scdn.co/image/ab67616d0000b273c1a13209dfe146aef3296e34"
     },
     {
       id: "5",
-      title: "Comfortably Numb",
-      artist: "Pink Floyd",
-      difficulties: Array(56).fill({ rating: 8 }),
-      status: "wantToLearn"
-    },
-    {
-      id: "6",
-      title: "Paranoid",
-      artist: "Black Sabbath",
-      difficulties: Array(34).fill({ rating: 4 }),
-      status: "learned"
+      title: "Sweet Child O' Mine",
+      artist: "Guns N' Roses",
+      avgDifficulty: 7.8,
+      coverUrl: "https://i.scdn.co/image/ab67616d0000b27321ebf49b3292c3f0f575f0f5"
     }
   ];
 
@@ -102,10 +74,21 @@ export const FeaturesSection = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const visibleSongs = [];
-  for (let i = 0; i < 3; i++) {
-    visibleSongs.push(MOCK_SONGS[(startIndex + i) % MOCK_SONGS.length]);
-  }
+  const visibleSongs = useMemo(() => {
+    const result = [];
+    for (let i = 0; i < 3; i++) {
+        result.push(MOCK_SONGS[(startIndex + i) % MOCK_SONGS.length]);
+    }
+    return result;
+  }, [startIndex]);
+
+  const activityData = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => 
+        Array.from({ length: 7 }).map(() => 
+            Math.random() > 0.7 ? Math.floor(Math.random() * 4) : 0
+        )
+    );
+  }, []);
 
   return (
     <section id='features' className='relative py-24 sm:py-32 bg-[#0d0d0c] overflow-hidden'>
@@ -123,6 +106,72 @@ export const FeaturesSection = () => {
         </div>
 
         <div className="space-y-32">
+          {/* GROUP 4: PROGRESSION FLOW */}
+          <div className="relative pb-20">
+             <div className="text-center mb-16">
+               <h3 className="text-2xl font-bold text-white mb-2">Your Guitar Learning System</h3>
+               <p className="text-zinc-400">A gamified guitar practice planner that keeps you motivated every single day.</p>
+            </div>
+
+            <div className='relative'>
+                 {/* Connection Line (Desktop) with Animated Beam */}
+                 <div className="hidden lg:block absolute top-[2.5rem] left-0 w-full h-0.5 bg-zinc-800/50 overflow-hidden rounded-full">
+                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent w-[50%] animate-beam"></div>
+                 </div>
+                 {/* Inject animation styles locally since we can't touch tailwind config easily */}
+                 <style dangerouslySetInnerHTML={{__html: `
+                    @keyframes beam {
+                      0% { transform: translateX(-100%); }
+                      100% { transform: translateX(200%); }
+                    }
+                    .animate-beam {
+                      animation: beam 3s infinite linear;
+                    }
+                 `}} />
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+                    {/* Step 1: Practice */}
+                    <div className="relative group">
+                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-900/20 group-hover:border-cyan-500/30 transition-all duration-300">
+                           <BookOpen className="w-8 h-8 text-cyan-400" />
+                       </div>
+                       <h4 className="text-lg font-bold text-white mb-2">1. Practice</h4>
+                       <p className="text-sm text-zinc-400 px-4">Creating your own <span className="text-cyan-400">Custom Plans</span> or choosing from our library of exercises.</p>
+                    </div>
+
+                    {/* Step 2: Points */}
+                    <div className="relative group">
+                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-900/20 group-hover:border-amber-500/30 transition-all duration-300">
+                           <Zap className="w-8 h-8 text-amber-400" />
+                       </div>
+                       <h4 className="text-lg font-bold text-white mb-2">2. Earn Points</h4>
+                       <p className="text-sm text-zinc-400 px-4">Every minute of practice rewards you with XP, tracking your dedication.</p>
+                    </div>
+
+                    {/* Step 3: Level Up */}
+                    <div className="relative group">
+                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-900/20 group-hover:border-purple-500/30 transition-all duration-300">
+                           <TrendingUp className="w-8 h-8 text-purple-400" />
+                       </div>
+                       <h4 className="text-lg font-bold text-white mb-2">3. Level Up</h4>
+                       <p className="text-sm text-zinc-400 px-4">Unlock new ranks and watch your profile grow as you improve.</p>
+                    </div>
+
+                    {/* Step 4: Compete */}
+                     <div className="relative group">
+                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-900/20 group-hover:border-emerald-500/30 transition-all duration-300">
+                           <div className="relative">
+                             <BarChart3 className="w-8 h-8 text-emerald-400" />
+                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                           </div>
+                       </div>
+                       <h4 className="text-lg font-bold text-white mb-2">4. Compete</h4>
+                       <p className="text-sm text-zinc-400 px-4">Join <span className="text-emerald-400">Seasonal Leaderboards</span> and compare your progress with others.</p>
+                    </div>
+                 </div>
+            </div>
+          </div>
+
           {/* GROUP 1: PRACTICE TOOLS */}
           <div>
             <div className="text-center mb-12">
@@ -197,11 +246,9 @@ export const FeaturesSection = () => {
                       
                       {/* The Grid */}
                       <div className="flex-1 flex gap-[3px] overflow-hidden mask-linear-fade">
-                         {Array.from({ length: 30 }).map((_, weekIndex) => (
+                         {activityData.map((week, weekIndex) => (
                             <div key={weekIndex} className="flex flex-col gap-[3px]">
-                               {Array.from({ length: 7 }).map((_, dayIndex) => {
-                                  // Mock randomized activity
-                                  const intensity = Math.random() > 0.7 ? Math.floor(Math.random() * 4) : 0;
+                               {week.map((intensity, dayIndex) => {
                                   const colors = [
                                      'bg-zinc-800/50', // 0: empty
                                      'bg-cyan-900/40', // 1: light
@@ -209,9 +256,6 @@ export const FeaturesSection = () => {
                                      'bg-cyan-500',    // 3: high
                                   ];
                                   
-                                  // Create a nice pattern manually for demo purposes instead of pure random if needed, 
-                                  // but random weighted is usually fine for "looks like git chart".
-                                  // Let's force some specific nice pattern later if needed, mostly random is fine.
                                   return (
                                      <div 
                                         key={dayIndex} 
@@ -330,16 +374,15 @@ export const FeaturesSection = () => {
                               transition={{ duration: 0.6, ease: "easeInOut" }}
                               className="transform"
                            >
-                              <SongCard 
+                              <LandingSongCard 
                                  song={{
                                     id: song.id,
                                     title: song.title,
                                     artist: song.artist,
-                                    difficulties: song.difficulties,
-                                    createdAt: {} as any,
-                                    createdBy: "1"
+                                    avgDifficulty: song.avgDifficulty,
+                                    coverUrl: song.coverUrl,
+                                    
                                  }}
-                                 onOpenDetails={() => {}}
                               />
                            </motion.div>
                         ))}
@@ -357,85 +400,20 @@ export const FeaturesSection = () => {
                   </div>
                   
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-x-5 gap-y-10 p-6 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm mb-12 justify-items-center">
-                     {/* REAL ACHIEVEMENT COMPONENTS */}
-                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="lvl100" /></div>
-                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="fireSession" /></div>
-                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="time_3" /></div>
-                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="points_3" /></div>
-                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="diamond" /></div>
-                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="scientist" /></div>
-                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="wizard" /></div>
-                     <div className="w-[50px] h-[50px] transition-transform hover:scale-110 duration-200"><AchievementCard id="medal" /></div>
+                     <div className="h-[50px] "><AchievementCard id="lvl100" /></div>
+                     <div className="h-[50px] "><AchievementCard id="fireSession" /></div>
+                     <div className="h-[50px] "><AchievementCard id="time_3" /></div>
+                     <div className="h-[50px] "><AchievementCard id="points_3" /></div>
+                     <div className="h-[50px] "><AchievementCard id="diamond" /></div>
+                     <div className="h-[50px] "><AchievementCard id="scientist" /></div>
+                     <div className="h-[50px] "><AchievementCard id="wizard" /></div>
+                     <div className="h-[50px] "><AchievementCard id="medal" /></div>
                   </div>
                </div>
             </div>
           </div>
 
-          {/* GROUP 4: PROGRESSION FLOW */}
-          <div className="relative pb-20">
-             <div className="text-center mb-16">
-               <h3 className="text-2xl font-bold text-white mb-2">Your Guitar Learning System</h3>
-               <p className="text-zinc-400">A gamified guitar practice planner that keeps you motivated every single day.</p>
-            </div>
 
-            <div className='relative'>
-                 {/* Connection Line (Desktop) with Animated Beam */}
-                 <div className="hidden lg:block absolute top-[2.5rem] left-0 w-full h-0.5 bg-zinc-800/50 overflow-hidden rounded-full">
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent w-[50%] animate-beam"></div>
-                 </div>
-                 {/* Inject animation styles locally since we can't touch tailwind config easily */}
-                 <style dangerouslySetInnerHTML={{__html: `
-                    @keyframes beam {
-                      0% { transform: translateX(-100%); }
-                      100% { transform: translateX(200%); }
-                    }
-                    .animate-beam {
-                      animation: beam 3s infinite linear;
-                    }
-                 `}} />
-
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
-                    {/* Step 1: Practice */}
-                    <div className="relative group">
-                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-900/20 group-hover:border-cyan-500/30 transition-all duration-300">
-                           <BookOpen className="w-8 h-8 text-cyan-400" />
-                       </div>
-                       <h4 className="text-lg font-bold text-white mb-2">1. Practice</h4>
-                       <p className="text-sm text-zinc-400 px-4">Creating your own <span className="text-cyan-400">Custom Plans</span> or choosing from our library of exercises.</p>
-                    </div>
-
-                    {/* Step 2: Points */}
-                    <div className="relative group">
-                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-900/20 group-hover:border-amber-500/30 transition-all duration-300">
-                           <Zap className="w-8 h-8 text-amber-400" />
-                       </div>
-                       <h4 className="text-lg font-bold text-white mb-2">2. Earn Points</h4>
-                       <p className="text-sm text-zinc-400 px-4">Every minute of practice rewards you with XP, tracking your dedication.</p>
-                    </div>
-
-                    {/* Step 3: Level Up */}
-                    <div className="relative group">
-                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-900/20 group-hover:border-purple-500/30 transition-all duration-300">
-                           <TrendingUp className="w-8 h-8 text-purple-400" />
-                       </div>
-                       <h4 className="text-lg font-bold text-white mb-2">3. Level Up</h4>
-                       <p className="text-sm text-zinc-400 px-4">Unlock new ranks and watch your profile grow as you improve.</p>
-                    </div>
-
-                    {/* Step 4: Compete */}
-                     <div className="relative group">
-                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-900/20 group-hover:border-emerald-500/30 transition-all duration-300">
-                           <div className="relative">
-                             <BarChart3 className="w-8 h-8 text-emerald-400" />
-                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                           </div>
-                       </div>
-                       <h4 className="text-lg font-bold text-white mb-2">4. Compete</h4>
-                       <p className="text-sm text-zinc-400 px-4">Join <span className="text-emerald-400">Seasonal Leaderboards</span> and compare your progress with others.</p>
-                    </div>
-                 </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
