@@ -36,6 +36,7 @@ import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 
 import Avatar from "components/UI/Avatar";
 import { NavPagesTypes } from "types/layout.types";
+import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
@@ -428,6 +429,19 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                       <span className='truncate text-sm font-semibold text-white'>
                         {userName}
                       </span>
+                      <div className='mt-2 flex items-center gap-2'>
+                        <Link 
+                          href="/settings" 
+                          onClick={handleLinkClick}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
+                          title={t("button.edit")}
+                        >
+                          <Settings size={14} />
+                        </Link>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white">
+                           <CopyLinkProfile mode="icon" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

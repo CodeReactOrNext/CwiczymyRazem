@@ -27,12 +27,12 @@ export const SkillCategoryGroup = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sticky top-[-1px] z-20 bg-second-600/95 backdrop-blur-md py-4 border-b border-zinc-800 -mx-4 px-4 lg:-mx-8 lg:px-8">
          <div className="flex items-center gap-3">
              <div className={cn("w-2 h-8 rounded-full", theme.glow)} />
-             <h2 className={cn("text-xl sm:text-2xl font-bold uppercase tracking-wider", theme.primary)}>
+             <h2 className={cn("text-xl sm:text-2xl font-bold  tracking-wider", theme.primary)}>
                 {t(`categories.${category}` as any)}
              </h2>
          </div>
 
-         <div className="flex items-center gap-3 bg-zinc-900/50 px-4 py-2 rounded-xl border border-zinc-800">
+         <div className="flex items-center gap-3 bg-zinc-900/50 px-4 py-2 rounded-xl ">
              <span className="text-zinc-400 text-xs uppercase tracking-widest font-bold">Points Available</span>
              <span className={cn("text-2xl font-bold", theme.primary)}>{availablePoints}</span>
          </div>
