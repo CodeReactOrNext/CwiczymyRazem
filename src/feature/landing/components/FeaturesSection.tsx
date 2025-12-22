@@ -105,6 +105,35 @@ export const FeaturesSection = () => {
           </p>
         </div>
 
+        {/* Demo Video Showcase */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative mb-24 w-[100vw] ml-[calc(50%-50vw)] sm:ml-auto sm:w-auto sm:mx-auto sm:max-w-4xl"
+        >
+          <div className="relative rounded-none sm:rounded-2xl border-x-0 sm:border-x border-y border-white/10 bg-zinc-900/50 p-0 sm:p-2 backdrop-blur-sm overflow-hidden shadow-2xl h-[500px] sm:h-auto">
+            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-amber-500/5 pointer-events-none z-10"></div>
+            
+            <video
+              className="w-full h-full sm:h-auto rounded-none sm:rounded-xl shadow-inner block object-cover sm:object-contain"
+              style={{ objectPosition: '10% 50%' }}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            >
+              <source src="/demo.webm" type="video/webm" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          
+          <div className="absolute -bottom-6 -right-6 -z-10 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute -top-6 -left-6 -z-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl"></div>
+        </motion.div>
+
         <div className="space-y-32">
           {/* GROUP 4: PROGRESSION FLOW */}
           <div className="relative pb-20">
