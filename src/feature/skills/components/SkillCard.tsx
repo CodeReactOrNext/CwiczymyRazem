@@ -45,7 +45,7 @@ export const SkillCard = ({
   };
 
   return (
-    <div className="bg-[#141414] border border-zinc-800/50 rounded-xl p-5 flex flex-col gap-4 hover:border-zinc-700 transition-colors group relative overflow-hidden">
+    <div className="bg-[#141414] border border-zinc-800/50 rounded-xl p-5 flex flex-col gap-4 transition-colors group relative overflow-hidden">
       {/* Top Row: Icon + Name + Current Lvl */}
       <div className="flex items-start gap-3 sm:gap-4 z-10">
         <div className={cn(
