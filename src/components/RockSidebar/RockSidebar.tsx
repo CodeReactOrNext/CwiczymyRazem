@@ -86,7 +86,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
   const activeId = getActiveProfileSection();
 
-  const isLinkActive = (id: string, href: string) => {
+  const isLinkActive = (id: string | null, href: string) => {
     // If we have a specific active ID from path detection, use it
     if (activeId && activeId === id) return true;
     
