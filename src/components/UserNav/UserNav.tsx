@@ -6,9 +6,10 @@ import { useAppDispatch } from "store/hooks";
 
 interface UserNavProps {
   flexDirection?: "row" | "col";
+  showOnlyLogout?: boolean;
 }
 
-const UserNav = ({ flexDirection }: UserNavProps) => {
+const UserNav = ({ flexDirection, showOnlyLogout }: UserNavProps) => {
   const { t } = useTranslation("common");
   const dispatch = useAppDispatch();
 
@@ -19,9 +20,11 @@ const UserNav = ({ flexDirection }: UserNavProps) => {
           ? "flex-col items-start justify-center"
           : "flex-row justify-around"
       }`}>
-      <Link href='/settings' className={buttonVariants({ size: "sm" })}>
-        {t("button.edit")}
-      </Link>
+      {!showOnlyLogout && (
+        <Link href='/settings' className={buttonVariants({ size: "sm" })}>
+          {t("button.edit")}
+        </Link>
+      )}
 
       <Button
         size='sm'

@@ -35,7 +35,7 @@ export const UserHeader = ({
   );
 
   return (
-    <header className='sticky top-0 z-50 border-b border-white/10 bg-card backdrop-blur-xl'>
+    <header className='sticky top-0 z-50 bg-card/80 backdrop-blur-xl'>
       {/* Subtle top accent */}
       <div className='absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent'></div>
 
@@ -49,7 +49,6 @@ export const UserHeader = ({
               currentLevelMaxPoints={currentLevelMaxPoints}
               size='mini'
               showStats={false}
-              className="mt-1"
             />
           </div>
 
@@ -65,16 +64,19 @@ export const UserHeader = ({
           </div>
 
           {/* Right Section - Actions */}
-          <div className='flex items-center gap-3'>
-            <div className='hidden items-center gap-3 sm:flex'>
-              <CopyLinkProfile />
-              <Separator orientation='vertical' className='h-6 bg-white/10' />
-            </div>
-
             <div className='flex items-center gap-2'>
-              <UserNav />
+              {/* Desktop Actions */}
+              <div className='hidden sm:flex items-center gap-3'>
+                <CopyLinkProfile />
+                <Separator orientation='vertical' className='h-6 bg-white/10' />
+                <UserNav />
+              </div>
+              
+              {/* Mobile Actions - Only Logout */}
+              <div className='flex sm:hidden'>
+                 <UserNav showOnlyLogout />
+              </div>
             </div>
-          </div>
         </div>
       </div>
 
