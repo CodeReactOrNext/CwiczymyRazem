@@ -113,7 +113,7 @@ const RatingPopUp = ({
           className='btn btn-circle btn-sm absolute right-2 top-2 z-20'
           onClick={() => {
             onClick(false);
-            Router.push("/");
+            Router.push("/dashboard");
           }}>
           ✕
         </Button>
@@ -180,7 +180,7 @@ const RatingPopUp = ({
             <Button
               onClick={() => {
                 onClick(false);
-                Router.push("/");
+                Router.push("/dashboard");
               }}
               className='btn-primary min-w-[120px] px-4 py-2 text-sm font-medium shadow-md sm:min-w-[140px] sm:px-6 sm:text-base'>
               {t("rating_popup.back")}

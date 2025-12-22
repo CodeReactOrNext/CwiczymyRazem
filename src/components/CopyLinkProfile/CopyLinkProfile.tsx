@@ -4,9 +4,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { MdCheck, MdCopyAll } from "react-icons/md";
+import { Link2 } from "lucide-react";
+import { cn } from "assets/lib/utils";
 import { useAppSelector } from "store/hooks";
 
-export const CopyLinkProfile = () => {
+export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon" }) => {
   const { t } = useTranslation(["common", "toast"]);
   const profilePath = useAppSelector(selectUserAuth);
   const [isCopied, setIsCopied] = React.useState(false);
@@ -27,9 +29,15 @@ export const CopyLinkProfile = () => {
 
   return (
     <Button
-      variant='outline'
+      variant={mode === "icon" ? "ghost" : "outline"}
+      size={mode === "icon" ? "icon" : "default"}
       onClick={handleCopyLink}
-      className='z-40 m-auto flex max-w-[220px] flex-row items-center gap-2 border-dashed text-center text-[0.7rem] click-behavior xs:text-xs'>
+      className={cn(
+        "z-40 click-behavior",
+        mode === "default" && "m-auto flex max-w-[220px] flex-row items-center gap-2 border-dashed text-center text-[0.7rem] xs:text-xs",
+        mode === "icon" && "h-8 w-8"
+      )}
+    >
       <AnimatePresence mode='wait'>
         {isCopied ? (
           <motion.div
@@ -42,7 +50,7 @@ export const CopyLinkProfile = () => {
               stiffness: 300,
               damping: 15,
             }}>
-            <MdCheck className='text-[1rem] text-green-600' />
+            <MdCheck className={cn("text-green-500", mode === "icon" ? "text-sm" : "text-[1rem]")} />
           </motion.div>
         ) : (
           <motion.div
@@ -55,11 +63,12 @@ export const CopyLinkProfile = () => {
               stiffness: 300,
               damping: 15,
             }}>
-            <MdCopyAll className='text-[1rem]' />
+            {mode === "icon" ? <Link2 size={14} /> : <MdCopyAll className='text-[1rem]' />}
           </motion.div>
         )}
       </AnimatePresence>
-      {t("common:button.link_copy_profile")}
+      {mode === "default" && t("common:button.link_copy_profile")}
     </Button>
+
   );
 };

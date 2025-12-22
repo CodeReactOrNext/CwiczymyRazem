@@ -41,8 +41,8 @@ export const LevelBar = ({
     100
   );
 
-  // Calculate segments (10 segments for better visual feedback)
-  const totalSegments = 10;
+  // Calculate segments (5 segments for better visual feedback)
+  const totalSegments = 5;
   const filledSegments = Math.floor((progressPercent / 100) * totalSegments);
   const partialSegment = ((progressPercent / 100) * totalSegments) % 1;
 
@@ -68,18 +68,21 @@ export const LevelBar = ({
       )}
 
       {/* Segmented Progress Bar */}
-      <div className='flex flex-col gap-2'>
+      <div className='flex flex-col gap-1.5'>
         {showLabel && (
-          <div className={cn("flex items-center gap-2", isMini ? "text-xs" : "text-sm")}>
-            <span className='font-semibold text-white'>Level {lvl}</span>
+          <div className={cn("flex items-center gap-2", isMini ? "text-[10px]" : "text-sm")}>
+            {!showBadge && <span className='font-semibold text-white'>Level {lvl}</span>}
             <span className='font-bold text-cyan-400'>
-              {Math.round(progressPercent)}%
+              {Math.round(progressPercent)}% XP
+            </span>
+            <span className={cn("font-medium text-white/40 ml-1", isMini ? "text-[9px]" : "text-xs")}>
+                ({pointsInThisLevel.toLocaleString()} / {levelXpDifference.toLocaleString()})
             </span>
           </div>
         )}
 
         {/* Segments Container */}
-        <div className={cn("flex", isMini ? "gap-0.5" : "gap-1")}>
+        <div className={cn("flex items-center", isMini ? "gap-1" : "gap-1.5")}>
           {Array.from({ length: totalSegments }, (_, index) => {
             let segmentFill = 0;
 
@@ -89,20 +92,29 @@ export const LevelBar = ({
               segmentFill = partialSegment * 100; // Partially filled
             }
 
+            const isFilled = segmentFill > 0;
+
             return (
               <div
                 key={index}
                 className={cn(
-                  "relative overflow-hidden rounded border border-zinc-600/30 bg-zinc-800/60",
-                  isMini ? "h-2 w-3" : "h-3 w-8"
+                  "relative overflow-hidden rounded-md border transition-all duration-500 shadow-inner",
+                  isMini ? "h-2.5 w-8" : "h-4 w-12",
+                  isFilled ? "border-cyan-400/30 bg-zinc-900/40" : "border-white/5 bg-zinc-900/60"
                 )}>
-                {/* Segment fill */}
+                {/* Segment fill with glow and premium gradient */}
                 <div
-                  className='h-full bg-gradient-to-b from-cyan-400 to-cyan-500 transition-all duration-700 ease-out'
+                  className={cn(
+                    'h-full bg-gradient-to-r from-cyan-600 via-cyan-400 to-cyan-500 transition-all duration-700 ease-out relative',
+                    isFilled && "shadow-[0_0_15px_rgba(34,211,238,0.3)]"
+                  )}
                   style={{ width: `${segmentFill}%` }}>
-                  {/* Subtle inner highlight */}
-                  {segmentFill > 0 && (
-                    <div className='absolute inset-0 bg-gradient-to-b from-white/20 to-transparent'></div>
+                  {/* Glossy overlay */}
+                  <div className='absolute inset-0 bg-gradient-to-b from-white/20 to-transparent'></div>
+                  
+                  {/* Active segment edge highlight */}
+                  {segmentFill > 0 && segmentFill < 100 && (
+                    <div className='absolute right-0 top-0 bottom-0 w-px bg-white/40 blur-[1px]'></div>
                   )}
                 </div>
               </div>
@@ -111,11 +123,11 @@ export const LevelBar = ({
         </div>
 
         {/* Stats */}
-        {showStats && (
+        {showStats && !isMini && (
           <div className={cn("text-white/80", isMini ? "text-xs" : "text-sm")}>
             <span>
-              {pointsInThisLevel.toLocaleString()}/
-              {levelXpDifference.toLocaleString()}
+              {pointsInThisLevel.toLocaleString()} /{" "}
+              {levelXpDifference.toLocaleString()} XP
             </span>
           </div>
         )}
