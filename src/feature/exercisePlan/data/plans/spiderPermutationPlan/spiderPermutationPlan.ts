@@ -22,14 +22,14 @@ import { spiderPermutation2143Exercise } from "../../exerises/spiderPermutation2
 import { spiderPermutation2314Exercise } from "../../exerises/spiderPermutation2314/spiderPermutation2314";
 import { spiderPermutation2341Exercise } from "../../exerises/spiderPermutation2341/spiderPermutation2341";
 import { spiderPermutation2413Exercise } from "../../exerises/spiderPermutation2413/spiderPermutation2413";
-import { spiderPermutation2431Exercise } from "../../exerises/spiderPermutation2431/spiderPermutation2431"; 
+import { spiderPermutation2431Exercise } from "../../exerises/spiderPermutation2431/spiderPermutation2431";
 import spiderPermutationImage from "./image.webp";
 
 
 export const spiderPermutationPlan: ExercisePlan = {
   id: "spider_permutation_complete",
-  title: "Kompletny trening pajączków - permutacje palców",
-  description: "Zaawansowany plan treningowy zawierający wszystkie permutacje pajączków dla doskonalenia niezależności palców i techniki gry.",
+  title: "Complete Spider Exercises - Finger Permutations",
+  description: "Advanced training plan containing all spider permutations for improving finger independence and playing technique.",
   difficulty: "medium",
   category: "technique",
   exercises: [
@@ -55,7 +55,7 @@ export const spiderPermutationPlan: ExercisePlan = {
     spiderPermutation4213Exercise,
     spiderPermutation4231Exercise,
     spiderPermutation4312Exercise,
-    spiderPermutation4321Exercise,    
+    spiderPermutation4321Exercise,
 
   ],
   userId: "system",
