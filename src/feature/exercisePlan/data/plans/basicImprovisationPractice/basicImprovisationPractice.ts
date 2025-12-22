@@ -9,14 +9,14 @@ import basicImprovisationPracticeImage from "./image.webp";
 
 export const basicImprovisationPractice: ExercisePlan = {
   id: "basic_improvisation_practice",
-    title: "Podstawowe ćwiczenie rozwijające improwizację",
-    description: "Zestaw podstawowych ćwiczeń rozwijających umiejętność improwizacji",
-    difficulty: "easy",
+  title: "Basic Improvisation Development Exercise",
+  description: "A set of basic exercises developing improvisation skills",
+  difficulty: "easy",
   category: "creativity",
   exercises: [
-  oneChordImprovExercise,
-  oneStringBackingExercise,
-  triadImprovisationExercise],
+    oneChordImprovExercise,
+    oneStringBackingExercise,
+    triadImprovisationExercise],
   userId: "system",
   image: basicImprovisationPracticeImage,
 }; 

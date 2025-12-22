@@ -10,8 +10,8 @@ import warmUpImage from "./image.webp";
 
 export const warmUp30MinutesPlan: ExercisePlan = {
   id: "warm_up_30_minutes",
-    title: "Rozgrzewka - 30 minut",
-    description: "Podstawowa rozgrzewka na 30 minut przed właściwym treningiem",
+  title: "Warm-up - 30 Minutes",
+  description: "Basic 30-minute warm-up before your main practice session",
   difficulty: "easy",
   category: "technique",
   exercises: [
