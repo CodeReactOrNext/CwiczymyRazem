@@ -4,6 +4,7 @@ import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaCheck, FaTrophy } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 interface ExerciseSuccessViewProps {
   planTitle: string;
@@ -16,6 +17,7 @@ export const ExerciseSuccessView = ({
   onFinish,
   onRestart,
 }: ExerciseSuccessViewProps) => {
+  const { t } = useTranslation("common");
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -96,9 +98,9 @@ export const ExerciseSuccessView = ({
           </div>
 
           <div className='space-y-2'>
-            <h2 className='text-2xl font-bold'>Gratulacje!</h2>
+            <h2 className='text-2xl font-bold'>{t("practice.congratulations")}</h2>
             <p className='text-muted-foreground'>
-              Ukończyłeś sesję treningową:
+              {t("practice.completed_session")}
             </p>
             <p className='text-lg font-semibold'>{planTitle}</p>
           </div>
@@ -109,12 +111,12 @@ export const ExerciseSuccessView = ({
                 variant='outline'
                 onClick={onRestart}
                 className='flex items-center gap-2'>
-                Trenuj ponownie
+                {t("practice.practice_again")}
               </Button>
             )}
 
             <Button onClick={onFinish} className='flex items-center gap-2'>
-              <span>Zakończ</span>
+              <span>{t("practice.finish")}</span>
               <FaCheck className='h-4 w-4' />
             </Button>
           </div>

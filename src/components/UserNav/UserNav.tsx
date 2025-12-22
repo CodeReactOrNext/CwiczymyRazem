@@ -3,6 +3,8 @@ import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "store/hooks";
+import { LogOut } from "lucide-react";
+import { cn } from "assets/lib/utils";
 
 interface UserNavProps {
   flexDirection?: "row" | "col";
@@ -27,10 +29,11 @@ const UserNav = ({ flexDirection, showOnlyLogout }: UserNavProps) => {
       )}
 
       <Button
-        size='sm'
+        size={showOnlyLogout ? 'icon' : 'sm'}
         variant='outline'
+        className={cn(showOnlyLogout && "h-8 w-8 border-white/10 bg-zinc-800/40")}
         onClick={() => dispatch(logUserOff())}>
-        {t("button.logout")}
+        {showOnlyLogout ? <LogOut size={14} className="text-zinc-400" /> : t("button.logout")}
       </Button>
     </div>
   );

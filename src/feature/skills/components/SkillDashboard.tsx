@@ -15,7 +15,7 @@ export const SkillDashboard = ({
   onSkillUpgrade,
 }: SkillDashboardProps) => {
   return (
-    <div className="w-full p-4 lg:p-8 pb-24">
+    <div className="w-full p-4 pl-16 md:pl-20 lg:p-8 pb-24">
         <div className="max-w-7xl mx-auto">
         
              {CATEGORIES.map((category) => {

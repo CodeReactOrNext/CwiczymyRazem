@@ -1,6 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { motion } from "framer-motion";
 import { FaPause, FaPlay, FaStepForward } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 interface SessionModalControlsProps {
   isPlaying: boolean;
@@ -19,6 +20,7 @@ export const SessionModalControls = ({
   toggleTimer,
   handleNextExercise,
 }: SessionModalControlsProps) => {
+  const { t } = useTranslation("common");
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
@@ -30,7 +32,7 @@ export const SessionModalControls = ({
           variant='outline'
           onClick={onClose}
           className='w-24 border-border/30 shadow-sm transition-all duration-200 hover:border-border/50 hover:shadow-md'>
-          Wyjdź
+          {t("practice.exit")}
         </Button>
 
         <div className='flex gap-2'>
@@ -59,7 +61,7 @@ export const SessionModalControls = ({
           variant='outline'
           onClick={onFinish}
           className='w-24 border-border/30 shadow-sm transition-all duration-200 hover:border-border/50 hover:shadow-md'>
-          Zakończ
+          {t("practice.finish")}
         </Button>
       </div>
     </motion.div>
