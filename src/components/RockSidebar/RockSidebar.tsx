@@ -71,20 +71,41 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
   // Get current route to determine active profile section
   const getActiveProfileSection = () => {
-    if (router.pathname === "/profile") return "overview";
+    if (router.pathname === "/dashboard") return "profile";
     if (router.pathname === "/profile/activity") return "activity";
     if (router.pathname === "/profile/skills") return "skills";
     if (router.pathname === "/profile/exercises") return "exercises";
     if (router.pathname.startsWith("/songs")) {
-      const view = router.query.view;
+      const view = router.query.view || "library";
       if (view === "library") return "library";
       if (view === "management") return "my_songs";
-      return "songs";
+      return "library";
     }
     return null;
   };
 
-  const activeProfileSection = getActiveProfileSection();
+  const activeId = getActiveProfileSection();
+
+  const isLinkActive = (id: string, href: string) => {
+    // If we have a specific active ID from path detection, use it
+    if (activeId && activeId === id) return true;
+    
+    // Otherwise fallback to pageId passed from layout
+    if (id === pageId) {
+       // Only if we don't have a more specific active sub-section
+       const hasActiveSubSection = ["activity", "skills", "exercises", "library", "my_songs"].includes(activeId || "");
+       return !hasActiveSubSection;
+    }
+
+    // Last resort: check if pathname starts with href (if it's not root)
+    if (href !== "/" && router.pathname.startsWith(href)) {
+        // Avoid matching /profile to everything under /profile if we have sub-sections
+        if (href === "/profile" && activeId !== "profile") return false;
+        return true;
+    }
+    
+    return false;
+  };
 
   const handleLinkClick = () => {
     setIsMobileOpen(false);
@@ -237,7 +258,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             </div>
             <div className='space-y-1'>
               {mainNavigation.map(({ id, name, href, icon }) => {
-                const isActive = id === pageId;
+                const isActive = isLinkActive(id, href);
                 return (
                   <Link
                     key={id}
@@ -270,24 +291,24 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             </div>
             <div className='space-y-1'>
               {profileSections.map(({ id, name, href, icon }) => {
-                const isActiveSection = activeProfileSection === id;
+                const isActive = isLinkActive(id, href);
                 return (
                   <Link
                     key={id}
                     href={href}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                      isActiveSection
+                      isActive
                         ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
                         : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                     }`}>
                     <span
                       className={
-                        isActiveSection ? "text-cyan-400" : "text-zinc-500"
+                        isActive ? "text-cyan-400" : "text-zinc-500"
                       }>
                       {icon}
                     </span>
                     <span>{name}</span>
-                    {isActiveSection && (
+                    {isActive && (
                       <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
                     )}
                   </Link>
@@ -305,24 +326,24 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             </div>
             <div className='space-y-1'>
               {songsSections.map(({ id, name, href, icon }) => {
-                const isActiveSection = activeProfileSection === id;
+                const isActive = isLinkActive(id, href);
                 return (
                   <Link
                     key={id}
                     href={href}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                      isActiveSection
+                      isActive
                         ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
                         : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                     }`}>
                     <span
                       className={
-                        isActiveSection ? "text-cyan-400" : "text-zinc-500"
+                        isActive ? "text-cyan-400" : "text-zinc-500"
                       }>
                       {icon}
                     </span>
                     <span>{name}</span>
-                    {isActiveSection && (
+                    {isActive && (
                       <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
                     )}
                   </Link>
@@ -340,7 +361,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             </div>
             <div className='space-y-1'>
               {otherSections.map(({ id, name, href, icon }) => {
-                const isActive = id === pageId;
+                const isActive = isLinkActive(id, href);
                 return (
                   <Link
                     key={id}
@@ -456,7 +477,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                   </div>
                   <div className='space-y-1'>
                     {mainNavigation.map(({ id, name, href, icon }) => {
-                      const isActive = id === pageId;
+                      const isActive = isLinkActive(id, href);
                       return (
                         <Link
                           key={id}
@@ -492,30 +513,27 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                   </div>
                   <div className='space-y-1'>
                     {profileSections.map(({ id, name, href, icon }) => {
-                      const isActiveSection =
-                        activeProfileSection === id ||
-                        (id === "library" && activeProfileSection === "library") ||
-                        (id === "my_songs" && activeProfileSection === "my_songs");
+                      const isActive = isLinkActive(id, href);
                       return (
                         <Link
                           key={id}
                           href={href}
                           onClick={handleLinkClick}
                           className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                            isActiveSection
+                            isActive
                               ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
                               : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                           }`}>
                           <span
                             className={
-                              isActiveSection
+                              isActive
                                 ? "text-cyan-400"
                                 : "text-zinc-500"
                             }>
                             {icon}
                           </span>
                           <span>{name}</span>
-                          {isActiveSection && (
+                          {isActive && (
                             <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
                           )}
                         </Link>
@@ -533,27 +551,27 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                   </div>
                   <div className='space-y-1'>
                     {songsSections.map(({ id, name, href, icon }) => {
-                      const isActiveSection = activeProfileSection === id;
+                      const isActive = isLinkActive(id, href);
                       return (
                         <Link
                           key={id}
                           href={href}
                           onClick={handleLinkClick}
                           className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                            isActiveSection
+                            isActive
                               ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
                               : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                           }`}>
                           <span
                             className={
-                              isActiveSection
+                              isActive
                                 ? "text-cyan-400"
                                 : "text-zinc-500"
                             }>
                             {icon}
                           </span>
                           <span>{name}</span>
-                          {isActiveSection && (
+                          {isActive && (
                             <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
                           )}
                         </Link>
@@ -571,7 +589,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                   </div>
                   <div className='space-y-1'>
                     {otherSections.map(({ id, name, href, icon }) => {
-                      const isActive = id === pageId;
+                      const isActive = isLinkActive(id, href);
                       return (
                         <Link
                           key={id}

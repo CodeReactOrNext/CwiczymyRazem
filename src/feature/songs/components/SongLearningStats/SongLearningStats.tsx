@@ -26,7 +26,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center">
       {/* Total Songs - Compact */}
-      <div className="flex flex-1 items-center gap-4 rounded-lg border border-white/5 bg-zinc-900/30 p-4 backdrop-blur-sm">
+      <div className="flex flex-1 items-center gap-4 rounded-lg bg-zinc-900/30 p-4 backdrop-blur-sm">
          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
             <Music2 className="h-5 w-5" />
          </div>
@@ -40,7 +40,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
       </div>
 
       {/* Completion Rate - Compact */}
-      <div className="flex flex-1 items-center gap-4 rounded-lg border border-white/5 bg-zinc-900/30 p-4 backdrop-blur-sm">
+      <div className="flex flex-1 items-center gap-4 rounded-lg  bg-zinc-900/30 p-4 backdrop-blur-sm">
          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10 text-green-500 border border-green-500/20">
             <Trophy className="h-5 w-5" />
          </div>

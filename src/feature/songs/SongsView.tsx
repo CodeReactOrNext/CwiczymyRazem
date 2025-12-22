@@ -167,7 +167,7 @@ const SongsView = () => {
                         placeholder={t("search_songs")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-12 w-full rounded-2xl border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                        className="h-12 w-full  border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                       />
                        {debounceLoading && (
                           <div className="absolute inset-y-0 right-0 flex items-center pr-4">
@@ -182,7 +182,7 @@ const SongsView = () => {
                         variant="outline"
                         onClick={() => setIsFilterSheetOpen(true)}
                         className={cn(
-                          "relative h-12 flex-1 rounded-2xl border-white/5 bg-zinc-900/60 px-6 font-bold text-zinc-300 shadow-lg hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
+                          "relative h-12 flex-1  border-white/5 bg-zinc-900/60 px-6 font-bold text-zinc-300 shadow-lg hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
                           hasFilters && "border-cyan-500/30 bg-cyan-500/5 text-cyan-400"
                         )}
                       >
@@ -198,7 +198,7 @@ const SongsView = () => {
                           variant="ghost"
                           size="icon"
                           onClick={handleClearFilters}
-                          className="h-12 w-12 shrink-0 rounded-2xl border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                          className="h-12 w-12 shrink-0  border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
                           title="Clear all filters"
                         >
                           <X className="h-5 w-5" />
