@@ -33,18 +33,18 @@ export const TimerDisplay = ({
 
   const progressColor = getProgressColor();
   const glowColor = isPlaying ? progressColor : "hsl(var(--muted))";
-  const textSize = size === "xs" ? "18px" : size === "sm" ? "24px" : size === "md" ? "28px" : "32px";
+  const textSize = size === "xs" ? "20px" : size === "sm" ? "24px" : size === "md" ? "28px" : "32px";
 
   return (
     <div className='relative'>
       <div
         className={cn(
-          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[25px] transition-all duration-700",
+          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-[20px] transition-all duration-700",
           sizeClasses[size]
         )}
         style={{
           background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
-          opacity: isPlaying ? 0.25 : 0.1,
+          opacity: isPlaying ? 0.3 : 0.1,
         }}
       />
 
@@ -113,7 +113,7 @@ export const TimerDisplay = ({
             styles={buildStyles({
               pathColor: progressColor,
               textColor: "white",
-              trailColor: "rgba(255,255,255, 0.1)",
+              trailColor: "rgba(255,255,255, 0.05)",
               pathTransition: isPlaying
                 ? "stroke-dashoffset 0.5s linear"
                 : "none",

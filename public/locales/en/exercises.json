@@ -372,7 +372,7 @@
     },
     "summary": "Plan Summary",
     "total_exercises": "Total Exercises",
-    "total_duration": "Total Duration",
+    "total_duration_label": "Total Duration",
     "create": "Create Plan"
   },
   "errors": {
@@ -393,6 +393,8 @@
     "stop": "Stop"
   },
   "instructions": "Instructions",
+  "hints": "Hints",
+  "no_instructions": "No instructions available.",
   "auto_plan": {
     "title": "Auto-Generated Practice Plan",
     "description": "Generate a random practice plan based on your available time",

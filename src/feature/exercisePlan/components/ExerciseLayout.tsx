@@ -49,14 +49,10 @@ export const ExerciseLayout = ({
       </header>
 
       <main className='relative z-10 flex-1 py-8'>
-        <div className="container mx-auto max-w-7xl px-4">
-            <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className='rounded-xl border border-border/10 bg-card/10 p-4 lg:p-6 shadow-md backdrop-blur-[2px] transition-all'>
+        <div className="container mx-auto px-4">
+            <div className='transition-all'>
             {children}
-            </motion.div>
+            </div>
         </div>
       </main>
     </div>

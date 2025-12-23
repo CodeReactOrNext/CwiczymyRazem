@@ -37,11 +37,10 @@ export const MainTimerSection = ({
 
   if (variant === "compact") {
     return (
-      <div className="flex w-full items-center justify-center gap-6 md:gap-12">
+      <div className="flex items-center gap-8">
           {/* Compact Timer */}
           <div className="relative shrink-0">
-             {/* Subtle timer glow */}
-             <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-xl transition-all duration-500" style={{ opacity: isPlaying ? 0.6 : 0 }}></div>
+             <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-xl transition-all duration-500" style={{ opacity: isPlaying ? 0.6 : 0 }}></div>
              <TimerDisplay
                 value={timerProgressValue}
                 text={formattedTimeLeft}
@@ -51,7 +50,7 @@ export const MainTimerSection = ({
           </div>
 
           {/* Compact Inline Controls */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
                <ExerciseControls
                   isPlaying={isPlaying}
                   isLastExercise={isLastExercise}
@@ -61,16 +60,12 @@ export const MainTimerSection = ({
                   variant="centered"
                 />
                
-               {/* Status Pill (Compact) - Refined */}
-               <div className={`hidden md:flex items-center gap-2 rounded-full border px-3 py-1 transition-colors ${
-                   isPlaying 
-                     ? "border-cyan-500/20 bg-cyan-500/10" 
-                     : "border-zinc-700/50 bg-zinc-800/50"
-               }`}>
-                   <div className={`h-1.5 w-1.5 rounded-full shadow-[0_0_8px_currentColor] transition-all ${
-                       isPlaying ? "bg-cyan-400 animate-pulse" : "bg-zinc-500"
+               {/* Status Pill (Compact) - Integrated */}
+               <div className="flex items-center gap-2 px-1 transition-colors">
+                   <div className={`h-1.5 w-1.5 rounded-full transition-all ${
+                       isPlaying ? "bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.6)]" : "bg-zinc-600"
                    }`} />
-                   <span className={`text-[10px] uppercase tracking-wider font-bold transition-colors ${
+                   <span className={`text-[10px] uppercase tracking-[0.2em] font-black ${
                        isPlaying ? "text-cyan-400" : "text-zinc-500"
                    }`}>
                         {isPlaying ? t("common:timer_status.active") : t("common:timer_status.paused")}
@@ -101,7 +96,7 @@ export const MainTimerSection = ({
 
         {/* Timer Card - Always render when showExerciseInfo is false */}
         {!showExerciseInfo && (
-          <Card className='border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
+          <Card className='radius-premium glass-card border-white/5'>
             <div className='flex flex-col items-center gap-8 p-8'>
               {/* CRITICAL: Timer section - most important element */}
               <motion.div
@@ -114,7 +109,7 @@ export const MainTimerSection = ({
                 }}
                 className='relative'>
                 {/* Subtle glow for timer importance */}
-                <div className='via-cyan-500/8 absolute inset-0 rounded-full bg-gradient-to-r from-transparent to-transparent blur-xl'></div>
+                <div className='absolute inset-0 rounded-full bg-cyan-500/5 blur-xl'></div>
                 <TimerDisplay
                   value={timerProgressValue}
                   text={formattedTimeLeft}
@@ -139,10 +134,10 @@ export const MainTimerSection = ({
               </motion.div>
 
               {/* TERTIARY: Status indicator - least important */}
-              <div className={`flex items-center gap-2 rounded-full border px-3 py-1.5 transition-colors ${
+              <div className={`flex items-center gap-2 rounded-full border px-3 py-1.5 transition-background ${
                   isPlaying 
-                    ? "border-cyan-500/20 bg-cyan-500/10" 
-                    : "border-zinc-700/30 bg-zinc-800/40"
+                    ? "border-cyan-500/20 bg-cyan-500/10 shadow-lg shadow-cyan-500/5" 
+                    : "border-white/5 bg-zinc-800/40"
               }`}>
                 <div
                   className={`h-2 w-2 rounded-full shadow-[0_0_8px_currentColor] transition-all duration-300 ${

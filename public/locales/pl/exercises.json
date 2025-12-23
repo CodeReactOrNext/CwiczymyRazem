@@ -106,7 +106,7 @@
     "category": "Kategoria",
     "skills": "Umiejętności",
     "instructions": "Instrukcje",
-    "tips": "Wskazówki",
+    "tips": "Hints",
     "min": "min",
     "cancel": "Anuluj",
     "create": "Stwórz",
@@ -203,7 +203,7 @@
         "media": "Media"
       },
       "instructions_placeholder": "Instrukcje krok po kroku...",
-      "tips_placeholder": "Pomocne wskazówki do ćwiczeń...",
+      "tips_placeholder": "Pomocne Hints do ćwiczeń...",
       "skills_select": "Wybierz umiejętności, które będą rozwijane podczas tego ćwiczenia",
       "settings_description": "Skonfiguruj ustawienia ćwiczenia",
       "metronome_description": "Ustaw zakres tempa dla tego ćwiczenia"
@@ -216,7 +216,7 @@
     "category": "Kategoria",
     "related_skills": "Powiązane umiejętności",
     "instructions": "Instrukcje",
-    "tips": "Wskazówki",
+    "tips": "Hints",
     "practice_speed": "Tempo ćwiczenia",
     "start_at": "Rozpocznij od",
     "target": "Cel",
@@ -314,7 +314,7 @@
     },
     "summary": "Podsumowanie planu",
     "total_exercises": "Liczba ćwiczeń",
-    "total_duration": "Całkowity czas",
+    "total_duration_label": "Całkowity czas",
     "categories": "Kategorie",
     "selected_exercises": "Wybrane ćwiczenia ({{count}})",
     "tips": {
@@ -349,6 +349,8 @@
     "stop": "Stop"
   },
   "instructions": "Instrukcje",
+  "hints": "Podpowiedzi",
+  "no_instructions": "Brak instrukcji.",
   "auto_plan": {
     "title": "Automatyczny plan ćwiczeń",
     "description": "Wygeneruj losowy plan ćwiczeń na podstawie dostępnego czasu",
