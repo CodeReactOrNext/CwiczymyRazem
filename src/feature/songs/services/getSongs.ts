@@ -105,11 +105,22 @@ export const getSongs = async (
       let valA = a[sortBy];
       let valB = b[sortBy];
 
+      // Handle specific fields
+      if (sortBy === 'popularity' || sortBy === 'avgDifficulty') {
+        valA = typeof valA === 'number' ? valA : 0;
+        valB = typeof valB === 'number' ? valB : 0;
+      }
+
       if (typeof valA === "string") valA = valA.toLowerCase();
       if (typeof valB === "string") valB = valB.toLowerCase();
 
-      if (sortDirection === "asc") return valA > valB ? 1 : -1;
-      else return valA < valB ? 1 : -1;
+      if (valA === valB) return 0;
+
+      if (sortDirection === "asc") {
+        return valA > valB ? 1 : -1;
+      } else {
+        return valA < valB ? 1 : -1;
+      }
     });
 
     const total = songs.length;
