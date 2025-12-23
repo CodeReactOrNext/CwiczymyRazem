@@ -61,13 +61,19 @@ export const getSongTier = (rating: number): SongTier => {
   }
 };
 
+let memoizedTiers: SongTier[] | null = null;
+
 export const getAllTiers = (): SongTier[] => {
-  return [
+  if (memoizedTiers) return memoizedTiers;
+
+  memoizedTiers = [
     getSongTier(10),
     getSongTier(8),
     getSongTier(6.5),
     getSongTier(5),
     getSongTier(2),
   ];
+
+  return memoizedTiers;
 };
 
