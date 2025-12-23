@@ -69,15 +69,6 @@ export const getUserSongs = async (userId: string) => {
           id: docSnap.id,
           avgDifficulty 
         } as Song);
-
-        // Optional: Hydrate on database if fields are missing
-        if (data.avgDifficulty === undefined || data.title_lowercase === undefined) {
-          updateDoc(doc(db, "songs", docSnap.id), {
-            avgDifficulty: avgDifficulty,
-            title_lowercase: data.title.toLowerCase(),
-            artist_lowercase: data.artist.toLowerCase(),
-          }).catch((err: any) => console.error("Hydration failure in getUserSongs:", err));
-        }
       });
     });
 

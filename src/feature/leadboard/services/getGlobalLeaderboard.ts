@@ -9,15 +9,16 @@ import { getTotalUsersCount } from "./getTotalUsersCount";
 interface GlobalLeaderboardResponse {
   users: FirebaseUserDataInterface[];
   totalUsers: number;
+  lastVisible?: any;
 }
 
 export const getGlobalLeaderboard = async (
   sortBy: SortByType,
-  page: number,
-  itemsPerPage: number
+  itemsPerPage: number,
+  lastVisible?: any
 ): Promise<GlobalLeaderboardResponse> => {
   try {
-    const cacheKey = `leaderboard:${sortBy}:${page}:${itemsPerPage}`;
+    const cacheKey = `leaderboard:${sortBy}:${itemsPerPage}:${lastVisible?.id || 'start'}`;
 
     const cached = memoryCache.get(cacheKey);
     if (cached) {
@@ -25,13 +26,14 @@ export const getGlobalLeaderboard = async (
     }
 
     const [usersResponse, totalCount] = await Promise.all([
-      firebaseGetUsersExceriseRaport(sortBy, page, itemsPerPage),
+      firebaseGetUsersExceriseRaport(sortBy, itemsPerPage, lastVisible),
       getTotalUsersCount(),
     ]);
 
     const result = {
       users: usersResponse.users,
       totalUsers: totalCount,
+      lastVisible: usersResponse.lastVisible,
     };
 
     memoryCache.set(cacheKey, result, 24 * 60 * 60 * 1000);
