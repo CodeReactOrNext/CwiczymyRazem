@@ -6,7 +6,6 @@ const {
 const nextConfig = {
   reactStrictMode: true,
   i18n,
-  productionBrowserSourceMaps: true,
   reactCompiler: true,
   turbopack: {},
   bundlePagesRouterDependencies: true,
