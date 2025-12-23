@@ -9,6 +9,7 @@ import {
   query,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+import { memoryCache } from "utils/cache/memoryCache";
 
 export const getSeasonalLeaderboard = async (
   seasonId: string,
@@ -17,6 +18,13 @@ export const getSeasonalLeaderboard = async (
   itemsPerPage: number
 ) => {
   try {
+    const cacheKey = `seasonal:${seasonId}:${sortBy}:${page}:${itemsPerPage}`;
+    
+    const cached = memoryCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const seasonalUsersRef = collection(db, "seasons", seasonId, "users");
 
     const totalSnapshot = await getCountFromServer(seasonalUsersRef);
@@ -60,10 +68,14 @@ export const getSeasonalLeaderboard = async (
       };
     });
 
-    return {
+    const result = {
       users,
       totalUsers: total,
     };
+
+    memoryCache.set(cacheKey, result, 24 * 60 * 60 * 1000);
+
+    return result;
   } catch (error) {
     throw error;
   }
