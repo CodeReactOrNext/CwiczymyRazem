@@ -78,7 +78,7 @@ export const useLeaderboard = ({
       );
 
       if (response) {
-        const mappedUsers = (response.users || []).map((user) => ({
+        const mappedUsers = (response.users || []).map((user: FirebaseUserDataInterface) => ({
           ...user,
           createdAt: new Date(),
           songLists: [],
