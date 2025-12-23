@@ -2,13 +2,14 @@ import type { AchievementList } from "feature/achievements/achievementsData";
 import { formatDiscordMessage } from "feature/discordBot/formatters/formatDiscordMessage";
 import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
 import { logger } from "feature/logger/Logger";
-    import {
+import {
   collection,
   doc,
   getDoc,
   setDoc,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+import { trackedGetDoc, trackedSetDoc } from "utils/firebase/client/firestoreTracking";
 
 export const firebaseAddLogReport = async (
   uid: string,
@@ -27,7 +28,7 @@ export const firebaseAddLogReport = async (
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
-  const userSnapshot = await getDoc(userDocRef);
+  const userSnapshot = await trackedGetDoc(userDocRef);
   const userName = userSnapshot.data()!.displayName;
 
   const logData = {
@@ -39,10 +40,10 @@ export const firebaseAddLogReport = async (
     newLevel,
     timestamp: new Date().toISOString(),
     timeSumary,
-    avatarUrl: avatarUrl ?? null ,
+    avatarUrl: avatarUrl ?? null,
   };
 
-  await setDoc(logsDocRef, logData);
+  await trackedSetDoc(logsDocRef, logData);
 
   try {
     const discordMessage = await formatDiscordMessage(logData);
