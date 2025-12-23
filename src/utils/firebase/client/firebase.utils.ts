@@ -49,11 +49,9 @@ export const firebaseSignInWithCredential = (credential: any) =>
 
 export const db = getFirestore(firebaseApp);
 
-enableIndexedDbPersistence(db).catch((err) => {
-  if (err.code === 'failed-precondition') {
-  } else if (err.code === 'unimplemented') {
-  }
-});
+if (typeof window !== 'undefined') {
+  enableIndexedDbPersistence(db).catch(() => { });
+}
 
 export const storage = getStorage(firebaseApp);
 
