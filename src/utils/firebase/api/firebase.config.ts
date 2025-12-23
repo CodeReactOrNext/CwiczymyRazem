@@ -1,8 +1,8 @@
 import * as admin from "firebase-admin";
 
 const projectId = process.env.NEXT_PUBLIC_FIREBASE_CONFIG_PROJECTID;
-const clientEmail = process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL;
-const privateKey = (process.env.NEXT_PUBLIC_FIREBASE_PRIVATEKEY || "")
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+const privateKey = (process.env.FIREBASE_PRIVATEKEY || "")
   .replace(/\\n/g, "\n")
   .replace(/^"|"$/g, "");
 
