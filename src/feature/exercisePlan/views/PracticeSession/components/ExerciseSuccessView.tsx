@@ -89,7 +89,7 @@ export const ExerciseSuccessView = ({
         isVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }
       }
       className='fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm'>
-      <Card className='relative w-full max-w-md overflow-hidden border-2 border-primary/20 bg-card/95 shadow-xl backdrop-blur-md'>
+      <Card className='relative w-full max-w-md overflow-hidden radius-premium glass-card shadow-xl'>
         <div className='absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent' />
 
         <div className='relative flex flex-col items-center space-y-6 p-6 text-center'>
@@ -107,15 +107,15 @@ export const ExerciseSuccessView = ({
 
           <div className='flex w-full flex-col justify-center gap-3 pt-4 sm:flex-row'>
             {onRestart && (
-              <Button
-                variant='outline'
-                onClick={onRestart}
-                className='flex items-center gap-2'>
-                {t("practice.practice_again")}
-              </Button>
+                <Button
+                  variant='outline'
+                  onClick={onRestart}
+                  className='flex items-center gap-2 radius-default border-white/10 hover:glass-card-hover'>
+                  {t("practice.practice_again")}
+                </Button>
             )}
 
-            <Button onClick={onFinish} className='flex items-center gap-2'>
+            <Button onClick={onFinish} className='flex items-center gap-2 radius-default bg-cyan-500 hover:bg-cyan-600 text-black font-bold'>
               <span>{t("practice.finish")}</span>
               <FaCheck className='h-4 w-4' />
             </Button>

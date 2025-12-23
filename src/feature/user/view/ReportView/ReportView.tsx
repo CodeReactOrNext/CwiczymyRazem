@@ -268,7 +268,7 @@ const ReportView = () => {
                 )}
               </div>
               <div className='mt-4 flex justify-end'>
-                <div className='flex items-center rounded-lg border border-white/10 bg-zinc-900/50 px-4 py-2 backdrop-blur-sm'>
+                <div className='flex items-center radius-default glass-card px-4 py-2'>
                   <span className='mr-2 text-sm text-zinc-400'>
                     {t("total_time")}:
                   </span>
@@ -358,10 +358,10 @@ const ReportView = () => {
                           onClick={() => {
                             setFieldValue("countBackDays", days);
                           }}
-                          className={`relative rounded-full border px-5 py-2 ${
+                          className={`relative rounded-full border px-5 py-2 transition-background ${
                             isSelected
-                              ? "border-transparent bg-gradient-to-r from-[#3a6ecc]/90 to-[#4a7edd]/90 text-white shadow-sm backdrop-blur-sm"
-                              : "border-gray-700/30 bg-[#0a0a0c]/60 text-gray-300 hover:bg-[#4a7edd]/10 hover:text-white"
+                              ? "border-transparent bg-gradient-to-r from-cyan-600/90 to-cyan-500/90 text-white shadow-sm backdrop-blur-sm"
+                              : "border-white/5 bg-zinc-900/40 text-gray-300 hover:glass-card-hover hover:text-white"
                           }`}>
                           {isSelected && (
                             <motion.span
@@ -377,7 +377,7 @@ const ReportView = () => {
                 </div>
 
                 <div className='flex items-start justify-start'>
-                  <Card className='border-0 bg-gradient-to-r from-[#4a7edd]/5 to-transparent px-4 py-2 text-left shadow-sm backdrop-blur-sm transition-all duration-300'>
+                  <Card className='border-0 bg-gradient-to-r from-cyan-500/5 to-transparent px-4 py-2 text-left shadow-sm glass-card radius-default transition-all duration-300'>
                     <p className='font-openSans text-sm text-gray-400'>
                       Selected date:{" "}
                       <span className='text-base font-medium text-white'>

@@ -175,7 +175,7 @@ const TimeInputBox = ({
                 />
               </div>
               <span className='text-[10px] font-bold tracking-wider text-slate-500'>
-                GODZ
+                HOURS
               </span>
             </div>
 

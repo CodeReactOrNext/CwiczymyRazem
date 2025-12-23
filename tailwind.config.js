@@ -71,28 +71,53 @@ const defaultClick = plugin(function ({
 }) {
   addUtilities({
     ".click-behavior": {
-      transform: "scale(95%)",
+      transform: "scale(98%)",
       transitionProperty: "transform",
       transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
       transitionDuration: "100ms",
     },
     ".click-behavior-second": {
-      transform: "scale(90%)",
+      transform: "scale(96%)",
     },
     ".transition-background": {
-      transitionProperty: "background-color, border-color",
+      transitionProperty: "background-color, border-color, box-shadow",
       transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-      transitionDuration: "30ms",
+      transitionDuration: "150ms",
     },
   });
 });
+
+const glassEffects = plugin(function ({ addUtilities }) {
+  addUtilities({
+    ".glass-card": {
+      "background-color": "rgba(24, 24, 27, 0.4)",
+      "backdrop-filter": "blur(12px)",
+      "-webkit-backdrop-filter": "blur(12px)",
+      "border": "1px solid rgba(255, 255, 255, 0.05)",
+      "box-shadow": "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
+    },
+    ".glass-card-hover": {
+      "border-color": "rgba(255, 255, 255, 0.1)",
+      "background-color": "rgba(24, 24, 27, 0.5)",
+      "box-shadow": "0 8px 32px 0 rgba(0, 0, 0, 0.5)",
+    },
+    ".blur-premium": {
+      "backdrop-filter": "blur(16px) saturate(180%)",
+      "-webkit-backdrop-filter": "blur(16px) saturate(180%)",
+    }
+  });
+});
+
 const borderRadius = plugin(function ({
   addUtilities
 }) {
   addUtilities({
     ".radius-default": {
-      "border-radius": "10px",
+      "border-radius": "12px",
     },
+    ".radius-premium": {
+      "border-radius": "16px",
+    }
   });
 });
 module.exports = {
@@ -349,6 +374,7 @@ module.exports = {
     rotateY,
     scrollbarHide,
     defaultClick,
+    glassEffects,
     borderRadius,
     require("tailwindcss-animate")
   ],
