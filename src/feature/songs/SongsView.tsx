@@ -64,7 +64,6 @@ const SongsView = () => {
     difficultyFilter,
     handlePageChange,
     handleClearFilters,
-    setDifficultyFilter,
     tierFilters,
     setTierFilters,
     handleStatusUpdate,
@@ -79,6 +78,8 @@ const SongsView = () => {
     debounceLoading,
     genreFilters,
     setGenreFilters,
+    applyFilters,
+    handleResetFilters,
   } = useSongs();
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
@@ -213,17 +214,13 @@ const SongsView = () => {
                   isOpen={isFilterSheetOpen}
                   onClose={() => setIsFilterSheetOpen(false)}
                   difficultyFilter={difficultyFilter}
-                  setDifficultyFilter={setDifficultyFilter}
                   tierFilters={tierFilters}
-                  setTierFilters={setTierFilters}
                   genreFilters={genreFilters}
-                  setGenreFilters={setGenreFilters}
                   sortBy={sortBy}
-                  setSortBy={setSortBy}
                   sortDirection={sortDirection}
-                  setSortDirection={setSortDirection}
                   availableGenres={availableGenres}
-                  onClearFilters={handleClearFilters}
+                  onApply={applyFilters}
+                  onClearFilters={handleResetFilters}
                   hasFilters={hasFilters}
                 />
 
