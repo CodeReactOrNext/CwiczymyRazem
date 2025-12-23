@@ -1,29 +1,14 @@
+import { useQuery } from "@tanstack/react-query";
 import { getSongs } from "feature/songs/services/getSongs";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
-import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useAppSelector } from "store/hooks";
 
 const ITEMS_PER_PAGE = 50;
 
 export const useSongs = () => {
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [userSongs, setUserSongs] = useState<{
-    wantToLearn: Song[];
-    learning: Song[];
-    learned: Song[];
-  }>({
-    wantToLearn: [],
-    learning: [],
-    learned: [],
-  });
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [debounceLoading, setIsDebounceLoading] = useState(true);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
   const debounceTimeout = useRef<NodeJS.Timeout>(null);
@@ -34,81 +19,48 @@ export const useSongs = () => {
   const [genreFilters, setGenreFilters] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>("title");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  const currentUserId = useAppSelector(selectUserAuth);
-  const [totalPages, setTotalPages] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const currentUserId = useAppSelector(selectUserAuth);
+
+  // Debounce search query
   useEffect(() => {
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     debounceTimeout.current = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
     }, 800);
-
     return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
   }, [searchQuery]);
 
-  const getStatus = (userSongs: any, songId: string) => {
-    if (!userSongs) return null;
+  // 1. Fetch Songs
+  const { data: songsData, isLoading: isSongsLoading } = useQuery({
+    queryKey: ["songs", sortBy, sortDirection, debouncedSearchQuery, page, tierFilters, difficultyFilter, genreFilters],
+    queryFn: () => getSongs(
+      sortBy,
+      sortDirection,
+      debouncedSearchQuery,
+      page,
+      ITEMS_PER_PAGE,
+      tierFilters,
+      difficultyFilter,
+      genreFilters
+    ),
+    staleTime: 5 * 60 * 1000,
+  });
 
-    if (userSongs.wantToLearn?.includes(songId)) return "wantToLearn";
-    if (userSongs.learning?.includes(songId)) return "learning";
-    if (userSongs.learned?.includes(songId)) return "learned";
-    return null;
-  };
+  // 2. Fetch User Songs
+  const { data: userSongsData, refetch: refetchUserSongs } = useQuery({
+    queryKey: ["user-songs", currentUserId],
+    queryFn: () => getUserSongs(currentUserId!),
+    enabled: !!currentUserId,
+    staleTime: 10 * 60 * 1000,
+  });
 
-  const getAverageDifficulty = (difficulties: { rating: number }[]) => {
-    if (!difficulties?.length) return 0;
-    return (
-      difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
-      difficulties.length
-    );
-  };
-
-  const loadSongs = async (skipLoading = false) => {
-    try {
-      if (!skipLoading) {
-        setIsLoading(true);
-      }
-      const loadedSongs = await getSongs(
-        sortBy,
-        sortDirection,
-        debouncedSearchQuery,
-        page,
-        ITEMS_PER_PAGE,
-        tierFilters,
-        difficultyFilter,
-        genreFilters
-      );
-      setSongs(loadedSongs.songs);
-      setTotalPages(Math.ceil(loadedSongs.total / ITEMS_PER_PAGE));
-    } catch (error) {
-      console.error("Error loading songs:", error);
-    } finally {
-      setIsDebounceLoading(false);
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    setIsDebounceLoading(true);
-    loadSongs(true);
-  }, [debouncedSearchQuery, page, tierFilters, difficultyFilter, genreFilters, sortBy, sortDirection]);
-
-  const loadUserSongs = async () => {
-    if (currentUserId) {
-      const songs = await getUserSongs(currentUserId);
-      setUserSongs(songs);
-    }
-  };
-
-  useEffect(() => {
-    loadUserSongs();
-  }, [currentUserId]);
+  const songs = songsData?.songs || [];
+  const totalPages = Math.ceil((songsData?.total || 0) / ITEMS_PER_PAGE);
+  const userSongs = userSongsData || { wantToLearn: [], learning: [], learned: [] };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -122,37 +74,15 @@ export const useSongs = () => {
     setSortDirection("asc");
   };
 
-  const filteredSongs = songs; // Filtering logic moved completely to getSongs for consistency
-
   const hasFilters =
     difficultyFilter !== "all" ||
     tierFilters.length > 0 ||
     genreFilters.length > 0 ||
     searchQuery !== "";
 
-  const refreshSongs = async () => {
-    if (!currentUserId) return;
-    const songs = await getUserSongs(currentUserId);
-    setUserSongs(songs);
-    await loadSongs();
-  };
-
-  const refreshSongsWithoutLoading = async () => {
-    if (!currentUserId) return;
-    const songs = await getUserSongs(currentUserId);
-    setUserSongs(songs);
-    await loadSongs(true);
-  };
-
-  const handleStatusUpdate = async () => {
-    await refreshSongs();
-  };
-
   const getSongStatus = (songId: string) => {
-    if (userSongs.wantToLearn.some((song) => song.id === songId))
-      return "wantToLearn";
-    if (userSongs.learning.some((song) => song.id === songId))
-      return "learning";
+    if (userSongs.wantToLearn.some((song) => song.id === songId)) return "wantToLearn";
+    if (userSongs.learning.some((song) => song.id === songId)) return "learning";
     if (userSongs.learned.some((song) => song.id === songId)) return "learned";
     return null;
   };
@@ -160,17 +90,15 @@ export const useSongs = () => {
   return {
     page,
     userSongs,
-    setUserSongs,
-    isLoading,
-    loadSongs,
+    isLoading: isSongsLoading,
     totalPages,
     hasFilters,
     searchQuery,
     isModalOpen,
-    filteredSongs,
+    filteredSongs: songs,
     setSearchQuery,
     setIsModalOpen,
-    debounceLoading,
+    debounceLoading: isSongsLoading,
     difficultyFilter,
     handlePageChange,
     handleClearFilters,
@@ -179,11 +107,10 @@ export const useSongs = () => {
     setTierFilters,
     genreFilters,
     setGenreFilters,
-    loadUserSongs,
-    handleStatusUpdate,
+    handleStatusUpdate: () => refetchUserSongs(),
     getSongStatus,
-    refreshSongs,
-    refreshSongsWithoutLoading,
+    refreshSongs: () => refetchUserSongs(),
+    refreshSongsWithoutLoading: () => refetchUserSongs(),
     songs,
     sortBy,
     setSortBy,

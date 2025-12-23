@@ -28,7 +28,7 @@ const AdminDashboard = () => {
     isAuth,
     handleLogin,
     handleLogout
-  } = useAdminAuth((pass) => fetchSongs(pass));
+  } = useAdminAuth(() => fetchSongs());
 
   const {
     songs,
