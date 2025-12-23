@@ -14,7 +14,6 @@ import {
 } from "feature/user/store/userSlice";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { Formik } from "formik";
-import { AnimatePresence, motion } from "framer-motion";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import {
@@ -244,16 +243,7 @@ const ReportView = () => {
                     { title, questionMarkProps, Icon, hoursName, minutesName, skillId },
                     index
                   ) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        delay: index * 0.1,
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 20,
-                      }}>
+                    <div key={index}>
                       <TimeInputBox
                         errors={errors}
                         title={title}
@@ -263,7 +253,7 @@ const ReportView = () => {
                         minutesName={minutesName}
                         skillId={skillId}
                       />
-                    </motion.div>
+                    </div>
                   )
                 )}
               </div>
@@ -287,22 +277,13 @@ const ReportView = () => {
               <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'>
                 {healthHabbitsList.map(
                   ({ name, questionMarkProps, title }, index) => (
-                    <motion.div
-                      key={name + index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        delay: index * 0.05,
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 20,
-                      }}>
+                    <div key={name + index}>
                       <HealthHabbitsBox
                         name={name}
                         title={title}
                         questionMarkProps={questionMarkProps}
                       />
-                    </motion.div>
+                    </div>
                   )
                 )}
               </div>
@@ -348,10 +329,7 @@ const ReportView = () => {
                         : `${days} days ago`;
 
                     return (
-                      <motion.div
-                        key={days}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}>
+                      <div key={days}>
                         <Button
                           type='button'
                           variant={isSelected ? "default" : "outline"}
@@ -364,14 +342,11 @@ const ReportView = () => {
                               : "border-white/5 bg-zinc-900/40 text-gray-300 hover:glass-card-hover hover:text-white"
                           }`}>
                           {isSelected && (
-                            <motion.span
-                              className='absolute inset-0 rounded-full bg-[#4a7edd]/20 blur-sm'
-                              layoutId='dateSelection'
-                            />
+                            <span className='absolute inset-0 rounded-full bg-cyan-500/20 blur-sm' />
                           )}
                           <span className='relative z-10'>{label}</span>
                         </Button>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>
@@ -390,40 +365,23 @@ const ReportView = () => {
                 </div>
               </div>
               {errors.countBackDays && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className='mt-2 text-center text-sm text-red-400'>
+                <p className='mt-2 text-center text-sm text-red-400'>
                   <FaTimesCircle className='mr-1 inline' />
                   {t("max_days", { days: MAX_DAYS_BACK })}
-                </motion.p>
+                </p>
               )}
             </div>
 
             {/* Submit Button Section */}
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className='mt-6 flex flex-col items-center'>
-              <AnimatePresence>
-                {Object.keys(errors).length !== 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className='mb-4'>
-                    <ErrorBox />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <div className='mt-6 flex flex-col items-center'>
+              {Object.keys(errors).length !== 0 && (
+                <div className='mb-4'>
+                  <ErrorBox />
+                </div>
+              )}
 
               <div className='flex flex-col items-center gap-4'>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className='relative'>
+                <div className='relative'>
                   <Button
                     size='lg'
                     type='submit'
@@ -437,49 +395,41 @@ const ReportView = () => {
 
                     {t("report_button")}
                   </Button>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
           </ReportFormLayout>
 
-          <AnimatePresence>
-            {acceptPopUpVisible && exceedingTime && (
+          {acceptPopUpVisible && exceedingTime && (
+            <Backdrop selector='overlays'>
+              <div>
+                <AcceptExceedingPopUp
+                  exceedingTime={exceedingTime}
+                  onAccept={() => reportOnSubmit(values)}
+                  isFetching={isFetching}
+                  setAcceptExceedingTime={setAcceptExceedingTime}
+                  setAcceptPopUpVisible={setAcceptPopUpVisible}
+                />
+              </div>
+            </Backdrop>
+          )}
+
+          {ratingSummaryVisible &&
+            raitingData &&
+            currentUserStats &&
+            previousUserStats && (
               <Backdrop selector='overlays'>
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}>
-                  <AcceptExceedingPopUp
-                    exceedingTime={exceedingTime}
-                    onAccept={() => reportOnSubmit(values)}
-                    isFetching={isFetching}
-                    setAcceptExceedingTime={setAcceptExceedingTime}
-                    setAcceptPopUpVisible={setAcceptPopUpVisible}
+                <div>
+                  <RatingPopUpLayout
+                    onClick={setRatingSummaryVisible}
+                    ratingData={raitingData}
+                    currentUserStats={currentUserStats}
+                    previousUserStats={previousUserStats}
+                    skillPointsGained={raitingData.skillPointsGained}
                   />
-                </motion.div>
+                </div>
               </Backdrop>
             )}
-
-            {ratingSummaryVisible &&
-              raitingData &&
-              currentUserStats &&
-              previousUserStats && (
-                <Backdrop selector='overlays'>
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.9, opacity: 0 }}>
-                    <RatingPopUpLayout
-                      onClick={setRatingSummaryVisible}
-                      ratingData={raitingData}
-                      currentUserStats={currentUserStats}
-                      previousUserStats={previousUserStats}
-                      skillPointsGained={raitingData.skillPointsGained}
-                    />
-                  </motion.div>
-                </Backdrop>
-              )}
-          </AnimatePresence>
         </>
       )}
     </Formik>

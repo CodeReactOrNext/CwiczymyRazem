@@ -1,6 +1,7 @@
 import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
 import { useTranslation } from "react-i18next";
 import { 
   FaClock, 
@@ -92,7 +93,11 @@ export const PlanCard = ({
 
   return (
     <Card
-      className={`group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 p-6 ${style.border} ${style.gradient}`}
+      className={cn(
+        "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-xl p-6 glass-card radius-premium click-behavior",
+        style.border,
+        style.gradient
+      )}
       onClick={onSelect}>
       
       {/* Header: Category Icon & Badges */}

@@ -1,7 +1,9 @@
 {
   "or": "lub",
+  "instructions": "Instrukcje",
+  "no_instructions": "Brak instrukcji.",
   "min": "min",
-  "button": {
+  "auto_plan": {
     "sign_in": "Loguj",
     "sign_up": "Zarejestruj się",
     "edit": "Edytuj",
@@ -180,6 +182,8 @@
     "active": "Aktywne",
     "paused": "Wstrzymane"
   },
+  "finish_session": "ZAKOŃCZ SESJĘ",
+  "next_step": "NASTĘPNY KROK",
   "seo": {
     "title": "Riff Quest - Aplikacja do ćwiczeń na gitarze (Guitar Practice App & Tracker)",
     "description": "Riff Quest to najlepsze narzędzie do śledzenia postępów na gitarze (guitar practice tracker). Buduj nawyk ćwiczeń, analizuj statystyki i ucz się efektywniej.",

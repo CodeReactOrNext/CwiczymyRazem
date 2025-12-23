@@ -29,7 +29,7 @@ export const CreatePlan = ({ onSubmit }: CreatePlanProps) => {
   };
 
   return (
-    <div className='container mx-auto max-w-5xl py-8'>
+    <div className='container mx-auto  py-8'>
       <AnimatePresence mode='wait'>
         {step === "select" && (
           <SelectExercisesStep
