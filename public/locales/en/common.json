@@ -2,8 +2,6 @@
   "or": "or",
   "start": "Start",
   "finish": "Finish",
-  "instructions": "Instructions",
-  "no_instructions": "No instructions available.",
   "min": "min",
   "button": {
     "sign_in": "Log in",
