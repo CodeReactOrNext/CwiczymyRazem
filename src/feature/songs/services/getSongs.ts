@@ -1,15 +1,14 @@
 import type { Song } from "feature/songs/types/songs.type";
 import {
   collection,
-  getDocs,
   query,
   where,
-  updateDoc,
   doc,
   orderBy,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { memoryCache } from "utils/cache/memoryCache";
+import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 
 const getAverageDifficulty = (difficulties: { rating: number }[]) => {
   if (!difficulties?.length) return 0;
@@ -61,7 +60,7 @@ export const getSongs = async (
       q = query(q, orderBy("avgDifficulty", "asc"));
     }
 
-    const snapshot = await getDocs(q);
+    const snapshot = await trackedGetDocs(q);
     let songs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Song));
 
     if (tierFilters && tierFilters.length > 0) {
