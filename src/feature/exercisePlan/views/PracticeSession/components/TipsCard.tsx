@@ -16,11 +16,9 @@ export const TipsCard = ({ tips }: TipsCardProps) => {
       <div className='border-b border-zinc-700/30 bg-gradient-to-r from-emerald-500/5 to-transparent p-4'>
         <div className='flex items-center gap-2'>
           <div className='h-2 w-2 rounded-full bg-emerald-400'></div>
-          <h3 className='text-lg font-semibold text-white'>Wskazówki</h3>
+          <h3 className='text-lg font-semibold text-white'>Hints</h3>
           <div className='ml-auto'>
-            <span className='rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-1 text-xs font-medium text-emerald-300'>
-              {tips.length} wskazówek
-            </span>
+        
           </div>
         </div>
       </div>
@@ -42,7 +40,7 @@ export const TipsCard = ({ tips }: TipsCardProps) => {
         <div className='mt-5 border-t border-zinc-800/50 pt-3'>
           <div className='flex items-center justify-between'>
             <span className='text-xs font-medium text-zinc-400'>
-              Pomocne wskazówki
+               Hints
             </span>
             <div className='flex gap-1'>
               {tips.map((_, idx) => (

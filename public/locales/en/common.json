@@ -2,6 +2,8 @@
   "or": "or",
   "start": "Start",
   "finish": "Finish",
+  "instructions": "Instructions",
+  "no_instructions": "No instructions available.",
   "min": "min",
   "button": {
     "sign_in": "Log in",
@@ -180,6 +182,8 @@
     "active": "Active",
     "paused": "Paused"
   },
+  "finish_session": "FINISH SESSION",
+  "next_step": "NEXT STEP",
   "seo": {
     "title": "Riff Quest - Guitar Practice App & Guitar Progress Tracker",
     "description": "Riff Quest is the ultimate guitar practice tool to track your guitar progress and build a consistent guitar practice routine. Learn guitar online with our intelligent tracker.",
