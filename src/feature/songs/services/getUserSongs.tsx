@@ -11,6 +11,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+import { trackedGetDocs, trackedGetDoc } from "utils/firebase/client/firestoreTracking";
 
 const getAverageDifficulty = (difficulties: { rating: number }[]) => {
   if (!difficulties?.length) return 0;
@@ -25,7 +26,7 @@ export const getUserSongs = async (userId: string) => {
   const userSongsRef = collection(userDocRef, "userSongs");
 
   try {
-    const userSongsSnapshot = await getDocs(userSongsRef);
+    const userSongsSnapshot = await trackedGetDocs(userSongsRef);
     const songLists = {
       wantToLearn: [] as Song[],
       learning: [] as Song[],
@@ -54,7 +55,7 @@ export const getUserSongs = async (userId: string) => {
       return getDocs(q);
     });
 
-    const fullSongsSnapshots = await Promise.all(fullSongsPromises);
+    const fullSongsSnapshots = await Promise.all(fullSongsPromises.map(p => trackedGetDocs(p as any)));
     const idToSongMap = new Map<string, Song>();
 
     fullSongsSnapshots.forEach((snap) => {

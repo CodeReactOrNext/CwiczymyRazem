@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { memoryCache } from "utils/cache/memoryCache";
+import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 
 export const getSeasonalLeaderboard = async (
   seasonId: string,
@@ -48,9 +49,9 @@ export const getSeasonalLeaderboard = async (
       q = query(q, startAfter(lastVisible));
     }
 
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await trackedGetDocs(q);
 
-    const users = querySnapshot.docs.map((doc) => {
+    const users = querySnapshot.docs.map((doc: any) => {
       const data = doc.data();
       return {
         profileId: doc.id,

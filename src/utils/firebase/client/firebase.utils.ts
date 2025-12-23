@@ -26,6 +26,13 @@ import {
   where,
   enableIndexedDbPersistence,
 } from "firebase/firestore";
+import {
+  trackedGetDocs,
+  trackedGetDoc,
+  trackedUpdateDoc,
+  trackedSetDoc,
+  trackedAddDoc
+} from "./firestoreTracking";
 import { getStorage, } from "firebase/storage";
 
 import { firebaseApp } from "./firebase.cofig";
@@ -110,9 +117,9 @@ export const firebaseGetUsersExceriseRaport = async (
       q = query(q, startAfter(lastVisible));
     }
 
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await trackedGetDocs(q);
 
-    const users = querySnapshot.docs.map((doc) => ({
+    const users = querySnapshot.docs.map((doc: any) => ({
       profileId: doc.id,
       ...doc.data(),
     })) as FirebaseUserDataInterface[];
@@ -136,13 +143,13 @@ export const firebaseCheckUsersNameIsNotUnique = async (
     where("displayName", "==", displayName),
     limit(1)
   );
-  const snapshot = await getDocs(q);
+  const snapshot = await trackedGetDocs(q);
   return !snapshot.empty;
 };
 
 export const firebaseGetUserDocument = async (userAuth: string) => {
   const userDocRef = doc(db, "users", userAuth);
-  const userSnapshot = await getDoc(userDocRef);
+  const userSnapshot = await trackedGetDoc(userDocRef);
   const userData = userSnapshot.data();
   return userData;
 };
@@ -195,7 +202,7 @@ export const firebaseUpdateUserDocument = async (
   value: string
 ) => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
-  await updateDoc(userDocRef, { [key]: value });
+  await trackedUpdateDoc(userDocRef, { [key]: value });
 };
 
 
@@ -230,7 +237,7 @@ export const firebaseGetUserTooltipData = async (
 ): Promise<UserTooltipData | null> => {
   try {
     const userDocRef = doc(db, "users", userId);
-    const userSnapshot = await getDoc(userDocRef);
+    const userSnapshot = await trackedGetDoc(userDocRef);
 
     if (!userSnapshot.exists()) return null;
 
