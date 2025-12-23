@@ -20,7 +20,7 @@ export const ExerciseProgress = ({
     ((currentExerciseIndex + 1) / plan.exercises.length) * 100;
 
   return (
-    <Card className='border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
+    <Card className='radius-premium glass-card border-white/5'>
       <div className='p-4'>
         {/* Compact horizontal layout */}
         <div className='flex items-center gap-6'>

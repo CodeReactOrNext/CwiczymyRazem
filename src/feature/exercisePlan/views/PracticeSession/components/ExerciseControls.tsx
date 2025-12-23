@@ -43,10 +43,10 @@ const ExerciseControls = ({
         onClick={toggleTimer}
         className={cn(
           variant === "centered" ? btnSizes[size] : "flex-1",
-          variant === "centered" ? "rounded-full" : "",
+          "radius-premium transition-background click-behavior",
           isPlaying 
-            ? "bg-cyan-500 text-black hover:bg-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.4)]" 
-            : "bg-zinc-800 hover:bg-zinc-700 text-white border border-white/10"
+            ? "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20" 
+            : "bg-zinc-800/40 hover:bg-zinc-700/60 text-white border border-white/5 backdrop-blur-sm"
         )}>
         {isPlaying ? (
           <FaPause className={iconSizes[size]} />
@@ -55,15 +55,13 @@ const ExerciseControls = ({
         )}
       </Button>
 
-      {!isLastExercise && (
+      {/* Primary Action Button - ONLY if NOT centered deck (where it's separate) */}
+      {variant !== "centered" && !isLastExercise && (
         <Button
           size={size === "lg" ? "lg" : "default"}
           variant='ghost'
           onClick={handleNextExercise}
-          className={cn(
-            variant === "centered" ? btnSizes[size] : "flex-1",
-            variant === "centered" ? "rounded-full" : ""
-          )}>
+          className="flex-1 radius-premium transition-background click-behavior">
           <FaStepForward className={iconSizes[size]} />
         </Button>
       )}

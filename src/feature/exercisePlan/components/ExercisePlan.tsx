@@ -25,7 +25,7 @@ export const ExercisePlan = () => {
   };
 
   return (
-    <div className='container mx-auto  font-openSans sm:px-6 sm:py-6 md:px-4 md:py-4'>
+    <div className='container mx-auto px-4 py-8 font-openSans'>
       <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
         <TabsList className='grid w-full grid-cols-2 md:grid-cols-3'>
           <TabsTrigger value='my_plans' className='text-xs sm:text-sm'>

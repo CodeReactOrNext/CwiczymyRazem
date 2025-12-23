@@ -14,6 +14,7 @@ import ThemeModeProvider from "wrappers/ThemeModeProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState } from "react";
+import ErrorBoundary from "components/ErrorBoundary/ErrorBoundary";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,17 +74,19 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppProps) =>
             })(window, document, "clarity", "script", "plp3vbsypt");
           `}
           </Script>{" "}
-        <ThemeModeProvider>
-          <AuthSyncWrapper>
-             <main className={`${teko.variable} ${inter.variable} `}>
-                <Toaster theme='dark' position='top-right' />
-                <NextTopLoader color='#ff3e4b' />
-                <div id='overlays'></div>
-                <Component {...pageProps} />
-             </main>
-          </AuthSyncWrapper>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </ThemeModeProvider>
+        <ErrorBoundary>
+          <ThemeModeProvider>
+            <AuthSyncWrapper>
+               <main className={`${teko.variable} ${inter.variable} `}>
+                  <Toaster theme='dark' position='top-right' />
+                  <NextTopLoader color='#ff3e4b' />
+                  <div id='overlays'></div>
+                  <Component {...pageProps} />
+               </main>
+            </AuthSyncWrapper>
+            <ReactQueryDevtools initialIsOpen={false} />
+          </ThemeModeProvider>
+        </ErrorBoundary>
       </QueryClientProvider>
       </Provider>
     </SessionProvider>

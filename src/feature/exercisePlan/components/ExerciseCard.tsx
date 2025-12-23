@@ -78,7 +78,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     <>
       <Card
         className={cn(
-          "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 p-6",
+          "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-xl p-6 glass-card radius-premium click-behavior",
           style.border,
           style.gradient
         )}
