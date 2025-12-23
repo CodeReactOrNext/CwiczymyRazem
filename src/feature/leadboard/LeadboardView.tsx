@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useLeaderboard } from "./hooks/useLeaderboard";
 
-const ITEMS_PER_PAGE = 30;
+const ITEMS_PER_PAGE = 10;
 
 interface LeadboardViewProps {
   defaultView?: "all-time" | "seasonal";

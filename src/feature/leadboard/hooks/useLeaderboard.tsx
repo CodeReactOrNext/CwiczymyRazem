@@ -47,16 +47,27 @@ export const useLeaderboard = ({
   const [seasons, setSeasons] = useState<SeasonDataInterface[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<string>("");
 
+  const [pageCursors, setPageCursors] = useState<{ [key: number]: any }>({ 1: null });
+
   const loadGlobalLeaderboard = async (page: number) => {
     try {
       setIsLoading(true);
+      const cursor = pageCursors[page];
       const response = await getGlobalLeaderboard(
         initialSortBy,
-        page,
-        itemsPerPage
+        itemsPerPage,
+        cursor
       );
+      
       setUsersData(response.users);
       setTotalUsers(response.totalUsers);
+      
+      if (response.lastVisible) {
+        setPageCursors(prev => ({
+          ...prev,
+          [page + 1]: response.lastVisible
+        }));
+      }
     } catch (error) {
       logger.error(error, {
         context: "loadGlobalLeaderboard",
@@ -70,11 +81,12 @@ export const useLeaderboard = ({
   const loadSeasonalLeaderboard = async (seasonId: string, page: number) => {
     try {
       setIsLoading(true);
+      const cursor = pageCursors[page];
       const response = await getSeasonalLeaderboard(
         seasonId,
         initialSortBy,
-        page,
-        itemsPerPage
+        itemsPerPage,
+        cursor
       );
 
       if (response) {
@@ -87,6 +99,13 @@ export const useLeaderboard = ({
         if (response.users && response.users.length > 0) {
           setUsersData(mappedUsers as any);
           setTotalUsers(response.totalUsers || 0);
+          
+          if (response.lastVisible) {
+            setPageCursors(prev => ({
+              ...prev,
+              [page + 1]: response.lastVisible
+            }));
+          }
         } else {
           setUsersData([]);
           setTotalUsers(0);
@@ -103,6 +122,10 @@ export const useLeaderboard = ({
   };
 
   const handlePageChange = (page: number) => {
+    // If we are jumping forward to a page we don't have a cursor for,
+    // we have to reset or handle intermediate. For simplicity and cost,
+    // we'll reset if jump is too big or handle it in the service if needed.
+    // In this UI, usually people go page by page.
     setCurrentPage(page);
     if (isSeasonalView && selectedSeason) {
       loadSeasonalLeaderboard(selectedSeason, page);
@@ -117,6 +140,7 @@ export const useLeaderboard = ({
       setIsLoading(true);
       setIsSeasonalView(newIsSeasonalView);
       setCurrentPage(1);
+      setPageCursors({ 1: null });
 
       if (newIsSeasonalView && selectedSeason) {
         await loadSeasonalLeaderboard(selectedSeason, 1);
@@ -139,6 +163,7 @@ export const useLeaderboard = ({
       setIsLoading(true);
       setSelectedSeason(newSeasonId);
       setCurrentPage(1);
+      setPageCursors({ 1: null });
       await loadSeasonalLeaderboard(newSeasonId, 1);
     } catch {
       toast(t("season_change_error"));
