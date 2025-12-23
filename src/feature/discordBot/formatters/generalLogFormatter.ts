@@ -15,7 +15,7 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
       embeds: [
         {
           title: "📊 **Nowy Raport Aktywności**",
-          description: ` **[${displayName}](https://www.cwiczymy-razem.pl/user/${log.uid})** zdobył **${log.points}** punktów! \n\nSprawdź jego szczegóły poniżej:`,
+          description: ` **[${displayName}](https://www.riff.quest/user/${log.uid})** zdobył **${log.points}** punktów! \n\nSprawdź jego szczegóły poniżej:`,
           color: 0x3498db,
           fields: [
             ...fields,

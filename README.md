@@ -15,7 +15,7 @@ A guitar exercise tracker featuring a leaderboard, leveling system, and Figma-de
 
 ## Test account
 
-https://cwiczymy-razem.pl
+https://riff.quest
 <br>
 <br>
 Test Account: <br>
