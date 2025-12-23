@@ -6,7 +6,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useAppSelector } from "store/hooks";
 
-const ITEMS_PER_PAGE = 50;
+const ITEMS_PER_PAGE = 16;
 
 export const useSongs = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,6 +14,7 @@ export const useSongs = () => {
   const debounceTimeout = useRef<NodeJS.Timeout>(null);
 
   const [page, setPage] = useState(1);
+  const [pageCursors, setPageCursors] = useState<Record<number, any>>({}); // Track cursors for each page
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const [tierFilters, setTierFilters] = useState<string[]>([]);
   const [genreFilters, setGenreFilters] = useState<string[]>([]);
@@ -45,10 +46,27 @@ export const useSongs = () => {
       ITEMS_PER_PAGE,
       tierFilters,
       difficultyFilter,
-      genreFilters
+      genreFilters,
+      pageCursors[page - 1] // Pass cursor of PREVIOUS page
     ),
     staleTime: 5 * 60 * 1000,
   });
+
+  // Track cursor for the current page
+  useEffect(() => {
+    if (songsData?.lastDoc) {
+      setPageCursors(prev => ({
+        ...prev,
+        [page]: songsData.lastDoc
+      }));
+    }
+  }, [songsData?.lastDoc, page]);
+
+  // Reset cursors and page when filters/sort change
+  useEffect(() => {
+    setPage(1);
+    setPageCursors({});
+  }, [sortBy, sortDirection, debouncedSearchQuery, tierFilters, difficultyFilter, genreFilters]);
 
   // 2. Fetch User Songs
   const { data: userSongsData, refetch: refetchUserSongs } = useQuery({

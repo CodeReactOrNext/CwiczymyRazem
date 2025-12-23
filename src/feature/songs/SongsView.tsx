@@ -40,6 +40,7 @@ import {
   Home,
   Code,
 } from "lucide-react";
+import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
 import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { cn } from "assets/lib/utils";
@@ -67,17 +68,12 @@ const SongsView = () => {
     tierFilters,
     setTierFilters,
     handleStatusUpdate,
-    getSongStatus,
     refreshSongs,
     refreshSongsWithoutLoading,
-    songs,
     sortBy,
-    setSortBy,
     sortDirection,
-    setSortDirection,
     debounceLoading,
     genreFilters,
-    setGenreFilters,
     applyFilters,
     handleResetFilters,
   } = useSongs();
@@ -132,7 +128,7 @@ const SongsView = () => {
                         key={tier.tier}
                         onClick={() => {
                           if (isActive) {
-                            setTierFilters(tierFilters.filter(t => t !== tier.tier));
+                            setTierFilters(tierFilters.filter((t: string) => t !== tier.tier));
                           } else {
                             setTierFilters([...tierFilters, tier.tier]);
                           }
@@ -227,9 +223,10 @@ const SongsView = () => {
                 {/* Grid Content */}
                 <div className="min-h-[500px] rounded-2xl bg-zinc-900/20 p-1">
                   {isLoading ? (
-                    <div className="flex h-[400px] flex-col items-center justify-center gap-4">
-                      <LoaderCircle className="h-12 w-12 animate-spin text-cyan-500" />
-                      <p className="font-medium text-zinc-400">Loading library...</p>
+                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+                      {Array.from({ length: 16 }).map((_, i) => (
+                        <SongCardSkeleton key={i} />
+                      ))}
                     </div>
                   ) : (
                     <SongsGrid

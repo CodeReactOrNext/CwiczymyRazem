@@ -101,7 +101,7 @@ export const firebaseGetUserAvatarURL = async () => {
 };
 
 
-export const firebaseGetUsersExceriseRaport = async (
+export const firebaseGetUsersExerciseReport = async (
   sortBy: SortByType,
   itemsPerPage: number,
   lastVisible?: any

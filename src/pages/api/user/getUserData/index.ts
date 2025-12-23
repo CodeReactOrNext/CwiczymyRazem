@@ -15,7 +15,7 @@ export default async function handler(
       const userAuth = await firebaseCreateUserDocumentFromAuth(user);
       const userData = await firebaseGetUserDocument(userAuth);
 
-      res.status(200).json({
+      return res.status(200).json({
         userInfo: {
           displayName: userData!.displayName,
           avatar: userData!.avatar,
@@ -28,8 +28,8 @@ export default async function handler(
         currentUserStats: userData!.statistics,
       });
     } catch (error) {
-      res.status(500).json({ error });
+      return res.status(500).json({ error });
     }
   }
-  res.status(400);
+  return res.status(400).end();
 }
