@@ -7,7 +7,7 @@ export const useAdminSongs = (password: string) => {
   const [songs, setSongs] = useState<Song[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState<"all" | "unverified" | "no-cover">("all");
+  const [filterType, setFilterType] = useState<"all" | "unverified" | "no-cover" | "no-rating">("all");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ title: "", artist: "", avgDifficulty: 0 });
 
@@ -55,6 +55,20 @@ export const useAdminSongs = (password: string) => {
     }
   };
 
+  const handleQuickRate = async (songId: string, rating: number) => {
+    try {
+      await axios.post("/api/admin/songs", {
+        password,
+        songId,
+        data: { avgDifficulty: rating, isVerified: true }
+      });
+      setSongs(prev => prev.map(s => s.id === songId ? { ...s, avgDifficulty: rating, isVerified: true } : s));
+      toast.success(`Song rated ${rating}`);
+    } catch (error) {
+      toast.error("Rating failed");
+    }
+  };
+
   const handleBulkAdd = async (bulkSongs: any[]) => {
     setIsLoading(true);
     try {
@@ -85,12 +99,26 @@ export const useAdminSongs = (password: string) => {
     }
   };
 
+  const handleDelete = async (songId: string) => {
+    if (!confirm("Are you sure you want to delete this song?")) return;
+    try {
+      await axios.delete(`/api/admin/songs?songId=${songId}`, {
+        headers: { "x-admin-password": password }
+      });
+      setSongs(prev => prev.filter(s => s.id !== songId));
+      toast.success("Song deleted");
+    } catch (error) {
+      toast.error("Failed to delete song");
+    }
+  };
+
   const filteredSongs = songs.filter(s => {
     const matchesSearch = s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.artist.toLowerCase().includes(searchTerm.toLowerCase());
 
     if (filterType === "unverified") return matchesSearch && !s.isVerified;
     if (filterType === "no-cover") return matchesSearch && !s.coverUrl;
+    if (filterType === "no-rating") return matchesSearch && (!s.avgDifficulty || s.avgDifficulty === 0);
 
     return matchesSearch;
   });
@@ -99,6 +127,7 @@ export const useAdminSongs = (password: string) => {
     total: songs.length,
     missing: songs.filter(s => !s.coverUrl).length,
     unverified: songs.filter(s => !s.isVerified).length,
+    noRating: songs.filter(s => !s.avgDifficulty || s.avgDifficulty === 0).length,
   };
 
   return {
@@ -118,6 +147,8 @@ export const useAdminSongs = (password: string) => {
     handleManualVerify,
     handleUpdateCover,
     handleBulkAdd,
+    handleQuickRate,
+    handleDelete,
     filteredSongs,
     stats
   };

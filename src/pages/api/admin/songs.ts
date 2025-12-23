@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "utils/firebase/client/firebase.utils";
-import { collection, getDocs, doc, updateDoc, query, orderBy, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, query, orderBy, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,6 +26,20 @@ export default async function handler(
       }));
 
       return res.status(200).json(songs);
+      return res.status(200).json(songs);
+    }
+
+    if (req.method === "DELETE") {
+      const { songId } = req.body.songId ? req.body : req.query; // Support body or query
+
+      if (!songId || typeof songId !== 'string') {
+        return res.status(400).json({ error: "Missing songId" });
+      }
+
+      const songRef = doc(db, "songs", songId);
+      await deleteDoc(songRef);
+
+      return res.status(200).json({ success: true });
     }
 
     if (req.method === "POST") {
@@ -94,6 +108,28 @@ export default async function handler(
       const updates = { ...data };
       if (data.title) updates.title_lowercase = data.title.toLowerCase();
       if (data.artist) updates.artist_lowercase = data.artist.toLowerCase();
+
+      // If updating rating, also add to difficulties array as 'admin'
+      if (typeof data.avgDifficulty === 'number') {
+        const songSnap = await getDoc(songRef);
+        if (songSnap.exists()) {
+          const songData = songSnap.data();
+          const currentDifficulties = Array.isArray(songData.difficulties) ? songData.difficulties : [];
+
+          // Remove existing admin rating if any
+          const otherDifficulties = currentDifficulties.filter((d: any) => d.userId !== 'admin');
+
+          // Add new admin rating
+          updates.difficulties = [
+            ...otherDifficulties,
+            {
+              userId: 'admin',
+              rating: data.avgDifficulty,
+              date: new Date() // Firestore converts this to Timestamp
+            }
+          ];
+        }
+      }
 
       await updateDoc(songRef, updates);
 

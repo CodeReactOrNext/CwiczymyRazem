@@ -6,12 +6,13 @@ import { cn } from "assets/lib/utils";
 interface AdminActionCenterProps {
   searchTerm: string;
   setSearchTerm: (val: string) => void;
-  filterType: "all" | "unverified" | "no-cover";
-  setFilterType: (type: "all" | "unverified" | "no-cover") => void;
+  filterType: "all" | "unverified" | "no-cover" | "no-rating";
+  setFilterType: (type: "all" | "unverified" | "no-cover" | "no-rating") => void;
   onSync: () => void;
   onMassVerify: () => void;
   onMassEnrich: () => void;
   onBulkAdd: () => void;
+  onFindDuplicates: () => void;
   isBulkProcessing: boolean;
   isLoading: boolean;
 }
@@ -25,6 +26,7 @@ const AdminActionCenter = ({
   onMassVerify,
   onMassEnrich,
   onBulkAdd,
+  onFindDuplicates,
   isBulkProcessing,
   isLoading
 }: AdminActionCenterProps) => {
@@ -65,6 +67,14 @@ const AdminActionCenter = ({
           >
             No Cover
           </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setFilterType("no-rating")}
+            className={cn("h-9 rounded-lg text-[10px] font-black uppercase tracking-widest", filterType === "no-rating" ? "bg-purple-500/10 text-purple-500" : "text-zinc-500")}
+          >
+            No Rating
+          </Button>
         </div>
       </div>
       
@@ -101,6 +111,15 @@ const AdminActionCenter = ({
         >
           <Plus className="mr-2 h-3.5 w-3.5" />
           Bulk Add Songs
+        </Button>
+        <Button 
+          onClick={onFindDuplicates} 
+          variant="ghost"
+          disabled={isLoading}
+          className="h-10 border border-white/5 bg-zinc-900/60 hover:bg-white/5 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 group"
+          title="Analyze client-side duplicates"
+        >
+          <span className="group-hover:text-amber-500 transition-colors">Find Duplicates</span>
         </Button>
       </div>
     </div>

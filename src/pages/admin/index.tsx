@@ -9,7 +9,9 @@ import CoverPickerModal from "feature/admin/components/CoverPickerModal";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
 import { useAdminSongs } from "feature/admin/hooks/useAdminSongs";
 import { useAdminBulkActions } from "feature/admin/hooks/useAdminBulkActions";
+import { useDuplicateDetector } from "feature/admin/hooks/useDuplicateDetector";
 import { BulkAddSongsModal } from "feature/admin/components/BulkAddSongsModal";
+import { DuplicateSongsModal } from "feature/admin/components/DuplicateSongsModal";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../api/auth/[...nextauth]";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -45,9 +47,17 @@ const AdminDashboard = () => {
     handleManualVerify,
     handleUpdateCover,
     handleBulkAdd,
+    handleQuickRate,
+    handleDelete,
     filteredSongs,
     stats
   } = useAdminSongs(password);
+
+  const {
+    duplicates,
+    isModalOpen: isDuplicateModalOpen,
+    setIsModalOpen: setIsDuplicateModalOpen
+  } = useDuplicateDetector(songs);
 
   const {
     isBulkProcessing,
@@ -74,6 +84,7 @@ const AdminDashboard = () => {
           totalSongs={stats.total} 
           missingCovers={stats.missing} 
           unverifiedCount={stats.unverified} 
+          noRatingCount={stats.noRating}
         />
 
         <div className="space-y-6">
@@ -86,6 +97,7 @@ const AdminDashboard = () => {
             onMassVerify={verifyAll}
             onMassEnrich={handleMassEnrich}
             onBulkAdd={() => setIsBulkAddOpen(true)}
+            onFindDuplicates={() => setIsDuplicateModalOpen(true)}
             isBulkProcessing={isBulkProcessing}
             isLoading={isLoading}
           />
@@ -112,6 +124,7 @@ const AdminDashboard = () => {
                 [field]: field === "avgDifficulty" ? parseFloat(value) || 0 : value 
               }))
             }}
+            onQuickRate={handleQuickRate}
             isLoading={isLoading}
           />
         </div>
@@ -138,6 +151,13 @@ const AdminDashboard = () => {
           await handleBulkAdd(songs);
           setIsBulkAddOpen(false);
         }}
+      />
+      
+      <DuplicateSongsModal 
+        isOpen={isDuplicateModalOpen}
+        onClose={() => setIsDuplicateModalOpen(false)}
+        duplicates={duplicates}
+        onDelete={handleDelete}
       />
     </AdminLayout>
   );
