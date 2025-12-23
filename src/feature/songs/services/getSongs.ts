@@ -3,20 +3,14 @@ import {
   collection,
   query,
   where,
-  doc,
   orderBy,
+  limit,
+  getCountFromServer,
+  startAfter,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { memoryCache } from "utils/cache/memoryCache";
 import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
-
-const getAverageDifficulty = (difficulties: { rating: number }[]) => {
-  if (!difficulties?.length) return 0;
-  return (
-    difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
-    difficulties.length
-  );
-};
 
 export const getSongs = async (
   sortBy: string,
@@ -26,108 +20,109 @@ export const getSongs = async (
   itemsPerPage: number,
   tierFilters?: string[],
   difficultyFilter?: string,
-  genreFilters?: string[]
+  genreFilters?: string[],
+  afterDoc?: any // Added for cursor support
 ) => {
   try {
-    const hasFilters =
-      searchQuery ||
-      (tierFilters && tierFilters.length > 0) ||
-      (difficultyFilter && difficultyFilter !== "all") ||
-      (genreFilters && genreFilters.length > 0);
+    const hasComplexFilters = (tierFilters && tierFilters.length > 0) || (genreFilters && genreFilters.length > 0) || searchQuery;
 
+    // Cache key should include afterDoc id if present to distinguish cursors
     const cacheKey = JSON.stringify({
       sortBy,
       sortDirection,
       page,
       itemsPerPage,
+      tierFilters,
+      difficultyFilter,
+      genreFilters,
+      searchQuery,
+      afterDocId: afterDoc?.id
     });
 
-    if (!hasFilters) {
-      const cached = memoryCache.get(cacheKey);
-      if (cached) {
-        return cached;
-      }
-    }
+    const cached = memoryCache.get(cacheKey);
+    if (cached) return cached;
 
     const songsRef = collection(db, "songs");
-    let q = query(songsRef);
+    let baseQuery = query(songsRef);
 
+    // 1. Difficulty Filter (Firestore-side)
     if (difficultyFilter && difficultyFilter !== "all") {
-      if (difficultyFilter === "easy") q = query(q, where("avgDifficulty", "<=", 4));
-      else if (difficultyFilter === "medium") q = query(q, where("avgDifficulty", ">", 4), where("avgDifficulty", "<=", 7));
-      else if (difficultyFilter === "hard") q = query(q, where("avgDifficulty", ">", 7));
-
-      q = query(q, orderBy("avgDifficulty", "asc"));
+      if (difficultyFilter === "easy") baseQuery = query(baseQuery, where("avgDifficulty", "<=", 4));
+      else if (difficultyFilter === "medium") baseQuery = query(baseQuery, where("avgDifficulty", ">", 4), where("avgDifficulty", "<=", 7));
+      else if (difficultyFilter === "hard") baseQuery = query(baseQuery, where("avgDifficulty", ">", 7));
     }
 
-    const snapshot = await trackedGetDocs(q);
-    let songs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Song));
+    // 2. Get Total Count (Very Cheap)
+    // For simple queries, getCountFromServer is 100x cheaper than fetching docs.
+    const countSnapshot = await getCountFromServer(baseQuery);
+    const totalCountPool = countSnapshot.data().count;
 
-    if (tierFilters && tierFilters.length > 0) {
-      songs = songs.filter(song => {
-        const diff = song.avgDifficulty ?? 0;
-        return tierFilters.some(tier => {
-          if (tier === "S") return diff >= 9;
-          if (tier === "A") return diff >= 7.5 && diff < 9;
-          if (tier === "B") return diff >= 6 && diff < 7.5;
-          if (tier === "C") return diff >= 4 && diff < 6;
-          if (tier === "D") return diff < 4;
+    // 3. Sorting and Paging
+    let q = query(baseQuery, orderBy(sortBy, sortDirection));
+
+    if (!hasComplexFilters) {
+      // Database Paging: Efficient cursor-based skip
+      if (afterDoc && page > 1) {
+        q = query(q, startAfter(afterDoc), limit(itemsPerPage));
+      } else {
+        // Fallback for jumps or first page
+        const limitCount = page * itemsPerPage;
+        q = query(q, limit(limitCount));
+      }
+
+      const snapshot = await trackedGetDocs(q);
+      const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
+
+      // If we used startAfter, we have exactly itemsPerPage or less.
+      // If we used limitCount (jumps), we still need to slice.
+      const pagedSongs = afterDoc && page > 1 ? docs : docs.slice((page - 1) * itemsPerPage);
+      const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+
+      const result = {
+        songs: pagedSongs,
+        total: totalCountPool,
+        lastDoc // Return for next page cursor
+      };
+
+      memoryCache.set(cacheKey, result, 5 * 60 * 1000);
+      return result;
+    } else {
+      // Complex path: Fetch pool and filter in-memory (still limited to 500 to prevent cost spikes)
+      const snapshot = await trackedGetDocs(query(q, limit(500)));
+      let songs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
+
+      if (tierFilters && tierFilters.length > 0) {
+        songs = songs.filter(song => {
+          const diff = song.avgDifficulty ?? 0;
+          if (tierFilters.includes("S") && diff >= 9) return true;
+          if (tierFilters.includes("A") && diff >= 7.5 && diff < 9) return true;
+          if (tierFilters.includes("B") && diff >= 6 && diff < 7.5) return true;
+          if (tierFilters.includes("C") && diff >= 4 && diff < 6) return true;
+          if (tierFilters.includes("D") && diff < 4) return true;
           return false;
         });
-      });
-    }
-
-    if (genreFilters && genreFilters.length > 0) {
-      songs = songs.filter(song => {
-        if (!song.genres || !song.genres.length) return false;
-        return genreFilters.some(g => song.genres?.includes(g));
-      });
-    }
-
-    if (searchQuery) {
-      const lowerSearch = searchQuery.toLowerCase();
-      songs = songs.filter(song => {
-        const titleMatch = (song.title || "").toLowerCase().includes(lowerSearch);
-        const artistMatch = (song.artist || "").toLowerCase().includes(lowerSearch);
-        return titleMatch || artistMatch;
-      });
-    }
-
-    songs.sort((a: any, b: any) => {
-      let valA = a[sortBy];
-      let valB = b[sortBy];
-
-      if (sortBy === 'popularity' || sortBy === 'avgDifficulty') {
-        valA = typeof valA === 'number' ? valA : 0;
-        valB = typeof valB === 'number' ? valB : 0;
       }
 
-      if (typeof valA === "string") valA = valA.toLowerCase();
-      if (typeof valB === "string") valB = valB.toLowerCase();
-
-      if (valA === valB) return 0;
-
-      if (sortDirection === "asc") {
-        return valA > valB ? 1 : -1;
-      } else {
-        return valA < valB ? 1 : -1;
+      if (genreFilters && genreFilters.length > 0) {
+        songs = songs.filter(song => song.genres?.some(g => genreFilters.includes(g)));
       }
-    });
 
-    const total = songs.length;
-    const startIndex = (page - 1) * itemsPerPage;
-    const pagedSongs = songs.slice(startIndex, startIndex + itemsPerPage);
+      if (searchQuery) {
+        const s = searchQuery.toLowerCase();
+        songs = songs.filter(song =>
+          song.title?.toLowerCase().includes(s) ||
+          song.artist?.toLowerCase().includes(s)
+        );
+      }
 
-    const result = {
-      songs: pagedSongs,
-      total,
-    };
+      const total = songs.length;
+      const startIndex = (page - 1) * itemsPerPage;
+      const pagedSongs = songs.slice(startIndex, startIndex + itemsPerPage);
 
-    if (!hasFilters) {
+      const result = { songs: pagedSongs, total, lastDoc: null };
       memoryCache.set(cacheKey, result, 5 * 60 * 1000);
+      return result;
     }
-
-    return result;
   } catch (error) {
     console.error("Error getting songs:", error);
     throw error;

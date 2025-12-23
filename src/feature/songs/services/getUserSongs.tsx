@@ -2,30 +2,18 @@ import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import {
   collection,
   doc,
-  getDocs,
   Timestamp,
-  getDoc,
   query,
   where,
   documentId,
-  updateDoc,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import { trackedGetDocs, trackedGetDoc } from "utils/firebase/client/firestoreTracking";
-
-const getAverageDifficulty = (difficulties: { rating: number }[]) => {
-  if (!difficulties?.length) return 0;
-  return (
-    difficulties.reduce((acc, curr) => acc + curr.rating, 0) /
-    difficulties.length
-  );
-};
+import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
+import { calculateAverageDifficulty } from "../utils/difficulty.utils";
 
 export const getUserSongs = async (userId: string) => {
-  console.log(`[getUserSongs.DEBUG] userId: ${userId}`);
   const userDocRef = doc(db, "users", userId);
   const userSongsRef = collection(userDocRef, "userSongs");
-  console.log(`[getUserSongs.DEBUG] userSongsRef:`, userSongsRef);
 
   try {
     const userSongsSnapshot = await trackedGetDocs(userSongsRef);
@@ -43,7 +31,6 @@ export const getUserSongs = async (userId: string) => {
 
     if (userSongs.length === 0) return songLists;
 
-    // Batched fetching of song details
     const songIds = userSongs.map((us) => us.id);
     const CHUNK_SIZE = 10;
     const songChunks = [];
@@ -52,11 +39,10 @@ export const getUserSongs = async (userId: string) => {
     }
 
     const songsRef = collection(db, "songs");
-    const fullSongsQueries = songChunks.map((chunk) => {
-      return query(songsRef, where(documentId(), "in", chunk));
-    });
-
-    const fullSongsSnapshots = await Promise.all(fullSongsQueries.map(q => trackedGetDocs(q)));
+    const fullSongsSnapshots = await Promise.all(
+      songChunks.map((chunk) => trackedGetDocs(query(songsRef, where(documentId(), "in", chunk))))
+    );
+    
     const idToSongMap = new Map<string, Song>();
 
     fullSongsSnapshots.forEach((snap) => {
@@ -64,7 +50,7 @@ export const getUserSongs = async (userId: string) => {
         const data = docSnap.data() as Song;
         const avgDifficulty = data.avgDifficulty !== undefined 
           ? data.avgDifficulty 
-          : getAverageDifficulty(data.difficulties || []);
+          : calculateAverageDifficulty(data.difficulties || []);
 
         idToSongMap.set(docSnap.id, { 
           ...data,
