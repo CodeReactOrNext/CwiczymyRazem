@@ -4,9 +4,10 @@ interface DashboardStatsProps {
   totalSongs: number;
   missingCovers: number;
   unverifiedCount: number;
+  noRatingCount: number;
 }
 
-export const DashboardStats = ({ totalSongs, missingCovers, unverifiedCount }: DashboardStatsProps) => {
+export const DashboardStats = ({ totalSongs, missingCovers, unverifiedCount, noRatingCount }: DashboardStatsProps) => {
   const stats = [
     {
       label: "Total Songs",
@@ -26,13 +27,20 @@ export const DashboardStats = ({ totalSongs, missingCovers, unverifiedCount }: D
       label: "Unverified",
       value: unverifiedCount,
       icon: ShieldCheck,
+      color: "text-red-500",
+      bgColor: "bg-red-500/10",
+    },
+    {
+      label: "No Rating",
+      value: noRatingCount,
+      icon: AlertTriangle,
       color: "text-purple-500",
       bgColor: "bg-purple-500/10",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
         <div key={stat.label} className="group relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-md transition-all hover:bg-zinc-900/60">
           <div className="flex items-center gap-4">

@@ -165,9 +165,6 @@ const RatingPopUp = ({
 
             {categoriesWithPoints.length > 0 && (
               <div className='mb-6 mt-4 sm:mb-8 sm:mt-6'>
-                <h3 className='mb-4 rounded-lg border border-main-300/20 bg-gradient-to-r from-main-300/20 via-main-300/5 to-transparent px-4 py-3 font-openSans text-base font-semibold text-white shadow-sm sm:text-lg'>
-                  {t("rating_popup.spend_skill_points")}
-                </h3>
                 <SkillMiniTree highlightCategories={categoriesWithPoints} />
               </div>
             )}

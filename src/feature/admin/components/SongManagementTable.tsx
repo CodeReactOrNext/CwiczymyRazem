@@ -4,6 +4,7 @@ import { Input } from "assets/components/ui/input";
 import { Music, CheckCircle2, ShieldCheck, XCircle, Edit2, Loader2, Save, ChevronLeft, ChevronRight, RefreshCw, Search } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { useState } from "react";
+import { StarRating } from "./StarRating";
 
 interface SongManagementTableProps {
   songs: Song[];
@@ -17,6 +18,7 @@ interface SongManagementTableProps {
   isEnrichingBySong: Record<string, boolean>;
   onCancel: () => void;
   onFieldChange: (field: "title" | "artist" | "avgDifficulty", value: string) => void;
+  onQuickRate?: (songId: string, rating: number) => void;
   isLoading?: boolean;
 }
 
@@ -32,6 +34,7 @@ export const SongManagementTable = ({
   isEnrichingBySong,
   onCancel,
   onFieldChange,
+  onQuickRate,
   isLoading
 }: SongManagementTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -134,9 +137,20 @@ export const SongManagementTable = ({
                       />
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center group/rating relative">
                        <span className="text-xs font-black text-cyan-400">{song.avgDifficulty?.toFixed(1) || "0.0"}</span>
-                       <span className="text-[7px] font-bold text-zinc-600 uppercase">Rating</span>
+                       
+                       {/* Quick Rating on Hover/Focus */}
+                       <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 opacity-0 group-hover/rating:opacity-100 pointer-events-none group-hover/rating:pointer-events-auto transition-all duration-300 z-50 w-max">
+                          <div className="flex flex-col items-center bg-zinc-900/90 backdrop-blur-md border border-white/10 p-3 rounded-xl shadow-2xl">
+                              <p className="mb-2 text-[9px] font-bold uppercase tracking-widest text-zinc-500">Quick Rate</p>
+                              <StarRating 
+                                rating={song.avgDifficulty || 0} 
+                                onRate={(r) => onQuickRate?.(song.id, r)} 
+                                max={10}
+                              />
+                          </div>
+                       </div>
                     </div>
                   )}
                 </div>
