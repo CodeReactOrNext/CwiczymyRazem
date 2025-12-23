@@ -9,6 +9,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+import { trackedGetDoc, trackedSetDoc } from "utils/firebase/client/firestoreTracking";
 
 
 
@@ -24,7 +25,7 @@ export const firebaseAddSongsLog = async (
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
-  const userSnapshot = await getDoc(userDocRef);
+  const userSnapshot = await trackedGetDoc(userDocRef);
   const userName = userSnapshot.data()!.displayName;
 
   const logData = {
@@ -37,7 +38,7 @@ export const firebaseAddSongsLog = async (
     avatarUrl,
   };
 
-  await setDoc(logsDocRef, logData);
+  await trackedSetDoc(logsDocRef, logData);
 
   try {
     const discordMessage = await formatDiscordMessage({
