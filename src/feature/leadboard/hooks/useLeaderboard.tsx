@@ -1,6 +1,7 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
 import { logger } from "feature/logger/Logger";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { SeasonDataInterface } from "types/api.types";
@@ -26,8 +27,8 @@ interface UseLeaderboardReturn {
   seasons: SeasonDataInterface[];
   selectedSeason: string;
   handlePageChange: (page: number) => void;
-  handleViewChange: (isSeasonalView: boolean) => Promise<void>;
-  handleSeasonChange: (seasonId: string) => Promise<void>;
+  handleViewChange: (isSeasonalView: boolean) => void;
+  handleSeasonChange: (seasonId: string) => void;
 }
 
 export const useLeaderboard = ({
@@ -36,180 +37,93 @@ export const useLeaderboard = ({
   defaultView = "all-time",
 }: UseLeaderboardProps): UseLeaderboardReturn => {
   const { t } = useTranslation("leadboard");
+  const queryClient = useQueryClient();
 
-  const [usersData, setUsersData] = useState<FirebaseUserDataInterface[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [totalUsers, setTotalUsers] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isSeasonalView, setIsSeasonalView] = useState(
-    defaultView === "seasonal"
-  );
-  const [seasons, setSeasons] = useState<SeasonDataInterface[]>([]);
+  const [isSeasonalView, setIsSeasonalView] = useState(defaultView === "seasonal");
   const [selectedSeason, setSelectedSeason] = useState<string>("");
-
   const [pageCursors, setPageCursors] = useState<{ [key: number]: any }>({ 1: null });
 
-  const loadGlobalLeaderboard = async (page: number) => {
-    try {
-      setIsLoading(true);
-      const cursor = pageCursors[page];
-      const response = await getGlobalLeaderboard(
-        initialSortBy,
-        itemsPerPage,
-        cursor
-      );
-      
-      setUsersData(response.users);
-      setTotalUsers(response.totalUsers);
-      
-      if (response.lastVisible) {
-        setPageCursors(prev => ({
-          ...prev,
-          [page + 1]: response.lastVisible
-        }));
-      }
-    } catch (error) {
-      logger.error(error, {
-        context: "loadGlobalLeaderboard",
-      });
-      toast.error(t("fetch_error"));
-    } finally {
-      setIsLoading(false);
+  // 1. Fetch Seasons
+  const { data: seasonsData = { seasons: [], currentSeasonId: "" } } = useQuery({
+    queryKey: ["leaderboard", "seasons"],
+    queryFn: async () => {
+      const [seasons, current] = await Promise.all([
+        getAvailableSeasons(),
+        getCurrentSeason(),
+      ]);
+      return { seasons, currentSeasonId: current.seasonId };
+    },
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+  });
+
+  const seasons = seasonsData.seasons;
+
+  useEffect(() => {
+    if (seasonsData.currentSeasonId && !selectedSeason) {
+      setSelectedSeason(seasonsData.currentSeasonId);
     }
-  };
+  }, [seasonsData.currentSeasonId]);
 
-  const loadSeasonalLeaderboard = async (seasonId: string, page: number) => {
-    try {
-      setIsLoading(true);
-      const cursor = pageCursors[page];
-      const response = await getSeasonalLeaderboard(
-        seasonId,
-        initialSortBy,
-        itemsPerPage,
-        cursor
-      );
-
-      if (response) {
-        const mappedUsers = (response.users || []).map((user: FirebaseUserDataInterface) => ({
-          ...user,
-          createdAt: new Date(),
-          songLists: [],
-        }));
-
-        if (response.users && response.users.length > 0) {
-          setUsersData(mappedUsers as any);
-          setTotalUsers(response.totalUsers || 0);
-          
-          if (response.lastVisible) {
-            setPageCursors(prev => ({
-              ...prev,
-              [page + 1]: response.lastVisible
-            }));
-          }
-        } else {
-          setUsersData([]);
-          setTotalUsers(0);
-          toast(t("no_seasonal_data"));
-        }
+  // 2. Fetch Leaderboard Data
+  const { data: leaderboardData, isLoading: isLeaderboardLoading } = useQuery({
+    queryKey: ["leaderboard", isSeasonalView ? "seasonal" : "global", selectedSeason, initialSortBy, currentPage],
+    queryFn: async () => {
+      const cursor = pageCursors[currentPage];
+      if (isSeasonalView) {
+        if (!selectedSeason) return null;
+        return getSeasonalLeaderboard(selectedSeason, initialSortBy, itemsPerPage, cursor);
       }
-    } catch {
-      toast(t("fetch_error"));
-      setUsersData([]);
-      setTotalUsers(0);
-    } finally {
-      setIsLoading(false);
+      return getGlobalLeaderboard(initialSortBy, itemsPerPage, cursor);
+    },
+    enabled: !isSeasonalView || !!selectedSeason,
+  });
+
+  // Track next page cursor
+  useEffect(() => {
+    if (leaderboardData?.lastVisible) {
+      setPageCursors(prev => ({
+        ...prev,
+        [currentPage + 1]: leaderboardData.lastVisible
+      }));
     }
-  };
+  }, [leaderboardData, currentPage]);
+
+  const usersData = useMemo(() => {
+    if (!leaderboardData?.users) return [];
+    if (isSeasonalView) {
+      return leaderboardData.users.map((user: any) => ({
+        ...user,
+        createdAt: new Date(),
+        songLists: [],
+      }));
+    }
+    return leaderboardData.users;
+  }, [leaderboardData, isSeasonalView]);
 
   const handlePageChange = (page: number) => {
-    // If we are jumping forward to a page we don't have a cursor for,
-    // we have to reset or handle intermediate. For simplicity and cost,
-    // we'll reset if jump is too big or handle it in the service if needed.
-    // In this UI, usually people go page by page.
     setCurrentPage(page);
-    if (isSeasonalView && selectedSeason) {
-      loadSeasonalLeaderboard(selectedSeason, page);
-    } else {
-      loadGlobalLeaderboard(page);
-    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleViewChange = async (newIsSeasonalView: boolean) => {
-    try {
-      setIsLoading(true);
-      setIsSeasonalView(newIsSeasonalView);
-      setCurrentPage(1);
-      setPageCursors({ 1: null });
-
-      if (newIsSeasonalView && selectedSeason) {
-        await loadSeasonalLeaderboard(selectedSeason, 1);
-      } else {
-        await loadGlobalLeaderboard(1);
-      }
-    } catch {
-      toast(t("view_change_error"));
-    } finally {
-      setIsLoading(false);
-    }
+  const handleViewChange = (newIsSeasonalView: boolean) => {
+    setIsSeasonalView(newIsSeasonalView);
+    setCurrentPage(1);
+    setPageCursors({ 1: null });
   };
 
-  const handleSeasonChange = async (newSeasonId: string) => {
-    try {
-      if (newSeasonId === selectedSeason) {
-        return;
-      }
-
-      setIsLoading(true);
+  const handleSeasonChange = (newSeasonId: string) => {
+    if (newSeasonId !== selectedSeason) {
       setSelectedSeason(newSeasonId);
       setCurrentPage(1);
       setPageCursors({ 1: null });
-      await loadSeasonalLeaderboard(newSeasonId, 1);
-    } catch {
-      toast(t("season_change_error"));
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    const initializeSeasons = async () => {
-      try {
-        const [seasonsData, currentSeason] = await Promise.all([
-          getAvailableSeasons(),
-          getCurrentSeason(),
-        ]);
-
-        if (seasonsData.length > 0) {
-          setSeasons(seasonsData);
-          const activeSeason = currentSeason.seasonId;
-          setSelectedSeason(activeSeason);
-
-          if (isSeasonalView) {
-            await loadSeasonalLeaderboard(activeSeason, 1);
-          }
-        }
-      } catch {
-        toast(t("seasons_fetch_error"));
-      }
-    };
-
-    initializeSeasons();
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-    if (isSeasonalView && selectedSeason) {
-      loadSeasonalLeaderboard(selectedSeason, 1);
-    } else {
-      loadGlobalLeaderboard(1);
-    }
-  }, []);
-
   return {
     usersData,
-    isLoading,
-    totalUsers,
+    isLoading: isLeaderboardLoading,
+    totalUsers: leaderboardData?.totalUsers || 0,
     currentPage,
     isSeasonalView,
     seasons,

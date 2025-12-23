@@ -49,7 +49,13 @@ const logStats = (type: string, path: string, isCacheHit = false) => {
 };
 
 export const trackedGetDocs = async <T = firestore.DocumentData>(q: firestore.Query<T>): Promise<firestore.QuerySnapshot<T>> => {
+  if (q instanceof Promise || (q && typeof (q as any).then === 'function')) {
+    console.error("trackedGetDocs received a Promise instead of a Query object!", q);
+    throw new Error("trackedGetDocs received a Promise instead of a Query object");
+  }
+
   const path = getQueryPath(q);
+  console.log(`[Firestore.DEBUG] trackedGetDocs path: ${path}`, q);
 
   // 1. Check Short-term Cache
   const cached = queryCache.get(path);
@@ -81,7 +87,13 @@ export const trackedGetDocs = async <T = firestore.DocumentData>(q: firestore.Qu
 };
 
 export const trackedGetDoc = async <T = firestore.DocumentData>(docRef: firestore.DocumentReference<T>): Promise<firestore.DocumentSnapshot<T>> => {
+  if (docRef instanceof Promise || (docRef && typeof (docRef as any).then === 'function')) {
+    console.error("trackedGetDoc received a Promise instead of a DocumentReference!", docRef);
+    throw new Error("trackedGetDoc received a Promise instead of a DocumentReference");
+  }
+
   const path = docRef.path;
+  console.log(`[Firestore.DEBUG] trackedGetDoc path: ${path}`, docRef);
 
   // 1. Check Short-term Cache
   const cached = docCache.get(path);
