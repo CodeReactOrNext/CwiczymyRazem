@@ -125,6 +125,7 @@ const AdminDashboard = () => {
               }))
             }}
             onQuickRate={handleQuickRate}
+            onDelete={handleDelete}
             isLoading={isLoading}
           />
         </div>

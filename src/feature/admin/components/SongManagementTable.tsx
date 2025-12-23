@@ -1,7 +1,7 @@
 import { Song } from "feature/songs/types/songs.type";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
-import { Music, CheckCircle2, ShieldCheck, XCircle, Edit2, Loader2, Save, ChevronLeft, ChevronRight, RefreshCw, Search } from "lucide-react";
+import { Music, CheckCircle2, ShieldCheck, XCircle, Edit2, Loader2, Save, ChevronLeft, ChevronRight, RefreshCw, Search, Trash2 } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { useState } from "react";
 import { StarRating } from "./StarRating";
@@ -19,6 +19,7 @@ interface SongManagementTableProps {
   onCancel: () => void;
   onFieldChange: (field: "title" | "artist" | "avgDifficulty", value: string) => void;
   onQuickRate?: (songId: string, rating: number) => void;
+  onDelete?: (songId: string) => void;
   isLoading?: boolean;
 }
 
@@ -35,6 +36,7 @@ export const SongManagementTable = ({
   onCancel,
   onFieldChange,
   onQuickRate,
+  onDelete,
   isLoading
 }: SongManagementTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -241,6 +243,15 @@ export const SongManagementTable = ({
                         className="h-8 w-8 rounded-full transition-colors hover:bg-white/10 hover:text-white"
                       >
                         <Edit2 className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button 
+                        onClick={() => onDelete?.(song.id)}
+                        variant="ghost" 
+                        size="icon" 
+                        title="Delete Song"
+                        className="h-8 w-8 rounded-full transition-colors hover:bg-red-500/10 hover:text-red-500 text-zinc-600"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   )}
