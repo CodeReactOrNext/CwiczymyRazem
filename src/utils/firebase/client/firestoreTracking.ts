@@ -12,19 +12,18 @@ const inFlightDocs = new Map<string, Promise<any>>();
 const queryCache = new Map<string, { data: any, timestamp: number }>();
 const inFlightQueries = new Map<string, Promise<any>>();
 const CACHE_TTL = 5000; // 5 seconds
+const queryKeyMap = new WeakMap<any, string>();
+let queryCounter = 0;
 
 const getQueryPath = (q: any): string => {
   if (q.path) return q.path;
-  // Handle various internal Firestore query structures
-  const path = q._query?.path?.segments?.join('/') ||
-    q.query?._query?.path?.segments?.join('/') ||
-    q.converter?._query?.path?.segments?.join('/') ||
-    'unknown-query';
 
-  // Try to append some query info to distinguish different queries on same path
-  const limit = q._query?.limit?.value || '';
-  const filters = q._query?.filters?.length || 0;
-  return filters > 0 || limit ? `${path} [filt:${filters}, lim:${limit}]` : path;
+  let key = queryKeyMap.get(q);
+  if (!key) {
+    key = `query-${++queryCounter}`;
+    queryKeyMap.set(q, key);
+  }
+  return key;
 };
 
 const logStats = (type: string, path: string, isCacheHit = false) => {
@@ -55,7 +54,7 @@ export const trackedGetDocs = async <T = firestore.DocumentData>(q: firestore.Qu
   }
 
   const path = getQueryPath(q);
-  console.log(`[Firestore.DEBUG] trackedGetDocs path: ${path}`, q);
+  console.log(`[Firestore.DEBUG] trackedGetDocs path: ${path}`);
 
   // 1. Check Short-term Cache
   const cached = queryCache.get(path);
@@ -93,7 +92,7 @@ export const trackedGetDoc = async <T = firestore.DocumentData>(docRef: firestor
   }
 
   const path = docRef.path;
-  console.log(`[Firestore.DEBUG] trackedGetDoc path: ${path}`, docRef);
+  console.log(`[Firestore.DEBUG] trackedGetDoc path: ${path}`);
 
   // 1. Check Short-term Cache
   const cached = docCache.get(path);

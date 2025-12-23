@@ -1,7 +1,7 @@
 import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
 import { logger } from "feature/logger/Logger";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
-import { firebaseGetUsersExceriseRaport } from "utils/firebase/client/firebase.utils";
+import { firebaseGetUsersExerciseReport } from "utils/firebase/client/firebase.utils";
 import { memoryCache } from "utils/cache/memoryCache";
 
 import { getTotalUsersCount } from "./getTotalUsersCount";
@@ -26,7 +26,7 @@ export const getGlobalLeaderboard = async (
     }
 
     const [usersResponse, totalCount] = await Promise.all([
-      firebaseGetUsersExceriseRaport(sortBy, itemsPerPage, lastVisible),
+      firebaseGetUsersExerciseReport(sortBy, itemsPerPage, lastVisible),
       getTotalUsersCount(),
     ]);
 
