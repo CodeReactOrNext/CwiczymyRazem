@@ -2,29 +2,29 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import type { Song } from "feature/songs/types/songs.type";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useAdminSongs = (password: string) => {
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<"all" | "unverified" | "no-cover" | "no-rating">("all");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ title: "", artist: "", avgDifficulty: 0 });
 
-  const fetchSongs = useCallback(async (pass = password) => {
-    if (!pass) return;
-    setIsLoading(true);
-    try {
+  const { data: songs = [], isLoading, refetch: fetchSongs } = useQuery({
+    queryKey: ["admin-songs", password],
+    queryFn: async () => {
       const res = await axios.get("/api/admin/songs", {
-        headers: { "x-admin-password": pass }
+        headers: { "x-admin-password": password }
       });
-      setSongs(res.data);
-    } catch (error) {
-      toast.error("Sync failed");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [password]);
+      return res.data as Song[];
+    },
+    enabled: !!password,
+  });
+
+  const invalidateSongs = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-songs"] });
+  };
 
   const handleSave = async (songId: string) => {
     try {
@@ -33,7 +33,7 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: editForm
       });
-      setSongs(prev => prev.map(s => s.id === songId ? { ...s, ...editForm } : s));
+      invalidateSongs();
       setEditingId(null);
       toast.success("Changes saved");
     } catch (error) {
@@ -48,7 +48,7 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: { isVerified: true }
       });
-      setSongs(prev => prev.map(s => s.id === songId ? { ...s, isVerified: true } : s));
+      invalidateSongs();
       toast.success("Song marked as verified");
     } catch (error) {
       toast.error("Verification update failed");
@@ -62,7 +62,7 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: { avgDifficulty: rating, isVerified: true }
       });
-      setSongs(prev => prev.map(s => s.id === songId ? { ...s, avgDifficulty: rating, isVerified: true } : s));
+      invalidateSongs();
       toast.success(`Song rated ${rating}`);
     } catch (error) {
       toast.error("Rating failed");
@@ -70,18 +70,15 @@ export const useAdminSongs = (password: string) => {
   };
 
   const handleBulkAdd = async (bulkSongs: any[]) => {
-    setIsLoading(true);
     try {
       const response = await axios.post("/api/admin/songs", {
         password,
         bulkSongs
       });
       toast.success(response.data.message || `Bulk add successful: ${bulkSongs.length} songs`);
-      await fetchSongs();
+      invalidateSongs();
     } catch (error) {
       toast.error("Bulk add failed");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -92,7 +89,7 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: { coverUrl, isVerified: true }
       });
-      setSongs(prev => prev.map(s => s.id === songId ? { ...s, coverUrl, isVerified: true } : s));
+      invalidateSongs();
       toast.success("Cover updated successfully");
     } catch (error) {
       toast.error("Failed to update cover");
@@ -105,7 +102,7 @@ export const useAdminSongs = (password: string) => {
       await axios.delete(`/api/admin/songs?songId=${songId}`, {
         headers: { "x-admin-password": password }
       });
-      setSongs(prev => prev.filter(s => s.id !== songId));
+      invalidateSongs();
       toast.success("Song deleted");
     } catch (error) {
       toast.error("Failed to delete song");
@@ -132,7 +129,7 @@ export const useAdminSongs = (password: string) => {
 
   return {
     songs,
-    setSongs,
+    setSongs: () => { }, // No longer needed as state managed by react-query
     isLoading,
     searchTerm,
     setSearchTerm,

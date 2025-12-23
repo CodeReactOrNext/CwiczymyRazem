@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APIKEY,
@@ -9,4 +9,10 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APPID,
 };
 
-export const firebaseApp = initializeApp(firebaseConfig);
+// Safety check for build environment without valid API key
+const isConfigValid = !!firebaseConfig.apiKey;
+
+export const firebaseApp =
+  getApps().length > 0
+    ? getApp()
+    : initializeApp(isConfigValid ? firebaseConfig : { ...firebaseConfig, apiKey: "dummy-key-for-build" });

@@ -11,6 +11,9 @@ import { Provider } from "react-redux";
 import { Toaster } from "sonner";
 import { store } from "store/store";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useState } from "react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,9 +35,21 @@ const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {
 }
 
 const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000,
+        gcTime: 5 * 60 * 1000,
+        retry: 1,
+        refetchOnWindowFocus: false,
+      },
+    },
+  }));
+
   return (
     <SessionProvider session={session}>
       <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
         
         <Head>
           <meta name='viewport' content='initial-scale=1.0, width=device-width' />
@@ -67,7 +82,9 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppProps) =>
                 <Component {...pageProps} />
              </main>
           </AuthSyncWrapper>
+          <ReactQueryDevtools initialIsOpen={false} />
         </ThemeModeProvider>
+      </QueryClientProvider>
       </Provider>
     </SessionProvider>
   );

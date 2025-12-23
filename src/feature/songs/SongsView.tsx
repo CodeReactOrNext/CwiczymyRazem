@@ -53,7 +53,6 @@ const SongsView = () => {
   const {
     page,
     isLoading,
-    loadSongs,
     userSongs,
     totalPages,
     hasFilters,
@@ -68,16 +67,18 @@ const SongsView = () => {
     setDifficultyFilter,
     tierFilters,
     setTierFilters,
-    setUserSongs,
+    handleStatusUpdate,
+    getSongStatus,
     refreshSongs,
     refreshSongsWithoutLoading,
-    debounceLoading,
-    genreFilters,
-    setGenreFilters,
+    songs,
     sortBy,
     setSortBy,
     sortDirection,
     setSortDirection,
+    debounceLoading,
+    genreFilters,
+    setGenreFilters,
   } = useSongs();
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
@@ -111,7 +112,7 @@ const SongsView = () => {
                <SongLearningSection
                 isLanding={false}
                 userSongs={userSongs}
-                onChange={setUserSongs}
+                onChange={handleStatusUpdate}
                 onStatusChange={refreshSongs}
               />
               </div>
@@ -255,7 +256,7 @@ const SongsView = () => {
         <AddSongModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSuccess={loadSongs}
+          onSuccess={handleStatusUpdate}
         />
       </div>
     </MainContainer>
