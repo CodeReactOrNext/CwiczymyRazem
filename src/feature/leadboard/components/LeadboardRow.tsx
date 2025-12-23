@@ -46,11 +46,12 @@ export const LeadboardRow = ({
   return (
     <li className='w-full'>
       <div
-        className={`relative overflow-hidden rounded-2xl border backdrop-blur-md transition-all duration-300 ${
+        className={cn(
+          "relative overflow-hidden radius-premium glass-card transition-background",
           profileId === currentUserId
             ? "border-cyan-500/30 bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20 shadow-lg shadow-cyan-500/10"
-            : "border-white/5 bg-zinc-900/40 shadow-xl shadow-black/20 hover:border-white/10"
-        }`}>
+            : "shadow-xl shadow-black/20 hover:glass-card-hover"
+        )}>
         {/* Background Pattern */}
         <div className='absolute inset-0 opacity-[0.03] transition-opacity duration-300 group-hover:opacity-[0.06]'>
           <div

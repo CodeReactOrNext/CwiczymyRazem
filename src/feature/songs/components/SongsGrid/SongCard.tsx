@@ -33,8 +33,8 @@ export const SongCard = ({
     <div 
       onClick={onOpenDetails}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-zinc-900/40 p-5 backdrop-blur-md transition-all duration-500 cursor-pointer",
-        "border-white/5 hover:border-white/10 hover:shadow-xl hover:shadow-black/40 hover:-translate-y-0.5 active:scale-[0.99]"
+        "group relative flex flex-col justify-between overflow-hidden radius-premium glass-card p-5 transition-background click-behavior cursor-pointer",
+        "hover:glass-card-hover hover:shadow-xl hover:shadow-black/40"
       )}
     >
       {/* Glassmorphism Depth Borders */}
@@ -46,7 +46,7 @@ export const SongCard = ({
           <img 
             src={song.coverUrl} 
             alt=""
-            className="h-full w-full object-cover blur-[55px] saturate-[1.1] scale-[1.2] transition-transform duration-1000 group-hover:scale-[1.4]"
+            className="h-full w-full object-cover blur-premium saturate-[1.1] scale-[1.2] transition-transform duration-1000 group-hover:scale-[1.4]"
           />
           <div className="absolute inset-0 bg-zinc-950/30" />
         </div>
@@ -142,7 +142,7 @@ export const SongCard = ({
               onOpenDetails();
             }}
             variant="outline"
-            className="h-8 w-full group/btn justify-between rounded-xl border-white/5 bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-all hover:bg-white/10 hover:text-white hover:border-white/10"
+            className="h-8 w-full group/btn justify-between radius-default border-white/5 bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-background hover:bg-white/10 hover:text-white"
           >
             <span>Open details</span>
             <Settings2 className="h-3.5 w-3.5 opacity-40 transition-transform group-hover/btn:rotate-90" />

@@ -8,6 +8,7 @@ import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.t
 import SeasonSelect from "./SeasonSelect";
 import UserStats from "./UserStats";
 import ViewToggle from "./ViewToggle";
+import { TableSkeleton } from "assets/components/ui/table-skeleton";
 
 export type SortByType = "points" | "sessionCount";
 
@@ -45,19 +46,7 @@ export const LeadboardLayout = ({
 
   const renderLeaderboardContent = () => {
     if (isLoading) {
-      return (
-        <div className='flex h-[50vh] items-center justify-center'>
-          <div className='text-center'>
-            <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-zinc-600 border-t-cyan-400'></div>
-            <p className='text-lg font-medium text-zinc-300'>
-              Ładowanie rankingu...
-            </p>
-            <p className='text-sm text-zinc-500'>
-              Pobieranie danych użytkowników
-            </p>
-          </div>
-        </div>
-      );
+      return <TableSkeleton rows={itemsPerPage} />;
     }
 
     if (!usersData.length) {
