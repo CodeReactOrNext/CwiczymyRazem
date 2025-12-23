@@ -22,8 +22,10 @@ const getAverageDifficulty = (difficulties: { rating: number }[]) => {
 };
 
 export const getUserSongs = async (userId: string) => {
+  console.log(`[getUserSongs.DEBUG] userId: ${userId}`);
   const userDocRef = doc(db, "users", userId);
   const userSongsRef = collection(userDocRef, "userSongs");
+  console.log(`[getUserSongs.DEBUG] userSongsRef:`, userSongsRef);
 
   try {
     const userSongsSnapshot = await trackedGetDocs(userSongsRef);
@@ -50,12 +52,11 @@ export const getUserSongs = async (userId: string) => {
     }
 
     const songsRef = collection(db, "songs");
-    const fullSongsPromises = songChunks.map((chunk) => {
-      const q = query(songsRef, where(documentId(), "in", chunk));
-      return getDocs(q);
+    const fullSongsQueries = songChunks.map((chunk) => {
+      return query(songsRef, where(documentId(), "in", chunk));
     });
 
-    const fullSongsSnapshots = await Promise.all(fullSongsPromises.map(p => trackedGetDocs(p as any)));
+    const fullSongsSnapshots = await Promise.all(fullSongsQueries.map(q => trackedGetDocs(q)));
     const idToSongMap = new Map<string, Song>();
 
     fullSongsSnapshots.forEach((snap) => {
