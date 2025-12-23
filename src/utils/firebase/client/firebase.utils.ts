@@ -96,37 +96,18 @@ export const firebaseGetUserAvatarURL = async () => {
 
 export const firebaseGetUsersExceriseRaport = async (
   sortBy: SortByType,
-  page: number,
-  itemsPerPage: number
+  itemsPerPage: number,
+  lastVisible?: any
 ) => {
   try {
-    let q;
+    let q = query(
+      collection(db, "users"),
+      orderBy(`statistics.${sortBy}`, "desc"),
+      limit(itemsPerPage)
+    );
 
-    if (page === 1) {
-      // First page query
-      q = query(
-        collection(db, "users"),
-        orderBy(`statistics.${sortBy}`, "desc"),
-        limit(itemsPerPage)
-      );
-    } else {
-      // Get the last document from the previous page
-      const lastVisibleDoc = await getDocumentAtIndex(
-        sortBy,
-        (page - 1) * itemsPerPage
-      );
-
-      if (!lastVisibleDoc) {
-        throw new Error("Could not find the reference document");
-      }
-
-      // Query after the last document
-      q = query(
-        collection(db, "users"),
-        orderBy(`statistics.${sortBy}`, "desc"),
-        startAfter(lastVisibleDoc),
-        limit(itemsPerPage)
-      );
+    if (lastVisible) {
+      q = query(q, startAfter(lastVisible));
     }
 
     const querySnapshot = await getDocs(q);
@@ -138,6 +119,7 @@ export const firebaseGetUsersExceriseRaport = async (
 
     return {
       users,
+      lastVisible: querySnapshot.docs[querySnapshot.docs.length - 1],
       hasMore: users.length === itemsPerPage,
     };
   } catch (error) {

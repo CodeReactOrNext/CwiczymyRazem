@@ -7,6 +7,7 @@ import {
   limit,
   orderBy,
   query,
+  startAfter,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { memoryCache } from "utils/cache/memoryCache";
@@ -14,11 +15,11 @@ import { memoryCache } from "utils/cache/memoryCache";
 export const getSeasonalLeaderboard = async (
   seasonId: string,
   sortBy: SortByType,
-  page: number,
-  itemsPerPage: number
+  itemsPerPage: number,
+  lastVisible?: any
 ) => {
   try {
-    const cacheKey = `seasonal:${seasonId}:${sortBy}:${page}:${itemsPerPage}`;
+    const cacheKey = `seasonal:${seasonId}:${sortBy}:${itemsPerPage}:${lastVisible?.id || 'start'}`;
     
     const cached = memoryCache.get(cacheKey);
     if (cached) {
@@ -37,11 +38,15 @@ export const getSeasonalLeaderboard = async (
       return { users: [], totalUsers: 0 };
     }
 
-    const q = query(
+    let q = query(
       seasonalUsersRef,
       orderBy(sortBy, "desc"),
       limit(itemsPerPage)
     );
+
+    if (lastVisible) {
+      q = query(q, startAfter(lastVisible));
+    }
 
     const querySnapshot = await getDocs(q);
 
@@ -71,6 +76,7 @@ export const getSeasonalLeaderboard = async (
     const result = {
       users,
       totalUsers: total,
+      lastVisible: querySnapshot.docs[querySnapshot.docs.length - 1],
     };
 
     memoryCache.set(cacheKey, result, 24 * 60 * 60 * 1000);
