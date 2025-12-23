@@ -23,6 +23,8 @@ import {
   startAfter,
   Timestamp,
   updateDoc,
+  where,
+  enableIndexedDbPersistence,
 } from "firebase/firestore";
 import { getStorage, } from "firebase/storage";
 
@@ -46,6 +48,13 @@ export const firebaseSignInWithCredential = (credential: any) =>
   signInWithCredential(auth, credential);
 
 export const db = getFirestore(firebaseApp);
+
+enableIndexedDbPersistence(db).catch((err) => {
+  if (err.code === 'failed-precondition') {
+  } else if (err.code === 'unimplemented') {
+  }
+});
+
 export const storage = getStorage(firebaseApp);
 
 export const firebaseSignInWithEmail = (email: string, password: string) =>
@@ -142,14 +151,13 @@ export const firebaseGetUsersExceriseRaport = async (
 export const firebaseCheckUsersNameIsNotUnique = async (
   displayName: string
 ) => {
-  const usersDocRef = await getDocs(collection(db, "users"));
-  const usersDataArr: FirebaseUserDataInterface[] = [];
-  usersDocRef.forEach((doc) => {
-    let currentUserData = doc.data() as FirebaseUserDataInterface;
-    currentUserData.profileId = doc.id;
-    usersDataArr.push(currentUserData);
-  });
-  return usersDataArr.some((user) => user.displayName === displayName);
+  const q = query(
+    collection(db, "users"),
+    where("displayName", "==", displayName),
+    limit(1)
+  );
+  const snapshot = await getDocs(q);
+  return !snapshot.empty;
 };
 
 export const firebaseGetUserDocument = async (userAuth: string) => {

@@ -8,6 +8,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+import { memoryCache } from "utils/cache/memoryCache";
 
 const getAverageDifficulty = (difficulties: { rating: number }[]) => {
   if (!difficulties?.length) return 0;
@@ -28,22 +29,38 @@ export const getSongs = async (
   genreFilters?: string[]
 ) => {
   try {
+    const hasFilters =
+      searchQuery ||
+      (tierFilters && tierFilters.length > 0) ||
+      (difficultyFilter && difficultyFilter !== "all") ||
+      (genreFilters && genreFilters.length > 0);
+
+    const cacheKey = JSON.stringify({
+      sortBy,
+      sortDirection,
+      page,
+      itemsPerPage,
+    });
+
+    if (!hasFilters) {
+      const cached = memoryCache.get(cacheKey);
+      if (cached) {
+        return cached;
+      }
+    }
+
     const songsRef = collection(db, "songs");
     let q = query(songsRef);
 
-    // 0. Base Filtering (Firestore-Native)
-    // We only do simple filters on DB to avoid complex index requirements for multi-select
     if (difficultyFilter && difficultyFilter !== "all") {
       if (difficultyFilter === "easy") q = query(q, where("avgDifficulty", "<=", 4));
       else if (difficultyFilter === "medium") q = query(q, where("avgDifficulty", ">", 4), where("avgDifficulty", "<=", 7));
       else if (difficultyFilter === "hard") q = query(q, where("avgDifficulty", ">", 7));
     }
 
-    // 1. Fetch Candidates
     const snapshot = await getDocs(q);
     let songs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Song));
 
-    // 2. Client-side Multi-select Filtering (Tier)
     if (tierFilters && tierFilters.length > 0) {
       songs = songs.filter(song => {
         const diff = song.avgDifficulty ?? 0;
@@ -58,16 +75,13 @@ export const getSongs = async (
       });
     }
 
-    // 3. Client-side Multi-select Filtering (Genre)
     if (genreFilters && genreFilters.length > 0) {
       songs = songs.filter(song => {
         if (!song.genres || !song.genres.length) return false;
-        // Check if item has ANY of the selected genres
         return genreFilters.some(g => song.genres?.includes(g));
       });
     }
 
-    // Background Hydration: update documents missing helper fields or search_string
     songs.forEach((song) => {
       const title = song.title || "";
       const artist = song.artist || "";
@@ -82,14 +96,12 @@ export const getSongs = async (
           search_string: searchStr
         }).catch(err => console.error("Hyration failure:", err));
 
-        // Update current object
         song.avgDifficulty = avg;
         song.title_lowercase = title.toLowerCase();
         song.search_string = searchStr;
       }
     });
 
-    // 4. Client-side Search Filtering
     if (searchQuery) {
       const lowerSearch = searchQuery.toLowerCase();
       songs = songs.filter(song => {
@@ -99,13 +111,10 @@ export const getSongs = async (
       });
     }
 
-    // 5. Client-side Sorting & Paging
-    // We do sorting here to handle cases where we can't do it on DB (e.g. combined filters without index)
     songs.sort((a: any, b: any) => {
       let valA = a[sortBy];
       let valB = b[sortBy];
 
-      // Handle specific fields
       if (sortBy === 'popularity' || sortBy === 'avgDifficulty') {
         valA = typeof valA === 'number' ? valA : 0;
         valB = typeof valB === 'number' ? valB : 0;
@@ -127,12 +136,22 @@ export const getSongs = async (
     const startIndex = (page - 1) * itemsPerPage;
     const pagedSongs = songs.slice(startIndex, startIndex + itemsPerPage);
 
-    return {
+    const result = {
       songs: pagedSongs,
       total,
     };
+
+    if (!hasFilters) {
+      memoryCache.set(cacheKey, result, 5 * 60 * 1000);
+    }
+
+    return result;
   } catch (error) {
     console.error("Error getting songs:", error);
     throw error;
   }
+};
+
+export const invalidateSongsCache = () => {
+  memoryCache.clear('songs');
 };
