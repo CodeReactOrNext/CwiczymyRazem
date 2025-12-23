@@ -6,6 +6,7 @@ import {
   where,
   updateDoc,
   doc,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { memoryCache } from "utils/cache/memoryCache";
@@ -56,6 +57,8 @@ export const getSongs = async (
       if (difficultyFilter === "easy") q = query(q, where("avgDifficulty", "<=", 4));
       else if (difficultyFilter === "medium") q = query(q, where("avgDifficulty", ">", 4), where("avgDifficulty", "<=", 7));
       else if (difficultyFilter === "hard") q = query(q, where("avgDifficulty", ">", 7));
+
+      q = query(q, orderBy("avgDifficulty", "asc"));
     }
 
     const snapshot = await getDocs(q);
@@ -81,26 +84,6 @@ export const getSongs = async (
         return genreFilters.some(g => song.genres?.includes(g));
       });
     }
-
-    songs.forEach((song) => {
-      const title = song.title || "";
-      const artist = song.artist || "";
-      const searchStr = `${title} ${artist}`.toLowerCase();
-
-      if (song.avgDifficulty === undefined || song.title_lowercase === undefined || song.search_string === undefined) {
-        const avg = getAverageDifficulty(song.difficulties || []);
-        updateDoc(doc(db, "songs", song.id), {
-          avgDifficulty: avg,
-          title_lowercase: title.toLowerCase(),
-          artist_lowercase: artist.toLowerCase(),
-          search_string: searchStr
-        }).catch(err => console.error("Hyration failure:", err));
-
-        song.avgDifficulty = avg;
-        song.title_lowercase = title.toLowerCase();
-        song.search_string = searchStr;
-      }
-    });
 
     if (searchQuery) {
       const lowerSearch = searchQuery.toLowerCase();
