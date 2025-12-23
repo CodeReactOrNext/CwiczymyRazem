@@ -111,6 +111,24 @@ export const useSongs = () => {
     getSongStatus,
     refreshSongs: () => refetchUserSongs(),
     refreshSongsWithoutLoading: () => refetchUserSongs(),
+    applyFilters: (newFilters: {
+      difficultyFilter?: string;
+      tierFilters?: string[];
+      genreFilters?: string[];
+      sortBy?: string;
+      sortDirection?: "asc" | "desc";
+    }) => {
+      if (newFilters.difficultyFilter !== undefined) setDifficultyFilter(newFilters.difficultyFilter);
+      if (newFilters.tierFilters !== undefined) setTierFilters(newFilters.tierFilters);
+      if (newFilters.genreFilters !== undefined) setGenreFilters(newFilters.genreFilters);
+      if (newFilters.sortBy !== undefined) setSortBy(newFilters.sortBy);
+      if (newFilters.sortDirection !== undefined) setSortDirection(newFilters.sortDirection);
+      setPage(1);
+    },
+    handleResetFilters: () => {
+      handleClearFilters();
+      setPage(1);
+    },
     songs,
     sortBy,
     setSortBy,
