@@ -1,4 +1,5 @@
 {
+  "song_already_rated": "You have already rated this song",
   "songs": "Songs",
   "add_song": "Add Song",
   "search_songs": "Search songs...",

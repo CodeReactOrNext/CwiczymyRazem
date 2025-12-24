@@ -1,3 +1,6 @@
+// Module-level cache for cooldowns (persists across re-renders but resets on reload)
+const ratingCooldowns = new Map<string, number>();
+
 import { rateSongDifficulty } from "feature/songs/services/rateSongDifficulty";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
@@ -5,17 +8,25 @@ import { Star, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import { rateSong } from "feature/user/store/userSlice.asyncThunk";
 
 interface SongRatingInterface {
   song: Song;
   refreshTable: () => void;
   tierColor?: string;
 }
+
 export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterface) => {
   const userId = useAppSelector(selectUserAuth);
   const avatar = useAppSelector(selectUserAvatar);
   const { t } = useTranslation("songs");
+  const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
+
+  const userRating = song?.difficulties?.find((d) => d.userId === userId);
+  const isRated = !!userRating;
 
   const [ratingHover, setRatingHover] = useState<{
     songId: string;
@@ -33,26 +44,84 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
       return;
     }
 
-    const userRating = song?.difficulties?.find((d) => d.userId === userId);
-
+    // 1. Check existing legacy cooldown (1 hour)
     if (userRating) {
-      const lastRatedDate = new Date(userRating.date.toDate());
+      let lastRatedDate: Date;
+      // Handle Firestore Timestamp or serialized object or string
+      if (userRating.date && typeof userRating.date.toDate === 'function') {
+        lastRatedDate = userRating.date.toDate();
+      } else if (userRating.date && typeof userRating.date === 'object' && 'seconds' in userRating.date) {
+         lastRatedDate = new Date((userRating.date as any).seconds * 1000);
+      } else {
+         lastRatedDate = new Date(userRating.date);
+      }
+      
       const now = new Date();
-
       const timeDiff = now.getTime() - lastRatedDate.getTime();
-      const oneHour = 60 * 60 * 1000;
+      const fifteenSeconds = 15 * 1000;
 
-      if (timeDiff < oneHour) {
-        toast.warning(t("wait_one_hour"));
+      if (timeDiff < fifteenSeconds) {
+        const remaining = Math.ceil((fifteenSeconds - timeDiff) / 1000);
+        toast.warning(`Wait ${remaining}s before rating this song again.`);
         return;
       }
     }
 
+    // 2. Check 15s client-side cooldown
+    const lastClickTime = ratingCooldowns.get(songId);
+    const now = Date.now();
+    if (lastClickTime && now - lastClickTime < 15000) {
+       const remaining = Math.ceil((15000 - (now - lastClickTime)) / 1000);
+       toast.warning(`Wait ${remaining}s before rating this song again.`);
+       return;
+    }
+
     try {
       setIsRatingLoading(true);
-      await rateSongDifficulty(songId, userId, rating, title, artist, avatar);
-      refreshTable();
-      toast.success(t("rating_updated"));
+      
+      // Optimistic update of points is handled in userSlice reducers
+
+      const isNewRating = !isRated;
+
+      const resultAction = await dispatch(rateSong({
+        songId,
+        rating,
+        title,
+        artist,
+        avatarUrl: avatar,
+        isNewRating
+      }));
+
+      if (rateSong.fulfilled.match(resultAction)) {
+        toast.success(isNewRating ? "+5 Points! Rating updated." : "Rating updated.");
+        ratingCooldowns.set(songId, Date.now());
+
+        // Update React Query Cache for all 'songs' lists
+        // We look for any query starting with ['songs'] and update the specific song in the list
+        queryClient.setQueriesData({ queryKey: ['songs'] }, (oldData: any) => {
+          if (!oldData || !oldData.songs) return oldData;
+          
+          return {
+            ...oldData,
+            songs: oldData.songs.map((s: Song) => {
+              if (s.id === songId) {
+                // Merge updated fields from API response (difficulties, avgDifficulty)
+                const { difficulties, avgDifficulty } = resultAction.payload;
+                return {
+                  ...s,
+                  difficulties,
+                  avgDifficulty
+                };
+              }
+              return s;
+            })
+          };
+        });
+
+      } else {
+        throw new Error("Rating failed");
+      }
+
     } catch (error) {
       toast.error(t("error_rating"));
     } finally {
@@ -61,22 +130,23 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
   };
 
   return (
-    <div>
+    <div className='flex flex-col'>
       <div className='flex items-center gap-1'>
         {[...Array(10)].map((_, i) => {
           const avgRating = song.avgDifficulty || 0;
+          const ratingValue = i + 1;
 
-          const userRating = song?.difficulties?.find(
+          const currentUserRatingValue = song?.difficulties?.find(
             (d) => d.userId === userId
           )?.rating;
 
           const isHovered =
-            ratingHover?.songId === song.id && ratingHover.rating >= i + 1;
+            ratingHover?.songId === song.id && ratingHover.rating >= ratingValue;
 
           const showUserRating =
-            !ratingHover?.songId && userRating && userRating >= i + 1;
+            !ratingHover?.songId && currentUserRatingValue && currentUserRatingValue >= ratingValue;
 
-          const showAvgRating = avgRating >= i + 1;
+          const showAvgRating = avgRating >= ratingValue;
 
           return (
             <div key={i + song.id} className='relative'>
@@ -96,12 +166,12 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
                 } ${isRatingLoading ? "cursor-not-allowed" : "cursor-pointer"}`}
                 style={(isHovered || showUserRating) ? { fill: tierColor, color: tierColor, filter: `drop-shadow(0 0 5px ${tierColor}40)` } : {}}
                 onClick={() =>
-                  !isRatingLoading && handleRating(song.id, song.title, song.artist, i + 1)
+                  !isRatingLoading && handleRating(song.id, song.title, song.artist, ratingValue)
                 }
                 onMouseEnter={() =>
                   !isRatingLoading && setRatingHover({
                     songId: song.id,
-                    rating: i + 1,
+                    rating: ratingValue,
                   })
                 }
                 onMouseLeave={() => setRatingHover(null)}
@@ -117,6 +187,7 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
           {ratingHover?.songId === song.id && `${ratingHover.rating}/10`}
         </div>
       </div>
+      {isRated && <span className="text-[10px] text-green-500 font-medium ml-1">Rated</span>}
     </div>
   );
 };

@@ -18,7 +18,7 @@ const LogsBoxButton = ({
   hasNewMessages,
 }: LogsBoxButtonProps) => {
   return (
-    <div className='indicator'>
+    <div className='relative'>
       <button
         className={`transition-color flex flex-row items-center gap-1 bg-opacity-80 p-1 duration-200 radius-default hover:bg-second-300 xs:p-2
         ${active ? "bg-second-400 " : ""}`}
@@ -26,7 +26,7 @@ const LogsBoxButton = ({
         <Icon className='mx-1 text-base xs:text-2xl sm:text-base' />
         <span className='hidden font-normal sm:block'> {title}</span>
         {hasNewMessages && (
-          <span className='badge indicator-item bg-main-500 text-white'>
+          <span className="ml-1 flex min-w-[18px] h-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm">
             {notificationCount || "!"}
           </span>
         )}

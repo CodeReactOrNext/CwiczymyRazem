@@ -5,7 +5,7 @@ import {
   Music, 
   Users,
   Settings2,
-  ShieldCheck
+  Check
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "assets/lib/utils";
@@ -15,6 +15,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { useAppSelector } from "store/hooks";
+import { selectUserAuth } from "feature/user/store/userSlice";
 
 interface SongCardProps {
   song: Song;
@@ -26,8 +28,11 @@ export const SongCard = ({
   onOpenDetails,
 }: SongCardProps) => {
   const { t } = useTranslation("songs");
+  const userId = useAppSelector(selectUserAuth);
   const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty);
+
+  const isRated = song.difficulties?.some(d => d.userId === userId);
 
   return (
     <div 
@@ -86,10 +91,24 @@ export const SongCard = ({
         </div>
         
         <div className="min-w-0 flex-1 pt-1">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between gap-1.5">
               <h3 className="line-clamp-1 text-base sm:text-lg font-bold text-white transition-colors group-hover:text-white/90">
                 {song.title}
               </h3>
+              {isRated && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="flex items-center justify-center h-5 w-5 rounded-full bg-green-500/10 border border-green-500/20">
+                        <Check className="h-3 w-3 text-green-500" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{t("song_already_rated")}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
             
             <p className="truncate text-sm font-medium text-zinc-400">
@@ -106,7 +125,7 @@ export const SongCard = ({
               {song.genres && song.genres.length > 0 && (
                 <div className="flex gap-1">
                   {song.genres.slice(0, 1).map(g => (
-                    <span key={g} className="px-2.5 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold text-cyan-400 transition-colors">
+                    <span key={g} className="px-2.5 py-0.5 capitalize rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-bold text-cyan-400 transition-colors">
                       {g}
                     </span>
                   ))}
