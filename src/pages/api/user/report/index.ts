@@ -1,4 +1,5 @@
 import { firebaseAddLogReport } from "feature/logs/services/addLogReport.service";
+import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import {
   firebaseGetUserData,
   firebaseSetUserExerciseRaprot,
@@ -96,6 +97,8 @@ export default async function handler(
       report.isDateBackReport,
       report.timeSummary
     );
+
+    invalidateActivityLogsCache(userUid);
 
     if (!report.isDateBackReport) {
       await firebaseAddLogReport(

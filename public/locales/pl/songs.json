@@ -1,4 +1,5 @@
 {
+  "song_already_rated": "Już oceniłeś tę piosenkę",
   "songs": "Piosenki",
   "add_song": "Dodaj piosenkę",
   "search_songs": "Wyszukaj piosenki...",
@@ -72,5 +73,6 @@
   "drop_here": "Upuść tutaj",
   "start_learning": "Ucz się",
   "mark_as_learned": "Umiem",
-  "learn_again": "Powtórz"
+  "learn_again": "Powtórz",
+  "your_skill_tier": "Poziom umiejętności"
 }

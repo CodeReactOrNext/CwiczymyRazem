@@ -1,5 +1,6 @@
 import type { SerializedError } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 import { signIn, signOut } from "next-auth/react";
 import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
@@ -29,6 +30,7 @@ import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 
 import type { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 import type { SignUpCredentials } from "../view/SingupView/SingupView";
+import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import { fetchReport, fetchUserData } from "./services/userServices";
 import {
   avatarErrorHandler,
@@ -225,6 +227,9 @@ export const updateUserStats = createAsyncThunk(
       const user = await firebaseGetCurrentUser();
       const token = await user!.getIdTokenResult();
       const statistics = await fetchReport({ token, inputData });
+      if (user?.uid) {
+        invalidateActivityLogsCache(user.uid);
+      }
       reportSuccess();
       return statistics as FetchedReportDataInterface;
     } catch (error) {
@@ -337,3 +342,35 @@ export const upgradeSkill = createAsyncThunk(
     }
   }
 );
+
+export interface RateSongPayload {
+  songId: string;
+  rating: number;
+  title: string;
+  artist: string;
+  avatarUrl?: string;
+  isNewRating?: boolean;
+}
+
+export const rateSong = createAsyncThunk(
+  "user/rateSong",
+  async (payload: RateSongPayload, { rejectWithValue }) => {
+    try {
+      const user = await firebaseGetCurrentUser();
+      if (!user) throw new Error("User not authenticated");
+      const token = await user.getIdTokenResult();
+
+      const response = await axios.post("/api/songs/rate", {
+        ...payload,
+        token,
+      });
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+
+

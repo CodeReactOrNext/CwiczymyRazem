@@ -1,6 +1,8 @@
 import { Card } from "assets/components/ui/card";
 import type { Song } from "feature/songs/types/songs.type";
-import { Award, Clock, Music2, Trophy } from "lucide-react";
+import { cn } from "assets/lib/utils";
+import { getSongTier } from "feature/songs/utils/getSongTier";
+import { Award, Music2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface SongLearningStatsProps {
@@ -22,6 +24,14 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
   const learnedPercentage = totalSongs
     ? (userSongs.learned.length / totalSongs) * 100
     : 0;
+
+  // Calculate Average Difficulty of Learned Songs (ignoring 0)
+  const learnedWithDifficulty = userSongs.learned.filter(s => (s.avgDifficulty || 0) > 0);
+  const avgDifficulty = learnedWithDifficulty.length > 0
+    ? learnedWithDifficulty.reduce((sum, s) => sum + (s.avgDifficulty || 0), 0) / learnedWithDifficulty.length
+    : 0;
+
+  const playerTier = avgDifficulty > 0 ? getSongTier(avgDifficulty) : null;
 
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-center">
@@ -59,6 +69,32 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
                     />
                  </div>
              </div>
+         </div>
+      </div>
+
+      {/* Player Tier - New */}
+      <div className="flex flex-1 items-center gap-4 rounded-lg bg-zinc-900/30 p-4 backdrop-blur-sm">
+         <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border", 
+             playerTier ? playerTier.bgColor : "bg-zinc-800",
+             playerTier ? playerTier.borderColor : "border-zinc-700",
+             playerTier ? playerTier.color.replace("#", "text-[#") : "text-zinc-500" // Quick hack or use explicit class if available
+         )}
+          style={{ color: playerTier ? playerTier.color : undefined, borderColor: playerTier ? playerTier.color : undefined }}
+         >
+            <Award className="h-5 w-5" />
+         </div>
+         <div>
+            <p className="text-sm font-medium text-zinc-400">{t("your_skill_tier", "Skill Tier")}</p>
+            <div className="flex items-baseline gap-2">
+               <h3 className="text-xl font-bold text-white" style={{ color: playerTier?.color }}>
+                   {playerTier ? playerTier.tier + "-Tier" : "N/A"}
+               </h3>
+               {playerTier && (
+                   <span className="text-xs text-zinc-500">
+                       ({t("avg")}: {avgDifficulty.toFixed(1)})
+                   </span>
+               )}
+            </div>
          </div>
       </div>
     </div>

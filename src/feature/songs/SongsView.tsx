@@ -76,6 +76,7 @@ const SongsView = () => {
     genreFilters,
     applyFilters,
     handleResetFilters,
+    updateUserSongsCache,
   } = useSongs();
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
@@ -109,7 +110,7 @@ const SongsView = () => {
                <SongLearningSection
                 isLanding={false}
                 userSongs={userSongs}
-                onChange={handleStatusUpdate}
+                onChange={updateUserSongsCache}
                 onStatusChange={refreshSongs}
               />
               </div>
