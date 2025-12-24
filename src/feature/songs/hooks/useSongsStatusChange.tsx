@@ -35,7 +35,8 @@ export const useSongsStatusChange = ({
     songId: string,
     newStatus: SongStatus,
     title: string,
-    artist: string
+    artist: string,
+    options?: { skipOptimisticUpdate?: boolean; skipRefetch?: boolean }
   ) => {
     if (!userId) {
       toast.error(t("must_be_logged_in"));
@@ -45,33 +46,35 @@ export const useSongsStatusChange = ({
     try {
       await updateSongStatus(userId, songId, title, artist, newStatus, avatar);
 
-      const allSongs = [
-        ...userSongs.wantToLearn,
-        ...userSongs.learning,
-        ...userSongs.learned,
-      ];
-      const updatedSong = allSongs.find((song) => song.id === songId);
+      if (!options?.skipOptimisticUpdate) {
+          const allSongs = [
+            ...userSongs.wantToLearn,
+            ...userSongs.learning,
+            ...userSongs.learned,
+          ];
+          const updatedSong = allSongs.find((song) => song.id === songId);
 
-      if (updatedSong) {
-        const newUserSongs = {
-          wantToLearn:
-            newStatus === "wantToLearn"
-              ? [...userSongs.wantToLearn, updatedSong]
-              : userSongs.wantToLearn.filter((s) => s.id !== songId),
-          learning:
-            newStatus === "learning"
-              ? [...userSongs.learning, updatedSong]
-              : userSongs.learning.filter((s) => s.id !== songId),
-          learned:
-            newStatus === "learned"
-              ? [...userSongs.learned, updatedSong]
-              : userSongs.learned.filter((s) => s.id !== songId),
-        };
+          if (updatedSong) {
+            const newUserSongs = {
+              wantToLearn:
+                newStatus === "wantToLearn"
+                  ? [...userSongs.wantToLearn, updatedSong]
+                  : userSongs.wantToLearn.filter((s) => s.id !== songId),
+              learning:
+                newStatus === "learning"
+                  ? [...userSongs.learning, updatedSong]
+                  : userSongs.learning.filter((s) => s.id !== songId),
+              learned:
+                newStatus === "learned"
+                  ? [...userSongs.learned, updatedSong]
+                  : userSongs.learned.filter((s) => s.id !== songId),
+            };
 
-        onChange(newUserSongs);
+            onChange(newUserSongs);
+          }
       }
 
-      if (onTableStatusChange) {
+      if (onTableStatusChange && !options?.skipRefetch) {
         await onTableStatusChange();
       }
 
