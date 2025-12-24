@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getSongs } from "feature/songs/services/getSongs";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
@@ -105,7 +105,14 @@ export const useSongs = () => {
     return null;
   };
 
+  const queryClient = useQueryClient();
+
+  const updateUserSongsCache = (newSongs: { wantToLearn: Song[]; learning: Song[]; learned: Song[] }) => {
+     queryClient.setQueryData(["user-songs", currentUserId], newSongs);
+  };
+
   return {
+    updateUserSongsCache,
     page,
     userSongs,
     isLoading: isSongsLoading,

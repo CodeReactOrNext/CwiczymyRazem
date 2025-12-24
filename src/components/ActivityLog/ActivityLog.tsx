@@ -13,7 +13,7 @@ const CALENDAR_HEIGHT = 7 * 19;
 
 const ActivityLog = ({ userAuth }: { userAuth: string }) => {
   const { t } = useTranslation("common");
-  const { reportList, year, setYear, datasWithReports } =
+  const { reportList, year, setYear, datasWithReports, isLoading } =
     useActivityLog(userAuth);
 
   const [hoveredItem, setHoveredItem] = useState<DateWithReport | null>(null);
@@ -38,7 +38,7 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
     yearButtons.push(y);
   }
 
-  if (!reportList.length) {
+  if (isLoading || !reportList.length) {
     return (
       <div className="flex h-40 w-full items-center justify-center">
         <FaSpinner className="animate-spin text-2xl text-second" />

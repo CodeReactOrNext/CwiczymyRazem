@@ -23,6 +23,7 @@ import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -111,6 +112,9 @@ export const SongLearningSection = ({
 
     setActiveId(null);
 
+    // Reset over container state
+    setActiveOverContainer(null);
+
     if (!overId) return;
 
     const activeContainer = findContainer(activeId);
@@ -156,14 +160,20 @@ export const SongLearningSection = ({
             [overContainer]: newOverItems,
         });
 
-        // API Update
+        // API Update: Log + Status Change
         try {
             await handleStatusChange(
               activeId,
               overContainer,
               activeSong.title,
-              activeSong.artist
+              activeSong.artist,
+              { skipOptimisticUpdate: true, skipRefetch: true }
             );
+            
+            // Persist order for BOTH lists to ensure gaps are closed and new item has correct index
+            await updateUserSongOrder(userId, newActiveItems);
+            await updateUserSongOrder(userId, newOverItems);
+
           } catch (error) {
             const songs = await getUserSongs(userId);
             onChange(songs);
@@ -177,12 +187,26 @@ export const SongLearningSection = ({
                 ...userSongs,
                 [activeContainer]: newItems
              });
-             // Note: Persisting reorder within same status might need API support if order matters in DB.
-             // For now we just update UI state.
+             
+             // Persist new order (No logs)
+             updateUserSongOrder(userId, newItems);
         }
     }
   };
 
+  const [activeOverContainer, setActiveOverContainer] = useState<SongStatus | null>(null);
+
+  const handleDragOver = (event: any) => {
+    const { over } = event;
+    const overId = over?.id;
+    if (!overId) {
+      setActiveOverContainer(null);
+      return;
+    }
+    const container = findContainer(overId);
+    setActiveOverContainer(container || null);
+  };
+  
   const getActiveSong = () => {
       if (!activeId) return null;
       const allSongs = [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned];
@@ -243,6 +267,7 @@ export const SongLearningSection = ({
         collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        onDragOver={handleDragOver}
     >
       <div className='mb-6'>
         <SongLearningStats userSongs={userSongs} />
@@ -260,6 +285,7 @@ export const SongLearningSection = ({
             onStatusChange={handleStatusChange}
             onSongRemove={handleSongRemoval}
             isMobile={false}
+            isDropTarget={activeOverContainer === 'wantToLearn'}
           />
           <SongStatusCard
             isLanding={isLanding}
@@ -269,6 +295,7 @@ export const SongLearningSection = ({
             onStatusChange={handleStatusChange}
             onSongRemove={handleSongRemoval}
             isMobile={false}
+            isDropTarget={activeOverContainer === 'learning'}
           />
           <SongStatusCard
             isLanding={isLanding}
@@ -278,6 +305,7 @@ export const SongLearningSection = ({
             onStatusChange={handleStatusChange}
             onSongRemove={handleSongRemoval}
             isMobile={false}
+            isDropTarget={activeOverContainer === 'learned'}
           />
         </div>
       )}
