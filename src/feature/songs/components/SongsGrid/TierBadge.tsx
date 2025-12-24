@@ -11,12 +11,11 @@ export const TierBadge = ({ song }: TierBadgeProps) => {
 
     return (
         <div 
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-xs font-black shadow-lg"
+            className="flex h-7 w-7 items-center justify-center rounded-lg border text-[10px] font-black shadow-lg backdrop-blur-xl"
             style={{
-                borderColor: `${tier.color}30`,
-                backgroundColor: `${tier.color}10`,
+                borderColor: `${tier.color}40`,
+                backgroundColor: `rgba(10, 10, 10, 0.9)`,
                 color: tier.color,
-                boxShadow: `0 4px 12px ${tier.color}15`
             }}
         >
             {tier.tier}

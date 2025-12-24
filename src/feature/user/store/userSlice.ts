@@ -25,6 +25,7 @@ import {
   updateUserStats,
   uploadUserAvatar,
   uploadUserSocialData,
+  rateSong,
 } from "./userSlice.asyncThunk";
 
 
@@ -94,6 +95,16 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(rateSong.pending, (state, action) => {
+        if (state.currentUserStats && action.meta.arg.isNewRating) {
+          state.currentUserStats.points = (state.currentUserStats.points || 0) + 5;
+        }
+      })
+      .addCase(rateSong.rejected, (state, action) => {
+        if (state.currentUserStats && action.meta.arg.isNewRating) {
+          state.currentUserStats.points = (state.currentUserStats.points || 0) - 5;
+        }
+      })
       .addCase(logInViaGoogle.pending, (state) => {
         state.isFetching = "google";
       })
@@ -150,6 +161,7 @@ export const userSlice = createSlice({
         state.isFetching = null;
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
       })
+
       .addMatcher(
         isAnyOf(
           updateUserStats.pending,
@@ -186,6 +198,7 @@ export const userSlice = createSlice({
           state.isFetching = null;
         }
       )
+
       .addMatcher(
         isAnyOf(
           logInViaGoogle.fulfilled,
