@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 import AppLayout from "layouts/AppLayout";
 import MainContainer from "components/MainContainer";
+import { LoaderPinwheel } from "lucide-react";
 
 const ProfileSkillsPage: NextPage = () => {
   const { t } = useTranslation("profile");
@@ -61,15 +62,14 @@ const ProfileSkillsPage: NextPage = () => {
       });
   };
 
-  if (!userSkills) return null;
 
   return (
     <AppLayout pageId={"profile"} subtitle='Skills' variant='secondary'>
       <MainContainer title={"Skills"}>
-        <SkillDashboard
+      { userSkills ? <SkillDashboard
           userSkills={userSkills as UserSkills}
           onSkillUpgrade={handleUpgradeSkill}
-        />
+        /> : null}
       </MainContainer>
     </AppLayout>
   );
