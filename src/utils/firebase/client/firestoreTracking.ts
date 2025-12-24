@@ -54,7 +54,6 @@ export const trackedGetDocs = async <T = firestore.DocumentData>(q: firestore.Qu
   }
 
   const path = getQueryPath(q);
-  console.log(`[Firestore.DEBUG] trackedGetDocs path: ${path}`);
 
   // 1. Check Short-term Cache
   const cached = queryCache.get(path);
@@ -92,7 +91,6 @@ export const trackedGetDoc = async <T = firestore.DocumentData>(docRef: firestor
   }
 
   const path = docRef.path;
-  console.log(`[Firestore.DEBUG] trackedGetDoc path: ${path}`);
 
   // 1. Check Short-term Cache
   const cached = docCache.get(path);
