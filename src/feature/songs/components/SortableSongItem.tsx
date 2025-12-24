@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn } from "assets/lib/utils";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import { Song, SongStatus } from "feature/songs/types/songs.type";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, GripVertical } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 
@@ -57,13 +57,21 @@ export const SortableSongItem = ({
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative flex flex-col gap-2 rounded-lg border border-white/5 bg-zinc-800/80 p-3 shadow-md transition-colors duration-200 hover:border-white/10 hover:bg-zinc-800 touch-none", // touch-none for dnd
-        isDragging && "shadow-2xl ring-2 ring-cyan-500/50 z-[9999] bg-zinc-900 opacity-100 placeholder-shown:opacity-100" // active state
+        "group relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/5 bg-zinc-900/40 p-3 shadow-sm transition-all duration-300 touch-none click-behavior", 
+        "hover:border-white/10 hover:bg-zinc-800/60 hover:shadow-lg hover:shadow-black/20",
+        isDragging && "shadow-2xl ring-1 ring-white/10 bg-zinc-800 z-[9999] opacity-100 scale-105 rotate-1" 
       )}
     >
-      <div className="flex items-center gap-3 pr-8"> {/* Added pr-8 for menu space */}
+        {/* Glassmorphism Depth Borders - subtle top highlight */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-50" />
+      <div className="flex items-center gap-3 pr-6"> 
+        {/* Drag Handle */}
+        <div className="hidden sm:flex text-zinc-600 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity -ml-1">
+             <GripVertical className="h-4 w-4" />
+        </div>
+
         {/* Small Cover Image */}
-        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-md border border-white/5 bg-zinc-950/40">
+        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-white/5 bg-zinc-950/40 shadow-sm transition-transform group-hover:scale-105">
           {song.coverUrl ? (
             <img 
               src={song.coverUrl} 
@@ -72,14 +80,14 @@ export const SortableSongItem = ({
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <StatusIcon className={cn("h-4 w-4 opacity-20", config.color)} />
+              <StatusIcon className={cn("h-4 w-4 opacity-40", config.color)} />
             </div>
           )}
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold text-white leading-snug">{song.title}</p>
-          <p className="truncate text-[10px] font-medium text-zinc-500">{song.artist}</p>
+          <p className="truncate text-sm font-bold text-zinc-100 leading-tight group-hover:text-white transition-colors">{song.title}</p>
+          <p className="truncate text-[11px] font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors">{song.artist}</p>
         </div>
         <TierBadge song={song} />
       </div>

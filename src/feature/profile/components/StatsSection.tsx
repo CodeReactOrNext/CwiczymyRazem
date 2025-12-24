@@ -16,6 +16,8 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 import { getTrendData } from "../utils/getTrendData";
 import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import ActivityLog from "components/ActivityLog/ActivityLog";
 import { DailyRecommendation } from "feature/songs/components/DailyRecommendation/DailyRecommendation";
 import { DailyPlanRecommendation } from "feature/songs/components/DailyRecommendation/DailyPlanRecommendation";
@@ -222,6 +224,13 @@ export const StatsSection = ({
                   const learningPercentage = totalSongs
                     ? (userSongs.learning.length / totalSongs) * 100
                     : 0;
+                    
+                  // Tier Calculation
+                  const learnedWithDifficulty = userSongs.learned.filter(s => (s.avgDifficulty || 0) > 0);
+                  const avgDifficulty = learnedWithDifficulty.length > 0
+                    ? learnedWithDifficulty.reduce((sum, s) => sum + (s.avgDifficulty || 0), 0) / learnedWithDifficulty.length
+                    : 0;
+                  const playerTier = avgDifficulty > 0 ? getSongTier(avgDifficulty) : null;
 
                   if (totalSongs === 0) {
                     return (
@@ -254,9 +263,26 @@ export const StatsSection = ({
                     <div className='space-y-5'>
                       <div className='flex items-center justify-between'>
                         <div>
-                          <h5 className='font-semibold text-white'>
-                            Overall progress
-                          </h5>
+                          <div className="flex items-center gap-2">
+                             <h5 className='font-semibold text-white'>
+                               Overall progress
+                             </h5>
+                             {playerTier && (
+                                <span className={cn(
+                                    "rounded-md border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                                    playerTier.bgColor,
+                                    playerTier.color.replace("#", "text-[#"),
+                                    playerTier.borderColor
+                                )}
+                                style={{
+                                    color: playerTier.color,
+                                    borderColor: playerTier.borderColor
+                                }}
+                                >
+                                    {playerTier.tier}-Tier
+                                </span>
+                             )}
+                          </div>
                           <div className='flex flex-wrap items-center gap-x-3 gap-y-1 mt-1'>
                             <p className='text-[10px] font-bold text-zinc-400'>
                               {totalSongs} songs

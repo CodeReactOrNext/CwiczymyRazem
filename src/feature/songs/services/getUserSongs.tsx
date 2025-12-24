@@ -27,7 +27,8 @@ export const getUserSongs = async (userId: string) => {
     const userSongs = userSongsSnapshot.docs.map((docSnap) => ({
       id: docSnap.data().songId,
       status: docSnap.data().status as SongStatus,
-    }));
+      order: docSnap.data().order ?? 0,
+    })).sort((a, b) => a.order - b.order);
 
     if (userSongs.length === 0) return songLists;
 

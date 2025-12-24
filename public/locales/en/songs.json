@@ -73,5 +73,6 @@
   "drop_here": "Drop here",
   "start_learning": "Learn",
   "mark_as_learned": "Finish",
-  "learn_again": "Review"
+  "learn_again": "Review",
+  "your_skill_tier": "Skill Tier"
 }

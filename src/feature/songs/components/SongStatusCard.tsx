@@ -14,6 +14,7 @@ interface SongStatusCardProps {
   onSongRemove: (id: string) => void;
   isMobile: boolean;
   isLanding: boolean;
+  isDropTarget?: boolean;
 }
 
 export const SongStatusCard = ({
@@ -24,12 +25,13 @@ export const SongStatusCard = ({
   onSongRemove,
   isMobile,
   isLanding,
+  isDropTarget,
 }: SongStatusCardProps) => {
   const { t } = useTranslation("songs");
   const config = STATUS_CONFIG[droppableId as keyof typeof STATUS_CONFIG];
   const StatusIcon = config.icon;
 
-  const { setNodeRef, isOver } = useDroppable({
+  const { setNodeRef } = useDroppable({
     id: droppableId,
   });
 
@@ -67,7 +69,9 @@ export const SongStatusCard = ({
         ref={setNodeRef}
         className={cn(
           "flex min-h-[150px] flex-1 flex-col gap-2 p-2 transition-all duration-300",
-          isOver ? "bg-white/5" : "bg-transparent"
+          isDropTarget 
+            ? cn("bg-white/5 ring-2 ring-inset transition-all duration-300", config.color.replace("text-", "ring-").replace("500", "500/50")) 
+            : "bg-transparent ring-0"
         )}
       >
         <SortableContext 
