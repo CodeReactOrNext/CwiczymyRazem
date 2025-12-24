@@ -79,7 +79,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppProps) =>
             <AuthSyncWrapper>
                <main className={`${teko.variable} ${inter.variable} `}>
                   <Toaster theme='dark' position='top-right' />
-                  <NextTopLoader color='#ff3e4b' />
+                  <NextTopLoader color='#06b6d4' />
                   <div id='overlays'></div>
                   <Component {...pageProps} />
                </main>

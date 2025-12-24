@@ -111,5 +111,10 @@
     "songs_description": "Learning status of songs in your library",
     "records_title": "Records and Achievements",
     "records_description": "Your best results and long-term statistics"
-  }
+  },
+  "no_songs_title": "No songs yet",
+  "no_songs_description": "Add your first songs to the library to track your progress.",
+  "browse_library": "Browse Library",
+  "weekly_summary": "Weekly Summary",
+  "sessions_this_week": "sessions this week"
 }

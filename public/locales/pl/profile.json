@@ -126,5 +126,10 @@
     "songs_description": "Status nauki utworów w Twojej bibliotece",
     "records_title": "Rekordy i osiągnięcia",
     "records_description": "Twoje najlepsze wyniki i długoterminowe statystyki"
-  }
+  },
+  "no_songs_title": "Brak utworów",
+  "no_songs_description": "Dodaj swoje pierwsze utwory do biblioteki, aby śledzić postępy.",
+  "browse_library": "Przeglądaj Bibliotekę",
+  "weekly_summary": "Podsumowanie Tygodnia",
+  "sessions_this_week": "sesji w tym tygodniu"
 }
