@@ -29,6 +29,7 @@ import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 
 import type { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 import type { SignUpCredentials } from "../view/SingupView/SingupView";
+import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import { fetchReport, fetchUserData } from "./services/userServices";
 import {
   avatarErrorHandler,
@@ -225,6 +226,9 @@ export const updateUserStats = createAsyncThunk(
       const user = await firebaseGetCurrentUser();
       const token = await user!.getIdTokenResult();
       const statistics = await fetchReport({ token, inputData });
+      if (user?.uid) {
+        invalidateActivityLogsCache(user.uid);
+      }
       reportSuccess();
       return statistics as FetchedReportDataInterface;
     } catch (error) {
