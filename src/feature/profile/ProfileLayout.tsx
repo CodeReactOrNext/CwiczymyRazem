@@ -67,7 +67,7 @@ const ProfileLayout = ({
     <MainContainer title={t("profile")}>
       <div className='m-auto max-w-screen-2xl space-y-8 px-5'>
         {/* Enhanced Profile Header */}
-        <div className='relative overflow-hidden rounded-2xl border border-zinc-700/50 bg-gradient-to-br from-zinc-900/90 to-zinc-800/50 p-8 shadow-2xl backdrop-blur-xl'>
+        <div className='relative overflow-hidden rounded-2xl bg-zinc-900/60 p-8 shadow-2xl'>
           {/* Background decoration */}
           <div className='absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-purple-500/5'></div>
           <div className='absolute -right-20 -top-20 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl'></div>
@@ -80,26 +80,29 @@ const ProfileLayout = ({
                 <div className='relative'>
                   <Avatar
                     name={displayName}
-                    lvl={statistics.lvl}
                     avatarURL={avatar}
                   />
-                  <div className='absolute -bottom-2 -right-2 rounded-full border-2 border-zinc-800 bg-gradient-to-r from-cyan-500 to-purple-500 px-3 py-1 text-xs font-bold text-white shadow-lg'>
-                    Lvl {statistics.lvl}
+                  <div className='absolute -bottom-1 -right-1 flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 shadow-xl'>
+                    <div className='flex flex-col items-center justify-center leading-none'>
+                      <span className='text-[8px] font-black uppercase tracking-tighter text-zinc-500'>LVL</span>
+                      <span className='text-sm font-black text-white'>{statistics.lvl}</span>
+                    </div>
                   </div>
                 </div>
                 <div className='flex-col'>
-                  <h1 className='relative bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-3xl font-bold text-transparent lg:text-5xl'>
+                  <h1 className='relative bg-gradient-to-r from-white via-white to-zinc-500 bg-clip-text text-3xl font-black tracking-tight text-transparent lg:text-5xl'>
                     {displayName}
                   </h1>
-                  <div className='mt-2 flex items-center gap-3'>
-                    <div className='rounded-lg border border-yellow-500/30 bg-yellow-500/10 px-3 py-1'>
-                      <span className='text-sm text-yellow-300'>
-                        {statistics.points.toLocaleString()} {t("points")}
+                  <div className='mt-2 flex items-center gap-2'>
+                    <div className='flex items-center gap-2 rounded-full bg-white/5 px-4 py-1.5'>
+                      <div className='h-1.5 w-1.5 rounded-full bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.4)]'></div>
+                      <span className='text-xs font-black uppercase tracking-widest text-zinc-300'>
+                        {statistics.points.toLocaleString()} <span className="text-zinc-500">{t("points")}</span>
                       </span>
                     </div>
                     {band && (
-                      <div className='rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-1'>
-                        <span className='text-sm text-purple-300'>{band}</span>
+                      <div className='rounded-full bg-purple-500/10 px-4 py-1.5'>
+                        <span className='text-xs font-bold text-purple-300/80'>{band}</span>
                       </div>
                     )}
                   </div>
@@ -128,13 +131,13 @@ const ProfileLayout = ({
 
                 {/* Social Links */}
                 {(youTubeLink || soundCloudLink) && (
-                  <div className='mt-4 flex flex-row flex-wrap justify-start gap-3 border-t border-zinc-700/30 pt-4'>
+                  <div className='mt-4 flex flex-row flex-wrap justify-start gap-3 pt-4'>
                     {youTubeLink && (
                       <a
                         target='_blank'
                         rel='noreferrer'
                         href={youTubeLink}
-                        className='flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm transition-all hover:border-red-500/50 hover:bg-red-500/20'>
+                        className='flex items-center gap-2 rounded-lg bg-red-500/10 px-3 py-2 text-sm transition-all hover:bg-red-500/20'>
                         <FaYoutube size={16} />
                         YouTube
                       </a>
@@ -144,7 +147,7 @@ const ProfileLayout = ({
                         target='_blank'
                         rel='noreferrer'
                         href={soundCloudLink}
-                        className='flex items-center gap-2 rounded-lg border border-orange-500/30 bg-orange-500/10 px-3 py-2 text-sm transition-all hover:border-orange-500/50 hover:bg-orange-500/20'>
+                        className='flex items-center gap-2 rounded-lg bg-orange-500/10 px-3 py-2 text-sm transition-all hover:bg-orange-500/20'>
                         <FaSoundcloud size={16} />
                         SoundCloud
                       </a>
@@ -188,7 +191,7 @@ const ProfileLayout = ({
 
         {/* Skills Section */}
         {userSkills && (
-          <div className='rounded-2xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+          <div className='rounded-2xl bg-zinc-900/30 p-6'>
             <h2 className='mb-6 text-2xl font-bold text-white'>Skills</h2>
             <SkillTreeCards isUserProfile userSkills={userSkills} />
           </div>
