@@ -113,9 +113,6 @@ export const LeadboardLayout = ({
                 
                 <div className="h-10 w-px bg-white/10 hidden lg:block mx-4" />
 
-                <ViewToggle
-                  isSeasonalView={isSeasonalView}
-                />
 
                 {isSeasonalView && (
                   <SeasonSelect
