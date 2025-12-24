@@ -4,22 +4,28 @@ import type { ReportListInterface } from "types/api.types";
 
 import { processRawReports } from "../activityLog.utils";
 
-export const useActivityLogReports = (userAuth: string) => {
+export const useActivityLogReports = (userAuth: string, year: number) => {
   const [reportList, setReportList] = useState<ReportListInterface[] | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchUserReports = async () => {
-      if (!userAuth || reportList !== null) return;
+      if (!userAuth) return;
 
-      const response = await firebaseGetUserRaprotsLogs(userAuth);
-      const processedReports = processRawReports(response);
-      setReportList(processedReports);
+      setIsLoading(true);
+      try {
+        const response = await firebaseGetUserRaprotsLogs(userAuth, year);
+        const processedReports = processRawReports(response);
+        setReportList(processedReports);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchUserReports();
-  }, [userAuth, reportList]);
+  }, [userAuth, year]);
 
-  return { reportList };
-}; 
+  return { reportList, isLoading };
+};
