@@ -7,7 +7,7 @@ import { withAuth } from "utils/auth/serverAuth";
 const Timer: NextPage = () => {
   const router = useRouter();
 
-  const handleModeSelect = (mode: "timer" | "plan" | "auto") => {
+  const handleModeSelect = (mode: "timer" | "plan" | "auto" | "song") => {
     switch (mode) {
       case "timer":
         router.push("/timer/practice");
@@ -17,6 +17,9 @@ const Timer: NextPage = () => {
         break;
       case "auto":
         router.push("/timer/auto");
+        break;
+      case "song":
+        router.push("/timer/song-select");
         break;
     }
   };
