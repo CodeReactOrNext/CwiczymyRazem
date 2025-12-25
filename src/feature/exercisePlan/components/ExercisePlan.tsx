@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/tabs";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/router";
 
 import type { ExercisePlan as ExercisePlanType } from "../types/exercise.types";
 import { PracticeSession } from "../views/PracticeSession/PracticeSession";
@@ -14,6 +15,7 @@ import { MyPlans } from "./MyPlans";
 
 export const ExercisePlan = () => {
   const { t } = useTranslation("exercises");
+  const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlanType | null>(
     null
   );
@@ -22,6 +24,10 @@ export const ExercisePlan = () => {
   const handlePlanSelect = (plan: ExercisePlanType) => {
     setSelectedPlan(plan);
     setActiveTab("practice");
+  };
+
+  const handleFinish = () => {
+    router.push("/report");
   };
 
   return (
@@ -49,10 +55,7 @@ export const ExercisePlan = () => {
             {selectedPlan && (
               <PracticeSession
                 plan={selectedPlan}
-                onFinish={() => {
-                  setSelectedPlan(null);
-                  setActiveTab("my_plans");
-                }}
+                onFinish={handleFinish}
               />
             )}
           </TabsContent>

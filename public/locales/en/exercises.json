@@ -410,5 +410,23 @@
     "description": "Select a plan that best suits your needs",
     "exercises_count": "{{count}} exercises",
     "exercises_count_one": "{{count}} exercise"
+  },
+  "custom_exercise": {
+    "title": "Create Custom Exercise",
+    "description": "Add a specific exercise to your plan.",
+    "exercise_title": "Title",
+    "exercise_desc": "Description",
+    "duration": "Duration (minutes)",
+    "category": "Category",
+    "difficulty": "Difficulty",
+    "title_required": "Title is required",
+    "created_success": "Custom exercise added",
+    "button_label": "Add Custom Exercise",
+    "instructions": "Instructions",
+    "tips": "Tips & Hints",
+    "add_instruction_placeholder": "Add step (press Enter)",
+    "add_tip_placeholder": "Add tip (press Enter)",
+    "no_instructions_hint": "No instructions added yet.",
+    "no_tips_hint": "No tips added yet."
   }
 }

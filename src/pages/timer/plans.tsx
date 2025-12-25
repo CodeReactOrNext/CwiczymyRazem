@@ -8,17 +8,37 @@ import { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { useState, useEffect } from "react";
 import MainContainer from "components/MainContainer";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { useAppSelector } from "store/hooks";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 
 const TimerPlans: NextPage = () => {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
+  const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
+  const userAuth = useAppSelector(selectUserAuth);
+
+  useEffect(() => {
+    const loadCustomPlans = async () => {
+      if (!userAuth) return;
+      
+      try {
+        const plans = await getUserExercisePlans(userAuth);
+        setCustomPlans(plans);
+      } catch (error) {
+        console.error("Failed to load custom plans:", error);
+      }
+    };
+
+    loadCustomPlans();
+  }, [userAuth]);
 
   useEffect(() => {
     if (router.isReady && router.query.planId) {
       const planId = router.query.planId as string;
       handlePlanSelect(planId);
     }
-  }, [router.isReady, router.query.planId]);
+  }, [router.isReady, router.query.planId, customPlans]);
 
   const handleBack = () => {
     if (selectedPlan) {
@@ -29,7 +49,8 @@ const TimerPlans: NextPage = () => {
   };
 
   const handlePlanSelect = (planId: string) => {
-    const plan = defaultPlans.find((p) => p.id === planId);
+    const allPlans = [...defaultPlans, ...customPlans];
+    const plan = allPlans.find((p) => p.id === planId);
     if (plan) {
       setSelectedPlan(plan);
     }
