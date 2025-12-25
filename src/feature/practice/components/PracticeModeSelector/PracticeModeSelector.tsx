@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FaClock, FaList, FaRandom } from "react-icons/fa";
 
 interface PracticeModeSelectorProps {
-  onSelectMode: (mode: "timer" | "plan" | "auto") => void;
+  onSelectMode: (mode: "timer" | "plan" | "auto" | "song") => void;
 }
 
 export const PracticeModeSelector = ({
@@ -31,14 +31,23 @@ export const PracticeModeSelector = ({
       to: "to-slate-950",
     },
     rose: {
-      iconBg: "bg-teal-800/30",
-      iconText: "text-teal-400/90",
-      blur: "bg-teal-700/15",
-      ring: "hover:ring-teal-700/30",
-      from: "from-teal-950/60",
-      via: "via-teal-950/40",
+      iconBg: "bg-rose-800/30",
+      iconText: "text-rose-400/90",
+      blur: "bg-rose-700/15",
+      ring: "hover:ring-rose-700/30",
+      from: "from-rose-950/60",
+      via: "via-rose-950/40",
       to: "to-slate-950",
     },
+    emerald: {
+        iconBg: "bg-emerald-800/30",
+        iconText: "text-emerald-400/90",
+        blur: "bg-emerald-700/15",
+        ring: "hover:ring-emerald-700/30",
+        from: "from-emerald-950/60",
+        via: "via-emerald-950/40",
+        to: "to-slate-950",
+      },
   };
 
   const modes = [
@@ -69,6 +78,14 @@ export const PracticeModeSelector = ({
       description: t("timer:modes.auto.description"),
       colors: colorClasses.rose,
       features: [ "Time adjusted", "Personalized"],
+    },
+    {
+        id: "song" as const,
+        icon: FaList, // Using FaList as a placeholder, maybe import Music note if available or stick with list
+        title: "Practice Song",
+        description: "Focus on a specific song",
+        colors: colorClasses.emerald,
+        features: ["Song specific", "Split progress", "Library integration"],
     },
   ] as const;
 

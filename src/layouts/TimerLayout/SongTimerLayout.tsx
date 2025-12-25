@@ -1,0 +1,179 @@
+import { Button } from "assets/components/ui/button";
+import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
+import MainContainer from "components/MainContainer";
+import { AnimatePresence, motion } from "framer-motion";
+import type { useTimerInterface } from "hooks/useTimer";
+import { ArrowLeft, ArrowRight, Music, Pause, Play } from "lucide-react"; // Added Play/Pause
+import { useTranslation } from "react-i18next";
+import { MdAccessTime } from "react-icons/md";
+import type { TimerInterface } from "types/api.types";
+import { convertMsToHMS } from "utils/converter";
+
+import { PageHeader } from "constants/PageHeader";
+import { Song } from "feature/songs/types/songs.type";
+import { IconBox } from "components/IconBox/IconBox";
+
+interface SongTimerLayoutProps {
+  timer: useTimerInterface;
+  timerData: TimerInterface;
+  song: Song;
+  timerSubmitHandler: () => void;
+  onBack: () => void;
+}
+
+export const SongTimerLayout = ({
+  timer,
+  timerData,
+  song,
+  timerSubmitHandler,
+  onBack,
+}: SongTimerLayoutProps) => {
+  const { t } = useTranslation("timer");
+  const { time, timerEnabled, startTimer, stopTimer } = timer; // Destructure start/stop
+
+  const sumTime =
+    timerData.creativity +
+    timerData.hearing +
+    timerData.theory +
+    timerData.technique;
+
+  const formatTime = (ms: number) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    // Display HH:MM:SS if > 60 mins, otherwise MM:SS
+    const hours = Math.floor(minutes / 60);
+    if (hours > 0) {
+        const remMinutes = minutes % 60;
+        return `${hours}:${remMinutes < 10 ? "0" : ""}${remMinutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    }
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  const toggleTimer = () => {
+      if (timerEnabled) {
+          stopTimer();
+      } else {
+          startTimer();
+      }
+  };
+
+  return (
+    <MainContainer>
+      <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
+        <div className="pl-14 sm:pl-0">
+             <div className="flex items-center gap-2 mb-6">
+                <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full hover:bg-white/10">
+                    <ArrowLeft className="h-5 w-5" />
+                </Button>
+                <h1 className="text-xl font-bold">Practice Session</h1>
+             </div>
+        </div>
+        
+        <div className="relative w-full max-w-4xl mx-auto">
+            {/* Ambient Background Blur */}
+            <div className="absolute inset-0 bg-emerald-500/10 blur-[100px] rounded-full opacity-50 pointer-events-none" />
+
+            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-zinc-900/50 backdrop-blur-xl border border-white/5 p-8 sm:p-12 rounded-3xl overflow-hidden shadow-2xl">
+                
+                {/* Left Col: Album Art */}
+                <div className="flex flex-col items-center justify-center space-y-6">
+                    <div className="relative group">
+                         {/* Glow effect */}
+                        <div className={cn(
+                            "absolute -inset-4 bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 rounded-full blur-xl transition-all duration-1000",
+                            timerEnabled ? "opacity-100 scale-110" : "opacity-0 scale-100"
+                        )} />
+                        
+                        <div className={cn(
+                            "relative h-64 w-64 sm:h-80 sm:w-80 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-transform duration-700 ease-in-out",
+                             timerEnabled && "scale-105"
+                        )}>
+                            {song.coverUrl ? (
+                                <img src={song.coverUrl} className="h-full w-full object-cover" alt={song.title} />
+                            ) : (
+                                <div className="h-full w-full bg-zinc-800 flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
+                                    <Music className="h-32 w-32 text-zinc-700" />
+                                </div>
+                            )}
+                            
+                             {/* Overlay when paused */}
+                            {!timerEnabled && time > 0 && (
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px]">
+                                    <Pause className="h-16 w-16 text-white/80" />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Col: Controls */}
+                <div className="flex flex-col items-center md:items-start space-y-8 text-center md:text-left w-full">
+                    <div className="space-y-2 w-full">
+                        <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight line-clamp-2">
+                            {song.title}
+                        </h2>
+                        <p className="text-xl text-zinc-400 font-medium">{song.artist}</p>
+                    </div>
+
+                    {/* Timer Display - More integrated but visible */}
+                    <div className="flex flex-col items-center md:items-start space-y-4 w-full">
+                         <div className={cn(
+                             "text-[6rem] sm:text-[7rem] leading-none font-black font-variant-numeric tabular-nums tracking-tighter transition-colors duration-300",
+                             timerEnabled ? "text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" : "text-zinc-600"
+                         )}>
+                            {formatTime(time)}
+                         </div>
+                         
+                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 w-full">
+                             <div className="flex items-center gap-2 text-zinc-400 text-sm font-bold uppercase tracking-widest bg-white/5 py-2 px-4 rounded-full border border-white/5">
+                                <MdAccessTime className="h-4 w-4" />
+                                <span>Total: {convertMsToHMS(sumTime)}</span>
+                             </div>
+                             
+                             {timerEnabled && (
+                                 <div className="flex items-center gap-2 text-emerald-400 text-sm font-bold uppercase tracking-widest animate-pulse">
+                                     <div className="h-2 w-2 rounded-full bg-emerald-400" />
+                                     Recording
+                                 </div>
+                             )}
+                         </div>
+                    </div>
+
+                    {/* Controls */}
+                    <div className="flex items-center gap-6 w-full pt-4">
+                        <Button
+                            onClick={toggleTimer}
+                            size="lg"
+                            className={cn(
+                                "h-20 w-20 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center border-4",
+                                timerEnabled 
+                                    ? "bg-zinc-900 text-white border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800" 
+                                    : "bg-white text-black border-white hover:bg-zinc-100"
+                            )}
+                        >
+                            {timerEnabled ? (
+                                <Pause className="h-8 w-8 fill-current" />
+                            ) : (
+                                <Play className="h-8 w-8 fill-current ml-1" />
+                            )}
+                        </Button>
+
+                        <div className="flex-1 border-t border-white/5 mx-4" />
+
+                        <Button
+                            onClick={timerSubmitHandler}
+                            variant="ghost"
+                            className="h-14 px-8 rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 font-bold uppercase tracking-widest text-sm transition-all"
+                        >
+                            Finish
+                        </Button>
+                    </div>
+                </div>
+            </div>
+       
+        </div>
+      </div>
+    </MainContainer>
+  );
+};
