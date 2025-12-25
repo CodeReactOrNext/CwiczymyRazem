@@ -22,23 +22,23 @@ export default Home;
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
-        ...(await serverSideTranslations(
-            locale ?? "pl",
-            [
-                "common",
-                "profile",
-                "footer",
-                "achievements",
-                "toast",
-                "skills",
-                "songs",
-                "chat",
-                "my_plans",
-                "exercises",
-                "skills",
-            ],
-            nextI18nextConfig
-          )),
+      ...(await serverSideTranslations(
+        locale ?? "pl",
+        [
+          "common",
+          "profile",
+          "footer",
+          "achievements",
+          "toast",
+          "skills",
+          "songs",
+          "chat",
+          "my_plans",
+          "exercises",
+          "skills",
+        ],
+        nextI18nextConfig
+      )),
     },
   };
 }
