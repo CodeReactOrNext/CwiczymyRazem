@@ -2,6 +2,7 @@ import FaqView from "feature/faq/FaqView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import AppLayout from "layouts/AppLayout";
 import type { NextPage } from "next";
+import Head from "next/head";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
 import nextI18nextConfig from "../../../next-i18next.config";
@@ -14,10 +15,17 @@ const FaqPage: NextPage = () => {
     },
   });
 
+  const siteUrl = "https://riff.quest/faq";
+
   return (
-    <AppLayout pageId={"faq"} subtitle={t("faq")} variant='secondary'>
-      <FaqView />
-    </AppLayout>
+    <>
+      <Head>
+        <link rel='canonical' href={siteUrl} />
+      </Head>
+      <AppLayout pageId={"faq"} subtitle={t("faq")} variant='secondary'>
+        <FaqView />
+      </AppLayout>
+    </>
   );
 };
 
