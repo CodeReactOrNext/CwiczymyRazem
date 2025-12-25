@@ -1,9 +1,19 @@
 import { LeadboardView } from "feature/leadboard/LeadboardView";
 import type { NextPage } from "next";
+import Head from "next/head";
 import { withAuth } from "utils/auth/serverAuth";
 
 const GlobalLeaderboard: NextPage = () => {
-  return <LeadboardView defaultView="all-time" />;
+  const siteUrl = "https://riff.quest/leaderboard/global";
+
+  return (
+    <>
+      <Head>
+        <link rel='canonical' href={siteUrl} />
+      </Head>
+      <LeadboardView defaultView="all-time" />
+    </>
+  );
 };
 
 export default GlobalLeaderboard;

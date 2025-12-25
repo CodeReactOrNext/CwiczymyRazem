@@ -3,6 +3,7 @@ import useAutoLogIn from "hooks/useAutoLogIn";
 import AppLayout from "layouts/AppLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { NextPage } from "next";
+import Head from "next/head";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import nextI18nextConfig from "../../../next-i18next.config";
 
@@ -13,10 +14,17 @@ const LeaderBoardPage: NextPage = () => {
     },
   });
 
+  const siteUrl = "https://riff.quest/leaderboard";
+
   return (
-    <AppLayout pageId={"leadboard"} subtitle='Leaderboard' variant='secondary'>
-      {isLoggedIn ? <LeadboardView /> : <PageLoadingLayout />}
-    </AppLayout>
+    <>
+      <Head>
+        <link rel='canonical' href={siteUrl} />
+      </Head>
+      <AppLayout pageId={"leadboard"} subtitle='Leaderboard' variant='secondary'>
+        {isLoggedIn ? <LeadboardView /> : <PageLoadingLayout />}
+      </AppLayout>
+    </>
   );
 };
 
