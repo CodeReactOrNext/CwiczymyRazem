@@ -1,10 +1,20 @@
 import LandingPage from "./landing";
 import { NextPage } from "next";
+import Head from "next/head";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import nextI18nextConfig from "../../next-i18next.config";
 
 const Home: NextPage = () => {
-  return <LandingPage />;
+  const siteUrl = "https://riff.quest";
+
+  return (
+    <>
+      <Head>
+        <link rel='canonical' href={siteUrl} />
+      </Head>
+      <LandingPage />
+    </>
+  );
 };
 
 export default Home;
