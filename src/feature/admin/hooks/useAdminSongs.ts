@@ -26,6 +26,22 @@ export const useAdminSongs = (password: string) => {
     queryClient.invalidateQueries({ queryKey: ["admin-songs"] });
   };
 
+  const updateLocalSong = useCallback((songId: string, updates: Partial<Song>) => {
+    queryClient.setQueryData<Song[]>(["admin-songs", password], (oldSongs) => {
+      if (!oldSongs) return [];
+      return oldSongs.map(song =>
+        song.id === songId ? { ...song, ...updates } : song
+      );
+    });
+  }, [queryClient, password]);
+
+  const removeLocalSong = useCallback((songId: string) => {
+    queryClient.setQueryData<Song[]>(["admin-songs", password], (oldSongs) => {
+      if (!oldSongs) return [];
+      return oldSongs.filter(song => song.id !== songId);
+    });
+  }, [queryClient, password]);
+
   const handleSave = async (songId: string) => {
     try {
       await axios.post("/api/admin/songs", {
@@ -33,7 +49,8 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: editForm
       });
-      invalidateSongs();
+      // invalidateSongs();
+      updateLocalSong(songId, editForm);
       setEditingId(null);
       toast.success("Changes saved");
     } catch (error) {
@@ -48,7 +65,8 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: { isVerified: true }
       });
-      invalidateSongs();
+      // invalidateSongs();
+      updateLocalSong(songId, { isVerified: true });
       toast.success("Song marked as verified");
     } catch (error) {
       toast.error("Verification update failed");
@@ -62,7 +80,8 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: { avgDifficulty: rating, isVerified: true }
       });
-      invalidateSongs();
+      // invalidateSongs();
+      updateLocalSong(songId, { avgDifficulty: rating, isVerified: true });
       toast.success(`Song rated ${rating}`);
     } catch (error) {
       toast.error("Rating failed");
@@ -76,7 +95,7 @@ export const useAdminSongs = (password: string) => {
         bulkSongs
       });
       toast.success(response.data.message || `Bulk add successful: ${bulkSongs.length} songs`);
-      invalidateSongs();
+      invalidateSongs(); // Keep invalidation for bulk add as it introduces new items
     } catch (error) {
       toast.error("Bulk add failed");
     }
@@ -89,7 +108,8 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: { coverUrl, isVerified: true }
       });
-      invalidateSongs();
+      // invalidateSongs();
+      updateLocalSong(songId, { coverUrl, isVerified: true });
       toast.success("Cover updated successfully");
     } catch (error) {
       toast.error("Failed to update cover");
@@ -102,7 +122,8 @@ export const useAdminSongs = (password: string) => {
       await axios.delete(`/api/admin/songs?songId=${songId}`, {
         headers: { "x-admin-password": password }
       });
-      invalidateSongs();
+      // invalidateSongs();
+      removeLocalSong(songId);
       toast.success("Song deleted");
     } catch (error) {
       toast.error("Failed to delete song");
