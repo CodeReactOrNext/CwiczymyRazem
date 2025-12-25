@@ -2,11 +2,14 @@ import { Button } from "assets/components/ui/button";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { FaPlus } from "react-icons/fa";
 
 import { ExerciseFilters } from "./components/ExerciseFilters";
 import { ExerciseGrid } from "./components/ExerciseGrid";
 import { SelectedExercisesList } from "./components/SelectedExercisesList";
 import { useExerciseSelection } from "./hooks/useExerciseSelection";
+import { CreateCustomExerciseDialog } from "./CreateCustomExerciseDialog";
 
 interface SelectExercisesStepProps {
   selectedExercises: Exercise[];
@@ -20,7 +23,7 @@ export const SelectExercisesStep = ({
   onNext,
 }: SelectExercisesStepProps) => {
   const { t } = useTranslation(["exercises", "common"]);
-  /* Removed currentLang setup */
+  const [isCustomExerciseDialogOpen, setIsCustomExerciseDialogOpen] = useState(false);
 
   const {
     searchQuery,
@@ -33,8 +36,11 @@ export const SelectExercisesStep = ({
   } = useExerciseSelection({
     selectedExercises,
     onExercisesSelect,
-    /* Removed currentLang */
   });
+
+  const handleCustomExerciseCreate = (exercise: Exercise) => {
+    onExercisesSelect([...selectedExercises, exercise]);
+  };
 
   return (
     <motion.div
@@ -53,6 +59,13 @@ export const SelectExercisesStep = ({
         </div>
         <div className='flex w-full flex-row items-center justify-between gap-3 sm:w-fit md:flex-col'>
           <Button
+            onClick={() => setIsCustomExerciseDialogOpen(true)}
+            variant="outline"
+            className='w-full sm:flex md:w-fit'>
+            <FaPlus className="mr-2 h-4 w-4" />
+            {t("exercises:custom_exercise.button_label")}
+          </Button>
+          <Button
             onClick={onNext}
             disabled={selectedExercises.length === 0}
             className='w-full sm:flex md:w-fit'>
@@ -63,7 +76,6 @@ export const SelectExercisesStep = ({
 
       <SelectedExercisesList
         selectedExercises={selectedExercises}
-        /* Removed currentLang */
         onToggleExercise={handleExerciseToggle}
       />
 
@@ -79,7 +91,12 @@ export const SelectExercisesStep = ({
         exercises={filteredExercises}
         selectedExercises={selectedExercises}
         onToggleExercise={handleExerciseToggle}
-        /* Removed currentLang */
+      />
+
+      <CreateCustomExerciseDialog 
+        open={isCustomExerciseDialogOpen} 
+        onOpenChange={setIsCustomExerciseDialogOpen} 
+        onExerciseCreate={handleCustomExerciseCreate}
       />
 
       <Button
