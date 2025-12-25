@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { SkillMiniTree } from "feature/skills/SkillMiniTree";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
+import MainContainer from "components/MainContainer";
 import Router from "next/router";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
@@ -9,8 +10,16 @@ import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getPointsToLvlUp } from "utils/gameLogic";
 
-import BonusPointsItem from "./components/BonusPointsItem";
 import LevelIndicator from "./components/LevelIndicator";
+import { WeeklyActivityChart } from "./components/WeeklyActivityChart";
+import { NextMilestone } from "./components/NextMilestone";
+import { WeeklySummary } from "./components/WeeklySummary";
+import { PerformanceComparison } from "./components/PerformanceComparison";
+import { SkillBalance } from "./components/SkillBalance";
+import { PointsBreakdown } from "./components/PointsBreakdown";
+import { SessionStats } from "./components/SessionStats";
+import { LevelUpBanner } from "./components/LevelUpBanner";
+import { AchievementsDisplay } from "./components/AchievementsDisplay";
 
 export interface BonusPointsInterface {
   timePoints: number;
@@ -33,6 +42,13 @@ interface RatingPopUpProps {
   previousUserStats: StatisticsDataInterface;
   skillPointsGained: SkillPointsGained;
   onClick: Dispatch<SetStateAction<boolean>>;
+  activityData?: {
+    date: string;
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+  }[];
 }
 
 const RatingPopUp = ({
@@ -41,6 +57,7 @@ const RatingPopUp = ({
   previousUserStats,
   skillPointsGained,
   onClick,
+  activityData = [],
 }: RatingPopUpProps) => {
   const [currentLevel, setCurrentLevel] = useState(previousUserStats.lvl);
   const [displayedPoints, setDisplayedPoints] = useState(0);
@@ -105,87 +122,86 @@ const RatingPopUp = ({
     .map(([category]) => category);
 
   return (
-    <div className='dialog fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-2 sm:p-4'>
-      <div className='modal-box relative mx-auto max-h-[95vh] w-full max-w-xl overflow-hidden rounded-lg bg-second-600 shadow-xl sm:max-h-[90vh] sm:max-w-2xl lg:max-w-4xl'>
-        {/* Button to close the modal */}
-        <Button
-          variant='outline'
-          className='btn btn-circle btn-sm absolute right-2 top-2 z-20'
-          onClick={() => {
-            onClick(false);
-            Router.push("/dashboard");
-          }}>
-          ✕
-        </Button>
+    <MainContainer title="Practice Summary">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className='mx-auto max-w-6xl p-4 sm:p-5'>
+        
+        {isGetNewLevel && <LevelUpBanner />}
 
-        {/* Scrollable Content Area */}
-        <div className='flex h-full max-h-[95vh] flex-col overflow-y-auto pb-20 sm:max-h-[90vh]'>
-          {/* Points Header */}
-          <div className='sticky top-0 z-10 bg-second-600 px-3 pb-4 pt-4 sm:px-4 sm:pb-6 md:px-8'>
-            <div className='flex flex-col items-center justify-center'>
-              <div className='mx-auto w-full rounded-lg border border-second-400/30 bg-gradient-to-r from-second-500 via-second-400/20 to-second-500 px-4 py-3 shadow-md sm:w-fit sm:px-8 sm:py-4'>
-                <div className='text-center'>
-                  <span className='mb-1 block font-openSans text-base sm:text-lg'>
-                    {t("rating_popup.title")}
-                  </span>
-                  <div className='flex items-center justify-center gap-2'>
-                    <span className='text-4xl font-bold text-main-300 sm:text-5xl'>
-                      {displayedPoints}
-                    </span>
-                    <span className='text-2xl sm:text-3xl'>
-                      {t("rating_popup.points")}
-                    </span>
-                  </div>
-                </div>
-              </div>
+        <div className='mb-4 rounded-lg border border-cyan-500/30 bg-gradient-to-r from-cyan-500/10 via-cyan-400/5 to-transparent p-4 shadow-lg glass-card'>
+          <div className='text-center'>
+            <div className='mb-3 flex items-center justify-center gap-2'>
+              <span className='text-4xl font-bold text-cyan-400 sm:text-5xl'>
+                {displayedPoints}
+              </span>
+              <span className='text-2xl text-white sm:text-3xl'>
+                {t("rating_popup.points")}
+              </span>
             </div>
+            
+            <PointsBreakdown bonusPoints={ratingData.bonusPoints} />
           </div>
+        </div>
 
-          {/* Main Content */}
-          <div className='flex-1 px-3 sm:px-4 md:px-8'>
-            <BonusPointsItem
-              bonusPoints={ratingData.bonusPoints}
-              actualDayWithoutBreak={currentUserStats.actualDayWithoutBreak}
-              achievements={newAchievements}
-              isGetNewLevel={isGetNewLevel}
+        {activityData && activityData.length > 0 && (
+          <div className='mb-4'>
+            <WeeklyActivityChart data={activityData} />
+          </div>
+        )}
+
+        <div className='mb-4 grid gap-3 sm:grid-cols-2'>
+          <NextMilestone currentUserStats={currentUserStats} pointsGained={ratingData.skillPointsGained.technique + ratingData.skillPointsGained.theory + ratingData.skillPointsGained.hearing + ratingData.skillPointsGained.creativity} />
+          <WeeklySummary activityData={activityData} />
+        </div>
+
+        <div className='mb-4 grid gap-3 sm:grid-cols-2'>
+          <PerformanceComparison todayTime={ratingData.bonusPoints.time} activityData={activityData} />
+          <SkillBalance activityData={activityData} />
+        </div>
+
+        <div className={`mb-4 grid gap-3 ${newAchievements.length > 0 ? 'sm:grid-cols-2' : ''}`}>
+          <SessionStats 
+            actualDayWithoutBreak={currentUserStats.actualDayWithoutBreak}
+            habitsCount={ratingData.bonusPoints.habitsCount}
+            time={ratingData.bonusPoints.time}
+          />
+          {newAchievements.length > 0 && (
+            <AchievementsDisplay achievements={newAchievements} />
+          )}
+        </div>
+
+        <div className='mx-auto mb-6 flex w-full items-center justify-center gap-2 sm:w-[90%] md:w-[80%]'>
+          <LevelIndicator>{currentLevel}</LevelIndicator>
+          <div className='relative h-4 w-full rounded-full bg-zinc-800/50 backdrop-blur-sm'>
+            <motion.div
+              initial={{ width: `${prevProgressPercent}%` }}
+              animate={{ width: `${currProgressPercent}%` }}
+              transition={{ duration: 1.5 }}
+              className='absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-400 shadow-lg'
             />
-
-            <div className='mx-auto mb-4 flex w-full justify-center sm:mb-6 sm:w-[90%] md:w-[80%]'>
-              <LevelIndicator>{currentLevel}</LevelIndicator>
-              <div className='relative mx-2 h-3 w-full bg-second-500 sm:h-4'>
-                <motion.div
-                  initial={{ width: `${prevProgressPercent}%` }}
-                  animate={{ width: `${currProgressPercent}%` }}
-                  transition={{ duration: 1.5 }}
-                  className='absolute left-0 top-0 h-full rounded-md bg-main-500'
-                />
-              </div>
-              <LevelIndicator>{currentLevel + 1}</LevelIndicator>
-            </div>
-
-            {categoriesWithPoints.length > 0 && (
-              <div className='mb-6 mt-4 sm:mb-8 sm:mt-6'>
-                <SkillMiniTree highlightCategories={categoriesWithPoints} />
-              </div>
-            )}
           </div>
+          <LevelIndicator>{currentLevel + 1}</LevelIndicator>
         </div>
 
-        {/* Back Button - Fixed to bottom */}
-        <div className='absolute bottom-0 left-0 right-0 z-20 border-t border-second-400/30 bg-gradient-to-t from-second-600 via-second-600 to-second-600/90 p-3 shadow-lg sm:p-4'>
-          <div className='container mx-auto flex justify-center'>
-            <Button
-              onClick={() => {
-                onClick(false);
-                Router.push("/dashboard");
-              }}
-              className='btn-primary min-w-[120px] px-4 py-2 text-sm font-medium shadow-md sm:min-w-[140px] sm:px-6 sm:text-base'>
-              {t("rating_popup.back")}
-            </Button>
+        {categoriesWithPoints.length > 0 && (
+          <div className='mb-6'>
+            <SkillMiniTree highlightCategories={categoriesWithPoints} />
           </div>
+        )}
+
+        <div className='mt-8 flex justify-center'>
+          <Button
+            onClick={() => Router.push("/dashboard")}
+            size='lg'
+            className='bg-gradient-to-r from-cyan-600 to-cyan-500 px-8 py-3 text-base font-medium text-white shadow-lg hover:from-cyan-500 hover:to-cyan-400'>
+            {t("rating_popup.back")}
+          </Button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </MainContainer>
   );
 };
 

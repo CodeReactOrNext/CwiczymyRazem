@@ -305,10 +305,10 @@ export const CreateCustomExerciseDialog = ({
         <div className="p-6 border-t border-white/10 bg-zinc-950 shrink-0">
             <SheetFooter>
                 <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto mt-2 sm:mt-0 border-zinc-700 hover:bg-zinc-800">
-                    {t("common:cancel")}
+                    {t("common:cancel" as any)}
                 </Button>
                 <Button type="submit" form="create-exercise-form" className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200">
-                    {t("common:create")}
+                    {t("common:create" as any)}
                 </Button>
             </SheetFooter>
         </div>
