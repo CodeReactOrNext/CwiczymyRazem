@@ -157,15 +157,11 @@ const BonusPointsItem = ({
           </motion.div>
         )}
 
-        {/* Stats Summary Section */}
-        <div className='mt-4 rounded-md border-t border-second-400/30 bg-second-400/10 p-3 sm:mt-6 sm:p-4'>
-          <h4 className='mb-2 text-xs font-medium text-white/70 sm:mb-3 sm:text-sm'>
-            {t("report:rating_popup.title")}
-          </h4>
-          <div className='grid gap-2 text-xs text-secondText sm:gap-3 sm:text-sm'>
+        <div className='mt-3 rounded-md border-t border-second-400/30 bg-second-400/10 p-2.5 sm:mt-4 sm:p-3'>
+          <div className='grid gap-1.5 text-xs text-secondText sm:gap-2 sm:text-sm'>
             <p className='flex items-center gap-2'>
               <span className='h-1.5 w-1.5 rounded-full bg-main-300 sm:h-2 sm:w-2'></span>
-              <span className='font-medium'>{actualDayWithoutBreak}</span>{" "}
+              <span className='font-bold text-white'>{actualDayWithoutBreak}</span>{" "}
               {t("report:rating_popup.streak")}
             </p>
             <p className='flex items-center gap-2'>
@@ -175,7 +171,7 @@ const BonusPointsItem = ({
             <p className='flex items-center gap-2'>
               <span className='h-1.5 w-1.5 rounded-full bg-main-300 sm:h-2 sm:w-2'></span>
               {t("report:rating_popup.time_amount")}{" "}
-              <span className='font-medium'>{convertMsToHM(time)}</span>
+              <span className='font-bold text-white'>{convertMsToHM(time)}</span>
             </p>
           </div>
         </div>
