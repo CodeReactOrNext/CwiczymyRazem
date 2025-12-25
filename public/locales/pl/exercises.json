@@ -360,5 +360,23 @@
     "generate": "Generuj plan",
     "generated_plan": "Wygenerowany plan",
     "no_exercises": "Nie znaleziono odpowiednich ćwiczeń dla tych kryteriów"
+  },
+  "custom_exercise": {
+    "title": "Stwórz Własne Ćwiczenie",
+    "description": "Dodaj własne ćwiczenie do planu.",
+    "exercise_title": "Tytuł",
+    "exercise_desc": "Opis",
+    "duration": "Czas trwania (minuty)",
+    "category": "Kategoria",
+    "difficulty": "Trudność",
+    "title_required": "Tytuł jest wymagany",
+    "created_success": "Dodano własne ćwiczenie",
+    "button_label": "Dodaj Własne Ćwiczenie",
+    "instructions": "Instrukcje",
+    "tips": "Wskazówki",
+    "add_instruction_placeholder": "Dodaj krok (wciśnij Enter)",
+    "add_tip_placeholder": "Dodaj wskazówkę (wciśnij Enter)",
+    "no_instructions_hint": "Nie dodano jeszcze żadnych instrukcji.",
+    "no_tips_hint": "Nie dodano jeszcze żadnych wskazówek."
   }
 }
