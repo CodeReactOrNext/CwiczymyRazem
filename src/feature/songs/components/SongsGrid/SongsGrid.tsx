@@ -62,15 +62,16 @@ export const SongsGrid = ({
       {/* Grid Container */}
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
         {songs.map((song) => {
-          const isPracticing = 
-            userSongs.wantToLearn.some(s => s.id === song.id) ||
-            userSongs.learning.some(s => s.id === song.id) ||
-            userSongs.learned.some(s => s.id === song.id);
+          let userStatus: SongStatus | undefined;
+          if (userSongs.wantToLearn.some(s => s.id === song.id)) userStatus = "wantToLearn";
+          else if (userSongs.learning.some(s => s.id === song.id)) userStatus = "learning";
+          else if (userSongs.learned.some(s => s.id === song.id)) userStatus = "learned";
 
           return (
             <SongCard
               key={song.id}
               song={song}
+              userStatus={userStatus}
               onOpenDetails={() => {
                 setSelectedSong(song);
                 setIsDetailsOpen(true);
@@ -137,7 +138,7 @@ export const SongsGrid = ({
                         <PaginationLink
                           onClick={() => onPageChange(pageNumber)}
                           isActive={currentPage === pageNumber}
-                          className={`border border-white/5 bg-zinc-800/50 hover:border-cyan-500/30 hover:bg-zinc-700/50 hover:text-cyan-300 ${
+                          className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:border-cyan-500/30 hover:bg-zinc-700/50 hover:text-cyan-300 ${
                             currentPage === pageNumber
                               ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
                               : ""
