@@ -225,7 +225,7 @@ const SongsView = () => {
                 <div className="min-h-[500px] rounded-2xl bg-zinc-900/20 p-1">
                   {isLoading ? (
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-                      {Array.from({ length: 16 }).map((_, i) => (
+                      {Array.from({ length: 20 }).map((_, i) => (
                         <SongCardSkeleton key={i} />
                       ))}
                     </div>

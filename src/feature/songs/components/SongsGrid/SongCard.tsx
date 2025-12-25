@@ -1,11 +1,14 @@
 import { Button } from "assets/components/ui/button";
-import type { Song } from "feature/songs/types/songs.type";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { 
   Music, 
   Users,
   Settings2,
-  Check
+  Check,
+  Bookmark,
+  TrendingUp,
+  Trophy
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "assets/lib/utils";
@@ -21,11 +24,13 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 interface SongCardProps {
   song: Song;
   onOpenDetails: () => void;
+  userStatus?: SongStatus;
 }
 
 export const SongCard = ({
   song,
   onOpenDetails,
+  userStatus,
 }: SongCardProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -54,6 +59,25 @@ export const SongCard = ({
             className="h-full w-full object-cover blur-premium saturate-[1.1] scale-[1.2] transition-transform duration-1000 group-hover:scale-[1.4]"
           />
           <div className="absolute inset-0 bg-zinc-950/30" />
+        </div>
+      )}
+
+      {/* User Status Badge */}
+      {userStatus && (
+        <div className="absolute top-0 right-0 z-30">
+             <div className={cn(
+               "flex items-center gap-1.5 px-3 py-1.5 rounded-bl-xl text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-lg border-b border-l",
+               userStatus === "wantToLearn" && "bg-amber-500/20 text-amber-400 border-amber-500/20",
+               userStatus === "learning" && "bg-cyan-500/20 text-cyan-400 border-cyan-500/20",
+               userStatus === "learned" && "bg-emerald-500/20 text-emerald-400 border-emerald-500/20"
+             )}>
+                {userStatus === "wantToLearn" && <Bookmark className="h-3 w-3 fill-current" />}
+                {userStatus === "learning" && <TrendingUp className="h-3 w-3" />}
+                {userStatus === "learned" && <Trophy className="h-3 w-3" />}
+                {userStatus === "wantToLearn" && "Want to Learn"}
+                {userStatus === "learning" && "Practicing"}
+                {userStatus === "learned" && "Completed"}
+             </div>
         </div>
       )}
 
@@ -92,7 +116,7 @@ export const SongCard = ({
         
         <div className="min-w-0 flex-1 pt-1">
             <div className="flex items-center justify-between gap-1.5">
-              <h3 className="line-clamp-1 text-base sm:text-lg font-bold text-white transition-colors group-hover:text-white/90">
+              <h3 className="line-clamp-1 text-base font-bold text-white transition-colors group-hover:text-white/90">
                 {song.title}
               </h3>
               {isRated && (
