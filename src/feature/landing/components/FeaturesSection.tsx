@@ -442,6 +442,57 @@ export const FeaturesSection = () => {
             </div>
           </div>
 
+          {/* GROUP 5: PRACTICE HABITS ARTICLE */}
+          <div className="relative">
+            <div className="text-center mb-16">
+              <h3 className="text-2xl font-bold text-white mb-2">Build Better Practice Habits</h3>
+              <p className="text-zinc-400">Learn science-backed strategies to create lasting guitar practice routines.</p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 backdrop-blur-sm p-8 hover:border-cyan-500/20 transition-all duration-500 group cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                <div className="relative z-10">
+                  <div className="flex items-start gap-6">
+                    {/* Article Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                          Practice Guide
+                        </span>
+                        <span className="text-xs text-zinc-500">•</span>
+                        <span className="text-xs text-zinc-500">8 min read</span>
+                      </div>
+
+                      <h4 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-100 transition-colors">
+                        How to Build Daily Guitar Practice Habits & Track Progress
+                      </h4>
+
+                      <p className="text-zinc-400 mb-4 leading-relaxed">
+                        Master the art of building daily guitar practice habits with science-backed strategies.
+                        Learn progress tracking techniques, habit formation principles, and practical tips for consistent practice.
+                      </p>
+
+                      <div className="flex items-center gap-4">
+                        <a
+                          href="/practice-habits"
+                          className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-medium transition-colors group-hover:translate-x-1 transform duration-200"
+                        >
+                          Read Full Article
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </a>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>
