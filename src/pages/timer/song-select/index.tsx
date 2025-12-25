@@ -75,7 +75,7 @@ const SongSelectPage = () => {
                        <p className="text-zinc-400 max-w-md mb-8">
                            Add songs to "Want to Learn" or "Learning" in your library to see them here.
                        </p>
-                       <Link href="/songs">
+                       <Link href="/songs?view=library">
                            <Button className="h-12 px-8 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl flex items-center gap-2">
                                Go to Library <ArrowRight className="h-4 w-4" />
                            </Button>
