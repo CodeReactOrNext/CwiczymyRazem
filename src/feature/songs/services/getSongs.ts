@@ -87,8 +87,9 @@ export const getSongs = async (
       memoryCache.set(cacheKey, result, 5 * 60 * 1000);
       return result;
     } else {
-      // Complex path: Fetch pool and filter in-memory (still limited to 500 to prevent cost spikes)
-      const snapshot = await trackedGetDocs(query(q, limit(500)));
+      // Complex path: Fetch pool and filter in-memory
+      // Reduced pool to 100 to significantly save on reads
+      const snapshot = await trackedGetDocs(query(q, limit(100)));
       let songs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
 
       if (tierFilters && tierFilters.length > 0) {

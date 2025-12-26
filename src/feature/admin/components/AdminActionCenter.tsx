@@ -12,7 +12,6 @@ interface AdminActionCenterProps {
   onMassVerify: () => void;
   onMassEnrich: () => void;
   onBulkAdd: () => void;
-  onArtistSelector: () => void;
   onFindDuplicates: () => void;
   isBulkProcessing: boolean;
   isLoading: boolean;
@@ -27,7 +26,6 @@ const AdminActionCenter = ({
   onMassVerify,
   onMassEnrich,
   onBulkAdd,
-  onArtistSelector,
   onFindDuplicates,
   isBulkProcessing,
   isLoading
@@ -113,14 +111,6 @@ const AdminActionCenter = ({
         >
           <Plus className="mr-2 h-3.5 w-3.5" />
           Bulk Add Songs
-        </Button>
-        <Button
-          onClick={onArtistSelector}
-          disabled={isLoading}
-          className="h-10 bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
-        >
-          <User className="mr-2 h-3.5 w-3.5" />
-          Artist Selector
         </Button>
         <Button
           onClick={onFindDuplicates}

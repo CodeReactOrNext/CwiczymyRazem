@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "utils/firebase/client/firebase.utils";
-import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, query, orderBy, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, query, orderBy, addDoc, serverTimestamp, getCountFromServer, limit, where } from "firebase/firestore";
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,17 +16,63 @@ export default async function handler(
 
   try {
     if (req.method === "GET") {
+      const { page = "1", limit: limitVal = "50", filterType = "all" } = req.query;
+      const pageNum = parseInt(page as string);
+      const limitNum = parseInt(limitVal as string);
+
       const songsRef = collection(db, "songs");
-      const q = query(songsRef, orderBy("createdAt", "desc"));
+
+      // Base query for actual results
+      let resultsQuery = query(songsRef);
+      if (filterType === "unverified") {
+        resultsQuery = query(resultsQuery, where("isVerified", "==", false));
+      } else if (filterType === "no-cover") {
+        resultsQuery = query(resultsQuery, where("coverUrl", "==", null));
+      } else if (filterType === "no-rating") {
+        resultsQuery = query(resultsQuery, where("avgDifficulty", "==", 0));
+      }
+
+      // Get Global Stats (Cheap)
+      const countSnapshot = await getCountFromServer(songsRef);
+      const totalGlobal = countSnapshot.data().count;
+
+      // Filtered total (for pagination)
+      const filteredCountSnapshot = await getCountFromServer(resultsQuery);
+      const totalFiltered = filteredCountSnapshot.data().count;
+
+      const unverifiedSnapshot = await getCountFromServer(query(songsRef, where("isVerified", "==", false)));
+      const unverified = unverifiedSnapshot.data().count;
+
+      const noCoverSnapshot = await getCountFromServer(query(songsRef, where("coverUrl", "==", null)));
+      const noCover = noCoverSnapshot.data().count;
+
+      const noRatingSnapshot = await getCountFromServer(query(songsRef, where("avgDifficulty", "==", 0)));
+      const noRating = noRatingSnapshot.data().count;
+
+      const q = query(
+        resultsQuery,
+        orderBy("createdAt", "desc"),
+        limit(limitNum * pageNum)
+      );
       const querySnapshot = await getDocs(q);
 
-      const songs = querySnapshot.docs.map(doc => ({
+      const allFetchedSongs = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
 
-      return res.status(200).json(songs);
-      return res.status(200).json(songs);
+      const songs = allFetchedSongs.slice((pageNum - 1) * limitNum);
+
+      return res.status(200).json({
+        songs,
+        total: totalFiltered,
+        stats: {
+          total: totalGlobal,
+          unverified,
+          noCover,
+          noRating
+        }
+      });
     }
 
     if (req.method === "DELETE") {
@@ -47,24 +93,42 @@ export default async function handler(
 
       if (bulkSongs && Array.isArray(bulkSongs)) {
         const songsRef = collection(db, "songs");
-        const existingSnapshot = await getDocs(songsRef);
-        const existingMap = new Set(
-          existingSnapshot.docs.map(doc => {
-            const d = doc.data();
-            return `${d.artist?.toLowerCase().trim()}|${d.title?.toLowerCase().trim()}`;
-          })
-        );
+
+        // Extract unique artists to narrow down the search
+        const artists = Array.from(new Set(bulkSongs.map(s => (s.artist || "").toLowerCase().trim())));
+
+        const existingMap = new Set();
+
+        // Fetch existing songs for these artists
+        if (artists.length > 0) {
+          // Firestore 'in' query has a limit of 10-30 values depending on version, 
+          // but artist_lowercase doesn't exist for all records yet or we might have many artists.
+          // For simplicity and safety, if batch is small we can query, otherwise we might have to fetch more.
+          // Let's use a simpler approach: fetch where artist_lowercase is in the list (up to 10 artists)
+          // or just fetch all if it's too complex. 
+          // Actually, let's fetch all for now but IMPROVE the check.
+
+          const existingSnapshot = await getDocs(songsRef);
+          existingSnapshot.docs.forEach(doc => {
+            const data = doc.data();
+            const key = `${(data.artist || "").toLowerCase().trim()}|${(data.title || "").toLowerCase().trim()}`;
+            existingMap.add(key);
+          });
+        }
 
         const results = [];
         let skipped = 0;
 
         for (const s of bulkSongs) {
-          const normalizedKey = `${s.artist?.toLowerCase().trim()}|${s.title?.toLowerCase().trim()}`;
+          const normalizedKey = `${(s.artist || "").toLowerCase().trim()}|${(s.title || "").toLowerCase().trim()}`;
 
           if (existingMap.has(normalizedKey)) {
             skipped++;
             continue;
           }
+
+          // Important: also check title variants (e.g. "Title (Live)" vs "Title")? 
+          // No, let's stick to exact match for safety.
 
           const difficulty = s.difficulty ? (typeof s.difficulty === 'string' ? parseFloat(s.difficulty) : s.difficulty) : null;
 
@@ -76,6 +140,7 @@ export default async function handler(
             createdAt: serverTimestamp(),
             createdBy: "admin",
             isVerified: true,
+            coverUrl: s.coverUrl || null,
             difficulties: difficulty !== null ? [{
               userId: "admin_system",
               rating: difficulty,
@@ -83,17 +148,20 @@ export default async function handler(
             }] : [],
             avgDifficulty: difficulty !== null ? difficulty : 0
           };
+
+          // Double check BEFORE addDoc (rare race condition protection)
+          // Map update is synchronous so this protects within the same request
+          existingMap.add(normalizedKey);
+
           const docRef = await addDoc(songsRef, newSong);
           results.push({ id: docRef.id, ...newSong });
-
-          // Add to map to prevent duplicates within the same batch
-          existingMap.add(normalizedKey);
         }
 
         return res.status(200).json({
           success: true,
           count: results.length,
           skipped,
+          results,
           message: `Added ${results.length} songs. Skipped ${skipped} duplicates.`
         });
       }

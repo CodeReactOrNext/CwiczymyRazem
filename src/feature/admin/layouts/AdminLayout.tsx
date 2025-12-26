@@ -1,16 +1,17 @@
 import { ReactNode, useState } from "react";
 import { 
   Music, 
-  Menu, 
-  ChevronLeft, 
-  LogOut, 
+  Menu,
+  ChevronLeft,
+  LogOut,
   Zap,
   LayoutDashboard,
   Users,
   Settings,
   Database,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  SearchCheck
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -29,7 +30,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
   const menuItems = [
     { name: "Inventory", href: "/admin", icon: Music },
     { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Activity", href: "/admin/activity", icon: Zap },
+    { name: "Discovery", href: "/admin/discovery", icon: SearchCheck },
   ];
 
   return (
