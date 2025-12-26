@@ -27,6 +27,8 @@ import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder"
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Music, Plus } from "lucide-react";
+import Link from "next/link";
 import { useAppSelector } from "store/hooks";
 
 interface SongLearningSectionProps {
@@ -294,7 +296,27 @@ export const SongLearningSection = ({
         <SongLearningStats userSongs={userSongs} />
       </div>
 
-      {isMobile ? (
+      {userSongs.wantToLearn.length === 0 && userSongs.learning.length === 0 && userSongs.learned.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-white/5 bg-zinc-900/10 p-12 text-center backdrop-blur-sm animate-in fade-in zoom-in duration-500">
+           <div className="relative mb-6">
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-800/50 text-zinc-500">
+                <Music size={40} />
+              </div>
+              <div className="absolute -bottom-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500 text-black shadow-lg shadow-cyan-500/20">
+                <Plus size={18} strokeWidth={3} />
+              </div>
+           </div>
+           <h3 className="text-xl font-bold text-white mb-2">Build your practice list</h3>
+           <p className="max-w-md text-sm text-zinc-400 mb-8">
+             Your song board is empty. Add songs from the library to track your progress and manage your learning journey.
+           </p>
+           <Link href="/songs?view=library">
+              <button className="h-12 rounded-xl bg-cyan-500 hover:bg-cyan-600 px-8 text-black font-bold transition-all active:scale-95 shadow-lg shadow-cyan-500/10">
+                Browse Library
+              </button>
+           </Link>
+        </div>
+      ) : isMobile ? (
         <MobileView />
       ) : (
         <div className='font-openSans grid grid-cols-1 gap-6 md:grid-cols-3'>
