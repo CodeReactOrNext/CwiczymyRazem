@@ -1,4 +1,4 @@
-import { Search, RefreshCw, ShieldCheck, Plus } from "lucide-react";
+import { Search, RefreshCw, ShieldCheck, Plus, User } from "lucide-react";
 import { Input } from "assets/components/ui/input";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
@@ -12,6 +12,7 @@ interface AdminActionCenterProps {
   onMassVerify: () => void;
   onMassEnrich: () => void;
   onBulkAdd: () => void;
+  onArtistSelector: () => void;
   onFindDuplicates: () => void;
   isBulkProcessing: boolean;
   isLoading: boolean;
@@ -26,6 +27,7 @@ const AdminActionCenter = ({
   onMassVerify,
   onMassEnrich,
   onBulkAdd,
+  onArtistSelector,
   onFindDuplicates,
   isBulkProcessing,
   isLoading
@@ -104,16 +106,24 @@ const AdminActionCenter = ({
           <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
           Mass Enrich
         </Button>
-        <Button 
-          onClick={onBulkAdd} 
+        <Button
+          onClick={onBulkAdd}
           disabled={isLoading}
           className="h-10 bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
         >
           <Plus className="mr-2 h-3.5 w-3.5" />
           Bulk Add Songs
         </Button>
-        <Button 
-          onClick={onFindDuplicates} 
+        <Button
+          onClick={onArtistSelector}
+          disabled={isLoading}
+          className="h-10 bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
+        >
+          <User className="mr-2 h-3.5 w-3.5" />
+          Artist Selector
+        </Button>
+        <Button
+          onClick={onFindDuplicates}
           variant="ghost"
           disabled={isLoading}
           className="h-10 border border-white/5 bg-zinc-900/60 hover:bg-white/5 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 group"
