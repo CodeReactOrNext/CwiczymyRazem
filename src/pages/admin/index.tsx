@@ -12,6 +12,7 @@ import { useAdminBulkActions } from "feature/admin/hooks/useAdminBulkActions";
 import { useDuplicateDetector } from "feature/admin/hooks/useDuplicateDetector";
 import { BulkAddSongsModal } from "feature/admin/components/BulkAddSongsModal";
 import { DuplicateSongsModal } from "feature/admin/components/DuplicateSongsModal";
+import { ArtistSongSelector } from "feature/admin/components/ArtistSongSelector";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../api/auth/[...nextauth]";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -21,6 +22,7 @@ import type { GetServerSideProps } from "next";
 const AdminDashboard = () => {
   const [selectedSongForCover, setSelectedSongForCover] = useState<{ id: string; artist: string; title: string } | null>(null);
   const [isBulkAddOpen, setIsBulkAddOpen] = useState(false);
+  const [isArtistSelectorOpen, setIsArtistSelectorOpen] = useState(false);
 
   const {
     password,
@@ -80,11 +82,12 @@ const AdminDashboard = () => {
           <p className="text-sm font-medium text-zinc-500">Manage library metadata and enrichment verification</p>
         </div>
 
-        <DashboardStats 
-          totalSongs={stats.total} 
-          missingCovers={stats.missing} 
-          unverifiedCount={stats.unverified} 
+        <DashboardStats
+          totalSongs={stats.total}
+          missingCovers={stats.missing}
+          unverifiedCount={stats.unverified}
           noRatingCount={stats.noRating}
+          onArtistSelector={() => setIsArtistSelectorOpen(true)}
         />
 
         <div className="space-y-6">
@@ -97,6 +100,7 @@ const AdminDashboard = () => {
             onMassVerify={verifyAll}
             onMassEnrich={handleMassEnrich}
             onBulkAdd={() => setIsBulkAddOpen(true)}
+            onArtistSelector={() => setIsArtistSelectorOpen(true)}
             onFindDuplicates={() => setIsDuplicateModalOpen(true)}
             isBulkProcessing={isBulkProcessing}
             isLoading={isLoading}
@@ -154,11 +158,24 @@ const AdminDashboard = () => {
         }}
       />
       
-      <DuplicateSongsModal 
+      <DuplicateSongsModal
         isOpen={isDuplicateModalOpen}
         onClose={() => setIsDuplicateModalOpen(false)}
         duplicates={duplicates}
         onDelete={handleDelete}
+      />
+
+      <ArtistSongSelector
+        isOpen={isArtistSelectorOpen}
+        onClose={() => setIsArtistSelectorOpen(false)}
+        onSongsSelected={async (songs, artistName) => {
+          await handleBulkAdd(songs.map(song => ({
+            title: song.title,
+            artist: song.artist || artistName,
+            difficulty: song.difficulty
+          })));
+          setIsArtistSelectorOpen(false);
+        }}
       />
     </AdminLayout>
   );
