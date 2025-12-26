@@ -32,44 +32,47 @@ export const LogReaction = ({ logId, reactions = [], currentUserId }: LogReactio
     await toggleLogReaction(logId, currentUserId, !nowReacted);
   };
 
-  if (localReactions.length === 0 && !isReacted) {
-    return (
-      <button
-        onClick={handleToggle}
-        className="text-zinc-700 hover:text-orange-500/50 transition-colors p-1"
-      >
-        <FaFire size={12} />
-      </button>
-    );
-  }
-
+  // Consolidate rendering to always show a visible button
   return (
     <button
       onClick={handleToggle}
       className={cn(
-        "group relative flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold transition-all",
-        isReacted 
-          ? "bg-orange-500/10 text-orange-500" 
-          : "bg-zinc-800/30 text-zinc-500 hover:bg-zinc-800/50"
+        "group relative ml-2 flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold transition-all hover:scale-105 active:scale-95",
+        isReacted
+          ? "border-orange-500/30 bg-orange-500/10 text-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.1)]"
+          : "border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-orange-500/30 hover:bg-zinc-800 hover:text-orange-400"
       )}
+      title={isReacted ? "Remove reaction" : "High five!"}
     >
-      <div className="relative">
-        <FaFire size={10} className={cn(isReacted && "fill-orange-500")} />
+      <div className="relative flex items-center justify-center">
+        <FaFire 
+          size={12} 
+          className={cn(
+            "transition-colors duration-300", 
+            isReacted ? "fill-orange-400" : "fill-current group-hover:text-orange-500"
+          )} 
+        />
         
         <AnimatePresence>
           {isAnimating && (
             <motion.div
-              initial={{ opacity: 1, scale: 1 }}
-              animate={{ opacity: 0, scale: 2 }}
+              initial={{ opacity: 1, scale: 1, y: 0 }}
+              animate={{ opacity: 0, scale: 2.5, y: -10 }}
               className="absolute inset-0 pointer-events-none"
             >
-              <FaFire size={10} className="text-orange-400" />
+              <FaFire size={12} className="text-orange-500" />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
       
-      <span>{localReactions.length}</span>
+      {localReactions.length > 0 ? (
+        <span>{localReactions.length}</span>
+      ) : (
+        <span className="opacity-0 w-0 overflow-hidden group-hover:w-auto group-hover:opacity-100 transition-all duration-300">
+           React
+        </span>
+      )}
     </button>
   );
 };
