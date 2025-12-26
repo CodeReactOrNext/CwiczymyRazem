@@ -52,7 +52,7 @@ interface LogsBoxLayoutProps {
 }
 
 const TimeStamp = ({ date }: { date: Date }) => (
-  <p className='mr-3 w-[23%] max-w-[8rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem] text-secondText lg:text-xs'>
+  <p className='hidden sm:block mr-3 w-[23%] max-w-[8rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem] text-secondText lg:text-xs'>
     {date.toLocaleDateString() +
       " " +
       addZeroToTime(date.getHours()) +
@@ -128,7 +128,7 @@ const FirebaseLogsSongItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className='flex w-[80%] flex-wrap items-center gap-1'>
+      <div className='flex w-full flex-wrap items-center gap-1 sm:w-[80%]'>
         <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
           <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} />
         </span>
@@ -169,7 +169,7 @@ const FirebaseLogsItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className='flex w-[80%] flex-wrap items-center gap-1'>
+      <div className='flex w-full flex-wrap items-center gap-1 sm:w-[80%]'>
         <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
           <UserLink
             uid={uid}
@@ -403,7 +403,7 @@ const NoTopPlayersData = ({
 }) => (
   <LogItem isNew={isNew}>
     <TimeStamp date={date} />
-    <div className='flex w-[80%] flex-col gap-2'>
+    <div className='flex w-full flex-col gap-2 sm:w-[80%]'>
       <h3 className='flex items-center gap-2 text-sm font-bold text-tertiary'>
         <FaTrophy className='text-yellow-400' />
         <span>{t("logsBox.top_players")}</span>

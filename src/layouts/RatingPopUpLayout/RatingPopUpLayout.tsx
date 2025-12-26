@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import MainContainer from "components/MainContainer";
 import Router from "next/router";
 import type { Dispatch, SetStateAction } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getPointsToLvlUp } from "utils/gameLogic";
@@ -16,7 +16,7 @@ import { NextMilestone } from "./components/NextMilestone";
 import { WeeklySummary } from "./components/WeeklySummary";
 import { PerformanceComparison } from "./components/PerformanceComparison";
 import { SkillBalance } from "./components/SkillBalance";
-import { PointsBreakdown } from "./components/PointsBreakdown";
+
 import { SessionStats } from "./components/SessionStats";
 import { LevelUpBanner } from "./components/LevelUpBanner";
 import { AchievementsDisplay } from "./components/AchievementsDisplay";
@@ -63,7 +63,18 @@ const RatingPopUp = ({
   const [displayedPoints, setDisplayedPoints] = useState(0);
   const { t } = useTranslation("report");
 
+  const topRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
+    // Scroll to top
+    // Try window scroll first
+    window.scrollTo(0, 0);
+    
+    // Try ref scroll as backup for nested containers
+    if (topRef.current) {
+        topRef.current.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+
     const timeout = setTimeout(() => {
       setCurrentLevel(currentUserStats.lvl);
     }, 2000);
@@ -129,11 +140,12 @@ const RatingPopUp = ({
         transition={{ duration: 0.5 }}
         className='mx-auto max-w-6xl p-4 sm:p-5'>
         
+        <div ref={topRef} />
         {isGetNewLevel && <LevelUpBanner />}
 
         <div className='mb-4 rounded-lg border border-cyan-500/30 bg-gradient-to-r from-cyan-500/10 via-cyan-400/5 to-transparent p-4 shadow-lg glass-card'>
           <div className='text-center'>
-            <div className='mb-3 flex items-center justify-center gap-2'>
+            <div className='flex items-center justify-center gap-2'>
               <span className='text-4xl font-bold text-cyan-400 sm:text-5xl'>
                 {displayedPoints}
               </span>
@@ -142,7 +154,6 @@ const RatingPopUp = ({
               </span>
             </div>
             
-            <PointsBreakdown bonusPoints={ratingData.bonusPoints} />
           </div>
         </div>
 
@@ -185,12 +196,6 @@ const RatingPopUp = ({
           </div>
           <LevelIndicator>{currentLevel + 1}</LevelIndicator>
         </div>
-
-        {categoriesWithPoints.length > 0 && (
-          <div className='mb-6'>
-            <SkillMiniTree highlightCategories={categoriesWithPoints} />
-          </div>
-        )}
 
         <div className='mt-8 flex justify-center'>
           <Button
