@@ -7,6 +7,7 @@ import AdminActionCenter from "feature/admin/components/AdminActionCenter";
 import MassActionProgress from "feature/admin/components/MassActionProgress";
 import CoverPickerModal from "feature/admin/components/CoverPickerModal";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
+import { toast } from "sonner";
 import { useAdminSongs } from "feature/admin/hooks/useAdminSongs";
 import { useAdminBulkActions } from "feature/admin/hooks/useAdminBulkActions";
 import { useDuplicateDetector } from "feature/admin/hooks/useDuplicateDetector";
@@ -52,14 +53,21 @@ const AdminDashboard = () => {
     handleQuickRate,
     handleDelete,
     filteredSongs,
-    stats
+    stats,
+    page,
+    setPage,
+    totalCount
   } = useAdminSongs(password);
 
   const {
     duplicates,
     isModalOpen: isDuplicateModalOpen,
-    setIsModalOpen: setIsDuplicateModalOpen
-  } = useDuplicateDetector(songs);
+    setIsModalOpen: setIsDuplicateModalOpen,
+    isScanning: isDuplicateScanning,
+    scanProgress: duplicateScanProgress,
+    handleDeepScan,
+    scannedCount
+  } = useDuplicateDetector(songs, password);
 
   const {
     isBulkProcessing,
@@ -100,13 +108,19 @@ const AdminDashboard = () => {
             onMassVerify={verifyAll}
             onMassEnrich={handleMassEnrich}
             onBulkAdd={() => setIsBulkAddOpen(true)}
-            onArtistSelector={() => setIsArtistSelectorOpen(true)}
-            onFindDuplicates={() => setIsDuplicateModalOpen(true)}
-            isBulkProcessing={isBulkProcessing}
-            isLoading={isLoading}
+            onFindDuplicates={handleDeepScan}
+            isBulkProcessing={isBulkProcessing || isDuplicateScanning}
+            isLoading={isLoading || isDuplicateScanning}
           />
 
-          {isBulkProcessing && <MassActionProgress progress={progress} />}
+          {(isBulkProcessing || isDuplicateScanning) && (
+            <MassActionProgress 
+              progress={isDuplicateScanning 
+                ? { current: scannedCount, total: stats.total } 
+                : progress
+              } 
+            />
+          )}
 
           <SongManagementTable 
             songs={filteredSongs}
@@ -131,6 +145,9 @@ const AdminDashboard = () => {
             onQuickRate={handleQuickRate}
             onDelete={handleDelete}
             isLoading={isLoading}
+            page={page}
+            totalCount={totalCount}
+            onPageChange={setPage}
           />
         </div>
       </div>
@@ -163,17 +180,34 @@ const AdminDashboard = () => {
         onClose={() => setIsDuplicateModalOpen(false)}
         duplicates={duplicates}
         onDelete={handleDelete}
+        scannedCount={scannedCount}
       />
 
       <ArtistSongSelector
         isOpen={isArtistSelectorOpen}
         onClose={() => setIsArtistSelectorOpen(false)}
-        onSongsSelected={async (songs, artistName) => {
-          await handleBulkAdd(songs.map(song => ({
+        onSongsSelected={async (songs, artistName, autoEnrich) => {
+          const res = await handleBulkAdd(songs.map(song => ({
             title: song.title,
             artist: song.artist || artistName,
             difficulty: song.difficulty
           })));
+
+          if (res?.success && autoEnrich && res.results?.length > 0) {
+            toast.promise(
+               async () => {
+                for (const addedSong of res.results) {
+                  await handleEnrich(addedSong.id, addedSong.artist, addedSong.title, true);
+                }
+               },
+               {
+                 loading: `Enriching ${res.results.length} songs...`,
+                 success: "Discovery & Enrichment complete!",
+                 error: "Discovery failed"
+               }
+            );
+          }
+
           setIsArtistSelectorOpen(false);
         }}
       />

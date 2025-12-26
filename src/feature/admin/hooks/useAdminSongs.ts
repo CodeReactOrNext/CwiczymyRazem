@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import type { Song } from "feature/songs/types/songs.type";
@@ -11,36 +11,56 @@ export const useAdminSongs = (password: string) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ title: "", artist: "", avgDifficulty: 0 });
 
-  const { data: songs = [], isLoading, refetch: fetchSongs } = useQuery({
-    queryKey: ["admin-songs", password],
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 15;
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [filterType]);
+
+  const { data: adminSongsData, isLoading, refetch: fetchSongs } = useQuery({
+    queryKey: ["admin-songs", password, page, filterType],
     queryFn: async () => {
       const res = await axios.get("/api/admin/songs", {
-        headers: { "x-admin-password": password }
+        headers: { "x-admin-password": password },
+        params: { page, limit: ITEMS_PER_PAGE, filterType }
       });
-      return res.data as Song[];
+      return res.data as { songs: Song[], total: number, stats: any };
     },
     enabled: !!password,
   });
+
+  const songs = adminSongsData?.songs || [];
+  const totalCount = adminSongsData?.total || 0;
+  const globalStats = adminSongsData?.stats || { total: 0, unverified: 0, noCover: 0, noRating: 0 };
 
   const invalidateSongs = () => {
     queryClient.invalidateQueries({ queryKey: ["admin-songs"] });
   };
 
   const updateLocalSong = useCallback((songId: string, updates: Partial<Song>) => {
-    queryClient.setQueryData<Song[]>(["admin-songs", password], (oldSongs) => {
-      if (!oldSongs) return [];
-      return oldSongs.map(song =>
-        song.id === songId ? { ...song, ...updates } : song
-      );
+    queryClient.setQueryData<{ songs: Song[], total: number, stats: any }>(["admin-songs", password, page], (oldData) => {
+      if (!oldData) return { songs: [], total: 0, stats: {} };
+      return {
+        ...oldData,
+        songs: oldData.songs.map(song =>
+          song.id === songId ? { ...song, ...updates } : song
+        )
+      };
     });
-  }, [queryClient, password]);
+  }, [queryClient, password, page]);
 
   const removeLocalSong = useCallback((songId: string) => {
-    queryClient.setQueryData<Song[]>(["admin-songs", password], (oldSongs) => {
-      if (!oldSongs) return [];
-      return oldSongs.filter(song => song.id !== songId);
+    queryClient.setQueryData<{ songs: Song[], total: number, stats: any }>(["admin-songs", password, page], (oldData) => {
+      if (!oldData) return { songs: [], total: 0, stats: {} };
+      return {
+        ...oldData,
+        songs: oldData.songs.filter(song => song.id !== songId),
+        total: oldData.total - 1
+      };
     });
-  }, [queryClient, password]);
+  }, [queryClient, password, page]);
 
   const handleSave = async (songId: string) => {
     try {
@@ -49,7 +69,6 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: editForm
       });
-      // invalidateSongs();
       updateLocalSong(songId, editForm);
       setEditingId(null);
       toast.success("Changes saved");
@@ -65,7 +84,6 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: { isVerified: true }
       });
-      // invalidateSongs();
       updateLocalSong(songId, { isVerified: true });
       toast.success("Song marked as verified");
     } catch (error) {
@@ -80,7 +98,6 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: { avgDifficulty: rating, isVerified: true }
       });
-      // invalidateSongs();
       updateLocalSong(songId, { avgDifficulty: rating, isVerified: true });
       toast.success(`Song rated ${rating}`);
     } catch (error) {
@@ -95,9 +112,11 @@ export const useAdminSongs = (password: string) => {
         bulkSongs
       });
       toast.success(response.data.message || `Bulk add successful: ${bulkSongs.length} songs`);
-      invalidateSongs(); // Keep invalidation for bulk add as it introduces new items
+      invalidateSongs();
+      return response.data; // Return results for further processing
     } catch (error) {
       toast.error("Bulk add failed");
+      return null;
     }
   };
 
@@ -108,7 +127,6 @@ export const useAdminSongs = (password: string) => {
         songId,
         data: { coverUrl, isVerified: true }
       });
-      // invalidateSongs();
       updateLocalSong(songId, { coverUrl, isVerified: true });
       toast.success("Cover updated successfully");
     } catch (error) {
@@ -122,7 +140,6 @@ export const useAdminSongs = (password: string) => {
       await axios.delete(`/api/admin/songs?songId=${songId}`, {
         headers: { "x-admin-password": password }
       });
-      // invalidateSongs();
       removeLocalSong(songId);
       toast.success("Song deleted");
     } catch (error) {
@@ -130,22 +147,17 @@ export const useAdminSongs = (password: string) => {
     }
   };
 
+  // Filter local page result based on search (still useful for current page)
   const filteredSongs = songs.filter(s => {
-    const matchesSearch = s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    return s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.artist.toLowerCase().includes(searchTerm.toLowerCase());
-
-    if (filterType === "unverified") return matchesSearch && !s.isVerified;
-    if (filterType === "no-cover") return matchesSearch && !s.coverUrl;
-    if (filterType === "no-rating") return matchesSearch && (!s.avgDifficulty || s.avgDifficulty === 0);
-
-    return matchesSearch;
   });
 
   const stats = {
-    total: songs.length,
-    missing: songs.filter(s => !s.coverUrl).length,
-    unverified: songs.filter(s => !s.isVerified).length,
-    noRating: songs.filter(s => !s.avgDifficulty || s.avgDifficulty === 0).length,
+    total: globalStats.total,
+    missing: globalStats.noCover,
+    unverified: globalStats.unverified,
+    noRating: globalStats.noRating,
   };
 
   return {
@@ -168,6 +180,9 @@ export const useAdminSongs = (password: string) => {
     handleQuickRate,
     handleDelete,
     filteredSongs,
-    stats
+    stats,
+    page,
+    setPage,
+    totalCount
   };
 };

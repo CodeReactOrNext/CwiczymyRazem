@@ -5,6 +5,7 @@ interface Song {
   title: string;
   artist: string;
   album?: string;
+  coverUrl?: string;
   year?: number;
   popularity?: number;
 }
@@ -24,8 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    console.error('Spotify credentials not configured');
-    return res.status(500).json({ error: 'Spotify credentials not configured' });
+    console.error('Spotify credentials missing in ENV:', { clientId: !!clientId, clientSecret: !!clientSecret });
+    return res.status(500).json({
+      error: 'Spotify API not configured. Please ensure NEXT_PUBLIC_SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET are set in your .env file and RESTART the server.'
+    });
   }
 
   try {
@@ -44,65 +47,77 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const accessToken = tokenResponse.data.access_token;
 
-    // Search for artist
-    const artistSearchTerm = encodeURIComponent(artist);
-    const artistResponse = await axios.get(
-      `https://api.spotify.com/v1/search?q=${artistSearchTerm}&type=artist&limit=1&market=PL`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
+    // Use a more flexible search. artist:"Name" is strict.
+    // We try both strict and relaxed if strict fails.
+    const searchTracks = async (queryStr: string, offset = 0) => {
+      try {
+        let response = await axios.get(
+          `https://api.spotify.com/v1/search?q=${encodeURIComponent(queryStr)}&type=track&limit=50&offset=${offset}&market=PL`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
 
-    const artists = artistResponse.data.artists?.items || [];
-    if (artists.length === 0) {
-      return res.status(404).json({ error: `Artist "${artist}" not found` });
+        // If PL market returns no tracks, try US market as a fallback
+        if (!response.data.tracks?.items || response.data.tracks.items.length === 0) {
+          response = await axios.get(
+            `https://api.spotify.com/v1/search?q=${encodeURIComponent(queryStr)}&type=track&limit=50&offset=${offset}&market=US`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          );
+        }
+        return response.data.tracks?.items || [];
+      } catch (err) {
+        console.error("Spotify Search Error:", err);
+        return [];
+      }
+    };
+
+    // Try strict artist search first
+    let rawTracks = await searchTracks(`artist:"${artist}"`, 0);
+
+    // If strict search returns very few results, try relaxed search
+    if (rawTracks.length < 10) {
+      const relaxedTracks = await searchTracks(artist, 0);
+      rawTracks = [...rawTracks, ...relaxedTracks];
     }
 
-    const artistId = artists[0].id;
+    // Deduplication and Filtering
+    const normalizedSongs = new Map<string, Song>();
 
-    // Get artist's top tracks and albums
-    const [topTracksResponse, albumsResponse] = await Promise.all([
-      axios.get(`https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=PL`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      }),
-      axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?limit=5&market=PL`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      })
-    ]);
+    for (const track of rawTracks) {
+      const mainArtist = track.artists[0]?.name || "";
 
-    const tracks = topTracksResponse.data.tracks || [];
-    const albums = albumsResponse.data.items || [];
+      // Verification: Does the artist name appear in the track's artists?
+      const hasArtistMatch = track.artists.some((a: any) =>
+        a.name.toLowerCase().includes(artist.toLowerCase()) ||
+        artist.toLowerCase().includes(a.name.toLowerCase())
+      );
 
-    // Get tracks from top albums
-    const albumPromises = albums.slice(0, 2).map((album: any) =>
-      axios.get(`https://api.spotify.com/v1/albums/${album.id}/tracks?limit=5&market=PL`, {
-        headers: { Authorization: `Bearer ${accessToken}` }
-      }).catch(err => {
-        console.error(`Error fetching tracks for album ${album.name}:`, err);
-        return { data: { items: [] } };
-      })
-    );
+      if (!hasArtistMatch) continue;
 
-    const albumResponses = await Promise.all(albumPromises);
-    const albumTracks = albumResponses.flatMap(response => response.data.items || []);
+      const title = track.name;
+      // Key: title + first artist
+      const key = `${title.toLowerCase().trim()}|${mainArtist.toLowerCase().trim()}`;
 
-    // Combine, deduplicate and format tracks
-    const allTracks = [...tracks, ...albumTracks];
-    const uniqueTracks = allTracks.filter((track, index, self) =>
-      index === self.findIndex(t => t.name === track.name)
-    );
+      if (!normalizedSongs.has(key)) {
+        normalizedSongs.set(key, {
+          title: title,
+          artist: track.artists.map((a: any) => a.name).join(", "),
+          album: track.album?.name,
+          coverUrl: track.album?.images?.[0]?.url,
+          year: track.album?.release_date ? new Date(track.album.release_date).getFullYear() : undefined,
+          popularity: track.popularity || 50
+        });
+      }
+    }
 
-    const songs: Song[] = uniqueTracks.slice(0, 20).map((track: any) => ({
-      title: track.name,
-      artist: track.artists.map((a: any) => a.name).join(", "),
-      album: track.album?.name,
-      year: track.album?.release_date ? new Date(track.album.release_date).getFullYear() : undefined,
-      popularity: track.popularity || 50
-    }));
+    const songs = Array.from(normalizedSongs.values())
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+      .slice(0, 80);
 
-    res.status(200).json({ songs });
+    return res.status(200).json({ songs });
   } catch (error: any) {
-    console.error("Error fetching artist songs:", error);
-    res.status(500).json({
-      error: error.message || "Failed to fetch artist songs from Spotify"
+    console.error("Fatal Spotify API Error:", error.response?.data || error.message);
+    return res.status(500).json({
+      error: error.response?.data?.error?.message || error.message || "Spotify connection failed"
     });
   }
 

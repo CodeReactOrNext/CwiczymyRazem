@@ -7,9 +7,10 @@ interface DuplicateSongsModalProps {
   onClose: () => void;
   duplicates: { key: string; songs: Song[] }[];
   onDelete: (songId: string) => void;
+  scannedCount?: number;
 }
 
-export const DuplicateSongsModal = ({ isOpen, onClose, duplicates, onDelete }: DuplicateSongsModalProps) => {
+export const DuplicateSongsModal = ({ isOpen, onClose, duplicates, onDelete, scannedCount }: DuplicateSongsModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -24,7 +25,9 @@ export const DuplicateSongsModal = ({ isOpen, onClose, duplicates, onDelete }: D
             </div>
             <div>
               <h3 className="text-2xl font-black text-white uppercase italic tracking-tight">Duplicate Detective</h3>
-              <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Found {duplicates.length} potential conflict groups</p>
+              <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">
+                Analyzed {scannedCount || "entire"} database • Found {duplicates.length} conflict groups
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors group">

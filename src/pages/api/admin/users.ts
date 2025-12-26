@@ -19,32 +19,16 @@ export default async function handler(
 
   try {
     const usersRef = collection(db, "users");
-    const now = new Date();
-    const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // 1. Get Total Users Count (Efficient Aggregation)
+    // Get Total Users Count (Efficient Aggregation)
     const totalSnapshot = await getCountFromServer(usersRef);
     const totalUsers = totalSnapshot.data().count;
 
-    // 2. Get Only Last 7 Days Users (for admin panel)
-    const recentUsersQuery = query(
-      usersRef,
-      where("createdAt", ">", Timestamp.fromDate(last7Days)),
-      orderBy("createdAt", "desc")
-    );
-    const recentSnapshot = await getDocs(recentUsersQuery);
-
-    const users = recentSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate?.() || doc.data().createdAt,
-    }));
-
     return res.status(200).json({
-      users,
+      users: [],
       stats: {
         totalUsers,
-        recentUsers: users.length,
+        recentUsers: 0,
         registrationTrend: []
       }
     });
