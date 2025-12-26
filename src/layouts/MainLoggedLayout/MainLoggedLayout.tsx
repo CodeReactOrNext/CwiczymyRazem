@@ -85,7 +85,7 @@ const MainLoggedLayout = ({
   ];
 
   return (
-    <main className='h-screen bg-zinc-950 font-sans'>
+    <main className='h-[100dvh] bg-zinc-950 font-sans overflow-hidden'>
       {/* Subtle background texture */}
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.02)_0%,transparent_80%)] opacity-20'></div>
 

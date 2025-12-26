@@ -48,7 +48,7 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-zinc-900/95 pb-safe pt-2 px-2 backdrop-blur-xl lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 bg-zinc-900/95 pb-safe pt-2 px-2 backdrop-blur-xl lg:hidden transform-gpu">
       <div className="flex items-center justify-around gap-1 max-w-md mx-auto">
         {navItems.map((item) => {
           const active = isActive(item.href);
