@@ -45,6 +45,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { cn } from "assets/lib/utils";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 
 const SongsView = () => {
@@ -100,11 +101,21 @@ const SongsView = () => {
             {/* MANAGEMENT SECTION */}
             {activeTab === "management" && (
               <div className="space-y-6 animate-in fade-in-50 duration-300">
-               <div className="flex flex-col gap-2">
-                  <h2 className="text-lg font-bold tracking-tight text-white">Your Progress</h2>
-                  <p className="text-sm text-zinc-400 max-w-2xl">
-                    Drag and drop songs to track your learning journey. Move items between columns to update their status.
-                  </p>
+               <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                  <div className="flex flex-col gap-2">
+                    <h2 className="text-lg font-bold tracking-tight text-white">{t("your_progress", "Your Progress")}</h2>
+                    <p className="text-sm text-zinc-400 max-w-2xl">
+                      {t("drag_and_drop_description", "Drag and drop songs to track your learning journey. Move items between columns to update their status.")}
+                    </p>
+                  </div>
+                  <Button 
+                    variant="outline"
+                    onClick={() => router.push("/songs?view=library")}
+                    className="h-10 border-white/10 bg-zinc-900/60 font-bold transition-all active:scale-95"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t("add_songs_from_library", "Add songs from library") as string}
+                  </Button>
                </div>
                
                <SongLearningSection
@@ -121,36 +132,42 @@ const SongsView = () => {
               <div className="space-y-6 animate-in fade-in-50 duration-300">
               
                 {/* Tier Selection Grid - New Requirement */}
-                <div className="flex flex-wrap gap-2">
-                  {getAllTiers().map((tier) => {
-                    const isActive = tierFilters.includes(tier.tier);
-                    return (
-                      <button
-                        key={tier.tier}
-                        onClick={() => {
-                          if (isActive) {
-                            setTierFilters(tierFilters.filter((t: string) => t !== tier.tier));
-                          } else {
-                            setTierFilters([...tierFilters, tier.tier]);
-                          }
-                        }}
-                        className={cn(
-                          "flex h-10 w-10 items-center justify-center rounded-xl border-2 font-black transition-all active:scale-90",
-                          isActive 
-                            ? "shadow-lg" 
-                            : "border-white/5 bg-zinc-900 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
-                        )}
-                        style={{
-                          borderColor: isActive ? tier.color : "transparent",
-                          backgroundColor: isActive ? `${tier.color}15` : "",
-                          color: isActive ? tier.color : "inherit",
-                          boxShadow: isActive ? `0 0 15px ${tier.color}30` : ""
-                        }}
-                      >
-                        {tier.tier}
-                      </button>
-                    );
-                  })}
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-cyan-500/80">Skill Level Filters</h3>
+                    <p className="text-[11px] text-zinc-500 font-medium">Filter library by player tier</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {getAllTiers().map((tier) => {
+                      const isActive = tierFilters.includes(tier.tier);
+                      return (
+                        <button
+                          key={tier.tier}
+                          onClick={() => {
+                            if (isActive) {
+                              setTierFilters(tierFilters.filter((t: string) => t !== tier.tier));
+                            } else {
+                              setTierFilters([...tierFilters, tier.tier]);
+                            }
+                          }}
+                          className={cn(
+                            "flex h-11 w-11 items-center justify-center rounded-xl border-2 font-black transition-all active:scale-90",
+                            isActive 
+                              ? "shadow-lg" 
+                              : "border-white/5 bg-zinc-900 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
+                          )}
+                          style={{
+                            borderColor: isActive ? tier.color : "transparent",
+                            backgroundColor: isActive ? `${tier.color}15` : "",
+                            color: isActive ? tier.color : "inherit",
+                            boxShadow: isActive ? `0 0 15px ${tier.color}30` : ""
+                          }}
+                        >
+                          {tier.tier}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Enhanced Search & Filter Bar */}
@@ -224,10 +241,15 @@ const SongsView = () => {
                 {/* Grid Content */}
                 <div className="min-h-[500px] rounded-2xl bg-zinc-900/20 p-1">
                   {isLoading ? (
-                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-                      {Array.from({ length: 20 }).map((_, i) => (
-                        <SongCardSkeleton key={i} />
-                      ))}
+                    <div className="space-y-8 pb-12">
+                      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+                        {Array.from({ length: 20 }).map((_, i) => (
+                          <SongCardSkeleton key={i} />
+                        ))}
+                      </div>
+                      <div className='flex justify-center mt-8'>
+                        <div className='h-12 w-64 animate-pulse rounded-2xl bg-zinc-900/30 backdrop-blur-sm' />
+                      </div>
                     </div>
                   ) : (
                     <SongsGrid

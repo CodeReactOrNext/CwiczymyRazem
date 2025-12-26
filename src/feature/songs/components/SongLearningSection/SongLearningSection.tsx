@@ -75,10 +75,6 @@ export const SongLearningSection = ({
     })
   );
 
-  if (!userId) {
-    return null;
-  }
-
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -90,6 +86,10 @@ export const SongLearningSection = ({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  if (!userId) {
+    return null;
+  }
 
   const findContainer = (id: string): SongStatus | undefined => {
     if (userSongs.wantToLearn.find((s) => s.id === id)) return "wantToLearn";
@@ -219,10 +219,28 @@ export const SongLearningSection = ({
 
   const MobileView = () => (
     <Tabs defaultValue="wantToLearn" className="w-full">
-      <TabsList className="mb-4 grid w-full grid-cols-3 bg-slate-800/50">
-        <TabsTrigger value="wantToLearn">{t("want_to_learn") as string}</TabsTrigger>
-        <TabsTrigger value="learning">{t("learning") as string}</TabsTrigger>
-        <TabsTrigger value="learned">{t("learned") as string}</TabsTrigger>
+      <TabsList className="mb-6 grid w-full grid-cols-3 bg-zinc-900/50 p-1.5 h-auto rounded-xl border border-white/5">
+        <TabsTrigger 
+          value="wantToLearn" 
+          className="flex flex-col gap-1.5 items-center py-3 rounded-lg data-[state=active]:bg-zinc-800 data-[state=active]:text-white transition-all"
+        >
+            <span className="text-[11px] font-bold uppercase tracking-wider opacity-70">{t("want_to_learn") as string}</span>
+            <span className="text-lg font-black leading-none">{userSongs.wantToLearn.length}</span>
+        </TabsTrigger>
+        <TabsTrigger 
+          value="learning" 
+          className="flex flex-col gap-1.5 items-center py-3 rounded-lg data-[state=active]:bg-zinc-800 data-[state=active]:text-white transition-all"
+        >
+            <span className="text-[11px] font-bold uppercase tracking-wider opacity-70">{t("learning") as string}</span>
+            <span className="text-lg font-black leading-none">{userSongs.learning.length}</span>
+        </TabsTrigger>
+        <TabsTrigger 
+          value="learned" 
+          className="flex flex-col gap-1.5 items-center py-3 rounded-lg data-[state=active]:bg-zinc-800 data-[state=active]:text-white transition-all"
+        >
+            <span className="text-[11px] font-bold uppercase tracking-wider opacity-70">{t("learned") as string}</span>
+            <span className="text-lg font-black leading-none">{userSongs.learned.length}</span>
+        </TabsTrigger>
       </TabsList>
       
       <TabsContent value="wantToLearn">
@@ -234,6 +252,7 @@ export const SongLearningSection = ({
           onStatusChange={handleStatusChange}
           onSongRemove={handleSongRemoval}
           isMobile={true}
+          hideHeaderOnMobile={true}
         />
       </TabsContent>
       <TabsContent value="learning">
@@ -245,6 +264,7 @@ export const SongLearningSection = ({
           onStatusChange={handleStatusChange}
           onSongRemove={handleSongRemoval}
           isMobile={true}
+          hideHeaderOnMobile={true}
         />
       </TabsContent>
       <TabsContent value="learned">
@@ -256,6 +276,7 @@ export const SongLearningSection = ({
           onStatusChange={handleStatusChange}
           onSongRemove={handleSongRemoval}
           isMobile={true}
+          hideHeaderOnMobile={true}
         />
       </TabsContent>
     </Tabs>
@@ -263,11 +284,11 @@ export const SongLearningSection = ({
 
   return (
     <DndContext 
-        sensors={sensors}
+        sensors={isMobile ? undefined : sensors}
         collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragOver={handleDragOver}
+        onDragStart={isMobile ? undefined : handleDragStart}
+        onDragEnd={isMobile ? undefined : handleDragEnd}
+        onDragOver={isMobile ? undefined : handleDragOver}
     >
       <div className='mb-6'>
         <SongLearningStats userSongs={userSongs} />
