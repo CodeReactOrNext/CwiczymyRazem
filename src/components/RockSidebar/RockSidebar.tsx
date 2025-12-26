@@ -320,6 +320,11 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             <div className='space-y-1'>
               {profileSections.map(({ id, name, href, icon }) => {
                 const isActive = isLinkActive(id, href);
+                const isSkills = id === 'skills';
+                const availablePoints = userStats?.availablePoints;
+                const totalSkillPoints = availablePoints ? 
+                  (availablePoints.technique + availablePoints.theory + availablePoints.hearing + availablePoints.creativity) : 0;
+
                 return (
                   <Link
                     key={id}
@@ -336,7 +341,12 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                       {icon}
                     </span>
                     <span>{name}</span>
-                    {isActive && (
+                    {isSkills && totalSkillPoints > 0 && (
+                      <span className="ml-auto text-[10px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">
+                        {totalSkillPoints > 9999 ? "+9999" : totalSkillPoints}
+                      </span>
+                    )}
+                    {isActive && !isSkills && (
                       <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
                     )}
                   </Link>
@@ -595,6 +605,11 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                   <div className='space-y-1'>
                     {profileSections.map(({ id, name, href, icon }) => {
                       const isActive = isLinkActive(id, href);
+                      const isSkills = id === 'skills';
+                      const availablePoints = userStats?.availablePoints;
+                      const totalSkillPoints = availablePoints ? 
+                        (availablePoints.technique + availablePoints.theory + availablePoints.hearing + availablePoints.creativity) : 0;
+
                       return (
                         <Link
                           key={id}
@@ -614,7 +629,12 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                             {icon}
                           </span>
                           <span>{name}</span>
-                          {isActive && (
+                          {isSkills && totalSkillPoints > 0 && (
+                            <span className="ml-auto text-[10px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">
+                              {totalSkillPoints > 9999 ? "+9999" : totalSkillPoints}
+                            </span>
+                          )}
+                          {isActive && !isSkills && (
                             <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
                           )}
                         </Link>
