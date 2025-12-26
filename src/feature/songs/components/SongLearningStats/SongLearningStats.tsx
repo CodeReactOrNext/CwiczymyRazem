@@ -34,7 +34,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
   const playerTier = avgDifficulty > 0 ? getSongTier(avgDifficulty) : null;
 
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-center">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {/* Total Songs - Compact */}
       <div className="flex flex-1 items-center gap-4 rounded-lg bg-zinc-900/30 p-4 backdrop-blur-sm">
          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">

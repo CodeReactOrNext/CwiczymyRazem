@@ -15,6 +15,7 @@ interface SongStatusCardProps {
   isMobile: boolean;
   isLanding: boolean;
   isDropTarget?: boolean;
+  hideHeaderOnMobile?: boolean;
 }
 
 export const SongStatusCard = ({
@@ -26,6 +27,7 @@ export const SongStatusCard = ({
   isMobile,
   isLanding,
   isDropTarget,
+  hideHeaderOnMobile,
 }: SongStatusCardProps) => {
   const { t } = useTranslation("songs");
   const config = STATUS_CONFIG[droppableId as keyof typeof STATUS_CONFIG];
@@ -52,23 +54,25 @@ export const SongStatusCard = ({
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-xl border border-white/5 bg-zinc-900/40 backdrop-blur-md">
       {/* Header */}
-      <div className={cn("flex items-center gap-3 border-b border-white/5 px-4 py-3", config.bgColor)}>
-        <div className={cn("rounded-lg p-2 bg-black/20", config.color)}>
-           <StatusIcon className="h-5 w-5" />
+      {(!isMobile || !hideHeaderOnMobile) && (
+        <div className={cn("flex items-center gap-3 border-b border-white/5 px-4 py-3", config.bgColor)}>
+            <div className={cn("rounded-lg p-2 bg-black/20", config.color)}>
+            <StatusIcon className="h-5 w-5" />
+            </div>
+            <div className="flex items-baseline gap-2">
+                <h3 className={cn("font-bold tracking-tight text-white")}>{title}</h3>
+                <span className="text-xs font-medium text-zinc-500">
+                {songs?.length || 0}
+                </span>
+            </div>
         </div>
-        <div className="flex items-baseline gap-2">
-            <h3 className={cn("font-bold tracking-tight text-white")}>{title}</h3>
-            <span className="text-xs font-medium text-zinc-500">
-               {songs?.length || 0}
-            </span>
-        </div>
-      </div>
+      )}
       
       {/* Content Area - Droppable */}
       <div 
         ref={setNodeRef}
         className={cn(
-          "flex min-h-[150px] flex-1 flex-col gap-2 p-2 transition-all duration-300",
+          "flex min-h-[150px] flex-1 flex-col gap-3 p-2 transition-all duration-300",
           isDropTarget 
             ? cn("bg-white/5 ring-2 ring-inset transition-all duration-300", config.color.replace("text-", "ring-").replace("500", "500/50")) 
             : "bg-transparent ring-0"

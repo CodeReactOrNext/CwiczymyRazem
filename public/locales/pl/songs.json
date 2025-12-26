@@ -74,5 +74,8 @@
   "start_learning": "Ucz się",
   "mark_as_learned": "Umiem",
   "learn_again": "Powtórz",
-  "your_skill_tier": "Poziom umiejętności"
+  "your_skill_tier": "Poziom umiejętności",
+  "add_songs_from_library": "Dodaj utwory z biblioteki",
+  "your_progress": "Twój postęp",
+  "drag_and_drop_description": "Przeciągaj i upuszczaj utwory, aby śledzić swoją naukę. Przenoś elementy między kolumnami, aby zaktualizować ich status."
 }
