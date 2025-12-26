@@ -560,7 +560,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               })()}
 
               {/* Navigation - Mobile */}
-              <nav className='flex-1 space-y-6 overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent'>
+              <nav className='flex-1 space-y-6 overflow-y-auto p-4 pb-20 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent'>
                 {/* Main Navigation */}
                 <div>
                   <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>

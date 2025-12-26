@@ -119,7 +119,7 @@ export const SongsGrid = ({
                   <PaginationItem>
                     <PaginationPrevious
                       onClick={() => onPageChange(currentPage - 1)}
-                      className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 ${
+                      className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 [&>span]:hidden sm:[&>span]:inline ${
                         currentPage <= 1
                           ? "pointer-events-none opacity-50"
                           : "cursor-pointer hover:border-cyan-500/30 hover:text-cyan-300"
@@ -129,19 +129,26 @@ export const SongsGrid = ({
 
                   {[...Array(totalPages)].map((_, index) => {
                     const pageNumber = index + 1;
-                    if (
-                      pageNumber === 1 ||
-                      pageNumber === totalPages ||
-                      (pageNumber >= currentPage - 1 &&
-                        pageNumber <= currentPage + 1)
-                    ) {
+                    const isCurrent = currentPage === pageNumber;
+                    const isFirst = pageNumber === 1;
+                    const isLast = pageNumber === totalPages;
+                    const isNeighbor =
+                      pageNumber === currentPage - 1 ||
+                      pageNumber === currentPage + 1;
+                    const isEllipsis =
+                      pageNumber === currentPage - 2 ||
+                      pageNumber === currentPage + 2;
+
+                    if (isFirst || isLast || isCurrent || isNeighbor) {
                       return (
-                        <PaginationItem key={pageNumber}>
+                        <PaginationItem
+                          key={pageNumber}
+                          className={isNeighbor ? "hidden sm:block" : ""}>
                           <PaginationLink
                             onClick={() => onPageChange(pageNumber)}
-                            isActive={currentPage === pageNumber}
+                            isActive={isCurrent}
                             className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:border-cyan-500/30 hover:bg-zinc-700/50 hover:text-cyan-300 ${
-                              currentPage === pageNumber
+                              isCurrent
                                 ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
                                 : ""
                             }`}>
@@ -149,12 +156,11 @@ export const SongsGrid = ({
                           </PaginationLink>
                         </PaginationItem>
                       );
-                    } else if (
-                      pageNumber === currentPage - 2 ||
-                      pageNumber === currentPage + 2
-                    ) {
+                    } else if (isEllipsis) {
                       return (
-                        <PaginationItem key={pageNumber}>
+                        <PaginationItem
+                          key={pageNumber}
+                          className='hidden sm:block'>
                           <PaginationEllipsis className='text-zinc-600' />
                         </PaginationItem>
                       );
@@ -165,7 +171,7 @@ export const SongsGrid = ({
                   <PaginationItem>
                     <PaginationNext
                       onClick={() => onPageChange(currentPage + 1)}
-                      className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 ${
+                      className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 [&>span]:hidden sm:[&>span]:inline ${
                         currentPage >= totalPages
                           ? "pointer-events-none opacity-50"
                           : "cursor-pointer hover:border-cyan-500/30 hover:text-cyan-300"

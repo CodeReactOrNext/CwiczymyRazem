@@ -10,6 +10,7 @@ import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 
 import { ActivitySheet } from "./components/ActivitySheet";
+import NavDecoration from "./components/NavDecoration";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
@@ -71,7 +72,7 @@ export const UserHeader = ({
             />
           </div>
 
-            {/* Right Section - Actions */}
+          {/* Right Section - Actions */}
             <div className='flex items-center gap-2'>
               {/* Desktop Actions */}
               <div className='hidden sm:flex items-center gap-1'>
