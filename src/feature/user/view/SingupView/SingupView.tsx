@@ -22,8 +22,10 @@ import {
   Shield,
   CheckCircle,
 } from "lucide-react";
+import { useRouter } from "next/router";
+import { cn } from "assets/lib/utils";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { FcGoogle } from "react-icons/fc";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -38,9 +40,11 @@ export interface SignUpCredentials {
 const SingupView = () => {
   const { t } = useTranslation(["common", "signup"]);
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
-
+  const [isSuccess, setIsSuccess] = useState(false);
+  
   const isFetching = useAppSelector(selectIsFetching) === "createAccount";
   const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
 
@@ -51,13 +55,73 @@ const SingupView = () => {
     repeat_password: "",
   };
 
-  const onSubmit = (credentials: SignUpCredentials) => {
-    dispatch(createAccount(credentials));
+  const onSubmit = async (credentials: SignUpCredentials) => {
+    try {
+      await dispatch(createAccount(credentials)).unwrap();
+      setIsSuccess(true);
+    } catch (error) {
+      // Error is handled by global toast in thunk
+    }
   };
 
   const googleLogInHandler = () => {
     dispatch(logInViaGoogle());
   };
+
+  const getPasswordStrength = (password: string) => {
+    if (!password) return 0;
+    let strength = 0;
+    if (password.length >= 8) strength += 25;
+    if (/[A-Z]/.test(password)) strength += 25;
+    if (/[0-9]/.test(password)) strength += 25;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+    return strength;
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      const timer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccess, router]);
+
+  if (isSuccess) {
+    return (
+      <div className='relative min-h-screen w-full overflow-hidden bg-zinc-950 text-foreground flex items-center justify-center p-6'>
+        <div className='absolute inset-0 overflow-hidden'>
+          <div className='absolute -left-[10%] -top-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-500/20 blur-[120px]' />
+          <div className='absolute -right-[10%] -bottom-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-800/20 blur-[120px]' />
+        </div>
+        
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative z-10 w-full max-w-md radius-premium glass-card p-8 text-center border border-white/10 shadow-2xl"
+        >
+          <div className="flex justify-center mb-6">
+            <div className="h-20 w-20 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+              <CheckCircle className="h-10 w-10" />
+            </div>
+          </div>
+          
+          <h2 className="text-3xl font-bold text-white mb-2">Welcome to the Quest!</h2>
+          <p className="text-zinc-400 mb-8 leading-relaxed">
+            Your account has been created successfully. Are you ready to level up your guitar skills?
+          </p>
+          
+          <Button 
+            onClick={() => router.push("/dashboard")}
+            className="w-full h-12 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-base transition-all group"
+          >
+            Go to Dashboard
+            <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className='relative min-h-screen w-full overflow-hidden bg-zinc-950 text-foreground flex items-center justify-center'>
@@ -74,17 +138,12 @@ const SingupView = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className='mb-6'>
             <div className='flex items-center justify-between'>
-              <Link
-                href='/login'
-                className='group inline-flex items-center gap-2 text-sm text-zinc-400 transition-all duration-300 hover:text-cyan-400'>
-                <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-                {t("signup:back_to_login")}
-              </Link>
-              <Link
-                href='/'
-                className='text-sm text-zinc-500 hover:text-zinc-300 transition-colors'>
-                {t("common:back")}
-              </Link>
+            <Link
+              href='/'
+              className='group inline-flex items-center gap-2 text-sm text-zinc-400 transition-all duration-300 hover:text-cyan-400'>
+              <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
+              {t("common:back")}
+            </Link>
             </div>
           </motion.div>
 
@@ -116,12 +175,35 @@ const SingupView = () => {
           </div>
 
           {/* Card */}
-          <div className="radius-premium glass-card p-6 shadow-xl">
+          <div className="radius-premium glass-card overflow-hidden shadow-xl border border-white/5 bg-zinc-900/40 backdrop-blur-md">
+            {/* Tab Switcher */}
+            <div className="flex border-b border-white/10">
+              <Link 
+                href="/login" 
+                className="flex-1 py-4 text-center text-sm font-bold transition-all text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+              >
+                {t("signup:login_link")}
+              </Link>
+              <Link 
+                href="/signup" 
+                className="flex-1 py-4 text-center text-sm font-bold transition-all relative text-white bg-white/5"
+              >
+                {t("signup:submit_button")}
+                <motion.div 
+                  layoutId="activeTab"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500" 
+                />
+              </Link>
+            </div>
+
+            <div className="p-6">
             <Formik
               initialValues={formikInitialValues}
               validationSchema={signupSchema}
               onSubmit={onSubmit}>
-              {({ values, errors, touched, handleChange, handleBlur }) => (
+              {({ values, errors, touched, handleChange, handleBlur }) => {
+                const strength = getPasswordStrength(values.password);
+                return (
                 <Form className='space-y-4'>
                    {/* Username Field */}
                    <div className="space-y-2">
@@ -148,6 +230,7 @@ const SingupView = () => {
                             {errors.login}
                           </p>
                         )}
+                        <p className="text-[10px] text-zinc-500">This is how others will see you.</p>
                     </div>
 
                   {/* Email Field */}
@@ -208,6 +291,32 @@ const SingupView = () => {
                         )}
                       </button>
                     </div>
+                    
+                    {/* Password Strength Indicator */}
+                    {values.password && (
+                        <div className="space-y-1.5 px-0.5">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] uppercase tracking-wider font-bold text-zinc-500">Security</span>
+                                <span className={cn(
+                                    "text-[10px] font-bold uppercase",
+                                    strength < 50 ? "text-red-400" : strength < 75 ? "text-amber-400" : "text-emerald-400"
+                                )}>
+                                    {strength < 50 ? "Weak" : strength < 75 ? "Medium" : "Strong"}
+                                </span>
+                            </div>
+                            <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
+                                <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${strength}%` }}
+                                    className={cn(
+                                        "h-full transition-all duration-500",
+                                        strength < 50 ? "bg-red-500" : strength < 75 ? "bg-amber-500" : "bg-emerald-500"
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    )}
+
                     {errors.password && touched.password && (
                       <p className='text-xs text-red-400 font-medium'>
                         {errors.password}
@@ -274,7 +383,7 @@ const SingupView = () => {
                     </Button>
                   </div>
                 </Form>
-              )}
+              )}}
             </Formik>
 
             <div className="relative my-6">
@@ -301,18 +410,9 @@ const SingupView = () => {
                   {t("signup:google_button")}
                 </span>
               </Button>
+            </div>
           </div>
 
-          <div className='text-center'>
-              <p className='text-sm text-zinc-400'>
-                {t("signup:already_have_account")}{" "}
-                <Link
-                  href='/login'
-                  className='font-bold text-cyan-400 hover:text-cyan-300 transition-colors'>
-                  {t("signup:login_link")}
-                </Link>
-              </p>
-            </div>
         </motion.div>
       </div>
     </div>

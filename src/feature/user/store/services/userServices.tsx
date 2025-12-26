@@ -11,8 +11,7 @@ export const fetchUserData = async (user: User) =>
     .post<UserDataInterface>("/api/user/getUserData", {
       user,
     })
-    .then((response) => response.data)
-    .catch((error) => error);
+    .then((response) => response.data);
 
 export const fetchReport = ({ token, inputData }: updateReprotInterface) =>
   axios
@@ -20,5 +19,4 @@ export const fetchReport = ({ token, inputData }: updateReprotInterface) =>
       token,
       inputData,
     })
-    .then((response) => response.data)
-    .catch((error) => error);
+    .then((response) => response.data);
