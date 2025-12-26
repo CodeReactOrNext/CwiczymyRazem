@@ -13,7 +13,7 @@ interface CommunityModalProps {
 export const CommunityModal = ({ isOpen, onClose }: CommunityModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-xl border-white/10 bg-zinc-900 text-white shadow-2xl">
+      <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto border-white/10 bg-zinc-900 text-white shadow-2xl">
         <DialogHeader className="border-b border-white/5 pb-4">
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
             <Heart className="h-5 w-5 text-rose-500 fill-rose-500" />
