@@ -23,9 +23,10 @@ export interface LogsBoxLayoutProps {
     | FirebaseLogsTopPlayersInterface
   )[];
   userAchievements: AchievementList[];
+  currentUserId: string;
 }
 
-const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
+const LogsBoxLayout = ({ logs, userAchievements, currentUserId }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
     "logs" | "achievements" | "discord" | "excerise" | "chat"
   >("logs");
@@ -88,7 +89,11 @@ const LogsBoxLayout = ({ logs, userAchievements }: LogsBoxLayoutProps) => {
       <div className='h-full overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
         {showedCategory === "logs" && logs && (
           <div onClick={markLogsAsRead}>
-            <Logs logs={logs} marksLogsAsRead={markLogsAsRead} />
+            <Logs 
+              logs={logs} 
+              marksLogsAsRead={markLogsAsRead} 
+              currentUserId={currentUserId}
+            />
           </div>
         )}
 
