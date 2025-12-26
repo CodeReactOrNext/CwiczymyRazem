@@ -17,6 +17,8 @@ export interface FirebaseLogsSongsInterface {
   difficulty_rate?: number;
   status: FirebaseLogsSongsStatuses;
   avatarUrl: string | undefined;
+  id?: string;
+  reactions?: string[];
 }
 
 export interface FirebaseUserExceriseLog {
@@ -61,6 +63,8 @@ export interface FirebaseLogsInterface {
     sumTime: number;
   };
   avatarUrl: string | null;
+  id?: string;
+  reactions?: string[];
 }
 
 export interface FirebaseLogsAchievementsInterface {
@@ -87,4 +91,6 @@ export interface FirebaseLogsTopPlayersInterface {
   topPlayers: TopPlayerData[];
   message: string;
   daysLeftInSeason?: number;
+  id?: string;
+  reactions?: string[];
 }

@@ -1,5 +1,5 @@
-import type { 
-  FirebaseLogsInterface, 
+import type {
+  FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface
 } from "feature/logs/types/logs.type";
@@ -24,13 +24,14 @@ export const firebaseGetLogsStream = (
     const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface | FirebaseLogsTopPlayersInterface)[] = [];
 
     snapshot.forEach((doc) => {
-      const log = doc.data() as
-        | FirebaseLogsInterface
-        | FirebaseLogsSongsInterface
-        | FirebaseLogsTopPlayersInterface;
+      const data = doc.data();
+      const log = {
+        ...data,
+        id: doc.id
+      } as (FirebaseLogsInterface | FirebaseLogsSongsInterface | FirebaseLogsTopPlayersInterface) & { id: string };
       logsArr.push(log);
     });
-    
+
     callback(logsArr);
   });
 };

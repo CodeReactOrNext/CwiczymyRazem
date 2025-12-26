@@ -19,6 +19,9 @@ import {
 } from "react-icons/fa";
 import { IoCalendarOutline, IoPersonOutline } from "react-icons/io5";
 import { addZeroToTime } from "utils/converter";
+import { LogReaction } from "feature/logs/components/LogReaction";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { useAppSelector } from "store/hooks";
 
 const isFirebaseLogsSongs = (
   log:
@@ -45,6 +48,7 @@ interface LogsBoxLayoutProps {
     | FirebaseLogsTopPlayersInterface
   )[];
   marksLogsAsRead: () => void;
+  currentUserId: string;
 }
 
 const TimeStamp = ({ date }: { date: Date }) => (
@@ -110,9 +114,11 @@ const getSongStatusMessage = (status: string, t: any): string => {
 const FirebaseLogsSongItem = ({
   log,
   isNew,
+  currentUserId,
 }: {
   log: FirebaseLogsSongsInterface;
   isNew: boolean;
+  currentUserId: string;
 }) => {
   const { t } = useTranslation("common");
   const { userName, data, songArtist, songTitle, status, uid, avatarUrl } = log;
@@ -133,6 +139,14 @@ const FirebaseLogsSongItem = ({
           </span>
           {status !== "difficulty_rate" && "."}
         </p>
+        
+        {log.id && (
+          <LogReaction 
+            logId={log.id} 
+            reactions={log.reactions} 
+            currentUserId={currentUserId} 
+          />
+        )}
       </div>
     </LogItem>
   );
@@ -141,9 +155,11 @@ const FirebaseLogsSongItem = ({
 const FirebaseLogsItem = ({
   log,
   isNew,
+  currentUserId,
 }: {
   log: FirebaseLogsInterface;
   isNew: boolean;
+  currentUserId: string;
 }) => {
   const { t } = useTranslation("common");
   const { userName, points, data, uid, newLevel, newAchievements, avatarUrl } =
@@ -185,6 +201,14 @@ const FirebaseLogsItem = ({
               </span>
             ))}
           </span>
+        )}
+        
+        {log.id && (
+          <LogReaction 
+            logId={log.id} 
+            reactions={log.reactions} 
+            currentUserId={currentUserId} 
+          />
         )}
       </div>
     </LogItem>
@@ -430,7 +454,7 @@ const FirebaseLogsTopPlayersItem = ({
     </div>
   );
 };
-const Logs = ({ logs, marksLogsAsRead }: LogsBoxLayoutProps) => {
+const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
   const { isNewMessage } = useUnreadMessages("logs");
   const spanRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -468,14 +492,22 @@ const Logs = ({ logs, marksLogsAsRead }: LogsBoxLayoutProps) => {
           key={log.data + (log as any).userName || "topPlayers"}
           className='mr-2'>
           {isFirebaseLogsSongs(log) ? (
-            <FirebaseLogsSongItem log={log} isNew={isNewMessage(log.data)} />
+            <FirebaseLogsSongItem 
+              log={log} 
+              isNew={isNewMessage(log.data)} 
+              currentUserId={currentUserId}
+            />
           ) : isFirebaseLogsTopPlayers(log) ? (
             <FirebaseLogsTopPlayersItem
               log={log}
               isNew={isNewMessage(log.data)}
             />
           ) : (
-            <FirebaseLogsItem log={log} isNew={isNewMessage(log.data)} />
+            <FirebaseLogsItem 
+              log={log} 
+              isNew={isNewMessage(log.data)} 
+              currentUserId={currentUserId}
+            />
           )}
         </div>
       ))}
