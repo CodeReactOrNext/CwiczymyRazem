@@ -45,6 +45,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { cn } from "assets/lib/utils";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 
 const SongsView = () => {
@@ -100,11 +101,21 @@ const SongsView = () => {
             {/* MANAGEMENT SECTION */}
             {activeTab === "management" && (
               <div className="space-y-6 animate-in fade-in-50 duration-300">
-               <div className="flex flex-col gap-2">
-                  <h2 className="text-lg font-bold tracking-tight text-white">Your Progress</h2>
-                  <p className="text-sm text-zinc-400 max-w-2xl">
-                    Drag and drop songs to track your learning journey. Move items between columns to update their status.
-                  </p>
+               <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                  <div className="flex flex-col gap-2">
+                    <h2 className="text-lg font-bold tracking-tight text-white">{t("your_progress", "Your Progress")}</h2>
+                    <p className="text-sm text-zinc-400 max-w-2xl">
+                      {t("drag_and_drop_description", "Drag and drop songs to track your learning journey. Move items between columns to update their status.")}
+                    </p>
+                  </div>
+                  <Button 
+                    variant="outline"
+                    onClick={() => router.push("/songs?view=library")}
+                    className="h-10 border-white/10 bg-zinc-900/60 font-bold transition-all active:scale-95"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t("add_songs_from_library", "Add songs from library") as string}
+                  </Button>
                </div>
                
                <SongLearningSection
