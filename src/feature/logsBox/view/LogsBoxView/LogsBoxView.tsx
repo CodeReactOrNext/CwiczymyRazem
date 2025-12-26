@@ -4,7 +4,7 @@ import type {
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
-import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import LogsBoxLayout from "layouts/LogsBoxLayout";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
@@ -15,7 +15,9 @@ const LogsBoxView = () => {
     (FirebaseLogsSongsInterface | FirebaseLogsInterface | FirebaseLogsTopPlayersInterface)[] | null
   >(null);
 
-  const userAchievement = useAppSelector(selectCurrentUserStats)?.achievements;
+  const userStats = useAppSelector(selectCurrentUserStats);
+  const currentUserId = useAppSelector(selectUserAuth);
+  const userAchievement = userStats?.achievements;
 
   useEffect(() => {
     const unsubscribe = firebaseGetLogsStream((logsData) => {
@@ -25,8 +27,12 @@ const LogsBoxView = () => {
     return () => unsubscribe();
   }, []);
 
-  return logs && userAchievement ? (
-    <LogsBoxLayout logs={logs} userAchievements={userAchievement} />
+  return logs && userAchievement && currentUserId ? (
+    <LogsBoxLayout 
+      logs={logs} 
+      userAchievements={userAchievement} 
+      currentUserId={currentUserId}
+    />
   ) : (
     <FaSpinner />
   );
