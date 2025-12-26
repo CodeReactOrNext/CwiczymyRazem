@@ -77,7 +77,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppProps) =>
         <ErrorBoundary>
           <ThemeModeProvider>
             <AuthSyncWrapper>
-               <main className={`${teko.variable} ${inter.variable} `}>
+               <main className={`${teko.variable} ${inter.variable} min-h-[100dvh] bg-zinc-950 text-foreground`}>
                   <Toaster theme='dark' position='top-right' />
                   <NextTopLoader color='#06b6d4' />
                   <div id='overlays'></div>
