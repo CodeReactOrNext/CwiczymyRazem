@@ -130,3 +130,99 @@ export async function fetchEnrichmentData(artist: string, title: string) {
 
   return { coverUrl: null, isVerified: false, source: "none" };
 }
+
+export async function fetchArtistSongs(artist: string): Promise<Array<{
+  title: string;
+  artist: string;
+  album?: string;
+  year?: number;
+  popularity?: number;
+}>> {
+  const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
+  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    throw new Error("Spotify credentials not configured");
+  }
+
+  try {
+    // 1. Get Access Token
+    const authString = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+    const tokenResponse = await axios.post(
+      "https://accounts.spotify.com/api/token",
+      "grant_type=client_credentials",
+      {
+        headers: {
+          Authorization: `Basic ${authString}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    const accessToken = tokenResponse.data.access_token;
+
+    // 2. Search for artist first
+    const artistSearchTerm = encodeURIComponent(artist);
+    const artistResponse = await axios.get(
+      `https://api.spotify.com/v1/search?q=${artistSearchTerm}&type=artist&limit=1&market=PL`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    const artists = artistResponse.data.artists?.items || [];
+    if (artists.length === 0) {
+      throw new Error(`Artist "${artist}" not found`);
+    }
+
+    const artistId = artists[0].id;
+
+    // 3. Get artist's top tracks
+    const topTracksResponse = await axios.get(
+      `https://api.spotify.com/v1/artists/${artistId}/top-tracks?market=PL`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    const tracks = topTracksResponse.data.tracks || [];
+
+    // 4. Get artist's albums for more songs
+    const albumsResponse = await axios.get(
+      `https://api.spotify.com/v1/artists/${artistId}/albums?limit=5&market=PL`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    const albums = albumsResponse.data.items || [];
+    const albumTracks: any[] = [];
+
+    // Get tracks from top albums
+    for (const album of albums.slice(0, 2)) {
+      try {
+        const albumTracksResponse = await axios.get(
+          `https://api.spotify.com/v1/albums/${album.id}/tracks?limit=5&market=PL`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        albumTracks.push(...albumTracksResponse.data.items);
+      } catch (err) {
+        console.error(`Error fetching tracks for album ${album.name}:`, err);
+      }
+    }
+
+    // Combine and deduplicate tracks
+    const allTracks = [...tracks, ...albumTracks];
+    const uniqueTracks = allTracks.filter((track, index, self) =>
+      index === self.findIndex(t => t.name === track.name)
+    );
+
+    // Format the response
+    const songs = uniqueTracks.slice(0, 20).map((track: any) => ({
+      title: track.name,
+      artist: track.artists.map((a: any) => a.name).join(", "),
+      album: track.album?.name || undefined,
+      year: track.album?.release_date ? new Date(track.album.release_date).getFullYear() : undefined,
+      popularity: track.popularity || 50
+    }));
+
+    return songs;
+  } catch (error: any) {
+    console.error("Error fetching artist songs:", error);
+    throw new Error(error.message || "Failed to fetch artist songs from Spotify");
+  }
+}
