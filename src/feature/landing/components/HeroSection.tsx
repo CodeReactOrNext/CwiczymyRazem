@@ -140,38 +140,48 @@ export const HeroSection = () => {
               </Link>
             ) : (
               <>
-                <Link href='/signup' className='w-full sm:w-auto'>
-                  <Button className='h-12 px-10 bg-white text-black hover:bg-zinc-200 font-semibold text-base transition-all w-full sm:w-auto'>
-                    Join Now
-                  </Button>
-                </Link>
-                <Link href='/login' className='w-full sm:w-auto'>
-                  <Button variant="outline" className='h-12 px-10 border-zinc-800 bg-white/5 text-white hover:bg-white/10 font-semibold text-base transition-all w-full sm:w-auto'>
-                    Sign In
-                  </Button>
-                </Link>
-                <Button
-                    onClick={handleGoogleLogin}
-                    disabled={isGoogleFetching}
-                    variant="outline"
-                    className="h-12 px-8 border-zinc-800 bg-white/5 text-white hover:bg-white/10 font-semibold text-base transition-all w-full sm:w-auto flex items-center gap-2"
-                >
-                    {isGoogleFetching ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <FcGoogle className="h-5 w-5" />
-                    )}
-                    Google
-                </Button>
+                <div className="flex flex-col items-center gap-3 w-full sm:w-auto">
+                    <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-start">
+                        <Link href='/signup' className='w-full sm:w-auto'>
+                        <Button className='h-12 px-10 bg-white text-black hover:bg-zinc-200 font-semibold text-base transition-all w-full sm:w-auto shadow-lg shadow-white/5'>
+                            Join Now
+                        </Button>
+                        </Link>
+                        <Button
+                            onClick={handleGoogleLogin}
+                            disabled={isGoogleFetching}
+                            variant="outline"
+                            className="h-12 px-8 border-white/10 bg-white/5 text-white hover:bg-white/10 font-semibold text-base transition-all w-full sm:w-auto flex items-center gap-2"
+                        >
+                            {isGoogleFetching ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                            <FcGoogle className="h-5 w-5" />
+                            )}
+                            Google
+                        </Button>
+                    </div>
+                    
+                    <div className="flex flex-col items-center sm:items-start gap-1 mt-1">
+                        <p className="text-zinc-500 text-sm">
+                            Already have an account?{" "}
+                            <Link href="/login" className="text-zinc-300 hover:text-cyan-400 font-bold transition-colors">
+                                Sign in
+                            </Link>
+                        </p>
+                        
+                        {!isLoggedIn && (
+                           <Link href='#features' className="mt-2 group">
+                            <span className='text-zinc-600 group-hover:text-zinc-400 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer flex items-center gap-2'>
+                              <div className="h-px w-8 bg-zinc-800 group-hover:bg-cyan-500/50 transition-colors" />
+                              Learn how it works
+                              <div className="h-px w-8 bg-zinc-800 group-hover:bg-cyan-500/50 transition-colors" />
+                            </span>
+                          </Link>
+                        )}
+                    </div>
+                </div>
               </>
-            )}
-            
-            {!isLoggedIn && (
-               <Link href='#features' className="ml-2 hidden sm:block">
-                <span className='text-zinc-500 hover:text-zinc-300 text-sm font-medium transition-colors cursor-pointer'>
-                  Learn how it works
-                </span>
-              </Link>
             )}
           </motion.div>
         </div>

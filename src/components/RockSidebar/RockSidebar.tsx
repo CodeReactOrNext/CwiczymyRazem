@@ -39,6 +39,8 @@ import Avatar from "components/UI/Avatar";
 import { NavPagesTypes } from "types/layout.types";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
+import { CommunityModal } from "./CommunityModal";
+import { Heart, MessageSquare } from "lucide-react";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
@@ -56,6 +58,7 @@ interface RockSidebarProps {
 export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
   const { t } = useTranslation("common");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
   const router = useRouter();
 
   // User data
@@ -389,6 +392,14 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               Community
             </div>
             <div className='space-y-1'>
+              <button
+                onClick={() => setIsCommunityModalOpen(true)}
+                className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                <span className='text-rose-500'>
+                  <Heart size={16} fill="currentColor" />
+                </span>
+                <span>Grow Riff Quest</span>
+              </button>
               <a
                 href='https://discord.gg/yRdT9T9F'
                 target='_blank'
@@ -641,6 +652,17 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                     Community
                   </div>
                   <div className='space-y-1'>
+                    <button
+                      onClick={() => {
+                        handleLinkClick();
+                        setIsCommunityModalOpen(true);
+                      }}
+                      className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                      <span className='text-rose-500'>
+                        <Heart size={16} fill="currentColor" />
+                      </span>
+                      <span>Grow Riff Quest</span>
+                    </button>
                     <a
                       href='https://discord.gg/yRdT9T9F'
                       target='_blank'
@@ -659,6 +681,11 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
           </>
         )}
       </AnimatePresence>
+
+      <CommunityModal 
+        isOpen={isCommunityModalOpen} 
+        onClose={() => setIsCommunityModalOpen(false)} 
+      />
     </>
   );
 };
