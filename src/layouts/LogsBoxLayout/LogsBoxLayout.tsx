@@ -24,9 +24,10 @@ export interface LogsBoxLayoutProps {
   )[];
   userAchievements: AchievementList[];
   currentUserId: string;
+  className?: string; // Allow custom styles
 }
 
-const LogsBoxLayout = ({ logs, userAchievements, currentUserId }: LogsBoxLayoutProps) => {
+const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }: LogsBoxLayoutProps) => {
   const [showedCategory, setShowedCategory] = useState<
     "logs" | "achievements" | "discord" | "excerise" | "chat"
   >("logs");
@@ -56,9 +57,9 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId }: LogsBoxLayoutP
 
   return (
     <Card
-      className={`relative m-auto  flex ${
-        showedCategory !== "achievements" && "h-[600px]"
-      } font-openSans flex-col p-1 pb-3 text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%]`}>
+      className={`relative m-auto flex ${
+        showedCategory !== "achievements" && !className.includes("h-") ? "h-[600px]" : ""
+      } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
       <div className=' left-0 top-0 flex flex-row  justify-around gap-4  font-bold'>
         <LogsBoxButton
           title={t("logsBox.logs")}
@@ -76,17 +77,19 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId }: LogsBoxLayoutP
           notificationCount={unreadChats}
           hasNewMessages={hasNewChats}
         />
-        <LogsBoxButton
-          title={t("logsBox.achievements_map")}
-          active={showedCategory === "achievements"}
-          onClick={() => handleCategoryChange("achievements")}
-          Icon={FaMedal}
-        />
+        {!className.includes("border-none") && (
+          <LogsBoxButton
+            title={t("logsBox.achievements_map")}
+            active={showedCategory === "achievements"}
+            onClick={() => handleCategoryChange("achievements")}
+            Icon={FaMedal}
+          />
+        )}
       </div>
       {showedCategory === "achievements" && (
         <AchievementsMap userAchievements={userAchievements} />
       )}
-      <div className='h-full overflow-x-scroll scrollbar-thin scrollbar-thumb-second-200'>
+      <div className='h-full overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700/50 scrollbar-track-transparent'>
         {showedCategory === "logs" && logs && (
           <div onClick={markLogsAsRead}>
             <Logs 
