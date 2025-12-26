@@ -40,7 +40,8 @@ import { NavPagesTypes } from "types/layout.types";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import { CommunityModal } from "./CommunityModal";
-import { Heart, MessageSquare } from "lucide-react";
+import { Heart, MessageSquare, Zap } from "lucide-react";
+import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
@@ -226,27 +227,55 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
         </div>
 
         {/* User Profile Section */}
-        {userStats && userName && (
-          <div className='border-b border-white/10 p-4'>
-            <div className='flex items-center gap-3'>
-              <div className='relative'>
-                <div className='rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 p-1'>
-                  <Avatar
-                    avatarURL={userAvatar}
-                    name={userName}
-                    lvl={userStats.lvl}
-                  />
+        {userStats && userName && (() => {
+          const currentLvlPoints = getPointsToLvlUp(userStats.lvl - 1);
+          const nextLvlPoints = getPointsToLvlUp(userStats.lvl);
+          const pointsInCurrentLvl = userStats.points - currentLvlPoints;
+          const pointsNeededForNextLvl = nextLvlPoints - currentLvlPoints;
+          const progress = Math.min(Math.max((pointsInCurrentLvl / pointsNeededForNextLvl) * 100, 0), 100);
+
+          return (
+            <div className='border-b border-white/10 p-4'>
+              <div className='flex items-center gap-3'>
+                <div className='relative'>
+                  <div className='rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 p-1'>
+                    <Avatar
+                      avatarURL={userAvatar}
+                      name={userName}
+                      lvl={userStats.lvl}
+                    />
+                  </div>
+                </div>
+
+                <div className='min-w-0 flex-1'>
+                  <span className='truncate text-sm font-semibold text-white'>
+                    {userName}
+                  </span>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <Zap size={10} className="text-yellow-400 fill-yellow-400" />
+                    <span className="text-[10px] font-bold text-zinc-400">LVL {userStats.lvl}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className='min-w-0 flex-1'>
-                <span className='truncate text-sm font-semibold text-white'>
-                  {userName}
-                </span>
+              {/* Enhanced XP Bar */}
+              <div className="mt-4 space-y-1.5">
+                <div className="flex items-center justify-between px-0.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500">Progress</span>
+                  <span className="text-[10px] font-bold text-cyan-400">{Math.floor(userStats.points)} / {nextLvlPoints} XP</span>
+                </div>
+                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.3)]"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Navigation */}
         <nav className='flex-1 space-y-6 overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent'>
@@ -461,40 +490,64 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               </div>
 
               {/* User Profile Section - Mobile */}
-              {userStats && userName && (
-                <div className='border-b border-white/10 p-4'>
-                  <div className='flex items-center gap-3'>
-                    <div className='relative'>
-                      <div className='rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 p-1'>
-                        <Avatar
-                          avatarURL={userAvatar}
-                          name={userName}
-                          lvl={userStats.lvl}
-                        />
-                      </div>
-                    </div>
+              {userStats && userName && (() => {
+                const currentLvlPoints = getPointsToLvlUp(userStats.lvl - 1);
+                const nextLvlPoints = getPointsToLvlUp(userStats.lvl);
+                const pointsInCurrentLvl = userStats.points - currentLvlPoints;
+                const pointsNeededForNextLvl = nextLvlPoints - currentLvlPoints;
+                const progress = Math.min(Math.max((pointsInCurrentLvl / pointsNeededForNextLvl) * 100, 0), 100);
 
-                    <div className='min-w-0 flex-1'>
-                      <span className='truncate text-sm font-semibold text-white'>
-                        {userName}
-                      </span>
-                      <div className='mt-2 flex items-center gap-2'>
-                        <Link 
-                          href="/settings" 
-                          onClick={handleLinkClick}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
-                          title={t("button.edit")}
-                        >
-                          <Settings size={14} />
-                        </Link>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white">
-                           <CopyLinkProfile mode="icon" />
+                return (
+                  <div className='border-b border-white/10 p-4'>
+                    <div className='flex items-center gap-3'>
+                      <div className='relative'>
+                        <div className='rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 p-1'>
+                          <Avatar
+                            avatarURL={userAvatar}
+                            name={userName}
+                            lvl={userStats.lvl}
+                          />
+                        </div>
+                      </div>
+
+                      <div className='min-w-0 flex-1'>
+                        <span className='truncate text-sm font-semibold text-white'>
+                          {userName}
+                        </span>
+                        <div className='mt-2 flex items-center gap-2'>
+                          <Link 
+                            href="/settings" 
+                            onClick={handleLinkClick}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
+                            title={t("button.edit")}
+                          >
+                            <Settings size={14} />
+                          </Link>
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white">
+                            <CopyLinkProfile mode="icon" />
+                          </div>
                         </div>
                       </div>
                     </div>
+
+                    {/* Progress Bar - Mobile */}
+                    <div className="mt-4 space-y-1.5">
+                      <div className="flex items-center justify-between px-0.5">
+                        <span className="text-[10px] font-bold text-zinc-500 uppercase">Level Progress</span>
+                        <span className="text-[10px] font-bold text-cyan-400">{Math.floor(userStats.points)} / {nextLvlPoints} XP</span>
+                      </div>
+                      <div className="relative h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${progress}%` }}
+                          transition={{ duration: 1, ease: "easeOut" }}
+                          className="absolute inset-y-0 left-0 bg-cyan-500"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* Navigation - Mobile */}
               <nav className='flex-1 space-y-6 overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent'>
