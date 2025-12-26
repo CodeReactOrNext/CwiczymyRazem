@@ -21,6 +21,9 @@ interface SongManagementTableProps {
   onQuickRate?: (songId: string, rating: number) => void;
   onDelete?: (songId: string) => void;
   isLoading?: boolean;
+  page: number;
+  totalCount: number;
+  onPageChange: (newPage: number) => void;
 }
 
 export const SongManagementTable = ({
@@ -37,20 +40,14 @@ export const SongManagementTable = ({
   onFieldChange,
   onQuickRate,
   onDelete,
-  isLoading
+  isLoading,
+  page,
+  totalCount,
+  onPageChange
 }: SongManagementTableProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
-  
-  const totalPages = Math.ceil(songs.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedSongs = songs.slice(startIndex, startIndex + itemsPerPage);
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-       setCurrentPage(newPage);
-    }
-  }
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const paginatedSongs = songs; // Now it comes already paginated from server
 
   return (
     <div className="space-y-4">
@@ -265,15 +262,15 @@ export const SongManagementTable = ({
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-2 pt-2">
           <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
-            Page <span className="text-white">{currentPage}</span> of <span className="text-white">{totalPages}</span>
-            <span className="ml-4 opacity-50">({songs.length} items)</span>
+            Page <span className="text-white">{page}</span> of <span className="text-white">{totalPages}</span>
+            <span className="ml-4 opacity-50">({totalCount} items)</span>
           </p>
           <div className="flex items-center gap-2">
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              onClick={() => onPageChange(page - 1)}
+              disabled={page === 1}
               className="h-8 w-8 border-white/5 bg-zinc-900/60 hover:bg-white/5 rounded-lg"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -281,8 +278,8 @@ export const SongManagementTable = ({
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              onClick={() => onPageChange(page + 1)}
+              disabled={page === totalPages}
               className="h-8 w-8 border-white/5 bg-zinc-900/60 hover:bg-white/5 rounded-lg"
             >
               <ChevronRight className="h-4 w-4" />
