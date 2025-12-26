@@ -116,6 +116,8 @@ export const createAccount = createAsyncThunk(
         throw new Error("nick-alredy-in-use");
       }
       const { user } = await firebaseCreateAccountWithEmail(email, password);
+      const token = await user.getIdToken();
+      await signIn("credentials", { idToken: token, redirect: false });
       const userWithDisplayName = { ...user, displayName: login };
       const userData = await fetchUserData(userWithDisplayName);
       signUpSuccess();
@@ -201,6 +203,8 @@ export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
     await signOut({ redirect: false });
     await firebaseLogUserOut();
     logOutInfo();
+    // Use hard redirect to home to clear all memory and stop loaders
+    window.location.href = "/";
   } catch (error) {
     udpateDataErrorHandler(error as SerializedError);
     return Promise.reject();

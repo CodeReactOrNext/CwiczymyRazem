@@ -12,13 +12,14 @@ import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 import { calculatePercent, convertMsToHM } from "utils/converter";
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 
 import { getTrendData } from "../utils/getTrendData";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import ActivityLog from "components/ActivityLog/ActivityLog";
+import Link from "next/link";
 import { DailyRecommendation } from "feature/songs/components/DailyRecommendation/DailyRecommendation";
 import { DailyPlanRecommendation } from "feature/songs/components/DailyRecommendation/DailyPlanRecommendation";
 import { RecommendationSkeleton } from "feature/songs/components/DailyRecommendation/RecommendationSkeleton";
@@ -233,30 +234,55 @@ export const StatsSection = ({
                   const playerTier = avgDifficulty > 0 ? getSongTier(avgDifficulty) : null;
 
                   if (totalSongs === 0) {
-                    return (
-                      <div className='rounded-lg  bg-zinc-800/30 p-6 text-center'>
-                        <div className='mb-3'>
-                          <svg
-                            className='mx-auto h-12 w-12 text-zinc-400'
-                            fill='none'
-                            stroke='currentColor'
-                            viewBox='0 0 24 24'>
-                            <path
-                              strokeLinecap='round'
-                              strokeLinejoin='round'
-                              strokeWidth={1.5}
-                              d='M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3'
-                            />
-                          </svg>
+                    const emptyContent = (
+                      <div className={cn(
+                        'rounded-lg bg-zinc-800/20 p-8 text-center border-2 border-dashed border-zinc-700/50 transition-all duration-300',
+                        isOwnProfile && "hover:border-cyan-500/50 hover:bg-zinc-800/40 group cursor-pointer"
+                      )}>
+                        <div className='relative mb-4'>
+                          <div className='relative mx-auto h-16 w-16'>
+                            <svg
+                              className={cn(
+                                'h-full w-full text-zinc-500 transition-all duration-300',
+                                isOwnProfile && "group-hover:text-cyan-400 group-hover:scale-110"
+                              )}
+                              fill='none'
+                              stroke='currentColor'
+                              viewBox='0 0 24 24'>
+                              <path
+                                strokeLinecap='round'
+                                strokeLinejoin='round'
+                                strokeWidth={1.5}
+                                d='M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3'
+                              />
+                            </svg>
+                            {isOwnProfile && (
+                               <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 transition-transform duration-300 group-hover:scale-125 group-hover:rotate-90">
+                                 <Plus size={14} strokeWidth={3} />
+                               </div>
+                            )}
+                          </div>
                         </div>
-                        <h5 className='mb-2 font-semibold text-white'>
-                          No songs
+                        <h5 className={cn(
+                          'mb-2 font-semibold text-white transition-colors',
+                          isOwnProfile && "group-hover:text-cyan-400"
+                        )}>
+                          {isOwnProfile ? "No songs" : "No songs yet"}
                         </h5>
-                        <p className='text-sm text-zinc-400'>
-                          Add your first songs to the library
+                        <p className={cn(
+                          'text-sm text-zinc-500 transition-colors',
+                          isOwnProfile && "group-hover:text-zinc-400"
+                        )}>
+                          {isOwnProfile ? "Add your first songs to the library" : "This user hasn't added any songs yet"}
                         </p>
                       </div>
                     );
+
+                    return isOwnProfile ? (
+                      <Link href="/songs" className="block">
+                        {emptyContent}
+                      </Link>
+                    ) : emptyContent;
                   }
 
                   return (

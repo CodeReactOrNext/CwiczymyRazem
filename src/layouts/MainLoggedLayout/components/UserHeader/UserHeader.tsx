@@ -3,6 +3,7 @@ import { Separator } from "assets/components/ui/separator";
 import Image from "next/image";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
 import { LevelBar } from "components/LevelBar/LevelBar";
+import { HeaderLevelBar } from "components/LevelBar/HeaderLevelBar";
 import UserNav from "components/UserNav";
 import { WelcomeMessage } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/WelcomeMessage";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -53,12 +54,9 @@ export const UserHeader = ({
                 className="h-7 w-7"
               />
             </div>
-            <LevelBar
+            <HeaderLevelBar
               points={points}
               lvl={lvl}
-              currentLevelMaxPoints={currentLevelMaxPoints}
-              size='mini'
-              showStats={false}
             />
           </div>
 
