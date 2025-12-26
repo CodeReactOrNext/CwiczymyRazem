@@ -22,6 +22,7 @@ import {
   Code,
   LayoutGrid,
 } from "lucide-react";
+import { FaDiscord } from "react-icons/fa";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -384,6 +385,27 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               })}
             </div>
           </div>
+
+          <Separator className='bg-white/10' />
+
+          {/* Community Section */}
+          <div>
+            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+              Community
+            </div>
+            <div className='space-y-1'>
+              <a
+                href='https://discord.gg/yRdT9T9F'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                <span className='text-zinc-500'>
+                  <FaDiscord size={16} />
+                </span>
+                <span>{t("nav.discord")}</span>
+              </a>
+            </div>
+          </div>
         </nav>
       </aside>
 
@@ -613,6 +635,28 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                         </Link>
                       );
                     })}
+                  </div>
+                </div>
+
+                <Separator className='bg-white/10' />
+
+                {/* Community Section - Mobile */}
+                <div>
+                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+                    Community
+                  </div>
+                  <div className='space-y-1'>
+                    <a
+                      href='https://discord.gg/yRdT9T9F'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      onClick={handleLinkClick}
+                      className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                      <span className='text-zinc-500'>
+                        <FaDiscord size={16} />
+                      </span>
+                      <span>{t("nav.discord")}</span>
+                    </a>
                   </div>
                 </div>
               </nav>
