@@ -38,6 +38,7 @@ import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import Avatar from "components/UI/Avatar";
 import { NavPagesTypes } from "types/layout.types";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
+import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
@@ -196,14 +197,8 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
   return (
     <>
-      {/* Mobile Hamburger Button */}
-      <Button
-        variant='outline'
-        size='icon'
-        onClick={() => setIsMobileOpen(true)}
-        className='fixed left-4 top-4 z-[60] border-white/20 bg-card text-white backdrop-blur-sm hover:bg-zinc-800 lg:hidden'>
-        <Menu size={18} />
-      </Button>
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav onMenuClick={() => setIsMobileOpen(true)} />
 
       {/* Desktop Sidebar */}
       <aside className='hidden h-full border-r border-white/10 bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col'>
