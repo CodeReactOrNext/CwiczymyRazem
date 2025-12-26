@@ -171,7 +171,7 @@ const SongsView = () => {
                 </div>
 
                 {/* Enhanced Search & Filter Bar */}
-                <div className="sticky top-0 z-30 -mx-4 px-4 py-4 backdrop-blur-xl md:static md:mx-0 md:p-0 md:backdrop-blur-none">
+                <div className="relative z-30 -mx-4 px-4 py-4 md:mx-0 md:p-0">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center">
                     
                     {/* Search Input */}
@@ -241,7 +241,7 @@ const SongsView = () => {
                 {/* Grid Content */}
                 <div className="min-h-[500px] rounded-2xl bg-zinc-900/20 p-1">
                   {isLoading ? (
-                    <div className="space-y-8 pb-12">
+                    <div className="space-y-8 min-h-[400px] flex flex-col justify-between pb-12">
                       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
                         {Array.from({ length: 20 }).map((_, i) => (
                           <SongCardSkeleton key={i} />

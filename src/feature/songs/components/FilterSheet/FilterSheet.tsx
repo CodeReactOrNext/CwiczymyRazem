@@ -236,7 +236,7 @@ const FilterSheet = ({
             </div>
           </div>
 
-          <div className="p-6 pb-24 sm:pb-6 border-t border-white/5 bg-zinc-950/50 backdrop-blur-sm">
+          <div className="p-6 border-t border-white/5 bg-zinc-950/50 backdrop-blur-sm">
             <Button 
                 onClick={handleApply}
                 className="h-14 w-full rounded-2xl bg-cyan-600 font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-cyan-900/20 hover:bg-cyan-500 transition-all active:scale-[0.98]"
