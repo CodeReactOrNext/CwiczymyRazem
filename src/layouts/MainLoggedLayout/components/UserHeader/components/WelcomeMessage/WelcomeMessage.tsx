@@ -6,7 +6,11 @@ import {
 } from "utils/gameLogic";
 import { cn } from "assets/lib/utils";
 
-import WeeklyStreakBox from "./components/WeeklyStreakBox";
+import DailyStreakBox from "./components/WeeklyStreakBox";
+import { useAppSelector } from "store/hooks";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { startOfWeek, addDays, isSameDay } from "date-fns";
 
 interface WelcomeMessageProps {
   userName: string;
@@ -23,6 +27,8 @@ export const WelcomeMessage = ({
   totalPracticeTime,
 }: WelcomeMessageProps) => {
   const { t } = useTranslation("common");
+  const userAuth = useAppSelector(selectUserAuth);
+  const { reportList } = useActivityLog(userAuth || "");
 
   const userLastReportDate = new Date(lastReportDate);
   const didPracticeToday = checkIsPracticeToday(userLastReportDate);
@@ -81,8 +87,22 @@ export const WelcomeMessage = ({
         </div>
 
         <div className='flex items-center gap-1 border-l border-white/5 pl-2'>
-            {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => {
-                const isActive = index < dayWithoutBreak;
+            {["M", "T", "W", "T", "F", "S", "S"].map((dayLabel, index) => {
+                const today = new Date();
+                // Get start of current week (Monday)
+                const start = startOfWeek(today, { weekStartsOn: 1 });
+                // Get the date for the current index (0 = Monday, etc.)
+                const dayDate = addDays(start, index);
+                
+                // Check if we have a report for this specific day
+                const hasReport = reportList?.some((report: { date: Date | string }) => 
+                    isSameDay(new Date(report.date), dayDate)
+                );
+                
+                // Allow highlighting today if we just practiced (optimistic update via props if reportList is stale)
+                const isToday = isSameDay(dayDate, today);
+                const isActive = hasReport || (isToday && didPracticeToday);
+
                 return (
                     <div
                         key={index}
@@ -92,8 +112,9 @@ export const WelcomeMessage = ({
                                 ? "bg-white text-zinc-900 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
                                 : "bg-zinc-800 text-zinc-600"
                         )}
+                        title={dayDate.toDateString()}
                     >
-                        {day}
+                        {dayLabel}
                     </div>
                 );
             })}

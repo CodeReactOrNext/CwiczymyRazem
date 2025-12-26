@@ -55,6 +55,7 @@ const ReportView = () => {
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
   const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
+  const [submittedValues, setSubmittedValues] = useState<ReportFormikInterface | null>(null);
   const { t } = useTranslation("report");
 
   const dispatch = useAppDispatch();
@@ -213,6 +214,7 @@ const ReportView = () => {
     }
 
     await dispatch(updateUserStats({ inputData }));
+    setSubmittedValues(inputData);
     setAcceptPopUpVisible(false);
     setView('success');
   };
@@ -225,6 +227,54 @@ const ReportView = () => {
     }
   }, [sumTime, t]);
 
+  const getUpdatedActivityData = () => {
+    if (!reportList) return [];
+    if (!submittedValues) return reportList as any;
+
+    const reportDate = getDateFromPast(Number(submittedValues.countBackDays));
+    const dateString = reportDate.toISOString();
+    
+    // Ensure all inputs are numbers
+    const entryTechnique = (Number(submittedValues.techniqueHours || 0) * 60 + Number(submittedValues.techniqueMinutes || 0)) * 60 * 1000;
+    const entryTheory = (Number(submittedValues.theoryHours || 0) * 60 + Number(submittedValues.theoryMinutes || 0)) * 60 * 1000;
+    const entryHearing = (Number(submittedValues.hearingHours || 0) * 60 + Number(submittedValues.hearingMinutes || 0)) * 60 * 1000;
+    const entryCreativity = (Number(submittedValues.creativityHours || 0) * 60 + Number(submittedValues.creativityMinutes || 0)) * 60 * 1000;
+
+    const newEntry = {
+        date: dateString,
+        techniqueTime: entryTechnique,
+        theoryTime: entryTheory,
+        hearingTime: entryHearing,
+        creativityTime: entryCreativity,
+    };
+    
+    // Check if an entry for this date already exists in reportList
+    const exists = (reportList as any[]).some(item => {
+        const itemDate = new Date(item.date);
+        return itemDate.toDateString() === reportDate.toDateString();
+    });
+
+    if (exists) {
+        return (reportList as any[]).map(item => {
+             const itemDate = new Date(item.date);
+             if (itemDate.toDateString() === reportDate.toDateString()) {
+                 return {
+                     ...item,
+                     techniqueTime: Number(item.techniqueTime || 0) + newEntry.techniqueTime,
+                     theoryTime: Number(item.theoryTime || 0) + newEntry.theoryTime,
+                     hearingTime: Number(item.hearingTime || 0) + newEntry.hearingTime,
+                     creativityTime: Number(item.creativityTime || 0) + newEntry.creativityTime,
+                 };
+             }
+             return item;
+        });
+    } else {
+        return [...(reportList as any), newEntry];
+    }
+  };
+
+  const activityDataToUse = submittedValues ? getUpdatedActivityData() : (reportList as any);
+
   return (
     <>
       {view === 'success' && raitingData && currentUserStats && previousUserStats ? (
@@ -234,7 +284,7 @@ const ReportView = () => {
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}
           skillPointsGained={raitingData.skillPointsGained}
-          activityData={reportList as any}
+          activityData={activityDataToUse}
         />
       ) : (
         <Formik
