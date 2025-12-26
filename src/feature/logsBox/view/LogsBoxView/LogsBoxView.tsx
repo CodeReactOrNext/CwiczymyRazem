@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
-const LogsBoxView = () => {
+const LogsBoxView = ({ className }: { className?: string }) => {
   const [logs, setLogs] = useState<
     (FirebaseLogsSongsInterface | FirebaseLogsInterface | FirebaseLogsTopPlayersInterface)[] | null
   >(null);
@@ -32,6 +32,7 @@ const LogsBoxView = () => {
       logs={logs} 
       userAchievements={userAchievement} 
       currentUserId={currentUserId}
+      className={className}
     />
   ) : (
     <FaSpinner />

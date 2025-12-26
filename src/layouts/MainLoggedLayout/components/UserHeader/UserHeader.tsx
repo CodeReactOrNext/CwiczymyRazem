@@ -9,7 +9,7 @@ import { WelcomeMessage } from "layouts/MainLoggedLayout/components/UserHeader/c
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 
-import NavDecoration from "./components/NavDecoration";
+import { ActivitySheet } from "./components/ActivitySheet";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
@@ -71,17 +71,19 @@ export const UserHeader = ({
             />
           </div>
 
-          {/* Right Section - Actions */}
+            {/* Right Section - Actions */}
             <div className='flex items-center gap-2'>
               {/* Desktop Actions */}
-              <div className='hidden sm:flex items-center gap-3'>
+              <div className='hidden sm:flex items-center gap-1'>
+                <ActivitySheet />
                 <CopyLinkProfile />
-                <Separator orientation='vertical' className='h-6 bg-white/10' />
+                <Separator orientation='vertical' className='mx-2 h-6 bg-white/10' />
                 <UserNav />
               </div>
               
-              {/* Mobile Actions - Only Logout */}
-              <div className='flex sm:hidden'>
+              {/* Mobile Actions */}
+              <div className='flex items-center gap-1 sm:hidden'>
+                 <ActivitySheet />
                  <UserNav showOnlyLogout />
               </div>
             </div>
