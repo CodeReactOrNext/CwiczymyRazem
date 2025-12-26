@@ -14,6 +14,7 @@ import {
 } from "feature/user/store/userSlice";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { Formik } from "formik";
+import { motion } from "framer-motion";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import {
@@ -246,10 +247,15 @@ const ReportView = () => {
             <>
               <ReportFormLayout>
 
-                <div className='mb-8'>
-                  <h3 className='font-openSans mb-4  text-sm font-medium text-white'>
-                    {t("exercise_type_title")}
-                  </h3>
+                {/* STEP 1: TIME TRACKING */}
+                <div className='mb-12'>
+                  <div className='mb-6 flex items-center gap-3'>
+                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-400 font-bold text-sm border border-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.1)]'>1</div>
+                    <h3 className='font-openSans text-lg font-bold text-white'>
+                      {t("exercise_type_title")}
+                    </h3>
+                  </div>
+                  
                   <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
                     {timeInputList.map(
                       (
@@ -270,142 +276,161 @@ const ReportView = () => {
                       )
                     )}
                   </div>
-                  <div className='mt-4 flex justify-end'>
-                    <div className='flex items-center radius-default glass-card px-4 py-2'>
-                      <span className='mr-2 text-sm text-zinc-400'>
+                  <div className='mt-4 flex flex-col items-end gap-2'>
+                    {sumTime > 0 && (
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-1.5 border border-emerald-500/20 shadow-[0_4px_12px_rgba(16,185,129,0.1)]"
+                      >
+                        <div className="relative">
+                          <Loader2 className="h-3 w-3 animate-spin text-emerald-400" />
+                          <div className="absolute inset-0 animate-ping rounded-full bg-emerald-400/20" />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                          Synced from Timer
+                        </span>
+                      </motion.div>
+                    )}
+                    <div className='flex items-center radius-default glass-card px-4 py-2 ring-1 ring-white/5 bg-zinc-900/40'>
+                      <span className='mr-3 text-sm font-bold uppercase tracking-wider text-zinc-500'>
                         {t("total_time")}:
                       </span>
-                      <span className='font-mono text-lg font-bold text-cyan-400'>
-                        {convertMsToHM(getSumTime(values))}
+                      <span className='font-mono text-2xl font-black text-white'>
+                         {convertMsToHM(getSumTime(values))}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Healthy Habits Section */}
-                <div className='mb-8'>
-                  <h3 className='font-openSans mb-4 text-lg  font-medium text-white'>
-                    {t("healthy_habits_title")}
-                  </h3>
-                  <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3'>
-                    {healthHabbitsList.map(
-                      ({ name, questionMarkProps, title }, index) => (
-                        <div key={name + index}>
-                          <HealthHabbitsBox
-                            name={name}
-                            title={title}
-                            questionMarkProps={questionMarkProps}
-                          />
+                {/* STEP 2: FOCUS & DETAILS */}
+                <div className='mb-12'>
+                  <div className='mb-6 flex items-center gap-3 border-t border-white/5 pt-12'>
+                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-sm border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.1)]'>2</div>
+                    <h3 className='font-openSans text-lg font-bold text-white'>
+                       Session Focus & Habits
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                     {/* Left: Goals & Title */}
+                     <div className="lg:col-span-12 xl:col-span-7 space-y-6">
+                        <div className='space-y-4 rounded-2xl bg-zinc-900/30 p-6 border border-white/5'>
+                          <label className='font-openSans text-sm font-bold uppercase tracking-wider text-zinc-400'>
+                            Session Headline
+                          </label>
+                          <div className='relative'>
+                            <Input
+                              name='reportTitle'
+                              startIcon={<MdTitle className='text-lg text-cyan-500/50' />}
+                              placeholder='e.g. Practicing major scales'
+                              className='h-12 border-white/10 bg-zinc-950/50 text-base shadow-sm focus:border-cyan-500/30'
+                              value={values.reportTitle}
+                              onChange={(e) => setFieldValue("reportTitle", e.target.value)}
+                            />
+                          </div>
+                          
+                          <div className='space-y-3 pt-2'>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">Quick focus tags:</p>
+                            <div className='flex flex-wrap gap-2'>
+                              {[
+                                { label: "Warmup", icon: "🎸", cat: "basic" },
+                                { label: "Technique", icon: "⚡", cat: "basic" },
+                                { label: "New Song", icon: "🎵", cat: "creative" },
+                                { label: "Theory", icon: "📚", cat: "theory" },
+                                { label: "Improvisation", icon: "✨", cat: "creative" },
+                                { label: "Ear Training", icon: "👂", cat: "theory" },
+                                { label: "Song Writing", icon: "✍️", cat: "creative" },
+                                { label: "Speed Building", icon: "🏎️", cat: "basic" },
+                                { label: "Jamming", icon: "🔊", cat: "creative" },
+                                { label: "Night practice", icon: "🌙", cat: "basic" }
+                              ].map((tag) => (
+                                <button
+                                  key={tag.label}
+                                  type="button"
+                                  onClick={() => setFieldValue("reportTitle", tag.label)}
+                                  className="group flex items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500 transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
+                                >
+                                  <span className="opacity-70 group-hover:opacity-100">{tag.icon}</span>
+                                  {tag.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
                         </div>
-                      )
-                    )}
+                     </div>
+
+                     {/* Right: Habits */}
+                     <div className="lg:col-span-12 xl:col-span-5 space-y-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 px-1">Check fulfilled habits:</p>
+                        <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1'>
+                          {healthHabbitsList.map(
+                            ({ name, questionMarkProps, title }, index) => (
+                              <HealthHabbitsBox
+                                key={name + index}
+                                name={name}
+                                title={title}
+                                questionMarkProps={questionMarkProps}
+                              />
+                            )
+                          )}
+                        </div>
+                     </div>
                   </div>
                 </div>
 
-                {/* Session Title Section */}
-                <div className='mb-8'>
-                  <h3 className='font-openSans mb-4  text-lg font-medium text-white'>
-                    {t("sesion_title")}
-                  </h3>
-                  <div className='space-y-3'>
-                    <div className='relative max-w-[600px]'>
-                      <Input
-                        name='reportTitle'
-                        startIcon={
-                          <MdTitle className='text-lg text-[#4a7edd]/50' />
-                        }
-                        placeholder='Title your session'
-                        className='border-gray-700/50 bg-[#0a0a0c]/60 py-2.5 text-base text-white placeholder:text-gray-500 focus:border-[#4a7edd]/40 hover:border-gray-600'
-                        value={values.reportTitle}
-                        onChange={(e) =>
-                          setFieldValue("reportTitle", e.target.value)
-                        }
-                      />
-                    </div>
+                {/* STEP 3: LOGGING */}
+                <div className='mb-8 border-t border-white/5 pt-12'>
+                  <div className='mb-6 flex items-center gap-3'>
+                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-rose-500/20 text-rose-400 font-bold text-sm border border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]'>3</div>
+                    <h3 className='font-openSans text-lg font-bold text-white'>
+                       Finalize Log
+                    </h3>
                   </div>
-                </div>
 
-                {/* Date Selection Section */}
-                <div className='mb-8'>
-                  <h3 className='font-openSans mb-4  text-lg font-medium text-white'>
-                    When did you practice?
-                  </h3>
-                  <div className='flex flex-col gap-4'>
-                    <div className='flex flex-wrap items-start justify-start gap-3'>
-                      {[0, 1, 2, 3, 4].map((days) => {
-                        const isSelected = values.countBackDays === days;
-                        let label =
-                          days === 0
-                            ? "Today"
-                            : days === 1
-                            ? "Yesterday"
-                            : `${days} days ago`;
+                  <div className='flex flex-col items-center gap-8 rounded-3xl bg-zinc-900/20 p-8 border border-white/5'>
+                    <div className='flex flex-col items-center gap-4'>
+                      <p className='text-xs font-bold uppercase tracking-widest text-zinc-500'>When did this happen?</p>
+                      <div className='flex flex-wrap items-center justify-center gap-3'>
+                        {[0, 1, 2, 3, 4].map((days) => {
+                          const isSelected = values.countBackDays === days;
+                          let label = days === 0 ? "Today" : days === 1 ? "Yesterday" : `${days} days ago`;
 
-                        return (
-                          <div key={days}>
+                          return (
                             <Button
+                              key={days}
                               type='button'
                               variant={isSelected ? "default" : "outline"}
-                              onClick={() => {
-                                setFieldValue("countBackDays", days);
-                              }}
-                              className={`relative rounded-full border px-5 py-2 transition-background ${
+                              onClick={() => setFieldValue("countBackDays", days)}
+                              className={`relative rounded-full border px-6 transition-all ${
                                 isSelected
-                                  ? "border-transparent bg-gradient-to-r from-cyan-600/90 to-cyan-500/90 text-white shadow-sm backdrop-blur-sm"
-                                  : "border-white/5 bg-zinc-900/40 text-gray-300 hover:glass-card-hover hover:text-white"
+                                  ? "border-transparent bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] font-black"
+                                  : "border-white/10 bg-zinc-900/50 text-zinc-400 hover:text-white"
                               }`}>
-                              {isSelected && (
-                                <span className='absolute inset-0 rounded-full bg-cyan-500/20 blur-sm' />
-                              )}
-                              <span className='relative z-10'>{label}</span>
+                              {label}
                             </Button>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
+                      <p className='text-xs font-medium text-zinc-600'>
+                        Selected: <span className="text-zinc-300">{getDateFromPast(values.countBackDays).toLocaleDateString()}</span>
+                      </p>
                     </div>
 
-                    <div className='flex items-start justify-start'>
-                      <Card className='border-0 bg-gradient-to-r from-cyan-500/5 to-transparent px-4 py-2 text-left shadow-sm glass-card radius-default transition-all duration-300'>
-                        <p className='font-openSans text-sm text-gray-400'>
-                          Selected date:{" "}
-                          <span className='text-base font-medium text-white'>
-                            {getDateFromPast(
-                              values.countBackDays
-                            ).toLocaleDateString()}
-                          </span>
-                        </p>
-                      </Card>
-                    </div>
-                  </div>
-                  {errors.countBackDays && (
-                    <p className='mt-2 text-center text-sm text-red-400'>
-                      <FaTimesCircle className='mr-1 inline' />
-                      {t("max_days", { days: MAX_DAYS_BACK })}
-                    </p>
-                  )}
-                </div>
+                    <div className="w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
 
-                {/* Submit Button Section */}
-                <div className='mt-6 flex flex-col items-center'>
-                  {Object.keys(errors).length !== 0 && (
-                    <div className='mb-4'>
-                      <ErrorBox />
-                    </div>
-                  )}
-
-                  <div className='flex flex-col items-center gap-4'>
-                    <div className='relative'>
+                    <div className='flex flex-col items-center gap-4'>
+                      {Object.keys(errors).length !== 0 && <ErrorBox />}
                       <Button
                         size='lg'
                         type='submit'
                         disabled={Object.keys(errors).length !== 0}
-                        className='relative'>
+                        className='h-14 min-w-[240px] rounded-2xl bg-white text-black font-black text-lg transition-all hover:scale-[1.02] active:scale-95 shadow-xl disabled:opacity-50'>
                         {isFetching ? (
-                          <Loader2 className='mr-2 h-5 w-5 animate-spin' />
+                          <Loader2 className='mr-2 h-6 w-6 animate-spin' />
                         ) : (
-                          <GrDocumentUpload className='mr-2 h-5 w-5' />
+                          <GrDocumentUpload className='mr-3 h-6 w-6' />
                         )}
-
                         {t("report_button")}
                       </Button>
                     </div>

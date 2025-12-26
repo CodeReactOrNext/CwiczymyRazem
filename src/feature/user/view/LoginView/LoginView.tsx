@@ -101,7 +101,28 @@ const LoginView = () => {
           </div>
 
           {/* Card */}
-          <div className="radius-premium glass-card p-6 shadow-xl">
+          <div className="radius-premium glass-card overflow-hidden shadow-xl border border-white/5 bg-zinc-900/40 backdrop-blur-md">
+            {/* Tab Switcher */}
+            <div className="flex border-b border-white/10">
+              <Link 
+                href="/login" 
+                className="flex-1 py-4 text-center text-sm font-bold transition-all relative text-white bg-white/5"
+              >
+                {t("login:submit_button")}
+                <motion.div 
+                  layoutId="activeTab"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500" 
+                />
+              </Link>
+              <Link 
+                href="/signup" 
+                className="flex-1 py-4 text-center text-sm font-bold transition-all text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+              >
+                {t("login:signup_link")}
+              </Link>
+            </div>
+
+            <div className="p-6">
             <Formik
               initialValues={formikInitialValues}
               validationSchema={loginSchema}
@@ -218,18 +239,9 @@ const LoginView = () => {
                   {t("login:google_button")}
                 </span>
               </Button>
+            </div>
           </div>
 
-          <div className='text-center'>
-              <p className='text-sm text-zinc-400'>
-                {t("login:not_have_account")}{" "}
-                <Link
-                  href='/signup'
-                  className='font-bold text-cyan-400 hover:text-cyan-300 transition-colors'>
-                  {t("login:signup_link")}
-                </Link>
-              </p>
-            </div>
         </motion.div>
       </div>
     </div>
