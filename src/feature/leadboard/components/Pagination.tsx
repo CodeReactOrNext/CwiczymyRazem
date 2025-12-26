@@ -42,92 +42,61 @@ export const Pagination = ({
     }
   };
 
-  const pageItems = useMemo(() => {
-    const maxVisiblePages = 5;
-    const result = [];
-
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    if (startPage > 1) {
-      result.push(
-        <PaginationItem key='first-page'>
-          <PaginationLink onClick={(e) => handlePageClick(e, 1)}>
-            1
-          </PaginationLink>
-        </PaginationItem>
-      );
-
-      if (startPage > 2) {
-        result.push(
-          <PaginationItem key='start-ellipsis'>
-            <PaginationEllipsis />
-          </PaginationItem>
-        );
-      }
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      result.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            onClick={(e) => handlePageClick(e, i)}
-            isActive={currentPage === i}>
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) {
-        result.push(
-          <PaginationItem key='end-ellipsis'>
-            <PaginationEllipsis />
-          </PaginationItem>
-        );
-      }
-
-      result.push(
-        <PaginationItem key='last-page'>
-          <PaginationLink onClick={(e) => handlePageClick(e, totalPages)}>
-            {totalPages}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return result;
-  }, [currentPage, totalPages, handlePageClick]);
-
-  if (totalPages <= 0) {
-    return null;
-  }
-
   return (
     <ShadcnPagination className='pb-4'>
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
             onClick={handlePrevious}
-            className={
+            className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 [&>span]:hidden sm:[&>span]:inline ${
               currentPage === 1 ? "pointer-events-none opacity-50" : ""
-            }
+            }`}
           />
         </PaginationItem>
 
-        {pageItems}
+        {[...Array(totalPages)].map((_, index) => {
+          const pageNumber = index + 1;
+          const isCurrent = currentPage === pageNumber;
+          const isFirst = pageNumber === 1;
+          const isLast = pageNumber === totalPages;
+          const isNeighbor =
+            pageNumber === currentPage - 1 || pageNumber === currentPage + 1;
+          const isEllipsis =
+            pageNumber === currentPage - 2 || pageNumber === currentPage + 2;
+
+          if (isFirst || isLast || isCurrent || isNeighbor) {
+            return (
+              <PaginationItem
+                key={pageNumber}
+                className={isNeighbor ? "hidden sm:block" : ""}>
+                <PaginationLink
+                  onClick={(e) => handlePageClick(e, pageNumber)}
+                  isActive={isCurrent}
+                  className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:border-cyan-500/30 hover:bg-zinc-700/50 hover:text-cyan-300 ${
+                    isCurrent
+                      ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
+                      : ""
+                  }`}>
+                  {pageNumber}
+                </PaginationLink>
+              </PaginationItem>
+            );
+          } else if (isEllipsis) {
+            return (
+              <PaginationItem key={pageNumber} className='hidden sm:block'>
+                <PaginationEllipsis />
+              </PaginationItem>
+            );
+          }
+          return null;
+        })}
 
         <PaginationItem>
           <PaginationNext
             onClick={handleNext}
-            className={
+            className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 [&>span]:hidden sm:[&>span]:inline ${
               currentPage === totalPages ? "pointer-events-none opacity-50" : ""
-            }
+            }`}
           />
         </PaginationItem>
       </PaginationContent>
