@@ -53,33 +53,34 @@ export const SongsGrid = ({
     onTableStatusChange: onStatusChange,
   });
 
-  if (songs.length === 0) {
-    return <SongsTableEmpty hasFilters={hasFilters} onAddSong={onAddSong} />;
-  }
-
   return (
-    <div className='space-y-8'>
-      {/* Grid Container */}
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-        {songs.map((song) => {
-          let userStatus: SongStatus | undefined;
-          if (userSongs.wantToLearn.some(s => s.id === song.id)) userStatus = "wantToLearn";
-          else if (userSongs.learning.some(s => s.id === song.id)) userStatus = "learning";
-          else if (userSongs.learned.some(s => s.id === song.id)) userStatus = "learned";
+    <div className='space-y-8 min-h-[400px] flex flex-col justify-between pb-12 transition-all duration-300'>
+      {songs.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center">
+          <SongsTableEmpty hasFilters={hasFilters} onAddSong={onAddSong} />
+        </div>
+      ) : (
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in duration-500'>
+          {songs.map((song) => {
+            let userStatus: SongStatus | undefined;
+            if (userSongs.wantToLearn.some(s => s.id === song.id)) userStatus = "wantToLearn";
+            else if (userSongs.learning.some(s => s.id === song.id)) userStatus = "learning";
+            else if (userSongs.learned.some(s => s.id === song.id)) userStatus = "learned";
 
-          return (
-            <SongCard
-              key={song.id}
-              song={song}
-              userStatus={userStatus}
-              onOpenDetails={() => {
-                setSelectedSong(song);
-                setIsDetailsOpen(true);
-              }}
-            />
-          );
-        })}
-      </div>
+            return (
+              <SongCard
+                key={song.id}
+                song={song}
+                userStatus={userStatus}
+                onOpenDetails={() => {
+                  setSelectedSong(song);
+                  setIsDetailsOpen(true);
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
 
       <SongSheet
         song={songs.find((s) => s.id === selectedSong?.id) || selectedSong}
@@ -108,73 +109,75 @@ export const SongsGrid = ({
         }
       />
 
-      {/* Pagination */}
-      {songs.length > 0 && (
-        <div className='flex justify-center'>
-          <div className='rounded-2xl border border-white/5 bg-zinc-900/40 p-3 backdrop-blur-sm'>
-            <Pagination>
-              <PaginationContent className='gap-2'>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => onPageChange(currentPage - 1)}
-                    className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 ${
-                      currentPage <= 1
-                        ? "pointer-events-none opacity-50"
-                        : "cursor-pointer hover:border-cyan-500/30 hover:text-cyan-300"
-                    }`}
-                  />
-                </PaginationItem>
+      {/* Pagination Container - Always rendered with fixed height to prevent jumps */}
+      <div className='mt-auto pt-8'>
+        {totalPages > 0 && (
+          <div className='flex justify-center'>
+            <div className='rounded-2xl border border-white/5 bg-zinc-900/40 p-3 backdrop-blur-sm'>
+              <Pagination>
+                <PaginationContent className='gap-2'>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => onPageChange(currentPage - 1)}
+                      className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 ${
+                        currentPage <= 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer hover:border-cyan-500/30 hover:text-cyan-300"
+                      }`}
+                    />
+                  </PaginationItem>
 
-                {[...Array(totalPages)].map((_, index) => {
-                  const pageNumber = index + 1;
-                  if (
-                    pageNumber === 1 ||
-                    pageNumber === totalPages ||
-                    (pageNumber >= currentPage - 1 &&
-                      pageNumber <= currentPage + 1)
-                  ) {
-                    return (
-                      <PaginationItem key={pageNumber}>
-                        <PaginationLink
-                          onClick={() => onPageChange(pageNumber)}
-                          isActive={currentPage === pageNumber}
-                          className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:border-cyan-500/30 hover:bg-zinc-700/50 hover:text-cyan-300 ${
-                            currentPage === pageNumber
-                              ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
-                              : ""
-                          }`}>
-                          {pageNumber}
-                        </PaginationLink>
-                      </PaginationItem>
-                    );
-                  } else if (
-                    pageNumber === currentPage - 2 ||
-                    pageNumber === currentPage + 2
-                  ) {
-                    return (
-                      <PaginationItem key={pageNumber}>
-                        <PaginationEllipsis className='text-zinc-600' />
-                      </PaginationItem>
-                    );
-                  }
-                  return null;
-                })}
+                  {[...Array(totalPages)].map((_, index) => {
+                    const pageNumber = index + 1;
+                    if (
+                      pageNumber === 1 ||
+                      pageNumber === totalPages ||
+                      (pageNumber >= currentPage - 1 &&
+                        pageNumber <= currentPage + 1)
+                    ) {
+                      return (
+                        <PaginationItem key={pageNumber}>
+                          <PaginationLink
+                            onClick={() => onPageChange(pageNumber)}
+                            isActive={currentPage === pageNumber}
+                            className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:border-cyan-500/30 hover:bg-zinc-700/50 hover:text-cyan-300 ${
+                              currentPage === pageNumber
+                                ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
+                                : ""
+                            }`}>
+                            {pageNumber}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    } else if (
+                      pageNumber === currentPage - 2 ||
+                      pageNumber === currentPage + 2
+                    ) {
+                      return (
+                        <PaginationItem key={pageNumber}>
+                          <PaginationEllipsis className='text-zinc-600' />
+                        </PaginationItem>
+                      );
+                    }
+                    return null;
+                  })}
 
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => onPageChange(currentPage + 1)}
-                    className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 ${
-                      currentPage >= totalPages
-                        ? "pointer-events-none opacity-50"
-                        : "cursor-pointer hover:border-cyan-500/30 hover:text-cyan-300"
-                    }`}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => onPageChange(currentPage + 1)}
+                      className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 ${
+                        currentPage >= totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer hover:border-cyan-500/30 hover:text-cyan-300"
+                      }`}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

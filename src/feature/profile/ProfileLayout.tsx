@@ -110,7 +110,7 @@ const ProfileLayout = ({
               </div>
 
               {/* Enhanced Info Section */}
-              <div className='rounded-xl border border-zinc-700/30 bg-zinc-800/20 p-6 backdrop-blur-sm'>
+              <div className='rounded-xl border border-zinc-700/30 bg-zinc-800/20 p-4 sm:p-6 backdrop-blur-sm'>
                 <div className='font-openSans space-y-3'>
                   <DaySinceMessage date={new Date(lastReportDate)} />
                   <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
@@ -157,7 +157,7 @@ const ProfileLayout = ({
               </div>
 
               {/* Enhanced Level Bar */}
-              <div className='rounded-xl border border-zinc-700/30 bg-zinc-800/20 p-6 backdrop-blur-sm'>
+              <div className='rounded-xl border border-zinc-700/30 bg-zinc-800/20 p-4 sm:p-6 backdrop-blur-sm'>
                 <h3 className='mb-4 text-lg font-semibold text-white'>
                   Level Progress
                 </h3>

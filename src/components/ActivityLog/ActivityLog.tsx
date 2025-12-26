@@ -38,7 +38,7 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
     yearButtons.push(y);
   }
 
-  if (isLoading || !reportList.length) {
+  if (isLoading ) {
     return (
       <div className="flex h-40 w-full items-center justify-center">
         <FaSpinner className="animate-spin text-2xl text-second" />

@@ -101,7 +101,7 @@ export const LeadboardLayout = ({
     <MainContainer title='Leadboard'>
       <div className='min-h-screen'>
         {/* Enhanced Header - Zen Aesthetic */}
-        <div className='sticky top-4 z-20 mb-12 mx-auto max-w-7xl px-4'>
+        <div className='mb-12 mx-auto max-w-7xl px-4'>
           <div className='rounded-2xl bg-zinc-950/40 p-8 shadow-2xl'>
             <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
               {/* Left Section - Controls */}
@@ -137,8 +137,60 @@ export const LeadboardLayout = ({
         </div>
 
         {/* Enhanced Content Container */}
-        <div className='mx-auto max-w-7xl px-4'>
-          <ul className='flex flex-col gap-6'>{renderLeaderboardContent()}</ul>
+        <div className='mx-auto max-w-7xl px-4 pb-20'>
+          {isLoading ? (
+            <>
+              <ul className='flex flex-col gap-6'>
+                <TableSkeleton rows={itemsPerPage} />
+              </ul>
+              <div className='mt-8 flex justify-center'>
+                 <div className='h-16 w-64 animate-pulse rounded-2xl bg-zinc-900/30 backdrop-blur-sm' />
+              </div>
+            </>
+          ) : !usersData.length ? (
+            <div className='flex h-[50vh] items-center justify-center'>
+              <div className='text-center'>
+                <div className='mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/50'>
+                  <span className='text-2xl'>📊</span>
+                </div>
+                <h3 className='mb-2 text-xl font-semibold text-zinc-300'>
+                  {isSeasonalView ? "Brak danych sezonowych" : "Brak użytkowników"}
+                </h3>
+                <p className='text-sm text-zinc-500'>
+                  {isSeasonalView
+                    ? t("no_seasonal_data_found")
+                    : t("no_users_found")}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <ul className='flex flex-col gap-6'>
+                {usersData.map((user, index) => (
+                  <LeadboardRow
+                    key={user.profileId}
+                    profileId={user.profileId}
+                    place={(currentPage - 1) * itemsPerPage + index + 1}
+                    nick={user.displayName}
+                    userAvatar={user.avatar}
+                    statistics={user.statistics}
+                    currentUserId={currentUserId}
+                  />
+                ))}
+              </ul>
+
+              {/* Clean Pagination */}
+              <div className='mt-8 flex justify-center'>
+                <div className='rounded-2xl bg-zinc-900/30 p-4 backdrop-blur-sm'>
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                  />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </MainContainer>

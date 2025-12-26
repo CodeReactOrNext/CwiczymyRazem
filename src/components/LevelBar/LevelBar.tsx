@@ -49,12 +49,12 @@ export const LevelBar = ({
   const isMini = size === "mini";
 
   return (
-    <div className={cn("flex items-center gap-4", isMini && "gap-2", className)}>
+    <div className={cn("flex items-center gap-3 sm:gap-4", isMini && "gap-2", className)}>
       {/* Level Badge */}
       {showBadge && (
         <div
           className={cn(
-            "flex items-center justify-center rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/20 to-cyan-600/30 shadow-lg",
+            "flex shrink-0 items-center justify-center rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/20 to-cyan-600/30 shadow-lg",
             isMini ? "h-8 w-8" : "h-10 w-10"
           )}>
           <span
@@ -68,21 +68,23 @@ export const LevelBar = ({
       )}
 
       {/* Segmented Progress Bar */}
-      <div className='flex flex-col gap-1.5'>
+      <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
         {showLabel && (
-          <div className={cn("flex items-center gap-2", isMini ? "text-[10px]" : "text-sm")}>
+          <div className={cn("flex flex-wrap items-center gap-x-2 gap-y-0.5", isMini ? "text-[10px]" : "text-sm")}>
             {!showBadge && <span className='font-semibold text-white'>Level {lvl}</span>}
-            <span className='font-bold text-cyan-400'>
-              {Math.round(progressPercent)}% XP
-            </span>
-            <span className={cn("font-medium text-white/40 ml-1", isMini ? "text-[9px]" : "text-xs")}>
-                ({pointsInThisLevel.toLocaleString()} / {levelXpDifference.toLocaleString()})
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className='font-bold text-cyan-400'>
+                {Math.round(progressPercent)}% XP
+              </span>
+              <span className={cn("font-medium text-white/40", isMini ? "text-[9px]" : "text-xs")}>
+                  ({pointsInThisLevel.toLocaleString()} / {levelXpDifference.toLocaleString()})
+              </span>
+            </div>
           </div>
         )}
 
         {/* Segments Container */}
-        <div className={cn("flex items-center", isMini ? "gap-1" : "gap-1.5")}>
+        <div className={cn("flex items-center justify-between gap-1", !isMini && "sm:gap-1.5")}>
           {Array.from({ length: totalSegments }, (_, index) => {
             let segmentFill = 0;
 
@@ -98,8 +100,7 @@ export const LevelBar = ({
               <div
                 key={index}
                 className={cn(
-                  "relative overflow-hidden rounded-md border transition-all duration-500 shadow-inner",
-                  isMini ? "h-2.5 w-8" : "h-4 w-12",
+                  "relative h-2.5 flex-1 overflow-hidden rounded-md border transition-all duration-500 shadow-inner sm:h-3.5",
                   isFilled ? "border-cyan-400/30 bg-zinc-900/40" : "border-white/5 bg-zinc-900/60"
                 )}>
                 {/* Segment fill with glow and premium gradient */}
@@ -122,9 +123,9 @@ export const LevelBar = ({
           })}
         </div>
 
-        {/* Stats */}
+        {/* Stats - Hidden on mobile if redundant */}
         {showStats && !isMini && (
-          <div className={cn("text-white/80", isMini ? "text-xs" : "text-sm")}>
+          <div className={cn("hidden text-white/80 sm:block", isMini ? "text-xs" : "text-sm")}>
             <span>
               {pointsInThisLevel.toLocaleString()} /{" "}
               {levelXpDifference.toLocaleString()} XP
