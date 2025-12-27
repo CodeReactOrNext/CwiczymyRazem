@@ -1,4 +1,4 @@
-import { Search, RefreshCw, ShieldCheck, Plus, User } from "lucide-react";
+import { Search, RefreshCw, ShieldCheck, Plus, User, Activity } from "lucide-react";
 import { Input } from "assets/components/ui/input";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
@@ -11,6 +11,7 @@ interface AdminActionCenterProps {
   onSync: () => void;
   onMassVerify: () => void;
   onMassEnrich: () => void;
+  onMigrateTiers: () => void;
   onBulkAdd: () => void;
   onFindDuplicates: () => void;
   isBulkProcessing: boolean;
@@ -25,6 +26,7 @@ const AdminActionCenter = ({
   onSync,
   onMassVerify,
   onMassEnrich,
+  onMigrateTiers,
   onBulkAdd,
   onFindDuplicates,
   isBulkProcessing,
@@ -32,6 +34,7 @@ const AdminActionCenter = ({
 }: AdminActionCenterProps) => {
   return (
     <div className="flex flex-col gap-4 bg-zinc-900/40 p-5 rounded-2xl border border-white/5 backdrop-blur-md">
+      {/* ... (search and filters) ... */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="relative flex-1 min-w-[300px]">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
@@ -103,6 +106,14 @@ const AdminActionCenter = ({
         >
           <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
           Mass Enrich
+        </Button>
+        <Button 
+          onClick={onMigrateTiers} 
+          disabled={isBulkProcessing}
+          className="h-10 bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
+        >
+          <Activity className="mr-2 h-3.5 w-3.5" />
+          Migrate Tiers
         </Button>
         <Button
           onClick={onBulkAdd}

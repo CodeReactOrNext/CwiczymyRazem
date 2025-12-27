@@ -32,6 +32,7 @@ export interface Song {
   avgDifficulty?: number;
   title_lowercase?: string;
   artist_lowercase?: string;
+  tier?: string;
 }
 
 export interface UserSongStatus {

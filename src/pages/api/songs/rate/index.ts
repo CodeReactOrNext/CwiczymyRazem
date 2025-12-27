@@ -23,14 +23,13 @@ export default async function handler(
   }
 
   try {
-    const { songId, rating, title, artist, avatarUrl, token } = req.body;
+    const { songId, rating, title, artist, avatarUrl, token, tier } = req.body;
 
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Verify user token using Admin SDK
-    // token.token might be passed if Redux passes the full IdTokenResult object, or just the token string
+    // ... (token verification remains same) ...
     const tokenString = token.token || token;
     let userId = "";
     try {
@@ -85,13 +84,25 @@ export default async function handler(
       newDifficulties.reduce((acc, curr) => acc + curr.rating, 0) /
       (newDifficulties.length || 1);
 
+    // Determine final tier
+    const getTierFromDifficulty = (diff: number): string => {
+        if (diff >= 9) return "S";
+        if (diff >= 7.5) return "A";
+        if (diff >= 6) return "B";
+        if (diff >= 4) return "C";
+        return "D";
+    };
+    
+    const finalTier =  getTierFromDifficulty(avgDifficulty);
+
     // Update Song
     await updateDoc(songRef, {
       difficulties: newDifficulties,
       avgDifficulty,
+      tier: finalTier
     });
 
-    // Update User Points (+5) ONLY if new rating
+    // Update User Points (+5) ONLY if new rating (remains same)
     let addedPoints = 0;
     if (isNewRating) {
       const userRef = doc(db, "users", userId);
@@ -101,8 +112,7 @@ export default async function handler(
       addedPoints = 5;
     }
 
-    // Add Log using existing client-side compatible service
-    // This handles Discord logging internally too
+    // Add Log ...
     await firebaseAddSongsLog(
       userId,
       new Date().toISOString(),
@@ -117,6 +127,7 @@ export default async function handler(
       success: true,
       difficulties: newDifficulties,
       avgDifficulty,
+      tier: finalTier,
       addedPoints
     });
 
