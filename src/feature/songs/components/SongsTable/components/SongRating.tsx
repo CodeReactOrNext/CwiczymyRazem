@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { rateSong } from "feature/user/store/userSlice.asyncThunk";
+import { cn } from "assets/lib/utils";
 
 interface SongRatingInterface {
   song: Song;
@@ -38,16 +39,16 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
     songId: string,
     title: string,
     artist: string,
-    rating: number
+    rating: number,
+    manualTier?: string
   ) => {
     if (!userId) {
       return;
     }
 
-    // 1. Check existing legacy cooldown (1 hour)
+    // 1. Check existing legacy cooldown (15s)
     if (userRating) {
       let lastRatedDate: Date;
-      // Handle Firestore Timestamp or serialized object or string
       if (userRating.date && typeof userRating.date.toDate === 'function') {
         lastRatedDate = userRating.date.toDate();
       } else if (userRating.date && typeof userRating.date === 'object' && 'seconds' in userRating.date) {
@@ -79,8 +80,6 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
     try {
       setIsRatingLoading(true);
       
-      // Optimistic update of points is handled in userSlice reducers
-
       const isNewRating = !isRated;
 
       const resultAction = await dispatch(rateSong({
@@ -89,15 +88,15 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
         title,
         artist,
         avatarUrl: avatar,
-        isNewRating
+        isNewRating,
+        tier: manualTier
       }));
+
 
       if (rateSong.fulfilled.match(resultAction)) {
         toast.success(isNewRating ? "+5 Points! Rating updated." : "Rating updated.");
         ratingCooldowns.set(songId, Date.now());
 
-        // Update React Query Cache for all 'songs' lists
-        // We look for any query starting with ['songs'] and update the specific song in the list
         queryClient.setQueriesData({ queryKey: ['songs'] }, (oldData: any) => {
           if (!oldData || !oldData.songs) return oldData;
           
@@ -105,19 +104,18 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
             ...oldData,
             songs: oldData.songs.map((s: Song) => {
               if (s.id === songId) {
-                // Merge updated fields from API response (difficulties, avgDifficulty)
-                const { difficulties, avgDifficulty } = resultAction.payload;
+                const { difficulties, avgDifficulty, tier } = resultAction.payload;
                 return {
                   ...s,
                   difficulties,
-                  avgDifficulty
+                  avgDifficulty,
+                  tier: tier || s.tier
                 };
               }
               return s;
             })
           };
         });
-
       } else {
         throw new Error("Rating failed");
       }
@@ -129,8 +127,16 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
     }
   };
 
+  const tiers = [
+    { id: 'S', color: '#FF7F7F' },
+    { id: 'A', color: '#FFBF7F' },
+    { id: 'B', color: '#FFFF7F' },
+    { id: 'C', color: '#7FFF7F' },
+    { id: 'D', color: '#7FFFFF' }
+  ];
+
   return (
-    <div className='flex flex-col'>
+    <div className='flex flex-col gap-4'>
       <div className='flex items-center gap-1'>
         {[...Array(10)].map((_, i) => {
           const avgRating = song.avgDifficulty || 0;
@@ -187,7 +193,38 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
           {ratingHover?.songId === song.id && `${ratingHover.rating}/10`}
         </div>
       </div>
-      {isRated && <span className="text-[10px] text-green-500 font-medium ml-1">Rated</span>}
+
+      <div className="flex flex-col gap-2">
+        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Manual Tier Override</span>
+        <div className="flex gap-2">
+            {tiers.map((t) => {
+                const isActive = (song as any).tier === t.id;
+                return (
+                    <button
+                        key={t.id}
+                        disabled={isRatingLoading}
+                        onClick={() => {
+                            const currentRating = song?.difficulties?.find(d => d.userId === userId)?.rating || 0;
+                            handleRating(song.id, song.title, song.artist, currentRating, t.id);
+                        }}
+                        className={cn(
+                            "flex h-9 w-9 items-center justify-center rounded-lg border-2 text-xs font-black transition-all active:scale-95",
+                            isActive ? "shadow-lg scale-105" : "border-white/5 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
+                        )}
+                        style={{
+                            borderColor: isActive ? t.color : "transparent",
+                            backgroundColor: isActive ? `${t.color}15` : "rgba(255,255,255,0.02)",
+                            color: isActive ? t.color : "inherit",
+                        }}
+                    >
+                        {t.id}
+                    </button>
+                )
+            })}
+        </div>
+      </div>
+
+      {isRated && <span className="text-[10px] text-green-500 font-medium">Song Rated</span>}
     </div>
   );
 };
