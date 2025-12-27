@@ -354,6 +354,7 @@ export interface RateSongPayload {
   artist: string;
   avatarUrl?: string;
   isNewRating?: boolean;
+  tier?: string;
 }
 
 export const rateSong = createAsyncThunk(
