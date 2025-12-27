@@ -120,27 +120,6 @@ export const useAdminBulkActions = (
     onFetchSongs();
   };
 
-  const handleMigrateTiers = async () => {
-    setIsBulkProcessing(true);
-    setProgress({ current: 0, total: 1 }); // We don't have a count yet, but it's a single API call
-
-    try {
-      const res = await axios.post("/api/admin/migrate-tiers", { password }, {
-        headers: { "x-admin-password": password }
-      });
-
-      if (res.data.success) {
-        toast.success(res.data.message);
-        onFetchSongs();
-      }
-    } catch (err) {
-      toast.error("Migration failed.");
-      console.error(err);
-    } finally {
-      setIsBulkProcessing(false);
-    }
-  };
-
   return {
     isBulkProcessing,
     progress,
@@ -148,7 +127,6 @@ export const useAdminBulkActions = (
     handleEnrich,
     verifyAll,
     handleMassEnrich,
-    handleBulkEnrich,
-    handleMigrateTiers
+    handleBulkEnrich
   };
 };
