@@ -11,7 +11,6 @@ interface AdminActionCenterProps {
   onSync: () => void;
   onMassVerify: () => void;
   onMassEnrich: () => void;
-  onMigrateTiers: () => void;
   onBulkAdd: () => void;
   onFindDuplicates: () => void;
   isBulkProcessing: boolean;
@@ -26,7 +25,6 @@ const AdminActionCenter = ({
   onSync,
   onMassVerify,
   onMassEnrich,
-  onMigrateTiers,
   onBulkAdd,
   onFindDuplicates,
   isBulkProcessing,
@@ -36,16 +34,16 @@ const AdminActionCenter = ({
     <div className="flex flex-col gap-4 bg-zinc-900/40 p-5 rounded-2xl border border-white/5 backdrop-blur-md">
       {/* ... (search and filters) ... */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="relative flex-1 min-w-[300px]">
+        <div className="relative flex-1 w-full md:w-auto">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
           <Input 
             placeholder="Search collection..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-12 h-11 border-white/5 bg-black/40 text-sm focus:border-cyan-500/30 transition-all rounded-xl"
+            className="pl-12 h-11 border-white/5 bg-black/40 text-sm focus:border-cyan-500/30 transition-all rounded-xl w-full"
           />
         </div>
-        <div className="flex items-center gap-2 bg-black/40 p-1 rounded-xl ring-1 ring-white/5">
+        <div className="flex items-center gap-2 bg-black/40 p-1 rounded-xl ring-1 ring-white/5 overflow-x-auto no-scrollbar max-w-full">
           <Button 
             variant="ghost" 
             size="sm"
@@ -81,7 +79,7 @@ const AdminActionCenter = ({
         </div>
       </div>
       
-      <div className="flex items-center justify-end gap-3 pt-2 border-t border-white/5">
+      <div className="flex flex-wrap items-center justify-start md:justify-end gap-3 pt-2 border-t border-white/5">
         <Button 
           variant="outline" 
           onClick={onSync} 
@@ -106,14 +104,6 @@ const AdminActionCenter = ({
         >
           <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
           Mass Enrich
-        </Button>
-        <Button 
-          onClick={onMigrateTiers} 
-          disabled={isBulkProcessing}
-          className="h-10 bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
-        >
-          <Activity className="mr-2 h-3.5 w-3.5" />
-          Migrate Tiers
         </Button>
         <Button
           onClick={onBulkAdd}
