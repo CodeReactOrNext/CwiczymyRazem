@@ -64,7 +64,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   );
 
   useEffect(() => {
-    if (title || artist) {
+    if (artist.trim() && title.trim()) {
       searchSongs(`${title} ${artist}`.trim());
     } else {
       setMatches([]);
@@ -151,7 +151,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md sm:max-w-lg border-white/5 bg-zinc-950 p-0 overflow-hidden">
-        <div className="p-6">
+        <div className="p-6 pb-20 md:pb-6 overflow-y-auto max-h-[90vh]">
           <DialogHeader className="mb-6">
             <DialogTitle className='font-openSans text-2xl font-black text-white flex items-center gap-3'>
               <div className="p-2 rounded-xl bg-cyan-500/10">
@@ -215,7 +215,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                     </button>
                   ))}
                   
-                  {!isSearching && matches.length === 0 && (title || artist) && (
+                  {!isSearching && matches.length === 0 && (artist.trim() && title.trim()) && (
                     <div className="p-8 text-center rounded-2xl border border-dashed border-white/10 bg-white/[0.02]">
                       <div className="text-sm font-medium text-zinc-500 italic">No exact matches in library yet - yours will be the first!</div>
                     </div>
@@ -265,16 +265,24 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                 {(Object.entries(STATUS_CONFIG) as [SongStatus, typeof STATUS_CONFIG.learning][]).map(([status, config]) => (
                   <button
                     key={status}
+                    disabled={isLoading}
                     onClick={() => handleSelectCategory(status)}
                     className={cn(
                       "flex items-center gap-4 p-4 rounded-2xl border-2 transition-all active:scale-95 text-left group",
                       config.borderColor,
                       config.bgHover,
-                      "bg-white/[0.02] hover:shadow-lg"
+                      "bg-white/[0.02] hover:shadow-lg",
+                      isLoading && "opacity-50 cursor-not-allowed"
                     )}
                   >
                     <div className={cn("p-3 rounded-xl", config.bgColor, config.color)}>
-                      <config.icon className="h-6 w-6" />
+                      {isLoading ? (
+                        <div className="h-6 w-6 flex items-center justify-center">
+                          <span className="loading loading-spinner loading-xs" />
+                        </div>
+                      ) : (
+                        <config.icon className="h-6 w-6" />
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className={cn("font-black tracking-tight", config.color)}>
@@ -291,7 +299,8 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
 
                 <button
                   onClick={() => handleSelectCategory("skip")}
-                  className="flex items-center gap-4 p-4 rounded-2xl border-2 border-white/5 bg-white/[0.02] hover:bg-zinc-900 transition-all active:scale-95 group"
+                  disabled={isLoading}
+                  className="flex items-center gap-4 p-4 rounded-2xl border-2 border-white/5 bg-white/[0.02] hover:bg-zinc-900 transition-all active:scale-95 group disabled:opacity-50"
                 >
                   <div className="p-3 rounded-xl bg-zinc-800 text-zinc-400">
                     <SkipForward className="h-6 w-6" />

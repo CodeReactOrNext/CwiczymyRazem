@@ -94,16 +94,6 @@ const SongsView = () => {
   return (
     <MainContainer title={t("songs")}>
       <div className='font-openSans flex flex-col gap-6 p-4 lg:p-8 min-h-screen'>
-        {/* Header Action */}
-        <div className="flex justify-end -mb-4">
-          <Button 
-            onClick={() => setIsModalOpen(true)}
-            className="h-11 bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all active:scale-95 shadow-[0_0_20px_rgba(8,145,178,0.3)] border-none"
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            {t("add_new_song")}
-          </Button>
-        </div>
 
         {/* Content Area */}
         <div className="flex-1">
@@ -143,10 +133,19 @@ const SongsView = () => {
               <div className="space-y-6 animate-in fade-in-50 duration-300">
               
                 {/* Tier Selection Grid - New Requirement */}
-                <div className="space-y-3">
-                  <div className="flex flex-col gap-1">
-                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-cyan-500/80">Skill Level Filters</h3>
-                    <p className="text-[11px] text-zinc-500 font-medium">Filter library by player tier</p>
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="text-xs font-black uppercase tracking-[0.2em] text-cyan-500/80">Skill Level Filters</h3>
+                      <p className="text-[11px] text-zinc-500 font-medium">Filter library by player tier</p>
+                    </div>
+                    <Button 
+                      onClick={() => setIsModalOpen(true)}
+                      className="h-11 bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all active:scale-95 shadow-[0_0_20px_rgba(8,145,178,0.3)] border-none px-6"
+                    >
+                      <Plus className="mr-2 h-5 w-5" />
+                      {t("add_new_song")}
+                    </Button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {getAllTiers().map((tier) => {
