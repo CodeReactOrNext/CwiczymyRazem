@@ -33,18 +33,84 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
     { name: "Discovery", href: "/admin/discovery", icon: SearchCheck },
   ];
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
-    <div className="flex min-h-screen bg-[#050505] text-zinc-400">
-      {/* Sidebar */}
+    <div className="flex min-h-screen bg-[#050505] text-zinc-400 flex-col lg:flex-row">
+      {/* Mobile Top Header */}
+      <header className="flex h-16 items-center justify-between border-b border-white/5 bg-zinc-950 px-6 lg:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500 shadow-lg shadow-cyan-500/20">
+            <ShieldCheck className="h-5 w-5 text-black" />
+          </div>
+          <h1 className="text-sm font-black tracking-tight text-white uppercase">Admin</h1>
+        </div>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="text-zinc-400 hover:text-white"
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <div 
+            className="h-full w-64 bg-zinc-950 p-6 shadow-2xl animate-in slide-in-from-left duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-8 flex items-center justify-between">
+               <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-cyan-500" />
+                  <span className="font-black text-white uppercase text-xs">Menu</span>
+               </div>
+               <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
+                  <ChevronLeft className="h-5 w-5" />
+               </Button>
+            </div>
+            <nav className="space-y-4">
+              {menuItems.map((item) => (
+                <Link key={item.name} href={item.href} onClick={() => setIsMobileMenuOpen(false)}>
+                  <div className={cn(
+                    "flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all",
+                    router.pathname === item.href ? "bg-cyan-500/10 text-cyan-500" : "text-zinc-500 hover:text-white"
+                  )}>
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.name}</span>
+                  </div>
+                </Link>
+              ))}
+              <div className="pt-4 mt-4 border-t border-white/5">
+                <Button 
+                   variant="ghost" 
+                   onClick={onLogout}
+                   className="w-full justify-start px-4 text-red-500/70 hover:bg-red-500/10 hover:text-red-500"
+                >
+                  <LogOut className="h-5 w-5 mr-3" />
+                  <span className="font-bold">Log Out</span>
+                </Button>
+              </div>
+            </nav>
+          </div>
+        </div>
+      )}
+
+      {/* Sidebar (Desktop) */}
       <aside 
         className={cn(
           "fixed left-0 top-0 z-40 h-screen border-r border-white/5 bg-zinc-950/50 backdrop-blur-3xl transition-all duration-300",
-          isCollapsed ? "w-20" : "w-64"
+          isCollapsed ? "w-20" : "w-64",
+          "hidden lg:block"
         )}
       >
         <div className="flex h-full flex-col p-4">
-          {/* Logo/Brand */}
-          <div className="mb-10 flex items-center gap-3 px-2">
+          <div className="mb-10 flex items-center gap-3 px-2 pt-2">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500 shadow-lg shadow-cyan-500/20">
               <ShieldCheck className="h-6 w-6 text-black" />
             </div>
@@ -56,7 +122,6 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
             )}
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 space-y-2">
             {menuItems.map((item) => {
               const isActive = router.pathname === item.href;
@@ -83,7 +148,6 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
             })}
           </nav>
 
-          {/* Bottom Actions */}
           <div className="mt-auto space-y-2 pt-10 border-t border-white/5">
             <Button 
                variant="ghost" 
@@ -113,10 +177,10 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
       <main 
         className={cn(
           "flex-1 transition-all duration-300",
-          isCollapsed ? "pl-20" : "pl-64"
+          isCollapsed ? "lg:pl-20" : "lg:pl-64"
         )}
       >
-        <div className="mx-auto min-h-screen max-w-7xl">
+        <div className="mx-auto min-h-screen max-w-7xl pt-6 px-4 lg:p-0">
            {children}
         </div>
       </main>

@@ -52,16 +52,18 @@ export const SongManagementTable = ({
   return (
     <div className="space-y-4">
       <div className="overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/20 backdrop-blur-sm shadow-xl">
-        <div className="grid grid-cols-12 gap-4 border-b border-white/5 bg-white/[0.02] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
-          <div className="col-span-1">Img</div>
-          <div className="col-span-5 uppercase">Song / Artist</div>
-          <div className="col-span-1 text-center uppercase">Rating</div>
-          <div className="col-span-2 text-center uppercase tracking-normal">Cover</div>
-          <div className="col-span-2 text-center uppercase">Status</div>
-          <div className="col-span-1 text-right uppercase">Actions</div>
-        </div>
-        
-        <div className="max-h-[60vh] overflow-y-auto divide-y divide-white/[0.03] scrollbar-thin scrollbar-track-zinc-900/40 scrollbar-thumb-zinc-700">
+        <div className="overflow-x-auto no-scrollbar">
+          <div className="min-w-[800px]">
+            <div className="grid grid-cols-12 gap-4 border-b border-white/5 bg-white/[0.02] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+              <div className="col-span-1">Img</div>
+              <div className="col-span-5 uppercase">Song / Artist</div>
+              <div className="col-span-1 text-center uppercase">Rating</div>
+              <div className="col-span-2 text-center uppercase tracking-normal">Cover</div>
+              <div className="col-span-2 text-center uppercase">Status</div>
+              <div className="col-span-1 text-right uppercase">Actions</div>
+            </div>
+            
+            <div className="max-h-[60vh] overflow-y-auto divide-y divide-white/[0.03] scrollbar-thin scrollbar-track-zinc-900/40 scrollbar-thumb-zinc-700">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
                <Loader2 className="h-10 w-10 animate-spin text-cyan-500 opacity-20" />
@@ -258,6 +260,8 @@ export const SongManagementTable = ({
           )}
         </div>
       </div>
+    </div>
+  </div>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-2 pt-2">
