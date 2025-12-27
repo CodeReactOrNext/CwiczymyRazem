@@ -2,6 +2,14 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "utils/firebase/client/firebase.utils";
 import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, query, orderBy, addDoc, serverTimestamp, getCountFromServer, limit, where } from "firebase/firestore";
 
+const getTierFromDifficulty = (difficulty: number): string => {
+  if (difficulty >= 9) return "S";
+  if (difficulty >= 7.5) return "A";
+  if (difficulty >= 6) return "B";
+  if (difficulty >= 4) return "C";
+  return "D";
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -146,7 +154,8 @@ export default async function handler(
               rating: difficulty,
               date: new Date()
             }] : [],
-            avgDifficulty: difficulty !== null ? difficulty : 0
+            avgDifficulty: difficulty !== null ? difficulty : 0,
+            tier: difficulty !== null ? getTierFromDifficulty(difficulty) : "D"
           };
 
           // Double check BEFORE addDoc (rare race condition protection)
@@ -199,7 +208,10 @@ export default async function handler(
         }
       }
 
-      await updateDoc(songRef, updates);
+      await updateDoc(songRef, {
+        ...updates,
+        tier: typeof updates.avgDifficulty === 'number' ? getTierFromDifficulty(updates.avgDifficulty) : undefined
+      });
 
       return res.status(200).json({ success: true });
     }

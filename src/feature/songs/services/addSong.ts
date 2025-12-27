@@ -19,6 +19,14 @@ const checkSongExists = async (title: string, artist: string) => {
   }
 };
 
+const getTierFromDifficulty = (difficulty: number): string => {
+  if (difficulty >= 9) return "S";
+  if (difficulty >= 7.5) return "A";
+  if (difficulty >= 6) return "B";
+  if (difficulty >= 4) return "C";
+  return "D";
+};
+
 
 export const addSong = async (
   title: string,
@@ -43,6 +51,9 @@ export const addSong = async (
       createdBy: userId,
       difficulties: [],
       avgDifficulty: 0,
+      tier: "D",
+      isVerified: false,
+      coverUrl: null,
     };
 
     const docRef = await addDoc(songsRef, newSong);
