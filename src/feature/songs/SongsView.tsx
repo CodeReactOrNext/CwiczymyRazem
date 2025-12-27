@@ -94,6 +94,17 @@ const SongsView = () => {
   return (
     <MainContainer title={t("songs")}>
       <div className='font-openSans flex flex-col gap-6 p-4 lg:p-8 min-h-screen'>
+        {/* Header Action */}
+        <div className="flex justify-end -mb-4">
+          <Button 
+            onClick={() => setIsModalOpen(true)}
+            className="h-11 bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all active:scale-95 shadow-[0_0_20px_rgba(8,145,178,0.3)] border-none"
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            {t("add_new_song")}
+          </Button>
+        </div>
+
         {/* Content Area */}
         <div className="flex-1">
           <div className="h-full w-full">
