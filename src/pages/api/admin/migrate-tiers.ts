@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { firestore } from "utils/firebase/api/firebase.config";
+import { db } from "utils/firebase/client/firebase.utils";
+import { collection, getDocs, writeBatch, doc } from "firebase/firestore";
 
 const getTierFromDifficulty = (difficulty: number): string => {
   if (difficulty >= 9) return "S";
@@ -13,34 +14,26 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const password = req.headers["x-admin-password"] || req.body.password;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-
-  if (!adminPassword || password !== adminPassword) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
   try {
-    const adminDb = firestore;
-    const songsRef = adminDb.collection("songs");
-    const snapshot = await songsRef.get();
+    const songsRef = collection(db, "songs");
+    const snapshot = await getDocs(songsRef);
 
     let updated = 0;
     const batchSize = 50;
-    let batch = adminDb.batch();
+    let batch = writeBatch(db);
 
     for (let i = 0; i < snapshot.docs.length; i++) {
-        const doc = snapshot.docs[i];
-        const data = doc.data();
+        const docSnap = snapshot.docs[i];
+        const data = docSnap.data();
         const avgDifficulty = data.avgDifficulty || 0;
         const tier = getTierFromDifficulty(avgDifficulty);
 
-        batch.update(doc.ref, { tier });
+        batch.update(docSnap.ref, { tier });
         updated++;
 
         if (updated % batchSize === 0) {
             await batch.commit();
-            batch = adminDb.batch();
+            batch = writeBatch(db);
         }
     }
 
