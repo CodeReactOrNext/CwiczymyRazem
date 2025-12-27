@@ -52,66 +52,65 @@ export const getSongs = async (
       else if (difficultyFilter === "hard") baseQuery = query(baseQuery, where("avgDifficulty", ">", 7));
     }
 
-    // 2. Complex Path: Search or Tier/Genre filters
-    if (searchQuery || (tierFilters && tierFilters.length > 0) || (genreFilters && genreFilters.length > 0)) {
-      let songs: Song[] = [];
+    // 1b. Tier Filters (Firestore-side range calculation)
+    if (tierFilters && tierFilters.length > 0) {
+      // Calculate the total range covered by selected tiers
+      // S: 9+, A: 7.5-9, B: 6-7.5, C: 4-6, D: 0-4
+      const tierMap: Record<string, { min: number, max: number }> = {
+        S: { min: 9, max: 11 },
+        A: { min: 7.5, max: 9 },
+        B: { min: 6, max: 7.5 },
+        C: { min: 4, max: 6 },
+        D: { min: 0, max: 4 }
+      };
 
-      if (searchQuery) {
-        const s = searchQuery.toLowerCase();
-        // 2a. NATIVE SEARCH: Run Title and Artist queries in parallel to get exact matching set from DB
-        const titleQ = query(baseQuery, where("title_lowercase", ">=", s), where("title_lowercase", "<=", s + "\uf8ff"), limit(200));
-        const artistQ = query(baseQuery, where("artist_lowercase", ">=", s), where("artist_lowercase", "<=", s + "\uf8ff"), limit(200));
+      const mins = tierFilters.map(t => tierMap[t]?.min ?? 10);
+      const maxs = tierFilters.map(t => tierMap[t]?.max ?? 0);
+      
+      const minVal = Math.min(...mins);
+      const maxVal = Math.max(...maxs);
 
-        const [titleSnap, artistSnap] = await Promise.all([
-          trackedGetDocs(titleQ),
-          trackedGetDocs(artistQ)
-        ]);
+      if (minVal > 0) baseQuery = query(baseQuery, where("avgDifficulty", ">=", minVal));
+      if (maxVal < 11) baseQuery = query(baseQuery, where("avgDifficulty", "<", maxVal));
+    }
 
-        const titleResults = titleSnap.docs.map(d => ({ id: d.id, ...d.data() } as Song));
-        const artistResults = artistSnap.docs.map(d => ({ id: d.id, ...d.data() } as Song));
+    // 1c. Genre Filters (Native Firestore array-contains-any)
+    if (genreFilters && genreFilters.length > 0) {
+      baseQuery = query(baseQuery, where("genres", "array-contains-any", genreFilters));
+    }
 
-        // Deduplicate
-        const seenIds = new Set();
-        songs = [...titleResults, ...artistResults].filter(song => {
-          if (seenIds.has(song.id)) return false;
-          seenIds.add(song.id);
-          return true;
-        });
-      } else {
-        // 2b. If no search but has filters, we fetch a generous slice to filter locally
-        // (Tier/Genre filtering is still best done in-memory due to Firestore range limits)
-        const snapshot = await trackedGetDocs(query(baseQuery, orderBy(sortBy, sortDirection), limit(1000)));
-        songs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
-      }
+    // 2. Search Path: Requires parallel queries and local merge
+    if (searchQuery) {
+      const s = searchQuery.toLowerCase();
+      // Use the already filtered baseQuery to ensure filters apply to search results too
+      const titleQ = query(baseQuery, where("title_lowercase", ">=", s), where("title_lowercase", "<=", s + "\uf8ff"), limit(100));
+      const artistQ = query(baseQuery, where("artist_lowercase", ">=", s), where("artist_lowercase", "<=", s + "\uf8ff"), limit(100));
 
-      // Local Post-Filtering (Tiers & Genres)
-      if (tierFilters && tierFilters.length > 0) {
-        songs = songs.filter(song => {
-          const diff = song.avgDifficulty ?? 0;
-          if (tierFilters.includes("S") && diff >= 9) return true;
-          if (tierFilters.includes("A") && diff >= 7.5 && diff < 9) return true;
-          if (tierFilters.includes("B") && diff >= 6 && diff < 7.5) return true;
-          if (tierFilters.includes("C") && diff >= 4 && diff < 6) return true;
-          if (tierFilters.includes("D") && diff < 4) return true;
-          return false;
-        });
-      }
+      const [titleSnap, artistSnap] = await Promise.all([
+        trackedGetDocs(titleQ),
+        trackedGetDocs(artistQ)
+      ]);
 
-      if (genreFilters && genreFilters.length > 0) {
-        songs = songs.filter(song => song.genres?.some(g => genreFilters.includes(g)));
-      }
+      const titleResults = titleSnap.docs.map(d => ({ id: d.id, ...d.data() } as Song));
+      const artistResults = artistSnap.docs.map(d => ({ id: d.id, ...d.data() } as Song));
 
-      // Handle re-sorting of merged search results
-      if (searchQuery) {
-        songs.sort((a, b) => {
-          const valA = (a as any)[sortBy];
-          const valB = (b as any)[sortBy];
-          if (typeof valA === 'string') {
-            return sortDirection === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
-          }
-          return sortDirection === "asc" ? (valA || 0) - (valB || 0) : (valB || 0) - (valA || 0);
-        });
-      }
+      // Merge and Deduplicate
+      const seenIds = new Set();
+      let songs = [...titleResults, ...artistResults].filter(song => {
+        if (seenIds.has(song.id)) return false;
+        seenIds.add(song.id);
+        return true;
+      });
+
+      // Sort merged results manually since they come from different queries
+      songs.sort((a, b) => {
+        const valA = (a as any)[sortBy] ?? (sortBy === 'title' ? '' : 0);
+        const valB = (b as any)[sortBy] ?? (sortBy === 'title' ? '' : 0);
+        if (typeof valA === 'string') {
+          return sortDirection === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
+        }
+        return sortDirection === "asc" ? valA - valB : valB - valA;
+      });
 
       const total = songs.length;
       const startIndex = (page - 1) * itemsPerPage;
@@ -122,7 +121,8 @@ export const getSongs = async (
       return result;
     }
 
-    // 3. Simple Path: Direct Paging
+    // 3. Simple Path: Native Paging (Used for regular browsing AND Tier/Genre filtering)
+    // This path is 100% native, no in-memory pooling
     const countSnapshot = await getCountFromServer(baseQuery);
     const totalCountPool = countSnapshot.data().count;
 
@@ -135,7 +135,7 @@ export const getSongs = async (
 
     const snapshot = await trackedGetDocs(q);
     const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
-    const pagedSongs = afterDoc && page > 1 ? docs : docs.slice((page - 1) * itemsPerPage);
+    const pagedSongs = (afterDoc && page > 1) ? docs : docs.slice((page - 1) * itemsPerPage);
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
 
     const result = {
