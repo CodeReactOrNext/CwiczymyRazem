@@ -31,6 +31,12 @@ interface AddSongModalProps {
 
 type ModalStep = "info" | "category";
 
+const STATUS_LABELS: Record<string, string> = {
+  learning: "Learning",
+  wantToLearn: "Want to Learn",
+  learned: "Learned",
+};
+
 const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const [step, setStep] = useState<ModalStep>("info");
   const [title, setTitle] = useState("");
@@ -153,7 +159,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
       <DialogContent className="max-w-md sm:max-w-lg border-white/5 bg-zinc-950 p-0 overflow-hidden">
         <div className="p-6 pb-20 md:pb-6 overflow-y-auto max-h-[90vh]">
           <DialogHeader className="mb-6">
-            <DialogTitle className='font-openSans text-2xl font-black text-white flex items-center gap-3'>
+            <DialogTitle className='font-openSans text-2xl font-bold text-white flex items-center gap-3'>
               <div className="p-2 rounded-xl bg-cyan-500/10">
                 <Music className="h-6 w-6 text-cyan-400" />
               </div>
@@ -191,7 +197,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
               {/* Match Results */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between ml-1">
-                  <span className="text-xs font-black uppercase tracking-widest text-zinc-500 flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-2">
                     {isSearching ? <Search className="h-3 w-3 animate-pulse" /> : <Check className="h-3 w-3" />}
                     {matches.length > 0 ? "Possible matches found" : isSearching ? "Searching..." : "Library Check"}
                   </span>
@@ -236,7 +242,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                 <Button
                   type='submit'
                   disabled={isLoading || !title.trim() || !artist.trim()}
-                  className="h-12 px-8 bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-[0_0_20px_rgba(8,145,178,0.2)] border-none"
+                  className="h-12 px-8"
                 >
                   {isLoading ? (
                     <span className='loading loading-spinner loading-sm' />
@@ -252,10 +258,10 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
           ) : (
             <div className="space-y-6">
               <div className="text-center space-y-2 mb-8">
-                <div className="text-2xl font-black text-white">{title}</div>
+                <div className="text-2xl font-bold text-white">{title}</div>
                 <div className="text-zinc-400 font-bold">{artist}</div>
                 <div className="pt-2">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-black uppercase tracking-widest border border-green-500/20">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-bold uppercase tracking-widest border border-green-500/20">
                     Song Added to Library
                   </span>
                 </div>
@@ -285,8 +291,8 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                       )}
                     </div>
                     <div className="flex-1">
-                      <div className={cn("font-black tracking-tight", config.color)}>
-                        {status}
+                      <div className={cn("font-bold tracking-tight", config.color)}>
+                        {STATUS_LABELS[status] || status}
                       </div>
                       <div className="text-xs text-zinc-500 font-medium leading-tight mt-0.5">
                         {status === "learning" && "Focus on this song today"}
@@ -306,7 +312,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                     <SkipForward className="h-6 w-6" />
                   </div>
                   <div>
-                    <div className="font-black tracking-tight text-white group-hover:text-cyan-400 transition-colors">
+                    <div className="font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors">
                       Skip for now
                     </div>
                     <div className="text-xs text-zinc-500 font-medium mt-0.5">

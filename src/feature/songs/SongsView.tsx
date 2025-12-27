@@ -136,7 +136,7 @@ const SongsView = () => {
                 <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div className="flex flex-col gap-1">
-                      <h3 className="text-xs font-black uppercase tracking-[0.2em] text-cyan-500/80">Skill Level Filters</h3>
+                      <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-500/80">Skill Level Filters</h3>
                       <p className="text-[11px] text-zinc-500 font-medium">Filter library by player tier</p>
                     </div>
                     <Button 
@@ -161,7 +161,7 @@ const SongsView = () => {
                             }
                           }}
                           className={cn(
-                            "flex h-11 w-11 items-center justify-center rounded-xl border-2 font-black transition-all active:scale-90",
+                            "flex h-11 w-11 items-center justify-center rounded-xl border-2 font-bold transition-all active:scale-90",
                             isActive 
                               ? "shadow-lg" 
                               : "border-white/5 bg-zinc-900 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
