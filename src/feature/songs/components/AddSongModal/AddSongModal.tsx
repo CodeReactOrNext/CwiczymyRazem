@@ -157,7 +157,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
               <div className="p-2 rounded-xl bg-cyan-500/10">
                 <Music className="h-6 w-6 text-cyan-400" />
               </div>
-              {step === "info" ? t("add_new_song") : t("set_status")}
+              {step === "info" ? 'Add new song' : 'Set status'}
             </DialogTitle>
           </DialogHeader>
 
@@ -278,7 +278,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                     </div>
                     <div className="flex-1">
                       <div className={cn("font-black tracking-tight", config.color)}>
-                        {t(`status_${status}`)}
+                        {status}
                       </div>
                       <div className="text-xs text-zinc-500 font-medium leading-tight mt-0.5">
                         {status === "learning" && "Focus on this song today"}
@@ -298,7 +298,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                   </div>
                   <div>
                     <div className="font-black tracking-tight text-white group-hover:text-cyan-400 transition-colors">
-                      {t("skip_for_now", "Skip for now")}
+                      Skip for now
                     </div>
                     <div className="text-xs text-zinc-500 font-medium mt-0.5">
                       Adjust status later from the lists
