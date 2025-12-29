@@ -10,7 +10,9 @@ import {
   FaGuitar, 
   FaBrain, 
   FaMusic, 
-  FaLayerGroup 
+  FaLayerGroup,
+  FaTrashAlt,
+  FaEdit
 } from "react-icons/fa";
 
 import type { DifficultyLevel, ExercisePlan } from "../types/exercise.types";
@@ -19,6 +21,8 @@ interface PlanCardProps {
   plan: ExercisePlan;
   onSelect?: () => void;
   onStart?: () => void;
+  onDelete?: () => void;
+  onEdit?: () => void;
   startButtonText?: string;
 }
 
@@ -64,6 +68,8 @@ export const PlanCard = ({
   plan,
   onSelect,
   onStart,
+  onDelete,
+  onEdit,
   startButtonText,
 }: PlanCardProps) => {
   const { t, i18n } = useTranslation(["exercises", "common"]);
@@ -110,9 +116,35 @@ export const PlanCard = ({
                 {t(`exercises:categories.${plan.category}` as any)}
             </Badge>
         </div>
-        <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-             {t(`exercises:difficulty.${difficulty}` as any)}
-        </Badge>
+        <div className="flex items-center gap-2">
+            {(onEdit || onDelete) && (
+                <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 mr-2">
+                    {onEdit && (
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-white/10"
+                            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                        >
+                            <FaEdit className="h-3.5 w-3.5" />
+                        </Button>
+                    )}
+                    {onDelete && (
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-zinc-400 hover:text-red-400 hover:bg-red-500/10"
+                            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                        >
+                            <FaTrashAlt className="h-3.5 w-3.5" />
+                        </Button>
+                    )}
+                </div>
+            )}
+            <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                {t(`exercises:difficulty.${difficulty}` as any)}
+            </Badge>
+        </div>
       </div>
 
       {/* Main Content */}

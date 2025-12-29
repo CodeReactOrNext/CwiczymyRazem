@@ -427,6 +427,9 @@
     "add_instruction_placeholder": "Add step (press Enter)",
     "add_tip_placeholder": "Add tip (press Enter)",
     "no_instructions_hint": "No instructions added yet.",
-    "no_tips_hint": "No tips added yet."
+    "no_tips_hint": "No tips added yet.",
+    "video_url": "YouTube Link",
+    "image_url": "Image URL (Tab/Score)",
+    "invalid_image": "Invalid image URL"
   }
 }

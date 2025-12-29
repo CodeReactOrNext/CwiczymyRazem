@@ -13,16 +13,19 @@ import { TitleField } from "./TitleField";
 interface PlanDetailsFormProps {
   selectedExercises: Exercise[];
   onSubmit: (data: Omit<ExercisePlan, "id">) => void;
+  initialData?: ExercisePlan;
 }
 
 export const PlanDetailsForm = ({
   selectedExercises,
   onSubmit,
+  initialData,
 }: PlanDetailsFormProps) => {
   const { t } = useTranslation("exercises");
   const { register, handleSubmit } = usePlanDetailsForm({
     selectedExercises,
     onSubmit,
+    initialData,
   });
 
   return (

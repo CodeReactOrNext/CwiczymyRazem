@@ -7,6 +7,15 @@ const nextConfig = {
   reactStrictMode: true,
   i18n,
   reactCompiler: true,
+  images: {
+    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
   turbopack: {},
   bundlePagesRouterDependencies: true,
   webpack: (config) => {

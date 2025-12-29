@@ -26,6 +26,8 @@ export interface Exercise {
   } | null;
   relatedSkills: GuitarSkillId[];
   image?: StaticImageData;
+  videoUrl?: string | null;
+  imageUrl?: string | null;
 }
 
 export interface ExercisePlan {
