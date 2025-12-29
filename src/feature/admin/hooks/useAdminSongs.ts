@@ -147,6 +147,27 @@ export const useAdminSongs = (password: string) => {
     }
   };
 
+  const handleMerge = async (sourceId: string, targetId: string) => {
+    try {
+      const response = await axios.post("/api/admin/songs/merge", {
+        password,
+        sourceId,
+        targetId
+      });
+      
+      if (response.data.success) {
+        removeLocalSong(sourceId);
+        // We'd ideally update targetId's popularity locally too, 
+        // but it's easier to just refetch or assume it's correct next time.
+        toast.success(response.data.message);
+        return true;
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Merge failed");
+      return false;
+    }
+  };
+
   // Filter local page result based on search (still useful for current page)
   const filteredSongs = songs.filter(s => {
     return s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -179,6 +200,7 @@ export const useAdminSongs = (password: string) => {
     handleBulkAdd,
     handleQuickRate,
     handleDelete,
+    handleMerge,
     filteredSongs,
     stats,
     page,

@@ -49,7 +49,11 @@ export const useDuplicateDetector = (initialSongs: Song[], password?: string) =>
         }
 
         allSongs = [...allSongs, ...songs];
-        setScannedSongs([...allSongs]); // Update UI progressively
+        setScannedSongs(prev => {
+          const uniqueMap = new Map<string, Song>((prev || []).map(s => [s.id, s]));
+          songs.forEach((s: Song) => uniqueMap.set(s.id, s));
+          return Array.from(uniqueMap.values());
+        }); // Update UI progressively, ensuring unique IDs
 
         const totalReal = total || stats?.total || 0;
         setScanProgress(Math.min(Math.round((allSongs.length / totalReal) * 100), 100));

@@ -56,11 +56,11 @@ export const SongManagementTable = ({
           <div className="min-w-[800px]">
             <div className="grid grid-cols-12 gap-4 border-b border-white/5 bg-white/[0.02] px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
               <div className="col-span-1">Img</div>
-              <div className="col-span-5 uppercase">Song / Artist</div>
+              <div className="col-span-4 uppercase">Song / Artist</div>
               <div className="col-span-1 text-center uppercase">Rating</div>
               <div className="col-span-2 text-center uppercase tracking-normal">Cover</div>
               <div className="col-span-2 text-center uppercase">Status</div>
-              <div className="col-span-1 text-right uppercase">Actions</div>
+              <div className="col-span-2 text-right uppercase">Actions</div>
             </div>
             
             <div className="max-h-[60vh] overflow-y-auto divide-y divide-white/[0.03] scrollbar-thin scrollbar-track-zinc-900/40 scrollbar-thumb-zinc-700">
@@ -88,7 +88,7 @@ export const SongManagementTable = ({
                       )}
                    </div>
                 </div>
-                <div className="col-span-5 min-w-0">
+                <div className="col-span-4 min-w-0">
                   {editingId === song.id ? (
                     <div className="space-y-2 animate-in fade-in slide-in-from-left-2 duration-300">
                       <Input 
@@ -180,7 +180,7 @@ export const SongManagementTable = ({
                     </div>
                   )}
                 </div>
-                <div className="col-span-1 flex justify-end gap-1">
+                <div className="col-span-2 flex justify-end gap-1">
                   {editingId === song.id ? (
                     <div className="flex gap-1 animate-in zoom-in-95 duration-200">
                       <Button 
