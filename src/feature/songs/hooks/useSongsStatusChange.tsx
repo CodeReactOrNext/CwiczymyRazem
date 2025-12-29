@@ -1,10 +1,10 @@
 import { removeUserSong } from "feature/songs/services/removeUserSong";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserAvatar, updatePoints } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 export const useSongsStatusChange = ({
   onChange,
@@ -30,6 +30,7 @@ export const useSongsStatusChange = ({
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
   const avatar = useAppSelector(selectUserAvatar);
+  const dispatch = useAppDispatch();
 
   const handleStatusChange = async (
     songId: string,
@@ -44,7 +45,12 @@ export const useSongsStatusChange = ({
     }
 
     try {
-      await updateSongStatus(userId, songId, title, artist, newStatus, avatar);
+      const result = await updateSongStatus(userId, songId, title, artist, newStatus, avatar);
+
+      // Update Points in local store
+      if (result.pointsAdded !== 0) {
+        dispatch(updatePoints(result.pointsAdded));
+      }
 
       if (!options?.skipOptimisticUpdate) {
           const allSongs = [
@@ -78,7 +84,11 @@ export const useSongsStatusChange = ({
         await onTableStatusChange();
       }
 
-      toast.success(t("status_updated"));
+      const pointsMsg = result.pointsAdded !== 0 
+        ? ` (${result.pointsAdded > 0 ? "+" : ""}${result.pointsAdded} pkt)` 
+        : "";
+      
+      toast.success(`${t("status_updated")}${pointsMsg}`);
     } catch (error) {
       toast.error(t("error_updating_status"));
     }
@@ -91,7 +101,12 @@ export const useSongsStatusChange = ({
     }
 
     try {
-      await removeUserSong(userId, songId);
+      const result = await removeUserSong(userId, songId);
+
+      // Update Points in local store
+      if (result.pointsAdded !== 0) {
+        dispatch(updatePoints(result.pointsAdded));
+      }
 
       const newUserSongs = {
         wantToLearn: userSongs.wantToLearn.filter((song) => song.id !== songId),
@@ -100,7 +115,12 @@ export const useSongsStatusChange = ({
       };
 
       onChange(newUserSongs);
-      toast.success(t("song_removed"));
+      
+      const pointsMsg = result.pointsAdded !== 0 
+        ? ` (${result.pointsAdded} pkt)` 
+        : "";
+        
+      toast.success(`${t("song_removed")}${pointsMsg}`);
     } catch (error) {
       toast.error(t("error_removing_song"));
     }

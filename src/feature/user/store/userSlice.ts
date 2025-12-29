@@ -92,6 +92,11 @@ export const userSlice = createSlice({
         state.timer.theory = payload.time;
       }
     },
+    updatePoints: (state, { payload }: PayloadAction<number>) => {
+      if (state.currentUserStats) {
+        state.currentUserStats.points = (state.currentUserStats.points || 0) + payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -221,6 +226,7 @@ export const {
   addUserData,
   updateTimerTime,
   updateLocalTimer,
+  updatePoints,
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
