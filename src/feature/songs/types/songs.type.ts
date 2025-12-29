@@ -33,6 +33,7 @@ export interface Song {
   title_lowercase?: string;
   artist_lowercase?: string;
   tier?: string;
+  spotifyId?: string;
 }
 
 export interface UserSongStatus {
