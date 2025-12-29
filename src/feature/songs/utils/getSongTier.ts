@@ -9,8 +9,10 @@ export interface SongTier {
   description: string;
 }
 
-export const getSongTier = (rating: number): SongTier => {
-  const tier = getTierFromDifficulty(rating);
+export const getSongTier = (ratingOrTier: number | string): SongTier => {
+  const tier = typeof ratingOrTier === 'string' 
+    ? ratingOrTier as 'S' | 'A' | 'B' | 'C' | 'D'
+    : getTierFromDifficulty(ratingOrTier);
 
   switch (tier) {
     case 'S':

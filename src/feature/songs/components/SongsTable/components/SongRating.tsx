@@ -39,8 +39,7 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
     songId: string,
     title: string,
     artist: string,
-    rating: number,
-    manualTier?: string
+    rating: number
   ) => {
     if (!userId) {
       return;
@@ -89,7 +88,6 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
         artist,
         avatarUrl: avatar,
         isNewRating,
-        tier: manualTier
       }));
 
 
@@ -191,36 +189,6 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
         </div>{" "}
         <div className='mt-1 w-[30px] text-sm text-primary'>
           {ratingHover?.songId === song.id && `${ratingHover.rating}/10`}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Manual Tier Override</span>
-        <div className="flex gap-2">
-            {tiers.map((t) => {
-                const isActive = (song as any).tier === t.id;
-                return (
-                    <button
-                        key={t.id}
-                        disabled={isRatingLoading}
-                        onClick={() => {
-                            const currentRating = song?.difficulties?.find(d => d.userId === userId)?.rating || 0;
-                            handleRating(song.id, song.title, song.artist, currentRating, t.id);
-                        }}
-                        className={cn(
-                            "flex h-9 w-9 items-center justify-center rounded-lg border-2 text-xs font-black transition-all active:scale-95",
-                            isActive ? "shadow-lg scale-105" : "border-white/5 opacity-40 grayscale hover:opacity-100 hover:grayscale-0"
-                        )}
-                        style={{
-                            borderColor: isActive ? t.color : "transparent",
-                            backgroundColor: isActive ? `${t.color}15` : "rgba(255,255,255,0.02)",
-                            color: isActive ? t.color : "inherit",
-                        }}
-                    >
-                        {t.id}
-                    </button>
-                )
-            })}
         </div>
       </div>
 

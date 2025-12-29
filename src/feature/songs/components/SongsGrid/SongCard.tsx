@@ -35,7 +35,7 @@ export const SongCard = ({
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
   const avgDifficulty = song.avgDifficulty || 0;
-  const tier = getSongTier(avgDifficulty);
+  const tier = getSongTier(song.tier || avgDifficulty);
 
   const isRated = song.difficulties?.some(d => d.userId === userId);
 

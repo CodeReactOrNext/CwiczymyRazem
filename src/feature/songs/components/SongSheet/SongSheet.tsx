@@ -132,7 +132,7 @@ const SongSheet = ({
   if (!song) return null;
 
   const avgDifficulty = song.avgDifficulty || 0;
-  const tier = getSongTier(avgDifficulty);
+  const tier = getSongTier(song.tier || avgDifficulty);
 
   return (
     <Sheet open={isOpen} onOpenChange={(v) => !v && onClose()}>
