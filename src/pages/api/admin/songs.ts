@@ -57,19 +57,34 @@ export default async function handler(
       const noRatingSnapshot = await getCountFromServer(query(songsRef, where("avgDifficulty", "==", 0)));
       const noRating = noRatingSnapshot.data().count;
 
-      const q = query(
+      let q = query(
         resultsQuery,
         orderBy("createdAt", "desc"),
-        limit(limitNum * pageNum)
+        limit(limitNum)
       );
-      const querySnapshot = await getDocs(q);
 
-      const allFetchedSongs = querySnapshot.docs.map(doc => ({
+      if (pageNum > 1) {
+        // To get the document to start after, we need to fetch the one just before it
+        // In a real production app, we should pass the last document ID as a cursor,
+        // but for this admin tool, we'll do a quick fetch of the previous items' last doc.
+        const prevQ = query(
+          resultsQuery,
+          orderBy("createdAt", "desc"),
+          limit((pageNum - 1) * limitNum)
+        );
+        const prevSnap = await getDocs(prevQ);
+        const lastDoc = prevSnap.docs[prevSnap.docs.length - 1];
+        if (lastDoc) {
+          const { startAfter } = require("firebase/firestore");
+          q = query(q, startAfter(lastDoc));
+        }
+      }
+
+      const querySnapshot = await getDocs(q);
+      const songs = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-
-      const songs = allFetchedSongs.slice((pageNum - 1) * limitNum);
 
       return res.status(200).json({
         songs,

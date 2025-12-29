@@ -52,6 +52,7 @@ const AdminDashboard = () => {
     handleBulkAdd,
     handleQuickRate,
     handleDelete,
+    handleMerge,
     filteredSongs,
     stats,
     page,
@@ -180,6 +181,7 @@ const AdminDashboard = () => {
         onClose={() => setIsDuplicateModalOpen(false)}
         duplicates={duplicates}
         onDelete={handleDelete}
+        onMerge={handleMerge}
         scannedCount={scannedCount}
       />
 

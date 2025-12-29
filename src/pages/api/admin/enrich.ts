@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db } from "utils/firebase/client/firebase.utils";
-import { collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
+import { firestore } from "utils/firebase/api/firebase.config";
 import { fetchEnrichmentData } from "utils/enrichment/enrichment.util";
 
 export default async function handler(
@@ -19,38 +18,33 @@ export default async function handler(
   }
 
   try {
-    const songsRef = collection(db, "songs");
-    const q = query(songsRef, where("isVerified", "!=", true)); // Non-verified songs
-    const querySnapshot = await getDocs(q);
+    const songsRef = firestore.collection("songs");
+    const querySnapshot = await songsRef.where("isVerified", "!=", true).get();
 
-    const unverifiedSongs = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as any[];
-
-    if (unverifiedSongs.length === 0) {
+    if (querySnapshot.empty) {
       return res.status(200).json({ success: true, count: 0 });
     }
 
     let processedCount = 0;
-    // We process in a loop on the server, but with a timeout safety
-    // For a larger database, we'd use a background worker (e.g., Firebase Functions)
-    for (const song of unverifiedSongs) {
+    
+    // Process songs sequentially to respect API rate limits
+    for (const doc of querySnapshot.docs) {
       try {
-        const enrichment = await fetchEnrichmentData(song.artist, song.title);
+        const songData = doc.data();
+        const enrichment = await fetchEnrichmentData(songData.artist, songData.title);
 
-        const songRef = doc(db, "songs", song.id);
-        await updateDoc(songRef, {
+        await doc.ref.update({
           coverUrl: enrichment.coverUrl || null,
           isVerified: !!enrichment.isVerified,
           coverAttempted: true,
+          genres: enrichment.genres || []
         });
 
         processedCount++;
         // Small delay to avoid hammering external APIs too hard
         await new Promise(r => setTimeout(r, 400));
-      } catch (err) {
-        console.error(`Failed to enrich song ${song.id}:`, err);
+      } catch (err: any) {
+        console.error(`Failed to enrich song ${doc.id}:`, err?.message || err);
       }
     }
 
