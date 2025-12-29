@@ -28,7 +28,7 @@ interface ExtendedExercise extends Exercise {
       }>;
     }>;
   };
-  imageUrl?: string;
+  imageUrl?: string | null;
 }
 
 interface ExerciseDetailsDialogProps {

@@ -102,14 +102,14 @@ export default async function handler(
       tier: finalTier
     });
 
-    // Update User Points (+5) ONLY if new rating (remains same)
+    // Update User Points (+25) ONLY if new rating (remains same)
     let addedPoints = 0;
     if (isNewRating) {
       const userRef = doc(db, "users", userId);
       await updateDoc(userRef, {
-        "statistics.points": increment(5)
+        "statistics.points": increment(25)
       });
-      addedPoints = 5;
+      addedPoints = 25;
     }
 
     // Add Log ...
