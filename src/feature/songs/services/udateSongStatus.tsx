@@ -31,6 +31,25 @@ export const updateSongStatus = async (
       }
     }
 
+    // 2. Fetch current status to handle point changes
+    const currentStatusSnap = await getDoc(userSongsRef);
+    const oldStatus = currentStatusSnap.exists() ? currentStatusSnap.data().status : null;
+
+    let pointsAdded = 0;
+    if (status === "learned" && oldStatus !== "learned") {
+      // Marked as learned -> +200 points
+      await updateDoc(userDocRef, {
+        "statistics.points": increment(200)
+      });
+      pointsAdded = 200;
+    } else if (oldStatus === "learned" && status !== "learned") {
+      // Moved away from learned -> -200 points
+      await updateDoc(userDocRef, {
+        "statistics.points": increment(-200)
+      });
+      pointsAdded = -200;
+    }
+
     await setDoc(userSongsRef, {
       songId,
       status,
@@ -48,7 +67,7 @@ export const updateSongStatus = async (
       avatarUrl,
       undefined
     );
-    return true;
+    return { success: true, pointsAdded };
   } catch (error) {
     console.error("Error updating song status:", error);
     throw error;
