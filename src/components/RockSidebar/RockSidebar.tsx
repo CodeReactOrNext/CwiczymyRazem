@@ -21,6 +21,7 @@ import {
   Home,
   Code,
   LayoutGrid,
+  BookOpen,
 } from "lucide-react";
 import { FaDiscord } from "react-icons/fa";
 import Link from "next/link";
@@ -179,6 +180,12 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
   // Other sections
   const otherSections = [
+    {
+      id: "guide" as NavPagesTypes,
+      name: "Guide",
+      href: "/guide",
+      icon: <BookOpen size={16} />,
+    },
     {
       id: "leaderboard" as NavPagesTypes,
       name: "Leaderboard",
