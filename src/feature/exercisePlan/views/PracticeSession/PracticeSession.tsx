@@ -19,6 +19,7 @@ import { FaInfoCircle, FaLightbulb, FaCheck, FaStepForward } from "react-icons/f
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
 import { Metronome } from "../../components/Metronome/Metronome";
+import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import type {
   ExercisePlan,
   LocalizedContent,
@@ -291,20 +292,24 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                 {/* 4. Unified Control Deck (Full Width Sticky Footer) */}
                <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
                     <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
-                         
-                         {/* Left: Tools (Metronome) */}
-                         <div className="flex-1 hidden xl:flex items-center justify-start">
-                             {currentExercise.metronomeSpeed && (
-                                <div className="scale-90 origin-left">
-                                    <Metronome
-                                        initialBpm={currentExercise.metronomeSpeed.recommended}
-                                        minBpm={currentExercise.metronomeSpeed.min}
-                                        maxBpm={currentExercise.metronomeSpeed.max}
-                                        recommendedBpm={currentExercise.metronomeSpeed.recommended}
-                                    />
+                                                  {/* Left: Tools (Metronome & Spotify) */}
+                          <div className="flex-1 hidden xl:flex items-center justify-start gap-4">
+                              {currentExercise.metronomeSpeed && (
+                                 <div className="scale-90 origin-left">
+                                     <Metronome
+                                         initialBpm={currentExercise.metronomeSpeed.recommended}
+                                         minBpm={currentExercise.metronomeSpeed.min}
+                                         maxBpm={currentExercise.metronomeSpeed.max}
+                                         recommendedBpm={currentExercise.metronomeSpeed.recommended}
+                                     />
+                                 </div>
+                              )}
+                              {currentExercise.spotifyId && (
+                                <div className="w-[300px] animate-in fade-in slide-in-from-left-4 duration-500">
+                                   <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
                                 </div>
-                             )}
-                         </div>
+                              )}
+                          </div>
 
                          {/* Center: Timer & Playback Controls Group */}
                          <div className="flex-none flex justify-center">

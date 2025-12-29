@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { i18n } from "next-i18next";
 import { FaExpand } from "react-icons/fa";
+import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 
 import { categoryGradients } from "../../../constants/categoryStyles";
 import type { LocalizedContent } from "../../../types/exercise.types";
@@ -134,6 +135,12 @@ const SessionModal = ({
                         </Button>
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {currentExercise.spotifyId && (
+                  <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
                   </div>
                 )}
 
