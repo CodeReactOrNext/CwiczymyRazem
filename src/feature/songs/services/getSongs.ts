@@ -15,7 +15,8 @@ import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 export const getSongs = async (
   sortBy: string,
   sortDirection: "asc" | "desc",
-  searchQuery: string,
+  titleQuery: string,
+  artistQuery: string,
   page: number,
   itemsPerPage: number,
   tierFilters?: string[],
@@ -24,7 +25,7 @@ export const getSongs = async (
   afterDoc?: any // Added for cursor support
 ) => {
   try {
-    const hasComplexFilters = (tierFilters && tierFilters.length > 0) || (genreFilters && genreFilters.length > 0) || searchQuery;
+    const hasSearch = titleQuery || artistQuery;
 
     // Cache key should include afterDoc id if present to distinguish cursors
     const cacheKey = JSON.stringify({
@@ -35,7 +36,8 @@ export const getSongs = async (
       tierFilters,
       difficultyFilter,
       genreFilters,
-      searchQuery,
+      titleQuery,
+      artistQuery,
       afterDocId: afterDoc?.id
     });
 
@@ -62,30 +64,37 @@ export const getSongs = async (
       baseQuery = query(baseQuery, where("genres", "array-contains-any", genreFilters));
     }
 
-    // 2. Search Path: Requires parallel queries and local merge
-    if (searchQuery) {
-      const s = searchQuery.toLowerCase();
-      // Use the already filtered baseQuery to ensure filters apply to search results too
-      const titleQ = query(baseQuery, where("title_lowercase", ">=", s), where("title_lowercase", "<=", s + "\uf8ff"), limit(100));
-      const artistQ = query(baseQuery, where("artist_lowercase", ">=", s), where("artist_lowercase", "<=", s + "\uf8ff"), limit(100));
+    // 2. Search Path: Requires parallel queries and local merge/intersection
+    if (hasSearch) {
+      const t = titleQuery.toLowerCase();
+      const a = artistQuery.toLowerCase();
+      
+      let titleResults: Song[] = [];
+      let artistResults: Song[] = [];
 
-      const [titleSnap, artistSnap] = await Promise.all([
-        trackedGetDocs(titleQ),
-        trackedGetDocs(artistQ)
-      ]);
+      const searches = [];
+      if (t) {
+        const titleQ = query(baseQuery, where("title_lowercase", ">=", t), where("title_lowercase", "<=", t + "\uf8ff"), limit(100));
+        searches.push(trackedGetDocs(titleQ).then(snap => titleResults = snap.docs.map(d => ({ id: d.id, ...d.data() } as Song))));
+      }
+      if (a) {
+        const artistQ = query(baseQuery, where("artist_lowercase", ">=", a), where("artist_lowercase", "<=", a + "\uf8ff"), limit(100));
+        searches.push(trackedGetDocs(artistQ).then(snap => artistResults = snap.docs.map(d => ({ id: d.id, ...d.data() } as Song))));
+      }
 
-      const titleResults = titleSnap.docs.map(d => ({ id: d.id, ...d.data() } as Song));
-      const artistResults = artistSnap.docs.map(d => ({ id: d.id, ...d.data() } as Song));
+      await Promise.all(searches);
 
-      // Merge and Deduplicate
-      const seenIds = new Set();
-      let songs = [...titleResults, ...artistResults].filter(song => {
-        if (seenIds.has(song.id)) return false;
-        seenIds.add(song.id);
-        return true;
-      });
+      let songs: Song[] = [];
+      if (t && a) {
+        // Intersection: must match both
+        const artistIds = new Set(artistResults.map(s => s.id));
+        songs = titleResults.filter(s => artistIds.has(s.id));
+      } else {
+        // Single search results
+        songs = t ? titleResults : artistResults;
+      }
 
-      // Sort merged results manually since they come from different queries
+      // Sort merged results manually since they come from different queries or manual intersection
       songs.sort((a, b) => {
         const valA = (a as any)[sortBy] ?? (sortBy === 'title' ? '' : 0);
         const valB = (b as any)[sortBy] ?? (sortBy === 'title' ? '' : 0);

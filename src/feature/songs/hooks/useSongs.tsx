@@ -9,8 +9,10 @@ import { useAppSelector } from "store/hooks";
 const ITEMS_PER_PAGE = 20;
 
 export const useSongs = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+  const [titleQuery, setTitleQuery] = useState("");
+  const [artistQuery, setArtistQuery] = useState("");
+  const [debouncedTitle, setDebouncedTitle] = useState("");
+  const [debouncedArtist, setDebouncedArtist] = useState("");
   const debounceTimeout = useRef<NodeJS.Timeout>(null);
 
   const [page, setPage] = useState(1);
@@ -24,24 +26,26 @@ export const useSongs = () => {
 
   const currentUserId = useAppSelector(selectUserAuth);
 
-  // Debounce search query
+  // Debounce search queries
   useEffect(() => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     debounceTimeout.current = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
+      setDebouncedTitle(titleQuery);
+      setDebouncedArtist(artistQuery);
     }, 800);
     return () => {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
-  }, [searchQuery]);
+  }, [titleQuery, artistQuery]);
 
   // 1. Fetch Songs
   const { data: songsData, isLoading: isSongsLoading } = useQuery({
-    queryKey: ["songs", sortBy, sortDirection, debouncedSearchQuery, page, tierFilters, difficultyFilter, genreFilters],
+    queryKey: ["songs", sortBy, sortDirection, debouncedTitle, debouncedArtist, page, tierFilters, difficultyFilter, genreFilters],
     queryFn: () => getSongs(
       sortBy,
       sortDirection,
-      debouncedSearchQuery,
+      debouncedTitle,
+      debouncedArtist,
       page,
       ITEMS_PER_PAGE,
       tierFilters,
@@ -66,7 +70,7 @@ export const useSongs = () => {
   useEffect(() => {
     setPage(1);
     setPageCursors({});
-  }, [sortBy, sortDirection, debouncedSearchQuery, tierFilters, difficultyFilter, genreFilters]);
+  }, [sortBy, sortDirection, debouncedTitle, debouncedArtist, tierFilters, difficultyFilter, genreFilters]);
 
   // 2. Fetch User Songs
   const { data: userSongsData, refetch: refetchUserSongs } = useQuery({
@@ -90,13 +94,16 @@ export const useSongs = () => {
     setGenreFilters([]);
     setSortBy("title");
     setSortDirection("asc");
+    setTitleQuery("");
+    setArtistQuery("");
   };
 
   const hasFilters =
     difficultyFilter !== "all" ||
     tierFilters.length > 0 ||
     genreFilters.length > 0 ||
-    searchQuery !== "";
+    titleQuery !== "" ||
+    artistQuery !== "";
 
   const getSongStatus = (songId: string) => {
     if (userSongs.wantToLearn.some((song) => song.id === songId)) return "wantToLearn";
@@ -118,10 +125,12 @@ export const useSongs = () => {
     isLoading: isSongsLoading,
     totalPages,
     hasFilters,
-    searchQuery,
+    titleQuery,
+    setTitleQuery,
+    artistQuery,
+    setArtistQuery,
     isModalOpen,
     filteredSongs: songs,
-    setSearchQuery,
     setIsModalOpen,
     debounceLoading: isSongsLoading,
     difficultyFilter,
