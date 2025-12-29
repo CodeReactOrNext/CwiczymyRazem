@@ -102,12 +102,12 @@ export const userSlice = createSlice({
     builder
       .addCase(rateSong.pending, (state, action) => {
         if (state.currentUserStats && action.meta.arg.isNewRating) {
-          state.currentUserStats.points = (state.currentUserStats.points || 0) + 5;
+          state.currentUserStats.points = (state.currentUserStats.points || 0) + 25;
         }
       })
       .addCase(rateSong.rejected, (state, action) => {
         if (state.currentUserStats && action.meta.arg.isNewRating) {
-          state.currentUserStats.points = (state.currentUserStats.points || 0) - 5;
+          state.currentUserStats.points = (state.currentUserStats.points || 0) - 25;
         }
       })
       .addCase(logInViaGoogle.pending, (state) => {

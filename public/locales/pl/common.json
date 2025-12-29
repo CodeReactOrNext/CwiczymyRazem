@@ -193,5 +193,10 @@
     "practice_again": "Trenuj ponownie",
     "finish": "Zakończ",
     "exit": "Wyjdź"
-  }
+  },
+  "video": "Wideo",
+  "confirm_delete": "Czy na pewno chcesz usunąć ten plan?",
+  "create": "Stwórz",
+  "success": "Sukces",
+  "error": "Błąd"
 }
