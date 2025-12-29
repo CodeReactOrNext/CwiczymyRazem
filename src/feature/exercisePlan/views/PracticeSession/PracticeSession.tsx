@@ -107,7 +107,7 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
           <ImageModal
             isOpen={isImageModalOpen}
             onClose={() => setIsImageModalOpen(false)}
-            imageSrc={currentExercise.image || ""}
+            imageSrc={currentExercise.imageUrl || currentExercise.image || ""}
             imageAlt={currentExercise.title[currentLang] as string}
           />
 
@@ -196,22 +196,44 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                         {currentExercise.title[currentLang]}
                     </h2>
                     
-                    {/* Score/Tab Image - Centered and Large */}
                     <div className="relative w-full overflow-hidden radius-premium border border-white/10 bg-zinc-900 shadow-2xl glass-card">
-                         {currentExercise.image && (
+                         {currentExercise.videoUrl ? (
+                            <div className="aspect-video w-full">
+                                {(() => {
+                                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                                    const match = currentExercise.videoUrl.match(regExp);
+                                    const videoId = match && match[2].length === 11 ? match[2] : null;
+
+                                    if (videoId) {
+                                        return (
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src={`https://www.youtube.com/embed/${videoId}`}
+                                                title="YouTube video player"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            />
+                                        );
+                                    }
+                                    return <div className="flex h-full items-center justify-center text-zinc-500">Invalid YouTube URL</div>;
+                                })()}
+                            </div>
+                         ) : (currentExercise.imageUrl || currentExercise.image) ? (
                             <ExerciseImage
-                            image={currentExercise.image}
-                            title={currentExercise.title[currentLang]}
-                            isMobileView={isMobileView}
-                            imageScale={imageScale}
-                            containerRef={containerRef}
-                            setImageModalOpen={setIsImageModalOpen}
-                            handleZoomIn={handleZoomIn}
-                            handleZoomOut={handleZoomOut}
-                            resetImagePosition={resetImagePosition}
-                            setImageScale={setImageScale}
+                                image={(currentExercise.imageUrl || currentExercise.image)!}
+                                title={currentExercise.title[currentLang]}
+                                isMobileView={isMobileView}
+                                imageScale={imageScale}
+                                containerRef={containerRef}
+                                setImageModalOpen={setIsImageModalOpen}
+                                handleZoomIn={handleZoomIn}
+                                handleZoomOut={handleZoomOut}
+                                resetImagePosition={resetImagePosition}
+                                setImageScale={setImageScale}
                             />
-                        )}
+                        ) : null}
                     </div>
                </div>
 
