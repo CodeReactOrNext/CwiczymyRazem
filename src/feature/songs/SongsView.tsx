@@ -58,10 +58,12 @@ const SongsView = () => {
     userSongs,
     totalPages,
     hasFilters,
-    searchQuery,
+    titleQuery,
+    setTitleQuery,
+    artistQuery,
+    setArtistQuery,
     isModalOpen,
     filteredSongs,
-    setSearchQuery,
     setIsModalOpen,
     difficultyFilter,
     handlePageChange,
@@ -184,16 +186,29 @@ const SongsView = () => {
                 <div className="relative z-30 -mx-4 px-4 py-4 md:mx-0 md:p-0">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center">
                     
-                    {/* Search Input */}
+                    {/* Artist Input */}
                     <div className="relative flex-1">
+                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                        <Music className="h-4 w-4 text-zinc-500" />
+                      </div>
+                      <Input
+                        placeholder={t("artist", "Artist...") as string}
+                        value={artistQuery}
+                        onChange={(e) => setArtistQuery(e.target.value)}
+                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                      />
+                    </div>
+
+                    {/* Title Input */}
+                    <div className="relative flex-[1.2]">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                         <Search className="h-4 w-4 text-zinc-500" />
                       </div>
                       <Input
-                        placeholder={t("search_songs")}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="h-12 w-full  border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
+                        placeholder={t("title", "Title...") as string}
+                        value={titleQuery}
+                        onChange={(e) => setTitleQuery(e.target.value)}
+                        className="h-12 w-full border-white/5 bg-zinc-900/60 pl-11 text-white placeholder:text-zinc-500 shadow-lg focus:border-cyan-500/50 focus:bg-zinc-900 focus:ring-4 focus:ring-cyan-500/10 transition-all font-medium"
                       />
                        {debounceLoading && (
                           <div className="absolute inset-y-0 right-0 flex items-center pr-4">

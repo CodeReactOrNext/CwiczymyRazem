@@ -51,14 +51,14 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const avatar = useAppSelector(selectUserAvatar);
 
   const searchSongs = useCallback(
-    debounce(async (searchValue: string) => {
-      if (searchValue.length < 2) {
+    debounce(async (t: string, a: string) => {
+      if (t.length < 2 && a.length < 2) {
         setMatches([]);
         return;
       }
       setIsSearching(true);
       try {
-        const result = await getSongs("popularity", "desc", searchValue, 1, 5);
+        const result = await getSongs("popularity", "desc", t, a, 1, 5);
         setMatches(result.songs);
       } catch (error) {
         console.error("Error searching for matches:", error);
@@ -70,8 +70,8 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   );
 
   useEffect(() => {
-    if (artist.trim() && title.trim()) {
-      searchSongs(`${title} ${artist}`.trim());
+    if (artist.trim() || title.trim()) {
+      searchSongs(title.trim(), artist.trim());
     } else {
       setMatches([]);
     }
