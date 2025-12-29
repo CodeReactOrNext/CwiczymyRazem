@@ -3,10 +3,13 @@ export type NavPagesTypes =
   | "exercise"
   | "report"
   | "leadboard"
+  | "leaderboard"
   | "faq"
   | "songs"
   | "library"
+  | "guide"
   | "my_songs"
   | "seasons"
   | "timer"
+  | "settings"
   | null;
