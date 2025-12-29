@@ -197,7 +197,7 @@ export default async function handler(
       const songRef = doc(db, "songs", songId);
 
       // Automatically sync lowercase fields if title/artist are updated
-      const updates = { ...data };
+      const updates: any = { ...data };
       if (data.title) updates.title_lowercase = data.title.toLowerCase();
       if (data.artist) updates.artist_lowercase = data.artist.toLowerCase();
 
@@ -220,13 +220,13 @@ export default async function handler(
               date: new Date() // Firestore converts this to Timestamp
             }
           ];
+
+          // Also update the tier since difficulty changed
+          updates.tier = getTierFromDifficulty(data.avgDifficulty);
         }
       }
 
-      await updateDoc(songRef, {
-        ...updates,
-        tier: typeof updates.avgDifficulty === 'number' ? getTierFromDifficulty(updates.avgDifficulty) : undefined
-      });
+      await updateDoc(songRef, updates);
 
       return res.status(200).json({ success: true });
     }
