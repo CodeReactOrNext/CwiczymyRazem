@@ -39,7 +39,8 @@ export async function fetchEnrichmentData(artist: string, title: string) {
       title: track.name,
       albumName: track.album?.name,
       source: "spotify",
-      artistId: track.artists[0]?.id // Store for genre fetching
+      artistId: track.artists[0]?.id, // Store for genre fetching
+      id: track.id // Store Spotify Track ID
     })).filter((c: any) => c.coverUrl);
 
     if (candidates.length > 0) {
@@ -63,6 +64,7 @@ export async function fetchEnrichmentData(artist: string, title: string) {
         genres,
         isVerified: true,
         source: "spotify",
+        spotifyId: candidates[0].id,
         candidates: candidates // Include candidates for manual selection
       };
     }

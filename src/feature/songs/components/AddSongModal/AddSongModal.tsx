@@ -22,6 +22,7 @@ import { Check, Music, Search, ArrowRight, SkipForward } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import debounce from "lodash/debounce";
+import { SpotifyPlayer } from "../SpotifyPlayer";
 
 interface AddSongModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const [matches, setMatches] = useState<Song[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedSongId, setAddedSongId] = useState<string | null>(null);
+  const [currentMatch, setCurrentMatch] = useState<Song | null>(null);
 
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -60,6 +62,14 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
       try {
         const result = await getSongs("popularity", "desc", t, a, 1, 5);
         setMatches(result.songs);
+        
+        // Try to find a high-quality match with spotifyId to show player
+        const bestMatch = result.songs.find((s: Song) => 
+          s.spotifyId && 
+          s.title.toLowerCase() === t.toLowerCase() && 
+          s.artist.toLowerCase() === a.toLowerCase()
+        );
+        setCurrentMatch(bestMatch || null);
       } catch (error) {
         console.error("Error searching for matches:", error);
       } finally {
@@ -194,6 +204,15 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                 </div>
               </div>
 
+              {currentMatch?.spotifyId && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <Label className="text-xs font-bold uppercase tracking-widest text-cyan-500 ml-1">
+                    Spotify Preview
+                  </Label>
+                  <SpotifyPlayer trackId={currentMatch.spotifyId} height={80} />
+                </div>
+              )}
+
               {/* Match Results */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between ml-1">
@@ -266,6 +285,16 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                   </span>
                 </div>
               </div>
+
+              {/* Show player in status step if we have a spotifyId */}
+              {(matches.find(m => m.id === addedSongId)?.spotifyId) && (
+                <div className="mb-6">
+                  <SpotifyPlayer 
+                    trackId={matches.find(m => m.id === addedSongId)!.spotifyId!} 
+                    height={152} 
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-1 gap-3">
                 {(Object.entries(STATUS_CONFIG) as [SongStatus, typeof STATUS_CONFIG.learning][]).map(([status, config]) => (
