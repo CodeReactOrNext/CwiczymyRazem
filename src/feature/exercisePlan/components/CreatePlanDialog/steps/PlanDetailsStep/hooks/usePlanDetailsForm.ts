@@ -13,26 +13,50 @@ export interface PlanDetailsFormData {
 interface UsePlanDetailsFormProps {
   selectedExercises: Exercise[];
   onSubmit: (data: Omit<ExercisePlan, "id">) => void;
+  initialData?: ExercisePlan;
 }
 
-export const usePlanDetailsForm = ({ selectedExercises, onSubmit }: UsePlanDetailsFormProps) => {
+export const usePlanDetailsForm = ({ 
+  selectedExercises, 
+  onSubmit,
+  initialData 
+}: UsePlanDetailsFormProps) => {
   const userAuth = useSelector(selectUserAuth);
-  const { register, handleSubmit, formState } = useForm<PlanDetailsFormData>();
+  
+  const getInitialValue = (val: string | { pl: string; en: string } | undefined) => {
+    if (!val) return "";
+    return typeof val === "string" ? val : (val.pl || val.en || "");
+  };
+
+  const { register, handleSubmit, formState } = useForm<PlanDetailsFormData>({
+    defaultValues: {
+      title: getInitialValue(initialData?.title),
+      description: getInitialValue(initialData?.description),
+    }
+  });
 
   const handleFormSubmit = (data: PlanDetailsFormData) => {
     onSubmit({
-      title: {
+      title: typeof initialData?.title === "object" ? {
+        ...initialData.title,
+        pl: data.title,
+        en: data.title,
+      } : {
         pl: data.title,
         en: data.title,
       },
-      description: {
+      description: typeof initialData?.description === "object" ? {
+        ...initialData.description,
+        pl: data.description,
+        en: data.description,
+      } : {
         pl: data.description,
         en: data.description,
       },
-      image: null,
-      createdAt: new Date(),
+      image: initialData?.image ?? null,
+      createdAt: initialData?.createdAt ?? new Date(),
       updatedAt: new Date(),
-      userId: userAuth ?? "",
+      userId: userAuth ?? initialData?.userId ?? "",
       exercises: selectedExercises,
       category: determinePlanCategory(selectedExercises),
       difficulty: determinePlanDifficulty(selectedExercises),

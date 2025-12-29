@@ -80,13 +80,44 @@ const SessionModal = ({
 
             <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5 pb-[76px]'>
               <div className='space-y-4 p-4'>
-                {currentExercise.image && (
+                {currentExercise.videoUrl ? (
+                  <div className='relative mb-4 w-full overflow-hidden rounded-xl border border-muted/30 bg-zinc-900 shadow-md transition-all duration-200'>
+                    <div className='aspect-video w-full'>
+                      {(() => {
+                        const regExp =
+                          /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                        const match = currentExercise.videoUrl?.match(regExp);
+                        const videoId =
+                          match && match[2].length === 11 ? match[2] : null;
+
+                        if (videoId) {
+                          return (
+                            <iframe
+                              width='100%'
+                              height='100%'
+                              src={`https://www.youtube.com/embed/${videoId}`}
+                              title='YouTube video player'
+                              frameBorder='0'
+                              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                              allowFullScreen
+                            />
+                          );
+                        }
+                        return (
+                          <div className='flex h-full items-center justify-center text-xs text-zinc-500'>
+                            Invalid YouTube URL
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                ) : (currentExercise.imageUrl || currentExercise.image) && (
                   <div
                     className='relative mb-4 w-full cursor-pointer overflow-hidden rounded-xl border border-muted/30 bg-white/5 shadow-md backdrop-blur-[1px] transition-all duration-200 hover:shadow-lg'
                     onClick={onImageClick}>
                     <div className='relative aspect-[3.5/1] w-full'>
                       <Image
-                        src={currentExercise.image}
+                        src={currentExercise.imageUrl || currentExercise.image}
                         alt={currentExercise.title[currentLang]}
                         className='h-full w-full object-contain'
                         fill

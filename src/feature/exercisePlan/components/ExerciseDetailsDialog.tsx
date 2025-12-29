@@ -163,6 +163,43 @@ export const ExerciseDetailsDialog = ({
               </div>
             </div>
           )}
+
+          {exercise.videoUrl && (
+            <div className='rounded-lg border p-4'>
+              <h4 className='mb-3 flex items-center gap-2 text-lg font-medium text-red-500'>
+                <FaGuitar className='h-4 w-4' />
+                {commonT("video", { defaultValue: "Video" })}
+              </h4>
+              <div className='aspect-video overflow-hidden rounded-md bg-zinc-900'>
+                {(() => {
+                  const regExp =
+                    /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                  const match = exercise.videoUrl.match(regExp);
+                  const videoId =
+                    match && match[2].length === 11 ? match[2] : null;
+
+                  if (videoId) {
+                    return (
+                      <iframe
+                        width='100%'
+                        height='100%'
+                        src={`https://www.youtube.com/embed/${videoId}`}
+                        title='YouTube video player'
+                        frameBorder='0'
+                        allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                        allowFullScreen
+                      />
+                    );
+                  }
+                  return (
+                    <div className='flex h-full items-center justify-center text-sm text-zinc-500'>
+                      Invalid YouTube URL
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter className='gap-3 px-6 pb-6 pt-2'>

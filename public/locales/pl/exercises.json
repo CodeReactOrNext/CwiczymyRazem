@@ -377,6 +377,9 @@
     "add_instruction_placeholder": "Dodaj krok (wciśnij Enter)",
     "add_tip_placeholder": "Dodaj wskazówkę (wciśnij Enter)",
     "no_instructions_hint": "Nie dodano jeszcze żadnych instrukcji.",
-    "no_tips_hint": "Nie dodano jeszcze żadnych wskazówek."
+    "no_tips_hint": "Nie dodano jeszcze żadnych wskazówek.",
+    "video_url": "Link do YouTube",
+    "image_url": "Link do obrazka (Tab/Nuty)",
+    "invalid_image": "Nieprawidłowy link do obrazka"
   }
 }

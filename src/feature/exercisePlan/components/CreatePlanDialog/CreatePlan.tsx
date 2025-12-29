@@ -15,17 +15,21 @@ import type {
 type Step = "select" | "order" | "details";
 
 interface CreatePlanProps {
+  initialPlan?: ExercisePlan;
   onSubmit: (
     title: string | LocalizedContent,
     description: string | LocalizedContent,
     exercises: Exercise[]
   ) => Promise<void>;
+  onUpdate?: (plan: ExercisePlan) => Promise<void>;
 }
 
-export const CreatePlan = ({ onSubmit }: CreatePlanProps) => {
+export const CreatePlan = ({ initialPlan, onSubmit, onUpdate }: CreatePlanProps) => {
   const { t } = useTranslation(["exercises"]);
   const [step, setStep] = useState<Step>("select");
-  const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
+  const [selectedExercises, setSelectedExercises] = useState<Exercise[]>(
+    initialPlan?.exercises || []
+  );
 
   const steps: { id: Step; label: string; number: number }[] = [
     { id: "select", label: t("exercises:plan.steps.exercises"), number: 1 },
@@ -33,8 +37,12 @@ export const CreatePlan = ({ onSubmit }: CreatePlanProps) => {
     { id: "details", label: t("exercises:plan.steps.details"), number: 3 },
   ];
 
-  const handleCreatePlan = (planData: Omit<ExercisePlan, "id">) => {
-    onSubmit(planData.title, planData.description, selectedExercises);
+  const handleFinish = (planData: Omit<ExercisePlan, "id">) => {
+    if (initialPlan && onUpdate) {
+        onUpdate({ ...planData, id: initialPlan.id } as ExercisePlan);
+    } else {
+        onSubmit(planData.title, planData.description, selectedExercises);
+    }
   };
 
   const currentStepIndex = steps.findIndex((s) => s.id === step);
@@ -99,7 +107,8 @@ export const CreatePlan = ({ onSubmit }: CreatePlanProps) => {
         {step === "details" && (
           <PlanDetailsStep
             selectedExercises={selectedExercises}
-            onSubmit={handleCreatePlan}
+            onSubmit={handleFinish}
+            initialData={initialPlan}
           />
         )}
       </AnimatePresence>

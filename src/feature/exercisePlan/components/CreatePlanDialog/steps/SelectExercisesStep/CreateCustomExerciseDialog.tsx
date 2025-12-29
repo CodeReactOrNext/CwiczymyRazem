@@ -1,3 +1,4 @@
+
 import { Button } from "assets/components/ui/button";
 import {
   Sheet,
@@ -26,7 +27,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Textarea } from "assets/components/ui/textarea";
-import { Plus, Trash2, AlignLeft, Clock, Dumbbell, Tag, HelpCircle, List } from "lucide-react";
+import { Plus, Trash2, AlignLeft, Clock, Dumbbell, Tag, HelpCircle, List, Youtube, Image as ImageIcon } from "lucide-react";
 
 interface CreateCustomExerciseDialogProps {
   open: boolean;
@@ -51,6 +52,9 @@ export const CreateCustomExerciseDialog = ({
   
   const [tips, setTips] = useState<string[]>([]);
   const [currentTip, setCurrentTip] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [isImageValid, setIsImageValid] = useState(true);
 
   const handleAddInstruction = () => {
       if (currentInstruction.trim()) {
@@ -96,6 +100,8 @@ export const CreateCustomExerciseDialog = ({
       tips: tips.map(toLocalized),
       metronomeSpeed: null,
       relatedSkills: [],
+      videoUrl: videoUrl.trim() || null,
+      imageUrl: imageUrl.trim() || null,
     };
 
     onExerciseCreate(newExercise);
@@ -114,6 +120,9 @@ export const CreateCustomExerciseDialog = ({
       setTips([]);
       setCurrentInstruction("");
       setCurrentTip("");
+      setVideoUrl("");
+      setImageUrl("");
+      setIsImageValid(true);
   };
 
   return (
@@ -156,6 +165,53 @@ export const CreateCustomExerciseDialog = ({
                         placeholder="..."
                         className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 min-h-[100px] resize-none"
                     />
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="videoUrl" className="flex items-center gap-2 text-zinc-300 font-medium">
+                        <Youtube className="h-4 w-4 text-red-500" />
+                        {t("exercises:custom_exercise.video_url", { defaultValue: "YouTube Link" })}
+                    </Label>
+                    <Input
+                        id="videoUrl"
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        className="bg-zinc-900 border-zinc-800 focus:ring-red-500/50 h-10"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="imageUrl" className="flex items-center gap-2 text-zinc-300 font-medium">
+                        <ImageIcon className="h-4 w-4 text-emerald-500" />
+                        {t("exercises:custom_exercise.image_url", { defaultValue: "Image URL (Tab/Score)" })}
+                    </Label>
+                    <Input
+                        id="imageUrl"
+                        value={imageUrl}
+                        onChange={(e) => {
+                            setImageUrl(e.target.value);
+                            setIsImageValid(true);
+                        }}
+                        placeholder="https://example.com/image.png"
+                        className="bg-zinc-900 border-zinc-800 focus:ring-emerald-500/50 h-10"
+                    />
+                    {imageUrl && (
+                        <div className="mt-2 relative aspect-[3.5/1] w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
+                            <img 
+                                src={imageUrl} 
+                                alt="Preview" 
+                                className="h-full w-full object-contain"
+                                onError={() => setIsImageValid(false)}
+                                onLoad={() => setIsImageValid(true)}
+                            />
+                            {!isImageValid && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/80 text-rose-500 text-xs font-medium">
+                                    {t("exercises:custom_exercise.invalid_image", { defaultValue: "Invalid image URL" })}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 

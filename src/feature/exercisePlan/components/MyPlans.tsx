@@ -19,6 +19,8 @@ import type {
 import { PlanCard } from "./PlanCard";
 import { CreatePlan } from "./CreatePlanDialog/CreatePlan";
 import { createExercisePlan } from "feature/exercisePlan/services/createExercisePlan";
+import { updateExercisePlan } from "feature/exercisePlan/services/updateExercisePlan";
+import { deleteExercisePlan } from "feature/exercisePlan/services/deleteExercisePlan";
 import { logger } from "feature/logger/Logger";
 import { determinePlanDifficulty } from "feature/exercisePlan/utils/determinePlanDifficulty";
 import { determinePlanCategory } from "feature/exercisePlan/utils/deteminePlanCategory";
@@ -32,6 +34,7 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
   const [plans, setPlans] = useState<ExercisePlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<ExercisePlan | null>(null);
   const userAuth = useAppSelector(selectUserAuth);
 
   useEffect(() => {
@@ -61,9 +64,11 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
       }
 
       const formattedPlanData = {
-        title: typeof title === "string" ? title : title.en,
+        title: typeof title === "string" ? { pl: title, en: title } : title,
         description:
-          typeof description === "string" ? description : description.en,
+          typeof description === "string"
+            ? { pl: description, en: description }
+            : description,
         category: determinePlanCategory(exercises),
         difficulty: determinePlanDifficulty(exercises),
         exercises,
@@ -83,10 +88,44 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
       setPlans((prevPlans) => [...prevPlans, newPlan]);
       setIsCreating(false);
 
-      toast.success(t("exercises:my_plans.create_success"));
+      toast.success(t("exercises:my_plans.create_success") as string);
     } catch (error) {
       logger.error(error, { context: "handleCreatePlan" });
-      toast.error(t("exercises:my_plans.create_error"));
+      toast.error(t("exercises:my_plans.create_error") as string);
+    }
+  };
+
+  const handleUpdatePlan = async (updatedPlan: ExercisePlan): Promise<void> => {
+    try {
+      await updateExercisePlan(updatedPlan.id, {
+        title: updatedPlan.title,
+        description: updatedPlan.description,
+        exercises: updatedPlan.exercises,
+        category: updatedPlan.category,
+        difficulty: updatedPlan.difficulty,
+      });
+
+      setPlans((prevPlans) =>
+        prevPlans.map((p) => (p.id === updatedPlan.id ? updatedPlan : p))
+      );
+      setEditingPlan(null);
+      toast.success(t("common:success") as string);
+    } catch (error) {
+      logger.error(error, { context: "handleUpdatePlan" });
+      toast.error(t("common:error") as string);
+    }
+  };
+
+  const handleDeletePlan = async (planId: string) => {
+    if (!window.confirm(t("common:confirm_delete") as string)) return;
+
+    try {
+      await deleteExercisePlan(planId);
+      setPlans((prevPlans) => prevPlans.filter((p) => p.id !== planId));
+      toast.success(t("common:success") as string);
+    } catch (error) {
+      logger.error(error, { context: "handleDeletePlan" });
+      toast.error(t("common:error") as string);
     }
   };
 
@@ -99,7 +138,29 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
   }
 
   if (isCreating) {
-    return <CreatePlan onSubmit={handleCreatePlan} />;
+    return (
+      <div className='container mx-auto'>
+        <div className='mb-4 px-4'>
+          <Button variant='ghost' onClick={() => setIsCreating(false)}>
+            {t("common:back")}
+          </Button>
+        </div>
+        <CreatePlan onSubmit={handleCreatePlan} />
+      </div>
+    );
+  }
+
+  if (editingPlan) {
+    return (
+      <div className='container mx-auto'>
+        <div className='mb-4 px-4'>
+          <Button variant='ghost' onClick={() => setEditingPlan(null)}>
+            {t("common:back")}
+          </Button>
+        </div>
+        <CreatePlan initialPlan={editingPlan} onSubmit={handleCreatePlan} onUpdate={handleUpdatePlan} />
+      </div>
+    );
   }
 
   return (
@@ -138,6 +199,8 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
                   plan={plan}
                   onSelect={() => onPlanSelect(plan)}
                   onStart={() => onPlanSelect(plan)}
+                  onEdit={() => setEditingPlan(plan)}
+                  onDelete={() => handleDeletePlan(plan.id)}
                 />
               ))}
             </div>

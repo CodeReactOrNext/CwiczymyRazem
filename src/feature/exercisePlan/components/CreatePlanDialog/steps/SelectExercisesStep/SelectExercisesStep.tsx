@@ -57,18 +57,17 @@ export const SelectExercisesStep = ({
             {t("exercises:my_plans.create_dialog.select_exercises_description")}
           </p>
         </div>
-        <div className='flex w-full flex-row items-center justify-between gap-3 sm:w-fit md:flex-col'>
+        <div className='flex items-center gap-3'>
           <Button
             onClick={() => setIsCustomExerciseDialogOpen(true)}
             variant="outline"
-            className='w-full sm:flex md:w-fit'>
+            className='whitespace-nowrap'>
             <FaPlus className="mr-2 h-4 w-4" />
             {t("exercises:custom_exercise.button_label")}
           </Button>
           <Button
             onClick={onNext}
-            disabled={selectedExercises.length === 0}
-            className='w-full sm:flex md:w-fit'>
+            disabled={selectedExercises.length === 0}>
             {t("common:next")}
           </Button>
         </div>
@@ -98,13 +97,6 @@ export const SelectExercisesStep = ({
         onOpenChange={setIsCustomExerciseDialogOpen} 
         onExerciseCreate={handleCustomExerciseCreate}
       />
-
-      <Button
-        onClick={onNext}
-        disabled={selectedExercises.length === 0}
-        className='w-full'>
-        {t("common:next")}
-      </Button>
     </motion.div>
   );
 };
