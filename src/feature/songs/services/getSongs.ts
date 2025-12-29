@@ -52,26 +52,9 @@ export const getSongs = async (
       else if (difficultyFilter === "hard") baseQuery = query(baseQuery, where("avgDifficulty", ">", 7));
     }
 
-    // 1b. Tier Filters (Firestore-side range calculation)
+    // 1b. Tier Filters (Direct Tier field filtering)
     if (tierFilters && tierFilters.length > 0) {
-      // Calculate the total range covered by selected tiers
-      // S: 9+, A: 7.5-9, B: 6-7.5, C: 4-6, D: 0-4
-      const tierMap: Record<string, { min: number, max: number }> = {
-        S: { min: 9, max: 11 },
-        A: { min: 7.5, max: 9 },
-        B: { min: 6, max: 7.5 },
-        C: { min: 4, max: 6 },
-        D: { min: 0, max: 4 }
-      };
-
-      const mins = tierFilters.map(t => tierMap[t]?.min ?? 10);
-      const maxs = tierFilters.map(t => tierMap[t]?.max ?? 0);
-      
-      const minVal = Math.min(...mins);
-      const maxVal = Math.max(...maxs);
-
-      if (minVal > 0) baseQuery = query(baseQuery, where("avgDifficulty", ">=", minVal));
-      if (maxVal < 11) baseQuery = query(baseQuery, where("avgDifficulty", "<", maxVal));
+      baseQuery = query(baseQuery, where("tier", "in", tierFilters));
     }
 
     // 1c. Genre Filters (Native Firestore array-contains-any)

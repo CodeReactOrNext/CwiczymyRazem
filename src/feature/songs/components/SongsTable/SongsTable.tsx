@@ -209,7 +209,7 @@ const SongsTable = ({
                     <TableCell className='px-6 py-4'>
                       {(() => {
                         const avgDifficulty = song.avgDifficulty || 0;
-                        const tier = getSongTier(avgDifficulty);
+                        const tier = getSongTier(song.tier || avgDifficulty);
                         return (
                           <div 
                             className='inline-flex items-center gap-2 rounded px-2.5 py-1 text-sm font-bold border'
