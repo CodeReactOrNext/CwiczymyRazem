@@ -32,6 +32,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { SpotifyPlayer } from "../SpotifyPlayer";
 
 interface SongSheetProps {
   song: Song | null;
@@ -200,6 +201,14 @@ const SongSheet = ({
           </div>
 
           <div className="p-6 space-y-8">
+            {/* Spotify Player */}
+            {song.spotifyId && (
+              <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-3">Continue listening on Spotify</p>
+                <SpotifyPlayer trackId={song.spotifyId} height={152} />
+              </div>
+            )}
+
             {/* Stats Row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl bg-white/[0.03] p-4 border border-white/5">

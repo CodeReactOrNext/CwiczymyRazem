@@ -29,6 +29,7 @@ export default async function handler(
       isVerified: !!data.isVerified,
       coverAttempted: true,
       genres,
+      spotifyId: data.spotifyId || null,
     });
 
     // Maintain global unique genres list
