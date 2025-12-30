@@ -1,4 +1,4 @@
-import { Search, RefreshCw, ShieldCheck, Plus, User, Activity } from "lucide-react";
+import { Search, RefreshCw, ShieldCheck, Plus, User, Activity, Music } from "lucide-react";
 import { Input } from "assets/components/ui/input";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
@@ -11,6 +11,7 @@ interface AdminActionCenterProps {
   onSync: () => void;
   onMassVerify: () => void;
   onMassEnrich: () => void;
+  onSpotifySync: () => void;
   onBulkAdd: () => void;
   onFindDuplicates: () => void;
   isBulkProcessing: boolean;
@@ -25,6 +26,7 @@ const AdminActionCenter = ({
   onSync,
   onMassVerify,
   onMassEnrich,
+  onSpotifySync,
   onBulkAdd,
   onFindDuplicates,
   isBulkProcessing,
@@ -104,6 +106,14 @@ const AdminActionCenter = ({
         >
           <RefreshCw className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
           Mass Enrich
+        </Button>
+        <Button 
+          onClick={onSpotifySync} 
+          disabled={isBulkProcessing}
+          className="h-10 bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-500/20 rounded-xl px-5 text-[10px] font-black uppercase tracking-[0.2em] text-white"
+        >
+          <Music className={cn("mr-2 h-3.5 w-3.5", isBulkProcessing && "animate-spin")} />
+          Sync Spotify IDs
         </Button>
         <Button
           onClick={onBulkAdd}
