@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { firestore } from "utils/firebase/api/firebase.config";
+import { db } from "utils/firebase/client/firebase.utils";
+import { doc, updateDoc, setDoc, arrayUnion } from "firebase/firestore";
 import { fetchEnrichmentData } from "utils/enrichment/enrichment.util";
-import { FieldValue } from "firebase-admin/firestore";
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,11 +20,11 @@ export default async function handler(
   try {
     const data = await fetchEnrichmentData(artist, title);
 
-    // Perform database update on the server using Admin SDK
-    const songRef = firestore.collection("songs").doc(songId);
+    // Perform database update on the server using Client SDK (consistent with other admin APIs)
+    const songRef = doc(db, "songs", songId);
     const genres = data.genres || [];
 
-    await songRef.update({
+    await updateDoc(songRef, {
       coverUrl: data.coverUrl || null,
       isVerified: !!data.isVerified,
       coverAttempted: true,
@@ -34,9 +34,9 @@ export default async function handler(
 
     // Maintain global unique genres list
     if (genres.length > 0) {
-      const globalMetaRef = firestore.collection("metadata").doc("global");
-      await globalMetaRef.set({
-        genres: FieldValue.arrayUnion(...genres)
+      const globalMetaRef = doc(db, "metadata", "global");
+      await setDoc(globalMetaRef, {
+        genres: arrayUnion(...genres)
       }, { merge: true }).catch((err: any) => console.error("Error updating global genres:", err));
     }
 

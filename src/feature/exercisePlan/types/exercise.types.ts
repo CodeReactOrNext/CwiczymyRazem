@@ -28,6 +28,7 @@ export interface Exercise {
   image?: StaticImageData;
   videoUrl?: string | null;
   imageUrl?: string | null;
+  spotifyId?: string;
 }
 
 export interface ExercisePlan {
