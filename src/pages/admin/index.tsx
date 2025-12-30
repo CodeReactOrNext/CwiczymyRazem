@@ -77,7 +77,6 @@ const AdminDashboard = () => {
     handleEnrich,
     verifyAll,
     handleMassEnrich,
-    handleSpotifySync,
   } = useAdminBulkActions(songs, password, setSongs, fetchSongs);
 
   if (!isAuth) {
@@ -109,7 +108,6 @@ const AdminDashboard = () => {
             onSync={() => fetchSongs()}
             onMassVerify={verifyAll}
             onMassEnrich={handleMassEnrich}
-            onSpotifySync={handleSpotifySync}
             onBulkAdd={() => setIsBulkAddOpen(true)}
             onFindDuplicates={handleDeepScan}
             isBulkProcessing={isBulkProcessing || isDuplicateScanning}
