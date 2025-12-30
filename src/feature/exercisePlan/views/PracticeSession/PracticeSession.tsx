@@ -305,8 +305,14 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                                  </div>
                               )}
                               {currentExercise.spotifyId && (
-                                <div className="w-[300px] animate-in fade-in slide-in-from-left-4 duration-500">
-                                   <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
+                                <div className="w-[300px] flex flex-col gap-2 animate-in fade-in slide-in-from-left-4 duration-500">
+                                    <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
+                                    <div className="flex items-center gap-2 px-2">
+                                        <div className="h-1 w-1 rounded-full bg-emerald-500" />
+                                        <p className="text-[9px] text-zinc-500 font-medium">
+                                            Log in to <a href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/20">Spotify.com</a> for full playback.
+                                        </p>
+                                    </div>
                                 </div>
                               )}
                           </div>
