@@ -13,6 +13,7 @@ import { convertMsToHMS } from "utils/converter";
 import { PageHeader } from "constants/PageHeader";
 import { Song } from "feature/songs/types/songs.type";
 import { IconBox } from "components/IconBox/IconBox";
+import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 
 interface SongTimerLayoutProps {
   timer: useTimerInterface;
@@ -171,7 +172,20 @@ export const SongTimerLayout = ({
                     </div>
                 </div>
             </div>
-       
+        
+            {/* Spotify Player Section */}
+            {song.spotifyId && (
+                <div className="mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="h-1 w-12 bg-emerald-500 rounded-full" />
+                        <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500">Spotify Playback (Full)</h3>
+                    </div>
+                    <SpotifyPlayer trackId={song.spotifyId} height={352} className="shadow-2xl hover:border-emerald-500/30 transition-colors duration-500" />
+                    <p className="mt-3 text-[10px] text-zinc-600 font-medium italic text-center">
+                        Note: Full song playback requires a Spotify Premium account logged in your browser.
+                    </p>
+                </div>
+            )}
         </div>
       </div>
     </MainContainer>
