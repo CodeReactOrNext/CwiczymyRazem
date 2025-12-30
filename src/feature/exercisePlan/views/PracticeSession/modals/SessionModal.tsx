@@ -139,8 +139,14 @@ const SessionModal = ({
                 )}
 
                 {currentExercise.spotifyId && (
-                  <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
                     <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
+                    <div className="mt-2 flex items-center gap-2 px-1">
+                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <p className="text-[10px] text-zinc-400 font-semibold italic">
+                            For full tracks, log in to <a href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/20">Spotify.com</a>
+                        </p>
+                    </div>
                   </div>
                 )}
 

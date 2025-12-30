@@ -176,14 +176,34 @@ export const SongTimerLayout = ({
             {/* Spotify Player Section */}
             {song.spotifyId && (
                 <div className="mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="h-1 w-12 bg-emerald-500 rounded-full" />
-                        <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500">Spotify Playback (Full)</h3>
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <div className="h-1 w-8 bg-emerald-500 rounded-full" />
+                            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500">Spotify Playback</h3>
+                        </div>
+                        <a 
+                            href={`https://open.spotify.com/track/${song.spotifyId}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-bold text-emerald-500 hover:text-emerald-400 flex items-center gap-1 transition-colors"
+                        >
+                            Open in App <ArrowRight className="h-3 w-3" />
+                        </a>
                     </div>
-                    <SpotifyPlayer trackId={song.spotifyId} height={352} className="shadow-2xl hover:border-emerald-500/30 transition-colors duration-500" />
-                    <p className="mt-3 text-[10px] text-zinc-600 font-medium italic text-center">
-                        Note: Full song playback requires a Spotify Premium account logged in your browser.
-                    </p>
+                    
+                    <SpotifyPlayer trackId={song.spotifyId} height={152} className="shadow-2xl hover:border-emerald-500/30 transition-colors duration-500" />
+                    
+                    <div className="mt-4 p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-4 group hover:bg-emerald-500/10 transition-all duration-300">
+                        <div className="h-10 w-10 shrink-0 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+                            <Music className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-sm font-bold text-emerald-400 mb-0.5">Important: Log in via Browser</p>
+                            <p className="text-xs text-zinc-400 leading-relaxed">
+                                To listen to full tracks (not just 30s previews), make sure you are logged into <a href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/30 hover:decoration-emerald-500">Spotify.com</a> with an active Premium account.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
