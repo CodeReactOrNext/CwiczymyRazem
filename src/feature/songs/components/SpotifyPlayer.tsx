@@ -12,13 +12,12 @@ export const SpotifyPlayer = ({ trackId, className, height = 152 }: SpotifyPlaye
   return (
     <div className={cn("w-full overflow-hidden rounded-xl bg-zinc-900/50 border border-white/5", className)}>
       <iframe
-        src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0`}
+        src={`https://open.spotify.com/embed/track/${trackId}?utm_source=generator`}
         width="100%"
         height={height}
         frameBorder="0"
-        allowFullScreen={false}
         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy"
+        allowFullScreen
         className="block"
       />
     </div>
