@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { firestore } from "utils/firebase/api/firebase.config";
+import { db } from "utils/firebase/client/firebase.utils";
+import { collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
 import { fetchEnrichmentData } from "utils/enrichment/enrichment.util";
 
 export default async function handler(
@@ -17,9 +18,23 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const { onlyMissingSpotify } = req.body;
+
   try {
-    const songsRef = firestore.collection("songs");
-    const querySnapshot = await songsRef.where("isVerified", "!=", true).get();
+    const songsRef = collection(db, "songs");
+    let q = query(songsRef);
+    
+    if (onlyMissingSpotify) {
+        // This is a bit tricky in Firestore (querying for undefined/null)
+        // For simplicity, we'll fetch all or verified and filter in memory if needed,
+        // or just let the script handle targetting better.
+        // For now, let's keep the isVerified check as the standard deep scan.
+        q = query(songsRef, where("isVerified", "!=", true));
+    } else {
+        q = query(songsRef, where("isVerified", "!=", true));
+    }
+    
+    const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
       return res.status(200).json({ success: true, count: 0 });
@@ -28,23 +43,24 @@ export default async function handler(
     let processedCount = 0;
     
     // Process songs sequentially to respect API rate limits
-    for (const doc of querySnapshot.docs) {
+    for (const songDoc of querySnapshot.docs) {
       try {
-        const songData = doc.data();
+        const songData = songDoc.data();
         const enrichment = await fetchEnrichmentData(songData.artist, songData.title);
 
-        await doc.ref.update({
+        await updateDoc(doc(db, "songs", songDoc.id), {
           coverUrl: enrichment.coverUrl || null,
           isVerified: !!enrichment.isVerified,
           coverAttempted: true,
-          genres: enrichment.genres || []
+          genres: enrichment.genres || [],
+          spotifyId: enrichment.spotifyId || null,
         });
 
         processedCount++;
         // Small delay to avoid hammering external APIs too hard
         await new Promise(r => setTimeout(r, 400));
       } catch (err: any) {
-        console.error(`Failed to enrich song ${doc.id}:`, err?.message || err);
+        console.error(`Failed to enrich song ${songDoc.id}:`, err?.message || err);
       }
     }
 
