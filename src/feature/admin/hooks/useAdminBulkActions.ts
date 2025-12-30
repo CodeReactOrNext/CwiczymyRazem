@@ -120,64 +120,6 @@ export const useAdminBulkActions = (
     onFetchSongs();
   };
 
-  const handleSpotifySync = async () => {
-    // 1. Fetch ALL songs from DB (client side, but filtered for missing IDs)
-    // IMPORTANT: We use the Client SDK 'db' which is already initialized and working
-    const { collection, getDocs, query, where } = await import("firebase/firestore");
-    const { db } = await import("utils/firebase/client/firebase.utils");
-    
-    setIsBulkProcessing(true);
-    setProgress({ current: 0, total: 100 }); // Initial estimate
-
-    try {
-        const songsRef = collection(db, "songs");
-        // We can't easily query for "field doesn't exist" in Firestore effectively across all versions,
-        // so we'll fetch verified songs and check in-memory or just fetch all if catalog is small.
-        const snapshot = await getDocs(songsRef);
-        const allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Song));
-        
-        const targetSongs = allSongs.filter(s => !s.spotifyId);
-        
-        if (targetSongs.length === 0) {
-            toast.info("All songs already have Spotify IDs!");
-            setIsBulkProcessing(false);
-            return;
-        }
-
-        setProgress({ current: 0, total: targetSongs.length });
-        
-        // Process in small batches to not lock up the browser/API
-        const batchSize = 3;
-        for (let i = 0; i < targetSongs.length; i += batchSize) {
-            const batch = targetSongs.slice(i, i + batchSize);
-            await Promise.all(batch.map(async (song) => {
-                try {
-                    // Call the WORKING enrichment API we just fixed
-                    await axios.post("/api/songs/enrich", {
-                        songId: song.id,
-                        artist: song.artist,
-                        title: song.title
-                    });
-                } catch (err) {
-                    console.error(`Failed to sync Spotify for ${song.title}:`, err);
-                }
-            }));
-            
-            setProgress(prev => ({ ...prev, current: Math.min(i + batchSize, targetSongs.length) }));
-            // Respect API limits
-            await new Promise(r => setTimeout(r, 500));
-        }
-
-        toast.success(`Successfully synced Spotify IDs for ${targetSongs.length} songs!`);
-        onFetchSongs();
-    } catch (error) {
-        console.error("Spotify Sync Error:", error);
-        toast.error("Failed to perform Spotify Sync");
-    } finally {
-        setIsBulkProcessing(false);
-    }
-  };
-
   return {
     isBulkProcessing,
     progress,
@@ -186,6 +128,5 @@ export const useAdminBulkActions = (
     verifyAll,
     handleMassEnrich,
     handleBulkEnrich,
-    handleSpotifySync
   };
 };

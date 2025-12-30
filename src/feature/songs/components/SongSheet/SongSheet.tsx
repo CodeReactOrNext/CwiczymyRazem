@@ -204,8 +204,8 @@ const SongSheet = ({
             {/* Spotify Player */}
             {song.spotifyId && (
               <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-3">Continue listening on Spotify</p>
-                <SpotifyPlayer trackId={song.spotifyId} height={152} />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-3">Spotify Playback</p>
+                <SpotifyPlayer trackId={song.spotifyId} height={80} />
               </div>
             )}
 
