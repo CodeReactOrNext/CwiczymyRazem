@@ -49,7 +49,7 @@ const ProfileLayout = ({
   } = userData;
   const { lastReportDate, achievements } = statistics;
   const [userSkills, setUserSkills] = useState<UserSkills>();
-  const { datasWithReports } = useActivityLog(userAuth);
+  const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
 
   const yearsOfPlaying = guitarStartDate
     ? getYearsOfPlaying(guitarStartDate.toDate())
@@ -186,6 +186,9 @@ const ProfileLayout = ({
             userSongs={songs}
             userAuth={userAuth}
             achievements={achievements}
+            year={year}
+            setYear={setYear}
+            isLoadingActivity={isLoading}
           />
         </div>
 
