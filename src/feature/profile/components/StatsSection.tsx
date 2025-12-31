@@ -23,6 +23,7 @@ import Link from "next/link";
 import { DailyRecommendation } from "feature/songs/components/DailyRecommendation/DailyRecommendation";
 import { DailyPlanRecommendation } from "feature/songs/components/DailyRecommendation/DailyPlanRecommendation";
 import { RecommendationSkeleton } from "feature/songs/components/DailyRecommendation/RecommendationSkeleton";
+import { RecommendationsSection } from "./Recommendations/RecommendationsSection";
 import { getDailyRecommendation } from "feature/songs/services/getRecommendation";
 import { getDailyExerciseRecommendation } from "feature/exercisePlan/services/getDailyRecommendation";
 import { useEffect } from "react";
@@ -68,9 +69,6 @@ export const StatsSection = ({
   const { t } = useTranslation("profile");
   const { time } = statistics;
   const [isAchievementsExpanded, setIsAchievementsExpanded] = useState(false);
-  const [dailyPick, setDailyPick] = useState<Song | null>(null);
-  const [dailyExercisePick, setDailyExercisePick] = useState<ExercisePlan | null>(null);
-  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const currentUserId = useAppSelector(selectUserAuth);
@@ -79,8 +77,6 @@ export const StatsSection = ({
   const refreshSongs = async () => {
     if (onSongsChange) {
       onSongsChange();
-    } else {
-      fetchRecommendations();
     }
   };
 
@@ -89,33 +85,6 @@ export const StatsSection = ({
     userSongs: userSongs || { wantToLearn: [], learning: [], learned: [] },
     onTableStatusChange: refreshSongs,
   });
-
-  const fetchRecommendations = async () => {
-    if (!isOwnProfile) return;
-    setIsLoadingRecommendations(true);
-    try {
-      // Song recommendation
-      if (userSongs) {
-        const ownedIds = [
-          ...userSongs.wantToLearn.map(s => s.id),
-          ...userSongs.learning.map(s => s.id),
-          ...userSongs.learned.map(s => s.id)
-        ];
-        const pick = await getDailyRecommendation(ownedIds);
-        setDailyPick(pick);
-      }
-
-      // Exercise recommendation
-      const exPick = getDailyExerciseRecommendation();
-      setDailyExercisePick(exPick);
-    } finally {
-      setIsLoadingRecommendations(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRecommendations();
-  }, [userSongs, isOwnProfile]);
 
   const totalTime =
     time.technique + time.theory + time.hearing + time.creativity;
@@ -199,21 +168,16 @@ export const StatsSection = ({
               ))}
           </div>
 
-          {isOwnProfile && isLoadingRecommendations && (
-            <RecommendationSkeleton type="song" />
-          )}
-
-          {isOwnProfile && !isLoadingRecommendations && dailyPick && (
-            <DailyRecommendation 
-              song={dailyPick} 
-              userSongs={userSongs || { wantToLearn: [], learning: [], learned: [] }} 
-              onRefreshSongs={refreshSongs}
-              onOpenDetails={(song) => {
+          <RecommendationsSection 
+            userSongs={userSongs} 
+            isOwnProfile={isOwnProfile} 
+            onRefreshSongs={refreshSongs}
+            onOpenDetails={(song) => {
                 setSelectedSong(song);
                 setIsSheetOpen(true);
-              }}
-            />
-          )}
+            }}
+            type="song"
+          />
 
           {!userSongs ? (
             <RecommendationSkeleton type="progress" />
@@ -368,27 +332,34 @@ export const StatsSection = ({
               </p>
             </div>
             <SkillsRadarChart statistics={statistics} />
-            {isOwnProfile && (
-              <div className="mt-4">
-                {isLoadingRecommendations ? (
-                  <RecommendationSkeleton type="exercise" />
-                ) : dailyExercisePick ? (
-                  <DailyPlanRecommendation plan={dailyExercisePick} />
-                ) : null}
-              </div>
-            )}
+            <div className="mt-4">
+               <RecommendationsSection 
+                  userSongs={userSongs} 
+                  isOwnProfile={isOwnProfile} 
+                  onRefreshSongs={refreshSongs}
+                  onOpenDetails={(song) => {
+                      setSelectedSong(song);
+                      setIsSheetOpen(true);
+                  }}
+                  type="exercise"
+                />
+            </div>
           </div>
         </div>
 
         <div className='space-y-6'>
           <div className='hidden lg:block space-y-4'>
             <SkillsRadarChart statistics={statistics} />
-            {isOwnProfile && isLoadingRecommendations && (
-               <RecommendationSkeleton type="exercise" />
-            )}
-            {isOwnProfile && !isLoadingRecommendations && dailyExercisePick && (
-              <DailyPlanRecommendation plan={dailyExercisePick} />
-            )}
+            <RecommendationsSection 
+                userSongs={userSongs} 
+                isOwnProfile={isOwnProfile} 
+                onRefreshSongs={refreshSongs}
+                onOpenDetails={(song) => {
+                    setSelectedSong(song);
+                    setIsSheetOpen(true);
+                }}
+                type="exercise"
+            />
           </div>
         </div>
       </div>
