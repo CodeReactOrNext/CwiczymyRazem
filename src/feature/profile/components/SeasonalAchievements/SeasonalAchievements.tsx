@@ -221,7 +221,7 @@ const SeasonalAchievements = ({
             {t("seasonal_achievements.title", "Osiągnięcia Sezonowe")}
           </h4>
           <div className='text-xs text-white/70'>
-            {achievements.length} osiągnięć
+            {achievements.length} achievements
           </div>
         </div>
 

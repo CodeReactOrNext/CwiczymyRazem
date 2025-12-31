@@ -34,7 +34,7 @@ const ProfileLandingLayout = ({
     learning: Song[];
     learned: Song[];
   }>();
-  const { reportList, datasWithReports } = useActivityLog(userAuth);
+  const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
   const { achievements } = userStats;
   const [userSkills, setUserSkills] = useState<UserSkills>();
   const [activeSection, setActiveSection] = useState<
@@ -67,6 +67,9 @@ const ProfileLandingLayout = ({
           onSongsChange={refreshSongs}
           userAuth={userAuth}
           achievements={achievements}
+          year={year}
+          setYear={setYear}
+          isLoadingActivity={isLoading}
         />
       </DashboardSection>
 
