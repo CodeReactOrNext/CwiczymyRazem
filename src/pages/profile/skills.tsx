@@ -17,7 +17,10 @@ import AppLayout from "layouts/AppLayout";
 import MainContainer from "components/MainContainer";
 import { LoaderPinwheel } from "lucide-react";
 
-const ProfileSkillsPage: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const ProfileSkillsPage: NextPageWithLayout = () => {
   const { t } = useTranslation("profile");
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
@@ -64,13 +67,19 @@ const ProfileSkillsPage: NextPage = () => {
 
 
   return (
+    <MainContainer title={"Skills"}>
+    { userSkills ? <SkillDashboard
+        userSkills={userSkills as UserSkills}
+        onSkillUpgrade={handleUpgradeSkill}
+      /> : null}
+    </MainContainer>
+  );
+};
+
+ProfileSkillsPage.getLayout = function getLayout(page: ReactElement) {
+  return (
     <AppLayout pageId={"profile"} subtitle='Skills' variant='secondary'>
-      <MainContainer title={"Skills"}>
-      { userSkills ? <SkillDashboard
-          userSkills={userSkills as UserSkills}
-          onSkillUpgrade={handleUpgradeSkill}
-        /> : null}
-      </MainContainer>
+      {page}
     </AppLayout>
   );
 };

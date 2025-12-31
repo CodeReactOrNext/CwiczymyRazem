@@ -92,6 +92,26 @@ export const userSlice = createSlice({
         state.timer.theory = payload.time;
       }
     },
+    increaseTimerTime: (
+      state,
+      { payload }: PayloadAction<{ type: SkillsType; time: number }>
+    ) => {
+      if (!state.timer) {
+        state.timer = { creativity: 0, hearing: 0, technique: 0, theory: 0 };
+      }
+      if (payload.type === "technique") {
+        state.timer.technique += payload.time;
+      }
+      if (payload.type === "creativity") {
+        state.timer.creativity += payload.time;
+      }
+      if (payload.type === "hearing") {
+        state.timer.hearing += payload.time;
+      }
+      if (payload.type === "theory") {
+        state.timer.theory += payload.time;
+      }
+    },
     updatePoints: (state, { payload }: PayloadAction<number>) => {
       if (state.currentUserStats) {
         state.currentUserStats.points = (state.currentUserStats.points || 0) + payload;
@@ -225,6 +245,7 @@ export const {
   addUserAuth,
   addUserData,
   updateTimerTime,
+  increaseTimerTime,
   updateLocalTimer,
   updatePoints,
 } = userSlice.actions;

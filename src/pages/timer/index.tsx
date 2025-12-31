@@ -1,13 +1,19 @@
 import { PracticeModeSelector } from "feature/practice/components/PracticeModeSelector/PracticeModeSelector";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import AppLayout from "layouts/AppLayout";
 import { withAuth } from "utils/auth/serverAuth";
 
-const Timer: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const Timer: NextPageWithLayout = () => {
   const router = useRouter();
+  const [loadingMode, setLoadingMode] = useState<"timer" | "plan" | "auto" | "song" | null>(null);
 
   const handleModeSelect = (mode: "timer" | "plan" | "auto" | "song") => {
+    setLoadingMode(mode);
     switch (mode) {
       case "timer":
         router.push("/timer/practice");
@@ -21,12 +27,20 @@ const Timer: NextPage = () => {
       case "song":
         router.push("/timer/song-select");
         break;
+      default:
+        setLoadingMode(null);
     }
   };
 
   return (
+    <PracticeModeSelector onSelectMode={handleModeSelect} loadingMode={loadingMode} />
+  );
+};
+
+Timer.getLayout = function getLayout(page: ReactElement) {
+  return (
     <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
-      <PracticeModeSelector onSelectMode={handleModeSelect} />
+      {page}
     </AppLayout>
   );
 };

@@ -13,19 +13,28 @@ import { useAppSelector } from "store/hooks";
 import AppLayout from "layouts/AppLayout";
 import { ExercisePlan } from "feature/exercisePlan/components/ExercisePlan";
 
-const ProfileExercisesPage: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const ProfileExercisesPage: NextPageWithLayout = () => {
   const { t } = useTranslation("profile");
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
 
   return (
+    <div className='w-full'>
+      <ExercisePlan />
+    </div>
+  );
+};
+
+ProfileExercisesPage.getLayout = function getLayout(page: ReactElement) {
+  return (
     <AppLayout
       pageId={"profile"}
-      subtitle={(t as any)("exercises", "Exercises")}
+      subtitle="Exercises"
       variant='secondary'>
-      <div className='w-full'>
-        <ExercisePlan />
-      </div>
+      {page}
     </AppLayout>
   );
 };
@@ -37,7 +46,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
     props: {
       ...(await serverSideTranslations(
         locale ?? "pl",
-        ["common", "profile", "exercises"],
+        ["common", "profile", "exercises", "rating_popup"],
         nextI18nextConfig
       )),
     },

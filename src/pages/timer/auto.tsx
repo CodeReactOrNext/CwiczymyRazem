@@ -8,9 +8,14 @@ import { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import MainContainer from "components/MainContainer";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 
-const TimerAuto: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const TimerAuto: NextPageWithLayout = () => {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   const handleBack = () => {
     if (selectedPlan) {
@@ -21,26 +26,35 @@ const TimerAuto: NextPage = () => {
   };
 
   const handleAutoPlanSelect = (plan: ExercisePlan) => {
-    setSelectedPlan(plan);
+    setIsStarting(true);
+    setTimeout(() => {
+      setSelectedPlan(plan);
+      setIsStarting(false);
+    }, 500);
   };
 
   const handlePlanFinish = () => {
-    setSelectedPlan(null);
+    setIsFinishing(true);
     router.push("/report");
   };
 
+  return selectedPlan ? (
+    <MainContainer>
+      <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
+    </MainContainer>
+  ) : (
+    <AutoPlanGenerator
+      onBack={handleBack}
+      onSelectPlan={handleAutoPlanSelect}
+      isStarting={isStarting}
+    />
+  );
+};
+
+TimerAuto.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
-      {selectedPlan ? (
-        <MainContainer>
-          <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} />
-        </MainContainer>
-      ) : (
-        <AutoPlanGenerator
-          onBack={handleBack}
-          onSelectPlan={handleAutoPlanSelect}
-        />
-      )}
+      {page}
     </AppLayout>
   );
 };
