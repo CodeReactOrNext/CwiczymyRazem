@@ -22,6 +22,8 @@ interface LandingLayoutProps {
   userAuth: string;
 }
 
+import { useQuery } from "@tanstack/react-query";
+
 const ProfileLandingLayout = ({
   statsField,
   userStats,
@@ -29,11 +31,7 @@ const ProfileLandingLayout = ({
   featSlot,
 }: LandingLayoutProps) => {
   const { t } = useTranslation("profile");
-  const [songs, setSongs] = useState<{
-    wantToLearn: Song[];
-    learning: Song[];
-    learned: Song[];
-  }>();
+  
   const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
   const { achievements } = userStats;
   const [userSkills, setUserSkills] = useState<UserSkills>();
@@ -41,13 +39,15 @@ const ProfileLandingLayout = ({
     "overview" | "activity" | "skills" | "exercises"
   >("overview");
 
-  const refreshSongs = () => {
-    getUserSongs(userAuth).then((songs) => setSongs(songs));
-  };
-
-  useEffect(() => {
-    refreshSongs();
-  }, [userAuth]);
+  /* eslint-disable unused-imports/no-unused-vars */
+  const { data: songs, refetch: refreshSongs } = useQuery({
+    queryKey: ['userSongs', userAuth],
+    queryFn: () => getUserSongs(userAuth),
+    enabled: !!userAuth,
+    staleTime: Infinity, 
+    gcTime: 1000 * 60 * 60 * 24, 
+  });
+  /* eslint-enable unused-imports/no-unused-vars */
 
   useEffect(() => {
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
