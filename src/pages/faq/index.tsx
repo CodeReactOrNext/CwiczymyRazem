@@ -7,8 +7,10 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
 import nextI18nextConfig from "../../../next-i18next.config";
 
-const FaqPage: NextPage = () => {
-  const { t } = useTranslation("faq");
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const FaqPage: NextPageWithLayout = () => {
   const { isLoggedIn } = useAutoLogIn({
     redirects: {
       loggedOut: "/faq",
@@ -22,10 +24,16 @@ const FaqPage: NextPage = () => {
       <Head>
         <link rel='canonical' href={siteUrl} />
       </Head>
-      <AppLayout pageId={"faq"} subtitle={t("faq")} variant='secondary'>
-        <FaqView />
-      </AppLayout>
+      <FaqView />
     </>
+  );
+};
+
+FaqPage.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <AppLayout pageId="faq" subtitle="FAQ" variant="secondary">
+      {page}
+    </AppLayout>
   );
 };
 

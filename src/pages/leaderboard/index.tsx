@@ -7,7 +7,10 @@ import Head from "next/head";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import nextI18nextConfig from "../../../next-i18next.config";
 
-const LeaderBoardPage: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const LeaderBoardPage: NextPageWithLayout = () => {
   const { isLoggedIn } = useAutoLogIn({
     redirects: {
       loggedOut: "/login",
@@ -21,10 +24,16 @@ const LeaderBoardPage: NextPage = () => {
       <Head>
         <link rel='canonical' href={siteUrl} />
       </Head>
-      <AppLayout pageId={"leadboard"} subtitle='Leaderboard' variant='secondary'>
-        {isLoggedIn ? <LeadboardView /> : <PageLoadingLayout />}
-      </AppLayout>
+      {isLoggedIn ? <LeadboardView /> : <PageLoadingLayout />}
     </>
+  );
+};
+
+LeaderBoardPage.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <AppLayout pageId={"leadboard"} subtitle='Leaderboard' variant='secondary'>
+      {page}
+    </AppLayout>
   );
 };
 

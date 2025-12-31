@@ -1,14 +1,10 @@
 import { RockSidebar } from "components/RockSidebar";
 import type { SidebarLinkInterface } from "components/RockSidebar";
-import { motion } from "framer-motion";
-import { AnimatePresence } from "framer-motion";
 import { Home, Music, Trophy, HelpCircle, Timer, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
-
 import DesktopHeaderWrapper from "./components/DesktopHeaderWrapper";
-import LandingNav from "./components/LandingNav";
 import type { LandingNavObjectInterface } from "./components/LandingNav/LandingNav";
 import MainLoggedWrapper from "./components/MainLoggedWrapper";
 import MobileHeaderWrapper from "./components/MobileHeaderWrapper";
@@ -110,16 +106,10 @@ const MainLoggedLayout = ({
             </MobileHeaderWrapper>
 
             <div className='z-20 mx-auto w-full max-w-[1490px] px-0 pb-24 pt-8 md:pb-8 lg:px-8'>
-              <AnimatePresence mode='wait'>
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
+                <div
                   className='relative z-10'>
                   {children}
-                </motion.div>
-              </AnimatePresence>
+                </div>
             </div>
           </MainLoggedWrapper>
         </div>

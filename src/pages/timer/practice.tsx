@@ -13,7 +13,10 @@ import { convertMsToHMObject } from "utils/converter/timeConverter";
 
 import type { SkillsType } from "types/skillsTypes";
 
-const TimerPractice: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const TimerPractice: NextPageWithLayout = () => {
   const dispatch = useAppDispatch();
   const [chosenSkill, setChosenSkill] = useState<SkillsType | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
@@ -65,16 +68,22 @@ const TimerPractice: NextPage = () => {
   }, [timerData, avatar, dispatch, router]);
 
   return (
+    <TimerLayout
+      timer={timer}
+      timerData={timerData}
+      chosenSkill={chosenSkill}
+      timerSubmitHandler={timerSubmitHandler}
+      choseSkillHandler={choseSkillHandler}
+      onBack={onBack}
+      isFinishing={isFinishing}
+    />
+  );
+};
+
+TimerPractice.getLayout = function getLayout(page: ReactElement) {
+  return (
     <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
-      <TimerLayout
-        timer={timer}
-        timerData={timerData}
-        chosenSkill={chosenSkill}
-        timerSubmitHandler={timerSubmitHandler}
-        choseSkillHandler={choseSkillHandler}
-        onBack={onBack}
-        isFinishing={isFinishing}
-      />
+      {page}
     </AppLayout>
   );
 };
