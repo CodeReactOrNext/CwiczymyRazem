@@ -212,7 +212,7 @@ export const PlanCard = ({
             {isLoading ? (
                 <div className="flex items-center gap-2">
                     <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Postępowanie...</span>
+                    <span>Loading...</span>
                 </div>
             ) : (
                 <>
