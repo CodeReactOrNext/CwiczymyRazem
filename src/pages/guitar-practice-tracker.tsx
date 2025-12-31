@@ -54,7 +54,7 @@ export default function GuitarPracticeTrackerPage() {
           <header className="mb-16">
             <p className="text-xs uppercase tracking-wider text-cyan-400 mb-4">Growth Systems</p>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-              Guitar Practice Tracker: What to Log & Measure
+              Guitar Practice Tracker: 5 Metrics That Predict Progress
             </h1>
             <p className="text-xl text-zinc-400 leading-relaxed">
               A tracker can be the difference between "I think I'm getting better?" and knowing you're improving. But most people track the wrong thing.
@@ -63,7 +63,7 @@ export default function GuitarPracticeTrackerPage() {
 
           <div className="prose prose-invert prose-lg max-w-none">
             <p>
-              The goal of tracking isn't paperwork. It's clarity: what works, what doesn't, and what to do next.
+              Tracking gives you clarity: what works, what doesn't, and what to try next.
             </p>
             <p>
               Below is a simple, beginner-friendly system you can use as a guitar practice log (or guitar practice journal) that actually measures progress—without turning practice into a chore.
@@ -167,7 +167,6 @@ export default function GuitarPracticeTrackerPage() {
             <CTASection />
 
             <h2 className="text-2xl font-bold text-white mt-16 mb-4">How Riff Quest Automates This</h2>
-            <p>The easiest tracking system is the one you'll actually use.</p>
             <ul className="space-y-3 my-6 text-sm">
               <li><strong className="text-white">Auto-Time</strong> — Time is captured automatically when you use a timer</li>
               <li><strong className="text-white">Skill Focus</strong> — Focus is baked into how you start a session</li>

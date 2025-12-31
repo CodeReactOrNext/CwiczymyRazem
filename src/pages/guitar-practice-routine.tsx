@@ -63,10 +63,10 @@ export default function GuitarPracticeRoutinePage() {
 
           <div className="prose prose-invert prose-lg max-w-none">
             <p>
-              Most routines fail because they're built around good intentions ("I'll practice every day") instead of a repeatable loop with feedback. That's what this guide is: a simple, structured method you can repeat daily — whether you have 15 minutes or 45.
+              Most routines fail because they're vague. This one isn't. It's a simple loop you can repeat daily, whether you have 15 minutes or 45.
             </p>
             <p>
-              It works especially well if you like using a timer, tracking what you did, and seeing your progress build over time.
+              It works especially well if you like using a timer, <Link href="/guitar-practice-tracker" className="text-cyan-400 hover:text-cyan-300 underline">tracking what you did</Link>, and seeing your progress build over time.
             </p>
 
             <h2 className="text-2xl font-bold text-white mt-16 mb-4">The #1 Reason Routines Fail</h2>
@@ -77,7 +77,7 @@ export default function GuitarPracticeRoutinePage() {
               <li>"Work on a song"</li>
               <li>"Jam"</li>
             </ul>
-            <p className="font-medium text-white">That's not a routine — that's a list of ideas.</p>
+            <p className="font-medium text-white">That's a list of ideas, not a routine.</p>
             <p>
               A routine becomes sustainable when two things are true: <strong className="text-white">Structure</strong> (you know what to do) and <strong className="text-white">Feedback</strong> (you get a result when you finish). Without feedback, your brain doesn't "close the loop".
             </p>
@@ -124,7 +124,7 @@ export default function GuitarPracticeRoutinePage() {
             </div>
 
             <h2 className="text-2xl font-bold text-white mt-16 mb-4">How to Keep the Streak</h2>
-            <p>A streak is kept by making practice smaller and more consistent. Not by making it bigger.</p>
+            <p>A streak is kept by making practice smaller and more consistent. Not by making it bigger. Want a challenge? Try our <Link href="/guitar-practice-streak-challenge" className="text-cyan-400 hover:text-cyan-300 underline">30-day streak challenge</Link>.</p>
             <ul className="space-y-3 my-6">
               <li>Lower the minimum. 5–10 minutes is enough.</li>
               <li>Protect the habit, not the perfect workout.</li>
