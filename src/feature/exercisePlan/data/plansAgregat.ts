@@ -11,5 +11,5 @@ export const defaultPlans: ExercisePlan[] = [
   basicImprovisationPractice,
   warmUp15MinutesPlan,
   warmUp30MinutesPlan,
-  metalGuitarExercisesPlan,
+  // metalGuitarExercisesPlan,
 ];
