@@ -8,9 +8,18 @@ import { i18n } from "next-i18next";
 import { FaExpand } from "react-icons/fa";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "assets/components/ui/accordion";
+import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
+import { FaInfoCircle, FaLightbulb, FaHeart, FaFacebook, FaInstagram, FaTwitter, FaExternalLinkAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+
 import { categoryGradients } from "../../../constants/categoryStyles";
 import type { LocalizedContent } from "../../../types/exercise.types";
-import { InstructionsCard } from "../components/InstructionsCard";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
 import { NextExerciseCard } from "../components/NextExerciseCard";
 import { SessionModalControls } from "../components/SessionModalControls";
@@ -33,6 +42,12 @@ interface SessionModalProps {
   formattedTimeLeft: string;
   toggleTimer: () => void;
   handleNextExercise: () => void;
+  sessionTimerData: any;
+  exerciseTimeSpent: number;
+  setVideoDuration: (duration: number) => void;
+  setTimerTime: (time: number) => void;
+  startTimer: () => void;
+  stopTimer: () => void;
 }
 
 const SessionModal = ({
@@ -51,8 +66,16 @@ const SessionModal = ({
   formattedTimeLeft,
   toggleTimer,
   handleNextExercise,
+  sessionTimerData,
+  exerciseTimeSpent,
+  setVideoDuration,
+  setTimerTime,
+  startTimer,
+  stopTimer
 }: SessionModalProps) => {
   if (!isOpen || !isMounted) return null;
+
+  const { t } = useTranslation(["exercises", "common"]);
 
   const category = currentExercise.category || "mixed";
   const currentLang = i18n?.language as keyof LocalizedContent;
@@ -80,9 +103,24 @@ const SessionModal = ({
             />
 
             <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5 pb-[76px]'>
-              <div className='space-y-4 p-4'>
-                {currentExercise.videoUrl ? (
-                  <div className='relative mb-4 w-full overflow-hidden rounded-xl border border-muted/30 bg-zinc-900 shadow-md transition-all duration-200'>
+              <div className='space-y-6 p-4'>
+                {currentExercise.youtubeVideoId ? (
+                   <div className="w-full radius-premium overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
+                      <YouTubePlayalong
+                          videoId={currentExercise.youtubeVideoId}
+                          isPlaying={isPlaying}
+                          onEnd={handleNextExercise}
+                          onReady={(duration: number) => setVideoDuration(duration)}
+                          onSeek={(time: number) => setTimerTime(time * 1000)}
+                          onStateChange={(state: number) => {
+                            if (state === 1) startTimer();
+                            if (state === 2) stopTimer();
+                          }}
+                          isMobile={true}
+                      />
+                   </div>
+                ) : currentExercise.videoUrl ? (
+                  <div className='relative w-full overflow-hidden rounded-xl border border-muted/30 bg-zinc-900 shadow-md transition-all duration-200'>
                     <div className='aspect-video w-full'>
                       {(() => {
                         const regExp =
@@ -150,18 +188,59 @@ const SessionModal = ({
                   </div>
                 )}
 
-                <MobileTimerDisplay
-                  timerProgressValue={timerProgressValue}
-                  formattedTimeLeft={formattedTimeLeft}
-                  isPlaying={isPlaying}
-                />
+                  <MobileTimerDisplay
+                    timerProgressValue={timerProgressValue}
+                    formattedTimeLeft={formattedTimeLeft}
+                    isPlaying={isPlaying}
+                    sessionTimerData={sessionTimerData}
+                    exerciseTimeSpent={exerciseTimeSpent}
+                  />
 
-                <InstructionsCard
-                  instructions={currentExercise.instructions}
-                  title='Instrukcje'
-                />
+                <Accordion type="single" collapsible defaultValue="instructions" className="w-full space-y-3">
+                    <AccordionItem value="instructions" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-white/5 transition-colors group">
+                            <div className="flex items-center gap-3">
+                                <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
+                                    <FaInfoCircle className="h-4 w-4" />
+                                </div>
+                                <span className="font-bold tracking-wide text-sm text-zinc-200 group-hover:text-white">{t("exercises:instructions")}</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4 pt-1">
+                                <div className={cn(
+                                "prose prose-invert max-w-none prose-p:text-sm prose-p:text-zinc-400 prose-p:leading-relaxed",
+                                )}>
+                                {currentExercise.instructions.map((instruction: LocalizedContent, idx: number) => (
+                                    <p key={idx} className="mb-2 last:mb-0">
+                                        {instruction[currentLang]}
+                                    </p>
+                                ))}
+                                </div>
+                        </AccordionContent>
+                    </AccordionItem>
 
-                <TipsCard tips={currentExercise.tips} />
+                    <AccordionItem value="tips" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                        <AccordionTrigger className="px-4 py-3 hover:bg-white/5 transition-colors group">
+                            <div className="flex items-center gap-3">
+                                <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
+                                    <FaLightbulb className="h-4 w-4" />
+                                </div>
+                                <span className="font-bold tracking-wide text-sm text-zinc-200 group-hover:text-white">{t("exercises:hints")}</span>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pb-4 pt-1">
+                                <ul className="list-inside list-disc space-y-1.5 text-sm text-zinc-400 marker:text-amber-500/50">
+                                {currentExercise.tips?.length > 0 && (
+                                    currentExercise.tips.map((tip: LocalizedContent, idx: number) => (
+                                        <li key={idx}>
+                                            {tip[currentLang] || tip.pl}
+                                        </li>
+                                    ))
+                                )}
+                                </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                 </Accordion>
 
                 {nextExercise && (
                   <NextExerciseCard
@@ -181,6 +260,43 @@ const SessionModal = ({
                       }
                     />
                   </div>
+                )}
+
+                {currentExercise.links && currentExercise.links.length > 0 && (
+                     <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-5 backdrop-blur-sm space-y-4 mb-20">
+                         <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
+                             <FaHeart className="animate-pulse" />
+                             <span>Support Bazok</span>
+                         </div>
+                         <div className="flex flex-col gap-2">
+                             {currentExercise.links.map((link: any, idx: number) => {
+                                 let Icon = FaExternalLinkAlt;
+                                 if (link.url.includes("facebook")) Icon = FaFacebook;
+                                 if (link.url.includes("instagram")) Icon = FaInstagram;
+                                 if (link.url.includes("twitter") || link.url.includes("x.com")) Icon = FaTwitter;
+                                 if (link.url.includes("patreon")) Icon = FaHeart;
+
+                                 return (
+                                     <a 
+                                         key={idx}
+                                         href={link.url}
+                                         target="_blank"
+                                         rel="noopener noreferrer"
+                                         className="flex items-center justify-between group px-4 py-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-sm"
+                                     >
+                                         <div className="flex items-center gap-3">
+                                             <Icon className={cn(
+                                                 "h-4 w-4",
+                                                 link.url.includes("patreon") ? "text-red-500" : "text-zinc-400 group-hover:text-white"
+                                             )} />
+                                             <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
+                                         </div>
+                                         <FaExternalLinkAlt className="h-3 w-3 text-zinc-600 group-hover:text-zinc-400" />
+                                     </a>
+                                 );
+                             })}
+                         </div>
+                     </div>
                 )}
               </div>
             </div>

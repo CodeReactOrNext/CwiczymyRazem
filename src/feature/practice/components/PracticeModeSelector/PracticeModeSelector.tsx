@@ -4,10 +4,12 @@ import { FaClock, FaList, FaRandom } from "react-icons/fa";
 
 interface PracticeModeSelectorProps {
   onSelectMode: (mode: "timer" | "plan" | "auto" | "song") => void;
+  loadingMode?: "timer" | "plan" | "auto" | "song" | null;
 }
 
 export const PracticeModeSelector = ({
   onSelectMode,
+  loadingMode
 }: PracticeModeSelectorProps) => {
   const { t } = useTranslation(["common", "timer"]);
 
@@ -151,8 +153,17 @@ export const PracticeModeSelector = ({
 
                   <Button
                     className={`w-auto border border-white/10 bg-white/5 py-1.5 text-xs backdrop-blur-sm transition-all duration-300 hover:bg-white/10 sm:w-full sm:py-3 sm:text-base`}
-                    variant='outline'>
-                    {t("common:select" as any)}
+                    variant='outline'
+                    disabled={!!loadingMode}
+                  >
+                    {loadingMode === mode.id ? (
+                        <div className="flex items-center gap-2">
+                           <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                           {t("common:loading_text" as any)}
+                        </div>
+                    ) : (
+                        t("common:select" as any)
+                    )}
                   </Button>
                 </div>
 

@@ -2,7 +2,7 @@ import { Badge } from "assets/components/ui/badge";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "react-i18next";
-import { Check, Clock, Info } from "lucide-react";
+import { Check, Clock, Info, Youtube, Video } from "lucide-react";
 import { cn } from "assets/lib/utils";
 
 interface ExerciseCardProps {
@@ -86,6 +86,19 @@ export const ExerciseCard = ({
            )}>
               {t(`common:difficulty.${exercise.difficulty}` as any)}
            </Badge>
+
+           {exercise.isPlayalong && (
+               <Badge className="bg-red-500/10 text-red-400 border-red-500/20 text-[9px] px-1.5 h-5 font-bold uppercase">
+                   <Youtube className="mr-1 h-2.5 w-2.5" />
+                   Playalong
+               </Badge>
+           )}
+           {exercise.videoUrl && !exercise.isPlayalong && (
+               <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[9px] px-1.5 h-5 font-bold uppercase">
+                   <Video className="mr-1 h-2.5 w-2.5" />
+                   Video
+               </Badge>
+           )}
         </div>
       </div>
       

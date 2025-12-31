@@ -11,6 +11,8 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 const TimerAuto: NextPage = () => {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   const handleBack = () => {
     if (selectedPlan) {
@@ -21,11 +23,15 @@ const TimerAuto: NextPage = () => {
   };
 
   const handleAutoPlanSelect = (plan: ExercisePlan) => {
-    setSelectedPlan(plan);
+    setIsStarting(true);
+    setTimeout(() => {
+      setSelectedPlan(plan);
+      setIsStarting(false);
+    }, 500);
   };
 
   const handlePlanFinish = () => {
-    setSelectedPlan(null);
+    setIsFinishing(true);
     router.push("/report");
   };
 
@@ -33,12 +39,13 @@ const TimerAuto: NextPage = () => {
     <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
       {selectedPlan ? (
         <MainContainer>
-          <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} />
+          <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
         </MainContainer>
       ) : (
         <AutoPlanGenerator
           onBack={handleBack}
           onSelectPlan={handleAutoPlanSelect}
+          isStarting={isStarting}
         />
       )}
     </AppLayout>

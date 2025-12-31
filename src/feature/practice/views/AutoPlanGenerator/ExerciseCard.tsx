@@ -12,6 +12,8 @@ import {
   FaClock,
   FaRandom,
   FaTrash,
+  FaYoutube,
+  FaVideo
 } from "react-icons/fa";
 
 interface ExerciseCardProps {
@@ -70,10 +72,22 @@ export const ExerciseCard = ({
           </div>
         </div>
 
-        <div className='mb-2 text-xs sm:text-sm'>
+        <div className='mb-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm'>
           <span className='inline-block rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-800'>
             {exercise.category}
           </span>
+          {exercise.isPlayalong && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider">
+               <FaYoutube className="h-2.5 w-2.5" />
+               Playalong
+            </span>
+          )}
+          {exercise.videoUrl && !exercise.isPlayalong && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700 text-[10px] font-bold uppercase tracking-wider">
+               <FaVideo className="h-2.5 w-2.5" />
+               Video
+            </span>
+          )}
         </div>
 
         {exercise.description && (

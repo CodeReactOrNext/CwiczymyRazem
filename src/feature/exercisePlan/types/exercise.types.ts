@@ -29,6 +29,12 @@ export interface Exercise {
   videoUrl?: string | null;
   imageUrl?: string | null;
   spotifyId?: string;
+  youtubeVideoId?: string;
+  isPlayalong?: boolean;
+  links?: {
+    label: string;
+    url: string;
+  }[];
 }
 
 export interface ExercisePlan {
