@@ -7,18 +7,19 @@ import {
   AccordionTrigger,
 } from "assets/components/ui/accordion";
 import { Button } from "assets/components/ui/button";
-import { Card } from "assets/components/ui/card";
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { useRouter } from "next/router";
 import { i18n } from "next-i18next";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { FaInfoCircle, FaLightbulb, FaCheck, FaStepForward } from "react-icons/fa";
+import { FaInfoCircle, FaLightbulb, FaCheck, FaStepForward, FaFacebook, FaInstagram, FaTwitter, FaHeart, FaExternalLinkAlt } from "react-icons/fa";
+import { Loader2 } from "lucide-react";
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
 import { Metronome } from "../../components/Metronome/Metronome";
+import { YouTubePlayalong } from "../../components/YouTubePlayalong";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import type {
   ExercisePlan,
@@ -32,10 +33,12 @@ import { useImageHandling } from "./hooks/useImageHandling";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
 import ImageModal from "./modals/ImageModal";
 import SessionModal from "./modals/SessionModal";
+import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
   onFinish: () => void;
+  isFinishing?: boolean;
 }
 
 const headerGradients = {
@@ -44,9 +47,10 @@ const headerGradients = {
   creativity: "from-purple-500/10 to-pink-500/5",
   hearing: "from-orange-500/10 to-amber-500/5",
   mixed: "from-red-500/10 to-yellow-500/5",
+  playalong: "from-red-600/20 via-zinc-950/10 to-zinc-950/5",
 };
 
-export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
+export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSessionProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const currentLang = i18n?.language as keyof LocalizedContent;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -72,9 +76,21 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
     timeLeft,
     toggleTimer,
     startTimer,
+    stopTimer,
     resetTimer,
     showSuccessView,
     resetSuccessView,
+    setVideoDuration,
+    setTimerTime,
+    autoSubmitReport,
+    isSubmittingReport,
+    reportResult,
+    currentUserStats,
+    previousUserStats,
+    planTitleString,
+    sessionTimerData,
+    exerciseTimeSpent,
+    jumpToExercise
   } = usePracticeSessionState({ plan, onFinish });
 
   const {
@@ -85,16 +101,50 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
     resetImagePosition,
   } = useImageHandling();
 
+  // Keyboard Navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        // Ignore if focus is in an input or similar (though not many here)
+        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+        if (e.key === "ArrowRight") {
+            if (!isLastExercise) {
+                handleNextExercise(resetTimer);
+            } else {
+                // optional: finish session
+            }
+        } 
+        if (e.key === "ArrowLeft") {
+            if (currentExerciseIndex > 0) {
+                jumpToExercise(currentExerciseIndex - 1);
+            }
+        }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLastExercise, currentExerciseIndex, handleNextExercise, jumpToExercise, resetTimer]);
+
   const category = currentExercise.category || "mixed";
-  const headerGradientClass =
-    headerGradients[category as keyof typeof headerGradients];
 
   return (
     <>
-      {showSuccessView && (
+      {reportResult && currentUserStats && previousUserStats && (
+        <div className="fixed inset-0 z-[1000] overflow-y-auto bg-zinc-950">
+          <RatingPopUp
+            ratingData={reportResult}
+            currentUserStats={currentUserStats}
+            previousUserStats={previousUserStats}
+            skillPointsGained={reportResult.skillPointsGained}
+            onClick={() => router.push("/dashboard")}
+          />
+        </div>
+      )}
+
+      {showSuccessView && !reportResult && (
         <ExerciseSuccessView
-          planTitle={plan.title as string}
-          onFinish={onFinish}
+          planTitle={planTitleString}
+          onFinish={autoSubmitReport}
           onRestart={() => {
             resetSuccessView();
             resetTimer();
@@ -115,7 +165,7 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
           <SessionModal
             isOpen={isFullSessionModalOpen}
             onClose={() => router.push("/report")}
-            onFinish={onFinish}
+            onFinish={isLastExercise ? autoSubmitReport : onFinish}
             onImageClick={() => setIsImageModalOpen(true)}
             isMounted={isMounted}
             currentExercise={currentExercise}
@@ -128,6 +178,12 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
             formattedTimeLeft={formattedTimeLeft}
             toggleTimer={toggleTimer}
             handleNextExercise={() => handleNextExercise(resetTimer)}
+            sessionTimerData={sessionTimerData}
+            exerciseTimeSpent={exerciseTimeSpent}
+            setVideoDuration={setVideoDuration}
+            setTimerTime={setTimerTime}
+            startTimer={startTimer}
+            stopTimer={stopTimer}
           />
         </>
       )}
@@ -142,7 +198,8 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
           category === "theory" && "bg-emerald-500",
           category === "creativity" && "bg-purple-500",
           category === "hearing" && "bg-orange-500",
-          category === "mixed" && "bg-cyan-500"
+          category === "mixed" && "bg-cyan-500",
+          currentExercise.isPlayalong && "bg-red-600 opacity-30 blur-[150px]"
         )} />
         <div className={cn(
           "absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-10 transition-all duration-1000",
@@ -156,75 +213,85 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
         <TooltipProvider>
           <ExerciseLayout
             title={plan.title}
-            actions={
-              <Button
-                variant='ghost'
-                size='sm'
-                onClick={onFinish}
-                className='radius-premium border border-white/5 bg-zinc-900/50 px-4 text-xs font-medium text-zinc-400 backdrop-blur-md transition-background click-behavior hover:border-white/20 hover:bg-white/10 hover:text-white'>
-                {t("common:finish")}
-              </Button>
-            }
             showBreadcrumbs={false}
             className="border-b border-white/5 bg-zinc-950/20 backdrop-blur-md sticky top-0 z-50">
             
             <div className='mx-auto max-w-6xl px-6 pb-64 pt-4 relative z-10'>
               
                {/* 1. Progress Bar (Top) */}
-               <div className="mb-12">
+               <div className="mb-8">
                    <ExerciseProgress
                         plan={plan}
                         currentExerciseIndex={currentExerciseIndex}
                         formattedTimeLeft={formattedTimeLeft}
+                        onExerciseSelect={jumpToExercise}
                    />
                </div>
 
                {/* 2. Hero Section (Image & Title) - "Zen Focus" */}
-               <div className="mb-12 mt-8 flex flex-col items-center justify-center text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/5 bg-white/5 mb-4 backdrop-blur-sm">
-                        <div className={cn("h-1.5 w-1.5 rounded-full", 
-                           category === "technique" && "bg-blue-400",
-                           category === "theory" && "bg-emerald-400",
-                           category === "creativity" && "bg-purple-400",
-                           category === "hearing" && "bg-orange-400",
-                           category === "mixed" && "bg-cyan-400"
-                        )} />
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
-                            {category}
-                        </span>
-                    </div>
-                    <h2 className="mb-8 text-4xl font-bold text-white tracking-tight sm:text-5xl">
+               <div className={cn(
+                 "flex flex-col items-center justify-center text-center",
+                 currentExercise.isPlayalong ? "mb-6 mt-0" : "mb-12 mt-8"
+               )}>
+                    <h2 className={cn(
+                      "font-bold text-white tracking-tight flex flex-wrap items-center justify-center gap-3 mb-8",
+                      currentExercise.isPlayalong ? "text-2xl sm:text-3xl" : "text-4xl sm:text-5xl"
+                    )}>
+                        {currentExercise.isPlayalong && (
+                           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/20 bg-red-500/10 backdrop-blur-sm">
+                              <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+                              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
+                                  Playalong
+                              </span>
+                           </div>
+                        )}
                         {currentExercise.title[currentLang]}
                     </h2>
                     
-                    <div className="relative w-full overflow-hidden radius-premium border border-white/10 bg-zinc-900 shadow-2xl glass-card">
-                         {currentExercise.videoUrl ? (
+                    <div className={cn(
+                      "relative w-full overflow-hidden radius-premium bg-zinc-900 shadow-2xl",
+                      currentExercise.isPlayalong ? "" : "border border-white/10 glass-card"
+                    )}>
+                         {currentExercise.isPlayalong && currentExercise.youtubeVideoId ? (
+                             !isMobileView && (
+                                <YouTubePlayalong
+                                    videoId={currentExercise.youtubeVideoId}
+                                    isPlaying={isPlaying}
+                                    onEnd={() => handleNextExercise(resetTimer)}
+                                    onReady={(duration) => setVideoDuration(duration)}
+                                    onSeek={(time) => setTimerTime(time * 1000)}
+                                    onStateChange={(state) => {
+                                        if (state === 1) startTimer();
+                                        if (state === 2) stopTimer();
+                                    }}
+                                />
+                             )
+                         ) : currentExercise.videoUrl ? (
                             <div className="aspect-video w-full">
                                 {(() => {
-                                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-                                    const match = currentExercise.videoUrl.match(regExp);
-                                    const videoId = match && match[2].length === 11 ? match[2] : null;
+                                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&?]*).*/;
+                                    const match = currentExercise.videoUrl?.match(regExp);
+                                    const videoId = (match && match[2].length === 11) ? match[2] : null;
 
                                     if (videoId) {
                                         return (
                                             <iframe
-                                                width="100%"
-                                                height="100%"
-                                                src={`https://www.youtube.com/embed/${videoId}`}
+                                                className="h-full w-full"
+                                                src={`https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1`}
                                                 title="YouTube video player"
                                                 frameBorder="0"
                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                                 allowFullScreen
-                                            />
+                                            ></iframe>
                                         );
                                     }
-                                    return <div className="flex h-full items-center justify-center text-zinc-500">Invalid YouTube URL</div>;
+                                    return <div className="flex h-full items-center justify-center bg-zinc-800 text-zinc-500">Video not available</div>;
                                 })()}
                             </div>
-                         ) : (currentExercise.imageUrl || currentExercise.image) ? (
-                            <ExerciseImage
-                                image={(currentExercise.imageUrl || currentExercise.image)!}
-                                title={currentExercise.title[currentLang]}
+                         ) : (
+                            <ExerciseImage 
+                                image={currentExercise.imageUrl || currentExercise.image || ""} 
+                                title={currentExercise.title[currentLang] as string} 
                                 isMobileView={isMobileView}
                                 imageScale={imageScale}
                                 containerRef={containerRef}
@@ -234,47 +301,50 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                                 resetImagePosition={resetImagePosition}
                                 setImageScale={setImageScale}
                             />
-                        ) : null}
+                         )}
                     </div>
                </div>
 
-               {/* 3. Collapsible Details (Tips & Instructions) - Hidden by default for Zen */}
-               <div className="mb-12">
-                    <Accordion type="single" collapsible className="w-full space-y-4">
-                        <AccordionItem value="instructions" className="border-b-0">
-                             <div className="radius-premium border border-white/5 bg-zinc-900/30 px-4 glass-card">
-                                <AccordionTrigger className="hover:no-underline py-4">
-                                    <div className="flex items-center gap-3 text-zinc-400">
-                                        <FaInfoCircle />
-                                        <span>{t("exercises:instructions")}</span>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
+                     <div className="lg:col-span-8 space-y-8">
+                         <Accordion type="single" collapsible defaultValue="instructions" className="w-full space-y-4">
+                            <AccordionItem value="instructions" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                                <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
+                                            <FaInfoCircle />
+                                        </div>
+                                        <span className="font-bold tracking-wide">{t("exercises:instructions")}</span>
                                     </div>
                                 </AccordionTrigger>
-                                <AccordionContent className="pb-4 pt-2 text-zinc-300 leading-relaxed">
-                                     <ul className="list-inside list-disc space-y-2">
-                                        {currentExercise.instructions?.length > 0 ? (
-                                            currentExercise.instructions.map((instruction, idx) => (
-                                                <li key={idx} className="marker:text-zinc-600">
-                                                    {instruction[currentLang] || instruction.pl}
-                                                </li>
-                                            ))
-                                        ) : (
-                                            <p className="text-zinc-500 italic">{t("exercises:no_instructions")}</p>
-                                        )}
-                                     </ul>
+                                <AccordionContent className="px-6 pb-6 pt-2">
+                                     <div className={cn(
+                                       "prose prose-invert max-w-none",
+                                       currentExercise.isPlayalong ? "text-sm leading-relaxed opacity-70" : ""
+                                     )}>
+                                        {currentExercise.instructions.map((instruction, idx) => (
+                                            <p key={idx} className="mb-4 last:mb-0">
+                                                {instruction[currentLang]}
+                                            </p>
+                                        ))}
+                                     </div>
                                 </AccordionContent>
-                             </div>
-                        </AccordionItem>
+                            </AccordionItem>
 
-                         <AccordionItem value="tips" className="border-b-0">
-                            <div className="radius-premium border border-amber-500/20 bg-amber-500/5 px-4 glass-card">
-                                <AccordionTrigger className="hover:no-underline py-4">
-                                    <div className="flex items-center gap-3 text-amber-500/80">
-                                        <FaLightbulb />
-                                        <span>{t("exercises:hints")}</span>
+                            <AccordionItem value="tips" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                                <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
+                                            <FaLightbulb />
+                                        </div>
+                                        <span className="font-bold tracking-wide">{t("exercises:hints")}</span>
                                     </div>
                                 </AccordionTrigger>
-                                <AccordionContent className="pb-4 pt-2 text-zinc-300 leading-relaxed">
-                                    <ul className="list-inside list-disc space-y-2">
+                                <AccordionContent className="px-6 pb-6 pt-2">
+                                     <ul className={cn(
+                                       "list-inside list-disc",
+                                       currentExercise.isPlayalong ? "space-y-1 text-sm" : "space-y-2"
+                                     )}>
                                         {currentExercise.tips?.length > 0 && (
                                             currentExercise.tips.map((tip, idx) => (
                                                 <li key={idx} className="marker:text-amber-500/50">
@@ -284,15 +354,63 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                                         )}
                                      </ul>
                                 </AccordionContent>
-                            </div>
-                        </AccordionItem>
-                    </Accordion>
-               </div>
+                            </AccordionItem>
+                         </Accordion>
+                     </div>
 
-                {/* 4. Unified Control Deck (Full Width Sticky Footer) */}
-               <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
-                    <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
-                                                  {/* Left: Tools (Metronome & Spotify) */}
+                     <div className="lg:col-span-4 space-y-6">
+                        {currentExercise.metronomeSpeed && (
+                             <div className="radius-premium bg-zinc-900/40 border border-white/5 p-6 backdrop-blur-sm">
+                                 <Metronome
+                                     initialBpm={currentExercise.metronomeSpeed.recommended}
+                                     minBpm={currentExercise.metronomeSpeed.min}
+                                     maxBpm={currentExercise.metronomeSpeed.max}
+                                     recommendedBpm={currentExercise.metronomeSpeed.recommended}
+                                 />
+                             </div>
+                        )}
+
+                        {currentExercise.links && currentExercise.links.length > 0 && (
+                            <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-6 backdrop-blur-sm space-y-4">
+                                <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
+                                    <FaHeart className="animate-pulse" />
+                                    <span>Support Bazok</span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    {currentExercise.links.map((link, idx) => {
+                                        let Icon = FaExternalLinkAlt;
+                                        if (link.url.includes("facebook")) Icon = FaFacebook;
+                                        if (link.url.includes("instagram")) Icon = FaInstagram;
+                                        if (link.url.includes("twitter") || link.url.includes("x.com")) Icon = FaTwitter;
+                                        if (link.url.includes("patreon")) Icon = FaHeart;
+
+                                        return (
+                                            <a 
+                                                key={idx}
+                                                href={link.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-between group px-4 py-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-sm"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    <Icon className={cn(
+                                                        "h-4 w-4",
+                                                        link.url.includes("patreon") ? "text-red-500" : "text-zinc-400 group-hover:text-white"
+                                                    )} />
+                                                    <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
+                                                </div>
+                                                <FaExternalLinkAlt className="h-3 w-3 text-zinc-600 group-hover:text-zinc-400" />
+                                            </a>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                     </div>
+                </div>
+
+                <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
+                     <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
                           <div className="flex-1 hidden xl:flex items-center justify-start gap-4">
                               {currentExercise.metronomeSpeed && (
                                  <div className="scale-90 origin-left">
@@ -304,59 +422,59 @@ export const PracticeSession = ({ plan, onFinish }: PracticeSessionProps) => {
                                      />
                                  </div>
                               )}
-                              {currentExercise.spotifyId && (
-                                <div className="w-[300px] flex flex-col gap-2 animate-in fade-in slide-in-from-left-4 duration-500">
-                                    <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
-                                    <div className="flex items-center gap-2 px-2">
-                                        <div className="h-1 w-1 rounded-full bg-emerald-500" />
-                                        <p className="text-[9px] text-zinc-500 font-medium">
-                                            Log in to <a href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/20">Spotify.com</a> for full playback.
-                                        </p>
-                                    </div>
-                                </div>
-                              )}
                           </div>
 
-                         {/* Center: Timer & Playback Controls Group */}
-                         <div className="flex-none flex justify-center">
-                            <MainTimerSection
-                                exerciseKey={exerciseKey}
-                                currentExercise={currentExercise}
-                                isLastExercise={isLastExercise}
-                                isPlaying={isPlaying}
-                                timerProgressValue={timerProgressValue}
-                                formattedTimeLeft={formattedTimeLeft}
-                                toggleTimer={toggleTimer}
-                                timeLeft={timeLeft}
-                                handleNextExercise={() => handleNextExercise(resetTimer)}
-                                showExerciseInfo={false}
-                                variant="compact"
-                            />
-                         </div>
+                          <div className="flex-none flex justify-center">
+                             <MainTimerSection
+                                 exerciseKey={exerciseKey}
+                                 currentExercise={currentExercise}
+                                 isLastExercise={isLastExercise}
+                                 isPlaying={isPlaying}
+                                 timerProgressValue={timerProgressValue}
+                                 formattedTimeLeft={formattedTimeLeft}
+                                 toggleTimer={toggleTimer}
+                                 timeLeft={timeLeft}
+                                 handleNextExercise={() => handleNextExercise(resetTimer)}
+                                 showExerciseInfo={false}
+                                 variant="compact"
+                                 sessionTimerData={sessionTimerData}
+                                 exerciseTimeSpent={exerciseTimeSpent}
+                             />
+                          </div>
 
-                         {/* Right: Main Action Button */}
-                         <div className="flex-1 flex justify-end items-center">
-                            <Button
-                                size="lg"
-                                className={cn(
-                                "h-14 min-w-[200px] px-8 radius-premium font-black text-xs tracking-[0.2em] transition-all click-behavior uppercase",
-                                isLastExercise 
-                                    ? "bg-cyan-500 text-black shadow-xl shadow-cyan-500/20 hover:bg-cyan-400" 
-                                    : "bg-white text-black shadow-xl shadow-white/10 hover:bg-zinc-200"
-                                )}
-                                onClick={() => handleNextExercise(resetTimer)}
-                            >
-                                {isLastExercise ? (
-                                    <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
-                                ) : (
-                                    <span className="flex items-center gap-2">{t("common:next_step")} <FaStepForward /></span>
-                                )}
-                            </Button>
-                         </div>
-                    </div>
-               </div>
+                          <div className="flex-1 flex justify-end items-center">
+                             <Button
+                                 size="lg"
+                                 className={cn(
+                                 "h-14 min-w-[200px] px-8 radius-premium font-black text-xs tracking-[0.2em] transition-all click-behavior uppercase",
+                                 isLastExercise 
+                                     ? "bg-cyan-500 text-black shadow-xl shadow-cyan-500/20 hover:bg-cyan-400" 
+                                     : "bg-white text-black shadow-xl shadow-white/10 hover:bg-zinc-200"
+                                 )}
+                                 onClick={() => {
+                                  if (isLastExercise) {
+                                    autoSubmitReport();
+                                  } else {
+                                    handleNextExercise(resetTimer);
+                                  }
+                                }}
+                                disabled={isFinishing || isSubmittingReport}
+                             >
+                                 {(isFinishing || isSubmittingReport) ? (
+                                     <div className="flex items-center gap-2">
+                                         <Loader2 className="h-4 w-4 animate-spin" />
+                                         <span>Saving...</span>
+                                     </div>
+                                 ) : isLastExercise ? (
+                                     <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
+                                 ) : (
+                                     <span className="flex items-center gap-2">{t("common:next_step")} <FaStepForward /></span>
+                                 )}
+                             </Button>
+                          </div>
+                     </div>
+                </div>
 
-               {/* Complete Dialog */}
                 <ExerciseCompleteDialog
                 isOpen={showCompleteDialog}
                 onClose={() => {

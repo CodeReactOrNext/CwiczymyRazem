@@ -12,7 +12,9 @@ import {
   FaMusic, 
   FaLayerGroup,
   FaTrashAlt,
-  FaEdit
+  FaEdit,
+  FaYoutube,
+  FaVideo
 } from "react-icons/fa";
 
 import type { DifficultyLevel, ExercisePlan } from "../types/exercise.types";
@@ -24,6 +26,7 @@ interface PlanCardProps {
   onDelete?: () => void;
   onEdit?: () => void;
   startButtonText?: string;
+  isLoading?: boolean;
 }
 
 const categoryStyles = {
@@ -62,6 +65,13 @@ const categoryStyles = {
     text: "text-red-500",
     badge: "bg-red-500/10 text-red-200 border-red-500/20",
   },
+  playalong: {
+    gradient: "from-red-600/20 via-zinc-950/60 to-zinc-950",
+    border: "border-red-500/40",
+    icon: FaYoutube,
+    text: "text-red-500",
+    badge: "bg-red-600 text-white border-red-500/30 font-bold",
+  }
 };
 
 export const PlanCard = ({
@@ -71,6 +81,7 @@ export const PlanCard = ({
   onDelete,
   onEdit,
   startButtonText,
+  isLoading
 }: PlanCardProps) => {
   const { t, i18n } = useTranslation(["exercises", "common"]);
 
@@ -93,8 +104,11 @@ export const PlanCard = ({
   const difficulty = ((plan as any).difficulty || "beginner") as
     | DifficultyLevel
     | "beginner";
+  
+  const hasPlayalong = plan.exercises.some(ex => ex.isPlayalong || ex.youtubeVideoId);
+  const hasVideo = plan.exercises.some(ex => ex.videoUrl && !ex.youtubeVideoId);
 
-  const style = categoryStyles[plan.category] || categoryStyles.mixed;
+  const style = hasPlayalong ? categoryStyles.playalong : (categoryStyles[plan.category as keyof typeof categoryStyles] || categoryStyles.mixed);
   const Icon = style.icon;
 
   return (
@@ -102,19 +116,34 @@ export const PlanCard = ({
       className={cn(
         "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-xl p-4 glass-card radius-premium click-behavior",
         style.border,
-        style.gradient
+        style.gradient,
+        hasPlayalong && "shadow-[0_0_20px_-3px_rgba(239,68,68,0.3)] border-red-500/30 ring-1 ring-red-500/10",
+        isLoading && "opacity-80 pointer-events-none"
       )}
       onClick={onSelect}>
       
       {/* Header: Category Icon & Badges */}
       <div className="mb-3 flex items-start justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
             <div className={`flex h-7 w-7 items-center justify-center rounded-lg border bg-zinc-950/50 shadow-sm ${style.border}`}>
                 <Icon className={`h-3.5 w-3.5 ${style.text}`} />
             </div>
             <Badge variant="secondary" className={`capitalize tracking-wide px-2 py-0.5 text-[10px] ${style.badge}`}>
                 {t(`exercises:categories.${plan.category}` as any)}
             </Badge>
+            
+            {hasPlayalong && (
+                <Badge className="bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30 text-[9px] h-5 px-2 font-bold uppercase tracking-wider">
+                    <FaYoutube className="mr-1.5 h-2.5 w-2.5" />
+                    Playalong
+                </Badge>
+            )}
+            {hasVideo && (
+                <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/30 text-[9px] h-5 px-2 font-bold uppercase tracking-wider">
+                    <FaVideo className="mr-1.5 h-2.5 w-2.5" />
+                    Video
+                </Badge>
+            )}
         </div>
         <div className="flex items-center gap-2">
             {(onEdit || onDelete) && (
@@ -178,9 +207,19 @@ export const PlanCard = ({
                 e.stopPropagation();
                 onStart();
             }}
+            disabled={isLoading}
            >
-            {startButtonText || t("common:start")} 
-            <FaPlay className="ml-2 h-2 w-2" />
+            {isLoading ? (
+                <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Postępowanie...</span>
+                </div>
+            ) : (
+                <>
+                    {startButtonText || t("common:start")} 
+                    <FaPlay className="ml-2 h-2 w-2" />
+                </>
+            )}
            </Button>
         )}
       </div>

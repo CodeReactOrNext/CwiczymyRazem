@@ -43,7 +43,16 @@ export default function PracticePage() {
     );
   }
 
+  const [isFinishing, setIsFinishing] = useState(false);
+
   return (
-    <PracticeSession plan={plan} onFinish={() => router.push("/report")} />
+    <PracticeSession 
+      plan={plan} 
+      onFinish={() => {
+        setIsFinishing(true);
+        router.push("/report");
+      }} 
+      isFinishing={isFinishing}
+    />
   );
 }

@@ -17,6 +17,8 @@ const TimerPlans: NextPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
   const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
   const userAuth = useAppSelector(selectUserAuth);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadCustomPlans = async () => {
@@ -52,12 +54,16 @@ const TimerPlans: NextPage = () => {
     const allPlans = [...defaultPlans, ...customPlans];
     const plan = allPlans.find((p) => p.id === planId);
     if (plan) {
-      setSelectedPlan(plan);
+      setLoadingPlanId(planId);
+      setTimeout(() => {
+        setSelectedPlan(plan);
+        setLoadingPlanId(null);
+      }, 500);
     }
   };
 
   const handlePlanFinish = () => {
-    setSelectedPlan(null);
+    setIsFinishing(true);
     router.push("/report");
   };
 
@@ -65,10 +71,10 @@ const TimerPlans: NextPage = () => {
     <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
       {selectedPlan ? (
         <MainContainer>
-          <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} />
+          <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
         </MainContainer>
       ) : (
-        <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} />
+        <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />
       )}
     </AppLayout>
   );
@@ -78,5 +84,5 @@ export default TimerPlans;
 
 export const getServerSideProps = withAuth({
   redirectIfUnauthenticated: "/login",
-  translations: ["common", "timer", "toast", "exercises"],
+  translations: ["common", "timer", "toast", "exercises", "rating_popup"],
 });

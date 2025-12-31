@@ -1,40 +1,52 @@
-import { updateTimerTime } from 'feature/user/store/userSlice';
-import useTimer from 'hooks/useTimer';
-import { useCallback, useEffect } from 'react';
+import { increaseTimerTime } from 'feature/user/store/userSlice';
+import type { useTimerInterface } from 'hooks/useTimer';
+import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from 'store/hooks';
 import type { SkillsType } from 'types/skillsTypes';
 
-export const useTimeTracking = (currentExercise: any) => {
+export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) => {
   const dispatch = useAppDispatch();
-  const timer = useTimer();
-  
-  const updateTime = useCallback(() => {
-    const timeInMs = timer.time;
-    if (timeInMs > 0) {
-      const skillType = currentExercise.category as SkillsType;
+  const lastTickRef = useRef<number | null>(null);
+  const [exerciseTimeSpent, setExerciseTimeSpent] = useState(0);
 
-      dispatch(
-        updateTimerTime({
-          type: skillType,
-          time: timeInMs,
-        })
-      );
+  // Reset exercise-specific time when the exercise changes
+  useEffect(() => {
+    setExerciseTimeSpent(0);
+    lastTickRef.current = null;
+  }, [currentExercise.id]);
+
+  useEffect(() => {
+    if (!timer.timerEnabled) {
+      lastTickRef.current = null;
+      return;
     }
-  }, [currentExercise.category, dispatch, timer.time]);
 
-  useEffect(() => {
-    timer.startTimer();
-    
-    return () => {
-      updateTime();
-      timer.stopTimer();
-    };
-  }, []);
+    // Initialize the tick if it's the first time the timer starts
+    if (lastTickRef.current === null) {
+      lastTickRef.current = Date.now();
+    }
 
-  useEffect(() => {
-    if (!timer.timerEnabled) return;
-    updateTime();
-  }, [timer.time, timer.timerEnabled, updateTime]);
-  
-  return { updateTime };
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const delta = now - (lastTickRef.current || now);
+
+      if (delta >= 1000) {
+        const skillType = currentExercise.category as SkillsType;
+
+        dispatch(
+          increaseTimerTime({
+            type: skillType,
+            time: delta,
+          })
+        );
+
+        setExerciseTimeSpent(prev => prev + delta);
+        lastTickRef.current = now;
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timer.timerEnabled, currentExercise.category, currentExercise.id, dispatch]);
+
+  return { exerciseTimeSpent };
 }; 
