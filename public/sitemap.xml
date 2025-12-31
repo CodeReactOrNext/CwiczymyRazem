@@ -8,19 +8,12 @@
     <priority>1.0</priority>
   </url>
 
-  <!-- Login -->
-  <url>
-    <loc>https://riff.quest/login</loc>
-    <lastmod>2025-12-19</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
 
-  <!-- Signup -->
+  <!-- Practice Habits -->
   <url>
-    <loc>https://riff.quest/signup</loc>
-    <lastmod>2025-12-19</lastmod>
+    <loc>https://riff.quest/practice-habits</loc>
+    <lastmod>2025-12-31</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.8</priority>
   </url>
 </urlset>
