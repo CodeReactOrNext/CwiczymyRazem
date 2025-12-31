@@ -57,13 +57,13 @@ export default function GuitarPracticeStreakChallengePage() {
               30-Day Guitar Practice Streak Challenge
             </h1>
             <p className="text-xl text-zinc-400 leading-relaxed">
-              Want to practice guitar consistently without turning it into a second job? This system helps you show up daily and build momentum.
+              30 days. 10 minutes daily. Build a guitar habit that sticks.
             </p>
           </header>
 
           <div className="prose prose-invert prose-lg max-w-none">
             <p>
-              It's not a "learn this riff" plan. It's a habit loop you can repeat every day:
+              This is a habit-building challenge, not a riff tutorial. Here's the loop:
             </p>
             <p className="text-center font-mono text-sm bg-zinc-900 p-4 rounded border border-white/10 my-8">
               Timer/Auto → Finish & Report → XP → Streak → Activity/Progress
@@ -93,7 +93,7 @@ export default function GuitarPracticeStreakChallengePage() {
             </div>
 
             <h2 className="text-2xl font-bold text-white mt-16 mb-4">The Rules</h2>
-            <p>The rules are intentionally boring. That's why they work.</p>
+            <p>The rules are simple. That's why they work.</p>
             <ul className="space-y-2 my-6">
               <li>Practice daily for 30 days</li>
               <li>10–20 minutes minimum (don't raise the minimum)</li>

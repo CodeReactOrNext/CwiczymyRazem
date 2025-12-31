@@ -26,10 +26,10 @@ export default function PracticeHabitsPage() {
   return (
     <>
       <Head>
-        <title>How to Build Daily Guitar Practice Habits & Track Progress | Riff Quest</title>
+        <title>Daily Guitar Practice Habits: Build Consistency & Track Your Progress</title>
         <meta 
           name="description" 
-          content="Master daily guitar practice habits with science-backed strategies. Learn progress tracking techniques, habit formation, and practical tips for consistent guitar practice." 
+          content="Build unbreakable guitar practice habits in 21 days. Learn the simple 3-step system that makes daily practice automatic—no willpower required." 
         />
         <link rel="canonical" href="https://riff.quest/practice-habits" />
         <meta property="og:title" content="How to Build Daily Guitar Practice Habits & Track Progress" />
@@ -73,7 +73,7 @@ export default function PracticeHabitsPage() {
               <li>Practice feels too big</li>
             </ul>
             <p>
-              The solution isn't more discipline. It's building a practice habit that's <strong className="text-white">small enough to start</strong>, <strong className="text-white">clear enough to repeat</strong>, and <strong className="text-white">measurable enough to feel rewarding</strong>.
+              The fix? Build a practice habit that's <strong className="text-white">small enough to start</strong>, <strong className="text-white">clear enough to repeat</strong>, and <strong className="text-white">easy to track</strong>.
             </p>
 
             {/* Key Stats */}
@@ -94,7 +94,7 @@ export default function PracticeHabitsPage() {
 
             <h2 className="text-2xl font-bold text-white mt-16 mb-4">The Science of Habit Formation</h2>
             <p>
-              Habits aren't built by intensity—they're built by repetition in a stable context. Research shows that automaticity grows gradually: early repetitions matter a lot, then gains slow as the behavior becomes more "default."
+              Habits form through repetition, not intensity. The first few reps matter most—afterward, the behavior starts running on autopilot.
             </p>
             
             <h3 className="text-lg font-bold text-white mt-8 mb-3">Key Takeaways:</h3>
@@ -163,7 +163,7 @@ export default function PracticeHabitsPage() {
             </div>
 
             <h2 className="text-2xl font-bold text-white mt-16 mb-4">How Riff Quest Helps</h2>
-            <p>Riff Quest is built around the idea that the best practice habit is one you can sustain—and that sustainability comes from clarity + tracking + motivation.</p>
+            <p>Riff Quest makes tracking simple: you see what you practiced, how long, and whether you showed up. Check out our <Link href="/guitar-practice-tracker" className="text-cyan-400 hover:text-cyan-300 underline">practice tracker guide</Link> for more details.</p>
 
             <div className="my-8 space-y-6">
               <div className="border-l-2 border-cyan-500/50 pl-6">
