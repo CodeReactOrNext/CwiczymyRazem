@@ -14,11 +14,13 @@ import { PlanSetup } from "./PlanSetup";
 interface AutoPlanGeneratorProps {
   onBack: () => void;
   onSelectPlan?: (plan: ExercisePlan) => void;
+  isStarting?: boolean;
 }
 
 export const AutoPlanGenerator = ({
   onBack,
   onSelectPlan,
+  isStarting
 }: AutoPlanGeneratorProps) => {
   const [time, setTime] = useState(30);
   const [selectedCategories, setSelectedCategories] = useState<ExerciseCategory[]>([]);
@@ -54,10 +56,6 @@ export const AutoPlanGenerator = ({
 
       if (totalTime >= time * 0.9) break;
     }
-
-    // If no exercises found (e.g. strict filters), just return to avoid crash or empty plan if unwanted
-    // But better to generate an empty plan or handle it. 
-    // For now, let's keep the logic even if empty, the user will see 0 exercises.
 
     const categoryCount: Record<string, number> = {};
     selectedExercises.forEach((exercise) => {
@@ -159,10 +157,6 @@ export const AutoPlanGenerator = ({
   const replaceExercise = (index: number) => {
     if (!generatedPlan) return;
 
-    // Filter available exercises based on current filters too? 
-    // Ideally yes, but maybe user wants to swap with anything. 
-    // Let's stick to filters if possible, or all if too restrictive.
-    // For now, let's use all aggregate to allow variety when replacing manually.
     const availableExercises = exercisesAgregat.filter(
       (e) => !generatedPlan.exercises.some((ge) => ge.id === e.id)
     );
@@ -196,6 +190,7 @@ export const AutoPlanGenerator = ({
         onMoveExerciseDown={moveExerciseDown}
         onReplaceExercise={replaceExercise}
         onRemoveExercise={removeExercise}
+        isStarting={isStarting}
       />
     );
   }

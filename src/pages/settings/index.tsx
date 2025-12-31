@@ -4,16 +4,22 @@ import { useTranslation } from "react-i18next";
 import AppLayout from "layouts/AppLayout";
 import { withAuth } from "utils/auth/serverAuth";
 
-const Settings: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const Settings: NextPageWithLayout = () => {
   const { t } = useTranslation("settings");
 
+  return <SettingsView />;
+};
 
+Settings.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout
       pageId={null}
-      subtitle={t("settings_subtilte")}
+      subtitle="Settings"
       variant='secondary'>
-      <SettingsView />
+      {page}
     </AppLayout>
   );
 };

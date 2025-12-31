@@ -16,7 +16,9 @@ import {
   FaBrain, 
   FaMusic, 
   FaLayerGroup,
-  FaArrowRight
+  FaArrowRight,
+  FaYoutube,
+  FaVideo
 } from "react-icons/fa";
 
 interface ExerciseCardProps {
@@ -93,6 +95,18 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                 <Badge variant="secondary" className={`capitalize tracking-wide ${style.badge}`}>
                     {t(`exercises:categories.${exercise.category}` as any)}
                 </Badge>
+                {exercise.isPlayalong && (
+                  <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 flex items-center gap-1.5 px-2 py-0.5 text-[10px] h-5">
+                    <FaYoutube className="h-3 w-3" />
+                    PLAYALONG
+                  </Badge>
+                )}
+                {exercise.videoUrl && !exercise.isPlayalong && (
+                  <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 flex items-center gap-1.5 px-2 py-0.5 text-[10px] h-5">
+                    <FaVideo className="h-3 w-3" />
+                    VIDEO
+                  </Badge>
+                )}
             </div>
             <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                  {t(`exercises:difficulty.${exercise.difficulty}` as any)}

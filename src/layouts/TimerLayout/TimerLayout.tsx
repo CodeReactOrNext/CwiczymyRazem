@@ -9,7 +9,7 @@ import MainContainer from "components/MainContainer";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import type { useTimerInterface } from "hooks/useTimer";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { MdAccessTime } from "react-icons/md";
@@ -30,6 +30,7 @@ interface TimerLayoutProps {
   timerSubmitHandler: () => void;
   choseSkillHandler: (chosenSkill: SkillsType) => void;
   onBack: () => void;
+  isFinishing?: boolean;
 }
 
 // Komponent łączący animowaną tarczę z pierścieniami umiejętności
@@ -282,6 +283,7 @@ const TimerLayout = ({
   chosenSkill,
   choseSkillHandler,
   onBack,
+  isFinishing
 }: TimerLayoutProps) => {
   const { t } = useTranslation("timer");
   const { time, startTimer, stopTimer, timerEnabled } = timer;
@@ -415,11 +417,22 @@ const TimerLayout = ({
           <div className='flex justify-center py-2'>
             <Button
               onClick={timerSubmitHandler}
-              className='px-6 py-2.5 text-sm sm:px-8 sm:py-3 sm:text-base'
+              className='px-6 py-2.5 text-sm sm:px-8 sm:py-3 sm:text-base min-w-[140px]'
               variant='default'
-              size='lg'>
-              {t("end_button")}
-              <ArrowRight />
+              size='lg'
+              disabled={isFinishing}
+            >
+              {isFinishing ? (
+                  <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Saving...</span>
+                  </div>
+              ) : (
+                  <>
+                    {t("end_button")}
+                    <ArrowRight />
+                  </>
+              )}
             </Button>
           </div>
           {(!userStats || userStats.points > 0) && <BeginnerMsg />}

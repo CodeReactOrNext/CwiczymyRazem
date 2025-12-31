@@ -17,7 +17,10 @@ import { toast } from "sonner";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 
-const SongPracticeTimer: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const SongPracticeTimer: NextPageWithLayout = () => {
     const router = useRouter();
     const { songId } = router.query;
     
@@ -113,16 +116,14 @@ const SongPracticeTimer: NextPage = () => {
 
     if (isLoading || !song) {
          return (
-             <AppLayout pageId="exercise" subtitle="Loading..." variant="secondary">
-                 <div className="flex h-screen items-center justify-center">
-                     <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-cyan-500" />
-                 </div>
-             </AppLayout>
+             <div className="flex h-screen items-center justify-center">
+                 <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-cyan-500" />
+             </div>
          );
     }
 
     return (
-        <AppLayout pageId="exercise" subtitle="Practice Song" variant="secondary">
+        <>
             <SongTimerLayout
                 timer={timer}
                 timerData={timerData}
@@ -138,8 +139,16 @@ const SongPracticeTimer: NextPage = () => {
                 onConfirm={handleConfirmSplit}
                 onCancel={() => setIsSplitterOpen(false)}
             />
-        </AppLayout>
+        </>
     );
+};
+
+SongPracticeTimer.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <AppLayout pageId="exercise" subtitle="Practice Song" variant="secondary">
+      {page}
+    </AppLayout>
+  );
 };
 
 export default SongPracticeTimer;

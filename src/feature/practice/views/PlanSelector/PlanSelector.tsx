@@ -13,6 +13,7 @@ import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExerc
 interface PlanSelectorProps {
   onBack: () => void;
   onSelectPlan?: (planId: string) => void;
+  loadingPlanId?: string | null;
 }
 
 const item = {
@@ -20,7 +21,7 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
-export const PlanSelector = ({ onBack, onSelectPlan }: PlanSelectorProps) => {
+export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelectorProps) => {
   const { t, i18n } = useTranslation(["exercises", "common"]);
   const currentLang = i18n.language as keyof LocalizedContent;
   const userAuth = useAppSelector(selectUserAuth);
@@ -90,6 +91,7 @@ export const PlanSelector = ({ onBack, onSelectPlan }: PlanSelectorProps) => {
                       onSelect={() => handleStartPlan(plan.id)}
                       onStart={() => handleStartPlan(plan.id)}
                       startButtonText={t("common:start")}
+                      isLoading={loadingPlanId === plan.id}
                     />
                   ))}
                 </motion.div>
@@ -112,6 +114,7 @@ export const PlanSelector = ({ onBack, onSelectPlan }: PlanSelectorProps) => {
                     onSelect={() => handleStartPlan(plan.id)}
                     onStart={() => handleStartPlan(plan.id)}
                     startButtonText={t("common:start")}
+                    isLoading={loadingPlanId === plan.id}
                   />
                 ))}
               </motion.div>

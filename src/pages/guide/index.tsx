@@ -3,10 +3,17 @@ import { NextPage } from "next";
 import AppLayout from "layouts/AppLayout";
 import { withAuth } from "utils/auth/serverAuth";
 
-const GuidePage: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const GuidePage: NextPageWithLayout = () => {
+  return <GuideView />;
+};
+
+GuidePage.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout pageId={"guide"} subtitle="App Guide" variant="secondary">
-      <GuideView />
+      {page}
     </AppLayout>
   );
 };

@@ -6,7 +6,10 @@ import Head from "next/head";
 import { withAuth } from "utils/auth/serverAuth";
 import AppLayout from "layouts/AppLayout";
 
-const SeasonsPage: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const SeasonsPage: NextPageWithLayout = () => {
   const siteUrl = "https://riff.quest/seasons";
 
   return (
@@ -14,13 +17,19 @@ const SeasonsPage: NextPage = () => {
       <Head>
         <link rel='canonical' href={siteUrl} />
       </Head>
-      <AppLayout
-        pageId={"seasons"}
-        subtitle='Seasons'
-        variant='secondary'>
-        <LeadboardView defaultView='seasonal' />
-      </AppLayout>
+      <LeadboardView defaultView='seasonal' />
     </>
+  );
+};
+
+SeasonsPage.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <AppLayout
+      pageId={"seasons"}
+      subtitle='Seasons'
+      variant='secondary'>
+      {page}
+    </AppLayout>
   );
 };
 

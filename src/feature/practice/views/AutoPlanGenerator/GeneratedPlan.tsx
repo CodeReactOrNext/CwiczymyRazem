@@ -18,6 +18,7 @@ interface GeneratedPlanProps {
   onMoveExerciseDown: (index: number) => void;
   onReplaceExercise: (index: number) => void;
   onRemoveExercise: (index: number) => void;
+  isStarting?: boolean;
 }
 
 export const GeneratedPlan = ({
@@ -29,9 +30,9 @@ export const GeneratedPlan = ({
   onMoveExerciseDown,
   onReplaceExercise,
   onRemoveExercise,
+  isStarting
 }: GeneratedPlanProps) => {
   const { t } = useTranslation(["exercises", "common"]);
-  /* Removed currentLang setup */
 
   const getLocalizedText = (content: LocalizedContent | string): string => {
     if (typeof content === "string") return content;
@@ -46,17 +47,28 @@ export const GeneratedPlan = ({
         </h1>
 
         <div className='flex flex-wrap gap-2'>
-          <Button variant='outline' onClick={onBack}>
+          <Button variant='outline' onClick={onBack} disabled={isStarting}>
             {t("common:back")}
           </Button>
-          <Button variant='secondary' onClick={onRegenerate}>
+          <Button variant='secondary' onClick={onRegenerate} disabled={isStarting}>
             Regenerate
           </Button>
           <Button
             onClick={() => onStart(plan)}
-            className='ml-auto bg-primary hover:bg-primary/90'>
-            <FaPlay className='mr-2 h-3.5 w-3.5' />
-            {t("common:start")}
+            className='ml-auto bg-primary hover:bg-primary/90'
+            disabled={isStarting}
+          >
+            {isStarting ? (
+                <div className="flex items-center gap-2">
+                    <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Loading...</span>
+                </div>
+            ) : (
+                <>
+                    <FaPlay className='mr-2 h-3.5 w-3.5' />
+                    {t("common:start")}
+                </>
+            )}
           </Button>
         </div>
       </div>
@@ -89,9 +101,20 @@ export const GeneratedPlan = ({
             onClick={() => onStart(plan)}
             className='w-full shadow-md'
             size='lg'
-            variant='default'>
-            <FaPlay className='mr-2 h-4 w-4' />
-            {t("common:start")}
+            variant='default'
+            disabled={isStarting}
+          >
+            {isStarting ? (
+                <div className="flex items-center gap-2">
+                    <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Loading...</span>
+                </div>
+            ) : (
+                <>
+                    <FaPlay className='mr-2 h-4 w-4' />
+                    {t("common:start")}
+                </>
+            )}
           </Button>
         </div>
       </Card>

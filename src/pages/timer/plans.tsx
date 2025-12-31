@@ -12,11 +12,16 @@ import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 
-const TimerPlans: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const TimerPlans: NextPageWithLayout = () => {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
   const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
   const userAuth = useAppSelector(selectUserAuth);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadCustomPlans = async () => {
@@ -52,24 +57,32 @@ const TimerPlans: NextPage = () => {
     const allPlans = [...defaultPlans, ...customPlans];
     const plan = allPlans.find((p) => p.id === planId);
     if (plan) {
-      setSelectedPlan(plan);
+      setLoadingPlanId(planId);
+      setTimeout(() => {
+        setSelectedPlan(plan);
+        setLoadingPlanId(null);
+      }, 500);
     }
   };
 
   const handlePlanFinish = () => {
-    setSelectedPlan(null);
+    setIsFinishing(true);
     router.push("/report");
   };
 
+  return selectedPlan ? (
+    <MainContainer>
+      <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
+    </MainContainer>
+  ) : (
+    <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />
+  );
+};
+
+TimerPlans.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
-      {selectedPlan ? (
-        <MainContainer>
-          <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} />
-        </MainContainer>
-      ) : (
-        <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} />
-      )}
+      {page}
     </AppLayout>
   );
 };
@@ -78,5 +91,5 @@ export default TimerPlans;
 
 export const getServerSideProps = withAuth({
   redirectIfUnauthenticated: "/login",
-  translations: ["common", "timer", "toast", "exercises"],
+  translations: ["common", "timer", "toast", "exercises", "rating_popup", ],
 });
