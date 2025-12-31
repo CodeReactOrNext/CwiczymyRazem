@@ -9,13 +9,20 @@ export const Footer = () => {
           <div className='mx-auto max-w-7xl px-6 lg:px-8'>
               {/* Logo & Social */}
               <div className='flex items-center justify-between'>
-                <Image
-                  src='/images/longlightlogo.svg'
-                  alt='Riff Quest'
-                  width={150}
-                  height={32}
-                  className='h-8 w-auto opacity-80 hover:opacity-100 transition-opacity'
-                />
+                <div className="flex items-center gap-8">
+                  <Image
+                    src='/images/longlightlogo.svg'
+                    alt='Riff Quest'
+                    width={150}
+                    height={32}
+                    className='h-8 w-auto opacity-80 hover:opacity-100 transition-opacity'
+                  />
+                  <nav className="hidden md:flex items-center gap-6">
+                    <Link href="/guide" className="text-sm text-zinc-500 hover:text-cyan-400 transition-colors">
+                      Guide
+                    </Link>
+                  </nav>
+                </div>
                 
                 <div className='flex items-center gap-6'>
                   <Link 
