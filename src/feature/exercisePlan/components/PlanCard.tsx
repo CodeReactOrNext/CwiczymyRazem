@@ -100,19 +100,19 @@ export const PlanCard = ({
   return (
     <Card
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-xl p-6 glass-card radius-premium click-behavior",
+        "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-xl p-4 glass-card radius-premium click-behavior",
         style.border,
         style.gradient
       )}
       onClick={onSelect}>
       
       {/* Header: Category Icon & Badges */}
-      <div className="mb-5 flex items-start justify-between">
+      <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-3">
-            <div className={`flex h-8 w-8 items-center justify-center rounded-lg border bg-zinc-950/50 shadow-sm ${style.border}`}>
-                <Icon className={`h-4 w-4 ${style.text}`} />
+            <div className={`flex h-7 w-7 items-center justify-center rounded-lg border bg-zinc-950/50 shadow-sm ${style.border}`}>
+                <Icon className={`h-3.5 w-3.5 ${style.text}`} />
             </div>
-            <Badge variant="secondary" className={`capitalize tracking-wide ${style.badge}`}>
+            <Badge variant="secondary" className={`capitalize tracking-wide px-2 py-0.5 text-[10px] ${style.badge}`}>
                 {t(`exercises:categories.${plan.category}` as any)}
             </Badge>
         </div>
@@ -123,42 +123,42 @@ export const PlanCard = ({
                         <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-white/10"
+                            className="h-7 w-7 text-zinc-400 hover:text-white hover:bg-white/10"
                             onClick={(e) => { e.stopPropagation(); onEdit(); }}
                         >
-                            <FaEdit className="h-3.5 w-3.5" />
+                            <FaEdit className="h-3 w-3" />
                         </Button>
                     )}
                     {onDelete && (
                         <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-zinc-400 hover:text-red-400 hover:bg-red-500/10"
+                            className="h-7 w-7 text-zinc-400 hover:text-red-400 hover:bg-red-500/10"
                             onClick={(e) => { e.stopPropagation(); onDelete(); }}
                         >
-                            <FaTrashAlt className="h-3.5 w-3.5" />
+                            <FaTrashAlt className="h-3 w-3" />
                         </Button>
                     )}
                 </div>
             )}
-            <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+            <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-[10px] h-5 px-2 font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
                 {t(`exercises:difficulty.${difficulty}` as any)}
             </Badge>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 space-y-3">
-        <h3 className="text-xl font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+      <div className="flex-1 space-y-1.5">
+        <h3 className="text-lg font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
             {title}
         </h3>
-        <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground/80">
+        <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground/80">
             {description}
         </p>
       </div>
 
       {/* Footer: Stats & Action */}
-      <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4">
+      <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
         <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                 <FaClock className="h-3.5 w-3.5" />
@@ -173,14 +173,14 @@ export const PlanCard = ({
         {onStart && (
            <Button 
             size="sm" 
-            className="h-9 px-4 text-xs font-semibold shadow-sm transition-all hover:scale-105"
+            className="h-8 px-3 text-xs font-semibold shadow-sm transition-all hover:scale-105"
             onClick={(e) => {
                 e.stopPropagation();
                 onStart();
             }}
            >
             {startButtonText || t("common:start")} 
-            <FaPlay className="ml-2 h-2.5 w-2.5" />
+            <FaPlay className="ml-2 h-2 w-2" />
            </Button>
         )}
       </div>
