@@ -44,8 +44,6 @@ const ProfileLandingLayout = ({
     queryKey: ['userSongs', userAuth],
     queryFn: () => getUserSongs(userAuth),
     enabled: !!userAuth,
-    staleTime: Infinity, 
-    gcTime: 1000 * 60 * 60 * 24, 
   });
   /* eslint-enable unused-imports/no-unused-vars */
 
