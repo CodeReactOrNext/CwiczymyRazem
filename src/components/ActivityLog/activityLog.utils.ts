@@ -26,21 +26,18 @@ export const formatDateKey = (year: number, month: number, day: number): string 
 export const processRawReports = (
   rawReports: FirebaseUserExceriseLog[]
 ): ReportListInterfaceWithTimeSumary[] => {
-  return rawReports.reduce((aggregatedReports, exerciseLog) => {
-    const reportDate = new Date(exerciseLog.reportDate.seconds * 1000);
+  const reportsMap: Record<string, ReportListInterfaceWithTimeSumary> = {};
 
-    const existingReportIndex = aggregatedReports.findIndex(
-      ({ date }: { date: Date }) => {
-        return (
-          reportDate.getFullYear() === date.getFullYear() &&
-          reportDate.getMonth() === date.getMonth() &&
-          reportDate.getDate() === date.getDate()
-        );
-      }
+  rawReports.forEach((exerciseLog) => {
+    const reportDate = new Date(exerciseLog.reportDate.seconds * 1000);
+    const dateKey = formatDateKey(
+      reportDate.getFullYear(),
+      reportDate.getMonth(),
+      reportDate.getDate()
     );
 
-    if (existingReportIndex !== -1) {
-      const existingReport = aggregatedReports[existingReportIndex];
+    if (reportsMap[dateKey]) {
+      const existingReport = reportsMap[dateKey];
 
       existingReport.points += exerciseLog.totalPoints;
       existingReport.totalTime += exerciseLog.bonusPoints.time;
@@ -73,19 +70,17 @@ export const processRawReports = (
           };
         }
       }
-
-      return aggregatedReports;
+    } else {
+      reportsMap[dateKey] = {
+        points: exerciseLog.totalPoints,
+        date: reportDate,
+        totalTime: exerciseLog.bonusPoints.time,
+        isDateBackReport: exerciseLog.isDateBackReport,
+        exceriseTitle: exerciseLog.exceriseTitle,
+        timeSumary: exerciseLog.timeSumary,
+      };
     }
+  });
 
-    aggregatedReports.push({
-      points: exerciseLog.totalPoints,
-      date: reportDate,
-      totalTime: exerciseLog.bonusPoints.time,
-      isDateBackReport: exerciseLog.isDateBackReport,
-      exceriseTitle: exerciseLog.exceriseTitle,
-      timeSumary: exerciseLog.timeSumary,
-    });
-
-    return aggregatedReports;
-  }, [] as ReportListInterfaceWithTimeSumary[]);
+  return Object.values(reportsMap);
 }; 

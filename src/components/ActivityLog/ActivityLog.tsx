@@ -4,17 +4,27 @@ import { FaSpinner } from "react-icons/fa";
 
 import { Card } from "assets/components/ui/card";
 
-import type { DateWithReport } from "./activityLog.types";
+import type { DateWithReport, ReportListInterfaceWithTimeSumary } from "./activityLog.types";
 import { useActivityLog } from "./hooks/useActivityLog";
 import ActivityCalendarCanvas from "./components/ActivityCalendarCanvas";
 import ExerciseShortInfo from "./components/ExerciseShortInfo";
 
 const CALENDAR_HEIGHT = 7 * 19;
 
-const ActivityLog = ({ userAuth }: { userAuth: string }) => {
+export interface ActivityLogViewProps {
+  year: number;
+  setYear: (year: number) => void;
+  datasWithReports: DateWithReport[];
+  isLoading: boolean;
+}
+
+export const ActivityLogView = ({
+  year,
+  setYear,
+  datasWithReports,
+  isLoading,
+}: ActivityLogViewProps) => {
   const { t } = useTranslation("common");
-  const { reportList, year, setYear, datasWithReports, isLoading } =
-    useActivityLog(userAuth);
 
   const [hoveredItem, setHoveredItem] = useState<DateWithReport | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
@@ -38,52 +48,49 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
     yearButtons.push(y);
   }
 
-  if (isLoading ) {
+  if (isLoading) {
     return (
-      <div className="flex h-40 w-full items-center justify-center">
-        <FaSpinner className="animate-spin text-2xl text-second" />
+      <div className='flex h-40 w-full items-center justify-center'>
+        <FaSpinner className='animate-spin text-2xl text-second' />
       </div>
     );
   }
 
   return (
-    <Card className="relative w-full overflow-hidden rounded-xl">
-      <div className="relative">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-white">Activity</h3>
+    <Card className='relative w-full overflow-hidden rounded-xl'>
+      <div className='relative'>
+        <div className='mb-4 flex items-center justify-between'>
+          <h3 className='text-xl font-semibold text-white'>Activity</h3>
 
-          <div className="flex gap-1 rounded-lg bg-white/10 p-1">
+          <div className='flex gap-1 rounded-lg bg-white/10 p-1'>
             {yearButtons.map((yearValue) => (
               <button
                 key={`year-btn-${yearValue}`}
-                role="tab"
+                role='tab'
                 onClick={() => setYear(yearValue)}
                 className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                   year === yearValue
                     ? "bg-white/20 text-white"
                     : "text-white/70 hover:bg-white/10 hover:text-white"
-                }`}
-              >
+                }`}>
                 {yearValue}
               </button>
             ))}
           </div>
         </div>
 
-        <div className="flex items-start gap-3">
-          <div 
-            className="flex flex-col justify-between text-xs text-white/60 shrink-0" 
-            style={{ height: CALENDAR_HEIGHT, paddingTop: 2, paddingBottom: 2 }}
-          >
+        <div className='flex items-start gap-3'>
+          <div
+            className='flex shrink-0 flex-col justify-between text-xs text-white/60'
+            style={{ height: CALENDAR_HEIGHT, paddingTop: 2, paddingBottom: 2 }}>
             <span>{t("calendar.monday")}</span>
             <span>{t("calendar.thursday")}</span>
             <span>{t("calendar.sunday")}</span>
           </div>
 
-          <div 
-            className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20"
-            style={{ height: CALENDAR_HEIGHT + 8 }}
-          >
+          <div
+            className='flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20'
+            style={{ height: CALENDAR_HEIGHT + 8 }}>
             <ActivityCalendarCanvas
               datasWithReports={datasWithReports}
               onHover={handleHover}
@@ -91,44 +98,43 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-4 text-xs text-white/60">
-          <div className="flex items-center gap-2">
-            <div className="relative h-3 w-3 rounded bg-cyan-500">
-              <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white" />
+        <div className='mt-4 flex flex-wrap gap-4 text-xs text-white/60'>
+          <div className='flex items-center gap-2'>
+            <div className='relative h-3 w-3 rounded bg-cyan-500'>
+              <div className='absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white' />
             </div>
             <span>{t("calendar.hasTitle")}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="relative h-3 w-3 rounded bg-cyan-500">
-              <div className="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white" />
+          <div className='flex items-center gap-2'>
+            <div className='relative h-3 w-3 rounded bg-cyan-500'>
+              <div className='absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white' />
             </div>
             <span>{t("calendar.backDate")}</span>
           </div>
         </div>
-        
-        <div className="mt-4 flex w-full items-center justify-end gap-2 text-xs text-zinc-500">
-            <span>Less</span>
-            <div className="flex gap-1">
-              <div className="h-3 w-3 rounded-[3px] bg-[#3f3f46]" />
-              <div className="h-3 w-3 rounded-[3px] bg-[#A5F3FC]" />
-              <div className="h-3 w-3 rounded-[3px] bg-[#67E8F9]" />
-              <div className="h-3 w-3 rounded-[3px] bg-[#22D3EE]" />
-              <div className="h-3 w-3 rounded-[3px] bg-[#06B6D4]" />
-              <div className="h-3 w-3 rounded-[3px] bg-[#0891B2]" />
-            </div>
-            <span>More</span>
+
+        <div className='mt-4 flex w-full items-center justify-end gap-2 text-xs text-zinc-500'>
+          <span>Less</span>
+          <div className='flex gap-1'>
+            <div className='h-3 w-3 rounded-[3px] bg-[#3f3f46]' />
+            <div className='h-3 w-3 rounded-[3px] bg-[#A5F3FC]' />
+            <div className='h-3 w-3 rounded-[3px] bg-[#67E8F9]' />
+            <div className='h-3 w-3 rounded-[3px] bg-[#22D3EE]' />
+            <div className='h-3 w-3 rounded-[3px] bg-[#06B6D4]' />
+            <div className='h-3 w-3 rounded-[3px] bg-[#0891B2]' />
+          </div>
+          <span>More</span>
         </div>
       </div>
 
       {hoveredItem?.report && (
         <div
-          className="pointer-events-none fixed z-50 rounded-lg border border-white/10 bg-neutral-900/95 p-3 shadow-xl backdrop-blur-sm"
+          className='pointer-events-none fixed z-50 rounded-lg border border-white/10 bg-neutral-900/95 p-3 shadow-xl backdrop-blur-sm'
           style={{
             left: tooltipPosition.x,
             top: tooltipPosition.y - 16,
             transform: "translateX(-50%) translateY(-100%)",
-          }}
-        >
+          }}>
           <ExerciseShortInfo
             date={hoveredItem.date}
             report={hoveredItem.report}
@@ -137,6 +143,12 @@ const ActivityLog = ({ userAuth }: { userAuth: string }) => {
       )}
     </Card>
   );
+};
+
+const ActivityLog = ({ userAuth }: { userAuth: string }) => {
+  const activityLogData = useActivityLog(userAuth);
+
+  return <ActivityLogView {...activityLogData} />;
 };
 
 export default ActivityLog;

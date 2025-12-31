@@ -53,14 +53,21 @@
       "wrappers/*": [
         "./src/wrappers/*"
       ]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "src/**/*",
     "tailwind.config.js",
     "next-env.d.ts",
     "next-i18next.config.js",
-    "**/*.ts"
+    "**/*.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

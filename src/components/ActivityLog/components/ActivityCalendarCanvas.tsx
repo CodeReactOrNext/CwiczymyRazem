@@ -67,12 +67,13 @@ const ActivityCalendarCanvas = ({
   onHover,
 }: ActivityCalendarCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const highlightRef = useRef<HTMLDivElement>(null);
 
   const cols = Math.ceil(datasWithReports.length / 7);
   const canvasWidth = cols * CELL_SIZE;
   const canvasHeight = 7 * CELL_SIZE;
 
+  // Draw static content only when data changes
   const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -81,11 +82,14 @@ const ActivityCalendarCanvas = ({
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = canvasWidth * dpr;
-    canvas.height = canvasHeight * dpr;
-    ctx.scale(dpr, dpr);
-
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    // Minimize resizing thrashing by checking if size changed
+    if (canvas.width !== canvasWidth * dpr || canvas.height !== canvasHeight * dpr) {
+      canvas.width = canvasWidth * dpr;
+      canvas.height = canvasHeight * dpr;
+      ctx.scale(dpr, dpr);
+    } else {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    }
 
     datasWithReports.forEach((item, index) => {
       const col = Math.floor(index / 7);
@@ -111,31 +115,20 @@ const ActivityCalendarCanvas = ({
           ctx.fill();
         }
       }
-
-      if (hoveredIndex === index && item) {
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
-        ctx.lineWidth = 2;
-        drawRoundedRect(ctx, x, y, SQUARE_SIZE, SQUARE_SIZE, BORDER_RADIUS);
-        ctx.stroke();
-      }
     });
-  }, [datasWithReports, hoveredIndex, canvasWidth, canvasHeight]);
+  }, [datasWithReports, canvasWidth, canvasHeight]);
 
   useEffect(() => {
     drawCanvas();
   }, [drawCanvas]);
 
   const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvasWidth / rect.width;
-      const scaleY = canvasHeight / rect.height;
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const scrollLeft = e.currentTarget.scrollLeft;
       
-      const mouseX = (e.clientX - rect.left) * scaleX;
-      const mouseY = (e.clientY - rect.top) * scaleY;
+      const mouseX = e.clientX - rect.left + scrollLeft;
+      const mouseY = e.clientY - rect.top;
 
       const col = Math.floor(mouseX / CELL_SIZE);
       const row = Math.floor(mouseY / CELL_SIZE);
@@ -148,33 +141,51 @@ const ActivityCalendarCanvas = ({
         if (index >= 0 && index < datasWithReports.length) {
           const item = datasWithReports[index];
           if (item) {
-            setHoveredIndex(index);
+             // Move highlight without React render
+             if (highlightRef.current) {
+               highlightRef.current.style.opacity = "1";
+               highlightRef.current.style.transform = `translate(${col * CELL_SIZE}px, ${row * CELL_SIZE}px)`;
+             }
             onHover(item, e.clientX, e.clientY);
             return;
           }
         }
       }
 
-      setHoveredIndex(null);
+      if (highlightRef.current) highlightRef.current.style.opacity = "0";
       onHover(null, 0, 0);
     },
-    [datasWithReports, onHover, canvasWidth, canvasHeight]
+    [datasWithReports, onHover]
   );
 
   const handleMouseLeave = useCallback(() => {
-    setHoveredIndex(null);
+    if (highlightRef.current) highlightRef.current.style.opacity = "0";
     onHover(null, 0, 0);
   }, [onHover]);
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div 
+      className="relative cursor-pointer"
       style={{ width: canvasWidth, height: canvasHeight }}
-      className="cursor-pointer"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-    />
+    >
+      <canvas
+        ref={canvasRef}
+        style={{ width: canvasWidth, height: canvasHeight, display: 'block' }}
+      />
+      {/* Hardware accelerated highlight overlay */}
+      <div 
+        ref={highlightRef}
+        className="pointer-events-none absolute left-0 top-0 rounded-[3px] border-2 border-white/90 shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-opacity duration-150"
+        style={{
+          width: SQUARE_SIZE,
+          height: SQUARE_SIZE,
+          opacity: 0,
+          willChange: "transform, opacity"
+        }}
+      />
+    </div>
   );
 };
-
 export default memo(ActivityCalendarCanvas);

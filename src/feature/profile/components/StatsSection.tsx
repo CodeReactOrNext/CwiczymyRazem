@@ -18,7 +18,7 @@ import { getTrendData } from "../utils/getTrendData";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import ActivityLog from "components/ActivityLog/ActivityLog";
+import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import Link from "next/link";
 import { DailyRecommendation } from "feature/songs/components/DailyRecommendation/DailyRecommendation";
 import { DailyPlanRecommendation } from "feature/songs/components/DailyRecommendation/DailyPlanRecommendation";
@@ -48,6 +48,9 @@ interface StatsSectionProps {
     | undefined;
   achievements?: any[];
   onSongsChange?: () => void;
+  year: number;
+  setYear: (year: number) => void;
+  isLoadingActivity: boolean;
 }
 
 export const StatsSection = ({
@@ -58,6 +61,9 @@ export const StatsSection = ({
   userAuth,
   achievements,
   onSongsChange,
+  year,
+  setYear,
+  isLoadingActivity,
 }: StatsSectionProps) => {
   const { t } = useTranslation("profile");
   const { time } = statistics;
@@ -387,7 +393,12 @@ export const StatsSection = ({
         </div>
       </div>
 
-      <ActivityLog userAuth={userAuth as string} />
+      <ActivityLogView 
+        year={year}
+        setYear={setYear}
+        datasWithReports={datasWithReports}
+        isLoading={isLoadingActivity}
+      />
 
       <div className='space-y-2'>
         <SeasonalAchievements userId={userAuth} />
