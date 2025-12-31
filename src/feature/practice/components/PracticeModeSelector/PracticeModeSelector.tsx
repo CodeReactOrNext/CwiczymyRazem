@@ -159,7 +159,7 @@ export const PracticeModeSelector = ({
                     {loadingMode === mode.id ? (
                         <div className="flex items-center gap-2">
                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                           {t("common:loading_text" as any)}
+                          Loading...
                         </div>
                     ) : (
                         t("common:select" as any)
