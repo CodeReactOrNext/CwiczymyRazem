@@ -5,7 +5,10 @@ import { useState } from "react";
 import AppLayout from "layouts/AppLayout";
 import { withAuth } from "utils/auth/serverAuth";
 
-const Timer: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const Timer: NextPageWithLayout = () => {
   const router = useRouter();
   const [loadingMode, setLoadingMode] = useState<"timer" | "plan" | "auto" | "song" | null>(null);
 
@@ -30,8 +33,14 @@ const Timer: NextPage = () => {
   };
 
   return (
+    <PracticeModeSelector onSelectMode={handleModeSelect} loadingMode={loadingMode} />
+  );
+};
+
+Timer.getLayout = function getLayout(page: ReactElement) {
+  return (
     <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
-      <PracticeModeSelector onSelectMode={handleModeSelect} loadingMode={loadingMode} />
+      {page}
     </AppLayout>
   );
 };

@@ -12,7 +12,10 @@ import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 
-const TimerPlans: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const TimerPlans: NextPageWithLayout = () => {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlan | null>(null);
   const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
@@ -67,15 +70,19 @@ const TimerPlans: NextPage = () => {
     router.push("/report");
   };
 
+  return selectedPlan ? (
+    <MainContainer>
+      <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
+    </MainContainer>
+  ) : (
+    <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />
+  );
+};
+
+TimerPlans.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout pageId={"exercise"} subtitle='Timer' variant='secondary'>
-      {selectedPlan ? (
-        <MainContainer>
-          <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
-        </MainContainer>
-      ) : (
-        <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />
-      )}
+      {page}
     </AppLayout>
   );
 };

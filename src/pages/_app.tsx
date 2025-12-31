@@ -30,12 +30,16 @@ const teko = Teko({
 
 import useAuthSync from "hooks/useAuthSync";
 
+import type { AppPropsWithLayout } from "types/page";
+
 const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {
     useAuthSync();
     return <>{children}</>;
 }
 
-const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
+const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
+  const getLayout = Component.getLayout ?? ((page) => page);
+
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
@@ -81,7 +85,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppProps) =>
                   <Toaster theme='dark' position='top-right' />
                   <NextTopLoader color='#06b6d4' />
                   <div id='overlays'></div>
-                  <Component {...pageProps} />
+                  {getLayout(<Component {...pageProps} />)}
                </main>
             </AuthSyncWrapper>
             <ReactQueryDevtools initialIsOpen={false} />

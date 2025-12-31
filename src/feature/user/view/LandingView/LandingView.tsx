@@ -28,17 +28,12 @@ const LandingView = () => {
   }
 
   return (
-    <AppLayout
-      pageId={"profile"}
-      subtitle={t("profile")}
-      variant='secondary'>
-      <ProfileLandingLayout
-        statsField={getUserStatsField(userStats) as StatsFieldProps[]}
-        userStats={userStats}
-        featSlot={<LogsBoxView />}
-        userAuth={userAuth as string}
-      />
-    </AppLayout>
+    <ProfileLandingLayout
+      statsField={getUserStatsField(userStats) as StatsFieldProps[]}
+      userStats={userStats}
+      featSlot={<LogsBoxView />}
+      userAuth={userAuth as string}
+    />
   );
 };
 

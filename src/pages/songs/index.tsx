@@ -4,16 +4,22 @@ import { useTranslation } from "react-i18next";
 import { withAuth } from "utils/auth/serverAuth";
 import AppLayout from "layouts/AppLayout";
 
-const SongsPage: NextPage = () => {
+import { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+const SongsPage: NextPageWithLayout = () => {
   const { t } = useTranslation("songs");
 
+  return <SongsView />;
+};
 
+SongsPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout
       pageId={"songs"}
-      subtitle={t("subtitlebar_text")}
+      subtitle="Songs"
       variant='primary'>
-      <SongsView />
+      {page}
     </AppLayout>
   );
 };
