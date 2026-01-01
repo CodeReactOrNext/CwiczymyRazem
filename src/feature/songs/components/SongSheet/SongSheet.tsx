@@ -23,6 +23,7 @@ import {
   HelpCircle,
   Loader2
 } from "lucide-react";
+import { TierBadge } from "../SongsGrid/TierBadge";
 import { cn } from "assets/lib/utils";
 import { doc, getDoc, collection, query, where, getDocs, documentId } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -137,7 +138,10 @@ const SongSheet = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="right" className="w-full sm:max-w-md border-l border-white/5 bg-zinc-950 p-0 shadow-2xl overflow-hidden flex flex-col">
+      <SheetContent 
+        side="right" 
+        className="w-full sm:max-w-md border-l border-white/5 bg-zinc-950 p-0 shadow-2xl overflow-hidden flex flex-col [&>button]:z-[70] [&>button]:bg-black/50 [&>button]:backdrop-blur-md [&>button]:opacity-100 [&>button]:hover:bg-black/70 [&>button]:text-white [&>button]:transition-all [&>button]:border [&>button]:border-white/10 [&>button]:right-6 [&>button]:top-6"
+      >
         <div className="flex-1 overflow-y-auto no-scrollbar">
           {/* Hero Section with Cover */}
           <div className="relative aspect-video w-full overflow-hidden">
@@ -148,7 +152,8 @@ const SongSheet = ({
                   alt={song.title} 
                   className="h-full w-full object-cover" 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent" />
+                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent" />
               </>
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-zinc-900">
@@ -158,7 +163,7 @@ const SongSheet = ({
             
             <div className="absolute bottom-6 left-6 right-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <h2 className="text-2xl font-black tracking-tight text-white leading-tight drop-shadow-lg">
+                  <h2 className="text-2xl font-black tracking-tight text-white leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
                     {song.title}
                   </h2>
                   {song.isVerified && (
@@ -174,7 +179,7 @@ const SongSheet = ({
                     </TooltipProvider>
                   )}
                 </div>
-                <p className="text-lg font-bold text-zinc-400 drop-shadow-md">{song.artist}</p>
+                <p className="text-lg font-bold text-zinc-300 [text-shadow:0_2px_8px_rgba(0,0,0,0.8)]">{song.artist}</p>
                 
                 {/* Genres List */}
                 {song.genres && song.genres.length > 0 && (
@@ -188,16 +193,10 @@ const SongSheet = ({
                 )}
             </div>
 
-            <div 
-              className="absolute top-6 right-12 flex h-12 w-12 items-center justify-center rounded-2xl border-2 text-lg font-black shadow-2xl backdrop-blur-xl"
-              style={{
-                borderColor: `${tier.color}90`,
-                backgroundColor: `rgba(10, 10, 10, 0.6)`,
-                color: tier.color,
-              }}
-            >
-              {tier.tier}
-            </div>
+            <TierBadge 
+              song={song} 
+              className="absolute top-6 right-20 h-12 w-12 rounded-2xl border-2 text-lg"
+            />
           </div>
 
           <div className="p-6 space-y-8">
