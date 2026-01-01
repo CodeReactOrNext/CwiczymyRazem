@@ -1,6 +1,8 @@
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { FaClock, FaList, FaRandom } from "react-icons/fa";
+import { HelpCircle } from "lucide-react";
+import Link from "next/link";
 
 interface PracticeModeSelectorProps {
   onSelectMode: (mode: "timer" | "plan" | "auto" | "song") => void;
@@ -95,13 +97,26 @@ export const PracticeModeSelector = ({
     <div className='mb-6 w-full'>
       <div className='font-openSans container mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-8'>
         <div className='space-y-4 sm:space-y-8'>
-          <div className='text-center'>
+          <div className='flex flex-col items-center text-center'>
             <h1 className='text-xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl'>
               {t("timer:select_practice_mode")}
             </h1>
-            <p className='mt-1.5 text-sm text-gray-400 sm:mt-3 sm:text-lg'>
-              {t("timer:choose_practice_description")}
-            </p>
+            <div className='mt-2 sm:mt-4 flex flex-col items-center gap-3'>
+              <p className='text-sm text-gray-400 sm:text-lg'>
+                {t("timer:choose_practice_description")}
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="h-7 gap-1.5 px-2.5 bg-cyan-500/5 border-cyan-500/20 hover:bg-cyan-500/10 hover:border-cyan-500/40 text-cyan-400 transition-all rounded-md"
+              >
+                <Link href="/guide?tab=practice">
+                  <HelpCircle size={13} strokeWidth={2.5} />
+                  <span className="text-[10px] font-black uppercase tracking-wider">How it works</span>
+                </Link>
+              </Button>
+            </div>
           </div>
 
           <div className='flex flex-col gap-3 sm:gap-6 md:grid md:grid-cols-3'>
