@@ -92,7 +92,7 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
 
 
       if (rateSong.fulfilled.match(resultAction)) {
-        toast.success(isNewRating ? "+5 Points! Rating updated." : "Rating updated.");
+        toast.success(isNewRating ? "+15 Points! Rating updated." : "Rating updated.");
         ratingCooldowns.set(songId, Date.now());
 
         queryClient.setQueriesData({ queryKey: ['songs'] }, (oldData: any) => {

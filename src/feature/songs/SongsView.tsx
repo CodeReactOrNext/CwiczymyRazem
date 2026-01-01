@@ -39,6 +39,7 @@ import {
   Calendar,
   Home,
   Code,
+  HelpCircle,
 } from "lucide-react";
 import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
 import { useTranslation } from "react-i18next";
@@ -106,10 +107,22 @@ const SongsView = () => {
               <div className="space-y-6 animate-in fade-in-50 duration-300">
                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                   <div className="flex flex-col gap-2">
-                    <h2 className="text-lg font-bold tracking-tight text-white">{t("your_progress", "Your Progress")}</h2>
-                    <p className="text-sm text-zinc-400 max-w-2xl">
-                      {t("drag_and_drop_description", "Drag and drop songs to track your learning journey. Move items between columns to update their status.")}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                      <p className="text-sm text-zinc-400 max-w-2xl leading-relaxed">
+                        {t("drag_and_drop_description", "Drag and drop songs to track your learning journey. Move items between columns to update their status.")}
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        className="h-7 gap-1.5 px-2.5 bg-cyan-500/5 border-cyan-500/20 hover:bg-cyan-500/10 hover:border-cyan-500/40 text-cyan-400 transition-all rounded-md shrink-0"
+                      >
+                        <Link href="/guide?tab=songs">
+                          <HelpCircle size={13} strokeWidth={2.5} />
+                          <span className="text-[10px] font-black uppercase tracking-wider">How it works</span>
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
                   <Button 
                     variant="outline"

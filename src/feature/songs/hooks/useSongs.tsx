@@ -20,8 +20,8 @@ export const useSongs = () => {
   const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const [tierFilters, setTierFilters] = useState<string[]>([]);
   const [genreFilters, setGenreFilters] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<string>("title");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortBy, setSortBy] = useState<string>("popularity");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const currentUserId = useAppSelector(selectUserAuth);
@@ -92,8 +92,8 @@ export const useSongs = () => {
     setDifficultyFilter("all");
     setTierFilters([]);
     setGenreFilters([]);
-    setSortBy("title");
-    setSortDirection("asc");
+    setSortBy("popularity");
+    setSortDirection("desc");
     setTitleQuery("");
     setArtistQuery("");
   };
