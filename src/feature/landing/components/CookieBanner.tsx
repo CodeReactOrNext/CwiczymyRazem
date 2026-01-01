@@ -51,7 +51,7 @@ export const CookieBanner = () => {
             <div className="flex items-start gap-3 mb-3">
               <Cookie className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
               <p className="text-[11px] text-zinc-400 leading-relaxed">
-                {t("common:cookies.description") as string}
+                {t("cookies.description") as string}
               </p>
             </div>
             <Button
@@ -59,7 +59,7 @@ export const CookieBanner = () => {
               size="sm"
               className="w-full h-8 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-[11px] transition-all"
             >
-              {t("common:cookies.accept") as string}
+              {t("cookies.accept") as string}
             </Button>
           </div>
 
