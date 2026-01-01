@@ -1,0 +1,26 @@
+# Ćwiczymy Razem (Riff Quest)
+
+> A comprehensive guitar exercise tracker and community platform designed to help musicians build consistent practice habits, track progress, and compete in a gamified environment.
+
+## Key Features
+
+- **Practice Tracking**: Log your guitar practice sessions with dynamic metronomes and stopwatches.
+- **Gamification**: Earn XP, level up, and unlock achievements as you practice.
+- **Leaderboards**: Compare your progress with the community and stay motivated.
+- **Activity Calendar**: Visual GitHub-style representation of your practice consistency.
+- **Songs & Exercises**: Access a library of songs and exercises to work on.
+- **Personalized Stats**: Detailed breakdown of your practice history across different categories.
+
+## Main Content
+
+- [Home](https://riff.quest/) - The landing page and entry point to the platform.
+- [FAQ](https://riff.quest/faq) - Frequently asked questions about the platform and practice tracking.
+- [Guide](https://riff.quest/guide) - A step-by-step guide for new users to get started with Riff Quest.
+- [Practice Habits](https://riff.quest/practice-habits) - Comprehensive guide on building effective guitar practice habits.
+- [Guitar Practice Routine](https://riff.quest/guitar-practice-routine) - Expert advice on structuring your daily practice routine.
+- [Guitar Practice Tracker](https://riff.quest/guitar-practice-tracker) - Detailed information on how to use the Riff Quest tracking features.
+- [Streak Challenge](https://riff.quest/guitar-practice-streak-challenge) - Information about the guitar practice streak challenge and its benefits.
+
+## Technical Details
+
+- **Responsive Design**: Fully optimized for mobile and desktop devices.
