@@ -10,6 +10,7 @@ import {
   signInWithPopup,
   signInWithCredential,
   signOut,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import {
   collection,
@@ -73,6 +74,10 @@ export const firebaseCreateAccountWithEmail = (
 export const firebaseLogUserOut = async () => {
   await signOut(auth);
 };
+
+export const firebaseSendPasswordResetEmail = (email: string) =>
+  sendPasswordResetEmail(auth, email);
+
 
 
 

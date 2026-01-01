@@ -14,6 +14,8 @@ import { PricingSection } from "feature/landing/components/PricingSection";
 import { FaqSection } from "feature/landing/components/FaqSection";
 import { BlogSection } from "feature/landing/components/BlogSection";
 import { Footer } from "feature/landing/components/Footer";
+import { CookieBanner } from "feature/landing/components/CookieBanner";
+
 
 const LandingPage: NextPage = () => {
   const { t } = useTranslation(["common", "profile"]);
@@ -125,7 +127,9 @@ const LandingPage: NextPage = () => {
         <FaqSection questions={faqQuestions} />
         <BlogSection />
         <Footer />
+        <CookieBanner />
       </main>
+
     </>
   );
 };
