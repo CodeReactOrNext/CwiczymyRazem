@@ -162,11 +162,11 @@ const BonusPointsItem = ({
             <p className='flex items-center gap-2'>
               <span className='h-1.5 w-1.5 rounded-full bg-main-300 sm:h-2 sm:w-2'></span>
               <span className='font-bold text-white'>{actualDayWithoutBreak}</span>{" "}
-              {t("report:rating_popup.streak")}
+              streak
             </p>
             <p className='flex items-center gap-2'>
               <span className='h-1.5 w-1.5 rounded-full bg-main-300 sm:h-2 sm:w-2'></span>
-              {t("report:rating_popup.habitsWithCount", { count: habitsCount })}
+             you have adopted {habitsCount} healthy habit
             </p>
             <p className='flex items-center gap-2'>
               <span className='h-1.5 w-1.5 rounded-full bg-main-300 sm:h-2 sm:w-2'></span>
