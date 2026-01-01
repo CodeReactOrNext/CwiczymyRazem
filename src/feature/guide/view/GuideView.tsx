@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useRouter } from "next/router";
 import {
   BookOpen,
   Music,
@@ -76,6 +77,9 @@ const VideoPlayer = ({ src, title }: { src: string; title: string }) => (
 );
 
 const GuideView = () => {
+  const router = useRouter();
+  const defaultTab = (router.query.tab as string) || "practice";
+
   return (
     <div className="min-h-screen bg-transparent text-zinc-100 pb-20 pt-8 lg:pt-12 px-4 lg:px-0">
       <MainContainer>
@@ -99,7 +103,14 @@ const GuideView = () => {
           </div>
         </motion.div>
 
-        <Tabs defaultValue="practice" className="space-y-8">
+        <Tabs 
+          key={defaultTab}
+          defaultValue={defaultTab} 
+          onValueChange={(value) => {
+            router.push({ query: { ...router.query, tab: value } }, undefined, { shallow: true });
+          }}
+          className="space-y-8"
+        >
           <TabsList className="grid w-full grid-cols-3 bg-zinc-900/50 p-1 lg:w-[600px] border border-white/5">
             <TabsTrigger value="practice" className="gap-2 transition-all">
               <Zap size={14} />
