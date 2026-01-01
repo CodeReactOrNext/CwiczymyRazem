@@ -198,5 +198,10 @@
   "confirm_delete": "Czy na pewno chcesz usunąć ten plan?",
   "create": "Stwórz",
   "success": "Sukces",
-  "error": "Błąd"
+  "error": "Błąd",
+  "cookies": {
+    "title": "Pliki Cookies",
+    "description": "Używamy ciasteczek, aby zapewnić Ci najlepsze wrażenia na naszej stronie i analizować ruch.",
+    "accept": "Akceptuję"
+  }
 }
