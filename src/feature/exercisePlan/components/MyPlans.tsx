@@ -207,7 +207,7 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
           )}
         </div>
 
-        <div>
+        <div className="space-y-12">
           <div className='mb-6'>
             <h2 className='text-2xl font-semibold'>
               {t("exercises:my_plans.predefined_plans")}
@@ -217,17 +217,40 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
             </p>
           </div>
 
-          <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-            {defaultPlans.map((plan) => (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                onSelect={() => onPlanSelect(plan)}
-                onStart={() => onPlanSelect(plan)}
-              />
-            ))}
-          </div>
+          {(["easy", "medium", "hard"] as const).map((difficulty) => {
+            const difficultyPlans = defaultPlans.filter((p) => p.difficulty === difficulty);
+            if (difficultyPlans.length === 0) return null;
+
+            const difficultyColors = {
+              easy: "text-emerald-400 border-emerald-500/20 bg-emerald-500/5",
+              medium: "text-amber-400 border-amber-500/20 bg-amber-500/5",
+              hard: "text-red-400 border-red-500/20 bg-red-500/5",
+            };
+
+            return (
+              <div key={difficulty} className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className={`px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest ${difficultyColors[difficulty]}`}>
+                    {t(`exercises:difficulty.${difficulty}`)}
+                  </div>
+                  <div className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
+                </div>
+                
+                <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+                  {difficultyPlans.map((plan) => (
+                    <PlanCard
+                      key={plan.id}
+                      plan={plan}
+                      onSelect={() => onPlanSelect(plan)}
+                      onStart={() => onPlanSelect(plan)}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
+
       </div>
     </ExerciseLayout>
   );
