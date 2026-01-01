@@ -14,12 +14,14 @@ interface AppLayoutProps {
   pageId: NavPagesTypes;
   subtitle?: string; // Kept for compatibility, unused
   variant?: "primary" | "secondary" | "landing";
+  isPublic?: boolean;
 }
 
 const AppLayout = ({
   children,
   pageId,
   variant = "secondary",
+  isPublic = false,
 }: AppLayoutProps) => {
   const { t } = useTranslation("common");
   const { status } = useSession();
@@ -33,10 +35,10 @@ const AppLayout = ({
   const isAuthenticated = !!(userAuth && userStats && userName);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (status === "unauthenticated" && !isPublic) {
       router.push("/");
     }
-  }, [status, router]);
+  }, [status, router, isPublic]);
 
   const navigation: LandingNavObjectInterface = {
     leftSideLinks: [
@@ -60,10 +62,19 @@ const AppLayout = ({
     ],
   };
 
-  if (!isAuthenticated || status === "loading") {
-    // If unauthenticated, the useEffect will trigger redirect.
-    // Meanwhile, show loader to prevent content flash or crash.
-    // If status is "loading" (next-auth check), show loader.
+  if (status === "loading") {
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-zinc-950">
+             <PageLoadingLayout />
+        </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    if (isPublic) {
+      return <>{children}</>;
+    }
+    
     return (
         <div className="flex min-h-screen items-center justify-center bg-zinc-950">
              <PageLoadingLayout />
