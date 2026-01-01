@@ -12,6 +12,7 @@ import { HeroSection } from "feature/landing/components/HeroSection";
 import { FeaturesSection } from "feature/landing/components/FeaturesSection";
 import { PricingSection } from "feature/landing/components/PricingSection";
 import { FaqSection } from "feature/landing/components/FaqSection";
+import { BlogSection } from "feature/landing/components/BlogSection";
 import { Footer } from "feature/landing/components/Footer";
 
 const LandingPage: NextPage = () => {
@@ -122,6 +123,7 @@ const LandingPage: NextPage = () => {
         <FeaturesSection />
         <PricingSection />
         <FaqSection questions={faqQuestions} />
+        <BlogSection />
         <Footer />
       </main>
     </>
