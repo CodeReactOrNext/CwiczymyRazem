@@ -10,5 +10,9 @@
   "or_continue_with": "or continue with",
   "not_have_account": "Don't have an account yet?",
   "signup_link": "Sign up",
-  "submit_button": "Log in"
+  "submit_button": "Log in",
+  "forgot_password": "Forgot your password?",
+  "reset_password_success": "A password reset email has been sent. Please check your inbox.",
+  "reset_password_error": "An error occurred while sending the password reset email. Make sure the email address is correct.",
+  "enter_email_error": "Please enter your email address first."
 }
