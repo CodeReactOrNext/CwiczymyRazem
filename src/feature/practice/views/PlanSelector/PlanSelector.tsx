@@ -98,27 +98,51 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
               </div>
             )}
 
-            <div className="space-y-4">
-              {customPlans.length > 0 && (
+            <div className="space-y-12">
+              {(customPlans.length > 0) && (
                 <h2 className="text-xl font-semibold text-zinc-100">
                   {t("exercises:my_plans.predefined_plans")}
                 </h2>
               )}
-              <motion.div
-                variants={item}
-                className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-                {defaultPlans.map((plan) => (
-                  <PlanCard
-                    key={plan.id}
-                    plan={plan}
-                    onSelect={() => handleStartPlan(plan.id)}
-                    onStart={() => handleStartPlan(plan.id)}
-                    startButtonText={t("common:start")}
-                    isLoading={loadingPlanId === plan.id}
-                  />
-                ))}
-              </motion.div>
+              
+              {(["easy", "medium", "hard"] as const).map((difficulty) => {
+                const plans = defaultPlans.filter((p) => p.difficulty === difficulty);
+                if (plans.length === 0) return null;
+
+                const difficultyColors = {
+                  easy: "text-emerald-400 border-emerald-500/20 bg-emerald-500/5",
+                  medium: "text-amber-400 border-amber-500/20 bg-amber-500/5",
+                  hard: "text-red-400 border-red-500/20 bg-red-500/5",
+                };
+
+                return (
+                  <div key={difficulty} className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest ${difficultyColors[difficulty]}`}>
+                         {t(`exercises:difficulty.${difficulty}`)}
+                      </div>
+                      <div className="h-px flex-1 bg-gradient-to-r from-zinc-800 to-transparent" />
+                    </div>
+                    
+                    <motion.div
+                      variants={item}
+                      className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+                      {plans.map((plan) => (
+                        <PlanCard
+                          key={plan.id}
+                          plan={plan}
+                          onSelect={() => handleStartPlan(plan.id)}
+                          onStart={() => handleStartPlan(plan.id)}
+                          startButtonText={t("common:start")}
+                          isLoading={loadingPlanId === plan.id}
+                        />
+                      ))}
+                    </motion.div>
+                  </div>
+                );
+              })}
             </div>
+
           </>
         )}
       </motion.div>
