@@ -1,11 +1,11 @@
 import React from "react";
 import { Sparkles, Plus, Music, Star, Users, Check, Play, Info } from "lucide-react";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { getSongTier } from "feature/songs/utils/getSongTier";
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
+import { TierBadge } from "../SongsGrid/TierBadge";
 import { toast } from "sonner";
 
 interface DailyRecommendationProps {
@@ -26,8 +26,6 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
     onChange: () => {}, // Handled by onRefreshSongs
     onTableStatusChange: onRefreshSongs,
   });
-
-  const tier = getSongTier(song.avgDifficulty || 0);
 
   const handleAdd = async (status: SongStatus) => {
     setIsAdding(true);
@@ -63,12 +61,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
                   <Music className="h-10 w-10 text-zinc-700" />
                 </div>
               )}
-              <div 
-                className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-[10px] font-black backdrop-blur-md shadow-xl"
-                style={{ color: tier.color, backgroundColor: `${tier.color}20` }}
-              >
-                {tier.tier}
-              </div>
+                <TierBadge song={song} className="absolute top-2 right-2" />
             </div>
 
             <div className="space-y-1">
