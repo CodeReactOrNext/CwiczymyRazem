@@ -43,8 +43,17 @@ export const processRawReports = (
       existingReport.totalTime += exerciseLog.bonusPoints.time;
 
       if (existingReport.exceriseTitle) {
-        existingReport.exceriseTitle =
-          exerciseLog.exceriseTitle + "  " + existingReport.exceriseTitle;
+        exerciseLog.exceriseTitle + "  " + existingReport.exceriseTitle;
+      }
+
+      if (existingReport.activities) {
+        existingReport.activities.push({
+          title: exerciseLog.exceriseTitle,
+          planId: exerciseLog.planId ?? undefined,
+          points: exerciseLog.totalPoints,
+          time: exerciseLog.bonusPoints.time,
+          timeSumary: exerciseLog.timeSumary,
+        });
       }
 
       if (exerciseLog.timeSumary) {
@@ -79,6 +88,15 @@ export const processRawReports = (
         exceriseTitle: exerciseLog.exceriseTitle,
         timeSumary: exerciseLog.timeSumary,
         planId: exerciseLog.planId ?? undefined,
+        activities: [
+          {
+            title: exerciseLog.exceriseTitle,
+            planId: exerciseLog.planId ?? undefined,
+            points: exerciseLog.totalPoints,
+            time: exerciseLog.bonusPoints.time,
+            timeSumary: exerciseLog.timeSumary,
+          },
+        ],
       };
     }
   });

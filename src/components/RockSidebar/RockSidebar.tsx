@@ -447,7 +447,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                 <span>Grow Riff Quest</span>
               </button>
               <a
-                href='https://discord.gg/yRdT9T9F'
+                href='https://discord.gg/phQutKwK'
                 target='_blank'
                 rel='noopener noreferrer'
                 className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
@@ -744,7 +744,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                       <span>Grow Riff Quest</span>
                     </button>
                     <a
-                      href='https://discord.gg/yRdT9T9F'
+                      href='https://discord.gg/phQutKwK'
                       target='_blank'
                       rel='noopener noreferrer'
                       onClick={handleLinkClick}
