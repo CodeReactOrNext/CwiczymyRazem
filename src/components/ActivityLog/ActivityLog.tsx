@@ -1,10 +1,17 @@
 import { useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
 import { Card } from "assets/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "assets/components/ui/dialog";
 
-import type { DateWithReport, ReportListInterfaceWithTimeSumary } from "./activityLog.types";
+import type { DateWithReport } from "./activityLog.types";
 import { useActivityLog } from "./hooks/useActivityLog";
 import ActivityCalendarCanvas from "./components/ActivityCalendarCanvas";
 import ExerciseShortInfo from "./components/ExerciseShortInfo";
@@ -28,9 +35,13 @@ export const ActivityLogView = ({
 
   const [hoveredItem, setHoveredItem] = useState<DateWithReport | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [selectedDay, setSelectedDay] = useState<DateWithReport | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleHover = useCallback(
     (item: DateWithReport | null, x: number, y: number) => {
+      // Hide tooltip if modal is open to avoid clutter, or keep it.
+      // The boolean prop "sm:block hidden" on tooltip div handles mobile visibility.
       if (item?.report) {
         setHoveredItem(item);
         setTooltipPosition({ x, y });
@@ -40,6 +51,13 @@ export const ActivityLogView = ({
     },
     []
   );
+
+  const handleDayClick = useCallback((item: DateWithReport) => {
+    if (item.report) {
+      setSelectedDay(item);
+      setIsModalOpen(true);
+    }
+  }, []);
 
   const startYear = 2023;
   const currentYear = new Date().getFullYear();
@@ -94,6 +112,7 @@ export const ActivityLogView = ({
             <ActivityCalendarCanvas
               datasWithReports={datasWithReports}
               onHover={handleHover}
+              onClick={handleDayClick}
             />
           </div>
         </div>
@@ -127,20 +146,37 @@ export const ActivityLogView = ({
         </div>
       </div>
 
-      {hoveredItem?.report && (
-        <div
-          className='pointer-events-none fixed z-50 rounded-lg border border-white/10 bg-neutral-900/95 p-3 shadow-xl backdrop-blur-sm'
-          style={{
-            left: tooltipPosition.x,
-            top: tooltipPosition.y - 16,
-            transform: "translateX(-50%) translateY(-100%)",
-          }}>
-          <ExerciseShortInfo
-            date={hoveredItem.date}
-            report={hoveredItem.report}
-          />
-        </div>
-      )}
+      {hoveredItem?.report &&
+        createPortal(
+          <div
+            className='pointer-events-none fixed z-50 rounded-lg border border-white/10 bg-neutral-900/95 p-3 shadow-xl backdrop-blur-sm sm:block hidden'
+            style={{
+              left: tooltipPosition.x,
+              top: tooltipPosition.y - 16,
+              transform: "translateX(-50%) translateY(-100%)",
+            }}>
+            <ExerciseShortInfo
+              date={hoveredItem.date}
+              report={hoveredItem.report}
+            />
+          </div>,
+          document.body
+        )}
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="border-white/10 bg-neutral-900 text-white sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Activity Details</DialogTitle>
+          </DialogHeader>
+          {selectedDay?.report && (
+            <ExerciseShortInfo
+              date={selectedDay.date}
+              report={selectedDay.report}
+              isModal={true}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

@@ -4,14 +4,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
-import type { ReportListInterface } from "types/api.types";
+import type { ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 
 import CalendarSquare from "./CalendarSquare/CalendarSquare";
 import ExerciseShortInfo from "./ExerciseShortInfo";
 
 interface CalendarWrapperSquareProps {
   date: Date;
-  report: ReportListInterface | undefined;
+  report: ReportListInterfaceWithTimeSumary | undefined;
 }
 
 const CalendarWrapperSquare = ({

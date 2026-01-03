@@ -6,6 +6,7 @@ import type { DateWithReport } from "../activityLog.types";
 interface ActivityCalendarCanvasProps {
   datasWithReports: DateWithReport[];
   onHover: (item: DateWithReport | null, x: number, y: number) => void;
+  onClick: (item: DateWithReport) => void;
 }
 
 const SQUARE_SIZE = 14;
@@ -65,6 +66,7 @@ const drawRoundedRect = (
 const ActivityCalendarCanvas = ({
   datasWithReports,
   onHover,
+  onClick,
 }: ActivityCalendarCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
@@ -163,12 +165,40 @@ const ActivityCalendarCanvas = ({
     onHover(null, 0, 0);
   }, [onHover]);
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const scrollLeft = e.currentTarget.scrollLeft;
+      
+      const mouseX = e.clientX - rect.left + scrollLeft;
+      const mouseY = e.clientY - rect.top;
+
+      const col = Math.floor(mouseX / CELL_SIZE);
+      const row = Math.floor(mouseY / CELL_SIZE);
+
+      const localX = mouseX - col * CELL_SIZE;
+      const localY = mouseY - row * CELL_SIZE;
+
+      if (col >= 0 && row >= 0 && row < 7 && localX <= SQUARE_SIZE && localY <= SQUARE_SIZE) {
+        const index = col * 7 + row;
+        if (index >= 0 && index < datasWithReports.length) {
+          const item = datasWithReports[index];
+          if (item?.report) {
+            onClick(item);
+          }
+        }
+      }
+    },
+    [datasWithReports, onClick]
+  );
+
   return (
     <div 
       className="relative cursor-pointer"
       style={{ width: canvasWidth, height: canvasHeight }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
     >
       <canvas
         ref={canvasRef}
