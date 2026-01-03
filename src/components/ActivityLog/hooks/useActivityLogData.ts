@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import type { ReportListInterface } from "types/api.types";
 
-import type { DateWithReport } from "../activityLog.types";
+import type { DateWithReport, ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 import { formatDateKey, getEmptySlots } from "../activityLog.utils";
 
 export const useActivityLogData = (
-  reportList: ReportListInterface[] | null,
+  reportList: ReportListInterfaceWithTimeSumary[] | null,
   year: number
 ) => {
   const [activityData, setActivityData] = useState<DateWithReport[]>([]);
@@ -13,7 +12,7 @@ export const useActivityLogData = (
   useEffect(() => {
     if (!reportList) return;
 
-    const reportMap = new Map<string, ReportListInterface[]>();
+    const reportMap = new Map<string, ReportListInterfaceWithTimeSumary[]>();
     reportList.forEach((report) => {
       const reportDate = new Date(report.date);
       const key = reportDate.toISOString().split("T")[0];

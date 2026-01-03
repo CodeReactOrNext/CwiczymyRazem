@@ -26,7 +26,7 @@ export const Footer = () => {
                 
                 <div className='flex items-center gap-6'>
                   <Link 
-                    href='https://discord.gg/yRdT9T9F' 
+                    href='https://discord.gg/phQutKwK' 
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-zinc-600 hover:text-white transition-colors'
