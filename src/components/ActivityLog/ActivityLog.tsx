@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
@@ -145,20 +146,22 @@ export const ActivityLogView = ({
         </div>
       </div>
 
-      {hoveredItem?.report && (
-        <div
-          className='pointer-events-none fixed z-50 rounded-lg border border-white/10 bg-neutral-900/95 p-3 shadow-xl backdrop-blur-sm sm:block hidden'
-          style={{
-            left: tooltipPosition.x,
-            top: tooltipPosition.y - 16,
-            transform: "translateX(-50%) translateY(-100%)",
-          }}>
-          <ExerciseShortInfo
-            date={hoveredItem.date}
-            report={hoveredItem.report}
-          />
-        </div>
-      )}
+      {hoveredItem?.report &&
+        createPortal(
+          <div
+            className='pointer-events-none fixed z-50 rounded-lg border border-white/10 bg-neutral-900/95 p-3 shadow-xl backdrop-blur-sm sm:block hidden'
+            style={{
+              left: tooltipPosition.x,
+              top: tooltipPosition.y - 16,
+              transform: "translateX(-50%) translateY(-100%)",
+            }}>
+            <ExerciseShortInfo
+              date={hoveredItem.date}
+              report={hoveredItem.report}
+            />
+          </div>,
+          document.body
+        )}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="border-white/10 bg-neutral-900 text-white sm:max-w-[425px]">
