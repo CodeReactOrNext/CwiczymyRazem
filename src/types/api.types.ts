@@ -94,7 +94,7 @@ export interface StatisticsDataInterface {
       [key: string]: number;
     };
   };
-  activeChallenge?: ActiveChallenge | null;
+  activeChallenges?: ActiveChallenge[] | null;
   dailyQuest?: DailyQuest | null;
   completedChallenges?: string[];
 }

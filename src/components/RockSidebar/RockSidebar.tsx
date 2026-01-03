@@ -79,39 +79,40 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
   // Get current route to determine active profile section
   const getActiveProfileSection = () => {
-    if (router.pathname === "/dashboard") return "profile";
-    if (router.pathname === "/profile/activity") return "activity";
-    if (router.pathname === "/profile/skills") return "skills";
-    if (router.pathname === "/profile/exercises") return "exercises";
-    if (router.pathname.startsWith("/songs")) {
-      const view = router.query.view || "library";
+    const { pathname, query } = router;
+    if (pathname === "/dashboard" || pathname === "/profile") return "profile";
+    if (pathname.startsWith("/profile/activity")) return "activity";
+    if (pathname.startsWith("/profile/skills")) return "skills";
+    if (pathname.startsWith("/profile/exercises")) return "exercises";
+    if (pathname.startsWith("/songs")) {
+      const view = query.view || "library";
       if (view === "library") return "library";
       if (view === "management") return "my_songs";
       return "library";
     }
-    if (router.pathname === "/timer/challenges") return "challenges";
+    if (pathname.startsWith("/timer/challenges")) return "challenges";
+    if (pathname === "/timer") return "timer";
+    if (pathname.startsWith("/report")) return "report";
+    if (pathname.startsWith("/guide")) return "guide";
+    if (pathname.startsWith("/leaderboard")) return "leaderboard";
+    if (pathname.startsWith("/seasons")) return "seasons";
+    if (pathname.startsWith("/settings")) return "settings";
     return null;
   };
 
   const activeId = getActiveProfileSection();
 
   const isLinkActive = (id: string | null, href: string) => {
-    // If we have a specific active ID from path detection, use it
-    if (activeId && activeId === id) return true;
+    // 1. If we have a specific active item identified, strictly match it
+    if (activeId) {
+        return activeId === id;
+    }
     
-    // Otherwise fallback to pageId passed from layout
-    if (id === pageId) {
-       // Only if we don't have a more specific active sub-section
-       const hasActiveSubSection = ["activity", "skills", "exercises", "library", "my_songs"].includes(activeId || "");
-       return !hasActiveSubSection;
-    }
+    // 2. Fallback to pageId passed from layout (for pages without explicit mapping)
+    if (id === pageId && pageId !== null) return true;
 
-    // Last resort: check if pathname starts with href (if it's not root)
-    if (href !== "/" && router.pathname.startsWith(href)) {
-        // Avoid matching /profile to everything under /profile if we have sub-sections
-        if (href === "/profile" && activeId !== "profile") return false;
-        return true;
-    }
+    // 3. Final fallback: simple path check (avoiding root)
+    if (href !== "/" && router.pathname === href) return true;
     
     return false;
   };
