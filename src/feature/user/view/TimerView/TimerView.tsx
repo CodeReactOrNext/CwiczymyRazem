@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { SkillsType } from "types/skillsTypes";
 import { convertMsToHMS } from "utils/converter";
 
-type PracticeMode = "timer" | "plan" | "auto" | "song" | null;
+type PracticeMode = "timer" | "plan" | "auto" | "song" | "challenges" | null;
 
 const TimerView = () => {
   const [mode, setMode] = useState<PracticeMode>(null);
@@ -28,6 +28,14 @@ const TimerView = () => {
   const router = useRouter();
 
   const handleModeSelect = (selectedMode: PracticeMode) => {
+    if (selectedMode === "challenges") {
+      router.push("/timer/challenges");
+      return;
+    }
+    if (selectedMode === "song") {
+      router.push("/timer/song-select");
+      return;
+    }
     setMode(selectedMode);
   };
 
