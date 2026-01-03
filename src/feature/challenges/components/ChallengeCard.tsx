@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { Challenge } from "../challenges.types";
 import { useTranslation } from "react-i18next";
-import { Lock, Timer, Calendar, ChevronRight, CheckCircle2 } from "lucide-react";
+import { Lock, Timer, Calendar, ChevronRight, CheckCircle2, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface ChallengeCardProps {
@@ -10,7 +10,9 @@ interface ChallengeCardProps {
   isUnlocked: boolean;
   currentLevel: number;
   onStart: (challenge: Challenge) => void;
+  onAdd: (challenge: Challenge) => void;
   hasActiveChallenge?: boolean;
+  isActive?: boolean;
   isDependencyMet?: boolean;
   isCompleted?: boolean;
 }
@@ -20,7 +22,9 @@ export const ChallengeCard = ({
   isUnlocked,
   currentLevel,
   onStart,
+  onAdd,
   hasActiveChallenge = false,
+  isActive = false,
   isDependencyMet = true,
   isCompleted = false,
 }: ChallengeCardProps) => {
@@ -107,24 +111,50 @@ export const ChallengeCard = ({
                     </div>
                 </div>
 
-                <Button
-                    disabled={hasActiveChallenge || isCompleted}
-                    onClick={() => !hasActiveChallenge && !isCompleted && onStart(challenge)}
-                    className={cn(
-                        "w-full py-2 rounded-lg font-black uppercase tracking-widest text-[8px] transition-all",
-                        !hasActiveChallenge && !isCompleted
-                            ? "bg-main text-white hover:bg-main-600 shadow-lg shadow-main/10" 
-                            : "bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5"
-                    )}
-                >
-                    {hasActiveChallenge ? (
-                        "In Progress"
+                <div className="flex gap-2">
+                    {isActive ? (
+                        <Button
+                            onClick={() => onStart(challenge)}
+                            className="flex-1 py-4 rounded-xl font-black uppercase tracking-widest text-[9px] bg-main text-white hover:bg-main-600 shadow-lg shadow-main/20 animate-pulse"
+                        >
+                            <span className="flex items-center justify-center gap-2">Practice <Play size={10} fill="currentColor" /></span>
+                        </Button>
                     ) : isCompleted ? (
-                        "Completed"
+                        <Button
+                            disabled
+                            className="w-full py-4 rounded-xl font-black uppercase tracking-widest text-[9px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 cursor-not-allowed"
+                        >
+                            Mastered
+                        </Button>
                     ) : (
-                        <span className="flex items-center justify-center gap-1.5">Start <ChevronRight size={12} /></span>
+                        <>
+                            <Button
+                                disabled={hasActiveChallenge}
+                                onClick={() => !hasActiveChallenge && onAdd(challenge)}
+                                className={cn(
+                                    "flex-1 py-4 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all",
+                                    !hasActiveChallenge 
+                                        ? "bg-zinc-800 text-white hover:bg-zinc-700 border border-white/5" 
+                                        : "bg-zinc-900 text-zinc-600 cursor-not-allowed border border-white/5"
+                                )}
+                            >
+                                Add
+                            </Button>
+                            <Button
+                                disabled={hasActiveChallenge}
+                                onClick={() => !hasActiveChallenge && onStart(challenge)}
+                                className={cn(
+                                    "flex-[1.5] py-4 rounded-xl font-black uppercase tracking-widest text-[9px] transition-all",
+                                    !hasActiveChallenge 
+                                        ? "bg-main text-white hover:bg-main-600 shadow-lg shadow-main/20" 
+                                        : "bg-zinc-900 text-zinc-600 cursor-not-allowed border border-white/5"
+                                )}
+                            >
+                                <span className="flex items-center justify-center gap-1.5">Start <Play size={10} fill="currentColor" /></span>
+                            </Button>
+                        </>
                     )}
-                </Button>
+                </div>
             </div>
           </>
         )}
