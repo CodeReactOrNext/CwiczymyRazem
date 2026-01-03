@@ -15,9 +15,7 @@ export const ActiveChallengeWidget = () => {
     const router = useRouter();
 
     console.log('[Widget] UserStats:', userStats);
-    console.log('[Widget] ActiveChallenge:', userStats?.activeChallenge);
-
-    if (!userStats?.activeChallenge) {
+    if (!userStats?.activeChallenges || userStats.activeChallenges.length === 0) {
         return (
             <motion.div 
                 initial={{ opacity: 0, y: -20 }}
@@ -50,114 +48,98 @@ export const ActiveChallengeWidget = () => {
         );
     }
 
-    const { challengeId, currentDay, totalDays, lastCompletedDate } = userStats.activeChallenge;
-    const challenge = challengesList.find(c => c.id === challengeId);
-
-    if (!challenge) return null;
-
-    // Check if today's goal is already done
-    const today = new Date().toISOString().split('T')[0];
-    const isTodayDone = lastCompletedDate === today;
-
-    const handleStartSession = () => {
-        // We can navigate to the challenges page with a specific query or state to auto-start
-        // Or simpler: pass the challenge data to a "Practice Runner" directly.
-        // For now, let's redirect to challenges page where we can auto-trigger it, 
-        // OR better: redirect to a "run active challenge" route or just start it here if we refactor.
-        // Let's assume we navigate to /timer/challenges?active=true for now or similar.
-        // Actually, the user wants to start it FROM here. 
-        // Ideally we'd open the PracticeSession modal. Since PracticeSession is usually a full page view or a big component,
-        // we might want to redirect to /timer/challenges with the challenge pre-selected.
-        router.push(`/timer/challenges?start=${challengeId}`);
-    };
-
-    const getLocalized = (content: string | any) => {
-        if (typeof content === 'string') return content;
-        if (!content) return '';
-        return content[currentLang] || content['en'] || '';
-    };
-
     return (
-        <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full h-full p-4 rounded-md bg-main-opposed-bg shadow-lg relative overflow-hidden flex flex-col justify-center"
-        >
-            {/* Background Glow */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-main/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="flex flex-col gap-4 w-full h-full">
+            {userStats.activeChallenges.map((ac) => {
+                const challenge = challengesList.find(c => c.id === ac.challengeId);
+                if (!challenge) return null;
 
-            <div className="relative z-10 flex flex-col h-full justify-between gap-3">
-                
-                {/* Header Section */}
-                <div className="flex items-start justify-between gap-3 p-1">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-md bg-main/10 text-main shrink-0">
-                            <Flame size={20} className="animate-pulse" />
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-0.5">
-                                <span>Active Commitment</span>
-                            </div>
-                            <h2 className="text-base font-bold text-white tracking-tight leading-tight">
-                                {getLocalized(challenge.title)}
-                            </h2>
-                            <p className="text-[10px] text-zinc-400 font-medium leading-none mt-0.5">
-                                {getLocalized(challenge.shortGoal)}
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div className="shrink-0 px-3 py-1 rounded-full bg-zinc-800 border border-white/5 flex items-center justify-center">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 leading-none">
-                            Day <span className="text-main">{currentDay - (isTodayDone ? 1 : 0)}</span> of {totalDays}
-                        </span>
-                    </div>
-                </div>
+                const today = new Date().toISOString().split('T')[0];
+                const isTodayDone = ac.lastCompletedDate === today;
 
-                {/* Progress Visuals - Centered & Flexible */}
-                <div className="flex-1 flex flex-col items-center justify-center min-h-0">
-                     <div className="flex flex-wrap items-center justify-center gap-1.5">
-                        {Array.from({ length: totalDays }).map((_, idx) => {
-                            const dayNum = idx + 1;
-                            const isCompleted = dayNum < currentDay;
-                            const isCurrent = dayNum === currentDay && !isTodayDone;
-                            
-                            return (
-                                <div key={dayNum} className="flex flex-col items-center">
-                                    <div 
-                                        className={cn(
-                                            "w-7 h-7 rounded-sm flex items-center justify-center transition-all duration-300",
-                                            isCompleted ? "bg-main text-white" : 
-                                            isCurrent ? "bg-main/20 text-main ring-1 ring-main shadow-[0_0_10px_rgba(45,212,191,0.2)]" : 
-                                            "bg-zinc-800 text-zinc-600"
-                                        )}
-                                    >
-                                        {isCompleted ? <CheckCircle2 size={12} /> : <span className="text-[10px] font-bold">{dayNum}</span>}
+                const handleStartSession = () => {
+                    router.push(`/timer/challenges?start=${ac.challengeId}`);
+                };
+
+                const getLocalized = (content: string | any) => {
+                    if (typeof content === 'string') return content;
+                    if (!content) return '';
+                    return content[currentLang] || content['en'] || '';
+                };
+
+                return (
+                    <motion.div 
+                        key={ac.challengeId}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="w-full p-4 rounded-md bg-zinc-900/60 shadow-lg relative overflow-hidden flex flex-col justify-center border border-white/5"
+                    >
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-main/5 blur-[60px] rounded-full pointer-events-none" />
+
+                        <div className="relative z-10 flex flex-col gap-2">
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex items-center gap-2">
+                                    <div className="p-1.5 rounded-md bg-main/10 text-main shrink-0">
+                                        <Flame size={16} />
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-1 mb-0.5">
+                                            <span className="text-[7px] font-black uppercase tracking-[0.2em] text-main px-1 bg-main/10 rounded">Challenge</span>
+                                        </div>
+                                        <h2 className="text-sm font-bold text-white tracking-tight leading-tight">
+                                            {getLocalized(challenge.title)}
+                                        </h2>
                                     </div>
                                 </div>
-                            );
-                         })}
-                     </div>
-                </div>
+                                
+                                {!isTodayDone && (
+                                    <Button 
+                                        onClick={handleStartSession}
+                                        size="sm"
+                                        className="h-8 px-3 rounded-md bg-main hover:bg-main-600 text-white font-bold uppercase tracking-widest transition-all text-[9px] gap-1.5 shadow-lg shadow-main/10"
+                                    >
+                                        <Play size={10} fill="currentColor" />
+                                        Start
+                                    </Button>
+                                )}
+                                {isTodayDone && (
+                                    <div className="px-2 py-1 rounded bg-zinc-800 text-emerald-400 border border-emerald-500/20 text-[8px] font-black uppercase tracking-widest">
+                                        Done
+                                    </div>
+                                )}
+                            </div>
 
-                {/* Action Button */}
-                <div className="w-full">
-                    {isTodayDone ? (
-                        <div className="w-full px-4 py-2.5 rounded-md bg-zinc-800/50 text-zinc-400 font-bold text-center text-[10px] uppercase tracking-widest border border-white/5">
-                            Today's Goal Complete
+                            <div className="flex flex-wrap gap-1.5 mt-2">
+                                {Array.from({ length: ac.totalDays }).map((_, idx) => {
+                                    const dayNum = idx + 1;
+                                    const isCompleted = dayNum < ac.currentDay || (dayNum === ac.currentDay && isTodayDone);
+                                    const isCurrent = dayNum === ac.currentDay && !isTodayDone;
+                                    
+                                    return (
+                                        <div 
+                                            key={dayNum} 
+                                            className={cn(
+                                                "w-7 h-7 rounded-md flex items-center justify-center transition-all duration-300 border-2",
+                                                isCompleted 
+                                                    ? "bg-main border-main text-white shadow-[0_4px_12px_rgba(var(--main-rgb),0.3)] scale-105" 
+                                                    : isCurrent 
+                                                        ? "bg-main/20 border-main text-main shadow-[0_0_15px_rgba(var(--main-rgb),0.2)]" 
+                                                        : "bg-zinc-800/50 border-white/5 text-zinc-500 hover:border-zinc-700"
+                                            )}
+                                        >
+                                            {isCompleted ? (
+                                                <CheckCircle2 size={12} strokeWidth={3} className="drop-shadow-md" />
+                                            ) : (
+                                                <span className="text-[10px] font-black">{dayNum}</span>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
-                    ) : (
-                        <Button 
-                            onClick={handleStartSession}
-                            className="w-full px-4 py-3 rounded-md bg-main hover:bg-main-600 text-white font-bold uppercase tracking-widest hover:scale-[1.01] transition-all text-xs gap-2 shadow-lg shadow-main/10"
-                        >
-                            <Play size={14} fill="currentColor" />
-                            Start Day {currentDay} Session
-                        </Button>
-                    )}
-                </div>
-
-            </div>
-        </motion.div>
+                    </motion.div>
+                );
+            })}
+        </div>
     );
 };

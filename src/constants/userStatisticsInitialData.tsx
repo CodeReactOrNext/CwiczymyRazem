@@ -31,4 +31,6 @@ export const statisticsInitial: StatisticsDataInterface = {
     hearing: 0,
     creativity: 0,
   },
+  activeChallenges: [],
+  completedChallenges: [],
 };

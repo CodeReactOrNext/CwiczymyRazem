@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import { toast } from "sonner";
 import { cn } from "assets/lib/utils";
 import AppLayout from "layouts/AppLayout";
 import { withAuth } from "utils/auth/serverAuth";
@@ -14,7 +15,7 @@ import { challengesList } from "feature/challenges/data/challengesList";
 import { ChallengeCard } from "feature/challenges/components/ChallengeCard";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { Challenge } from "feature/challenges/challenges.types";
-import { ArrowLeft, Info, Trophy, XCircle, Calendar, Flame, ChevronRight } from "lucide-react";
+import { ArrowLeft, Info, Trophy, XCircle, Calendar, Flame, ChevronRight, Play, CheckCircle2 } from "lucide-react";
 import type { NextPageWithLayout } from "types/page";
 
 const ChallengesPage: NextPageWithLayout = () => {
@@ -26,10 +27,16 @@ const ChallengesPage: NextPageWithLayout = () => {
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
 
-  const activeChallenge = userStats?.activeChallenge;
-  const activeChallengeData = activeChallenge 
-    ? challengesList.find(c => c.id === activeChallenge.challengeId) 
-    : null;
+  const activeChallenges = userStats?.activeChallenges || [];
+  // For UI simplicity in the banner, we could show the most recent or all. 
+  // Let's find data for all active challenges.
+  const activeChallengesData = activeChallenges.map(ac => ({
+    ...ac,
+    data: challengesList.find(c => c.id === ac.challengeId)
+  })).filter(ac => ac.data);
+
+  const activeChallenge = activeChallenges[0];
+  const activeChallengeData = activeChallengesData[0]?.data || null;
 
   useEffect(() => {
     if (userAuth) {
@@ -47,22 +54,50 @@ const ChallengesPage: NextPageWithLayout = () => {
     }
   }, [router.query.start]);
 
-  const handleStartChallenge = (challenge: Challenge) => {
+  const handleAddChallenge = (challenge: Challenge) => {
     const today = new Date().toISOString();
     dispatch(saveActiveChallenge({
-        challengeId: challenge.id,
-        startDate: today,
-        lastCompletedDate: null,
-        currentDay: 1,
-        totalDays: challenge.streakDays
+        challenge: {
+            challengeId: challenge.id,
+            startDate: today,
+            lastCompletedDate: null,
+            currentDay: 1,
+            totalDays: challenge.streakDays
+        }
     })).unwrap().then(() => {
-        setSelectedChallenge(challenge);
+        toast.success("Challenge added! Take it on whenever you're ready.");
+    }).catch(err => {
+        toast.error(err);
     });
   };
 
-  const handleQuitChallenge = () => {
+  const handleStartChallenge = (challenge: Challenge) => {
+    const isActive = activeChallenges.some(ac => ac.challengeId === challenge.id);
+    
+    if (isActive) {
+        setSelectedChallenge(challenge);
+        return;
+    }
+
+    const today = new Date().toISOString();
+    dispatch(saveActiveChallenge({
+        challenge: {
+            challengeId: challenge.id,
+            startDate: today,
+            lastCompletedDate: null,
+            currentDay: 1,
+            totalDays: challenge.streakDays
+        }
+    })).unwrap().then(() => {
+        setSelectedChallenge(challenge);
+    }).catch(err => {
+        toast.error(err);
+    });
+  };
+
+  const handleQuitChallenge = (id: string) => {
     if (confirm("Are you sure you want to quit current challenge? All progress will be lost.")) {
-      dispatch(saveActiveChallenge(null));
+      dispatch(saveActiveChallenge({ challenge: null, quitId: id }));
     }
   };
 
@@ -178,8 +213,8 @@ const ChallengesPage: NextPageWithLayout = () => {
           </div>
           </div>
 
-          {activeChallenge && activeChallengeData && (
-             <div className="mt-4 overflow-hidden rounded-3xl bg-zinc-900/40 border border-white/5 backdrop-blur-xl shadow-2xl relative group">
+          {activeChallengesData.length > 0 && activeChallengesData.map(({ data, ...ac }) => data && (
+             <div key={ac.challengeId} className="mt-4 overflow-hidden rounded-3xl bg-zinc-900/40 border border-white/5 backdrop-blur-xl shadow-2xl relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-main/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 
                 <div className="p-5 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
@@ -189,7 +224,7 @@ const ChallengesPage: NextPageWithLayout = () => {
                             <Trophy size={36} fill="currentColor" className="opacity-80" />
                         </div>
                         <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-lg bg-main text-black flex items-center justify-center font-black text-xs shadow-lg">
-                            {activeChallenge.currentDay}
+                            {ac.currentDay}
                         </div>
                     </div>
                     
@@ -198,32 +233,57 @@ const ChallengesPage: NextPageWithLayout = () => {
                             <span className="px-2 py-0.5 rounded bg-main/10 text-main text-[9px] font-black uppercase tracking-widest">Active Quest</span>
                             <span className="h-[1px] w-8 bg-zinc-800" />
                             <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-tight">
-                                Day {activeChallenge.currentDay} of {activeChallenge.totalDays}
+                                Day {ac.currentDay} of {ac.totalDays}
                             </span>
                         </div>
                         
                         <h3 className="text-3xl md:text-4xl font-black text-white uppercase italic tracking-tighter leading-none mb-3">
-                          {typeof activeChallengeData.title === 'string' ? activeChallengeData.title : (activeChallengeData.title as any)['en']}
+                          {typeof data.title === 'string' ? data.title : (data.title as any)['en']}
                         </h3>
                         
-                        <div className="flex items-center justify-center sm:justify-start gap-4">
+                        <div className="flex items-center justify-center sm:justify-start gap-4 mb-4">
                            <div className="flex items-center gap-2">
                               <Calendar size={14} className="text-zinc-600" />
-                              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide">Ends in {activeChallenge.totalDays - activeChallenge.currentDay + 1} Days</span>
+                              <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide">Ends in {ac.totalDays - ac.currentDay + 1} Days</span>
                            </div>
-                           <div className="w-32 h-1.5 bg-zinc-950 rounded-full border border-white/5 overflow-hidden">
-                              <div 
-                                className="h-full bg-main shadow-[0_0_10px_rgba(var(--main-rgb),0.5)] transition-all duration-1000" 
-                                style={{ width: `${(activeChallenge.currentDay / activeChallenge.totalDays) * 100}%` }} 
-                              />
-                           </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-1.5 justify-center sm:justify-start">
+                            {Array.from({ length: ac.totalDays }).map((_, idx) => {
+                                const dayNum = idx + 1;
+                                const isCompleted = dayNum < ac.currentDay;
+                                const isCurrent = dayNum === ac.currentDay;
+                                
+                                return (
+                                    <div 
+                                        key={dayNum} 
+                                        className={cn(
+                                            "w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300 border",
+                                            isCompleted 
+                                                ? "bg-main border-main text-white shadow-[0_4px_12px_rgba(var(--main-rgb),0.3)]" 
+                                                : isCurrent 
+                                                    ? "bg-main/10 border-main/50 text-main shadow-[0_0_15px_rgba(var(--main-rgb),0.1)]" 
+                                                    : "bg-zinc-800/30 border-white/5 text-zinc-600"
+                                        )}
+                                    >
+                                        {isCompleted ? <CheckCircle2 size={12} strokeWidth={3} /> : <span className="text-[10px] font-bold">{dayNum}</span>}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
                     <button
-                        onClick={handleQuitChallenge}
+                        onClick={() => handleStartChallenge(data)}
+                        className="px-6 py-3 rounded-xl bg-main text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-lg shadow-main/20 hover:scale-105 transition-all flex items-center gap-2"
+                    >
+                        <Play size={16} fill="currentColor" />
+                        Practice
+                    </button>
+                    <button
+                        onClick={() => handleQuitChallenge(ac.challengeId)}
                         className="px-5 py-3 rounded-xl bg-zinc-950 border border-white/5 text-zinc-600 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/5 transition-all text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 group/btn"
                     >
                         <XCircle size={16} className="group-hover/btn:rotate-90 transition-transform" />
@@ -232,7 +292,7 @@ const ChallengesPage: NextPageWithLayout = () => {
                   </div>
                 </div>
              </div>
-          )}
+          ))}
         </div>
 
         <div className="space-y-16">
@@ -304,10 +364,12 @@ const ChallengesPage: NextPageWithLayout = () => {
                                 challenge={challenge}
                                 isUnlocked={isUnlocked}
                                 currentLevel={currentLevel}
-                                onStart={handleStartChallenge}
-                                hasActiveChallenge={!!activeChallenge}
-                                isDependencyMet={isDependencyMet}
-                                isCompleted={isAlreadyCompleted}
+                                 onStart={handleStartChallenge}
+                                 onAdd={handleAddChallenge}
+                                 hasActiveChallenge={activeChallenges.length >= 3 && !activeChallenges.some(ac => ac.challengeId === challenge.id)}
+                                 isActive={activeChallenges.some(ac => ac.challengeId === challenge.id)}
+                                 isDependencyMet={isDependencyMet}
+                                 isCompleted={isAlreadyCompleted}
                               />
                             </div>
                           );
