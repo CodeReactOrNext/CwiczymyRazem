@@ -62,6 +62,7 @@ const TimerView = () => {
   };
 
   const timerSubmitHandler = () => {
+    timer.stopTimer();
     if (chosenSkill) {
       const payload = {
         type: chosenSkill,
@@ -72,21 +73,27 @@ const TimerView = () => {
     router.push("/report");
   };
 
-  const choseSkillHandler = (chosenSkill: SkillsType) => {
-    timer.stopTimer();
-    setChosenSkill(chosenSkill);
-    timer.restartTime();
-    timer.setInitialStartTime(timerData[chosenSkill]);
+  const choseSkillHandler = (newSkill: SkillsType) => {
+    if (chosenSkill) {
+      timer.stopTimer();
+      dispatch(updateTimerTime({ type: chosenSkill, time: timer.time }));
+    }
+    setChosenSkill(newSkill);
+    timer.setInitialStartTime(timerData[newSkill]);
   };
 
   useEffect(() => {
     if (!timer.timerEnabled || !chosenSkill) return;
+
+    // Safety check: if time is 0 but Redux has time, we might be in a transition state
+    if (timer.time === 0 && timerData[chosenSkill] > 0) return;
+
     const payload = {
       type: chosenSkill,
       time: timer.time,
     };
     dispatch(updateTimerTime(payload));
-  }, [timer.time, chosenSkill, dispatch, timer.timerEnabled]);
+  }, [timer.time, chosenSkill, dispatch, timer.timerEnabled, timerData]);
 
   useEffect(() => {
     if (timer.timerEnabled && chosenSkill) {

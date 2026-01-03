@@ -1,4 +1,4 @@
-import { selectTimerData, selectUserAvatar } from "feature/user/store/userSlice";
+import { selectTimerData, selectUserAvatar, updateTimerTime } from "feature/user/store/userSlice";
 import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import useTimer from "hooks/useTimer";
@@ -10,6 +10,7 @@ import { useState, useCallback } from "react";
 import { useAppSelector, useAppDispatch } from "store/hooks";
 import { withAuth } from "utils/auth/serverAuth";
 import { convertMsToHMObject } from "utils/converter/timeConverter";
+import { useEffect } from "react";
 
 import type { SkillsType } from "types/skillsTypes";
 
@@ -26,46 +27,40 @@ const TimerPractice: NextPageWithLayout = () => {
   const avatar = useAppSelector(selectUserAvatar);
   const router = useRouter();
 
-  const choseSkillHandler = (chosenSkill: SkillsType) => {
-    setChosenSkill(chosenSkill);
+  const choseSkillHandler = (newSkill: SkillsType) => {
+    if (chosenSkill) {
+      timer.stopTimer();
+      dispatch(updateTimerTime({ type: chosenSkill, time: timer.time }));
+    }
+    setChosenSkill(newSkill);
+    timer.setInitialStartTime(timerData[newSkill]);
   };
 
   const onBack = () => {
     router.push("/timer");
   };
 
-  const timerSubmitHandler = useCallback(async () => {
-    setIsFinishing(true);
-    
-    const techniqueTime = convertMsToHMObject(timerData.technique);
-    const theoryTime = convertMsToHMObject(timerData.theory);
-    const hearingTime = convertMsToHMObject(timerData.hearing);
-    const creativityTime = convertMsToHMObject(timerData.creativity);
+  useEffect(() => {
+    if (!timer.timerEnabled || !chosenSkill) return;
 
-    const inputData: ReportFormikInterface = {
-      techniqueHours: techniqueTime.hours,
-      techniqueMinutes: techniqueTime.minutes,
-      theoryHours: theoryTime.hours,
-      theoryMinutes: theoryTime.minutes,
-      hearingHours: hearingTime.hours,
-      hearingMinutes: hearingTime.minutes,
-      creativityHours: creativityTime.hours,
-      creativityMinutes: creativityTime.minutes,
-      habbits: [],
-      countBackDays: 0,
-      reportTitle: "Free Practice",
-      avatarUrl: avatar ?? null,
-    };
+    if (timer.time === 0 && timerData[chosenSkill] > 0) return;
 
-    try {
-      await dispatch(updateUserStats({ inputData })).unwrap();
-      router.push("/report");
-    } catch (error) {
-      console.error("Timer submit failed:", error);
-    } finally {
-      setIsFinishing(false);
+    dispatch(updateTimerTime({
+      type: chosenSkill,
+      time: timer.time,
+    }));
+  }, [timer.time, chosenSkill, dispatch, timer.timerEnabled, timerData]);
+
+  const timerSubmitHandler = useCallback(() => {
+    timer.stopTimer();
+    if (chosenSkill) {
+      dispatch(updateTimerTime({
+        type: chosenSkill,
+        time: timer.time,
+      }));
     }
-  }, [timerData, avatar, dispatch, router]);
+    router.push("/report");
+  }, [timer, chosenSkill, dispatch, router]);
 
   return (
     <TimerLayout
