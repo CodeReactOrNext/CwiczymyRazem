@@ -53,7 +53,7 @@ type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
 const ReportView = () => {
   const router = useRouter();
-  const { songId, songTitle, songArtist } = router.query;
+  const { songId, songTitle, songArtist, planId, planTitle } = router.query;
   const [view, setView] = useState<'form' | 'success'>('form');
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
@@ -92,11 +92,12 @@ const ReportView = () => {
     creativityMinutes: creativityTime.minutes,
     habbits: [],
     countBackDays: 0,
-    reportTitle: songTitle && songArtist ? `Practicing: ${songArtist} - ${songTitle}` : "",
+    reportTitle: planTitle ? (planTitle as string) : (songTitle && songArtist ? `Practicing: ${songArtist} - ${songTitle}` : ""),
     avatarUrl: avatar ?? null,
     songId: (songId as string) || undefined,
     songTitle: (songTitle as string) || undefined,
     songArtist: (songArtist as string) || undefined,
+    planId: (planId as string) || undefined,
   };
 
   const timeInputList: TimeInputProps[] = [
@@ -225,6 +226,13 @@ const ReportView = () => {
     // Quest Trigger
     if (inputData.habbits && inputData.habbits.length >= 2) {
         dispatch(updateQuestProgress({ type: 'healthy_habits', amount: 2 }));
+    }
+
+    if (inputData.planId) {
+        dispatch(updateQuestProgress({ type: 'practice_plan' }));
+        if (inputData.planId.startsWith('auto')) {
+            dispatch(updateQuestProgress({ type: 'auto_plan' }));
+        }
     }
 
     setSubmittedValues(inputData);

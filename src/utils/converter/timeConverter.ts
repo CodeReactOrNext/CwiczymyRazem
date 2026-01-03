@@ -19,7 +19,7 @@ export const convertMsToHMObject = (milliseconds: number) => {
   let hours = Math.floor(minutes / 60);
 
   seconds = seconds % 60;
-  minutes = seconds >= 60 ? minutes + 1 : minutes;
+  minutes = seconds >= 30 ? minutes + 1 : minutes;
   minutes = minutes % 60;
   return {
     hours: padTo2Digits(hours),
