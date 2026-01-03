@@ -34,7 +34,7 @@ export const CommunityModal = ({ isOpen, onClose }: CommunityModalProps) => {
                   Leave feedback, suggest features, and chat with fellow guitarists.
                 </p>
                 <a
-                  href="https://discord.gg/yRdT9T9F"
+                  href="https://discord.gg/phQutKwK"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-4 flex items-center gap-2 text-sm font-bold text-[#5865F2] hover:underline"
