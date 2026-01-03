@@ -37,17 +37,17 @@ export const updateSongStatus = async (
 
     let pointsAdded = 0;
     if (status === "learned" && oldStatus !== "learned") {
-      // Marked as learned -> +200 points
+      // Marked as learned -> +100 points
       await updateDoc(userDocRef, {
-        "statistics.points": increment(200)
+        "statistics.points": increment(100)
       });
-      pointsAdded = 200;
+      pointsAdded = 100;
     } else if (oldStatus === "learned" && status !== "learned") {
-      // Moved away from learned -> -200 points
+      // Moved away from learned -> -100 points
       await updateDoc(userDocRef, {
-        "statistics.points": increment(-200)
+        "statistics.points": increment(-100)
       });
-      pointsAdded = -200;
+      pointsAdded = -100;
     }
 
     await setDoc(userSongsRef, {
