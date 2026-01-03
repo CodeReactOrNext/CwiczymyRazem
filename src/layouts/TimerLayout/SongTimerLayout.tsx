@@ -131,13 +131,6 @@ export const SongTimerLayout = ({
                                 <MdAccessTime className="h-4 w-4" />
                                 <span>Total: {convertMsToHMS(sumTime)}</span>
                              </div>
-                             
-                             {timerEnabled && (
-                                 <div className="flex items-center gap-2 text-emerald-400 text-sm font-bold uppercase tracking-widest animate-pulse">
-                                     <div className="h-2 w-2 rounded-full bg-emerald-400" />
-                                     Recording
-                                 </div>
-                             )}
                          </div>
                     </div>
 

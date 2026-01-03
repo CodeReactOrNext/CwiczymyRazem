@@ -9,18 +9,15 @@ interface SkillCategoryGroupProps {
   category: CategoryKeys;
   skills: GuitarSkill[];
   userSkills: UserSkills;
-  onUpgrade: (skillId: GuitarSkillId, points: number) => void;
 }
 
 export const SkillCategoryGroup = ({
   category,
   skills,
   userSkills,
-  onUpgrade,
 }: SkillCategoryGroupProps) => {
   const { t } = useTranslation("skills");
   const theme = getSkillTheme(category);
-  const availablePoints = userSkills.availablePoints[category] || 0;
 
   return (
     <div className="mb-12 last:mb-0">
@@ -32,10 +29,6 @@ export const SkillCategoryGroup = ({
              </h2>
          </div>
 
-         <div className="flex items-center gap-3 bg-zinc-900/50 px-4 py-2 rounded-xl ">
-             <span className="text-zinc-400 text-xs uppercase tracking-widest font-bold">Points Available</span>
-             <span className={cn("text-2xl font-bold", theme.primary)}>{availablePoints}</span>
-         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -44,8 +37,6 @@ export const SkillCategoryGroup = ({
                 key={skill.id}
                 skill={skill}
                 currentPoints={userSkills.unlockedSkills[skill.id] || 0}
-                availableCategoryPoints={availablePoints}
-                onUpgrade={onUpgrade}
              />
          ))}
       </div>

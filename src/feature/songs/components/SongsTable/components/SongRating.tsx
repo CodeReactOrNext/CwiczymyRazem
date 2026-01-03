@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { useQueryClient } from "@tanstack/react-query";
-import { rateSong } from "feature/user/store/userSlice.asyncThunk";
+import { rateSong, updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
 import { cn } from "assets/lib/utils";
 
 interface SongRatingInterface {
@@ -94,6 +94,10 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
       if (rateSong.fulfilled.match(resultAction)) {
         toast.success(isNewRating ? "+15 Points! Rating updated." : "Rating updated.");
         ratingCooldowns.set(songId, Date.now());
+
+        if (isNewRating) {
+            dispatch(updateQuestProgress({ type: 'rate_song' }));
+        }
 
         queryClient.setQueriesData({ queryKey: ['songs'] }, (oldData: any) => {
           if (!oldData || !oldData.songs) return oldData;

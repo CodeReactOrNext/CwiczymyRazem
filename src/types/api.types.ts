@@ -8,6 +8,37 @@ import type { SignUpCredentials } from "feature/user/view/SingupView/SingupView"
 import type { IdTokenResult } from "firebase/auth";
 import type { Timestamp } from "firebase/firestore";
 
+export interface ActiveChallenge {
+  challengeId: string;
+  startDate: string; // ISO date string
+  lastCompletedDate: string | null;
+  currentDay: number; // 1-indexed
+  totalDays: number;
+}
+
+export type DailyQuestTaskType =
+  | 'rate_song'
+  | 'add_want_to_learn'
+  | 'practice_any_song'
+  | 'healthy_habits'
+  | 'auto_plan'
+  | 'practice_plan';
+
+export interface DailyQuestTask {
+  id: string;
+  type: DailyQuestTaskType;
+  title: string;
+  isCompleted: boolean;
+  progress: number;
+  target: number;
+}
+
+export interface DailyQuest {
+  date: string;
+  tasks: DailyQuestTask[];
+  isRewardClaimed: boolean;
+}
+
 export interface UserDataInterface {
   userInfo: {
     displayName: string;
@@ -58,6 +89,14 @@ export interface StatisticsDataInterface {
     hearing: number;
     creativity: number;
   };
+  skills?: {
+    unlockedSkills: {
+      [key: string]: number;
+    };
+  };
+  activeChallenge?: ActiveChallenge | null;
+  dailyQuest?: DailyQuest | null;
+  completedChallenges?: string[];
 }
 
 export interface TimerInterface {
@@ -81,6 +120,7 @@ export interface ReportListInterface {
   exceriseTitle?: string;
   isDateBackReport: string;
   timeSumary?: ReportTimeData;
+  planId?: string;
 }
 
 export interface UserSliceProviderData {

@@ -42,6 +42,10 @@ export interface FirebaseUserExceriseLog {
     sumTime: number;
   };
   avatarUrl: string | undefined;
+  planId?: string | null;
+  songId?: string;
+  songTitle?: string;
+  songArtist?: string;
 }
 
 export interface FirebaseLogsInterface {
@@ -65,6 +69,10 @@ export interface FirebaseLogsInterface {
   avatarUrl: string | null;
   id?: string;
   reactions?: string[];
+  planId?: string | null;
+  songId?: string;
+  songTitle?: string;
+  songArtist?: string;
 }
 
 export interface FirebaseLogsAchievementsInterface {
