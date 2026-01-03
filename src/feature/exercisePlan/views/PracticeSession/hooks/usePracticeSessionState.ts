@@ -12,7 +12,7 @@ import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selec
 import { updateUserStats, checkAndSaveChallengeProgress, updateQuestProgress } from 'feature/user/store/userSlice.asyncThunk';
 import { convertMsToHMObject } from 'utils/converter';
 import type { ReportFormikInterface, ReportDataInterface } from 'feature/user/view/ReportView/ReportView.types';
-
+import { useRouter } from 'next/router';
 
 interface UsePracticeSessionStateProps {
   plan: ExercisePlan;
@@ -20,6 +20,7 @@ interface UsePracticeSessionStateProps {
 }
 
 export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionStateProps) => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const timerData = useAppSelector(selectTimerData);
   const avatar = useAppSelector(selectUserAvatar);
@@ -93,58 +94,21 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
     setShowSuccessView(false);
   }, []);
 
-  const autoSubmitReport = useCallback(async () => {
-    setIsSubmittingReport(true);
-
-    const techniqueTime = convertMsToHMObject(timerData.technique);
-    const theoryTime = convertMsToHMObject(timerData.theory);
-    const hearingTime = convertMsToHMObject(timerData.hearing);
-    const creativityTime = convertMsToHMObject(timerData.creativity);
+  const handleFinishSession = useCallback(() => {
+    timer.stopTimer();
 
     const planTitle = typeof plan.title === 'string'
       ? plan.title
       : (plan.title as LocalizedContent)[(i18n?.language as 'pl' | 'en') || 'pl'];
 
-    const inputData: ReportFormikInterface = {
-      techniqueHours: techniqueTime.hours,
-      techniqueMinutes: techniqueTime.minutes,
-      theoryHours: theoryTime.hours,
-      theoryMinutes: theoryTime.minutes,
-      hearingHours: hearingTime.hours,
-      hearingMinutes: hearingTime.minutes,
-      creativityHours: creativityTime.hours,
-      creativityMinutes: creativityTime.minutes,
-      habbits: [],
-      countBackDays: 0,
-      reportTitle: planTitle,
-      avatarUrl: avatar ?? null,
-      planId: plan.id || null,
-    };
+    const params = new URLSearchParams();
+    params.set('planId', plan.id || '');
+    params.set('planTitle', planTitle);
 
-    try {
-      const result = await dispatch(updateUserStats({ inputData })).unwrap();
-      setReportResult(result.raitingData);
+    router.push(`/report?${params.toString()}`);
+  }, [timer, plan, router]);
 
-      // Quest Triggers
-      dispatch(updateQuestProgress({ type: 'practice_plan' }));
-
-      if (plan.id && plan.id.startsWith('auto')) {
-        dispatch(updateQuestProgress({ type: 'auto_plan' }));
-      }
-
-      const isSongPlan = plan.exercises.some(ex => ex.isPlayalong || ex.videoUrl?.includes('youtu') || (ex as any).category === 'song');
-      if (isSongPlan) {
-        dispatch(updateQuestProgress({ type: 'practice_any_song' }));
-      }
-
-      dispatch(checkAndSaveChallengeProgress());
-
-    } catch (error) {
-      console.error("Auto-submit report failed:", error);
-    } finally {
-      setIsSubmittingReport(false);
-    }
-  }, [timerData, plan, avatar, dispatch]);
+  const autoSubmitReport = handleFinishSession;
 
   const planTitleString = typeof plan.title === 'string'
     ? plan.title
