@@ -1,7 +1,7 @@
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import type { IconType } from "react-icons";
 
-export type GuitarSkillId = 
+export type GuitarSkillId =
   | "alternate_picking"
   | "legato"
   | "sweep_picking"
@@ -26,18 +26,10 @@ export type GuitarSkillId =
   | "technique"
   | "bending"
   | "tapping"
-  | "music_composition"
   | "pitch_recognition"
-  
-  | "harmony"
-  | 'fingerpicking'
-  | 'phrasing'
-  | "improvisation"
-  | "ear_training"
-  | "sight_reading"
-  | "composition"
-  | 'articulation'
-  | "music_theory";
+  | "fingerpicking"
+  | "phrasing"
+  | "articulation";
 
 export interface GuitarSkill {
   id: GuitarSkillId;

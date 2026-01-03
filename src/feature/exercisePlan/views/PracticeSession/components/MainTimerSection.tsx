@@ -23,6 +23,7 @@ interface MainTimerSectionProps {
   variant?: "default" | "compact";
   sessionTimerData?: TimerInterface;
   exerciseTimeSpent?: number;
+  canSkipExercise?: boolean;
 }
 
 export const MainTimerSection = ({
@@ -38,7 +39,8 @@ export const MainTimerSection = ({
   showExerciseInfo = true,
   variant = "default",
   sessionTimerData,
-  exerciseTimeSpent = 0
+  exerciseTimeSpent = 0,
+  canSkipExercise = true
 }: MainTimerSectionProps) => {
   const { t } = useTranslation(["common"]);
 
@@ -92,6 +94,7 @@ export const MainTimerSection = ({
                   handleNextExercise={handleNextExercise}
                   size="md"
                   variant="centered"
+                  canSkipExercise={canSkipExercise}
                 />
                
                {/* Status Pill (Compact) - Integrated */}
@@ -188,6 +191,7 @@ export const MainTimerSection = ({
                   toggleTimer={toggleTimer}
                   handleNextExercise={handleNextExercise}
                   size='lg'
+                  canSkipExercise={canSkipExercise}
                 />
               </motion.div>
 

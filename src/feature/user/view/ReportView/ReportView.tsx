@@ -12,7 +12,7 @@ import {
   selectUserAuth,
   selectUserAvatar,
 } from "feature/user/store/userSlice";
-import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
+import { updateUserStats, updateQuestProgress, checkAndSaveChallengeProgress } from "feature/user/store/userSlice.asyncThunk";
 import { Formik } from "formik";
 import { motion } from "framer-motion";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
@@ -27,6 +27,7 @@ import {
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/router";
 import { i18n } from "next-i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -51,6 +52,8 @@ import type { ReportFormikInterface } from "./ReportView.types";
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
 const ReportView = () => {
+  const router = useRouter();
+  const { songId, songTitle, songArtist } = router.query;
   const [view, setView] = useState<'form' | 'success'>('form');
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
@@ -89,8 +92,11 @@ const ReportView = () => {
     creativityMinutes: creativityTime.minutes,
     habbits: [],
     countBackDays: 0,
-    reportTitle: "",
+    reportTitle: songTitle && songArtist ? `Practicing: ${songArtist} - ${songTitle}` : "",
     avatarUrl: avatar ?? null,
+    songId: (songId as string) || undefined,
+    songTitle: (songTitle as string) || undefined,
+    songArtist: (songArtist as string) || undefined,
   };
 
   const timeInputList: TimeInputProps[] = [
@@ -214,6 +220,13 @@ const ReportView = () => {
     }
 
     await dispatch(updateUserStats({ inputData }));
+    await dispatch(checkAndSaveChallengeProgress());
+    
+    // Quest Trigger
+    if (inputData.habbits && inputData.habbits.length >= 2) {
+        dispatch(updateQuestProgress({ type: 'healthy_habits', amount: 2 }));
+    }
+
     setSubmittedValues(inputData);
     setAcceptPopUpVisible(false);
     setView('success');

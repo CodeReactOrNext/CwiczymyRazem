@@ -7,6 +7,11 @@ import type {
   StatisticsDataInterface,
   TimerInterface,
   userSliceInitialState,
+  ActiveChallenge,
+  DailyQuest,
+  DailyQuestTask,
+  DailyQuestTaskType,
+  StatisticsTime,
 } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
 
@@ -26,7 +31,10 @@ import {
   uploadUserAvatar,
   uploadUserSocialData,
   rateSong,
+  saveActiveChallenge,
+  checkAndSaveChallengeProgress,
 } from "./userSlice.asyncThunk";
+import { challengesList } from "feature/challenges/data/challengesList";
 
 
 const initialState: userSliceInitialState = {
@@ -117,6 +125,75 @@ export const userSlice = createSlice({
         state.currentUserStats.points = (state.currentUserStats.points || 0) + payload;
       }
     },
+    setActiveChallenge: (state, { payload }: PayloadAction<ActiveChallenge | null>) => {
+      if (state.currentUserStats) {
+        state.currentUserStats.activeChallenge = payload;
+      }
+    },
+    generateDailyQuest: (state) => {
+      if (!state.currentUserStats) return;
+      const today = new Date().toISOString().split('T')[0];
+
+      // If quest exists for today, do nothing
+      if (state.currentUserStats.dailyQuest?.date === today) return;
+
+      // Templates
+      const taskTemplates: { type: DailyQuestTaskType; title: string; target: number }[] = [
+        { type: 'rate_song', title: 'Rate a Song', target: 1 },
+        { type: 'add_want_to_learn', title: 'Add song to "Want to Learn"', target: 1 },
+        { type: 'practice_any_song', title: 'Practice any Song', target: 1 },
+        { type: 'healthy_habits', title: 'Use 2 Healthy Habits', target: 2 },
+        { type: 'auto_plan', title: 'Generate & Practice Auto Plan', target: 1 },
+        { type: 'practice_plan', title: 'Complete a Practice Plan', target: 1 },
+      ];
+
+      // Shuffle and pick 3
+      const shuffled = [...taskTemplates].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 3);
+
+      const newQuest: DailyQuest = {
+        date: today,
+        isRewardClaimed: false,
+        tasks: selected.map((t, index) => ({
+          id: `quest_${today}_${index}`,
+          type: t.type,
+          title: t.title,
+          isCompleted: false,
+          progress: 0,
+          target: t.target
+        }))
+      };
+
+      state.currentUserStats.dailyQuest = newQuest;
+    },
+    completeQuestTask: (state, { payload }: PayloadAction<{ type: DailyQuestTaskType; amount?: number }>) => {
+      if (!state.currentUserStats?.dailyQuest) return;
+
+      // Check if today
+      const today = new Date().toISOString().split('T')[0];
+      if (state.currentUserStats.dailyQuest.date !== today) return;
+
+      const quest = state.currentUserStats.dailyQuest;
+
+      const task = quest.tasks.find(t => t.type === payload.type);
+      if (task && !task.isCompleted) {
+        const amount = payload.amount || 1;
+        task.progress = Math.min(task.progress + amount, task.target);
+        if (task.progress >= task.target) {
+          task.isCompleted = true;
+        }
+      }
+    },
+    claimQuestReward: (state) => {
+      if (!state.currentUserStats?.dailyQuest) return;
+      const quest = state.currentUserStats.dailyQuest;
+
+      const allCompleted = quest.tasks.every(t => t.isCompleted);
+      if (allCompleted && !quest.isRewardClaimed) {
+        quest.isRewardClaimed = true;
+        state.currentUserStats.points = (state.currentUserStats.points || 0) + 100;
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -128,6 +205,41 @@ export const userSlice = createSlice({
       .addCase(rateSong.rejected, (state, action) => {
         if (state.currentUserStats && action.meta.arg.isNewRating) {
           state.currentUserStats.points = (state.currentUserStats.points || 0) - 25;
+        }
+      })
+      .addCase(saveActiveChallenge.fulfilled, (state, { payload }) => {
+        if (state.currentUserStats) {
+          state.currentUserStats.activeChallenge = payload;
+        }
+      })
+      .addCase(checkAndSaveChallengeProgress.fulfilled, (state, { payload }) => {
+        if (!state.currentUserStats || !payload) return;
+
+        const { challenge, challengeFinished, pointsToAdd, rewardSkillId } = payload;
+
+        if (rewardSkillId) {
+          if (!state.currentUserStats.skills) {
+            state.currentUserStats.skills = { unlockedSkills: {} };
+          }
+          const currentLevel = state.currentUserStats.skills.unlockedSkills[rewardSkillId] || 0;
+          state.currentUserStats.skills.unlockedSkills[rewardSkillId] = currentLevel + 1;
+        }
+
+        if (challengeFinished) {
+          state.currentUserStats.activeChallenge = null;
+
+          if (!state.currentUserStats.completedChallenges) {
+            state.currentUserStats.completedChallenges = [];
+          }
+          if (!state.currentUserStats.completedChallenges.includes(challenge.challengeId)) {
+            state.currentUserStats.completedChallenges.push(challenge.challengeId);
+          }
+
+          if (pointsToAdd > 0) {
+            state.currentUserStats.points = (state.currentUserStats.points || 0) + pointsToAdd;
+          }
+        } else {
+          state.currentUserStats.activeChallenge = challenge;
         }
       })
       .addCase(logInViaGoogle.pending, (state) => {
@@ -147,11 +259,59 @@ export const userSlice = createSlice({
         state.timer.creativity = 0;
         state.timer.hearing = 0;
         state.timer.theory = 0;
-        state.currentUserStats = payload.currentUserStats;
-        state.previousUserStats = payload.previousUserStats;
-        state.raitingData = {
-          ...payload.raitingData,
-        };
+
+        if (payload?.currentUserStats && state.currentUserStats) {
+          const prevStats = { ...state.currentUserStats };
+
+          const currentActiveChallenge = prevStats?.activeChallenge;
+          const currentDailyQuest = prevStats?.dailyQuest;
+          const currentSkills = prevStats?.skills;
+          const currentAvailablePoints = prevStats?.availablePoints;
+          const today = new Date().toISOString().split('T')[0];
+
+          state.currentUserStats = {
+            ...payload.currentUserStats,
+            activeChallenge: currentActiveChallenge || payload.currentUserStats.activeChallenge,
+            dailyQuest: (currentDailyQuest && currentDailyQuest.date === today) ? currentDailyQuest : payload.currentUserStats.dailyQuest,
+            skills: currentSkills || payload.currentUserStats.skills,
+            availablePoints: currentAvailablePoints || payload.currentUserStats.availablePoints,
+          };
+
+          state.previousUserStats = prevStats;
+
+          // SKILL REWARD LOGIC: Every category practiced today gives +1 level to its master skill
+          const isNewDayReport = prevStats?.lastReportDate?.split('T')[0] !== today;
+
+          if (isNewDayReport && state.currentUserStats.skills) {
+            const skills = { ...state.currentUserStats.skills };
+            if (!skills.unlockedSkills) skills.unlockedSkills = {};
+
+            const masterSkillMap: Record<string, string> = {
+              technique: "alternate_picking",
+              theory: "music_theory",
+              hearing: "ear_training",
+              creativity: "improvisation"
+            };
+
+            let pointsAwarded = false;
+            Object.entries(masterSkillMap).forEach(([cat, skillId]) => {
+              const categoryKey = cat as keyof StatisticsTime;
+              const prevTime = prevStats?.time?.[categoryKey] || 0;
+              const currTime = state.currentUserStats?.time?.[categoryKey] || 0;
+
+              if (currTime > prevTime) {
+                skills.unlockedSkills[skillId] = (skills.unlockedSkills[skillId] || 0) + 1;
+                pointsAwarded = true;
+              }
+            });
+
+            if (pointsAwarded) {
+              state.currentUserStats.skills = skills;
+            }
+          }
+        }
+
+        state.raitingData = payload.raitingData;
         state.isFetching = null;
       })
       .addCase(restartUserStats.fulfilled, (state) => {
@@ -248,6 +408,10 @@ export const {
   increaseTimerTime,
   updateLocalTimer,
   updatePoints,
+  setActiveChallenge,
+  generateDailyQuest,
+  completeQuestTask,
+  claimQuestReward
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
@@ -263,6 +427,10 @@ export const selectUserName = (state: RootState) =>
 export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectUserAvatar = (state: RootState) =>
   state.user.userInfo?.avatar;
+export const selectActiveChallenge = (state: RootState) =>
+  state.user.currentUserStats?.activeChallenge;
+export const selectDailyQuest = (state: RootState) =>
+  state.user.currentUserStats?.dailyQuest;
 export const selectIsLoggedOut = (state: RootState) => state.user.isLoggedOut;
 
 export default userSlice.reducer;

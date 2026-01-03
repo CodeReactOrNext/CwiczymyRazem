@@ -56,12 +56,12 @@ export const skillTreeData: SkillNodeDef[] = [
 
   // --- CREATIVITY CLUSTER (Right) ---
   // Center Totem Area: 19, 12
-  { id: "improvisation", x: 17, y: 12, visualConnections: ["phrasing", "music_composition"] }, // Gateway
+  { id: "improvisation", x: 17, y: 12, visualConnections: ["phrasing"] }, // Gateway
 
   { id: "phrasing", x: 19, y: 12, visualConnections: ["articulation"] },
   { id: "articulation", x: 21, y: 12, visualConnections: [] },
 
-  { id: "music_composition", x: 19, y: 10, visualConnections: ["audio_production"] },
+  { id: "composition", x: 19, y: 10, visualConnections: ["audio_production"] },
   { id: "audio_production", x: 20, y: 9, visualConnections: [] },
 
   // --- HEARING CLUSTER (Bottom) ---

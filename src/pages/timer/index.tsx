@@ -10,9 +10,9 @@ import type { NextPageWithLayout } from "types/page";
 
 const Timer: NextPageWithLayout = () => {
   const router = useRouter();
-  const [loadingMode, setLoadingMode] = useState<"timer" | "plan" | "auto" | "song" | null>(null);
+  const [loadingMode, setLoadingMode] = useState<"timer" | "plan" | "auto" | "song" | "challenges" | null>(null);
 
-  const handleModeSelect = (mode: "timer" | "plan" | "auto" | "song") => {
+  const handleModeSelect = (mode: "timer" | "plan" | "auto" | "song" | "challenges") => {
     setLoadingMode(mode);
     switch (mode) {
       case "timer":
@@ -27,13 +27,18 @@ const Timer: NextPageWithLayout = () => {
       case "song":
         router.push("/timer/song-select");
         break;
+      case "challenges":
+        router.push("/timer/challenges");
+        break;
       default:
         setLoadingMode(null);
     }
   };
 
   return (
-    <PracticeModeSelector onSelectMode={handleModeSelect} loadingMode={loadingMode} />
+    <div className="flex flex-col w-full h-full">
+      <PracticeModeSelector onSelectMode={handleModeSelect} loadingMode={loadingMode} />
+    </div>
   );
 };
 

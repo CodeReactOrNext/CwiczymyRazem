@@ -1,5 +1,5 @@
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import {  doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 import { db } from "../../../utils/firebase/client/firebase.utils";
 
@@ -21,9 +21,15 @@ export const firebaseSetUserExerciseRaprot = async (
     hearingTime: number;
     creativityTime: number;
     sumTime: number;
+  },
+  planId?: string | null,
+  songDetails?: {
+    songId?: string;
+    songTitle?: string;
+    songArtist?: string;
   }
 ) => {
-  const dataRaport = { ...raport, exceriseTitle, timeSumary, isDateBackReport };
+  const dataRaport = { ...raport, exceriseTitle, timeSumary, isDateBackReport, planId, ...songDetails };
 
   const userDocRef = doc(db, "users", userAuth, "exerciseData", raport.reportDate.toISOString());
 

@@ -9,9 +9,10 @@ import { useTimeTracking } from './useTimeTracking';
 import { useUIState } from './useUIState';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAvatar } from 'feature/user/store/userSlice';
-import { updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
+import { updateUserStats, checkAndSaveChallengeProgress, updateQuestProgress } from 'feature/user/store/userSlice.asyncThunk';
 import { convertMsToHMObject } from 'utils/converter';
 import type { ReportFormikInterface, ReportDataInterface } from 'feature/user/view/ReportView/ReportView.types';
+
 
 interface UsePracticeSessionStateProps {
   plan: ExercisePlan;
@@ -27,6 +28,9 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
 
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
   const [reportResult, setReportResult] = useState<ReportDataInterface | null>(null);
+
+  const isChallenge = currentUserStats?.activeChallenge?.challengeId === plan.id;
+  console.log('[Challenge] isChallenge:', isChallenge, 'plan.id:', plan.id, 'activeChallenge:', currentUserStats?.activeChallenge);
 
   const {
     currentExerciseIndex,
@@ -72,6 +76,9 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
   const formattedTimeLeft = `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`;
   const timerProgressValue = Math.min(100, (timer.time / (effectiveTotalSeconds * 1000)) * 100);
 
+  const canSkipExercise = !isChallenge || timeLeft <= 0;
+  console.log('[Challenge] canSkipExercise:', canSkipExercise, 'timeLeft:', timeLeft, 'isChallenge:', isChallenge);
+
   const checkForSuccess = useCallback(() => {
     if (isLastExercise && timeLeft <= 0) {
       setShowSuccessView(true);
@@ -111,11 +118,27 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
       countBackDays: 0,
       reportTitle: planTitle,
       avatarUrl: avatar ?? null,
+      planId: plan.id || null,
     };
 
     try {
       const result = await dispatch(updateUserStats({ inputData })).unwrap();
       setReportResult(result.raitingData);
+
+      // Quest Triggers
+      dispatch(updateQuestProgress({ type: 'practice_plan' }));
+
+      if (plan.id && plan.id.startsWith('auto')) {
+        dispatch(updateQuestProgress({ type: 'auto_plan' }));
+      }
+
+      const isSongPlan = plan.exercises.some(ex => ex.isPlayalong || ex.videoUrl?.includes('youtu') || (ex as any).category === 'song');
+      if (isSongPlan) {
+        dispatch(updateQuestProgress({ type: 'practice_any_song' }));
+      }
+
+      dispatch(checkAndSaveChallengeProgress());
+
     } catch (error) {
       console.error("Auto-submit report failed:", error);
     } finally {
@@ -155,6 +178,7 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
     resetSuccessView,
     setVideoDuration,
     autoSubmitReport,
+    canSkipExercise,
     isSubmittingReport,
     reportResult,
     currentUserStats,
