@@ -15,7 +15,8 @@ import { i18n } from "next-i18next";
 import { useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { FaInfoCircle, FaLightbulb, FaCheck, FaStepForward, FaFacebook, FaInstagram, FaTwitter, FaHeart, FaExternalLinkAlt } from "react-icons/fa";
-import { Loader2 } from "lucide-react";
+import { Loader2, Crosshair, Layers, Sparkles, Calendar, Flame, Timer } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
 import { Metronome } from "../../components/Metronome/Metronome";
@@ -90,7 +91,8 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
     planTitleString,
     sessionTimerData,
     exerciseTimeSpent,
-    jumpToExercise
+    jumpToExercise,
+    canSkipExercise
   } = usePracticeSessionState({ plan, onFinish });
 
   const {
@@ -247,6 +249,38 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
                         )}
                         {currentExercise.title[currentLang]}
                     </h2>
+
+                    {/* Simple Challenge Banner */}
+                    {(plan as any).streakDays && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-10 w-full max-w-2xl px-6 py-4 rounded-xl bg-main/10 border border-main/20 flex items-center justify-between"
+                      >
+                         <div className="flex items-center gap-4">
+                            <div className="p-3 rounded-lg bg-main text-white">
+                               <Timer size={20} />
+                            </div>
+                            <div>
+                               <h3 className="text-lg font-bold text-white tracking-tight">
+                                 Challenge: {typeof (plan as any).title === 'string' ? (plan as any).title : (plan as any).title[currentLang]}
+                               </h3>
+                               <p className="text-sm text-zinc-400 leading-relaxed">
+                                 {typeof (plan as any).description === 'string' ? (plan as any).description : (plan as any).description[currentLang]}
+                               </p>
+                               <p className="text-xs text-main font-bold uppercase tracking-widest">
+                                 Reward: {(plan as any).rewardDescription}
+                               </p>
+                            </div>
+                         </div>
+                         
+                         <div className="flex gap-1.5">
+                            {Array.from({ length: (plan as any).streakDays }).map((_, i) => (
+                               <div key={i} className="h-1.5 w-6 rounded-full bg-main/20 border border-main/10" />
+                            ))}
+                         </div>
+                      </motion.div>
+                    )}
                     
                     <div className={cn(
                       "relative w-full overflow-hidden radius-premium bg-zinc-900 shadow-2xl",
@@ -307,54 +341,56 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
                      <div className="lg:col-span-8 space-y-8">
-                         <Accordion type="single" collapsible defaultValue="instructions" className="w-full space-y-4">
-                            <AccordionItem value="instructions" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
-                                <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
-                                            <FaInfoCircle />
+                         <Accordion type="single" collapsible defaultValue={currentExercise.instructions?.length > 0 ? "instructions" : (currentExercise.tips?.length > 0 ? "tips" : undefined)} className="w-full space-y-4">
+                            {currentExercise.instructions && currentExercise.instructions.length > 0 && (
+                                <AccordionItem value="instructions" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                                    <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
+                                                <FaInfoCircle />
+                                            </div>
+                                            <span className="font-bold tracking-wide">{t("exercises:instructions")}</span>
                                         </div>
-                                        <span className="font-bold tracking-wide">{t("exercises:instructions")}</span>
-                                    </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="px-6 pb-6 pt-2">
-                                     <div className={cn(
-                                       "prose prose-invert max-w-none",
-                                       currentExercise.isPlayalong ? "text-sm leading-relaxed opacity-70" : ""
-                                     )}>
-                                        {currentExercise.instructions.map((instruction, idx) => (
-                                            <p key={idx} className="mb-4 last:mb-0">
-                                                {instruction[currentLang]}
-                                            </p>
-                                        ))}
-                                     </div>
-                                </AccordionContent>
-                            </AccordionItem>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-6 pb-6 pt-2">
+                                         <div className={cn(
+                                           "prose prose-invert max-w-none",
+                                           currentExercise.isPlayalong ? "text-sm leading-relaxed opacity-70" : ""
+                                         )}>
+                                            {currentExercise.instructions.map((instruction, idx) => (
+                                                <p key={idx} className="mb-4 last:mb-0">
+                                                    {instruction[currentLang]}
+                                                </p>
+                                            ))}
+                                         </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            )}
 
-                            <AccordionItem value="tips" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
-                                <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
-                                            <FaLightbulb />
+                            {currentExercise.tips && currentExercise.tips.length > 0 && (
+                                <AccordionItem value="tips" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                                    <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
+                                                <FaLightbulb />
+                                            </div>
+                                            <span className="font-bold tracking-wide">{t("exercises:hints")}</span>
                                         </div>
-                                        <span className="font-bold tracking-wide">{t("exercises:hints")}</span>
-                                    </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="px-6 pb-6 pt-2">
-                                     <ul className={cn(
-                                       "list-inside list-disc",
-                                       currentExercise.isPlayalong ? "space-y-1 text-sm" : "space-y-2"
-                                     )}>
-                                        {currentExercise.tips?.length > 0 && (
-                                            currentExercise.tips.map((tip, idx) => (
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-6 pb-6 pt-2">
+                                         <ul className={cn(
+                                           "list-inside list-disc",
+                                           currentExercise.isPlayalong ? "space-y-1 text-sm" : "space-y-2"
+                                         )}>
+                                            {currentExercise.tips.map((tip, idx) => (
                                                 <li key={idx} className="marker:text-amber-500/50">
                                                     {tip[currentLang] || tip.pl}
                                                 </li>
-                                            ))
-                                        )}
-                                     </ul>
-                                </AccordionContent>
-                            </AccordionItem>
+                                            ))}
+                                         </ul>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            )}
                          </Accordion>
                      </div>
 
@@ -439,6 +475,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
                                  variant="compact"
                                  sessionTimerData={sessionTimerData}
                                  exerciseTimeSpent={exerciseTimeSpent}
+                                 canSkipExercise={canSkipExercise}
                              />
                           </div>
 
@@ -449,7 +486,8 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
                                  "h-14 min-w-[200px] px-8 radius-premium font-black text-xs tracking-[0.2em] transition-all click-behavior uppercase",
                                  isLastExercise 
                                      ? "bg-cyan-500 text-black shadow-xl shadow-cyan-500/20 hover:bg-cyan-400" 
-                                     : "bg-white text-black shadow-xl shadow-white/10 hover:bg-zinc-200"
+                                     : "bg-white text-black shadow-xl shadow-white/10 hover:bg-zinc-200",
+                                 !canSkipExercise && "opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500 hover:bg-zinc-800 shadow-none border border-white/5"
                                  )}
                                  onClick={() => {
                                   if (isLastExercise) {
@@ -458,7 +496,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
                                     handleNextExercise(resetTimer);
                                   }
                                 }}
-                                disabled={isFinishing || isSubmittingReport}
+                                disabled={isFinishing || isSubmittingReport || !canSkipExercise}
                              >
                                  {(isFinishing || isSubmittingReport) ? (
                                      <div className="flex items-center gap-2">

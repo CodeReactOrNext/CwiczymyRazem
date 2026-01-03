@@ -95,7 +95,13 @@ export default async function handler(
       { ...report.raitingData, skillPointsGained },
       inputData.reportTitle,
       report.isDateBackReport,
-      report.timeSummary
+      report.timeSummary,
+      inputData.planId ?? null,
+      inputData.songId || inputData.songTitle || inputData.songArtist ? {
+        songId: inputData.songId,
+        songTitle: inputData.songTitle,
+        songArtist: inputData.songArtist
+      } : undefined
     );
 
     invalidateActivityLogsCache(userUid);
@@ -111,7 +117,13 @@ export default async function handler(
           level: report.currentUserStats.lvl,
         },
         report.timeSummary,
-        inputData.avatarUrl ?? null
+        inputData.avatarUrl ?? null,
+        inputData.planId ?? null,
+        inputData.songId || inputData.songTitle || inputData.songArtist ? {
+          songId: inputData.songId,
+          songTitle: inputData.songTitle,
+          songArtist: inputData.songArtist
+        } : undefined
       );
     }
 

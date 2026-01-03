@@ -14,6 +14,8 @@ import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 
 import { StatsSection } from "./components/StatsSection";
+import { ActiveChallengeWidget } from "feature/challenges/components/ActiveChallengeWidget";
+import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -57,6 +59,15 @@ const ProfileLandingLayout = ({
 
       {/* Statistics Section */}
       <DashboardSection color='cyan' compact>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+            <div className="lg:col-span-2 h-full">
+                <ActiveChallengeWidget />
+            </div>
+            <div className="lg:col-span-2 h-full">
+                <DailyQuestWidget />
+            </div>
+        </div>
+
         <StatsSection
           statsField={statsField}
           statistics={userStats}

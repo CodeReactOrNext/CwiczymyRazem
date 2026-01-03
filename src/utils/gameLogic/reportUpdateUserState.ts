@@ -53,16 +53,17 @@ export const reportUpdateUserStats = ({
       ? makeRatingData(inputData, sumTime, 1)
       : makeRatingData(inputData, sumTime, updatedActualDayWithoutBreak)),
     skillPointsGained: {
-      technique: techniqueTime > 0 ? 1 : 0,
-      theory: theoryTime > 0 ? 1 : 0,
-      hearing: hearingTime > 0 ? 1 : 0,
-      creativity: creativityTime > 0 ? 1 : 0,
+      technique: 0,
+      theory: 0,
+      hearing: 0,
+      creativity: 0,
     },
   };
   const updatedLevel = levelUpUser(lvl, points + raiting.totalPoints);
   const isNewLevel = updatedLevel > lvl;
 
   const updatedUserData: StatisticsDataInterface = {
+    ...currentUserStats,
     time: {
       technique: time.technique + techniqueTime,
       theory: time.theory + theoryTime,

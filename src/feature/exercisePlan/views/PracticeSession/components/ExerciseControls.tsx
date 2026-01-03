@@ -9,6 +9,7 @@ interface ExerciseControlsProps {
   handleNextExercise: () => void;
   size?: "sm" | "md" | "lg";
   variant?: "default" | "centered";
+  canSkipExercise?: boolean;
 }
 
 const ExerciseControls = ({
@@ -18,6 +19,7 @@ const ExerciseControls = ({
   handleNextExercise,
   size = "md",
   variant = "default",
+  canSkipExercise = true
 }: ExerciseControlsProps) => {
   const btnSizes = {
     sm: "h-10 w-10",
@@ -61,7 +63,11 @@ const ExerciseControls = ({
           size={size === "lg" ? "lg" : "default"}
           variant='ghost'
           onClick={handleNextExercise}
-          className="flex-1 radius-premium transition-background click-behavior">
+          disabled={!canSkipExercise}
+          className={cn(
+            "flex-1 radius-premium transition-background click-behavior",
+            !canSkipExercise && "opacity-50 cursor-not-allowed hover:bg-transparent"
+          )}>
           <FaStepForward className={iconSizes[size]} />
         </Button>
       )}

@@ -2,6 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "assets/components/ui/dialog";
 import { Slider } from "assets/components/ui/slider";
 import { Checkbox } from "assets/components/ui/checkbox";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { convertMsToHMS } from "utils/converter";
 
@@ -11,6 +12,7 @@ interface TimeSplitterModalProps {
   onConfirm: (hearingTime: number, techniqueTime: number, markAsLearned: boolean) => void;
   onCancel: () => void;
   songTitle: string;
+  isLoading?: boolean;
 }
 
 export const TimeSplitterModal = ({
@@ -19,6 +21,7 @@ export const TimeSplitterModal = ({
   onConfirm,
   onCancel,
   songTitle,
+  isLoading = false,
 }: TimeSplitterModalProps) => {
   const [splitRatio, setSplitRatio] = useState(50); // 0 = 100% Hearing, 100 = 100% Technique
   const [markAsLearned, setMarkAsLearned] = useState(false);
@@ -79,11 +82,22 @@ export const TimeSplitterModal = ({
         </div>
 
         <DialogFooter className="sm:justify-between gap-2">
-           <Button variant="ghost" onClick={onCancel} className="text-zinc-400 hover:text-white">
+           <Button variant="ghost" onClick={onCancel} disabled={isLoading} className="text-zinc-400 hover:text-white">
              Resume Timer
            </Button>
-           <Button onClick={() => onConfirm(hearingTime, techniqueTime, markAsLearned)} className="bg-cyan-600 hover:bg-cyan-500 text-white">
-             Confirm & Finish
+           <Button 
+             onClick={() => onConfirm(hearingTime, techniqueTime, markAsLearned)} 
+             disabled={isLoading}
+             className="bg-cyan-600 hover:bg-cyan-500 text-white"
+           >
+             {isLoading ? (
+               <>
+                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                 Saving...
+               </>
+             ) : (
+               "Confirm & Finish"
+             )}
            </Button>
         </DialogFooter>
       </DialogContent>

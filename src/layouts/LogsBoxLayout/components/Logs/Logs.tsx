@@ -22,6 +22,9 @@ import { addZeroToTime } from "utils/converter";
 import { LogReaction } from "feature/logs/components/LogReaction";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
+import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import { challengesList } from "feature/challenges/data/challengesList";
+import { cn } from "assets/lib/utils";
 
 const isFirebaseLogsSongs = (
   log:
@@ -29,7 +32,7 @@ const isFirebaseLogsSongs = (
     | FirebaseLogsSongsInterface
     | FirebaseLogsTopPlayersInterface
 ): log is FirebaseLogsSongsInterface => {
-  return (log as FirebaseLogsSongsInterface).songArtist !== undefined;
+  return (log as FirebaseLogsSongsInterface).status !== undefined;
 };
 
 const isFirebaseLogsTopPlayers = (
@@ -161,10 +164,27 @@ const FirebaseLogsItem = ({
   isNew: boolean;
   currentUserId: string;
 }) => {
-  const { t } = useTranslation("common");
-  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl } =
-    log;
+  const { t, i18n } = useTranslation(["common", "exercises"]);
+  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist } = log;
   const date = new Date(data);
+
+  let plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
+  let isChallenge = false;
+  
+  if (!plan && planId) {
+      plan = challengesList.find(c => c.id === planId);
+      if (plan) isChallenge = true;
+  }
+
+  const currentLang = (i18n.language === 'pl' || i18n.language === 'en') ? i18n.language : 'en';
+  
+  const getLocalizedTitle = (title: any) => {
+      if (typeof title === 'string') return title;
+      if (!title) return null;
+      return title[currentLang] || title['en'];
+  };
+
+  const planTitle = plan ? getLocalizedTitle(plan.title) : null;
 
   return (
     <LogItem isNew={isNew}>
@@ -177,15 +197,37 @@ const FirebaseLogsItem = ({
             avatarUrl={avatarUrl ?? undefined}
           />
         </span>{" "}
-        <span className='text-secondText'>{t("logsBox.get")}</span>
+        <span className='text-secondText'>{t("common:logsBox.get")}</span>
         <span className='mr-1 text-main'>
           +{points}
-          <span className='text-secondText'> {t("logsBox.points")}</span>
+          <span className='text-secondText'> {t("common:logsBox.points")}</span>
         </span>
+        
+        {planTitle && (
+            <span className={cn(
+                "ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded border opacity-90",
+                isChallenge 
+                    ? "text-orange-400 bg-orange-950/30 border-orange-500/20" 
+                    : "text-cyan-400 bg-cyan-950/30 border-cyan-500/20"
+            )}>
+              <span className="uppercase tracking-widest text-[9px] opacity-70">
+                  {isChallenge ? "CHALLENGE" : "PLAN"}
+              </span>
+              <span className="font-medium">{planTitle}</span>
+            </span>
+        )}
+
+        {songTitle && songArtist && (
+            <span className="ml-2 inline-flex items-center gap-1 text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90">
+              <span className="uppercase tracking-widest text-[9px] opacity-70">SONG</span>
+              <span className="font-medium">{songArtist} - {songTitle}</span>
+            </span>
+        )}
+
         {newLevel.isNewLevel && (
           <span className='text-secondText'>
             {" "}
-            {t("logsBox.lvl_up")}
+            {t("common:logsBox.lvl_up")}
             <span className='ml-1 text-main'>
               {newLevel.level}
               {" lvl"}
@@ -194,7 +236,7 @@ const FirebaseLogsItem = ({
         )}
         {newAchievements.length > 0 && (
           <span className='inline-flex items-center gap-2'>
-            {t("logsBox.achievements")}{" "}
+            {t("common:logsBox.achievements")}{" "}
             {newAchievements.map((achievement, index) => (
               <span key={index} className='inline-flex items-center gap-2'>
                 <Achievement id={achievement} />

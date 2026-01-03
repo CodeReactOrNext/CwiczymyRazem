@@ -2,6 +2,7 @@ import { removeUserSong } from "feature/songs/services/removeUserSong";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar, updatePoints } from "feature/user/store/userSlice";
+import { updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -48,8 +49,13 @@ export const useSongsStatusChange = ({
       const result = await updateSongStatus(userId, songId, title, artist, newStatus, avatar);
 
       // Update Points in local store
+      // Update Points in local store
       if (result.pointsAdded !== 0) {
         dispatch(updatePoints(result.pointsAdded));
+      }
+
+      if (newStatus === "wantToLearn") {
+        dispatch(updateQuestProgress({ type: 'add_want_to_learn' }));
       }
 
       if (!options?.skipOptimisticUpdate) {

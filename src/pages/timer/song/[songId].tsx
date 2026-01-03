@@ -14,8 +14,12 @@ import { db } from "utils/firebase/client/firebase.utils";
 import type { Song } from "feature/songs/types/songs.type";
 import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal";
 import { toast } from "sonner";
-import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
+import { selectUserAuth, selectUserAvatar, selectCurrentUserStats, selectPreviousUserStats, selectRaitingData } from "feature/user/store/userSlice";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
+import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import { updateUserStats, updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
+import RatingPopUpLayout from "layouts/RatingPopUpLayout";
+import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 
 import { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
@@ -29,11 +33,17 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     const timerData = useAppSelector(selectTimerData);
     const userId = useAppSelector(selectUserAuth);
     const userAvatar = useAppSelector(selectUserAvatar);
+    const currentUserStats = useAppSelector(selectCurrentUserStats);
+    const previousUserStats = useAppSelector(selectPreviousUserStats);
+    const raitingData = useAppSelector(selectRaitingData);
+    const { reportList } = useActivityLog(userId as string);
     const { t } = useTranslation(["timer", "common"]);
     
     const [song, setSong] = useState<Song | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSplitterOpen, setIsSplitterOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
         const fetchSong = async () => {
@@ -68,6 +78,14 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     };
 
     const handleConfirmSplit = async (hearingTime: number, techniqueTime: number, markAsLearned: boolean) => {
+        if (!song) {
+            toast.error("Song data not available");
+            setIsSplitterOpen(false);
+            return;
+        }
+
+        setIsSubmitting(true);
+
         if (hearingTime > 0) {
             dispatch(updateTimerTime({ type: "hearing", time: hearingTime }));
         }
@@ -75,7 +93,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             dispatch(updateTimerTime({ type: "technique", time: techniqueTime }));
         }
         
-        if (markAsLearned && userId && song) {
+        if (markAsLearned && userId) {
             try {
                  await updateSongStatus(
                      userId,
@@ -92,8 +110,36 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             }
         }
         
-        setIsSplitterOpen(false);
-        router.push("/report");
+        const inputData: ReportFormikInterface = {
+            techniqueHours: "0",
+            techniqueMinutes: Math.floor(techniqueTime / 60000).toString(),
+            theoryHours: "0",
+            theoryMinutes: "0",
+            hearingHours: "0",
+            hearingMinutes: Math.floor(hearingTime / 60000).toString(),
+            creativityHours: "0",
+            creativityMinutes: "0",
+            habbits: [],
+            countBackDays: 0,
+            reportTitle: `Practicing: ${song.artist} - ${song.title}`,
+            avatarUrl: userAvatar ?? null,
+            songId: song.id,
+            songTitle: song.title,
+            songArtist: song.artist,
+        };
+
+        try {
+            dispatch(updateQuestProgress({ type: 'practice_any_song' }));
+            await dispatch(updateUserStats({ inputData })).unwrap();
+            setIsSplitterOpen(false);
+            setIsSubmitting(false);
+            setShowSuccess(true);
+        } catch (error) {
+            console.error("Failed to submit report:", error);
+            toast.error("Failed to save practice session");
+            setIsSplitterOpen(false);
+            setIsSubmitting(false);
+        }
     };
 
     const handleBack = () => {
@@ -122,6 +168,19 @@ const SongPracticeTimer: NextPageWithLayout = () => {
          );
     }
 
+    if (showSuccess && raitingData && currentUserStats && previousUserStats) {
+        return (
+            <RatingPopUpLayout
+                onClick={() => router.push("/dashboard")}
+                ratingData={raitingData}
+                currentUserStats={currentUserStats}
+                previousUserStats={previousUserStats}
+                skillPointsGained={raitingData.skillPointsGained}
+                activityData={reportList as any}
+            />
+        );
+    }
+
     return (
         <>
             <SongTimerLayout
@@ -138,6 +197,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 songTitle={song.title}
                 onConfirm={handleConfirmSplit}
                 onCancel={() => setIsSplitterOpen(false)}
+                isLoading={isSubmitting}
             />
         </>
     );

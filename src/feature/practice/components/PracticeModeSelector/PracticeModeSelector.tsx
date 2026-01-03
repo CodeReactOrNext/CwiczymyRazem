@@ -1,12 +1,12 @@
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { FaClock, FaList, FaRandom } from "react-icons/fa";
+import { FaClock, FaList, FaRandom, FaStar } from "react-icons/fa";
 import { HelpCircle } from "lucide-react";
 import Link from "next/link";
 
 interface PracticeModeSelectorProps {
-  onSelectMode: (mode: "timer" | "plan" | "auto" | "song") => void;
-  loadingMode?: "timer" | "plan" | "auto" | "song" | null;
+  onSelectMode: (mode: "timer" | "plan" | "auto" | "song" | "challenges") => void;
+  loadingMode?: "timer" | "plan" | "auto" | "song" | "challenges" | null;
 }
 
 export const PracticeModeSelector = ({
@@ -44,14 +44,23 @@ export const PracticeModeSelector = ({
       to: "to-slate-950",
     },
     emerald: {
-        iconBg: "bg-emerald-800/30",
-        iconText: "text-emerald-400/90",
-        blur: "bg-emerald-700/15",
-        ring: "hover:ring-emerald-700/30",
-        from: "from-emerald-950/60",
-        via: "via-emerald-950/40",
-        to: "to-slate-950",
-      },
+      iconBg: "bg-emerald-800/30",
+      iconText: "text-emerald-400/90",
+      blur: "bg-emerald-700/15",
+      ring: "hover:ring-emerald-700/30",
+      from: "from-emerald-950/60",
+      via: "via-emerald-950/40",
+      to: "to-slate-950",
+    },
+    cyan: {
+      iconBg: "bg-cyan-800/30",
+      iconText: "text-cyan-400/90",
+      blur: "bg-cyan-700/15",
+      ring: "hover:ring-cyan-700/30",
+      from: "from-cyan-950/60",
+      via: "via-cyan-950/40",
+      to: "to-slate-950",
+    },
   };
 
   const modes = [
@@ -84,12 +93,20 @@ export const PracticeModeSelector = ({
       features: [ "Time adjusted", "Personalized"],
     },
     {
-        id: "song" as const,
-        icon: FaList, // Using FaList as a placeholder, maybe import Music note if available or stick with list
-        title: "Practice Song",
-        description: "Focus on a specific song",
-        colors: colorClasses.emerald,
-        features: ["Song specific", "Split progress", "Library integration"],
+      id: "song" as const,
+      icon: FaList,
+      title: "Practice Song",
+      description: "Focus on a specific song",
+      colors: colorClasses.emerald,
+      features: ["Song specific", "Split progress", "Library integration"],
+    },
+    {
+      id: "challenges" as const,
+      icon: FaStar,
+      title: "Challenges",
+      description: "Unlock special category feats",
+      colors: colorClasses.cyan,
+      features: ["Skill based", "Gamified", "Unique rewards"],
     },
   ] as const;
 
@@ -119,7 +136,7 @@ export const PracticeModeSelector = ({
             </div>
           </div>
 
-          <div className='flex flex-col gap-3 sm:gap-6 md:grid md:grid-cols-3'>
+          <div className='flex flex-col gap-3 sm:gap-6 md:grid md:grid-cols-2 lg:grid-cols-3'>
             {modes.map((mode) => (
               <div
                 key={mode.id}
