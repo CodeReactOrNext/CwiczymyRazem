@@ -33,7 +33,7 @@ const getSongFormatter = (status: string): SongFormatter => {
 export const formatDiscordMessage = async (
   log: FirebaseLogsInterface | FirebaseLogsSongsInterface
 ) => {
-  if ("songTitle" in log) {
+  if ("status" in log) {
     const formatter = getSongFormatter(log.status);
     return formatter.format(log);
   } else {
