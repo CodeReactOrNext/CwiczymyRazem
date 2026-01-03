@@ -14,7 +14,7 @@ export const SessionStats = ({
   habitsCount,
   time,
 }: SessionStatsProps) => {
-  const { t } = useTranslation(["report"]);
+  const { t } = useTranslation("report") as any;
 
   return (
     <motion.div
@@ -28,15 +28,15 @@ export const SessionStats = ({
             <p className='flex items-center gap-2'>
               <span className='h-1.5 w-1.5 rounded-full bg-main-300 sm:h-2 sm:w-2'></span>
               <span className='font-bold text-white'>{actualDayWithoutBreak}</span>{" "}
-              streak
+              {t("rating_popup.streak")}
             </p>
             <p className='flex items-center gap-2'>
               <span className='h-1.5 w-1.5 rounded-full bg-main-300 sm:h-2 sm:w-2'></span>
-              you have adopted {habitsCount} healthy habit
+              {t("rating_popup.habitsWithCount", { count: habitsCount })}
             </p>
             <p className='flex items-center gap-2'>
               <span className='h-1.5 w-1.5 rounded-full bg-main-300 sm:h-2 sm:w-2'></span>
-             you practiced for{" "}
+              {t("rating_popup.time_amount")}{" "}
               <span className='font-bold text-white'>{convertMsToHM(time)}</span>
             </p>
           </div>

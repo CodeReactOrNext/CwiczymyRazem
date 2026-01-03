@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MdUpgrade } from "react-icons/md";
 
 export const LevelUpBanner = () => {
-  const { t } = useTranslation(["report"]);
+  const { t } = useTranslation("report") as any;
 
   return (
     <motion.div
@@ -14,7 +14,7 @@ export const LevelUpBanner = () => {
       <div className='flex items-center justify-center gap-2 text-white sm:gap-3'>
         <MdUpgrade className='text-2xl text-main-300 sm:text-3xl' />
         <p className='text-lg font-semibold sm:text-xl'>
-          {t("report:rating_popup.new_level")}
+          {t("rating_popup.new_level")}
         </p>
       </div>
     </motion.div>

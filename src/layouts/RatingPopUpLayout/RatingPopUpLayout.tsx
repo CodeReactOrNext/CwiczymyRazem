@@ -61,7 +61,7 @@ const RatingPopUp = ({
 }: RatingPopUpProps) => {
   const [currentLevel, setCurrentLevel] = useState(previousUserStats.lvl);
   const [displayedPoints, setDisplayedPoints] = useState(0);
-  const { t } = useTranslation("report");
+  const { t } = useTranslation("report") as any;
 
   const topRef = useRef<HTMLDivElement>(null);
 
@@ -150,7 +150,7 @@ const RatingPopUp = ({
                 {displayedPoints}
               </span>
               <span className='text-2xl text-white sm:text-3xl'>
-                points
+                {t("rating_popup.points")}
               </span>
             </div>
             
@@ -202,7 +202,7 @@ const RatingPopUp = ({
             onClick={() => Router.push("/dashboard")}
             size='lg'
             className='bg-gradient-to-r from-cyan-600 to-cyan-500 px-8 py-3 text-base font-medium text-white shadow-lg hover:from-cyan-500 hover:to-cyan-400'>
-           Back
+            {t("rating_popup.back")}
           </Button>
         </div>
       </motion.div>
