@@ -25,6 +25,10 @@ export interface ReportFormikInterface {
   reportTitle: string;
   habbits: HabbitsType[];
   avatarUrl: string | null;
+  planId?: string | null;
+  songId?: string;
+  songTitle?: string;
+  songArtist?: string;
 }
 export interface ReportDataInterface {
   reportDate: Date;

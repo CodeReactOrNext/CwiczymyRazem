@@ -4,11 +4,10 @@ import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
-import { updateUserSkills } from "feature/skills/services/updateUserSkills";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronRight, Plus, Sparkles } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
@@ -29,8 +28,6 @@ export const SkillMiniTree = ({
   const [expandedCategories, setExpandedCategories] =
     useState<string[]>(highlightCategories);
   const [clickedCategory, setClickedCategory] = useState<string | null>(null);
-  const [upgradingSkill, setUpgradingSkill] = useState<string | null>(null);
-  const [animationComplete, setAnimationComplete] = useState(true);
 
   useEffect(() => {
     if (!userAuth) return;
@@ -109,101 +106,8 @@ export const SkillMiniTree = ({
     );
   };
 
-  const canUpgradeSkill = (skill: GuitarSkill) => {
-    const pointsCost = 1;
-    if (!userSkills) return false;
-    return userSkills.availablePoints[skill.category] >= pointsCost;
-  };
-
-  const handleSkillUpgrade = async (skillId: string, category: string) => {
-    if (!userSkills || !userAuth || !animationComplete) return;
-
-    const skill = guitarSkills.find((s) => s.id === skillId);
-    if (!skill) return;
-
-    if (!canUpgradeSkill(skill)) {
-      return;
-    }
-
-    setAnimationComplete(false);
-    setUpgradingSkill(skillId);
-
-    // Wait for animation to play before actual update
-    setTimeout(async () => {
-      const success = await updateUserSkills(userAuth, skillId);
-
-      if (success) {
-        const updatedSkills = await getUserSkills(userAuth);
-        setUserSkillsLocal(updatedSkills);
-        setHighlightedSkills((prev) => new Set(prev).add(skillId));
-
-        // Reset animation states after completion
-        setTimeout(() => {
-          setUpgradingSkill(null);
-          setAnimationComplete(true);
-        }, 800);
-      } else {
-        console.error("Failed to upgrade skill");
-        setUpgradingSkill(null);
-        setAnimationComplete(true);
-      }
-    }, 600);
-  };
 
   // Particle animation component
-  const SkillUpgradeEffect = ({
-    skillId,
-    categoryColor,
-  }: {
-    skillId: string;
-    categoryColor: string;
-  }) => {
-    return (
-      <motion.div
-        className='pointer-events-none absolute inset-0 z-10 flex items-center justify-center'
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}>
-        {/* Central flash */}
-        <motion.div
-          className='absolute inset-0 rounded-md'
-          style={{ boxShadow: `0 0 20px 5px ${categoryColor}` }}
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: [0, 0.8, 0],
-          }}
-          transition={{ duration: 0.8, times: [0, 0.2, 1] }}
-        />
-
-        {/* Sparkle icon that grows and fades */}
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{
-            scale: [0.5, 1.5, 2],
-            opacity: [0, 1, 0],
-          }}
-          transition={{ duration: 0.8, times: [0, 0.3, 1] }}>
-          <Sparkles className='h-8 w-8 text-white' />
-        </motion.div>
-
-        {/* Particles radiating outward */}
-        {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={`particle-${skillId}-${i}`}
-            className='absolute h-1.5 w-1.5 rounded-full bg-white'
-            initial={{ opacity: 0, x: 0, y: 0 }}
-            animate={{
-              opacity: [0, 1, 0],
-              x: [0, Math.cos((i * Math.PI) / 4) * 40],
-              y: [0, Math.sin((i * Math.PI) / 4) * 40],
-              scale: [0.8, 1.2, 0.3],
-            }}
-            transition={{ duration: 0.8, times: [0, 0.3, 1] }}
-          />
-        ))}
-      </motion.div>
-    );
-  };
 
   // Group skills by category
   const skillsByCategory = guitarSkills.reduce((acc, skill) => {
@@ -217,9 +121,10 @@ export const SkillMiniTree = ({
   // Filter categories to only show ones with available points or highlighted skills
   const relevantCategories = Object.keys(skillsByCategory).filter(
     (category): category is CategoryKeys =>
-      (userSkills?.availablePoints?.[category as CategoryKeys] &&
-        userSkills.availablePoints[category as CategoryKeys] > 0) ||
-      highlightCategories.includes(category)
+      highlightCategories.includes(category) ||
+      skillsByCategory[category].some(
+        (skill) => (userSkills?.unlockedSkills?.[skill.id] || 0) > 0
+      )
   );
 
   if (relevantCategories.length === 0) return null;
@@ -231,30 +136,6 @@ export const SkillMiniTree = ({
 
   return (
     <>
-      {userSkills?.availablePoints && (
-        <div className='mb-6 rounded-lg border border-second-400/20 bg-second-500/60 p-4 font-openSans shadow-sm backdrop-blur-sm'>
-          <h3 className='mb-3 text-base font-semibold sm:text-lg'>
-            {t("report:rating_popup.skill_points_gained")}
-          </h3>
-          <div className='flex flex-wrap gap-3'>
-            {Object.entries(userSkills?.availablePoints).map(
-              ([skill, points]) =>
-                points > 0 && (
-                  <div key={skill}>
-                    <Badge
-                      variant='outline'
-                      className={`
-                        px-3 py-1.5 text-sm font-medium text-white
-                        ${getCategoryColor(skill).badgeBg}
-                      `}>
-                      +{points} {t(`report:skills.${skill}` as any)}
-                    </Badge>
-                  </div>
-                )
-            )}
-          </div>
-        </div>
-      )}
 
       <div className='mb-4 space-y-3 font-openSans'>
         {relevantCategories.map((category) => {
@@ -287,15 +168,6 @@ export const SkillMiniTree = ({
                 onClick={() => toggleCategory(category)}
                 whileTap={{ scale: 0.98 }}>
                 <div className='flex items-center gap-2'>
-                  <Badge
-                    className={cn(
-                      `px-2 py-1 font-medium text-white`,
-                      isClicked || isExpanded
-                        ? categoryColors.badgeActiveBg
-                        : categoryColors.badgeBg
-                    )}>
-                    {userSkills?.availablePoints?.[category] || 0}
-                  </Badge>
                   <h4 className={`font-medium text-white`}>
                     {getCategoryName(category)}
                   </h4>
@@ -326,9 +198,7 @@ export const SkillMiniTree = ({
                     {categorySkills.map((skill) => {
                       const currentLevel =
                         userSkills?.unlockedSkills?.[skill.id] || 0;
-                      const canUpgrade = canUpgradeSkill(skill);
                       const isHighlighted = highlightedSkills.has(skill.id);
-                      const isUpgrading = upgradingSkill === skill.id;
 
                       return (
                         <motion.div
@@ -336,32 +206,19 @@ export const SkillMiniTree = ({
                           className={cn(
                             "relative overflow-hidden rounded-md border p-3",
                             "bg-gradient-to-b from-second-400/20 to-second-400/5 backdrop-blur-sm",
-                            !canUpgrade && "opacity-70",
                             isHighlighted &&
                               `ring-2 ${categoryColors.highlight}`
                           )}
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{
                             opacity: 1,
-                            scale: isUpgrading ? [1, 1.05, 1] : 1,
-                            transition: {
-                              scale: { duration: 0.8, times: [0, 0.2, 1] },
-                            },
+                            scale: 1,
                           }}
                           transition={{ duration: 0.2 }}
                           whileHover={{
                             scale: 1.02,
                             transition: { duration: 0.1 },
                           }}>
-                          <AnimatePresence>
-                            {isUpgrading && (
-                              <SkillUpgradeEffect
-                                skillId={skill.id}
-                                categoryColor={categoryColors.glowColor}
-                              />
-                            )}
-                          </AnimatePresence>
-
                           <div className='flex items-center justify-between gap-2'>
                             <div className='flex flex-col gap-1'>
                               <div className='flex items-center gap-2'>
@@ -385,20 +242,6 @@ export const SkillMiniTree = ({
                                 )}
                               </div>
                             </div>
-                            {canUpgrade && (
-                              <Button
-                                size='sm'
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleSkillUpgrade(skill.id, skill.category);
-                                }}
-                                disabled={isUpgrading || !animationComplete}
-                                className={`h-8 w-8 rounded-full ${
-                                  categoryColors.button
-                                } ${isUpgrading ? "opacity-0" : ""}`}>
-                                <Plus className='h-4 w-4' />
-                              </Button>
-                            )}
                           </div>
                         </motion.div>
                       );

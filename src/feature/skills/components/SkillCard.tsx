@@ -1,7 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
-import type { GuitarSkill, GuitarSkillId } from "feature/skills/skills.types";
-import { Plus } from "lucide-react";
+import type { GuitarSkill } from "feature/skills/skills.types";
 import { useTranslation } from "react-i18next";
 import {
   Tooltip,
@@ -13,15 +12,11 @@ import {
 interface SkillCardProps {
   skill: GuitarSkill;
   currentPoints: number;
-  availableCategoryPoints: number;
-  onUpgrade: (skillId: GuitarSkillId, points: number) => void;
 }
 
 export const SkillCard = ({
   skill,
   currentPoints,
-  availableCategoryPoints,
-  onUpgrade,
 }: SkillCardProps) => {
   const { t } = useTranslation("skills");
   const theme = getSkillTheme(skill.category);
@@ -38,11 +33,6 @@ export const SkillCard = ({
   const visualMax = 50; 
   const progress = Math.min((currentPoints / visualMax) * 100, 100);
 
-  const handleUpgrade = (amount: number) => {
-    if (availableCategoryPoints >= amount) {
-      onUpgrade(skill.id, amount);
-    }
-  };
 
   return (
     <div className="bg-[#141414] border border-zinc-800/50 rounded-xl p-5 flex flex-col gap-4 transition-colors group relative overflow-hidden">
@@ -88,28 +78,6 @@ export const SkillCard = ({
                style={{ width: `${progress}%` }}
              />
          </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="grid grid-cols-3 gap-2 mt-2 z-10">
-         {[1, 5, 10].map((amount) => {
-            const canAfford = availableCategoryPoints >= amount;
-            return (
-                    <button
-                        onClick={() => handleUpgrade(amount)}
-                        disabled={!canAfford}
-                        className={cn(
-                            "py-2 rounded-lg text-xs font-bold border transition-all flex items-center justify-center gap-1",
-                            canAfford 
-                                ? `bg-zinc-900 border-zinc-800 text-zinc-300 hover:bg-zinc-800 hover:text-white hover:border-zinc-700 active:scale-95`
-                                : "bg-zinc-950/50 border-zinc-900 text-zinc-700 cursor-not-allowed opacity-50"
-                        )}
-                    >
-                        <Plus className="w-3 h-3" />
-                        {amount}
-                    </button>
-            );
-         })}
       </div>
 
        {/* Ambient Glow from Theme */}

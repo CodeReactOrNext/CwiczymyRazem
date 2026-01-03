@@ -25,6 +25,12 @@ export const firebaseAddLogReport = async (
     sumTime: number;
   },
   avatarUrl: string | undefined,
+  planId?: string | null,
+  songDetails?: {
+    songId?: string;
+    songTitle?: string;
+    songArtist?: string;
+  }
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -41,6 +47,8 @@ export const firebaseAddLogReport = async (
     timestamp: new Date().toISOString(),
     timeSumary,
     avatarUrl: avatarUrl ?? null,
+    planId,
+    ...songDetails
   };
 
   await trackedSetDoc(logsDocRef, logData);

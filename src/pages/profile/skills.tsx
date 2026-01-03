@@ -32,45 +32,10 @@ const ProfileSkillsPage: NextPageWithLayout = () => {
     }
   }, [userAuth]);
 
-  const handleUpgradeSkill = async (skillId: string, points: number) => {
-    if (!userAuth || !userStats || !userSkills) {
-      return;
-    }
-
-    const skill = guitarSkills.find((s) => s.id === skillId);
-    if (!skill) {
-      return;
-    }
-
-      // Optimistic update with proper immutability
-      const skillKey = skill.id as keyof typeof userSkills.unlockedSkills;
-      
-      const updatedSkills = { 
-        ...userSkills,
-        unlockedSkills: {
-            ...userSkills.unlockedSkills,
-            [skillKey]: (userSkills.unlockedSkills[skillKey] || 0) + points
-        },
-        availablePoints: {
-            ...userSkills.availablePoints,
-            [skill.category]: userSkills.availablePoints[skill.category] - points
-        }
-      };
-      setUserSkills(updatedSkills);
-
-      await updateUserSkills(userAuth, skill.id, points);
-      // We can fetch in background to sync, but optimistic should be enough for UI responsiveness
-      getUserSkills(userAuth).then((serverSkills) => {
-          if (serverSkills) setUserSkills(serverSkills);
-      });
-  };
-
-
   return (
     <MainContainer title={"Skills"}>
     { userSkills ? <SkillDashboard
         userSkills={userSkills as UserSkills}
-        onSkillUpgrade={handleUpgradeSkill}
       /> : null}
     </MainContainer>
   );

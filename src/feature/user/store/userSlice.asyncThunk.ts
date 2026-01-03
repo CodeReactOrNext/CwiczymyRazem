@@ -4,11 +4,14 @@ import axios from "axios";
 import { signIn, signOut } from "next-auth/react";
 import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { challengesList } from "feature/challenges/data/challengesList";
+import type { RootState } from "store/store";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import type {
+  DailyQuestTaskType,
   FetchedReportDataInterface,
   updateSocialInterface,
   updateUserInterface,
@@ -282,70 +285,7 @@ export const uploadUserSocialData = createAsyncThunk(
   }
 );
 
-export const upgradeSkill = createAsyncThunk(
-  "user/upgradeSkill",
-  async ({ skillId }: { skillId: string }, { rejectWithValue }) => {
-    try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) {
-        throw new Error("User not authenticated");
-      }
 
-      const userRef = doc(db, "users", userId);
-      const userDoc = await getDoc(userRef);
-
-      if (!userDoc.exists()) {
-        throw new Error("User document not found");
-      }
-
-      const userData = userDoc.data();
-      const currentSkills = userData.skills?.unlockedSkills || {};
-      const currentPoints = userData.statistics?.availablePoints || {};
-
-      // Get the skill category from your skills data
-      const skillData = guitarSkills.find((skill) => skill.id === skillId);
-      if (!skillData) {
-        throw new Error("Skill not found");
-      }
-
-      // Check if user has enough points
-      if (
-        !currentPoints[skillData.category] ||
-        currentPoints[skillData.category] <= 0
-      ) {
-        throw new Error("Not enough skill points");
-      }
-
-      // Update the unlocked skills and decrease available points
-      await updateDoc(userRef, {
-        "skills.unlockedSkills": {
-          ...currentSkills,
-          [skillId]: true,
-        },
-        "statistics.availablePoints": {
-          ...currentPoints,
-          [skillData.category]: currentPoints[skillData.category] - 1,
-        },
-      });
-
-      // Return the updated skills data
-      return {
-        unlockedSkills: {
-          ...currentSkills,
-          [skillId]: true,
-        },
-        availablePoints: {
-          ...currentPoints,
-          [skillData.category]: currentPoints[skillData.category] - 1,
-        },
-      };
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to upgrade skill"
-      );
-    }
-  }
-);
 
 export interface RateSongPayload {
   songId: string;
@@ -379,3 +319,173 @@ export const rateSong = createAsyncThunk(
 
 
 
+
+export const saveActiveChallenge = createAsyncThunk(
+  "user/saveActiveChallenge",
+  async (activeChallenge: any | null, { rejectWithValue }) => {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+      const userRef = doc(db, "users", userId);
+
+      await updateDoc(userRef, {
+        "statistics.activeChallenge": activeChallenge
+      });
+
+      return activeChallenge;
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to save active challenge"
+      );
+    }
+  }
+);
+
+export const checkAndSaveChallengeProgress = createAsyncThunk(
+  "user/checkAndSaveChallengeProgress",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const currentUserStats = state.user.currentUserStats;
+      const userId = auth.currentUser?.uid;
+
+      if (!userId || !currentUserStats?.activeChallenge) {
+        return; // No challenge or user
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+
+      // Ensure lastCompletedDate is a string for comparison
+      if (currentUserStats.activeChallenge.lastCompletedDate && currentUserStats.activeChallenge.lastCompletedDate === today) {
+        return rejectWithValue("Already completed today");
+      }
+
+      const challenge = { ...currentUserStats.activeChallenge, lastCompletedDate: today }; // Copy and mark done
+      let pointsToAdd = 0;
+      let challengeFinished = false;
+
+      if (challenge.currentDay >= challenge.totalDays) {
+        // Challenge Complete
+        const challengeData = challengesList.find(c => c.id === challenge.challengeId);
+        const rewardPoints = parseInt(challengeData?.rewardDescription?.match(/\d+/)?.[0] || '0');
+        if (rewardPoints > 0) {
+          pointsToAdd = rewardPoints;
+        }
+        challengeFinished = true;
+      } else {
+        // Next Day
+        challenge.currentDay += 1;
+      }
+
+      // Update Firebase
+      const userRef = doc(db, "users", userId);
+      const { increment, arrayUnion } = await import("firebase/firestore");
+      const updates: any = {};
+
+      const challengeData = challengesList.find(c => c.id === challenge.challengeId);
+
+      // Grant incremental skill reward (+1 daily)
+      if (challengeData?.rewardSkillId) {
+        updates[`skills.unlockedSkills.${challengeData.rewardSkillId}`] = increment(1);
+      }
+
+      if (challengeFinished) {
+        updates["statistics.activeChallenge"] = null;
+        updates["statistics.completedChallenges"] = arrayUnion(challenge.challengeId);
+
+        if (pointsToAdd > 0) {
+          updates["statistics.points"] = increment(pointsToAdd);
+        }
+      } else {
+        updates["statistics.activeChallenge"] = challenge;
+      }
+
+      await updateDoc(userRef, updates);
+
+      return {
+        challenge,
+        challengeFinished,
+        pointsToAdd,
+        rewardSkillId: challengeData?.rewardSkillId,
+        rewardLevel: challengeData?.rewardLevel // This can now be treated as a target or metadata
+      };
+
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to update challenge progress"
+      );
+    }
+  }
+);
+
+export const saveDailyQuestAction = createAsyncThunk(
+  "user/saveDailyQuest",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const dailyQuest = state.user.currentUserStats?.dailyQuest;
+      const userId = auth.currentUser?.uid;
+
+      if (!userId || !dailyQuest) {
+        return;
+      }
+
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, {
+        "statistics.dailyQuest": dailyQuest
+      });
+
+      return dailyQuest;
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to save daily quest"
+      );
+    }
+  }
+);
+
+/**
+ * Thunk to update quest progress and persist it to Firebase
+ */
+export const updateQuestProgress = createAsyncThunk(
+  "user/updateQuestProgress",
+  async (payload: { type: DailyQuestTaskType; amount?: number }, { dispatch }) => {
+    const { completeQuestTask } = await import("./userSlice");
+    dispatch(completeQuestTask(payload));
+    dispatch(saveDailyQuestAction());
+  }
+);
+
+export const initializeDailyQuestAction = createAsyncThunk(
+  "user/initializeDailyQuest",
+  async (_, { dispatch }) => {
+    const { generateDailyQuest } = await import("./userSlice");
+    dispatch(generateDailyQuest());
+    dispatch(saveDailyQuestAction());
+  }
+);
+
+export const claimQuestRewardAction = createAsyncThunk(
+  "user/claimQuestReward",
+  async (_, { dispatch, getState, rejectWithValue }) => {
+    try {
+      const { claimQuestReward } = await import("./userSlice");
+      dispatch(claimQuestReward());
+      dispatch(saveDailyQuestAction());
+
+      const state = getState() as RootState;
+      const userId = auth.currentUser?.uid;
+      if (userId && state.user.currentUserStats) {
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+          "statistics.points": state.user.currentUserStats.points
+        });
+      }
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to claim reward");
+    }
+  }
+);
