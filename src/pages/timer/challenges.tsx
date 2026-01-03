@@ -327,7 +327,7 @@ const ChallengesPage: NextPageWithLayout = () => {
 
 ChallengesPage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId={"exercise"} subtitle='Challenges' variant='secondary'>
+    <AppLayout pageId={"challenges"} subtitle='Challenges' variant='secondary'>
       {page}
     </AppLayout>
   );

@@ -22,6 +22,7 @@ import {
   Code,
   LayoutGrid,
   BookOpen,
+  Flame,
 } from "lucide-react";
 import { FaDiscord } from "react-icons/fa";
 import Link from "next/link";
@@ -88,6 +89,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
       if (view === "management") return "my_songs";
       return "library";
     }
+    if (router.pathname === "/timer/challenges") return "challenges";
     return null;
   };
 
@@ -137,6 +139,12 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
       name: "Reports",
       href: "/report",
       icon: <FileText size={18} />,
+    },
+    {
+      id: "challenges" as NavPagesTypes,
+      name: "Challenges",
+      href: "/timer/challenges",
+      icon: <Flame size={18} />,
     },
   ];
 

@@ -35,7 +35,8 @@
     "faq": "FAQ",
     "exercise": "Exercise",
     "report": "Report",
-    "songs": "Songs"
+    "songs": "Songs",
+    "challenges": "Challenges"
   },
   "day_since": {
     "no_practice": "Player hasn't practiced",
