@@ -1,4 +1,4 @@
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface useTimerInterface {
   time: number;
@@ -27,6 +27,10 @@ const useTimer = () => {
   };
 
   const stopTimer = () => {
+    const timeDifference = new Date().getTime() - startTimeDate;
+    const finalTime = initialTime + timeDifference;
+    setTime(finalTime);
+    setInitialTime(finalTime);
     setTimerEnabled(false);
   };
 
