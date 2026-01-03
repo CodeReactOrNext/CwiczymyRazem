@@ -221,7 +221,7 @@ const ReportView = () => {
     }
 
     await dispatch(updateUserStats({ inputData }));
-    await dispatch(checkAndSaveChallengeProgress());
+    await dispatch(checkAndSaveChallengeProgress(inputData.planId ?? undefined));
     
     // Quest Trigger
     if (inputData.habbits && inputData.habbits.length >= 2) {

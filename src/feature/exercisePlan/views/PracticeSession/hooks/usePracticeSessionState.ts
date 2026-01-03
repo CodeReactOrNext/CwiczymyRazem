@@ -30,8 +30,8 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
   const [reportResult, setReportResult] = useState<ReportDataInterface | null>(null);
 
-  const isChallenge = currentUserStats?.activeChallenge?.challengeId === plan.id;
-  console.log('[Challenge] isChallenge:', isChallenge, 'plan.id:', plan.id, 'activeChallenge:', currentUserStats?.activeChallenge);
+  const isChallenge = (currentUserStats?.activeChallenges || []).some(ac => ac.challengeId === plan.id);
+  console.log('[Challenge] isChallenge:', isChallenge, 'plan.id:', plan.id, 'activeChallenges:', currentUserStats?.activeChallenges);
 
   const {
     currentExerciseIndex,

@@ -125,9 +125,9 @@ export const userSlice = createSlice({
         state.currentUserStats.points = (state.currentUserStats.points || 0) + payload;
       }
     },
-    setActiveChallenge: (state, { payload }: PayloadAction<ActiveChallenge | null>) => {
+    setActiveChallenges: (state, { payload }: PayloadAction<ActiveChallenge[] | null>) => {
       if (state.currentUserStats) {
-        state.currentUserStats.activeChallenge = payload;
+        state.currentUserStats.activeChallenges = payload;
       }
     },
     generateDailyQuest: (state) => {
@@ -209,7 +209,7 @@ export const userSlice = createSlice({
       })
       .addCase(saveActiveChallenge.fulfilled, (state, { payload }) => {
         if (state.currentUserStats) {
-          state.currentUserStats.activeChallenge = payload;
+          state.currentUserStats.activeChallenges = payload;
         }
       })
       .addCase(checkAndSaveChallengeProgress.fulfilled, (state, { payload }) => {
@@ -226,7 +226,7 @@ export const userSlice = createSlice({
         }
 
         if (challengeFinished) {
-          state.currentUserStats.activeChallenge = null;
+          state.currentUserStats.activeChallenges = (state.currentUserStats.activeChallenges || []).filter(c => c.challengeId !== challenge.challengeId);
 
           if (!state.currentUserStats.completedChallenges) {
             state.currentUserStats.completedChallenges = [];
@@ -239,7 +239,13 @@ export const userSlice = createSlice({
             state.currentUserStats.points = (state.currentUserStats.points || 0) + pointsToAdd;
           }
         } else {
-          state.currentUserStats.activeChallenge = challenge;
+          if (!state.currentUserStats.activeChallenges) state.currentUserStats.activeChallenges = [];
+          const index = state.currentUserStats.activeChallenges.findIndex(c => c.challengeId === challenge.challengeId);
+          if (index !== -1) {
+            state.currentUserStats.activeChallenges[index] = challenge;
+          } else {
+            state.currentUserStats.activeChallenges.push(challenge);
+          }
         }
       })
       .addCase(logInViaGoogle.pending, (state) => {
@@ -263,7 +269,7 @@ export const userSlice = createSlice({
         if (payload?.currentUserStats && state.currentUserStats) {
           const prevStats = { ...state.currentUserStats };
 
-          const currentActiveChallenge = prevStats?.activeChallenge;
+          const currentActiveChallenge = prevStats?.activeChallenges;
           const currentDailyQuest = prevStats?.dailyQuest;
           const currentSkills = prevStats?.skills;
           const currentAvailablePoints = prevStats?.availablePoints;
@@ -271,7 +277,7 @@ export const userSlice = createSlice({
 
           state.currentUserStats = {
             ...payload.currentUserStats,
-            activeChallenge: currentActiveChallenge || payload.currentUserStats.activeChallenge,
+            activeChallenges: currentActiveChallenge || payload.currentUserStats.activeChallenges,
             dailyQuest: (currentDailyQuest && currentDailyQuest.date === today) ? currentDailyQuest : payload.currentUserStats.dailyQuest,
             skills: currentSkills || payload.currentUserStats.skills,
             availablePoints: currentAvailablePoints || payload.currentUserStats.availablePoints,
@@ -408,7 +414,7 @@ export const {
   increaseTimerTime,
   updateLocalTimer,
   updatePoints,
-  setActiveChallenge,
+  setActiveChallenges,
   generateDailyQuest,
   completeQuestTask,
   claimQuestReward
@@ -427,8 +433,8 @@ export const selectUserName = (state: RootState) =>
 export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectUserAvatar = (state: RootState) =>
   state.user.userInfo?.avatar;
-export const selectActiveChallenge = (state: RootState) =>
-  state.user.currentUserStats?.activeChallenge;
+export const selectActiveChallenges = (state: RootState) =>
+  state.user.currentUserStats?.activeChallenges;
 export const selectDailyQuest = (state: RootState) =>
   state.user.currentUserStats?.dailyQuest;
 export const selectIsLoggedOut = (state: RootState) => state.user.isLoggedOut;
