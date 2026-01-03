@@ -78,7 +78,7 @@ export const processRawReports = (
         isDateBackReport: exerciseLog.isDateBackReport,
         exceriseTitle: exerciseLog.exceriseTitle,
         timeSumary: exerciseLog.timeSumary,
-        planId: exerciseLog.planId,
+        planId: exerciseLog.planId ?? undefined,
       };
     }
   });
