@@ -13,6 +13,7 @@ import { store } from "store/store";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { TooltipProvider } from "assets/components/ui/tooltip";
 import { useState } from "react";
 import ErrorBoundary from "components/ErrorBoundary/ErrorBoundary";
 
@@ -29,6 +30,7 @@ const teko = Teko({
 });
 
 import useAuthSync from "hooks/useAuthSync";
+import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 
 import type { AppPropsWithLayout } from "types/page";
 
@@ -81,12 +83,15 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
         <ErrorBoundary>
           <ThemeModeProvider>
             <AuthSyncWrapper>
-               <main className={`${teko.variable} ${inter.variable} min-h-[100dvh] bg-zinc-950 text-foreground`}>
-                  <Toaster theme='dark' position='top-right' />
-                  <NextTopLoader color='#06b6d4' />
-                  <div id='overlays'></div>
-                  {getLayout(<Component {...pageProps} />)}
-               </main>
+               <ResponsiveInitializer />
+               <TooltipProvider>
+                  <main className={`${teko.variable} ${inter.variable} min-h-[100dvh] bg-zinc-950 text-foreground`}>
+                     <Toaster theme='dark' position='top-right' />
+                     <NextTopLoader color='#06b6d4' />
+                     <div id='overlays'></div>
+                     {getLayout(<Component {...pageProps} />)}
+                  </main>
+               </TooltipProvider>
             </AuthSyncWrapper>
             <ReactQueryDevtools initialIsOpen={false} />
           </ThemeModeProvider>

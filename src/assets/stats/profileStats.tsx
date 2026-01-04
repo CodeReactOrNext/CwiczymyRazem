@@ -1,4 +1,4 @@
-import { achievementsData } from "feature/achievements/achievementsData";
+import { achievementsData } from "feature/achievements/data/achievementsData";
 import { i18n } from "next-i18next";
 import {
   FaCalendarDay,

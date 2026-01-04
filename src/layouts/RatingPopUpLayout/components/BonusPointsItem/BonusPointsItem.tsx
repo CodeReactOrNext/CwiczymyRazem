@@ -1,5 +1,5 @@
-import type { AchievementList } from "feature/achievements/achievementsData";
-import Achievement from "feature/achievements/components/Achievement";
+import type { AchievementList } from "feature/achievements/types";
+import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -150,7 +150,7 @@ const BonusPointsItem = ({
               </p>
               <div className='flex flex-wrap gap-2 p-1 sm:gap-3 sm:p-2'>
                 {achievements.map((id) => (
-                  <Achievement key={id} id={id} />
+                  <AchievementIcon key={id} id={id} />
                 ))}
               </div>
             </div>

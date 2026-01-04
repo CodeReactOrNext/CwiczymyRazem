@@ -1,19 +1,21 @@
 import { IconBox } from "components/IconBox/IconBox";
-import type { AchievementsDataInterface } from "feature/achievements/achievementsData";
-import type { AchievementsRarityType } from "feature/achievements/achievementsRarity";
-import { AchievementCard } from "feature/achievements/components/AchievementCard";
+import type { AchievementContext, AchievementsDataInterface } from "feature/achievements/types";
+import type { AchievementsRarityType } from "feature/achievements/data/achievementsRarity";
+import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
 import { useTranslation } from "react-i18next";
 import { FaMedal } from "react-icons/fa";
 
 export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];
   maxLenght: number;
+  context?: AchievementContext | null;
 }
 
 export const AchievementBox = ({
   achievment,
   rarity,
   maxLenght,
+  context,
 }: AchievementBoxProps) => {
   const { t } = useTranslation("achievements");
 
@@ -28,19 +30,15 @@ export const AchievementBox = ({
           </span>
         </p>
         <div className='flex w-full  flex-row flex-wrap md:gap-4'>
-          {achievment.length === 0 ? (
-            <p>{t("empty")}</p>
-          ) : (
-            achievment.map(({ id }) => {
+           {achievment.map((item) => {
               return (
                 <div
-                  key={id}
+                  key={item.id}
                   className='mb-2 flex w-[4rem] flex-col items-center text-center'>
-                  <AchievementCard id={id} />
+                  <AchievementCard id={item.id} data={item} context={context} isUnlocked={true} />
                 </div>
               );
-            })
-          )}
+            })}
         </div>
       </div>
     </div>

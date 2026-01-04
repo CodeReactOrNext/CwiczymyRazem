@@ -1,6 +1,6 @@
-import type { AchievementList } from "feature/achievements/achievementsData";
-import { achievementsData } from "feature/achievements/achievementsData";
-import Achievement from "feature/achievements/components/Achievement";
+import type { AchievementList } from "feature/achievements/types";
+import { achievementsData } from "feature/achievements/data/achievementsData";
+import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
@@ -54,7 +54,7 @@ export const AchievementsCarousel = ({
           {achievements.length === 0
             ? t("empty")
             : displayItems(index).map((achivId) => {
-                return <Achievement key={achivId} id={achivId} />;
+                return <AchievementIcon key={achivId} id={achivId} />;
               })}
         </div>
         <button onClick={handleNext}>
