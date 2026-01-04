@@ -73,7 +73,7 @@ export type AchievementList =
 
 export interface AchievementContext {
   statistics: StatisticsDataInterface;
-  reportData: ReportDataInterface;
+  sessionResults: ReportDataInterface;
   inputData: ReportFormikInterface;
   songLists: SongListInterface;
 }

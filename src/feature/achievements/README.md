@@ -10,7 +10,7 @@ Provides the necessary data state required for any achievement validation rule.
 
 - **Properties**
   - `statistics` (StatisticsDataInterface): Global user statistics (time, points, level).
-  - `reportData` (ReportDataInterface): Data from the most recently submitted practice report.
+  - `sessionResults` (ReportDataInterface): Data from the most recently submitted practice session (points, bonuses). 
   - `inputData` (ReportFormikInterface): Raw form data from the current report submission.
   - `songLists` (SongListInterface): Categorized lists of user songs (wantToLearn, learning, learned).
 
