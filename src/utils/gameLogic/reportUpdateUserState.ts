@@ -93,7 +93,7 @@ export const reportUpdateUserStats = ({
 
   const newAchievements = AchievementManager.getNewlyEarned({
     statistics: updatedUserData,
-    reportData: raiting,
+    sessionResults: raiting,
     inputData,
     songLists: currentUserSongLists
   });

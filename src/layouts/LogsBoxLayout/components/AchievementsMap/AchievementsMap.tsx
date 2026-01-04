@@ -23,6 +23,7 @@ const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
                 id={id} 
                 data={achievementsData[index]} 
                 isUnlocked={true} 
+                showProgress={true}
               />
             )}
             {!isUnlocked && (
@@ -31,6 +32,7 @@ const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
                 data={achievementsData[index]} 
                 context={context} 
                 isUnlocked={false}
+                showProgress={true}
               />
             )}
           </div>
