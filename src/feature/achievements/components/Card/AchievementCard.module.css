@@ -18,7 +18,6 @@
   filter: saturate(1.2) brightness(1.05);
 }
 
-/* Rest of the file... */
 .card::before {
   content: "";
   position: absolute;

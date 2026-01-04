@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 
 const AchievementIcon = ({ id }: { id: AchievementList }) => {
   const { t } = useTranslation("achievements");
-  // O(1) Lookup
   const achievementData = achievementsMap.get(id);
   const { Icon, rarity, description } = achievementData!;
 
