@@ -23,7 +23,11 @@ export const AchievementCard = memo(({
   const { Icon, rarity, description, name, getProgress } = achievementData;
   const isMobileView = useResponsiveStore((state) => state.isMobile);
 
-  const progress = context && getProgress ? getProgress(context) : undefined;
+  const rawProgress = context && getProgress ? getProgress(context) : undefined;
+  const progress = rawProgress ? {
+    ...rawProgress,
+    current: Math.min(rawProgress.current, rawProgress.max)
+  } : undefined;
 
   const cardContent = (
     <AchievementPhysicalCard
