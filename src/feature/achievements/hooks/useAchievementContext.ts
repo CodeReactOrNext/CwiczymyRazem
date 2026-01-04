@@ -3,7 +3,6 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
 import { AchievementContext } from "../types";
-import { StatisticsDataInterface } from "types/api.types";
 import { SongListInterface } from "src/pages/api/user/report";
 
 export const useAchievementContext = (): AchievementContext | null => {
@@ -20,11 +19,6 @@ export const useAchievementContext = (): AchievementContext | null => {
   if (!currentUserStats || !userSongs) {
     return null;
   }
-
-  // We mock reportData and inputData as they are not relevant for static progress display
-  // or we could use optional chaining in checks but our factories assume they exist.
-  // Ideally, we should update AchievementContext type to make these optional or partial,
-  // but for now we provide safeguards/defaults.
 
   return {
     statistics: currentUserStats,
@@ -49,6 +43,6 @@ export const useAchievementContext = (): AchievementContext | null => {
       theoryTime: 0,
       hearingTime: 0,
       creativityTime: 0,
-    } as any, // Mock
+    } as any,
   };
 };

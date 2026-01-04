@@ -38,10 +38,12 @@ export class AchievementRequirement {
       max: min,
       unit: "songs",
     }),
+
     achievementCount: (min: number) => (ctx: any): AchievementProgress => ({
       current: ctx.statistics.achievements.length,
       max: min,
     }),
+
     statThreshold: (path: keyof StatisticsDataInterface, min: number, unit?: AchievementProgress["unit"]) => (ctx: any): AchievementProgress => {
       const value = ctx.statistics[path];
       return {
@@ -50,11 +52,13 @@ export class AchievementRequirement {
         unit,
       };
     },
+
     statTimeThreshold: (path: keyof StatisticsTime, min: number) => (ctx: any): AchievementProgress => ({
       current: Math.floor(ctx.statistics.time[path] / 3600000),
       max: Math.floor(min / 3600000),
       unit: "h",
     }),
+
     totalTimeThreshold: (minMs: number) => (ctx: any): AchievementProgress => {
       const { time } = ctx.statistics;
       const total = time.technique + time.theory + time.hearing + time.creativity;

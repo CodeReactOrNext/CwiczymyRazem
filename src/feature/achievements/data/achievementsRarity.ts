@@ -20,7 +20,7 @@ export const achievementsRarity = {
   },
   epic: {
     name: "epic",
-    color: "rgb(110 70 255 / 1)", // Match tailwind.config.js
+    color: "rgb(110 70 255 / 1)",
     tailwindClass: "text-achievements-epic",
   },
 };
