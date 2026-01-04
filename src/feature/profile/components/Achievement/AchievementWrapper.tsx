@@ -1,13 +1,14 @@
 import { Card } from "assets/components/ui/card";
 import Link from "next/link";
 import { FaMapMarkedAlt } from "react-icons/fa";
-import type {
-  AchievementList,
-  AchievementsDataInterface,
-} from "feature/achievements/types";
-import {  achievementsMap, achievementsCounts } from "feature/achievements/data/achievementsData";
+import { 
+  AchievementList, 
+  AchievementsDataInterface, 
+  achievementsMap, 
+  achievementsCounts,
+  useAchievementContext 
+} from "feature/achievements";
 import { AchievementBox } from "feature/profile/components/Achievement/AchievementBox";
-import { useAchievementContext } from "feature/achievements/hooks/useAchievementContext";
 
 export const AchievementWrapper = ({
   userAchievements,
