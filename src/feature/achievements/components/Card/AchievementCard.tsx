@@ -1,5 +1,5 @@
 import { useResponsiveStore } from "store/useResponsiveStore";
-import type { AchievementList, AchievementsDataInterface } from "../../types";
+import type { AchievementContext, AchievementList, AchievementsDataInterface } from "../../types";
 import { achievementsMap } from "../../data/achievementsData";
 import { AchievementPhysicalCard } from "./AchievementPhysicalCard";
 import { AchievementCardMobile } from "./AchievementCardMobile";
@@ -7,16 +7,23 @@ import { AchievementCardDesktop } from "./AchievementCardDesktop";
 
 export const AchievementCard = ({ 
   id, 
-  data 
+  data,
+  context,
+  isUnlocked
 }: { 
   id: AchievementList; 
   data?: AchievementsDataInterface;
+  context?: AchievementContext | null;
+  isUnlocked?: boolean;
 }) => {
+  // O(1) Lookup - prioritizing passed data
   const achievementData = data || achievementsMap.get(id);
   if (!achievementData) return null;
   
-  const { Icon, rarity, description, name } = achievementData;
+  const { Icon, rarity, description, name, getProgress } = achievementData;
   const isMobileView = useResponsiveStore((state) => state.isMobile);
+
+  const progress = context && getProgress && !isUnlocked ? getProgress(context) : undefined;
 
   const cardContent = (
     <AchievementPhysicalCard
@@ -34,6 +41,7 @@ export const AchievementCard = ({
         rarity={rarity}
         name={name}
         description={description}
+        progress={progress}
       >
         {cardContent}
       </AchievementCardMobile>
@@ -44,6 +52,7 @@ export const AchievementCard = ({
     <AchievementCardDesktop
       name={name}
       description={description}
+      progress={progress}
     >
       {cardContent}
     </AchievementCardDesktop>

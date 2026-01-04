@@ -10,9 +10,10 @@ interface AchievementCardMobileProps {
   name: string;
   description: string;
   children: React.ReactNode;
+  progress?: { current: number; max: number };
 }
 
-export const AchievementCardMobile = ({ Icon, rarity, name, description, children }: AchievementCardMobileProps) => {
+export const AchievementCardMobile = ({ Icon, rarity, name, description, children, progress }: AchievementCardMobileProps) => {
   const { t } = useTranslation("achievements");
 
   return (
@@ -41,6 +42,15 @@ export const AchievementCardMobile = ({ Icon, rarity, name, description, childre
                 {t(rarity as any)}
               </span>
               {t(description as any)}
+              
+              {progress && progress.current < progress.max && (
+                <div className="mt-4 bg-white/10 rounded-lg p-2 max-w-[200px] mx-auto">
+                    <div className="flex justify-center gap-2 text-xs font-bold opacity-80">
+                        <span className="uppercase text-[10px] tracking-wider">Progress</span>
+                        <span className="text-green-400">{progress.current} / {progress.max}</span>
+                    </div>
+                </div>
+              )}
             </DialogDescription>
           </div>
         </DialogHeader>

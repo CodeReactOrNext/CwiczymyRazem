@@ -5,12 +5,14 @@ import type {
 } from "feature/achievements/types";
 import { achievementsData, achievementsMap, achievementsCounts } from "feature/achievements/data/achievementsData";
 import { AchievementBox } from "feature/profile/components/Achievement/AchievementBox";
+import { useAchievementContext } from "feature/achievements/hooks/useAchievementContext";
 
 export const AchievementWrapper = ({
   userAchievements,
 }: {
   userAchievements: AchievementList[];
 }) => {
+  const context = useAchievementContext();
   interface grupedAchievements {
     common: AchievementsDataInterface[];
     rare: AchievementsDataInterface[];
@@ -52,14 +54,16 @@ export const AchievementWrapper = ({
         achievment={common}
         maxLenght={achievementsCounts.common}
         rarity='common'
+        context={context}
       />
-      <AchievementBox achievment={rare} maxLenght={achievementsCounts.rare} rarity='rare' />
+      <AchievementBox achievment={rare} maxLenght={achievementsCounts.rare} rarity='rare' context={context} />
       <AchievementBox
         achievment={veryRare}
         maxLenght={achievementsCounts.veryRare}
         rarity='veryRare'
+        context={context}
       />
-      <AchievementBox achievment={epic} maxLenght={achievementsCounts.epic} rarity='epic' />
+      <AchievementBox achievment={epic} maxLenght={achievementsCounts.epic} rarity='epic' context={context} />
     </Card>
   );
 };

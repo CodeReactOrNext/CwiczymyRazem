@@ -86,6 +86,7 @@ export interface AchievementsDataInterface extends AchievementsRarityType {
   Icon: IconType;
   description: TFuncKey<"achievements">;
   check: AchievementCheck;
+  getProgress?: (ctx: AchievementContext) => { current: number; max: number };
 }
 
 export type AchievementCheckerReturnType = AchievementList | undefined;
