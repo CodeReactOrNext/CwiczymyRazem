@@ -8,7 +8,6 @@ import { hoursToMilliseconds } from "date-fns";
 import { inputTimeConverter } from "utils/converter";
 import { AchievementList } from "../../types";
 import { achivFactor } from "../achievementsData.utils";
-import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
 
 export const habitAchievements = [
   achivFactor("record" as AchievementList, FaMicrophoneAlt, "rare", (ctx) => {
