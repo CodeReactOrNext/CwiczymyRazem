@@ -2,7 +2,7 @@
 
 import { Brain, Timer, Clock, Zap, BarChart3, TrendingUp, Music2, BookOpen } from "lucide-react";
 import { LandingSongCard } from "./LandingSongCard";
-import { AchievementCard } from "feature/achievements/components/AchievementCard";
+import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
 import { MiniTrendChart } from "feature/profile/components/MiniTrendChart";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";

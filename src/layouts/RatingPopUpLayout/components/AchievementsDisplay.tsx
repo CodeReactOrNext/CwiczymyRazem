@@ -1,8 +1,9 @@
-import Achievement from "feature/achievements/components/Achievement";
-import type { AchievementList } from "feature/achievements/achievementsData";
+import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
+import type { AchievementList } from "feature/achievements/types";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Card } from "assets/components/ui/card";
+import { useAchievementContext } from "feature/achievements/hooks/useAchievementContext";
 
 interface AchievementsDisplayProps {
   achievements: AchievementList[];
@@ -10,6 +11,7 @@ interface AchievementsDisplayProps {
 
 export const AchievementsDisplay = ({ achievements }: AchievementsDisplayProps) => {
   const { t } = useTranslation(["report"]);
+  const context = useAchievementContext();
 
   if (achievements.length === 0) return null;
 
@@ -18,14 +20,16 @@ export const AchievementsDisplay = ({ achievements }: AchievementsDisplayProps) 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 1.2 }}>
-      <Card className='border-yellow-500/20 bg-yellow-500/5 backdrop-blur-sm'>
-        <div className='p-3'>
-          <h3 className='mb-2 text-sm font-semibold text-white'>
+      <Card className='border-amber-500/20 bg-amber-500/5 backdrop-blur-sm'>
+        <div className='p-4'>
+          <h3 className='mb-4 text-sm font-semibold text-white/80 uppercase tracking-wider'>
             {t("report:rating_popup.new_achievements")}
           </h3>
-          <div className='flex flex-wrap gap-2'>
+          <div className='flex flex-wrap gap-4'>
             {achievements.map((id) => (
-              <Achievement key={id} id={id} />
+              <div key={id} className="w-12 h-12">
+                <AchievementCard id={id} context={context} isUnlocked={true} />
+              </div>
             ))}
           </div>
         </div>
