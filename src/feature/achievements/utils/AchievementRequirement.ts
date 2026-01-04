@@ -28,4 +28,30 @@ export class AchievementRequirement {
 
   static habitPresent = (habit: HabbitsType): AchievementCheck =>
     (ctx) => ctx.inputData.habbits.includes(habit);
+
+  static getProgressFor = {
+    songCount: (listName: keyof SongListInterface, min: number) => (ctx: any) => ({
+      current: ctx.songLists[listName].length,
+      max: min,
+    }),
+    statThreshold: (path: keyof StatisticsDataInterface, min: number) => (ctx: any) => {
+      const value = ctx.statistics[path];
+      return {
+        current: typeof value === 'number' ? value : 0,
+        max: min,
+      };
+    },
+    statTimeThreshold: (path: keyof StatisticsTime, min: number) => (ctx: any) => ({
+      current: Math.floor(ctx.statistics.time[path] / 60000),
+      max: Math.floor(min / 60000),
+    }),
+    totalTimeThreshold: (minMs: number) => (ctx: any) => {
+      const { time } = ctx.statistics;
+      const total = time.technique + time.theory + time.hearing + time.creativity;
+      return {
+        current: Math.floor(total / 60000),
+        max: Math.floor(minMs / 60000),
+      };
+    },
+  };
 }

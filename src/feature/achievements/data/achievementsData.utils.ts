@@ -5,7 +5,8 @@ export const achivFactor = (
   id: AchievementList,
   Icon: IconType,
   rarity: "common" | "rare" | "veryRare" | "epic",
-  check: AchievementCheck
+  check: AchievementCheck,
+  getProgress?: (ctx: any) => { current: number; max: number }
 ): AchievementsDataInterface => ({
   id,
   Icon,
@@ -13,4 +14,5 @@ export const achivFactor = (
   name: `${id}.title` as any,
   description: `${id}.description` as any,
   check,
+  getProgress,
 });

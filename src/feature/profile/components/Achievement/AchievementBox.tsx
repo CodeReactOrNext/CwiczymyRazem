@@ -1,5 +1,5 @@
 import { IconBox } from "components/IconBox/IconBox";
-import type { AchievementsDataInterface } from "feature/achievements/types";
+import type { AchievementContext, AchievementsDataInterface } from "feature/achievements/types";
 import type { AchievementsRarityType } from "feature/achievements/data/achievementsRarity";
 import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
 import { useTranslation } from "react-i18next";
@@ -8,12 +8,14 @@ import { FaMedal } from "react-icons/fa";
 export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];
   maxLenght: number;
+  context?: AchievementContext | null;
 }
 
 export const AchievementBox = ({
   achievment,
   rarity,
   maxLenght,
+  context,
 }: AchievementBoxProps) => {
   const { t } = useTranslation("achievements");
 
@@ -36,7 +38,7 @@ export const AchievementBox = ({
                 <div
                   key={item.id}
                   className='mb-2 flex w-[4rem] flex-col items-center text-center'>
-                  <AchievementCard id={item.id} data={item} />
+                  <AchievementCard id={item.id} data={item} context={context} isUnlocked={true} />
                 </div>
               );
             })
