@@ -65,7 +65,7 @@ import type { IconType } from "react-icons/lib";
 import { hoursToMilliseconds, minutesToMilliseconds } from "date-fns";
 import { TbGuitarPick } from "react-icons/tb";
 import { inputTimeConverter } from "utils/converter";
-import type { AchievementCheck, AchievementContext, AchievementList, AchievementsDataInterface } from "../types";
+import type { AchievementCheck, AchievementList, AchievementsDataInterface } from "../types";
 import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
 
 const achivFactor = (
