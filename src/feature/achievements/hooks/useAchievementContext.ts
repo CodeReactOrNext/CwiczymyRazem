@@ -23,7 +23,7 @@ export const useAchievementContext = (): AchievementContext | null => {
   return {
     statistics: currentUserStats,
     songLists: userSongs as unknown as SongListInterface,
-    reportData: {
+    sessionResults: {
       totalPoints: 0,
       bonusPoints: {
         habitsCount: 0,
