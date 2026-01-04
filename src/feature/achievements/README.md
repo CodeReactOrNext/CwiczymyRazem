@@ -64,6 +64,18 @@ The `AchievementsManager` is the core engine that evaluates the entire registry 
 - **Method**: `getNewlyEarned(oldStats, context)`
 - **Returns**: `AchievementList[]` - An array of IDs for achievements earned in the current session that weren't already unlocked.
 
+## Public API
+
+The module exposes its public interface through the root `index.ts`. Always import from this file when using achievements in other parts of the application.
+
+```typescript
+import { 
+  AchievementCard, 
+  AchievementManager, 
+  AchievementContext 
+} from "feature/achievements";
+```
+
 ## Directory Structure
 
 - `src/feature/achievements/`

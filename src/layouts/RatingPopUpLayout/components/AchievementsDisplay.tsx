@@ -1,9 +1,7 @@
-import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
-import type { AchievementList } from "feature/achievements/types";
+import { AchievementCard, AchievementList, useAchievementContext } from "feature/achievements";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Card } from "assets/components/ui/card";
-import { useAchievementContext } from "feature/achievements/hooks/useAchievementContext";
 
 interface AchievementsDisplayProps {
   achievements: AchievementList[];
