@@ -1,4 +1,4 @@
-import type { AchievementList } from "feature/achievements/achievementsData";
+import type { AchievementList } from "feature/achievements/types";
 import type { MediaType } from "feature/settings/components/MediaLinks/MediaLinks";
 import type {
   ReportDataInterface,

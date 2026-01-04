@@ -1,12 +1,7 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@radix-ui/react-tooltip";
-import type { AchievementList } from "feature/achievements/achievementsData";
-import { achievementsData } from "feature/achievements/achievementsData";
-import { AchievementCard } from "feature/achievements/components/AchievementCard";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
+import type { AchievementList } from "feature/achievements/types";
+import { achievementsData } from "feature/achievements/data/achievementsData";
+import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
 import { motion } from "framer-motion";
 
 interface AchievementsMapProps {
@@ -29,16 +24,12 @@ const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
               isUnlocked ? "" : "bg-second-600"
             }`}>
             {isUnlocked && <AchievementCard id={id} />}
-            <TooltipProvider>
-              {!isUnlocked && (
-                <>
-                      <Icon
-                        className={`text-3xl transition-all duration-300 ${"text-gray-600 grayscale"}`}
-                        data-tip={"Achievement Locked"}
-                      />
-                </>
-              )}
-            </TooltipProvider>
+            {!isUnlocked && (
+              <Icon
+                className={`text-3xl transition-all duration-300 ${"text-gray-600 grayscale"}`}
+                data-tip={"Achievement Locked"}
+              />
+            )}
           </motion.div>
         );
       })}

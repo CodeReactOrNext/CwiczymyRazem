@@ -1,4 +1,4 @@
-import type { AchievementList } from "feature/achievements/achievementsData";
+import type { AchievementList } from "feature/achievements/types";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 
 export type FirebaseLogsSongsStatuses =

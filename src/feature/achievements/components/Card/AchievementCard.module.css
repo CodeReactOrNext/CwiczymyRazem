@@ -1,34 +1,23 @@
-/* CSS Module now only handles overlay effects */
-
 .card {
-  /* No structural dimensions here, let Tailwind handle it */
   position: relative;
-  /* transform-style: preserve-3d; -> Handled in inline style */
 }
 
-/* Base Physical Card Shape - Additive Only */
 .card::before {
-  /* Noise Texture Layer */
   content: "";
   position: absolute;
   inset: 0;
   opacity: 0.12;
-  /* Slightly reduced */
   z-index: 2;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   background-size: 100px 100px;
   mix-blend-mode: overlay;
   border-radius: inherit;
-  /* Physical Depth: Softer, more realistic bevel */
   box-shadow:
     inset 0 0 2px 1px rgba(255, 255, 255, 0.1),
-    /* Highlight edge */
     inset 0 0 6px 0 rgba(0, 0, 0, 0.3);
-  /* Inner depth */
 }
 
-/* Icon Styling */
 .iconWrapper {
   font-size: 1.5rem;
   z-index: 10;
@@ -40,18 +29,15 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Deep but stable parallax */
   transform: translate(calc((var(--pointer-x) - 50%) * -0.2), calc((var(--pointer-y) - 50%) * -0.2));
   transition: transform 0.1s ease-out;
 }
 
 .iconWrapper svg {
-  /* Realistic shadow */
   filter: drop-shadow(calc((var(--pointer-x) - 50%) * 0.15px) calc((var(--pointer-y) - 50%) * 0.15px) 3px rgba(0, 0, 0, 0.6));
 }
 
 .cardContainer:hover .iconWrapper svg {
-  /* Subtle glow on hover */
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
 }
 
@@ -59,7 +45,6 @@
   filter: drop-shadow(0 0 10px rgba(186, 12, 248, 0.6));
 }
 
-/* Glare Effect - Glassy but not blinding */
 .glare {
   position: absolute;
   inset: -100%;
@@ -78,10 +63,8 @@
 
 .cardContainer:hover .glare {
   opacity: 0.8;
-  /* Toned down from 1 */
 }
 
-/* Holographic Foil */
 .holo {
   position: absolute;
   inset: -100%;
@@ -104,18 +87,12 @@
 
 .cardContainer:hover .holo {
   opacity: 0.6;
-  /* Toned down to avoid washout */
 }
 
-/* Color Lift on Hover */
 .card:hover {
   filter: saturate(1.2) brightness(1.05);
-  /* Gentle lift */
 }
 
-/* Rarity Material Tweaks */
-
-/* Shared Frame Effect for all rarities */
 .rarity-Common::before,
 .rarity-Rare::before,
 .rarity-VeryRare::before,
@@ -126,20 +103,15 @@
   border-radius: inherit;
   pointer-events: none;
   z-index: 4;
-  /* On top of holo */
   mix-blend-mode: overlay;
   box-shadow:
     inset 0 0 10px 2px rgba(255, 255, 255, 0.1),
     inset 0 0 2px 1px rgba(0, 0, 0, 0.2);
 }
 
-/* Common: "Brushed Steel" - Now with subtle faceted structure */
 .rarity-Common .holo {
   opacity: 0;
-  /* Normal blend mode ensures the white actually covers/lightens the icon regardless of its color */
   mix-blend-mode: normal;
-
-  /* Simple white "plastic" reflection */
   background-image:
     linear-gradient(115deg,
       transparent 30%,
@@ -150,15 +122,12 @@
   background-size: 200% 200%;
   background-position: var(--background-x) var(--background-y);
   filter: blur(1px);
-  /* Soften the edges slightly like cheap plastic */
 }
 
 .cardContainer:hover .rarity-Common .holo {
   opacity: 0.6;
-  /* Balanced opacity */
 }
 
-/* Rare/VeryRare standard overrides */
 .rarity-Rare .holo {
   mix-blend-mode: color-dodge;
 }
@@ -167,16 +136,10 @@
   mix-blend-mode: color-dodge;
 }
 
-/* Epic: "Mega Prism" - Faceted/Gemstone "Secret Rare" Vibe */
 .rarity-Epic .holo {
   mix-blend-mode: color-dodge;
-  /* Switched back to color-dodge for maximum glow on dark */
   opacity: 0.2;
-  /* Visible distinct idle state */
-
-  /* Faceted geometric pattern */
   background-image:
-    /* 1. Sharp diagonal color bands */
     repeating-linear-gradient(135deg,
       rgba(255, 0, 0, 0.5) 0%,
       rgba(255, 154, 0, 0.5) 5%,
@@ -189,27 +152,22 @@
       rgba(186, 12, 248, 0.5) 40%,
       rgba(251, 7, 217, 0.5) 45%,
       rgba(255, 0, 0, 0.5) 50%),
-    /* 2. Vertical shards for texture */
     repeating-linear-gradient(90deg,
       transparent 0%,
       transparent 4%,
       rgba(255, 255, 255, 0.3) 4.5%,
       rgba(255, 255, 255, 0.1) 5%,
       transparent 6%);
-
   background-size: 300% 300%, 200% 200%;
   background-position: var(--background-x) var(--background-y), calc(var(--background-x) * 1.5) calc(var(--background-y) * 1.5);
-
   filter: contrast(1.2) saturate(1.5) brightness(1.3);
   transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cardContainer:hover .rarity-Epic .holo {
   opacity: 1;
-  /* Full intensity on hover */
 }
 
-/* Add a deep inner glow/shadow for Epic */
 .rarity-Epic::after {
   content: "";
   position: absolute;
@@ -220,19 +178,13 @@
   z-index: 4;
 }
 
-/* Epic Specific Frame Tweaks (if any needed on top of shared) */
 .rarity-Epic::before {
-  /* Add the purple tint back to the frame for Epic specifically, but subtle */
   box-shadow:
     inset 0 0 10px 2px rgba(255, 255, 255, 0.1),
     inset 0 0 15px rgba(159, 214, 7, 0.2);
 }
 
 .rarity-Epic .iconWrapper svg {
-  /* Ensure icon pops even under the intense holo */
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
-  /* We don't add extra glow here to let the holo do the work,
-     but we ensure it's visible */
   z-index: 1;
-  /* Keep it effectively under holo (z-index 3) */
 }
