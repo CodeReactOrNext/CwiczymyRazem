@@ -68,7 +68,6 @@ export const StatsSection = ({
 }: StatsSectionProps) => {
   const { t } = useTranslation("profile");
   const { time } = statistics;
-  const [isAchievementsExpanded, setIsAchievementsExpanded] = useState(false);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const currentUserId = useAppSelector(selectUserAuth);
@@ -375,38 +374,14 @@ export const StatsSection = ({
         <SeasonalAchievements userId={userAuth} />
       </div>
 
-      {/* Regular Achievements - Collapsible */}
-      <div className='space-y-2'>
-        <button
-          onClick={() => setIsAchievementsExpanded(!isAchievementsExpanded)}
-          className='group flex w-full items-center justify-between rounded-lg p-3 transition-all duration-200 hover:bg-white/5'
-          aria-expanded={isAchievementsExpanded}>
-          <div className='text-left'>
-            <div className='flex items-center gap-2'>
-              <h3 className='text-lg font-semibold text-white'>Achievements</h3>
-              <span className='rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/70'>
-                {achievements?.length || 0}
-              </span>
-            </div>
-            <p className='text-sm text-zinc-400'>Your trophies and rewards</p>
-          </div>
-          <div className='text-white/60 transition-colors duration-200 group-hover:text-white'>
-            {isAchievementsExpanded ? (
-              <ChevronUp size={18} />
-            ) : (
-              <ChevronDown size={18} />
-            )}
-          </div>
-        </button>
-
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            isAchievementsExpanded
-              ? "max-h-[1000px] opacity-100"
-              : "max-h-0 opacity-0"
-          }`}>
-          <AchievementWrapper userAchievements={achievements ?? []} />
+      <div className='space-y-4'>
+        <div className='flex items-center gap-2'>
+          <h3 className='text-lg font-semibold text-white'>Achievements</h3>
+          <span className='rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/70'>
+            {achievements?.length || 0}
+          </span>
         </div>
+        <AchievementWrapper userAchievements={achievements ?? []} />
       </div>
 
       <SongSheet

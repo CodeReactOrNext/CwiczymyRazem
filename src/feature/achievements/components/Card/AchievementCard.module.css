@@ -1,7 +1,24 @@
 .card {
   position: relative;
+
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --scale: 1;
+  --z-index: 1;
+
+  transform: perspective(1000px) rotateX(var(--rotate-x)) rotateY(var(--rotate-y)) scale(var(--scale));
+  z-index: var(--z-index);
+  transition: transform 0.1s ease-out, filter 0.1s, background-color 0.1s;
+  transform-style: preserve-3d;
 }
 
+.card:hover {
+  --scale: 2.2;
+  --z-index: 50;
+  filter: saturate(1.2) brightness(1.05);
+}
+
+/* Rest of the file... */
 .card::before {
   content: "";
   position: absolute;
@@ -29,7 +46,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  transform: translate(calc((var(--pointer-x) - 50%) * -0.2), calc((var(--pointer-y) - 50%) * -0.2));
+  transform: translate(calc((var(--pointer-x) - 50%) * -0.15), calc((var(--pointer-y) - 50%) * -0.15));
   transition: transform 0.1s ease-out;
 }
 
@@ -37,7 +54,7 @@
   filter: drop-shadow(calc((var(--pointer-x) - 50%) * 0.15px) calc((var(--pointer-y) - 50%) * 0.15px) 3px rgba(0, 0, 0, 0.6));
 }
 
-.cardContainer:hover .iconWrapper svg {
+.card:hover .iconWrapper svg {
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
 }
 
@@ -58,10 +75,10 @@
   mix-blend-mode: overlay;
   pointer-events: none;
   border-radius: inherit;
-  transition: opacity 0.2s;
+  transition: opacity 0.1s;
 }
 
-.cardContainer:hover .glare {
+.card:hover .glare {
   opacity: 0.8;
 }
 
@@ -82,15 +99,11 @@
   background-position: var(--background-x) var(--background-y);
   filter: brightness(1.1) contrast(1.1);
   border-radius: inherit;
-  transition: opacity 0.2s;
+  transition: opacity 0.1s;
 }
 
-.cardContainer:hover .holo {
+.card:hover .holo {
   opacity: 0.6;
-}
-
-.card:hover {
-  filter: saturate(1.2) brightness(1.05);
 }
 
 .rarity-Common::before,
@@ -124,7 +137,7 @@
   filter: blur(1px);
 }
 
-.cardContainer:hover .rarity-Common .holo {
+.card:hover .rarity-Common .holo {
   opacity: 0.6;
 }
 
@@ -164,7 +177,7 @@
   transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.cardContainer:hover .rarity-Epic .holo {
+.card:hover .rarity-Epic .holo {
   opacity: 1;
 }
 

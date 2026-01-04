@@ -11,7 +11,6 @@ import {
 import { GiCelebrationFire, GiExtraTime } from "react-icons/gi";
 import { hoursToMilliseconds } from "date-fns";
 import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
-import { AchievementList } from "../../types";
 import { achivFactor } from "../achievementsData.utils";
 
 export const timeAchievements = [
@@ -28,6 +27,6 @@ export const timeAchievements = [
   achivFactor("fireSession", GiCelebrationFire, "epic", (ctx) => {
     const { time } = ctx.statistics;
     return (time.technique + time.theory + time.hearing + time.creativity) >= hoursToMilliseconds(10);
-  }, AchievementRequirement.getProgressFor.totalTimeThreshold(hoursToMilliseconds(10))),
-  achivFactor("100days", GiExtraTime, "epic", AchievementRequirement.totalTimeThreshold(hoursToMilliseconds(24 * 100)), AchievementRequirement.getProgressFor.totalTimeThreshold(hoursToMilliseconds(24 * 100))),
+  }),
+  achivFactor("100days", GiExtraTime, "epic", AchievementRequirement.statThreshold("dayWithoutBreak", 100), AchievementRequirement.getProgressFor.statThreshold("dayWithoutBreak", 100, "days")),
 ];

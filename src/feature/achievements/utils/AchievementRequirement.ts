@@ -1,4 +1,4 @@
-import { AchievementCheck } from "feature/achievements/types";
+import { AchievementCheck, AchievementProgress } from "feature/achievements/types";
 import { HabbitsType } from "feature/user/view/ReportView/ReportView.types";
 import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface, StatisticsTime } from "types/api.types";
@@ -6,6 +6,9 @@ import type { StatisticsDataInterface, StatisticsTime } from "types/api.types";
 export class AchievementRequirement {
   static songCount = (listName: keyof SongListInterface, min: number): AchievementCheck =>
     (ctx) => ctx.songLists[listName].length >= min;
+
+  static achievementCount = (min: number): AchievementCheck =>
+    (ctx) => ctx.statistics.achievements.length >= min;
 
   static statThreshold = (path: keyof StatisticsDataInterface, min: number): AchievementCheck =>
     (ctx) => {
@@ -30,27 +33,35 @@ export class AchievementRequirement {
     (ctx) => ctx.inputData.habbits.includes(habit);
 
   static getProgressFor = {
-    songCount: (listName: keyof SongListInterface, min: number) => (ctx: any) => ({
+    songCount: (listName: keyof SongListInterface, min: number) => (ctx: any): AchievementProgress => ({
       current: ctx.songLists[listName].length,
       max: min,
+      unit: "songs",
     }),
-    statThreshold: (path: keyof StatisticsDataInterface, min: number) => (ctx: any) => {
+    achievementCount: (min: number) => (ctx: any): AchievementProgress => ({
+      current: ctx.statistics.achievements.length,
+      max: min,
+    }),
+    statThreshold: (path: keyof StatisticsDataInterface, min: number, unit?: AchievementProgress["unit"]) => (ctx: any): AchievementProgress => {
       const value = ctx.statistics[path];
       return {
         current: typeof value === 'number' ? value : 0,
         max: min,
+        unit,
       };
     },
-    statTimeThreshold: (path: keyof StatisticsTime, min: number) => (ctx: any) => ({
-      current: Math.floor(ctx.statistics.time[path] / 60000),
-      max: Math.floor(min / 60000),
+    statTimeThreshold: (path: keyof StatisticsTime, min: number) => (ctx: any): AchievementProgress => ({
+      current: Math.floor(ctx.statistics.time[path] / 3600000),
+      max: Math.floor(min / 3600000),
+      unit: "h",
     }),
-    totalTimeThreshold: (minMs: number) => (ctx: any) => {
+    totalTimeThreshold: (minMs: number) => (ctx: any): AchievementProgress => {
       const { time } = ctx.statistics;
       const total = time.technique + time.theory + time.hearing + time.creativity;
       return {
-        current: Math.floor(total / 60000),
-        max: Math.floor(minMs / 60000),
+        current: Math.floor(total / 3600000),
+        max: Math.floor(minMs / 3600000),
+        unit: "h",
       };
     },
   };

@@ -1,3 +1,4 @@
+import React, { memo } from "react";
 import { useResponsiveStore } from "store/useResponsiveStore";
 import type { AchievementContext, AchievementList, AchievementsDataInterface } from "../../types";
 import { achievementsMap } from "../../data/achievementsData";
@@ -5,7 +6,7 @@ import { AchievementPhysicalCard } from "./AchievementPhysicalCard";
 import { AchievementCardMobile } from "./AchievementCardMobile";
 import { AchievementCardDesktop } from "./AchievementCardDesktop";
 
-export const AchievementCard = ({ 
+export const AchievementCard = memo(({ 
   id, 
   data,
   context,
@@ -16,14 +17,13 @@ export const AchievementCard = ({
   context?: AchievementContext | null;
   isUnlocked?: boolean;
 }) => {
-  // O(1) Lookup - prioritizing passed data
   const achievementData = data || achievementsMap.get(id);
   if (!achievementData) return null;
   
   const { Icon, rarity, description, name, getProgress } = achievementData;
   const isMobileView = useResponsiveStore((state) => state.isMobile);
 
-  const progress = context && getProgress && !isUnlocked ? getProgress(context) : undefined;
+  const progress = context && getProgress ? getProgress(context) : undefined;
 
   const cardContent = (
     <AchievementPhysicalCard
@@ -57,4 +57,6 @@ export const AchievementCard = ({
       {cardContent}
     </AchievementCardDesktop>
   );
-};
+});
+
+AchievementCard.displayName = "AchievementCard";
