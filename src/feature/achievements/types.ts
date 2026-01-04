@@ -80,13 +80,19 @@ export interface AchievementContext {
 
 export type AchievementCheck = (ctx: AchievementContext) => boolean;
 
+export interface AchievementProgress {
+  current: number;
+  max: number;
+  unit?: "h" | "pts" | "days" | "sessions" | "songs" | "habits";
+}
+
 export interface AchievementsDataInterface extends AchievementsRarityType {
   id: AchievementList;
   name: TFuncKey<"achievements">;
   Icon: IconType;
   description: TFuncKey<"achievements">;
   check: AchievementCheck;
-  getProgress?: (ctx: AchievementContext) => { current: number; max: number };
+  getProgress?: (ctx: AchievementContext) => AchievementProgress;
 }
 
 export type AchievementCheckerReturnType = AchievementList | undefined;

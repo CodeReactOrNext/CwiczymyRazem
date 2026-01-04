@@ -37,8 +37,6 @@ export const AchievementPhysicalCard = forwardRef<HTMLDivElement, AchievementPhy
     const rarityModuleClass = `rarity-${rarity.charAt(0).toUpperCase() + rarity.slice(1)}`;
     const innerRef = useRef<HTMLDivElement>(null);
     
-    const [isHovered, setIsHovered] = React.useState(false);
-    
     useImperativeHandle(forwardedRef, () => innerRef.current!);
 
     const x = useMotionValue(0);
@@ -67,7 +65,6 @@ export const AchievementPhysicalCard = forwardRef<HTMLDivElement, AchievementPhy
     };
 
     const handleMouseLeaveInternal = () => {
-      setIsHovered(false);
       if (isMobileView) return;
       x.set(0);
       y.set(0);
@@ -96,7 +93,6 @@ export const AchievementPhysicalCard = forwardRef<HTMLDivElement, AchievementPhy
         {...props}
         className={`group relative inline-flex items-center justify-center shrink-0 flex-none ${isMobileView ? "cursor-pointer" : "cursor-help"} ${props.className || ""}`} 
         ref={innerRef}
-        onPointerEnter={() => setIsHovered(true)}
         onMouseMove={(e) => {
             handleMouseMove(e);
             props.onMouseMove?.(e);
@@ -118,16 +114,15 @@ export const AchievementPhysicalCard = forwardRef<HTMLDivElement, AchievementPhy
             ...getEpicCardStyle(rarity),
             ...customStyle,
           }}
-          whileHover={isMobileView ? {} : { scale: 1.8, zIndex: 50 }}
-          transition={{ duration: 0.15 }} // Make hover snappier
+          whileHover={isMobileView ? {} : { 
+            scale: 2.0, 
+            zIndex: 50,
+            transition: { duration: 0.1 }
+          }}
           className={`${baseCardClasses} w-full h-full rounded-[inherit] ${styles.card} ${styles[rarityModuleClass]}`}
         >
-          {isHovered && (
-            <>
-              <div className={styles.holo} />
-              <div className={styles.glare} />
-            </>
-          )}
+          <div className={styles.holo} />
+          <div className={styles.glare} />
 
           <div className={styles.cardContent}>
             <Icon className={`relative ${cardSize === "lg" ? "text-5xl" : "text-lg md:text-2xl"}`} />
