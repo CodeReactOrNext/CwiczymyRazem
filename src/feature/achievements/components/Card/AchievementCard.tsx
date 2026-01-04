@@ -10,12 +10,14 @@ export const AchievementCard = memo(({
   id, 
   data,
   context,
-  isUnlocked
+  isUnlocked,
+  showProgress = false
 }: { 
   id: AchievementList; 
   data?: AchievementsDataInterface;
   context?: AchievementContext | null;
   isUnlocked?: boolean;
+  showProgress?: boolean;
 }) => {
   const achievementData = data || achievementsMap.get(id);
   if (!achievementData) return null;
@@ -24,7 +26,7 @@ export const AchievementCard = memo(({
   const isMobileView = useResponsiveStore((state) => state.isMobile);
 
   const rawProgress = context && getProgress ? getProgress(context) : undefined;
-  const progress = rawProgress ? {
+  const progress = (rawProgress && showProgress && !isUnlocked) ? {
     ...rawProgress,
     current: Math.min(rawProgress.current, rawProgress.max)
   } : undefined;

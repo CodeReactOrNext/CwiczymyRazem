@@ -30,7 +30,7 @@ const createMockContext = (overrides: Partial<AchievementContext> = {}): Achieve
     },
     ...overrides?.statistics,
   },
-  reportData: {
+  sessionResults: {
     reportDate: new Date(),
     totalPoints: 0,
     bonusPoints: {
@@ -46,7 +46,7 @@ const createMockContext = (overrides: Partial<AchievementContext> = {}): Achieve
       hearing: 0,
       creativity: 0,
     },
-    ...overrides?.reportData,
+    ...overrides?.sessionResults,
   },
   inputData: {
     habbits: [],
