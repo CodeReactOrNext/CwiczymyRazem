@@ -30,10 +30,7 @@ export const AchievementBox = ({
           </span>
         </p>
         <div className='flex w-full  flex-row flex-wrap md:gap-4'>
-          {achievment.length === 0 ? (
-            <p>{t("empty")}</p>
-          ) : (
-            achievment.map((item) => {
+           {achievment.map((item) => {
               return (
                 <div
                   key={item.id}
@@ -41,8 +38,7 @@ export const AchievementBox = ({
                   <AchievementCard id={item.id} data={item} context={context} isUnlocked={true} />
                 </div>
               );
-            })
-          )}
+            })}
         </div>
       </div>
     </div>
