@@ -1,25 +1,22 @@
-import { useEffect, useState } from "react";
-import { useMedia } from "react-use";
-import type { AchievementList } from "../../types";
-import { achievementsData } from "../../data/achievementsData";
+import { useResponsiveStore } from "store/useResponsiveStore";
+import type { AchievementList, AchievementsDataInterface } from "../../types";
+import { achievementsMap } from "../../data/achievementsData";
 import { AchievementPhysicalCard } from "./AchievementPhysicalCard";
 import { AchievementCardMobile } from "./AchievementCardMobile";
 import { AchievementCardDesktop } from "./AchievementCardDesktop";
 
-export const AchievementCard = ({ id }: { id: AchievementList }) => {
-  const achievementData = achievementsData.find((achiv) => achiv.id === id);
+export const AchievementCard = ({ 
+  id, 
+  data 
+}: { 
+  id: AchievementList; 
+  data?: AchievementsDataInterface;
+}) => {
+  const achievementData = data || achievementsMap.get(id);
   if (!achievementData) return null;
   
   const { Icon, rarity, description, name } = achievementData;
-  
-  const [isMounted, setIsMounted] = useState(false);
-  const isMobile = useMedia("(max-width: 768px)", false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const isMobileView = isMounted && isMobile;
+  const isMobileView = useResponsiveStore((state) => state.isMobile);
 
   const cardContent = (
     <AchievementPhysicalCard

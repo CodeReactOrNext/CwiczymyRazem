@@ -1,0 +1,46 @@
+import {
+  GiSwordman,
+  GiSwordsPower,
+  GiNotebook,
+  GiMisdirection,
+  GiMoebiusTriangle,
+  GiWeight,
+  GiWeightLiftingUp,
+  GiPush,
+  GiMuscularTorso,
+  GiMultipleTargets,
+  GiRearAura,
+  GiCard2Hearts,
+  GiCard3Diamonds,
+  GiCard4Diamonds,
+  GiCard5Diamonds,
+  GiCard6Diamonds,
+  GiCardJackDiamonds,
+  GiCardKingDiamonds,
+  GiCardAceDiamonds,
+} from "react-icons/gi";
+import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
+import { AchievementList } from "../../types";
+import { achivFactor } from "../achievementsData.utils";
+
+export const songAchievements = [
+  achivFactor("wannaLearn1" as AchievementList, GiSwordman, "common", AchievementRequirement.songCount("wantToLearn", 1)),
+  achivFactor("wannaLearn2" as AchievementList, GiSwordsPower, "common", AchievementRequirement.songCount("wantToLearn", 3)),
+  achivFactor("wannaLearn3" as AchievementList, GiNotebook, "common", AchievementRequirement.songCount("wantToLearn", 5)),
+  achivFactor("wannaLearn10" as AchievementList, GiMisdirection, "rare", AchievementRequirement.songCount("wantToLearn", 10)),
+  achivFactor("wannaLearn30" as AchievementList, GiMoebiusTriangle, "veryRare", AchievementRequirement.songCount("wantToLearn", 30)),
+  achivFactor("learning1" as AchievementList, GiWeight, "common", AchievementRequirement.songCount("learning", 1)),
+  achivFactor("learning3" as AchievementList, GiWeightLiftingUp, "common", AchievementRequirement.songCount("learning", 3)),
+  achivFactor("learning5" as AchievementList, GiPush, "common", AchievementRequirement.songCount("learning", 5)),
+  achivFactor("learning10" as AchievementList, GiMuscularTorso, "rare", AchievementRequirement.songCount("learning", 10)),
+  achivFactor("learning20" as AchievementList, GiMultipleTargets, "veryRare", AchievementRequirement.songCount("learning", 20)),
+  achivFactor("learning30" as AchievementList, GiRearAura, "epic", AchievementRequirement.songCount("learning", 30)),
+  achivFactor("learned1" as AchievementList, GiCard2Hearts, "common", AchievementRequirement.songCount("learned", 1)),
+  achivFactor("learned3" as AchievementList, GiCard3Diamonds, "common", AchievementRequirement.songCount("learned", 3)),
+  achivFactor("learned5" as AchievementList, GiCard4Diamonds, "common", AchievementRequirement.songCount("learned", 5)),
+  achivFactor("learned10" as AchievementList, GiCard5Diamonds, "rare", AchievementRequirement.songCount("learned", 10)),
+  achivFactor("learned20" as AchievementList, GiCard6Diamonds, "veryRare", AchievementRequirement.songCount("learned", 20)),
+  achivFactor("learned30" as AchievementList, GiCardJackDiamonds, "veryRare", AchievementRequirement.songCount("learned", 30)),
+  achivFactor("learned50" as AchievementList, GiCardKingDiamonds, "epic", AchievementRequirement.songCount("learned", 50)),
+  achivFactor("learned100" as AchievementList, GiCardAceDiamonds, "epic", AchievementRequirement.songCount("learned", 100)),
+];

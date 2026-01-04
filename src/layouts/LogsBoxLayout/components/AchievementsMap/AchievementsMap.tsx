@@ -23,7 +23,7 @@ const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
             className={`mb-4 rounded-xl p-3 ${
               isUnlocked ? "" : "bg-second-600"
             }`}>
-            {isUnlocked && <AchievementCard id={id} />}
+            {isUnlocked && <AchievementCard id={id} data={achievementsData[index]} />}
             {!isUnlocked && (
               <Icon
                 className={`text-3xl transition-all duration-300 ${"text-gray-600 grayscale"}`}

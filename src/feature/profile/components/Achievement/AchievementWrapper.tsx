@@ -3,7 +3,7 @@ import type {
   AchievementList,
   AchievementsDataInterface,
 } from "feature/achievements/types";
-import { achievementsData } from "feature/achievements/data/achievementsData";
+import { achievementsData, achievementsMap, achievementsCounts } from "feature/achievements/data/achievementsData";
 import { AchievementBox } from "feature/profile/components/Achievement/AchievementBox";
 
 export const AchievementWrapper = ({
@@ -21,9 +21,10 @@ export const AchievementWrapper = ({
   const { common, rare, veryRare, epic } =
     userAchievements.reduce<grupedAchievements>(
       ({ common, rare, veryRare, epic }, userAchivId) => {
-        const achievementData = achievementsData.find(
-          (achiv) => achiv.id === userAchivId
-        );
+        // O(1) Lookup
+        const achievementData = achievementsMap.get(userAchivId);
+        
+        if (!achievementData) return { common, rare, veryRare, epic };
 
         switch (achievementData?.rarity) {
           case "common":
@@ -45,36 +46,20 @@ export const AchievementWrapper = ({
       { common: [], rare: [], veryRare: [], epic: [] }
     );
 
-  const commonLenght = achievementsData.filter(
-    (achivement) => achivement.rarity === "common"
-  ).length;
-
-  const rareLenght = achievementsData.filter(
-    (achivement) => achivement.rarity === "rare"
-  ).length;
-
-  const veryRareLenght = achievementsData.filter(
-    (achivement) => achivement.rarity === "veryRare"
-  ).length;
-
-  const epicLenght = achievementsData.filter(
-    (achivement) => achivement.rarity === "epic"
-  ).length;
-
   return (
     <Card>
       <AchievementBox
         achievment={common}
-        maxLenght={commonLenght}
+        maxLenght={achievementsCounts.common}
         rarity='common'
       />
-      <AchievementBox achievment={rare} maxLenght={rareLenght} rarity='rare' />
+      <AchievementBox achievment={rare} maxLenght={achievementsCounts.rare} rarity='rare' />
       <AchievementBox
         achievment={veryRare}
-        maxLenght={veryRareLenght}
+        maxLenght={achievementsCounts.veryRare}
         rarity='veryRare'
       />
-      <AchievementBox achievment={epic} maxLenght={epicLenght} rarity='epic' />
+      <AchievementBox achievment={epic} maxLenght={achievementsCounts.epic} rarity='epic' />
     </Card>
   );
 };
