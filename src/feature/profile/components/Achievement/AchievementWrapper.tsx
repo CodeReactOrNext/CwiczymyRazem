@@ -2,8 +2,8 @@ import { Card } from "assets/components/ui/card";
 import type {
   AchievementList,
   AchievementsDataInterface,
-} from "feature/achievements/achievementsData";
-import { achievementsData } from "feature/achievements/achievementsData";
+} from "feature/achievements/types";
+import { achievementsData } from "feature/achievements/data/achievementsData";
 import { AchievementBox } from "feature/profile/components/Achievement/AchievementBox";
 
 export const AchievementWrapper = ({

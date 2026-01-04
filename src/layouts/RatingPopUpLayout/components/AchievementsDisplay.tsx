@@ -1,5 +1,5 @@
-import Achievement from "feature/achievements/components/Achievement";
-import type { AchievementList } from "feature/achievements/achievementsData";
+import AchievementIcon from "feature/achievements/components/AchievementIcon";
+import type { AchievementList } from "feature/achievements/types";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Card } from "assets/components/ui/card";
@@ -25,7 +25,7 @@ export const AchievementsDisplay = ({ achievements }: AchievementsDisplayProps) 
           </h3>
           <div className='flex flex-wrap gap-2'>
             {achievements.map((id) => (
-              <Achievement key={id} id={id} />
+              <AchievementIcon key={id} id={id} />
             ))}
           </div>
         </div>

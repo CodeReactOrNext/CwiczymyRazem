@@ -1,5 +1,5 @@
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
-import Achievement from "feature/achievements/components/Achievement";
+import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import type {
@@ -239,7 +239,7 @@ const FirebaseLogsItem = ({
             {t("common:logsBox.achievements")}{" "}
             {newAchievements.map((achievement, index) => (
               <span key={index} className='inline-flex items-center gap-2'>
-                <Achievement id={achievement} />
+                <AchievementIcon id={achievement} />
               </span>
             ))}
           </span>

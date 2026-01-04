@@ -1,4 +1,4 @@
-import type { AchievementList } from "feature/achievements/achievementsData";
+import type { AchievementList } from "feature/achievements/types";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
   FirebaseLogsInterface,

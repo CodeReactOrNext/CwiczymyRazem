@@ -3,13 +3,13 @@ import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getDateFromPast, inputTimeConverter } from "utils/converter";
 import {
-  checkAchievements,
+  AchievementManager,
   checkIsPracticeToday,
   getPointsToLvlUp,
   getUpdatedActualDayWithoutBreak,
   levelUpUser,
   makeRatingData,
-} from "utils/gameLogic";
+} from "./index";
 
 interface updateUserStatsProps {
   currentUserStats: StatisticsDataInterface;
@@ -91,7 +91,12 @@ export const reportUpdateUserStats = ({
     guitarStartDate: null
   };
 
-  const newAchievements = checkAchievements(updatedUserData, raiting, inputData, currentUserSongLists);
+  const newAchievements = AchievementManager.getNewlyEarned({
+    statistics: updatedUserData,
+    reportData: raiting,
+    inputData,
+    songLists: currentUserSongLists
+  });
   const updatedUserDataWithAchievements: StatisticsDataInterface = {
     ...updatedUserData,
     achievements: [...newAchievements, ...updatedUserData.achievements],
