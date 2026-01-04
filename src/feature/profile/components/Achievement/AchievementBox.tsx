@@ -31,12 +31,12 @@ export const AchievementBox = ({
           {achievment.length === 0 ? (
             <p>{t("empty")}</p>
           ) : (
-            achievment.map(({ id }) => {
+            achievment.map((item) => {
               return (
                 <div
-                  key={id}
+                  key={item.id}
                   className='mb-2 flex w-[4rem] flex-col items-center text-center'>
-                  <AchievementCard id={id} />
+                  <AchievementCard id={item.id} data={item} />
                 </div>
               );
             })

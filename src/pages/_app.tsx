@@ -30,6 +30,7 @@ const teko = Teko({
 });
 
 import useAuthSync from "hooks/useAuthSync";
+import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 
 import type { AppPropsWithLayout } from "types/page";
 
@@ -82,6 +83,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
         <ErrorBoundary>
           <ThemeModeProvider>
             <AuthSyncWrapper>
+               <ResponsiveInitializer />
                <TooltipProvider>
                   <main className={`${teko.variable} ${inter.variable} min-h-[100dvh] bg-zinc-950 text-foreground`}>
                      <Toaster theme='dark' position='top-right' />
