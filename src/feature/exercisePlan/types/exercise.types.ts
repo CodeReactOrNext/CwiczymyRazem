@@ -48,4 +48,8 @@ export interface ExercisePlan {
   exercises: Exercise[];
   userId: string;
   image: StaticImageData | null;
+  author?: {
+    name: string;
+    avatar: StaticImageData;
+  };
 }
