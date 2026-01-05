@@ -410,7 +410,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
                             <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-6 backdrop-blur-sm space-y-4">
                                 <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
                                     <FaHeart className="animate-pulse" />
-                                    <span>Support Bazok</span>
+                                    <span>Support Author</span>
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     {currentExercise.links.map((link, idx) => {
