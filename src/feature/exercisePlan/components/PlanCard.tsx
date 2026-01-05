@@ -16,6 +16,7 @@ import {
   FaYoutube,
   FaVideo
 } from "react-icons/fa";
+import Image from "next/image";
 
 import type { DifficultyLevel, ExercisePlan } from "../types/exercise.types";
 
@@ -176,14 +177,31 @@ export const PlanCard = ({
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 space-y-1.5">
-        <h3 className="text-lg font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
-            {title}
-        </h3>
-        <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground/80">
-            {description}
-        </p>
+      {/* Main Content with Avatar */}
+      <div className="flex gap-4">
+        {plan.author && (
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-white/10 shadow-inner">
+                <Image 
+                    src={plan.author.avatar} 
+                    alt={plan.author.name} 
+                    fill 
+                    className="object-cover"
+                />
+            </div>
+        )}
+        <div className="flex-1 space-y-1">
+            {plan.author && (
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80 leading-none">
+                    {plan.author.name}
+                </span>
+            )}
+            <h3 className="text-base font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+                {title}
+            </h3>
+            <p className="line-clamp-2 text-[11px] leading-relaxed text-muted-foreground/80">
+                {description}
+            </p>
+        </div>
       </div>
 
       {/* Footer: Stats & Action */}

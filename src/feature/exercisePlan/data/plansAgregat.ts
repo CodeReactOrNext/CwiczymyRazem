@@ -11,6 +11,7 @@ import { musicianFitnessLvl1S8Plan } from "feature/exercisePlan/data/plans/metal
 import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
+import { pentatonicPlayalongPlan } from "feature/exercisePlan/data/plans/pentatonicPlayalong/pentatonicPlayalongPlan";
 
 import type { ExercisePlan } from "../types/exercise.types";
 
@@ -25,6 +26,7 @@ export const defaultPlans: ExercisePlan[] = [
   basicImprovisationPractice,
   warmUp15MinutesPlan,
   warmUp30MinutesPlan,
+  pentatonicPlayalongPlan,
   // metalGuitarExercisesPlan,
   musicianFitnessLvl1S1Plan,
   musicianFitnessLvl1S2Plan,
