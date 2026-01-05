@@ -40,6 +40,7 @@ interface PracticeSessionProps {
   plan: ExercisePlan;
   onFinish: () => void;
   isFinishing?: boolean;
+  autoReport?: boolean;
 }
 
 const headerGradients = {
@@ -51,7 +52,7 @@ const headerGradients = {
   playalong: "from-red-600/20 via-zinc-950/10 to-zinc-950/5",
 };
 
-export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSessionProps) => {
+export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: PracticeSessionProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const currentLang = i18n?.language as keyof LocalizedContent;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -91,9 +92,10 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
     planTitleString,
     sessionTimerData,
     exerciseTimeSpent,
+    activityDataToUse,
     jumpToExercise,
     canSkipExercise
-  } = usePracticeSessionState({ plan, onFinish });
+  } = usePracticeSessionState({ plan, onFinish, autoReport });
 
   const {
     imageScale,
@@ -139,6 +141,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
             previousUserStats={previousUserStats}
             skillPointsGained={reportResult.skillPointsGained}
             onClick={() => router.push("/dashboard")}
+            activityData={activityDataToUse}
           />
         </div>
       )}
@@ -410,7 +413,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing }: PracticeSession
                             <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-6 backdrop-blur-sm space-y-4">
                                 <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
                                     <FaHeart className="animate-pulse" />
-                                    <span>Support Bazok</span>
+                                    <span>Support Author</span>
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     {currentExercise.links.map((link, idx) => {
