@@ -72,7 +72,7 @@ const TimerPlans: NextPageWithLayout = () => {
 
   return selectedPlan ? (
     <MainContainer>
-      <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
+      <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} autoReport={true} />
     </MainContainer>
   ) : (
     <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />
@@ -91,5 +91,5 @@ export default TimerPlans;
 
 export const getServerSideProps = withAuth({
   redirectIfUnauthenticated: "/login",
-  translations: ["common", "timer", "toast", "exercises", "rating_popup", ],
+  translations: ["common", "timer", "toast", "exercises", "report", ],
 });
