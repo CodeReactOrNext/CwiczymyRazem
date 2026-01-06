@@ -1,8 +1,7 @@
-import { db } from "utils/firebase/client/firebase.utils";
-import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
-import { IChallengeRepository } from "../../../backend/domain/repositories/IChallengeRepository";
-import { Challenge, ActiveChallenge } from "../../../backend/domain/models/Challenge";
+import { IChallengeRepository } from "../../domain/repositories/IChallengeRepository";
+import { Challenge, ActiveChallenge } from "../../domain/models/Challenge";
 import { challengesList } from "./staticChallenges";
+import { challengeService } from "./challenge.service";
 
 export class ChallengeRepository implements IChallengeRepository {
   async getAllChallenges(): Promise<Challenge[]> {
@@ -14,19 +13,12 @@ export class ChallengeRepository implements IChallengeRepository {
   }
 
   async getActiveChallenges(userId: string): Promise<ActiveChallenge[]> {
-    const userRef = doc(db, "users", userId);
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-      const data = userSnap.data();
-      return data.statistics?.activeChallenges || [];
-    }
-    return [];
+    const data = await challengeService.getUserStats(userId);
+    return data?.statistics?.activeChallenges || [];
   }
 
   async saveActiveChallenge(userId: string, challenge: ActiveChallenge): Promise<void> {
-    const userRef = doc(db, "users", userId);
     const activeChallenges = await this.getActiveChallenges(userId);
-
     const existingIndex = activeChallenges.findIndex(c => c.challengeId === challenge.challengeId);
     let updated = [...activeChallenges];
 
@@ -36,52 +28,32 @@ export class ChallengeRepository implements IChallengeRepository {
       updated.push(challenge);
     }
 
-    await updateDoc(userRef, {
-      "statistics.activeChallenges": updated
-    });
+    await challengeService.updateActiveChallenges(userId, updated);
   }
 
-  async updateChallengeProgress(userId: string, challenge: ActiveChallenge): Promise<void> {
-    const userRef = doc(db, "users", userId);
+  async updateChallengeProgress(userId: string, challenge: ActiveChallenge, rewardSkillId?: string): Promise<void> {
     const activeChallenges = await this.getActiveChallenges(userId);
-
     const updated = activeChallenges.map(c =>
       c.challengeId === challenge.challengeId ? challenge : c
     );
 
-    await updateDoc(userRef, {
-      "statistics.activeChallenges": updated
-    });
+    await challengeService.updateProgress(userId, updated, rewardSkillId);
   }
 
   async abandonChallenge(userId: string, challengeId: string): Promise<void> {
-    const userRef = doc(db, "users", userId);
     const activeChallenges = await this.getActiveChallenges(userId);
     const filtered = activeChallenges.filter(c => c.challengeId !== challengeId);
-
-    await updateDoc(userRef, {
-      "statistics.activeChallenges": filtered
-    });
+    await challengeService.updateActiveChallenges(userId, filtered);
   }
 
-  async markChallengeAsCompleted(userId: string, challengeId: string): Promise<void> {
-    const userRef = doc(db, "users", userId);
+  async markChallengeAsCompleted(userId: string, challengeId: string, stats?: { rewardPoints?: number; rewardSkillId?: string }): Promise<void> {
     const activeChallenges = await this.getActiveChallenges(userId);
     const filtered = activeChallenges.filter(c => c.challengeId !== challengeId);
-
-    await updateDoc(userRef, {
-      "statistics.activeChallenges": filtered,
-      "statistics.completedChallenges": arrayUnion(challengeId)
-    });
+    await challengeService.markAsCompleted(userId, challengeId, filtered, stats);
   }
 
   async getCompletedChallengeIds(userId: string): Promise<string[]> {
-    const userRef = doc(db, "users", userId);
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-      const data = userSnap.data();
-      return data.statistics?.completedChallenges || [];
-    }
-    return [];
+    const data = await challengeService.getUserStats(userId);
+    return data?.statistics?.completedChallenges || [];
   }
 }

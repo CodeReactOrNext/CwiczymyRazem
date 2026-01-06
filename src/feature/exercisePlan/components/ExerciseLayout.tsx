@@ -33,7 +33,7 @@ export const ExerciseLayout = ({
                         Training Mode
                     </span>
                     <h1 className="text-sm font-bold text-white truncate">
-                        {typeof title === "string" ? title : title.en}
+                        {typeof title === "string" ? title : (title as any).pl || (title as any).en}
                     </h1>
                 </motion.div>
             </div>

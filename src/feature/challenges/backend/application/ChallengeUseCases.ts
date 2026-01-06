@@ -20,34 +20,50 @@ export class ChallengeUseCases {
     await this.challengeRepository.abandonChallenge(userId, challengeId);
   }
 
-  async completeProgress(userId: string, challengeId: string): Promise<{ finished: boolean; rewardPoints: number }> {
+  async completeProgress(userId: string, challengeId: string): Promise<{
+    finished: boolean;
+    rewardPoints: number;
+    rewardLevel: number;
+    rewardSkillId?: string;
+    activeChallenge: ActiveChallenge;
+  }> {
     const activeChallenges = await this.challengeRepository.getActiveChallenges(userId);
     const activeChallenge = activeChallenges.find(c => c.challengeId === challengeId);
 
     if (!activeChallenge) throw new Error("Challenge not active");
 
     const today = new Date().toISOString().split('T')[0];
+
     if (activeChallenge.lastCompletedDate === today) {
-      return { finished: false, rewardPoints: 0 };
+      throw new Error("Already completed today");
     }
 
     const challenge = await this.challengeRepository.getChallengeById(challengeId);
     if (!challenge) throw new Error("Challenge definition not found");
 
     let finished = false;
-    let rewardPoints = 0;
+    let rewardPoints = parseInt(challenge.rewardDescription || '0');
+    let rewardLevel = challenge.rewardLevel || 0;
 
     if (activeChallenge.currentDay >= activeChallenge.totalDays) {
       finished = true;
-      rewardPoints = parseInt(challenge.rewardDescription?.match(/\d+/)?.[0] || '0');
-      await this.challengeRepository.markChallengeAsCompleted(userId, challengeId);
+      await this.challengeRepository.markChallengeAsCompleted(userId, challengeId, {
+        rewardPoints,
+        rewardSkillId: challenge.rewardSkillId
+      });
     } else {
       activeChallenge.currentDay += 1;
       activeChallenge.lastCompletedDate = today;
-      await this.challengeRepository.updateChallengeProgress(userId, activeChallenge);
+      await this.challengeRepository.updateChallengeProgress(userId, activeChallenge, challenge.rewardSkillId);
     }
 
-    return { finished, rewardPoints };
+    return {
+      finished,
+      rewardPoints,
+      rewardLevel,
+      rewardSkillId: challenge.rewardSkillId,
+      activeChallenge
+    };
   }
 
   async getAllChallenges(): Promise<Challenge[]> {

@@ -8,13 +8,11 @@ import {
 } from "assets/components/ui/select";
 import { ExerciseCard } from "feature/exercisePlan/components/ExerciseCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import type { LocalizedContent } from "feature/exercisePlan/types/exercise.types";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export const ExerciseLibrary = () => {
-  const { t, i18n } = useTranslation("exercises");
-  const currentLang = i18n.language as keyof LocalizedContent;
+  const { t } = useTranslation("exercises");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
@@ -23,7 +21,7 @@ export const ExerciseLibrary = () => {
   const filteredExercises = exercisesAgregat.filter((exercise) => {
     if (!exercise || !exercise.title) return false;
 
-    const matchesSearch = exercise.title[currentLang]
+    const matchesSearch = exercise.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     const matchesDifficulty =

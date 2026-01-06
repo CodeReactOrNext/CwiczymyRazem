@@ -3,15 +3,14 @@ import { cn } from "assets/lib/utils";
 import { useTranslation } from "react-i18next";
 
 import { categoryColors } from "../constants/categoryStyles";
-import type { Exercise, LocalizedContent } from "../types/exercise.types";
+import type { Exercise } from "../types/exercise.types";
 
 interface ExerciseDescriptionProps {
   exercise: Exercise;
 }
 
 export const ExerciseDescription = ({ exercise }: ExerciseDescriptionProps) => {
-  const { t, i18n } = useTranslation("exercises");
-  const currentLang = i18n.language as keyof LocalizedContent;
+  const { t } = useTranslation("exercises");
 
   return (
     <div className='space-y-4 p-4'>
@@ -30,10 +29,10 @@ export const ExerciseDescription = ({ exercise }: ExerciseDescriptionProps) => {
 
       <div className='space-y-2 text-center'>
         <h2 className='text-2xl font-bold tracking-tight'>
-          {exercise.title[currentLang]}
+          {exercise.title}
         </h2>
         <p className='text-sm text-muted-foreground'>
-          {exercise.description[currentLang]}
+          {exercise.description}
         </p>
       </div>
     </div>

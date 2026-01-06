@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import { Badge } from "assets/components/ui/badge";
 import { Separator } from "assets/components/ui/separator";
@@ -303,6 +304,11 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             <div className='space-y-1'>
               {mainNavigation.map(({ id, name, href, icon }) => {
                 const isActive = isLinkActive(id, href);
+                const isChallenges = id === 'challenges';
+                const activeChallengesCount = userStats?.activeChallenges?.length || 0;
+                const today = new Date().toISOString().split('T')[0];
+                const doneTodayCount = userStats?.activeChallenges?.filter(ac => ac.lastCompletedDate === today).length || 0;
+
                 return (
                   <Link
                     key={id}
@@ -316,9 +322,21 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                       className={isActive ? "text-cyan-400" : "text-zinc-500"}>
                       {icon}
                     </span>
-                    <span>{name}</span>
-                    {isActive && (
-                      <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
+                    <span className="flex-1">{name}</span>
+                    
+                    {isChallenges && activeChallengesCount > 0 && (
+                      <div className="flex items-center gap-1">
+                        <span className={cn(
+                          "text-[9px] font-black px-1.5 py-0.5 rounded",
+                          doneTodayCount === activeChallengesCount ? "bg-emerald-500/20 text-emerald-400" : "bg-main/20 text-main"
+                        )}>
+                          {doneTodayCount}/{activeChallengesCount}
+                        </span>
+                      </div>
+                    )}
+
+                    {isActive && !isChallenges && (
+                      <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
                     )}
                   </Link>
                 );
@@ -357,14 +375,6 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                       {icon}
                     </span>
                     <span>{name}</span>
-                    {isSkills && totalSkillPoints > 0 && (
-                      <span className="ml-auto text-[10px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">
-                        {totalSkillPoints > 9999 ? "+9999" : totalSkillPoints}
-                      </span>
-                    )}
-                    {isActive && !isSkills && (
-                      <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
-                    )}
                   </Link>
                 );
               })}

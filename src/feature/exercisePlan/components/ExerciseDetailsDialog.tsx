@@ -16,7 +16,7 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "react-i18next";
 import { FaClock, FaDumbbell, FaGuitar, FaLightbulb } from "react-icons/fa";
 
-import type { Exercise, LocalizedContent } from "../types/exercise.types";
+import type { Exercise } from "../types/exercise.types";
 
 interface ExtendedExercise extends Exercise {
   tab?: string[];
@@ -44,9 +44,8 @@ export const ExerciseDetailsDialog = ({
   onClose,
   onStart,
 }: ExerciseDetailsDialogProps) => {
-  const { t: exerciseT, i18n } = useTranslation("exercises");
+  const { t: exerciseT } = useTranslation("exercises");
   const { t: commonT } = useTranslation("common");
-  const currentLang = i18n.language as keyof LocalizedContent;
 
   const skills = exercise.relatedSkills
     .map((skillId) => guitarSkills.find((s) => s.id === skillId))
@@ -68,10 +67,10 @@ export const ExerciseDetailsDialog = ({
           )}>
           <DialogHeader className='mb-4'>
             <DialogTitle className='text-2xl font-bold tracking-tight'>
-              {exercise.title[currentLang]}
+              {exercise.title}
             </DialogTitle>
-            <DialogDescription className='mt-2 text-base'>
-              {exercise.description[currentLang]}
+            <DialogDescription className='mt-2 text-base text-zinc-300'>
+              {exercise.description}
             </DialogDescription>
           </DialogHeader>
 
@@ -121,7 +120,7 @@ export const ExerciseDetailsDialog = ({
             </div>
           </div>
 
-          <div className='rounded-lg border p-4'>
+          <div className='rounded-lg border border-white/10 p-4'>
             <h4 className='mb-3 flex items-center gap-2 text-lg font-medium'>
               <FaLightbulb className='h-4 w-4 text-amber-500' />
               {exerciseT("exercise.instructions")}
@@ -129,13 +128,13 @@ export const ExerciseDetailsDialog = ({
             <ul className='list-disc space-y-2 pl-5'>
               {exercise.instructions.map((instruction, index) => (
                 <li key={index} className='text-foreground/90'>
-                  {instruction[currentLang]}
+                  {instruction}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className='rounded-lg border p-4'>
+          <div className='rounded-lg border border-white/10 p-4'>
             <h4 className='mb-3 flex items-center gap-2 text-lg font-medium'>
               <FaLightbulb className='h-4 w-4 text-primary' />
               {exerciseT("exercise.tips")}
@@ -143,14 +142,14 @@ export const ExerciseDetailsDialog = ({
             <ul className='list-disc space-y-2 pl-5'>
               {exercise.tips.map((tip, index) => (
                 <li key={index} className='text-foreground/90'>
-                  {tip[currentLang]}
+                  {tip}
                 </li>
               ))}
             </ul>
           </div>
 
           {exercise.imageUrl && (
-            <div className='rounded-lg border p-4'>
+            <div className='rounded-lg border border-white/10 p-4'>
               <h4 className='mb-3 flex items-center gap-2 text-lg font-medium'>
                 {exerciseT("exercise.tab")}
               </h4>
@@ -165,7 +164,7 @@ export const ExerciseDetailsDialog = ({
           )}
 
           {exercise.videoUrl && (
-            <div className='rounded-lg border p-4'>
+            <div className='rounded-lg border border-white/10 p-4'>
               <h4 className='mb-3 flex items-center gap-2 text-lg font-medium text-red-500'>
                 <FaGuitar className='h-4 w-4' />
                 {commonT("video", { defaultValue: "Video" })}
