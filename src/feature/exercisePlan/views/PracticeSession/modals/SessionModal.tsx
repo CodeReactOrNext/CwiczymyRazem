@@ -4,7 +4,6 @@ import { Metronome } from "feature/exercisePlan/components/Metronome/Metronome";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { i18n } from "next-i18next";
 import { FaExpand } from "react-icons/fa";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 
@@ -19,7 +18,6 @@ import { FaInfoCircle, FaLightbulb, FaHeart, FaFacebook, FaInstagram, FaTwitter,
 import { useTranslation } from "react-i18next";
 
 import { categoryGradients } from "../../../constants/categoryStyles";
-import type { LocalizedContent } from "../../../types/exercise.types";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
 import { NextExerciseCard } from "../components/NextExerciseCard";
 import { SessionModalControls } from "../components/SessionModalControls";
@@ -78,7 +76,6 @@ const SessionModal = ({
   const { t } = useTranslation(["exercises", "common"]);
 
   const category = currentExercise.category || "mixed";
-  const currentLang = i18n?.language as keyof LocalizedContent;
 
   const gradientClasses =
     categoryGradients[category as keyof typeof categoryGradients];
@@ -96,7 +93,7 @@ const SessionModal = ({
               gradientClasses
             )}>
             <SessionModalHeader
-              exerciseTitle={currentExercise.title[currentLang]}
+              exerciseTitle={currentExercise.title}
               currentExerciseIndex={currentExerciseIndex}
               totalExercises={totalExercises}
               onClose={onClose}
@@ -157,7 +154,7 @@ const SessionModal = ({
                     <div className='relative aspect-[3.5/1] w-full'>
                       <Image
                         src={currentExercise.imageUrl || currentExercise.image}
-                        alt={currentExercise.title[currentLang]}
+                        alt={currentExercise.title}
                         className='h-full w-full object-contain'
                         fill
                         priority
@@ -210,9 +207,9 @@ const SessionModal = ({
                                 <div className={cn(
                                 "prose prose-invert max-w-none prose-p:text-sm prose-p:text-zinc-400 prose-p:leading-relaxed",
                                 )}>
-                                {currentExercise.instructions.map((instruction: LocalizedContent, idx: number) => (
+                                {currentExercise.instructions.map((instruction: string, idx: number) => (
                                     <p key={idx} className="mb-2 last:mb-0">
-                                        {instruction[currentLang]}
+                                        {instruction}
                                     </p>
                                 ))}
                                 </div>
@@ -231,9 +228,9 @@ const SessionModal = ({
                         <AccordionContent className="px-4 pb-4 pt-1">
                                 <ul className="list-inside list-disc space-y-1.5 text-sm text-zinc-400 marker:text-amber-500/50">
                                 {currentExercise.tips?.length > 0 && (
-                                    currentExercise.tips.map((tip: LocalizedContent, idx: number) => (
+                                    currentExercise.tips.map((tip: string, idx: number) => (
                                         <li key={idx}>
-                                            {tip[currentLang] || tip.pl}
+                                            {tip}
                                         </li>
                                     ))
                                 )}

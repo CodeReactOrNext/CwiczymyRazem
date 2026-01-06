@@ -1,12 +1,10 @@
 import { useAppSelector, useAppDispatch } from "store/hooks";
 import { selectUserAuth, selectCurrentUserStats } from "feature/user/store/userSlice";
-import { challengeRepository } from "../../index";
-import { ChallengeUseCases } from "../../backend/application/ChallengeUseCases";
-import { useEffect, useState, useMemo } from "react";
-import { Challenge, ActiveChallenge } from "../../backend/domain/models/Challenge";
+import { challengeUseCases } from "../../index";
+import { saveActiveChallenge } from "feature/user/store/userSlice.asyncThunk";
+import { useEffect, useState } from "react";
+import { Challenge } from "../../backend/domain/models/Challenge";
 import { toast } from "sonner";
-
-const useCases = new ChallengeUseCases(challengeRepository);
 
 export const useChallenges = () => {
   const userAuth = useAppSelector(selectUserAuth);
@@ -14,10 +12,12 @@ export const useChallenges = () => {
   const [allChallenges, setAllChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const userId = userAuth?.uid;
+  const userId = userAuth
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    useCases.getAllChallenges().then(setAllChallenges);
+    challengeUseCases.getAllChallenges().then(setAllChallenges);
   }, []);
 
   const activeChallenges = userStats?.activeChallenges || [];
@@ -27,9 +27,8 @@ export const useChallenges = () => {
     if (!userId) return;
     setLoading(true);
     try {
-      await useCases.startChallenge(userId, challenge);
+      await dispatch(saveActiveChallenge({ challenge: { challengeId: challenge.id } as any })).unwrap();
       toast.success("Challenge started!");
-      // Progress is managed via Redux update usually, but here we would need to refresh or trust socket/firebase sync
     } catch (e: any) {
       toast.error(e.message);
     } finally {
@@ -42,7 +41,7 @@ export const useChallenges = () => {
     if (!confirm("Are you sure you want to quit?")) return;
     setLoading(true);
     try {
-      await useCases.abandonChallenge(userId, challengeId);
+      await dispatch(saveActiveChallenge({ challenge: null, quitId: challengeId })).unwrap();
       toast.success("Challenge abandoned.");
     } catch (e: any) {
       toast.error(e.message);

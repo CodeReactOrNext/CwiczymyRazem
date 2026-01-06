@@ -8,14 +8,13 @@ import { useChallenges } from "../../hooks/useChallenges";
 import { useState, useEffect } from "react";
 import { Challenge } from "../../../backend/domain/models/Challenge";
 import { useRouter } from "next/router";
-import { getUserSkills } from "feature/skills/services/getUserSkills";
 import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { selectUserAuth, selectCurrentUserStats } from "feature/user/store/userSlice";
 
 export const ChallengesView = () => {
   const router = useRouter();
   const userAuth = useAppSelector(selectUserAuth);
-  const [userSkills, setUserSkills] = useState<any>(null);
+  const userStats = useAppSelector(selectCurrentUserStats);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
 
@@ -27,16 +26,12 @@ export const ChallengesView = () => {
     handleAbandon 
   } = useChallenges();
 
-  useEffect(() => {
-    if (userAuth) {
-      getUserSkills(userAuth).then(setUserSkills);
-    }
-  }, [userAuth]);
+  const userSkills = userStats?.skills;
 
   useEffect(() => {
     if (router.query.start) {
         const challengeId = router.query.start as string;
-        const challengeToStart = allChallenges.find(c => c.id === challengeId);
+        const challengeToStart = (allChallenges as Challenge[]).find(c => c.id === challengeId);
         if (challengeToStart) {
             setSelectedChallenge(challengeToStart);
         }
@@ -45,10 +40,10 @@ export const ChallengesView = () => {
 
   const activeChallengesData = activeChallenges.map(ac => ({
     ...ac,
-    data: allChallenges.find(c => c.id === ac.challengeId)
+    data: (allChallenges as Challenge[]).find(c => c.id === ac.challengeId)
   })).filter(ac => ac.data);
 
-  const challengesByCategory = allChallenges.reduce((acc, challenge) => {
+  const challengesByCategory = (allChallenges as Challenge[]).reduce((acc, challenge) => {
     const category = challenge.category;
     if (!acc[category]) acc[category] = {};
     const skillId = challenge.requiredSkillId;
@@ -70,6 +65,19 @@ export const ChallengesView = () => {
     }
   };
 
+  const onPractice = (challenge: Challenge) => {
+    setSelectedChallenge(challenge);
+  };
+
+  const onAdd = async (challenge: Challenge) => {
+    await handleStart(challenge);
+  };
+
+  const onStartNew = async (challenge: Challenge) => {
+    await handleStart(challenge);
+    setSelectedChallenge(challenge);
+  };
+
   if (selectedChallenge) {
     return (
       <MainContainer>
@@ -87,12 +95,12 @@ export const ChallengesView = () => {
       <div className="container mx-auto max-w-7xl px-4 py-8">
         <ChallengeHeader onBack={handleBack} />
 
-        <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10 flex items-start gap-3 mb-10">
+        <div className="p-4 rounded-lg bg-blue-500/5 flex items-start gap-3 mb-10">
           <Info size={16} className="text-blue-500 shrink-0 mt-0.5" />
           <p className="text-[11px] text-zinc-400 leading-relaxed">
             <span className="text-blue-400 font-bold uppercase tracking-wider block mb-1">Concept Mode</span>
             These challenges focus on specific guitar techniques and theoretical concepts. 
-            <strong>You are responsible for choosing or creating specific exercises</strong> that fit the challenge goals.
+            Choose or create exercises that best fit the challenge goals.
           </p>
         </div>
 
@@ -101,7 +109,7 @@ export const ChallengesView = () => {
             key={ac.challengeId}
             activeChallenge={ac}
             challengeData={data}
-            onStart={handleStart}
+            onStart={onPractice}
             onAbandon={handleAbandon}
           />
         ))}
@@ -111,8 +119,9 @@ export const ChallengesView = () => {
           userSkills={userSkills}
           completedChallenges={completedChallenges}
           activeChallenges={activeChallenges}
-          handleStart={handleStart}
-          handleAdd={handleStart} // Simplified for now
+          onPractice={onPractice}
+          onAdd={onAdd}
+          onStart={onStartNew}
         />
       </div>
     </MainContainer>

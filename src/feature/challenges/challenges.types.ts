@@ -1,4 +1,4 @@
-import type { CategoryKeys } from "../../components/Charts/ActivityChart";
+import type { CategoryKeys } from "components/Charts/ActivityChart";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 

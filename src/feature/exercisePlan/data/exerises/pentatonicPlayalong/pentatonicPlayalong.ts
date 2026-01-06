@@ -2,30 +2,15 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const pentatonicPlayalongExercise: Exercise = {
   id: "pentatonic_playalong_best_of",
-  title: {
-    pl: "Pentatonic Best Of - Guitar Playalongs",
-    en: "Pentatonic Best Of - Guitar Playalongs"
-  },
-  description: {
-    pl: "Ćwicz skale pentatoniczne razem z filmem. Najlepsze ćwiczenia pentatoniczne w jednym miejscu.",
-    en: "Practice pentatonic scales along with the video. The best pentatonic exercises in one place."
-  },
+  title: "Pentatonic Best Of - Guitar Playalongs",
+  description: "Practice pentatonic scales along with the video. The best pentatonic exercises in one place.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 13,
   instructions: [
-    {
-      pl: "Włącz film i graj razem z instruktorem",
-      en: "Play the video and follow along with the instructor"
-    },
-    {
-      pl: "Zwróć uwagę na palcowanie i czystość dźwięku",
-      en: "Pay attention to fingering and clarity of sound"
-    },
-    {
-      pl: "Staraj się utrzymać tempo narzucone w filmie",
-      en: "Try to keep up with the tempo in the video"
-    }
+    "Play the video and follow along with the instructor",
+    "Pay attention to fingering and clarity of sound",
+    "Try to keep up with the tempo in the video"
   ],
   tips: [],
   metronomeSpeed: null,

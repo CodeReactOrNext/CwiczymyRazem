@@ -7,8 +7,9 @@ interface ChallengeMapProps {
   userSkills: any;
   completedChallenges: string[];
   activeChallenges: any[];
-  handleStart: (c: Challenge) => void;
-  handleAdd: (c: Challenge) => void;
+  onPractice: (c: Challenge) => void;
+  onAdd: (c: Challenge) => void;
+  onStart: (c: Challenge) => void;
 }
 
 export const ChallengeMap = ({
@@ -16,8 +17,9 @@ export const ChallengeMap = ({
   userSkills,
   completedChallenges,
   activeChallenges,
-  handleStart,
-  handleAdd
+  onPractice,
+  onAdd,
+  onStart
 }: ChallengeMapProps) => {
   const formatSkillName = (skillId: string) => {
     return skillId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -66,13 +68,13 @@ export const ChallengeMap = ({
               return (
                 <div key={skillId} className="relative pl-12">
                   <div className="absolute left-6 top-[-24px] bottom-0 w-[2px] bg-gradient-to-b from-zinc-800 to-transparent" />
-                  <div className="absolute left-5 top-4 w-4 h-4 rounded-full border-2 border-zinc-800 bg-zinc-950 flex items-center justify-center">
-                     <div className="w-1.5 h-1.5 rounded-full bg-zinc-800" />
+                  <div className="absolute left-5 top-4 w-4 h-4 rounded-full bg-zinc-800 flex items-center justify-center">
+                     <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
                   </div>
 
                   <div className="mb-4 flex items-center gap-4">
-                    <div className="px-3 py-1 rounded-full bg-zinc-800 border border-white/5 relative">
-                       <h3 className="text-xs font-black text-zinc-300 uppercase tracking-[0.2em]">
+                    <div className="px-3 py-1 rounded bg-zinc-800 relative">
+                       <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">
                          {formatSkillName(skillId)}
                        </h3>
                     </div>
@@ -90,18 +92,27 @@ export const ChallengeMap = ({
                       }
 
                       const isUnlocked = currentLevel >= challenge.requiredLevel && isDependencyMet;
+                      const activeChallenge = activeChallenges.find(ac => ac.challengeId === challenge.id);
+                      const isActive = !!activeChallenge;
+                      const today = new Date().toISOString().split('T')[0];
+                      const isTodayDone = activeChallenge?.lastCompletedDate === today;
 
                       return (
-                        <div key={challenge.id} className="min-w-[200px] max-w-[240px] flex-1 snap-start relative group">
+                        <div key={challenge.id} className="min-w-[260px] max-w-[300px] flex-1 snap-start relative group">
                           {index < sorted.length - 1 && (
                             <div className="hidden md:flex absolute top-12 -right-8 w-8 items-center justify-center z-0">
                               <div className={cn(
-                                "h-[1px] w-full transition-all duration-500",
-                                isUnlocked ? "bg-main/30 shadow-[0_0_8px_rgba(var(--main-rgb),0.2)]" : "bg-zinc-800/50"
+                                "h-[2px] w-full transition-all duration-700",
+                                isUnlocked 
+                                  ? (isAlreadyCompleted ? "bg-main/40" : "bg-main shadow-[0_0_8px_rgba(var(--main-rgb),0.4)]") 
+                                  : "bg-zinc-800"
                               )} />
+                              {!isAlreadyCompleted && isUnlocked && (
+                                <div className="absolute w-2 h-2 rounded-full bg-main animate-ping opacity-20" />
+                              )}
                               <div className={cn(
-                                "absolute w-1.5 h-1.5 rounded-full border transition-all duration-500",
-                                isUnlocked ? "bg-main border-main shadow-[0_0_12px_rgba(var(--main-rgb),0.6)] scale-110" : "bg-zinc-900 border-zinc-800"
+                                "absolute w-2 h-2 rounded-full transition-all duration-500",
+                                isUnlocked ? "bg-main" : "bg-zinc-800"
                               )} />
                             </div>
                           )}
@@ -109,10 +120,12 @@ export const ChallengeMap = ({
                             challenge={challenge as any}
                             isUnlocked={isUnlocked}
                             currentLevel={currentLevel}
-                            onStart={handleStart}
-                            onAdd={handleAdd}
-                            hasActiveChallenge={activeChallenges.length >= 3 && !activeChallenges.some(ac => ac.challengeId === challenge.id)}
-                            isActive={activeChallenges.some(ac => ac.challengeId === challenge.id)}
+                            onPractice={onPractice}
+                            onAdd={onAdd}
+                            onStart={onStart}
+                            hasActiveChallenge={activeChallenges.length >= 3 && !isActive}
+                            isActive={isActive}
+                            isTodayDone={isTodayDone}
                             isDependencyMet={isDependencyMet}
                             isCompleted={isAlreadyCompleted}
                           />

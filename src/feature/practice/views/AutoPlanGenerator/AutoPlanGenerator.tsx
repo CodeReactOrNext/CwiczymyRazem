@@ -89,15 +89,9 @@ export const AutoPlanGenerator = ({
     if (avgDifficulty > 2.3) difficulty = "hard";
     else if (avgDifficulty > 1.5) difficulty = "medium";
 
-    const title: LocalizedContent = {
-      pl: `Plan ${time} minut`,
-      en: `${time} minute plan`,
-    };
+    const title: LocalizedContent = `Plan ${time} minut`;
 
-    const description: LocalizedContent = {
-      pl: "Automatycznie wygenerowany plan ćwiczeń",
-      en: "Automatically generated practice plan",
-    };
+    const description: LocalizedContent = "Automatically generated practice plan";
 
     const newPlan: ExercisePlan = {
       id: "auto-" + Date.now(),

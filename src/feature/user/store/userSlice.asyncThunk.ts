@@ -4,7 +4,7 @@ import axios from "axios";
 import { signIn, signOut } from "next-auth/react";
 import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { challengesList } from "feature/challenges/data/challengesList";
+import { challengesList, challengeUseCases } from "feature/challenges";
 import type { RootState } from "store/store";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
@@ -325,37 +325,23 @@ export const saveActiveChallenge = createAsyncThunk(
   "user/saveActiveChallenge",
   async (payload: { challenge: ActiveChallenge | null; quitId?: string }, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const currentUserStats = state.user.currentUserStats;
       const userId = auth.currentUser?.uid;
       if (!userId) {
         throw new Error("User not authenticated");
       }
 
-      let activeChallenges = [...(currentUserStats?.activeChallenges || [])];
-
       if (payload.quitId) {
-        activeChallenges = activeChallenges.filter(c => c.challengeId !== payload.quitId);
+        await challengeUseCases.abandonChallenge(userId, payload.quitId);
       } else if (payload.challenge) {
-        const index = activeChallenges.findIndex(c => c.challengeId === payload.challenge!.challengeId);
-        if (index !== -1) {
-          activeChallenges[index] = payload.challenge;
-        } else {
-          // Limit to 3 active challenges
-          if (activeChallenges.length >= 3) {
-            throw new Error("Maximum 3 active challenges allowed");
-          }
-          activeChallenges.push(payload.challenge);
-        }
+        // We need the full challenge object to start it, but payload only has ActiveChallenge
+        // Let's find the full challenge
+        const fullChallenge = challengesList.find(c => c.id === payload.challenge!.challengeId);
+        if (!fullChallenge) throw new Error("Challenge definition not found");
+        await challengeUseCases.startChallenge(userId, fullChallenge);
       }
 
-      const userRef = doc(db, "users", userId);
-
-      await updateDoc(userRef, {
-        "statistics.activeChallenges": activeChallenges
-      });
-
-      return activeChallenges;
+      // Return the updated list of active challenges
+      return await challengeUseCases.getActiveChallenges(userId);
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to save active challenge"
@@ -379,64 +365,18 @@ export const checkAndSaveChallengeProgress = createAsyncThunk(
       // Find challenge that matches the planId
       const challengeToUpdate = planId
         ? currentUserStats.activeChallenges.find(c => c.challengeId === planId)
-        : currentUserStats.activeChallenges[0]; // Fallback for safety, though planId should be provided
+        : currentUserStats.activeChallenges[0];
 
       if (!challengeToUpdate) return;
 
-      const today = new Date().toISOString().split('T')[0];
-
-      if (challengeToUpdate.lastCompletedDate && challengeToUpdate.lastCompletedDate === today) {
-        return rejectWithValue("Already completed today");
-      }
-
-      const challenge = { ...challengeToUpdate, lastCompletedDate: today };
-      let pointsToAdd = 0;
-      let challengeFinished = false;
-
-      if (challenge.currentDay >= challenge.totalDays) {
-        const challengeData = challengesList.find(c => c.id === challenge.challengeId);
-        const rewardPoints = parseInt(challengeData?.rewardDescription?.match(/\d+/)?.[0] || '0');
-        if (rewardPoints > 0) {
-          pointsToAdd = rewardPoints;
-        }
-        challengeFinished = true;
-      } else {
-        challenge.currentDay += 1;
-      }
-
-      const userRef = doc(db, "users", userId);
-      const { increment, arrayUnion } = await import("firebase/firestore");
-      const updates: any = {};
-
-      const challengeData = challengesList.find(c => c.id === challenge.challengeId);
-
-      if (challengeData?.rewardSkillId) {
-        updates[`skills.unlockedSkills.${challengeData.rewardSkillId}`] = increment(1);
-      }
-
-      if (challengeFinished) {
-        const remainingChallenges = currentUserStats.activeChallenges.filter(c => c.challengeId !== challenge.challengeId);
-        updates["statistics.activeChallenges"] = remainingChallenges;
-        updates["statistics.completedChallenges"] = arrayUnion(challenge.challengeId);
-
-        if (pointsToAdd > 0) {
-          updates["statistics.points"] = increment(pointsToAdd);
-        }
-      } else {
-        const updatedChallenges = currentUserStats.activeChallenges.map(c =>
-          c.challengeId === challenge.challengeId ? challenge : c
-        );
-        updates["statistics.activeChallenges"] = updatedChallenges;
-      }
-
-      await updateDoc(userRef, updates);
+      const result = await challengeUseCases.completeProgress(userId, challengeToUpdate.challengeId);
 
       return {
-        challenge,
-        challengeFinished,
-        pointsToAdd,
-        rewardSkillId: challengeData?.rewardSkillId,
-        rewardLevel: challengeData?.rewardLevel
+        challenge: result.activeChallenge,
+        challengeFinished: result.finished,
+        pointsToAdd: result.rewardPoints,
+        rewardLevel: result.rewardLevel,
+        rewardSkillId: result.rewardSkillId,
       };
 
     } catch (error) {

@@ -24,7 +24,7 @@ export const DailyPlanRecommendation = ({ plan }: DailyPlanRecommendationProps) 
   };
 
   const colorStyle = categoryColors[plan.category] || categoryColors.mixed;
-  const titleStr = typeof plan.title === "string" ? plan.title : plan.title.en;
+  const titleStr = plan.title;
 
   return (
     <Card

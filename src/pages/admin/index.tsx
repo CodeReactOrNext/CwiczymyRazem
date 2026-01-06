@@ -14,6 +14,8 @@ import { useDuplicateDetector } from "feature/admin/hooks/useDuplicateDetector";
 import { BulkAddSongsModal } from "feature/admin/components/BulkAddSongsModal";
 import { DuplicateSongsModal } from "feature/admin/components/DuplicateSongsModal";
 import { ArtistSongSelector } from "feature/admin/components/ArtistSongSelector";
+import { MigrationCenter } from "feature/admin/components/MigrationCenter";
+import { useExerciseMigration } from "feature/admin/hooks/useExerciseMigration";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../api/auth/[...nextauth]";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -78,6 +80,12 @@ const AdminDashboard = () => {
     verifyAll,
     handleMassEnrich,
   } = useAdminBulkActions(songs, password, setSongs, fetchSongs);
+
+  const {
+    runMigration,
+    isMigrating: isExerciseMigrating,
+    migrationProgress
+  } = useExerciseMigration(password);
 
   if (!isAuth) {
     return <AdminLogin password={password} setPassword={setPassword} onLogin={handleLogin} />;
@@ -151,6 +159,12 @@ const AdminDashboard = () => {
             onPageChange={setPage}
           />
         </div>
+
+        <MigrationCenter 
+          onMigrateExercises={runMigration}
+          isMigrating={isExerciseMigrating}
+          progress={migrationProgress}
+        />
       </div>
       
       <CoverPickerModal 

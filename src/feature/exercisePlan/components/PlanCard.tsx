@@ -84,18 +84,10 @@ export const PlanCard = ({
   startButtonText,
   isLoading
 }: PlanCardProps) => {
-  const { t, i18n } = useTranslation(["exercises", "common"]);
+  const { t } = useTranslation(["exercises", "common"]);
 
-  const title =
-    typeof plan.title === "string"
-      ? plan.title
-      : plan.title?.[i18n.language as keyof typeof plan.title] ||
-        plan.title?.pl;
-  const description =
-    typeof plan.description === "string"
-      ? plan.description
-      : plan.description?.[i18n.language as keyof typeof plan.description] ||
-        plan.description?.pl;
+  const title = plan.title;
+  const description = plan.description;
 
   const totalDuration = plan.exercises.reduce(
     (acc, exercise) => acc + exercise.timeInMinutes,

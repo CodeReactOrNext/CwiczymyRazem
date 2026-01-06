@@ -1,10 +1,7 @@
 import { Card } from "assets/components/ui/card";
-import { i18n } from "next-i18next";
-
-import type { LocalizedContent } from "../../../types/exercise.types";
 
 interface InstructionsCardProps {
-  instructions: Array<LocalizedContent>;
+  instructions: Array<string>;
   title: string;
 }
 
@@ -12,8 +9,6 @@ export const InstructionsCard = ({
   instructions,
   title,
 }: InstructionsCardProps) => {
-  const currentLang = i18n?.language as keyof LocalizedContent;
-
   return (
     <Card className='border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
       {/* PRIMARY: Enhanced header with visual hierarchy */}
@@ -39,7 +34,7 @@ export const InstructionsCard = ({
               </div>
               <div className='flex-1'>
                 <p className='text-sm leading-relaxed text-zinc-200 transition-colors duration-200 group-hover:text-white [&>strong]:font-semibold [&>strong]:text-white'>
-                  {instruction[currentLang]}
+                  {instruction}
                 </p>
               </div>
             </div>

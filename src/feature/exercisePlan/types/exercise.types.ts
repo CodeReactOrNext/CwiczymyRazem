@@ -5,10 +5,7 @@ import type { StaticImageData } from "next/image";
 export type DifficultyLevel = "easy" | "medium" | "hard";
 export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing" | "mixed";
 
-export interface LocalizedContent {
-  pl: string;
-  en: string;
-}
+export type LocalizedContent = string;
 
 export interface Exercise {
   id: string;
@@ -39,11 +36,11 @@ export interface Exercise {
 
 export interface ExercisePlan {
   id: string;
-  title: string | LocalizedContent;
+  title: string;
   createdAt?: Date;
   updatedAt?: Date;
   difficulty: DifficultyLevel;
-  description: string | LocalizedContent;
+  description: string;
   category: ExerciseCategory | 'mixed';
   exercises: Exercise[];
   userId: string;
