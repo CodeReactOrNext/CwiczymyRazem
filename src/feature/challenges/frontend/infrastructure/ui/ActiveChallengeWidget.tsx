@@ -1,7 +1,6 @@
 import { useAppSelector } from "store/hooks";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { challengesList } from "feature/challenges/data/challengesList";
-import { useTranslation } from "react-i18next";
+import { challengesList } from "../persistence/staticChallenges";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Circle, Flame, Play, Timer, Trophy } from "lucide-react";
 import { cn } from "assets/lib/utils";
@@ -9,8 +8,6 @@ import { Button } from "assets/components/ui/button";
 import { useRouter } from "next/router";
 
 export const ActiveChallengeWidget = () => {
-    const { i18n } = useTranslation();
-    const currentLang = (i18n.language || 'en').split('-')[0] as 'pl' | 'en';
     const userStats = useAppSelector(selectCurrentUserStats);
     const router = useRouter();
 
@@ -51,7 +48,7 @@ export const ActiveChallengeWidget = () => {
     return (
         <div className="flex flex-col gap-4 w-full h-full">
             {userStats.activeChallenges.map((ac) => {
-                const challenge = challengesList.find(c => c.id === ac.challengeId);
+                const challenge = (challengesList as any[]).find(c => c.id === ac.challengeId);
                 if (!challenge) return null;
 
                 const today = new Date().toISOString().split('T')[0];
@@ -59,12 +56,6 @@ export const ActiveChallengeWidget = () => {
 
                 const handleStartSession = () => {
                     router.push(`/timer/challenges?start=${ac.challengeId}`);
-                };
-
-                const getLocalized = (content: string | any) => {
-                    if (typeof content === 'string') return content;
-                    if (!content) return '';
-                    return content[currentLang] || content['en'] || '';
                 };
 
                 return (
@@ -87,7 +78,7 @@ export const ActiveChallengeWidget = () => {
                                             <span className="text-[7px] font-black uppercase tracking-[0.2em] text-main px-1 bg-main/10 rounded">Challenge</span>
                                         </div>
                                         <h2 className="text-sm font-bold text-white tracking-tight leading-tight">
-                                            {getLocalized(challenge.title)}
+                                            {challenge.title}
                                         </h2>
                                     </div>
                                 </div>

@@ -14,7 +14,6 @@ import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 
 import { StatsSection } from "./components/StatsSection";
-import { ActiveChallengeWidget } from "feature/challenges/components/ActiveChallengeWidget";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 
 interface LandingLayoutProps {
@@ -25,6 +24,7 @@ interface LandingLayoutProps {
 }
 
 import { useQuery } from "@tanstack/react-query";
+import { ActiveChallengeWidget } from "feature/challenges/frontend/infrastructure/ui/ActiveChallengeWidget";
 
 const ProfileLandingLayout = ({
   statsField,

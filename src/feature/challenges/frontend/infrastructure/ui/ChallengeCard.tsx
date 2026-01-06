@@ -1,7 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Challenge } from "../challenges.types";
-import { useTranslation } from "react-i18next";
+import { Challenge } from "../../../backend/domain/models/Challenge";
 import { Lock, Timer, Calendar, ChevronRight, CheckCircle2, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -28,15 +27,7 @@ export const ChallengeCard = ({
   isDependencyMet = true,
   isCompleted = false,
 }: ChallengeCardProps) => {
-  const { i18n } = useTranslation();
-  const currentLang = (i18n.language || 'en').split('-')[0] as 'pl' | 'en';
   const progress = Math.min((currentLevel / challenge.requiredLevel) * 100, 100);
-
-  const getLocalized = (content: string | any) => {
-    if (typeof content === 'string') return content;
-    if (!content) return '';
-    return content[currentLang] || content['en'] || '';
-  };
 
   return (
     <div
@@ -79,13 +70,13 @@ export const ChallengeCard = ({
             "font-bold text-white mb-1 tracking-tight",
             isUnlocked ? "text-lg" : "text-base opacity-50"
           )}>
-            {getLocalized(challenge.title)}
+            {challenge.title}
           </h3>
           <p className={cn(
             "text-xs leading-relaxed line-clamp-2",
             isUnlocked ? "text-zinc-400" : "text-zinc-600 italic"
           )}>
-            {getLocalized(challenge.description)}
+            {challenge.description}
           </p>
         </div>
 
