@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { selectDailyQuest } from "feature/user/store/userSlice";
 import { initializeDailyQuestAction, claimQuestRewardAction } from "feature/user/store/userSlice.asyncThunk";
-import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Circle, Gift, Swords } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
@@ -29,11 +28,7 @@ export const DailyQuestWidget = () => {
     };
 
     return (
-        <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full h-full rounded-md bg-main-opposed-bg shadow-lg p-5 flex flex-col justify-between"
-        >
+        <div className="w-full h-full rounded-md bg-main-opposed-bg shadow-lg p-5 flex flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-sm bg-orange-500/10 text-orange-500">
@@ -100,6 +95,6 @@ export const DailyQuestWidget = () => {
                     "Complete All Tasks"
                 )}
             </Button>
-        </motion.div>
+        </div>
     );
 };

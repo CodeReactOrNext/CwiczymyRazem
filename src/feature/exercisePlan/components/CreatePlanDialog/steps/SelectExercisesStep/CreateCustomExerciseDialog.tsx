@@ -78,9 +78,6 @@ export const CreateCustomExerciseDialog = ({
       setTips(tips.filter((_, i) => i !== index));
   };
   
-  // Helper to create LocalizedContent from string (same value for both)
-  const toLocalized = (text: string): LocalizedContent => ({ en: text, pl: text });
-
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
 
@@ -91,13 +88,13 @@ export const CreateCustomExerciseDialog = ({
 
     const newExercise: Exercise = {
       id: `custom-${Date.now()}`,
-      title: toLocalized(title),
-      description: toLocalized(description),
+      title: title,
+      description: description,
       difficulty,
       category,
       timeInMinutes: parseInt(duration) || 5,
-      instructions: instructions.map(toLocalized),
-      tips: tips.map(toLocalized),
+      instructions: instructions,
+      tips: tips,
       metronomeSpeed: null,
       relatedSkills: [],
       videoUrl: videoUrl.trim() || null,

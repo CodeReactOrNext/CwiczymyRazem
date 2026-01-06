@@ -49,7 +49,7 @@ export const useExerciseSelection = ({
 
   const filteredExercises = useMemo(() => {
     return exercises.filter((exercise) => {
-      const matchesSearch = exercise.title.en
+      const matchesSearch = exercise.title
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 

@@ -5,7 +5,6 @@ import { cn } from "assets/lib/utils";
 import { ExerciseDetailsDialog } from "feature/exercisePlan/components/ExerciseDetailsDialog";
 import type {
   Exercise,
-  LocalizedContent,
 } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useState } from "react";
@@ -65,8 +64,7 @@ const categoryStyles = {
 };
 
 export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
-  const { t, i18n } = useTranslation(["exercises", "common"]);
-  const currentLang = i18n.language as keyof LocalizedContent;
+  const { t } = useTranslation(["exercises", "common"]);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const exerciseSkills = exercise.relatedSkills
@@ -116,10 +114,10 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
         {/* Main Content */}
         <div className="flex-1 space-y-3">
             <h3 className="text-xl font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
-                {exercise.title[currentLang]}
+                {exercise.title}
             </h3>
             <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground/80">
-                {exercise.description[currentLang]}
+                {exercise.description}
             </p>
         </div>
 

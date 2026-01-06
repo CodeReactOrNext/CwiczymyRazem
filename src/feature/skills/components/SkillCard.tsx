@@ -22,25 +22,14 @@ export const SkillCard = ({
   const theme = getSkillTheme(skill.category);
   const Icon = skill.icon;
 
-  // Level logic (assuming max 100 for visual bar, or maybe 50?)
-  // Let's assume infinite or high cap for now, visual bar fills to next "Milestone" vs simple linear?
-  // For dashboard, simple linear 0-100 or relative to some max is fine.
-  // Let's settle on a visual max of 100 for the bar segment, but allow infinite points.
-  // Or maybe relative to current points + 10?
-  // Let's just visually cap at 100 for now or cycle. 
-  // User screenshot shows "Technika 4% 108h 42m". This implies time tracking.
-  // But here we are spending points. Let's just show raw points.
   const visualMax = 50; 
   const progress = Math.min((currentPoints / visualMax) * 100, 100);
 
-
   return (
-    <div className="bg-[#141414] border border-zinc-800/50 rounded-xl p-5 flex flex-col gap-4 transition-colors group relative overflow-hidden">
-      {/* Top Row: Icon + Name + Current Lvl */}
+    <div className="bg-[#141414] rounded-lg p-5 flex flex-col gap-4 transition-colors group relative overflow-hidden shadow-lg">
       <div className="flex items-start gap-3 sm:gap-4 z-10">
         <div className={cn(
-            "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center border bg-zinc-900/50 flex-shrink-0",
-            theme.border,
+            "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center bg-zinc-900/50 flex-shrink-0",
             theme.primary
         )}>
            {Icon && <Icon className="w-5 h-5 sm:w-6 sm:h-6" />}
@@ -66,7 +55,6 @@ export const SkillCard = ({
         </div>
       </div>
 
-      {/* Progress Bar */}
       <div className="flex flex-col gap-1.5 z-10">
          <div className="flex justify-between text-xs text-zinc-400">
             <span>Progress</span>
@@ -80,7 +68,6 @@ export const SkillCard = ({
          </div>
       </div>
 
-       {/* Ambient Glow from Theme */}
        <div className={cn(
          "absolute -top-20 -right-20 w-40 h-40 blur-[80px] rounded-full pointer-events-none opacity-10 transition-opacity group-hover:opacity-20",
          theme.glow

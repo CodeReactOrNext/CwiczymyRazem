@@ -34,7 +34,7 @@ import {
   saveActiveChallenge,
   checkAndSaveChallengeProgress,
 } from "./userSlice.asyncThunk";
-import { challengesList } from "feature/challenges/data/challengesList";
+import { challengesList } from "feature/challenges";
 
 
 const initialState: userSliceInitialState = {
@@ -215,14 +215,14 @@ export const userSlice = createSlice({
       .addCase(checkAndSaveChallengeProgress.fulfilled, (state, { payload }) => {
         if (!state.currentUserStats || !payload) return;
 
-        const { challenge, challengeFinished, pointsToAdd, rewardSkillId } = payload;
+        const { challenge, challengeFinished, pointsToAdd, rewardLevel, rewardSkillId } = payload;
 
         if (rewardSkillId) {
           if (!state.currentUserStats.skills) {
             state.currentUserStats.skills = { unlockedSkills: {} };
           }
           const currentLevel = state.currentUserStats.skills.unlockedSkills[rewardSkillId] || 0;
-          state.currentUserStats.skills.unlockedSkills[rewardSkillId] = currentLevel + 1;
+          state.currentUserStats.skills.unlockedSkills[rewardSkillId] = currentLevel + (rewardLevel || 0);
         }
 
         if (challengeFinished) {
@@ -277,10 +277,10 @@ export const userSlice = createSlice({
 
           state.currentUserStats = {
             ...payload.currentUserStats,
-            activeChallenges: currentActiveChallenge || payload.currentUserStats.activeChallenges,
+            activeChallenges: payload.currentUserStats.activeChallenges || currentActiveChallenge,
             dailyQuest: (currentDailyQuest && currentDailyQuest.date === today) ? currentDailyQuest : payload.currentUserStats.dailyQuest,
-            skills: currentSkills || payload.currentUserStats.skills,
-            availablePoints: currentAvailablePoints || payload.currentUserStats.availablePoints,
+            skills: payload.currentUserStats.skills || currentSkills,
+            availablePoints: payload.currentUserStats.availablePoints || currentAvailablePoints,
           };
 
           state.previousUserStats = prevStats;

@@ -7,13 +7,10 @@ import {
 } from "assets/components/ui/card";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
-import { i18n } from "next-i18next";
-
-import type { LocalizedContent } from "../../../types/exercise.types";
 
 interface NextExerciseCardProps {
   nextExercise: {
-    title: LocalizedContent;
+    title: string;
     image?: string | StaticImageData;
     timeInMinutes: number;
   } | null;
@@ -24,8 +21,6 @@ export const NextExerciseCard = ({
   nextExercise,
   isMobile = false,
 }: NextExerciseCardProps) => {
-  const currentLang = i18n?.language as keyof LocalizedContent;
-
   if (!nextExercise) return null;
 
   const formatTime = (timeInMinutes: number): string => {
@@ -45,7 +40,7 @@ export const NextExerciseCard = ({
           {nextExercise.image ? (
             <Image
               src={nextExercise.image}
-              alt={nextExercise.title[currentLang]}
+              alt={nextExercise.title}
               className='object-cover'
               fill
             />
@@ -55,7 +50,7 @@ export const NextExerciseCard = ({
         </div>
         <div className='flex flex-1 flex-col gap-1'>
           <h4 className='text-sm font-medium leading-tight text-foreground'>
-            {nextExercise.title[currentLang]}
+            {nextExercise.title}
           </h4>
           <Badge variant='secondary' className='w-fit text-xs'>
             {formatTime(nextExercise.timeInMinutes)}
