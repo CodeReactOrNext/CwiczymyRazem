@@ -16,13 +16,13 @@ interface UsePlanDetailsFormProps {
   initialData?: ExercisePlan;
 }
 
-export const usePlanDetailsForm = ({ 
-  selectedExercises, 
+export const usePlanDetailsForm = ({
+  selectedExercises,
   onSubmit,
-  initialData 
+  initialData
 }: UsePlanDetailsFormProps) => {
   const userAuth = useSelector(selectUserAuth);
-  
+
   const getInitialValue = (val: string | { pl: string; en: string } | undefined) => {
     if (!val) return "";
     return typeof val === "string" ? val : (val.pl || val.en || "");
@@ -37,22 +37,8 @@ export const usePlanDetailsForm = ({
 
   const handleFormSubmit = (data: PlanDetailsFormData) => {
     onSubmit({
-      title: typeof initialData?.title === "object" ? {
-        ...initialData.title,
-        pl: data.title,
-        en: data.title,
-      } : {
-        pl: data.title,
-        en: data.title,
-      },
-      description: typeof initialData?.description === "object" ? {
-        ...initialData.description,
-        pl: data.description,
-        en: data.description,
-      } : {
-        pl: data.description,
-        en: data.description,
-      },
+      title: data.title,
+      description: data.description,
       image: initialData?.image ?? null,
       createdAt: initialData?.createdAt ?? new Date(),
       updatedAt: new Date(),

@@ -23,7 +23,7 @@ import { LogReaction } from "feature/logs/components/LogReaction";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import { challengesList } from "feature/challenges/data/challengesList";
+import { challengesList } from 'feature/challenges';
 import { cn } from "assets/lib/utils";
 
 const isFirebaseLogsSongs = (
@@ -179,9 +179,8 @@ const FirebaseLogsItem = ({
   const currentLang = (i18n.language === 'pl' || i18n.language === 'en') ? i18n.language : 'en';
   
   const getLocalizedTitle = (title: any) => {
-      if (typeof title === 'string') return title;
       if (!title) return null;
-      return title[currentLang] || title['en'];
+      return title;
   };
 
   const planTitle = plan ? getLocalizedTitle(plan.title) : null;

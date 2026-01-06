@@ -48,7 +48,7 @@ export const SelectedExercisesList = ({
             key={exercise.id}
             className='group flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-sm'>
             <span className='max-w-[150px] truncate'>
-              {exercise.title.en}
+              {exercise.title}
             </span>
             <div className='flex min-w-[60px] items-center gap-1 text-muted-foreground'>
               <FaClock className='h-3 w-3' />

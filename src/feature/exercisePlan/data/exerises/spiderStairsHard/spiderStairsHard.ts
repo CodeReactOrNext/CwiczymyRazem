@@ -5,52 +5,22 @@ import spiderBasicImage from "./image.png";
 
 export const spiderStairsHardExercise: Exercise = {
   id: "spider_stairs_hard",
-  title: {
-    pl: "Pająki schodkowe - zaawansowane",
-    en: "Advanced Spider Stairs Exercise",
-  },
-  description: {
-    pl: "Zaawansowana wersja ćwiczenia schodkowego z większymi odstępami między dźwiękami i szybszym tempem.",
-    en: "Advanced version of the stairs exercise with wider note intervals and faster tempo.",
-  },
+  title: "Advanced Spider Stairs Exercise",
+  description: "Advanced version of the stairs exercise with wider note intervals and faster tempo.",
   difficulty: "medium",
   category: "technique",
   timeInMinutes: 5,
   instructions: [
-    {
-      pl: "Zacznij od pierwszego progu na strunie E, używając układu palców 1-2-4.",
-      en: "Start from the first fret on the E string, using fingers 1-2-4.",
-    },
-    {
-      pl: "Przejdź na następną strunę przesuwając się o dwa progi wyżej.",
-      en: "Move to the next string shifting two frets higher.",
-    },
-    {
-      pl: "Kontynuuj wzór aż do najwyższej struny, zwiększając rozpiętość między palcami.",
-      en: "Continue the pattern until the highest string, increasing finger stretch.",
-    },
-    {
-      pl: "Wróć tą samą drogą w dół, zachowując precyzję ruchów.",
-      en: "Return the same way down, maintaining movement precision.",
-    }
+    "Start from the first fret on the E string, using fingers 1-2-4.",
+    "Move to the next string shifting two frets higher.",
+    "Continue the pattern until the highest string, increasing finger stretch.",
+    "Return the same way down, maintaining movement precision."
   ],
   tips: [
-    {
-      pl: "Zachowaj szczególną uwagę na precyzję przy większych rozpiętościach.",
-      en: "Pay special attention to precision with wider stretches.",
-    },
-    {
-      pl: "Utrzymuj nadgarstek w prawidłowej pozycji mimo większych odległości.",
-      en: "Maintain proper wrist position despite larger distances.",
-    },
-    {
-      pl: "Kontroluj siłę nacisku - przy większych rozpiętościach łatwo o nadmierny nacisk.",
-      en: "Control pressure - it's easy to press too hard with wider stretches.",
-    },
-    {
-      pl: "Jeśli czujesz dyskomfort, zmniejsz tempo.",
-      en: "If you feel discomfort, reduce tempo.",
-    },
+    "Pay special attention to precision with wider stretches.",
+    "Maintain proper wrist position despite larger distances.",
+    "Control pressure - it's easy to press too hard with wider stretches.",
+    "If you feel discomfort, reduce tempo.",
   
   ],
   metronomeSpeed: {

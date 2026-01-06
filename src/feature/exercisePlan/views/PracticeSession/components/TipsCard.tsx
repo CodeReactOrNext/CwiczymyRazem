@@ -1,15 +1,10 @@
 import { Card } from "assets/components/ui/card";
-import { i18n } from "next-i18next";
-
-import type { LocalizedContent } from "../../../types/exercise.types";
 
 interface TipsCardProps {
-  tips: Array<LocalizedContent>;
+  tips: Array<string>;
 }
 
 export const TipsCard = ({ tips }: TipsCardProps) => {
-  const currentLang = i18n?.language as keyof LocalizedContent;
-
   return (
     <Card className='border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
       {/* PRIMARY: Enhanced header with visual hierarchy */}
@@ -30,7 +25,7 @@ export const TipsCard = ({ tips }: TipsCardProps) => {
             <div key={index} className='group flex items-start gap-3'>
               <div className='mt-1 flex h-2 w-2 flex-shrink-0 rounded-full bg-emerald-400/60 transition-colors duration-200 group-hover:bg-emerald-400'></div>
               <p className='text-sm leading-relaxed text-zinc-200 transition-colors duration-200 group-hover:text-white'>
-                {tip[currentLang]}
+                {tip}
               </p>
             </div>
           ))}

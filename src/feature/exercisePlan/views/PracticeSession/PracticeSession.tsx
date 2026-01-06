@@ -54,7 +54,6 @@ const headerGradients = {
 
 export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: PracticeSessionProps) => {
   const { t } = useTranslation(["exercises", "common"]);
-  const currentLang = i18n?.language as keyof LocalizedContent;
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -146,6 +145,8 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
         </div>
       )}
 
+
+
       {showSuccessView && !reportResult && (
         <ExerciseSuccessView
           planTitle={planTitleString}
@@ -164,7 +165,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
             isOpen={isImageModalOpen}
             onClose={() => setIsImageModalOpen(false)}
             imageSrc={currentExercise.imageUrl || currentExercise.image || ""}
-            imageAlt={currentExercise.title[currentLang] as string}
+            imageAlt={currentExercise.title}
           />
 
           <SessionModal
@@ -250,7 +251,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                               </span>
                            </div>
                         )}
-                        {currentExercise.title[currentLang]}
+                        {currentExercise.title}
                     </h2>
 
                     {/* Simple Challenge Banner */}
@@ -266,10 +267,10 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                             </div>
                             <div>
                                <h3 className="text-lg font-bold text-white tracking-tight">
-                                 Challenge: {typeof (plan as any).title === 'string' ? (plan as any).title : (plan as any).title[currentLang]}
+                                 Challenge: {typeof (plan as any).title === 'string' ? (plan as any).title : (plan as any).title}
                                </h3>
                                <p className="text-sm text-zinc-400 leading-relaxed">
-                                 {typeof (plan as any).description === 'string' ? (plan as any).description : (plan as any).description[currentLang]}
+                                 {typeof (plan as any).description === 'string' ? (plan as any).description : (plan as any).description}
                                </p>
                                <p className="text-xs text-main font-bold uppercase tracking-widest">
                                  Reward: {(plan as any).rewardDescription}
@@ -328,7 +329,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                          ) : (
                             <ExerciseImage 
                                 image={currentExercise.imageUrl || currentExercise.image || ""} 
-                                title={currentExercise.title[currentLang] as string} 
+                                title={currentExercise.title} 
                                 isMobileView={isMobileView}
                                 imageScale={imageScale}
                                 containerRef={containerRef}
@@ -362,7 +363,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                          )}>
                                             {currentExercise.instructions.map((instruction, idx) => (
                                                 <p key={idx} className="mb-4 last:mb-0">
-                                                    {instruction[currentLang]}
+                                                    {instruction}
                                                 </p>
                                             ))}
                                          </div>
@@ -387,7 +388,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                          )}>
                                             {currentExercise.tips.map((tip, idx) => (
                                                 <li key={idx} className="marker:text-amber-500/50">
-                                                    {tip[currentLang] || tip.pl}
+                                                    {tip}
                                                 </li>
                                             ))}
                                          </ul>
@@ -527,7 +528,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                     resetTimer();
                     startTimer();
                 }}
-                exerciseTitle={currentExercise.title[currentLang]}
+                exerciseTitle={currentExercise.title}
                 duration={currentExercise.timeInMinutes}
                 />
             </div>

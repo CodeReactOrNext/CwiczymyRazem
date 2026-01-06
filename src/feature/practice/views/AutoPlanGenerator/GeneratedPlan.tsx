@@ -35,8 +35,7 @@ export const GeneratedPlan = ({
   const { t } = useTranslation(["exercises", "common"]);
 
   const getLocalizedText = (content: LocalizedContent | string): string => {
-    if (typeof content === "string") return content;
-    return content.en;
+    return content;
   };
 
   return (

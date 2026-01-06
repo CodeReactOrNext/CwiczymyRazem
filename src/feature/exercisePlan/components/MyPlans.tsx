@@ -14,7 +14,6 @@ import { getUserExercisePlans } from "../services/getUserExercisePlans";
 import type {
   Exercise,
   ExercisePlan,
-  LocalizedContent,
 } from "../types/exercise.types";
 import { PlanCard } from "./PlanCard";
 import { CreatePlan } from "./CreatePlanDialog/CreatePlan";
@@ -50,8 +49,8 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
   }, [userAuth]);
 
   const handleCreatePlan = async (
-    title: string | LocalizedContent,
-    description: string | LocalizedContent,
+    title: string,
+    description: string,
     exercises: Exercise[]
   ): Promise<void> => {
     try {
@@ -64,11 +63,8 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
       }
 
       const formattedPlanData = {
-        title: typeof title === "string" ? { pl: title, en: title } : title,
-        description:
-          typeof description === "string"
-            ? { pl: description, en: description }
-            : description,
+        title,
+        description,
         category: determinePlanCategory(exercises),
         difficulty: determinePlanDifficulty(exercises),
         exercises,

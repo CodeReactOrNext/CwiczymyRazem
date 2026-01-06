@@ -2,7 +2,7 @@ import { Badge } from "assets/components/ui/badge";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "react-i18next";
-import { Check, Clock, Info, Youtube, Video } from "lucide-react";
+import { Check, Clock, Youtube, Video } from "lucide-react";
 import { cn } from "assets/lib/utils";
 
 interface ExerciseCardProps {
@@ -51,10 +51,10 @@ export const ExerciseCard = ({
             "pr-8 font-semibold leading-tight tracking-tight transition-colors",
             isSelected ? "text-cyan-400" : "text-zinc-100 group-hover:text-white"
           )}>
-            {exercise.title.en}
+            {exercise.title}
           </h3>
           <p className="mt-1.5 line-clamp-2 text-xs text-zinc-400 group-hover:text-zinc-300">
-            {exercise.description.en}
+            {exercise.description}
           </p>
         </div>
 
