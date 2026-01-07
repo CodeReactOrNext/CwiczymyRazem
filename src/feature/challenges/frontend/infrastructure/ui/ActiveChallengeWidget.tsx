@@ -11,7 +11,6 @@ export const ActiveChallengeWidget = () => {
     const userStats = useAppSelector(selectCurrentUserStats);
     const router = useRouter();
 
-    console.log('[Widget] UserStats:', userStats);
     if (!userStats?.activeChallenges || userStats.activeChallenges.length === 0) {
         return (
             <div className="w-full h-full p-4 rounded-lg bg-main-opposed-bg relative overflow-hidden flex flex-col justify-center items-center gap-3">
