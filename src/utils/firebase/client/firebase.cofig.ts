@@ -7,6 +7,7 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_STORAGEBUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_MESSAGEINGSENDERID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_APPID,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_CONFIG_DATABASEURL,
 };
 
 // Safety check for build environment without valid API key
