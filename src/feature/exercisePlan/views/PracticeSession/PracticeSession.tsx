@@ -11,6 +11,7 @@ import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { useRouter } from "next/router";
+import Head from "next/head";
 import { i18n } from "next-i18next";
 import { useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -132,9 +133,12 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
 
   return (
     <>
+      <Head>
+        <title>{formattedTimeLeft} | {currentExercise.title}</title>
+      </Head>
       {reportResult && currentUserStats && previousUserStats && (
-        <div className="fixed inset-0 z-[1000] overflow-y-auto bg-zinc-950">
-          <RatingPopUp
+        <div className="fixed inset-0 z-[999999999] overflow-y-auto bg-zinc-950">
+          <RatingPopUp 
             ratingData={reportResult}
             currentUserStats={currentUserStats}
             previousUserStats={previousUserStats}
@@ -169,7 +173,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
           />
 
           <SessionModal
-            isOpen={isFullSessionModalOpen}
+            isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult}
             onClose={() => router.push("/report")}
             onFinish={isLastExercise ? autoSubmitReport : onFinish}
             onImageClick={() => setIsImageModalOpen(true)}
@@ -190,6 +194,9 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
             setTimerTime={setTimerTime}
             startTimer={startTimer}
             stopTimer={stopTimer}
+            isFinishing={isFinishing}
+            isSubmittingReport={isSubmittingReport}
+            canSkipExercise={canSkipExercise}
           />
         </>
       )}
@@ -452,16 +459,6 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                 <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
                      <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
                           <div className="flex-1 hidden xl:flex items-center justify-start gap-4">
-                              {currentExercise.metronomeSpeed && (
-                                 <div className="scale-90 origin-left">
-                                     <Metronome
-                                         initialBpm={currentExercise.metronomeSpeed.recommended}
-                                         minBpm={currentExercise.metronomeSpeed.min}
-                                         maxBpm={currentExercise.metronomeSpeed.max}
-                                         recommendedBpm={currentExercise.metronomeSpeed.recommended}
-                                     />
-                                 </div>
-                              )}
                           </div>
 
                           <div className="flex-none flex justify-center">
@@ -476,7 +473,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                  timeLeft={timeLeft}
                                  handleNextExercise={() => handleNextExercise(resetTimer)}
                                  showExerciseInfo={false}
-                                 variant="compact"
+                variant="compact"
                                  sessionTimerData={sessionTimerData}
                                  exerciseTimeSpent={exerciseTimeSpent}
                                  canSkipExercise={canSkipExercise}
@@ -516,25 +513,25 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                           </div>
                      </div>
                 </div>
-
-                <ExerciseCompleteDialog
-                isOpen={showCompleteDialog}
-                onClose={() => {
-                    setShowCompleteDialog(false);
-                    onFinish?.();
-                }}
-                onRestart={() => {
-                    setShowCompleteDialog(false);
-                    resetTimer();
-                    startTimer();
-                }}
-                exerciseTitle={currentExercise.title}
-                duration={currentExercise.timeInMinutes}
-                />
             </div>
           </ExerciseLayout>
         </TooltipProvider>
       </div>
+
+      <ExerciseCompleteDialog
+        isOpen={showCompleteDialog}
+        onClose={() => {
+            setShowCompleteDialog(false);
+            onFinish?.();
+        }}
+        onRestart={() => {
+            setShowCompleteDialog(false);
+            resetTimer();
+            startTimer();
+        }}
+        exerciseTitle={currentExercise.title}
+        duration={currentExercise.timeInMinutes}
+      />
     </>
   );
 };

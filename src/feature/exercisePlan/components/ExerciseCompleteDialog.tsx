@@ -39,7 +39,7 @@ export const ExerciseCompleteDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='sm:max-w-md'>
+      <DialogContent className='sm:max-w-md z-[99999999]'>
         <DialogHeader>
           <DialogTitle className='text-center'>
             <div className='flex flex-col items-center gap-4'>
