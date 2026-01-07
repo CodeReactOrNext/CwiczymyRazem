@@ -64,11 +64,17 @@ export const getSongs = async (
       baseQuery = query(baseQuery, where("genres", "array-contains-any", genreFilters));
     }
 
+    // Fix for Count Mismatch: Ensure count respects "popularity" existence if sorting by it.
+    // We can only do this if we don't have another range filter (difficultyFilter) to avoid Firestore "multiple range filters" error.
+    if (sortBy === "popularity" && (!difficultyFilter || difficultyFilter === "all")) {
+      baseQuery = query(baseQuery, where("popularity", ">=", 0));
+    }
+
     // 2. Search Path: Requires parallel queries and local merge/intersection
     if (hasSearch) {
       const t = titleQuery.toLowerCase();
       const a = artistQuery.toLowerCase();
-      
+
       let titleResults: Song[] = [];
       let artistResults: Song[] = [];
 
@@ -118,7 +124,9 @@ export const getSongs = async (
     const countSnapshot = await getCountFromServer(baseQuery);
     const totalCountPool = countSnapshot.data().count;
 
-    let q = query(baseQuery, orderBy(sortBy, sortDirection));
+    // Add secondary sort by ID (__name__) for stability
+    let q = query(baseQuery, orderBy(sortBy, sortDirection), orderBy("__name__", "asc"));
+
     if (afterDoc && page > 1) {
       q = query(q, startAfter(afterDoc), limit(itemsPerPage));
     } else {
