@@ -8,8 +8,10 @@ import { IconBox } from "components/IconBox/IconBox";
 import Avatar from "components/UI/Avatar";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
 import {
   FaClock,
+  FaExternalLinkAlt,
   FaFire,
   FaLeaf,
   FaMusic,
@@ -84,8 +86,11 @@ export const UserTooltip = ({ userId, children }: UserTooltipProps) => {
                   </div>
                 )}
                 <div>
-                  <h3 className='text-base font-bold text-gray-900'>
+                  <h3 className='flex items-center gap-2 text-base font-bold text-gray-900'>
                     {userData.displayName}
+                    <Link href={`/user/${userId}`} className="cursor-pointer hover:text-cyan-500 transition-colors">
+                      <FaExternalLinkAlt className='text-xs text-gray-400 hover:text-cyan-500' />
+                    </Link>
                   </h3>
                 </div>
               </div>
