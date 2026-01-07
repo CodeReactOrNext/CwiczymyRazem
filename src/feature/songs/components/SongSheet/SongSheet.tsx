@@ -122,12 +122,32 @@ const SongSheet = ({
     }
   }, [isOpen, song]);
 
+  /* OPTIMISTIC UPDATE LOGIC */
+  const [optimisticStatus, setOptimisticStatus] = useState<SongStatus | undefined>(status);
+
+  // Sync optimistic status with prop when it changes externally (e.g. initial load)
+  useEffect(() => {
+    setOptimisticStatus(status);
+  }, [status]);
+
   const handleStatusUpdate = async (newStatus: SongStatus) => {
-    setIsUpdatingStatus(newStatus);
+    if (isUpdatingStatus) return; // Prevent double clicks
+    if (newStatus === optimisticStatus) return; // Prevent re-selecting the same status
+    
+    // 1. Optimistic Update
+    const prevStatus = optimisticStatus;
+    setOptimisticStatus(newStatus);
+    setIsUpdatingStatus(newStatus); // Lock UI
+
     try {
+      // 2. Perform Async Update
       await onStatusChange(newStatus);
+    } catch (error) {
+       // 3. Revert on Failure
+       console.error("Failed to update status, reverting:", error);
+       setOptimisticStatus(prevStatus);
     } finally {
-      setIsUpdatingStatus(null);
+       setIsUpdatingStatus(null); // Unlock UI
     }
   };
 
@@ -294,7 +314,7 @@ const SongSheet = ({
               <div className="grid gap-2">
                 {STATUS_OPTIONS.map((opt) => {
                   const Icon = opt.icon;
-                  const isActive = status === opt.id;
+                  const isActive = optimisticStatus === opt.id;
                   const isPending = isUpdatingStatus === opt.id;
 
                   return (
