@@ -46,6 +46,9 @@ interface SessionModalProps {
   setTimerTime: (time: number) => void;
   startTimer: () => void;
   stopTimer: () => void;
+  isFinishing?: boolean;
+  isSubmittingReport?: boolean;
+  canSkipExercise?: boolean;
 }
 
 const SessionModal = ({
@@ -69,7 +72,10 @@ const SessionModal = ({
   setVideoDuration,
   setTimerTime,
   startTimer,
-  stopTimer
+  stopTimer,
+  isFinishing,
+  isSubmittingReport,
+  canSkipExercise
 }: SessionModalProps) => {
   if (!isOpen || !isMounted) return null;
 
@@ -305,6 +311,9 @@ const SessionModal = ({
               onFinish={onFinish}
               toggleTimer={toggleTimer}
               handleNextExercise={handleNextExercise}
+              isFinishing={isFinishing}
+              isSubmittingReport={isSubmittingReport}
+              canSkipExercise={canSkipExercise}
             />
           </motion.div>
         )}
