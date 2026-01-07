@@ -25,6 +25,7 @@ import { useAppSelector } from "store/hooks";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { challengesList } from 'feature/challenges';
 import { cn } from "assets/lib/utils";
+import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 
 const isFirebaseLogsSongs = (
   log:
@@ -527,6 +528,9 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
 
   return (
     <>
+      <div className="mb-2">
+        <OnlineUsers />
+      </div>
       <div ref={spanRef} className='h-1' />
       {logs.map((log) => (
         <div
