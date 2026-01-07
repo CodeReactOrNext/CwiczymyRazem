@@ -138,7 +138,7 @@ const RatingPopUp = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className='mx-auto max-w-6xl p-4 sm:p-5'>
+        className='mx-auto max-w-6xl p-4 sm:p-5 pb-32 pt-24 sm:pb-5 sm:pt-5'>
         
         <div ref={topRef} />
         {isGetNewLevel && <LevelUpBanner />}
