@@ -475,6 +475,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                 </span>
                 <span>{t("nav.discord")}</span>
               </a>
+
             </div>
           </div>
         </nav>
