@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { rateSong, updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
 import { cn } from "assets/lib/utils";
+import { useEffect } from "react";
 
 interface SongRatingInterface {
   song: Song;
@@ -34,6 +35,15 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
     rating: number;
   } | null>(null);
   const [isRatingLoading, setIsRatingLoading] = useState(false);
+  // OPTIMISTIC RATING STATE
+  const [optimisticRating, setOptimisticRating] = useState<number | undefined>(userRating?.rating);
+  
+  // Sync if external userRating updates
+  useEffect(() => {
+    if (userRating?.rating !== undefined) {
+      setOptimisticRating(userRating.rating);
+    }
+  }, [userRating?.rating]);
 
   const handleRating = async (
     songId: string,
@@ -45,7 +55,7 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
       return;
     }
 
-    // 1. Check existing legacy cooldown (15s)
+  // 1. Check existing legacy cooldown (15s)
     if (userRating) {
       let lastRatedDate: Date;
       if (userRating.date && typeof userRating.date.toDate === 'function') {
@@ -196,7 +206,7 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
         </div>
       </div>
 
-      {isRated && <span className="text-[10px] text-green-500 font-medium">Song Rated</span>}
+      {isRated && <span className="text-[10px] text-green-500 font-medium">Song Rated: {userRating?.rating}/10</span>}
     </div>
   );
 };

@@ -27,10 +27,25 @@ export const getSongs = async (
   try {
     const hasSearch = titleQuery || artistQuery;
 
+    const hasOtherFilters =
+      (difficultyFilter && difficultyFilter !== "all") ||
+      (tierFilters && tierFilters.length > 0) ||
+      (genreFilters && genreFilters.length > 0);
+
+    // Override sort to 'title' (asc) if filtering by properties while sorting by popularity,
+    // to avoid needing composite indexes for every combination of filters + popularity.
+    let effectiveSortBy = sortBy;
+    let effectiveSortDirection = sortDirection;
+
+    if (sortBy === "popularity" && hasOtherFilters) {
+      effectiveSortBy = "title";
+      effectiveSortDirection = "asc";
+    }
+
     // Cache key should include afterDoc id if present to distinguish cursors
     const cacheKey = JSON.stringify({
-      sortBy,
-      sortDirection,
+      sortBy: effectiveSortBy,
+      sortDirection: effectiveSortDirection,
       page,
       itemsPerPage,
       tierFilters,
@@ -65,8 +80,9 @@ export const getSongs = async (
     }
 
     // Fix for Count Mismatch: Ensure count respects "popularity" existence if sorting by it.
-    // We can only do this if we don't have another range filter (difficultyFilter) to avoid Firestore "multiple range filters" error.
-    if (sortBy === "popularity" && (!difficultyFilter || difficultyFilter === "all")) {
+    // We only apply this if NO other filters are active to avoid complex composite index requirements (Error 400).
+    // If filters are active, we accept a potential minor count mismatch to ensure stability and avoid crashes.
+    if (effectiveSortBy === "popularity" && !hasOtherFilters) {
       baseQuery = query(baseQuery, where("popularity", ">=", 0));
     }
 
@@ -102,12 +118,12 @@ export const getSongs = async (
 
       // Sort merged results manually since they come from different queries or manual intersection
       songs.sort((a, b) => {
-        const valA = (a as any)[sortBy] ?? (sortBy === 'title' ? '' : 0);
-        const valB = (b as any)[sortBy] ?? (sortBy === 'title' ? '' : 0);
+        const valA = (a as any)[effectiveSortBy] ?? (effectiveSortBy === 'title' ? '' : 0);
+        const valB = (b as any)[effectiveSortBy] ?? (effectiveSortBy === 'title' ? '' : 0);
         if (typeof valA === 'string') {
-          return sortDirection === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
+          return effectiveSortDirection === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
         }
-        return sortDirection === "asc" ? valA - valB : valB - valA;
+        return effectiveSortDirection === "asc" ? valA - valB : valB - valA;
       });
 
       const total = songs.length;
@@ -125,7 +141,7 @@ export const getSongs = async (
     const totalCountPool = countSnapshot.data().count;
 
     // Add secondary sort by ID (__name__) for stability
-    let q = query(baseQuery, orderBy(sortBy, sortDirection), orderBy("__name__", "asc"));
+    let q = query(baseQuery, orderBy(effectiveSortBy, effectiveSortDirection), orderBy("__name__", "asc"));
 
     if (afterDoc && page > 1) {
       q = query(q, startAfter(afterDoc), limit(itemsPerPage));
