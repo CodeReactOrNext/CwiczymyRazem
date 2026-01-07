@@ -215,5 +215,5 @@ export default SongPracticeTimer;
 
 export const getServerSideProps = withAuth({
     redirectIfUnauthenticated: "/login",
-    translations: ["common", "timer", "toast"],
+    translations: ["common", "timer", "toast", 'rating_popup'],
 });
