@@ -36,6 +36,27 @@ import type { AppPropsWithLayout } from "types/page";
 
 const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {
     useAuthSync();
+
+    if (typeof window !== "undefined" && !(window as any)._fetchAuthPatched) {
+      const originalFetch = window.fetch;
+      window.fetch = async (...args) => {
+        try {
+          return await originalFetch(...args);
+        } catch (error) {
+          const url = typeof args[0] === 'string' ? args[0] : (args[0] instanceof Request ? args[0].url : '');
+          if (url.includes('/api/auth/session')) {
+             if (!url.includes('callbackUrl')) {
+                 import("next-auth/react").then(({ signOut }) => {
+                     signOut({ redirect: true, callbackUrl: "/" });
+                 });
+             }
+          }
+          throw error;
+        }
+      };
+      (window as any)._fetchAuthPatched = true;
+    }
+
     return <>{children}</>;
 }
 
