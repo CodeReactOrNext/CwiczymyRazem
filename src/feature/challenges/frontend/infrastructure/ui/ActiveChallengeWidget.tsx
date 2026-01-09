@@ -1,7 +1,7 @@
 import { useAppSelector } from "store/hooks";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { challengesList } from "feature/challenges";
-import { CheckCircle2, Circle, Flame, Play, Timer, Trophy, Award } from "lucide-react";
+import { CheckCircle2, Circle, Flame, Play, Timer, Trophy } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import { useRouter } from "next/router";
@@ -79,22 +79,9 @@ export const ActiveChallengeWidget = () => {
                                                 {challenge.title}
                                             </h2>
                                             {challenge.rewardSkillId && (
-                                              <div className="flex items-center gap-2 mt-1.5 p-2 rounded-lg bg-main/5 border border-main/10 w-fit">
-                                                 <div className="p-1.5 rounded bg-main/10 text-main">
-                                                 {(() => {
-                                                   const rewSkill = guitarSkills.find(s => s.id === challenge.rewardSkillId);
-                                                   const RewIcon = rewSkill?.icon;
-                                                   return RewIcon ? <RewIcon size={14} /> : <Award size={14} />;
-                                                 })()}
-                                                 </div>
-                                                 <div className="flex flex-col">
-                                                     <span className="text-[9px] font-black text-main uppercase tracking-wider leading-none mb-0.5">Reward</span>
-                                                     <div className="flex items-center gap-1.5">
-                                                        <span className="text-[11px] font-black text-white leading-none">+{challenge.rewardLevel} XP</span>
-                                                        <span className="text-[9px] font-bold text-zinc-500 uppercase">{challenge.rewardSkillId.split('_').join(' ')}</span>
-                                                     </div>
-                                                 </div>
-                                              </div>
+                                              <span className="text-xs font-black text-cyan-400 mt-1">
+                                                +{challenge.rewardLevel} {challenge.rewardSkillId.split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                                              </span>
                                             )}
                                         </div>
                                     </div>
@@ -129,7 +116,7 @@ export const ActiveChallengeWidget = () => {
                                             className={cn(
                                                 "w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300",
                                                 isCompleted 
-                                                    ? "bg-main text-white shadow-lg shadow-main/20 scale-105" 
+                                                    ? "bg-white text-zinc-900 shadow-lg shadow-white/20 scale-105" 
                                                     : isCurrent 
                                                         ? "bg-main/20 text-main ring-1 ring-main" 
                                                         : "bg-zinc-800/50 text-zinc-500"
