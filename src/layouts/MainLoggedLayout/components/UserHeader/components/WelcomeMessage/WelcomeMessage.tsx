@@ -42,33 +42,7 @@ export const WelcomeMessage = ({
 
   return (
     <div className='flex items-center gap-4'>
-      {/* Today's Practice Status - Redesigned */}
-      <div className={cn(
-        "flex h-10 items-center justify-center gap-2 rounded-lg px-3 py-2 shadow-sm backdrop-blur-sm transition-all duration-500",
-        didPracticeToday 
-            ? "bg-emerald-500/10 text-emerald-400" 
-            : "bg-zinc-800/40 text-zinc-400"
-      )}>
-        {didPracticeToday ? (
-          <div className="flex items-center gap-2">
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white">
-                <FaCheck />
-            </div>
-            <span className='text-[10px] font-bold uppercase tracking-wider'>
-              Goal met
-            </span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-700 text-[10px] text-zinc-400">
-                <FaTimes />
-            </div>
-            <span className='text-[10px] font-bold uppercase tracking-wider opacity-60'>
-              Todays goal
-            </span>
-          </div>
-        )}
-      </div>
+   
 
       {/* Flame Streak & Weekly Progress Combined */}
       <div className='flex h-10 items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm'>
