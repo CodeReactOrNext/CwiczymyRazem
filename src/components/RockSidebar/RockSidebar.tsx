@@ -11,9 +11,6 @@ import {
   Timer,
   FileText,
   X,
-  Menu,
-  Guitar,
-  LayoutDashboard,
   Activity,
   Brain,
   Dumbbell,
@@ -24,6 +21,7 @@ import {
   LayoutGrid,
   BookOpen,
   Flame,
+  Coffee,
 } from "lucide-react";
 import { FaDiscord } from "react-icons/fa";
 import Link from "next/link";
@@ -131,28 +129,6 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
       icon: <User size={18} />,
     },
     {
-      id: "timer" as NavPagesTypes,
-      name: "Practice",
-      href: "/timer",
-      icon: <Timer size={18} />,
-    },
-    {
-      id: "report" as NavPagesTypes,
-      name: "Reports",
-      href: "/report",
-      icon: <FileText size={18} />,
-    },
-    {
-      id: "challenges" as NavPagesTypes,
-      name: "Challenges",
-      href: "/timer/challenges",
-      icon: <Flame size={18} />,
-    },
-  ];
-
-  // Profile subsections
-  const profileSections = [
-    {
       id: "activity",
       name: "Activity",
       href: "/profile/activity",
@@ -165,14 +141,46 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
       icon: <Brain size={16} />,
     },
     {
+      id: "leaderboard" as NavPagesTypes,
+      name: "Leaderboard",
+      href: "/leaderboard",
+      icon: <Trophy size={16} />,
+    },
+    {
+      id: "seasons" as NavPagesTypes,
+      name: "Seasons",
+      href: "/seasons",
+      icon: <Calendar size={16} />,
+    },
+  ];
+
+  const practiceSections = [
+    {
+      id: "timer" as NavPagesTypes,
+      name: "Practice",
+      href: "/timer",
+      icon: <Timer size={18} />,
+    },
+    {
       id: "exercises",
       name: "Exercises",
       href: "/profile/exercises",
       icon: <Dumbbell size={16} />,
     },
+    {
+      id: "challenges" as NavPagesTypes,
+      name: "Challenges",
+      href: "/timer/challenges",
+      icon: <Flame size={18} />,
+    },
+    {
+      id: "report" as NavPagesTypes,
+      name: "Reports",
+      href: "/report",
+      icon: <FileText size={18} />,
+    },
   ];
 
-  // Songs Section
   const songsSections = [
     {
       id: "library" as NavPagesTypes,
@@ -188,25 +196,12 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
     },
   ];
 
-  // Other sections
   const otherSections = [
     {
       id: "guide" as NavPagesTypes,
       name: "Guide",
       href: "/guide",
       icon: <BookOpen size={16} />,
-    },
-    {
-      id: "leaderboard" as NavPagesTypes,
-      name: "Leaderboard",
-      href: "/leaderboard",
-      icon: <Trophy size={16} />,
-    },
-    {
-      id: "seasons" as NavPagesTypes,
-      name: "Seasons",
-      href: "/seasons",
-      icon: <Calendar size={16} />,
     },
     {
       id: "settings" as NavPagesTypes,
@@ -304,6 +299,39 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
             <div className='space-y-1'>
               {mainNavigation.map(({ id, name, href, icon }) => {
                 const isActive = isLinkActive(id, href);
+                return (
+                  <Link
+                    key={id}
+                    href={href}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                    }`}>
+                    <span
+                      className={isActive ? "text-cyan-400" : "text-zinc-500"}>
+                      {icon}
+                    </span>
+                    <span className="flex-1">{name}</span>
+                    {isActive && (
+                      <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          <Separator className='bg-white/10' />
+
+          {/* Practice Section */}
+          <div>
+            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
+              Practice
+            </div>
+            <div className='space-y-1'>
+              {practiceSections.map(({ id, name, href, icon }) => {
+                const isActive = isLinkActive(id, href);
                 const isChallenges = id === 'challenges';
                 const activeChallengesCount = userStats?.activeChallenges?.length || 0;
                 const today = new Date().toISOString().split('T')[0];
@@ -338,43 +366,6 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                     {isActive && !isChallenges && (
                       <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
                     )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          <Separator className='bg-white/10' />
-
-          {/* Profile Section */}
-          <div>
-            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-              Profile
-            </div>
-            <div className='space-y-1'>
-              {profileSections.map(({ id, name, href, icon }) => {
-                const isActive = isLinkActive(id, href);
-                const isSkills = id === 'skills';
-                const availablePoints = userStats?.availablePoints;
-                const totalSkillPoints = availablePoints ? 
-                  (availablePoints.technique + availablePoints.theory + availablePoints.hearing + availablePoints.creativity) : 0;
-
-                return (
-                  <Link
-                    key={id}
-                    href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                    }`}>
-                    <span
-                      className={
-                        isActive ? "text-cyan-400" : "text-zinc-500"
-                      }>
-                      {icon}
-                    </span>
-                    <span>{name}</span>
                   </Link>
                 );
               })}
@@ -457,14 +448,16 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
               Community
             </div>
             <div className='space-y-1'>
-              <button
-                onClick={() => setIsCommunityModalOpen(true)}
-                className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
-                <span className='text-rose-500'>
-                  <Heart size={16} fill="currentColor" />
+              <a
+                href='https://buymeacoffee.com/riffquest'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                <span className='text-amber-500'>
+                  <Coffee size={16} />
                 </span>
-                <span>Grow Riff Quest</span>
-              </button>
+                <span>Buy Me a Coffee</span>
+              </a>
               <a
                 href='https://discord.gg/phQutKwK'
                 target='_blank'
@@ -475,6 +468,14 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                 </span>
                 <span>{t("nav.discord")}</span>
               </a>
+              <button
+                onClick={() => setIsCommunityModalOpen(true)}
+                className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                <span className='text-rose-500'>
+                  <Heart size={16} fill="currentColor" />
+                </span>
+                <span>Grow Riff Quest</span>
+              </button>
 
             </div>
           </div>
@@ -624,18 +625,18 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
                 <Separator className='bg-white/10' />
 
-                {/* Profile Section */}
+                {/* Practice Section - Mobile */}
                 <div>
                   <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-                    Profile
+                    Practice
                   </div>
                   <div className='space-y-1'>
-                    {profileSections.map(({ id, name, href, icon }) => {
+                    {practiceSections.map(({ id, name, href, icon }) => {
                       const isActive = isLinkActive(id, href);
-                      const isSkills = id === 'skills';
-                      const availablePoints = userStats?.availablePoints;
-                      const totalSkillPoints = availablePoints ? 
-                        (availablePoints.technique + availablePoints.theory + availablePoints.hearing + availablePoints.creativity) : 0;
+                      const isChallenges = id === 'challenges';
+                      const activeChallengesCount = userStats?.activeChallenges?.length || 0;
+                      const today = new Date().toISOString().split('T')[0];
+                      const doneTodayCount = userStats?.activeChallenges?.filter(ac => ac.lastCompletedDate === today).length || 0;
 
                       return (
                         <Link
@@ -655,13 +656,20 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                             }>
                             {icon}
                           </span>
-                          <span>{name}</span>
-                          {isSkills && totalSkillPoints > 0 && (
-                            <span className="ml-auto text-[10px] text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">
-                              {totalSkillPoints > 9999 ? "+9999" : totalSkillPoints}
-                            </span>
+                          <span className="flex-1">{name}</span>
+                          
+                          {isChallenges && activeChallengesCount > 0 && (
+                            <div className="flex items-center gap-1">
+                              <span className={cn(
+                                "text-[9px] font-black px-1.5 py-0.5 rounded",
+                                doneTodayCount === activeChallengesCount ? "bg-emerald-500/20 text-emerald-400" : "bg-main/20 text-main"
+                              )}>
+                                {doneTodayCount}/{activeChallengesCount}
+                              </span>
+                            </div>
                           )}
-                          {isActive && !isSkills && (
+
+                          {isActive && !isChallenges && (
                             <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
                           )}
                         </Link>
@@ -752,17 +760,17 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                     Community
                   </div>
                   <div className='space-y-1'>
-                    <button
-                      onClick={() => {
-                        handleLinkClick();
-                        setIsCommunityModalOpen(true);
-                      }}
-                      className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
-                      <span className='text-rose-500'>
-                        <Heart size={16} fill="currentColor" />
+                    <a
+                      href='https://buymeacoffee.com/riffquest'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      onClick={handleLinkClick}
+                      className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                      <span className='text-amber-500'>
+                        <Coffee size={16} />
                       </span>
-                      <span>Grow Riff Quest</span>
-                    </button>
+                      <span>Buy Me a Coffee</span>
+                    </a>
                     <a
                       href='https://discord.gg/phQutKwK'
                       target='_blank'
@@ -774,6 +782,17 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                       </span>
                       <span>{t("nav.discord")}</span>
                     </a>
+                    <button
+                      onClick={() => {
+                        handleLinkClick();
+                        setIsCommunityModalOpen(true);
+                      }}
+                      className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                      <span className='text-rose-500'>
+                        <Heart size={16} fill="currentColor" />
+                      </span>
+                      <span>Grow Riff Quest</span>
+                    </button>
                   </div>
                 </div>
               </nav>
