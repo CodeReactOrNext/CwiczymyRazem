@@ -5,4 +5,5 @@ export interface ChatMessageType {
   message: string;
   timestamp: Date;
   userPhotoURL?: string;
+  lvl?: number;
 } 

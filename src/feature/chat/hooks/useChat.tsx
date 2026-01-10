@@ -8,6 +8,7 @@ import {
   selectUserAuth,
   selectUserAvatar,
   selectUserName,
+  selectCurrentUserStats,
 } from "feature/user/store/userSlice";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -23,6 +24,7 @@ export const useChat = () => {
   const currentUserId = useAppSelector(selectUserAuth);
   const currentUserName = useAppSelector(selectUserName) || "Anonymous";
   const avatar = useAppSelector(selectUserAvatar);
+  const userStats = useAppSelector(selectCurrentUserStats);
 
   useEffect(() => {
     const unsubscribe = fetchChatMessages(setMessages);
@@ -47,7 +49,8 @@ export const useChat = () => {
           newMessage,
           currentUserId,
           currentUserName,
-          avatar
+          avatar,
+          userStats?.lvl || 0
         );
 
         setNewMessage("");
@@ -55,8 +58,9 @@ export const useChat = () => {
         toast.error(t("error"));
       }
     },
-    [newMessage, currentUserId, currentUserName, avatar]
+    [newMessage, currentUserId, currentUserName, avatar, userStats]
   );
+
 
   return {
     messages,

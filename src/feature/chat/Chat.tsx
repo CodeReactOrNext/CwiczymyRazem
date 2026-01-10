@@ -54,6 +54,7 @@ export const Chat = () => {
                           size='sm'
                           name={msg.username}
                           avatarURL={msg.userPhotoURL}
+                          lvl={msg.lvl}
                         />
                       </div>
                     </div>
