@@ -6,7 +6,7 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -56,14 +56,22 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
         }).length;
       } else {
         const sortedDocs = snapshot.docs.sort((a, b) => {
-          const timestampA = a.data().timestamp.toDate();
-          const timestampB = b.data().timestamp.toDate();
-          return timestampB.getTime() - timestampA.getTime();
+          // timestamp can be null during local write with serverTimestamp()
+          const dataA = a.data();
+          const dataB = b.data();
+
+          const timeA = dataA.timestamp?.toDate ? dataA.timestamp.toDate().getTime() : Date.now();
+          const timeB = dataB.timestamp?.toDate ? dataB.timestamp.toDate().getTime() : Date.now();
+
+          return timeB - timeA;
         });
 
         count = sortedDocs.filter((doc) => {
-          const timestamp = doc.data().timestamp;
-          return timestamp.toDate() > lastReadTime;
+          const data = doc.data();
+          // Safety check: if timestamp is missing/null (pending write), treat as new (now)
+          if (!data.timestamp || !data.timestamp.toDate) return true;
+
+          return data.timestamp.toDate() > lastReadTime;
         }).length;
       }
 
@@ -94,10 +102,10 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
     return date > state.lastReadTime;
   };
 
-  return { 
-    unreadCount: state.unreadCount, 
-    hasNewMessages: state.hasNewMessages, 
+  return {
+    unreadCount: state.unreadCount,
+    hasNewMessages: state.hasNewMessages,
     markAsRead,
-    isNewMessage 
+    isNewMessage
   };
 };
