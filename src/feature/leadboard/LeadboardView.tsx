@@ -28,6 +28,7 @@ export const LeadboardView = ({
     handlePageChange,
     handleViewChange,
     handleSeasonChange,
+    lastAccessiblePage,
   } = useLeaderboard({
     itemsPerPage: ITEMS_PER_PAGE,
     defaultView,
@@ -51,6 +52,7 @@ export const LeadboardView = ({
       seasons={seasons}
       selectedSeason={selectedSeason}
       setSelectedSeason={handleSeasonChange}
+      lastAccessiblePage={lastAccessiblePage}
     />
   );
 };

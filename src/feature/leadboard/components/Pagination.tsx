@@ -13,19 +13,23 @@ interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  lastAccessiblePage: number;
 }
 
 export const Pagination = ({
   currentPage,
   totalPages,
   onPageChange,
+  lastAccessiblePage,
 }: PaginationProps) => {
   const handlePageClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
     page: number
   ) => {
     e.preventDefault();
-    onPageChange(page);
+    if (page <= lastAccessiblePage) {
+      onPageChange(page);
+    }
   };
 
   const handlePrevious = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -37,7 +41,7 @@ export const Pagination = ({
 
   const handleNext = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    if (currentPage < totalPages) {
+    if (currentPage < totalPages && currentPage < lastAccessiblePage) {
       onPageChange(currentPage + 1);
     }
   };
@@ -63,6 +67,7 @@ export const Pagination = ({
             pageNumber === currentPage - 1 || pageNumber === currentPage + 1;
           const isEllipsis =
             pageNumber === currentPage - 2 || pageNumber === currentPage + 2;
+          const isAccessible = pageNumber <= lastAccessiblePage;
 
           if (isFirst || isLast || isCurrent || isNeighbor) {
             return (
@@ -70,12 +75,14 @@ export const Pagination = ({
                 key={pageNumber}
                 className={isNeighbor ? "hidden sm:block" : ""}>
                 <PaginationLink
-                  onClick={(e) => handlePageClick(e, pageNumber)}
+                  onClick={(e) => isAccessible && handlePageClick(e, pageNumber)}
                   isActive={isCurrent}
-                  className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:border-cyan-500/30 hover:bg-zinc-700/50 hover:text-cyan-300 ${
+                  className={`cursor-pointer border border-white/5 bg-zinc-800/50 ${
                     isCurrent
                       ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
-                      : ""
+                      : isAccessible 
+                        ? "hover:border-cyan-500/30 hover:bg-zinc-700/50 hover:text-cyan-300"
+                        : "opacity-30 cursor-not-allowed hover:bg-zinc-800/50"
                   }`}>
                   {pageNumber}
                 </PaginationLink>
@@ -95,7 +102,7 @@ export const Pagination = ({
           <PaginationNext
             onClick={handleNext}
             className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 [&>span]:hidden sm:[&>span]:inline ${
-              currentPage === totalPages ? "pointer-events-none opacity-50" : ""
+              (currentPage === totalPages || currentPage >= lastAccessiblePage) ? "pointer-events-none opacity-50" : ""
             }`}
           />
         </PaginationItem>
