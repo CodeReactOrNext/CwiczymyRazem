@@ -3,6 +3,7 @@ import { getUserStatsField } from "assets/stats/profileStats";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { StatsField } from "feature/profile/components/StatsField";
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
+import { SongLearningStatsSkeleton } from "feature/songs/components/SongLearningStats/SongLearningStatsSkeleton";
 import type { Song } from "feature/songs/types/songs.type";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -38,19 +39,21 @@ export const DetailedStats = ({
   return (
     <div className='space-y-6'>
       {/* Song Learning Stats */}
-      {userSongs && (
-        <Card>
-          <div className='mb-4'>
-            <h4 className='text-lg font-semibold text-white'>
-              {t("detailed_stats.songs_title")}
-            </h4>
-            <p className='text-sm text-zinc-400'>
-              {t("detailed_stats.songs_description")}
-            </p>
-          </div>
+      <Card>
+        <div className='mb-4'>
+          <h4 className='text-lg font-semibold text-white'>
+            {t("detailed_stats.songs_title")}
+          </h4>
+          <p className='text-sm text-zinc-400'>
+            {t("detailed_stats.songs_description")}
+          </p>
+        </div>
+        {userSongs ? (
           <SongLearningStats userSongs={userSongs} />
-        </Card>
-      )}
+        ) : (
+          <SongLearningStatsSkeleton />
+        )}
+      </Card>
 
       {/* Detailed Statistics Grid */}
       <Card>

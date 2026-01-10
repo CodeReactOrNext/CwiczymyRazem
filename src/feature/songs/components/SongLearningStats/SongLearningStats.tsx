@@ -5,6 +5,8 @@ import { getSongTier } from "feature/songs/utils/getSongTier";
 import { Award, Music2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+import { TierBadge } from "../SongsGrid/TierBadge";
+
 interface SongLearningStatsProps {
   userSongs: {
     wantToLearn: Song[];
@@ -36,8 +38,8 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {/* Total Songs - Compact */}
-      <div className="flex flex-1 items-center gap-4 rounded-lg bg-zinc-900/30 p-4 backdrop-blur-sm">
-         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
+      <div className="flex flex-1 items-center gap-4 rounded-lg  p-4 ">
+         <div className="rounded-lg bg-second p-2">
             <Music2 className="h-5 w-5" />
          </div>
          <div>
@@ -50,8 +52,8 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
       </div>
 
       {/* Completion Rate - Compact */}
-      <div className="flex flex-1 items-center gap-4 rounded-lg  bg-zinc-900/30 p-4 backdrop-blur-sm">
-         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10 text-green-500 border border-green-500/20">
+      <div className="flex flex-1 items-center gap-4 rounded-lg   p-4 ">
+         <div className="rounded-lg bg-second p-2">
             <Trophy className="h-5 w-5" />
          </div>
          <div className="flex-1">
@@ -73,16 +75,8 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
       </div>
 
       {/* Player Tier - New */}
-      <div className="flex flex-1 items-center gap-4 rounded-lg bg-zinc-900/30 p-4 backdrop-blur-sm">
-         <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg border", 
-             playerTier ? playerTier.bgColor : "bg-zinc-800",
-             playerTier ? playerTier.borderColor : "border-zinc-700",
-             playerTier ? playerTier.color.replace("#", "text-[#") : "text-zinc-500" // Quick hack or use explicit class if available
-         )}
-          style={{ color: playerTier ? playerTier.color : undefined, borderColor: playerTier ? playerTier.color : undefined }}
-         >
-            <Award className="h-5 w-5" />
-         </div>
+      <div className="flex flex-1 items-center gap-4 rounded-lg  p-4 ">
+         <TierBadge difficulty={avgDifficulty} className="h-10 w-10 text-sm" />
          <div>
             <p className="text-sm font-medium text-zinc-400">{t("your_skill_tier", "Skill Tier")}</p>
             <div className="flex items-baseline gap-2">
