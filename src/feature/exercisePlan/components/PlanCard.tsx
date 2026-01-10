@@ -86,8 +86,14 @@ export const PlanCard = ({
 }: PlanCardProps) => {
   const { t } = useTranslation(["exercises", "common"]);
 
-  const title = plan.title;
-  const description = plan.description;
+  const getLocalizedString = (value: string | { en?: string; pl?: string } | undefined): string => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    return value.pl || value.en || '';
+  };
+
+  const title = getLocalizedString(plan.title as any);
+  const description = getLocalizedString(plan.description as any);
 
   const totalDuration = plan.exercises.reduce(
     (acc, exercise) => acc + exercise.timeInMinutes,
