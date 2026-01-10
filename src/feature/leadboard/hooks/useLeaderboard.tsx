@@ -29,6 +29,7 @@ interface UseLeaderboardReturn {
   handlePageChange: (page: number) => void;
   handleViewChange: (isSeasonalView: boolean) => void;
   handleSeasonChange: (seasonId: string) => void;
+  lastAccessiblePage: number;
 }
 
 export const useLeaderboard = ({
@@ -131,5 +132,6 @@ export const useLeaderboard = ({
     handlePageChange,
     handleViewChange,
     handleSeasonChange,
+    lastAccessiblePage: Math.max(...Object.keys(pageCursors).map(Number)),
   };
 };
