@@ -1,4 +1,5 @@
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import Avatar from "components/UI/Avatar";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
@@ -69,10 +70,12 @@ const UserLink = ({
   uid,
   userName,
   avatarUrl,
+  lvl,
 }: {
   uid: string | undefined;
   userName: string;
   avatarUrl?: string;
+  lvl?: number;
 }) => {
   if (!uid) return <span>{userName}</span>;
 
@@ -81,16 +84,15 @@ const UserLink = ({
       <Link
         className='flex items-center gap-2 text-white hover:underline'
         href={`/user/${uid}`}>
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={userName}
-            className='h-6 w-6 rounded-full'
+        <div className="scale-75 origin-left">
+          <Avatar 
+            size="sm" 
+            name={userName} 
+            avatarURL={avatarUrl} 
+            lvl={lvl} 
           />
-        ) : (
-          <IoPersonOutline className='text-secondText' />
-        )}
-        {userName}
+        </div>
+        <span className="-ml-2">{userName}</span>
       </Link>
     </UserTooltip>
   );
@@ -195,6 +197,7 @@ const FirebaseLogsItem = ({
             uid={uid}
             userName={userName}
             avatarUrl={avatarUrl ?? undefined}
+            lvl={newLevel?.level}
           />
         </span>{" "}
         <span className='text-secondText'>{t("common:logsBox.get")}</span>

@@ -248,16 +248,15 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
           return (
             <div className='border-b border-white/10 p-4'>
-              <div className='flex items-center gap-3'>
-                <div className='relative'>
-                  <div className='rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 p-1'>
-                    <Avatar
-                      avatarURL={userAvatar}
-                      name={userName}
-                      lvl={userStats.lvl}
-                    />
-                  </div>
-                </div>
+                  <div className='flex items-center gap-3'>
+                    <div className='relative'>
+                      <Avatar
+                        avatarURL={userAvatar}
+                        name={userName}
+                        lvl={userStats.lvl}
+                      />
+                    </div>
+
 
                 <div className='min-w-0 flex-1'>
                   <span className='truncate text-sm font-semibold text-white'>
@@ -539,13 +538,11 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                   <div className='border-b border-white/10 p-4'>
                     <div className='flex items-center gap-3'>
                       <div className='relative'>
-                        <div className='rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 p-1'>
-                          <Avatar
-                            avatarURL={userAvatar}
-                            name={userName}
-                            lvl={userStats.lvl}
-                          />
-                        </div>
+                        <Avatar
+                          avatarURL={userAvatar}
+                          name={userName}
+                          lvl={userStats.lvl}
+                        />
                       </div>
 
                       <div className='min-w-0 flex-1'>

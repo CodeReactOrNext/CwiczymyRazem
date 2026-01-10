@@ -32,15 +32,17 @@ export const sendChatMessage = async (
   message: string,
   userId: string,
   username: string,
-  avatar: string | undefined
+  avatar: string | undefined,
+  lvl: number
 ) => {
   if (!message.trim()) return undefined
-  
+
   return addDoc(collection(db, "chats"), {
     userId,
     username,
     message,
     timestamp: serverTimestamp(),
     userPhotoURL: avatar,
+    lvl,
   });
 };
