@@ -21,8 +21,6 @@ import {
 import { IoCalendarOutline, IoPersonOutline } from "react-icons/io5";
 import { addZeroToTime } from "utils/converter";
 import { LogReaction } from "feature/logs/components/LogReaction";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { challengesList } from 'feature/challenges';
 import { cn } from "assets/lib/utils";
@@ -293,37 +291,21 @@ const PlayerAvatar = ({
   player: TopPlayerData;
   isFirst: boolean;
 }) => (
-  <div className='relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-second-400/30 bg-second-500/50 sm:h-8 sm:w-8'>
-    {player.avatar ? (
-      <img
-        src={player.avatar}
-        alt={player.displayName}
-        width={32}
-        height={32}
-        className='h-full w-full object-cover'
-        onError={(e) => {
-          // Fallback to icon on error
-          e.currentTarget.style.display = "none";
-          e.currentTarget.parentElement?.setAttribute(
-            "data-image-error",
-            "true"
-          );
-        }}
-      />
-    ) : (
-      <IoPersonOutline className='text-lg text-white/70 sm:text-xl' />
-    )}
-    {/* Fallback icon when image fails to load */}
-    {player.avatar && (
-      <div
-        data-image-fallback
-        className='absolute inset-0 flex hidden items-center justify-center'>
-        <IoPersonOutline className='text-lg text-white/70 sm:text-xl' />
-      </div>
-    )}
+  <div className='relative flex flex-shrink-0 items-center justify-center'>
+    <div className="scale-75 origin-center">
+       <Avatar 
+         size="sm" 
+         name={player.displayName} 
+         avatarURL={player.avatar ?? undefined} 
+         lvl={(player as any).lvl ?? (player as any).level} 
+       />
+    </div>
+    {/* isFirst indicator was chevron up, but maybe new avatar border is enough? 
+        The user wants level borders. If player object has level/lvl, it will work. 
+        If not, it will be silver. */}
     {isFirst && (
-      <div className='absolute -bottom-1 flex w-full justify-center'>
-        <FaChevronUp className='text-xs text-yellow-400' />
+      <div className='absolute -bottom-1 z-10 flex w-full justify-center'>
+        <FaChevronUp className='text-xs text-yellow-400 drop-shadow-md' />
       </div>
     )}
   </div>
