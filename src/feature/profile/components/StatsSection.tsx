@@ -10,30 +10,20 @@ import { AchievementWrapper } from "feature/profile/components/Achievement/Achie
 import type { Song } from "feature/songs/types/songs.type";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
-import { calculatePercent, convertMsToHM } from "utils/converter";
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Plus } from "lucide-react";
-
+import { Plus } from "lucide-react";
 import { getTrendData } from "../utils/getTrendData";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import Link from "next/link";
-import { DailyRecommendation } from "feature/songs/components/DailyRecommendation/DailyRecommendation";
-import { DailyPlanRecommendation } from "feature/songs/components/DailyRecommendation/DailyPlanRecommendation";
 import { RecommendationSkeleton } from "feature/songs/components/DailyRecommendation/RecommendationSkeleton";
 import { RecommendationsSection } from "./Recommendations/RecommendationsSection";
-import { getDailyRecommendation } from "feature/songs/services/getRecommendation";
-import { getDailyExerciseRecommendation } from "feature/exercisePlan/services/getDailyRecommendation";
-import { useEffect } from "react";
 import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
-import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
-import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import { DashboardSection } from "components/Layout";
 
 interface StatsSectionProps {
   statsField: StatsFieldProps[];

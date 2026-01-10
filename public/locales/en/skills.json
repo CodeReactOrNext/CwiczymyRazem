@@ -238,6 +238,10 @@
     "composition_advanced": {
       "name": "Advanced Composition",
       "description": "Sophisticated compositional techniques"
+    },
+    "composition": {
+      "name": "Composition",
+      "description": "Learn to write and arrange your own music"
     }
   }
 }
