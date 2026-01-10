@@ -25,6 +25,7 @@ export interface LeaderboardProps {
   seasons: SeasonDataInterface[];
   selectedSeason: string;
   setSelectedSeason: (value: string) => void;
+  lastAccessiblePage: number;
 }
 
 export const LeadboardLayout = ({
@@ -40,6 +41,7 @@ export const LeadboardLayout = ({
   seasons,
   selectedSeason,
   setSelectedSeason,
+  lastAccessiblePage,
 }: LeaderboardProps) => {
   const { t } = useTranslation("leadboard");
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
@@ -90,6 +92,7 @@ export const LeadboardLayout = ({
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={onPageChange}
+              lastAccessiblePage={lastAccessiblePage}
             />
           </div>
         </div>
@@ -186,6 +189,7 @@ export const LeadboardLayout = ({
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={onPageChange}
+                    lastAccessiblePage={lastAccessiblePage}
                   />
                 </div>
               </div>
