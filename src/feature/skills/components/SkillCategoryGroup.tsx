@@ -3,6 +3,7 @@ import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import type { GuitarSkill, GuitarSkillId, UserSkills } from "feature/skills/skills.types";
 import { SkillCard } from "./SkillCard";
+import { SkillRadarChart } from "./SkillRadarChart";
 import { useTranslation } from "react-i18next";
 
 interface SkillCategoryGroupProps {
@@ -31,14 +32,25 @@ export const SkillCategoryGroup = ({
 
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-         {skills.map((skill) => (
-             <SkillCard 
-                key={skill.id}
-                skill={skill}
-                currentPoints={userSkills.unlockedSkills[skill.id] || 0}
-             />
-         ))}
+      <div className="flex flex-col xl:flex-row gap-8">
+         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+             {skills.map((skill) => (
+                 <SkillCard 
+                    key={skill.id}
+                    skill={skill}
+                    currentPoints={userSkills.unlockedSkills[skill.id] || 0}
+                 />
+             ))}
+         </div>
+         <div className="w-full xl:w-5/12 flex items-start justify-center">
+            <div className="bg-zinc-900/10 rounded-2xl p-4 w-full backdrop-blur-sm sticky top-24">
+                <SkillRadarChart 
+                    category={category}
+                    skills={skills}
+                    userSkills={userSkills}
+                />
+            </div>
+         </div>
       </div>
     </div>
   );
