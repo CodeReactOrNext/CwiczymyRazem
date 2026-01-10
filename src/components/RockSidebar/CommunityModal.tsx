@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MessageSquare, Share2, Users, Heart, ExternalLink } from "lucide-react";
+import { X, MessageSquare, Share2, Users, Heart, ExternalLink, Coffee } from "lucide-react";
 import { FaDiscord } from "react-icons/fa";
 import { Button } from "assets/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
@@ -60,7 +60,7 @@ export const CommunityModal = ({ isOpen, onClose }: CommunityModalProps) => {
               </div>
             </div>
 
-            {/* Support */}
+            {/* Invite friends */}
             <div className="rounded-2xl border border-white/5 bg-zinc-800/50 p-5">
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400">
                 <Users size={20} />
@@ -85,6 +85,29 @@ export const CommunityModal = ({ isOpen, onClose }: CommunityModalProps) => {
               >
                 Share App
               </Button>
+            </div>
+          </div>
+
+          {/* Buy Me a Coffee - Full Width */}
+          <div className="rounded-2xl border border-white/5 bg-zinc-800/50 p-5">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400">
+                <Coffee size={24} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-white">Buy Me a Coffee</h3>
+                <p className="mt-1 text-sm text-zinc-400">
+                  Support the development of Riff Quest and help us build more features!
+                </p>
+                <a
+                  href="https://buymeacoffee.com/riffquest"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 flex items-center gap-2 text-sm font-bold text-amber-400 hover:underline"
+                >
+                  Support the Project ☕ <ExternalLink size={14} />
+                </a>
+              </div>
             </div>
           </div>
 
