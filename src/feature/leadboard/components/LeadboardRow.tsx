@@ -81,11 +81,9 @@ export const LeadboardRow = ({
 
               {/* Avatar & Identity */}
               <div className="flex flex-1 items-center gap-3 overflow-hidden">
-                 <Link href={`/user/${profileId}`} className="relative flex-shrink-0">
-                    <div className="h-10 w-10 flex items-center justify-center overflow-hidden rounded-full bg-zinc-800 ring-2 ring-white/5">
-                       <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
-                    </div>
-                 </Link>
+                  <Link href={`/user/${profileId}`} className="relative flex-shrink-0">
+                     <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} size="sm" />
+                  </Link>
 
                  <div className="flex flex-col min-w-0 gap-0.5">
                     <Link href={`/user/${profileId}`} className="block truncate">
@@ -173,7 +171,7 @@ export const LeadboardRow = ({
           {/* Avatar */}
           <Link href={`/user/${profileId}`} className='flex-shrink-0'>
             <div className='relative transition-transform duration-300 group-hover:scale-105'>
-              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} />
+              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} size="sm" />
             </div>
           </Link>
 
