@@ -24,8 +24,7 @@ export const AchievementBox = ({
 
   return (
     <div className='flex'>
-      <IconBox Icon={FaMedal} medium />
-      <div className='mx-2 self-center '>
+      <div className='self-center '>
         <p className=' mb-2  text-secondText '>
           {t(rarity)}
           <span className='ml-1'>

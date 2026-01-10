@@ -6,6 +6,7 @@ import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import { useRouter } from "next/router";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { Card } from "assets/components/ui/card";
 
 export const ActiveChallengeWidget = () => {
     const userStats = useAppSelector(selectCurrentUserStats);
@@ -13,7 +14,7 @@ export const ActiveChallengeWidget = () => {
 
     if (!userStats?.activeChallenges || userStats.activeChallenges.length === 0) {
         return (
-            <div className="w-full h-full p-4 rounded-lg bg-main-opposed-bg relative overflow-hidden flex flex-col justify-center items-center gap-3">
+            <Card>
                 <div className="absolute top-0 right-0 w-64 h-64 bg-main/5 blur-[100px] rounded-full pointer-events-none" />
                 
                 <div className="relative z-10 flex flex-col items-center gap-3 text-center">
@@ -36,12 +37,12 @@ export const ActiveChallengeWidget = () => {
                         Browse Challenges
                     </Button>
                 </div>
-            </div>
+            </Card>
         );
     }
 
     return (
-        <div className="flex flex-col gap-4 w-full h-full">
+        <Card>
             {userStats.activeChallenges.map((ac) => {
                 const challenge = (challengesList as any[]).find(c => c.id === ac.challengeId);
                 if (!challenge) return null;
@@ -135,6 +136,6 @@ export const ActiveChallengeWidget = () => {
                     </div>
                 );
             })}
-        </div>
+        </Card>
     );
 };

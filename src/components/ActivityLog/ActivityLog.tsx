@@ -77,8 +77,8 @@ export const ActivityLogView = ({
   return (
     <Card className='relative w-full overflow-hidden rounded-xl'>
       <div className='relative'>
-        <div className='mb-4 flex items-center justify-between'>
-          <h3 className='text-xl font-semibold text-white'>Activity</h3>
+        <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
+          <h3 className='text-xl font-semibold text-white mr-2'>Activity</h3>
 
           <div className='flex gap-1 rounded-lg bg-white/10 p-1'>
             {yearButtons.map((yearValue) => (

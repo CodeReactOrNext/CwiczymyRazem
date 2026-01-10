@@ -6,6 +6,7 @@ import { CheckCircle2, Circle, Gift, Swords } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { Card } from "assets/components/ui/card";
 
 export const DailyQuestWidget = () => {
     const dispatch = useAppDispatch();
@@ -28,7 +29,7 @@ export const DailyQuestWidget = () => {
     };
 
     return (
-        <div className="w-full h-full rounded-md bg-main-opposed-bg shadow-lg p-5 flex flex-col justify-between">
+        <Card className="flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                     <div className="p-2 rounded-sm bg-orange-500/10 text-orange-500">
@@ -95,6 +96,6 @@ export const DailyQuestWidget = () => {
                     "Complete All Tasks"
                 )}
             </Button>
-        </div>
+        </Card>
     );
 };
