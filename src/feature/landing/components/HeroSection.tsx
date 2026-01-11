@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
 import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
 import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
-import { Loader2, ChevronRight, Check } from "lucide-react";
+import { Loader2, ChevronRight, Check, Sparkles } from "lucide-react";
 import { FaFire } from "react-icons/fa";
 import { cn } from "assets/lib/utils";
 
@@ -169,6 +169,13 @@ export const HeroSection = () => {
                                 Sign in
                             </Link>
                         </p>
+
+                        <Link href="/guitar-practice-builder" className="mt-4 flex items-center gap-2 group/gen">
+                            <span className="text-cyan-400/80 group-hover/gen:text-cyan-400 text-sm font-semibold transition-colors">
+                                Generate Custom Practice Plan
+                            </span>
+                            <Sparkles className="w-4 h-4 text-cyan-400/60 group-hover/gen:text-cyan-400 group-hover/gen:rotate-12 transition-all" />
+                        </Link>
                         
                         {!isLoggedIn && (
                            <Link href='#features' className="mt-2 group">
