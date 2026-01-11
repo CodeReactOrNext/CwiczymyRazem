@@ -8,8 +8,8 @@ export const Footer = () => {
         <footer className='relative bg-[#0d0d0c] py-16 border-t border-zinc-800'>
           <div className='mx-auto max-w-7xl px-6 lg:px-8'>
               {/* Logo & Social */}
-              <div className='flex items-center justify-between'>
-                <div className="flex items-center gap-8">
+              <div className='flex flex-wrap items-center justify-between gap-y-8'>
+                <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
                   <Image
                     src='/images/longlightlogo.svg'
                     alt='Riff Quest'
@@ -17,14 +17,20 @@ export const Footer = () => {
                     height={32}
                     className='h-8 w-auto opacity-80 hover:opacity-100 transition-opacity'
                   />
-                  <nav className="hidden md:flex items-center gap-6">
-                    <Link href="/guide" className="text-sm text-zinc-500 hover:text-cyan-400 transition-colors">
+                  <nav className="flex flex-wrap items-center gap-x-4 sm:gap-x-6 gap-y-2">
+                    <Link href="/guide" className="text-xs sm:text-sm font-bold text-zinc-500 hover:text-cyan-400 transition-colors">
                       Guide
+                    </Link>
+                    <Link href="/guitar-practice-builder" className="text-xs sm:text-sm font-bold text-zinc-500 hover:text-cyan-400 transition-colors">
+                      Practice Builder
+                    </Link>
+                    <Link href="https://www.buymeacoffee.com/riffquest" target="_blank" className="text-xs sm:text-sm font-bold text-amber-400/80 hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                      ☕ Buy me a coffee
                     </Link>
                   </nav>
                 </div>
                 
-                <div className='flex items-center gap-6'>
+                <div className='flex items-center gap-6 ml-auto sm:ml-0'>
                   <Link 
                     href='https://discord.gg/phQutKwK' 
                     target='_blank'
