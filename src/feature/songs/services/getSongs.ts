@@ -62,27 +62,20 @@ export const getSongs = async (
     const songsRef = collection(db, "songs");
     let baseQuery = query(songsRef);
 
-    // 1. Difficulty Filter (Firestore-side)
-    if (difficultyFilter && difficultyFilter !== "all") {
-      if (difficultyFilter === "easy") baseQuery = query(baseQuery, where("avgDifficulty", "<=", 4));
-      else if (difficultyFilter === "medium") baseQuery = query(baseQuery, where("avgDifficulty", ">", 4), where("avgDifficulty", "<=", 7));
-      else if (difficultyFilter === "hard") baseQuery = query(baseQuery, where("avgDifficulty", ">", 7));
-    }
-
     // 1b. Tier Filters (Direct Tier field filtering)
     if (tierFilters && tierFilters.length > 0) {
       baseQuery = query(baseQuery, where("tier", "in", tierFilters));
     }
 
     // 1c. Genre Filters (Native Firestore array-contains-any)
-    if (genreFilters && genreFilters.length > 0) {
+    // Only apply if tier filter is NOT present, to avoid Multiple Disjunctions error
+    if (genreFilters && genreFilters.length > 0 && !(tierFilters && tierFilters.length > 0)) {
       baseQuery = query(baseQuery, where("genres", "array-contains-any", genreFilters));
     }
 
     // Fix for Count Mismatch: Ensure count respects "popularity" existence if sorting by it.
-    // We only apply this if NO other filters are active to avoid complex composite index requirements (Error 400).
-    // If filters are active, we accept a potential minor count mismatch to ensure stability and avoid crashes.
-    if (effectiveSortBy === "popularity" && !hasOtherFilters) {
+    // We only apply this if NOT searching to avoid inequality conflicts.
+    if (!hasSearch && effectiveSortBy === "popularity") {
       baseQuery = query(baseQuery, where("popularity", ">=", 0));
     }
 
@@ -114,6 +107,11 @@ export const getSongs = async (
       } else {
         // Single search results
         songs = t ? titleResults : artistResults;
+      }
+
+      // Local filtering for skipped Genre disjunction (if Tier filter was also active)
+      if (genreFilters && genreFilters.length > 0 && (tierFilters && tierFilters.length > 0)) {
+        songs = songs.filter(s => s.genres && genreFilters.some(g => s.genres?.includes(g)));
       }
 
       // Sort merged results manually since they come from different queries or manual intersection
@@ -150,7 +148,13 @@ export const getSongs = async (
     }
 
     const snapshot = await trackedGetDocs(q);
-    const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
+    let docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
+
+    // Local filtering for skipped Genre disjunction (if Tier filter was also active) in simple path
+    if (genreFilters && genreFilters.length > 0 && (tierFilters && tierFilters.length > 0)) {
+      docs = docs.filter(s => s.genres && genreFilters.some(g => s.genres?.includes(g)));
+    }
+
     const pagedSongs = (afterDoc && page > 1) ? docs : docs.slice((page - 1) * itemsPerPage);
     const lastDoc = snapshot.docs[snapshot.docs.length - 1];
 
