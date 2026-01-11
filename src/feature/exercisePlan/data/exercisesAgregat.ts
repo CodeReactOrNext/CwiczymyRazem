@@ -38,6 +38,9 @@ import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStai
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
+import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
+import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
+import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
 
 export const exercisesAgregat: Exercise[] = [
   spiderOneStringExercise,
@@ -55,7 +58,10 @@ export const exercisesAgregat: Exercise[] = [
   precisionBendingExercise,
   spiderLegatoBasicExercise,
   spiderRhythmicProgressionExercise,
-
+  economyPickingAngularExercise,
+  hammerOnSequence579Exercise,
+  legatoSextuplets457Exercise,
+  
   spiderPermutation1243Exercise,
   spiderPermutation1324Exercise,
   spiderPermutation1342Exercise,
@@ -67,21 +73,21 @@ export const exercisesAgregat: Exercise[] = [
   spiderPermutation2314Exercise,
   spiderPermutation2341Exercise,
   spiderPermutation2413Exercise,
-  spiderPermutation2431Exercise,    
+  spiderPermutation2431Exercise,
 
   spiderPermutation3124Exercise,
   spiderPermutation3142Exercise,
   spiderPermutation3214Exercise,
   spiderPermutation3241Exercise,
   spiderPermutation3412Exercise,
-  spiderPermutation3421Exercise,    
+  spiderPermutation3421Exercise,
 
   spiderPermutation4123Exercise,
   spiderPermutation4132Exercise,
   spiderPermutation4213Exercise,
   spiderPermutation4231Exercise,
   spiderPermutation4312Exercise,
-  spiderPermutation4321Exercise,  
-  
-  
+  spiderPermutation4321Exercise,
+
+
 ];
