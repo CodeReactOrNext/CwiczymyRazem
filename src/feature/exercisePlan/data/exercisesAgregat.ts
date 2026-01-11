@@ -41,6 +41,15 @@ import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExten
 import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
 import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
 import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
+import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
+import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
+import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
+import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
+import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
+import { dynamicControlExercise } from "feature/exercisePlan/data/exerises/dynamicControl/dynamicControl";
+import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
+import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
+import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
 
 export const exercisesAgregat: Exercise[] = [
   spiderOneStringExercise,
@@ -61,7 +70,16 @@ export const exercisesAgregat: Exercise[] = [
   economyPickingAngularExercise,
   hammerOnSequence579Exercise,
   legatoSextuplets457Exercise,
-  
+  guideToneVoiceLeadingExercise,
+  twoNotesPerBarPhrasingExercise,
+  chordToneImprovisationExercise,
+  callAndResponsePhrasingExercise,
+  minimalMotionVoiceLeadingExercise,
+  dynamicControlExercise,
+  naturalNotesMapExercise,
+  fretboardMasteryExercise,
+  smoothChordTransitionsExercise,
+
   spiderPermutation1243Exercise,
   spiderPermutation1324Exercise,
   spiderPermutation1342Exercise,
