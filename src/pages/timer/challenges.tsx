@@ -20,5 +20,5 @@ export default ChallengesPage;
 
 export const getServerSideProps = withAuth({
   redirectIfUnauthenticated: "/login",
-  translations: ["common", "timer", "toast", "exercises", "report"],
+  translations: ["common", "timer", "toast", "exercises", "report",'rating_popup'],
 });

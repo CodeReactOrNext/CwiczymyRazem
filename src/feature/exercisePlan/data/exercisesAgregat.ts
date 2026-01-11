@@ -38,6 +38,24 @@ import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStai
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
+import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
+import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
+import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
+import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
+import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
+import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
+import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
+import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
+import { dynamicControlExercise } from "feature/exercisePlan/data/exerises/dynamicControl/dynamicControl";
+import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
+import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
+import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
+import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
+import { articulationContrastExercise } from "feature/exercisePlan/data/exerises/articulationContrast/articulationContrast";
+import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
+import { rhythmicMotifDisplacementExercise } from "feature/exercisePlan/data/exerises/rhythmicMotifDisplacement/rhythmicMotifDisplacement";
+import { intervalStringJumpsExercise } from "feature/exercisePlan/data/exerises/intervalStringJumps/intervalStringJumps";
+import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
 
 export const exercisesAgregat: Exercise[] = [
   spiderOneStringExercise,
@@ -55,6 +73,24 @@ export const exercisesAgregat: Exercise[] = [
   precisionBendingExercise,
   spiderLegatoBasicExercise,
   spiderRhythmicProgressionExercise,
+  economyPickingAngularExercise,
+  hammerOnSequence579Exercise,
+  legatoSextuplets457Exercise,
+  guideToneVoiceLeadingExercise,
+  twoNotesPerBarPhrasingExercise,
+  chordToneImprovisationExercise,
+  callAndResponsePhrasingExercise,
+  minimalMotionVoiceLeadingExercise,
+  dynamicControlExercise,
+  naturalNotesMapExercise,
+  fretboardMasteryExercise,
+  smoothChordTransitionsExercise,
+  vibratoMasteryExercise,
+  articulationContrastExercise,
+  metronomeGapTestExercise,
+  rhythmicMotifDisplacementExercise,
+  intervalStringJumpsExercise,
+  singWhatYouPlayExercise,
 
   spiderPermutation1243Exercise,
   spiderPermutation1324Exercise,
@@ -67,21 +103,21 @@ export const exercisesAgregat: Exercise[] = [
   spiderPermutation2314Exercise,
   spiderPermutation2341Exercise,
   spiderPermutation2413Exercise,
-  spiderPermutation2431Exercise,    
+  spiderPermutation2431Exercise,
 
   spiderPermutation3124Exercise,
   spiderPermutation3142Exercise,
   spiderPermutation3214Exercise,
   spiderPermutation3241Exercise,
   spiderPermutation3412Exercise,
-  spiderPermutation3421Exercise,    
+  spiderPermutation3421Exercise,
 
   spiderPermutation4123Exercise,
   spiderPermutation4132Exercise,
   spiderPermutation4213Exercise,
   spiderPermutation4231Exercise,
   spiderPermutation4312Exercise,
-  spiderPermutation4321Exercise,  
-  
-  
+  spiderPermutation4321Exercise,
+
+
 ];

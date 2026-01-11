@@ -11,7 +11,7 @@ export const basicImprovisationPractice: ExercisePlan = {
   id: "basic_improvisation_practice",
   title: "Basic Improvisation Development Exercise",
   description: "A set of basic exercises developing improvisation skills",
-  difficulty: "easy",
+  difficulty: "medium",
   category: "creativity",
   exercises: [
     oneChordImprovExercise,
