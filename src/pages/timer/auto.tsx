@@ -63,5 +63,6 @@ export default TimerAuto;
 
 export const getServerSideProps = withAuth({
   redirectIfUnauthenticated: "/login",
-  translations: ["common", "timer", "toast", "exercises"],
+  translations: ["common", "timer", "toast", "exercises",'rating_popup'],
 });
+  
