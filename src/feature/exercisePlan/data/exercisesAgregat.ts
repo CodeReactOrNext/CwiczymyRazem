@@ -50,6 +50,12 @@ import { dynamicControlExercise } from "feature/exercisePlan/data/exerises/dynam
 import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
 import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
 import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
+import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
+import { articulationContrastExercise } from "feature/exercisePlan/data/exerises/articulationContrast/articulationContrast";
+import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
+import { rhythmicMotifDisplacementExercise } from "feature/exercisePlan/data/exerises/rhythmicMotifDisplacement/rhythmicMotifDisplacement";
+import { intervalStringJumpsExercise } from "feature/exercisePlan/data/exerises/intervalStringJumps/intervalStringJumps";
+import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
 
 export const exercisesAgregat: Exercise[] = [
   spiderOneStringExercise,
@@ -79,6 +85,12 @@ export const exercisesAgregat: Exercise[] = [
   naturalNotesMapExercise,
   fretboardMasteryExercise,
   smoothChordTransitionsExercise,
+  vibratoMasteryExercise,
+  articulationContrastExercise,
+  metronomeGapTestExercise,
+  rhythmicMotifDisplacementExercise,
+  intervalStringJumpsExercise,
+  singWhatYouPlayExercise,
 
   spiderPermutation1243Exercise,
   spiderPermutation1324Exercise,

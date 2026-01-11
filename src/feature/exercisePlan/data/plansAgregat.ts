@@ -12,6 +12,13 @@ import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPer
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
 import { pentatonicPlayalongPlan } from "feature/exercisePlan/data/plans/pentatonicPlayalong/pentatonicPlayalongPlan";
+import { fretboardAwarenessPlan } from "feature/exercisePlan/data/plans/fretboardAwareness/fretboardAwareness";
+import { harmonicVoiceLeadingPlan } from "feature/exercisePlan/data/plans/harmonicVoiceLeading/harmonicVoiceLeading";
+import { creativePhrasingPlan } from "feature/exercisePlan/data/plans/creativePhrasing/creativePhrasing";
+import { advancedImprovisationPlan } from "feature/exercisePlan/data/plans/advancedImprovisation/advancedImprovisation";
+import { expressiveLeadPlayingPlan } from "feature/exercisePlan/data/plans/expressiveLeadPlaying/expressiveLeadPlaying";
+import { rhythmicPrecisionPlan } from "feature/exercisePlan/data/plans/rhythmicPrecision/rhythmicPrecision";
+import { theIntervalMapPlan } from "feature/exercisePlan/data/plans/theIntervalMap/theIntervalMap";
 
 import type { ExercisePlan } from "../types/exercise.types";
 
@@ -27,6 +34,13 @@ export const defaultPlans: ExercisePlan[] = [
   warmUp15MinutesPlan,
   warmUp30MinutesPlan,
   pentatonicPlayalongPlan,
+  fretboardAwarenessPlan,
+  harmonicVoiceLeadingPlan,
+  creativePhrasingPlan,
+  advancedImprovisationPlan,
+  expressiveLeadPlayingPlan,
+  rhythmicPrecisionPlan,
+  theIntervalMapPlan,
   // metalGuitarExercisesPlan,
   musicianFitnessLvl1S1Plan,
   musicianFitnessLvl1S2Plan,
