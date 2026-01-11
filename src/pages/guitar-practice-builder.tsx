@@ -477,7 +477,7 @@ export default function GuitarPracticeBuilderPage() {
                     },
                     { 
                         title: "Zero Decision Fatigue", 
-                        desc: "Don't spend 20 minutes wondering what to play. We build the stack, you pick up the guitar. Perfect for busy professionals.",
+                        desc: "Don't spend 20 minutes wondering what to play. We build the stack, you pick up the guitar.",
                         icon: <Zap className="text-cyan-500" />
                     },
                     { 
