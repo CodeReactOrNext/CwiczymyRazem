@@ -220,6 +220,8 @@ const ReportView = () => {
       return;
     }
 
+    if (isFetching) return;
+
     await dispatch(updateUserStats({ inputData }));
     await dispatch(checkAndSaveChallengeProgress(inputData.planId ?? undefined));
     
@@ -304,7 +306,6 @@ const ReportView = () => {
           ratingData={raitingData}
           currentUserStats={currentUserStats}
           previousUserStats={previousUserStats}
-          skillPointsGained={raitingData.skillPointsGained}
           activityData={activityDataToUse}
         />
       ) : (
@@ -495,14 +496,13 @@ const ReportView = () => {
                       <Button
                         size='lg'
                         type='submit'
+                        loading={isFetching}
                         disabled={Object.keys(errors).length !== 0}
                         className='h-14 min-w-[240px] rounded-2xl bg-white text-black font-black text-lg transition-all hover:scale-[1.02] active:scale-95 shadow-xl disabled:opacity-50'>
-                        {isFetching ? (
-                          <Loader2 className='mr-2 h-6 w-6 animate-spin' />
-                        ) : (
-                          <GrDocumentUpload className='mr-3 h-6 w-6' />
-                        )}
-                        {t("report_button")}
+                        <div className="flex items-center gap-2">
+                          <GrDocumentUpload className='h-6 w-6' />
+                          <span>{isFetching ? "Saving..." : t("report_button")}</span>
+                        </div>
                       </Button>
                     </div>
                   </div>

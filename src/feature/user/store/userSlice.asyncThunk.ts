@@ -365,7 +365,7 @@ export const checkAndSaveChallengeProgress = createAsyncThunk(
       // Find challenge that matches the planId
       const challengeToUpdate = planId
         ? currentUserStats.activeChallenges.find(c => c.challengeId === planId)
-        : currentUserStats.activeChallenges[0];
+        : null;
 
       if (!challengeToUpdate) return;
 
@@ -382,6 +382,25 @@ export const checkAndSaveChallengeProgress = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : "Failed to update challenge progress"
+      );
+    }
+  }
+);
+
+export const resetChallenge = createAsyncThunk(
+  "user/resetChallenge",
+  async (challengeId: string, { rejectWithValue }) => {
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+      await challengeUseCases.resetChallenge(userId, challengeId);
+      return challengeId;
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to reset challenge"
       );
     }
   }

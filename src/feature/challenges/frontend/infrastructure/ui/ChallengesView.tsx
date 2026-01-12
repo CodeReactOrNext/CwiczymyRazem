@@ -23,7 +23,8 @@ export const ChallengesView = () => {
     activeChallenges, 
     completedChallenges, 
     handleStart, 
-    handleAbandon 
+    handleAbandon,
+    handleReset
   } = useChallenges();
 
   const userSkills = userStats?.skills;
@@ -122,6 +123,7 @@ export const ChallengesView = () => {
           onPractice={onPractice}
           onAdd={onAdd}
           onStart={onStartNew}
+          onReset={handleReset}
         />
       </div>
     </MainContainer>

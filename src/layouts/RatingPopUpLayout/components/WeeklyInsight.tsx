@@ -1,0 +1,138 @@
+import { Card } from "assets/components/ui/card";
+import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
+import { motion } from "framer-motion";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { convertMsToHM } from "utils/converter";
+import { Calendar } from "lucide-react";
+
+interface WeeklyInsightProps {
+  activityData: {
+    date: string;
+    techniqueTime: number;
+    theoryTime: number;
+    hearingTime: number;
+    creativityTime: number;
+  }[];
+}
+
+export function WeeklyInsight({ activityData }: WeeklyInsightProps) {
+  const last7Days = activityData.slice(-7);
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+
+  const weekDayLabels = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (6 - i));
+    return d;
+  });
+
+  const chartData = weekDayLabels.map((date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    const item = last7Days.find(d => new Date(d.date).toISOString().split('T')[0] === dateStr);
+    
+    return {
+      date: date.toLocaleDateString("en", { weekday: "short" }),
+      fullName: date.toLocaleDateString("en", { month: "short", day: "numeric" }),
+      totalTime: item ? (item.techniqueTime + item.theoryTime + item.hearingTime + item.creativityTime) : 0,
+      isToday: dateStr === todayStr,
+    };
+  });
+
+  const totalWeekTime = chartData.reduce((acc, d) => acc + d.totalTime, 0);
+  const completedDaysCount = chartData.filter(d => d.totalTime > 0).length;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.4 }}>
+      <Card className='border-none bg-zinc-900/40 backdrop-blur-xl h-full overflow-hidden rounded-lg'>
+        <div className='p-8'>
+          <div className="flex items-center justify-between mb-8">
+              <div className="space-y-1">
+                  <h3 className='text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500'>
+                    {completedDaysCount}/7 Days Completed
+                  </h3>
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-3xl font-black text-white">{convertMsToHM(totalWeekTime)}</span>
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Weekly Cumulative</span>
+                  </div>
+              </div>
+              <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-zinc-500" />
+              </div>
+          </div>
+
+          <ChartContainer
+            config={{ totalTime: { label: "Time spent", color: "rgb(6, 182, 212)" } }}
+            className='aspect-auto h-[160px] w-full mb-8'>
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+              <defs>
+                <linearGradient id='fillTotal' x1='0' y1='0' x2='0' y2='1'>
+                  <stop offset='5%' stopColor='rgb(6, 182, 212)' stopOpacity={0.4} />
+                  <stop offset='95%' stopColor='rgb(6, 182, 212)' stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray='4 4' stroke='rgba(255,255,255,0.02)' vertical={false} />
+              <XAxis 
+                dataKey='date' 
+                tickLine={false} 
+                axisLine={false} 
+                tickMargin={12} 
+                className='text-[10px] font-bold text-zinc-600 uppercase tracking-tighter' 
+              />
+              <YAxis hide domain={[0, 'auto']} />
+              <ChartTooltip
+                cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }}
+                content={(props) => {
+                  const { active, payload } = props;
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className='rounded-lg bg-zinc-950/90 p-4 shadow-2xl backdrop-blur-xl border-none'>
+                        <div className='flex flex-col gap-1'>
+                          <span className='text-[10px] font-black uppercase tracking-widest text-zinc-500'>
+                            {payload[0].payload.fullName}
+                          </span>
+                          <span className='text-xl font-black text-white'>
+                            {convertMsToHM(Number(payload[0].value) || 0)}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Area
+                dataKey='totalTime'
+                type='monotone'
+                fill='url(#fillTotal)'
+                stroke='rgb(6, 182, 212)'
+                strokeWidth={3}
+                animationDuration={2000}
+                dot={(props) => {
+                  const { cx, cy, payload } = props;
+                  if (payload.isToday) {
+                    return (
+                      <circle cx={cx} cy={cy} r={4} fill='rgb(6, 182, 212)' stroke='white' strokeWidth={2} />
+                    );
+                  }
+                  return <g />;
+                }}
+              />
+            </AreaChart>
+          </ChartContainer>
+
+          <div className="grid grid-cols-7 gap-2">
+             {chartData.map((day, i) => (
+                <div key={i} className="flex flex-col items-center gap-2">
+                    <div className={`h-1 w-full rounded-full transition-all duration-1000 ${day.totalTime > 0 ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/5'}`} />
+                    <span className={`text-[9px] font-black uppercase tracking-tighter ${day.isToday ? 'text-cyan-500' : 'text-zinc-700'}`}>{day.date}</span>
+                </div>
+             ))}
+          </div>
+        </div>
+      </Card>
+    </motion.div>
+  );
+}

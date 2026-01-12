@@ -1,21 +1,28 @@
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { MdUpgrade } from "react-icons/md";
+import { Sparkles } from "lucide-react";
 
 export const LevelUpBanner = () => {
   const { t } = useTranslation("report") as any;
 
   return (
     <motion.div
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.5 }}
-      className='mb-4 w-full rounded-lg border border-second-400/30 bg-gradient-to-r from-main-300/20 to-transparent p-3 text-center sm:p-4'>
-      <div className='flex items-center justify-center gap-2 text-white sm:gap-3'>
-        <MdUpgrade className='text-2xl text-main-300 sm:text-3xl' />
-        <p className='text-lg font-semibold sm:text-xl'>
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ 
+        type: "spring",
+        stiffness: 300,
+        damping: 20,
+        delay: 0.2 
+      }}
+      className='mb-8 w-full rounded-lg bg-gradient-to-r from-cyan-600/30 via-cyan-500/10 to-transparent p-6 text-center border-none relative overflow-hidden'>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.15),transparent)] animate-pulse" />
+      <div className='relative z-10 flex items-center justify-center gap-4 text-white uppercase tracking-[0.4em] font-black'>
+        <Sparkles className='h-6 w-6 text-cyan-400 fill-cyan-400' />
+        <p className='text-xl sm:text-2xl drop-shadow-lg'>
           {t("rating_popup.new_level")}
         </p>
+        <Sparkles className='h-6 w-6 text-cyan-400 fill-cyan-400' />
       </div>
     </motion.div>
   );

@@ -1,23 +1,14 @@
 import { Button } from "assets/components/ui/button";
-import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
-import { AnimatePresence, motion } from "framer-motion";
 import type { useTimerInterface } from "hooks/useTimer";
-import { ArrowLeft, ArrowRight, Music, Pause, Play } from "lucide-react"; // Added Play/Pause
-import { useTranslation } from "react-i18next";
-import { MdAccessTime } from "react-icons/md";
-import type { TimerInterface } from "types/api.types";
-import { convertMsToHMS } from "utils/converter";
-
-import { PageHeader } from "constants/PageHeader";
+import { ArrowLeft, ArrowRight, Music, Pause, Play } from "lucide-react";
+import { useTranslation, Trans } from "react-i18next";
 import { Song } from "feature/songs/types/songs.type";
-import { IconBox } from "components/IconBox/IconBox";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 
 interface SongTimerLayoutProps {
   timer: useTimerInterface;
-  timerData: TimerInterface;
   song: Song;
   timerSubmitHandler: () => void;
   onBack: () => void;
@@ -25,24 +16,16 @@ interface SongTimerLayoutProps {
 
 export const SongTimerLayout = ({
   timer,
-  timerData,
   song,
   timerSubmitHandler,
   onBack,
 }: SongTimerLayoutProps) => {
   const { t } = useTranslation("timer");
-  const { time, timerEnabled, startTimer, stopTimer } = timer; // Destructure start/stop
-
-  const sumTime =
-    timerData.creativity +
-    timerData.hearing +
-    timerData.theory +
-    timerData.technique;
+  const { time, timerEnabled, startTimer, stopTimer } = timer;
 
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
-    // Display HH:MM:SS if > 60 mins, otherwise MM:SS
     const hours = Math.floor(minutes / 60);
     if (hours > 0) {
         const remMinutes = minutes % 60;
@@ -67,20 +50,17 @@ export const SongTimerLayout = ({
                 <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full hover:bg-white/10">
                     <ArrowLeft className="h-5 w-5" />
                 </Button>
-                <h1 className="text-xl font-bold">Practice Session</h1>
+                <h1 className="text-xl font-bold">{t("practice_session")}</h1>
              </div>
         </div>
         
         <div className="relative w-full max-w-4xl mx-auto">
-            {/* Ambient Background Blur */}
             <div className="absolute inset-0 bg-emerald-500/10 blur-[100px] rounded-full opacity-50 pointer-events-none" />
 
             <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-zinc-900/50 backdrop-blur-xl border border-white/5 p-8 sm:p-12 rounded-3xl overflow-hidden shadow-2xl">
                 
-                {/* Left Col: Album Art */}
                 <div className="flex flex-col items-center justify-center space-y-6">
                     <div className="relative group">
-                         {/* Glow effect */}
                         <div className={cn(
                             "absolute -inset-4 bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 rounded-full blur-xl transition-all duration-1000",
                             timerEnabled ? "opacity-100 scale-110" : "opacity-0 scale-100"
@@ -98,7 +78,6 @@ export const SongTimerLayout = ({
                                 </div>
                             )}
                             
-                             {/* Overlay when paused */}
                             {!timerEnabled && time > 0 && (
                                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px]">
                                     <Pause className="h-16 w-16 text-white/80" />
@@ -108,7 +87,6 @@ export const SongTimerLayout = ({
                     </div>
                 </div>
 
-                {/* Right Col: Controls */}
                 <div className="flex flex-col items-center md:items-start space-y-8 text-center md:text-left w-full">
                     <div className="space-y-2 w-full">
                         <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight line-clamp-2">
@@ -117,7 +95,6 @@ export const SongTimerLayout = ({
                         <p className="text-xl text-zinc-400 font-medium">{song.artist}</p>
                     </div>
 
-                    {/* Timer Display - More integrated but visible */}
                     <div className="flex flex-col items-center md:items-start space-y-4 w-full">
                          <div className={cn(
                              "text-[6rem] sm:text-[7rem] leading-none font-black font-variant-numeric tabular-nums tracking-tighter transition-colors duration-300",
@@ -125,16 +102,8 @@ export const SongTimerLayout = ({
                          )}>
                             {formatTime(time)}
                          </div>
-                         
-                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 w-full">
-                             <div className="flex items-center gap-2 text-zinc-400 text-sm font-bold uppercase tracking-widest bg-white/5 py-2 px-4 rounded-full border border-white/5">
-                                <MdAccessTime className="h-4 w-4" />
-                                <span>Total: {convertMsToHMS(sumTime)}</span>
-                             </div>
-                         </div>
                     </div>
 
-                    {/* Controls */}
                     <div className="flex items-center gap-6 w-full pt-4">
                         <Button
                             onClick={toggleTimer}
@@ -160,19 +129,18 @@ export const SongTimerLayout = ({
                             variant="ghost"
                             className="h-14 px-8 rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 font-bold uppercase tracking-widest text-sm transition-all"
                         >
-                            Finish
+                            {t("finish")}
                         </Button>
                     </div>
                 </div>
             </div>
         
-            {/* Spotify Player Section */}
             {song.spotifyId && (
                 <div className="mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                             <div className="h-1 w-8 bg-emerald-500 rounded-full" />
-                            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500">Spotify Playback</h3>
+                            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500">{t("spotify.playback")}</h3>
                         </div>
                         <a 
                             href={`https://open.spotify.com/track/${song.spotifyId}`} 
@@ -180,7 +148,7 @@ export const SongTimerLayout = ({
                             rel="noopener noreferrer"
                             className="text-[10px] font-bold text-emerald-500 hover:text-emerald-400 flex items-center gap-1 transition-colors"
                         >
-                            Open in App <ArrowRight className="h-3 w-3" />
+                            {t("spotify.open_in_app")} <ArrowRight className="h-3 w-3" />
                         </a>
                     </div>
                     
@@ -191,9 +159,15 @@ export const SongTimerLayout = ({
                             <Music className="h-5 w-5" />
                         </div>
                         <div className="flex-1">
-                            <p className="text-sm font-bold text-emerald-400 mb-0.5">Important: Log in via Browser</p>
+                            <p className="text-sm font-bold text-emerald-400 mb-0.5">{t("spotify.important_login")}</p>
                             <p className="text-xs text-zinc-400 leading-relaxed">
-                                To listen to full tracks (not just 30s previews), make sure you are logged into <a href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/30 hover:decoration-emerald-500">Spotify.com</a> with an active Premium account.
+                                <Trans
+                                  t={t}
+                                  i18nKey="spotify.login_description"
+                                  components={[
+                                    <a key="0" href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/30 hover:decoration-emerald-500" />,
+                                  ]}
+                                />
                             </p>
                         </div>
                     </div>

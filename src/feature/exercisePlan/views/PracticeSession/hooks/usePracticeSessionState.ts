@@ -98,6 +98,7 @@ export const usePracticeSessionState = ({ plan, onFinish, autoReport }: UsePract
   }, []);
 
   const handleFinishSession = useCallback(async () => {
+    if (isSubmittingReport) return;
     timer.stopTimer();
 
     const planTitle = typeof plan.title === 'string'
