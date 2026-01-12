@@ -1,47 +1,27 @@
+import React from "react";
 import { Button } from "assets/components/ui/button";
-import { SkillMiniTree } from "feature/skills/SkillMiniTree";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
 import MainContainer from "components/MainContainer";
 import Router from "next/router";
 import type { Dispatch, SetStateAction } from "react";
-import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
-import { getPointsToLvlUp } from "utils/gameLogic";
+import { Sparkles, Zap, Trophy, Goal } from "lucide-react";
 
-import LevelIndicator from "./components/LevelIndicator";
-import { WeeklyActivityChart } from "./components/WeeklyActivityChart";
+import { WeeklyInsight } from "./components/WeeklyInsight";
 import { NextMilestone } from "./components/NextMilestone";
-import { WeeklySummary } from "./components/WeeklySummary";
-import { PerformanceComparison } from "./components/PerformanceComparison";
 import { SkillBalance } from "./components/SkillBalance";
-
 import { SessionStats } from "./components/SessionStats";
 import { LevelUpBanner } from "./components/LevelUpBanner";
 import { AchievementsDisplay } from "./components/AchievementsDisplay";
-
-export interface BonusPointsInterface {
-  timePoints: number;
-  additionalPoints: number;
-  habitsCount: number;
-  time: number;
-  multiplier: number;
-}
-
-interface SkillPointsGained {
-  technique: number;
-  theory: number;
-  hearing: number;
-  creativity: number;
-}
+import { useRatingPopUp } from "./hooks/useRatingPopUp";
 
 interface RatingPopUpProps {
   ratingData: ReportDataInterface;
   currentUserStats: StatisticsDataInterface;
   previousUserStats: StatisticsDataInterface;
-  skillPointsGained: SkillPointsGained;
-  onClick: Dispatch<SetStateAction<boolean>>;
+  onClick?: (val: any) => void;
   activityData?: {
     date: string;
     techniqueTime: number;
@@ -51,157 +31,145 @@ interface RatingPopUpProps {
   }[];
 }
 
-const RatingPopUp = ({
+const RatingPopUpLayout = ({
   ratingData,
   currentUserStats,
   previousUserStats,
-  skillPointsGained,
   onClick,
   activityData = [],
 }: RatingPopUpProps) => {
-  const [currentLevel, setCurrentLevel] = useState(previousUserStats.lvl);
-  const [displayedPoints, setDisplayedPoints] = useState(0);
   const { t } = useTranslation("report") as any;
-
-  const topRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Scroll to top
-    // Try window scroll first
-    window.scrollTo(0, 0);
-    
-    // Try ref scroll as backup for nested containers
-    if (topRef.current) {
-        topRef.current.scrollIntoView({ behavior: 'auto', block: 'start' });
-    }
-
-    const timeout = setTimeout(() => {
-      setCurrentLevel(currentUserStats.lvl);
-    }, 2000);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [currentUserStats.lvl]);
-
-  // Animation for counting up points
-  useEffect(() => {
-    if (displayedPoints >= ratingData.totalPoints) return;
-
-    const duration = 1500; // Animation duration in ms
-    const totalPoints = ratingData.totalPoints;
-    const startTime = Date.now();
-
-    const interval = setInterval(() => {
-      const elapsedTime = Date.now() - startTime;
-      const progress = Math.min(elapsedTime / duration, 1);
-
-      // Easing function for smoother animation
-      const easeOutQuad = (t: number) => t * (2 - t);
-      const easedProgress = easeOutQuad(progress);
-
-      setDisplayedPoints(Math.floor(easedProgress * totalPoints));
-
-      if (progress >= 1) {
-        clearInterval(interval);
-        setDisplayedPoints(totalPoints);
-      }
-    }, 16); // ~60fps
-
-    return () => clearInterval(interval);
-  }, [ratingData.totalPoints]);
-
-  const isGetNewLevel = currentUserStats.lvl > previousUserStats.lvl;
-  const newAchievements = currentUserStats.achievements.filter(
-    (x) => !previousUserStats.achievements.includes(x)
-  );
-
-  const levelXpStart =
-    currentUserStats.lvl === 1 ? 0 : getPointsToLvlUp(currentUserStats.lvl - 1);
-  const levelXpEnd = getPointsToLvlUp(currentUserStats.lvl);
-
-  const pointsInThisLevel = currentUserStats.points - levelXpStart;
-  const levelXpDifference = levelXpEnd - levelXpStart;
-
-  const prevProgressPercent =
-    ((pointsInThisLevel - ratingData.totalPoints) / levelXpDifference) * 100;
-  const currProgressPercent = (pointsInThisLevel / levelXpDifference) * 100;
-
-  // Get categories where points were gained
-  const categoriesWithPoints = Object.entries(skillPointsGained)
-    .filter(([_, points]) => points > 0)
-    .map(([category]) => category);
+  const {
+    currentLevel,
+    displayedPoints,
+    topRef,
+    isGetNewLevel,
+    newAchievements,
+    prevProgressPercent,
+    currProgressPercent,
+    avgTime,
+    sessionBreakdown,
+  } = useRatingPopUp({
+    ratingData,
+    currentUserStats,
+    previousUserStats,
+    activityData,
+  });
 
   return (
-    <MainContainer title="Practice Summary">
+       <MainContainer title="Practice Summary">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className='mx-auto max-w-6xl p-4 sm:p-5 pb-32 pt-24 sm:pb-5 sm:pt-5'>
+        className='mx-auto max-w-7xl p-4 sm:p-5 pb-32 pt-16 sm:pb-10 sm:pt-10 space-y-8'>
         
         <div ref={topRef} />
         {isGetNewLevel && <LevelUpBanner />}
 
-        <div className='mb-4 rounded-lg border border-cyan-500/30 bg-gradient-to-r from-cyan-500/10 via-cyan-400/5 to-transparent p-4 shadow-lg glass-card'>
-          <div className='text-center'>
-            <div className='flex items-center justify-center gap-2'>
-              <span className='text-4xl font-bold text-cyan-400 sm:text-5xl'>
-                {displayedPoints}
-              </span>
-              <span className='text-2xl text-white sm:text-3xl'>
-                {t("rating_popup.points")}
-              </span>
+        {/* Global Performance Header */}
+        <div className='relative flex flex-col md:flex-row items-center justify-between gap-10 bg-zinc-900/40 p-10 rounded-lg backdrop-blur-3xl shadow-2xl overflow-hidden'>
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cyan-500/5 via-transparent to-transparent opacity-30" />
+            
+            <div className="flex flex-col items-center md:items-start relative z-10">
+               <div className="flex items-center gap-2 mb-3 bg-white/5 px-3 py-1 rounded-full">
+                    <Zap className="h-3 w-3 text-cyan-400 fill-cyan-400" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Total Reward</span>
+               </div>
+               <div className="flex items-baseline gap-4">
+                  <span className="text-7xl font-black text-white tracking-tighter">{displayedPoints}</span>
+                  <span className="text-2xl font-bold text-zinc-600 uppercase tracking-tighter">pts</span>
+               </div>
             </div>
             
-          </div>
+            <div className='flex-1 max-w-lg w-full relative z-10 space-y-6'>
+                <div className="space-y-3">
+                    <div className="flex justify-between items-end px-1">
+                        <div className="space-y-1">
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Tier Evolution</span>
+                            <h4 className="text-lg font-bold text-white tracking-tight">Level {currentLevel} <span className="text-zinc-500 mx-1">→</span> {currentLevel+1}</h4>
+                        </div>
+                        <span className="text-xl font-black text-cyan-500 tabular-nums">{Math.round(currProgressPercent)}%</span>
+                    </div>
+                    
+                    <div className='relative h-3 w-full rounded-full bg-white/5 p-0.5 overflow-hidden shadow-inner'>
+                        <motion.div
+                            initial={{ width: `${prevProgressPercent}%` }}
+                            animate={{ width: `${currProgressPercent}%` }}
+                            transition={{ duration: 1.8, ease: "circOut" }}
+                            className='relative h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)]'
+                        >
+                            <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.05)_75%,transparent_75%,transparent)] bg-[length:12px_12px] animate-[progress-stripe_2s_linear_infinite]" />
+                        </motion.div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        {activityData && activityData.length > 0 && (
-          <div className='mb-4'>
-            <WeeklyActivityChart data={activityData} />
-          </div>
-        )}
-
-        <div className='mb-4 grid gap-3 sm:grid-cols-2'>
-          <NextMilestone currentUserStats={currentUserStats} pointsGained={ratingData.skillPointsGained.technique + ratingData.skillPointsGained.theory + ratingData.skillPointsGained.hearing + ratingData.skillPointsGained.creativity} />
-          <WeeklySummary activityData={activityData} />
+        {/* Core Insights Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-5 h-full">
+                <SessionStats 
+                    time={ratingData.bonusPoints.time}
+                    todayTotalTime={ratingData.bonusPoints.time}
+                    averageWeeklyTime={avgTime}
+                    breakdown={sessionBreakdown}
+                />
+            </div>
+            
+            <div className="lg:col-span-7 space-y-6">
+                <WeeklyInsight activityData={activityData} />
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <NextMilestone currentUserStats={currentUserStats} pointsGained={ratingData.totalPoints} />
+                    <div className="bg-zinc-900/40 rounded-lg p-8 flex flex-col justify-center backdrop-blur-xl border-none">
+                         <div className="flex items-center gap-4 mb-4">
+                            <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
+                                <Trophy className="h-5 w-5" />
+                            </div>
+                            <h4 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Practice Goal</h4>
+                         </div>
+                         <p className="text-lg font-bold text-zinc-300 leading-snug">
+                            Active <span className="text-white font-black">{currentUserStats.actualDayWithoutBreak} day</span> streak! 
+                            <br/>Stay consistent Riffer!
+                         </p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div className='mb-4 grid gap-3 sm:grid-cols-2'>
-          <PerformanceComparison todayTime={ratingData.bonusPoints.time} activityData={activityData} />
-          <SkillBalance activityData={activityData} />
+        {/* Global Metrics & Gear */}
+        <div className='grid gap-6 grid-cols-1 lg:grid-cols-3'>
+           <div className="lg:col-span-2">
+                <SkillBalance activityData={activityData} />
+           </div>
+           
+           <div className="h-full">
+                {newAchievements.length > 0 ? (
+                    <AchievementsDisplay achievements={newAchievements} />
+                ) : (
+                    <div className="h-full bg-zinc-900/20 border-none rounded-lg p-10 flex flex-col items-center justify-center text-center group hover:bg-zinc-900/30 transition-all duration-500">
+                        <div className="h-16 w-16 rounded-lg bg-zinc-800/40 flex items-center justify-center mb-6 shadow-2xl group-hover:scale-105 transition-all">
+                            <Goal className="h-8 w-8 text-zinc-700" />
+                        </div>
+                        <h4 className="text-xs font-black text-zinc-600 uppercase tracking-[0.4em] mb-3">Next Badges</h4>
+                        <p className="text-[11px] font-medium text-zinc-700 max-w-[200px] leading-relaxed italic">Daily discipline unlocks technical mastery achievements.</p>
+                    </div>
+                )}
+           </div>
         </div>
 
-        <div className={`mb-4 grid gap-3 ${newAchievements.length > 0 ? 'sm:grid-cols-2' : ''}`}>
-          <SessionStats 
-            actualDayWithoutBreak={currentUserStats.actualDayWithoutBreak}
-            habitsCount={ratingData.bonusPoints.habitsCount}
-            time={ratingData.bonusPoints.time}
-          />
-          {newAchievements.length > 0 && (
-            <AchievementsDisplay achievements={newAchievements} />
-          )}
-        </div>
-
-        <div className='mx-auto mb-6 flex w-full items-center justify-center gap-2 sm:w-[90%] md:w-[80%]'>
-          <LevelIndicator>{currentLevel}</LevelIndicator>
-          <div className='relative h-4 w-full rounded-full bg-zinc-800/50 backdrop-blur-sm'>
-            <motion.div
-              initial={{ width: `${prevProgressPercent}%` }}
-              animate={{ width: `${currProgressPercent}%` }}
-              transition={{ duration: 1.5 }}
-              className='absolute left-0 top-0 h-full rounded-full bg-gradient-to-r from-cyan-500 to-cyan-400 shadow-lg'
-            />
-          </div>
-          <LevelIndicator>{currentLevel + 1}</LevelIndicator>
-        </div>
-
-        <div className='mt-8 flex justify-center'>
+        <div className='flex justify-center pt-10 border-t border-white/5'>
           <Button
-            onClick={() => Router.push("/dashboard")}
+            onClick={() => {
+              if (onClick) {
+                onClick(false);
+              } else {
+                Router.push("/dashboard");
+              }
+            }}
             size='lg'
-            className='bg-gradient-to-r from-cyan-600 to-cyan-500 px-8 py-3 text-base font-medium text-white shadow-lg hover:from-cyan-500 hover:to-cyan-400'>
+            className='bg-white text-zinc-950 hover:bg-white/90 px-16 h-14 rounded-lg text-xs font-black uppercase tracking-[0.3em] shadow-2xl transition-all active:scale-95'>
             {t("rating_popup.back")}
           </Button>
         </div>
@@ -210,4 +178,4 @@ const RatingPopUp = ({
   );
 };
 
-export default RatingPopUp;
+export default RatingPopUpLayout;

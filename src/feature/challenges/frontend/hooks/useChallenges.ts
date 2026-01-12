@@ -1,7 +1,7 @@
 import { useAppSelector, useAppDispatch } from "store/hooks";
 import { selectUserAuth, selectCurrentUserStats } from "feature/user/store/userSlice";
 import { challengeUseCases } from "../../index";
-import { saveActiveChallenge } from "feature/user/store/userSlice.asyncThunk";
+import { saveActiveChallenge, resetChallenge } from "feature/user/store/userSlice.asyncThunk";
 import { useEffect, useState } from "react";
 import { Challenge } from "../../backend/domain/models/Challenge";
 import { toast } from "sonner";
@@ -50,12 +50,26 @@ export const useChallenges = () => {
     }
   };
 
+  const handleReset = async (challengeId: string) => {
+    if (!userId) return;
+    setLoading(true);
+    try {
+      await dispatch(resetChallenge(challengeId)).unwrap();
+      toast.success("Challenge reset! you can now start it again.");
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     allChallenges,
     activeChallenges,
     completedChallenges,
     handleStart,
     handleAbandon,
+    handleReset,
     loading
   };
 };
