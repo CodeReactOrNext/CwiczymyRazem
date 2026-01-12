@@ -27,5 +27,26 @@
       "title": "Automatyczny plan",
       "description": "Pozwól nam stworzyć plan dostosowany do Twojego czasu"
     }
-  }
+  },
+  "time_splitter": {
+    "title": "Podsumowanie sesji",
+    "description": "Ćwiczyłeś <1>{{songTitle}}</1> przez <3>{{time}}</3>.",
+    "question": "Jak spędziłeś ten czas?",
+    "hearing": "Słuch",
+    "technique": "Technika",
+    "learned_title": "Nauczyłem się tej piosenki!",
+    "learned_description": "Oznacz jako 'Nauczone' i przenieś do ukończonych",
+    "resume": "Wznów licznik",
+    "confirm": "Potwierdź i zakończ",
+    "saving": "Zapisywanie..."
+  },
+  "practice_session": "Sesja ćwiczeń",
+  "finish": "Zakończ",
+  "spotify": {
+    "playback": "Odtwarzanie Spotify",
+    "open_in_app": "Otwórz w aplikacji",
+    "important_login": "Ważne: Zaloguj się w przeglądarce",
+    "login_description": "Aby słuchać całych utworów (nie tylko 30-sekundowych fragmentów), upewnij się, że jesteś zalogowany na <1>Spotify.com</1> z aktywnym kontem Premium."
+  },
+  "rating_summary": "Podsumowanie ćwiczeń"
 }

@@ -10,12 +10,14 @@ interface ExerciseSuccessViewProps {
   planTitle: string;
   onFinish: () => void;
   onRestart?: () => void;
+  isLoading?: boolean;
 }
 
 export const ExerciseSuccessView = ({
   planTitle,
   onFinish,
   onRestart,
+  isLoading = false,
 }: ExerciseSuccessViewProps) => {
   const { t } = useTranslation("common");
   const [isVisible, setIsVisible] = useState(false);
@@ -110,14 +112,24 @@ export const ExerciseSuccessView = ({
                 <Button
                   variant='outline'
                   onClick={onRestart}
+                  disabled={isLoading}
                   className='flex items-center gap-2 radius-default border-white/10 hover:glass-card-hover'>
                   {t("practice.practice_again")}
                 </Button>
             )}
 
-            <Button onClick={onFinish} className='flex items-center gap-2 radius-default bg-cyan-500 hover:bg-cyan-600 text-black font-bold'>
-              <span>{t("practice.finish")}</span>
-              <FaCheck className='h-4 w-4' />
+            <Button onClick={onFinish} disabled={isLoading} className='flex items-center gap-2 radius-default bg-cyan-500 hover:bg-cyan-600 text-black font-bold'>
+               {isLoading ? (
+                  <>
+                     <span className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                     <span>Saving...</span>
+                  </>
+               ) : (
+                  <>
+                     <span>{t("practice.finish")}</span>
+                     <FaCheck className='h-4 w-4' />
+                  </>
+               )}
             </Button>
           </div>
         </div>

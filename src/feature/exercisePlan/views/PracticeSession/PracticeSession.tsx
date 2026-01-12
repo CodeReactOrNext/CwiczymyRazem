@@ -142,7 +142,6 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
             ratingData={reportResult}
             currentUserStats={currentUserStats}
             previousUserStats={previousUserStats}
-            skillPointsGained={reportResult.skillPointsGained}
             onClick={() => router.push("/dashboard")}
             activityData={activityDataToUse}
           />
@@ -160,6 +159,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
             resetTimer();
             startTimer();
           }}
+          isLoading={isFinishing}
         />
       )}
 
@@ -483,6 +483,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                           <div className="flex-1 flex justify-end items-center">
                              <Button
                                  size="lg"
+                                 loading={isFinishing || isSubmittingReport}
                                  className={cn(
                                  "h-14 min-w-[200px] px-8 radius-premium font-black text-xs tracking-[0.2em] transition-all click-behavior uppercase",
                                  isLastExercise 
@@ -497,13 +498,10 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                     handleNextExercise(resetTimer);
                                   }
                                 }}
-                                disabled={isFinishing || isSubmittingReport || !canSkipExercise}
+                                disabled={!canSkipExercise}
                              >
                                  {(isFinishing || isSubmittingReport) ? (
-                                     <div className="flex items-center gap-2">
-                                         <Loader2 className="h-4 w-4 animate-spin" />
-                                         <span>Saving...</span>
-                                     </div>
+                                     <span>Saving...</span>
                                  ) : isLastExercise ? (
                                      <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
                                  ) : (

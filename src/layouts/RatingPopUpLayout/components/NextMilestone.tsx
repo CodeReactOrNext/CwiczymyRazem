@@ -14,38 +14,40 @@ export function NextMilestone({ currentUserStats, pointsGained }: NextMilestoneP
   const currentLevel = currentUserStats.lvl;
   const pointsToNextLevel = getPointsToLvlUp(currentLevel);
   const progressToNextLevel = (currentPoints / pointsToNextLevel) * 100;
-  const pointsNeeded = pointsToNextLevel - currentPoints;
+  const pointsRemaining = pointsToNextLevel - currentPoints;
 
-  const currentStreak = currentUserStats.actualDayWithoutBreak;
-  const nextStreakMilestone = 
-    currentStreak < 3 ? 3 :
-    currentStreak < 7 ? 7 :
-    currentStreak < 14 ? 14 :
-    currentStreak < 30 ? 30 :
-    currentStreak < 50 ? 50 :
-    currentStreak < 100 ? 100 : currentStreak + 50;
+  const currentStreakCount = currentUserStats.actualDayWithoutBreak;
+  const nextStreakTarget = 
+    currentStreakCount < 3 ? 3 :
+    currentStreakCount < 7 ? 7 :
+    currentStreakCount < 14 ? 14 :
+    currentStreakCount < 30 ? 30 :
+    currentStreakCount < 50 ? 50 :
+    currentStreakCount < 100 ? 100 : currentStreakCount + 50;
   
-  const daysToStreakMilestone = nextStreakMilestone - currentStreak;
+  const daysUntilNextStreak = nextStreakTarget - currentStreakCount;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.7 }}>
-      <Card className='border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 backdrop-blur-sm'>
-        <div className='p-3'>
-          <div className='mb-2 flex items-center gap-2'>
-            <Target className='h-4 w-4 text-cyan-400' />
-            <h3 className='text-sm font-semibold text-white'>Next Milestones</h3>
+      <Card className='border-none bg-zinc-900/40 backdrop-blur-xl rounded-lg'>
+        <div className='p-6'>
+          <div className='mb-4 flex items-center gap-3'>
+            <div className="h-8 w-8 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                <Target className='h-4 w-4 text-cyan-400' />
+            </div>
+            <h3 className='text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500'>Next Objectives</h3>
           </div>
-          
-          <div className='space-y-2.5'>
+           
+          <div className='space-y-6'>
             <div>
-              <div className='mb-1 flex items-center justify-between text-xs'>
-                <span className='text-gray-400'>Level {currentLevel + 1}</span>
-                <span className='font-bold text-cyan-400'>{pointsNeeded} pts to go</span>
+              <div className='mb-2 flex items-center justify-between text-xs'>
+                <span className='font-bold text-zinc-400 uppercase tracking-tight'>LEVEL {currentLevel + 1}</span>
+                <span className='font-black text-white tabular-nums'>{pointsRemaining} XP required</span>
               </div>
-              <div className='relative h-2 overflow-hidden rounded-full bg-zinc-800/50'>
+              <div className='relative h-2.5 overflow-hidden rounded-full bg-white/5'>
                 <motion.div
                   initial={{ width: `${Math.max(0, progressToNextLevel - 10)}%` }}
                   animate={{ width: `${progressToNextLevel}%` }}
@@ -55,14 +57,7 @@ export function NextMilestone({ currentUserStats, pointsGained }: NextMilestoneP
               </div>
             </div>
 
-            {daysToStreakMilestone > 0 && (
-              <div className='flex items-center gap-2 rounded-md bg-white/5 p-2'>
-                <Zap className='h-3.5 w-3.5 text-orange-400' />
-                <span className='flex-1 text-xs text-gray-300'>
-                  <span className='font-bold text-white'>{daysToStreakMilestone}</span> more days to {nextStreakMilestone}-day streak 🔥
-                </span>
-              </div>
-            )}
+        
           </div>
         </div>
       </Card>

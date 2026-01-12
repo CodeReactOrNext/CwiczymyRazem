@@ -10,6 +10,7 @@ interface ChallengeMapProps {
   onPractice: (c: Challenge) => void;
   onAdd: (c: Challenge) => void;
   onStart: (c: Challenge) => void;
+  onReset?: (challengeId: string) => void;
 }
 
 export const ChallengeMap = ({
@@ -19,7 +20,8 @@ export const ChallengeMap = ({
   activeChallenges,
   onPractice,
   onAdd,
-  onStart
+  onStart,
+  onReset
 }: ChallengeMapProps) => {
   const formatSkillName = (skillId: string) => {
     return skillId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -128,6 +130,7 @@ export const ChallengeMap = ({
                             isTodayDone={isTodayDone}
                             isDependencyMet={isDependencyMet}
                             isCompleted={isAlreadyCompleted}
+                            onReset={onReset}
                           />
                         </div>
                       );

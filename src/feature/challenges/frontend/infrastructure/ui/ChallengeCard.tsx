@@ -16,6 +16,7 @@ interface ChallengeCardProps {
   isTodayDone?: boolean;
   isDependencyMet?: boolean;
   isCompleted?: boolean;
+  onReset?: (challengeId: string) => void;
 }
 
 export const ChallengeCard = ({
@@ -30,6 +31,7 @@ export const ChallengeCard = ({
   isTodayDone = false,
   isDependencyMet = true,
   isCompleted = false,
+  onReset,
 }: ChallengeCardProps) => {
   const formatSkillName = (skillId: string) => {
     return skillId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -205,8 +207,13 @@ export const ChallengeCard = ({
                           )}
                       </Button>
                   ) : isCompleted ? (
-                      <Button disabled size="sm" variant="secondary" className="w-full h-10 font-black uppercase text-[11px] opacity-50">
-                          Unlocked
+                      <Button 
+                          onClick={() => onReset?.(challenge.id)}
+                          size="sm" 
+                          variant="secondary" 
+                          className="w-full h-10 font-black uppercase text-[11px] group/redo hover:bg-main hover:text-black transition-all"
+                      >
+                          <span className="flex items-center gap-2">Redo Challenge <Plus size={14} className="group-hover/redo:rotate-90 transition-transform" /></span>
                       </Button>
                   ) : hasActiveChallenge ? (
                       <div className="w-full h-10 flex items-center justify-center rounded bg-zinc-800/30">
