@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 export interface useTimerInterface {
   time: number;
@@ -10,53 +10,55 @@ export interface useTimerInterface {
 }
 
 const useTimer = () => {
-  const [initialTime, setInitialTime] = useState(0);
   const [time, setTime] = useState(0);
-  const [startTimeDate, setStartTimeDate] = useState(new Date().getTime());
   const [timerEnabled, setTimerEnabled] = useState(false);
 
-  const restartTime = () => {
-    setTime(0);
-    setInitialTime(0);
-    setTimerEnabled(false);
-  };
+  const startTimeRef = useRef<number | null>(null);
+  const initialTimeRef = useRef(0);
 
-  const startTimer = () => {
-    setStartTimeDate(new Date().getTime());
+  const startTimer = useCallback(() => {
+    if (timerEnabled) return;
+    startTimeRef.current = Date.now();
     setTimerEnabled(true);
-  };
+  }, [timerEnabled]);
 
-  const stopTimer = () => {
-    const timeDifference = new Date().getTime() - startTimeDate;
-    const finalTime = initialTime + timeDifference;
-    setTime(finalTime);
-    setInitialTime(finalTime);
+  const stopTimer = useCallback(() => {
+    if (!timerEnabled) return;
+
+    if (startTimeRef.current !== null) {
+      const sessionDuration = Date.now() - startTimeRef.current;
+      initialTimeRef.current += sessionDuration;
+      startTimeRef.current = null;
+    }
+
     setTimerEnabled(false);
-  };
+    setTime(initialTimeRef.current);
+  }, [timerEnabled]);
 
-  const setInitialStartTime = (startTime: number) => {
+  const restartTime = useCallback(() => {
+    initialTimeRef.current = 0;
+    startTimeRef.current = null;
+    setTime(0);
+    setTimerEnabled(false);
+  }, []);
+
+  const setInitialStartTime = useCallback((startTime: number) => {
+    initialTimeRef.current = startTime;
+    startTimeRef.current = timerEnabled ? Date.now() : null;
     setTime(startTime);
-    setInitialTime(startTime);
-    setStartTimeDate(new Date().getTime());
-  };
+  }, [timerEnabled]);
 
   useEffect(() => {
-    if (!timerEnabled) {
-      const timeDiffrence = new Date().getTime() - startTimeDate;
-      setInitialTime((prev) => {
-        return prev + timeDiffrence;
-      });
-    }
-  }, [startTimeDate, timerEnabled]);
+    if (!timerEnabled) return;
 
-  useEffect(() => {
-    if (!timerEnabled) {
-      return;
-    }
-    const timeDiffrence = new Date().getTime() - startTimeDate;
-    const timer = setInterval(() => setTime(timeDiffrence + initialTime), 1000);
-    return () => clearInterval(timer);
-  }, [time, timerEnabled, initialTime, startTimeDate]);
+    const interval = setInterval(() => {
+      if (startTimeRef.current !== null) {
+        setTime(initialTimeRef.current + (Date.now() - startTimeRef.current));
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [timerEnabled]);
 
   return {
     time,

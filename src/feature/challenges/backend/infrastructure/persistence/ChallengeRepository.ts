@@ -31,13 +31,13 @@ export class ChallengeRepository implements IChallengeRepository {
     await challengeService.updateActiveChallenges(userId, updated);
   }
 
-  async updateChallengeProgress(userId: string, challenge: ActiveChallenge, rewardSkillId?: string): Promise<void> {
+  async updateChallengeProgress(userId: string, challenge: ActiveChallenge): Promise<void> {
     const activeChallenges = await this.getActiveChallenges(userId);
     const updated = activeChallenges.map(c =>
       c.challengeId === challenge.challengeId ? challenge : c
     );
 
-    await challengeService.updateProgress(userId, updated, rewardSkillId);
+    await challengeService.updateProgress(userId, updated);
   }
 
   async abandonChallenge(userId: string, challengeId: string): Promise<void> {
@@ -46,10 +46,14 @@ export class ChallengeRepository implements IChallengeRepository {
     await challengeService.updateActiveChallenges(userId, filtered);
   }
 
-  async markChallengeAsCompleted(userId: string, challengeId: string, stats?: { rewardPoints?: number; rewardSkillId?: string }): Promise<void> {
+  async markChallengeAsCompleted(userId: string, challengeId: string, stats?: { rewardPoints?: number; rewardSkillId?: string; rewardLevel?: number }): Promise<void> {
     const activeChallenges = await this.getActiveChallenges(userId);
     const filtered = activeChallenges.filter(c => c.challengeId !== challengeId);
     await challengeService.markAsCompleted(userId, challengeId, filtered, stats);
+  }
+
+  async resetChallenge(userId: string, challengeId: string): Promise<void> {
+    await challengeService.resetChallenge(userId, challengeId);
   }
 
   async getCompletedChallengeIds(userId: string): Promise<string[]> {

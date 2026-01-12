@@ -33,6 +33,7 @@ import {
   rateSong,
   saveActiveChallenge,
   checkAndSaveChallengeProgress,
+  resetChallenge,
 } from "./userSlice.asyncThunk";
 import { challengesList } from "feature/challenges";
 
@@ -217,14 +218,6 @@ export const userSlice = createSlice({
 
         const { challenge, challengeFinished, pointsToAdd, rewardLevel, rewardSkillId } = payload;
 
-        if (rewardSkillId) {
-          if (!state.currentUserStats.skills) {
-            state.currentUserStats.skills = { unlockedSkills: {} };
-          }
-          const currentLevel = state.currentUserStats.skills.unlockedSkills[rewardSkillId] || 0;
-          state.currentUserStats.skills.unlockedSkills[rewardSkillId] = currentLevel + (rewardLevel || 0);
-        }
-
         if (challengeFinished) {
           state.currentUserStats.activeChallenges = (state.currentUserStats.activeChallenges || []).filter(c => c.challengeId !== challenge.challengeId);
 
@@ -233,6 +226,14 @@ export const userSlice = createSlice({
           }
           if (!state.currentUserStats.completedChallenges.includes(challenge.challengeId)) {
             state.currentUserStats.completedChallenges.push(challenge.challengeId);
+          }
+
+          if (rewardSkillId) {
+            if (!state.currentUserStats.skills) {
+              state.currentUserStats.skills = { unlockedSkills: {} };
+            }
+            const currentLevel = state.currentUserStats.skills.unlockedSkills[rewardSkillId] || 0;
+            state.currentUserStats.skills.unlockedSkills[rewardSkillId] = currentLevel + (rewardLevel || 0);
           }
 
           if (pointsToAdd > 0) {
@@ -246,6 +247,11 @@ export const userSlice = createSlice({
           } else {
             state.currentUserStats.activeChallenges.push(challenge);
           }
+        }
+      })
+      .addCase(resetChallenge.fulfilled, (state, { payload }) => {
+        if (state.currentUserStats) {
+          state.currentUserStats.completedChallenges = (state.currentUserStats.completedChallenges || []).filter(id => id !== payload);
         }
       })
       .addCase(logInViaGoogle.pending, (state) => {

@@ -1,7 +1,5 @@
-import { selectTimerData, updateTimerTime } from "feature/user/store/userSlice";
 import useTimer from "hooks/useTimer";
 import { SongTimerLayout } from "layouts/TimerLayout/SongTimerLayout";
-import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -30,14 +28,13 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     
     const timer = useTimer();
     const dispatch = useAppDispatch();
-    const timerData = useAppSelector(selectTimerData);
     const userId = useAppSelector(selectUserAuth);
     const userAvatar = useAppSelector(selectUserAvatar);
     const currentUserStats = useAppSelector(selectCurrentUserStats);
     const previousUserStats = useAppSelector(selectPreviousUserStats);
     const raitingData = useAppSelector(selectRaitingData);
     const { reportList } = useActivityLog(userId as string);
-    const { t } = useTranslation(["timer", "common"]);
+    const { t } = useTranslation(["timer", "common", "report"]);
     
     const [song, setSong] = useState<Song | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -78,20 +75,11 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     };
 
     const handleConfirmSplit = async (hearingTime: number, techniqueTime: number, markAsLearned: boolean) => {
-        if (!song) {
-            toast.error("Song data not available");
-            setIsSplitterOpen(false);
+        if (!song || isSubmitting) {
             return;
         }
 
         setIsSubmitting(true);
-
-        if (hearingTime > 0) {
-            dispatch(updateTimerTime({ type: "hearing", time: hearingTime }));
-        }
-        if (techniqueTime > 0) {
-            dispatch(updateTimerTime({ type: "technique", time: techniqueTime }));
-        }
         
         if (markAsLearned && userId) {
             try {
@@ -110,18 +98,25 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             }
         }
         
+        // Calculate minutes independently of Redux, ensuring precision
+        const totalMinutes = Math.round((techniqueTime + hearingTime) / 60000);
+        const finalTotalMinutes = totalMinutes === 0 && (techniqueTime + hearingTime) > 30000 ? 1 : totalMinutes;
+        
+        const tMins = Math.round(finalTotalMinutes * (techniqueTime / (techniqueTime + hearingTime || 1)));
+        const hMins = finalTotalMinutes - tMins;
+
         const inputData: ReportFormikInterface = {
             techniqueHours: "0",
-            techniqueMinutes: Math.floor(techniqueTime / 60000).toString(),
+            techniqueMinutes: tMins.toString(),
             theoryHours: "0",
             theoryMinutes: "0",
             hearingHours: "0",
-            hearingMinutes: Math.floor(hearingTime / 60000).toString(),
+            hearingMinutes: hMins.toString(),
             creativityHours: "0",
             creativityMinutes: "0",
             habbits: [],
             countBackDays: 0,
-            reportTitle: `Practicing: ${song.artist} - ${song.title}`,
+            reportTitle: `${t("timer:currently_exercising")} ${song.artist} - ${song.title}`,
             avatarUrl: userAvatar ?? null,
             songId: song.id,
             songTitle: song.title,
@@ -132,12 +127,12 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             dispatch(updateQuestProgress({ type: 'practice_any_song' }));
             await dispatch(updateUserStats({ inputData })).unwrap();
             setIsSplitterOpen(false);
-            setIsSubmitting(false);
             setShowSuccess(true);
         } catch (error) {
             console.error("Failed to submit report:", error);
             toast.error("Failed to save practice session");
             setIsSplitterOpen(false);
+        } finally {
             setIsSubmitting(false);
         }
     };
@@ -175,7 +170,6 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 ratingData={raitingData}
                 currentUserStats={currentUserStats}
                 previousUserStats={previousUserStats}
-                skillPointsGained={raitingData.skillPointsGained}
                 activityData={reportList as any}
             />
         );
@@ -185,7 +179,6 @@ const SongPracticeTimer: NextPageWithLayout = () => {
         <>
             <SongTimerLayout
                 timer={timer}
-                timerData={timerData}
                 song={song}
                 timerSubmitHandler={timerSubmitHandler}
                 onBack={handleBack}
@@ -215,5 +208,5 @@ export default SongPracticeTimer;
 
 export const getServerSideProps = withAuth({
     redirectIfUnauthenticated: "/login",
-    translations: ["common", "timer", "toast", 'rating_popup'],
+    translations: ["common", "timer", "toast", "report"],
 });

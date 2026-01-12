@@ -27,5 +27,26 @@
       "title": "Auto Plan",
       "description": "Let us create a plan adjusted to your time"
     }
-  }
+  },
+  "time_splitter": {
+    "title": "Session Summary",
+    "description": "You practiced <1>{{songTitle}}</1> for <3>{{time}}</3>.",
+    "question": "How did you spend your time?",
+    "hearing": "Hearing",
+    "technique": "Technique",
+    "learned_title": "I've learned this song!",
+    "learned_description": "Mark as 'Learned' and move to completed",
+    "resume": "Resume Timer",
+    "confirm": "Confirm & Finish",
+    "saving": "Saving..."
+  },
+  "practice_session": "Practice Session",
+  "finish": "Finish",
+  "spotify": {
+    "playback": "Spotify Playback",
+    "open_in_app": "Open in App",
+    "important_login": "Important: Log in via Browser",
+    "login_description": "To listen to full tracks (not just 30s previews), make sure you are logged into <1>Spotify.com</1> with an active Premium account."
+  },
+  "rating_summary": "Practice Summary"
 }
