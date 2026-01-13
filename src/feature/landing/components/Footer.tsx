@@ -24,6 +24,9 @@ export const Footer = () => {
                     <Link href="/guitar-practice-builder" className="text-xs sm:text-sm font-bold text-zinc-500 hover:text-cyan-400 transition-colors">
                       Practice Builder
                     </Link>
+                    <Link href="/blog" className="text-xs sm:text-sm font-bold text-zinc-500 hover:text-cyan-400 transition-colors">
+                      Blog
+                    </Link>
                     <Link href="https://www.buymeacoffee.com/riffquest" target="_blank" className="text-xs sm:text-sm font-bold text-amber-400/80 hover:text-amber-400 transition-colors flex items-center gap-1.5">
                       ☕ Buy me a coffee
                     </Link>
