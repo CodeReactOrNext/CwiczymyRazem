@@ -32,6 +32,25 @@ const nextConfig = {
     };
     return config;
   },
+  async redirects() {
+    return [
+      {
+        source: '/guitar-practice-tracker',
+        destination: '/blog/guitar-practice-tracker',
+        permanent: true,
+      },
+      {
+        source: '/guitar-practice-routine',
+        destination: '/blog/guitar-practice-routine',
+        permanent: true,
+      },
+      {
+        source: '/practice-habits',
+        destination: '/blog/practice-habits',
+        permanent: true,
+      },
+    ]
+  },
 };
 
 module.exports = nextConfig;
