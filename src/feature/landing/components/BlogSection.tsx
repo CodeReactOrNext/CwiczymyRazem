@@ -6,11 +6,12 @@ import { Card, CardContent } from "assets/components/ui/card";
 
 const articles = [
   {
-    title: "How to Build Daily Guitar Practice Habits & Track Progress",
+    title: "Science-Backed Strategies for Consistent Guitar Practice",
     excerpt: "Master the art of building daily guitar practice habits with science-backed strategies and practical tracking techniques.",
     readTime: "8 min read",
     tag: "Habit Formation",
-    link: "/practice-habits",
+    link: "/blog/practice-habits",
+    image: "/images/blog/guitar-1.jpg",
     borderColor: "group-hover:border-blue-500/50"
   },
   {
@@ -18,7 +19,8 @@ const articles = [
     excerpt: "Most routines fail because they lack structure. Discover the simple loop that makes practicing addictive and productive.",
     readTime: "5 min read",
     tag: "Methodology",
-    link: "/guitar-practice-routine",
+    link: "/blog/guitar-practice-routine",
+    image: "/images/blog/guitar-4677875_1920.jpg",
     borderColor: "group-hover:border-cyan-500/50"
   },
   {
@@ -26,16 +28,9 @@ const articles = [
     excerpt: "Stop tracking just minutes. Learn the 5 metrics that actually predict improvement and how to log them quickly.",
     readTime: "6 min read",
     tag: "Growth Systems",
-    link: "/guitar-practice-tracker",
+    link: "/blog/guitar-practice-tracker",
+    image: "/images/blog/guitar-1853661_1280.jpg",
     borderColor: "group-hover:border-purple-500/50"
-  },
-  {
-    title: "30-Day Guitar Practice Streak Challenge (Free Tracker + XP Score)",
-    excerpt: "A simple 30-day streak system designed to help you show up daily, build momentum, and actually see proof that you're improving.",
-    readTime: "4 min read",
-    tag: "Community Challenge",
-    link: "/guitar-practice-streak-challenge",
-    borderColor: "group-hover:border-emerald-500/50"
   }
 ];
 
@@ -48,14 +43,14 @@ export const BlogSection = () => {
             Knowledge Base
           </Badge>
           <h2 className="text-3xl font-bold text-white sm:text-4xl mb-4">
-            Level Up Your <span className="text-cyan-400">Understanding</span>
+            Knowledge & <span className="text-cyan-400">Inspiration</span>
           </h2>
           <p className="text-lg text-zinc-400">
-            Deep dives into practice psychology, routine building, and effective learning strategies.
+            Discover articles that will help you become a better guitarist. From technique to practice psychology.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {articles.map((article, index) => (
             <motion.div
               key={index}
@@ -65,13 +60,20 @@ export const BlogSection = () => {
               transition={{ delay: index * 0.1 }}
             >
               <Link href={article.link} className="block group h-full">
-                <Card className={`h-full bg-zinc-900/50 border-white/5 transition-all duration-300 ${article.borderColor} hover:bg-zinc-900`}>
-                  <CardContent className="p-8 flex flex-col h-full">
-                    
+                <Card className={`h-full flex flex-col overflow-hidden bg-zinc-900/50 border-white/5 transition-all duration-300 ${article.borderColor} hover:bg-zinc-900`}>
+                  
+                  {/* Image Section */}
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <div className="absolute inset-0 bg-black/20 z-10 group-hover:bg-transparent transition-colors duration-500" />
+                    <img 
+                      src={article.image} 
+                      alt={article.title}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  </div>
+
+                  <CardContent className="p-6 flex flex-col flex-grow">
                     <div className="flex items-center gap-4 mb-4 text-xs font-medium text-zinc-500">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={12} /> Today
-                      </span>
                       <span className="flex items-center gap-1">
                         <Clock size={12} /> {article.readTime}
                       </span>
@@ -80,10 +82,10 @@ export const BlogSection = () => {
                       </Badge>
                     </div>
 
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors line-clamp-2">
                       {article.title}
                     </h3>
-                    <p className="text-zinc-400 mb-6 flex-grow">
+                    <p className="text-zinc-400 mb-6 flex-grow line-clamp-3 text-sm">
                       {article.excerpt}
                     </p>
 

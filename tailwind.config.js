@@ -376,6 +376,7 @@ module.exports = {
     defaultClick,
     glassEffects,
     borderRadius,
-    require("tailwindcss-animate")
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography"),
   ],
 };
