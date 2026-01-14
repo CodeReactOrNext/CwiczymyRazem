@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { FaFire } from "react-icons/fa";
 import { cn } from "assets/lib/utils";
 import { toggleLogReaction } from "feature/logs/services/toggleLogReaction.service";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThumbsUp } from "lucide-react";
 
 interface LogReactionProps {
   logId: string;
@@ -45,11 +45,11 @@ export const LogReaction = ({ logId, reactions = [], currentUserId }: LogReactio
       title={isReacted ? "Remove reaction" : "High five!"}
     >
       <div className="relative flex items-center justify-center">
-        <FaFire 
-          size={12} 
+        <ThumbsUp  
+          size={14} 
           className={cn(
             "transition-colors duration-300", 
-            isReacted ? "fill-orange-400" : "fill-current group-hover:text-orange-500"
+  
           )} 
         />
         
@@ -60,7 +60,7 @@ export const LogReaction = ({ logId, reactions = [], currentUserId }: LogReactio
               animate={{ opacity: 0, scale: 2.5, y: -10 }}
               className="absolute inset-0 pointer-events-none"
             >
-              <FaFire size={12} className="text-orange-500" />
+              <ThumbsUp  size={14} className="text-orange-500" />
             </motion.div>
           )}
         </AnimatePresence>
