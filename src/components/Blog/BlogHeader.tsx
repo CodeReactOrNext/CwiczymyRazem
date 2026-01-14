@@ -46,7 +46,7 @@ export const BlogHeader = ({ title, description, date, image, author, readTime =
       </motion.div>
 
       {/* Content */}
-      <div className="relative z-20 flex h-full items-end pb-16 md:pb-24">
+      <div className="relative z-20 flex h-full items-center pt-24 pb-16 md:items-end md:pt-0 md:pb-24">
         <div className="container mx-auto px-6">
           <motion.div
             style={{ opacity }}

@@ -6,6 +6,15 @@ import { Card, CardContent } from "assets/components/ui/card";
 
 const articles = [
   {
+    title: "What Song Should I Learn on Guitar? Find Songs by Difficulty (with Riff.quest)",
+    excerpt: "Choosing the perfect next song on guitar isn’t easy – especially when every player’s experience is different. Learn how to find songs by difficulty using Riff.quest.",
+    readTime: "7 min read",
+    tag: "Song Discovery",
+    link: "/blog/find-guitar-songs-difficulty",
+    image: "/images/blog/find-guitar-songs-difficulty.png",
+    borderColor: "group-hover:border-amber-500/50"
+  },
+  {
     title: "Science-Backed Strategies for Consistent Guitar Practice",
     excerpt: "Master the art of building daily guitar practice habits with science-backed strategies and practical tracking techniques.",
     readTime: "8 min read",
@@ -50,7 +59,7 @@ export const BlogSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {articles.map((article, index) => (
             <motion.div
               key={index}

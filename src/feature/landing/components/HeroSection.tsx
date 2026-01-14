@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/router";
+
 import { Button } from "assets/components/ui/button";
 import { Logo } from "components/Logo/Logo";
 import { motion } from "framer-motion";
@@ -16,10 +19,17 @@ import { FaFire } from "react-icons/fa";
 import { cn } from "assets/lib/utils";
 
 export const HeroSection = () => {
+  const router = useRouter();
+  const [isDashboardLoading, setIsDashboardLoading] = useState(false);
   const dispatch = useAppDispatch();
   const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
   const userAuth = useAppSelector(selectUserAuth);
   const isLoggedIn = !!userAuth;
+
+  const handleGoToDashboard = () => {
+    setIsDashboardLoading(true);
+    router.push("/dashboard");
+  };
 
   const handleGoogleLogin = () => {
     dispatch(logInViaGoogle());
@@ -133,11 +143,21 @@ export const HeroSection = () => {
             className='flex flex-wrap gap-4 items-center'>
             
             {isLoggedIn ? (
-              <Link href='/dashboard' className='w-full sm:w-auto'>
-                <Button className='h-12 px-10  bg-white text-black hover:bg-zinc-200 font-semibold text-base transition-all w-full'>
-                  Go to Dashboard <ChevronRight className="ml-1 w-4 h-4" />
-                </Button>
-              </Link>
+              <Button
+                onClick={handleGoToDashboard}
+                disabled={isDashboardLoading}
+                className='h-12 px-10 bg-white text-black hover:bg-zinc-200 font-semibold text-base transition-all w-full sm:w-auto shadow-lg shadow-white/5'
+              >
+                {isDashboardLoading ? (
+                  <>
+                    Loading... <Loader2 className='ml-2 h-4 w-4 animate-spin' />
+                  </>
+                ) : (
+                  <>
+                    Go to Dashboard <ChevronRight className='ml-1 w-4 h-4' />
+                  </>
+                )}
+              </Button>
             ) : (
               <>
                 <div className="flex flex-col items-center gap-3 w-full sm:w-auto">

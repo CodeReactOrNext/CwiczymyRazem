@@ -24,7 +24,7 @@ export class SeasonUpdateFormatter {
         },
         {
           title: "➡️ **Dołącz do zabawy!**",
-          description: " https://www.cwiczymy-razem.pl",
+          description: "https://riff.quest",
           color: 0x3498db,
         },
       ],
