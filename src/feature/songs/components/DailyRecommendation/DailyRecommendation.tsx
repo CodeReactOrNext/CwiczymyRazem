@@ -66,8 +66,7 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
 
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-cyan-400">
-                  <Sparkles className="h-2.5 w-2.5" />
+                <div className="flex items-center gap-1.5 rounded-sm  border border-cyan-500/20 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-cyan-400">
                   Pick of the Day
                 </div>
               </div>

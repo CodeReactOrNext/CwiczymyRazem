@@ -1,7 +1,8 @@
 import { Button } from "assets/components/ui/button";
-import { Brain, Dumbbell, Library, Music } from "lucide-react";
+import { Brain, Dumbbell, Library, Music, Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 
 interface NavigationCardProps {
   title: string;
@@ -17,6 +18,7 @@ interface NavigationCardProps {
   };
   onClick?: () => void;
   colorAccent?: "cyan" | "purple" | "green" | "amber";
+  isLoading?: boolean;
 }
 
 export const NavigationCard = ({
@@ -27,6 +29,7 @@ export const NavigationCard = ({
   secondaryAction,
   onClick,
   colorAccent = "cyan",
+  isLoading = false,
 }: NavigationCardProps) => {
   const colorClasses = {
     cyan: {
@@ -64,6 +67,12 @@ export const NavigationCard = ({
       tabIndex={0}
       aria-label={title}
       onKeyDown={(e) => e.key === "Enter" && onClick?.()}>
+      {isLoading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-xl">
+          <Loader2 className={`h-8 w-8 ${colors.iconText} animate-spin`} />
+        </div>
+      )}
+      
       <div
         className={`${colors.blur} absolute right-0 top-0 -mr-10 -mt-10 h-32 w-32 rounded-full blur-2xl`}></div>
 
@@ -139,13 +148,20 @@ interface NavigationCardsProps {
 export const NavigationCards = ({ setActiveSection }: NavigationCardsProps) => {
   const { t } = useTranslation("profile");
   const router = useRouter();
+  
+  const [loadingCard, setLoadingCard] = useState<string | null>(null);
+
+  const handleNavigation = async (path: string, cardId: string) => {
+    setLoadingCard(cardId);
+    await router.push(path);
+  };
 
   const handleSkillsClick = () => {
-    router.push("/profile/skills");
+    handleNavigation("/profile/skills", "skills");
   };
 
   const handleExercisesClick = () => {
-    router.push("/profile/exercises");
+    handleNavigation("/profile/exercises", "exercises");
   };
 
   return (
@@ -154,24 +170,26 @@ export const NavigationCards = ({ setActiveSection }: NavigationCardsProps) => {
         title={(t as any)("cards.practice.title")}
         description={(t as any)("cards.practice.description")}
         icon={<Dumbbell className='h-6 w-6' />}
-        onClick={() => router.push("/timer")}
+        onClick={() => handleNavigation("/timer", "practice")}
         primaryAction={{
           label: (t as any)("cards.practice.choose"),
-          onClick: () => router.push("/timer"),
+          onClick: () => handleNavigation("/timer", "practice"),
         }}
         secondaryAction={{
           label: (t as any)("cards.practice.report"),
-          onClick: () => router.push("/report"),
+          onClick: () => handleNavigation("/report", "report"),
         }}
         colorAccent='cyan'
+        isLoading={loadingCard === "practice" || loadingCard === "report"}
       />
 
       <NavigationCard
         title={(t as any)("cards.songs.title")}
         description={(t as any)("cards.songs.description")}
         icon={<Music className='h-6 w-6' />}
-        onClick={() => router.push("/songs")}
+        onClick={() => handleNavigation("/songs", "songs")}
         colorAccent='purple'
+        isLoading={loadingCard === "songs"}
       />
 
       <NavigationCard
@@ -180,6 +198,7 @@ export const NavigationCards = ({ setActiveSection }: NavigationCardsProps) => {
         icon={<Brain className='h-6 w-6' />}
         onClick={handleSkillsClick}
         colorAccent='green'
+        isLoading={loadingCard === "skills"}
       />
 
       <NavigationCard
@@ -188,6 +207,7 @@ export const NavigationCards = ({ setActiveSection }: NavigationCardsProps) => {
         icon={<Library className='h-6 w-6' />}
         onClick={handleExercisesClick}
         colorAccent='amber'
+        isLoading={loadingCard === "exercises"}
       />
     </div>
   );
