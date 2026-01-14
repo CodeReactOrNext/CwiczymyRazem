@@ -349,21 +349,7 @@ const ReportView = () => {
                     )}
                   </div>
                   <div className='mt-4 flex flex-col items-end gap-2'>
-                    {sumTime > 0 && (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-1.5 border border-emerald-500/20 shadow-[0_4px_12px_rgba(16,185,129,0.1)]"
-                      >
-                        <div className="relative">
-                          <Loader2 className="h-3 w-3 animate-spin text-emerald-400" />
-                          <div className="absolute inset-0 animate-ping rounded-full bg-emerald-400/20" />
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
-                          Synced from Timer
-                        </span>
-                      </motion.div>
-                    )}
+                  
                     <div className='flex items-center radius-default glass-card px-4 py-2 ring-1 ring-white/5 bg-zinc-900/40'>
                       <span className='mr-3 text-sm font-bold uppercase tracking-wider text-zinc-500'>
                         {t("total_time")}:
@@ -396,10 +382,15 @@ const ReportView = () => {
                               name='reportTitle'
                               startIcon={<MdTitle className='text-lg text-cyan-500/50' />}
                               placeholder='e.g. Practicing major scales'
-                              className='h-12 border-white/10 bg-zinc-950/50 text-base shadow-sm focus:border-cyan-500/30'
+                              className={`h-12 border-white/10 bg-zinc-950/50 text-base shadow-sm focus:border-cyan-500/30 ${errors.reportTitle ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
                               value={values.reportTitle}
                               onChange={(e) => setFieldValue("reportTitle", e.target.value)}
                             />
+                            {errors.reportTitle && (
+                              <p className="mt-1.5 text-[10px] font-bold uppercase tracking-wider text-red-500">
+                                {errors.reportTitle}
+                              </p>
+                            )}
                           </div>
                           
                           <div className='space-y-3 pt-2'>
@@ -492,7 +483,7 @@ const ReportView = () => {
                     <div className="w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
 
                     <div className='flex flex-col items-center gap-4'>
-                      {Object.keys(errors).length !== 0 && <ErrorBox />}
+                      {Object.keys(errors).length !== 0 && <ErrorBox errors={errors} />}
                       <Button
                         size='lg'
                         type='submit'

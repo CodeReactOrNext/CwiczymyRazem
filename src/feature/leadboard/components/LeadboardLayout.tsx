@@ -85,7 +85,6 @@ export const LeadboardLayout = ({
           />
         ))}
 
-        {/* Clean Pagination */}
         <div className='mt-8 flex justify-center'>
           <div className='rounded-2xl bg-zinc-900/30 p-4 backdrop-blur-sm'>
             <Pagination
@@ -105,16 +104,11 @@ export const LeadboardLayout = ({
       <div className='min-h-screen'>
         {/* Enhanced Header - Zen Aesthetic */}
         <div className='mb-12 mx-auto max-w-7xl px-4'>
-          <div className='rounded-2xl bg-zinc-950/40 p-8 shadow-2xl'>
+          <div className='rounded-2xl '>
             <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
               {/* Left Section - Controls */}
               <div className='flex flex-wrap items-center gap-6'>
-                <div className="flex flex-col">
-                  <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-500 mb-2">Hall of Fame</h2>
-                  <h1 className="text-3xl font-black text-white tracking-tight">Leaderboard</h1>
-                </div>
-                
-                <div className="h-10 w-px bg-white/10 hidden lg:block mx-4" />
+           
 
 
                 {isSeasonalView && (

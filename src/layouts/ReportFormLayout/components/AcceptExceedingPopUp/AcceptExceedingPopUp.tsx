@@ -36,7 +36,7 @@ const AcceptExceedingPopUp = ({
           {t("report_button")}
         </Button>
         <Button onClick={() => setAcceptPopUpVisible(false)}>
-          {t("rating_popup.back")}
+         Back
         </Button>
       </div>
     </div>

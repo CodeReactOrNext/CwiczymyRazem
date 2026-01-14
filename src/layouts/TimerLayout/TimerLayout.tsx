@@ -241,7 +241,7 @@ const AnimatedTimerDisplay = ({
         <div className='absolute inset-0 z-20 flex flex-col items-center justify-center rounded-full text-white'>
           <div className='text-center'>
             <p
-              className='font-sans text-6xl font-semibold tracking-wider'
+              className='font-sans text-5xl font-semibold tracking-wider'
               style={{
                 textShadow: activeSkill
                   ? `0 0 10px ${progressColor}50`
@@ -435,7 +435,6 @@ const TimerLayout = ({
               )}
             </Button>
           </div>
-          {(!userStats || userStats.points > 0) && <BeginnerMsg />}
 
           <p className='text-center text-xs text-muted-foreground sm:text-sm'>
             {t("info_about_repot ")}{" "}
