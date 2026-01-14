@@ -49,19 +49,10 @@ export const LeadboardRow = ({
         className={cn(
           "relative overflow-hidden radius-premium glass-card transition-background",
           profileId === currentUserId
-            ? "border-cyan-500/30 bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20 shadow-lg shadow-cyan-500/10"
-            : "shadow-xl shadow-black/20 hover:glass-card-hover"
+            ? " bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20 "
+            : " hover:glass-card-hover"
         )}>
-        {/* Background Pattern */}
-        <div className='absolute inset-0 opacity-[0.03] transition-opacity duration-300 group-hover:opacity-[0.06]'>
-          <div
-            className={`h-full w-full bg-gradient-to-br ${
-              profileId === currentUserId
-                ? "from-cyan-400 to-blue-500"
-                : "from-white to-zinc-400"
-            }`}
-          />
-        </div>
+      
 
         {/* --- Mobile Layout (<640px) --- */}
         <div className='relative z-10 flex flex-col gap-4 p-4 sm:hidden'>
@@ -70,10 +61,10 @@ export const LeadboardRow = ({
               {/* Rank Badge */}
               <div 
                 className={cn(
-                  "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-lg font-black italic tracking-tighter shadow-sm",
+                  "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-lg font-black italic tracking-tighter",
                    profileId === currentUserId 
-                    ? "bg-cyan-500 text-black shadow-cyan-500/20" 
-                    : "bg-balck/40 text-zinc-400 border border-white/5"
+                    ? "bg-cyan-500 text-black" 
+                    : "bg-balck/40 text-zinc-400"
                 )}
               >
                  #{place}
@@ -101,7 +92,7 @@ export const LeadboardRow = ({
                     <div className="flex items-center gap-2 text-[10px] font-medium text-zinc-500">
                        <div 
                           className={cn(
-                            "flex items-center rounded px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider",
+                            "flex items-center rounded-sm px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider",
                             profileId === currentUserId 
                              ? "bg-cyan-500/10 text-cyan-400" 
                              : "bg-zinc-800 text-zinc-400"
@@ -118,7 +109,7 @@ export const LeadboardRow = ({
            </div>
 
            {/* Stats Grid - Card within a Card */}
-           <div className="grid grid-cols-2 divide-x divide-white/5 rounded-xl border border-white/5 bg-black/20">
+           <div className="grid grid-cols-2 divide-x divide-white/5 rounded-xl bg-black/20">
               <div className="flex flex-col items-center justify-center py-3">
                  <span className={cn(
                     "text-lg font-black tracking-tight",
@@ -146,7 +137,7 @@ export const LeadboardRow = ({
 
            {/* Achievements Footer */}
            {statistics.achievements && statistics.achievements.length > 0 && (
-              <div className="flex items-center justify-center border-t border-white/5 pt-3">
+              <div className="flex items-center justify-center  pt-3">
                  <div className="scale-90 opacity-80">
                     <AchievementsCarousel achievements={statistics.achievements} />
                  </div>
@@ -154,9 +145,7 @@ export const LeadboardRow = ({
            )}
         </div>
 
-        {/* --- Desktop Layout (>=640px) --- */}
         <div className='relative z-10 hidden items-center gap-3 p-4 sm:flex sm:gap-5 sm:p-5 lg:gap-8 lg:p-6'>
-          {/* Rank Number */}
           <div
             className={`flex h-10 w-10 flex-shrink-0 items-center justify-center text-lg font-black italic tracking-tighter sm:h-12 sm:w-12 sm:text-xl lg:h-14 lg:w-14 lg:text-2xl ${
               profileId === currentUserId
@@ -171,7 +160,7 @@ export const LeadboardRow = ({
           {/* Avatar */}
           <Link href={`/user/${profileId}`} className='flex-shrink-0'>
             <div className='relative transition-transform duration-300 group-hover:scale-105'>
-              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} size="sm" />
+              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl}  />
             </div>
           </Link>
 
@@ -191,7 +180,7 @@ export const LeadboardRow = ({
               </Link>
 
               <div
-                className={`flex w-fit items-center gap-1.5 rounded-full px-3 py-1 ${
+                className={`flex w-fit items-center gap-1.5 rounded-sm px-3 py-1 ${
                   profileId === currentUserId
                     ? "bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-500/30"
                     : "bg-zinc-800 text-zinc-400 ring-1 ring-white/5"
