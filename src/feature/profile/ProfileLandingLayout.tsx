@@ -15,6 +15,7 @@ import type { StatisticsDataInterface } from "types/api.types";
 
 import { StatsSection } from "./components/StatsSection";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
+import { OnboardingCards } from "feature/dashboard/components/OnboardingCards";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -55,10 +56,12 @@ const ProfileLandingLayout = ({
 
   return (
     <DashboardContainer>
-      {activeSection === "overview" && <NavigationCards setActiveSection={setActiveSection} />}
+      {activeSection === "overview" && userStats.points > 0 && <NavigationCards setActiveSection={setActiveSection} />}
 
       {/* Statistics Section */}
       <DashboardSection color='cyan' compact>
+        {userStats.points === 0 && <OnboardingCards />}
+        
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
             <div className="lg:col-span-2 h-full">
                 <ActiveChallengeWidget />
