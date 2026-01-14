@@ -2,13 +2,13 @@ import { Button } from "assets/components/ui/button";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { 
+  Star,
+  Bookmark,
+  TrendingUp,
+  Trophy,
   Music, 
   Users,
   Settings2,
-  Check,
-  Bookmark,
-  TrendingUp,
-  Trophy
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "assets/lib/utils";
@@ -36,8 +36,8 @@ export const SongCard = ({
   const userId = useAppSelector(selectUserAuth);
   const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(song.tier || avgDifficulty);
-
   const isRated = song.difficulties?.some(d => d.userId === userId);
+
 
   return (
     <div 
@@ -101,6 +101,22 @@ export const SongCard = ({
             </div>
           )}
           
+          {/* Rated Status Badge */}
+          {isRated && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="absolute -top-1 -left-1 z-20 flex h-6 w-6 items-center justify-center rounded-full border border-amber-500/30 bg-zinc-950/90 text-amber-500 shadow-lg backdrop-blur-xl">
+                    <Star className="h-3.5 w-3.5 fill-amber-500/20" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>You have rated this song</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
           {/* Tier Badge */}
           <div 
               className="absolute -bottom-1 -right-1 z-20 flex h-7 w-7 items-center justify-center rounded-lg border text-[10px] font-black shadow-lg backdrop-blur-xl"
@@ -119,20 +135,6 @@ export const SongCard = ({
               <h3 className="line-clamp-1 text-base font-bold text-white transition-colors group-hover:text-white/90">
                 {song.title}
               </h3>
-              {isRated && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className="flex items-center justify-center h-5 w-5 rounded-full bg-green-500/10 border border-green-500/20">
-                        <Check className="h-3 w-3 text-green-500" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{t("song_already_rated")}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
             </div>
             
             <p className="truncate text-sm font-medium text-zinc-400">
