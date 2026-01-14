@@ -115,15 +115,15 @@ const SeasonalAchievements = ({
   const getAchievementIcon = (place: number) => {
     switch (place) {
       case 1:
-        return <TrophyIcon size={24} strokeWidth={1.5} />;
+        return <TrophyIcon size={28} strokeWidth={1.2} />;
       case 2:
-        return <MedalIcon size={22} strokeWidth={1.5} />;
+        return <MedalIcon size={26} strokeWidth={1.2} />;
       case 3:
-        return <MedalIcon size={22} strokeWidth={1.5} />;
+        return <MedalIcon size={26} strokeWidth={1.2} />;
       case 4:
-        return <AwardIcon size={20} strokeWidth={1.5} />;
+        return <AwardIcon size={24} strokeWidth={1.2} />;
       default:
-        return <FaStar size={16} />;
+        return <FaStar size={18} />;
     }
   };
 
@@ -209,7 +209,7 @@ const SeasonalAchievements = ({
           <Link
             href='/seasons'
             className='flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-cyan-500 hover:text-cyan-400 transition-colors'>
-            TABELA SEZONOWA
+            SEASONS TABLE
             <FaExternalLinkAlt size={10} />
           </Link>
         </div>
@@ -258,9 +258,9 @@ const SeasonalAchievements = ({
                   </div>
                 </div>
 
-                {/* Vertical accent bars for podium */}
+                {/* Vertical accent bars for podium - slightly larger and more prominent */}
                 {achievement.place <= 3 && (
-                  <div className={`absolute bottom-0 h-0.5 w-1/4 rounded-full blur-[2px] opacity-20 ${
+                  <div className={`absolute bottom-0 h-1 w-1/3 rounded-full blur-[3px] opacity-40 ${
                     achievement.place === 1 ? 'bg-amber-500' : achievement.place === 2 ? 'bg-zinc-300' : 'bg-orange-600'
                   }`} />
                 )}
