@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { FaClock, FaList, FaRandom, FaStar } from "react-icons/fa";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 interface PracticeModeSelectorProps {
@@ -67,46 +67,37 @@ export const PracticeModeSelector = ({
     {
       id: "timer" as const,
       icon: FaClock,
-      title: t("timer:modes.timer.title"),
-      description: t("timer:modes.timer.description"),
+      title: "Standard Practice",
+      description: "Start the timer and practice freely.",
       colors: colorClasses.indigo,
-      features: ["Flexible time", "Skill selection", "Progress tracking"],
     },
     {
       id: "plan" as const,
       icon: FaList,
-      title: t("timer:modes.plan.title"),
-      description: t("timer:modes.plan.description"),
+      title: "Exercise Plan",
+      description: "Follow a structured plan step by step.",
       colors: colorClasses.amber,
-      features: [
-        "Ready-made plans",
-        "Structured exercises",
-        "Step-by-step guide",
-      ],
     },
     {
       id: "auto" as const,
       icon: FaRandom,
-      title: t("timer:modes.auto.title"),
-      description: t("timer:modes.auto.description"),
+      title: "Auto Plan",
+      description: "Get a practice plan generated for you.",
       colors: colorClasses.rose,
-      features: [ "Time adjusted", "Personalized"],
     },
     {
       id: "song" as const,
       icon: FaList,
       title: "Practice Song",
-      description: "Focus on a specific song",
+      description: "Practice a specific song and track your time.",
       colors: colorClasses.emerald,
-      features: ["Song specific", "Split progress", "Library integration"],
     },
     {
       id: "challenges" as const,
       icon: FaStar,
       title: "Challenges",
-      description: "Unlock special category feats",
+      description: "Complete challenges earn skills points and extra XP.",
       colors: colorClasses.cyan,
-      features: ["Skill based", "Gamified", "Unique rewards"],
     },
   ] as const;
 
@@ -169,22 +160,11 @@ export const PracticeModeSelector = ({
                       <p className='mt-1 hidden text-xs text-gray-300 sm:mt-2 sm:block sm:text-sm'>
                         {mode.description}
                       </p>
-                      {/* Features list - only visible on desktop */}
-                      <div className='mt-3 hidden sm:block'>
-                        <ul className='space-y-1 text-xs text-gray-400'>
-                          {mode.features.map((feature, i) => (
-                            <li key={i} className='flex items-center gap-1'>
-                              <div className='h-1 w-1 rounded-full bg-gray-500'></div>
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
                     </div>
                   </div>
 
                   <Button
-                    className={`w-auto border border-white/10 bg-white/5 py-1.5 text-xs backdrop-blur-sm transition-all duration-300 hover:bg-white/10 sm:w-full sm:py-3 sm:text-base`}
+                    className={`w-auto border border-white/10 bg-white/5 py-1.5 text-xs backdrop-blur-sm transition-all duration-300 hover:bg-white/10 sm:w-full sm:py-3 sm:text-base gap-2 group`}
                     variant='outline'
                     disabled={!!loadingMode}
                   >
@@ -194,7 +174,10 @@ export const PracticeModeSelector = ({
                           Loading...
                         </div>
                     ) : (
-                        t("common:select" as any)
+                        <div className="flex items-center justify-center gap-2">
+                          {t("common:select" as any)}
+                          <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+                        </div>
                     )}
                   </Button>
                 </div>

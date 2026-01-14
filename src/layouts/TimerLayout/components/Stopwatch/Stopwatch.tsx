@@ -99,7 +99,7 @@ const Stopwatch = ({ time, timerData, activeSkill = null }: StopwatchProps) => {
 
       <div className='absolute inset-0 flex flex-col items-center justify-center rounded-full text-white'>
         <div className='text-center'>
-          <p className='font-sans text-6xl font-semibold tracking-wider'>
+          <p className='font-sans text-5xl font-semibold tracking-wider'>
             {convertMsToHMObject(time).minutes}:
             {addZeroToTime(convertMsToHMObject(time).seconds)}
           </p>

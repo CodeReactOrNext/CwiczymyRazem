@@ -136,7 +136,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
       <Head>
         <title>{formattedTimeLeft} | {currentExercise.title}</title>
       </Head>
-      {reportResult && currentUserStats && previousUserStats && (
+      {isMobileView && reportResult && currentUserStats && previousUserStats && (
         <div className="fixed inset-0 z-[999999999] overflow-y-auto bg-zinc-950">
           <RatingPopUp 
             ratingData={reportResult}
@@ -205,32 +205,52 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
         className={cn("font-openSans min-h-screen bg-zinc-950 relative overflow-hidden", isMobileView && "hidden")}>
         
         {/* Background Ambiance Glows */}
-        <div className={cn(
-          "absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-20 transition-all duration-1000",
-          category === "technique" && "bg-blue-500",
-          category === "theory" && "bg-emerald-500",
-          category === "creativity" && "bg-purple-500",
-          category === "hearing" && "bg-orange-500",
-          category === "mixed" && "bg-cyan-500",
-          currentExercise.isPlayalong && "bg-red-600 opacity-30 blur-[150px]"
-        )} />
-        <div className={cn(
-          "absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-10 transition-all duration-1000",
-          category === "technique" && "bg-indigo-500",
-          category === "theory" && "bg-green-500",
-          category === "creativity" && "bg-pink-500",
-          category === "hearing" && "bg-amber-500",
-          category === "mixed" && "bg-blue-500"
-        )} />
+        {!reportResult && (
+          <>
+            <div className={cn(
+              "absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-20 transition-all duration-1000",
+              category === "technique" && "bg-blue-500",
+              category === "theory" && "bg-emerald-500",
+              category === "creativity" && "bg-purple-500",
+              category === "hearing" && "bg-orange-500",
+              category === "mixed" && "bg-cyan-500",
+              currentExercise.isPlayalong && "bg-red-600 opacity-30 blur-[150px]"
+            )} />
+            <div className={cn(
+              "absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-10 transition-all duration-1000",
+              category === "technique" && "bg-indigo-500",
+              category === "theory" && "bg-green-500",
+              category === "creativity" && "bg-pink-500",
+              category === "hearing" && "bg-amber-500",
+              category === "mixed" && "bg-blue-500"
+            )} />
+          </>
+        )}
 
         <TooltipProvider>
           <ExerciseLayout
-            title={plan.title}
+            title={reportResult ? "Practice Summary" : plan.title}
             showBreadcrumbs={false}
             className="border-b border-white/5 bg-zinc-950/20 backdrop-blur-md sticky top-0 z-50">
             
-            <div className='mx-auto max-w-6xl px-6 pb-64 pt-4 relative z-10'>
+            <div className={cn(
+              'mx-auto max-w-6xl px-6 pb-64 pt-4 relative z-10',
+              reportResult && "max-w-7xl px-4 pt-8"
+            )}>
               
+               {reportResult && currentUserStats && previousUserStats ? (
+                  <div className="animate-in fade-in duration-700 slide-in-from-bottom-4">
+                      <RatingPopUp 
+                          ratingData={reportResult}
+                          currentUserStats={currentUserStats}
+                          previousUserStats={previousUserStats}
+                          onClick={() => router.push("/dashboard")}
+                          activityData={activityDataToUse}
+                          hideWrapper={true}
+                      />
+                  </div>
+               ) : (
+                <>
                {/* 1. Progress Bar (Top) */}
                <div className="mb-8">
                    <ExerciseProgress
@@ -456,6 +476,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                      </div>
                 </div>
 
+                {!reportResult && (
                 <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
                      <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
                           <div className="flex-1 hidden xl:flex items-center justify-start gap-4">
@@ -473,7 +494,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                  timeLeft={timeLeft}
                                  handleNextExercise={() => handleNextExercise(resetTimer)}
                                  showExerciseInfo={false}
-                variant="compact"
+                                 variant="compact"
                                  sessionTimerData={sessionTimerData}
                                  exerciseTimeSpent={exerciseTimeSpent}
                                  canSkipExercise={canSkipExercise}
@@ -511,6 +532,9 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                           </div>
                      </div>
                 </div>
+                )}
+                </>
+                )}
             </div>
           </ExerciseLayout>
         </TooltipProvider>
