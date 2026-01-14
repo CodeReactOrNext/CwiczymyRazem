@@ -15,7 +15,7 @@ export const OnlineUsers = () => {
 
     return (
         <div 
-            className="flex flex-col gap-3 p-3 mt-4 rounded-xl bg-gradient-to-br from-zinc-900/50 to-zinc-900/80 backdrop-blur-sm"
+            className="flex flex-col gap-3 p-3 mt-4"
         >
             <div className="flex items-center pl-2">
                 {displayUsers.map((user, i) => (
@@ -36,7 +36,6 @@ export const OnlineUsers = () => {
                                             </div>
                                          )}
                                     </div>
-                                    {/* Status dot */}
                                     <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-zinc-900 bg-emerald-500"></div>
                                 </div>
                             </Link>
