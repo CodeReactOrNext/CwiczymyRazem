@@ -1,42 +1,60 @@
 import { useAppSelector } from "store/hooks";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { challengesList } from "feature/challenges";
-import { CheckCircle2, Circle, Flame, Play, Timer, Trophy } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronRight, Circle, Flame, Play, Timer, Trophy, Loader2 } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import { useRouter } from "next/router";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { Card } from "assets/components/ui/card";
+import { useState } from "react";
 
 export const ActiveChallengeWidget = () => {
     const userStats = useAppSelector(selectCurrentUserStats);
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleBrowseChallenges = async () => {
+        setIsLoading(true);
+        await router.push('/timer/challenges');
+    };
 
     if (!userStats?.activeChallenges || userStats.activeChallenges.length === 0) {
         return (
-            <Card>
-                <div className="absolute top-0 right-0 w-64 h-64 bg-main/5 blur-[100px] rounded-full pointer-events-none" />
-                
-                <div className="relative z-10 flex flex-col items-center gap-3 text-center">
-                    <div className="p-3 rounded-lg bg-zinc-800/50 text-zinc-500">
-                        <Flame size={32} className="opacity-50" />
+            <Card className="flex-col justify-between">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-sm bg-purple-500/10 text-purple-500">
+                            <Flame size={18} />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-white tracking-wider">No Active Challenge</h3>
+                        </div>
                     </div>
-                    
-                    <div>
-                        <h3 className="text-sm font-bold text-white mb-1">No Active Challenge</h3>
-                        <p className="text-xs text-zinc-500 max-w-[200px]">
-                            Take on a streak challenge to earn massive XP rewards
-                        </p>
-                    </div>
-                    
-                    <Button
-                        onClick={() => router.push('/timer/challenges')}
-                        className="mt-2 px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold uppercase tracking-wider transition-all text-xs gap-2"
-                    >
-                        <Trophy size={14} />
-                        Browse Challenges
-                    </Button>
                 </div>
+
+                <p className="text-xs text-zinc-400 mb-4">
+                    Take on a streak challenge to earn massive XP rewards
+                </p>
+                
+                <Button
+                    variant='secondary'
+                    onClick={handleBrowseChallenges}
+                    disabled={isLoading}
+                    className="w-full h-10 rounded-sm text-xs font-bold tracking-wide"
+                >
+                    {isLoading ? (
+                        <>
+                            <Loader2 size={14} className="animate-spin" />
+                            Loading...
+                        </>
+                    ) : (
+                        <>
+                            Browse Challenges
+                            <ChevronRight size={14} />
+                        </>
+                    )}
+                </Button>
             </Card>
         );
     }

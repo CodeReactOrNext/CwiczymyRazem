@@ -36,14 +36,23 @@ export const DailyQuestWidget = () => {
                         <Swords size={18} />
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-white uppercase tracking-wider">Daily Quests</h3>
+                        <h3 className="text-sm font-bold text-white tracking-wider">Daily Quests</h3>
                         <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
                             {new Date().toLocaleDateString()}
                         </p>
                     </div>
                 </div>
-                <div className="text-xs font-bold text-zinc-500">
-                    {dailyQuest.tasks.filter(t => t.isCompleted).length}/{dailyQuest.tasks.length}
+                <div className="flex items-center gap-3">
+                    {!isClaimed && (
+                        <div className="flex items-center justify-center px-2 py-1 rounded-sm bg-orange-500/10 border border-orange-500/20">
+                            <span className="text-[10px] font-bold text-orange-400 tracking-wider leading-none">
+                                +100 XP
+                            </span>
+                        </div>
+                    )}
+                    <div className="text-xs font-bold text-zinc-500">
+                        {dailyQuest.tasks.filter(t => t.isCompleted).length}/{dailyQuest.tasks.length}
+                    </div>
                 </div>
             </div>
 
@@ -80,7 +89,7 @@ export const DailyQuestWidget = () => {
                 disabled={!allCompleted || isClaimed}
                 onClick={handleClaim}
                 className={cn(
-                    "w-full h-10 rounded-sm text-xs font-bold uppercase tracking-widest transition-all",
+                    "w-full h-10 rounded-sm text-xs font-bold tracking-wide transition-all",
                     isClaimed 
                         ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
                         : allCompleted 
