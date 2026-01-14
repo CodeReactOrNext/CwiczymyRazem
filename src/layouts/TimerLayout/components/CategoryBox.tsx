@@ -116,10 +116,7 @@ const CategoryBox = ({
     }
   };
 
-  const formatTime = () => {
-    const minutes = Number(timeObject.minutes);
-    return `${timeObject.hours}:${minutes < 10 ? "0" + minutes : minutes}`;
-  };
+
 
   const getGradientStyle = () => {
     if (!chosen) return {};
@@ -192,13 +189,16 @@ const CategoryBox = ({
       </div>
 
       <div className='relative z-10 mb-6 flex items-end justify-between'>
-        <div className='flex items-baseline gap-1'>
+        <div className='flex items-baseline'>
           <h3
-            className={` text-xl font-bold tracking-wide md:text-3xl ${
+            className={`text-xl font-bold tracking-wide md:text-3xl ${
               isActive ? "text-white" : "text-gray-200"
             }`}>
-            {formatTime()}
+            {timeObject.hours}:{timeObject.minutes}
           </h3>
+          <span className={`text-sm font-bold opacity-40 ml-1 md:text-lg ${isActive ? "text-white" : "text-gray-400"}`}>
+            :{timeObject.seconds.toString().padStart(2, '0')}
+          </span>
         </div>
 
         <div className='flex items-center gap-1 text-base'>
