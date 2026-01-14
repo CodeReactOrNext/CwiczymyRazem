@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { Card } from "assets/components/ui/card";
 import {
@@ -66,17 +67,30 @@ export const ActivityLogView = ({
     yearButtons.push(y);
   }
 
-  if (isLoading) {
-    return (
-      <div className='flex h-40 w-full items-center justify-center'>
-        <FaSpinner className='animate-spin text-2xl text-second' />
-      </div>
-    );
-  }
-
   return (
-    <Card className='relative w-full overflow-hidden rounded-xl'>
-      <div className='relative'>
+    <Card className='relative w-full overflow-hidden rounded-xl border-white/5 bg-zinc-900/50 backdrop-blur-md p-0'>
+      <AnimatePresence mode="wait">
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className='absolute inset-0 z-30 flex items-center justify-center bg-black/40 backdrop-blur-[2px]'
+          >
+            <div className='flex flex-col items-center gap-3'>
+              <div className="relative">
+                <FaSpinner className='animate-spin text-4xl text-cyan-500' />
+                <div className="absolute inset-0 animate-pulse blur-xl bg-cyan-500/20" />
+              </div>
+              <span className='text-[10px] font-bold uppercase tracking-widest text-cyan-500/80'>
+                {t("loading.subtitle", { defaultValue: "Synchronizing" })}
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className={`p-4 transition-all duration-500 ${isLoading ? 'blur-[1.5px] opacity-40 grayscale-[0.5] pointer-events-none scale-[0.995]' : 'blur-0 opacity-100 grayscale-0'}`}>
         <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
           <h3 className='text-xl font-semibold text-white mr-2'>Activity</h3>
 
