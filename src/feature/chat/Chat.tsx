@@ -32,51 +32,57 @@ export const Chat = () => {
   }, [messages]);
 
   return (
-    <div className='flex h-full flex-col overflow-hidden radius-premium border border-white/5 bg-zinc-950/40 shadow-2xl backdrop-blur-md'>
+    <div className='flex h-full flex-col overflow-hidden radius-premium  bg-zinc-950/40 '>
       {/* Header for Chat if needed, otherwise just the list */}
-      <ScrollArea ref={scrollRef} className='flex-1 p-4 sm:p-6'>
-        <div className='flex flex-col gap-6'>
-          {messages.map((msg) => {
+      <ScrollArea ref={scrollRef} className='flex-1 p-2 sm:p-4 '>
+        <div className='flex flex-col gap-1 px-2'>
+          {messages.map((msg, index) => {
             const isMe = msg.userId === currentUserId;
+            const prevMsg = index > 0 ? messages[index - 1] : null;
+            const isFollowUp = prevMsg && prevMsg.userId === msg.userId;
+            
             return (
               <div
                 key={msg.id}
-                className={`flex w-full flex-col ${isMe ? "items-end" : "items-start"}`}>
+                className={`flex w-full flex-col ${isMe ? "items-end" : "items-start"} ${isFollowUp ? "mt-0.5" : "mt-4"}`}>
                 <div
-                  className={`flex max-w-[85%] gap-2 ${
+                  className={`flex max-w-[90%] gap-3 ${
                     isMe ? "flex-row-reverse" : "flex-row"
                   }`}>
-                  {/* Avatar Section */}
-                  <UserTooltip userId={msg.userId}>
-                    <div className='mt-auto flex-shrink-0'>
-                      <div className='radius-default p-0.5'>
-                        <Avatar
-                          size='sm'
-                          name={msg.username}
-                          avatarURL={msg.userPhotoURL}
-                          lvl={msg.lvl}
-                        />
-                      </div>
-                    </div>
-                  </UserTooltip>
+                  
+                  {/* Avatar Section - Only show if not a follow-up */}
+                  <div className='flex w-10 flex-shrink-0 justify-center'>
+                    {!isFollowUp && (
+                      <UserTooltip userId={msg.userId}>
+                        <div className='mt-0.5'>
+                          <Avatar
+                            size='sm'
+                            name={msg.username}
+                            avatarURL={msg.userPhotoURL}
+                            lvl={msg.lvl}
+                          />
+                        </div>
+                      </UserTooltip>
+                    )}
+                  </div>
 
                   {/* Message Section */}
                   <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
-                    <UserTooltip userId={msg.userId}>
-                      <span className='mb-1 px-2 text-[10px] font-bold uppercase tracking-wide text-zinc-500'>
-                        {msg.username}
-                      </span>
-                    </UserTooltip>
+                    {!isFollowUp && (
+                      <UserTooltip userId={msg.userId}>
+                        <span className='mb-1 px-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500/80'>
+                          {msg.username}
+                        </span>
+                      </UserTooltip>
+                    )}
                     
                     <Card
-                      className={`relative px-4 py-2.5 text-sm shadow-md transition-all ${
+                      className={`relative border-none px-3 py-2 text-sm transition-all sm:px-4 ${
                         isMe
-                          ? "bg-cyan-600/20 text-cyan-50 border-cyan-500/30 rounded-2xl rounded-tr-sm"
-                          : "glass-card text-zinc-100 border-white/10 rounded-2xl rounded-tl-sm"
+                          ? `bg-cyan-500/20 text-cyan-50 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tr-sm"}`
+                          : `bg-white/5 text-zinc-100 ${isFollowUp ? "rounded-2xl" : "rounded-2xl rounded-tl-sm"}`
                       }`}>
                       {msg.message}
-                      
-                      {/* Optional: Visual "tail" hint via border-radius already applied above */}
                     </Card>
                   </div>
                 </div>
