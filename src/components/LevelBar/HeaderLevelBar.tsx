@@ -27,13 +27,13 @@ export const HeaderLevelBar = ({ points, lvl, className }: HeaderLevelBarProps) 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1 text-zinc-500">
             <Zap size={10} className="fill-current" />
-            <span className="text-[9px] font-bold uppercase tracking-wider">Progress</span>
+            <span className="text-[10px] font-bold tracking-wider">Progress</span>
           </div>
           <span className="text-[10px] font-black text-white/90">{Math.floor(progressPercent)}%</span>
         </div>
         
         {/* Simple Flat Progress Bar */}
-        <div className="relative h-1 w-28 overflow-hidden rounded-full bg-zinc-950/60">
+        <div className="relative h-1 w-40 overflow-hidden rounded-full bg-zinc-950/60">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
