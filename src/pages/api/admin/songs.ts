@@ -24,9 +24,10 @@ export default async function handler(
 
   try {
     if (req.method === "GET") {
-      const { page = "1", limit: limitVal = "50", filterType = "all" } = req.query;
+      const { page = "1", limit: limitVal = "50", filterType = "all", search = "" } = req.query;
       const pageNum = parseInt(page as string);
       const limitNum = parseInt(limitVal as string);
+      const searchTerm = (search as string).toLowerCase().trim();
 
       const songsRef = collection(db, "songs");
 
@@ -40,13 +41,13 @@ export default async function handler(
         resultsQuery = query(resultsQuery, where("avgDifficulty", "==", 0));
       }
 
+      // If search is provided, we need to handle it. 
+      // Firestore doesn't support 'contains' well across multiple fields.
+      // If searchTerm is short, we might fetch a lot. 
+      // Let's use a titles prefix search if it's purely a search request.
       // Get Global Stats (Cheap)
       const countSnapshot = await getCountFromServer(songsRef);
       const totalGlobal = countSnapshot.data().count;
-
-      // Filtered total (for pagination)
-      const filteredCountSnapshot = await getCountFromServer(resultsQuery);
-      const totalFiltered = filteredCountSnapshot.data().count;
 
       const unverifiedSnapshot = await getCountFromServer(query(songsRef, where("isVerified", "==", false)));
       const unverified = unverifiedSnapshot.data().count;
@@ -56,6 +57,44 @@ export default async function handler(
 
       const noRatingSnapshot = await getCountFromServer(query(songsRef, where("avgDifficulty", "==", 0)));
       const noRating = noRatingSnapshot.data().count;
+
+      // If we have a search term, we'll fetch a larger set and filter in memory
+      // because Firestore doesn't support "contains" across multiple fields or combined with inequality filters well.
+      if (searchTerm) {
+        // Fetch up to 1000 items to filter (should be enough for admin purposes)
+        const qSearch = query(resultsQuery, orderBy("createdAt", "desc"), limit(1000));
+        const querySnapshot = await getDocs(qSearch);
+        let allFilteredSongs = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as any[];
+
+        // Apply search filter
+        allFilteredSongs = allFilteredSongs.filter(song =>
+          (song.title_lowercase || "").includes(searchTerm) ||
+          (song.artist_lowercase || "").includes(searchTerm) ||
+          (song.title || "").toLowerCase().includes(searchTerm) ||
+          (song.artist || "").toLowerCase().includes(searchTerm)
+        );
+
+        const totalFilteredCount = allFilteredSongs.length;
+        const pagedSongs = allFilteredSongs.slice((pageNum - 1) * limitNum, pageNum * limitNum);
+
+        return res.status(200).json({
+          songs: pagedSongs,
+          total: totalFilteredCount,
+          stats: {
+            total: totalGlobal,
+            unverified,
+            noCover,
+            noRating
+          }
+        });
+      }
+
+      // NO SEARCH - standard paginated firestore query
+      const filteredCountSnapshot = await getCountFromServer(resultsQuery);
+      const totalFiltered = filteredCountSnapshot.data().count;
 
       let q = query(
         resultsQuery,
@@ -76,7 +115,7 @@ export default async function handler(
         const lastDoc = prevSnap.docs[prevSnap.docs.length - 1];
         if (lastDoc) {
           const { startAfter } = require("firebase/firestore");
-          q = query(q, startAfter(lastDoc));
+          q = query(resultsQuery, orderBy("createdAt", "desc"), startAfter(lastDoc), limit(limitNum));
         }
       }
 
