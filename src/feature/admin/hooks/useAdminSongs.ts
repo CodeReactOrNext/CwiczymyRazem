@@ -14,17 +14,17 @@ export const useAdminSongs = (password: string) => {
   const [page, setPage] = useState(1);
   const ITEMS_PER_PAGE = 15;
 
-  // Reset page when filter changes
+  // Reset page when filter or search changes
   useEffect(() => {
     setPage(1);
-  }, [filterType]);
+  }, [filterType, searchTerm]);
 
   const { data: adminSongsData, isLoading, refetch: fetchSongs } = useQuery({
-    queryKey: ["admin-songs", password, page, filterType],
+    queryKey: ["admin-songs", password, page, filterType, searchTerm],
     queryFn: async () => {
       const res = await axios.get("/api/admin/songs", {
         headers: { "x-admin-password": password },
-        params: { page, limit: ITEMS_PER_PAGE, filterType }
+        params: { page, limit: ITEMS_PER_PAGE, filterType, search: searchTerm }
       });
       return res.data as { songs: Song[], total: number, stats: any };
     },
@@ -40,7 +40,7 @@ export const useAdminSongs = (password: string) => {
   };
 
   const updateLocalSong = useCallback((songId: string, updates: Partial<Song>) => {
-    queryClient.setQueryData<{ songs: Song[], total: number, stats: any }>(["admin-songs", password, page], (oldData) => {
+    queryClient.setQueryData<{ songs: Song[], total: number, stats: any }>(["admin-songs", password, page, filterType, searchTerm], (oldData) => {
       if (!oldData) return { songs: [], total: 0, stats: {} };
       return {
         ...oldData,
@@ -49,10 +49,10 @@ export const useAdminSongs = (password: string) => {
         )
       };
     });
-  }, [queryClient, password, page]);
+  }, [queryClient, password, page, filterType, searchTerm]);
 
   const removeLocalSong = useCallback((songId: string) => {
-    queryClient.setQueryData<{ songs: Song[], total: number, stats: any }>(["admin-songs", password, page], (oldData) => {
+    queryClient.setQueryData<{ songs: Song[], total: number, stats: any }>(["admin-songs", password, page, filterType, searchTerm], (oldData) => {
       if (!oldData) return { songs: [], total: 0, stats: {} };
       return {
         ...oldData,
@@ -60,7 +60,7 @@ export const useAdminSongs = (password: string) => {
         total: oldData.total - 1
       };
     });
-  }, [queryClient, password, page]);
+  }, [queryClient, password, page, filterType, searchTerm]);
 
   const handleSave = async (songId: string) => {
     try {
@@ -154,7 +154,7 @@ export const useAdminSongs = (password: string) => {
         sourceId,
         targetId
       });
-      
+
       if (response.data.success) {
         removeLocalSong(sourceId);
         // We'd ideally update targetId's popularity locally too, 
@@ -168,11 +168,8 @@ export const useAdminSongs = (password: string) => {
     }
   };
 
-  // Filter local page result based on search (still useful for current page)
-  const filteredSongs = songs.filter(s => {
-    return s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.artist.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  // API now handles search
+  const filteredSongs = songs;
 
   const stats = {
     total: globalStats.total,
