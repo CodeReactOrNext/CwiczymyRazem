@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { cn } from "assets/lib/utils";
 
 interface Song {
+  spotifyId: string;
   title: string;
   artist: string;
   album?: string;
@@ -46,7 +47,10 @@ export const ArtistSongSelector = ({
   const [artist, setArtist] = useState("");
   const [songs, setSongs] = useState<Song[]>([]);
   const [selectedSongs, setSelectedSongs] = useState<Set<string>>(new Set());
+  const [customDifficulties, setCustomDifficulties] = useState<Record<string, number>>({});
+  const [offset, setOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadMoreLoading, setIsLoadMoreLoading] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autoEnrich, setAutoEnrich] = useState(true);
@@ -85,20 +89,28 @@ export const ArtistSongSelector = ({
 
   if (!isOpen) return null;
 
-  const searchArtistSongs = async () => {
+  const searchArtistSongs = async (isLoadMore = false) => {
     if (!artist.trim()) {
       setError("Enter artist name");
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-    setSongs([]);
-    setSelectedSongs(new Set());
+    if (isLoadMore) {
+        setIsLoadMoreLoading(true);
+    } else {
+        setIsLoading(true);
+        setError(null);
+        setSongs([]);
+        setSelectedSongs(new Set());
+        setCustomDifficulties({});
+        setOffset(0);
+    }
+
+    const currentOffset = isLoadMore ? offset + 50 : 0;
 
     try {
       const response = await fetch(
-        `/api/admin/artist-songs?artist=${encodeURIComponent(artist)}`
+        `/api/admin/artist-songs?artist=${encodeURIComponent(artist)}&offset=${currentOffset}`
       );
       const data = await response.json();
 
@@ -106,11 +118,17 @@ export const ArtistSongSelector = ({
         throw new Error(data.error || "Failed to fetch songs");
       }
 
-      setSongs(data.songs);
-      
-      if (data.songs.length === 0) {
-        toast.error(`No songs found for "${artist}". Try a simpler search.`);
+      if (isLoadMore) {
+        setSongs(prev => [...prev, ...data.songs]);
+        setOffset(currentOffset);
       } else {
+        setSongs(data.songs);
+        setOffset(0);
+      }
+      
+      if (data.songs.length === 0 && !isLoadMore) {
+        toast.error(`No songs found for "${artist}". Try a simpler search.`);
+      } else if (!isLoadMore) {
         const topSongs = data.songs.slice(0, 15).map((s: Song) => s.title);
         setSelectedSongs(new Set(topSongs));
         toast.success(`Found ${data.songs.length} unique songs for ${artist}`);
@@ -120,6 +138,17 @@ export const ArtistSongSelector = ({
       toast.error("Error searching songs");
     } finally {
       setIsLoading(false);
+      setIsLoadMoreLoading(false);
+    }
+  };
+
+  const handleDifficultyChange = (spotifyId: string, val: string) => {
+    const num = parseInt(val);
+    if (!isNaN(num)) {
+        setCustomDifficulties(prev => ({
+            ...prev,
+            [spotifyId]: num
+        }));
     }
   };
 
@@ -150,7 +179,7 @@ export const ArtistSongSelector = ({
         title: song.title,
         artist: song.artist,
         coverUrl: song.coverUrl,
-        difficulty: Math.round((song.popularity || 50) / 10),
+        difficulty: customDifficulties[song.spotifyId] ?? Math.round((song.popularity || 50) / 10),
       }));
 
     if (songsToAdd.length === 0) {
@@ -227,7 +256,7 @@ export const ArtistSongSelector = ({
                         />
                     </div>
                     <Button
-                        onClick={searchArtistSongs}
+                        onClick={() => searchArtistSongs()}
                         disabled={isLoading || !artist.trim()}
                         className='h-16 rounded-[1.5rem] bg-purple-600 px-10 font-black uppercase tracking-widest text-white hover:bg-purple-500 shadow-xl shadow-purple-900/20 transition-all active:scale-95 disabled:opacity-30'>
                         {isLoading ? (
@@ -303,8 +332,8 @@ export const ArtistSongSelector = ({
                                     </div>
 
                                     {/* Song Details */}
-                                    <div className='min-w-0 flex-1 space-y-1'>
-                                        <div className='truncate text-[13px] font-black uppercase tracking-tight text-white'>
+                                    <div className='min-w-0 flex-1 space-y-1' onClick={(e) => e.stopPropagation()}>
+                                        <div className='text-[13px] font-black uppercase tracking-tight text-white leading-tight'>
                                             {song.title}
                                         </div>
                                         <div className='truncate text-[10px] font-bold text-purple-400 uppercase tracking-widest'>
@@ -325,18 +354,40 @@ export const ArtistSongSelector = ({
                                     </div>
 
                                     {/* Difficulty Badge */}
-                                    <div className='ml-2 shrink-0 text-center px-4'>
-                                        <div className='text-[8px] font-black uppercase tracking-widest text-zinc-600 mb-1'>EST DIFF</div>
-                                        <div className={cn(
-                                            "text-xs font-black px-2 py-1 rounded-lg transition-colors",
-                                            selectedSongs.has(song.title) ? "bg-purple-500/20 text-purple-300" : "bg-white/5 text-zinc-400"
-                                        )}>
-                                            {Math.round((song.popularity || 50) / 10)}
-                                        </div>
+                                    <div className='ml-2 shrink-0 text-center px-4' onClick={(e) => e.stopPropagation()}>
+                                        <div className='text-[8px] font-black uppercase tracking-widest text-zinc-600 mb-1'>DIFF</div>
+                                        <input 
+                                            type="number"
+                                            min="1"
+                                            max="10"
+                                            value={customDifficulties[song.spotifyId] ?? Math.round((song.popularity || 50) / 10)}
+                                            onChange={(e) => handleDifficultyChange(song.spotifyId, e.target.value)}
+                                            className={cn(
+                                                "w-12 text-center text-xs font-black px-1 py-1 rounded-lg transition-colors border-none focus:ring-1 focus:ring-purple-500 bg-transparent outline-none",
+                                                selectedSongs.has(song.title) ? "bg-purple-500/20 text-purple-300" : "bg-white/5 text-zinc-400"
+                                            )}
+                                        />
                                     </div>
                                 </div>
                             ))}
                         </div>
+
+                        {songs.length > 0 && songs.length % 50 === 0 && (
+                            <div className="mt-8 flex justify-center pb-4">
+                                <Button
+                                    onClick={() => searchArtistSongs(true)}
+                                    disabled={isLoadMoreLoading}
+                                    variant="outline"
+                                    className="h-12 px-8 rounded-xl border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-white hover:bg-white/10 transition-all"
+                                >
+                                    {isLoadMoreLoading ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        "Load 50 More Tracks"
+                                    )}
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </div>
             ) : !isLoading && (
