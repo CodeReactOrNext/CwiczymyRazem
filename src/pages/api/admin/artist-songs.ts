@@ -2,6 +2,7 @@ import axios from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 interface Song {
+  spotifyId: string;
   title: string;
   artist: string;
   album?: string;
@@ -15,7 +16,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { artist } = req.query;
+  const { artist, offset } = req.query;
+  const currentOffset = parseInt(offset as string) || 0;
 
   if (!artist || typeof artist !== 'string') {
     return res.status(400).json({ error: 'Artist parameter is required' });
@@ -71,10 +73,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     // Try strict artist search first
-    let rawTracks = await searchTracks(`artist:"${artist}"`, 0);
+    let rawTracks = await searchTracks(`artist:"${artist}"`, currentOffset);
 
-    // If strict search returns very few results, try relaxed search
-    if (rawTracks.length < 10) {
+    // If strict search returns very few results on the first page, try relaxed search
+    if (currentOffset === 0 && rawTracks.length < 10) {
       const relaxedTracks = await searchTracks(artist, 0);
       rawTracks = [...rawTracks, ...relaxedTracks];
     }
@@ -99,6 +101,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (!normalizedSongs.has(key)) {
         normalizedSongs.set(key, {
+          spotifyId: track.id,
           title: title,
           artist: track.artists.map((a: any) => a.name).join(", "),
           album: track.album?.name,
@@ -110,10 +113,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const songs = Array.from(normalizedSongs.values())
-      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
-      .slice(0, 80);
+      .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
 
-    return res.status(200).json({ songs });
+    // We can't easily get the total for mixed searches, but we can return the raw total from the last search
+    // Or just a hasMore flag. Let's return total.
+    return res.status(200).json({ songs, total: songs.length });
   } catch (error: any) {
     console.error("Fatal Spotify API Error:", error.response?.data || error.message);
     return res.status(500).json({
