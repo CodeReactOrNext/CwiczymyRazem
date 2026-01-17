@@ -30,7 +30,8 @@ export const firebaseAddLogReport = async (
     songId?: string;
     songTitle?: string;
     songArtist?: string;
-  }
+  },
+  streak?: number
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -48,14 +49,23 @@ export const firebaseAddLogReport = async (
     timeSumary,
     avatarUrl: avatarUrl ?? null,
     planId,
+    streak,
     ...songDetails
   };
 
   await trackedSetDoc(logsDocRef, logData);
 
   try {
-    const discordMessage = await formatDiscordMessage(logData);
+    const discordMessage = await formatDiscordMessage(logData, "PL");
     await sendDiscordMessage(discordMessage as any);
+
+    if (process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL_EN) {
+      const discordMessageEn = await formatDiscordMessage(logData, "EN");
+      await sendDiscordMessage(
+        discordMessageEn as any,
+        process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL_EN
+      );
+    }
   } catch (error) {
     logger.error(error, {
       context: "addLogReport",

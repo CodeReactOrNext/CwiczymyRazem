@@ -41,11 +41,28 @@ export const firebaseAddSongsLog = async (
   await trackedSetDoc(logsDocRef, logData);
 
   try {
-    const discordMessage = await formatDiscordMessage({
-      ...logData,
-      difficulty_rate,
-    });
+    const discordMessage = await formatDiscordMessage(
+      {
+        ...logData,
+        difficulty_rate,
+      },
+      "PL"
+    );
     await sendDiscordMessage(discordMessage as any);
+
+    if (process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL_EN) {
+      const discordMessageEn = await formatDiscordMessage(
+        {
+          ...logData,
+          difficulty_rate,
+        },
+        "EN"
+      );
+      await sendDiscordMessage(
+        discordMessageEn as any,
+        process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL_EN
+      );
+    }
   } catch (error) {
     logger.error(error, {
       context: "addSongsLog",

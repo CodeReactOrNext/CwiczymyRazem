@@ -16,9 +16,18 @@ export default async function handler(
     }
 
     const formatter = new SeasonUpdateFormatter();
-    const message = formatter.format(seasonData);
+    const message = formatter.format(seasonData, "PL");
 
     await sendDiscordMessage(message);
+
+    if (process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL_EN) {
+      const messageEn = formatter.format(seasonData, "EN");
+      await sendDiscordMessage(
+        messageEn,
+        process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL_EN
+      );
+    }
+
     res.status(200).json({ message: "Daily update sent" });
   } catch (error) {
     console.error("Error sending daily update:", error);
