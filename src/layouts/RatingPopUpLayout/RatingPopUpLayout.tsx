@@ -5,10 +5,9 @@ import type { ReportDataInterface } from "feature/user/view/ReportView/ReportVie
 import { motion } from "framer-motion";
 import MainContainer from "components/MainContainer";
 import Router from "next/router";
-import type { Dispatch, SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
-import { Sparkles, Zap, Trophy, Goal } from "lucide-react";
+import { Trophy } from "lucide-react";
 
 import { WeeklyInsight } from "./components/WeeklyInsight";
 import { NextMilestone } from "./components/NextMilestone";
@@ -17,6 +16,7 @@ import { SessionStats } from "./components/SessionStats";
 import { LevelUpBanner } from "./components/LevelUpBanner";
 import { AchievementsDisplay } from "./components/AchievementsDisplay";
 import { useRatingPopUp } from "./hooks/useRatingPopUp";
+import { SuccessRewardCard } from "./components/SuccessRewardCard";
 
 interface RatingPopUpProps {
   ratingData: ReportDataInterface;
@@ -72,44 +72,12 @@ const RatingPopUpLayout = ({
       <div ref={topRef} />
       {isGetNewLevel && <LevelUpBanner />}
 
-      {/* Global Performance Header */}
-      <div className='relative flex flex-col md:flex-row items-center justify-between gap-10 bg-zinc-900/40 p-10 rounded-lg backdrop-blur-3xl shadow-2xl overflow-hidden'>
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cyan-500/5 via-transparent to-transparent opacity-30" />
-          
-          <div className="flex flex-col items-center md:items-start relative z-10">
-             <div className="flex items-center gap-2 mb-3 bg-white/5 px-3 py-1 rounded-sm">
-                  <Zap className="h-3 w-3 text-cyan-400 fill-cyan-400" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Total Reward</span>
-             </div>
-             <div className="flex items-baseline gap-4">
-                <span className="text-7xl font-black text-white tracking-tighter">{displayedPoints}</span>
-                <span className="text-2xl font-bold text-zinc-600 uppercase tracking-tighter">pts</span>
-             </div>
-          </div>
-          
-          <div className='flex-1 max-w-lg w-full relative z-10 space-y-6'>
-              <div className="space-y-3">
-                  <div className="flex justify-between items-end px-1">
-                      <div className="space-y-1">
-                          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Tier Evolution</span>
-                          <h4 className="text-lg font-bold text-white tracking-tight">Level {currentLevel} <span className="text-zinc-500 mx-1">→</span> {currentLevel+1}</h4>
-                      </div>
-                      <span className="text-xl font-black text-cyan-500 tabular-nums">{Math.round(currProgressPercent)}%</span>
-                  </div>
-                  
-                  <div className='relative h-3 w-full rounded-full bg-white/5 p-0.5 overflow-hidden shadow-inner'>
-                      <motion.div
-                          initial={{ width: `${prevProgressPercent}%` }}
-                          animate={{ width: `${currProgressPercent}%` }}
-                          transition={{ duration: 1.8, ease: "circOut" }}
-                          className='relative h-full rounded-full bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.3)]'
-                      >
-                          <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.05)_75%,transparent_75%,transparent)] bg-[length:12px_12px] animate-[progress-stripe_2s_linear_infinite]" />
-                      </motion.div>
-                  </div>
-              </div>
-          </div>
-      </div>
+      <SuccessRewardCard 
+        displayedPoints={displayedPoints}
+        currentLevel={currentLevel}
+        prevProgressPercent={prevProgressPercent}
+        currProgressPercent={currProgressPercent}
+      />
 
       {/* Core Insights Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -166,7 +134,7 @@ const RatingPopUpLayout = ({
           }}
           size='lg'
           className='bg-white text-zinc-950 hover:bg-white/90 px-16 h-14 rounded-lg text-xs font-black uppercase tracking-[0.3em] shadow-2xl transition-all active:scale-95'>
-          Back
+          Continue
         </Button>
       </div>
     </motion.div>

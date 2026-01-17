@@ -77,5 +77,6 @@
   "your_skill_tier": "Skill Tier",
   "add_songs_from_library": "Add songs from library",
   "your_progress": "Your Progress",
-  "drag_and_drop_description": "Drag and drop songs to track your learning journey. Move items between columns to update their status."
+  "drag_and_drop_description": "Drag and drop songs to track your learning journey. Move items between columns to update their status.",
+  "search_placeholder": "Search title or artist..."
 }

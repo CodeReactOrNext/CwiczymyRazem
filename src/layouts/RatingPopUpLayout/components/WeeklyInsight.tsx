@@ -47,25 +47,26 @@ export function WeeklyInsight({ activityData }: WeeklyInsightProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.4 }}>
       <Card className='border-none bg-zinc-900/40 backdrop-blur-xl h-full overflow-hidden rounded-lg'>
-        <div className='p-8'>
-          <div className="flex items-center justify-between mb-8">
+        <div className='p-6'>
+          <div className="flex items-center justify-between mb-6">
               <div className="space-y-1">
+                  <div className="flex items-center gap-2 mb-1">
+                      <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                      <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Your weekly habit is building</h4>
+                  </div>
                   <h3 className='text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500'>
                     {completedDaysCount}/7 Days Completed
                   </h3>
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-black text-white">{convertMsToHM(totalWeekTime)}</span>
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Weekly Cumulative</span>
+                  <div className="flex items-baseline gap-3 pt-1">
+                    <span className="text-2xl font-black text-white">{convertMsToHM(totalWeekTime)}</span>
+                    <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Cumulative Time</span>
                   </div>
-              </div>
-              <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-zinc-500" />
               </div>
           </div>
 
           <ChartContainer
             config={{ totalTime: { label: "Time spent", color: "rgb(6, 182, 212)" } }}
-            className='aspect-auto h-[160px] w-full mb-8'>
+            className='aspect-auto h-[100px] w-full mb-6'>
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
               <defs>
                 <linearGradient id='fillTotal' x1='0' y1='0' x2='0' y2='1'>
