@@ -31,14 +31,15 @@ const getSongFormatter = (status: string): SongFormatter => {
 };
 
 export const formatDiscordMessage = async (
-  log: FirebaseLogsInterface | FirebaseLogsSongsInterface
+  log: FirebaseLogsInterface | FirebaseLogsSongsInterface,
+  lang: "PL" | "EN" = "PL"
 ) => {
   if ("status" in log) {
     const formatter = getSongFormatter(log.status);
-    return formatter.format(log);
+    return formatter.format(log, lang);
   } else {
     const formatter = new ActivityLogFormatter();
-    return formatter.format(log);
+    return formatter.format(log, lang);
   }
 };
 
