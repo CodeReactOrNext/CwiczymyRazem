@@ -1,6 +1,7 @@
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import type { Song } from "feature/songs/types/songs.type";
 import { Music, Plus } from "lucide-react";
 import Link from "next/link";
@@ -72,11 +73,8 @@ export const MySongsProgress = ({ userSongs, isOwnProfile }: MySongsProgressProp
     const learnedPercentage = totalSongs ? (userSongs.learned.length / totalSongs) * 100 : 0;
     const learningPercentage = totalSongs ? (userSongs.learning.length / totalSongs) * 100 : 0;
     
-    const learnedWithDifficulty = userSongs.learned.filter(s => (s.avgDifficulty || 0) > 0);
-    const avgDifficulty = learnedWithDifficulty.length > 0
-        ? learnedWithDifficulty.reduce((sum, s) => sum + (s.avgDifficulty || 0), 0) / learnedWithDifficulty.length
-        : 0;
-    const playerTier = avgDifficulty > 0 ? getSongTier(avgDifficulty) : null;
+    const skillPower = calculateSkillPower(userSongs.learned);
+    const playerTier = skillPower > 0 ? getSongTier(skillPower) : null;
 
     return (
         <div className='space-y-5'>
