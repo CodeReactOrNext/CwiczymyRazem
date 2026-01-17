@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
+import { differenceInYears } from "date-fns";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -50,9 +51,11 @@ export const GuitarStartDate = () => {
     }
   };
 
+  const durationYears = date ? differenceInYears(new Date(), date) : 0;
+
   return (
-    <div className=' mt-6 p-4'>
-      <h3 className='mb-4 font-openSans text-lg font-semibold'>
+    <div className='flex flex-col gap-6'>
+      <h3 className='font-openSans text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>
         {t("guitarStartDate.title")}
       </h3>
 
@@ -71,6 +74,13 @@ export const GuitarStartDate = () => {
             ))}
           </SelectContent>
         </Select>
+        
+        {date && (
+            <div className="bg-muted/50 border border-muted p-3 rounded-md text-sm text-foreground">
+                <span role="img" aria-label="guitar" className="mr-2">🎸</span>
+                {t("guitarStartDate.duration_years", { years: durationYears })}
+            </div>
+        )}
 
         <Button onClick={handleSave} disabled={!date}>
           {t("guitarStartDate.save")}

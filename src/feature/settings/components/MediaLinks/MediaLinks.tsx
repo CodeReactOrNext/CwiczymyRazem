@@ -3,102 +3,114 @@ import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { uploadUserSocialData } from "feature/user/store/userSlice.asyncThunk";
-import { mediaSchema } from "feature/settings/SettingsView/Settings.schemas";
-import { Formik } from "formik";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
-export type MediaType = "youTubeLink" | "soundCloudLink" | "band";
-
 const MediaLinks = () => {
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
-  const { soundCloudLink, youTubeLink, band } = useAppSelector(selectUserInfo)!;
+  const userInfo = useAppSelector(selectUserInfo)!;
   const dispatch = useAppDispatch();
   const { t } = useTranslation(["common", "toast", "settings"]);
 
-  const formikInitialValues = {
+  const [state, setState] = useState({
     youtube: "",
     soundcloud: "",
     bands: "",
+  });
+
+  useEffect(() => {
+    if (userInfo) {
+      setState({
+        youtube: userInfo.youTubeLink || "",
+        soundcloud: userInfo.soundCloudLink || "",
+        bands: userInfo.band || "",
+      });
+    }
+  }, [userInfo]);
+
+  const handleChange = (field: keyof typeof state, value: string) => {
+    setState((prev) => ({ ...prev, [field]: value }));
   };
 
-  const SocialField = ({
-    name,
-    icon: Icon,
-    title,
-    currentValue,
-  }: {
-    name: string;
-    icon: any;
-    title: string;
-    currentValue?: string;
-  }) => (
-    <div className='space-y-2'>
-      <Label className='flex items-center gap-2'>
-        <Icon className='h-4 w-4' />
-        {title}
-      </Label>
-      <div className='flex space-x-2'>
+  const handleSave = async () => {
+    const promises = [];
+
+    if (state.youtube !== (userInfo.youTubeLink || "")) {
+      promises.push(
+        dispatch(
+          uploadUserSocialData({ value: state.youtube, type: "youTubeLink" })
+        )
+      );
+    }
+    if (state.soundcloud !== (userInfo.soundCloudLink || "")) {
+      promises.push(
+        dispatch(
+          uploadUserSocialData({ value: state.soundcloud, type: "soundCloudLink" })
+        )
+      );
+    }
+    if (state.bands !== (userInfo.band || "")) {
+      promises.push(
+        dispatch(uploadUserSocialData({ value: state.bands, type: "band" }))
+      );
+    }
+
+    await Promise.all(promises);
+  };
+
+  const hasChanges =
+    state.youtube !== (userInfo.youTubeLink || "") ||
+    state.soundcloud !== (userInfo.soundCloudLink || "") ||
+    state.bands !== (userInfo.band || "");
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <Label className="flex items-center gap-2">
+          <FaYoutube className="h-4 w-4" />
+          YouTube
+        </Label>
         <Input
-          name={name}
-          placeholder={currentValue || title}
-          className='flex-1'
+          value={state.youtube}
+          onChange={(e) => handleChange("youtube", e.target.value)}
+          placeholder="https://youtube.com/..."
         />
-        <Button
-          type='submit'
-          disabled={isFetching}
-          onClick={() => {
-            const value =
-              formikInitialValues[name as keyof typeof formikInitialValues];
-            if (value) {
-              dispatch(
-                uploadUserSocialData({
-                  value,
-                  type:
-                    name === "youtube"
-                      ? "youTubeLink"
-                      : name === "soundcloud"
-                      ? "soundCloudLink"
-                      : "band",
-                })
-              );
-            }
-          }}>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="flex items-center gap-2">
+          <FaSoundcloud className="h-4 w-4" />
+          SoundCloud
+        </Label>
+        <Input
+          value={state.soundcloud}
+          onChange={(e) => handleChange("soundcloud", e.target.value)}
+          placeholder="https://soundcloud.com/..."
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label className="flex items-center gap-2">
+          <FaGuitar className="h-4 w-4" />
+          {t("settings:bands")}
+        </Label>
+        <Input
+          value={state.bands}
+          onChange={(e) => handleChange("bands", e.target.value)}
+          placeholder="Your bands..."
+        />
+      </div>
+
+      <div className="flex justify-end pt-4">
+        <Button onClick={handleSave} disabled={!hasChanges || isFetching}>
+          {isFetching && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {t("settings:save")}
         </Button>
       </div>
     </div>
-  );
-
-  return (
-    <Formik
-      initialValues={formikInitialValues}
-      validationSchema={mediaSchema}
-      onSubmit={() => {}}>
-      {({ values, errors }) => (
-        <div className='space-y-4'>
-          <SocialField
-            name='youtube'
-            icon={FaYoutube}
-            title='YouTube'
-            currentValue={youTubeLink}
-          />
-          <SocialField
-            name='soundcloud'
-            icon={FaSoundcloud}
-            title='SoundCloud'
-            currentValue={soundCloudLink}
-          />
-          <SocialField
-            name='bands'
-            icon={FaGuitar}
-            title={t("settings:bands")}
-            currentValue={band}
-          />
-        </div>
-      )}
-    </Formik>
   );
 };
 

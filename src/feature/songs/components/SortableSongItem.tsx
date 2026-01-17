@@ -5,13 +5,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn } from "assets/lib/utils";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import { Song, SongStatus } from "feature/songs/types/songs.type";
-import { MoreVertical, GripVertical, ChevronRight } from "lucide-react";
+import { MoreVertical, GripVertical, ChevronRight, Play } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
+import Link from "next/link";
 
 interface SortableSongItemProps {
   song: Song;
-  config: any; // Using the config type from SongStatusCard
+  config: any;
   isMobile: boolean;
   nextStatus?: SongStatus;
   getPrimaryActionText: (status: string) => string;
@@ -19,6 +20,53 @@ interface SortableSongItemProps {
   onSongRemove: (id: string) => void;
   droppableId: string;
 }
+
+const SongCover = ({ song, config, size = "sm" }: { song: Song; config: any; size?: "sm" | "md" }) => {
+  const StatusIcon = config.icon;
+  const dimensions = size === "md" ? "h-14 w-14" : "h-10 w-10";
+  const iconSize = size === "md" ? "h-6 w-6" : "h-4 w-4";
+
+  return (
+    <div className={cn(
+      "relative shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/60 shadow-inner",
+      dimensions
+    )}>
+      {song.coverUrl ? (
+        <img src={song.coverUrl} alt={song.title} className="h-full w-full object-cover" />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center bg-zinc-800/50">
+          <StatusIcon className={cn(iconSize, "opacity-40", config.color)} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+const PracticeButton = ({ songId, isMobile }: { songId: string; isMobile: boolean }) => (
+  <Link 
+    href={`/timer/song/${songId}`} 
+    className={isMobile ? "flex-1" : ""} 
+    onClick={(e) => e.stopPropagation()}
+    onPointerDown={(e) => e.stopPropagation()}
+  >
+    {isMobile ? (
+      <Button
+        size="sm"
+        className="h-8 w-full bg-cyan-600 text-[11px] font-bold text-white hover:bg-cyan-500 active:scale-95 transition-all shadow-lg shadow-cyan-500/10"
+      >
+        <Play className="mr-1.5 h-3 w-3 fill-current" />
+        Practice
+      </Button>
+    ) : (
+      <Button
+        size="icon"
+        className="h-8 w-8 rounded-lg bg-cyan-600/10 text-cyan-500 hover:bg-cyan-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+      >
+        <Play className="h-4 w-4 fill-current" />
+      </Button>
+    )}
+  </Link>
+);
 
 export const SortableSongItem = ({
   song,
@@ -87,15 +135,7 @@ export const SortableSongItem = ({
       {/* Mobile Header & Action Row */}
       {isMobile ? (
         <div className="flex items-center gap-4 py-1">
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-950/60 shadow-inner">
-            {song.coverUrl ? (
-              <img src={song.coverUrl} alt={song.title} className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-zinc-800/50">
-                <StatusIcon className={cn("h-6 w-6 opacity-40", config.color)} />
-              </div>
-            )}
-          </div>
+          <SongCover song={song} config={config} size="md" />
           
           <div className="min-w-0 flex-1 space-y-2.5">
              <div className="flex items-start justify-between gap-2">
@@ -105,50 +145,44 @@ export const SortableSongItem = ({
                 </div>
                 <TierBadge song={song} />
              </div>
-             
-             {nextStatus && (
-               <Button
-                 size="sm"
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   onStatusChange(song.id, nextStatus, song.title, song.artist);
-                 }}
-                 className="h-8 w-full bg-zinc-100 text-[11px] font-bold text-zinc-900 hover:bg-white active:scale-95 transition-all shadow-lg"
-                 onPointerDown={(e) => e.stopPropagation()}
-               >
-                 {getPrimaryActionText(droppableId)}
-                 <ChevronRight className="ml-1 h-3.5 w-3.5" />
-               </Button>
-             )}
+
+             <div className="flex gap-2">
+                {droppableId !== "learned" && <PracticeButton songId={song.id} isMobile={true} />}
+                
+                {nextStatus && (
+                    <Button
+                        size="sm"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onStatusChange(song.id, nextStatus, song.title, song.artist);
+                        }}
+                        className="h-8 flex-1 bg-zinc-100 text-[11px] font-bold text-zinc-900 hover:bg-white active:scale-95 transition-all shadow-lg"
+                        onPointerDown={(e) => e.stopPropagation()}
+                    >
+                        {getPrimaryActionText(droppableId)}
+                        <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                    </Button>
+                )}
+             </div>
           </div>
         </div>
       ) : (
         <div className="flex items-center gap-3 pr-6"> 
-          {/* Drag Handle */}
           <div className="hidden sm:flex text-zinc-600 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity -ml-1">
                <GripVertical className="h-4 w-4" />
           </div>
 
-          {/* Small Cover Image */}
-          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-white/5 bg-zinc-950/40 shadow-sm transition-transform group-hover:scale-105">
-            {song.coverUrl ? (
-              <img 
-                src={song.coverUrl} 
-                alt={song.title}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <StatusIcon className={cn("h-4 w-4 opacity-40", config.color)} />
-              </div>
-            )}
-          </div>
+          <SongCover song={song} config={config} />
 
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-zinc-100 leading-tight group-hover:text-white transition-colors">{song.title}</p>
             <p className="truncate text-[11px] font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors">{song.artist}</p>
           </div>
-          <TierBadge song={song} />
+
+          <div className="flex items-center gap-2">
+            {droppableId !== "learned" && <PracticeButton songId={song.id} isMobile={false} />}
+            <TierBadge song={song} />
+          </div>
         </div>
       )}
 

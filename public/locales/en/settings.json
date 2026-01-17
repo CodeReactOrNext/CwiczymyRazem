@@ -23,7 +23,8 @@
     "placeholder": "Pick a date",
     "save": "Save",
     "success": "Start date updated successfully!",
-    "error": "Failed to update start date"
+    "error": "Failed to update start date",
+    "duration_years": "You have been playing for {{years}} years!"
   },
   "profile_settings": "Profile Settings",
   "manage_your_profile_information": "Manage your profile information",

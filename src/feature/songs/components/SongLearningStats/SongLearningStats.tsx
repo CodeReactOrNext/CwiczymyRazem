@@ -2,6 +2,7 @@ import { Card } from "assets/components/ui/card";
 import type { Song } from "feature/songs/types/songs.type";
 import { cn } from "assets/lib/utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import { Award, Music2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -27,13 +28,8 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
     ? (userSongs.learned.length / totalSongs) * 100
     : 0;
 
-  // Calculate Average Difficulty of Learned Songs (ignoring 0)
-  const learnedWithDifficulty = userSongs.learned.filter(s => (s.avgDifficulty || 0) > 0);
-  const avgDifficulty = learnedWithDifficulty.length > 0
-    ? learnedWithDifficulty.reduce((sum, s) => sum + (s.avgDifficulty || 0), 0) / learnedWithDifficulty.length
-    : 0;
-
-  const playerTier = avgDifficulty > 0 ? getSongTier(avgDifficulty) : null;
+  const skillPower = calculateSkillPower(userSongs.learned);
+  const playerTier = skillPower > 0 ? getSongTier(skillPower) : null;
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -76,7 +72,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
 
       {/* Player Tier - New */}
       <div className="flex flex-1 items-center gap-4 rounded-lg  p-4 ">
-         <TierBadge difficulty={avgDifficulty} className="h-10 w-10 text-sm" />
+         <TierBadge difficulty={skillPower} className="h-10 w-10 text-sm" />
          <div>
             <p className="text-sm font-medium text-zinc-400">{t("your_skill_tier", "Skill Tier")}</p>
             <div className="flex items-baseline gap-2">
@@ -85,7 +81,7 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
                </h3>
                {playerTier && (
                    <span className="text-xs text-zinc-500">
-                       ({t("avg")}: {avgDifficulty.toFixed(1)})
+                       (Power: {skillPower.toFixed(1)})
                    </span>
                )}
             </div>
