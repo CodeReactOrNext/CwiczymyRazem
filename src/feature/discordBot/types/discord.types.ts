@@ -9,6 +9,12 @@ export interface DiscordEmbed {
   description?: string;
   color?: number;
   fields?: DiscordField[];
+  url?: string;
+  author?: {
+    name: string;
+    url?: string;
+    icon_url?: string;
+  };
   thumbnail?: {
     url: string;
   };

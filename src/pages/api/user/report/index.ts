@@ -123,7 +123,8 @@ export default async function handler(
           songId: inputData.songId,
           songTitle: inputData.songTitle,
           songArtist: inputData.songArtist
-        } : undefined
+        } : undefined,
+        report.raitingData.bonusPoints.streak
       );
     }
 

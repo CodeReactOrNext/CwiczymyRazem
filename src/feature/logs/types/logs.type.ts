@@ -59,6 +59,7 @@ export interface FirebaseLogsInterface {
     level: number;
   };
   points: number;
+  streak?: number;
   timeSumary: {
     techniqueTime: number;
     theoryTime: number;
