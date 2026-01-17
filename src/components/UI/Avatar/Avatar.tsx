@@ -5,7 +5,8 @@ interface AvatarProps {
   name: string;
   lvl?: number;
   avatarURL?: string;
-  size?: "sm";
+  size?: "sm" | "2xl";
+  className?: string;
 }
 
 const getRankImgPath = (lvl: number) => {
@@ -31,21 +32,26 @@ const getBorderStyles = (lvl: number) => {
   return "bg-gradient-to-br from-gray-300 via-gray-400 to-gray-600";
 };
 
-const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
+const Avatar = ({ name, lvl, avatarURL, size, className }: AvatarProps) => {
   const imgPath = getRankImgPath(lvl ?? 0);
   const borderStyles = getBorderStyles(lvl ?? 0);
 
   // Styles for the outer wrapper (border)
-  const containerSizeClass = size === "sm" ? "h-10 w-10 rounded-full" : "h-20 w-20 rounded-xl";
+  let containerSizeClass = "h-20 w-20 rounded-xl";
+  if (size === "sm") containerSizeClass = "h-10 w-10 rounded-full";
+  if (size === "2xl") containerSizeClass = "h-32 w-32 rounded-2xl";
   
   // Styles for the inner content (image or text)
-  // We need slightly smaller rounding for the inner part to look nested perfectly if it's a square/rect, 
-  // but for circle/full it matches.
-  // For 'rounded-xl' outer, inner should be roughly 'rounded-lg'.
-  const innerRoundedClass = size === "sm" ? "rounded-full" : "rounded-[10px]";
+  let innerRoundedClass = "rounded-[10px]";
+  if (size === "sm") innerRoundedClass = "rounded-full";
+  if (size === "2xl") innerRoundedClass = "rounded-[14px]";
+
+  const badgePosition = size === "2xl" 
+    ? { bottom: "28px", left: "58px" } 
+    : { bottom: "18px", left: "35px" };
 
   return (
-    <div className='relative inline-block'>
+    <div className={`relative inline-block ${className || ""}`}>
       <div
         className={`flex items-center justify-center p-[3px] ${containerSizeClass} ${borderStyles}`}>
         <div
@@ -69,8 +75,8 @@ const Avatar = ({ name, lvl, avatarURL, size }: AvatarProps) => {
       </div>
       {lvl !== undefined && (
         <img
-          className='absolute bottom-[18px] left-[35px] -rotate-90 '
-          style={size === "sm" ? { display: "none" } : {}}
+          className='absolute -rotate-90 '
+          style={size === "sm" ? { display: "none" } : { ...badgePosition }}
           src={`/static/images/rank/${imgPath}.png`}
           alt={`gutiar rank image for level ${lvl ?? 0}`}
         />

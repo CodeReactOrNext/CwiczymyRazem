@@ -77,5 +77,6 @@
   "your_skill_tier": "Poziom umiejętności",
   "add_songs_from_library": "Dodaj utwory z biblioteki",
   "your_progress": "Twój postęp",
-  "drag_and_drop_description": "Przeciągaj i upuszczaj utwory, aby śledzić swoją naukę. Przenoś elementy między kolumnami, aby zaktualizować ich status."
+  "drag_and_drop_description": "Przeciągaj i upuszczaj utwory, aby śledzić swoją naukę. Przenoś elementy między kolumnami, aby zaktualizować ich status.",
+  "search_placeholder": "Szukaj tytułu lub wykonawcy..."
 }

@@ -12,7 +12,8 @@
     "singup": "Failed to sign up",
     "upadate": "Failed to update data. Please try again.",
     "avatar_max": "Avatar can be a maximum of 250px by 250px.",
-    "wrong_file_type": "Only png and jpg/jpeg file types are allowed"
+    "wrong_file_type": "Only png and jpg/jpeg file types are allowed",
+    "generic": "Something went wrong. Please try again."
   },
   "info": {
     "new_user_tip": "Check out the FAQ to learn how to use 'Riff Quest'",
