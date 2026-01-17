@@ -12,10 +12,14 @@ export type SongStatus =
 
 export interface SongFormatter {
   format: (
-    log: FirebaseLogsSongsInterface
+    log: FirebaseLogsSongsInterface,
+    lang?: "PL" | "EN"
   ) => Promise<{ embeds: DiscordEmbed[] }>;
 }
 
 export interface GeneralLogFormatter {
-  format: (log: FirebaseLogsInterface) => Promise<{ embeds: DiscordEmbed[] }>;
+  format: (
+    log: FirebaseLogsInterface,
+    lang?: "PL" | "EN"
+  ) => Promise<{ embeds: DiscordEmbed[] }>;
 }

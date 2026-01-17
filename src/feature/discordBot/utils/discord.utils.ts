@@ -1,11 +1,13 @@
-import {logger } from "feature/logger/Logger";
+import { logger } from "feature/logger/Logger";
 
 import type { DiscordMessage } from "../types/discord.types";
 
 export const sendDiscordMessage = async (
-  message: DiscordMessage
+  message: DiscordMessage,
+  webhookUrlOverride?: string
 ): Promise<boolean> => {
-  const webhookUrl = process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL;
+  const webhookUrl =
+    webhookUrlOverride || process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_URL;
 
   if (!webhookUrl) {
     logger.error("Discord webhook URL not configured", { context: "sendDiscordMessage" });
