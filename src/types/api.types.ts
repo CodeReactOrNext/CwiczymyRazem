@@ -1,5 +1,4 @@
 import type { AchievementList } from "feature/achievements/types";
-import type { MediaType } from "feature/settings/components/MediaLinks/MediaLinks";
 import type {
   ReportDataInterface,
   ReportFormikInterface,
@@ -159,6 +158,8 @@ export interface updateReprotInterface {
   token: IdTokenResult;
   inputData: ReportFormikInterface;
 }
+
+export type MediaType = "youTubeLink" | "soundCloudLink" | "band";
 
 export interface updateSocialInterface {
   value: string;
