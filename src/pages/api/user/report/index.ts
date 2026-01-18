@@ -42,7 +42,10 @@ export default async function handler(
     const userSongLists = await getUserSongs(userUid);
 
 
-    const currentUserStats = userData?.statistics as StatisticsDataInterface;
+    const currentUserStats = {
+      ...(userData?.statistics as StatisticsDataInterface),
+      skills: userData?.skills || { unlockedSkills: {} }
+    };
     const currentUserSongLists = userSongLists as unknown as SongListInterface;
 
 

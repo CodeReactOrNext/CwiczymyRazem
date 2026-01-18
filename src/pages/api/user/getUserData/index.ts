@@ -25,7 +25,10 @@ export default async function handler(
           guitarStartDate: userData!.guitarStartDate,
         },
         userAuth,
-        currentUserStats: userData!.statistics,
+        currentUserStats: {
+          ...userData!.statistics,
+          skills: userData!.skills || { unlockedSkills: {} }
+        },
       });
     } catch (error) {
       return res.status(500).json({ error });
