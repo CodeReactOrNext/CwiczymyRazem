@@ -1670,5 +1670,1061 @@ export const challengesList: Challenge[] = [
         relatedSkills: ["sight_reading"]
       }
     ]
+  },
+
+  // BENDING - Advanced Path
+  {
+    id: "bending_expressive_7_days",
+    title: "Expressive Bending Vocabulary",
+    description: "Master pre-bends, release bends, and compound bending techniques.",
+    streakDays: 7,
+    intensity: "medium",
+    difficulty: "medium",
+    category: "technique",
+    requiredSkillId: "bending",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Bending",
+    dependsOn: "bending_5_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "700",
+    accentColor: "main",
+    rewardSkillId: "bending",
+    rewardLevel: 15,
+    exercises: [
+      {
+        id: "bend_expr_1",
+        title: "Vocal Bending",
+        description: "Imitate vocal melodies using only bends and vibrato.",
+        difficulty: "medium",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Listen to blues singers and try to match their phrasing with your bends."],
+        metronomeSpeed: null,
+        relatedSkills: ["bending", "phrasing"]
+      }
+    ]
+  },
+  {
+    id: "bending_unison_10_days",
+    title: "Unison Bending Mastery",
+    description: "Perfect the art of bending one string while holding another for dramatic unison effects.",
+    streakDays: 10,
+    intensity: "high",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "bending",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Bending",
+    dependsOn: "bending_expressive_7_days",
+    shortGoal: "10 days / 10 min daily",
+    rewardDescription: "1000",
+    accentColor: "main",
+    rewardSkillId: "bending",
+    rewardLevel: 20,
+    exercises: [
+      {
+        id: "bend_uni_1",
+        title: "Double-Stop Bends",
+        description: "Bend the lower string to match the pitch of the higher string.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Use your ear - the moment the pitches match, you'll hear the beating stop."],
+        metronomeSpeed: null,
+        relatedSkills: ["bending", "ear_training"]
+      }
+    ]
+  },
+
+  // TAPPING - Extended Path
+  {
+    id: "tapping_8_finger_7_days",
+    title: "8-Finger Tapping Independence",
+    description: "Develop true independence between both hands for complex tapping passages.",
+    streakDays: 7,
+    intensity: "extreme",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "tapping",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Tapping",
+    dependsOn: "tapping_3_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "800",
+    accentColor: "main",
+    rewardSkillId: "tapping",
+    rewardLevel: 15,
+    exercises: [
+      {
+        id: "tap_8f_1",
+        title: "Polyrhythmic Tapping",
+        description: "Play different rhythms with each hand simultaneously.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Start with simple 2 against 3 patterns before attempting more complex polyrhythms."],
+        metronomeSpeed: { min: 60, max: 100, recommended: 70 },
+        relatedSkills: ["tapping", "rhythm"]
+      }
+    ]
+  },
+  {
+    id: "tapping_melodic_10_days",
+    title: "Melodic Tapping Compositions",
+    description: "Create flowing melodic lines using tapping as your primary technique.",
+    streakDays: 10,
+    intensity: "high",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "tapping",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Tapping",
+    dependsOn: "tapping_8_finger_7_days",
+    shortGoal: "10 days / 15 min daily",
+    rewardDescription: "1200",
+    accentColor: "main",
+    rewardSkillId: "tapping",
+    rewardLevel: 22,
+    exercises: [
+      {
+        id: "tap_mel_1",
+        title: "Tapped Melodies",
+        description: "Play recognizable melodies using only tapping technique.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Think like a pianist - your hands work independently but create one musical statement."],
+        metronomeSpeed: null,
+        relatedSkills: ["tapping", "composition"]
+      }
+    ]
+  },
+
+  // HYBRID PICKING - Extended Path
+  {
+    id: "hybrid_chicken_7_days",
+    title: "Chicken Pickin' Mastery",
+    description: "Master the snappy, percussive country-style hybrid picking sound.",
+    streakDays: 7,
+    intensity: "high",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "hybrid_picking",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Hybrid",
+    dependsOn: "hybrid_5_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "800",
+    accentColor: "main",
+    rewardSkillId: "hybrid_picking",
+    rewardLevel: 15,
+    exercises: [
+      {
+        id: "hyb_chick_1",
+        title: "Snap and Pop",
+        description: "Practice snapping strings with fingers for that classic country 'pop' sound.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Pull the string slightly away from the fretboard before releasing for maximum snap."],
+        metronomeSpeed: { min: 100, max: 140, recommended: 120 },
+        relatedSkills: ["hybrid_picking", "rhythm"]
+      }
+    ]
+  },
+  {
+    id: "hybrid_jazz_10_days",
+    title: "Jazz Chord Melody Hybrid",
+    description: "Combine walking bass lines with chord voicings using hybrid picking.",
+    streakDays: 10,
+    intensity: "high",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "hybrid_picking",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Hybrid",
+    dependsOn: "hybrid_chicken_7_days",
+    shortGoal: "10 days / 15 min daily",
+    rewardDescription: "1200",
+    accentColor: "main",
+    rewardSkillId: "hybrid_picking",
+    rewardLevel: 20,
+    exercises: [
+      {
+        id: "hyb_jazz_1",
+        title: "Bass and Chords",
+        description: "Play bass notes with pick while comping chords with fingers.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Think of your picking hand as two separate instruments - bass and piano."],
+        metronomeSpeed: { min: 70, max: 110, recommended: 90 },
+        relatedSkills: ["hybrid_picking", "chord_theory"]
+      }
+    ]
+  },
+
+  // FINGERPICKING - Extended Path
+  {
+    id: "fingerstyle_travis_7_days",
+    title: "Advanced Travis Patterns",
+    description: "Master complex Travis picking with syncopated bass lines.",
+    streakDays: 7,
+    intensity: "medium",
+    difficulty: "medium",
+    category: "technique",
+    requiredSkillId: "fingerpicking",
+    requiredLevel: 6,
+    unlockDescription: "Lvl 6 Fingerpicking",
+    dependsOn: "fingerstyle_5_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "700",
+    accentColor: "main",
+    rewardSkillId: "fingerpicking",
+    rewardLevel: 12,
+    exercises: [
+      {
+        id: "fing_trav_1",
+        title: "Syncopated Thumb",
+        description: "Add syncopation to your alternating bass patterns.",
+        difficulty: "medium",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["The thumb is your metronome - keep it steady even when fingers play off-beat."],
+        metronomeSpeed: { min: 70, max: 100, recommended: 85 },
+        relatedSkills: ["fingerpicking", "rhythm"]
+      }
+    ]
+  },
+  {
+    id: "fingerstyle_percussive_10_days",
+    title: "Percussive Fingerstyle",
+    description: "Incorporate slaps, taps, and body hits into your fingerstyle playing.",
+    streakDays: 10,
+    intensity: "high",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "fingerpicking",
+    requiredLevel: 10,
+    unlockDescription: "Lvl 10 Fingerpicking",
+    dependsOn: "fingerstyle_travis_7_days",
+    shortGoal: "10 days / 15 min daily",
+    rewardDescription: "1100",
+    accentColor: "main",
+    rewardSkillId: "fingerpicking",
+    rewardLevel: 18,
+    exercises: [
+      {
+        id: "fing_perc_1",
+        title: "Body as Drum",
+        description: "Create drum-like sounds while maintaining melody and bass.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Think in layers: bass, snare, hi-hat, and melody - each hand part has a role."],
+        metronomeSpeed: { min: 80, max: 120, recommended: 100 },
+        relatedSkills: ["fingerpicking", "rhythm"]
+      }
+    ]
+  },
+
+  // HARMONY - Extended Path
+  {
+    id: "harmony_substitutions_10_days",
+    title: "Chord Substitution Mastery",
+    description: "Learn tritone subs, diminished passing chords, and reharmonization.",
+    streakDays: 10,
+    intensity: "medium",
+    difficulty: "hard",
+    category: "theory",
+    requiredSkillId: "harmony",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Harmony",
+    dependsOn: "harmony_7_days",
+    shortGoal: "10 days / 10 min daily",
+    rewardDescription: "1000",
+    accentColor: "main",
+    rewardSkillId: "harmony",
+    rewardLevel: 15,
+    exercises: [
+      {
+        id: "harm_sub_1",
+        title: "Tritone Substitutes",
+        description: "Replace dominant chords with their tritone equivalents.",
+        difficulty: "hard",
+        category: "theory",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["The 3rd and 7th of a dominant chord become the 7th and 3rd of its tritone sub."],
+        metronomeSpeed: null,
+        relatedSkills: ["harmony", "chord_theory"]
+      }
+    ]
+  },
+  {
+    id: "harmony_voice_leading_14_days",
+    title: "Voice Leading Excellence",
+    description: "Create smooth harmonic motion with minimal finger movement.",
+    streakDays: 14,
+    intensity: "medium",
+    difficulty: "hard",
+    category: "theory",
+    requiredSkillId: "harmony",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Harmony",
+    dependsOn: "harmony_substitutions_10_days",
+    shortGoal: "14 days / 10 min daily",
+    rewardDescription: "1500",
+    accentColor: "main",
+    rewardSkillId: "harmony",
+    rewardLevel: 22,
+    exercises: [
+      {
+        id: "harm_vl_1",
+        title: "One Note Changes",
+        description: "Move through progressions by changing only one note at a time.",
+        difficulty: "hard",
+        category: "theory",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Find common tones between chords and keep them stationary."],
+        metronomeSpeed: null,
+        relatedSkills: ["harmony", "composition"]
+      }
+    ]
+  },
+
+  // PITCH RECOGNITION - Extended Path
+  {
+    id: "pitch_absolute_7_days",
+    title: "Absolute Pitch Development",
+    description: "Train your memory to recall specific pitches without reference.",
+    streakDays: 7,
+    intensity: "high",
+    difficulty: "hard",
+    category: "hearing",
+    requiredSkillId: "pitch_recognition",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Pitch",
+    dependsOn: "pitch_recognition_5_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "800",
+    accentColor: "main",
+    rewardSkillId: "pitch_recognition",
+    rewardLevel: 15,
+    exercises: [
+      {
+        id: "pitch_abs_1",
+        title: "Reference Pitch Memory",
+        description: "Memorize one pitch (like A440) and use it to find all others.",
+        difficulty: "hard",
+        category: "hearing",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Start each practice by singing your reference pitch before checking with a tuner."],
+        metronomeSpeed: null,
+        relatedSkills: ["pitch_recognition", "ear_training"]
+      }
+    ]
+  },
+  {
+    id: "pitch_chord_quality_10_days",
+    title: "Chord Quality Recognition",
+    description: "Instantly identify major, minor, diminished, augmented, and extended chords by ear.",
+    streakDays: 10,
+    intensity: "high",
+    difficulty: "hard",
+    category: "hearing",
+    requiredSkillId: "pitch_recognition",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Pitch",
+    dependsOn: "pitch_absolute_7_days",
+    shortGoal: "10 days / 10 min daily",
+    rewardDescription: "1100",
+    accentColor: "main",
+    rewardSkillId: "pitch_recognition",
+    rewardLevel: 20,
+    exercises: [
+      {
+        id: "pitch_cq_1",
+        title: "Chord Quality Quiz",
+        description: "Identify chord types played randomly without seeing the guitar.",
+        difficulty: "hard",
+        category: "hearing",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Focus on the emotional character: major = bright, minor = dark, dim = tense."],
+        metronomeSpeed: null,
+        relatedSkills: ["pitch_recognition", "chord_theory"]
+      }
+    ]
+  },
+
+  // TRANSCRIPTION - Extended Path
+  {
+    id: "transcription_rhythm_7_days",
+    title: "Rhythmic Transcription",
+    description: "Focus on capturing exact rhythms and timing nuances in transcriptions.",
+    streakDays: 7,
+    intensity: "high",
+    difficulty: "hard",
+    category: "hearing",
+    requiredSkillId: "transcription",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Transcription",
+    dependsOn: "transcription_5_days",
+    shortGoal: "7 days / 15 min daily",
+    rewardDescription: "900",
+    accentColor: "main",
+    rewardSkillId: "transcription",
+    rewardLevel: 15,
+    exercises: [
+      {
+        id: "trans_rhy_1",
+        title: "Groove Capture",
+        description: "Transcribe not just notes but the exact feel and pocket of a performance.",
+        difficulty: "hard",
+        category: "hearing",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Record yourself and compare - are you rushing or dragging compared to the original?"],
+        metronomeSpeed: null,
+        relatedSkills: ["transcription", "rhythm"]
+      }
+    ]
+  },
+  {
+    id: "transcription_full_solo_14_days",
+    title: "Complete Solo Transcription",
+    description: "Transcribe an entire guitar solo from start to finish.",
+    streakDays: 14,
+    intensity: "extreme",
+    difficulty: "hard",
+    category: "hearing",
+    requiredSkillId: "transcription",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Transcription",
+    dependsOn: "transcription_rhythm_7_days",
+    shortGoal: "14 days / 20 min daily",
+    rewardDescription: "1800",
+    accentColor: "main",
+    rewardSkillId: "transcription",
+    rewardLevel: 25,
+    exercises: [
+      {
+        id: "trans_full_1",
+        title: "Solo Study",
+        description: "Learn every note, bend, and articulation of a classic solo.",
+        difficulty: "hard",
+        category: "hearing",
+        timeInMinutes: 20,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Break the solo into 4-bar phrases and master each before moving on."],
+        metronomeSpeed: null,
+        relatedSkills: ["transcription", "phrasing"]
+      }
+    ]
+  },
+
+  // COMPOSITION - Extended Path
+  {
+    id: "composition_arrange_7_days",
+    title: "Arranging for Guitar",
+    description: "Adapt melodies and songs for solo guitar performance.",
+    streakDays: 7,
+    intensity: "medium",
+    difficulty: "medium",
+    category: "creativity",
+    requiredSkillId: "composition",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Composition",
+    dependsOn: "composition_5_days",
+    shortGoal: "7 days / 15 min daily",
+    rewardDescription: "800",
+    accentColor: "main",
+    rewardSkillId: "composition",
+    rewardLevel: 14,
+    exercises: [
+      {
+        id: "comp_arr_1",
+        title: "Melody Plus Bass",
+        description: "Arrange a simple song with melody on top strings and bass on low strings.",
+        difficulty: "medium",
+        category: "creativity",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Start with the melody, then add bass notes on beats 1 and 3."],
+        metronomeSpeed: null,
+        relatedSkills: ["composition", "chord_theory"]
+      }
+    ]
+  },
+  {
+    id: "composition_full_song_14_days",
+    title: "Complete Song Creation",
+    description: "Write a full song with intro, verses, chorus, bridge, and outro.",
+    streakDays: 14,
+    intensity: "high",
+    difficulty: "hard",
+    category: "creativity",
+    requiredSkillId: "composition",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Composition",
+    dependsOn: "songwriting_7_days",
+    shortGoal: "14 days / 20 min daily",
+    rewardDescription: "2000",
+    accentColor: "main",
+    rewardSkillId: "composition",
+    rewardLevel: 25,
+    exercises: [
+      {
+        id: "comp_song_1",
+        title: "Song Blueprint",
+        description: "Map out and record a complete original song.",
+        difficulty: "hard",
+        category: "creativity",
+        timeInMinutes: 20,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Contrast is key - make your chorus feel different from your verse."],
+        metronomeSpeed: null,
+        relatedSkills: ["composition", "harmony"]
+      }
+    ]
+  },
+
+  // PHRASING - Extended Path
+  {
+    id: "phrasing_call_response_7_days",
+    title: "Call and Response Mastery",
+    description: "Develop musical conversations between phrases.",
+    streakDays: 7,
+    intensity: "medium",
+    difficulty: "medium",
+    category: "creativity",
+    requiredSkillId: "phrasing",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Phrasing",
+    dependsOn: "phrasing_5_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "700",
+    accentColor: "main",
+    rewardSkillId: "phrasing",
+    rewardLevel: 14,
+    exercises: [
+      {
+        id: "phr_call_1",
+        title: "Question and Answer",
+        description: "Play a phrase, then answer it with a complementary phrase.",
+        difficulty: "medium",
+        category: "creativity",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Think of it like a conversation - the answer should relate to the question."],
+        metronomeSpeed: null,
+        relatedSkills: ["phrasing", "improvisation"]
+      }
+    ]
+  },
+  {
+    id: "phrasing_motif_10_days",
+    title: "Motivic Development",
+    description: "Build entire solos from a single short musical idea.",
+    streakDays: 10,
+    intensity: "high",
+    difficulty: "hard",
+    category: "creativity",
+    requiredSkillId: "phrasing",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Phrasing",
+    dependsOn: "phrasing_call_response_7_days",
+    shortGoal: "10 days / 15 min daily",
+    rewardDescription: "1100",
+    accentColor: "main",
+    rewardSkillId: "phrasing",
+    rewardLevel: 20,
+    exercises: [
+      {
+        id: "phr_mot_1",
+        title: "Theme Variations",
+        description: "Create 5 different variations of a 4-note motif.",
+        difficulty: "hard",
+        category: "creativity",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Try transposition, rhythmic displacement, inversion, and ornamentation."],
+        metronomeSpeed: null,
+        relatedSkills: ["phrasing", "composition"]
+      }
+    ]
+  },
+
+  // ARTICULATION - Extended Path
+  {
+    id: "articulation_dynamics_7_days",
+    title: "Dynamic Articulation",
+    description: "Master the full range from whisper-quiet to aggressive attack.",
+    streakDays: 7,
+    intensity: "medium",
+    difficulty: "medium",
+    category: "technique",
+    requiredSkillId: "articulation",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Articulation",
+    dependsOn: "articulation_3_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "700",
+    accentColor: "main",
+    rewardSkillId: "articulation",
+    rewardLevel: 15,
+    exercises: [
+      {
+        id: "art_dyn_1",
+        title: "Crescendo Scales",
+        description: "Play scales going from pianissimo to fortissimo and back.",
+        difficulty: "medium",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Control comes from pick depth and arm weight, not grip tension."],
+        metronomeSpeed: { min: 70, max: 100, recommended: 85 },
+        relatedSkills: ["articulation", "alternate_picking"]
+      }
+    ]
+  },
+  {
+    id: "articulation_tone_colors_10_days",
+    title: "Tonal Palette Expansion",
+    description: "Discover all the tone colors available from picking position and angle.",
+    streakDays: 10,
+    intensity: "medium",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "articulation",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Articulation",
+    dependsOn: "articulation_dynamics_7_days",
+    shortGoal: "10 days / 10 min daily",
+    rewardDescription: "1000",
+    accentColor: "main",
+    rewardSkillId: "articulation",
+    rewardLevel: 20,
+    exercises: [
+      {
+        id: "art_tone_1",
+        title: "Position Exploration",
+        description: "Play the same phrase at bridge, middle, and neck positions.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Each position has a purpose - bright for cutting through, dark for blending."],
+        metronomeSpeed: null,
+        relatedSkills: ["articulation", "audio_production"]
+      }
+    ]
+  },
+
+  // SLIDE GUITAR - Extended Path
+  {
+    id: "slide_open_tunings_7_days",
+    title: "Open Tuning Exploration",
+    description: "Discover the unique possibilities of open D, G, and E tunings.",
+    streakDays: 7,
+    intensity: "medium",
+    difficulty: "medium",
+    category: "technique",
+    requiredSkillId: "slide_guitar",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Slide",
+    dependsOn: "slide_guitar_3_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "700",
+    accentColor: "main",
+    rewardSkillId: "slide_guitar",
+    rewardLevel: 15,
+    exercises: [
+      {
+        id: "slide_open_1",
+        title: "Chord Drone Slides",
+        description: "Use open strings as drones while sliding melodic lines.",
+        difficulty: "medium",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Open tunings let you play full chords with the slide flat across strings."],
+        metronomeSpeed: null,
+        relatedSkills: ["slide_guitar", "chord_theory"]
+      }
+    ]
+  },
+  {
+    id: "slide_standard_10_days",
+    title: "Standard Tuning Slide Mastery",
+    description: "Master slide technique without changing your tuning.",
+    streakDays: 10,
+    intensity: "high",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "slide_guitar",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Slide",
+    dependsOn: "slide_open_tunings_7_days",
+    shortGoal: "10 days / 15 min daily",
+    rewardDescription: "1100",
+    accentColor: "main",
+    rewardSkillId: "slide_guitar",
+    rewardLevel: 22,
+    exercises: [
+      {
+        id: "slide_std_1",
+        title: "Single-String Melodies",
+        description: "Play complete melodies on one string using precise slide positioning.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Intonation is everything in standard tuning - your ear must guide the slide."],
+        metronomeSpeed: null,
+        relatedSkills: ["slide_guitar", "ear_training"]
+      }
+    ]
+  },
+
+  // STRING SKIPPING - Extended Path
+  {
+    id: "string_skipping_arpeggios_7_days",
+    title: "Wide Interval Arpeggios",
+    description: "Create huge intervallic leaps using string skipping patterns.",
+    streakDays: 7,
+    intensity: "high",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "string_skipping",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 String Skipping",
+    dependsOn: "string_skipping_5_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "800",
+    accentColor: "main",
+    rewardSkillId: "string_skipping",
+    rewardLevel: 16,
+    exercises: [
+      {
+        id: "skip_arp_1",
+        title: "Spread Triads",
+        description: "Play triads with each note on a non-adjacent string.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Visualize where your pick needs to land before you move."],
+        metronomeSpeed: { min: 60, max: 100, recommended: 75 },
+        relatedSkills: ["string_skipping", "chord_theory"]
+      }
+    ]
+  },
+  {
+    id: "string_skipping_melodic_10_days",
+    title: "Melodic String Skipping",
+    description: "Apply string skipping to create unique melodic lines impossible with linear playing.",
+    streakDays: 10,
+    intensity: "extreme",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "string_skipping",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 String Skipping",
+    dependsOn: "string_skipping_arpeggios_7_days",
+    shortGoal: "10 days / 15 min daily",
+    rewardDescription: "1200",
+    accentColor: "main",
+    rewardSkillId: "string_skipping",
+    rewardLevel: 22,
+    exercises: [
+      {
+        id: "skip_mel_1",
+        title: "Skip Sequences",
+        description: "Transform standard scale sequences into string-skipping patterns.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["The wider the skip, the more dramatic the melodic effect."],
+        metronomeSpeed: { min: 70, max: 110, recommended: 85 },
+        relatedSkills: ["string_skipping", "scales"]
+      }
+    ]
+  },
+
+  // FINGER INDEPENDENCE - Extended Path
+  {
+    id: "finger_indep_pinky_7_days",
+    title: "Pinky Power Development",
+    description: "Transform your weakest finger into a reliable tool.",
+    streakDays: 7,
+    intensity: "medium",
+    difficulty: "medium",
+    category: "technique",
+    requiredSkillId: "finger_independence",
+    requiredLevel: 10,
+    unlockDescription: "Lvl 10 Independence",
+    dependsOn: "finger_independence_7_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "800",
+    accentColor: "main",
+    rewardSkillId: "finger_independence",
+    rewardLevel: 18,
+    exercises: [
+      {
+        id: "ind_pinky_1",
+        title: "Pinky-Led Patterns",
+        description: "Play patterns where the pinky initiates each phrase.",
+        difficulty: "medium",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Keep the pinky curved - flat pinky = weak pinky."],
+        metronomeSpeed: { min: 60, max: 100, recommended: 80 },
+        relatedSkills: ["finger_independence", "legato"]
+      }
+    ]
+  },
+  {
+    id: "finger_indep_stretch_10_days",
+    title: "Fret Span Expansion",
+    description: "Gradually increase the uncomfortable stretches your fingers can handle.",
+    streakDays: 10,
+    intensity: "high",
+    difficulty: "hard",
+    category: "technique",
+    requiredSkillId: "finger_independence",
+    requiredLevel: 15,
+    unlockDescription: "Lvl 15 Independence",
+    dependsOn: "finger_indep_pinky_7_days",
+    shortGoal: "10 days / 10 min daily",
+    rewardDescription: "1100",
+    accentColor: "main",
+    rewardSkillId: "finger_independence",
+    rewardLevel: 25,
+    exercises: [
+      {
+        id: "ind_str_1",
+        title: "Stretch Sequences",
+        description: "Play patterns that span 5+ frets while maintaining clarity.",
+        difficulty: "hard",
+        category: "technique",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Warm up thoroughly - never push cold hands into extreme stretches."],
+        metronomeSpeed: { min: 50, max: 80, recommended: 60 },
+        relatedSkills: ["finger_independence", "technique"]
+      }
+    ]
+  },
+
+  // MUSIC THEORY - Extended Path
+  {
+    id: "theory_modes_7_days",
+    title: "Modal Mastery",
+    description: "Understand and apply all seven modes of the major scale.",
+    streakDays: 7,
+    intensity: "medium",
+    difficulty: "medium",
+    category: "theory",
+    requiredSkillId: "music_theory",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Theory",
+    dependsOn: "music_theory_5_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "800",
+    accentColor: "main",
+    rewardSkillId: "music_theory",
+    rewardLevel: 14,
+    exercises: [
+      {
+        id: "theory_mod_1",
+        title: "Mode by Mode",
+        description: "Learn the unique character of each mode through playing and listening.",
+        difficulty: "medium",
+        category: "theory",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Focus on the characteristic note that makes each mode unique."],
+        metronomeSpeed: null,
+        relatedSkills: ["music_theory", "scales"]
+      }
+    ]
+  },
+  {
+    id: "theory_functional_10_days",
+    title: "Functional Harmony",
+    description: "Understand why chord progressions work and how to create tension and release.",
+    streakDays: 10,
+    intensity: "medium",
+    difficulty: "hard",
+    category: "theory",
+    requiredSkillId: "music_theory",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Theory",
+    dependsOn: "theory_modes_7_days",
+    shortGoal: "10 days / 15 min daily",
+    rewardDescription: "1100",
+    accentColor: "main",
+    rewardSkillId: "music_theory",
+    rewardLevel: 20,
+    exercises: [
+      {
+        id: "theory_func_1",
+        title: "Tension Resolution",
+        description: "Identify and play dominant-tonic resolutions in different keys.",
+        difficulty: "hard",
+        category: "theory",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["The V-I is the foundation of western harmony - feel the pull."],
+        metronomeSpeed: null,
+        relatedSkills: ["music_theory", "harmony"]
+      }
+    ]
+  },
+
+  // RHYTHM RECOGNITION - Extended Path
+  {
+    id: "rhythm_recog_complex_7_days",
+    title: "Complex Rhythm Detection",
+    description: "Identify syncopation, polyrhythms, and unusual time signatures by ear.",
+    streakDays: 7,
+    intensity: "high",
+    difficulty: "hard",
+    category: "hearing",
+    requiredSkillId: "rythm_recognition",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Rhythm Recognition",
+    dependsOn: "rhythm_recog_5_days",
+    shortGoal: "7 days / 10 min daily",
+    rewardDescription: "800",
+    accentColor: "main",
+    rewardSkillId: "rythm_recognition",
+    rewardLevel: 14,
+    exercises: [
+      {
+        id: "rhy_rec_comp_1",
+        title: "Odd Time Identification",
+        description: "Recognize 5/4, 7/8, and other odd meters in recordings.",
+        difficulty: "hard",
+        category: "hearing",
+        timeInMinutes: 10,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Count along until you find the pattern - where does the '1' fall?"],
+        metronomeSpeed: null,
+        relatedSkills: ["rythm_recognition", "rhythm"]
+      }
+    ]
+  },
+  {
+    id: "rhythm_recog_groove_10_days",
+    title: "Groove Analysis",
+    description: "Understand why some rhythms feel better than others.",
+    streakDays: 10,
+    intensity: "medium",
+    difficulty: "hard",
+    category: "hearing",
+    requiredSkillId: "rythm_recognition",
+    requiredLevel: 12,
+    unlockDescription: "Lvl 12 Rhythm Recognition",
+    dependsOn: "rhythm_recog_complex_7_days",
+    shortGoal: "10 days / 15 min daily",
+    rewardDescription: "1100",
+    accentColor: "main",
+    rewardSkillId: "rythm_recognition",
+    rewardLevel: 20,
+    exercises: [
+      {
+        id: "rhy_rec_grv_1",
+        title: "Feel Analysis",
+        description: "Compare straight vs. swung rhythms and identify the subtle timing differences.",
+        difficulty: "hard",
+        category: "hearing",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Groove lives in the tiny timing deviations - the space between metronomic and human."],
+        metronomeSpeed: null,
+        relatedSkills: ["rythm_recognition", "rhythm"]
+      }
+    ]
+  },
+
+  // IMPROVISATION - Extended Path  
+  {
+    id: "improv_over_changes_7_days",
+    title: "Following Chord Changes",
+    description: "Learn to hear and react to chord changes in real-time.",
+    streakDays: 7,
+    intensity: "high",
+    difficulty: "hard",
+    category: "creativity",
+    requiredSkillId: "improvisation",
+    requiredLevel: 8,
+    unlockDescription: "Lvl 8 Improvisation",
+    dependsOn: "improv_5_days",
+    shortGoal: "7 days / 15 min daily",
+    rewardDescription: "900",
+    accentColor: "main",
+    rewardSkillId: "improvisation",
+    rewardLevel: 16,
+    exercises: [
+      {
+        id: "imp_changes_1",
+        title: "Target Notes",
+        description: "Land on chord tones at each chord change.",
+        difficulty: "hard",
+        category: "creativity",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Know where the 3rd and 7th of each chord are - they define the harmony."],
+        metronomeSpeed: null,
+        relatedSkills: ["improvisation", "chord_theory"]
+      }
+    ]
+  },
+  {
+    id: "improv_outside_10_days",
+    title: "Playing Outside",
+    description: "Learn to deliberately create and resolve tension with 'wrong' notes.",
+    streakDays: 10,
+    intensity: "extreme",
+    difficulty: "hard",
+    category: "creativity",
+    requiredSkillId: "improvisation",
+    requiredLevel: 14,
+    unlockDescription: "Lvl 14 Improvisation",
+    dependsOn: "blues_soloing_5_days",
+    shortGoal: "10 days / 15 min daily",
+    rewardDescription: "1300",
+    accentColor: "main",
+    rewardSkillId: "improvisation",
+    rewardLevel: 22,
+    exercises: [
+      {
+        id: "imp_out_1",
+        title: "Chromatic Tension",
+        description: "Deliberately play outside the key, then resolve back home.",
+        difficulty: "hard",
+        category: "creativity",
+        timeInMinutes: 15,
+        instructions: ["Choose exercises or songs that fit the given topic."],
+        tips: ["Outside playing only works if you can get back inside - resolution is key."],
+        metronomeSpeed: null,
+        relatedSkills: ["improvisation", "scales"]
+      }
+    ]
   }
 ];
