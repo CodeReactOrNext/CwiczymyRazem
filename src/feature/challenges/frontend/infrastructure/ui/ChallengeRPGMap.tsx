@@ -111,7 +111,7 @@ export const ChallengeRPGMap = ({
                     const skillData = guitarSkills.find(s => s.id === skillId);
                     const SkillIcon = skillData?.icon || CatIcon;
                     const challenges = [...skillsMap[skillId]].sort((a, b) => a.requiredLevel - b.requiredLevel);
-                    const currentSkillLevel = userSkills[skillId] || 0;
+                    const currentSkillLevel = userSkills ? (userSkills[skillId] || 0) : 0;
 
                     return (
                       <div key={skillId} className="flex flex-col items-center gap-6 min-w-[70px]">
@@ -255,7 +255,7 @@ export const ChallengeRPGMap = ({
                             />
                         </div>
                         <span className="text-[8px] font-bold text-zinc-600 text-center">
-                            Your Current: Lvl {userSkills[activeNode.challenge.requiredSkillId] || 0}
+                            Your Current: Lvl {userSkills ? (userSkills[activeNode.challenge.requiredSkillId] || 0) : 0}
                         </span>
                     </div>
                   )}
