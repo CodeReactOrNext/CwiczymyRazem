@@ -91,7 +91,7 @@ export const ActiveChallengeWidget = () => {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-1 mb-0.5">
-                                            <span className="text-[7px] font-black uppercase tracking-[0.2em] text-main px-1 bg-main/10 rounded">Challenge</span>
+                                            <span className="text-[7px] font-bold tracking-wide text-main px-1 bg-main/10 rounded">Challenge</span>
                                         </div>
                                         <div className="flex flex-col">
                                             <h2 className="text-sm font-bold text-white tracking-tight leading-tight">
@@ -110,14 +110,14 @@ export const ActiveChallengeWidget = () => {
                                     <Button 
                                         onClick={handleStartSession}
                                         size="sm"
-                                        className="h-8 px-3 rounded-lg bg-main hover:bg-main-600 text-white font-bold uppercase tracking-wider transition-all text-[9px] gap-1.5 shadow-lg shadow-main/10"
+                                        className="h-8 px-3 rounded-lg bg-main hover:bg-main-600 text-white font-bold tracking-wide transition-all text-[9px] gap-1.5 shadow-lg shadow-main/10"
                                     >
                                         <Play size={10} fill="currentColor" />
                                         Start
                                     </Button>
                                 )}
                                 {isTodayDone && (
-                                    <div className="px-2 py-1 rounded bg-zinc-800 text-emerald-400 text-[8px] font-black uppercase tracking-wider">
+                                    <div className="px-2 py-1 rounded bg-zinc-800 text-emerald-400 text-[8px] font-bold tracking-wide">
                                         Done
                                     </div>
                                 )}

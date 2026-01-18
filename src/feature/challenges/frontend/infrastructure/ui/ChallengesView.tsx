@@ -1,9 +1,12 @@
-import { Info } from "lucide-react";
+import { Info, Trophy, Play } from "lucide-react";
+import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { ChallengeHeader } from "./ChallengeHeader";
 import { ActiveChallengeBanner } from "./ActiveChallengeBanner";
 import { ChallengeMap } from "./ChallengeMap";
+import { ChallengeCard } from "./ChallengeCard";
+import { ChallengeRPGMap } from "./ChallengeRPGMap";
 import { useChallenges } from "../../hooks/useChallenges";
 import { useState, useEffect } from "react";
 import { Challenge } from "../../../backend/domain/models/Challenge";
@@ -17,6 +20,7 @@ export const ChallengesView = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [activeTab, setActiveTab] = useState<'ACTIVE' | 'PROGRESS' | 'EXPLORE'>('ACTIVE');
 
   const { 
     allChallenges, 
@@ -28,6 +32,8 @@ export const ChallengesView = () => {
   } = useChallenges();
 
   const userSkills = userStats?.skills;
+
+  const hasActiveChallenge = activeChallenges.length > 0;
 
   useEffect(() => {
     if (router.query.start) {
@@ -91,41 +97,106 @@ export const ChallengesView = () => {
     );
   }
 
+  const recommendedStarters = (allChallenges as Challenge[])
+    .filter(c => c.requiredLevel <= 1 && !completedChallenges.includes(c.id))
+    .slice(0, 3);
+
+  const tabs = [
+    { id: 'ACTIVE', label: 'Active', icon: Play },
+    { id: 'PROGRESS', label: 'Progress', icon: Trophy },
+  ] as const;
+
   return (
     <MainContainer>
-      <div className="container mx-auto max-w-7xl px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4 py-12">
         <ChallengeHeader onBack={handleBack} />
 
-        <div className="p-4 rounded-lg bg-blue-500/5 flex items-start gap-3 mb-10">
-          <Info size={16} className="text-blue-500 shrink-0 mt-0.5" />
-          <p className="text-[11px] text-zinc-400 leading-relaxed">
-            <span className="text-blue-400 font-bold uppercase tracking-wider block mb-1">Concept Mode</span>
-            These challenges focus on specific guitar techniques and theoretical concepts. 
-            Choose or create exercises that best fit the challenge goals.
-          </p>
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded-lg w-fit mb-12">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex items-center gap-2 px-6 py-2.5 rounded-lg text-[10px] font-bold tracking-wide transition-all",
+                  isActive 
+                    ? "bg-zinc-800 text-white shadow-lg" 
+                    : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"
+                )}
+              >
+                <Icon size={14} className={isActive ? "text-main" : ""} />
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
-        {activeChallengesData.map(({ data, ...ac }) => data && (
-          <ActiveChallengeBanner 
-            key={ac.challengeId}
-            activeChallenge={ac}
-            challengeData={data}
-            onStart={onPractice}
-            onAbandon={handleAbandon}
-          />
-        ))}
+        <div className="space-y-16">
+          {activeTab === 'ACTIVE' && (
+            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {hasActiveChallenge ? (
+                <div className="space-y-6">
+                  {activeChallengesData.map(({ data, ...ac }) => data && (
+                    <ActiveChallengeBanner 
+                      key={ac.challengeId}
+                      activeChallenge={ac}
+                      challengeData={data}
+                      onStart={onPractice}
+                      onAbandon={handleAbandon}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20 bg-zinc-950/30 rounded-2xl flex flex-col items-center">
+                  <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center mb-6 text-zinc-700">
+                    <Trophy size={32} strokeWidth={1} />
+                  </div>
+                  <h3 className="text-xl font-black text-white italic mb-2">No active challenges</h3>
+                  <p className="text-zinc-500 text-sm mb-8">Pick a challenge to start your daily practice routine.</p>
+                  <button 
+                    onClick={() => setActiveTab('PROGRESS')}
+                    className="px-8 py-3 bg-main text-black rounded-lg font-bold text-[10px] tracking-wide hover:scale-105 transition-transform"
+                  >
+                    Browse Catalog
+                  </button>
+                </div>
+              )}
 
-        <ChallengeMap 
-          challengesByCategory={challengesByCategory}
-          userSkills={userSkills}
-          completedChallenges={completedChallenges}
-          activeChallenges={activeChallenges}
-          onPractice={onPractice}
-          onAdd={onAdd}
-          onStart={onStartNew}
-          onReset={handleReset}
-        />
+              {/* Quick Recommendations even if has active ones, or only if few? */}
+              <ChallengeMap 
+                challengesByCategory={challengesByCategory}
+                userSkills={userSkills}
+                completedChallenges={completedChallenges}
+                activeChallenges={activeChallenges}
+                onPractice={onPractice}
+                onAdd={onAdd}
+                onStart={onStartNew}
+                onReset={handleReset}
+                isExpanded={false}
+              />
+            </div>
+          )}
+
+          {activeTab === 'PROGRESS' && (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <ChallengeRPGMap 
+                challengesByCategory={challengesByCategory}
+                completedChallenges={completedChallenges}
+                activeChallenges={activeChallenges}
+                userSkills={userSkills?.unlockedSkills}
+                onPractice={onPractice}
+                onAdd={onAdd}
+                onStart={onStartNew}
+              />
+            </div>
+          )}
+
+        </div>
       </div>
     </MainContainer>
   );
 };
+

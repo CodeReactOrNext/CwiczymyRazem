@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Challenge } from "../../../backend/domain/models/Challenge";
 import { ChallengeCard } from "./ChallengeCard";
 import { cn } from "assets/lib/utils";
+import { Trophy, Lock } from "lucide-react";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
 
 interface ChallengeMapProps {
   challengesByCategory: Record<string, Record<string, Challenge[]>>;
@@ -11,6 +14,7 @@ interface ChallengeMapProps {
   onAdd: (c: Challenge) => void;
   onStart: (c: Challenge) => void;
   onReset?: (challengeId: string) => void;
+  isExpanded?: boolean;
 }
 
 export const ChallengeMap = ({
@@ -21,14 +25,11 @@ export const ChallengeMap = ({
   onPractice,
   onAdd,
   onStart,
-  onReset
+  onReset,
+  isExpanded = true
 }: ChallengeMapProps) => {
   const formatSkillName = (skillId: string) => {
     return skillId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  };
-
-  const sortedSkills = (categoryDict: Record<string, Challenge[]>) => {
-    return Object.entries(categoryDict).sort((a, b) => b[1].length - a[1].length);
   };
 
   const getSortedChallengesInSkill = (challenges: Challenge[]) => {
@@ -43,56 +44,120 @@ export const ChallengeMap = ({
         sorted.push(next);
         visited.add(next.id);
       } else {
-        sorted.push(...remaining.splice(0));
+        const next = remaining.splice(0, 1)[0];
+        sorted.push(next);
+        visited.add(next.id);
       }
     }
     return sorted;
   };
 
+  const categories = Object.keys(challengesByCategory);
+
+  const allAvailableChallenges = Object.values(challengesByCategory)
+    .flatMap(skills => Object.values(skills))
+    .flat()
+    .filter(c => {
+      const currentLevel = userSkills?.unlockedSkills[c.requiredSkillId] || 0;
+      const isDependencyMet = !c.dependsOn || completedChallenges.includes(c.dependsOn);
+      const isUnlocked = currentLevel >= c.requiredLevel && isDependencyMet;
+      const isAlreadyCompleted = completedChallenges.includes(c.id);
+      const isActive = activeChallenges.some(ac => ac.challengeId === c.id);
+      return isUnlocked && !isAlreadyCompleted && !isActive;
+    })
+    .slice(0, 3);
+
+  if (!isExpanded) {
+    return (
+      <div className="space-y-8 relative">
+        <div className="flex flex-col gap-1 mb-6 px-4">
+            <h2 className="text-xl font-black text-white italic tracking-wide flex items-center gap-2">
+              <Trophy className="text-main" size={18} />
+              Recommended 
+            </h2>
+            <p className="text-zinc-500 text-xs font-bold tracking-wide">Ready to start immediately</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+          {allAvailableChallenges.map(challenge => (
+             <ChallengeCard
+                key={challenge.id}
+                challenge={challenge as any}
+                isUnlocked={true}
+                currentLevel={userSkills?.unlockedSkills[challenge.requiredSkillId] || 0}
+                onPractice={onPractice}
+                onAdd={onAdd}
+                onStart={onStart}
+                hasActiveChallenge={activeChallenges.length >= 3}
+                isActive={false}
+                isTodayDone={false}
+                isDependencyMet={true}
+                isCompleted={false}
+                onReset={onReset}
+              />
+          ))}
+          {allAvailableChallenges.length === 0 && (
+            <div className="col-span-full h-40 rounded-lg bg-zinc-900/50 flex flex-col items-center justify-center gap-3">
+                <Lock className="text-zinc-800" size={32} />
+                <span className="text-zinc-600 text-[10px] font-bold tracking-wide">All current paths mastered</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-16">
+    <div className="space-y-32">
+      {/* Category Navigation (Sticky) */}
+      <div className="sticky top-6 z-30 bg-zinc-900 p-1 flex items-center gap-1 max-w-fit mx-auto shadow-2xl rounded-lg">
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => document.getElementById(`category-${cat}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="px-6 py-2 rounded-lg text-[10px] font-bold tracking-wide text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all"
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       {Object.entries(challengesByCategory).map(([category, skills]) => (
-        <div key={category} className="relative">
-          <div className="flex items-baseline gap-4 mb-8">
-            <h2 className="text-3xl font-black text-white uppercase tracking-tighter opacity-20">
+        <div key={category} id={`category-${category}`} className="relative scroll-mt-24 space-y-16">
+          <div className="flex flex-col gap-2">
+            <h2 className="text-4xl font-black text-white italic tracking-tight">
               {category}
             </h2>
-            <div className="h-[2px] flex-1 bg-gradient-to-r from-white/10 to-transparent" />
+            <div className="h-1 w-12 bg-main" />
           </div>
 
-          <div className="absolute inset-0 top-16 -z-10 opacity-[0.03] pointer-events-none" 
-               style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-
-          <div className="grid grid-cols-1 gap-12">
-            {sortedSkills(skills).map(([skillId, unsortedChallenges]) => {
+          <div className="grid grid-cols-1 gap-24">
+            {Object.entries(skills).map(([skillId, unsortedChallenges]) => {
               const sorted = getSortedChallengesInSkill(unsortedChallenges);
-              
+              const skillData = guitarSkills.find(s => s.id === skillId);
+              const SkillIcon = skillData?.icon;
+
               return (
-                <div key={skillId} className="relative pl-12">
-                  <div className="absolute left-6 top-[-24px] bottom-0 w-[2px] bg-gradient-to-b from-zinc-800 to-transparent" />
-                  <div className="absolute left-5 top-4 w-4 h-4 rounded-full bg-zinc-800 flex items-center justify-center">
-                     <div className="w-1.5 h-1.5 rounded-full bg-zinc-700" />
-                  </div>
-
-                  <div className="mb-4 flex items-center gap-4">
-                    <div className="px-3 py-1 rounded bg-zinc-800 relative">
-                       <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">
-                         {formatSkillName(skillId)}
-                       </h3>
+                <div key={skillId} className="space-y-10 group/skill">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-zinc-900 flex items-center justify-center text-main">
+                       {SkillIcon ? <SkillIcon size={20} /> : <Trophy size={20} />}
                     </div>
-                    <div className="h-[1px] flex-1 bg-zinc-900" />
+                    <div className="flex flex-col">
+                      <h3 className="text-base font-black text-white italic tracking-wide leading-none mb-1">
+                        {formatSkillName(skillId)}
+                      </h3>
+                      <span className="text-[9px] font-bold text-zinc-600 tracking-wide leading-none">
+                        Path Progression
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="relative flex flex-col md:flex-row gap-8 overflow-x-auto pb-8 scrollbar-hide snap-x px-4">
-                    {sorted.map((challenge, index) => {
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {sorted.map((challenge) => {
                       const currentLevel = userSkills?.unlockedSkills[challenge.requiredSkillId] || 0;
-                      let isDependencyMet = true;
                       const isAlreadyCompleted = completedChallenges.includes(challenge.id);
-
-                      if (challenge.dependsOn && !completedChallenges.includes(challenge.dependsOn)) {
-                        isDependencyMet = false;
-                      }
-
+                      const isDependencyMet = !challenge.dependsOn || completedChallenges.includes(challenge.dependsOn);
                       const isUnlocked = currentLevel >= challenge.requiredLevel && isDependencyMet;
                       const activeChallenge = activeChallenges.find(ac => ac.challengeId === challenge.id);
                       const isActive = !!activeChallenge;
@@ -100,24 +165,7 @@ export const ChallengeMap = ({
                       const isTodayDone = activeChallenge?.lastCompletedDate === today;
 
                       return (
-                        <div key={challenge.id} className="min-w-[260px] max-w-[300px] flex-1 snap-start relative group">
-                          {index < sorted.length - 1 && (
-                            <div className="hidden md:flex absolute top-12 -right-8 w-8 items-center justify-center z-0">
-                              <div className={cn(
-                                "h-[2px] w-full transition-all duration-700",
-                                isUnlocked 
-                                  ? (isAlreadyCompleted ? "bg-main/40" : "bg-main shadow-[0_0_8px_rgba(var(--main-rgb),0.4)]") 
-                                  : "bg-zinc-800"
-                              )} />
-                              {!isAlreadyCompleted && isUnlocked && (
-                                <div className="absolute w-2 h-2 rounded-full bg-main animate-ping opacity-20" />
-                              )}
-                              <div className={cn(
-                                "absolute w-2 h-2 rounded-full transition-all duration-500",
-                                isUnlocked ? "bg-main" : "bg-zinc-800"
-                              )} />
-                            </div>
-                          )}
+                        <div key={challenge.id} className="relative h-full">
                           <ChallengeCard
                             challenge={challenge as any}
                             isUnlocked={isUnlocked}
@@ -145,3 +193,4 @@ export const ChallengeMap = ({
     </div>
   );
 };
+

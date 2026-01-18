@@ -1,7 +1,9 @@
 import { Button } from "assets/components/ui/button";
+import { Badge } from "assets/components/ui/badge";
 import { cn } from "assets/lib/utils";
 import { Challenge } from "../../../backend/domain/models/Challenge";
-import { Lock, Calendar, CheckCircle2, Play, Plus, Target, Award, ShieldAlert, Sparkles, Flame } from "lucide-react";
+import { Lock, Calendar, CheckCircle2, Play, Plus, Target, Award, ShieldAlert, Sparkles, Flame, Trophy } from "lucide-react";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 
 interface ChallengeCardProps {
@@ -40,79 +42,94 @@ export const ChallengeCard = ({
   const skillData = guitarSkills.find(s => s.id === challenge.requiredSkillId);
   const SkillIcon = skillData?.icon;
 
+  const getBenefit = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'technique': return 'Precision & Speed';
+      case 'theory': return 'Concept Mastery';
+      case 'hearing': return 'Ear-to-Hand';
+      case 'creativity': return 'Melodic Flow';
+      default: return 'Core Skill';
+    }
+  };
+
+  const tierMap: Record<string, 'S' | 'A' | 'B' | 'C' | 'D'> = {
+    extreme: 'S',
+    high: 'A',
+    medium: 'B',
+    low: 'C',
+  };
+
+  const tier = getSongTier(tierMap[challenge.intensity] || 'D');
+
   return (
     <div
       className={cn(
-        "relative flex flex-col h-full rounded-lg transition-all group overflow-hidden",
+        "relative flex flex-col h-full rounded-lg transition-all group overflow-hidden bg-zinc-900",
         isCompleted
-          ? "bg-zinc-900/50"
-          : isUnlocked 
-            ? "bg-zinc-900 shadow-xl shadow-black/20"
-            : "bg-zinc-900/30 grayscale-[0.5]"
+          ? "opacity-60 bg-zinc-950"
+          : isActive
+            ? "ring-2 ring-main shadow-[0_0_20px_rgba(var(--main-rgb),0.1)]"
+            : isUnlocked 
+              ? "hover:bg-zinc-800/80 shadow-xl"
+              : "opacity-40 grayscale-[0.8]"
       )}
     >
-      {isUnlocked && !isCompleted && (
-        <div className={cn(
-            "absolute left-0 top-0 bottom-0 w-[2px] transition-all",
-            isActive ? "bg-main shadow-[0_0_8px_rgba(var(--main-rgb),0.5)]" : "bg-zinc-700"
-        )} />
+      {isActive && (
+        <div className="absolute top-0 right-0 p-3">
+            <Sparkles size={14} className="text-main" />
+        </div>
       )}
 
       {isCompleted && (
         <div className="absolute top-3 right-3">
-            <CheckCircle2 size={16} className="text-main/60" />
+            <CheckCircle2 size={14} className="text-main/40" />
         </div>
       )}
       
-      <div className="flex flex-col h-full p-5">
+      <div className="flex flex-col h-full p-6">
         <div className="flex items-center justify-between mb-4">
             {!isUnlocked ? (
-              <div className="flex items-center gap-1.5 text-red-400/80">
-                  <Lock size={12} />
-                  <span className="text-[10px] font-bold uppercase tracking-tight">Locked</span>
+              <div className="flex items-center gap-1 text-[10px] font-bold tracking-wide text-zinc-600">
+                  <Lock size={10} />
+                  <span>Locked</span>
               </div>
+            ) : isActive ? (
+                <div className="flex items-center gap-1.5 text-main text-[10px] font-bold tracking-wide">
+                    <Flame size={12} className="fill-main" />
+                    Focus
+                </div>
             ) : (
-                <div className="flex items-center gap-1.5 text-zinc-500 text-[10px] font-bold uppercase tracking-tight">
-                    <Calendar size={12} className="opacity-70" />
-                    {challenge.streakDays} Days
+                <div className="flex items-center gap-1 text-[10px] font-bold tracking-wide text-zinc-500">
+                    <Calendar size={12} className="opacity-50" />
+                    {challenge.streakDays}d
                 </div>
             )}
 
-            <div className="flex items-center gap-0.5 ml-auto mr-3">
-              {[...Array(4)].map((_, i) => {
-                const levels: Record<string, number> = { low: 1, medium: 2, high: 3, extreme: 4 };
-                const challengeLevel = levels[challenge.intensity] || 1;
-                const isActive = i < challengeLevel;
-                return (
-                  <Flame 
-                    key={i} 
-                    size={11}
-                    className={cn(
-                      "transition-colors",
-                      isActive 
-                        ? (challenge.intensity === 'extreme' ? "text-red-500 fill-red-500" : "text-main fill-main") 
-                        : "text-zinc-800"
-                    )} 
-                  />
-                );
-              })}
-            </div>
-
-            {isCompleted && (
-               <span className="text-[9px] font-black text-main/50 uppercase">Mastered</span>
-            )}
+            <Badge 
+              variant="outline"
+              className="font-black text-[9px] border-none px-2"
+              style={{
+                backgroundColor: `${tier.color}15`,
+                color: tier.color,
+              }}
+            >
+              Tier {tier.tier}
+            </Badge>
         </div>
 
-        <div className="mb-5">
+        <div className="mb-6">
           <h3 className={cn(
-            "font-black text-white leading-tight mb-1.5",
-            isUnlocked ? "text-[17px]" : "text-base opacity-40"
+            "font-black text-white leading-tight mb-1",
+            isUnlocked ? "text-lg" : "text-base"
           )}>
             {challenge.title}
           </h3>
+          <p className="text-main text-[10px] font-bold tracking-wide mb-3 leading-none italic">
+            {getBenefit(challenge.category)}
+          </p>
           <p className={cn(
-            "text-[12px] leading-normal line-clamp-2 italic",
-            isUnlocked ? "text-zinc-500" : "text-zinc-600 opacity-30"
+            "text-[12px] leading-relaxed line-clamp-3",
+            isUnlocked ? "text-zinc-500 font-medium" : "text-zinc-600"
           )}>
             {challenge.description}
           </p>
@@ -120,123 +137,87 @@ export const ChallengeCard = ({
 
         <div className="mt-auto space-y-4">
           {!isUnlocked ? (
-            <div className="p-3 rounded bg-red-400/5 border border-red-400/10 space-y-2">
-                <div className="flex items-center gap-2 text-[10px]">
-                    <ShieldAlert size={12} className="text-red-400/60" />
-                    <span className="text-zinc-400 uppercase font-black">Requirements</span>
-                </div>
-                <div className="space-y-1">
-                    <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-zinc-500 uppercase font-bold">{formatSkillName(challenge.requiredSkillId)}</span>
-                        <span className={cn(
-                            "font-black",
-                            currentLevel >= challenge.requiredLevel ? "text-emerald-500" : "text-red-400"
-                        )}>
-                            Lvl {challenge.requiredLevel}
-                        </span>
+            <div className="p-4 rounded-lg bg-zinc-950/30">
+                <div className="flex items-center justify-between text-[11px]">
+                    <div className="flex items-center gap-1.5 text-zinc-600 font-bold tracking-tight">
+                        <Lock size={12} />
+                        <span>{formatSkillName(challenge.requiredSkillId)}</span>
                     </div>
-                    {challenge.dependsOn && (
-                         <div className="flex items-center justify-between text-[10px]">
-                            <span className="text-zinc-500 uppercase font-bold">Previous Step</span>
-                            <span className={cn(
-                                "font-black",
-                                isDependencyMet ? "text-emerald-500" : "text-red-400"
-                            )}>
-                                {isDependencyMet ? "Done" : "Required"}
-                            </span>
-                        </div>
-                    )}
+                    <span className={cn(
+                        "font-black px-2 py-0.5 rounded bg-zinc-900",
+                        currentLevel >= challenge.requiredLevel ? "text-emerald-500" : "text-red-400"
+                    )}>
+                        Lvl {challenge.requiredLevel}
+                    </span>
                 </div>
             </div>
           ) : (
             <>
-              <div className="space-y-3">
-                  <div className="flex items-center gap-2.5 text-[11px]">
-                      <Target size={14} className="text-zinc-600 shrink-0" />
-                      <div className="flex flex-col">
-                        <span className="text-zinc-500 text-[9px] font-bold uppercase leading-none mb-0.5">Objective</span>
-                        <span className="text-zinc-300 font-medium leading-tight">{challenge.shortGoal}</span>
-                      </div>
+              {/* Reward Section */}
+              <div className="p-4 rounded-lg bg-zinc-950/50 flex flex-col gap-3">
+                <div className="flex items-center justify-between pb-1">
+                   <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-600 tracking-wide uppercase">
+                      <Award size={12} className="text-amber-500/50" />
+                      <span>Unlock Reward</span>
+                   </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-xs font-medium text-zinc-300 truncate">{challenge.rewardDescription || "Performance Mastery"}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-white/5 px-2 py-0.5 rounded text-[9px] font-black text-white">
+                        <Sparkles size={10} className="text-amber-400" />
+                        <span>XP</span>
+                    </div>
                   </div>
-
-                  <div className="relative p-3 rounded-lg bg-zinc-950 border border-white/5 overflow-hidden group/reward">
-                      <div className="absolute top-0 right-0 p-2 opacity-5">
-                         {SkillIcon && <SkillIcon className="w-12 h-12" />}
+                  {challenge.rewardSkillId && (
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
+                        <span className="text-[10px] font-bold text-zinc-500">
+                          {formatSkillName(challenge.rewardSkillId)}
+                        </span>
                       </div>
-                      
-                      <div className="relative flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-main/10 flex items-center justify-center text-main">
-                             <Award size={20} />
-                          </div>
-                          <div className="flex flex-col">
-                              <span className="text-zinc-500 text-[9px] font-black uppercase leading-none mb-1 flex items-center gap-1">
-                                Reward
-                              </span>
-                              <div className="flex flex-col">
-                                  <span className="text-white text-[12px] font-bold leading-tight uppercase italic">{challenge.rewardDescription} XP</span>
-                                  {challenge.rewardSkillId && (
-                                    <div className="flex items-center gap-1.5 mt-0.5">
-                                      {SkillIcon && <SkillIcon className="w-3 h-3 text-main" />}
-                                      <span className="text-main text-[11px] font-black leading-none">
-                                        +{challenge.rewardLevel} pts
-                                      </span>
-                                      <span className="text-zinc-500 text-[9px] font-bold uppercase">
-                                        {formatSkillName(challenge.rewardSkillId)}
-                                      </span>
-                                    </div>
-                                  )}
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+                      <span className="text-[10px] font-black text-emerald-400">+{challenge.rewardLevel}pts</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-2">
                   {isActive ? (
                       <Button
                           size="sm"
                           onClick={() => onPractice(challenge)}
                           disabled={isTodayDone}
-                          className="flex-1 h-10 font-black uppercase tracking-wider text-[11px]"
-                          variant={isTodayDone ? "secondary" : "default"}
-                      >
-                          {isTodayDone ? (
-                              <span className="flex items-center gap-2">Done <CheckCircle2 size={14} /></span>
-                          ) : (
-                              <span className="flex items-center gap-2">Practice <Play size={14} fill="currentColor" /></span>
+                          className={cn(
+                            "flex-1 h-10 font-bold tracking-wide text-[10px] rounded-lg",
+                            isTodayDone ? "bg-zinc-800 text-zinc-500" : "bg-main text-black"
                           )}
+                      >
+                          {isTodayDone ? "Daily Goal Done" : "Continue"}
                       </Button>
                   ) : isCompleted ? (
                       <Button 
                           onClick={() => onReset?.(challenge.id)}
                           size="sm" 
-                          variant="secondary" 
-                          className="w-full h-10 font-black uppercase text-[11px] group/redo hover:bg-main hover:text-black transition-all"
+                          className="w-full h-10 font-bold text-[10px] tracking-wide bg-zinc-800 text-zinc-400 hover:text-white rounded-lg"
                       >
-                          <span className="flex items-center gap-2">Redo Challenge <Plus size={14} className="group-hover/redo:rotate-90 transition-transform" /></span>
+                          Mastered (Redo)
                       </Button>
                   ) : hasActiveChallenge ? (
-                      <div className="w-full h-10 flex items-center justify-center rounded bg-zinc-800/30">
-                          <span className="text-[11px] font-bold text-zinc-600 uppercase tracking-tight">Limit (3/3) Active</span>
+                      <div className="w-full h-10 flex items-center justify-center rounded-lg bg-zinc-950">
+                          <span className="text-[10px] font-bold text-zinc-700 tracking-wide">Focus Limit</span>
                       </div>
                   ) : (
-                      <>
-                          <Button
-                              size="sm"
-                              onClick={() => onAdd(challenge)}
-                              variant="secondary"
-                              className="flex-1 h-10 font-black uppercase text-[11px]"
-                          >
-                              Add
-                          </Button>
-                          <Button
-                              size="sm"
-                              onClick={() => onStart(challenge)}
-                              className="flex-1 h-10 font-black uppercase text-[11px]"
-                          >
-                              Start
-                          </Button>
-                      </>
+                      <Button
+                          size="sm"
+                          onClick={() => onStart(challenge)}
+                          className="w-full h-10 font-bold tracking-wide text-[10px] bg-white text-black hover:bg-main rounded-lg"
+                      >
+                          Start Challenge
+                      </Button>
                   )}
               </div>
             </>
@@ -246,3 +227,4 @@ export const ChallengeCard = ({
     </div>
   );
 };
+
