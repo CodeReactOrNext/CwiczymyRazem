@@ -35,7 +35,7 @@ export const Footer = () => {
                 
                 <div className='flex items-center gap-6 ml-auto sm:ml-0'>
                   <Link 
-                    href='https://discord.gg/phQutKwK' 
+                    href='https://discord.gg/6yJmsZW2Ne' 
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-zinc-600 hover:text-white transition-colors'
