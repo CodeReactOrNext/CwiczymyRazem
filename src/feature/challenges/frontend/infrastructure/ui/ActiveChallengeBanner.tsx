@@ -1,4 +1,4 @@
-import { Trophy, CheckCircle2, Play, XCircle } from "lucide-react";
+import { Trophy, CheckCircle2, Play, XCircle, Award } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { ActiveChallenge, Challenge } from "../../../backend/domain/models/Challenge";
 import { Button } from "assets/components/ui/button";
@@ -24,82 +24,100 @@ export const ActiveChallengeBanner = ({
   const SkillIcon = skillData?.icon;
 
   return (
-    <div className="mb-4 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden">
-      <div className="p-3 sm:p-4 flex flex-col gap-4">
-        <div className="flex items-start gap-3">
-          <div className="relative shrink-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-zinc-950 rounded-lg flex items-center justify-center text-main">
-              {SkillIcon ? <SkillIcon size={18} /> : <Trophy size={18} />}
+    <div className="mb-10 rounded-lg bg-zinc-900 border border-white/5 overflow-hidden relative">
+      <div className="p-5 sm:p-6 flex flex-col gap-6 relative z-10">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 bg-zinc-950 rounded-lg flex items-center justify-center text-main shrink-0">
+              {SkillIcon ? <SkillIcon size={28} /> : <Trophy size={28} />}
             </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded bg-main text-black flex items-center justify-center font-black text-[9px] sm:text-[10px]">
-                {activeChallenge.currentDay}
+            
+            <div className="min-w-0">
+              <h2 className="text-2xl sm:text-3xl font-black text-white italic tracking-tight mb-2 leading-none">
+                {challengeData.title}
+              </h2>
+              <div className="flex items-center gap-3">
+                <span className="text-zinc-500 text-[10px] font-bold tracking-wide">
+                  You're working on
+                </span>
+                <div className="h-1 w-1 rounded-full bg-zinc-700" />
+                <span className="text-main text-[11px] font-black italic">
+                  Day {activeChallenge.currentDay} of {activeChallenge.totalDays}
+                </span>
+              </div>
             </div>
           </div>
-          
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-zinc-500 text-[9px] font-bold uppercase tracking-tight">
-                Day {activeChallenge.currentDay} / {activeChallenge.totalDays}
-              </span>
-            </div>
-            <h3 className="text-sm sm:text-lg font-black text-white uppercase italic tracking-tight leading-tight line-clamp-1">
-              {challengeData.title}
-            </h3>
-            
-            <div className="flex flex-wrap gap-1 mt-2">
-              {Array.from({ length: activeChallenge.totalDays }).map((_, idx) => {
-                const dayNum = idx + 1;
-                const isCompleted = dayNum < activeChallenge.currentDay || (dayNum === activeChallenge.currentDay && isTodayDone);
-                const isCurrent = dayNum === activeChallenge.currentDay && !isTodayDone;
-                
-                return (
-                  <div 
-                    key={dayNum} 
-                    className={cn(
-                      "w-4 h-4 rounded-sm flex items-center justify-center text-[8px] font-bold transition-all",
-                      isCompleted 
-                        ? "bg-main text-white" 
-                        : isCurrent 
-                          ? "bg-main/20 text-main ring-1 ring-main/30" 
-                          : "bg-zinc-800 text-zinc-600"
-                    )}
-                  >
-                    {isCompleted && <CheckCircle2 size={8} strokeWidth={3} />}
-                    {!isCompleted && dayNum}
-                  </div>
-                );
-              })}
-            </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {Array.from({ length: activeChallenge.totalDays }).map((_, i) => {
+              const isDone = i < activeChallenge.currentDay;
+              const isCurrent = i === activeChallenge.currentDay && !isTodayDone;
+              return (
+                <div 
+                  key={i}
+                  className={cn(
+                    "w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all",
+                    isDone 
+                      ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.1)]" 
+                      : "bg-zinc-800 text-zinc-600"
+                  )}
+                >
+                  {i + 1}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-3 bg-zinc-950 px-4 py-3 rounded-lg border border-white/5">
+              <div className="flex flex-col">
+                <span className="text-[9px] font-bold text-zinc-600 tracking-wide leading-none mb-1">Potential Reward</span>
+                <span className="text-xs font-black text-white italic leading-none">{challengeData.rewardDescription} XP</span>
+              </div>
+              {challengeData.rewardSkillId && (
+                <div className="h-6 w-px bg-white/10 mx-1" />
+              )}
+              {challengeData.rewardSkillId && (
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-bold text-zinc-600 tracking-wide leading-none mb-1">
+                    {challengeData.rewardSkillId.split('_')[0]}
+                  </span>
+                  <span className="text-xs font-black text-emerald-400 italic leading-none">+{challengeData.rewardLevel}pts</span>
+                </div>
+              )}
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            onClick={() => !isTodayDone && onStart(challengeData)}
-            disabled={isTodayDone}
-            className={cn(
-              "flex-1 h-9 rounded-lg font-black uppercase tracking-wider text-[10px] gap-2",
-              isTodayDone ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : ""
-            )}
-            variant={isTodayDone ? "secondary" : "default"}
-          >
-            {isTodayDone ? (
-              <><CheckCircle2 size={14} /> Done</>
-            ) : (
-              <><Play size={14} fill="currentColor" /> Practice</>
-            )}
-          </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => onAbandon(activeChallenge.challengeId)}
-            className="h-9 px-3 rounded-lg text-zinc-500 hover:text-red-400 transition-colors"
-          >
-            <XCircle size={16} />
-          </Button>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/5">
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <Button
+              size="sm"
+              onClick={() => !isTodayDone && onStart(challengeData)}
+              disabled={isTodayDone}
+              className={cn(
+                "w-full sm:w-auto px-8 h-11 rounded-lg font-bold tracking-wide text-[11px] gap-2",
+                isTodayDone 
+                  ? "bg-zinc-800 text-zinc-500" 
+                  : "bg-main hover:bg-main/90 text-black"
+              )}
+            >
+              {isTodayDone ? (
+                <><CheckCircle2 size={14} /> Daily Goal Met</>
+              ) : (
+                <><Play size={14} fill="currentColor" /> Continue Challenge</>
+              )}
+            </Button>
+            
+            <button
+              onClick={() => onAbandon(activeChallenge.challengeId)}
+              className="px-4 py-2 text-zinc-600 hover:text-red-400 text-[10px] font-bold tracking-wide transition-colors"
+            >
+              Stop this challenge
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
   );
 };
+
