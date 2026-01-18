@@ -12,7 +12,7 @@ export const ChallengeHeader = ({ onBack }: ChallengeHeaderProps) => {
     <div className="flex flex-col gap-6 mb-10">
       <button 
         onClick={onBack}
-        className="group w-fit flex items-center gap-2 text-zinc-500 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+        className="group w-fit flex items-center gap-2 text-zinc-500 hover:text-white transition-all text-xs font-bold tracking-wide"
       >
         <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
         Back
@@ -20,7 +20,7 @@ export const ChallengeHeader = ({ onBack }: ChallengeHeaderProps) => {
       
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="max-w-2xl">
-          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase italic leading-none mb-2">
+          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter italic leading-none mb-2">
             Challenge <span className="text-main">Map</span>
           </h1>
           <p className="max-w-md text-sm leading-relaxed text-zinc-500">
@@ -37,8 +37,8 @@ export const ChallengeHeader = ({ onBack }: ChallengeHeaderProps) => {
                <Flame size={20} />
             </div>
             <div className="flex flex-col items-start leading-none gap-1">
-              <span className="text-[10px] uppercase tracking-wider font-black text-zinc-500">View Progress</span>
-              <span className="text-sm font-black text-white uppercase italic flex items-center gap-2">
+              <span className="text-[10px] tracking-wide font-bold text-zinc-500">View Progress</span>
+              <span className="text-sm font-black text-white italic flex items-center gap-2">
                 Your Skills <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </span>
             </div>
