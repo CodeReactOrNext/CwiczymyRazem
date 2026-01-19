@@ -33,7 +33,7 @@ export const PWASidebarItem = () => {
                     {isIOS ? (
                         <div className="space-y-2">
                             <p className="text-[10px] text-zinc-500 leading-normal">
-                                Tap Share and then 'Add to Home Screen'
+                                Use <span className="text-white font-semibold">Safari browser</span>, tap Share and then 'Add to Home Screen'
                             </p>
                             <div className="flex items-center gap-2 text-[10px] text-main font-bold">
                                 <Share size={12} />
