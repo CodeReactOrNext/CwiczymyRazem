@@ -204,5 +204,11 @@
     "title": "Cookies",
     "description": "We use cookies to ensure you get the best experience on our website and to analyze traffic.",
     "accept": "Accept"
+  },
+  "pwa": {
+    "install_title": "Install Riff Quest",
+    "install_description_android": "Add the app to your phone",
+    "install_description_ios": "Tap Share and 'Add to Home Screen'",
+    "install_button": "Download"
   }
 }
