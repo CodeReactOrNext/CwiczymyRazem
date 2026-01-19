@@ -204,5 +204,11 @@
     "title": "Pliki Cookies",
     "description": "Używamy ciasteczek, aby zapewnić Ci najlepsze wrażenia na naszej stronie i analizować ruch.",
     "accept": "Akceptuję"
+  },
+  "pwa": {
+    "install_title": "Zainstaluj Riff Quest",
+    "install_description_android": "Dodaj aplikację na swój telefon",
+    "install_description_ios": "Kliknij Udostępnij i 'Dodaj do ekranu pocz.'",
+    "install_button": "Pobierz"
   }
 }
