@@ -20,11 +20,11 @@ export const PWASidebarItem = () => {
     if (!showPrompt) return null;
 
     return (
-        <div className="mt-4 px-2">
+        <div className="mt-4 px-2 pb-4">
             <div className="py-2 border-t border-white/10">
                 <div className="flex items-center gap-2 px-3 py-2 text-zinc-400">
                     {isDesktop ? <Laptop size={14} /> : <Download size={14} />}
-                    <span className="text-xs font-medium uppercase tracking-wider opacity-60">
+                    <span className="text-[10px] font-bold uppercase tracking-wider opacity-60">
                         {isDesktop ? "Desktop App" : "App"}
                     </span>
                 </div>
@@ -33,19 +33,19 @@ export const PWASidebarItem = () => {
                     {isIOS ? (
                         <div className="space-y-2">
                             <p className="text-[10px] text-zinc-500 leading-normal">
-                                {t("pwa.install_description_ios")}
+                                Tap Share and then 'Add to Home Screen'
                             </p>
-                            <div className="flex items-center gap-2 text-[10px] text-cyan-500/80 font-medium">
+                            <div className="flex items-center gap-2 text-[10px] text-main font-bold">
                                 <Share size={12} />
-                                <span>Dodaj do ekranu początkowego</span>
+                                <span>Add to Home Screen</span>
                             </div>
                         </div>
                     ) : (
                         <button
                             onClick={handleInstall}
-                            className="w-full py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold transition-colors border border-white/10 text-center"
+                            className="w-full py-2 px-3 rounded-lg bg-main hover:opacity-90 text-white text-[10px] font-black uppercase tracking-tight transition-all shadow-[0_0_15px_rgba(var(--main),0.2)] text-center"
                         >
-                            {isDesktop ? "Zainstaluj na komputerze" : t("pwa.install_button")}
+                            {isDesktop ? "Install on Desktop" : "Download App"}
                         </button>
                     )}
                 </div>
