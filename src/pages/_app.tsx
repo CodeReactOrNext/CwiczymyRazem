@@ -60,7 +60,6 @@ const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
 }
 
-import { PWAInstallPrompt } from "components/PWA/PWAInstallPrompt";
 
 const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout ?? ((page) => page);
@@ -112,7 +111,6 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                      <Toaster theme='dark' position='top-right' />
                      <NextTopLoader color='#06b6d4' />
                      <div id='overlays'></div>
-                     <PWAInstallPrompt />
                      {getLayout(<Component {...pageProps} />)}
                   </main>
                </TooltipProvider>
