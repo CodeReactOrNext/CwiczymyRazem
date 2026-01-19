@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { ArrowRight, Calendar, Clock } from "lucide-react";
 import { Badge } from "assets/components/ui/badge";
 import Link from "next/link";
@@ -16,7 +15,7 @@ const articles = [
   },
   {
     title: "Science-Backed Strategies for Consistent Guitar Practice",
-    excerpt: "Master the art of building daily guitar practice habits with science-backed strategies and practical tracking techniques.",
+    excerpt: "Master the art of daily guitar practice habits with science-backed strategies and practical tracking techniques.",
     readTime: "8 min read",
     tag: "Habit Formation",
     link: "/blog/practice-habits",
@@ -61,13 +60,7 @@ export const BlogSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {articles.map((article, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-            >
+            <div key={index}>
               <Link href={article.link} className="block group h-full">
                 <Card className={`h-full flex flex-col overflow-hidden bg-zinc-900/50 border-white/5 transition-all duration-300 ${article.borderColor} hover:bg-zinc-900`}>
                   
@@ -92,7 +85,7 @@ export const BlogSection = () => {
                     </div>
 
                     <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors line-clamp-2">
-                      {article.title}
+                       {article.title}
                     </h3>
                     <p className="text-zinc-400 mb-6 flex-grow line-clamp-3 text-sm">
                       {article.excerpt}
@@ -104,7 +97,7 @@ export const BlogSection = () => {
                   </CardContent>
                 </Card>
               </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
