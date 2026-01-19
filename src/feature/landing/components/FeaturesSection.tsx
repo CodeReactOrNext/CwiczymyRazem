@@ -4,8 +4,8 @@ import { Brain, Timer, Clock, Zap, BarChart3, TrendingUp, Music2, BookOpen } fro
 import { LandingSongCard } from "./LandingSongCard";
 import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
 import { MiniTrendChart } from "feature/profile/components/MiniTrendChart";
-import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const FeaturesSection = () => {
   const skillCategories = [
@@ -106,13 +106,7 @@ export const FeaturesSection = () => {
         </div>
 
         {/* Demo Video Showcase */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative mb-24 w-[100vw] ml-[calc(50%-50vw)] sm:ml-auto sm:w-auto sm:mx-auto sm:max-w-4xl"
-        >
+        <div className="relative mb-24 w-[100vw] ml-[calc(50%-50vw)] sm:ml-auto sm:w-auto sm:mx-auto sm:max-w-4xl">
           <div className="relative rounded-none sm:rounded-2xl border-x-0 sm:border-x border-y border-white/10 bg-zinc-900/50 p-0 sm:p-2 backdrop-blur-sm overflow-hidden shadow-2xl h-[500px] sm:h-auto">
             <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-amber-500/5 pointer-events-none z-10"></div>
             
@@ -132,14 +126,14 @@ export const FeaturesSection = () => {
           
           <div className="absolute -bottom-6 -right-6 -z-10 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl"></div>
           <div className="absolute -top-6 -left-6 -z-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl"></div>
-        </motion.div>
+        </div>
 
         <div className="space-y-32">
-          {/* GROUP 4: PROGRESSION FLOW */}
+          {/* GROUP 4: PROGRESSION FLOW -> BENEFITS */}
           <div className="relative pb-20">
              <div className="text-center mb-16">
-               <h3 className="text-2xl font-bold text-white mb-2">Your Guitar Learning System</h3>
-               <p className="text-zinc-400">A gamified guitar practice planner that keeps you motivated every single day.</p>
+               <h3 className="text-2xl font-bold text-white mb-2">Build your guitar practice routine</h3>
+               <p className="text-zinc-400">Everything you need to stay consistent and see your progress as a guitarist.</p>
             </div>
 
             <div className='relative'>
@@ -159,43 +153,42 @@ export const FeaturesSection = () => {
                  `}} />
 
                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
-                    {/* Step 1: Practice */}
-                    <div className="relative group">
+                    {/* Item 1: Track your practice */}
+                    <div className="relative group text-center">
                        <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-900/20 group-hover:border-cyan-500/30 transition-all duration-300">
-                           <BookOpen className="w-8 h-8 text-cyan-400" />
+                           <Clock className="w-8 h-8 text-cyan-400" />
                        </div>
-                       <h4 className="text-lg font-bold text-white mb-2">1. Practice</h4>
-                       <p className="text-sm text-zinc-400 px-4">Creating your own <span className="text-cyan-400">Custom Plans</span> or choosing from our library of exercises.</p>
+                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Track your practice</h4>
+                       <p className="text-sm text-zinc-400 px-4">Log practice time and sessions automatically to build awareness and consistency.</p>
                     </div>
 
-                    {/* Step 2: Points */}
-                    <div className="relative group">
+                    {/* Item 2: Develop your skills */}
+                    <div className="relative group text-center">
                        <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-900/20 group-hover:border-amber-500/30 transition-all duration-300">
                            <Zap className="w-8 h-8 text-amber-400" />
                        </div>
-                       <h4 className="text-lg font-bold text-white mb-2">2. Earn Points</h4>
-                       <p className="text-sm text-zinc-400 px-4">Every minute of practice rewards you with XP, tracking your dedication.</p>
+                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Develop your skills</h4>
+                       <p className="text-sm text-zinc-400 px-4">Earn skill points and see how your abilities grow over time.</p>
                     </div>
 
-                    {/* Step 3: Level Up */}
-                    <div className="relative group">
+                    {/* Item 3: Track song difficulty */}
+                    <div className="relative group text-center">
                        <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-900/20 group-hover:border-purple-500/30 transition-all duration-300">
-                           <TrendingUp className="w-8 h-8 text-purple-400" />
+                           <Music2 className="w-8 h-8 text-purple-400" />
                        </div>
-                       <h4 className="text-lg font-bold text-white mb-2">3. Level Up</h4>
-                       <p className="text-sm text-zinc-400 px-4">Unlock new ranks and watch your profile grow as you improve.</p>
+                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Track song difficulty</h4>
+                       <p className="text-sm text-zinc-400 px-4">Songs are rated by the community, so you know what’s easy, hard, and worth practicing next.</p>
                     </div>
 
-                    {/* Step 4: Compete */}
-                     <div className="relative group">
+                    {/* Item 4: See real progress */}
+                     <div className="relative group text-center">
                        <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-900/20 group-hover:border-emerald-500/30 transition-all duration-300">
                            <div className="relative">
-                             <BarChart3 className="w-8 h-8 text-emerald-400" />
-                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                             <TrendingUp className="w-8 h-8 text-emerald-400" />
                            </div>
                        </div>
-                       <h4 className="text-lg font-bold text-white mb-2">4. Compete</h4>
-                       <p className="text-sm text-zinc-400 px-4">Join <span className="text-emerald-400">Seasonal Leaderboards</span> and compare your progress with others.</p>
+                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">See real progress</h4>
+                       <p className="text-sm text-zinc-400 px-4">Clear stats and history show your improvement — not just effort.</p>
                     </div>
                  </div>
             </div>
@@ -369,6 +362,13 @@ export const FeaturesSection = () => {
                  </div>
               </div>
             </div>
+
+            {/* TASK 4: STATISTICS SECTION (SEO AKAPIT) */}
+            <div className="mt-12 max-w-4xl mx-auto text-center">
+               <p className="text-zinc-500 text-sm leading-relaxed">
+                  Riff Quest helps guitarists track their guitar practice routine over time. By visualizing daily guitar practice, skills, and focus areas, you can clearly see what you practice and how it affects your progress.
+               </p>
+            </div>
           </div>
 
           {/* GROUP 3: SONGS & PROGRESSION */}
@@ -377,8 +377,10 @@ export const FeaturesSection = () => {
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-gradient-to-b from-purple-500/5 to-amber-500/5 blur-3xl rounded-[100px] pointer-events-none -z-10 opacity-60"></div>
 
             <div className="text-center mb-16 relative z-10">
-               <h3 className="text-2xl font-bold text-white mb-2">Songs & Achievements</h3>
-               <p className="text-zinc-400">Master your favorite tracks and add them to your library.</p>
+               <h3 className="text-2xl font-bold text-white mb-2">Track song difficulty and build your repertoire</h3>
+               <p className="text-zinc-400 max-w-2xl mx-auto">
+                  Songs are rated by the community, so difficulty reflects real player experience. Track which songs you know, what level they belong to, and how your repertoire grows over time.
+               </p>
             </div>
 
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-start relative z-10'>
@@ -392,30 +394,33 @@ export const FeaturesSection = () => {
                   </div>
                   
                   <div className="h-[750px] overflow-hidden relative flex flex-col gap-4 p-4 [mask-image:linear-gradient(to_bottom,black_80%,transparent)]">
-                     <AnimatePresence mode='popLayout'>
-                        {visibleSongs.map((song) => (
-                           <motion.div
-                              key={song.id}
-                              layout
-                              initial={{ opacity: 0, x: -50, scale: 0.9 }}
-                              animate={{ opacity: 1, x: 0, scale: 1 }}
-                              exit={{ opacity: 0, x: 50, scale: 0.9 }}
-                              transition={{ duration: 0.6, ease: "easeInOut" }}
-                              className="transform"
-                           >
-                              <LandingSongCard 
-                                 song={{
-                                    id: song.id,
-                                    title: song.title,
-                                    artist: song.artist,
-                                    avgDifficulty: song.avgDifficulty,
-                                    coverUrl: song.coverUrl,
-                                    
-                                 }}
-                              />
-                           </motion.div>
-                        ))}
-                     </AnimatePresence>
+                    <AnimatePresence mode='popLayout'>
+                      {visibleSongs.map((song) => (
+                        <motion.div
+                          key={song.id}
+                          layout
+                          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -30, scale: 0.98 }}
+                          transition={{ 
+                            duration: 0.8, 
+                            ease: [0.22, 1, 0.36, 1],
+                            opacity: { duration: 0.4 }
+                          }}
+                          className="w-full"
+                        >
+                           <LandingSongCard 
+                              song={{
+                                 id: song.id,
+                                 title: song.title,
+                                 artist: song.artist,
+                                 avgDifficulty: song.avgDifficulty,
+                                 coverUrl: song.coverUrl,
+                              }}
+                           />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </div>
                </div>
 

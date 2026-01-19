@@ -5,7 +5,6 @@ import { useRouter } from "next/router";
 
 import { Button } from "assets/components/ui/button";
 import { Logo } from "components/Logo/Logo";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Zap, Calendar, Trophy, Star } from "lucide-react";
@@ -62,69 +61,57 @@ export const HeroSection = () => {
           </div>
         </nav>
 
-        <div className='max-w-2xl lg:max-w-3xl pt-32 sm:pt-40'>
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className='text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6'>
-            The ultimate <br />
-            <span className='bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent'>guitar practice tracker</span>
-          </motion.h1>
+        <div className='max-w-2xl lg:max-w-4xl pt-32 sm:pt-40'>
+          {/* Header & Description Group */}
+          <div className="space-y-4 mb-10">
+            <h1 className='text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1]'>
+              Build a daily guitar practice <br />
+              <span className='bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent italic'>routine that actually works</span>
+            </h1>
 
-          {/* Subheadline */}
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className='text-lg sm:text-xl text-zinc-400 leading-relaxed mb-10 max-w-xl'>
-            The intelligent guitar practice app for guitarists. Build your guitar practice routine, track time by skill, and visualize your progress with detailed analytics.
-          </motion.p>
+            <div className="max-w-2xl space-y-3">
+              <h2 className='text-lg sm:text-xl font-bold text-zinc-200 leading-snug'>
+                Track your practice, skills, and song difficulty — and stay motivated without rigid plans or pressure.
+              </h2>
+              <p className='text-base text-zinc-500 leading-relaxed font-semibold'>
+                A free guitar practice app for guitarists who struggle with motivation and visible progress.
+              </p>
+            </div>
+          </div>
 
-          {/* Stats preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-            className='flex flex-wrap items-center gap-4 sm:gap-6 mb-10'
-          >
-            <div className='flex items-center gap-2'>
-              <Star className='w-5 h-5 text-amber-400' />
-              <span className='text-white font-semibold'>2934</span>
-              <span className='text-zinc-500 text-sm'>points</span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <Zap className='w-5 h-5 text-cyan-400' />
-              <span className='text-white font-semibold'>2693h</span>
-              <span className='text-zinc-500 text-sm'>practiced</span>
-            </div>
-            <div className='flex items-center gap-1.5'>
-              <div className="flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2 shadow-sm backdrop-blur-sm transition-all duration-500 text-emerald-400">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white">
-                    <Check className="w-3 h-3" />
-                </div>
-                <span className='text-[10px] font-bold uppercase tracking-wider'>
-                  Goal met
-                </span>
+          {/* Featured Stat & Streak */}
+          <div className='flex flex-wrap items-center gap-12 mb-12'>
+            {/* Prominent Stat */}
+            <div className='flex items-center gap-4 group cursor-default'>
+              <div className="relative">
+                <div className="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full" />
+                <Zap className='w-8 h-8 text-cyan-400 relative z-10' />
               </div>
-              
-              <div className='flex h-10 items-center gap-3 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm'>
-                <div className="flex items-center gap-1.5 shrink-0 px-1">
-                    <FaFire className="text-xl text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
-                    <span className="text-sm font-black text-white">1</span>
+              <div className="flex flex-col">
+                <span className='text-white font-black text-3xl leading-none tracking-tight'>10,000h+</span>
+                <span className='text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em] mt-2'>Practice Hours Logged</span>
+              </div>
+            </div>
+
+            {/* Streak Counter */}
+            <div className='flex items-center gap-4'>
+              <div className='flex h-12 items-center gap-3 rounded-2xl bg-zinc-900/30 px-4 shadow-sm backdrop-blur-md border border-white/5'>
+                <div className="flex items-center gap-2 shrink-0">
+                    <FaFire className="text-xl text-orange-500" />
+                    <span className="text-base font-black text-white">12</span>
                 </div>
-                <div className='flex items-center gap-1 border-l border-white/5 pl-2'>
+                <div className='flex items-center gap-1.5 border-l border-white/10 pl-3'>
                     {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => {
-                        const isActive = index === 0;
+                        const activeDays = [0, 1, 3, 4, 5, 6];
+                        const isActive = activeDays.includes(index);
                         return (
                             <div
                                 key={index}
                                 className={cn(
-                                    "flex h-5 w-5 items-center justify-center rounded-[4px] text-[9px] font-bold transition-all duration-300",
+                                    "flex h-6 w-6 items-center justify-center rounded-md text-[9px] font-black transition-all duration-300",
                                     isActive
-                                        ? "bg-white text-zinc-900 shadow-[0_0_10px_rgba(255,255,255,0.2)]"
-                                        : "bg-zinc-800 text-zinc-600"
+                                        ? "bg-white text-zinc-900"
+                                        : "bg-zinc-800/40 text-zinc-700"
                                 )}
                             >
                                 {day}
@@ -134,19 +121,15 @@ export const HeroSection = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className='flex flex-wrap gap-4 items-center'>
-            
+          {/* Action Group */}
+          <div className='flex flex-col gap-6'>
             {isLoggedIn ? (
               <Button
                 onClick={handleGoToDashboard}
                 disabled={isDashboardLoading}
-                className='h-12 px-10 bg-white text-black hover:bg-zinc-200 font-semibold text-base transition-all w-full sm:w-auto shadow-lg shadow-white/5'
+                className='h-12 px-8 bg-white text-black hover:bg-zinc-200 font-black text-base transition-all w-full sm:w-56 shadow-xl shadow-white/5 whitespace-nowrap'
               >
                 {isDashboardLoading ? (
                   <>
@@ -159,58 +142,51 @@ export const HeroSection = () => {
                 )}
               </Button>
             ) : (
-              <>
-                <div className="flex flex-col items-center gap-3 w-full sm:w-auto">
-                    <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-start">
-                        <Link href='/signup' className='w-full sm:w-auto'>
-                        <Button className='h-12 px-10 bg-white text-black hover:bg-zinc-200 font-semibold text-base transition-all w-full sm:w-auto shadow-lg shadow-white/5'>
-                            Join Now
-                        </Button>
-                        </Link>
-                        <Button
-                            onClick={handleGoogleLogin}
-                            disabled={isGoogleFetching}
-                            variant="outline"
-                            className="h-12 px-8 border-white/10 bg-white/5 text-white hover:bg-white/10 font-semibold text-base transition-all w-full sm:w-auto flex items-center gap-2"
-                        >
-                            {isGoogleFetching ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                            <FcGoogle className="h-5 w-5" />
-                            )}
-                            Google
-                        </Button>
-                    </div>
-                    
-                    <div className="flex flex-col items-center sm:items-start gap-1 mt-1">
-                        <p className="text-zinc-500 text-sm">
-                            Already have an account?{" "}
-                            <Link href="/login" className="text-zinc-300 hover:text-cyan-400 font-bold transition-colors">
-                                Sign in
-                            </Link>
-                        </p>
-
-                        <Link href="/guitar-practice-builder" className="mt-4 flex items-center gap-2 group/gen">
-                            <span className="text-cyan-400/80 group-hover/gen:text-cyan-400 text-sm font-semibold transition-colors">
-                                Generate Custom Practice Plan
-                            </span>
-                            <Sparkles className="w-4 h-4 text-cyan-400/60 group-hover/gen:text-cyan-400 group-hover/gen:rotate-12 transition-all" />
-                        </Link>
-                        
-                        {!isLoggedIn && (
-                           <Link href='#features' className="mt-2 group">
-                            <span className='text-zinc-600 group-hover:text-zinc-400 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer flex items-center gap-2'>
-                              <div className="h-px w-8 bg-zinc-800 group-hover:bg-cyan-500/50 transition-colors" />
-                              Learn how it works
-                              <div className="h-px w-8 bg-zinc-800 group-hover:bg-cyan-500/50 transition-colors" />
-                            </span>
-                          </Link>
-                        )}
-                    </div>
+              <div className="space-y-6">
+                {/* Primary Buttons Row */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                  <Link href='/signup' className='flex-1 sm:flex-none'>
+                    <Button className='h-14 px-10 bg-cyan-500 text-black hover:bg-cyan-400 font-black text-lg transition-all w-full sm:w-auto shadow-lg shadow-cyan-500/10 border-none rounded-xl whitespace-nowrap'>
+                      Start practicing for free
+                    </Button>
+                  </Link>
+                  
+                  <Button
+                    onClick={handleGoogleLogin}
+                    disabled={isGoogleFetching}
+                    variant="outline"
+                    className="h-14 px-8 border-white/10 bg-white/5 text-white hover:bg-white/10 font-bold text-base transition-all rounded-xl flex items-center justify-center gap-3 sm:w-64 whitespace-nowrap"
+                  >
+                    {isGoogleFetching ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <FcGoogle className="h-5 w-5" />
+                    )}
+                    Sign in with Google
+                  </Button>
                 </div>
-              </>
+
+                {/* Secondary Info */}
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-2 text-zinc-500 text-sm font-bold">
+                      <span>Already have an account?</span>
+                      <Link href="/login" className="text-white hover:text-cyan-400 font-black transition-all">
+                        Sign in
+                      </Link>
+                    </div>
+
+                    <Link href='#features' className="group flex items-center gap-2">
+                        <span className='text-zinc-600 group-hover:text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em] transition-colors cursor-pointer flex items-center gap-2'>
+                          <div className="h-px w-4 bg-zinc-800 group-hover:bg-cyan-500/50 transition-colors" />
+                          How it works
+                        </span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
 

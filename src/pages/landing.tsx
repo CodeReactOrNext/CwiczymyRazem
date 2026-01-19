@@ -9,6 +9,7 @@ import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 
 // Import new modular components
 import { HeroSection } from "feature/landing/components/HeroSection";
+import { WhySection } from "feature/landing/components/WhySection";
 import { FeaturesSection } from "feature/landing/components/FeaturesSection";
 import { PricingSection } from "feature/landing/components/PricingSection";
 import { FaqSection } from "feature/landing/components/FaqSection";
@@ -92,7 +93,7 @@ const LandingPage: NextPage = () => {
         <script
           type='application/ld+json'
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
+             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "Riff Quest",
@@ -122,6 +123,7 @@ const LandingPage: NextPage = () => {
 
       <main className='min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30'>
         <HeroSection />
+        <WhySection />
         <FeaturesSection />
         <PricingSection />
         <FaqSection questions={faqQuestions} />
