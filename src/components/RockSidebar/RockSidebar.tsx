@@ -43,6 +43,7 @@ import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import { CommunityModal } from "./CommunityModal";
 import { Heart, MessageSquare, Zap } from "lucide-react";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
+import { PWASidebarItem } from "components/PWA/PWASidebarItem";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
@@ -441,6 +442,8 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
           <Separator className='bg-white/10' />
 
+          <PWASidebarItem />
+
           {/* Community Section */}
           <div>
             <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
@@ -792,6 +795,8 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
                     </button>
                   </div>
                 </div>
+
+                <PWASidebarItem />
               </nav>
             </motion.aside>
           </>
