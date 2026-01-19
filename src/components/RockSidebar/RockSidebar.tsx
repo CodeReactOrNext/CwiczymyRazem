@@ -442,8 +442,6 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
           <Separator className='bg-white/10' />
 
-          <PWASidebarItem />
-
           {/* Community Section */}
           <div>
             <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
@@ -481,6 +479,8 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
 
             </div>
           </div>
+
+          <PWASidebarItem />
         </nav>
       </aside>
 
