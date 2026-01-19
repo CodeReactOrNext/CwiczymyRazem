@@ -39,9 +39,17 @@ class MyDocument extends Document {
             href='favicon/favicon-16x16.png'
           />
           <link rel='manifest' href='/site.webmanifest' />
+          <meta name="application-name" content="Riff Quest" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+          <meta name="apple-mobile-web-app-title" content="Riff Quest" />
+          <meta name="format-detection" content="telephone=no" />
+          <meta name="mobile-web-app-capable" content="yes" />
+          <meta name="msapplication-TileColor" content="#0a0a0a" />
+          <meta name="msapplication-tap-highlight" content="no" />
+          <meta name="theme-color" content="#0a0a0a" />
+
           <link rel='mask-icon' href='/images/logolight.svg' color='#06b6d4' />
-          <meta name='msapplication-TileColor' content='#da532c' />
-          <meta name='theme-color' content='#ffffff' />
         </Head>
         <body>
           <Main />
