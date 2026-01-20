@@ -1,6 +1,6 @@
+import { addDoc, collection, deleteDoc, doc, getCountFromServer, getDoc, getDocs, limit, orderBy, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "utils/firebase/client/firebase.utils";
-import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, query, orderBy, addDoc, serverTimestamp, getCountFromServer, limit, where } from "firebase/firestore";
 
 const getTierFromDifficulty = (difficulty: number): string => {
   if (difficulty >= 9) return "S";

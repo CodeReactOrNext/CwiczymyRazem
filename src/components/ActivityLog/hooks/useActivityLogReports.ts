@@ -1,7 +1,7 @@
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import { useEffect, useState } from "react";
-import type { ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 
+import type { ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 import { processRawReports } from "../activityLog.utils";
 
 export const useActivityLogReports = (userAuth: string, year: number) => {

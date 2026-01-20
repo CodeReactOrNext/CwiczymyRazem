@@ -1,7 +1,7 @@
 "use client";
 
-import { Check, Zap, Star, Trophy } from "lucide-react";
 import { Button } from "assets/components/ui/button";
+import { Check, Star, Trophy,Zap } from "lucide-react";
 import Link from "next/link";
 
 export const PricingSection = () => {

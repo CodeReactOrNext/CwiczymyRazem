@@ -1,18 +1,16 @@
 // Module-level cache for cooldowns (persists across re-renders but resets on reload)
 const ratingCooldowns = new Map<string, number>();
 
-import { rateSongDifficulty } from "feature/songs/services/rateSongDifficulty";
+import { useQueryClient } from "@tanstack/react-query";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
-import { Star, Loader2 } from "lucide-react";
+import { rateSong, updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
+import { Loader2,Star } from "lucide-react";
 import { useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { useQueryClient } from "@tanstack/react-query";
-import { rateSong, updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
-import { cn } from "assets/lib/utils";
-import { useEffect } from "react";
 
 interface SongRatingInterface {
   song: Song;

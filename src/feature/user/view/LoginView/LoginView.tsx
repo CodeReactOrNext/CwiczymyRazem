@@ -1,7 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
-import Image from "next/image";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   logInViaEmail,
@@ -11,21 +10,22 @@ import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { Form, Formik } from "formik";
 import { motion } from "framer-motion";
 import {
-  Mail,
-  Lock,
-  Loader2,
+  ArrowLeft,
+  ChevronRight,
   Eye,
   EyeOff,
-  ChevronRight,
-  ArrowLeft,
+  Loader2,
+  Lock,
+  Mail,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FcGoogle } from "react-icons/fc";
+import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { firebaseSendPasswordResetEmail } from "utils/firebase/client/firebase.utils";
-import { toast } from "sonner";
 
 
 export interface logInCredentials {

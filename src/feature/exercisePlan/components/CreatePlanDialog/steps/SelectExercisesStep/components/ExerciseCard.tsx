@@ -1,9 +1,9 @@
 import { Badge } from "assets/components/ui/badge";
+import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { Check, Clock, Video,Youtube } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Check, Clock, Youtube, Video } from "lucide-react";
-import { cn } from "assets/lib/utils";
 
 interface ExerciseCardProps {
   exercise: Exercise;

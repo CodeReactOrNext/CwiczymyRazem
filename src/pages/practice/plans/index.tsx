@@ -1,9 +1,8 @@
 import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
-
-import { ReactElement } from "react";
-import type { NextPageWithLayout } from "types/page";
 import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
 
 const PlanSelectorPage: NextPageWithLayout = () => {
     const router = useRouter();

@@ -1,14 +1,12 @@
-import { CheckIcon, XIcon } from "lucide-react";
-
+import { Button } from "assets/components/ui/button";
 import {
   Widget,
   WidgetContent,
   WidgetFooter,
 } from "assets/components/ui/widget";
-import { Button } from "assets/components/ui/button";
-
 import type { WheelPickerOption } from "assets/components/wheel-picker";
 import { WheelPicker, WheelPickerWrapper } from "assets/components/wheel-picker";
+import { CheckIcon, XIcon } from "lucide-react";
 
 const createArray = (length: number, add = 0): WheelPickerOption[] =>
   Array.from({ length }, (_, i) => {

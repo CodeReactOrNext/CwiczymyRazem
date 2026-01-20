@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
+import { useEffect, useRef,useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getPointsToLvlUp } from "utils/gameLogic";
 

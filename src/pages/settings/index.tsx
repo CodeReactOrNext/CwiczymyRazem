@@ -1,11 +1,9 @@
 import SettingsView from "feature/settings/SettingsView";
-import type { NextPage } from "next";
-import { useTranslation } from "react-i18next";
 import AppLayout from "layouts/AppLayout";
-import { withAuth } from "utils/auth/serverAuth";
-
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
+import { useTranslation } from "react-i18next";
 import type { NextPageWithLayout } from "types/page";
+import { withAuth } from "utils/auth/serverAuth";
 
 const Settings: NextPageWithLayout = () => {
   const { t } = useTranslation("settings");

@@ -1,8 +1,8 @@
 import LandingView from "feature/user/view/LandingView";
-import { withAuth } from "utils/auth/serverAuth";
-import { ReactElement } from "react";
-import type { NextPageWithLayout } from "types/page";
 import AppLayout from "layouts/AppLayout";
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+import { withAuth } from "utils/auth/serverAuth";
 
 const Dashboard: NextPageWithLayout = () => {
   return <LandingView />;

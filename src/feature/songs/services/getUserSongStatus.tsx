@@ -1,5 +1,5 @@
 import type { SongStatus } from "feature/songs/types/songs.type";
-import { doc, getDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDoc } from "utils/firebase/client/firestoreTracking";
 

@@ -1,21 +1,21 @@
 import { Button, buttonVariants } from "assets/components/ui/button";
-import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
-import Link from "next/link";
-import { useTranslation } from "react-i18next";
-import { useAppDispatch } from "store/hooks";
-import { LogOut } from "lucide-react";
-import { cn } from "assets/lib/utils";
-import { useState } from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "assets/components/ui/dialog";
+import { cn } from "assets/lib/utils";
+import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
+import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppDispatch } from "store/hooks";
 
 interface UserNavProps {
   flexDirection?: "row" | "col";

@@ -1,8 +1,8 @@
-import { ReactElement } from "react";
-import AppLayout from "layouts/AppLayout";
-import { withAuth } from "utils/auth/serverAuth";
-import type { NextPageWithLayout } from "types/page";
 import { ChallengesView } from "feature/challenges/frontend/infrastructure/ui/ChallengesView";
+import AppLayout from "layouts/AppLayout";
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+import { withAuth } from "utils/auth/serverAuth";
 
 const ChallengesPage: NextPageWithLayout = () => {
   return <ChallengesView />;

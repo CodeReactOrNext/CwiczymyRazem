@@ -2,13 +2,13 @@ import MainContainer from "components/MainContainer";
 import { PageHeader } from "constants/PageHeader";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import type { ExercisePlan, LocalizedContent } from "feature/exercisePlan/types/exercise.types";
-import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
+import type { ExercisePlan, LocalizedContent } from "feature/exercisePlan/types/exercise.types";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppSelector } from "store/hooks";
 
 interface PlanSelectorProps {
   onBack: () => void;

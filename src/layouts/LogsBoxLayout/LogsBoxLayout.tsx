@@ -1,3 +1,4 @@
+import { Card } from "assets/components/ui/card";
 import type { AchievementList } from "feature/achievements/types";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type {
@@ -14,7 +15,6 @@ import { IoChatboxEllipses } from "react-icons/io5";
 
 import Chat from "../../feature/chat/Chat";
 import Logs from "./components/Logs";
-import { Card } from "assets/components/ui/card";
 
 export interface LogsBoxLayoutProps {
   logs: (

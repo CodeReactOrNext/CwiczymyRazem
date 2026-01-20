@@ -1,6 +1,6 @@
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
 import { memoryCache } from "utils/cache/memoryCache";
+import { db } from "utils/firebase/client/firebase.utils";
 
 const GENRES_CACHE_KEY = "global_genres";
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour

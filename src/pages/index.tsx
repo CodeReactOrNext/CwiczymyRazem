@@ -1,8 +1,9 @@
-import LandingPage from "./landing";
-import { NextPage } from "next";
+import type { NextPage } from "next";
 import Head from "next/head";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 import nextI18nextConfig from "../../next-i18next.config";
+import LandingPage from "./landing";
 
 const Home: NextPage = () => {
   const siteUrl = "https://riff.quest";

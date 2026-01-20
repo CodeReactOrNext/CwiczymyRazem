@@ -1,15 +1,15 @@
 import { Button } from "assets/components/ui/button";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaPlus } from "react-icons/fa";
 
 import { ExerciseFilters } from "./components/ExerciseFilters";
 import { ExerciseGrid } from "./components/ExerciseGrid";
 import { SelectedExercisesList } from "./components/SelectedExercisesList";
-import { useExerciseSelection } from "./hooks/useExerciseSelection";
 import { CreateCustomExerciseDialog } from "./CreateCustomExerciseDialog";
+import { useExerciseSelection } from "./hooks/useExerciseSelection";
 
 interface SelectExercisesStepProps {
   selectedExercises: Exercise[];

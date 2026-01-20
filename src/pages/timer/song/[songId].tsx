@@ -1,26 +1,25 @@
+import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal";
+import { updateSongStatus } from "feature/songs/services/udateSongStatus";
+import type { Song } from "feature/songs/types/songs.type";
+import { selectCurrentUserStats, selectPreviousUserStats, selectRaitingData,selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
+import { updateQuestProgress,updateUserStats } from "feature/user/store/userSlice.asyncThunk";
+import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import { doc, getDoc } from "firebase/firestore";
 import useTimer from "hooks/useTimer";
+import AppLayout from "layouts/AppLayout";
+import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import { SongTimerLayout } from "layouts/TimerLayout/SongTimerLayout";
 import { useRouter } from "next/router";
+import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch, useAppSelector } from "store/hooks";
-import { convertMsToHMS } from "utils/converter";
-import AppLayout from "layouts/AppLayout";
-import { withAuth } from "utils/auth/serverAuth";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
-import type { Song } from "feature/songs/types/songs.type";
-import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal";
 import { toast } from "sonner";
-import { selectUserAuth, selectUserAvatar, selectCurrentUserStats, selectPreviousUserStats, selectRaitingData } from "feature/user/store/userSlice";
-import { updateSongStatus } from "feature/songs/services/udateSongStatus";
-import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
-import { updateUserStats, updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
-import RatingPopUpLayout from "layouts/RatingPopUpLayout";
-import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
-
-import { ReactElement } from "react";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
+import { withAuth } from "utils/auth/serverAuth";
+import { convertMsToHMS } from "utils/converter";
+import { db } from "utils/firebase/client/firebase.utils";
 
 const SongPracticeTimer: NextPageWithLayout = () => {
     const router = useRouter();

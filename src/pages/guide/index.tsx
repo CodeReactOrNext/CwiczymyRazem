@@ -1,15 +1,15 @@
 import GuideView from "feature/guide/view/GuideView";
 import { Footer } from "feature/landing/components/Footer";
-import { NextPage } from "next";
-import Head from "next/head";
-import Link from "next/link";
-import Image from "next/image";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import nextI18nextConfig from "../../../next-i18next.config";
-import { useSession } from "next-auth/react";
 import AppLayout from "layouts/AppLayout";
-import { ReactElement } from "react";
-import { NextPageWithLayout } from "types/page";
+import Head from "next/head";
+import Image from "next/image";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import type { ReactElement } from "react";
+import type { NextPageWithLayout } from "types/page";
+
+import nextI18nextConfig from "../../../next-i18next.config";
 
 const GuidePage: NextPageWithLayout = () => {
   const { status } = useSession();

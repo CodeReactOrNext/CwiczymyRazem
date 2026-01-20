@@ -1,8 +1,8 @@
-import { useState, useCallback, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { toast } from "sonner";
 import type { Song } from "feature/songs/types/songs.type";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect,useState } from "react";
+import { toast } from "sonner";
 
 export const useAdminSongs = (password: string) => {
   const queryClient = useQueryClient();

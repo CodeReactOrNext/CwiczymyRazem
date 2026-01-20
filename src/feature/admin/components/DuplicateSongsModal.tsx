@@ -1,6 +1,6 @@
-import { X, Copy, Trash2, AlertTriangle, Users, GitMerge, Loader2, CheckCircle2 } from "lucide-react";
-import { Song } from "feature/songs/types/songs.type";
 import { Button } from "assets/components/ui/button";
+import type { Song } from "feature/songs/types/songs.type";
+import { AlertTriangle, CheckCircle2, GitMerge, Loader2, Trash2, Users, X } from "lucide-react";
 import React, { useState } from "react";
 
 interface DuplicateSongsModalProps {

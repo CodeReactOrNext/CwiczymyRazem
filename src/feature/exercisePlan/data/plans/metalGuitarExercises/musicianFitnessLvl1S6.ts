@@ -1,6 +1,7 @@
 import { musicianFitnessLvl1S6Exercise } from "feature/exercisePlan/data/exerises/metalPlayalong/metalPlayalong";
-import type { ExercisePlan } from "../../../types/exercise.types";
 import authorAvatar from "public/images/avatars/musicfitnes.jpg";
+
+import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const musicianFitnessLvl1S6Plan: ExercisePlan = {
   id: "musician_fitness_lvl1_s6",

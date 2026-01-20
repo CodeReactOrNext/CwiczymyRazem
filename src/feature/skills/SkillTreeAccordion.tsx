@@ -1,16 +1,14 @@
 "use client";
 
-import { Badge } from "assets/components/ui/badge";
-import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { SkillCategoryAccordion } from "feature/skills/components/SkillCategoryAccordion";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
-import { Info, Gem, Diamond, Crown, Sparkles, X, Trophy, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { Crown, Diamond, Gem, Info, Sparkles, Trophy } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface SkillTreeAccordionProps {
   userSkills: UserSkills;

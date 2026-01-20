@@ -1,15 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { db } from "utils/firebase/client/firebase.utils";
 import { 
+  deleteDoc, 
   doc, 
   getDoc, 
+  serverTimestamp, 
   setDoc, 
-  updateDoc, 
-  deleteDoc, 
-  collection, 
-  getDocs, 
-  serverTimestamp 
-} from "firebase/firestore";
+  updateDoc} from "firebase/firestore";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { db } from "utils/firebase/client/firebase.utils";
 
 export default async function handler(
   req: NextApiRequest,

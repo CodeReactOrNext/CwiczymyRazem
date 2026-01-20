@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
+import type { SongListInterface } from "src/pages/api/user/report";
 import { useAppSelector } from "store/hooks";
-import { AchievementContext } from "../types";
-import { SongListInterface } from "src/pages/api/user/report";
+
+import type { AchievementContext } from "../types";
 
 export const useAchievementContext = (): AchievementContext | null => {
   const currentUserId = useAppSelector(selectUserAuth);

@@ -1,11 +1,11 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
+import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
+import type { Song } from "feature/songs/types/songs.type";
 import type { useTimerInterface } from "hooks/useTimer";
 import { ArrowLeft, ArrowRight, Music, Pause, Play } from "lucide-react";
-import { useTranslation, Trans } from "react-i18next";
-import { Song } from "feature/songs/types/songs.type";
-import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
+import { Trans,useTranslation } from "react-i18next";
 
 interface SongTimerLayoutProps {
   timer: useTimerInterface;

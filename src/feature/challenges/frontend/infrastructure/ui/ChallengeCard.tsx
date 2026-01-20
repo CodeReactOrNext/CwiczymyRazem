@@ -1,10 +1,11 @@
-import { Button } from "assets/components/ui/button";
 import { Badge } from "assets/components/ui/badge";
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { Challenge } from "../../../backend/domain/models/Challenge";
-import { Lock, Calendar, CheckCircle2, Play, Plus, Target, Award, ShieldAlert, Sparkles, Flame, Trophy } from "lucide-react";
-import { getSongTier } from "feature/songs/utils/getSongTier";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { getSongTier } from "feature/songs/utils/getSongTier";
+import { Award, Calendar, CheckCircle2, Flame, Lock, Sparkles } from "lucide-react";
+
+import type { Challenge } from "../../../backend/domain/models/Challenge";
 
 interface ChallengeCardProps {
   challenge: Challenge;

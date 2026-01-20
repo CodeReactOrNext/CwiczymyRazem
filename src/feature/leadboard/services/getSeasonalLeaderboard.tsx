@@ -3,14 +3,13 @@ import { logger } from "feature/logger/Logger";
 import {
   collection,
   getCountFromServer,
-  getDocs,
   limit,
   orderBy,
   query,
   startAfter,
 } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
 import { memoryCache } from "utils/cache/memoryCache";
+import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 
 export const getSeasonalLeaderboard = async (

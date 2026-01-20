@@ -4,7 +4,6 @@ import OldEffect from "components/OldEffect";
 import Guitar from "feature/hero/components/Guitar";
 import { HeroSlogan } from "feature/hero/components/HeroSlogan";
 import Link from "next/link";
-
 import { useTranslation } from "react-i18next";
 
 interface HeroProps {

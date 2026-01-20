@@ -1,21 +1,20 @@
 import "styles/globals.css";
 
-import { SessionProvider } from "next-auth/react";
-import type { AppProps } from "next/app";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { TooltipProvider } from "assets/components/ui/tooltip";
+import ErrorBoundary from "components/ErrorBoundary/ErrorBoundary";
 import { Inter, Teko } from "next/font/google";
 import Head from "next/head";
 import Script from "next/script";
+import { SessionProvider } from "next-auth/react";
 import { appWithTranslation } from "next-i18next";
 import NextTopLoader from "nextjs-toploader";
+import { useState } from "react";
 import { Provider } from "react-redux";
 import { Toaster } from "sonner";
 import { store } from "store/store";
 import ThemeModeProvider from "wrappers/ThemeModeProvider";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { TooltipProvider } from "assets/components/ui/tooltip";
-import { useState } from "react";
-import ErrorBoundary from "components/ErrorBoundary/ErrorBoundary";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,9 +28,8 @@ const teko = Teko({
   display: "swap",
 });
 
-import useAuthSync from "hooks/useAuthSync";
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
-
+import useAuthSync from "hooks/useAuthSync";
 import type { AppPropsWithLayout } from "types/page";
 
 const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {

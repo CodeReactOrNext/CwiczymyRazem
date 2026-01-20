@@ -1,11 +1,3 @@
-import React from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "assets/components/ui/sheet";
 import { Button } from "assets/components/ui/button";
 import {
   Select,
@@ -14,9 +6,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
-import { getAllTiers } from "feature/songs/utils/getSongTier";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "assets/components/ui/sheet";
 import { cn } from "assets/lib/utils";
-import { Filter, Check, Music, ArrowUpDown, Shield, X } from "lucide-react";
+import { getAllTiers } from "feature/songs/utils/getSongTier";
+import { ArrowUpDown, Check, Filter, Music, X } from "lucide-react";
+import React from "react";
 
 interface FilterSheetProps {
   isOpen: boolean;

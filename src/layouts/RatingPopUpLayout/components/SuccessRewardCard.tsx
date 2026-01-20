@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { Zap } from "lucide-react";
-import confetti from "canvas-confetti";
+import React, { useEffect } from "react";
 
 interface SuccessRewardCardProps {
   displayedPoints: number;

@@ -1,11 +1,11 @@
 import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
+import { Link2 } from "lucide-react";
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { MdCheck, MdCopyAll } from "react-icons/md";
-import { Link2 } from "lucide-react";
-import { cn } from "assets/lib/utils";
 import { useAppSelector } from "store/hooks";
 
 export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon" }) => {

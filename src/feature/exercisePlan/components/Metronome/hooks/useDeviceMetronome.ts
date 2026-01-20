@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+
+import { isMobileDevice } from "../utils/deviceDetection";
 import { useMetronome } from "./useMetronome";
 import { useMobileMetronome } from "./useMobileMetronome";
-import { isMobileDevice } from "../utils/deviceDetection";
 
 interface UseDeviceMetronomeProps {
   initialBpm?: number;

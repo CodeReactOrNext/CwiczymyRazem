@@ -1,9 +1,3 @@
-import { useCallback, useState } from "react";
-import { createPortal } from "react-dom";
-import { useTranslation } from "react-i18next";
-import { FaSpinner } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
-
 import { Card } from "assets/components/ui/card";
 import {
   Dialog,
@@ -11,11 +5,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
+import { AnimatePresence,motion } from "framer-motion";
+import { useCallback, useState } from "react";
+import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
+import { FaSpinner } from "react-icons/fa";
 
 import type { DateWithReport } from "./activityLog.types";
-import { useActivityLog } from "./hooks/useActivityLog";
 import ActivityCalendarCanvas from "./components/ActivityCalendarCanvas";
 import ExerciseShortInfo from "./components/ExerciseShortInfo";
+import { useActivityLog } from "./hooks/useActivityLog";
 
 const CALENDAR_HEIGHT = 7 * 19;
 

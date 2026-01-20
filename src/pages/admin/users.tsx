@@ -1,14 +1,14 @@
-import AdminLayout from "feature/admin/layouts/AdminLayout";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../api/auth/[...nextauth]";
-import { db } from "utils/firebase/client/firebase.utils";
-import { doc, getDoc } from "firebase/firestore";
-import type { GetServerSideProps } from "next";
+import AdminLogin from "feature/admin/components/AdminLogin";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
 import { useAdminUsers } from "feature/admin/hooks/useAdminUsers";
-import AdminLogin from "feature/admin/components/AdminLogin";
-import { useEffect } from "react";
-import { TrendingUp, Users } from "lucide-react";
+import AdminLayout from "feature/admin/layouts/AdminLayout";
+import { doc, getDoc } from "firebase/firestore";
+import { Users } from "lucide-react";
+import type { GetServerSideProps } from "next";
+import { getServerSession } from "next-auth/next";
+import { db } from "utils/firebase/client/firebase.utils";
+
+import { authOptions } from "../api/auth/[...nextauth]";
 
 const AdminUsersPage = () => {
   const {

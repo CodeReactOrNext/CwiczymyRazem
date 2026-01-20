@@ -1,8 +1,7 @@
-import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
-import { getSongTier } from "feature/songs/utils/getSongTier";
-import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import type { Song } from "feature/songs/types/songs.type";
+import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { Music, Plus } from "lucide-react";
 import Link from "next/link";
 

@@ -1,10 +1,11 @@
-import { Trophy, CheckCircle2, Star, Swords, Shield, Wand2, Lock, Gift, ArrowUpCircle, Play, X } from "lucide-react";
 import { Badge } from "assets/components/ui/badge";
 import { cn } from "assets/lib/utils";
-import { Challenge } from "../../../backend/domain/models/Challenge";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { useState, useEffect } from "react";
+import { ArrowUpCircle, Gift, Lock, Play, Shield, Star, Swords, Trophy, Wand2, X } from "lucide-react";
+import { useEffect,useState } from "react";
 import { createPortal } from "react-dom";
+
+import type { Challenge } from "../../../backend/domain/models/Challenge";
 
 interface ChallengeRPGMapProps {
   challengesByCategory: Record<string, Record<string, Challenge[]>>;

@@ -1,4 +1,4 @@
-import { Challenge, ActiveChallenge } from "../models/Challenge";
+import type { ActiveChallenge,Challenge } from "../models/Challenge";
 
 export interface IChallengeRepository {
   getAllChallenges(): Promise<Challenge[]>;

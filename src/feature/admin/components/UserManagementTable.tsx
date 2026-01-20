@@ -1,7 +1,6 @@
-import { Users, Mail, Calendar, ExternalLink, Loader2, Search } from "lucide-react";
-import { cn } from "assets/lib/utils";
 import { Input } from "assets/components/ui/input";
 import { format } from "date-fns";
+import { Calendar, ExternalLink, Loader2, Mail, Search } from "lucide-react";
 
 interface UserManagementTableProps {
   users: any[];

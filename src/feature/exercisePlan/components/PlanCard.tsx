@@ -2,21 +2,20 @@ import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
+import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import { 
-  FaClock, 
-  FaListUl, 
-  FaPlay, 
-  FaGuitar, 
   FaBrain, 
-  FaMusic, 
-  FaLayerGroup,
-  FaTrashAlt,
+  FaClock, 
   FaEdit,
-  FaYoutube,
-  FaVideo
-} from "react-icons/fa";
-import Image from "next/image";
+  FaGuitar, 
+  FaLayerGroup,
+  FaListUl, 
+  FaMusic, 
+  FaPlay, 
+  FaTrashAlt,
+  FaVideo,
+  FaYoutube} from "react-icons/fa";
 
 import type { DifficultyLevel, ExercisePlan } from "../types/exercise.types";
 

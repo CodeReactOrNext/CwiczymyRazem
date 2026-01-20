@@ -1,4 +1,5 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+
 import { ExerciseCard } from "./ExerciseCard";
 
 interface ExerciseGridProps {

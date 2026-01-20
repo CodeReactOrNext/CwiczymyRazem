@@ -1,14 +1,12 @@
 import FaqView from "feature/faq/FaqView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import AppLayout from "layouts/AppLayout";
-import type { NextPage } from "next";
 import Head from "next/head";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useTranslation } from "react-i18next";
-import nextI18nextConfig from "../../../next-i18next.config";
-
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
+
+import nextI18nextConfig from "../../../next-i18next.config";
 
 const FaqPage: NextPageWithLayout = () => {
   const { isLoggedIn } = useAutoLogIn({

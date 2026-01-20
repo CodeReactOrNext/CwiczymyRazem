@@ -1,5 +1,9 @@
+import { advancedImprovisationPlan } from "feature/exercisePlan/data/plans/advancedImprovisation/advancedImprovisation";
 import { basicImprovisationPractice } from "feature/exercisePlan/data/plans/basicImprovisationPractice/basicImprovisationPractice";
-import { metalGuitarExercisesPlan } from "feature/exercisePlan/data/plans/metalGuitarExercises/metalGuitarExercises";
+import { creativePhrasingPlan } from "feature/exercisePlan/data/plans/creativePhrasing/creativePhrasing";
+import { expressiveLeadPlayingPlan } from "feature/exercisePlan/data/plans/expressiveLeadPlaying/expressiveLeadPlaying";
+import { fretboardAwarenessPlan } from "feature/exercisePlan/data/plans/fretboardAwareness/fretboardAwareness";
+import { harmonicVoiceLeadingPlan } from "feature/exercisePlan/data/plans/harmonicVoiceLeading/harmonicVoiceLeading";
 import { musicianFitnessLvl1S1Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S1";
 import { musicianFitnessLvl1S2Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S2";
 import { musicianFitnessLvl1S3Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S3";
@@ -8,17 +12,12 @@ import { musicianFitnessLvl1S5Plan } from "feature/exercisePlan/data/plans/metal
 import { musicianFitnessLvl1S6Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S6";
 import { musicianFitnessLvl1S7Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S7";
 import { musicianFitnessLvl1S8Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S8";
+import { pentatonicPlayalongPlan } from "feature/exercisePlan/data/plans/pentatonicPlayalong/pentatonicPlayalongPlan";
+import { rhythmicPrecisionPlan } from "feature/exercisePlan/data/plans/rhythmicPrecision/rhythmicPrecision";
 import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
+import { theIntervalMapPlan } from "feature/exercisePlan/data/plans/theIntervalMap/theIntervalMap";
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
-import { pentatonicPlayalongPlan } from "feature/exercisePlan/data/plans/pentatonicPlayalong/pentatonicPlayalongPlan";
-import { fretboardAwarenessPlan } from "feature/exercisePlan/data/plans/fretboardAwareness/fretboardAwareness";
-import { harmonicVoiceLeadingPlan } from "feature/exercisePlan/data/plans/harmonicVoiceLeading/harmonicVoiceLeading";
-import { creativePhrasingPlan } from "feature/exercisePlan/data/plans/creativePhrasing/creativePhrasing";
-import { advancedImprovisationPlan } from "feature/exercisePlan/data/plans/advancedImprovisation/advancedImprovisation";
-import { expressiveLeadPlayingPlan } from "feature/exercisePlan/data/plans/expressiveLeadPlaying/expressiveLeadPlaying";
-import { rhythmicPrecisionPlan } from "feature/exercisePlan/data/plans/rhythmicPrecision/rhythmicPrecision";
-import { theIntervalMapPlan } from "feature/exercisePlan/data/plans/theIntervalMap/theIntervalMap";
 
 import type { ExercisePlan } from "../types/exercise.types";
 

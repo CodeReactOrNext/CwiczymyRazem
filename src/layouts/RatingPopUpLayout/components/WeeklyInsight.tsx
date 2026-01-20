@@ -3,7 +3,6 @@ import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
 import { motion } from "framer-motion";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { convertMsToHM } from "utils/converter";
-import { Calendar } from "lucide-react";
 
 interface WeeklyInsightProps {
   activityData: {

@@ -1,8 +1,9 @@
+import { EXERCISE_PLANS_COLLECTION,EXERCISES_COLLECTION } from "feature/exercisePlan/services/constants";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]";
 import { firestore } from "utils/firebase/api/firebase.config";
-import { EXERCISES_COLLECTION, EXERCISE_PLANS_COLLECTION } from "feature/exercisePlan/services/constants";
+
+import { authOptions } from "../auth/[...nextauth]";
 
 const migrateValue = (val: any) => {
   if (typeof val === "object" && val !== null) {

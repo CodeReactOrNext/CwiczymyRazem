@@ -1,21 +1,17 @@
-import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
-import { ActivityChart } from "components/Charts/ActivityChart";
-import { HeadDecoration } from "components/HeadDecoration";
 import { DashboardContainer, DashboardSection } from "components/Layout";
+import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
+import { OnboardingCards } from "feature/dashboard/components/OnboardingCards";
 import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
-import type { Song } from "feature/songs/types/songs.type";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 
 import { StatsSection } from "./components/StatsSection";
-import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
-import { OnboardingCards } from "feature/dashboard/components/OnboardingCards";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];

@@ -1,8 +1,9 @@
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { IconType } from "react-icons/lib";
-import styles from "./AchievementCard.module.css";
-import React, { forwardRef, useRef, useImperativeHandle } from "react";
+import React, { forwardRef, useImperativeHandle,useRef } from "react";
+import type { IconType } from "react-icons/lib";
+
 import { achievementsRarity } from "../../data/achievementsRarity";
+import styles from "./AchievementCard.module.css";
 
 interface AchievementPhysicalCardProps extends React.HTMLAttributes<HTMLDivElement> {
   Icon: IconType;
