@@ -1,5 +1,5 @@
 import { achievementsData } from "feature/achievements/data/achievementsData";
-import { AchievementContext } from "feature/achievements/types";
+import type { AchievementContext } from "feature/achievements/types";
 
 export class AchievementManager {
   static getNewlyEarned(ctx: AchievementContext) {

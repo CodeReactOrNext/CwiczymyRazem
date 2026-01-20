@@ -1,17 +1,20 @@
-import React from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import Image from 'next/image';
-import { GetStaticPaths, GetStaticProps } from 'next';
-import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
-import { serialize } from 'next-mdx-remote/serialize';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import nextI18nextConfig from '../../../next-i18next.config';
-import { getBlogBySlug, getAllBlogs, BlogFrontmatter } from 'lib/blog';
-import { BlogHeader } from 'components/Blog/BlogHeader';
-import { Footer } from 'feature/landing/components/Footer';
 import { BlogCard } from 'components/Blog/BlogCard';
+import { BlogHeader } from 'components/Blog/BlogHeader';
 import { YouTube } from 'components/Blog/YouTube';
+import { Footer } from 'feature/landing/components/Footer';
+import type { BlogFrontmatter} from 'lib/blog';
+import {getAllBlogs, getBlogBySlug } from 'lib/blog';
+import type { GetStaticPaths, GetStaticProps } from 'next';
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
+import { MDXRemote } from 'next-mdx-remote';
+import { serialize } from 'next-mdx-remote/serialize';
+import React from 'react';
+
+import nextI18nextConfig from '../../../next-i18next.config';
 
 interface BlogPostProps {
   frontmatter: BlogFrontmatter;

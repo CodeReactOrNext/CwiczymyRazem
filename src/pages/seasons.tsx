@@ -1,13 +1,9 @@
 import { LeadboardView } from "feature/leadboard/LeadboardView";
-import useAutoLogIn from "hooks/useAutoLogIn";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
-import type { NextPage } from "next";
-import Head from "next/head";
-import { withAuth } from "utils/auth/serverAuth";
 import AppLayout from "layouts/AppLayout";
-
-import { ReactElement } from "react";
+import Head from "next/head";
+import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
+import { withAuth } from "utils/auth/serverAuth";
 
 const SeasonsPage: NextPageWithLayout = () => {
   const siteUrl = "https://riff.quest/seasons";

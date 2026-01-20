@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
 import { Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const LevelUpBanner = () => {
   const { t } = useTranslation("report") as any;

@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Calendar, User, Clock, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Calendar, ChevronRight,Clock, User } from 'lucide-react';
 import Link from 'next/link';
+import React, { useRef } from 'react';
 
 interface BlogHeaderProps {
   title: string;

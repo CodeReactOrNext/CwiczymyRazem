@@ -1,6 +1,4 @@
 import axios from "axios";
-import { doc, updateDoc, arrayUnion, setDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
 
 export const enrichSong = async (songId: string, artist: string, title: string) => {
   try {

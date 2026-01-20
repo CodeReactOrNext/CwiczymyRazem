@@ -1,15 +1,15 @@
 import type { SerializedError } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { signIn, signOut } from "next-auth/react";
-import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
-import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { challengesList, challengeUseCases } from "feature/challenges";
-import type { RootState } from "store/store";
+import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
+import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
+import { signIn, signOut } from "next-auth/react";
+import type { RootState } from "store/store";
 import type {
   ActiveChallenge,
   DailyQuestTaskType,
@@ -26,15 +26,14 @@ import {
   firebaseGetUserProviderData,
   firebaseLogUserOut,
   firebaseReauthenticateUser,
+  firebaseSignInWithCredential,
   firebaseSignInWithEmail,
   firebaseSignInWithGooglePopup,
-  firebaseSignInWithCredential,
 } from "utils/firebase/client/firebase.utils";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 
 import type { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 import type { SignUpCredentials } from "../view/SingupView/SingupView";
-import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import { fetchReport, fetchUserData } from "./services/userServices";
 import {
   avatarErrorHandler,

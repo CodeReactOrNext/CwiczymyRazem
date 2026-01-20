@@ -1,6 +1,6 @@
-import { ShieldCheck } from "lucide-react";
-import { Input } from "assets/components/ui/input";
 import { Button } from "assets/components/ui/button";
+import { Input } from "assets/components/ui/input";
+import { ShieldCheck } from "lucide-react";
 
 interface AdminLoginProps {
   password: string;

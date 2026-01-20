@@ -3,13 +3,10 @@ import { logger } from "feature/logger/Logger";
 import {
   collection,
   doc,
-  getDoc,
-  getDocs,
-  setDoc,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import { trackedGetDocs, trackedGetDoc, trackedSetDoc } from "utils/firebase/client/firestoreTracking";
+import { trackedGetDoc, trackedGetDocs, trackedSetDoc } from "utils/firebase/client/firestoreTracking";
 
 export interface SeasonalAchievement {
   seasonId: string;

@@ -1,12 +1,12 @@
-import { IconBox } from "components/IconBox/IconBox";
-import { 
+import type { 
   AchievementContext, 
-  AchievementsDataInterface, 
-  AchievementCard,
+  AchievementsDataInterface,
   AchievementsRarityType 
 } from "feature/achievements";
+import { 
+  AchievementCard 
+} from "feature/achievements";
 import { useTranslation } from "react-i18next";
-import { FaMedal } from "react-icons/fa";
 
 export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];

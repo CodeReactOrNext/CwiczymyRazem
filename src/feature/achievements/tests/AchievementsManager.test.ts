@@ -1,6 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+import type { AchievementContext, AchievementsDataInterface } from '../types';
 import { AchievementManager } from '../utils/AchievementsManager';
-import { AchievementContext, AchievementsDataInterface } from '../types';
 
 vi.mock('../data/achievementsData', () => ({
   achievementsData: [

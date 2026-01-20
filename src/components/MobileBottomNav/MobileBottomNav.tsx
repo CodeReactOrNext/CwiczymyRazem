@@ -1,8 +1,8 @@
-import React from "react";
+import { cn } from "assets/lib/utils";
+import { FileText,Home, LayoutGrid, Menu, Timer } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Home, Timer, Menu, Trophy, LayoutGrid, FileText } from "lucide-react";
-import { cn } from "assets/lib/utils";
+import React from "react";
 
 interface MobileBottomNavProps {
   onMenuClick: () => void;

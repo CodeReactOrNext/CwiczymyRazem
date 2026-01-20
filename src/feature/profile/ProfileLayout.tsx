@@ -1,10 +1,8 @@
-import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DaySinceMessage } from "components/DaySince/DaySince";
 import { LevelBar } from "components/LevelBar/LevelBar";
 import MainContainer from "components/MainContainer";
 import Avatar from "components/UI/Avatar";
-import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";

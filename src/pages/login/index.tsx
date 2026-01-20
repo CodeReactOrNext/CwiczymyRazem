@@ -1,8 +1,7 @@
 import LoginView from "feature/user/view/LoginView";
 import type { NextPage } from "next";
-import { withAuth } from "utils/auth/serverAuth";
-
 import Head from "next/head";
+import { withAuth } from "utils/auth/serverAuth";
 
 const LoginPage: NextPage = () => {
     // If we're here, it means withAuth didn't redirect us elsewhere (e.g. to dashboard),

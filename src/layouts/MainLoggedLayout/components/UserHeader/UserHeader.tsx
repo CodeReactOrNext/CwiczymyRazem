@@ -1,16 +1,13 @@
-import { Button } from "assets/components/ui/button";
 import { Separator } from "assets/components/ui/separator";
-import Image from "next/image";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
-import { LevelBar } from "components/LevelBar/LevelBar";
 import { HeaderLevelBar } from "components/LevelBar/HeaderLevelBar";
 import UserNav from "components/UserNav";
 import { WelcomeMessage } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/WelcomeMessage";
+import Image from "next/image";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 
 import { ActivitySheet } from "./components/ActivitySheet";
-import NavDecoration from "./components/NavDecoration";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;

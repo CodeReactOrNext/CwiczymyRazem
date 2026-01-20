@@ -1,12 +1,11 @@
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
-import type { AchievementList } from "feature/achievements/types";
 import { achievementsMap } from "feature/achievements/data/achievementsData";
 import { achievementsRarity } from "feature/achievements/data/achievementsRarity";
+import type { AchievementList } from "feature/achievements/types";
 import { useTranslation } from "react-i18next";
 
 const AchievementIcon = ({ id }: { id: AchievementList }) => {

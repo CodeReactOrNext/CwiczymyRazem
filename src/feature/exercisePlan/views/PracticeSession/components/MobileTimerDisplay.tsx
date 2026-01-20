@@ -1,6 +1,6 @@
-import { convertMsToHMS } from "utils/converter/timeConverter";
 import { FaDumbbell, FaHistory } from "react-icons/fa";
 import type { TimerInterface } from "types/api.types";
+import { convertMsToHMS } from "utils/converter/timeConverter";
 
 interface MobileTimerDisplayProps {
   timerProgressValue: number;

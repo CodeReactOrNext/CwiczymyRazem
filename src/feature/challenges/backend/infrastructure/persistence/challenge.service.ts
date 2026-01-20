@@ -1,6 +1,7 @@
+import { arrayRemove,arrayUnion, doc, getDoc, increment, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import { doc, getDoc, updateDoc, arrayUnion, increment, arrayRemove } from "firebase/firestore";
-import { ActiveChallenge } from "../../domain/models/Challenge";
+
+import type { ActiveChallenge } from "../../domain/models/Challenge";
 
 export const challengeService = {
   async getUserStats(userId: string) {

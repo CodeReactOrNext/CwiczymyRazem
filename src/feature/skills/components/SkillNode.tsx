@@ -1,10 +1,8 @@
-import { Badge } from "assets/components/ui/badge";
 import { cn } from "assets/lib/utils";
-import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import type { GuitarSkill, GuitarSkillId } from "feature/skills/skills.types";
-import { Lock, Star, Check } from "lucide-react";
 import { motion } from "framer-motion";
+import { Star } from "lucide-react";
 
 interface SkillNodeProps {
   skill: GuitarSkill;

@@ -2,11 +2,11 @@ import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Gem, Diamond, Crown, Sparkles } from "lucide-react";
+import { AnimatePresence,motion } from "framer-motion";
+import { ChevronDown, Crown, Diamond, Gem, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaStar, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 
 interface SkillCategoryAccordionProps {
   category: CategoryKeys;

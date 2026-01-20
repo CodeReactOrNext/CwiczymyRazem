@@ -1,6 +1,6 @@
+import type { Song } from "feature/songs/types/songs.type";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import type { Song } from "feature/songs/types/songs.type";
 
 export const getDailyRecommendation = async (ownedSongIds: string[]): Promise<Song | null> => {
   try {

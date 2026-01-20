@@ -1,5 +1,5 @@
 import { Card } from "assets/components/ui/card";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface StatsCardProps {
   title: string;

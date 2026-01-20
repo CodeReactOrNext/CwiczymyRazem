@@ -1,6 +1,6 @@
-import { useState, useMemo, useCallback } from "react";
-import { Song } from "feature/songs/types/songs.type";
 import axios from "axios";
+import type { Song } from "feature/songs/types/songs.type";
+import { useCallback,useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export const useDuplicateDetector = (initialSongs: Song[], password?: string) => {

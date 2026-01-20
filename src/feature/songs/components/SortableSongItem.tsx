@@ -4,11 +4,11 @@ import { Button } from "assets/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "assets/components/ui/dropdown-menu";
 import { cn } from "assets/lib/utils";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
-import { Song, SongStatus } from "feature/songs/types/songs.type";
-import { MoreVertical, GripVertical, ChevronRight, Play } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { ChevronRight, GripVertical, MoreVertical, Play } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 interface SortableSongItemProps {
   song: Song;

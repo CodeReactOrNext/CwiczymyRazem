@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
-import Image from "next/image";
+import { cn } from "assets/lib/utils";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   createAccount,
@@ -11,21 +11,21 @@ import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
 import { Form, Formik } from "formik";
 import { motion } from "framer-motion";
 import {
-  Mail,
-  Lock,
-  User,
-  Loader2,
+  ArrowLeft,
+  CheckCircle,
+  ChevronRight,
   Eye,
   EyeOff,
-  ChevronRight,
-  ArrowLeft,
+  Loader2,
+  Lock,
+  Mail,
   Shield,
-  CheckCircle,
+  User,
 } from "lucide-react";
-import { useRouter } from "next/router";
-import { cn } from "assets/lib/utils";
+import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { useEffect,useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FcGoogle } from "react-icons/fc";
 import { useAppDispatch, useAppSelector } from "store/hooks";

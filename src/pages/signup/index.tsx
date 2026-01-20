@@ -1,8 +1,7 @@
 import SingupView from "feature/user/view/SingupView";
 import type { NextPage } from "next";
-import { withAuth } from "utils/auth/serverAuth";
-
 import Head from "next/head";
+import { withAuth } from "utils/auth/serverAuth";
 
 const SignUpPage: NextPage = () => {
   return (

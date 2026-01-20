@@ -1,26 +1,27 @@
-import { useState } from "react";
-import AdminLayout from "feature/admin/layouts/AdminLayout";
-import { DashboardStats } from "feature/admin/components/DashboardStats";
-import { SongManagementTable } from "feature/admin/components/SongManagementTable";
-import AdminLogin from "feature/admin/components/AdminLogin";
 import AdminActionCenter from "feature/admin/components/AdminActionCenter";
-import MassActionProgress from "feature/admin/components/MassActionProgress";
-import CoverPickerModal from "feature/admin/components/CoverPickerModal";
-import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
-import { toast } from "sonner";
-import { useAdminSongs } from "feature/admin/hooks/useAdminSongs";
-import { useAdminBulkActions } from "feature/admin/hooks/useAdminBulkActions";
-import { useDuplicateDetector } from "feature/admin/hooks/useDuplicateDetector";
-import { BulkAddSongsModal } from "feature/admin/components/BulkAddSongsModal";
-import { DuplicateSongsModal } from "feature/admin/components/DuplicateSongsModal";
+import AdminLogin from "feature/admin/components/AdminLogin";
 import { ArtistSongSelector } from "feature/admin/components/ArtistSongSelector";
+import { BulkAddSongsModal } from "feature/admin/components/BulkAddSongsModal";
+import CoverPickerModal from "feature/admin/components/CoverPickerModal";
+import { DashboardStats } from "feature/admin/components/DashboardStats";
+import { DuplicateSongsModal } from "feature/admin/components/DuplicateSongsModal";
+import MassActionProgress from "feature/admin/components/MassActionProgress";
 import { MigrationCenter } from "feature/admin/components/MigrationCenter";
+import { SongManagementTable } from "feature/admin/components/SongManagementTable";
+import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
+import { useAdminBulkActions } from "feature/admin/hooks/useAdminBulkActions";
+import { useAdminSongs } from "feature/admin/hooks/useAdminSongs";
+import { useDuplicateDetector } from "feature/admin/hooks/useDuplicateDetector";
 import { useExerciseMigration } from "feature/admin/hooks/useExerciseMigration";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../api/auth/[...nextauth]";
-import { db } from "utils/firebase/client/firebase.utils";
+import AdminLayout from "feature/admin/layouts/AdminLayout";
 import { doc, getDoc } from "firebase/firestore";
 import type { GetServerSideProps } from "next";
+import { getServerSession } from "next-auth/next";
+import { useState } from "react";
+import { toast } from "sonner";
+import { db } from "utils/firebase/client/firebase.utils";
+
+import { authOptions } from "../api/auth/[...nextauth]";
 
 const AdminDashboard = () => {
   const [selectedSongForCover, setSelectedSongForCover] = useState<{ id: string; artist: string; title: string } | null>(null);

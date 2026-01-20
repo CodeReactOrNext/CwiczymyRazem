@@ -1,7 +1,8 @@
-import { db } from "utils/firebase/client/firebase.utils";
-import { doc, deleteDoc } from "firebase/firestore";
-import { EXERCISE_PLANS_COLLECTION } from "./constants";
 import { logger } from "feature/logger/Logger";
+import { deleteDoc,doc } from "firebase/firestore";
+import { db } from "utils/firebase/client/firebase.utils";
+
+import { EXERCISE_PLANS_COLLECTION } from "./constants";
 
 export const deleteExercisePlan = async (planId: string): Promise<void> => {
   try {

@@ -1,5 +1,6 @@
 import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
+
 import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const advancedImprovisationPlan: ExercisePlan = {

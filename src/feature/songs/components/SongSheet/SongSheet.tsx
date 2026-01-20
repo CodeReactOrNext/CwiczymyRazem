@@ -1,38 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "assets/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
 } from "assets/components/ui/sheet";
-import { Button } from "assets/components/ui/button";
-import { SongRating } from "feature/songs/components/SongsTable/components/SongRating";
-import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { getSongTier } from "feature/songs/utils/getSongTier";
-import { 
-  Music, 
-  BookOpen, 
-  CheckCircle, 
-  Users, 
-  ShieldCheck, 
-  Star,
-  Info,
-  ExternalLink,
-  HelpCircle,
-  Loader2
-} from "lucide-react";
-import { TierBadge } from "../SongsGrid/TierBadge";
-import { cn } from "assets/lib/utils";
-import { doc, getDoc, collection, query, where, getDocs, documentId } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
+import { SongRating } from "feature/songs/components/SongsTable/components/SongRating";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { getSongTier } from "feature/songs/utils/getSongTier";
+import { collection, documentId, getDocs, query, where } from "firebase/firestore";
+import {motion } from "framer-motion";
+import { 
+  BookOpen, 
+  CheckCircle,
+  HelpCircle,
+  Loader2,
+  Music, 
+  ShieldCheck, 
+  Star,
+  Users} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { db } from "utils/firebase/client/firebase.utils";
+
+import { TierBadge } from "../SongsGrid/TierBadge";
 import { SpotifyPlayer } from "../SpotifyPlayer";
 
 interface SongSheetProps {

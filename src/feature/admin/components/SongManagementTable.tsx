@@ -1,9 +1,9 @@
-import { Song } from "feature/songs/types/songs.type";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
-import { Music, CheckCircle2, ShieldCheck, XCircle, Edit2, Loader2, Save, ChevronLeft, ChevronRight, RefreshCw, Search, Trash2 } from "lucide-react";
 import { cn } from "assets/lib/utils";
-import { useState } from "react";
+import type { Song } from "feature/songs/types/songs.type";
+import { CheckCircle2, ChevronLeft, ChevronRight, Edit2, Loader2, Music, RefreshCw, Save, Search, ShieldCheck, Trash2,XCircle } from "lucide-react";
+
 import { StarRating } from "./StarRating";
 
 interface SongManagementTableProps {

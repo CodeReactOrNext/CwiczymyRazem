@@ -1,10 +1,11 @@
 import React, { memo } from "react";
 import { useResponsiveStore } from "store/useResponsiveStore";
-import type { AchievementContext, AchievementList, AchievementsDataInterface } from "../../types";
+
 import { achievementsMap } from "../../data/achievementsData";
-import { AchievementPhysicalCard } from "./AchievementPhysicalCard";
-import { AchievementCardMobile } from "./AchievementCardMobile";
+import type { AchievementContext, AchievementList, AchievementsDataInterface } from "../../types";
 import { AchievementCardDesktop } from "./AchievementCardDesktop";
+import { AchievementCardMobile } from "./AchievementCardMobile";
+import { AchievementPhysicalCard } from "./AchievementPhysicalCard";
 
 export const AchievementCard = memo(({ 
   id, 

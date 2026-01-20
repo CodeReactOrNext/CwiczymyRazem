@@ -1,8 +1,24 @@
+import { articulationContrastExercise } from "feature/exercisePlan/data/exerises/articulationContrast/articulationContrast";
+import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
+import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
 import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
+import { dynamicControlExercise } from "feature/exercisePlan/data/exerises/dynamicControl/dynamicControl";
+import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
+import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
+import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
+import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
+import { intervalStringJumpsExercise } from "feature/exercisePlan/data/exerises/intervalStringJumps/intervalStringJumps";
+import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
+import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
+import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
+import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
 import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { playByEarExercise } from "feature/exercisePlan/data/exerises/playByEar/playByEar";
 import { precisionBendingExercise } from "feature/exercisePlan/data/exerises/precisionBending/precisionBending";
+import { rhythmicMotifDisplacementExercise } from "feature/exercisePlan/data/exerises/rhythmicMotifDisplacement/rhythmicMotifDisplacement";
+import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
+import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
 import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
 import { spiderLegatoBasicExercise } from "feature/exercisePlan/data/exerises/spiderLegatoBasic/spiderLegatoBasic";
 import { spiderPermutation1423Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1423/spiderPermutation1423";
@@ -27,6 +43,8 @@ import { spiderPermutation4312Exercise } from "feature/exercisePlan/data/exerise
 import { spiderPermutation4321Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4321/spiderPermutation4321";
 import { spiderRhythmicProgressionExercise } from "feature/exercisePlan/data/exerises/spiderRhythmicProgression/spiderRhythmicProgression";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
+import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
+import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 import { spiderOneStringExercise } from "./exerises/spiderOneString/spiderOneString";
@@ -38,24 +56,6 @@ import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStai
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
-import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
-import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
-import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
-import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
-import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
-import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
-import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
-import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
-import { dynamicControlExercise } from "feature/exercisePlan/data/exerises/dynamicControl/dynamicControl";
-import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
-import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
-import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
-import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
-import { articulationContrastExercise } from "feature/exercisePlan/data/exerises/articulationContrast/articulationContrast";
-import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
-import { rhythmicMotifDisplacementExercise } from "feature/exercisePlan/data/exerises/rhythmicMotifDisplacement/rhythmicMotifDisplacement";
-import { intervalStringJumpsExercise } from "feature/exercisePlan/data/exerises/intervalStringJumps/intervalStringJumps";
-import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
 
 export const exercisesAgregat: Exercise[] = [
   spiderOneStringExercise,

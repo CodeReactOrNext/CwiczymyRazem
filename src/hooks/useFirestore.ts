@@ -1,13 +1,13 @@
-import { useQuery, useMutation, UseQueryOptions } from "@tanstack/react-query";
-import * as firestore from "firebase/firestore";
+import type { UseQueryOptions } from "@tanstack/react-query";
+import { useMutation,useQuery } from "@tanstack/react-query";
+import type * as firestore from "firebase/firestore";
 import {
+  trackedAddDoc,
+  trackedDeleteDoc,
   trackedGetDoc,
   trackedGetDocs,
   trackedSetDoc,
-  trackedUpdateDoc,
-  trackedAddDoc,
-  trackedDeleteDoc
-} from "utils/firebase/client/firestoreTracking";
+  trackedUpdateDoc} from "utils/firebase/client/firestoreTracking";
 
 /**
  * Hook to fetch a single Firestore document with TanStack Query.

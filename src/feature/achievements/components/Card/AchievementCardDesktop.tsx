@@ -1,5 +1,5 @@
-import React from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
+import React from "react";
 import { useTranslation } from "react-i18next";
 
 import type { AchievementProgress } from "../../types";

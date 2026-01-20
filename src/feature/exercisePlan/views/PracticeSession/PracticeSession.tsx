@@ -10,22 +10,20 @@ import { Button } from "assets/components/ui/button";
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
-import { useRouter } from "next/router";
-import Head from "next/head";
-import { i18n } from "next-i18next";
-import { useRef, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { FaInfoCircle, FaLightbulb, FaCheck, FaStepForward, FaFacebook, FaInstagram, FaTwitter, FaHeart, FaExternalLinkAlt } from "react-icons/fa";
-import { Loader2, Crosshair, Layers, Sparkles, Calendar, Flame, Timer } from "lucide-react";
 import { motion } from "framer-motion";
+import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
+import { Timer } from "lucide-react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect,useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { FaCheck, FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaStepForward, FaTwitter } from "react-icons/fa";
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
 import { Metronome } from "../../components/Metronome/Metronome";
 import { YouTubePlayalong } from "../../components/YouTubePlayalong";
-import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import type {
   ExercisePlan,
-  LocalizedContent,
 } from "../../types/exercise.types";
 import { ExerciseImage } from "./components/ExerciseImage";
 import { ExerciseProgress } from "./components/ExerciseProgress";
@@ -35,7 +33,6 @@ import { useImageHandling } from "./hooks/useImageHandling";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
 import ImageModal from "./modals/ImageModal";
 import SessionModal from "./modals/SessionModal";
-import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;

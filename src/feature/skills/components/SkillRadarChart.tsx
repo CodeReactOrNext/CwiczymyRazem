@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react"
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
-
+import type {
+  ChartConfig} from "assets/components/ui/chart";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "assets/components/ui/chart"
-import { getSkillTheme } from "feature/skills/constants/skillTreeTheme"
-import { useTranslation } from "react-i18next"
 import type { CategoryKeys } from "components/Charts/ActivityChart"
+import { getSkillTheme } from "feature/skills/constants/skillTreeTheme"
+import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
+
 import type { GuitarSkill, UserSkills } from "../skills.types"
 
 interface SkillRadarChartProps {

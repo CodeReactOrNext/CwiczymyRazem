@@ -1,11 +1,12 @@
-import type { TFuncKey } from "i18next";
-import type { IconType } from "react-icons/lib";
 import type {
   ReportDataInterface,
   ReportFormikInterface
 } from "feature/user/view/ReportView/ReportView.types";
+import type { TFuncKey } from "i18next";
+import type { IconType } from "react-icons/lib";
 import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface } from "types/api.types";
+
 import type { AchievementsRarityType } from "./data/achievementsRarity";
 
 export type AchievementList =

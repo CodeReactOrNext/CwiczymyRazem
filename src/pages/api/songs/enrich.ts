@@ -1,7 +1,7 @@
+import { arrayUnion,doc, setDoc, updateDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db } from "utils/firebase/client/firebase.utils";
-import { doc, updateDoc, setDoc, arrayUnion } from "firebase/firestore";
 import { fetchEnrichmentData } from "utils/enrichment/enrichment.util";
+import { db } from "utils/firebase/client/firebase.utils";
 
 export default async function handler(
   req: NextApiRequest,

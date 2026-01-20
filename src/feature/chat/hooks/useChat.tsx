@@ -5,10 +5,10 @@ import {
 } from "feature/chat/services/chatService";
 import type { ChatMessageType } from "feature/chat/types/chat.types";
 import {
+  selectCurrentUserStats,
   selectUserAuth,
   selectUserAvatar,
   selectUserName,
-  selectCurrentUserStats,
 } from "feature/user/store/userSlice";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

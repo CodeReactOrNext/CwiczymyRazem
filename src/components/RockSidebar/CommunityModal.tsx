@@ -1,9 +1,8 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { X, MessageSquare, Share2, Users, Heart, ExternalLink, Coffee } from "lucide-react";
-import { FaDiscord } from "react-icons/fa";
 import { Button } from "assets/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
+import { Coffee,ExternalLink, Heart, Share2, Users } from "lucide-react";
+import { FaDiscord } from "react-icons/fa";
 
 interface CommunityModalProps {
   isOpen: boolean;

@@ -1,16 +1,15 @@
+import { cn } from "assets/lib/utils";
+import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
+import { addDays, isSameDay,startOfWeek } from "date-fns";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "react-i18next";
-import { FaCheck, FaTimes, FaClock, FaTrophy, FaFire } from "react-icons/fa";
+import { FaClock, FaFire, FaTrophy } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
 import {
   checkIsPracticeToday,
   getUpdatedActualDayWithoutBreak,
 } from "utils/gameLogic";
-import { cn } from "assets/lib/utils";
 
-import DailyStreakBox from "./components/WeeklyStreakBox";
-import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
-import { startOfWeek, addDays, isSameDay } from "date-fns";
 
 interface WelcomeMessageProps {
   userName: string;

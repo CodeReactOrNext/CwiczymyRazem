@@ -1,9 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
-import { logger } from "feature/logger/Logger";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo,useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 

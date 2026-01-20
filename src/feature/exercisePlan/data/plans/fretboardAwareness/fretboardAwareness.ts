@@ -1,5 +1,6 @@
-import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
 import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
+import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
+
 import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const fretboardAwarenessPlan: ExercisePlan = {

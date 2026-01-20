@@ -1,7 +1,7 @@
 import { pentatonicPlayalongExercise } from "feature/exercisePlan/data/exerises/pentatonicPlayalong/pentatonicPlayalong";
+import authorAvatar from "public/images/avatars/guitarplayalogns.jpg";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
-import authorAvatar from "public/images/avatars/guitarplayalogns.jpg";
 
 export const pentatonicPlayalongPlan: ExercisePlan = {
   id: "pentatonic_playalong_best_of_plan",

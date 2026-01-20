@@ -1,12 +1,12 @@
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "store/hooks";
-import { selectDailyQuest } from "feature/user/store/userSlice";
-import { initializeDailyQuestAction, claimQuestRewardAction } from "feature/user/store/userSlice.asyncThunk";
-import { CheckCircle2, Circle, Gift, Swords } from "lucide-react";
-import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
-import { useTranslation } from "react-i18next";
 import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
+import { selectDailyQuest } from "feature/user/store/userSlice";
+import { claimQuestRewardAction,initializeDailyQuestAction } from "feature/user/store/userSlice.asyncThunk";
+import { CheckCircle2, Gift, Swords } from "lucide-react";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 export const DailyQuestWidget = () => {
     const dispatch = useAppDispatch();

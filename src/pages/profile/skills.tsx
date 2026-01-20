@@ -1,24 +1,20 @@
-import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { getUserSkills } from "feature/skills/services/getUserSkills";
-import { updateUserSkills } from "feature/skills/services/updateUserSkills";
-import type { UserSkills } from "feature/skills/skills.types";
+import MainContainer from "components/MainContainer";
 import { SkillDashboard } from "feature/skills/components/SkillDashboard";
+import { getUserSkills } from "feature/skills/services/getUserSkills";
+import type { UserSkills } from "feature/skills/skills.types";
 import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
-import type { NextPage } from "next";
+import AppLayout from "layouts/AppLayout";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
-import nextI18nextConfig from "../../../next-i18next.config";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
-import AppLayout from "layouts/AppLayout";
-import MainContainer from "components/MainContainer";
-import { LoaderPinwheel } from "lucide-react";
-
-import { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
+
+import nextI18nextConfig from "../../../next-i18next.config";
 
 const ProfileSkillsPage: NextPageWithLayout = () => {
   const { t } = useTranslation("profile");

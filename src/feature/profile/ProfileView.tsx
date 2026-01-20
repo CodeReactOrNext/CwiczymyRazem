@@ -1,12 +1,12 @@
 import { getUserStatsField } from "assets/stats/profileStats";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import ProfileLayout from "feature/profile/ProfileLayout";
+import AppLayout from "layouts/AppLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { firebaseGetUserDocument } from "utils/firebase/client/firebase.utils";
-import AppLayout from "layouts/AppLayout";
 
 const ProfileView = () => {
   const [userData, setUserData] = useState<ProfileInterface | undefined>(

@@ -1,28 +1,27 @@
+import { Card } from "assets/components/ui/card";
+import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import type { DateWithReport } from "components/ActivityLog/activityLog.types";
 import { StatsCard } from "components/Cards";
+import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import SkillsRadarChart from "feature/profile/components/SkillsRadarChart/SkillsRadarChart";
 import {
   StatsField,
   type StatsFieldProps,
 } from "feature/profile/components/StatsField";
-import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
-import type { Song } from "feature/songs/types/songs.type";
-import { useTranslation } from "react-i18next";
-import type { StatisticsDataInterface } from "types/api.types";
-import { useState } from "react";
-import { getTrendData } from "../utils/getTrendData";
-import { Card } from "assets/components/ui/card";
-import { cn } from "assets/lib/utils";
-import { ActivityLogView } from "components/ActivityLog/ActivityLog";
-import Link from "next/link";
-import { MySongsProgress } from "./MySongsProgress";
 import { RecommendationSkeleton } from "feature/songs/components/DailyRecommendation/RecommendationSkeleton";
-import { RecommendationsSection } from "./Recommendations/RecommendationsSection";
 import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
+import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
+import type { StatisticsDataInterface } from "types/api.types";
+
+import { getTrendData } from "../utils/getTrendData";
+import { MySongsProgress } from "./MySongsProgress";
+import { RecommendationsSection } from "./Recommendations/RecommendationsSection";
 
 interface StatsSectionProps {
   statsField: StatsFieldProps[];

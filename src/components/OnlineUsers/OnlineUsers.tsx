@@ -1,5 +1,5 @@
-import { useOnlineUsers } from "hooks/useOnlineUsers";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { useOnlineUsers } from "hooks/useOnlineUsers";
 import Link from "next/link";
 
 export const OnlineUsers = () => {

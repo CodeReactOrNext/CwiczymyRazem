@@ -1,6 +1,7 @@
-import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import type { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 import { getSession } from "next-auth/react";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 import nextI18nextConfig from "../../../next-i18next.config";
 
 type WithAuthOptions = {

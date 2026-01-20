@@ -1,42 +1,41 @@
-import {
-  DndContext,
+import type {
   DragEndEvent,
+  DragStartEvent} from "@dnd-kit/core";
+import {
+  closestCorners,
+  DndContext,
   DragOverlay,
-  DragStartEvent,
   KeyboardSensor,
   PointerSensor,
-  closestCorners,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { Input } from "assets/components/ui/input";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
-import { Button } from "assets/components/ui/button";
-import { Input } from "assets/components/ui/input";
-import {
-  Search,
-  X,
-  Filter
-} from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
-import { getAllTiers } from "feature/songs/utils/getSongTier";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
-import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { getAllTiers } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useEffect, useState, useMemo } from "react";
-import { useTranslation } from "react-i18next";
+import {
+  Search,
+  X
+} from "lucide-react";
 import { Music, Plus } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useMemo,useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
 
 interface SongLearningSectionProps {

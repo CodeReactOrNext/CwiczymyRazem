@@ -1,13 +1,13 @@
-import { cn } from "assets/lib/utils";
-import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
-import type { GuitarSkill } from "feature/skills/skills.types";
-import { useTranslation } from "react-i18next";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
+import { cn } from "assets/lib/utils";
+import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
+import type { GuitarSkill } from "feature/skills/skills.types";
+import { useTranslation } from "react-i18next";
 
 interface SkillCardProps {
   skill: GuitarSkill;

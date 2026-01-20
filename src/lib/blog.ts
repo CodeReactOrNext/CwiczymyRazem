@@ -1,6 +1,6 @@
 import fs from 'fs';
-import path from 'path';
 import matter from 'gray-matter';
+import path from 'path';
 
 const BLOG_DIR = path.join(process.cwd(), 'src/content/blog');
 
