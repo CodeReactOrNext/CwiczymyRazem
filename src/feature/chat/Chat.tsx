@@ -1,13 +1,13 @@
 import { Button } from "assets/components/ui/button";
+import { Card } from "assets/components/ui/card";
 import { Input } from "assets/components/ui/input";
 import { ScrollArea } from "assets/components/ui/scroll-area";
-import { Card } from "assets/components/ui/card";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChat } from "feature/chat/hooks/useChat";
+import { SendHorizontal } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { SendHorizontal } from "lucide-react";
 
 export const Chat = () => {
   const {

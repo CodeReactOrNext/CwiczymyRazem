@@ -2,9 +2,9 @@ import type { FirebaseLogsInterface } from "feature/logs/types/logs.type";
 import { convertMsToHM } from "utils/converter";
 
 import { ACTIVITY_MESSAGES, DISCORD_JOKES } from "../constants/messages";
+import type { DiscordEmbed } from "../types/discord.types";
 import type { GeneralLogFormatter } from "../types/formatter.types";
 import { getUserDisplayName } from "../utils/userUtils";
-import type { DiscordEmbed } from "../types/discord.types";
 
 export class ActivityLogFormatter implements GeneralLogFormatter {
   async format(log: FirebaseLogsInterface, lang: "PL" | "EN" = "PL") {

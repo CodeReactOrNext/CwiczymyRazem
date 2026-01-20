@@ -6,15 +6,16 @@ import {
   getAuth,
   GoogleAuthProvider,
   reauthenticateWithCredential,
+  sendPasswordResetEmail,
+  signInWithCredential,
   signInWithEmailAndPassword,
   signInWithPopup,
-  signInWithCredential,
   signOut,
-  sendPasswordResetEmail,
 } from "firebase/auth";
 import {
   collection,
   doc,
+  enableIndexedDbPersistence,
   getDoc,
   getDocs,
   getFirestore,
@@ -25,21 +26,17 @@ import {
   Timestamp,
   updateDoc,
   where,
-  enableIndexedDbPersistence,
 } from "firebase/firestore";
-import {
-  trackedGetDocs,
-  trackedGetDoc,
-  trackedUpdateDoc,
-  trackedSetDoc,
-  trackedAddDoc
-} from "./firestoreTracking";
 import { getStorage, } from "firebase/storage";
 
 import { firebaseApp } from "./firebase.cofig";
 import type {
   FirebaseUserDataInterface,
 } from "./firebase.types";
+import {
+  trackedGetDoc,
+  trackedGetDocs,
+  trackedUpdateDoc} from "./firestoreTracking";
 
 const provider = new GoogleAuthProvider();
 

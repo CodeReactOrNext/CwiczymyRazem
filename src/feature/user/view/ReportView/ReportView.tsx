@@ -1,8 +1,7 @@
 import { Button } from "assets/components/ui/button";
-import { Card } from "assets/components/ui/card";
 import { Input } from "assets/components/ui/input";
+import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import Backdrop from "components/UI/Backdrop";
-import { MAX_DAYS_BACK } from "constants/gameSettings";
 import {
   selectCurrentUserStats,
   selectIsFetching,
@@ -12,26 +11,23 @@ import {
   selectUserAuth,
   selectUserAvatar,
 } from "feature/user/store/userSlice";
-import { updateUserStats, updateQuestProgress, checkAndSaveChallengeProgress } from "feature/user/store/userSlice.asyncThunk";
+import { checkAndSaveChallengeProgress,updateQuestProgress, updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { Formik } from "formik";
-import { motion } from "framer-motion";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import {
   AcceptExceedingPopUp,
   ErrorBox,
   HealthHabbitsBox,
-  ReportCategoryWrapper,
   TimeInputBox,
 } from "layouts/ReportFormLayout/components";
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
-import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { i18n } from "next-i18next";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FaBrain, FaMusic, FaTimesCircle } from "react-icons/fa";
+import { FaBrain, FaMusic } from "react-icons/fa";
 import { GrDocumentUpload } from "react-icons/gr";
 import { IoMdHand } from "react-icons/io";
 import { MdSchool, MdTitle } from "react-icons/md";
@@ -44,7 +40,6 @@ import {
   inputTimeConverter,
 } from "utils/converter";
 
-import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import { RaportSchema } from "./helpers/RaportShcema";
 import type { ReportFormikInterface } from "./ReportView.types";

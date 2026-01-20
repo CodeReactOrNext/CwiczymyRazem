@@ -1,16 +1,13 @@
-import { HeroView } from "feature/hero/HeroView";
 import LogsBoxView from "feature/logsBox/view/LogsBoxView";
 import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
 import {
   selectCurrentUserStats,
-  selectUserAuth,
 } from "feature/user/store/userSlice";
+import AppLayout from "layouts/AppLayout";
+import { useRouter } from "next/router";
+import type { ReactElement } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
-import AppLayout from "layouts/AppLayout";
-
-import { useRouter } from "next/router";
-import { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 
 const ProfileOverviewPage: NextPageWithLayout = () => {

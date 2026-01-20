@@ -1,27 +1,24 @@
-import React from "react";
-import Link from "next/link";
-import { Card, CardContent } from "assets/components/ui/card";
 import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { Separator } from "assets/components/ui/separator";
 import {
   ArrowLeft,
+  Award,
+  BarChart3,
   Calendar,
-  Clock,
-  User,
-  Share2,
-  BookOpen,
-  Target,
-  TrendingUp,
   CheckCircle,
+  Clock,
   ExternalLink,
   Lightbulb,
-  Award,
-  Zap,
-  BarChart3,
   Music,
   Star,
+  Target,
+  TrendingUp,
+  User,
+  Zap,
 } from "lucide-react";
+import Link from "next/link";
+import React from "react";
 
 const PracticeHabitsView = () => {
   const articleData = {

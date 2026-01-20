@@ -1,8 +1,5 @@
-import OldEffect from "components/OldEffect";
 
 import ContentBox from "./components/ContentBox";
-import Header from "./components/Header";
-import SubtitleBar from "./components/SubtitleBar";
 
 export type layoutVariant = "primary" | "secondary" | "landing";
 

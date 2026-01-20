@@ -1,10 +1,11 @@
-import { useAppSelector, useAppDispatch } from "store/hooks";
-import { selectUserAuth, selectCurrentUserStats } from "feature/user/store/userSlice";
-import { challengeUseCases } from "../../index";
-import { saveActiveChallenge, resetChallenge } from "feature/user/store/userSlice.asyncThunk";
+import { selectCurrentUserStats,selectUserAuth } from "feature/user/store/userSlice";
+import { resetChallenge,saveActiveChallenge } from "feature/user/store/userSlice.asyncThunk";
 import { useEffect, useState } from "react";
-import { Challenge } from "../../backend/domain/models/Challenge";
 import { toast } from "sonner";
+import { useAppDispatch,useAppSelector } from "store/hooks";
+
+import type { Challenge } from "../../backend/domain/models/Challenge";
+import { challengeUseCases } from "../../index";
 
 export const useChallenges = () => {
   const userAuth = useAppSelector(selectUserAuth);

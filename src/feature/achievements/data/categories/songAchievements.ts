@@ -1,26 +1,26 @@
+import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
 import {
-  GiSwordman,
-  GiSwordsPower,
-  GiNotebook,
-  GiMisdirection,
-  GiMoebiusTriangle,
-  GiWeight,
-  GiWeightLiftingUp,
-  GiPush,
-  GiMuscularTorso,
-  GiMultipleTargets,
-  GiRearAura,
   GiCard2Hearts,
   GiCard3Diamonds,
   GiCard4Diamonds,
   GiCard5Diamonds,
   GiCard6Diamonds,
+  GiCardAceDiamonds,
   GiCardJackDiamonds,
   GiCardKingDiamonds,
-  GiCardAceDiamonds,
+  GiMisdirection,
+  GiMoebiusTriangle,
+  GiMultipleTargets,
+  GiMuscularTorso,
+  GiNotebook,
+  GiPush,
+  GiRearAura,
+  GiSwordman,
+  GiSwordsPower,
+  GiWeight,
+  GiWeightLiftingUp,
 } from "react-icons/gi";
-import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
-import { AchievementList } from "../../types";
+
 import { achivFactor } from "../achievementsData.utils";
 
 export const songAchievements = [

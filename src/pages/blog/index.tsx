@@ -1,13 +1,15 @@
-import React from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
-import Image from 'next/image';
-import { GetStaticProps } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import nextI18nextConfig from '../../../next-i18next.config';
-import { getAllBlogs, BlogFrontmatter } from 'lib/blog';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { Footer } from 'feature/landing/components/Footer';
+import type { BlogFrontmatter} from 'lib/blog';
+import {getAllBlogs } from 'lib/blog';
+import type { GetStaticProps } from 'next';
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import React from 'react';
+
+import nextI18nextConfig from '../../../next-i18next.config';
 
 interface BlogIndexProps {
   blogs: BlogFrontmatter[];

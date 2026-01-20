@@ -1,11 +1,11 @@
 import { IconBox } from "components/IconBox/IconBox";
+import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "react-i18next";
 import { FaClock, FaRegCalendarAlt, FaStar } from "react-icons/fa";
-import type { ReportListInterfaceWithTimeSumary } from "../../activityLog.types";
+import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer } from "recharts";
 import { convertMsToHM } from "utils/converter";
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from "recharts";
 
-import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import type { ReportListInterfaceWithTimeSumary } from "../../activityLog.types";
 
 const ExerciseShortInfo = ({
   date,

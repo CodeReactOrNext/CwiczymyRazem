@@ -1,22 +1,22 @@
+import { hoursToMilliseconds } from "date-fns";
+import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
 import {
   FaBalanceScale,
-  FaHeart,
-  FaRing,
-  FaUserMd,
-  FaHandSparkles,
+  FaDumbbell,
   FaGrimace,
-  FaTired,
+  FaHeart,
   FaHotjar,
   FaMedal,
-  FaDumbbell,
-  FaWrench,
+  FaRing,
   FaShieldAlt,
+  FaTired,
   FaTrophy,
+  FaUserMd,
+  FaWrench,
 } from "react-icons/fa";
 import { GiHeartBattery, GiRollingBomb } from "react-icons/gi";
-import { hoursToMilliseconds } from "date-fns";
 import { inputTimeConverter } from "utils/converter";
-import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
+
 import { achivFactor } from "../achievementsData.utils";
 
 export const specialAchievements = [

@@ -1,4 +1,4 @@
-import { Users, Star, TrendingUp } from "lucide-react";
+import { Star, TrendingUp,Users } from "lucide-react";
 
 interface UserAnalyticsProps {
   totalUsers: number;

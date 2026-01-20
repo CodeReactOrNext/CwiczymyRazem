@@ -8,20 +8,21 @@ import {
 } from "assets/components/ui/dialog";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import { cn } from "assets/lib/utils";
+import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { addSong } from "feature/songs/services/addSong";
-import { updateSongStatus } from "feature/songs/services/udateSongStatus";
-import { getSongs } from "feature/songs/services/getSongs";
 import { enrichSong } from "feature/songs/services/enrichment.service";
+import { getSongs } from "feature/songs/services/getSongs";
+import { updateSongStatus } from "feature/songs/services/udateSongStatus";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
-import { useState, useEffect, useCallback } from "react";
+import debounce from "lodash/debounce";
+import { ArrowRight, Check, Music, Search, SkipForward } from "lucide-react";
+import { useCallback,useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
-import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
-import { Check, Music, Search, ArrowRight, SkipForward } from "lucide-react";
-import { cn } from "assets/lib/utils";
-import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import debounce from "lodash/debounce";
+
 import { SpotifyPlayer } from "../SpotifyPlayer";
 
 interface AddSongModalProps {

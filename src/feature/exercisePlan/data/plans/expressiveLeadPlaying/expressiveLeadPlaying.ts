@@ -1,7 +1,8 @@
-import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
 import { articulationContrastExercise } from "feature/exercisePlan/data/exerises/articulationContrast/articulationContrast";
-import { precisionBendingExercise } from "feature/exercisePlan/data/exerises/precisionBending/precisionBending";
 import { dynamicControlExercise } from "feature/exercisePlan/data/exerises/dynamicControl/dynamicControl";
+import { precisionBendingExercise } from "feature/exercisePlan/data/exerises/precisionBending/precisionBending";
+import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
+
 import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const expressiveLeadPlayingPlan: ExercisePlan = {

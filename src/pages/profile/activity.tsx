@@ -10,17 +10,16 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
-import type { NextPage } from "next";
+import AppLayout from "layouts/AppLayout";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
-import nextI18nextConfig from "../../../next-i18next.config";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "store/hooks";
-import { StatisticsDataInterface } from "types/api.types";
-import AppLayout from "layouts/AppLayout";
-
-import { ReactElement } from "react";
+import type { StatisticsDataInterface } from "types/api.types";
 import type { NextPageWithLayout } from "types/page";
+
+import nextI18nextConfig from "../../../next-i18next.config";
 
 const ProfileActivityPage: NextPageWithLayout = () => {
   const { t } = useTranslation("profile");

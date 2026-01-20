@@ -1,20 +1,16 @@
-import { StatsSection } from "feature/profile/components/StatsSection";
-import { getUserStatsField } from "assets/stats/profileStats";
-import type { StatsFieldProps } from "feature/profile/components/StatsField";
+import { ExercisePlan } from "feature/exercisePlan/components/ExercisePlan";
 import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
-import type { NextPage } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useTranslation } from "react-i18next";
-import nextI18nextConfig from "../../../next-i18next.config";
-import { useAppSelector } from "store/hooks";
 import AppLayout from "layouts/AppLayout";
-import { ExercisePlan } from "feature/exercisePlan/components/ExercisePlan";
-
-import { ReactElement } from "react";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import type { ReactElement } from "react";
+import { useTranslation } from "react-i18next";
+import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
+
+import nextI18nextConfig from "../../../next-i18next.config";
 
 const ProfileExercisesPage: NextPageWithLayout = () => {
   const { t } = useTranslation("profile");

@@ -1,4 +1,4 @@
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip,XAxis, YAxis } from "recharts";
 
 interface UserGrowthChartProps {
   data: { name: string; users: number }[];

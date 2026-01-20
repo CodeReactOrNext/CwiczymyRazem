@@ -1,11 +1,9 @@
 import SongsView from "feature/songs/SongsView";
-import type { NextPage } from "next";
-import { useTranslation } from "react-i18next";
-import { withAuth } from "utils/auth/serverAuth";
 import AppLayout from "layouts/AppLayout";
-
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
+import { useTranslation } from "react-i18next";
 import type { NextPageWithLayout } from "types/page";
+import { withAuth } from "utils/auth/serverAuth";
 
 const SongsPage: NextPageWithLayout = () => {
   const { t } = useTranslation("songs");

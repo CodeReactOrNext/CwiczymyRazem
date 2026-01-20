@@ -1,12 +1,11 @@
 import { Badge } from "assets/components/ui/badge";
-import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

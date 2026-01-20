@@ -5,8 +5,6 @@ import type { FirebaseLogsSongsStatuses } from "feature/logs/types/logs.type";
 import {
   collection,
   doc,
-  getDoc,
-  setDoc,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDoc, trackedSetDoc } from "utils/firebase/client/firestoreTracking";

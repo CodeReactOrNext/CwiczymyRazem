@@ -1,9 +1,8 @@
-import { Card } from "assets/components/ui/card";
 import { Button } from "assets/components/ui/button";
-import { useRouter } from "next/router";
-import { Play, BookOpen, Sparkles, Loader2 } from "lucide-react";
-import { useState } from "react";
 import { cn } from "assets/lib/utils";
+import { BookOpen, Loader2,Play, Sparkles } from "lucide-react";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 export const OnboardingCards = () => {
     const router = useRouter();

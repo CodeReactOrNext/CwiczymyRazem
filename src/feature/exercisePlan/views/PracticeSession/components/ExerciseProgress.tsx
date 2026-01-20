@@ -1,4 +1,5 @@
 import { cn } from "assets/lib/utils";
+
 import type { ExercisePlan } from "../../../types/exercise.types";
 
 interface ExerciseProgressProps {

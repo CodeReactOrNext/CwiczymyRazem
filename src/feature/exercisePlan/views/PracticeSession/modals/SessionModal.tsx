@@ -1,28 +1,26 @@
-import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
-import { Metronome } from "feature/exercisePlan/components/Metronome/Metronome";
-import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
-import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
-import { FaExpand } from "react-icons/fa";
-import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
-
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "assets/components/ui/accordion";
+import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
+import { Metronome } from "feature/exercisePlan/components/Metronome/Metronome";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
-import { FaInfoCircle, FaLightbulb, FaHeart, FaFacebook, FaInstagram, FaTwitter, FaExternalLinkAlt } from "react-icons/fa";
+import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
+import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
+import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import { useTranslation } from "react-i18next";
+import { FaExpand } from "react-icons/fa";
+import { FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaTwitter } from "react-icons/fa";
 
 import { categoryGradients } from "../../../constants/categoryStyles";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
 import { NextExerciseCard } from "../components/NextExerciseCard";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
-import { TipsCard } from "../components/TipsCard";
 
 interface SessionModalProps {
   isOpen: boolean;

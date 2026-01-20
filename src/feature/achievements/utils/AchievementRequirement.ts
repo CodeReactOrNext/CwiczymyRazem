@@ -1,5 +1,5 @@
-import { AchievementCheck, AchievementProgress } from "feature/achievements/types";
-import { HabbitsType } from "feature/user/view/ReportView/ReportView.types";
+import type { AchievementCheck, AchievementProgress } from "feature/achievements/types";
+import type { HabbitsType } from "feature/user/view/ReportView/ReportView.types";
 import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface, StatisticsTime } from "types/api.types";
 

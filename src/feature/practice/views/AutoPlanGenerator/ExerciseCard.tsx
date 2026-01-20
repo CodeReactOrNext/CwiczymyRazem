@@ -12,9 +12,8 @@ import {
   FaClock,
   FaRandom,
   FaTrash,
-  FaYoutube,
-  FaVideo
-} from "react-icons/fa";
+  FaVideo,
+  FaYoutube} from "react-icons/fa";
 
 interface ExerciseCardProps {
   exercise: Exercise;

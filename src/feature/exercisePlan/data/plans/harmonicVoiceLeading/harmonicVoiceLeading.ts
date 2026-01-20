@@ -1,6 +1,7 @@
 import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
-import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
 import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
+import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
+
 import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const harmonicVoiceLeadingPlan: ExercisePlan = {

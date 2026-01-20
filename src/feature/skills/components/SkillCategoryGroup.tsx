@@ -1,10 +1,11 @@
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
-import type { GuitarSkill, GuitarSkillId, UserSkills } from "feature/skills/skills.types";
+import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
+import { useTranslation } from "react-i18next";
+
 import { SkillCard } from "./SkillCard";
 import { SkillRadarChart } from "./SkillRadarChart";
-import { useTranslation } from "react-i18next";
 
 interface SkillCategoryGroupProps {
   category: CategoryKeys;

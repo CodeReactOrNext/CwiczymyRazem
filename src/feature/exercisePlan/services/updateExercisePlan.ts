@@ -1,8 +1,9 @@
-import { db } from "utils/firebase/client/firebase.utils";
-import { doc, updateDoc, Timestamp } from "firebase/firestore";
-import { EXERCISE_PLANS_COLLECTION } from "./constants";
 import { logger } from "feature/logger/Logger";
+import { doc, Timestamp,updateDoc } from "firebase/firestore";
+import { db } from "utils/firebase/client/firebase.utils";
+
 import type { ExercisePlan } from "../types/exercise.types";
+import { EXERCISE_PLANS_COLLECTION } from "./constants";
 
 export const updateExercisePlan = async (
   planId: string,

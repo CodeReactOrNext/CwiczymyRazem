@@ -1,8 +1,8 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
-import { FaPause, FaPlay, FaStepForward, FaCheck } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { FaCheck,FaPause, FaPlay, FaStepForward } from "react-icons/fa";
 
 interface SessionModalControlsProps {
   isPlaying: boolean;

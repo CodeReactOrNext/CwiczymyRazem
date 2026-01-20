@@ -1,5 +1,4 @@
 import React from "react";
-import { cn } from "assets/lib/utils";
 
 export const RecommendationSkeleton = ({ type = "song" }: { type?: "song" | "exercise" | "progress" }) => {
   if (type === "exercise") {

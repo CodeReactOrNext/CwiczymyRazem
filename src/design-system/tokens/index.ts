@@ -3,17 +3,17 @@
  * Centralized design tokens for consistent, minimal design
  */
 
-import { animation, type Animation } from './animation';
-import { colors, type Colors } from './colors';
-import { effects, type Effects } from './effects';
-import { spacing, type Spacing } from './spacing';
-import { typography, type Typography } from './typography';
+import { type Animation,animation } from './animation';
+import { type Colors,colors } from './colors';
+import { type Effects,effects } from './effects';
+import { type Spacing,spacing } from './spacing';
+import { type Typography,typography } from './typography';
 
-export { animation, type Animation };
-export { colors, type Colors };
-export { effects, type Effects };
-export { spacing, type Spacing };
-export { typography, type Typography };
+export { type Animation,animation };
+export { type Colors,colors };
+export { type Effects,effects };
+export { type Spacing,spacing };
+export { type Typography,typography };
 
 // Combined design tokens
 export const designTokens = {

@@ -1,8 +1,8 @@
 import { Card } from "assets/components/ui/card";
 import { motion } from "framer-motion";
+import { Activity, BookOpen, Clock, Headphones, Minus,Sparkles, TrendingDown, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { convertMsToHM } from "utils/converter";
-import { Activity, Headphones, BookOpen, Sparkles, Clock, TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 interface SessionStatsProps {
   time: number;

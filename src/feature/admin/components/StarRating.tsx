@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Star } from "lucide-react";
 import { cn } from "assets/lib/utils";
+import { Star } from "lucide-react";
+import { useState } from "react";
 
 interface StarRatingProps {
   rating: number;

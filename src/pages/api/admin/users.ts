@@ -1,6 +1,6 @@
+import { collection, getCountFromServer } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "utils/firebase/client/firebase.utils";
-import { collection, query, getDocs, orderBy, Timestamp, getCountFromServer, limit, where } from "firebase/firestore";
 
 export default async function handler(
   req: NextApiRequest,

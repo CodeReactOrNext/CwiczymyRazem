@@ -1,5 +1,5 @@
-import { IChallengeRepository } from "../domain/repositories/IChallengeRepository";
-import { ActiveChallenge, Challenge } from "../domain/models/Challenge";
+import type { ActiveChallenge, Challenge } from "../domain/models/Challenge";
+import type { IChallengeRepository } from "../domain/repositories/IChallengeRepository";
 
 export class ChallengeUseCases {
   constructor(private challengeRepository: IChallengeRepository) { }

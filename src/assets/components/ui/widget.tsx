@@ -1,6 +1,6 @@
-import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "assets/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+import * as React from "react";
 
 const widgetVariants = cva(
   "relative flex flex-col border-2 whitespace-nowrap shadow-md dark:shadow-secondary/50 rounded-3xl",
@@ -98,9 +98,9 @@ WidgetFooter.displayName = "WidgetFooter";
 
 export {
   Widget,
-  WidgetHeader,
-  WidgetTitle,
   WidgetContent,
   WidgetFooter,
+  WidgetHeader,
+  WidgetTitle,
   widgetVariants,
 };

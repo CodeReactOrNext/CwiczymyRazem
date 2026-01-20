@@ -4,8 +4,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
-import type { ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 
+import type { ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 import CalendarSquare from "./CalendarSquare/CalendarSquare";
 import ExerciseShortInfo from "./ExerciseShortInfo";
 

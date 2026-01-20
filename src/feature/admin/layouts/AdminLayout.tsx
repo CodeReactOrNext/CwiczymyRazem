@@ -1,22 +1,18 @@
-import { ReactNode, useState } from "react";
+import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { 
-  Music, 
-  Menu,
   ChevronLeft,
-  LogOut,
-  Zap,
-  LayoutDashboard,
-  Users,
-  Settings,
-  Database,
   ChevronRight,
+  LogOut,
+  Menu,
+  Music, 
+  SearchCheck,
   ShieldCheck,
-  SearchCheck
-} from "lucide-react";
+  Users} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { cn } from "assets/lib/utils";
-import { Button } from "assets/components/ui/button";
+import type { ReactNode} from "react";
+import { useState } from "react";
 
 interface AdminLayoutProps {
   children: ReactNode;

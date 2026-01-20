@@ -1,3 +1,4 @@
+import { TableSkeleton } from "assets/components/ui/table-skeleton";
 import MainContainer from "components/MainContainer";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
@@ -7,8 +8,6 @@ import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.t
 
 import SeasonSelect from "./SeasonSelect";
 import UserStats from "./UserStats";
-import ViewToggle from "./ViewToggle";
-import { TableSkeleton } from "assets/components/ui/table-skeleton";
 
 export type SortByType = "points" | "sessionCount";
 

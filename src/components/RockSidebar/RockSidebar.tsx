@@ -1,49 +1,46 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
-import { Badge } from "assets/components/ui/badge";
 import { Separator } from "assets/components/ui/separator";
-import Image from "next/image";
+import { cn } from "assets/lib/utils";
+import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
+import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
+import { PWASidebarItem } from "components/PWA/PWASidebarItem";
+import Avatar from "components/UI/Avatar";
+import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import {
-  User,
-  Music,
-  Trophy,
-  Timer,
-  FileText,
-  X,
+  selectCurrentUserStats,
+  selectUserAvatar,
+  selectUserName,
+} from "feature/user/store/userSlice";
+import { AnimatePresence,motion } from "framer-motion";
+import {
   Activity,
-  Brain,
-  Dumbbell,
-  Settings,
-  Calendar,
-  Home,
-  Code,
-  LayoutGrid,
   BookOpen,
-  Flame,
+  Brain,
+  Calendar,
   Coffee,
+  Dumbbell,
+  FileText,
+  Flame,
+  LayoutGrid,
+  Music,
+  Settings,
+  Timer,
+  Trophy,
+  User,
+  X,
 } from "lucide-react";
-import { FaDiscord } from "react-icons/fa";
+import { Heart, Zap } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { FaDiscord } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
-import {
-  selectCurrentUserStats,
-  selectUserName,
-  selectUserAvatar,
-} from "feature/user/store/userSlice";
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
-
-import Avatar from "components/UI/Avatar";
-import { NavPagesTypes } from "types/layout.types";
-import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
-import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
-import { CommunityModal } from "./CommunityModal";
-import { Heart, MessageSquare, Zap } from "lucide-react";
+import type { NavPagesTypes } from "types/layout.types";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
-import { PWASidebarItem } from "components/PWA/PWASidebarItem";
+
+import { CommunityModal } from "./CommunityModal";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;

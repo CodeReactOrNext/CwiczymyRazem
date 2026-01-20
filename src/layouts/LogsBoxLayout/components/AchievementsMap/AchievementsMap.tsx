@@ -1,4 +1,5 @@
-import { AchievementList, achievementsData, AchievementCard, useAchievementContext } from "feature/achievements";
+import type { AchievementList} from "feature/achievements";
+import { AchievementCard, achievementsData, useAchievementContext } from "feature/achievements";
 
 interface AchievementsMapProps {
   userAchievements: AchievementList[];

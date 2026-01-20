@@ -1,7 +1,7 @@
-import { IChallengeRepository } from "../../domain/repositories/IChallengeRepository";
-import { Challenge, ActiveChallenge } from "../../domain/models/Challenge";
-import { challengesList } from "./staticChallenges";
+import type { ActiveChallenge,Challenge } from "../../domain/models/Challenge";
+import type { IChallengeRepository } from "../../domain/repositories/IChallengeRepository";
 import { challengeService } from "./challenge.service";
+import { challengesList } from "./staticChallenges";
 
 export class ChallengeRepository implements IChallengeRepository {
   async getAllChallenges(): Promise<Challenge[]> {

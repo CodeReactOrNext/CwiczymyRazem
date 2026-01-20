@@ -3,8 +3,8 @@ import { Card } from "assets/components/ui/card";
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { FaCheck, FaTrophy } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { FaCheck, FaTrophy } from "react-icons/fa";
 
 interface ExerciseSuccessViewProps {
   planTitle: string;

@@ -1,41 +1,38 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { statisticsInitial } from "constants/userStatisticsInitialData";
-import Router from "next/router";
 import type { RootState } from "store/store";
 import type {
-  StatisticsDataInterface,
-  TimerInterface,
-  userSliceInitialState,
   ActiveChallenge,
   DailyQuest,
-  DailyQuestTask,
   DailyQuestTaskType,
+  StatisticsDataInterface,
   StatisticsTime,
+  TimerInterface,
+  userSliceInitialState,
 } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
 
 import {
   autoLogIn,
   changeUserDisplayName,
+  checkAndSaveChallengeProgress,
   createAccount,
   getUserProvider,
   logInViaEmail,
   logInViaGoogle,
   logInViaGoogleCredential,
   logUserOff,
+  rateSong,
+  resetChallenge,
   restartUserStats,
+  saveActiveChallenge,
   updateUserEmail,
   updateUserPassword,
   updateUserStats,
   uploadUserAvatar,
   uploadUserSocialData,
-  rateSong,
-  saveActiveChallenge,
-  checkAndSaveChallengeProgress,
-  resetChallenge,
 } from "./userSlice.asyncThunk";
-import { challengesList } from "feature/challenges";
 
 
 const initialState: userSliceInitialState = {

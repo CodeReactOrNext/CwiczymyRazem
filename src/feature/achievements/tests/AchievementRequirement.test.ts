@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect,it } from 'vitest';
+
+import type { AchievementContext } from '../types';
 import { AchievementRequirement } from '../utils/AchievementRequirement';
-import { AchievementContext } from '../types';
 
 const createMockContext = (overrides: Partial<AchievementContext> = {}): AchievementContext => ({
   statistics: {

@@ -1,22 +1,22 @@
-import React from "react";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import MainContainer from "components/MainContainer";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
-import MainContainer from "components/MainContainer";
+import { Trophy } from "lucide-react";
 import Router from "next/router";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
-import { Trophy } from "lucide-react";
 
-import { WeeklyInsight } from "./components/WeeklyInsight";
-import { NextMilestone } from "./components/NextMilestone";
-import { SkillBalance } from "./components/SkillBalance";
-import { SessionStats } from "./components/SessionStats";
-import { LevelUpBanner } from "./components/LevelUpBanner";
 import { AchievementsDisplay } from "./components/AchievementsDisplay";
-import { useRatingPopUp } from "./hooks/useRatingPopUp";
+import { LevelUpBanner } from "./components/LevelUpBanner";
+import { NextMilestone } from "./components/NextMilestone";
+import { SessionStats } from "./components/SessionStats";
+import { SkillBalance } from "./components/SkillBalance";
 import { SuccessRewardCard } from "./components/SuccessRewardCard";
+import { WeeklyInsight } from "./components/WeeklyInsight";
+import { useRatingPopUp } from "./hooks/useRatingPopUp";
 
 interface RatingPopUpProps {
   ratingData: ReportDataInterface;

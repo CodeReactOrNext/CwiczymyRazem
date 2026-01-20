@@ -1,7 +1,8 @@
 import { Card } from "assets/components/ui/card";
+import type {
+  WheelPickerOption} from "assets/components/wheel-picker";
 import {
-  WheelPicker,
-  WheelPickerOption,
+  WheelPicker
 } from "assets/components/wheel-picker";
 import type { QuestionMarkProps } from "components/UI/QuestionMark";
 import QuestionMark from "components/UI/QuestionMark";

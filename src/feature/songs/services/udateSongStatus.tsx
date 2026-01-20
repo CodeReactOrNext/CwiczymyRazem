@@ -1,6 +1,6 @@
 import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
 import type { SongStatus } from "feature/songs/types/songs.type";
-import { doc, setDoc, Timestamp, getDoc, updateDoc, arrayUnion, increment } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, increment,setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const updateSongStatus = async (

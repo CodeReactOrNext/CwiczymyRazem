@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { cn } from "assets/lib/utils";
 import { toggleLogReaction } from "feature/logs/services/toggleLogReaction.service";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence,motion } from "framer-motion";
 import { ThumbsUp } from "lucide-react";
+import { useState } from "react";
 
 interface LogReactionProps {
   logId: string;

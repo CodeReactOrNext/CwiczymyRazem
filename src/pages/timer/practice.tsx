@@ -1,21 +1,15 @@
 import { selectTimerData, selectUserAvatar, updateTimerTime } from "feature/user/store/userSlice";
-import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
-import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import useTimer from "hooks/useTimer";
 import AppLayout from "layouts/AppLayout";
 import TimerLayout from "layouts/TimerLayout/TimerLayout";
-import { type NextPage } from "next";
 import { useRouter } from "next/router";
-import { useState, useCallback } from "react";
-import { useAppSelector, useAppDispatch } from "store/hooks";
-import { withAuth } from "utils/auth/serverAuth";
-import { convertMsToHMObject } from "utils/converter/timeConverter";
+import type { ReactElement } from "react";
+import { useCallback,useState } from "react";
 import { useEffect } from "react";
-
-import type { SkillsType } from "types/skillsTypes";
-
-import { ReactElement } from "react";
+import { useAppDispatch,useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
+import type { SkillsType } from "types/skillsTypes";
+import { withAuth } from "utils/auth/serverAuth";
 
 const TimerPractice: NextPageWithLayout = () => {
   const dispatch = useAppDispatch();

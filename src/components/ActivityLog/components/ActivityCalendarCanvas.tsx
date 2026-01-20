@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef } from "react";
 import type { ReportListInterface } from "types/api.types";
 
 import type { DateWithReport } from "../activityLog.types";

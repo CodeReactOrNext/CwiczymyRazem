@@ -1,19 +1,19 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import { updateCredsSchema } from "feature/settings/SettingsView/Settings.schemas";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import {
   getUserProvider,
   updateUserEmail,
 } from "feature/user/store/userSlice.asyncThunk";
-import { updateCredsSchema } from "feature/settings/SettingsView/Settings.schemas";
 import type { UserInfo } from "firebase-admin/lib/auth/user-record";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import type { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
+
 import ReauthForm from "../ReauthForm";
 
 const EmailChange = () => {

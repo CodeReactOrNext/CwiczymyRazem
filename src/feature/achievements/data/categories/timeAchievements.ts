@@ -1,17 +1,18 @@
+import { hoursToMilliseconds } from "date-fns";
+import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
 import {
-  FaThumbsUp,
   FaBook,
-  FaHeadphones,
-  FaUserNinja,
-  FaPalette,
   FaClock,
+  FaHeadphones,
   FaHourglass,
   FaMicroscope,
+  FaPalette,
+  FaThumbsUp,
+  FaUserNinja,
 } from "react-icons/fa";
 import { GiCelebrationFire, GiExtraTime } from "react-icons/gi";
-import { hoursToMilliseconds } from "date-fns";
 import { inputTimeConverter } from "utils/converter";
-import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
+
 import { achivFactor } from "../achievementsData.utils";
 
 export const timeAchievements = [

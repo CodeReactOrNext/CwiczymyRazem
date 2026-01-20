@@ -1,6 +1,6 @@
-import { Download, Share, Laptop } from "lucide-react";
-import { useTranslation } from "next-i18next";
 import { usePWAInstall } from "hooks/usePWAInstall";
+import { Download, Laptop,Share } from "lucide-react";
+import { useTranslation } from "next-i18next";
 import { useEffect, useState } from "react";
 
 export const PWASidebarItem = () => {

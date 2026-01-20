@@ -1,11 +1,12 @@
+import { hoursToMilliseconds } from "date-fns";
 import {
+  FaHandSparkles,
   FaMicrophoneAlt,
   FaRecordVinyl,
-  FaHandSparkles,
   FaRoute,
 } from "react-icons/fa";
-import { hoursToMilliseconds } from "date-fns";
 import { inputTimeConverter } from "utils/converter";
+
 import { achivFactor } from "../achievementsData.utils";
 
 export const habitAchievements = [

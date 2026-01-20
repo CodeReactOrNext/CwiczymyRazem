@@ -6,8 +6,8 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
 import { memoryCache } from "utils/cache/memoryCache";
+import { db } from "utils/firebase/client/firebase.utils";
 
 const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
 
