@@ -1,6 +1,12 @@
 import { Card } from "assets/components/ui/card";
 import type { SeasonalAchievement } from "feature/profile/services/seasonalAchievementsService";
 import { getUserSeasonalAchievements } from "feature/profile/services/seasonalAchievementsService";
+import { 
+  Award as AwardIcon,
+  Medal as MedalIcon,
+  Trophy as TrophyIcon, 
+} from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -8,12 +14,6 @@ import {
   FaExternalLinkAlt,
   FaRegStar as FaStar,
 } from "react-icons/fa";
-import { 
-  Trophy as TrophyIcon, 
-  Medal as MedalIcon,
-  Award as AwardIcon,
-} from "lucide-react";
-import Link from "next/link";
 
 interface SeasonalAchievementProps {
   userId?: string;

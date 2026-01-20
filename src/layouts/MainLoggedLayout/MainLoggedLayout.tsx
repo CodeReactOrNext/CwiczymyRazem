@@ -1,9 +1,10 @@
-import { RockSidebar } from "components/RockSidebar";
 import type { SidebarLinkInterface } from "components/RockSidebar";
-import { Home, Music, Trophy, HelpCircle, Timer, FileText } from "lucide-react";
+import { RockSidebar } from "components/RockSidebar";
+import { FileText,HelpCircle, Home, Music, Timer, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
+
 import DesktopHeaderWrapper from "./components/DesktopHeaderWrapper";
 import type { LandingNavObjectInterface } from "./components/LandingNav/LandingNav";
 import MainLoggedWrapper from "./components/MainLoggedWrapper";

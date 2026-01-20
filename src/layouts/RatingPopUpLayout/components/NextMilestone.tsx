@@ -1,6 +1,6 @@
 import { Card } from "assets/components/ui/card";
 import { motion } from "framer-motion";
-import { Target, Zap } from "lucide-react";
+import { Target } from "lucide-react";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getPointsToLvlUp } from "utils/gameLogic";
 

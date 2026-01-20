@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { auth } from "utils/firebase/api/firebase.config";
 
 export default async function handler(

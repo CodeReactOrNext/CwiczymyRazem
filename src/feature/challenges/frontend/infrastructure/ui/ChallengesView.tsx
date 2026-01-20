@@ -1,18 +1,18 @@
-import { Info, Trophy, Play } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
-import { ChallengeHeader } from "./ChallengeHeader";
-import { ActiveChallengeBanner } from "./ActiveChallengeBanner";
-import { ChallengeMap } from "./ChallengeMap";
-import { ChallengeCard } from "./ChallengeCard";
-import { ChallengeRPGMap } from "./ChallengeRPGMap";
-import { useChallenges } from "../../hooks/useChallenges";
-import { useState, useEffect } from "react";
-import { Challenge } from "../../../backend/domain/models/Challenge";
+import { selectCurrentUserStats,selectUserAuth } from "feature/user/store/userSlice";
+import { Play,Trophy } from "lucide-react";
 import { useRouter } from "next/router";
+import { useEffect,useState } from "react";
 import { useAppSelector } from "store/hooks";
-import { selectUserAuth, selectCurrentUserStats } from "feature/user/store/userSlice";
+
+import type { Challenge } from "../../../backend/domain/models/Challenge";
+import { useChallenges } from "../../hooks/useChallenges";
+import { ActiveChallengeBanner } from "./ActiveChallengeBanner";
+import { ChallengeHeader } from "./ChallengeHeader";
+import { ChallengeMap } from "./ChallengeMap";
+import { ChallengeRPGMap } from "./ChallengeRPGMap";
 
 export const ChallengesView = () => {
   const router = useRouter();

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 // Store the event globally in case it fires before the hook mounts
 let globalDeferredPrompt: any = null;

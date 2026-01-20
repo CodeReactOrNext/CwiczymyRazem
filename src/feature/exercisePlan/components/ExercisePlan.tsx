@@ -1,15 +1,15 @@
+import { Button } from "assets/components/ui/button";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useRouter } from "next/router";
-import { Button } from "assets/components/ui/button";
 import { HelpCircle } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { ExercisePlan as ExercisePlanType } from "../types/exercise.types";
 import { PracticeSession } from "../views/PracticeSession/PracticeSession";

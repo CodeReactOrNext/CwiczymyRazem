@@ -1,8 +1,9 @@
-import React from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "assets/components/ui/dialog";
-import { AchievementPhysicalCard } from "./AchievementPhysicalCard";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { IconType } from "react-icons/lib";
+import type { IconType } from "react-icons/lib";
+
+import { AchievementPhysicalCard } from "./AchievementPhysicalCard";
 
 interface AchievementCardMobileProps {
   Icon: IconType;

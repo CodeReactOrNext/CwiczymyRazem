@@ -1,13 +1,10 @@
-import { useState, useCallback } from "react";
-import AdminLayout from "feature/admin/layouts/AdminLayout";
 import { ArtistSongSelector } from "feature/admin/components/ArtistSongSelector";
-import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
-import { toast } from "sonner";
-import { useAdminSongs } from "feature/admin/hooks/useAdminSongs";
-import { useAdminBulkActions } from "feature/admin/hooks/useAdminBulkActions";
 import MassActionProgress from "feature/admin/components/MassActionProgress";
-import { Loader2, Sparkles, Plus, SearchCheck } from "lucide-react";
-import { Button } from "assets/components/ui/button";
+import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
+import { useAdminBulkActions } from "feature/admin/hooks/useAdminBulkActions";
+import { useAdminSongs } from "feature/admin/hooks/useAdminSongs";
+import AdminLayout from "feature/admin/layouts/AdminLayout";
+import { Loader2,Sparkles } from "lucide-react";
 
 const AdminDiscoveryPage = () => {
   const { password, handleLogout } = useAdminAuth((_pass: string) => {});

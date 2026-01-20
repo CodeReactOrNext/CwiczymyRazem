@@ -1,11 +1,11 @@
 "use client";
 
-import { Brain, Timer, Clock, Zap, BarChart3, TrendingUp, Music2, BookOpen } from "lucide-react";
-import { LandingSongCard } from "./LandingSongCard";
 import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
-import { MiniTrendChart } from "feature/profile/components/MiniTrendChart";
-import { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence,motion } from "framer-motion";
+import {Brain, Clock, Music2, TrendingUp, Zap } from "lucide-react";
+import { useEffect, useMemo,useState } from "react";
+
+import { LandingSongCard } from "./LandingSongCard";
 
 export const FeaturesSection = () => {
   const skillCategories = [

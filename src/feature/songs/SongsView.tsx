@@ -1,52 +1,28 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "assets/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "assets/components/ui/tabs";
+import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
-import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
-import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
 import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
-import { useSongs } from "feature/songs/hooks/useSongs";
-import { getAllTiers } from "feature/songs/utils/getSongTier";
-import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
-import { 
-  LoaderCircle, 
-  Search, 
-  X, 
-  Plus, 
-  Filter,  
-  LayoutGrid,
-  SlidersHorizontal,
-  ListMusic,
-  Music,
-  LayoutDashboard,
-  Activity,
-  Brain,
-  Dumbbell,
-  Settings,
-  Calendar,
-  Home,
-  Code,
-  HelpCircle,
-} from "lucide-react";
+import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
 import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
-import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
-import { cn } from "assets/lib/utils";
-import { useRouter } from "next/router";
+import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
+import { useSongs } from "feature/songs/hooks/useSongs";
+import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
+import { getAllTiers } from "feature/songs/utils/getSongTier";
+import {  
+  HelpCircle,
+  LoaderCircle, 
+  Music,
+  Plus, 
+  Search,
+  SlidersHorizontal,
+  X, 
+} from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect,useState } from "react";
+import { useTranslation } from "react-i18next";
 
 
 const SongsView = () => {

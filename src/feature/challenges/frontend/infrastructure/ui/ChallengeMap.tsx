@@ -1,9 +1,8 @@
-import { useState } from "react";
-import { Challenge } from "../../../backend/domain/models/Challenge";
-import { ChallengeCard } from "./ChallengeCard";
-import { cn } from "assets/lib/utils";
-import { Trophy, Lock } from "lucide-react";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { Lock,Trophy } from "lucide-react";
+
+import type { Challenge } from "../../../backend/domain/models/Challenge";
+import { ChallengeCard } from "./ChallengeCard";
 
 interface ChallengeMapProps {
   challengesByCategory: Record<string, Record<string, Challenge[]>>;

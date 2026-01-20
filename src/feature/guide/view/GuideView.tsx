@@ -1,22 +1,4 @@
-import { motion } from "framer-motion";
-import { useRouter } from "next/router";
-import {
-  BookOpen,
-  Music,
-  Zap,
-  Play,
-  LineChart,
-  PlusCircle,
-  Layout,
-  Clock,
-  CheckCircle2,
-  Trophy,
-  Dumbbell,
-  Target,
-  Sparkles,
-  Search,
-  ArrowRight,
-} from "lucide-react";
+import { Badge } from "assets/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -24,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "assets/components/ui/card";
-import { Badge } from "assets/components/ui/badge";
 import {
   Tabs,
   TabsContent,
@@ -32,7 +13,24 @@ import {
   TabsTrigger,
 } from "assets/components/ui/tabs";
 import MainContainer from "components/MainContainer/MainContainer";
-import { Separator } from "assets/components/ui/separator";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Dumbbell,
+  Layout,
+  LineChart,
+  Music,
+  Play,
+  PlusCircle,
+  Search,
+  Target,
+  Trophy,
+  Zap,
+} from "lucide-react";
+import { useRouter } from "next/router";
 
 const containerVariants = {
   hidden: { opacity: 0 },

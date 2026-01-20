@@ -1,8 +1,13 @@
-import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { cn } from "assets/lib/utils";
+import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 import Avatar from "components/UI/Avatar";
+import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
+import { challengesList } from 'feature/challenges';
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
+import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import { LogReaction } from "feature/logs/components/LogReaction";
 import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
@@ -18,13 +23,8 @@ import {
   FaRegStar,
   FaTrophy,
 } from "react-icons/fa";
-import { IoCalendarOutline, IoPersonOutline } from "react-icons/io5";
+import { IoCalendarOutline } from "react-icons/io5";
 import { addZeroToTime } from "utils/converter";
-import { LogReaction } from "feature/logs/components/LogReaction";
-import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import { challengesList } from 'feature/challenges';
-import { cn } from "assets/lib/utils";
-import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 
 const isFirebaseLogsSongs = (
   log:

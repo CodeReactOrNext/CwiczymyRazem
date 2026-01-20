@@ -2,13 +2,12 @@ import { LeadboardView } from "feature/leadboard/LeadboardView";
 import useAutoLogIn from "hooks/useAutoLogIn";
 import AppLayout from "layouts/AppLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
-import type { NextPage } from "next";
 import Head from "next/head";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import nextI18nextConfig from "../../../next-i18next.config";
-
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
+
+import nextI18nextConfig from "../../../next-i18next.config";
 
 const LeaderBoardPage: NextPageWithLayout = () => {
   const { isLoggedIn } = useAutoLogIn({

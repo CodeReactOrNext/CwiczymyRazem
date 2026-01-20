@@ -1,6 +1,6 @@
-import { Song } from "feature/songs/types/songs.type";
-import { getSongTier } from "feature/songs/utils/getSongTier";
 import { cn } from "assets/lib/utils";
+import type { Song } from "feature/songs/types/songs.type";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 
 interface TierBadgeProps {
     song?: Song;

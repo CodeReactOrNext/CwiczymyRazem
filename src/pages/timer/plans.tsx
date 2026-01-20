@@ -1,19 +1,17 @@
-import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
-import { NextPage } from "next";
-import { useRouter } from "next/router";
-import AppLayout from "layouts/AppLayout";
-import { withAuth } from "utils/auth/serverAuth";
-import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import { useState, useEffect } from "react";
 import MainContainer from "components/MainContainer";
-import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
-import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
-
-import { ReactElement } from "react";
+import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
+import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import AppLayout from "layouts/AppLayout";
+import { useRouter } from "next/router";
+import type { ReactElement } from "react";
+import { useEffect,useState } from "react";
+import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
+import { withAuth } from "utils/auth/serverAuth";
 
 const TimerPlans: NextPageWithLayout = () => {
   const router = useRouter();

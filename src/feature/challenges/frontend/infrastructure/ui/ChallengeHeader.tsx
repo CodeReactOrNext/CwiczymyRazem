@@ -1,4 +1,4 @@
-import { ArrowLeft, Flame, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight,Flame } from "lucide-react";
 import { useRouter } from "next/router";
 
 interface ChallengeHeaderProps {

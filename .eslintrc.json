@@ -46,7 +46,7 @@
       "no-unused-vars": "off",
       "@typescript-eslint/naming-convention": "off",
       "unused-imports/no-unused-vars": [
-        "warn",
+        "error",
         {
           "vars": "all",
           "varsIgnorePattern": "^_",

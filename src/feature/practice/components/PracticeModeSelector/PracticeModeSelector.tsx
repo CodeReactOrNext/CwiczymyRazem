@@ -1,8 +1,8 @@
 import { Button } from "assets/components/ui/button";
+import { ChevronRight,HelpCircle } from "lucide-react";
+import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaClock, FaList, FaRandom, FaStar } from "react-icons/fa";
-import { HelpCircle, ChevronRight } from "lucide-react";
-import Link from "next/link";
 
 interface PracticeModeSelectorProps {
   onSelectMode: (mode: "timer" | "plan" | "auto" | "song" | "challenges") => void;

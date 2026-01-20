@@ -1,13 +1,13 @@
-import { useAppSelector } from "store/hooks";
-import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { challengesList } from "feature/challenges";
-import { ArrowRight, CheckCircle2, ChevronRight, Circle, Flame, Play, Timer, Trophy, Loader2 } from "lucide-react";
-import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
-import { useRouter } from "next/router";
-import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { Card } from "assets/components/ui/card";
+import { cn } from "assets/lib/utils";
+import { challengesList } from "feature/challenges";
+import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { CheckCircle2, ChevronRight, Flame, Loader2,Play } from "lucide-react";
+import { useRouter } from "next/router";
 import { useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 export const ActiveChallengeWidget = () => {
     const userStats = useAppSelector(selectCurrentUserStats);

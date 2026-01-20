@@ -1,12 +1,11 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useSession, signOut } from "next-auth/react";
+import type { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
-import { User } from "firebase/auth";
+import { signOut,useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "store/store";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
-import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
-import { RootState } from "store/store";
 
 const useAuthSync = () => {
   const { data: session, status } = useSession();

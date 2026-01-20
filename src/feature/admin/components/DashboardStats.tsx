@@ -1,4 +1,4 @@
-import { Music, AlertTriangle, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Music, ShieldCheck } from "lucide-react";
 
 interface DashboardStatsProps {
   totalSongs: number;

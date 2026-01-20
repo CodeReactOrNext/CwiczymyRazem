@@ -1,38 +1,34 @@
-import Head from "next/head";
-import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
-import { GetStaticProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import nextI18nextConfig from "../../next-i18next.config";
-import { Footer } from "feature/landing/components/Footer";
-import { 
-  ArrowRight, 
-  RefreshCw, 
-  Printer, 
-  Zap, 
-  Trophy, 
-  Target, 
-  Clock, 
-  ChevronRight,
-  Sparkles,
-  CheckCircle2,
-  Calendar,
-  Lock,
-  Music,
-  BarChart3,
-  Dumbbell,
-  Settings2,
-  CircleDot,
-  FastForward,
-  BrainCircuit,
-  Waves
-} from "lucide-react";
 import { Button } from "assets/components/ui/button";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { Exercise, ExerciseCategory, DifficultyLevel } from "feature/exercisePlan/types/exercise.types";
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "assets/lib/utils";
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import type { DifficultyLevel,Exercise, ExerciseCategory } from "feature/exercisePlan/types/exercise.types";
+import { Footer } from "feature/landing/components/Footer";
+import {motion } from "framer-motion";
+import { 
+  ArrowRight,
+  BrainCircuit,
+  CheckCircle2,
+  ChevronRight,
+  CircleDot,
+  Clock, 
+  Dumbbell,
+  FastForward,
+  Printer, 
+  RefreshCw, 
+  Settings2,
+  Sparkles,
+  Target, 
+  Trophy, 
+  Waves,
+  Zap} from "lucide-react";
+import type { GetStaticProps } from "next";
+import Head from "next/head";
+import Image from "next/image";
+import Link from "next/link";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useState } from "react";
+
+import nextI18nextConfig from "../../next-i18next.config";
 
 export default function GuitarPracticeBuilderPage() {
   const [step, setStep] = useState<'setup' | 'generated'>('setup');

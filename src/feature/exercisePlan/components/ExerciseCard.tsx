@@ -10,15 +10,14 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { 
+  FaArrowRight,
+  FaBrain, 
   FaClock, 
   FaGuitar, 
-  FaBrain, 
-  FaMusic, 
   FaLayerGroup,
-  FaArrowRight,
-  FaYoutube,
-  FaVideo
-} from "react-icons/fa";
+  FaMusic, 
+  FaVideo,
+  FaYoutube} from "react-icons/fa";
 
 interface ExerciseCardProps {
   exercise: Exercise;

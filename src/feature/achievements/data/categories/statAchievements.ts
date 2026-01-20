@@ -1,18 +1,18 @@
+import { achivFactor } from "feature/achievements/data/achievementsData.utils";
+import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
 import {
+  FaCalendarWeek,
   FaCat,
   FaChartLine,
-  FaCalendarWeek,
-  FaMouse,
-  FaHiking,
-  FaKiwiBird,
   FaFrog,
-  FaInfinity,
   FaHatCowboy,
+  FaHiking,
+  FaInfinity,
+  FaKiwiBird,
+  FaMouse,
 } from "react-icons/fa";
 import { TbGuitarPick } from "react-icons/tb";
-import { AchievementRequirement } from "feature/achievements/utils/AchievementRequirement";
-import { AchievementList } from "../../types";
-import { achivFactor } from "feature/achievements/data/achievementsData.utils";
+
 
 export const statAchievements = [
   achivFactor("points_1", FaCat, "common", AchievementRequirement.statThreshold("points", 100), AchievementRequirement.getProgressFor.statThreshold("points", 100, "pts")),

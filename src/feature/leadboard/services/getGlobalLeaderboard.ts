@@ -1,8 +1,8 @@
 import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
 import { logger } from "feature/logger/Logger";
+import { memoryCache } from "utils/cache/memoryCache";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 import { firebaseGetUsersExerciseReport } from "utils/firebase/client/firebase.utils";
-import { memoryCache } from "utils/cache/memoryCache";
 
 import { getTotalUsersCount } from "./getTotalUsersCount";
 

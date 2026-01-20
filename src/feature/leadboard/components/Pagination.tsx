@@ -7,7 +7,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "assets/components/ui/pagination";
-import { useMemo } from "react";
 
 interface PaginationProps {
   currentPage: number;

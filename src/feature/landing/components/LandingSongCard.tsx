@@ -1,10 +1,10 @@
 "use client";
 
-import { Music, Users } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import Image from "next/image";
 import { motion } from "framer-motion";
+import { Music, Users } from "lucide-react";
+import Image from "next/image";
 
 interface LandingSongCardProps {
   song: {

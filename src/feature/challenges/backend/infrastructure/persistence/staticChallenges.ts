@@ -1,4 +1,4 @@
-import { Challenge } from "../../domain/models/Challenge";
+import type { Challenge } from "../../domain/models/Challenge";
 
 export const challengesList: Challenge[] = [
   // TECHNIQUE - Alternate Picking

@@ -1,8 +1,9 @@
-import { Trophy, CheckCircle2, Play, XCircle, Award } from "lucide-react";
-import { cn } from "assets/lib/utils";
-import { ActiveChallenge, Challenge } from "../../../backend/domain/models/Challenge";
 import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import {CheckCircle2, Play, Trophy } from "lucide-react";
+
+import type { ActiveChallenge, Challenge } from "../../../backend/domain/models/Challenge";
 
 interface ActiveChallengeBannerProps {
   activeChallenge: ActiveChallenge;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, BarChart3, Heart } from "lucide-react";
+import { BarChart3, Heart,Star } from "lucide-react";
 
 const points = [
   {

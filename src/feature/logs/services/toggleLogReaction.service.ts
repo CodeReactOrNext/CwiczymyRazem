@@ -1,5 +1,5 @@
+import { arrayRemove,arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
 /**
  * Adds or removes a user's reaction to a log entry.

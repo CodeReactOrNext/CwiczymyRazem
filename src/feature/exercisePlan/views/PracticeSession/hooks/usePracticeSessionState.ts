@@ -1,19 +1,16 @@
+import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
+import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAuth,selectUserAvatar } from 'feature/user/store/userSlice';
+import { checkAndSaveChallengeProgress, updateQuestProgress,updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
+import type { ReportDataInterface,ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import useTimer from 'hooks/useTimer';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { i18n } from 'next-i18next';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 
-import type { ExercisePlan, LocalizedContent } from '../../../types/exercise.types';
+import type { ExercisePlan } from '../../../types/exercise.types';
 import { useExerciseNavigation } from './useExerciseNavigation';
 import { useTimeTracking } from './useTimeTracking';
 import { useUIState } from './useUIState';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAvatar, selectUserAuth } from 'feature/user/store/userSlice';
-import { updateUserStats, checkAndSaveChallengeProgress, updateQuestProgress } from 'feature/user/store/userSlice.asyncThunk';
-import { convertMsToHMObject } from 'utils/converter';
-import type { ReportFormikInterface, ReportDataInterface } from 'feature/user/view/ReportView/ReportView.types';
-import { useRouter } from 'next/router';
-import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
 
 interface UsePracticeSessionStateProps {
   plan: ExercisePlan;

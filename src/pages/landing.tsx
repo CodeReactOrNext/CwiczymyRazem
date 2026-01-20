@@ -1,21 +1,21 @@
 "use client";
 
+import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
+import { BlogSection } from "feature/landing/components/BlogSection";
+import { CookieBanner } from "feature/landing/components/CookieBanner";
+import { FaqSection } from "feature/landing/components/FaqSection";
+import { FeaturesSection } from "feature/landing/components/FeaturesSection";
+import { Footer } from "feature/landing/components/Footer";
+// Import new modular components
+import { HeroSection } from "feature/landing/components/HeroSection";
+import { PricingSection } from "feature/landing/components/PricingSection";
+import { WhySection } from "feature/landing/components/WhySection";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "react-i18next";
-import nextI18nextConfig from "../../next-i18next.config";
-import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 
-// Import new modular components
-import { HeroSection } from "feature/landing/components/HeroSection";
-import { WhySection } from "feature/landing/components/WhySection";
-import { FeaturesSection } from "feature/landing/components/FeaturesSection";
-import { PricingSection } from "feature/landing/components/PricingSection";
-import { FaqSection } from "feature/landing/components/FaqSection";
-import { BlogSection } from "feature/landing/components/BlogSection";
-import { Footer } from "feature/landing/components/Footer";
-import { CookieBanner } from "feature/landing/components/CookieBanner";
+import nextI18nextConfig from "../../next-i18next.config";
 
 
 const LandingPage: NextPage = () => {

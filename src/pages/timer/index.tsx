@@ -1,12 +1,10 @@
 import { PracticeModeSelector } from "feature/practice/components/PracticeModeSelector/PracticeModeSelector";
-import type { NextPage } from "next";
-import { useRouter } from "next/router";
-import { useState } from "react";
 import AppLayout from "layouts/AppLayout";
-import { withAuth } from "utils/auth/serverAuth";
-
-import { ReactElement } from "react";
+import { useRouter } from "next/router";
+import type { ReactElement } from "react";
+import { useState } from "react";
 import type { NextPageWithLayout } from "types/page";
+import { withAuth } from "utils/auth/serverAuth";
 
 const Timer: NextPageWithLayout = () => {
   const router = useRouter();

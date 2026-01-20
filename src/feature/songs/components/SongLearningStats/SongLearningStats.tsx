@@ -1,9 +1,7 @@
-import { Card } from "assets/components/ui/card";
 import type { Song } from "feature/songs/types/songs.type";
-import { cn } from "assets/lib/utils";
-import { getSongTier } from "feature/songs/utils/getSongTier";
 import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
-import { Award, Music2, Trophy } from "lucide-react";
+import { getSongTier } from "feature/songs/utils/getSongTier";
+import { Music2, Trophy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { TierBadge } from "../SongsGrid/TierBadge";

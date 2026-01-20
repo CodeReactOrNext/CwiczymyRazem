@@ -1,10 +1,11 @@
+import { Button } from "assets/components/ui/button";
+import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { UserSkills } from "feature/skills/skills.types";
-import { SkillCategoryGroup } from "./SkillCategoryGroup";
-import type { CategoryKeys } from "components/Charts/ActivityChart";
-import { useRouter } from "next/router";
 import {  ChevronRight } from "lucide-react";
-import { Button } from "assets/components/ui/button";
+import { useRouter } from "next/router";
+
+import { SkillCategoryGroup } from "./SkillCategoryGroup";
 
 interface SkillDashboardProps {
   userSkills: UserSkills;

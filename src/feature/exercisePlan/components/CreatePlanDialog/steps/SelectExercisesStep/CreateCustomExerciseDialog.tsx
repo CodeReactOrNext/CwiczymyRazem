@@ -1,13 +1,5 @@
 
 import { Button } from "assets/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from "assets/components/ui/sheet";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import {
@@ -17,17 +9,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "assets/components/ui/sheet";
+import { Textarea } from "assets/components/ui/textarea";
 import type {
     DifficultyLevel,
     Exercise,
-    ExerciseCategory,
-    LocalizedContent
+    ExerciseCategory
 } from "feature/exercisePlan/types/exercise.types";
+import { AlignLeft, Clock, Dumbbell, HelpCircle, Image as ImageIcon,List, Plus, Tag, Trash2, Youtube } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Textarea } from "assets/components/ui/textarea";
-import { Plus, Trash2, AlignLeft, Clock, Dumbbell, Tag, HelpCircle, List, Youtube, Image as ImageIcon } from "lucide-react";
 
 interface CreateCustomExerciseDialogProps {
   open: boolean;

@@ -1,9 +1,9 @@
-import { AchievementsDataInterface, AchievementList} from "../types";
-import { statAchievements } from "./categories/statAchievements";
-import { timeAchievements } from "./categories/timeAchievements";
+import type { AchievementList,AchievementsDataInterface} from "../types";
+import { habitAchievements } from "./categories/habitAchievements";
 import { songAchievements } from "./categories/songAchievements";
 import { specialAchievements } from "./categories/specialAchievements";
-import { habitAchievements } from "./categories/habitAchievements";
+import { statAchievements } from "./categories/statAchievements";
+import { timeAchievements } from "./categories/timeAchievements";
 
 export const achievementsData: AchievementsDataInterface[] = [
   ...statAchievements,

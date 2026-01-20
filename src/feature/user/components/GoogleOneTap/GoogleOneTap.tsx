@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
-import Script from "next/script";
-import { useAppDispatch, useAppSelector } from "store/hooks";
-import { logInViaGoogleCredential } from "feature/user/store/userSlice.asyncThunk";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { logInViaGoogleCredential } from "feature/user/store/userSlice.asyncThunk";
+import Script from "next/script";
+import { useEffect, useRef } from "react";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 
 declare global {
   interface Window {

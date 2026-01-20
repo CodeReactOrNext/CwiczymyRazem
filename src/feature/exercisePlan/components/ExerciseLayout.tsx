@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
 import { cn } from "assets/lib/utils";
+import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
 import type { LocalizedContent } from "../types/exercise.types";

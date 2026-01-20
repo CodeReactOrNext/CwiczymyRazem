@@ -1,6 +1,7 @@
 import { intervalStringJumpsExercise } from "feature/exercisePlan/data/exerises/intervalStringJumps/intervalStringJumps";
-import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
 import { playByEarExercise } from "feature/exercisePlan/data/exerises/playByEar/playByEar";
+import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
+
 import type { ExercisePlan } from "../../../types/exercise.types";
 
 export const theIntervalMapPlan: ExercisePlan = {

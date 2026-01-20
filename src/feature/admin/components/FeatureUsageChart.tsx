@@ -1,4 +1,4 @@
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { Cell, Legend,Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 interface FeatureUsageChartProps {
   data: { name: string; value: number }[];

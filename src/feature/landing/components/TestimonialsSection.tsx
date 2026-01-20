@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, Quote } from "lucide-react";
+import { Quote,Star } from "lucide-react";
 
 export const TestimonialsSection = () => {
   const testimonials = [

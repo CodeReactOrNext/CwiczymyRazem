@@ -1,16 +1,16 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
+import { updateCredsSchema } from "feature/settings/SettingsView/Settings.schemas";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { updateUserPassword } from "feature/user/store/userSlice.asyncThunk";
-import { updateCredsSchema } from "feature/settings/SettingsView/Settings.schemas";
 import { Form, Formik } from "formik";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import type { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
+
 import ReauthForm from "../ReauthForm";
 
 const PasswordChange = () => {

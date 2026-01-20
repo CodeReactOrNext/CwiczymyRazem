@@ -3,10 +3,9 @@ import "react-circular-progressbar/dist/styles.css";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
-import { BeginnerMsg } from "components/BeginnerMsg/BeginnerMsg";
 import { IconBox } from "components/IconBox/IconBox";
 import MainContainer from "components/MainContainer";
-import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { PageHeader } from "constants/PageHeader";
 import { AnimatePresence, motion } from "framer-motion";
 import type { useTimerInterface } from "hooks/useTimer";
 import { ArrowRight, Loader2 } from "lucide-react";
@@ -20,7 +19,6 @@ import { calculatePercent, convertMsToHMS } from "utils/converter";
 
 import BlinkingDot from "./components/BlinkingDot";
 import CategoryBox from "./components/CategoryBox";
-import { PageHeader } from "constants/PageHeader";
 import { skillColors } from "./components/Stopwatch/Stopwatch";
 
 interface TimerLayoutProps {
@@ -287,7 +285,6 @@ const TimerLayout = ({
 }: TimerLayoutProps) => {
   const { t } = useTranslation("timer");
   const { time, startTimer, stopTimer, timerEnabled } = timer;
-  const userStats = useAppSelector(selectCurrentUserStats);
 
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {

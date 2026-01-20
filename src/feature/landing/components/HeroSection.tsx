@@ -1,21 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/router";
-
 import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { Logo } from "components/Logo/Logo";
+import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
+import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
+import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
+import { Zap } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Zap, Calendar, Trophy, Star } from "lucide-react";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { FaFire } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
-import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
-import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
-import { Loader2, ChevronRight, Check, Sparkles } from "lucide-react";
-import { FaFire } from "react-icons/fa";
-import { cn } from "assets/lib/utils";
 
 export const HeroSection = () => {
   const router = useRouter();

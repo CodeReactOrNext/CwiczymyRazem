@@ -3,7 +3,7 @@ import { getSongs } from "feature/songs/services/getSongs";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect,useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 const ITEMS_PER_PAGE = 20;

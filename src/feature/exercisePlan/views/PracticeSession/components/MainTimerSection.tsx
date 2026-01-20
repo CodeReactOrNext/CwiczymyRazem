@@ -1,13 +1,13 @@
 import { Card } from "assets/components/ui/card";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { FaHistory } from "react-icons/fa";
+import type { TimerInterface } from "types/api.types";
+import { convertMsToHMS } from "utils/converter/timeConverter";
 
 import { ExerciseDescription } from "../../../components/ExerciseDescription";
 import ExerciseControls from "./ExerciseControls";
 import { TimerDisplay } from "./TimerDisplay";
-import { convertMsToHMS } from "utils/converter/timeConverter";
-import { FaHistory, FaDumbbell, FaClock } from "react-icons/fa";
-import type { TimerInterface } from "types/api.types";
 
 interface MainTimerSectionProps {
   exerciseKey: number;

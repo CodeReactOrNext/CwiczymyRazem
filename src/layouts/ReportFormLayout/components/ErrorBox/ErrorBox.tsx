@@ -1,6 +1,6 @@
+import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
+import type { FormikErrors } from "formik";
 import { FaTimesCircle } from "react-icons/fa";
-import { FormikErrors } from "formik";
-import { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 
 interface ErrorBoxProps {
   errors: FormikErrors<ReportFormikInterface>;

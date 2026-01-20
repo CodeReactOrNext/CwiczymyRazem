@@ -1,9 +1,9 @@
-import React from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Calendar } from 'lucide-react';
 import { format } from 'date-fns';
-import { BlogFrontmatter } from 'lib/blog';
+import { motion } from 'framer-motion';
+import type { BlogFrontmatter } from 'lib/blog';
+import { Calendar } from 'lucide-react';
+import Link from 'next/link';
+import React from 'react';
 
 interface BlogCardProps {
   blog: BlogFrontmatter;
