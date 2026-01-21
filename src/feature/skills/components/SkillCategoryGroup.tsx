@@ -2,7 +2,7 @@ import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import { SkillCard } from "./SkillCard";
 import { SkillRadarChart } from "./SkillRadarChart";

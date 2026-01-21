@@ -4,7 +4,7 @@ import type {
   ExercisePlan,
 } from "feature/exercisePlan/types/exercise.types";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import { usePlanDetailsForm } from "../hooks/usePlanDetailsForm";
 import { DescriptionField } from "./DescriptionField";

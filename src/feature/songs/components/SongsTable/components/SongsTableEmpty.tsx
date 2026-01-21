@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { TableCell, TableRow } from "assets/components/ui/table";
 import { Music } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaPlusCircle } from "react-icons/fa";
 
 interface SongsTableEmptyProps {

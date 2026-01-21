@@ -8,7 +8,7 @@ import {
 import { AnimatePresence,motion } from "framer-motion";
 import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaSpinner } from "react-icons/fa";
 
 import type { DateWithReport } from "./activityLog.types";

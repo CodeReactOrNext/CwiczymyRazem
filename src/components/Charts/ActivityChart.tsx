@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { addZeroToTime, convertMsToHMObject } from "utils/converter";

@@ -1,12 +1,6 @@
 /**
- * If you want to enable locale keys typechecking and enhance IDE experience.
- *
- * Requires `resolveJsonModule:true` in your tsconfig.json.
- *
- * @link https://www.i18next.com/overview/typescript
+ * Type definitions for translation namespaces
  */
-import "i18next";
-
 import type not_found from "../../public/locales/en/404.json";
 import type achievements from "../../public/locales/en/achievements.json";
 import type chat from "../../public/locales/en/chat.json";
@@ -26,8 +20,7 @@ import type timer from "../../public/locales/en/timer.json";
 import type toast from "../../public/locales/en/toast.json";
 import type yup_errors from "../../public/locales/en/yup_errors.json";
 
-
-interface I18nNamespaces {
+export interface I18nNamespaces {
   common: typeof common;
   profile: typeof profile;
   login: typeof login;
@@ -46,13 +39,4 @@ interface I18nNamespaces {
   skills: typeof skills;
   chat: typeof chat;
   exercises: typeof exercises;
-}
-
-declare module "i18next" {
-  interface CustomTypeOptions {
-    defaultNS: "common";
-    achievements: "achievements";
-    toast: "toast";
-    resources: I18nNamespaces;
-  }
 }

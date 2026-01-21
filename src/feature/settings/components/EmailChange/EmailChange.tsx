@@ -10,7 +10,7 @@ import {
 import type { UserInfo } from "firebase-admin/lib/auth/user-record";
 import { Formik } from "formik";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 

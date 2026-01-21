@@ -1,8 +1,4 @@
 /** @type {import('next').NextConfig} */
-const {
-  i18n
-} = require("./next-i18next.config");
-
 const withPWA = require("@ducanh2912/next-pwa").default({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
@@ -12,7 +8,6 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 
 const nextConfig = {
   reactStrictMode: true,
-  i18n,
   reactCompiler: true,
   images: {
     unoptimized: true,

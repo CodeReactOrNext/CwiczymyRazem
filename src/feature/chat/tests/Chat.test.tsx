@@ -5,11 +5,7 @@ import Chat from "../Chat";
 import { useChat } from "../hooks/useChat";
 
 vi.mock("../hooks/useChat");
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+
 
 describe("Chat Component", () => {
   const mockSendMessage = vi.fn();

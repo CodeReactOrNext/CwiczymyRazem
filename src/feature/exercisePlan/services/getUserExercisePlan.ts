@@ -1,6 +1,6 @@
 import { logger } from "feature/logger/Logger";
 import { doc, getDoc } from "firebase/firestore";
-import { i18n } from "next-i18next";
+import { i18n } from "utils/translation";
 import { db } from "utils/firebase/client/firebase.utils";
 
 import type { Exercise, ExercisePlan } from "../types/exercise.types";

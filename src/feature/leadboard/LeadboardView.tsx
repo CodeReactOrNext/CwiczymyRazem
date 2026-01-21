@@ -1,6 +1,6 @@
 import { LeadboardLayout } from "feature/leadboard/components/LeadboardLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useLeaderboard } from "./hooks/useLeaderboard";

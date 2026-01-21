@@ -4,13 +4,13 @@ import {
   selectUserAuth,
 } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 import type { ReactElement } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 
-import nextI18nextConfig from "../../../next-i18next.config";
+
 
 const ProfileExercisesPage: NextPageWithLayout = () => {
   const { t } = useTranslation("profile");
@@ -37,14 +37,4 @@ ProfileExercisesPage.getLayout = function getLayout(page: ReactElement) {
 
 export default ProfileExercisesPage;
 
-export async function getStaticProps({ locale }: { locale: string }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(
-        locale ?? "pl",
-        ["common", "profile", "exercises", "rating_popup"],
-        nextI18nextConfig
-      )),
-    },
-  };
-}
+

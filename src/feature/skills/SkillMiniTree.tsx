@@ -8,7 +8,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 
 interface MiniSkillTreeProps {

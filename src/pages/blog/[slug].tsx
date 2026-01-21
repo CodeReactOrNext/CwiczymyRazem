@@ -8,13 +8,13 @@ import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import React from 'react';
 
-import nextI18nextConfig from '../../../next-i18next.config';
+
 
 interface BlogPostProps {
   frontmatter: BlogFrontmatter;
@@ -115,11 +115,6 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
       frontmatter,
       mdxSource,
       relatedBlogs,
-      ...(await serverSideTranslations(
-        locale ?? "pl",
-        ["common", "profile", "footer"],
-        nextI18nextConfig
-      )),
     },
   };
 };

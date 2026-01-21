@@ -2,7 +2,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { Music2, Trophy } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import { TierBadge } from "../SongsGrid/TierBadge";
 

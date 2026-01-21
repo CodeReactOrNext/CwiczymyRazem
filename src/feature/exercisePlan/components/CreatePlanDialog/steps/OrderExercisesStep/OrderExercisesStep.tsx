@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { useExerciseReorder } from "feature/exercisePlan/components/CreatePlanDialog/steps/OrderExercisesStep/hooks/useExerciseReorder";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import { ExerciseList } from "./components/ExerciseList";
 

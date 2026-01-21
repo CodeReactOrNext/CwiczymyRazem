@@ -1,4 +1,4 @@
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 const daysSince = (date: Date) => {
   const currentDate = new Date();

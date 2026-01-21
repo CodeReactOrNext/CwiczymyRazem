@@ -1,5 +1,5 @@
 import { achievementsData } from "feature/achievements/data/achievementsData";
-import { i18n } from "next-i18next";
+import { i18n } from "utils/translation";
 import {
   FaCalendarDay,
   FaClock,

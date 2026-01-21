@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaArrowRight, FaInfoCircle } from "react-icons/fa";
 
 export const BeginnerMsg = () => {

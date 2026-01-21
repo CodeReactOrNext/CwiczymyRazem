@@ -4,7 +4,7 @@ import { SelectExercisesStep } from "feature/exercisePlan/components/CreatePlanD
 import { AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import type {
   Exercise,

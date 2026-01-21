@@ -12,10 +12,10 @@ import { PricingSection } from "feature/landing/components/PricingSection";
 import { WhySection } from "feature/landing/components/WhySection";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useTranslation } from "react-i18next";
 
-import nextI18nextConfig from "../../next-i18next.config";
+import { useTranslation } from "hooks/useTranslation";
+
+
 
 
 const LandingPage: NextPage = () => {
@@ -138,14 +138,4 @@ const LandingPage: NextPage = () => {
 
 export default LandingPage;
 
-export async function getStaticProps({ locale }: { locale: string }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(
-        locale ?? "pl",
-        ["common", "profile"],
-        nextI18nextConfig
-      )),
-    },
-  };
-}
+

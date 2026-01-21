@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { useTimerInterface } from "hooks/useTimer";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { MdAccessTime } from "react-icons/md";
 import { useAppSelector } from "store/hooks";
 import type { TimerInterface } from "types/api.types";

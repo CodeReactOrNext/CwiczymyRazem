@@ -1,7 +1,7 @@
 import ReportView from "feature/user/view/ReportView";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 

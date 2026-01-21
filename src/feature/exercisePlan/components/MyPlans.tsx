@@ -2,7 +2,7 @@
 import { Button } from "assets/components/ui/button";
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
 
 import { selectUserAuth } from "feature/user/store/userSlice";

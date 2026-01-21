@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
 import Router from "next/router";
 import React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import type { StatisticsDataInterface } from "types/api.types";
 
 import { AchievementsDisplay } from "./components/AchievementsDisplay";

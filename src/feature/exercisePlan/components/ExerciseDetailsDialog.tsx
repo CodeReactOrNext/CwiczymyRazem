@@ -13,7 +13,7 @@ import {
 import { cn } from "assets/lib/utils";
 import { categoryGradients } from "feature/exercisePlan/constants/categoryStyles";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaClock, FaDumbbell, FaGuitar, FaLightbulb } from "react-icons/fa";
 
 import type { Exercise } from "../types/exercise.types";

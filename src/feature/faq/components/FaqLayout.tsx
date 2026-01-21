@@ -6,7 +6,7 @@ import {
 } from "assets/components/ui/accordion";
 import { Card } from "assets/components/ui/card";
 import { HelpCircle } from "lucide-react";
-import { useTranslation } from "next-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 export interface faqQuestionInterface {
   title: string;

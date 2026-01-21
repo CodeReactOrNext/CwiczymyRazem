@@ -5,7 +5,7 @@ import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { AnimatePresence,motion } from "framer-motion";
 import { ChevronDown, Crown, Diamond, Gem, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
 
 interface SkillCategoryAccordionProps {

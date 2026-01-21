@@ -7,7 +7,7 @@ import {
   selectUserAuth,
 } from "feature/user/store/userSlice";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 
 const LandingView = () => {

@@ -12,11 +12,7 @@ vi.mock("store/hooks", () => ({
     return null;
   },
 }));
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
-}));
+
 
 describe("useChat Hook", () => {
   beforeEach(() => {

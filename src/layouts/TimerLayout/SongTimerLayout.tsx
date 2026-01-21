@@ -5,7 +5,7 @@ import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import type { Song } from "feature/songs/types/songs.type";
 import type { useTimerInterface } from "hooks/useTimer";
 import { ArrowLeft, ArrowRight, Music, Pause, Play } from "lucide-react";
-import { Trans,useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface SongTimerLayoutProps {
   timer: useTimerInterface;
@@ -161,13 +161,7 @@ export const SongTimerLayout = ({
                         <div className="flex-1">
                             <p className="text-sm font-bold text-emerald-400 mb-0.5">{t("spotify.important_login")}</p>
                             <p className="text-xs text-zinc-400 leading-relaxed">
-                                <Trans
-                                  t={t}
-                                  i18nKey="spotify.login_description"
-                                  components={[
-                                    <a key="0" href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/30 hover:decoration-emerald-500" />,
-                                  ]}
-                                />
+                                To listen to full tracks (not just 30s previews), make sure you are logged into <a href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/30 hover:decoration-emerald-500">Spotify.com</a> with an active Premium account.
                             </p>
                         </div>
                     </div>
