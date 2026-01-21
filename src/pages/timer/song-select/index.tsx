@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect,useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";

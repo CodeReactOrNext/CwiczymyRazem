@@ -1,6 +1,6 @@
 import { cn } from "assets/lib/utils";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface ViewToggleProps {
   isSeasonalView: boolean;

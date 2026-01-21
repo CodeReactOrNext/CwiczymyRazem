@@ -5,7 +5,7 @@ import { SkillsList } from "feature/skills/components/SkillsList";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface SkillCategoryCardProps {
   category: CategoryKeys;

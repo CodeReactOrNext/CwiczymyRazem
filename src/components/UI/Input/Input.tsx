@@ -1,6 +1,6 @@
 import { useField } from "formik";
-import type { TFuncKey } from "i18next";
-import { useTranslation } from "react-i18next";
+import { useTransition } from "react";
+import { useTranslation } from "hooks/useTranslation";
 import type { IconType } from "react-icons/lib";
 
 export interface InputProps {
@@ -11,7 +11,8 @@ export interface InputProps {
   type?: string;
 }
 
-const ErrorWrapper = ({ error }: { error: TFuncKey }) => {
+
+const ErrorWrapper = ({ error }: { error: string }) => {
   const { t } = useTranslation();
   return <>{t(error)}</>;
 };
@@ -39,7 +40,7 @@ const Input = ({ Icon, placeholder, id, name, type = "text" }: InputProps) => {
       />
       {meta.touched && meta.error ? (
         <div className='error absolute  right-0 -bottom-6 font-medium'>
-          <ErrorWrapper error={meta.error as TFuncKey} />
+          <ErrorWrapper error={meta.error as string} />
         </div>
       ) : null}
     </div>

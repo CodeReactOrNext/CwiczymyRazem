@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Brain, Dumbbell, Library, Loader2,Music } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface NavigationCardProps {
   title: string;

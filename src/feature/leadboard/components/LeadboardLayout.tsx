@@ -2,7 +2,7 @@ import { TableSkeleton } from "assets/components/ui/table-skeleton";
 import MainContainer from "components/MainContainer";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 

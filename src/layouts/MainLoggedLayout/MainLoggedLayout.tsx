@@ -1,7 +1,7 @@
 import type { SidebarLinkInterface } from "components/RockSidebar";
 import { RockSidebar } from "components/RockSidebar";
 import { FileText,HelpCircle, Home, Music, Timer, Trophy } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
 

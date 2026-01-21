@@ -19,7 +19,7 @@ import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import debounce from "lodash/debounce";
 import { ArrowRight, Check, Music, Search, SkipForward } from "lucide-react";
 import { useCallback,useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 

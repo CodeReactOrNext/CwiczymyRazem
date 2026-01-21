@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import {
   FaCrown,
   FaExternalLinkAlt,
@@ -174,8 +174,8 @@ const SeasonalAchievements = ({
           </div>
           <Link
             href='/seasons'
-            className='flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-6 py-2 text-sm font-bold text-cyan-400 transition-all hover:bg-cyan-500/20 hover:border-cyan-500/50'>
-            CHECK SEASONS
+            className='flex items-center gap-2 rounded-sm border border-cyan-500/30 bg-cyan-500/10 px-6 py-2 text-sm font-bold text-cyan-400 transition-all hover:bg-cyan-500/20 hover:border-cyan-500/50'>
+            Check Seasons
             <FaExternalLinkAlt size={12} />
           </Link>
         </div>

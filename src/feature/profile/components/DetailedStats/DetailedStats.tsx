@@ -5,7 +5,7 @@ import { StatsField } from "feature/profile/components/StatsField";
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { SongLearningStatsSkeleton } from "feature/songs/components/SongLearningStats/SongLearningStatsSkeleton";
 import type { Song } from "feature/songs/types/songs.type";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import type { StatisticsDataInterface } from "types/api.types";
 
 interface DetailedStatsProps {

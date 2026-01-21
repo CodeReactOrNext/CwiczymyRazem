@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "assets/components/ui/select";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import type { SeasonDataInterface } from "types/api.types";
 
 interface SeasonSelectProps {

@@ -6,7 +6,7 @@ import type {
 import { 
   AchievementCard 
 } from "feature/achievements";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 export interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];

@@ -9,7 +9,7 @@ import {
 import { ExerciseCard } from "feature/exercisePlan/components/ExerciseCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 export const ExerciseLibrary = () => {
   const { t } = useTranslation("exercises");

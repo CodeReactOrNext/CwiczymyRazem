@@ -3,7 +3,7 @@ import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { Check, Clock, Video,Youtube } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface ExerciseCardProps {
   exercise: Exercise;

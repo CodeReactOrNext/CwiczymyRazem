@@ -1,5 +1,5 @@
 import LightningSVG from "public/static/images/svg/Lightning";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 export const HeroSlogan = () => {
   const { t } = useTranslation("profile");

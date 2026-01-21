@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
 
 import { ExerciseFilters } from "./components/ExerciseFilters";

@@ -4,7 +4,7 @@ import { Slider } from "assets/components/ui/slider";
 import MainContainer from "components/MainContainer";
 import { PageHeader } from "constants/PageHeader";
 import type { DifficultyLevel, ExerciseCategory } from "feature/exercisePlan/types/exercise.types";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface PlanSetupProps {
   time: number;

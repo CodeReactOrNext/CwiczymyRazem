@@ -4,7 +4,7 @@ import HearingIcon from "components/Icon/HearingIcon";
 import TechniqueIcon from "components/Icon/TechniqueIcon";
 import TheoryIcon from "components/Icon/TheoryIcon";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { VscDebugPause, VscDebugStart } from "react-icons/vsc";
 import { convertMsToHMObject } from "utils/converter";
 

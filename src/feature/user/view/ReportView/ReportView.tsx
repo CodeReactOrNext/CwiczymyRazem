@@ -24,9 +24,9 @@ import {
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
 import { useRouter } from "next/router";
-import { i18n } from "next-i18next";
+import { i18n } from "utils/translation";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaBrain, FaMusic } from "react-icons/fa";
 import { GrDocumentUpload } from "react-icons/gr";
 import { IoMdHand } from "react-icons/io";

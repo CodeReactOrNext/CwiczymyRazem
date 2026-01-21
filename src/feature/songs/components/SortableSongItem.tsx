@@ -8,7 +8,7 @@ import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { ChevronRight, GripVertical, MoreVertical, Play } from "lucide-react";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface SortableSongItemProps {
   song: Song;

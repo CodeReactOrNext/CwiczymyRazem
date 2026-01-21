@@ -1,6 +1,6 @@
 import { Badge } from "assets/components/ui/badge";
 import { cn } from "assets/lib/utils";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import { categoryColors } from "../constants/categoryStyles";
 import type { Exercise } from "../types/exercise.types";

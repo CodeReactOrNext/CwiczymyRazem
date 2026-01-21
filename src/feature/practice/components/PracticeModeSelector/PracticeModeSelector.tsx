@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { ChevronRight,HelpCircle } from "lucide-react";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaClock, FaList, FaRandom, FaStar } from "react-icons/fa";
 
 interface PracticeModeSelectorProps {

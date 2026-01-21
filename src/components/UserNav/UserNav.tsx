@@ -14,7 +14,7 @@ import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppDispatch } from "store/hooks";
 
 interface UserNavProps {
