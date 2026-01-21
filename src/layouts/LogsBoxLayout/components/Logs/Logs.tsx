@@ -15,7 +15,7 @@ import type {
 } from "feature/logs/types/logs.type";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import {
   FaChevronUp,
   FaCrown,

@@ -5,7 +5,7 @@ import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { uploadUserSocialData } from "feature/user/store/userSlice.asyncThunk";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 

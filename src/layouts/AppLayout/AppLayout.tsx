@@ -5,7 +5,7 @@ import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import React, { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 

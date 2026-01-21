@@ -1,5 +1,5 @@
 import { Button } from "assets/components/ui/button";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaArrowLeft } from "react-icons/fa";
 
 interface PageHeaderProps {

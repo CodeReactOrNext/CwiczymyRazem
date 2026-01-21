@@ -4,7 +4,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link2 } from "lucide-react";
 import * as React from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { MdCheck, MdCopyAll } from "react-icons/md";
 import { useAppSelector } from "store/hooks";
 

@@ -9,7 +9,7 @@ import type {
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaGuitar, FaMedal } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
 

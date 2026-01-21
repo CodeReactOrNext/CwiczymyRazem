@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface LevelInterfaceProps {

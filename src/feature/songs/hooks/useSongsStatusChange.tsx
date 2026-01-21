@@ -3,7 +3,7 @@ import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar, updatePoints } from "feature/user/store/userSlice";
 import { updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 

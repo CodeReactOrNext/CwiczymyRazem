@@ -34,7 +34,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaDiscord } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
@@ -245,7 +245,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
           const progress = Math.min(Math.max((pointsInCurrentLvl / pointsNeededForNextLvl) * 100, 0), 100);
 
           return (
-            <div className='border-b border-white/10 p-4'>
+            <div className='p-4'>
                   <div className='flex items-center gap-3'>
                     <div className='relative'>
                       <Avatar

@@ -1,6 +1,6 @@
 import { IconBox } from "components/IconBox/IconBox";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaClock, FaRegCalendarAlt, FaStar } from "react-icons/fa";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer } from "recharts";
 import { convertMsToHM } from "utils/converter";

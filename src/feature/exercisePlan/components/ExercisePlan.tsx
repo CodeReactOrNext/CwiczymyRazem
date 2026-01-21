@@ -9,7 +9,7 @@ import { HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import type { ExercisePlan as ExercisePlanType } from "../types/exercise.types";
 import { PracticeSession } from "../views/PracticeSession/PracticeSession";

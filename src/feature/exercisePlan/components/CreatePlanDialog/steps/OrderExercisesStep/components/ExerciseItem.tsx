@@ -2,7 +2,7 @@ import type { DraggableProvided } from "@hello-pangea/dnd";
 import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import {
   FaArrowDown,
   FaArrowUp,

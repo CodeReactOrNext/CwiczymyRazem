@@ -2,7 +2,7 @@ import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { addDays, isSameDay,startOfWeek } from "date-fns";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaClock, FaFire, FaTrophy } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 import {

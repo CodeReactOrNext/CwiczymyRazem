@@ -1,5 +1,5 @@
 import type { SerializedError } from "@reduxjs/toolkit";
-import { i18n } from "next-i18next";
+import { i18n } from "utils/translation";
 import { toast } from "sonner";
 
 export const loginViaEmailErrorHandler = (error: SerializedError) => {

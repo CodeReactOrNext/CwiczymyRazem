@@ -5,11 +5,11 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 
-import nextI18nextConfig from "../../../next-i18next.config";
+
 
 const GuidePage: NextPageWithLayout = () => {
   const { status } = useSession();
@@ -66,14 +66,4 @@ GuidePage.getLayout = function getLayout(page: ReactElement) {
 
 export default GuidePage;
 
-export async function getStaticProps({ locale }: { locale: string }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(
-        locale ?? "pl",
-        ["common"],
-        nextI18nextConfig
-      )),
-    },
-  };
-}
+

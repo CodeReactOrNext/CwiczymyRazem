@@ -8,7 +8,7 @@ import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
 import { Info } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
 
 interface SkillTreeProps {

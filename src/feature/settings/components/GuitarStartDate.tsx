@@ -9,7 +9,7 @@ import {
 import { differenceInYears } from "date-fns";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { updateGuitarStartDate } from "utils/firebase/client/firebase.utils";
 import { db } from "utils/firebase/client/firebase.utils";

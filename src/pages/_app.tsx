@@ -8,7 +8,6 @@ import { Inter, Teko } from "next/font/google";
 import Head from "next/head";
 import Script from "next/script";
 import { SessionProvider } from "next-auth/react";
-import { appWithTranslation } from "next-i18next";
 import NextTopLoader from "nextjs-toploader";
 import { useState } from "react";
 import { Provider } from "react-redux";
@@ -122,4 +121,4 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
   );
 }
 
-export default appWithTranslation(MyApp);
+export default MyApp;

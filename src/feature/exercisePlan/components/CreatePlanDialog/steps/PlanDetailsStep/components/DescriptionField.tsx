@@ -1,7 +1,7 @@
 import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
 import type { UseFormRegister } from "react-hook-form";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import type { PlanDetailsFormData } from "../hooks/usePlanDetailsForm";
 

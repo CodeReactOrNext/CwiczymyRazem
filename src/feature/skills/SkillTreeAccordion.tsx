@@ -8,7 +8,7 @@ import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { motion } from "framer-motion";
 import { Crown, Diamond, Gem, Info, Sparkles, Trophy } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface SkillTreeAccordionProps {
   userSkills: UserSkills;

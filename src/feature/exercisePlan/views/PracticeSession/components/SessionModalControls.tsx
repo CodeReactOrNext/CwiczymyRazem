@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaCheck,FaPause, FaPlay, FaStepForward } from "react-icons/fa";
 
 interface SessionModalControlsProps {

@@ -3,7 +3,7 @@ import { DaySinceMessage } from "components/DaySince/DaySince";
 import Avatar from "components/UI/Avatar";
 import { AchievementsCarousel } from "feature/leadboard/components/AchievementsCarousel";
 import Link from "next/link";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";

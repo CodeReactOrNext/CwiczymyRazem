@@ -10,7 +10,7 @@ import useTimer from "hooks/useTimer";
 import TimerLayout from "layouts/TimerLayout";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { SkillsType } from "types/skillsTypes";
 import { convertMsToHMS } from "utils/converter";

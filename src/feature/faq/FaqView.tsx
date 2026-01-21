@@ -1,6 +1,6 @@
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { FaqLayout } from "feature/faq/components/FaqLayout";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 const FaqView = () => {
   const { t } = useTranslation("faq");

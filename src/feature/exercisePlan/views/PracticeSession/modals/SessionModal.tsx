@@ -12,7 +12,7 @@ import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/compone
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaExpand } from "react-icons/fa";
 import { FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaTwitter } from "react-icons/fa";
 

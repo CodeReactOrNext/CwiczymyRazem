@@ -2,7 +2,7 @@ import type {
   ReportDataInterface,
   ReportFormikInterface
 } from "feature/user/view/ReportView/ReportView.types";
-import type { TFuncKey } from "i18next";
+
 import type { IconType } from "react-icons/lib";
 import type { SongListInterface } from "src/pages/api/user/report";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -89,9 +89,9 @@ export interface AchievementProgress {
 
 export interface AchievementsDataInterface extends AchievementsRarityType {
   id: AchievementList;
-  name: TFuncKey<"achievements">;
+  name: string;
   Icon: IconType;
-  description: TFuncKey<"achievements">;
+  description: string;
   check: AchievementCheck;
   getProgress?: (ctx: AchievementContext) => AchievementProgress;
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import OldEffect from "components/OldEffect";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 const NotFoundLayout = () => {
   const { t } = useTranslation("404");

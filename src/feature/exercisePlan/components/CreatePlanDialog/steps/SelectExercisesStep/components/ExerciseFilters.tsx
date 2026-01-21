@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "assets/components/ui/select";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaSearch } from "react-icons/fa";
 
 interface ExerciseFiltersProps {

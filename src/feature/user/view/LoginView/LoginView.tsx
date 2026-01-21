@@ -21,7 +21,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
