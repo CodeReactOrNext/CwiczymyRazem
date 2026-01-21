@@ -1,5 +1,5 @@
 import { Card } from "assets/components/ui/card";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface Skill {
   name: string;

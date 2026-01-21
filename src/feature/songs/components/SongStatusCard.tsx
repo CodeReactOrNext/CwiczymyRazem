@@ -3,7 +3,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { cn } from "assets/lib/utils";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 import { SortableSongItem } from "./SortableSongItem";
 

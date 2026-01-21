@@ -6,10 +6,10 @@ import type { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 import React from 'react';
 
-import nextI18nextConfig from '../../../next-i18next.config';
+
 
 interface BlogIndexProps {
   blogs: BlogFrontmatter[];
@@ -71,11 +71,6 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
       blogs,
-      ...(await serverSideTranslations(
-        locale ?? "pl",
-        ["common", "profile", "footer"],
-        nextI18nextConfig
-      )),
     },
   };
 };

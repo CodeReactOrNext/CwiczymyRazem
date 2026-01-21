@@ -7,7 +7,7 @@ import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChat } from "feature/chat/hooks/useChat";
 import { SendHorizontal } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 export const Chat = () => {
   const {

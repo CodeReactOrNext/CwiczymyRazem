@@ -5,7 +5,7 @@ import { selectDailyQuest } from "feature/user/store/userSlice";
 import { claimQuestRewardAction,initializeDailyQuestAction } from "feature/user/store/userSlice.asyncThunk";
 import { CheckCircle2, Gift, Swords } from "lucide-react";
 import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 export const DailyQuestWidget = () => {

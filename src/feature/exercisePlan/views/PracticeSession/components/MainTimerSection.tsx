@@ -1,6 +1,6 @@
 import { Card } from "assets/components/ui/card";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaHistory } from "react-icons/fa";
 import type { TimerInterface } from "types/api.types";
 import { convertMsToHMS } from "utils/converter/timeConverter";

@@ -8,7 +8,7 @@ import { rateSong, updateQuestProgress } from "feature/user/store/userSlice.asyn
 import { Loader2,Star } from "lucide-react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 

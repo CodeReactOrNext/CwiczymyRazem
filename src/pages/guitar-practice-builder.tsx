@@ -25,10 +25,10 @@ import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
 import { useState } from "react";
 
-import nextI18nextConfig from "../../next-i18next.config";
+
 
 export default function GuitarPracticeBuilderPage() {
   const [step, setStep] = useState<'setup' | 'generated'>('setup');
@@ -562,14 +562,4 @@ export default function GuitarPracticeBuilderPage() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  return {
-    props: {
-        ...(await serverSideTranslations(
-            locale ?? "en",
-            ["common"],
-            nextI18nextConfig
-        )),
-    },
-  };
-};
+

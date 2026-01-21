@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription,DialogFooter, DialogHeader, Di
 import { Slider } from "assets/components/ui/slider";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { Trans,useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { convertMsToHMS } from "utils/converter";
 
 interface TimeSplitterModalProps {
@@ -37,17 +37,9 @@ export const TimeSplitterModal = ({
         <DialogHeader>
           <DialogTitle>{t("time_splitter.title")}</DialogTitle>
           <DialogDescription className="text-zinc-400">
-            <Trans
-              t={t}
-              i18nKey="time_splitter.description"
-              values={{ songTitle, time: convertMsToHMS(totalTime) }}
-              components={[
-                <span key="0" />,
-                <span key="1" className="text-white font-bold" />,
-                <span key="2" />,
-                <span key="3" className="text-cyan-400 font-bold" />,
-              ]}
-            />
+            <span>
+              You practiced <span className="text-white font-bold">{songTitle}</span> for <span className="text-cyan-400 font-bold">{convertMsToHMS(totalTime)}</span>.
+            </span>
             <br />
             {t("time_splitter.question")}
           </DialogDescription>

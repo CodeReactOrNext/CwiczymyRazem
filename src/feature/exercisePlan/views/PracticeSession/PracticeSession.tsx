@@ -16,7 +16,7 @@ import { Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect,useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { FaCheck, FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaStepForward, FaTwitter } from "react-icons/fa";
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";

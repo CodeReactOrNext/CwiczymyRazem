@@ -4,7 +4,7 @@ import { cn } from "assets/lib/utils";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface SkillCardProps {
   skill: GuitarSkill;

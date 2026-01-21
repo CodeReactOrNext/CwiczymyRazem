@@ -13,7 +13,7 @@ import { SongTimerLayout } from "layouts/TimerLayout/SongTimerLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";

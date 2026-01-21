@@ -18,7 +18,7 @@ import {
   Trophy,
   Users,
 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 
 interface SongCardProps {

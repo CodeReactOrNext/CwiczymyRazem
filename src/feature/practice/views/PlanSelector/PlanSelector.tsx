@@ -7,7 +7,7 @@ import type { ExercisePlan, LocalizedContent } from "feature/exercisePlan/types/
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 
 interface PlanSelectorProps {

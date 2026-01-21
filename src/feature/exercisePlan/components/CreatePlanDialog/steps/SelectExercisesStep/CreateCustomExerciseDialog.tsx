@@ -25,7 +25,7 @@ import type {
 } from "feature/exercisePlan/types/exercise.types";
 import { AlignLeft, Clock, Dumbbell, HelpCircle, Image as ImageIcon,List, Plus, Tag, Trash2, Youtube } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 
 interface CreateCustomExerciseDialogProps {

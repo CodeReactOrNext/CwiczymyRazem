@@ -8,7 +8,7 @@ import {
 import { uploadUserAvatar } from "feature/user/store/userSlice.asyncThunk";
 import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 

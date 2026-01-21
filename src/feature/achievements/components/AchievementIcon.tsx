@@ -6,7 +6,7 @@ import {
 import { achievementsMap } from "feature/achievements/data/achievementsData";
 import { achievementsRarity } from "feature/achievements/data/achievementsRarity";
 import type { AchievementList } from "feature/achievements/types";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 const AchievementIcon = ({ id }: { id: AchievementList }) => {
   const { t } = useTranslation("achievements");

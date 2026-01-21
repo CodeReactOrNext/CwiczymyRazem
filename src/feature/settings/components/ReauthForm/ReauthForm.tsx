@@ -7,7 +7,7 @@ import { selectIsFetching } from "feature/user/store/userSlice";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { Form, Formik } from "formik";
 import { Loader2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 import type { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
 

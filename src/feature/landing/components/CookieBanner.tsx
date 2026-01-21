@@ -4,7 +4,7 @@ import { Button } from "assets/components/ui/button";
 import { Cookie } from "lucide-react";
 import { useEffect,useState } from "react";
 import { createPortal } from "react-dom";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 export const CookieBanner = () => {
   const { t } = useTranslation("common");

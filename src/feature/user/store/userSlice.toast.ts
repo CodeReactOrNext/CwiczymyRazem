@@ -1,4 +1,4 @@
-import { i18n } from "next-i18next";
+import { i18n } from "utils/translation";
 import { toast } from "sonner";
 
 export const updateUserEmailSuccess = () => {

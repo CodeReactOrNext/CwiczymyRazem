@@ -181,18 +181,7 @@ const SongSheet = ({
                   <h2 className="text-2xl font-black tracking-tight text-white leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
                     {song.title}
                   </h2>
-                  {song.isVerified && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <ShieldCheck className="h-5 w-5 text-cyan-500 cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent className="bg-zinc-900 border-white/10 text-zinc-300">
-                          <p>Native Verification: This song's existence is confirmed.</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
+                 
                 </div>
                 <p className="text-lg font-bold text-zinc-300 [text-shadow:0_2px_8px_rgba(0,0,0,0.8)]">{song.artist}</p>
                 

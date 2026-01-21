@@ -4,7 +4,7 @@ import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/Prac
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 

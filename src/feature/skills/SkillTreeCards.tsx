@@ -4,7 +4,7 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { motion } from "framer-motion";
 import { Activity, Book, Lightbulb, Music } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 
 interface SkillTreeProps {
   userSkills: UserSkills;

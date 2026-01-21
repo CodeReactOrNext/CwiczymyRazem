@@ -35,7 +35,7 @@ import {
 import { Music, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo,useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 
 interface SongLearningSectionProps {
