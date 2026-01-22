@@ -2,9 +2,9 @@ import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
+import { useTranslation } from "hooks/useTranslation";
 import { Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 
 interface SkillCardProps {
   skill: GuitarSkill;

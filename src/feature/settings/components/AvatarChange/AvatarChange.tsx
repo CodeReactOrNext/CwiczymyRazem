@@ -6,9 +6,9 @@ import {
   selectUserName,
 } from "feature/user/store/userSlice";
 import { uploadUserAvatar } from "feature/user/store/userSlice.asyncThunk";
+import { useTranslation } from "hooks/useTranslation";
 import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 

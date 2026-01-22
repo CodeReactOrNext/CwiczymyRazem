@@ -6,8 +6,8 @@ import Backdrop from "components/UI/Backdrop";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { Form, Formik } from "formik";
-import { Loader2 } from "lucide-react";
 import { useTranslation } from "hooks/useTranslation";
+import { Loader2 } from "lucide-react";
 import { useAppSelector } from "store/hooks";
 import type { updateUserInterface as UpdatedUserCredentials } from "types/api.types";
 

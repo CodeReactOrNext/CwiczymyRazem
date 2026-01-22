@@ -1,5 +1,5 @@
-import { useMemo } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useMemo } from "react";
 import { FaBrain, FaClock, FaRegLightbulb, FaTrophy } from "react-icons/fa";
 import { convertMsToHM } from "utils/converter";
 

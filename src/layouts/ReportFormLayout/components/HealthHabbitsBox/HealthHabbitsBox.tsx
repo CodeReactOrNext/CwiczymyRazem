@@ -41,7 +41,7 @@ const HealthHabbitsBox = ({
   questionMarkProps,
   name,
 }: HealthHabbitsBoxProps) => {
-  const [field, meta, helpers] = useField("habbits");
+  const [field, _meta, helpers] = useField("habbits");
   const isActive = field.value.includes(name);
   const HabitIcon = getHabitIcon(name);
 

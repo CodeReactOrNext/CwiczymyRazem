@@ -13,6 +13,7 @@ import {
 } from "feature/user/store/userSlice";
 import { checkAndSaveChallengeProgress,updateQuestProgress, updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { Formik } from "formik";
+import { useTranslation } from "hooks/useTranslation";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import ReportFormLayout from "layouts/ReportFormLayout";
 import {
@@ -24,9 +25,7 @@ import {
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
 import { useRouter } from "next/router";
-import { i18n } from "utils/translation";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FaBrain, FaMusic } from "react-icons/fa";
 import { GrDocumentUpload } from "react-icons/gr";
 import { IoMdHand } from "react-icons/io";
@@ -39,6 +38,7 @@ import {
   getDateFromPast,
   inputTimeConverter,
 } from "utils/converter";
+import { i18n } from "utils/translation";
 
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import { RaportSchema } from "./helpers/RaportShcema";
@@ -310,7 +310,7 @@ const ReportView = () => {
           validateOnBlur={false}
           enableReinitialize={true}
           onSubmit={reportOnSubmit}>
-          {({ errors, handleSubmit, values, setFieldValue }) => (
+          {({ errors,  values, setFieldValue }) => (
             <>
               <ReportFormLayout>
 

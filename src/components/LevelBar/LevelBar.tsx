@@ -22,13 +22,10 @@ export const LevelBar = ({
   showLabel = true,
   className,
 }: LevelInterfaceProps) => {
-  const { t } = useTranslation("common");
 
   const levelXpStart = getPointsToLvlUp(lvl - 1);
   const levelXpEnd = getPointsToLvlUp(lvl);
-
-  // Heuristic: If points are less than start XP, they are likely relative points (points within level)
-  // rather than total lifetime xp. We adjust for this to show correct progress.
+  
   let effectivePoints = points;
   if (points < levelXpStart && lvl > 1) {
     effectivePoints += levelXpStart;

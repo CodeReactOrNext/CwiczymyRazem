@@ -6,9 +6,9 @@ import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { SkillCard } from "feature/skills/SkillCard";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
+import { useTranslation } from "hooks/useTranslation";
 import { Info } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
 
 interface SkillTreeProps {
@@ -29,7 +29,6 @@ const canUpgradeSkill = (
 };
 
 const CategorySection = ({
-  category,
   skills,
   userSkills,
   onSkillUpgrade,
@@ -39,7 +38,6 @@ const CategorySection = ({
   userSkills: UserSkills;
   onSkillUpgrade: (skillId: string) => void;
 }) => {
-  const { t } = useTranslation("skills");
 
   const filteredSkills = skills.filter(
     (skill) => (userSkills.unlockedSkills[skill.id] || 0) > 0

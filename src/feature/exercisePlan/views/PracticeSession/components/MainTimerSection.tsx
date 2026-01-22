@@ -18,7 +18,6 @@ interface MainTimerSectionProps {
   formattedTimeLeft: string;
   toggleTimer: () => void;
   handleNextExercise: () => void;
-  timeLeft: number;
   showExerciseInfo?: boolean;
   variant?: "default" | "compact";
   sessionTimerData?: TimerInterface;
@@ -35,7 +34,6 @@ export const MainTimerSection = ({
   formattedTimeLeft,
   toggleTimer,
   handleNextExercise,
-  timeLeft,
   showExerciseInfo = true,
   variant = "default",
   sessionTimerData,
@@ -49,8 +47,6 @@ export const MainTimerSection = ({
     : 0;
 
   if (variant === "compact") {
-    // We use the physically tracked time for "Active/Spent" instead of derived calculation
-    const formattedElapsed = convertMsToHMS(exerciseTimeSpent);
     const formattedTotalSession = convertMsToHMS(totalSessionMs);
 
     return (

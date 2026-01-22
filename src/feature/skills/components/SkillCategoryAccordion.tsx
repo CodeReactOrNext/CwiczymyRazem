@@ -3,9 +3,9 @@ import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { AnimatePresence,motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronDown, Crown, Diamond, Gem, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
 
 interface SkillCategoryAccordionProps {
@@ -90,7 +90,7 @@ export const SkillCategoryAccordion = ({
   const CategoryIcon =
     SKILL_CATEGORY_ICONS[category as keyof typeof SKILL_CATEGORY_ICONS];
   const colors = getCategoryColors(category);
-  const currencyIcon = getCurrencyIcon(category);
+  const _currencyIcon = getCurrencyIcon(category);
 
   // Calculate stats
   const totalLevels = skills.reduce(
@@ -104,7 +104,7 @@ export const SkillCategoryAccordion = ({
   // Show all skills, not just those with points
   const allSkills = skills;
 
-  const canUpgradeSkills = skills.filter((skill) => {
+  const _canUpgradeSkills = skills.filter((skill) => {
     const hasPoints = availablePoints > 0;
     return hasPoints && (userSkills.unlockedSkills[skill.id] || 0) > 0;
   });

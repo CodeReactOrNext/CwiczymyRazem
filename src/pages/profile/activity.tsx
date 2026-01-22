@@ -10,11 +10,10 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
-
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NextPageWithLayout } from "types/page";
@@ -22,7 +21,6 @@ import type { NextPageWithLayout } from "types/page";
 
 
 const ProfileActivityPage: NextPageWithLayout = () => {
-  const { t } = useTranslation("profile");
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
   const { reportList } = useActivityLog(userAuth as string);

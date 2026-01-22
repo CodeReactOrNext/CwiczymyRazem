@@ -25,7 +25,7 @@ export const BlogHeader = ({ title, description, date, image, author, readTime =
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
 
   return (
-    <div ref={ref} className="relative h-[75vh] min-h-[500px] w-full overflow-hidden bg-zinc-950">
+    <div ref={ref} className="relative min-h-[500px] w-full overflow-hidden bg-zinc-950">
       {/* Parallax Background Image */}
       <motion.div
         style={{ y, scale }}
@@ -46,7 +46,7 @@ export const BlogHeader = ({ title, description, date, image, author, readTime =
       </motion.div>
 
       {/* Content */}
-      <div className="relative z-20 flex h-full items-center pt-24 pb-16 md:items-end md:pt-0 md:pb-24">
+      <div className="relative z-20 flex h-full items-center pt-32 pb-16 md:items-end md:pt-32 md:pb-24">
         <div className="container mx-auto px-6">
           <motion.div
             style={{ opacity }}

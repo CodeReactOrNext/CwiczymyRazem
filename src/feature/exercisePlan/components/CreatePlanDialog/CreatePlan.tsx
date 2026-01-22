@@ -2,9 +2,9 @@ import { OrderExercisesStep } from "feature/exercisePlan/components/CreatePlanDi
 import { PlanDetailsStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/PlanDetailsStep/PlanDetailsStep";
 import { SelectExercisesStep } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/SelectExercisesStep";
 import { AnimatePresence } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { Check } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 
 import type {
   Exercise,

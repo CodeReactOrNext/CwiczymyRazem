@@ -13,9 +13,9 @@ import type {
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
+import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import {
   FaChevronUp,
   FaCrown,
@@ -177,7 +177,7 @@ const FirebaseLogsItem = ({
       if (plan) isChallenge = true;
   }
 
-  const currentLang = (i18n.language === 'pl' || i18n.language === 'en') ? i18n.language : 'en';
+  const _currentLang = (i18n.language === 'pl' || i18n.language === 'en') ? i18n.language : 'en';
   
   const getLocalizedTitle = (title: any) => {
       if (!title) return null;

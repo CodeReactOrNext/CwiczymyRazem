@@ -21,11 +21,9 @@ import {
   Trophy, 
   Waves,
   Zap} from "lucide-react";
-import type { GetStaticProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-
 import { useState } from "react";
 
 

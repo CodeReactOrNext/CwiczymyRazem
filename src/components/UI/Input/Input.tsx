@@ -1,5 +1,4 @@
 import { useField } from "formik";
-import { useTransition } from "react";
 import { useTranslation } from "hooks/useTranslation";
 import type { IconType } from "react-icons/lib";
 

@@ -1,8 +1,8 @@
+import { useTranslation } from "hooks/useTranslation";
 import HamburgerLayout from "layouts/HamburgerLayout";
 import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 import Link from "next/link";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FaBars } from "react-icons/fa";
 
 import NavLink from "./component/NavLink";

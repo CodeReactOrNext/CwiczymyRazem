@@ -23,7 +23,6 @@ export const ChallengeRPGMap = ({
   activeChallenges,
   userSkills = {},
   onPractice,
-  onAdd,
   onStart
  }: ChallengeRPGMapProps) => {
   const [activeNode, setActiveNode] = useState<{ challenge: Challenge; rect: DOMRect; cat: any } | null>(null);

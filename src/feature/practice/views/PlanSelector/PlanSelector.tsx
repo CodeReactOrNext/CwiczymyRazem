@@ -6,8 +6,8 @@ import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExerc
 import type { ExercisePlan, LocalizedContent } from "feature/exercisePlan/types/exercise.types";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 interface PlanSelectorProps {
@@ -23,7 +23,6 @@ const item = {
 
 export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelectorProps) => {
   const { t, i18n } = useTranslation(["exercises", "common"]);
-  const currentLang = i18n.language as keyof LocalizedContent;
   const userAuth = useAppSelector(selectUserAuth);
   
   const [customPlans, setCustomPlans] = useState<ExercisePlan[]>([]);
@@ -56,7 +55,6 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
     }
   };
 
-  const allPlans = [...defaultPlans, ...customPlans];
 
   return (
     <MainContainer>
