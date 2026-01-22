@@ -21,7 +21,6 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
       log.timeSumary.techniqueTime +
       log.timeSumary.theoryTime;
 
-    const formattedTime = convertMsToHM(totalTime);
     const sessionHours = Math.floor(totalTime / (1000 * 60 * 60));
     const sessionMinutes = Math.floor((totalTime % (1000 * 60 * 60)) / (1000 * 60));
     const timeString = isEn

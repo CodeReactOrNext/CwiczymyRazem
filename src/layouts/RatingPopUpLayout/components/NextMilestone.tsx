@@ -6,10 +6,9 @@ import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface NextMilestoneProps {
   currentUserStats: StatisticsDataInterface;
-  pointsGained: number;
 }
 
-export function NextMilestone({ currentUserStats, pointsGained }: NextMilestoneProps) {
+export function NextMilestone({ currentUserStats}: NextMilestoneProps) {
   const currentPoints = currentUserStats.points;
   const currentLevel = currentUserStats.lvl;
   const pointsToNextLevel = getPointsToLvlUp(currentLevel);
@@ -25,7 +24,7 @@ export function NextMilestone({ currentUserStats, pointsGained }: NextMilestoneP
     currentStreakCount < 50 ? 50 :
     currentStreakCount < 100 ? 100 : currentStreakCount + 50;
   
-  const daysUntilNextStreak = nextStreakTarget - currentStreakCount;
+  const _daysUntilNextStreak = nextStreakTarget - currentStreakCount;
 
   return (
     <motion.div

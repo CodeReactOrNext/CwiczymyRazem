@@ -3,8 +3,8 @@ import { Button } from "assets/components/ui/button";
 import OldEffect from "components/OldEffect";
 import Guitar from "feature/hero/components/Guitar";
 import { HeroSlogan } from "feature/hero/components/HeroSlogan";
-import Link from "next/link";
 import { useTranslation } from "hooks/useTranslation";
+import Link from "next/link";
 
 interface HeroProps {
   children: React.ReactElement;

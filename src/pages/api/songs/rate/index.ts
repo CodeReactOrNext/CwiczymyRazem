@@ -23,7 +23,7 @@ export default async function handler(
   }
 
   try {
-    const { songId, rating, title, artist, avatarUrl, token, tier } = req.body;
+    const { songId, rating, title, artist, avatarUrl, token } = req.body;
 
     if (!token) {
       return res.status(401).json({ message: "Unauthorized" });

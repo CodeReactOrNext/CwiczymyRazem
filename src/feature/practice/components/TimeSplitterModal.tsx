@@ -2,9 +2,9 @@ import { Button } from "assets/components/ui/button";
 import { Checkbox } from "assets/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription,DialogFooter, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
 import { Slider } from "assets/components/ui/slider";
+import { useTranslation } from "hooks/useTranslation";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { convertMsToHMS } from "utils/converter";
 
 interface TimeSplitterModalProps {

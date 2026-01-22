@@ -3,7 +3,6 @@ import type { TimerInterface } from "types/api.types";
 import { convertMsToHMS } from "utils/converter/timeConverter";
 
 interface MobileTimerDisplayProps {
-  timerProgressValue: number;
   formattedTimeLeft: string;
   isPlaying: boolean;
   sessionTimerData?: TimerInterface;
@@ -11,7 +10,6 @@ interface MobileTimerDisplayProps {
 }
 
 export const MobileTimerDisplay = ({
-  timerProgressValue,
   formattedTimeLeft,
   isPlaying,
   sessionTimerData,

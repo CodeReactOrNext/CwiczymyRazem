@@ -3,10 +3,9 @@ import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { Trophy } from "lucide-react";
 import Router from "next/router";
-import React from "react";
-import { useTranslation } from "hooks/useTranslation";
 import type { StatisticsDataInterface } from "types/api.types";
 
 import { AchievementsDisplay } from "./components/AchievementsDisplay";
@@ -41,7 +40,6 @@ const RatingPopUpLayout = ({
   activityData = [],
   hideWrapper = false,
 }: RatingPopUpProps) => {
-  const { t } = useTranslation("report") as any;
   const {
     currentLevel,
     displayedPoints,
@@ -94,7 +92,7 @@ const RatingPopUpLayout = ({
               <WeeklyInsight activityData={activityData} />
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <NextMilestone currentUserStats={currentUserStats} pointsGained={ratingData.totalPoints} />
+                  <NextMilestone currentUserStats={currentUserStats} />
                   <div className="bg-zinc-900/40 rounded-lg p-8 flex flex-col justify-center backdrop-blur-xl border-none">
                        <div className="flex items-center gap-4 mb-4">
                           <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">

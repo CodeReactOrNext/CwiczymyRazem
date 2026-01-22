@@ -6,9 +6,9 @@ import { cn } from "assets/lib/utils";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronRight, GripVertical, MoreVertical, Play } from "lucide-react";
 import Link from "next/link";
-import { useTranslation } from "hooks/useTranslation";
 
 interface SortableSongItemProps {
   song: Song;
@@ -79,7 +79,7 @@ export const SortableSongItem = ({
   droppableId,
 }: SortableSongItemProps) => {
   const { t } = useTranslation("songs");
-  const StatusIcon = config.icon;
+  const _StatusIcon = config.icon;
 
   const {
     attributes,

@@ -2,8 +2,8 @@ import { Card } from "assets/components/ui/card";
 import type { AchievementList} from "feature/achievements";
 import { AchievementCard, useAchievementContext } from "feature/achievements";
 import { motion } from "framer-motion";
-import { Trophy } from "lucide-react";
 import { useTranslation } from "hooks/useTranslation";
+import { Trophy } from "lucide-react";
 
 interface AchievementsDisplayProps {
   achievements: AchievementList[];

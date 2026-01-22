@@ -23,7 +23,7 @@ export default async function handler(
       try {
         const decodedClaims = await auth.verifySessionCookie(sessionCookie);
         await auth.revokeRefreshTokens(decodedClaims.sub);
-      } catch (ignored) {
+      } catch  {
         // Ignore if invalid
       }
     }

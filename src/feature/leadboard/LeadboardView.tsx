@@ -1,6 +1,6 @@
 import { LeadboardLayout } from "feature/leadboard/components/LeadboardLayout";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useTranslation } from "hooks/useTranslation";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
 
 import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useLeaderboard } from "./hooks/useLeaderboard";
@@ -14,7 +14,6 @@ interface LeadboardViewProps {
 export const LeadboardView = ({
   defaultView = "all-time",
 }: LeadboardViewProps = {}) => {
-  const { t } = useTranslation("leadboard");
   const { currentUserId } = useCurrentUser();
 
   const {
@@ -48,7 +47,6 @@ export const LeadboardView = ({
       itemsPerPage={ITEMS_PER_PAGE}
       onPageChange={handlePageChange}
       isSeasonalView={isSeasonalView}
-      setIsSeasonalView={handleViewChange}
       seasons={seasons}
       selectedSeason={selectedSeason}
       setSelectedSeason={handleSeasonChange}

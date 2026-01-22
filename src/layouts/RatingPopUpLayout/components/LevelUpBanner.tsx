@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
 import { useTranslation } from "hooks/useTranslation";
+import { Sparkles } from "lucide-react";
 
 export const LevelUpBanner = () => {
   const { t } = useTranslation("report") as any;

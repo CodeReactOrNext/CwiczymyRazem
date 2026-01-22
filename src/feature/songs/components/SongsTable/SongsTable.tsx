@@ -30,8 +30,8 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useEffect, useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 interface SongsTableProps {
@@ -154,7 +154,7 @@ const SongsTable = ({
           {/* Enhanced Table Body */}
           <TableBody>
             {songs.length > 0 ? (
-              songs.map((song, index) => {
+              songs.map((song, _index) => {
                 const userSong = allUserSongs.find(
                   (userSong) => song.id === userSong.id
                 );
@@ -201,7 +201,7 @@ const SongsTable = ({
                     {/* Rating Cell */}
                     <TableCell className='px-6 py-4'>
                       <div className='w-fit rounded-lg border border-zinc-700/30 bg-zinc-800/20 p-2 backdrop-blur-sm'>
-                        <SongRating song={song} refreshTable={onStatusChange} />
+                        <SongRating song={song}  />
                       </div>
                     </TableCell>
 

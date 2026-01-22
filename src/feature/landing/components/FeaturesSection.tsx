@@ -15,10 +15,6 @@ export const FeaturesSection = () => {
     { name: 'Creative work', time: '10:00', percent: '0%', color: 'border-purple-500/50 text-purple-400', dot: 'bg-purple-500' },
   ];
 
-  const stats = [
-    { label: 'Total time', value: '2693:18', icon: Clock, trend: '+100%', color: 'text-cyan-400' },
-    { label: 'Points', value: '2934', icon: Zap, trend: '+100%', color: 'text-amber-400' },
-  ];
 
   const skills = [
     { name: 'Technique', percent: 4, time: '107h 44m', color: 'bg-red-500' },

@@ -9,6 +9,7 @@ import {
 import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { Form, Formik } from "formik";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowLeft,
   ChevronRight,
@@ -21,7 +22,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -58,7 +58,7 @@ const LoginView = () => {
     try {
       await firebaseSendPasswordResetEmail(email);
       toast.success(t("login:reset_password_success"));
-    } catch (error) {
+    } catch  {
       toast.error(t("login:reset_password_error"));
     }
   };

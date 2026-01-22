@@ -10,6 +10,7 @@ import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
 import { useSongs } from "feature/songs/hooks/useSongs";
 import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
+import { useTranslation } from "hooks/useTranslation";
 import {  
   HelpCircle,
   LoaderCircle, 
@@ -22,7 +23,6 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect,useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 
 
 const SongsView = () => {

@@ -1,5 +1,5 @@
-import { i18n } from "utils/translation";
 import { toast } from "sonner";
+import { i18n } from "utils/translation";
 
 export const updateUserEmailSuccess = () => {
   toast.success(i18n?.t("toast:success.update_email"));

@@ -16,10 +16,10 @@ import { getSongs } from "feature/songs/services/getSongs";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import debounce from "lodash/debounce";
 import { ArrowRight, Check, Music, Search, SkipForward } from "lucide-react";
 import { useCallback,useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
@@ -158,7 +158,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
       toast.success(t("status_updated"));
       onSuccess();
       handleClose();
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("error_updating_status"));
     } finally {
       setIsLoading(false);

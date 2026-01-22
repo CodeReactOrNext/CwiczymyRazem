@@ -1,7 +1,7 @@
 import type { SidebarLinkInterface } from "components/RockSidebar";
 import { RockSidebar } from "components/RockSidebar";
-import { FileText,HelpCircle, Home, Music, Timer, Trophy } from "lucide-react";
 import { useTranslation } from "hooks/useTranslation";
+import { FileText,HelpCircle, Home, Music, Timer, Trophy } from "lucide-react";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { NavPagesTypes } from "types/layout.types";
 
@@ -87,7 +87,7 @@ const MainLoggedLayout = ({
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.02)_0%,transparent_80%)] opacity-20'></div>
 
       <div className='relative flex h-full w-full'>
-        <RockSidebar links={sidebarLinks} pageId={pageId} />
+        <RockSidebar  pageId={pageId} />
 
         <div className='relative flex h-full flex-1 flex-col overflow-y-auto overflow-x-hidden scrollbar-hide'>
           <MainLoggedWrapper>

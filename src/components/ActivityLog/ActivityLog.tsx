@@ -6,9 +6,9 @@ import {
   DialogTitle,
 } from "assets/components/ui/dialog";
 import { AnimatePresence,motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
-import { useTranslation } from "hooks/useTranslation";
 import { FaSpinner } from "react-icons/fa";
 
 import type { DateWithReport } from "./activityLog.types";

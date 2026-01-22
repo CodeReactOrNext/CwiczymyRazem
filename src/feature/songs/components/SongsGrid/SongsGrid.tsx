@@ -41,7 +41,6 @@ export const SongsGrid = ({
   onStatusChange,
   userSongs,
 }: SongsGridProps) => {
-  const userId = useAppSelector(selectUserAuth);
 
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);

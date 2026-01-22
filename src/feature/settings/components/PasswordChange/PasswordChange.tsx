@@ -5,9 +5,9 @@ import { updateCredsSchema } from "feature/settings/SettingsView/Settings.schema
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { updateUserPassword } from "feature/user/store/userSlice.asyncThunk";
 import { Form, Formik } from "formik";
+import { useTranslation } from "hooks/useTranslation";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 

@@ -1,13 +1,12 @@
+import { useTranslation } from "hooks/useTranslation";
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslation } from "hooks/useTranslation";
 
 interface LogoProps {
   large?: boolean;
 }
 
 export const Logo = ({ large }: LogoProps) => {
-  const { t } = useTranslation("common");
   return (
     <Link href='/'>
       <div className='z-50 flex cursor-pointer items-center'>

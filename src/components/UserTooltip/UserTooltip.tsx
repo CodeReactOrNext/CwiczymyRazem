@@ -6,9 +6,9 @@ import {
 } from "assets/components/ui/tooltip";
 import { IconBox } from "components/IconBox/IconBox";
 import Avatar from "components/UI/Avatar";
+import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import {
   FaClock,
   FaExternalLinkAlt,

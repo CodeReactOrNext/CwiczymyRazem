@@ -10,10 +10,9 @@ import { Footer } from "feature/landing/components/Footer";
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { PricingSection } from "feature/landing/components/PricingSection";
 import { WhySection } from "feature/landing/components/WhySection";
+import { useTranslation } from "hooks/useTranslation";
 import type { NextPage } from "next";
 import Head from "next/head";
-
-import { useTranslation } from "hooks/useTranslation";
 
 
 

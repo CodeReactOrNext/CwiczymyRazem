@@ -25,7 +25,6 @@ export const WelcomeMessage = ({
   actualDayWithoutBreak,
   totalPracticeTime,
 }: WelcomeMessageProps) => {
-  const { t } = useTranslation("common");
   const userAuth = useAppSelector(selectUserAuth);
   const { reportList } = useActivityLog(userAuth || "");
 

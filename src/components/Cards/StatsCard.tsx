@@ -21,9 +21,7 @@ export const StatsCard = ({
   icon,
   trend,
   compact = false,
-  className = "",
 }: StatsCardProps) => {
-  const padding = compact ? "p-3" : "p-4";
   const valueSize = compact ? "text-xl" : "text-2xl";
 
   return (

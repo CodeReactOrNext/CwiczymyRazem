@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
+import { useTranslation } from "hooks/useTranslation";
 import { Cookie } from "lucide-react";
 import { useEffect,useState } from "react";
 import { createPortal } from "react-dom";
-import { useTranslation } from "hooks/useTranslation";
 
 export const CookieBanner = () => {
   const { t } = useTranslation("common");

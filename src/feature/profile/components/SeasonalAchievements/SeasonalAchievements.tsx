@@ -1,6 +1,7 @@
 import { Card } from "assets/components/ui/card";
 import type { SeasonalAchievement } from "feature/profile/services/seasonalAchievementsService";
 import { getUserSeasonalAchievements } from "feature/profile/services/seasonalAchievementsService";
+import { useTranslation } from "hooks/useTranslation";
 import { 
   Award as AwardIcon,
   Medal as MedalIcon,
@@ -8,7 +9,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import {
   FaCrown,
   FaExternalLinkAlt,
@@ -17,12 +17,10 @@ import {
 
 interface SeasonalAchievementProps {
   userId?: string;
-  className?: string;
 }
 
 const SeasonalAchievements = ({
   userId,
-  className = "",
 }: SeasonalAchievementProps) => {
   const { t, i18n } = useTranslation("profile");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -93,13 +91,6 @@ const SeasonalAchievements = ({
     fetchAchievements();
   }, [userId]);
 
-  const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1 >= totalItems ? 0 : prev + 1));
-  };
-
-  const handlePrev = () => {
-    setActiveIndex((prev) => (prev - 1 < 0 ? totalItems - 1 : prev - 1));
-  };
 
   const getVisibleAchievements = () => {
     const visibleItems = [];
@@ -158,7 +149,6 @@ const SeasonalAchievements = ({
     }
   };
 
-  const visibleAchievements = getVisibleAchievements();
 
   if (!loading && achievements.length === 0) {
     return (

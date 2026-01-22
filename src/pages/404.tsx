@@ -1,9 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
+import { useTranslation } from "hooks/useTranslation";
 import MainLayout from "layouts/MainLayout";
 import NotFoundLayout from "layouts/NotFoundLayout";
 import type { NextPage } from "next";
-
-import { useTranslation } from "hooks/useTranslation";
 
 
 

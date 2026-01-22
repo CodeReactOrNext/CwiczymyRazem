@@ -1,8 +1,8 @@
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import { achievementsData } from "feature/achievements/data/achievementsData";
 import type { AchievementList } from "feature/achievements/types";
-import React, { useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import React, { useState } from "react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
 export const AchievementsCarousel = ({

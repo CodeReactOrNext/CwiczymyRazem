@@ -6,10 +6,10 @@ import type {
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
 } from "feature/logs/types/logs.type";
+import { useTranslation } from "hooks/useTranslation";
 import AchievementsMap from "layouts/LogsBoxLayout/components/AchievementsMap";
 import LogsBoxButton from "layouts/LogsBoxLayout/components/LogsBoxButton";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FaGuitar, FaMedal } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
 

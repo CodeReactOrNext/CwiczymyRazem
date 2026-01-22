@@ -14,8 +14,8 @@ import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
 
@@ -54,7 +54,6 @@ export const StatsSection = ({
   setYear,
   isLoadingActivity,
 }: StatsSectionProps) => {
-  const { t } = useTranslation("profile");
   const { time } = statistics;
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -72,9 +71,6 @@ export const StatsSection = ({
     userSongs: userSongs || { wantToLearn: [], learning: [], learned: [] },
     onTableStatusChange: refreshSongs,
   });
-
-  const totalTime =
-    time.technique + time.theory + time.hearing + time.creativity;
 
   const statsWithKeys = statsField.map((stat) => {
     if (stat.id === "total-time") {

@@ -12,12 +12,10 @@ interface ChallengeCardProps {
   isUnlocked: boolean;
   currentLevel: number;
   onPractice: (challenge: Challenge) => void;
-  onAdd: (challenge: Challenge) => void;
   onStart: (challenge: Challenge) => void;
   hasActiveChallenge?: boolean;
   isActive?: boolean;
   isTodayDone?: boolean;
-  isDependencyMet?: boolean;
   isCompleted?: boolean;
   onReset?: (challengeId: string) => void;
 }
@@ -27,12 +25,10 @@ export const ChallengeCard = ({
   isUnlocked,
   currentLevel,
   onPractice,
-  onAdd,
   onStart,
   hasActiveChallenge = false,
   isActive = false,
   isTodayDone = false,
-  isDependencyMet = true,
   isCompleted = false,
   onReset,
 }: ChallengeCardProps) => {
@@ -41,7 +37,7 @@ export const ChallengeCard = ({
   };
 
   const skillData = guitarSkills.find(s => s.id === challenge.requiredSkillId);
-  const SkillIcon = skillData?.icon;
+  const _SkillIcon = skillData?.icon;
 
   const getBenefit = (category: string) => {
     switch (category.toLowerCase()) {

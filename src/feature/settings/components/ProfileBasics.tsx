@@ -26,10 +26,10 @@ import {
   changeUserDisplayName,
   uploadUserAvatar,
 } from "feature/user/store/userSlice.asyncThunk";
+import { useTranslation } from "hooks/useTranslation";
 import { Loader2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Cropper from "react-easy-crop";
-import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import getCroppedImg from "utils/canvasUtils";

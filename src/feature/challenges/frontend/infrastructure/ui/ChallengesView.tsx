@@ -16,7 +16,6 @@ import { ChallengeRPGMap } from "./ChallengeRPGMap";
 
 export const ChallengesView = () => {
   const router = useRouter();
-  const userAuth = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
@@ -97,7 +96,7 @@ export const ChallengesView = () => {
     );
   }
 
-  const recommendedStarters = (allChallenges as Challenge[])
+  const _recommendedStarters = (allChallenges as Challenge[])
     .filter(c => c.requiredLevel <= 1 && !completedChallenges.includes(c.id))
     .slice(0, 3);
 

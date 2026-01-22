@@ -10,8 +10,8 @@ import {
   selectUserAvatar,
   selectUserName,
 } from "feature/user/store/userSlice";
-import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
@@ -54,7 +54,7 @@ export const useChat = () => {
         );
 
         setNewMessage("");
-      } catch (error) {
+      } catch  {
         toast.error(t("error"));
       }
     },

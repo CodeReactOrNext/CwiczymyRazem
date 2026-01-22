@@ -1,6 +1,5 @@
 import type { layoutVariant } from "layouts/MainLayout/MainLayout";
 import LightningThinSVG from "public/static/images/svg/Lightning_thin";
-import React from "react";
 
 const LightningDesktopDivider = ({ variant }: { variant: layoutVariant }) => {
   return (

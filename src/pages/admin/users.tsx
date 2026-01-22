@@ -85,7 +85,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     return { props: {} };
-  } catch (error) {
+  } catch  {
     return { notFound: true };
   }
 };

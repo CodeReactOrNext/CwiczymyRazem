@@ -78,23 +78,6 @@ export const firebaseSendPasswordResetEmail = (email: string) =>
 
 
 
-const getDocumentAtIndex = async (sortBy: SortByType, index: number) => {
-  try {
-    // Get the document at the specified index
-    const q = query(
-      collection(db, "users"),
-      orderBy(`statistics.${sortBy}`, "desc"),
-      limit(1),
-      ...(index > 0 ? [startAfter(index - 1)] : [])
-    );
-
-    const snapshot = await getDocs(q);
-    return snapshot.docs[0];
-  } catch (error) {
-    console.error("Error getting document at index:", error);
-    return null;
-  }
-};
 
 export const firebaseGetUserAvatarURL = async () => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);

@@ -85,12 +85,10 @@ export const ChallengeMap = ({
                 isUnlocked={true}
                 currentLevel={userSkills?.unlockedSkills[challenge.requiredSkillId] || 0}
                 onPractice={onPractice}
-                onAdd={onAdd}
                 onStart={onStart}
                 hasActiveChallenge={activeChallenges.length >= 3}
                 isActive={false}
                 isTodayDone={false}
-                isDependencyMet={true}
                 isCompleted={false}
                 onReset={onReset}
               />
@@ -170,12 +168,10 @@ export const ChallengeMap = ({
                             isUnlocked={isUnlocked}
                             currentLevel={currentLevel}
                             onPractice={onPractice}
-                            onAdd={onAdd}
                             onStart={onStart}
                             hasActiveChallenge={activeChallenges.length >= 3 && !isActive}
                             isActive={isActive}
                             isTodayDone={isTodayDone}
-                            isDependencyMet={isDependencyMet}
                             isCompleted={isAlreadyCompleted}
                             onReset={onReset}
                           />

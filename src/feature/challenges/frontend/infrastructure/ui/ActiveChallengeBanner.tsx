@@ -52,7 +52,6 @@ export const ActiveChallengeBanner = ({
           <div className="flex flex-wrap items-center gap-2">
             {Array.from({ length: activeChallenge.totalDays }).map((_, i) => {
               const isDone = i < activeChallenge.currentDay;
-              const isCurrent = i === activeChallenge.currentDay && !isTodayDone;
               return (
                 <div 
                   key={i}

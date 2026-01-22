@@ -5,8 +5,8 @@ import {
   AccordionTrigger,
 } from "assets/components/ui/accordion";
 import { Card } from "assets/components/ui/card";
-import { HelpCircle } from "lucide-react";
 import { useTranslation } from "hooks/useTranslation";
+import { HelpCircle } from "lucide-react";
 
 export interface faqQuestionInterface {
   title: string;

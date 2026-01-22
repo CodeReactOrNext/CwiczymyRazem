@@ -14,7 +14,6 @@ interface SongStatusCardProps {
   onStatusChange: (id: string, status: SongStatus, title: string, artist: string) => void;
   onSongRemove: (id: string) => void;
   isMobile: boolean;
-  isLanding: boolean;
   isDropTarget?: boolean;
   hideHeaderOnMobile?: boolean;
 }
@@ -26,7 +25,6 @@ export const SongStatusCard = ({
   onStatusChange,
   onSongRemove,
   isMobile,
-  isLanding,
   isDropTarget,
   hideHeaderOnMobile,
 }: SongStatusCardProps) => {

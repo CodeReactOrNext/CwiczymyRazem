@@ -14,11 +14,10 @@ import { withAuth } from "utils/auth/serverAuth";
 const TimerPractice: NextPageWithLayout = () => {
   const dispatch = useAppDispatch();
   const [chosenSkill, setChosenSkill] = useState<SkillsType | null>(null);
-  const [isFinishing, setIsFinishing] = useState(false);
+  const [isFinishing] = useState(false);
   
   const timer = useTimer();
   const timerData = useAppSelector(selectTimerData);
-  const avatar = useAppSelector(selectUserAvatar);
   const router = useRouter();
 
   const choseSkillHandler = (newSkill: SkillsType) => {

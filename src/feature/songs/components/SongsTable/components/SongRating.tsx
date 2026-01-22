@@ -5,20 +5,19 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { rateSong, updateQuestProgress } from "feature/user/store/userSlice.asyncThunk";
+import { useTranslation } from "hooks/useTranslation";
 import { Loader2,Star } from "lucide-react";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 interface SongRatingInterface {
   song: Song;
-  refreshTable: () => void;
   tierColor?: string;
 }
 
-export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterface) => {
+export const SongRating = ({ song,  tierColor }: SongRatingInterface) => {
   const userId = useAppSelector(selectUserAuth);
   const avatar = useAppSelector(selectUserAvatar);
   const { t } = useTranslation("songs");
@@ -34,7 +33,7 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
   } | null>(null);
   const [isRatingLoading, setIsRatingLoading] = useState(false);
   // OPTIMISTIC RATING STATE
-  const [optimisticRating, setOptimisticRating] = useState<number | undefined>(userRating?.rating);
+  const [_optimisticRating, setOptimisticRating] = useState<number | undefined>(userRating?.rating);
   
   // Sync if external userRating updates
   useEffect(() => {
@@ -130,14 +129,14 @@ export const SongRating = ({ song, refreshTable, tierColor }: SongRatingInterfac
         throw new Error("Rating failed");
       }
 
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("error_rating"));
     } finally {
       setIsRatingLoading(false);
     }
   };
 
-  const tiers = [
+  const _tiers = [
     { id: 'S', color: '#FF7F7F' },
     { id: 'A', color: '#FFBF7F' },
     { id: 'B', color: '#FFFF7F' },

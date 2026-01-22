@@ -6,19 +6,16 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
-
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 
 
 
 const ProfileSkillsPage: NextPageWithLayout = () => {
-  const { t } = useTranslation("profile");
-  const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
   const [userSkills, setUserSkills] = useState<UserSkills>();
 

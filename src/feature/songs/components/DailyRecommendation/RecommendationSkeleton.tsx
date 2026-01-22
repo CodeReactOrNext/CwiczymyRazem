@@ -1,4 +1,3 @@
-import React from "react";
 
 export const RecommendationSkeleton = ({ type = "song" }: { type?: "song" | "exercise" | "progress" }) => {
   if (type === "exercise") {

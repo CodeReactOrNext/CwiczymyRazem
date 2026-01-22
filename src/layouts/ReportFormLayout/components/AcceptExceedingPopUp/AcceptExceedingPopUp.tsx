@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
-import type { SetStateAction } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import type { SetStateAction } from "react";
 import { convertMsToHM } from "utils/converter";
 
 interface PopUpProps {
