@@ -72,7 +72,7 @@ export const useAdminSongs = (password: string) => {
       updateLocalSong(songId, editForm);
       setEditingId(null);
       toast.success("Changes saved");
-    } catch (error) {
+    } catch  {
       toast.error("Save failed");
     }
   };
@@ -86,7 +86,7 @@ export const useAdminSongs = (password: string) => {
       });
       updateLocalSong(songId, { isVerified: true });
       toast.success("Song marked as verified");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Verification update failed");
     }
   };
@@ -100,7 +100,7 @@ export const useAdminSongs = (password: string) => {
       });
       updateLocalSong(songId, { avgDifficulty: rating, isVerified: true });
       toast.success(`Song rated ${rating}`);
-    } catch (error) {
+    } catch  {
       toast.error("Rating failed");
     }
   };
@@ -114,7 +114,7 @@ export const useAdminSongs = (password: string) => {
       toast.success(response.data.message || `Bulk add successful: ${bulkSongs.length} songs`);
       invalidateSongs();
       return response.data; // Return results for further processing
-    } catch (error) {
+    } catch  {
       toast.error("Bulk add failed");
       return null;
     }
@@ -129,7 +129,7 @@ export const useAdminSongs = (password: string) => {
       });
       updateLocalSong(songId, { coverUrl, isVerified: true });
       toast.success("Cover updated successfully");
-    } catch (error) {
+    } catch  {
       toast.error("Failed to update cover");
     }
   };
@@ -142,7 +142,7 @@ export const useAdminSongs = (password: string) => {
       });
       removeLocalSong(songId);
       toast.success("Song deleted");
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete song");
     }
   };

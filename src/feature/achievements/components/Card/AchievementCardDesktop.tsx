@@ -1,6 +1,6 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "assets/components/ui/tooltip";
-import React from "react";
 import { useTranslation } from "hooks/useTranslation";
+import React from "react";
 
 import type { AchievementProgress } from "../../types";
 

@@ -8,8 +8,8 @@ import {
 } from "assets/components/ui/select";
 import { ExerciseCard } from "feature/exercisePlan/components/ExerciseCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useState } from "react";
 
 export const ExerciseLibrary = () => {
   const { t } = useTranslation("exercises");

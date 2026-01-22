@@ -21,10 +21,9 @@ import {
   HelpCircle,
   Loader2,
   Music, 
-  ShieldCheck, 
   Star,
   Users} from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";
 
 import { TierBadge } from "../SongsGrid/TierBadge";
@@ -286,7 +285,6 @@ const SongSheet = ({
               <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 backdrop-blur-sm transition-all hover:bg-white/[0.05]">
                 <SongRating 
                   song={song} 
-                  refreshTable={onRatingChange} 
                   tierColor={tier.color} 
                 />
               </div>

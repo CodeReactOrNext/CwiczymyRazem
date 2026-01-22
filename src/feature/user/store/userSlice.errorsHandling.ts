@@ -1,6 +1,6 @@
 import type { SerializedError } from "@reduxjs/toolkit";
-import { i18n } from "utils/translation";
 import { toast } from "sonner";
+import { i18n } from "utils/translation";
 
 export const loginViaEmailErrorHandler = (error: SerializedError) => {
   if (error.code === "auth/wrong-password") {

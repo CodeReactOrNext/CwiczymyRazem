@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "assets/components/ui/dialog";
-import React from "react";
 import { useTranslation } from "hooks/useTranslation";
+import React from "react";
 import type { IconType } from "react-icons/lib";
 
 import { AchievementPhysicalCard } from "./AchievementPhysicalCard";

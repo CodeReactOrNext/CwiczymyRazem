@@ -95,7 +95,7 @@ export const useSongsStatusChange = ({
         : "";
       
       toast.success(`${t("status_updated")}${pointsMsg}`);
-    } catch (error) {
+    } catch {
       toast.error(t("error_updating_status"));
     }
   };
@@ -127,7 +127,7 @@ export const useSongsStatusChange = ({
         : "";
         
       toast.success(`${t("song_removed")}${pointsMsg}`);
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("error_removing_song"));
     }
   };

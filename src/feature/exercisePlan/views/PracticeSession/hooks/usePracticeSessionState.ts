@@ -3,7 +3,6 @@ import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selec
 import { checkAndSaveChallengeProgress, updateQuestProgress,updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
 import type { ReportDataInterface,ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import useTimer from 'hooks/useTimer';
-import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 
@@ -18,8 +17,7 @@ interface UsePracticeSessionStateProps {
   autoReport?: boolean;
 }
 
-export const usePracticeSessionState = ({ plan, onFinish, autoReport }: UsePracticeSessionStateProps) => {
-  const router = useRouter();
+export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionStateProps) => {
   const dispatch = useAppDispatch();
   const timerData = useAppSelector(selectTimerData);
   const avatar = useAppSelector(selectUserAvatar);
@@ -38,7 +36,6 @@ export const usePracticeSessionState = ({ plan, onFinish, autoReport }: UsePract
     currentExerciseIndex,
     setCurrentExerciseIndex,
     exerciseKey,
-    setExerciseKey,
     currentExercise,
     nextExercise,
     isLastExercise,

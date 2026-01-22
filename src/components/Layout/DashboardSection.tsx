@@ -1,18 +1,9 @@
 import type { ReactNode } from "react";
 
-type SectionColor =
-  | "cyan"
-  | "yellow"
-  | "green"
-  | "violet"
-  | "purple"
-  | "blue"
-  | "red";
 
 interface DashboardSectionProps {
   title?: string;
   subtitle?: string;
-  color: SectionColor;
   children: ReactNode;
   action?: ReactNode;
   compact?: boolean;
@@ -22,7 +13,6 @@ interface DashboardSectionProps {
 export const DashboardSection = ({
   title,
   subtitle,
-  color,
   children,
   action,
   compact = false,

@@ -1,10 +1,8 @@
 import { usePWAInstall } from "hooks/usePWAInstall";
 import { Download, Laptop,Share } from "lucide-react";
-import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
 
 export const PWASidebarItem = () => {
-    const { t } = useTranslation("common");
     const { showPrompt, isIOS, handleInstall } = usePWAInstall();
     const [isDesktop, setIsDesktop] = useState(false);
 

@@ -10,7 +10,6 @@ interface SkillNodeProps {
   y: number;
   isUnlocked: boolean;
   currentPoints: number;
-  maxPoints?: number; 
   isAvailable: boolean; 
   isSelected?: boolean;
   onUpgrade: (id: GuitarSkillId) => void;
@@ -22,7 +21,6 @@ export const SkillNode = ({
   y,
   isUnlocked,
   currentPoints,
-  maxPoints = 5,
   isAvailable,
   isSelected,
   onUpgrade,

@@ -57,7 +57,7 @@ const fetchUserDataByDisplayName = async (
       points: 0,
       level: 1,
     };
-  } catch (error) {
+  } catch  {
     logger.warn(`Could not fetch user data for ${displayName}`, {
       context: "dailyTopPlayersUpdate"
     });

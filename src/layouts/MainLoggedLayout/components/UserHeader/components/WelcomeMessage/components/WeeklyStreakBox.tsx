@@ -5,7 +5,6 @@ interface WeeklyStreakBoxProps {
 }
 
 const WeeklyStreakBox = ({ dayWithoutBreak }: WeeklyStreakBoxProps) => {
-  const { t } = useTranslation("common");
 
   // Get days of week (Monday = 0, Sunday = 6)
   const daysOfWeek = ["M", "T", "W", "T", "F", "S", "S"];

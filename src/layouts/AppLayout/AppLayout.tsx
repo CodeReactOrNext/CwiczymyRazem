@@ -1,11 +1,11 @@
 import { selectCurrentUserStats, selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import type { LandingNavObjectInterface } from "layouts/MainLoggedLayout/components/LandingNav";
 import MainLoggedLayout from "layouts/MainLoggedLayout/MainLoggedLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import React, { useEffect } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 

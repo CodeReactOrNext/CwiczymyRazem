@@ -28,7 +28,7 @@ export const useAdminBulkActions = (
       } else {
         if (!silent) toast.error("Enrichment failed for this song");
       }
-    } catch (error) {
+    } catch {
       if (!silent) toast.error("Service error during enrichment");
     } finally {
       setIsEnrichingBySong(prev => ({ ...prev, [songId]: false }));
@@ -101,7 +101,7 @@ export const useAdminBulkActions = (
     const batchSize = 5;
     for (let i = 0; i < songsToEnrich.length; i += batchSize) {
       const batch = songsToEnrich.slice(i, i + batchSize);
-      await Promise.all(batch.map(async (song, index) => {
+      await Promise.all(batch.map(async (song, _index) => {
         try {
           await handleEnrich(song.id, song.artist, song.title, true);
           setProgress(prev => ({ ...prev, current: prev.current + 1 }));

@@ -1,8 +1,8 @@
 import { Button } from "assets/components/ui/button";
+import { useTranslation } from "hooks/useTranslation";
 import { Brain, Dumbbell, Library, Loader2,Music } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 
 interface NavigationCardProps {
   title: string;
@@ -139,13 +139,9 @@ export const NavigationCard = ({
   );
 };
 
-interface NavigationCardsProps {
-  setActiveSection?: (
-    section: "overview" | "activity" | "skills" | "exercises"
-  ) => void;
-}
 
-export const NavigationCards = ({ setActiveSection }: NavigationCardsProps) => {
+
+export const NavigationCards = () => {
   const { t } = useTranslation("profile");
   const router = useRouter();
   

@@ -7,8 +7,8 @@ import type {
   Exercise,
 } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useState } from "react";
 import { 
   FaArrowRight,
   FaBrain, 

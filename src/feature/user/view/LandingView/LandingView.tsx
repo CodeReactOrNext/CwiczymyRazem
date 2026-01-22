@@ -6,12 +6,11 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
-import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useTranslation } from "hooks/useTranslation";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useAppSelector } from "store/hooks";
 
 const LandingView = () => {
-  const { t } = useTranslation("profile");
 
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);

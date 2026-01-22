@@ -3,9 +3,9 @@ import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { selectIsFetching, selectUserInfo } from "feature/user/store/userSlice";
 import { uploadUserSocialData } from "feature/user/store/userSlice.asyncThunk";
+import { useTranslation } from "hooks/useTranslation";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FaGuitar, FaSoundcloud, FaYoutube } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 

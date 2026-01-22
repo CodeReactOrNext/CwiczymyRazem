@@ -28,6 +28,7 @@ import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder"
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Search,
   X
@@ -35,7 +36,6 @@ import {
 import { Music, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo,useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 
 interface SongLearningSectionProps {
@@ -138,7 +138,7 @@ const FilterBar = ({
   );
 };
 
-const EmptyState = ({ t }: { t: any }) => (
+const EmptyState = () => (
   <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-white/5 bg-zinc-900/10 p-12 text-center backdrop-blur-sm animate-in fade-in zoom-in duration-500">
      <div className="relative mb-6">
         <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-800/50 text-zinc-500">
@@ -179,7 +179,7 @@ export const SongLearningSection = ({
   // --- Filtering State ---
   const [searchQuery, setSearchQuery] = useState("");
   const [tierFilters, setTierFilters] = useState<string[]>([]);
-  const hasActiveFilters = searchQuery.length > 0 || tierFilters.length > 0;
+  const _hasActiveFilters = searchQuery.length > 0 || tierFilters.length > 0;
 
   const filteredSongs = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
@@ -320,7 +320,7 @@ export const SongLearningSection = ({
             await updateUserSongOrder(userId, newActiveItems);
             await updateUserSongOrder(userId, newOverItems);
 
-          } catch (error) {
+          } catch (_error) {
             const songs = await getUserSongs(userId);
             onChange(songs);
           }
@@ -392,7 +392,6 @@ export const SongLearningSection = ({
           {(["wantToLearn", "learning", "learned"] as const).map(status => (
             <TabsContent key={status} value={status}>
               <SongStatusCard
-                isLanding={isLanding}
                 title={getStatusLabel(status) as string}
                 songs={filteredSongs[status]}
                 droppableId={status}
@@ -412,7 +411,6 @@ export const SongLearningSection = ({
         {(["wantToLearn", "learning", "learned"] as const).map(status => (
           <SongStatusCard
             key={status}
-            isLanding={isLanding}
             title={getStatusLabel(status) as string}
             songs={filteredSongs[status]}
             droppableId={status}
@@ -447,7 +445,7 @@ export const SongLearningSection = ({
       />
 
       {Object.values(userSongs).every(arr => arr.length === 0) ? (
-        <EmptyState t={t} />
+        <EmptyState />
       ) : renderBoard(isMobile)}
       
       <DragOverlay>

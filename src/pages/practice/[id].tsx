@@ -2,9 +2,9 @@ import { getUserExercisePlan } from "feature/exercisePlan/services/getUserExerci
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 

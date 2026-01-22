@@ -1,12 +1,11 @@
 import SettingsView from "feature/settings/SettingsView";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 
 const Settings: NextPageWithLayout = () => {
-  const { t } = useTranslation("settings");
 
   return <SettingsView />;
 };

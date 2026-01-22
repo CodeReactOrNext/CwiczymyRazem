@@ -68,7 +68,7 @@ const AdminDashboard = () => {
     isModalOpen: isDuplicateModalOpen,
     setIsModalOpen: setIsDuplicateModalOpen,
     isScanning: isDuplicateScanning,
-    scanProgress: duplicateScanProgress,
+    scanProgress: _duplicateScanProgress,
     handleDeepScan,
     scannedCount
   } = useDuplicateDetector(songs, password);

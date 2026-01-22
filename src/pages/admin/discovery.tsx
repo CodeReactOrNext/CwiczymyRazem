@@ -14,7 +14,6 @@ const AdminDiscoveryPage = () => {
   } = useAdminSongs(password);
 
   const { 
-    handleEnrich, 
     handleBulkEnrich,
     isBulkProcessing,
     progress

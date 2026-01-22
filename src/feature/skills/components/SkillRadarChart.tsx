@@ -7,8 +7,8 @@ import {
 } from "assets/components/ui/chart"
 import type { CategoryKeys } from "components/Charts/ActivityChart"
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme"
-import { useEffect, useState } from "react"
 import { useTranslation } from "hooks/useTranslation"
+import { useEffect, useState } from "react"
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
 
 import type { GuitarSkill, UserSkills } from "../skills.types"

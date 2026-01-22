@@ -8,7 +8,7 @@ interface DashboardStatsProps {
   onArtistSelector?: () => void;
 }
 
-export const DashboardStats = ({ totalSongs, missingCovers, unverifiedCount, noRatingCount, onArtistSelector }: DashboardStatsProps) => {
+export const DashboardStats = ({ totalSongs, missingCovers, unverifiedCount, noRatingCount}: DashboardStatsProps) => {
   const stats = [
     {
       label: "Total Songs",

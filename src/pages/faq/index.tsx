@@ -8,7 +8,7 @@ import type { NextPageWithLayout } from "types/page";
 
 
 const FaqPage: NextPageWithLayout = () => {
-  const { isLoggedIn } = useAutoLogIn({
+  const {  } = useAutoLogIn({
     redirects: {
       loggedOut: "/faq",
     },

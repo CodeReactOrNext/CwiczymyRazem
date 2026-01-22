@@ -10,7 +10,6 @@ interface YouTubePlayalongProps {
   onEnd?: () => void;
   onProgressUpdate?: (currentTime: number, duration: number) => void;
   onSeek?: (timeInSeconds: number) => void;
-  isMobile?: boolean;
 }
 
 export const YouTubePlayalong = ({
@@ -21,7 +20,6 @@ export const YouTubePlayalong = ({
   onEnd,
   onProgressUpdate,
   onSeek,
-  isMobile = false
 }: YouTubePlayalongProps) => {
   const playerRef = useRef<any>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);

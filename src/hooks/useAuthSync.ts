@@ -8,7 +8,7 @@ import type { RootState } from "store/store";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
 
 const useAuthSync = () => {
-  const { data: session, status } = useSession();
+  const { data: _session, status } = useSession();
   const dispatch: ThunkDispatch<RootState, unknown, AnyAction> = useDispatch();
   const userStats = useSelector(selectCurrentUserStats);
   const userAuth = useSelector(selectUserAuth);

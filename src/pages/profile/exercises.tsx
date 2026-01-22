@@ -3,19 +3,15 @@ import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
-import AppLayout from "layouts/AppLayout";
-
-import type { ReactElement } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import AppLayout from "layouts/AppLayout";
+import type { ReactElement } from "react";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 
 
 
 const ProfileExercisesPage: NextPageWithLayout = () => {
-  const { t } = useTranslation("profile");
-  const userStats = useAppSelector(selectCurrentUserStats);
-  const userAuth = useAppSelector(selectUserAuth);
 
   return (
     <div className='w-full'>

@@ -5,9 +5,9 @@ import { ScrollArea } from "assets/components/ui/scroll-area";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import { useChat } from "feature/chat/hooks/useChat";
+import { useTranslation } from "hooks/useTranslation";
 import { SendHorizontal } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { useTranslation } from "hooks/useTranslation";
 
 export const Chat = () => {
   const {
