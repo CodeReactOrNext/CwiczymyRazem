@@ -3,7 +3,6 @@ import useAutoLogIn from "hooks/useAutoLogIn";
 import AppLayout from "layouts/AppLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import Head from "next/head";
-
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 

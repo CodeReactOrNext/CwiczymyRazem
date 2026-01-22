@@ -1,5 +1,4 @@
 import type { layoutVariant } from "layouts/MainLayout/MainLayout";
-import React from "react";
 interface BackgroundProps {
   variant: layoutVariant;
 }

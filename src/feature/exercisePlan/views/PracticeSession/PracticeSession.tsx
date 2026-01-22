@@ -11,12 +11,12 @@ import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import { Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect,useRef } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FaCheck, FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaStepForward, FaTwitter } from "react-icons/fa";
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
@@ -41,14 +41,7 @@ interface PracticeSessionProps {
   autoReport?: boolean;
 }
 
-const headerGradients = {
-  technique: "from-blue-500/10 to-indigo-500/5",
-  theory: "from-emerald-500/10 to-green-500/5",
-  creativity: "from-purple-500/10 to-pink-500/5",
-  hearing: "from-orange-500/10 to-amber-500/5",
-  mixed: "from-red-500/10 to-yellow-500/5",
-  playalong: "from-red-600/20 via-zinc-950/10 to-zinc-950/5",
-};
+
 
 export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: PracticeSessionProps) => {
   const { t } = useTranslation(["exercises", "common"]);
@@ -181,7 +174,6 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
             totalExercises={plan.exercises.length}
             isLastExercise={isLastExercise}
             isPlaying={isPlaying}
-            timerProgressValue={timerProgressValue}
             formattedTimeLeft={formattedTimeLeft}
             toggleTimer={toggleTimer}
             handleNextExercise={() => handleNextExercise(resetTimer)}
@@ -488,7 +480,6 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                  timerProgressValue={timerProgressValue}
                                  formattedTimeLeft={formattedTimeLeft}
                                  toggleTimer={toggleTimer}
-                                 timeLeft={timeLeft}
                                  handleNextExercise={() => handleNextExercise(resetTimer)}
                                  showExerciseInfo={false}
                                  variant="compact"

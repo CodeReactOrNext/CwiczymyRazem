@@ -7,13 +7,13 @@ import { updateQuestProgress,updateUserStats } from "feature/user/store/userSlic
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import { doc, getDoc } from "firebase/firestore";
 import useTimer from "hooks/useTimer";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
 import { SongTimerLayout } from "layouts/TimerLayout/SongTimerLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";

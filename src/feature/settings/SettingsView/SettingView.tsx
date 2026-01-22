@@ -16,14 +16,13 @@ import SettingsLayout from "feature/settings/SettingsLayout";
 import { selectIsFetching } from "feature/user/store/userSlice";
 import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
 import type { UserInfo } from "firebase/auth";
-import { useEffect, useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 const SettingsView = () => {
   const { t } = useTranslation(["common", "settings", "toast"]);
   const [userProviderData, setUserProviderData] = useState<UserInfo>();
-  const isFetching = useAppSelector(selectIsFetching) === "updateData";
   const dispatch = useAppDispatch();
 
   const isViaGoogle = userProviderData?.providerId !== "google.com";

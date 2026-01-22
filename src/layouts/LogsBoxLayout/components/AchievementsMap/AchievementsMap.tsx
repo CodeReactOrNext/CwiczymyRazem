@@ -10,7 +10,7 @@ const AchievementsMap = ({ userAchievements }: AchievementsMapProps) => {
 
   return (
     <div className='mt-4 flex h-full flex-row flex-wrap items-center justify-center gap-5 '>
-      {achievementsData.map(({ Icon, id, name, description }, index) => {
+      {achievementsData.map(({ id }, index) => {
         const isUnlocked = userAchievements?.includes(id);
 
         return (

@@ -4,8 +4,8 @@ import MainContainer from "components/MainContainer";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import type { Song } from "feature/songs/types/songs.type";
 import type { useTimerInterface } from "hooks/useTimer";
-import { ArrowLeft, ArrowRight, Music, Pause, Play } from "lucide-react";
 import { useTranslation } from "hooks/useTranslation";
+import { ArrowLeft, ArrowRight, Music, Pause, Play } from "lucide-react";
 
 interface SongTimerLayoutProps {
   timer: useTimerInterface;

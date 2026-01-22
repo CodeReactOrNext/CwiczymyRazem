@@ -10,6 +10,7 @@ import {
 import { signupSchema } from "feature/user/view/SingupView/SignUp.schemas";
 import { Form, Formik } from "formik";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import {
   ArrowLeft,
   CheckCircle,
@@ -26,7 +27,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect,useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FcGoogle } from "react-icons/fc";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
@@ -59,7 +59,7 @@ const SingupView = () => {
     try {
       await dispatch(createAccount(credentials)).unwrap();
       setIsSuccess(true);
-    } catch (error) {
+    } catch  {
       // Error is handled by global toast in thunk
     }
   };

@@ -2,16 +2,16 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link2 } from "lucide-react";
-import * as React from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { Link2 } from "lucide-react";
+import { useState } from "react";
 import { MdCheck, MdCopyAll } from "react-icons/md";
 import { useAppSelector } from "store/hooks";
 
 export const CopyLinkProfile = ({ mode = "default" }: { mode?: "default" | "icon" }) => {
   const { t } = useTranslation(["common", "toast"]);
   const profilePath = useAppSelector(selectUserAuth);
-  const [isCopied, setIsCopied] = React.useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleCopyLink = () => {
     if (isCopied) return;

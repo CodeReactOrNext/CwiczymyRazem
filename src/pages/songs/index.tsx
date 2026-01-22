@@ -1,12 +1,11 @@
 import SongsView from "feature/songs/SongsView";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 
 const SongsPage: NextPageWithLayout = () => {
-  const { t } = useTranslation("songs");
 
   return <SongsView />;
 };

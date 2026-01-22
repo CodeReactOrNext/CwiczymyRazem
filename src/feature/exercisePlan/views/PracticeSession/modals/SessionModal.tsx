@@ -11,8 +11,8 @@ import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalo
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
 import { useTranslation } from "hooks/useTranslation";
+import Image from "next/image";
 import { FaExpand } from "react-icons/fa";
 import { FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaTwitter } from "react-icons/fa";
 
@@ -34,7 +34,6 @@ interface SessionModalProps {
   totalExercises: number;
   isLastExercise: boolean;
   isPlaying: boolean;
-  timerProgressValue: number;
   formattedTimeLeft: string;
   toggleTimer: () => void;
   handleNextExercise: () => void;
@@ -61,7 +60,6 @@ const SessionModal = ({
   totalExercises,
   isLastExercise,
   isPlaying,
-  timerProgressValue,
   formattedTimeLeft,
   toggleTimer,
   handleNextExercise,
@@ -117,7 +115,6 @@ const SessionModal = ({
                             if (state === 1) startTimer();
                             if (state === 2) stopTimer();
                           }}
-                          isMobile={true}
                       />
                    </div>
                 ) : currentExercise.videoUrl ? (
@@ -190,7 +187,6 @@ const SessionModal = ({
                 )}
 
                   <MobileTimerDisplay
-                    timerProgressValue={timerProgressValue}
                     formattedTimeLeft={formattedTimeLeft}
                     isPlaying={isPlaying}
                     sessionTimerData={sessionTimerData}
@@ -246,7 +242,6 @@ const SessionModal = ({
                 {nextExercise && (
                   <NextExerciseCard
                     nextExercise={nextExercise}
-                    isMobile={true}
                   />
                 )}
 

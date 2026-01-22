@@ -7,8 +7,8 @@ import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
-import { useEffect, useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useEffect, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 
 import { StatsSection } from "./components/StatsSection";
@@ -29,11 +29,10 @@ const ProfileLandingLayout = ({
   userAuth,
   featSlot,
 }: LandingLayoutProps) => {
-  const { t } = useTranslation("profile");
   
-  const { reportList, datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
+  const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
   const { achievements } = userStats;
-  const [userSkills, setUserSkills] = useState<UserSkills>();
+  const [_userSkills, setUserSkills] = useState<UserSkills>();
   const [activeSection, setActiveSection] = useState<
     "overview" | "activity" | "skills" | "exercises"
   >("overview");
@@ -52,10 +51,10 @@ const ProfileLandingLayout = ({
 
   return (
     <DashboardContainer>
-      {activeSection === "overview" && userStats.points > 0 && <NavigationCards setActiveSection={setActiveSection} />}
+      {activeSection === "overview" && userStats.points > 0 && <NavigationCards />}
 
       {/* Statistics Section */}
-      <DashboardSection color='cyan' compact>
+      <DashboardSection  compact>
         {userStats.points === 0 && <OnboardingCards />}
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">

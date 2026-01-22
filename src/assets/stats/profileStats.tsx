@@ -1,5 +1,4 @@
 import { achievementsData } from "feature/achievements/data/achievementsData";
-import { i18n } from "utils/translation";
 import {
   FaCalendarDay,
   FaClock,
@@ -12,6 +11,7 @@ import {
 } from "react-icons/fa";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
+import { i18n } from "utils/translation";
 
 export const getUserStatsField = (userStats: StatisticsDataInterface) => {
   const {

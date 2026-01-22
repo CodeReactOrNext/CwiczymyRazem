@@ -1,7 +1,7 @@
 import { logger } from "feature/logger/Logger";
 import { doc, getDoc } from "firebase/firestore";
-import { i18n } from "utils/translation";
 import { db } from "utils/firebase/client/firebase.utils";
+import { i18n } from "utils/translation";
 
 import type { Exercise, ExercisePlan } from "../types/exercise.types";
 import { EXERCISE_PLANS_COLLECTION } from "./constants";

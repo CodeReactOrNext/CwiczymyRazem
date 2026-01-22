@@ -18,12 +18,10 @@ interface UserHeaderProps {
 export const UserHeader = ({
   userStats,
   userName,
-  avatar,
 }: UserHeaderProps) => {
   const {
     points,
     lvl,
-    currentLevelMaxPoints,
     lastReportDate,
     actualDayWithoutBreak,
     time,

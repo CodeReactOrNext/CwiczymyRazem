@@ -12,6 +12,7 @@ import {
   selectUserName,
 } from "feature/user/store/userSlice";
 import { AnimatePresence,motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
   BookOpen,
@@ -34,7 +35,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { FaDiscord } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
@@ -51,11 +51,10 @@ export interface SidebarLinkInterface {
 }
 
 interface RockSidebarProps {
-  links: SidebarLinkInterface[];
   pageId: NavPagesTypes;
 }
 
-export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
+export const RockSidebar = ({  pageId }: RockSidebarProps) => {
   const { t } = useTranslation("common");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
@@ -66,14 +65,7 @@ export const RockSidebar = ({ links, pageId }: RockSidebarProps) => {
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
 
-  // Get rank image path
-  const getRankImgPath = (lvl: number) => {
-    if (lvl >= IMG_RANKS_NUMBER) {
-      return IMG_RANKS_NUMBER;
-    }
-    return lvl;
-  };
-
+ 
   // Get current route to determine active profile section
   const getActiveProfileSection = () => {
     const { pathname, query } = router;

@@ -5,7 +5,6 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 

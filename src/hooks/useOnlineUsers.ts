@@ -66,7 +66,7 @@ export const useOnlineUsers = () => {
     let db;
     try {
       db = getDatabase(firebaseApp);
-    } catch (e) {
+    } catch  {
       return;
     }
 

@@ -10,13 +10,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect,useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 
 const SongSelectPage: NextPageWithLayout = () => {
-    const { t } = useTranslation(["songs", "timer", "common"]);
     const router = useRouter();
     const userId = useAppSelector(selectUserAuth);
     const [songs, setSongs] = useState<Song[]>([]);
@@ -62,7 +60,6 @@ const SongSelectPage: NextPageWithLayout = () => {
                            <SongCard 
                                song={song} 
                                onOpenDetails={() => handleSongSelect(song)}
-                               // We could pass userStatus here if we calculated it, but not strictly necessary for selection
                            />
                        </div>
                    ))}

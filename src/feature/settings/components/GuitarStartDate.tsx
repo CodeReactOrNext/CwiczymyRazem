@@ -8,8 +8,8 @@ import {
 } from "assets/components/ui/select";
 import { differenceInYears } from "date-fns";
 import { doc, getDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
 import { useTranslation } from "hooks/useTranslation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { updateGuitarStartDate } from "utils/firebase/client/firebase.utils";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -46,7 +46,7 @@ export const GuitarStartDate = () => {
     try {
       await updateGuitarStartDate(date);
       toast.success(t("guitarStartDate.success"));
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("guitarStartDate.error"));
     }
   };

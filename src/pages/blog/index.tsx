@@ -7,8 +7,6 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import React from 'react';
-
 
 
 interface BlogIndexProps {
@@ -20,7 +18,7 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
     <>
       <Head>
         <title>Blog | Riff Quest</title>
-        <meta name="description" content="Dowiedz się więcej o grze na gitarze, nauce i motywacji." />
+        <meta name="description" content="Learn more about guitar playing, learning and motivation." />
       </Head>
 
       <main className="min-h-screen bg-zinc-950 text-zinc-300">
@@ -39,10 +37,10 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
         <div className="pt-32 pb-24 container mx-auto px-4">
           <div className="mb-16 text-center">
             <h1 className="mb-4 text-5xl font-bold text-white md:text-7xl font-teko uppercase tracking-tight">
-              Wiedza i <span className="text-cyan-400">Inspiracja</span>
+              Knowledge and <span className="text-cyan-400">Inspiration</span>
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-zinc-400">
-              Odkryj artykuły, które pomogą Ci stać się lepszym gitarzystą. Od techniki po psychologię ćwiczeń.
+              Discover articles that will help you become a better guitarist. From technique to practice psychology.
             </p>
           </div>
 
@@ -54,7 +52,7 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
             </div>
           ) : (
             <div className="py-20 text-center">
-              <p className="text-xl text-zinc-500">Jeszcze nie ma żadnych artykułów. Zajrzyj tu wkrótce!</p>
+              <p className="text-xl text-zinc-500">No articles yet. Check back soon!</p>
             </div>
           )}
         </div>
@@ -65,7 +63,7 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getStaticProps: GetStaticProps = async () => {
   const blogs = getAllBlogs();
 
   return {

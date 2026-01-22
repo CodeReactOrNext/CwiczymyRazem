@@ -11,10 +11,10 @@ import {
 } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
+import { useTranslation } from "hooks/useTranslation";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { useAppDispatch } from "store/hooks";
 
 interface UserNavProps {

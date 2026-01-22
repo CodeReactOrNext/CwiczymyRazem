@@ -14,12 +14,10 @@ interface NextExerciseCardProps {
     image?: string | StaticImageData;
     timeInMinutes: number;
   } | null;
-  isMobile?: boolean;
 }
 
 export const NextExerciseCard = ({
   nextExercise,
-  isMobile = false,
 }: NextExerciseCardProps) => {
   if (!nextExercise) return null;
 

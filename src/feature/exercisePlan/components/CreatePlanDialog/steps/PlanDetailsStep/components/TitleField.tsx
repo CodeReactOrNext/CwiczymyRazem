@@ -1,7 +1,7 @@
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
-import type { UseFormRegister } from "react-hook-form";
 import { useTranslation } from "hooks/useTranslation";
+import type { UseFormRegister } from "react-hook-form";
 
 import type { PlanDetailsFormData } from "../hooks/usePlanDetailsForm";
 

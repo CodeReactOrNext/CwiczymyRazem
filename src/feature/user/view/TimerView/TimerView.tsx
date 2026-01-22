@@ -7,10 +7,10 @@ import { AutoPlanGenerator } from "feature/practice/views/AutoPlanGenerator/Auto
 import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
 import { selectTimerData, updateTimerTime } from "feature/user/store/userSlice";
 import useTimer from "hooks/useTimer";
+import { useTranslation } from "hooks/useTranslation";
 import TimerLayout from "layouts/TimerLayout";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { SkillsType } from "types/skillsTypes";
 import { convertMsToHMS } from "utils/converter";

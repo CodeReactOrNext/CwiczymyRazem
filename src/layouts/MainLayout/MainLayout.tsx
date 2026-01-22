@@ -9,7 +9,7 @@ interface MainLayoutProps {
   variant: layoutVariant;
 }
 
-const MainHeroLayout = ({ children, subtitle, variant }: MainLayoutProps) => {
+const MainHeroLayout = ({ children, variant }: MainLayoutProps) => {
   return (
     <main className='h-screen '>
               <ContentBox variant={variant}>{children}</ContentBox>

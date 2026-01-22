@@ -3,8 +3,8 @@ import { SkillCategoryCard } from "feature/skills/components/SkillCategoryCard";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { motion } from "framer-motion";
-import { Activity, Book, Lightbulb, Music } from "lucide-react";
 import { useTranslation } from "hooks/useTranslation";
+import { Activity, Book, Lightbulb, Music } from "lucide-react";
 
 interface SkillTreeProps {
   userSkills: UserSkills;

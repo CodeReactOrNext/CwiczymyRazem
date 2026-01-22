@@ -4,7 +4,7 @@ interface SubtitleBarProps {
   children: React.ReactNode;
 }
 
-const SubtitleBar = ({ variant, children }: SubtitleBarProps) => {
+const SubtitleBar = ({ children }: SubtitleBarProps) => {
   return (
     <div className='z-30 flex w-full  items-center justify-end lg:h-20'>
       <span

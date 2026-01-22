@@ -3,17 +3,15 @@ import { NavigationCards } from "feature/profile/components/NavigationCards/Navi
 import {
   selectCurrentUserStats,
 } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 
 const ProfileOverviewPage: NextPageWithLayout = () => {
   const { t } = useTranslation("profile");
-  const userStats = useAppSelector(selectCurrentUserStats);
-  const router = useRouter();
 
   // Explicitly handle loading/unauth view if needed, or let AppLayout handle it.
   // ProfileContent

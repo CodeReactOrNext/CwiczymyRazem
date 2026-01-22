@@ -4,7 +4,6 @@ import { cn } from "assets/lib/utils";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { ArrowRight, Clock, Dumbbell, Target, Zap } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 
 interface DailyPlanRecommendationProps {
   plan: ExercisePlan;

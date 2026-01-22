@@ -6,9 +6,9 @@ import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 import { useAppSelector } from "store/hooks";
 
 interface MiniSkillTreeProps {
@@ -21,7 +21,7 @@ export const SkillMiniTree = ({
   const { t } = useTranslation(["skills", "common", "report"]);
   const userAuth = useAppSelector(selectUserAuth);
   const [userSkills, setUserSkillsLocal] = useState<UserSkills>();
-  const [highlightedSkills, setHighlightedSkills] = useState<Set<string>>(
+  const [highlightedSkills] = useState<Set<string>>(
     new Set()
   );
   const [expandedCategories, setExpandedCategories] =

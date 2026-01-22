@@ -56,7 +56,7 @@ const CoverPickerModal = ({ isOpen, onClose, song, password, onSelect }: CoverPi
       if (res.data.candidates?.length === 0) {
         toast.info("No cover candidates found for this song.");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to search for covers");
     } finally {
       setIsLoading(false);

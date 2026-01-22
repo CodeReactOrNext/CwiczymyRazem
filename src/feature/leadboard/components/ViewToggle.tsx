@@ -1,15 +1,13 @@
 import { cn } from "assets/lib/utils";
-import Link from "next/link";
 import { useTranslation } from "hooks/useTranslation";
+import Link from "next/link";
 
 interface ViewToggleProps {
   isSeasonalView: boolean;
-  isLoading?: boolean;
 }
 
 const ViewToggle = ({
   isSeasonalView,
-  isLoading,
 }: ViewToggleProps) => {
   const { t } = useTranslation("leadboard");
 

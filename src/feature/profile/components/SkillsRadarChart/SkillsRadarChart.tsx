@@ -8,7 +8,6 @@ interface Skill {
 }
 
 interface SkillsRadarChartProps {
-  className?: string;
   statistics: {
     time: {
       technique: number;
@@ -20,7 +19,6 @@ interface SkillsRadarChartProps {
 }
 
 const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
-  className,
   statistics,
 }) => {
   const { t } = useTranslation("skills");
@@ -93,7 +91,7 @@ const SkillsRadarChart: React.FC<SkillsRadarChartProps> = ({
     <>
       <Card className='group relative  mb-5 overflow-hidden rounded-xl p-4'>
         <div className='relative space-y-6'>
-          {skills.map((skill, index) => (
+          {skills.map((skill) => (
             <div key={skill.name} className='group/item space-y-3'>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-4'>

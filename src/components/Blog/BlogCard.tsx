@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import type { BlogFrontmatter } from 'lib/blog';
 import { Calendar } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
 
 interface BlogCardProps {
   blog: BlogFrontmatter;

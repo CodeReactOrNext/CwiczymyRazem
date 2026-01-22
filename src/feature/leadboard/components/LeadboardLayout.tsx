@@ -20,7 +20,6 @@ export interface LeaderboardProps {
   itemsPerPage: number;
   onPageChange: (page: number) => void;
   isSeasonalView: boolean;
-  setIsSeasonalView: (value: boolean) => void;
   seasons: SeasonDataInterface[];
   selectedSeason: string;
   setSelectedSeason: (value: string) => void;
@@ -36,7 +35,6 @@ export const LeadboardLayout = ({
   itemsPerPage,
   onPageChange,
   isSeasonalView,
-  setIsSeasonalView,
   seasons,
   selectedSeason,
   setSelectedSeason,
@@ -44,59 +42,6 @@ export const LeadboardLayout = ({
 }: LeaderboardProps) => {
   const { t } = useTranslation("leadboard");
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
-
-  const renderLeaderboardContent = () => {
-    if (isLoading) {
-      return <TableSkeleton rows={itemsPerPage} />;
-    }
-
-    if (!usersData.length) {
-      return (
-        <div className='flex h-[50vh] items-center justify-center'>
-          <div className='text-center'>
-            <div className='mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-800/50'>
-              <span className='text-2xl'>📊</span>
-            </div>
-            <h3 className='mb-2 text-xl font-semibold text-zinc-300'>
-              {isSeasonalView ? "Brak danych sezonowych" : "Brak użytkowników"}
-            </h3>
-            <p className='text-sm text-zinc-500'>
-              {isSeasonalView
-                ? t("no_seasonal_data_found")
-                : t("no_users_found")}
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <>
-        {usersData.map((user, index) => (
-          <LeadboardRow
-            key={user.profileId}
-            profileId={user.profileId}
-            place={(currentPage - 1) * itemsPerPage + index + 1}
-            nick={user.displayName}
-            userAvatar={user.avatar}
-            statistics={user.statistics}
-            currentUserId={currentUserId}
-          />
-        ))}
-
-        <div className='mt-8 flex justify-center'>
-          <div className='rounded-2xl bg-zinc-900/30 p-4 backdrop-blur-sm'>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-              lastAccessiblePage={lastAccessiblePage}
-            />
-          </div>
-        </div>
-      </>
-    );
-  };
 
   return (
     <MainContainer title='Leadboard'>

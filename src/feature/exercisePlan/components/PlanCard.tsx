@@ -2,8 +2,8 @@ import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
-import Image from "next/image";
 import { useTranslation } from "hooks/useTranslation";
+import Image from "next/image";
 import { 
   FaBrain, 
   FaClock, 

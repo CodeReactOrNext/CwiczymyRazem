@@ -253,7 +253,7 @@ export const uploadUserAvatar = createAsyncThunk(
       const avatarUrl = await firebaseUploadAvatar(avatar);
       updateUserAvatarSuccess();
       return { avatar: avatarUrl };
-    } catch (error) {
+    } catch  {
       avatarErrorHandler();
       return Promise.reject();
     }
@@ -278,7 +278,7 @@ export const uploadUserSocialData = createAsyncThunk(
           break;
       }
       updateUserDataSuccess();
-    } catch (error) {
+    } catch (_error) {
       udpateDataErrorHandler(new Error());
       return Promise.reject();
     }
@@ -322,7 +322,7 @@ export const rateSong = createAsyncThunk(
 
 export const saveActiveChallenge = createAsyncThunk(
   "user/saveActiveChallenge",
-  async (payload: { challenge: ActiveChallenge | null; quitId?: string }, { getState, rejectWithValue }) => {
+  async (payload: { challenge: ActiveChallenge | null; quitId?: string }, {  rejectWithValue }) => {
     try {
       const userId = auth.currentUser?.uid;
       if (!userId) {

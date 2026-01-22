@@ -1,7 +1,7 @@
 import { Card } from "assets/components/ui/card";
 import { motion } from "framer-motion";
-import { Activity, BookOpen, Clock, Headphones, Minus,Sparkles, TrendingDown, TrendingUp } from "lucide-react";
 import { useTranslation } from "hooks/useTranslation";
+import { Activity, BookOpen, Clock, Headphones, Minus,Sparkles, TrendingDown, TrendingUp } from "lucide-react";
 import { convertMsToHM } from "utils/converter";
 
 interface SessionStatsProps {

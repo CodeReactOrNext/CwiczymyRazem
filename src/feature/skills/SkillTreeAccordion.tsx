@@ -6,9 +6,9 @@ import { SkillCategoryAccordion } from "feature/skills/components/SkillCategoryA
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
 import { Crown, Diamond, Gem, Info, Sparkles, Trophy } from "lucide-react";
 import { useState } from "react";
-import { useTranslation } from "hooks/useTranslation";
 
 interface SkillTreeAccordionProps {
   userSkills: UserSkills;
@@ -75,7 +75,7 @@ export const SkillTreeAccordion = ({
   onSkillUpgrade,
 }: SkillTreeAccordionProps) => {
   const { t } = useTranslation("skills");
-  const [showIntro, setShowIntro] = useState(true);
+  const [_showIntro, _setShowIntro] = useState(true);
 
   const categorizedSkills = guitarSkills.reduce((acc, skill) => {
     const category = skill.category;

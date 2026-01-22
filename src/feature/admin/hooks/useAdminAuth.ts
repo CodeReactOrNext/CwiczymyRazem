@@ -22,7 +22,7 @@ export const useAdminAuth = (onAuthSuccess: (pass: string) => void) => {
         sessionStorage.setItem("admin_session_pass", pass);
         onAuthSuccess(pass);
       }
-    } catch (error) {
+    } catch {
       // toast.error("Session expired");
     }
   };
@@ -37,7 +37,7 @@ export const useAdminAuth = (onAuthSuccess: (pass: string) => void) => {
         onAuthSuccess(password);
         toast.success("Identity verified");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Invalid password");
     }
   };
