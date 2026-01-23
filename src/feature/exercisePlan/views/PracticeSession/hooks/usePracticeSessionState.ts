@@ -1,7 +1,8 @@
 import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
-import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAuth,selectUserAvatar } from 'feature/user/store/userSlice';
-import { checkAndSaveChallengeProgress, updateQuestProgress,updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
-import type { ReportDataInterface,ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
+import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAuth, selectUserAvatar } from 'feature/user/store/userSlice';
+import { checkAndSaveChallengeProgress, updateQuestProgress, updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
+import { setActivity } from 'feature/user/store/userSlice';
+import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import useTimer from 'hooks/useTimer';
 import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -86,6 +87,23 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
   useEffect(() => {
     checkForSuccess();
   }, [checkForSuccess]);
+
+  // Update online activity
+  useEffect(() => {
+    if (userAuth) {
+      dispatch(setActivity({
+        planTitle: typeof plan.title === 'string' ? plan.title : plan.title,
+        exerciseTitle: currentExercise.title,
+        category: currentExercise.category,
+        timestamp: Date.now()
+      }));
+    }
+
+    return () => {
+      // Clear activity when leaving the page/session
+      dispatch(setActivity(null));
+    };
+  }, [userAuth, currentExercise, plan, dispatch]);
 
   const resetSuccessView = useCallback(() => {
     setShowSuccessView(false);
