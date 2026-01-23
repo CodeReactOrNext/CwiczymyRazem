@@ -3,6 +3,7 @@ import { TimeSplitterModal } from "feature/practice/components/TimeSplitterModal
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectCurrentUserStats, selectPreviousUserStats, selectRaitingData,selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
+import { setActivity } from "feature/user/store/userSlice";
 import { updateQuestProgress,updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportView.types";
 import { doc, getDoc } from "firebase/firestore";
@@ -144,7 +145,22 @@ const SongPracticeTimer: NextPageWithLayout = () => {
         }
     };
 
-    // Update document title
+    // Update online activity
+    useEffect(() => {
+        if (userId && song) {
+            dispatch(setActivity({
+                planTitle: "Practicing Song",
+                exerciseTitle: `${song.artist} - ${song.title}`,
+                category: "technique", // Songs are mostly technique
+                timestamp: Date.now()
+            }));
+        }
+
+        return () => {
+            dispatch(setActivity(null));
+        };
+    }, [userId, song, dispatch]);
+
     useEffect(() => {
         if (timer.timerEnabled && song) {
             document.title = `${convertMsToHMS(timer.time)} - ${song.title}`;
