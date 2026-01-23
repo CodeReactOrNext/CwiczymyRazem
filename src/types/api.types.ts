@@ -141,6 +141,12 @@ export interface userSliceInitialState {
     role?: "admin" | "user";
   } | null;
   timer: TimerInterface;
+  currentActivity: {
+    planTitle: string;
+    exerciseTitle: string;
+    category?: string;
+    timestamp: number;
+  } | null;
   isLoggedOut: true | null;
   currentUserStats: StatisticsDataInterface | null;
   previousUserStats: StatisticsDataInterface | null;

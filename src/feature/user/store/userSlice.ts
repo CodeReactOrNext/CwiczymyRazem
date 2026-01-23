@@ -51,6 +51,7 @@ const initialState: userSliceInitialState = {
     email: null,
     photoURL: null,
   },
+  currentActivity: null,
 };
 
 export const userSlice = createSlice({
@@ -191,6 +192,9 @@ export const userSlice = createSlice({
         quest.isRewardClaimed = true;
         state.currentUserStats.points = (state.currentUserStats.points || 0) + 100;
       }
+    },
+    setActivity: (state, { payload }: PayloadAction<userSliceInitialState["currentActivity"]>) => {
+      state.currentActivity = payload;
     }
   },
   extraReducers: (builder) => {
@@ -420,7 +424,8 @@ export const {
   setActiveChallenges,
   generateDailyQuest,
   completeQuestTask,
-  claimQuestReward
+  claimQuestReward,
+  setActivity
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
@@ -436,6 +441,7 @@ export const selectUserName = (state: RootState) =>
 export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectUserAvatar = (state: RootState) =>
   state.user.userInfo?.avatar;
+export const selectCurrentActivity = (state: RootState) => state.user.currentActivity;
 export const selectActiveChallenges = (state: RootState) =>
   state.user.currentUserStats?.activeChallenges;
 export const selectDailyQuest = (state: RootState) =>
