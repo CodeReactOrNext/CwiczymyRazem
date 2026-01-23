@@ -42,9 +42,13 @@ const StatsBox = ({
 interface UserTooltipProps {
   userId: string | null;
   children: React.ReactNode;
+  currentActivity?: {
+    planTitle: string;
+    exerciseTitle: string;
+  } | null;
 }
 
-export const UserTooltip = ({ userId, children }: UserTooltipProps) => {
+export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipProps) => {
   const [userData, setUserData] = useState<UserTooltipData | null>(null);
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation("common");
@@ -67,11 +71,31 @@ export const UserTooltip = ({ userId, children }: UserTooltipProps) => {
     <TooltipProvider>
       <Tooltip delayDuration={200}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent className='rounded-xl bg-white/90 p-4 shadow-2xl'>
+        <TooltipContent className='rounded-xl bg-white/95 p-4 shadow-2xl border border-gray-100 backdrop-blur-md'>
           {loading ? (
             <div className='h-24 w-56 animate-pulse rounded-lg bg-gray-100' />
           ) : userData ? (
             <div className='flex flex-col gap-5 text-gray-900'>
+               {/* Activity Section */}
+               {currentActivity && (
+                <div className="mb-2 p-3 rounded-lg bg-cyan-50 border border-cyan-100">
+                  <div className="flex items-center gap-2 text-cyan-600 font-bold text-[10px] uppercase tracking-widest mb-1.5">
+                    <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                    Live Now
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-md bg-cyan-100 text-cyan-600">
+                      <FaMusic className="h-3 w-3" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-500 font-medium">Practicing:</p>
+                      <p className="text-xs font-bold text-gray-900 leading-tight">{currentActivity.exerciseTitle}</p>
+                      <p className="text-[10px] text-gray-400 italic mt-0.5">{currentActivity.planTitle}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className='flex items-center gap-8'>
                 {userData.avatar ? (
                   <Avatar

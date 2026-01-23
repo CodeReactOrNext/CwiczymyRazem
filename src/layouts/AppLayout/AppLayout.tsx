@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import React, { useEffect } from "react";
 import { useAppSelector } from "store/hooks";
+import { usePresence } from "hooks/usePresence";
 import type { NavPagesTypes } from "types/layout.types";
 
 interface AppLayoutProps {
@@ -23,6 +24,7 @@ const AppLayout = ({
   variant = "secondary",
   isPublic = false,
 }: AppLayoutProps) => {
+  usePresence();
   const { t } = useTranslation("common");
   const { status } = useSession();
   const router = useRouter();
