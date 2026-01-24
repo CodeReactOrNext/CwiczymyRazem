@@ -1,7 +1,7 @@
-import type { AchievementList } from "feature/achievements/types";
 import { formatDiscordMessage } from "feature/discordBot/formatters/formatDiscordMessage";
 import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
 import { logger } from "feature/logger/Logger";
+import type { FirebaseLogsRecordingsInterface } from "feature/logs/types/logs.type";
 import {
   collection,
   doc,
@@ -9,49 +9,40 @@ import {
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDoc, trackedSetDoc } from "utils/firebase/client/firestoreTracking";
 
-export const firebaseAddLogReport = async (
+export const firebaseAddRecordingLog = async (
   uid: string,
-  data: string,
-  points: number,
-  newAchievements: AchievementList[],
-  newLevel: { isNewLevel: boolean; level: number },
-  timeSumary: {
-    techniqueTime: number;
-    theoryTime: number;
-    hearingTime: number;
-    creativityTime: number;
-    sumTime: number;
-  },
-  avatarUrl: string | undefined,
-  planId?: string | null,
-  songDetails?: {
-    songId?: string;
-    songTitle?: string;
-    songArtist?: string;
-  },
-  streak?: number
+  videoUrl: string,
+  recordingTitle: string,
+  recordingDescription: string,
+  recordingId: string,
+  songTitle?: string | null,
+  songArtist?: string | null,
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
   const userSnapshot = await trackedGetDoc(userDocRef);
-  const userData = userSnapshot.data()!;
-  const userName = userData.displayName;
-  const userAvatarFrame = userData.selectedFrame ?? userData.statistics?.lbl ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0;
+  const userData = userSnapshot.data();
 
-  const logData = {
-    data,
+  if (!userData) {
+    logger.error(`User not found for uid: ${uid}`, { context: "addRecordingLog" });
+    return;
+  }
+
+  const logData: FirebaseLogsRecordingsInterface = {
     uid,
-    userName,
-    userAvatarFrame,
-    points,
-    newAchievements,
-    newLevel,
+    userName: userData.displayName,
+    userAvatarUrl: userData.photoURL || null,
+    videoUrl,
+    recordingTitle,
+    recordingId: recordingId,
+    recordingDescription,
+    songTitle: songTitle || null,
+    songArtist: songArtist || null,
     timestamp: new Date().toISOString(),
-    timeSumary,
-    avatarUrl: avatarUrl ?? null,
-    planId,
-    streak,
-    ...songDetails
+    type: "recording_added",
+    data: videoUrl,
+    avatarUrl: userData.photoURL || null,
+    userAvatarFrame: userData.selectedFrame ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0,
   };
 
   await trackedSetDoc(logsDocRef, logData);
@@ -69,7 +60,7 @@ export const firebaseAddLogReport = async (
     }
   } catch (error) {
     logger.error(error, {
-      context: "addLogReport",
+      context: "addRecordingLog",
     });
   }
 };

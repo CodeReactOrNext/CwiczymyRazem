@@ -24,13 +24,8 @@ export const UserHeader = ({
     lvl,
     lastReportDate,
     actualDayWithoutBreak,
-    time,
+    fame,
   } = userStats;
-
-  // Calculate derived values for WelcomeMessage
-  const totalPracticeTime = convertMsToHM(
-    time.technique + time.theory + time.creativity + time.hearing
-  );
 
   return (
     <header className='sticky top-0 z-50 border-b border-white/5 bg-zinc-950/80 shadow-lg backdrop-blur-xl'>
@@ -63,7 +58,7 @@ export const UserHeader = ({
               lastReportDate={lastReportDate}
               points={points}
               actualDayWithoutBreak={actualDayWithoutBreak}
-              totalPracticeTime={totalPracticeTime}
+              fame={fame || 0}
             />
           </div>
 

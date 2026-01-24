@@ -24,7 +24,9 @@ export const firebaseAddSongsLog = async (
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
   const userSnapshot = await trackedGetDoc(userDocRef);
-  const userName = userSnapshot.data()!.displayName;
+  const userData = userSnapshot.data()!;
+  const userName = userData.displayName;
+  const userAvatarFrame = userData.selectedFrame ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0;
 
   const logData = {
     data,
@@ -34,6 +36,7 @@ export const firebaseAddSongsLog = async (
     songArtist,
     status,
     avatarUrl,
+    userAvatarFrame,
   };
 
   await trackedSetDoc(logsDocRef, logData);

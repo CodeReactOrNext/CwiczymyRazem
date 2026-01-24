@@ -13,4 +13,5 @@ export type NavPagesTypes =
   | "timer"
   | "challenges"
   | "settings"
+  | "recordings"
   | null;

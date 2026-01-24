@@ -13,6 +13,7 @@ import {
   FaClock,
   FaExternalLinkAlt,
   FaFire,
+  FaGem,
   FaLeaf,
   FaMusic,
   FaStar,
@@ -137,6 +138,11 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   Icon={FaTrophy}
                   label={"Lvl"}
                   value={userData.statistics.level}
+                />
+                <StatsBox
+                  Icon={FaGem}
+                  label={"Fame"}
+                  value={userData.statistics.fame}
                 />
                 <StatsBox
                   Icon={FaFire}
