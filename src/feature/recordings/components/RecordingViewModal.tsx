@@ -166,7 +166,7 @@ export const RecordingViewModal = ({ isOpen, onClose, recordingId, initialRecord
                         <div key={comment.id} className="flex gap-3">
                             <div className="shrink-0 transform scale-75 origin-top">
                                 <Avatar 
-                                    avatarURL={comment.userAvatarUrl} 
+                                    avatarURL={comment.userAvatarUrl || undefined} 
                                     name={comment.userName || "?"}
                                     lvl={comment.userAvatarFrame}
                                     size="sm"

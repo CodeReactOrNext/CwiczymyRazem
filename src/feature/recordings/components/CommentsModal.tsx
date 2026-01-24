@@ -71,7 +71,7 @@ export const CommentsModal = ({ isOpen, onClose, recordingId }: CommentsModalPro
                     <div key={comment.id} className="flex gap-3">
                     <div className="transform scale-[0.85] origin-top mt-1">
                          <Avatar 
-                            avatarURL={comment.userAvatarUrl} 
+                            avatarURL={comment.userAvatarUrl || undefined} 
                             name={comment.userName || "?"}
                             lvl={comment.userAvatarFrame}
                             size="sm"
