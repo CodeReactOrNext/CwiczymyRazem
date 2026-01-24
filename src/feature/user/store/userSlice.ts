@@ -32,6 +32,7 @@ import {
   updateUserStats,
   uploadUserAvatar,
   uploadUserSocialData,
+  updateProfileCustomization,
 } from "./userSlice.asyncThunk";
 
 
@@ -358,6 +359,17 @@ export const userSlice = createSlice({
         state.isFetching = null;
         state.userInfo = { ...state.userInfo, ...action.payload.avatar };
       })
+      .addCase(updateProfileCustomization.fulfilled, (state, { payload }) => {
+        state.isFetching = null;
+        if (state.userInfo) {
+          if (payload.selectedFrame !== undefined) {
+            state.userInfo.selectedFrame = payload.selectedFrame;
+          }
+          if (payload.selectedGuitar !== undefined) {
+            state.userInfo.selectedGuitar = payload.selectedGuitar;
+          }
+        }
+      })
 
       .addMatcher(
         isAnyOf(
@@ -367,7 +379,8 @@ export const userSlice = createSlice({
           changeUserDisplayName.pending,
           updateUserPassword.pending,
           updateUserEmail.pending,
-          uploadUserSocialData.pending
+          uploadUserSocialData.pending,
+          updateProfileCustomization.pending
         ),
         (state) => {
           state.isFetching = "updateData";
@@ -389,7 +402,8 @@ export const userSlice = createSlice({
           logInViaGoogle.rejected,
           logInViaGoogleCredential.rejected,
           createAccount.rejected,
-          uploadUserSocialData.rejected
+          uploadUserSocialData.rejected,
+          updateProfileCustomization.rejected
         ),
         (state) => {
           state.isFetching = null;

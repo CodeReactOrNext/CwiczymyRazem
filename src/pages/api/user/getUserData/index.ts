@@ -23,6 +23,8 @@ export default async function handler(
           soundCloudLink: userData!.soundCloudLink,
           band: userData!.band,
           guitarStartDate: userData!.guitarStartDate,
+          selectedFrame: userData!.selectedFrame,
+          selectedGuitar: userData!.selectedGuitar,
         },
         userAuth,
         currentUserStats: {
