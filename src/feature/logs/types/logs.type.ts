@@ -17,6 +17,7 @@ export interface FirebaseLogsSongsInterface {
   difficulty_rate?: number;
   status: FirebaseLogsSongsStatuses;
   avatarUrl: string | undefined;
+  userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
 }
@@ -68,6 +69,7 @@ export interface FirebaseLogsInterface {
     sumTime: number;
   };
   avatarUrl: string | null;
+  userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
   planId?: string | null;
@@ -100,6 +102,25 @@ export interface FirebaseLogsTopPlayersInterface {
   topPlayers: TopPlayerData[];
   message: string;
   daysLeftInSeason?: number;
+  id?: string;
+  reactions?: string[];
+}
+
+export interface FirebaseLogsRecordingsInterface {
+  uid: string;
+  userName: string;
+  userAvatarUrl?: string | null; // Denormalized for display
+  videoUrl: string;
+  recordingId?: string | null;
+  recordingTitle: string;
+  recordingDescription: string;
+  songTitle?: string | null;
+  songArtist?: string | null;
+  timestamp: string | number | Date;
+  type: "recording_added";
+  data: string; // Generic data field if needed, or url
+  avatarUrl: string | undefined | null; // For consistency with other logs
+  userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
 }

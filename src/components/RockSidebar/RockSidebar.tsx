@@ -30,6 +30,7 @@ import {
   Trophy,
   User,
   X,
+  Video,
 } from "lucide-react";
 import { Heart, Zap } from "lucide-react";
 import Image from "next/image";
@@ -42,6 +43,7 @@ import type { NavPagesTypes } from "types/layout.types";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 
 import { CommunityModal } from "./CommunityModal";
+import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;
@@ -186,6 +188,12 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
       href: "/songs?view=management",
       icon: <LayoutGrid size={16} />,
     },
+    {
+      id: "recordings" as NavPagesTypes,
+      name: "Recordings",
+      href: "/recordings",
+      icon: <Video size={16} />,
+    },
   ];
 
   const otherSections = [
@@ -226,6 +234,9 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
               <h2 className='text-sm font-semibold text-white'>
                 Rifff Quest
               </h2>
+            </div>
+            <div className='ml-auto'>
+                <NotificationsBell />
             </div>
           </div>
         </div>
@@ -513,13 +524,16 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                     </h2>
                   </div>
                 </div>
-                <Button
-                  variant='ghost'
-                  size='icon'
-                  onClick={() => setIsMobileOpen(false)}
-                  className='text-zinc-400 hover:bg-white/10 hover:text-white'>
-                  <X size={16} />
-                </Button>
+                <div className="flex items-center gap-2">
+                    <NotificationsBell />
+                    <Button
+                    variant='ghost'
+                    size='icon'
+                    onClick={() => setIsMobileOpen(false)}
+                    className='text-zinc-400 hover:bg-white/10 hover:text-white'>
+                    <X size={16} />
+                    </Button>
+                </div>
               </div>
 
               {/* User Profile Section - Mobile */}

@@ -202,6 +202,7 @@ export interface UserTooltipData {
     totalPracticeTime: number;
     totalPoints: number;
     level: number;
+    fame: number;
     achievements: string[];
     actualDayWithoutBreak: number;
     currentLevelMaxPoints: number;
@@ -245,6 +246,7 @@ export const firebaseGetUserTooltipData = async (
           userData.statistics.time.theory || 0,
         totalPoints: userData.statistics.points || 0,
         level: userData.statistics.lvl || 0,
+        fame: userData.statistics.fame || 0,
         achievements: userData.statistics.achievements || [],
         actualDayWithoutBreak: userData.statistics.actualDayWithoutBreak || 0,
         currentLevelMaxPoints: userData.statistics.currentLevelMaxPoints || 0,

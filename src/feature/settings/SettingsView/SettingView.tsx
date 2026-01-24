@@ -39,8 +39,8 @@ const SettingsView = () => {
           {/* Sidebar-like TabsList */}
           <div className="w-full md:w-72 space-y-6 shrink-0">
              <div className="px-4 py-2">
-                <h2 className="text-2xl font-black tracking-tight text-foreground">Ustawienia</h2>
-                <p className="text-sm text-muted-foreground font-medium">Zarządzaj swoim kontem</p>
+                <h2 className="text-2xl font-black tracking-tight text-foreground">Settings</h2>
+                <p className="text-sm text-muted-foreground font-medium">Manage your account</p>
              </div>
              <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 gap-1.5">
                 <TabsTrigger 
@@ -50,7 +50,7 @@ const SettingsView = () => {
                   <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-cyan-500/10 group-data-[state=active]:text-cyan-500 transition-colors">
                     <User className="h-4 w-4" />
                   </div>
-                  <span className="font-bold">Profil</span>
+                  <span className="font-bold">Profile</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="customization" 
@@ -59,7 +59,7 @@ const SettingsView = () => {
                   <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-purple-500/10 group-data-[state=active]:text-purple-500 transition-colors">
                     <Palette className="h-4 w-4" />
                   </div>
-                  <span className="font-bold">Wygląd profilu</span>
+                  <span className="font-bold">Profile Appearance</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="socials" 
@@ -77,7 +77,7 @@ const SettingsView = () => {
                   <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-amber-500/10 group-data-[state=active]:text-amber-500 transition-colors">
                     <SettingsIcon className="h-4 w-4" />
                   </div>
-                  <span className="font-bold">Preferencje</span>
+                  <span className="font-bold">Preferences</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="security" 
@@ -86,7 +86,7 @@ const SettingsView = () => {
                   <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-zinc-100 group-data-[state=active]:text-zinc-950 transition-colors">
                     <Lock className="h-4 w-4" />
                   </div>
-                  <span className="font-bold">Bezpieczeństwo</span>
+                  <span className="font-bold">Security</span>
                 </TabsTrigger>
                 
                 <div className="py-2 px-4">
@@ -100,7 +100,7 @@ const SettingsView = () => {
                   <div className="p-2 rounded-xl bg-red-500/5 group-data-[state=active]:bg-red-500 group-data-[state=active]:text-white transition-colors">
                     <ShieldAlert className="h-4 w-4" />
                   </div>
-                  <span>Strefa Niebezpieczna</span>
+                  <span>Danger Zone</span>
                 </TabsTrigger>
              </TabsList>
           </div>
