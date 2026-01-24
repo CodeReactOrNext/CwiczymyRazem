@@ -77,13 +77,13 @@ const ProfileCustomization = () => {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-foreground">Personalizacja</h3>
-              <p className="text-sm text-muted-foreground">Wybierz ramkę i gitarę</p>
+              <h3 className="text-lg font-bold text-foreground">Personalization</h3>
+              <p className="text-sm text-muted-foreground">Customize your profile frame and guitar icon</p>
             </div>
             <div className="flex items-center gap-3 bg-zinc-900/50 rounded-xl px-4 py-2 border border-zinc-800">
                <Trophy className="h-4 w-4 text-cyan-500" />
                <div>
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Poziom</p>
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Level</p>
                   <p className="text-xl font-black text-foreground leading-none">{currentLevel}</p>
                </div>
             </div>
@@ -123,7 +123,7 @@ const ProfileCustomization = () => {
                 className="w-full mt-4 h-11 font-bold"
               >
                 {isFetching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Check className="mr-2 h-4 w-4" />}
-                {isFetching ? "Zapisywanie..." : "Zapisz zmiany"}
+                {isFetching ? "Saving..." : "Save changes"}
               </Button>
             </div>
 
@@ -134,7 +134,7 @@ const ProfileCustomization = () => {
                 <div className="flex items-center justify-between px-1">
                   <h4 className="flex items-center gap-2 text-sm font-bold text-zinc-300">
                     <Trophy className="h-4 w-4 text-cyan-500" />
-                    Ramki Prestiżowe
+                    Prestige Frames
                   </h4>
                   <span className="text-xs font-medium text-zinc-500">
                     {FRAMES.filter(f => currentLevel >= f.lvl).length} / {FRAMES.length}
@@ -200,7 +200,7 @@ const ProfileCustomization = () => {
                 <div className="flex items-center justify-between px-1">
                   <h4 className="flex items-center gap-2 text-sm font-bold text-zinc-300">
                     <Zap className="h-4 w-4 text-yellow-500" />
-                    Ikony Gitary
+                    Guitar Icons
                   </h4>
                   <span className="text-xs font-medium text-zinc-500">
                     {Math.min(currentLevel + 1, GUITAR_COUNT + 1)} / {GUITAR_COUNT + 1}
@@ -235,7 +235,7 @@ const ProfileCustomization = () => {
                           )}>
                             {i === 0 ? (
                                 <div className="flex flex-col items-center opacity-40">
-                                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Brak</span>
+                                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">None</span>
                                 </div>
                             ) : (
                                 <img

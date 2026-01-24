@@ -98,6 +98,7 @@ export interface StatisticsDataInterface {
   activeChallenges?: ActiveChallenge[] | null;
   dailyQuest?: DailyQuest | null;
   completedChallenges?: string[];
+  fame?: number;
 }
 
 export interface TimerInterface {

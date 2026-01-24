@@ -12,6 +12,7 @@ import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
+  FirebaseLogsRecordingsInterface
 } from "feature/logs/types/logs.type";
 import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
@@ -24,6 +25,9 @@ import {
   FaTrophy,
 } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
+import { Video } from "lucide-react"; 
+import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
+import { useState } from "react";
 import { addZeroToTime } from "utils/converter";
 
 const isFirebaseLogsSongs = (
@@ -31,6 +35,7 @@ const isFirebaseLogsSongs = (
     | FirebaseLogsInterface
     | FirebaseLogsSongsInterface
     | FirebaseLogsTopPlayersInterface
+    | FirebaseLogsRecordingsInterface
 ): log is FirebaseLogsSongsInterface => {
   return (log as FirebaseLogsSongsInterface).status !== undefined;
 };
@@ -40,8 +45,19 @@ const isFirebaseLogsTopPlayers = (
     | FirebaseLogsInterface
     | FirebaseLogsSongsInterface
     | FirebaseLogsTopPlayersInterface
+    | FirebaseLogsRecordingsInterface
 ): log is FirebaseLogsTopPlayersInterface => {
   return (log as FirebaseLogsTopPlayersInterface).type === "top_players_update";
+};
+
+const isFirebaseLogsRecording = (
+  log:
+    | FirebaseLogsInterface
+    | FirebaseLogsSongsInterface
+    | FirebaseLogsTopPlayersInterface
+    | FirebaseLogsRecordingsInterface
+): log is FirebaseLogsRecordingsInterface => {
+  return (log as FirebaseLogsRecordingsInterface).type === "recording_added";
 };
 
 interface LogsBoxLayoutProps {
@@ -49,6 +65,7 @@ interface LogsBoxLayoutProps {
     | FirebaseLogsSongsInterface
     | FirebaseLogsInterface
     | FirebaseLogsTopPlayersInterface
+    | FirebaseLogsRecordingsInterface
   )[];
   marksLogsAsRead: () => void;
   currentUserId: string;
@@ -72,7 +89,7 @@ const UserLink = ({
 }: {
   uid: string | undefined;
   userName: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
   lvl?: number;
 }) => {
   if (!uid) return <span>{userName}</span>;
@@ -86,7 +103,7 @@ const UserLink = ({
           <Avatar 
             size="sm" 
             name={userName} 
-            avatarURL={avatarUrl} 
+            avatarURL={avatarUrl || undefined} 
             lvl={lvl} 
           />
         </div>
@@ -125,7 +142,7 @@ const FirebaseLogsSongItem = ({
   currentUserId: string;
 }) => {
   const { t } = useTranslation("common");
-  const { userName, data, songArtist, songTitle, status, uid, avatarUrl } = log;
+  const { userName, data, songArtist, songTitle, status, uid, avatarUrl, userAvatarFrame } = log;
   const date = new Date(data);
   const message = getSongStatusMessage(status, t);
 
@@ -134,7 +151,7 @@ const FirebaseLogsSongItem = ({
       <TimeStamp date={date} />
       <div className='flex w-full flex-wrap items-center gap-1 sm:w-[80%]'>
         <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} />
+          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
         </span>
         <p className='text-secondText'>
           {message}{" "}
@@ -143,6 +160,73 @@ const FirebaseLogsSongItem = ({
           </span>
           {status !== "difficulty_rate" && "."}
         </p>
+        
+        {log.id && (
+          <LogReaction 
+            logId={log.id} 
+            reactions={log.reactions} 
+            currentUserId={currentUserId} 
+          />
+        )}
+      </div>
+    </LogItem>
+  );
+};
+
+const FirebaseLogsRecordingItem = ({
+  log,
+  isNew,
+  currentUserId,
+  onView,
+}: {
+  log: FirebaseLogsRecordingsInterface;
+  isNew: boolean;
+  currentUserId: string;
+  onView: (id: string) => void;
+}) => {
+  // const { t } = useTranslation("recordings"); // Add translation if needed
+  const { userName, timestamp, songArtist, songTitle, videoUrl, recordingTitle, uid, avatarUrl, userAvatarFrame, recordingId } = log;
+  const date = new Date(timestamp);
+
+  // Simple YouTube ID extraction for log preview maybe? Or just link
+  const getYoutubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+  const _videoId = getYoutubeId(videoUrl);
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className='flex w-full flex-wrap items-center gap-1 sm:w-[80%]'>
+        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
+          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+        </span>
+        <div className='text-secondText flex items-center gap-1'>
+          <Video className="h-3 w-3 text-cyan-400" />
+          added a new recording:
+          {recordingId ? (
+            <button 
+                onClick={() => onView(recordingId)}
+                className='font-bold text-white hover:text-cyan-400 hover:underline transition-colors text-left'
+            >
+                {recordingTitle}
+            </button>
+          ) : (
+            <a 
+                href={videoUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className='font-bold text-white hover:text-cyan-400 hover:underline transition-colors'
+            >
+                {recordingTitle}
+            </a>
+          )}
+          {songTitle && (
+             <span className="text-xs opacity-70">({songArtist} - {songTitle})</span>
+          )}
+        </div>
         
         {log.id && (
           <LogReaction 
@@ -166,7 +250,7 @@ const FirebaseLogsItem = ({
   currentUserId: string;
 }) => {
   const { t, i18n } = useTranslation(["common", "exercises"]);
-  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist } = log;
+  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, userAvatarFrame } = log;
   const date = new Date(data);
 
   let plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
@@ -195,7 +279,7 @@ const FirebaseLogsItem = ({
             uid={uid}
             userName={userName}
             avatarUrl={avatarUrl ?? undefined}
-            lvl={newLevel?.level}
+            lvl={userAvatarFrame ?? newLevel?.level}
           />
         </span>{" "}
         <span className='text-secondText'>{t("common:logsBox.get")}</span>
@@ -225,7 +309,7 @@ const FirebaseLogsItem = ({
             </span>
         )}
 
-        {newLevel.isNewLevel && (
+        {newLevel?.isNewLevel && (
           <span className='text-secondText'>
             {" "}
             {t("common:logsBox.lvl_up")}
@@ -235,7 +319,7 @@ const FirebaseLogsItem = ({
             </span>
           </span>
         )}
-        {newAchievements.length > 0 && (
+        {newAchievements?.length > 0 && (
           <span className='inline-flex items-center gap-2'>
             {t("common:logsBox.achievements")}{" "}
             {newAchievements.map((achievement, index) => (
@@ -483,6 +567,7 @@ const FirebaseLogsTopPlayersItem = ({
 };
 const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
   const { isNewMessage } = useUnreadMessages("logs");
+  const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
   const spanRef = useRef<HTMLDivElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -532,6 +617,13 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
               log={log}
               isNew={isNewMessage(log.data)}
             />
+           ) : isFirebaseLogsRecording(log) ? (
+             <FirebaseLogsRecordingItem
+               log={log}
+               isNew={isNewMessage(log.data)}
+               currentUserId={currentUserId}
+               onView={setActiveRecordingId}
+             />
           ) : (
             <FirebaseLogsItem 
               log={log} 
@@ -541,6 +633,12 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
           )}
         </div>
       ))}
+
+      <RecordingViewModal 
+        isOpen={!!activeRecordingId}
+        onClose={() => setActiveRecordingId(null)}
+        recordingId={activeRecordingId}
+      />
     </>
   );
 };
