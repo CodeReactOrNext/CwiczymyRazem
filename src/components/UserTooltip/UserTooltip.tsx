@@ -103,6 +103,8 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                     avatarURL={userData.avatar}
                     size='sm'
                     lvl={userData.statistics.level}
+                    selectedFrame={userData.selectedFrame}
+                    selectedGuitar={userData.selectedGuitar}
                   />
                 ) : (
                   <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-900'>

@@ -3,7 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { challengesList, challengeUseCases } from "feature/challenges";
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
-import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
+import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateProfileCustomization, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import type { FirebaseError } from "firebase/app";
 import type { User } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
@@ -193,6 +193,19 @@ export const updateUserPassword = createAsyncThunk(
   }
 );
 
+export const updateProfileCustomization = createAsyncThunk(
+  "user/updateProfileCustomization",
+  async ({ selectedFrame, selectedGuitar }: { selectedFrame?: number; selectedGuitar?: number }) => {
+    try {
+      await firebaseUpdateProfileCustomization(selectedFrame, selectedGuitar);
+      return { selectedFrame, selectedGuitar };
+    } catch (error) {
+      udpateDataErrorHandler(error as SerializedError);
+      return Promise.reject();
+    }
+  }
+);
+
 export const getUserProvider = createAsyncThunk(
   "user/getUserProvider",
   async () => {
@@ -253,7 +266,7 @@ export const uploadUserAvatar = createAsyncThunk(
       const avatarUrl = await firebaseUploadAvatar(avatar);
       updateUserAvatarSuccess();
       return { avatar: avatarUrl };
-    } catch  {
+    } catch {
       avatarErrorHandler();
       return Promise.reject();
     }
@@ -322,7 +335,7 @@ export const rateSong = createAsyncThunk(
 
 export const saveActiveChallenge = createAsyncThunk(
   "user/saveActiveChallenge",
-  async (payload: { challenge: ActiveChallenge | null; quitId?: string }, {  rejectWithValue }) => {
+  async (payload: { challenge: ActiveChallenge | null; quitId?: string }, { rejectWithValue }) => {
     try {
       const userId = auth.currentUser?.uid;
       if (!userId) {

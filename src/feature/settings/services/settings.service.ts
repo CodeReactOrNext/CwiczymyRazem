@@ -13,7 +13,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, firebaseUpdateUserDocument, storage } from "utils/firebase/client/firebase.utils";
 import { shuffleUid } from "utils/user/shuffleUid";
 
- const auth = getAuth();
+const auth = getAuth();
 
 
 export const firebaseRestartUserStats = async () => {
@@ -75,9 +75,17 @@ export const firebaseUpdateYouTubeLink = async (youtubeLink: string) => {
 export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
+}; export const firebaseUpdateProfileCustomization = async (
+  selectedFrame?: number,
+  selectedGuitar?: number
+) => {
+  const userDocRef = doc(db, "users", auth.currentUser?.uid!);
+  const updateData: any = {};
+  if (selectedFrame !== undefined) updateData.selectedFrame = selectedFrame;
+  if (selectedGuitar !== undefined) updateData.selectedGuitar = selectedGuitar;
+
+  if (Object.keys(updateData).length > 0) {
+    await updateDoc(userDocRef, updateData);
+  }
 };
-
-
-
-
 
