@@ -3,6 +3,7 @@ import {
   FaCalendarDay,
   FaClock,
   FaDumbbell,
+  FaGem,
   FaGuitar,
   FaHeart,
   FaMedal,
@@ -22,9 +23,16 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
     time,
     dayWithoutBreak,
     maxPoints,
+    fame,
   } = userStats;
 
   return [
+    {
+      id: "fame",
+      Icon: FaGem,
+      description: "Fame",
+      value: fame || 0,
+    },
     {
       id: "total-time",
       Icon: FaClock,

@@ -17,6 +17,7 @@ import { getYearsOfPlaying } from "utils/converter";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
 import { StatsSection } from "./components/StatsSection";
+import { UserRecordingsSection } from "./components/UserRecordingsSection";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -197,6 +198,9 @@ const ProfileLayout = ({
             <SkillTreeCards isUserProfile userSkills={userSkills} />
           </div>
         )}
+
+        {/* Recordings Section */}
+        <UserRecordingsSection userId={userAuth} />
 
 
       </div>

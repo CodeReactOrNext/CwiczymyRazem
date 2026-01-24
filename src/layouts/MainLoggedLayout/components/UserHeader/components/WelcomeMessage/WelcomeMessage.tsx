@@ -3,7 +3,7 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { addDays, isSameDay,startOfWeek } from "date-fns";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { FaClock, FaFire, FaTrophy } from "react-icons/fa";
+import { FaClock, FaFire, FaGem, FaTrophy } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 import {
   checkIsPracticeToday,
@@ -16,14 +16,14 @@ interface WelcomeMessageProps {
   lastReportDate: string;
   points: number;
   actualDayWithoutBreak: number;
-  totalPracticeTime: string;
+  fame: number;
 }
 
 export const WelcomeMessage = ({
   points,
   lastReportDate,
   actualDayWithoutBreak,
-  totalPracticeTime,
+  fame,
 }: WelcomeMessageProps) => {
   const userAuth = useAppSelector(selectUserAuth);
   const { reportList } = useActivityLog(userAuth || "");
@@ -101,11 +101,11 @@ export const WelcomeMessage = ({
         </span>
       </div>
 
-      {/* Time - Compact Card */}
-      <div className='hidden h-10 items-center justify-center gap-2 rounded-lg bg-zinc-800/40 px-3 py-2 shadow-sm backdrop-blur-sm lg:flex'>
-        <FaClock className='text-xs text-zinc-400' />
-        <span className='font-mono text-xs font-semibold text-white'>
-          {totalPracticeTime}
+      {/* Fame - Compact Card */}
+      <div className='hidden h-10 items-center justify-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2 shadow-sm backdrop-blur-sm md:flex'>
+        <FaGem className='text-xs text-amber-500' />
+        <span className='text-xs font-bold text-amber-400'>
+          {fame.toLocaleString()}
         </span>
       </div>
     </div>

@@ -33,4 +33,5 @@ export const statisticsInitial: StatisticsDataInterface = {
   },
   activeChallenges: [],
   completedChallenges: [],
+  fame: 0,
 };
