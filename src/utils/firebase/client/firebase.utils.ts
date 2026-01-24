@@ -36,7 +36,8 @@ import type {
 import {
   trackedGetDoc,
   trackedGetDocs,
-  trackedUpdateDoc} from "./firestoreTracking";
+  trackedUpdateDoc
+} from "./firestoreTracking";
 
 const provider = new GoogleAuthProvider();
 
@@ -195,6 +196,8 @@ export interface UserTooltipData {
   displayName: string;
   avatar: string | null;
   band: string;
+  selectedFrame?: number;
+  selectedGuitar?: number;
   statistics: {
     totalPracticeTime: number;
     totalPoints: number;
@@ -232,6 +235,8 @@ export const firebaseGetUserTooltipData = async (
       displayName: userData.displayName,
       avatar: userData.avatar || null,
       band: userData.band,
+      selectedFrame: userData.selectedFrame,
+      selectedGuitar: userData.selectedGuitar,
       statistics: {
         totalPracticeTime:
           userData.statistics.time.creativity +

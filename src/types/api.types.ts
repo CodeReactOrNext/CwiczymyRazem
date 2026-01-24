@@ -45,6 +45,8 @@ export interface UserDataInterface {
     soundCloudLink?: string;
     youTubeLink?: string;
     band?: string;
+    selectedFrame?: number;
+    selectedGuitar?: number;
   };
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
@@ -138,6 +140,8 @@ export interface userSliceInitialState {
     soundCloudLink?: string;
     youTubeLink?: string;
     band?: string;
+    selectedFrame?: number;
+    selectedGuitar?: number;
     role?: "admin" | "user";
   } | null;
   timer: TimerInterface;

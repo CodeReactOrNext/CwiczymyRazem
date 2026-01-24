@@ -12,6 +12,8 @@ export interface FirebaseUserDataInterface {
   youTubeLink?: string;
   band?: string;
   guitarStartDate?: Timestamp;
+  selectedFrame?: number;
+  selectedGuitar?: number;
   statistics: StatisticsDataInterface;
   songLists: UserSongLists;
 }
