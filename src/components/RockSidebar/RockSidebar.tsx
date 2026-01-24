@@ -9,6 +9,7 @@ import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import {
   selectCurrentUserStats,
   selectUserAvatar,
+  selectUserInfo,
   selectUserName,
 } from "feature/user/store/userSlice";
 import { AnimatePresence,motion } from "framer-motion";
@@ -64,6 +65,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
+  const userInfo = useAppSelector(selectUserInfo);
 
  
   // Get current route to determine active profile section
@@ -244,6 +246,8 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                         avatarURL={userAvatar}
                         name={userName}
                         lvl={userStats.lvl}
+                        selectedFrame={userInfo?.selectedFrame}
+                        selectedGuitar={userInfo?.selectedGuitar}
                       />
                     </div>
 
@@ -534,6 +538,8 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                           avatarURL={userAvatar}
                           name={userName}
                           lvl={userStats.lvl}
+                          selectedFrame={userInfo?.selectedFrame}
+                          selectedGuitar={userInfo?.selectedGuitar}
                         />
                       </div>
 

@@ -218,3 +218,18 @@ a {
     height: 100%;
   }
 }
+@property --shimmer-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes shimmer {
+  from {
+    --shimmer-angle: 0deg;
+  }
+  to {
+    --shimmer-angle: 360deg;
+  }
+}
+
