@@ -47,14 +47,18 @@ export const RecommendationsSection = ({
                 const cacheDate = new Date(cachedData.timestamp);
                 const now = new Date();
                 
-                // Refresh if cache is older than 24 hours OR if it's a new calendar day (optional, sticking to 24h/simple logic for now)
-                // Actually, daily recommendation should be stable for the day.
-                // Let's assume refreshing every 6 hours or just checking if day changed.
-                // Simple approach: if less than 1 hour old, use cache? No, "Daily".
-                // If it is the SAME day.
+                // If we have learning songs, the pick MUST be one of them. 
+                // If it's not, we invalidate cache to force the "learning priority" logic.
+                const isCachedSongInLearning = userSongs?.learning.some(s => s.id === cachedData.data.id);
+                const shouldBeInLearning = (userSongs?.learning.length ?? 0) > 0;
+
                 if (now.toDateString() === cacheDate.toDateString()) {
-                    setDailyPick(cachedData.data);
-                    return; 
+                    if (shouldBeInLearning && !isCachedSongInLearning) {
+                        // Invalidate cache - we have songs to learn but cache shows something else
+                    } else {
+                        setDailyPick(cachedData.data);
+                        return; 
+                    }
                 }
             }
         } else if (type === "exercise") {
@@ -77,12 +81,29 @@ export const RecommendationsSection = ({
     setIsLoading(true);
     try {
       if (type === "song" && userSongs) {
-        const ownedIds = [
-          ...userSongs.wantToLearn.map((s) => s.id),
-          ...userSongs.learning.map((s) => s.id),
-          ...userSongs.learned.map((s) => s.id),
-        ];
-        const pick = await getDailyRecommendation(ownedIds);
+        let pick: Song | null = null;
+        
+        // Prioritize songs the user is currently learning
+        if (userSongs.learning.length > 0) {
+            const today = new Date();
+            const dateString = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+            let hash = 0;
+            for (let i = 0; i < dateString.length; i++) {
+                const char = dateString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            const index = Math.abs(hash) % userSongs.learning.length;
+            pick = userSongs.learning[index];
+        } else {
+            const ownedIds = [
+              ...userSongs.wantToLearn.map((s) => s.id),
+              ...userSongs.learning.map((s) => s.id),
+              ...userSongs.learned.map((s) => s.id),
+            ];
+            pick = await getDailyRecommendation(ownedIds);
+        }
+
         setDailyPick(pick);
         
         // Cache song
