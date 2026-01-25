@@ -62,7 +62,7 @@ const ProfileLandingLayout = ({
           className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'practice' ? 'bg-zinc-800 text-white shadow-lg border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
           <Play size={14} className={activeTab === 'practice' ? "fill-current" : ""} />
-          Start practicing
+          Practicing
         </button>
         <button 
           onClick={() => setActiveTab("review")}
