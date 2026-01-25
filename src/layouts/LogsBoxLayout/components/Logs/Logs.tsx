@@ -203,9 +203,9 @@ const FirebaseLogsRecordingItem = ({
         <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
           <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
         </span>
-        <div className='text-secondText flex items-center gap-1'>
-          <Video className="h-3 w-3 text-cyan-400" />
-          added a new recording:
+        <p className='text-secondText'>
+          <Video className="mr-1.5 inline-block h-3 w-3 text-cyan-400" />
+          added a new recording:{" "}
           {recordingId ? (
             <button 
                 onClick={() => onView(recordingId)}
@@ -223,10 +223,11 @@ const FirebaseLogsRecordingItem = ({
                 {recordingTitle}
             </a>
           )}
+          {" "}
           {songTitle && (
              <span className="text-xs opacity-70">({songArtist} - {songTitle})</span>
           )}
-        </div>
+        </p>
         
         {log.id && (
           <LogReaction 
