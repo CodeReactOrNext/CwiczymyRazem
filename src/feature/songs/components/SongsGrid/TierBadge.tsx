@@ -11,7 +11,7 @@ interface TierBadgeProps {
 
 export const TierBadge = ({ song, difficulty, className, style }: TierBadgeProps) => {
     const avgDifficulty = difficulty ?? song?.avgDifficulty ?? 0;
-    const tier = getSongTier(avgDifficulty);
+    const tier = getSongTier(avgDifficulty === 0 ? "?" : (song?.tier || avgDifficulty));
 
     return (
         <div 

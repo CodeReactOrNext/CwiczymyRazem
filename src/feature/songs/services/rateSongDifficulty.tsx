@@ -39,9 +39,12 @@ export const rateSongDifficulty = async (
       newDifficulties.reduce((acc, curr) => acc + curr.rating, 0) /
       (newDifficulties.length || 1);
 
+    const { getTierFromDifficulty } = await import("feature/songs/utils/difficulty.utils");
+
     await updateDoc(songRef, {
       difficulties: newDifficulties,
       avgDifficulty: avgDifficulty,
+      tier: getTierFromDifficulty(avgDifficulty),
     });
 
     firebaseAddSongsLog(

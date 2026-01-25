@@ -44,7 +44,7 @@ export const addSong = async (
       createdBy: userId,
       difficulties: [],
       avgDifficulty: 0,
-      tier: "D",
+      tier: "?",
       isVerified: false,
       coverUrl: null,
     };

@@ -1,6 +1,6 @@
 import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
 import type { Song } from "feature/songs/types/songs.type";
-import { doc, getDoc, increment,Timestamp, updateDoc } from "firebase/firestore";
+import { doc, getDoc, increment, Timestamp, updateDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth } from "utils/firebase/api/firebase.config"; // Admin Auth for verification
 import { db } from "utils/firebase/client/firebase.utils"; // Client DB for operations
@@ -86,14 +86,15 @@ export default async function handler(
 
     // Determine final tier
     const getTierFromDifficulty = (diff: number): string => {
-        if (diff >= 9) return "S";
-        if (diff >= 7.5) return "A";
-        if (diff >= 6) return "B";
-        if (diff >= 4) return "C";
-        return "D";
+      if (diff === 0) return "?";
+      if (diff >= 9) return "S";
+      if (diff >= 7.5) return "A";
+      if (diff >= 6) return "B";
+      if (diff >= 4) return "C";
+      return "D";
     };
-    
-    const finalTier =  getTierFromDifficulty(avgDifficulty);
+
+    const finalTier = getTierFromDifficulty(avgDifficulty);
 
     // Update Song
     await updateDoc(songRef, {
