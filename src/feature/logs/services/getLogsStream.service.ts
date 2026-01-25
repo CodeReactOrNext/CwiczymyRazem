@@ -18,7 +18,7 @@ export const firebaseGetLogsStream = (
   ) => void
 ) => {
   const logsDocRef = collection(db, "logs");
-  const sortLogs = query(logsDocRef, orderBy("data", "desc"), limit(15));
+  const sortLogs = query(logsDocRef, orderBy("timestamp", "desc"), limit(15));
 
   return onSnapshot(sortLogs, (snapshot) => {
     const logsArr: (FirebaseLogsInterface | FirebaseLogsSongsInterface | FirebaseLogsTopPlayersInterface)[] = [];

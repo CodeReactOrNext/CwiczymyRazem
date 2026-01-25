@@ -37,6 +37,7 @@ export const firebaseAddSongsLog = async (
     status,
     avatarUrl,
     userAvatarFrame,
+    timestamp: new Date().toISOString(),
   };
 
   await trackedSetDoc(logsDocRef, logData);

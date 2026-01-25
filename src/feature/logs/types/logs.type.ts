@@ -20,6 +20,7 @@ export interface FirebaseLogsSongsInterface {
   userAvatarFrame?: number;
   id?: string;
   reactions?: string[];
+  timestamp: string | number | Date;
 }
 
 export interface FirebaseUserExceriseLog {
@@ -104,6 +105,7 @@ export interface FirebaseLogsTopPlayersInterface {
   daysLeftInSeason?: number;
   id?: string;
   reactions?: string[];
+  timestamp: string | number | Date;
 }
 
 export interface FirebaseLogsRecordingsInterface {
