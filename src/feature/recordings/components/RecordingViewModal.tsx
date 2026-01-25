@@ -75,9 +75,9 @@ export const RecordingViewModal = ({ isOpen, onClose, recordingId, initialRecord
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl bg-zinc-950 border-white/5 text-white p-0 overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-[80vh]">
+      <DialogContent className="max-w-none sm:max-w-6xl bg-zinc-950 border-white/5 text-white p-0 overflow-hidden flex flex-col sm:flex-row h-full sm:h-[85vh] sm:rounded-2xl">
         {/* Left Side: Video & Info */}
-        <div className="flex-1 flex flex-col min-h-0 border-r border-white/5">
+        <div className="flex-1 flex flex-col min-h-0 border-b sm:border-b-0 sm:border-r border-white/5">
             <div className="aspect-video bg-black relative">
                 {videoId ? (
                     <iframe
@@ -148,7 +148,7 @@ export const RecordingViewModal = ({ isOpen, onClose, recordingId, initialRecord
         </div>
 
         {/* Right Side: Comments */}
-        <div className="w-full md:w-80 lg:w-96 flex flex-col bg-zinc-900/30">
+        <div className="w-full sm:w-80 lg:w-96 flex flex-col bg-zinc-900/30">
             <div className="p-4 border-b border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4 text-cyan-400" />

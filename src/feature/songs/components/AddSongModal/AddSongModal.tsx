@@ -167,8 +167,8 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md sm:max-w-lg border-white/5 bg-zinc-950 p-0 overflow-hidden">
-        <div className="p-6 pb-20 md:pb-6 overflow-y-auto max-h-[90vh]">
+      <DialogContent className="max-w-none sm:max-w-lg border-white/5 bg-zinc-950 p-0 overflow-hidden h-full sm:h-auto sm:rounded-2xl">
+        <div className="p-6 pb-24 sm:pb-6 overflow-y-auto h-full sm:max-h-[85vh]">
           <DialogHeader className="mb-6">
             <DialogTitle className='font-openSans text-2xl font-bold text-white flex items-center gap-3'>
               <div className="p-2 rounded-xl bg-cyan-500/10">
