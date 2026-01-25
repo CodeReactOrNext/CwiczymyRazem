@@ -40,6 +40,7 @@ interface StatsSectionProps {
   year: number;
   setYear: (year: number) => void;
   isLoadingActivity: boolean;
+  mode?: "practice" | "review";
 }
 
 export const StatsSection = ({
@@ -53,6 +54,7 @@ export const StatsSection = ({
   year,
   setYear,
   isLoadingActivity,
+  mode = "review",
 }: StatsSectionProps) => {
   const { time } = statistics;
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
@@ -114,6 +116,61 @@ export const StatsSection = ({
     };
   });
 
+  if (mode === "practice") {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <RecommendationsSection 
+            userSongs={userSongs} 
+            isOwnProfile={isOwnProfile} 
+            onRefreshSongs={refreshSongs}
+            onOpenDetails={(song) => {
+                setSelectedSong(song);
+                setIsSheetOpen(true);
+            }}
+            type="exercise"
+            />
+            <RecommendationsSection 
+            userSongs={userSongs} 
+            isOwnProfile={isOwnProfile} 
+            onRefreshSongs={refreshSongs}
+            onOpenDetails={(song) => {
+                setSelectedSong(song);
+                setIsSheetOpen(true);
+            }}
+            type="song"
+            />
+        </div>
+        <SongSheet
+          song={selectedSong}
+          isOpen={isSheetOpen}
+          onClose={() => setIsSheetOpen(false)}
+          onStatusChange={async (newStatus) => {
+            if (selectedSong) {
+              if (newStatus === undefined) {
+                await handleSongRemoval(selectedSong.id);
+              } else {
+                await handleStatusChange(
+                  selectedSong.id,
+                  newStatus,
+                  selectedSong.title,
+                  selectedSong.artist
+                );
+              }
+            }
+          }}
+          onRatingChange={refreshSongs}
+          status={
+            userSongs?.wantToLearn.some(s => s.id === selectedSong?.id) ? "wantToLearn" :
+            userSongs?.learning.some(s => s.id === selectedSong?.id) ? "learning" :
+            userSongs?.learned.some(s => s.id === selectedSong?.id) ? "learned" : 
+            undefined
+          }
+        />
+      </div>
+    );
+  }
+
   return (
     <div className='space-y-6'>
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
@@ -151,17 +208,6 @@ export const StatsSection = ({
               ))}
           </div>
 
-          <RecommendationsSection 
-            userSongs={userSongs} 
-            isOwnProfile={isOwnProfile} 
-            onRefreshSongs={refreshSongs}
-            onOpenDetails={(song) => {
-                setSelectedSong(song);
-                setIsSheetOpen(true);
-            }}
-            type="song"
-          />
-
           {!userSongs ? (
             <RecommendationSkeleton type="progress" />
           ) : (
@@ -179,34 +225,12 @@ export const StatsSection = ({
               </p>
             </div>
             <SkillsRadarChart statistics={statistics} />
-            <div className="mt-4">
-               <RecommendationsSection 
-                  userSongs={userSongs} 
-                  isOwnProfile={isOwnProfile} 
-                  onRefreshSongs={refreshSongs}
-                  onOpenDetails={(song) => {
-                      setSelectedSong(song);
-                      setIsSheetOpen(true);
-                  }}
-                  type="exercise"
-                />
-            </div>
           </div>
         </div>
 
         <div className='space-y-6'>
           <div className='hidden lg:block space-y-4'>
             <SkillsRadarChart statistics={statistics} />
-            <RecommendationsSection 
-                userSongs={userSongs} 
-                isOwnProfile={isOwnProfile} 
-                onRefreshSongs={refreshSongs}
-                onOpenDetails={(song) => {
-                    setSelectedSong(song);
-                    setIsSheetOpen(true);
-                }}
-                type="exercise"
-            />
           </div>
         </div>
       </div>

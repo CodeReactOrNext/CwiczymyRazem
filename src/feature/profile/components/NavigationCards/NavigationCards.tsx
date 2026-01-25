@@ -1,6 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
-import { Brain, Dumbbell, Library, Loader2,Music } from "lucide-react";
+import { ClipboardCheck, ClipboardList, Library, Loader2, Music, Play, Sparkles } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -142,7 +142,6 @@ export const NavigationCard = ({
 
 
 export const NavigationCards = () => {
-  const { t } = useTranslation("profile");
   const router = useRouter();
   
   const [loadingCard, setLoadingCard] = useState<string | null>(null);
@@ -152,56 +151,40 @@ export const NavigationCards = () => {
     await router.push(path);
   };
 
-  const handleSkillsClick = () => {
-    handleNavigation("/profile/skills", "skills");
-  };
-
-  const handleExercisesClick = () => {
-    handleNavigation("/profile/exercises", "exercises");
-  };
-
   return (
     <div className='grid grid-cols-1 gap-3  sm:gap-4  md:grid-cols-2 lg:grid-cols-4'>
       <NavigationCard
-        title={(t as any)("cards.practice.title")}
-        description={(t as any)("cards.practice.description")}
-        icon={<Dumbbell className='h-6 w-6' />}
-        onClick={() => handleNavigation("/timer", "practice")}
-        primaryAction={{
-          label: (t as any)("cards.practice.choose"),
-          onClick: () => handleNavigation("/timer", "practice"),
-        }}
-        secondaryAction={{
-          label: (t as any)("cards.practice.report"),
-          onClick: () => handleNavigation("/report", "report"),
-        }}
+        title="Report practice"
+        description="Save and log your manual practice session."
+        icon={<ClipboardCheck className='h-6 w-6' />}
+        onClick={() => handleNavigation("/report", "report")}
         colorAccent='cyan'
-        isLoading={loadingCard === "practice" || loadingCard === "report"}
+        isLoading={loadingCard === "report"}
       />
 
       <NavigationCard
-        title={(t as any)("cards.songs.title")}
-        description={(t as any)("cards.songs.description")}
+        title="Practice songs"
+        description="Master your favorite tracks from your collection."
         icon={<Music className='h-6 w-6' />}
-        onClick={() => handleNavigation("/songs", "songs")}
+        onClick={() => handleNavigation("/timer/song-select", "songs")}
         colorAccent='purple'
         isLoading={loadingCard === "songs"}
       />
 
       <NavigationCard
-        title={(t as any)("cards.skills.title")}
-        description={(t as any)("cards.skills.description")}
-        icon={<Brain className='h-6 w-6' />}
-        onClick={handleSkillsClick}
+        title="Practice plan"
+        description="Follow your structured daily workout routines."
+        icon={<ClipboardList className='h-6 w-6' />}
+        onClick={() => handleNavigation("/timer/plans", "plans")}
         colorAccent='green'
-        isLoading={loadingCard === "skills"}
+        isLoading={loadingCard === "plans"}
       />
 
       <NavigationCard
-        title={(t as any)("cards.library.title")}
-        description={(t as any)("cards.library.description")}
-        icon={<Library className='h-6 w-6' />}
-        onClick={handleExercisesClick}
+        title="Auto plan"
+        description="Get an AI-powered session tailored to your skill level."
+        icon={<Sparkles className='h-6 w-6' fill="currentColor" />}
+        onClick={() => handleNavigation("/timer/auto", "exercises")}
         colorAccent='amber'
         isLoading={loadingCard === "exercises"}
       />
