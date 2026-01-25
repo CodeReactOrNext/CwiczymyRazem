@@ -8,6 +8,7 @@ import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { useTranslation } from "hooks/useTranslation";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 
@@ -22,6 +23,7 @@ interface LandingLayoutProps {
 
 import { useQuery } from "@tanstack/react-query";
 import { ActiveChallengeWidget } from "feature/challenges/frontend/infrastructure/ui/ActiveChallengeWidget";
+import { BarChart3, ChevronRight, Play } from "lucide-react";
 
 const ProfileLandingLayout = ({
   statsField,
@@ -30,10 +32,14 @@ const ProfileLandingLayout = ({
   featSlot,
 }: LandingLayoutProps) => {
   
+  const router = useRouter();
   const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
   const { achievements } = userStats;
   const [_userSkills, setUserSkills] = useState<UserSkills>();
   const [activeTab, setActiveTab] = useState<"practice" | "review">("practice");
+
+  const todayStr = new Date().toDateString();
+  const isTodayCompleted = datasWithReports.some(d => d.date.toDateString() === todayStr && d.report);
 
   /* eslint-disable unused-imports/no-unused-vars */
   const { data: songs, refetch: refreshSongs } = useQuery({
@@ -44,6 +50,7 @@ const ProfileLandingLayout = ({
   /* eslint-enable unused-imports/no-unused-vars */
 
   useEffect(() => {
+    getUserSongs(userAuth);
     getUserSkills(userAuth).then((skills) => setUserSkills(skills));
   }, [userAuth]);
 
@@ -52,23 +59,66 @@ const ProfileLandingLayout = ({
       <div className="flex items-center gap-2 mb-8 bg-zinc-900/50 p-1 rounded-xl border border-zinc-800/50 w-fit">
         <button 
           onClick={() => setActiveTab("practice")}
-          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === 'practice' ? 'bg-zinc-800 text-white shadow-lg border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'practice' ? 'bg-zinc-800 text-white shadow-lg border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
-          Practice Now
+          <Play size={14} className={activeTab === 'practice' ? "fill-current" : ""} />
+          Start practicing
         </button>
         <button 
           onClick={() => setActiveTab("review")}
-          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === 'review' ? 'bg-zinc-800 text-white shadow-lg border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'review' ? 'bg-zinc-800 text-white shadow-lg border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
         >
-          Review Progress
+          <BarChart3 size={14} />
+          See your stats
         </button>
       </div>
 
       {activeTab === "practice" && (
-        <>
-          {userStats.points > 0 && <NavigationCards />}
-          
-          <DashboardSection compact>
+        <div className="space-y-20 py-4">
+          <div className="space-y-12">
+            {!isTodayCompleted && (
+              <div 
+                onClick={() => router.push("/timer")}
+                className="group relative cursor-pointer overflow-hidden rounded-xl border border-zinc-300 bg-gradient-to-br from-white via-zinc-100 to-zinc-200 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-black/5 transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.15)] hover:border-zinc-400 hover:from-white hover:to-white active:scale-[0.99]"
+              >
+                  <div className="relative z-10 flex items-center justify-between gap-6">
+                    <div className="space-y-1">
+                      <div className="mb-3 flex items-center gap-1.5 rounded-full bg-zinc-950 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest text-white w-fit">
+                        Not practiced today
+                      </div>
+                      <h3 className="text-3xl font-black text-zinc-950 tracking-tight">
+                        Start today’s practice
+                      </h3>
+                      <p className="text-sm font-bold text-zinc-500 tracking-wide">
+                        Choose practice mode
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                      <span className="text-zinc-600 font-black uppercase tracking-widest text-[10px] hidden sm:block">
+                        Choose mode
+                      </span>
+                      <div className="rounded-2xl bg-zinc-950 text-white p-4 shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:translate-x-1">
+                        <ChevronRight className="h-8 w-8" strokeWidth={3} />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="absolute right-0 top-0 -mr-16 -mt-16 h-48 w-48 rounded-full bg-cyan-500/25 blur-3xl transition-opacity duration-500 group-hover:opacity-100 opacity-60" />
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 pl-1">
+                Choose how you want to practice today
+              </h3>
+              {userStats.points > 0 && <NavigationCards />}
+            </div>
+          </div>
+
+          <div className="relative pt-12">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-800/50 to-transparent" />
+            <DashboardSection compact>
             {userStats.points === 0 && <OnboardingCards />}
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
@@ -91,8 +141,10 @@ const ProfileLandingLayout = ({
             />
           </DashboardSection>
 
+          </div>
+
           {featSlot && featSlot}
-        </>
+        </div>
       )}
 
       {activeTab === "review" && (

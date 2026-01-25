@@ -60,100 +60,125 @@ export const ActiveChallengeWidget = () => {
     }
 
     return (
-        <Card>
-            {userStats.activeChallenges.map((ac) => {
-                const challenge = (challengesList as any[]).find(c => c.id === ac.challengeId);
-                if (!challenge) return null;
+        <Card className="flex-col justify-between">
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-sm bg-main/10 text-main">
+                        <Flame size={18} />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-bold text-white tracking-wider">Active Challenges</h3>
+                    </div>
+                </div>
+            </div>
 
-                const today = new Date().toISOString().split('T')[0];
-                const isTodayDone = ac.lastCompletedDate === today;
+            <div className="space-y-2">
+                {userStats.activeChallenges.map((ac) => {
+                    const challenge = (challengesList as any[]).find(c => c.id === ac.challengeId);
+                    if (!challenge) return null;
 
-                const handleStartSession = () => {
-                    router.push(`/timer/challenges?start=${ac.challengeId}`);
-                };
+                    const today = new Date().toISOString().split('T')[0];
+                    const isTodayDone = ac.lastCompletedDate === today;
 
-                return (
-                    <div 
-                        key={ac.challengeId}
-                        className="w-full p-4 rounded-lg bg-zinc-900/60 relative overflow-hidden flex flex-col justify-center"
-                    >
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-main/5 blur-[60px] rounded-full pointer-events-none" />
+                    const handleStartSession = () => {
+                        router.push(`/timer/challenges?start=${ac.challengeId}`);
+                    };
 
-                        <div className="relative z-10 flex flex-col gap-2">
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="flex items-center gap-2">
-                                    <div className="p-1.5 rounded-lg bg-main/10 text-main shrink-0">
-                                        {(() => {
-                                            const skillData = guitarSkills.find(s => s.id === challenge.requiredSkillId);
-                                            const SkillIcon = skillData?.icon;
-                                            return SkillIcon ? <SkillIcon size={16} /> : <Flame size={16} />;
-                                        })()}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-1 mb-0.5">
-                                            <span className="text-[7px] font-bold tracking-wide text-main px-1 bg-main/10 rounded">Challenge</span>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <h2 className="text-sm font-bold text-white tracking-tight leading-tight">
+                    return (
+                        <div 
+                            key={ac.challengeId}
+                            className={cn(
+                                "flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-sm transition-all mb-4",
+                                isTodayDone 
+                                    ? "bg-zinc-800/40" 
+                                    : "bg-zinc-800/80"
+                            )}
+                        >
+                            <div className="flex items-start gap-3 flex-1 min-w-0 w-full">
+                                <div className="p-1.5 rounded-lg bg-main/10 text-main shrink-0 mt-1">
+                                    {(() => {
+                                        const skillData = guitarSkills.find(s => s.id === challenge.requiredSkillId);
+                                        const SkillIcon = skillData?.icon;
+                                        return SkillIcon ? <SkillIcon size={14} /> : <Flame size={14} />;
+                                    })()}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-start justify-between gap-4 mb-2">
+                                        <div className="min-w-0">
+                                            <h4 className={cn(
+                                                "text-xs font-bold truncate",
+                                                isTodayDone ? "text-zinc-500 line-through opacity-50" : "text-white"
+                                            )}>
                                                 {challenge.title}
-                                            </h2>
-                                            {challenge.rewardSkillId && (
-                                              <span className="text-xs font-black text-cyan-400 mt-1">
-                                                +{challenge.rewardLevel} {challenge.rewardSkillId.split('_').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                                              </span>
-                                            )}
+                                            </h4>
                                         </div>
+                                        
+                                        {challenge.rewardSkillId && (
+                                            <div className="flex items-center justify-center px-1.5 py-0.5 rounded-sm bg-orange-500/10 border border-orange-500/20 shrink-0">
+                                                <span className="text-[9px] font-bold text-orange-400 tracking-wider">
+                                                    +{challenge.rewardLevel} {challenge.rewardSkillId.split('_').pop()?.toUpperCase()}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Mini Progress Bar */}
+                                    <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden mb-3">
+                                        <div 
+                                            className="h-full bg-main transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(6,182,212,0.5)]"
+                                            style={{ width: `${Math.min(((ac.currentDay - (isTodayDone ? 0 : 1)) / ac.totalDays) * 100, 100)}%` }}
+                                        />
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-1">
+                                        {Array.from({ length: ac.totalDays }).map((_, idx) => {
+                                            const dayNum = idx + 1;
+                                            const isCompleted = dayNum < ac.currentDay;
+                                            const isCurrent = dayNum === ac.currentDay && !isTodayDone;
+                                            
+                                            return (
+                                                <div 
+                                                    key={dayNum} 
+                                                    className={cn(
+                                                        "w-5 h-5 rounded-md flex items-center justify-center transition-all duration-300",
+                                                        isCompleted 
+                                                            ? "bg-white text-zinc-900 shadow-sm scale-105" 
+                                                            : isCurrent 
+                                                                ? "bg-main/20 text-main ring-1 ring-main" 
+                                                                : "bg-zinc-800/50 text-zinc-500"
+                                                    )}
+                                                >
+                                                    {isCompleted ? (
+                                                        <CheckCircle2 size={10} strokeWidth={3} />
+                                                    ) : (
+                                                        <span className="text-[8px] font-black">{dayNum}</span>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
-                                
-                                {!isTodayDone && (
-                                    <Button 
-                                        onClick={handleStartSession}
-                                        size="sm"
-                                        className="h-8 px-3 rounded-lg bg-main hover:bg-main-600 text-white font-bold tracking-wide transition-all text-[9px] gap-1.5 shadow-lg shadow-main/10"
-                                    >
-                                        <Play size={10} fill="currentColor" />
-                                        Start
-                                    </Button>
-                                )}
-                                {isTodayDone && (
-                                    <div className="px-2 py-1 rounded bg-zinc-800 text-emerald-400 text-[8px] font-bold tracking-wide">
-                                        Done
-                                    </div>
-                                )}
                             </div>
-
-                            <div className="flex flex-wrap gap-1.5 mt-2">
-                                {Array.from({ length: ac.totalDays }).map((_, idx) => {
-                                    const dayNum = idx + 1;
-                                    const isCompleted = dayNum < ac.currentDay;
-                                    const isCurrent = dayNum === ac.currentDay && !isTodayDone;
-                                    
-                                    return (
-                                        <div 
-                                            key={dayNum} 
-                                            className={cn(
-                                                "w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-300",
-                                                isCompleted 
-                                                    ? "bg-white text-zinc-900 shadow-lg shadow-white/20 scale-105" 
-                                                    : isCurrent 
-                                                        ? "bg-main/20 text-main ring-1 ring-main" 
-                                                        : "bg-zinc-800/50 text-zinc-500"
-                                            )}
-                                        >
-                                            {isCompleted ? (
-                                                <CheckCircle2 size={12} strokeWidth={3} className="drop-shadow-md" />
-                                            ) : (
-                                                <span className="text-[10px] font-black">{dayNum}</span>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                            
+                            {!isTodayDone ? (
+                                <Button 
+                                    onClick={handleStartSession}
+                                    size="sm"
+                                    className="w-full sm:w-auto"
+                                >
+                                    {ac.currentDay === 1 ? `Start Day 1` : `Continue (Day ${ac.currentDay})`}
+                                    <ChevronRight size={14} strokeWidth={3} className="ml-1" />
+                                </Button>
+                            ) : (
+                                <div className="flex items-center justify-end sm:justify-start gap-2 shrink-0 pr-2 w-full sm:w-auto">
+                                     <CheckCircle2 size={16} className="text-emerald-500" />
+                                     <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest">Done</span>
+                                </div>
+                            )}
                         </div>
-                    </div>
-                );
-            })}
+                    );
+                })}
+            </div>
         </Card>
     );
 };
