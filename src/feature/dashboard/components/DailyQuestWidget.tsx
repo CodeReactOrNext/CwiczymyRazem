@@ -31,11 +31,11 @@ export const DailyQuestWidget = () => {
         <Card className="flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-sm bg-orange-500/10 text-orange-500">
+                    <div className="p-2 rounded-sm bg-orange-500/5 text-zinc-500">
                         <Swords size={18} />
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-white tracking-wider">Daily Quests</h3>
+                        <h3 className="text-sm font-bold text-zinc-200 tracking-wider">Daily Quests</h3>
                         <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
                             {new Date().toLocaleDateString()}
                         </p>
@@ -43,8 +43,8 @@ export const DailyQuestWidget = () => {
                 </div>
                 <div className="flex items-center gap-3">
                     {!isClaimed && (
-                        <div className="flex items-center justify-center px-2 py-1 rounded-sm bg-orange-500/10 border border-orange-500/20">
-                            <span className="text-[10px] font-bold text-orange-400 tracking-wider leading-none">
+                        <div className="flex items-center justify-center px-1.5 py-0.5 rounded-sm bg-orange-500/10 border border-orange-500/20">
+                            <span className="text-[9px] font-bold text-orange-400 tracking-wider leading-none">
                                 +100 XP
                             </span>
                         </div>
@@ -84,26 +84,24 @@ export const DailyQuestWidget = () => {
                 ))}
             </div>
 
-            <Button
-                disabled={!allCompleted || isClaimed}
-                onClick={handleClaim}
-                className={cn(
-                    "w-full h-10 rounded-sm text-xs font-bold tracking-wide transition-all",
-                    isClaimed 
-                        ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                        : allCompleted 
-                            ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20 hover:scale-105"
-                            : "bg-zinc-800/50 text-zinc-600"
-                )}
-            >
-                {isClaimed ? (
-                    <span className="flex items-center gap-2"><CheckCircle2 size={14} /> Reward Claimed</span>
-                ) : allCompleted ? (
-                    <span className="flex items-center gap-2"><Gift size={14} className="animate-bounce" /> Claim 100 XP</span>
-                ) : (
-                    "Complete All Tasks"
-                )}
-            </Button>
+            {allCompleted && !isClaimed && (
+                <Button
+                    onClick={handleClaim}
+                    className="w-full h-10 rounded-sm text-xs font-bold tracking-wide transition-all bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20 hover:scale-105"
+                >
+                    <span className="flex items-center gap-2">
+                        <Gift size={14} className="animate-bounce" /> 
+                        Claim 100 XP
+                    </span>
+                </Button>
+            )}
+
+            {isClaimed && (
+                 <div className="w-full h-10 flex items-center justify-center gap-2 rounded-sm bg-zinc-800/40 text-[10px] font-black uppercase tracking-widest text-zinc-500 border border-white/5">
+                     <CheckCircle2 size={14} className="text-emerald-500" />
+                     Reward Claimed
+                 </div>
+            )}
         </Card>
     );
 };
