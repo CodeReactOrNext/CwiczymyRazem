@@ -77,8 +77,8 @@ export const RecordingViewModal = ({ isOpen, onClose, recordingId, initialRecord
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-none sm:max-w-6xl bg-zinc-950 border-white/5 text-white p-0 overflow-hidden flex flex-col sm:flex-row h-full sm:h-[85vh] sm:rounded-2xl">
         {/* Left Side: Video & Info */}
-        <div className="flex-1 flex flex-col min-h-0 border-b sm:border-b-0 sm:border-r border-white/5">
-            <div className="aspect-video bg-black relative">
+        <div className="flex-1 flex flex-col min-h-0 sm:border-r border-white/5 overflow-hidden">
+            <div className="aspect-video bg-black relative shrink-0 z-10">
                 {videoId ? (
                     <iframe
                         width="100%"
@@ -96,59 +96,109 @@ export const RecordingViewModal = ({ isOpen, onClose, recordingId, initialRecord
                 )}
             </div>
 
-            <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
-                {isLoadingRecording ? (
-                    <div className="space-y-4 animate-pulse">
-                        <div className="h-8 bg-zinc-900 rounded w-3/4" />
-                        <div className="h-4 bg-zinc-900 rounded w-1/2" />
-                        <div className="h-20 bg-zinc-900 rounded" />
-                    </div>
-                ) : recording ? (
-                    <div className="space-y-6">
-                        <div>
-                            <div className="flex items-center justify-between gap-4 mb-2">
-                                <h2 className="text-2xl font-bold text-white">{recording.title}</h2>
-                                <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={handleLike}
-                                    className={cn("gap-2 hover:bg-red-500/10", hasLiked ? "text-red-500" : "text-zinc-400")}
-                                >
-                                    <Heart className={cn("h-5 w-5", hasLiked && "fill-current")} />
-                                    <span className="font-bold">{recording.likes?.length || 0}</span>
-                                </Button>
-                            </div>
-                            
-                            {(recording.songTitle || recording.songArtist) && (
-                                <div className="text-sm font-medium text-cyan-400 bg-cyan-950/30 px-3 py-1 rounded inline-block mb-4">
-                                    {recording.songArtist} - {recording.songTitle}
-                                </div>
-                            )}
-
-                            <div className="flex items-center gap-6 text-xs text-zinc-500 mb-6">
-                                <div className="flex items-center gap-1.5">
-                                    <User className="h-3 w-3" />
-                                    <span className="font-semibold text-zinc-300">{recording.userDisplayName}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <Calendar className="h-3 w-3" />
-                                    <span>{formattedDate}</span>
-                                </div>
-                            </div>
-
-                            <p className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                                {recording.description}
-                            </p>
+            {/* Scrollable Content Wrapper - On mobile this will contain Info + Comments if we were to restructure, but let's keep it simple: just make the info part scroll and comments part scroll separately if side-by-side, or stacked. */}
+            {/* To fix the user's issue: on mobile we need the "Right Side" to be visible. */}
+            <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+                <div className="p-6 shrink-0 sm:flex-1">
+                    {isLoadingRecording ? (
+                        <div className="space-y-4 animate-pulse">
+                            <div className="h-8 bg-zinc-900 rounded w-3/4" />
+                            <div className="h-4 bg-zinc-900 rounded w-1/2" />
+                            <div className="h-20 bg-zinc-900 rounded" />
                         </div>
+                    ) : recording ? (
+                        <div className="space-y-6">
+                            <div>
+                                <div className="flex items-center justify-between gap-4 mb-2">
+                                    <h2 className="text-xl sm:text-2xl font-bold text-white">{recording.title}</h2>
+                                    <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        onClick={handleLike}
+                                        className={cn("gap-2 hover:bg-red-500/10", hasLiked ? "text-red-500" : "text-zinc-400")}
+                                    >
+                                        <Heart className={cn("h-5 w-5", hasLiked && "fill-current")} />
+                                        <span className="font-bold">{recording.likes?.length || 0}</span>
+                                    </Button>
+                                </div>
+                                
+                                {(recording.songTitle || recording.songArtist) && (
+                                    <div className="text-sm font-medium text-cyan-400 bg-cyan-950/30 px-3 py-1 rounded inline-block mb-4">
+                                        {recording.songArtist} - {recording.songTitle}
+                                    </div>
+                                )}
+
+                                <div className="flex items-center gap-6 text-[10px] sm:text-xs text-zinc-500 mb-6 font-medium">
+                                    <div className="flex items-center gap-1.5">
+                                        <User className="h-3 w-3" />
+                                        <span className="text-zinc-300">{recording.userDisplayName}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                        <Calendar className="h-3 w-3" />
+                                        <span>{formattedDate}</span>
+                                    </div>
+                                </div>
+
+                                <p className="text-sm sm:text-base text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                                    {recording.description}
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-center py-20 text-zinc-500">Recording not found</div>
+                    )}
+                </div>
+
+                {/* Mobile-only Comments Section (Visible when vertical/mobile) */}
+                <div className="flex sm:hidden flex-col bg-zinc-900/50 border-t border-white/5">
+                    <div className="p-4 flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4 text-cyan-400" />
+                        <span className="font-bold text-sm">Comments ({comments?.length || 0})</span>
                     </div>
-                ) : (
-                    <div className="text-center py-20 text-zinc-500">Recording not found</div>
-                )}
+                    <div className="p-4 space-y-4">
+                        {comments?.map((comment) => (
+                            <div key={comment.id} className="flex gap-3">
+                                <div className="shrink-0 transform scale-75 origin-top">
+                                    <Avatar 
+                                        avatarURL={comment.userAvatarUrl || undefined} 
+                                        name={comment.userName || "?"}
+                                        lvl={comment.userAvatarFrame}
+                                        size="sm"
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-0 bg-zinc-800/50 rounded-lg p-2.5 border border-white/5">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <span className="font-bold text-xs text-cyan-400 truncate pr-2">{comment.userName}</span>
+                                        <span className="text-[9px] text-zinc-500 shrink-0 mt-0.5">
+                                            {comment.createdAt ? new Date((comment.createdAt as any).toDate ? (comment.createdAt as any).toDate() : comment.createdAt).toLocaleDateString() : ""}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-zinc-300 whitespace-pre-wrap leading-normal lowercase first-letter:uppercase">{comment.content}</p>
+                                </div>
+                            </div>
+                        ))}
+                        {comments?.length === 0 && <p className="text-center text-zinc-500 text-xs py-4">No comments yet.</p>}
+                    </div>
+                    <div className="p-4 sticky bottom-0 bg-zinc-950 border-t border-white/5">
+                        <form onSubmit={handleSubmitComment} className="flex gap-2">
+                            <Input 
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                placeholder="Write a comment..."
+                                className="bg-zinc-900 border-white/10 h-10 text-sm"
+                                disabled={isAddingComment}
+                            />
+                            <Button type="submit" size="icon" disabled={!newComment.trim() || isAddingComment} className="h-10 w-10 bg-cyan-600 hover:bg-cyan-500 text-white shrink-0">
+                                {isAddingComment ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                            </Button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
-        {/* Right Side: Comments */}
-        <div className="w-full sm:w-80 lg:w-96 flex flex-col bg-zinc-900/30">
+        {/* Right Side: Comments (Desktop only) */}
+        <div className="hidden sm:flex w-80 lg:w-96 flex-col bg-zinc-900/30">
             <div className="p-4 border-b border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4 text-cyan-400" />
@@ -156,7 +206,7 @@ export const RecordingViewModal = ({ isOpen, onClose, recordingId, initialRecord
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+            <div className="flex-none sm:flex-1 sm:overflow-y-auto custom-scrollbar p-4 space-y-4">
                 {isLoadingComments ? (
                     <div className="flex justify-center p-8"><Loader2 className="animate-spin text-zinc-500" /></div>
                 ) : comments?.length === 0 ? (
