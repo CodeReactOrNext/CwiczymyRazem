@@ -62,8 +62,8 @@ const HealthHabbitsBox = ({
         onClick={handleCheckboxClick}
         className={`group relative cursor-pointer overflow-hidden rounded-xl p-0 transition-all duration-300 hover:shadow-sm ${
           isActive
-            ? "bg-gradient-to-br from-[#4a7edd]/10 to-transparent ring-1 ring-gray-700/30 backdrop-blur-sm border-white/20"
-            : "bg-gradient-to-br from-gray-900/10 to-transparent hover:bg-gray-900/20"
+            ? "bg-emerald-500/5 ring-1 ring-emerald-500/20 backdrop-blur-sm border-white/10"
+            : "bg-zinc-900/30 border-white/5 hover:bg-zinc-900/50"
         }`}>
         <div className='block w-full p-4'>
           <div className='cursor-pointer'>
@@ -72,17 +72,17 @@ const HealthHabbitsBox = ({
             <div className='flex items-center gap-3'>
               <div
                 className={`
-                  flex h-6 w-6 items-center justify-center rounded-full border
+                  flex h-5 w-5 items-center justify-center rounded-md border
                   transition-all duration-300
                   ${
                     isActive
-                      ? "border-[#4a7edd]/50 bg-[#4a7edd]/10 text-[#4a7edd]/80"
-                      : "border-gray-700/30 bg-transparent text-transparent"
+                      ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-400"
+                      : "border-gray-700/30 bg-black/20 text-transparent"
                   }
                 `}>
                 <FaCheck
-                  className={`h-3 w-3 transition-all duration-300 ${
-                    isActive ? "opacity-100" : "opacity-0"
+                  className={`h-2.5 w-2.5 transition-all duration-300 ${
+                    isActive ? "scale-100 opacity-100" : "scale-50 opacity-0"
                   }`}
                 />
               </div>
@@ -91,8 +91,8 @@ const HealthHabbitsBox = ({
                 <span
                   className={`transition-colors duration-300 ${
                     isActive
-                      ? "text-[#4a7edd]/70"
-                      : "text-gray-500 group-hover:text-gray-400"
+                      ? "text-emerald-400"
+                      : "text-gray-600 group-hover:text-gray-400"
                   }`}>
                   {HabitIcon}
                 </span>
@@ -104,7 +104,7 @@ const HealthHabbitsBox = ({
                   }`}>
                   {title}
                 </p>
-                <QuestionMark description={questionMarkProps.description} />
+                <QuestionMark description={questionMarkProps.description} className="!text-sm opacity-50" />
               </div>
             </div>
           </div>

@@ -145,7 +145,7 @@ const SongsView = () => {
                     </div>
                     <Button 
                       onClick={() => setIsModalOpen(true)}
-                      className="h-11 bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all active:scale-95 shadow-[0_0_20px_rgba(8,145,178,0.3)] border-none px-6"
+                     
                     >
                       <Plus className="mr-2 h-5 w-5" />
                       {t("add_new_song")}
