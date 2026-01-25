@@ -5,6 +5,7 @@ import MainContainer from "components/MainContainer";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
+import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
 import { useSongs } from "feature/songs/hooks/useSongs";
@@ -80,42 +81,54 @@ const SongsView = () => {
             
             {/* MANAGEMENT SECTION */}
             {activeTab === "management" && (
-              <div className="space-y-6 animate-in fade-in-50 duration-300">
-               <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                      <p className="text-sm text-zinc-400 max-w-2xl leading-relaxed">
-                        {t("drag_and_drop_description", "Drag and drop songs to track your learning journey. Move items between columns to update their status.")}
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="h-7 gap-1.5 px-2.5 bg-cyan-500/5 border-cyan-500/20 hover:bg-cyan-500/10 hover:border-cyan-500/40 text-cyan-400 transition-all rounded-md shrink-0"
-                      >
-                        <Link href="/guide?tab=songs">
-                          <HelpCircle size={13} strokeWidth={2.5} />
-                          <span className="text-[10px] font-black uppercase tracking-wider">How it works</span>
-                        </Link>
-                      </Button>
-                    </div>
+              <div className="space-y-10 animate-in fade-in-50 duration-500">
+                {/* 1. Primary Header Row */}
+                <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-white/5 pb-8">
+                  <div className="space-y-1">
+                    <h2 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
+                      My Song Board
+                    </h2>
+                    <p className="text-zinc-500 font-medium">
+                      Track and manage your guitar repertoire progress
+                    </p>
                   </div>
-                  <Button 
-                    variant="outline"
-                    onClick={() => router.push("/songs?view=library")}
-                    className="h-10 border-white/10 bg-zinc-900/60 font-bold transition-all active:scale-95"
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    {t("add_songs_from_library", "Add songs from library") as string}
-                  </Button>
-               </div>
-               
-               <SongLearningSection
-                isLanding={false}
-                userSongs={userSongs}
-                onChange={updateUserSongsCache}
-                onStatusChange={refreshSongs}
-              />
+                  
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                 
+                    >
+                      <Link href="/guide?tab=songs">
+                        <HelpCircle size={16} className="text-cyan-400" />
+                        <span className="text-xs font-bold uppercase tracking-wider">How it works</span>
+                      </Link>
+                    </Button>
+                    <Button 
+                      onClick={() => router.push("/songs?view=library")}
+                      
+                    >
+                      <Plus className="mr-2 h-5 w-5" />
+                      Add a song to learn
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 2. Global Strategy/Stats Dashboard */}
+                <div className="rounded-xl bg-zinc-900/40 p-2 backdrop-blur-sm -mt-4">
+                  <SongLearningStats userSongs={userSongs} />
+                </div>
+
+                {/* 3. Board Section */}
+                <div className="space-y-6">
+                  <SongLearningSection
+                    isLanding={false}
+                    userSongs={userSongs}
+                    onChange={updateUserSongsCache}
+                    onStatusChange={refreshSongs}
+                  />
+                </div>
               </div>
             )}
 
@@ -132,7 +145,7 @@ const SongsView = () => {
                     </div>
                     <Button 
                       onClick={() => setIsModalOpen(true)}
-                      className="h-11 bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all active:scale-95 shadow-[0_0_20px_rgba(8,145,178,0.3)] border-none px-6"
+                     
                     >
                       <Plus className="mr-2 h-5 w-5" />
                       {t("add_new_song")}

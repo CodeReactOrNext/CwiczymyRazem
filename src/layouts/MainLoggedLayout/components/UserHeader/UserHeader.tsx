@@ -45,10 +45,7 @@ export const UserHeader = ({
                 className="h-7 w-7"
               />
             </div>
-            <HeaderLevelBar
-              points={points}
-              lvl={lvl}
-            />
+   
           </div>
 
           {/* Center Section - Welcome Message with Weekly Progress */}

@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
+import { cn } from "assets/lib/utils";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import Backdrop from "components/UI/Backdrop";
 import {
@@ -30,6 +31,7 @@ import { FaBrain, FaMusic } from "react-icons/fa";
 import { GrDocumentUpload } from "react-icons/gr";
 import { IoMdHand } from "react-icons/io";
 import { MdSchool, MdTitle } from "react-icons/md";
+import { ArrowDown, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
@@ -310,74 +312,131 @@ const ReportView = () => {
           validateOnBlur={false}
           enableReinitialize={true}
           onSubmit={reportOnSubmit}>
-          {({ errors,  values, setFieldValue }) => (
-            <>
-              <ReportFormLayout>
+          {({ errors, values, setFieldValue }) => {
+            const isStep1Done = getSumTime(values) > 0;
+            const isStep2Completed = values.reportTitle.trim().length > 0 || (values.habbits && values.habbits.length > 0);
 
-                {/* STEP 1: TIME TRACKING */}
-                <div className='mb-12'>
-                  <div className='mb-6 flex items-center gap-3'>
-                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-400 font-bold text-sm border border-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.1)]'>1</div>
-                    <h3 className='font-openSans text-lg font-bold text-white'>
-                      {t("exercise_type_title")}
-                    </h3>
-                  </div>
-                  
-                  <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                    {timeInputList.map(
-                      (
-                        { title, questionMarkProps, Icon, hoursName, minutesName, skillId },
-                        index
-                      ) => (
-                        <div key={index}>
-                          <TimeInputBox
-                            errors={errors}
-                            title={title}
-                            questionMarkProps={questionMarkProps}
-                            Icon={Icon}
-                            hoursName={hoursName}
-                            minutesName={minutesName}
-                            skillId={skillId}
-                          />
+            return (
+              <>
+                <ReportFormLayout>
+                  {/* STEP 1: TIME TRACKING */}
+                  <div className='mb-12'>
+                    <div className='mb-8 flex flex-col gap-2'>
+                        <div className='flex items-center gap-3'>
+                          <div className={cn(
+                            'flex h-9 w-9 items-center justify-center rounded-full font-bold text-sm border transition-all duration-500',
+                            isStep1Done ? "bg-emerald-500 text-black border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.4)]" : "bg-cyan-500/20 text-cyan-400 border-cyan-500/20"
+                          )}>
+                            {isStep1Done ? <Check className="h-5 w-5 stroke-[3]" /> : "1"}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className='font-openSans text-xl font-bold text-white'>
+                              {t("exercise_type_title")}
+                            </h3>
+                          </div>
                         </div>
-                      )
-                    )}
-                  </div>
-                  <div className='mt-4 flex flex-col items-end gap-2'>
-                  
-                    <div className='flex items-center radius-default glass-card px-4 py-2 ring-1 ring-white/5 bg-zinc-900/40'>
-                      <span className='mr-3 text-sm font-bold uppercase tracking-wider text-zinc-500'>
-                        {t("total_time")}:
-                      </span>
-                      <span className='font-mono text-2xl font-black text-white'>
-                         {convertMsToHM(getSumTime(values))}
-                      </span>
+                        <p className={cn(
+                          "text-sm font-medium transition-colors duration-500 ml-12",
+                          isStep1Done ? "text-emerald-400/80" : "text-zinc-500"
+                        )}>
+                          {isStep1Done 
+                            ? "Great! Practice time added. You can save now or fill optional details below." 
+                            : "What did you practice today? Add time below."}
+                        </p>
+                    </div>
+                    
+                    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                      {timeInputList.map(
+                        (
+                          { title, questionMarkProps, Icon, hoursName, minutesName, skillId },
+                          index
+                        ) => (
+                          <div key={index}>
+                            <TimeInputBox
+                              errors={errors}
+                              title={title}
+                              questionMarkProps={questionMarkProps}
+                              Icon={Icon}
+                              hoursName={hoursName}
+                              minutesName={minutesName}
+                              skillId={skillId}
+                            />
+                          </div>
+                        )
+                      )}
+                    </div>
+                    <div className='mt-8 pt-8 border-t border-white/5'>
+                      <div className="flex flex-col items-center md:items-end gap-4">
+                        <div className='flex items-center rounded-2xl border border-white/10 bg-zinc-900/60 p-1 px-4 py-2 shadow-2xl backdrop-blur-md'>
+                          <div className="flex flex-col items-start mr-6">
+                            <span className='text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 mb-0.5'>
+                              {t("total_time")}
+                            </span>
+                            <span className='font-mono text-2xl font-black text-white leading-none'>
+                               {convertMsToHM(getSumTime(values))}
+                            </span>
+                          </div>
+
+                          {isStep1Done && (
+                            <Button
+                              type='submit'
+                              loading={isFetching}
+                              className="h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all animate-in zoom-in-95 duration-300"
+                            >
+                              <Check className="mr-2 h-4 w-4" />
+                              Save Now
+                            </Button>
+                          )}
+                        </div>
+
+                        {isStep1Done ? (
+                          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-700 pr-4 mt-2">
+                             <p className="text-[10px] font-black text-emerald-500/80 uppercase tracking-[0.15em]">
+                                Or add more details below
+                             </p>
+                             <ArrowDown className="h-5 w-5 text-emerald-500 animate-bounce" />
+                          </div>
+                        ) : (
+                          <p className="text-[10px] font-bold text-zinc-700 uppercase tracking-widest italic pr-4 mt-2">Complete Step 1 to continue</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* STEP 2: FOCUS & DETAILS */}
-                <div className='mb-12'>
-                  <div className='mb-6 flex items-center gap-3 border-t border-white/5 pt-12'>
-                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-400 font-bold text-sm border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.1)]'>2</div>
-                    <h3 className='font-openSans text-lg font-bold text-white'>
-                       Session Focus & Habits
-                    </h3>
-                  </div>
+                  {/* STEP 2: FOCUS & DETAILS (OPTIONAL) */}
+                  <div className={cn('mb-12 transition-all duration-500', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
+                    <div className='mb-6 flex items-center gap-3 border-t border-white/5 pt-12'>
+                      <div className={cn(
+                        'flex h-9 w-9 items-center justify-center rounded-full font-bold text-sm border transition-all duration-500',
+                        isStep2Completed
+                          ? "bg-indigo-500 text-white border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.4)]"
+                          : isStep1Done
+                            ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/20"
+                            : "bg-zinc-800 text-zinc-500 border-white/5"
+                      )}>
+                         {isStep2Completed ? <Check className="h-5 w-5 stroke-[3]" /> : "2"}
+                      </div>
+                      <div className="flex items-baseline gap-3">
+                        <h3 className='font-openSans text-xl font-bold text-white tracking-tight'>
+                           Session focus & habits
+                        </h3>
+                        <span className="text-[10px] font-bold text-zinc-500 bg-white/5 px-2 py-0.5 rounded border border-white/5 whitespace-nowrap">Optional</span>
+                      </div>
+                    </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                     {/* Left: Goals & Title */}
-                     <div className="lg:col-span-12 xl:col-span-7 space-y-6">
-                        <div className='space-y-4 rounded-2xl bg-zinc-900/30 p-6 border border-white/5'>
-                          <label className='font-openSans text-sm font-bold uppercase tracking-wider text-zinc-400'>
-                            Session Headline
-                          </label>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                       <div className="lg:col-span-12 xl:col-span-7 space-y-6">
+                        <div className='space-y-4'>
+                          <div className="flex items-center justify-between">
+                            <label className='font-openSans text-sm font-bold text-zinc-400'>
+                              Session title
+                            </label>
+                          </div>
                           <div className='relative'>
                             <Input
                               name='reportTitle'
-                              startIcon={<MdTitle className='text-lg text-cyan-500/50' />}
                               placeholder='e.g. Practicing major scales'
-                              className={`h-12 border-white/10 bg-zinc-950/50 text-base shadow-sm focus:border-cyan-500/30 ${errors.reportTitle ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
+                              className={`h-11 border-white/10 bg-zinc-900/40 text-sm shadow-sm focus:border-cyan-500/30 ${errors.reportTitle ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
                               value={values.reportTitle}
                               onChange={(e) => setFieldValue("reportTitle", e.target.value)}
                             />
@@ -389,127 +448,139 @@ const ReportView = () => {
                           </div>
                           
                           <div className='space-y-3 pt-2'>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">Quick focus tags:</p>
                             <div className='flex flex-wrap gap-2'>
-                              {[
-                                { label: "Warmup", icon: "🎸", cat: "basic" },
-                                { label: "Technique", icon: "⚡", cat: "basic" },
-                                { label: "New Song", icon: "🎵", cat: "creative" },
-                                { label: "Theory", icon: "📚", cat: "theory" },
-                                { label: "Improvisation", icon: "✨", cat: "creative" },
-                                { label: "Ear Training", icon: "👂", cat: "theory" },
-                                { label: "Song Writing", icon: "✍️", cat: "creative" },
-                                { label: "Speed Building", icon: "🏎️", cat: "basic" },
-                                { label: "Jamming", icon: "🔊", cat: "creative" },
-                                { label: "Night practice", icon: "🌙", cat: "basic" }
-                              ].map((tag) => (
-                                <button
-                                  key={tag.label}
-                                  type="button"
-                                  onClick={() => setFieldValue("reportTitle", tag.label)}
-                                  className="group flex items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500 transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
-                                >
-                                  <span className="opacity-70 group-hover:opacity-100">{tag.icon}</span>
-                                  {tag.label}
-                                </button>
-                              ))}
+                                {[
+                                  { label: "Warmup", icon: "🎸", cat: "basic" },
+                                  { label: "Technique", icon: "⚡", cat: "basic" },
+                                  { label: "New Song", icon: "🎵", cat: "creative" },
+                                  { label: "Theory", icon: "📚", cat: "theory" },
+                                  { label: "Improvisation", icon: "✨", cat: "creative" },
+                                  { label: "Ear Training", icon: "👂", cat: "theory" },
+                                  { label: "Song Writing", icon: "✍️", cat: "creative" },
+                                  { label: "Speed Building", icon: "🏎️", cat: "basic" },
+                                  { label: "Jamming", icon: "🔊", cat: "creative" },
+                                  { label: "Night practice", icon: "🌙", cat: "basic" }
+                                ].map((tag) => (
+                                  <button
+                                    key={tag.label}
+                                    type="button"
+                                    onClick={() => setFieldValue("reportTitle", tag.label)}
+                                    className="group flex items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500 transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
+                                  >
+                                    <span className="opacity-70 group-hover:opacity-100">{tag.icon}</span>
+                                    {tag.label}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                     </div>
+                       </div>
 
-                     {/* Right: Habits */}
-                     <div className="lg:col-span-12 xl:col-span-5 space-y-4">
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 px-1">Check fulfilled habits:</p>
-                        <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1'>
-                          {healthHabbitsList.map(
-                            ({ name, questionMarkProps, title }, index) => (
-                              <HealthHabbitsBox
-                                key={name + index}
-                                name={name}
-                                title={title}
-                                questionMarkProps={questionMarkProps}
-                              />
-                            )
-                          )}
-                        </div>
-                     </div>
-                  </div>
-                </div>
-
-                {/* STEP 3: LOGGING */}
-                <div className='mb-8 border-t border-white/5 pt-12'>
-                  <div className='mb-6 flex items-center gap-3'>
-                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-rose-500/20 text-rose-400 font-bold text-sm border border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]'>3</div>
-                    <h3 className='font-openSans text-lg font-bold text-white'>
-                       Finalize Log
-                    </h3>
+                       <div className="lg:col-span-12 xl:col-span-5 space-y-4">
+                          <div className="flex flex-col px-1">
+                            <p className="text-lg font-bold text-zinc-300">Habits checklist</p>
+                          </div>
+                          <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1'>
+                            {healthHabbitsList.map(
+                              ({ name, questionMarkProps, title }, index) => (
+                                <HealthHabbitsBox
+                                  key={name + index}
+                                  name={name}
+                                  title={title}
+                                  questionMarkProps={questionMarkProps}
+                                />
+                              )
+                            )}
+                          </div>
+                       </div>
+                    </div>
                   </div>
 
-                  <div className='flex flex-col items-center gap-8 rounded-3xl bg-zinc-900/20 p-8 border border-white/5'>
-                    <div className='flex flex-col items-center gap-4'>
-                      <p className='text-xs font-bold uppercase tracking-widest text-zinc-500'>When did this happen?</p>
-                      <div className='flex flex-wrap items-center justify-center gap-3'>
-                        {[0, 1, 2, 3, 4].map((days) => {
-                          const isSelected = values.countBackDays === days;
-                          let label = days === 0 ? "Today" : days === 1 ? "Yesterday" : `${days} days ago`;
-
-                          return (
-                            <Button
-                              key={days}
-                              type='button'
-                              variant={isSelected ? "default" : "outline"}
-                              onClick={() => setFieldValue("countBackDays", days)}
-                              className={`relative rounded-full border px-6 transition-all ${
-                                isSelected
-                                  ? "border-transparent bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] font-black"
-                                  : "border-white/10 bg-zinc-900/50 text-zinc-400 hover:text-white"
-                              }`}>
-                              {label}
-                            </Button>
-                          );
-                        })}
+                  {/* STEP 3: LOGGING (OPTIONAL DETAILS) */}
+                  <div className={cn('scroll-mt-24 transition-all duration-500', !isStep1Done ? "opacity-30 grayscale pointer-events-none" : "opacity-100")}>
+                    <div className="mb-8 border-t border-white/5 pt-12">
+                      <div className='mb-6 flex items-center gap-3'>
+                        <div className={cn(
+                          'flex h-9 w-9 items-center justify-center rounded-full font-bold text-sm border transition-all duration-500',
+                          isStep1Done 
+                            ? "bg-rose-500/20 text-rose-400 border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]" 
+                            : "bg-zinc-800 text-zinc-500 border-white/5"
+                        )}>3</div>
+                        <div className="flex items-baseline gap-3">
+                          <h3 className='font-openSans text-lg font-bold text-white'>
+                             Finalize Log
+                          </h3>
+                          <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded border border-white/5 whitespace-nowrap">Optional Details</span>
+                        </div>
                       </div>
-                      <p className='text-xs font-medium text-zinc-600'>
-                        Selected: <span className="text-zinc-300">{getDateFromPast(values.countBackDays).toLocaleDateString()}</span>
-                      </p>
-                    </div>
 
-                    <div className="w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                      <div className='flex flex-col items-center gap-8 py-4'>
+                          <div className='flex flex-col items-center gap-4'>
+                            <p className='text-xs font-bold uppercase tracking-widest text-zinc-500'>When did this happen?</p>
+                            <div className='flex flex-wrap items-center justify-center gap-3'>
+                              {[0, 1, 2, 3, 4].map((days) => {
+                                const isSelected = values.countBackDays === days;
+                                let label = (days === 0 ? "Today" : days === 1 ? "Yesterday" : `${days} days ago`);
 
-                    <div className='flex flex-col items-center gap-4'>
-                      {Object.keys(errors).length !== 0 && <ErrorBox errors={errors} />}
-                      <Button
-                        size='lg'
-                        type='submit'
-                        loading={isFetching}
-                        disabled={Object.keys(errors).length !== 0}
-                        className='h-14 min-w-[240px] rounded-2xl bg-white text-black font-black text-lg transition-all hover:scale-[1.02] active:scale-95 shadow-xl disabled:opacity-50'>
-                        <div className="flex items-center gap-2">
-                          <GrDocumentUpload className='h-6 w-6' />
-                          <span>{isFetching ? "Saving..." : t("report_button")}</span>
-                        </div>
-                      </Button>
+                                return (
+                                  <Button
+                                    key={days}
+                                    type='button'
+                                    variant={isSelected ? "default" : "outline"}
+                                    onClick={() => setFieldValue("countBackDays", days)}
+                                    className={cn(
+                                      "relative rounded-full border px-6 transition-all",
+                                      isSelected
+                                        ? "border-transparent bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] font-black"
+                                        : "border-white/10 bg-zinc-900/50 text-zinc-400 hover:text-white"
+                                    )}>
+                                    {label}
+                                  </Button>
+                                );
+                              })}
+                            </div>
+                            <p className='text-xs font-medium text-zinc-600'>
+                              Selected: <span className="text-zinc-300">{getDateFromPast(values.countBackDays).toLocaleDateString()}</span>
+                            </p>
+                          </div>
+
+                          <div className="w-full h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+
+                          <div className='flex flex-col items-center gap-4'>
+                            {Object.keys(errors).length !== 0 && <ErrorBox errors={errors} />}
+                            <Button
+                              size='lg'
+                              type='submit'
+                              loading={isFetching}
+                              disabled={Object.keys(errors).length !== 0 || !isStep1Done}
+                              className='h-14 min-w-[280px] rounded-2xl bg-white text-black font-black text-lg transition-all hover:scale-[1.02] active:scale-95 shadow-xl disabled:opacity-50'>
+                              <div className="flex items-center gap-2">
+                                <Check className='h-6 w-6 text-emerald-600' />
+                                <span>{isFetching ? "Saving..." : "Finish & Save Practice"}</span>
+                              </div>
+                            </Button>
+                          </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </ReportFormLayout>
+                </ReportFormLayout>
 
-              {acceptPopUpVisible && exceedingTime && (
-                <Backdrop selector='overlays'>
-                  <div>
-                    <AcceptExceedingPopUp
-                      exceedingTime={exceedingTime}
-                      onAccept={() => reportOnSubmit(values)}
-                      isFetching={isFetching}
-                      setAcceptExceedingTime={setAcceptExceedingTime}
-                      setAcceptPopUpVisible={setAcceptPopUpVisible}
-                    />
-                  </div>
-                </Backdrop>
-              )}
-            </>
-          )}
+                {acceptPopUpVisible && exceedingTime && (
+                  <Backdrop selector='overlays'>
+                    <div>
+                      <AcceptExceedingPopUp
+                        exceedingTime={exceedingTime}
+                        onAccept={() => reportOnSubmit(values)}
+                        isFetching={isFetching}
+                        setAcceptExceedingTime={setAcceptExceedingTime}
+                        setAcceptPopUpVisible={setAcceptPopUpVisible}
+                      />
+                    </div>
+                  </Backdrop>
+                )}
+              </>
+            );
+          }}
         </Formik>
       )}
     </>
