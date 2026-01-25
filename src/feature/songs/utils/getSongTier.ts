@@ -1,7 +1,7 @@
 import { getTierFromDifficulty } from "./difficulty.utils";
 
 export interface SongTier {
-  tier: 'S' | 'A' | 'B' | 'C' | 'D';
+  tier: 'S' | 'A' | 'B' | 'C' | 'D' | '?';
   label: string;
   color: string;
   bgColor: string;
@@ -10,8 +10,8 @@ export interface SongTier {
 }
 
 export const getSongTier = (ratingOrTier: number | string): SongTier => {
-  const tier = typeof ratingOrTier === 'string' 
-    ? ratingOrTier as 'S' | 'A' | 'B' | 'C' | 'D'
+  const tier = typeof ratingOrTier === 'string'
+    ? ratingOrTier as 'S' | 'A' | 'B' | 'C' | 'D' | '?'
     : getTierFromDifficulty(ratingOrTier);
 
   switch (tier) {
@@ -51,7 +51,7 @@ export const getSongTier = (ratingOrTier: number | string): SongTier => {
         borderColor: 'border-green-400/30',
         description: 'tier.intermediate'
       };
-    default:
+    case 'D':
       return {
         tier: 'D',
         label: 'D-Tier',
@@ -59,6 +59,15 @@ export const getSongTier = (ratingOrTier: number | string): SongTier => {
         bgColor: 'bg-blue-500/15',
         borderColor: 'border-blue-400/30',
         description: 'tier.beginner'
+      };
+    default:
+      return {
+        tier: '?',
+        label: 'Unrated',
+        color: '#A1A1AA',
+        bgColor: 'bg-zinc-500/15',
+        borderColor: 'border-zinc-400/30',
+        description: 'tier.unrated'
       };
   }
 };
@@ -74,6 +83,7 @@ export const getAllTiers = (): SongTier[] => {
     getSongTier(6.5),
     getSongTier(5),
     getSongTier(2),
+    getSongTier(0),
   ];
 
   return memoizedTiers;
