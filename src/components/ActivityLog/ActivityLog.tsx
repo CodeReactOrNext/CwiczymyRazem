@@ -177,7 +177,7 @@ export const ActivityLogView = ({
         )}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="border-white/10 bg-neutral-900 text-white sm:max-w-[425px]">
+        <DialogContent className="max-w-none sm:max-w-[425px] border-white/10 bg-neutral-900 text-white h-full sm:h-auto">
           <DialogHeader>
             <DialogTitle>Activity Details</DialogTitle>
           </DialogHeader>

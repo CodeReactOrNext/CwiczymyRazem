@@ -46,7 +46,7 @@ export const CommentsModal = ({ isOpen, onClose, recordingId }: CommentsModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-zinc-950 border-white/5 text-white flex flex-col h-[80vh]">
+      <DialogContent className="max-w-md bg-zinc-950 border-white/5 text-white flex flex-col h-full sm:h-[80vh] sm:rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-cyan-400" />

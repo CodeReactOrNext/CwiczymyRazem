@@ -1,7 +1,7 @@
 import { SeasonService } from "feature/discordBot/services/seasonService";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { logger } from "feature/logger/Logger";
-import { 
+import {
   assignSeasonalAchievements,
   hasSeasonalAchievement
 } from "feature/profile/services/seasonalAchievementsService";
@@ -27,18 +27,18 @@ const removeUndefined = <T extends Record<string, any>>(obj: T): Partial<T> => {
 };
 
 const fetchUserDataByDisplayName = async (
-  displayName: string, 
+  displayName: string,
   index: number
 ): Promise<TopPlayerData> => {
   try {
     const usersRef = collection(db, "users");
     const q = query(usersRef, where("displayName", "==", displayName));
     const userSnapshot = await getDocs(q);
-    
+
     if (!userSnapshot.empty) {
       const userDoc = userSnapshot.docs[0];
       const userData = userDoc.data();
-      
+
       const playerData: TopPlayerData = {
         uid: userDoc.id,
         displayName,
@@ -46,22 +46,22 @@ const fetchUserDataByDisplayName = async (
         level: userData.level || 1,
         avatar: userData.avatar || null,
       };
-      
+
       return playerData;
     }
-    
-   
+
+
     return {
       uid: `player-${index}`,
       displayName,
       points: 0,
       level: 1,
     };
-  } catch  {
+  } catch {
     logger.warn(`Could not fetch user data for ${displayName}`, {
       context: "dailyTopPlayersUpdate"
     });
-    
+
     return {
       uid: `player-${index}`,
       displayName,
@@ -73,14 +73,15 @@ const fetchUserDataByDisplayName = async (
 
 
 const createLogData = (
-  topPlayers: TopPlayerData[], 
+  topPlayers: TopPlayerData[],
   daysLeftInSeason: number
 ) => {
   return removeUndefined({
     type: "top_players_update",
     data: new Date().toISOString(),
     topPlayers,
-    daysLeftInSeason
+    daysLeftInSeason,
+    timestamp: new Date().toISOString(),
   });
 };
 
@@ -96,7 +97,7 @@ const checkSeasonEndAndAssignAchievements = async (
 
   const now = new Date();
   const seasonId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  
+
   logger.info("Season is ending, assigning achievements", {
     context: "dailyTopPlayersUpdate",
     extra: {
@@ -107,19 +108,19 @@ const checkSeasonEndAndAssignAchievements = async (
 
   const topFivePlayers = topPlayers.slice(0, 5);
   const playersWithoutAchievements = [];
-  
+
   for (const player of topFivePlayers) {
     if (!player.uid || player.uid.startsWith('player-')) {
       continue;
     }
-    
+
     const hasAchievement = await hasSeasonalAchievement(player.uid, seasonId);
 
     if (!hasAchievement) {
       playersWithoutAchievements.push(player);
     }
   }
-  
+
   if (playersWithoutAchievements.length === 0) {
     logger.info("All top players already have achievements for this season", {
       context: "dailyTopPlayersUpdate",
@@ -129,10 +130,10 @@ const checkSeasonEndAndAssignAchievements = async (
   }
 
   const assignedCount = await assignSeasonalAchievements(
-    topPlayers, 
+    topPlayers,
     seasonId,
   );
-  
+
   logger.info(`Assigned ${assignedCount} seasonal achievements`, {
     context: "dailyTopPlayersUpdate",
     extra: {
@@ -150,8 +151,8 @@ export default async function handler(
     const seasonData = await seasonService.getSeasonData(5);
 
     if (!seasonData || !seasonData.players.length) {
-      logger.warn("No top players data available for daily update", { 
-        context: "dailyTopPlayersUpdate" 
+      logger.warn("No top players data available for daily update", {
+        context: "dailyTopPlayersUpdate"
       });
       return res.status(404).json({ message: "Top players data not found" });
     }
@@ -159,7 +160,7 @@ export default async function handler(
     const topPlayers = await Promise.all(
       seasonData.players.map(async (player, index) => {
         const playerData = await fetchUserDataByDisplayName(player.displayName, index);
-        
+
         return {
           ...playerData,
           points: player.points
