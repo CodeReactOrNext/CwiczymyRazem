@@ -34,7 +34,7 @@ export const SongCard = ({
 }: SongCardProps) => {
   const userId = useAppSelector(selectUserAuth);
   const avgDifficulty = song.avgDifficulty || 0;
-  const tier = getSongTier(song.tier || avgDifficulty);
+  const tier = getSongTier(avgDifficulty === 0 ? "?" : (song.tier || avgDifficulty));
   const isRated = song.difficulties?.some(d => d.userId === userId);
 
 
