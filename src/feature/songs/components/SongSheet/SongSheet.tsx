@@ -229,8 +229,63 @@ const SongSheet = ({
               </div>
             </div>
 
+            {/* Status Options */}
+            <div className="space-y-4 pt-4 border-t border-white/5">
+              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Music Library Status</h4>
+              <div className="grid gap-2">
+                {STATUS_OPTIONS.map((opt) => {
+                  const Icon = opt.icon;
+                  const isActive = optimisticStatus === opt.id;
+                  const isPending = isUpdatingStatus === opt.id;
+
+                  return (
+                    <button
+                      key={opt.id}
+                      disabled={!!isUpdatingStatus}
+                      onClick={() => handleStatusUpdate(opt.id as SongStatus)}
+                      className={cn(
+                        "flex items-center justify-between rounded-xl p-4 transition-all active:scale-[0.98]",
+                        "border border-white/5 bg-zinc-900/60 hover:bg-white/5",
+                        isActive ? "ring-2 ring-cyan-500 border-transparent bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.15)]" : "",
+                        isUpdatingStatus && "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={cn(
+                          "flex h-9 w-9 items-center justify-center rounded-xl bg-black/40 transition-colors", 
+                          isActive ? opt.color : "text-zinc-600",
+                          opt.id === "remove" && !isActive && "group-hover/remove:text-red-400"
+                        )}>
+                          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
+                        </div>
+                        <div className="text-left">
+                          <p className={cn(
+                            "text-xs font-black uppercase tracking-widest transition-colors", 
+                            isActive ? "text-white" : "text-zinc-400",
+                            opt.id === "remove" && !isActive && "group-hover/remove:text-red-300"
+                          )}>
+                            {opt.label}
+                          </p>
+                          <p className="text-[10px] font-medium text-zinc-600">{opt.desc}</p>
+                          
+                          {/* Active Indicator Underline */}
+                          {isActive && (
+                            <motion.div 
+                              layoutId="activeStatus"
+                              className="mt-1 h-0.5 w-8 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]" 
+                            />
+                          )}
+                        </div>
+                      </div>
+                      {isActive && !isPending && <CheckCircle className="h-4 w-4 text-cyan-500" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Practitioners Section */}
-            <div className="space-y-4">
+            <div className="space-y-4 pt-4 border-t border-white/5">
                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Who's practicing</h4>
                {isLoadingUsers ? (
                  <div className="flex gap-2">
@@ -289,61 +344,6 @@ const SongSheet = ({
                 />
               </div>
             </div>
-
-            {/* Status Options */}
-            <div className="space-y-4">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Music Library Status</h4>
-              <div className="grid gap-2">
-                {STATUS_OPTIONS.map((opt) => {
-                  const Icon = opt.icon;
-                  const isActive = optimisticStatus === opt.id;
-                  const isPending = isUpdatingStatus === opt.id;
-
-                  return (
-                    <button
-                      key={opt.id}
-                      disabled={!!isUpdatingStatus}
-                      onClick={() => handleStatusUpdate(opt.id as SongStatus)}
-                      className={cn(
-                        "flex items-center justify-between rounded-xl p-4 transition-all active:scale-[0.98]",
-                        "border border-white/5 bg-zinc-900/60 hover:bg-white/5",
-                        isActive ? "ring-2 ring-cyan-500 border-transparent bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.15)]" : "",
-                        isUpdatingStatus && "opacity-50 cursor-not-allowed"
-                      )}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={cn(
-                          "flex h-9 w-9 items-center justify-center rounded-xl bg-black/40 transition-colors", 
-                          isActive ? opt.color : "text-zinc-600",
-                          opt.id === "remove" && !isActive && "group-hover/remove:text-red-400"
-                        )}>
-                          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
-                        </div>
-                        <div className="text-left">
-                          <p className={cn(
-                            "text-xs font-black uppercase tracking-widest transition-colors", 
-                            isActive ? "text-white" : "text-zinc-400",
-                            opt.id === "remove" && !isActive && "group-hover/remove:text-red-300"
-                          )}>
-                            {opt.label}
-                          </p>
-                          <p className="text-[10px] font-medium text-zinc-600">{opt.desc}</p>
-                          
-                          {/* Active Indicator Underline */}
-                          {isActive && (
-                            <motion.div 
-                              layoutId="activeStatus"
-                              className="mt-1 h-0.5 w-8 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]" 
-                            />
-                          )}
-                        </div>
-                      </div>
-                      {isActive && !isPending && <CheckCircle className="h-4 w-4 text-cyan-500" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </div>
         </div>
 
@@ -352,7 +352,7 @@ const SongSheet = ({
               onClick={onClose}
               className="h-14 w-full rounded-2xl bg-zinc-900 border border-white/5 font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-cyan-400 hover:bg-zinc-800 transition-all shadow-2xl"
           >
-            Finished
+            Close details
           </Button>
         </div>
       </SheetContent>
