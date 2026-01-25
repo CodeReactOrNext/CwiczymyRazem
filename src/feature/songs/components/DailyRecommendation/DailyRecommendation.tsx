@@ -46,20 +46,9 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
   const isWantToLearn = userSongs.wantToLearn.some((s) => s.id === song.id);
 
   return (
-    <Card className="group relative flex h-full flex-col justify-between overflow-hidden border-white/5 bg-zinc-900/40 p-6 shadow-2xl transition-all hover:border-cyan-500/30">
-      {/* Background Glow */}
-      <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-cyan-500/10 blur-[100px] transition-all group-hover:bg-cyan-500/20" />
-      
-      {/* Blurred Cover Background */}
-      {song.coverUrl && (
-        <div className="absolute inset-0 -z-10 opacity-[0.08] transition-opacity duration-700 group-hover:opacity-[0.14]">
-          <img src={song.coverUrl} alt="" className="h-full w-full object-cover blur-3xl scale-110" />
-          <div className="absolute inset-0 bg-gradient-to-br from-zinc-950/80 to-transparent" />
-        </div>
-      )}
-
-      <div className="relative z-10 h-full">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+    <Card className="flex-col justify-between h-full">
+      <div className="h-full">
+        <div className="flex flex-col justify-between gap-6 h-full">
           <div className="flex items-start gap-4 sm:gap-5 flex-1">
             {/* Song Cover / Icon */}
             <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-2xl">
@@ -100,10 +89,10 @@ export const DailyRecommendation = ({ song, userSongs, onRefreshSongs, onOpenDet
               variant="ghost"
               size="icon"
               onClick={() => onOpenDetails(song)}
-              className="h-9 w-9 shrink-0"
+              className="h-10 w-10 shrink-0 rounded-lg bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-white"
               title="View Details"
             >
-              <Info className="h-4 w-4" />
+              <Info className="h-5 w-5" />
             </Button>
             
             {isLearning && (

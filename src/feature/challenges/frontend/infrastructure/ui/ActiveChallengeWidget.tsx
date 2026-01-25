@@ -95,18 +95,18 @@ export const ActiveChallengeWidget = () => {
                             )}
                         >
                             <div className="flex items-start gap-3 flex-1 min-w-0 w-full">
-                                <div className="p-1.5 rounded-lg bg-main/10 text-main shrink-0 mt-1">
+                                <div className="p-2 rounded-lg bg-main/10 text-main shrink-0 mt-1">
                                     {(() => {
                                         const skillData = guitarSkills.find(s => s.id === challenge.requiredSkillId);
                                         const SkillIcon = skillData?.icon;
-                                        return SkillIcon ? <SkillIcon size={14} /> : <Flame size={14} />;
+                                        return SkillIcon ? <SkillIcon size={18} /> : <Flame size={18} />;
                                     })()}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <div className="flex items-start justify-between gap-4 mb-2">
+                                    <div className="flex items-start justify-between gap-4 mb-3">
                                         <div className="min-w-0">
                                             <h4 className={cn(
-                                                "text-xs font-bold truncate",
+                                                "text-sm font-bold truncate",
                                                 isTodayDone ? "text-zinc-500 line-through opacity-50" : "text-white"
                                             )}>
                                                 {challenge.title}
@@ -114,8 +114,8 @@ export const ActiveChallengeWidget = () => {
                                         </div>
                                         
                                         {challenge.rewardSkillId && (
-                                            <div className="flex items-center justify-center px-1.5 py-0.5 rounded-sm bg-orange-500/10 border border-orange-500/20 shrink-0">
-                                                <span className="text-[9px] font-bold text-orange-400 tracking-wider">
+                                            <div className="flex items-center justify-center px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 shrink-0">
+                                                <span className="text-[10px] font-bold text-orange-400 tracking-wider">
                                                     +{challenge.rewardLevel} {challenge.rewardSkillId.split('_').pop()?.toUpperCase()}
                                                 </span>
                                             </div>
@@ -123,14 +123,14 @@ export const ActiveChallengeWidget = () => {
                                     </div>
 
                                     {/* Mini Progress Bar */}
-                                    <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden mb-3">
+                                    <div className="h-1.5 w-full bg-zinc-700/50 rounded-full overflow-hidden mb-4">
                                         <div 
                                             className="h-full bg-main transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(6,182,212,0.5)]"
                                             style={{ width: `${Math.min(((ac.currentDay - (isTodayDone ? 0 : 1)) / ac.totalDays) * 100, 100)}%` }}
                                         />
                                     </div>
 
-                                    <div className="flex flex-wrap gap-1">
+                                    <div className="flex flex-wrap gap-2">
                                         {Array.from({ length: ac.totalDays }).map((_, idx) => {
                                             const dayNum = idx + 1;
                                             const isCompleted = dayNum < ac.currentDay;
@@ -140,18 +140,18 @@ export const ActiveChallengeWidget = () => {
                                                 <div 
                                                     key={dayNum} 
                                                     className={cn(
-                                                        "w-5 h-5 rounded-md flex items-center justify-center transition-all duration-300",
+                                                        "w-6 h-6 rounded-md flex items-center justify-center transition-all duration-300",
                                                         isCompleted 
-                                                            ? "bg-white text-zinc-900 shadow-sm scale-105" 
+                                                            ? "bg-white text-zinc-900 shadow-sm scale-105 font-black" 
                                                             : isCurrent 
-                                                                ? "bg-main/20 text-main ring-1 ring-main" 
-                                                                : "bg-zinc-800/50 text-zinc-500"
+                                                                ? "bg-main/20 text-main ring-1 ring-main shadow-[0_0_10px_rgba(6,182,212,0.3)] font-black" 
+                                                                : "bg-zinc-800/80 text-zinc-600 font-bold border border-white/5"
                                                     )}
                                                 >
                                                     {isCompleted ? (
-                                                        <CheckCircle2 size={10} strokeWidth={3} />
+                                                        <CheckCircle2 size={12} strokeWidth={3} />
                                                     ) : (
-                                                        <span className="text-[8px] font-black">{dayNum}</span>
+                                                        <span className="text-[10px]">{dayNum}</span>
                                                     )}
                                                 </div>
                                             );

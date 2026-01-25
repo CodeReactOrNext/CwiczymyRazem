@@ -24,6 +24,7 @@ interface LandingLayoutProps {
 import { useQuery } from "@tanstack/react-query";
 import { ActiveChallengeWidget } from "feature/challenges/frontend/infrastructure/ui/ActiveChallengeWidget";
 import { BarChart3, ChevronRight, Play } from "lucide-react";
+import { GiMetronome } from "react-icons/gi";
 
 const ProfileLandingLayout = ({
   statsField,
@@ -56,30 +57,30 @@ const ProfileLandingLayout = ({
 
   return (
     <DashboardContainer>
-      <div className="flex items-center gap-2 mb-8 bg-zinc-900/50 p-1 rounded-xl border border-zinc-800/50 w-fit">
+      <div className="flex items-center gap-1 mb-8 bg-black/40 p-1.5 rounded-2xl border border-white/5 w-fit">
         <button 
           onClick={() => setActiveTab("practice")}
-          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'practice' ? 'bg-zinc-800 text-white shadow-lg border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`px-6 py-2.5 rounded-xl text-sm font-black tracking-wide transition-all duration-300 flex items-center gap-2 ${activeTab === 'practice' ? 'bg-white text-zinc-950 shadow-xl scale-100 ring-1 ring-white/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'}`}
         >
-          <Play size={14} className={activeTab === 'practice' ? "fill-current" : ""} />
+          <Play size={14} className={activeTab === 'practice' ? "fill-current" : ""} strokeWidth={3} />
           Practicing
         </button>
         <button 
           onClick={() => setActiveTab("review")}
-          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'review' ? 'bg-zinc-800 text-white shadow-lg border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
+          className={`px-6 py-2.5 rounded-xl text-sm font-black tracking-wide transition-all duration-300 flex items-center gap-2 ${activeTab === 'review' ? 'bg-white text-zinc-950 shadow-xl scale-100 ring-1 ring-white/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'}`}
         >
-          <BarChart3 size={14} />
+          <BarChart3 size={14} strokeWidth={3} />
           See your stats
         </button>
       </div>
 
       {activeTab === "practice" && (
-        <div className="space-y-20 py-4">
+        <div className="space-y-8 py-4">
           <div className="space-y-12">
             {!isTodayCompleted && (
               <div 
                 onClick={() => router.push("/timer")}
-                className="group relative cursor-pointer overflow-hidden rounded-xl border border-zinc-300 bg-gradient-to-br from-white via-zinc-100 to-zinc-200 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-black/5 transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.15)] hover:border-zinc-400 hover:from-white hover:to-white active:scale-[0.99]"
+                className="group relative cursor-pointer overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-black/5 transition-all duration-500 hover:shadow-[0_40px_80px_rgba(0,0,0,0.15)] hover:border-zinc-300 hover:bg-zinc-50 active:scale-[0.99]"
               >
                   <div className="relative z-10 flex items-center justify-between gap-6">
                     <div className="space-y-1">
@@ -104,20 +105,23 @@ const ProfileLandingLayout = ({
                     </div>
                   </div>
                   
-                  <div className="absolute right-0 top-0 -mr-16 -mt-16 h-48 w-48 rounded-full bg-cyan-500/25 blur-3xl transition-opacity duration-500 group-hover:opacity-100 opacity-60" />
+                  <div className="absolute -bottom-4 right-12 rotate-[-12deg] text-zinc-950/5 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[-6deg]">
+                    <GiMetronome size={180} />
+                  </div>
               </div>
             )}
 
-            <div className="space-y-4">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 pl-1">
-                Choose how you want to practice today
-              </h3>
-              {userStats.points > 0 && <NavigationCards />}
-            </div>
+              {userStats.points > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 pl-1">
+                    Choose how you want to practice today
+                  </h3>
+                  <NavigationCards />
+                </div>
+              )}
           </div>
 
-          <div className="relative pt-12">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-800/50 to-transparent" />
+          <div>
             <DashboardSection compact>
             {userStats.points === 0 && <OnboardingCards />}
             
