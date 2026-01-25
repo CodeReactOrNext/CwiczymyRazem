@@ -62,7 +62,8 @@
     "expert": "Expert",
     "advanced": "Advanced",
     "intermediate": "Intermediate",
-    "beginner": "Beginner"
+    "beginner": "Beginner",
+    "unrated": "Unrated"
   },
   "song_count_one": "song",
   "song_count_other": "songs",

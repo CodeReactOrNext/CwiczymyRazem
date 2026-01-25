@@ -11,6 +11,7 @@ export const calculateAverageDifficulty = (difficulties: DifficultyRating[]): nu
 };
 
 export const getTierFromDifficulty = (difficulty: number): string => {
+  if (difficulty === 0) return "?";
   if (difficulty >= 9) return "S";
   if (difficulty >= 7.5) return "A";
   if (difficulty >= 6) return "B";
