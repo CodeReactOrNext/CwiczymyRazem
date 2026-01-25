@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { ClipboardCheck, ClipboardList, Library, Loader2, Music, Play, Sparkles } from "lucide-react";
 import { useRouter } from "next/router";
@@ -19,17 +20,17 @@ interface NavigationCardProps {
   onClick?: () => void;
   colorAccent?: "cyan" | "purple" | "green" | "amber";
   isLoading?: boolean;
+  actionLabel?: string;
 }
 
 export const NavigationCard = ({
   title,
   description,
   icon,
-  primaryAction,
-  secondaryAction,
   onClick,
   colorAccent = "cyan",
   isLoading = false,
+  actionLabel = "Go to action",
 }: NavigationCardProps) => {
   const colorClasses = {
     cyan: {
@@ -62,88 +63,53 @@ export const NavigationCard = ({
 
   return (
     <div
-      className={`${colors.ring} font-openSans relative flex h-full transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-card via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-100 hover:shadow-xl hover:ring-2 sm:p-4`}
+      className={cn(
+        "font-openSans group relative flex h-full transform cursor-pointer flex-col justify-between overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-card via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2 sm:p-4",
+        colors.ring
+      )}
       onClick={onClick}
       tabIndex={0}
       aria-label={title}
       onKeyDown={(e) => e.key === "Enter" && onClick?.()}>
       {isLoading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-xl">
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-xl">
           <Loader2 className={`h-8 w-8 ${colors.iconText} animate-spin`} />
         </div>
       )}
       
       <div
-        className={`${colors.blur} absolute right-0 top-0 -mr-10 -mt-10 h-32 w-32 rounded-full blur-2xl`}></div>
+        className={cn(colors.blur, "absolute right-0 top-0 -mr-10 -mt-10 h-32 w-32 rounded-full blur-2xl")}></div>
 
-      <div className='flex flex-1 flex-row items-center'>
-        <div className='flex-1 pr-2 sm:pr-3'>
-          <h3 className='mb-1 line-clamp-1 text-sm font-bold text-white'>
+      <div className="relative z-10 flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h3 className="text-sm font-black tracking-wider text-white">
             {title}
           </h3>
-          <p className='line-clamp-2 text-xs text-gray-300'>{description}</p>
-
-          {(primaryAction || secondaryAction) && (
-            <div className='mt-2 flex flex-wrap gap-1 sm:gap-1.5'>
-              {primaryAction && (
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    primaryAction.onClick();
-                  }}
-                  size='sm'
-                  className='h-7 min-w-fit px-2 py-0 text-xs shadow-sm transition-colors'>
-                  {primaryAction.label}
-                </Button>
-              )}
-              {secondaryAction && (
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    secondaryAction.onClick();
-                  }}
-                  className='h-7 min-w-fit border-second-400/30 px-2 py-0 text-xs transition-colors hover:bg-second-400/10'>
-                  {secondaryAction.label}
-                </Button>
-              )}
-            </div>
-          )}
+          <p className="text-[11px] font-medium leading-relaxed text-zinc-400">
+            {description}
+          </p>
         </div>
-
-        <div className='flex-shrink-0'>
-          <div
-            className={`${colors.iconBg} ${colors.iconText} rounded-full p-2 shadow-sm sm:p-2.5`}>
-            {icon}
-          </div>
+        <div className={cn(
+          "rounded-xl p-2.5 shadow-2xl transition-all duration-500 group-hover:scale-110",
+          colors.iconBg,
+          colors.iconText
+        )}>
+          {icon}
         </div>
       </div>
 
-      <div
-        className={`${colors.iconText} opacity-80 hover:${colors.iconText} absolute right-2 top-2 transition-all`}>
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='12'
-          height='12'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'>
-          <path d='M7 17l9.2-9.2M17 17V7H7' />
+      <div className="relative z-10 mt-6 flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-zinc-500 transition-colors group-hover:text-white">
+        <span>{actionLabel}</span>
+        <svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='3' strokeLinecap='round' strokeLinejoin='round' className="transition-transform group-hover:translate-x-1">
+          <path d='M5 12h14m-7-7l7 7-7 7' />
         </svg>
       </div>
     </div>
   );
 };
 
-
-
 export const NavigationCards = () => {
   const router = useRouter();
-  
   const [loadingCard, setLoadingCard] = useState<string | null>(null);
 
   const handleNavigation = async (path: string, cardId: string) => {
@@ -152,41 +118,45 @@ export const NavigationCards = () => {
   };
 
   return (
-    <div className='grid grid-cols-1 gap-3  sm:gap-4  md:grid-cols-2 lg:grid-cols-4'>
+    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
       <NavigationCard
-        title="Report practice"
+        title="Report Practice"
         description="Save and log your manual practice session."
-        icon={<ClipboardCheck className='h-6 w-6' />}
+        icon={<ClipboardCheck className='h-5 w-5' />}
         onClick={() => handleNavigation("/report", "report")}
         colorAccent='cyan'
         isLoading={loadingCard === "report"}
+        actionLabel="Log Now"
       />
 
       <NavigationCard
-        title="Practice songs"
-        description="Master your favorite tracks from your collection."
-        icon={<Music className='h-6 w-6' />}
+        title="Play Songs"
+        description="Practice real songs from your library."
+        icon={<Music className='h-5 w-5' />}
         onClick={() => handleNavigation("/timer/song-select", "songs")}
         colorAccent='purple'
         isLoading={loadingCard === "songs"}
+        actionLabel="Choose a Song"
       />
 
       <NavigationCard
-        title="Practice plan"
-        description="Follow your structured daily workout routines."
-        icon={<ClipboardList className='h-6 w-6' />}
+        title="Guided Routine"
+        description="Follow a structured daily workout."
+        icon={<ClipboardList className='h-5 w-5' />}
         onClick={() => handleNavigation("/timer/plans", "plans")}
         colorAccent='green'
         isLoading={loadingCard === "plans"}
+        actionLabel="Start Plan"
       />
 
       <NavigationCard
-        title="Auto plan"
-        description="Get an AI-powered session tailored to your skill level."
-        icon={<Sparkles className='h-6 w-6' fill="currentColor" />}
+        title="Generate Session"
+        description="A ready-to-play session prepared for you."
+        icon={<Sparkles className='h-5 w-5' fill="currentColor" />}
         onClick={() => handleNavigation("/timer/auto", "exercises")}
         colorAccent='amber'
         isLoading={loadingCard === "exercises"}
+        actionLabel="Start Auto Practice"
       />
     </div>
   );
