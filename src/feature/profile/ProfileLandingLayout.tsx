@@ -33,9 +33,7 @@ const ProfileLandingLayout = ({
   const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
   const { achievements } = userStats;
   const [_userSkills, setUserSkills] = useState<UserSkills>();
-  const [activeSection, setActiveSection] = useState<
-    "overview" | "activity" | "skills" | "exercises"
-  >("overview");
+  const [activeTab, setActiveTab] = useState<"practice" | "review">("practice");
 
   /* eslint-disable unused-imports/no-unused-vars */
   const { data: songs, refetch: refreshSongs } = useQuery({
@@ -51,39 +49,71 @@ const ProfileLandingLayout = ({
 
   return (
     <DashboardContainer>
-      {activeSection === "overview" && userStats.points > 0 && <NavigationCards />}
+      <div className="flex items-center gap-2 mb-8 bg-zinc-900/50 p-1 rounded-xl border border-zinc-800/50 w-fit">
+        <button 
+          onClick={() => setActiveTab("practice")}
+          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === 'practice' ? 'bg-zinc-800 text-white shadow-lg border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
+        >
+          Practice Now
+        </button>
+        <button 
+          onClick={() => setActiveTab("review")}
+          className={`px-6 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${activeTab === 'review' ? 'bg-zinc-800 text-white shadow-lg border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}
+        >
+          Review Progress
+        </button>
+      </div>
 
-      {/* Statistics Section */}
-      <DashboardSection  compact>
-        {userStats.points === 0 && <OnboardingCards />}
-        
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-            <div className="lg:col-span-2 h-full">
-                <ActiveChallengeWidget />
+      {activeTab === "practice" && (
+        <>
+          {userStats.points > 0 && <NavigationCards />}
+          
+          <DashboardSection compact>
+            {userStats.points === 0 && <OnboardingCards />}
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+              <ActiveChallengeWidget />
+              <DailyQuestWidget />
             </div>
-            <div className="lg:col-span-2 h-full">
-                <DailyQuestWidget />
-            </div>
-        </div>
 
-        <StatsSection
-          statsField={statsField}
-          statistics={userStats}
-          datasWithReports={datasWithReports}
-          userSongs={songs}
-          onSongsChange={refreshSongs}
-          userAuth={userAuth}
-          achievements={achievements}
-          year={year}
-          setYear={setYear}
-          isLoadingActivity={isLoading}
-        />
-      </DashboardSection>
+            <StatsSection
+              statsField={statsField}
+              statistics={userStats}
+              datasWithReports={datasWithReports}
+              userSongs={songs}
+              onSongsChange={refreshSongs}
+              userAuth={userAuth}
+              achievements={achievements}
+              year={year}
+              setYear={setYear}
+              isLoadingActivity={isLoading}
+              mode="practice"
+            />
+          </DashboardSection>
 
-      {/* Activity Chart Section */}
+          {featSlot && featSlot}
+        </>
+      )}
 
-
-      {featSlot && featSlot}
+      {activeTab === "review" && (
+        <>
+          <DashboardSection compact>
+            <StatsSection
+              statsField={statsField}
+              statistics={userStats}
+              datasWithReports={datasWithReports}
+              userSongs={songs}
+              onSongsChange={refreshSongs}
+              userAuth={userAuth}
+              achievements={achievements}
+              year={year}
+              setYear={setYear}
+              isLoadingActivity={isLoading}
+              mode="review"
+            />
+          </DashboardSection>
+        </>
+      )}
     </DashboardContainer>
   );
 };
