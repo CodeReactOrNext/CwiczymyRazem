@@ -7,8 +7,9 @@ import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronRight, GripVertical, MoreVertical, Play } from "lucide-react";
+import { ChevronRight, GripVertical, MoreVertical, Play, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 interface SortableSongItemProps {
   song: Song;
@@ -79,6 +80,7 @@ export const SortableSongItem = ({
   droppableId,
 }: SortableSongItemProps) => {
   const { t } = useTranslation("songs");
+  const router = useRouter();
   const _StatusIcon = config.icon;
 
   const {
@@ -134,94 +136,175 @@ export const SortableSongItem = ({
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-50" />
       {/* Mobile Header & Action Row */}
       {isMobile ? (
-        <div className="flex items-center gap-4 py-1">
-          <SongCover song={song} config={config} size="md" />
-          
-          <div className="min-w-0 flex-1 space-y-2.5">
-             <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                    <p className="truncate text-[15px] font-bold text-white tracking-tight leading-none mb-1">{song.title}</p>
-                    <p className="truncate text-xs font-medium text-zinc-400">{song.artist}</p>
-                </div>
-                <TierBadge song={song} />
-             </div>
-
-             <div className="flex gap-2">
-                {droppableId !== "learned" && <PracticeButton songId={song.id} isMobile={true} />}
-                
-                {nextStatus && (
-                    <Button
-                        size="sm"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onStatusChange(song.id, nextStatus, song.title, song.artist);
-                        }}
-                        className="h-8 flex-1 bg-zinc-100 text-[11px] font-bold text-zinc-900 hover:bg-white active:scale-95 transition-all shadow-lg"
-                        onPointerDown={(e) => e.stopPropagation()}
+        <div className="relative flex flex-col gap-4 py-1">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0 flex-1">
+              <SongCover song={song} config={config} size="md" />
+              <div className="min-w-0 flex-1">
+                  <p className="truncate text-[15px] font-bold text-white tracking-tight leading-none mb-1">{song.title}</p>
+                  <p className="truncate text-xs font-medium text-zinc-400">{song.artist}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1 shrink-0">
+               <TierBadge song={song} />
+               <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-10 w-10 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all active:scale-90"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <MoreVertical className="h-6 w-6" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-zinc-900/95 border-white/10 backdrop-blur-xl p-1.5 shadow-2xl">
+                  {droppableId !== "learned" && (
+                    <DropdownMenuItem
+                      onClick={() => router.push(`/timer/song/${song.id}`)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-cyan-400 focus:bg-cyan-500/10 focus:text-cyan-300 cursor-pointer rounded-lg mb-1"
                     >
-                        {getPrimaryActionText(droppableId)}
-                        <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                    </Button>
-                )}
-             </div>
+                      <Play className="h-4 w-4 fill-current" />
+                      Practice Song
+                    </DropdownMenuItem>
+                  )}
+                  
+                  <div className="h-px bg-white/5 my-1" />
+                  
+                  {(["wantToLearn", "learning", "learned"] as const).map((status) => {
+                    const statusConfig = STATUS_CONFIG[status];
+                    const Icon = statusConfig.icon;
+                    const isActive = status === droppableId;
+
+                    return (
+                      <DropdownMenuItem
+                        key={status}
+                        onClick={() => onStatusChange(song.id, status, song.title, song.artist)}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2 text-sm font-medium cursor-pointer rounded-lg transition-colors",
+                          isActive ? "bg-white/5 text-white" : "text-zinc-400 hover:text-zinc-200"
+                        )}
+                      >
+                        <Icon className={cn("h-4 w-4", statusConfig.color)} />
+                        <span className="flex-1">
+                          {isActive ? "Currently in " : "Move to "} {t(`status.${status}` as any)}
+                        </span>
+                      </DropdownMenuItem>
+                    );
+                  })}
+
+                  <div className="h-px bg-white/5 my-1" />
+
+                  <DropdownMenuItem
+                    onClick={() => onSongRemove(song.id)}
+                    className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-500 focus:bg-red-500/10 focus:text-red-400 cursor-pointer rounded-lg"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Remove from list
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            {droppableId !== "learned" && <PracticeButton songId={song.id} isMobile={true} />}
+            
+            {nextStatus && (
+                <Button
+                    size="sm"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onStatusChange(song.id, nextStatus, song.title, song.artist);
+                    }}
+                    className="h-8 flex-1 bg-zinc-100 text-[11px] font-bold text-zinc-900 hover:bg-white active:scale-95 transition-all shadow-lg"
+                    onPointerDown={(e) => e.stopPropagation()}
+                >
+                    {getPrimaryActionText(droppableId)}
+                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                </Button>
+            )}
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-3 pr-6"> 
-          <div className="hidden sm:flex text-zinc-600 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity -ml-1">
+        <div className="flex items-center gap-4"> 
+          <div className="hidden sm:flex text-zinc-600 opacity-60 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity">
                <GripVertical className="h-4 w-4" />
           </div>
 
           <SongCover song={song} config={config} />
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-zinc-100 leading-tight group-hover:text-white transition-colors">{song.title}</p>
-            <p className="truncate text-[11px] font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors">{song.artist}</p>
+            <p className="truncate text-[15px] font-bold text-zinc-100 leading-tight group-hover:text-white transition-colors">{song.title}</p>
+            <p className="truncate text-xs font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors">{song.artist}</p>
           </div>
 
-          <div className="flex items-center gap-2">
-            {droppableId !== "learned" && <PracticeButton songId={song.id} isMobile={false} />}
+          <div className="flex items-center gap-4">
             <TierBadge song={song} />
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-10 w-10 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all active:scale-90"
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
+                >
+                  <MoreVertical className="h-6 w-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-zinc-900/95 border-white/10 backdrop-blur-xl p-1.5 shadow-2xl">
+                {droppableId !== "learned" && (
+                  <DropdownMenuItem
+                    onClick={() => router.push(`/timer/song/${song.id}`)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-cyan-400 focus:bg-cyan-500/10 focus:text-cyan-300 cursor-pointer rounded-lg mb-1"
+                  >
+                    <Play className="h-4 w-4 fill-current" />
+                    Practice Song
+                  </DropdownMenuItem>
+                )}
+                
+                <div className="h-px bg-white/5 my-1" />
+                
+                {(["wantToLearn", "learning", "learned"] as const).map((status) => {
+                  const statusConfig = STATUS_CONFIG[status];
+                  const Icon = statusConfig.icon;
+                  const isActive = status === droppableId;
+
+                  return (
+                    <DropdownMenuItem
+                      key={status}
+                      onClick={() => onStatusChange(song.id, status, song.title, song.artist)}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 text-sm font-medium cursor-pointer rounded-lg transition-colors",
+                        isActive ? "bg-white/5 text-white" : "text-zinc-400 hover:text-zinc-200"
+                      )}
+                    >
+                      <Icon className={cn("h-4 w-4", statusConfig.color)} />
+                      <span className="flex-1">
+                        {isActive ? "Currently in " : "Move to "} {t(`status.${status}` as any)}
+                      </span>
+                    </DropdownMenuItem>
+                  );
+                })}
+
+                <div className="h-px bg-white/5 my-1" />
+
+                <DropdownMenuItem
+                  onClick={() => onSongRemove(song.id)}
+                  className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-500 focus:bg-red-500/10 focus:text-red-400 cursor-pointer rounded-lg"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Remove from list
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       )}
 
-      {/* Desktop Menu */}
-      {!isMobile && (
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-6 w-6 rounded-full hover:bg-white/10"
-                onClick={(e) => e.stopPropagation()}
-                onPointerDown={(e) => e.stopPropagation()} // Stop drag initiation
-              >
-                <MoreVertical className="h-3 w-3 text-zinc-400" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40 bg-zinc-900 border-zinc-800">
-              {(["wantToLearn", "learning", "learned"] as const).map((status) => (
-                <DropdownMenuItem
-                  key={status}
-                  onClick={() => onStatusChange(song.id, status, song.title, song.artist)}
-                  className="text-xs cursor-pointer gap-2"
-                >
-                  <div className={cn("h-1.5 w-1.5 rounded-full", STATUS_CONFIG[status].color.replace("text-", "bg-"))} />
-                  {STATUS_CONFIG[status].color === config.color ? "Current" : t(`status.${status}` as any)}
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuItem
-                onClick={() => onSongRemove(song.id)}
-                className="text-xs text-red-400 focus:text-red-300 focus:bg-red-500/10 cursor-pointer"
-              >
-                Remove
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
     </div>
   );
 };

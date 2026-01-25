@@ -432,9 +432,6 @@ export const SongLearningSection = ({
         onDragEnd={isMobile ? undefined : handleDragEnd}
         onDragOver={isMobile ? undefined : handleDragOver}
     >
-      <div className='mb-6'>
-        <SongLearningStats userSongs={userSongs} />
-      </div>
 
       <FilterBar 
         searchQuery={searchQuery}

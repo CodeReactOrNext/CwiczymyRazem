@@ -5,6 +5,10 @@ import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { useTranslation } from "hooks/useTranslation";
 
+import { ArrowDown } from "lucide-react";
+import Link from "next/link";
+import { Button } from "assets/components/ui/button";
+
 import { SortableSongItem } from "./SortableSongItem";
 
 interface SongStatusCardProps {
@@ -82,9 +86,43 @@ export const SongStatusCard = ({
           strategy={verticalListSortingStrategy}
         >
           {songs?.length === 0 ? (
-             <div className="flex flex-1 flex-col items-center justify-center gap-3 py-8 text-center text-zinc-500 opacity-60">
-                <StatusIcon className="h-8 w-8" />
-                <p className="text-xs font-medium">Empty List</p>
+             <div className="flex flex-1 flex-col items-center justify-center p-6 text-center animate-in fade-in duration-500">
+                <div className={cn("mb-4 rounded-full p-4 text-zinc-500/50 bg-zinc-800/30", droppableId === "wantToLearn" && "text-zinc-600")}>
+                   <StatusIcon className="h-8 w-8" />
+                </div>
+                
+                {droppableId === "wantToLearn" && (
+                  <>
+                    <h4 className="text-sm font-bold text-zinc-200">You don’t have any songs here yet</h4>
+                    <p className="mt-1 text-xs text-zinc-500">Add songs you want to learn next</p>
+                    <div className="mt-6 flex flex-col items-center gap-3">
+                      <ArrowDown className="h-4 w-4 text-cyan-500 animate-bounce" />
+                      <Link href="/songs?view=library">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-9 border-cyan-500/20 bg-cyan-500/5 px-4 font-bold text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/40"
+                        >
+                          Browse song library
+                        </Button>
+                      </Link>
+                    </div>
+                  </>
+                )}
+
+                {droppableId === "learning" && (
+                  <>
+                    <h4 className="text-sm font-bold text-zinc-400">Time to practice!</h4>
+                    <p className="mt-1 text-sm text-zinc-500 leading-relaxed max-w-[150px]">Drag songs from your want-to-learn list here to start tracking your progress.</p>
+                  </>
+                )}
+
+                {droppableId === "learned" && (
+                  <>
+                    <h4 className="text-sm font-bold text-zinc-400">The hall of fame awaits</h4>
+                    <p className="mt-1 text-sm text-zinc-500 leading-relaxed max-w-[150px]">Master your songs and move them here to celebrate your success.</p>
+                  </>
+                )}
              </div>
           ) : (
             songs?.map((song) => (
