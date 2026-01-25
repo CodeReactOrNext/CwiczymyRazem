@@ -24,13 +24,10 @@ export const DailyPlanRecommendation = ({ plan }: DailyPlanRecommendationProps) 
   const titleStr = plan.title;
 
   return (
-    <Card
-      className="group relative flex h-full flex-col justify-between overflow-hidden bg-zinc-900/40 p-6 border-white/5 transition-all hover:border-white/10"
-    >
-      <div className="relative z-10 h-full">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+    <Card className="flex-col justify-between h-full">
+        <div className="flex flex-col justify-between gap-6 h-full">
           <div className="flex items-start gap-4 flex-1">
-             <div className={cn("p-2 rounded-lg shrink-0 mt-1", colorStyle)}>
+             <div className="p-2 rounded-lg shrink-0 mt-1 bg-zinc-800/40 text-zinc-400">
                 <Dumbbell className="h-4 w-4" />
              </div>
              <div className="min-w-0 flex-1 space-y-1">
@@ -57,7 +54,7 @@ export const DailyPlanRecommendation = ({ plan }: DailyPlanRecommendationProps) 
              </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center justify-end gap-3 shrink-0">
             <Link href={`/timer/plans?planId=${plan.id}`} className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto">
                 Practice
@@ -66,10 +63,6 @@ export const DailyPlanRecommendation = ({ plan }: DailyPlanRecommendationProps) 
             </Link>
           </div>
         </div>
-      </div>
-
-      {/* Subtle Background Glow */}
-      <div className="absolute -right-4 -bottom-4 h-24 w-24 rounded-full bg-cyan-500/5 blur-2xl group-hover:bg-cyan-500/10 transition-all" />
     </Card>
   );
 };
