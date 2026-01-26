@@ -50,18 +50,20 @@ class MyDocument extends Document {
           <meta name="theme-color" content="#0a0a0a" />
 
           <link rel='mask-icon' href='/images/logolight.svg' color='#06b6d4' />
-          <script
-            id="microsoft-clarity-analytics"
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function(c,l,a,r,i,t,y){
-                    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-                })(window, document, "clarity", "script", "plp3vbsypt");
-              `,
-            }}
-          />
+          {process.env.NODE_ENV === "production" && (
+            <script
+              id="microsoft-clarity-analytics"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  (function(c,l,a,r,i,t,y){
+                      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                  })(window, document, "clarity", "script", "plp3vbsypt");
+                `,
+              }}
+            />
+          )}
         </Head>
         <body data-clarity-unmask="true">
           <Main />
