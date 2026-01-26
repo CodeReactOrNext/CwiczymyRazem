@@ -1,3 +1,4 @@
+import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DashboardContainer, DashboardSection } from "components/Layout";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
@@ -120,16 +121,19 @@ const ProfileLandingLayout = ({
 
           <div>
             <DashboardSection compact>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-              <ActiveChallengeWidget />
-              <DailyQuestWidget />
-            </div>
-
-
-          </DashboardSection>
-
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                <ActiveChallengeWidget />
+                <DailyQuestWidget />
+              </div>
+            </DashboardSection>
           </div>
+
+          <ActivityLogView 
+            year={year}
+            setYear={setYear}
+            datasWithReports={datasWithReports}
+            isLoading={isLoading}
+          />
 
           {featSlot && featSlot}
         </div>
