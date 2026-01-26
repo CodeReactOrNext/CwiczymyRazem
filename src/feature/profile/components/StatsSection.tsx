@@ -1,5 +1,5 @@
 import { Card } from "assets/components/ui/card";
-import { ActivityLogView } from "components/ActivityLog/ActivityLog";
+
 import type { DateWithReport } from "components/ActivityLog/activityLog.types";
 import { StatsCard } from "components/Cards";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
@@ -235,12 +235,7 @@ export const StatsSection = ({
         </div>
       </div>
 
-      <ActivityLogView 
-        year={year}
-        setYear={setYear}
-        datasWithReports={datasWithReports}
-        isLoading={isLoadingActivity}
-      />
+
 
       <div className='space-y-2'>
         <SeasonalAchievements userId={userAuth} />
