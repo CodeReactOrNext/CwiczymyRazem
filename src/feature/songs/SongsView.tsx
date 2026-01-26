@@ -102,16 +102,16 @@ const SongsView = () => {
                     </p>
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <Button
                       variant="outline"
                       size="sm"
+                      className="flex-1 sm:flex-initial"
                       asChild
-                 
                     >
                       <Link href="/guide?tab=songs">
-                        <HelpCircle size={16} className="text-cyan-400" />
-                        <span className="text-xs font-bold uppercase tracking-wider">How it works</span>
+                        <HelpCircle size={16} className="mr-2 text-cyan-400" />
+                        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">How it works</span>
                       </Link>
                     </Button>
                     <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
@@ -119,10 +119,10 @@ const SongsView = () => {
                         <Button 
                           variant="outline"
                           size="sm"
-                          className="border-cyan-500/30 bg-cyan-500/5 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300"
+                          className="flex-1 sm:flex-initial border-cyan-500/30 bg-cyan-500/5 text-cyan-400 hover:bg-cyan-500/10"
                         >
                           <Sparkles className="mr-2 h-4 w-4" />
-                          <span className="text-xs font-bold uppercase tracking-wider">Song Wizard</span>
+                          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Song Wizard</span>
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-md bg-zinc-950 border-white/10 p-4 pt-12">
@@ -134,9 +134,10 @@ const SongsView = () => {
                     </Dialog>
                     <Button 
                       onClick={() => router.push("/songs?view=library")}
-                      
+                      className="w-full sm:w-auto"
+                      size="sm"
                     >
-                      <Plus className="mr-2 h-5 w-5" />
+                      <Plus className="mr-2 h-4 w-4" />
                       Add a song to learn
                     </Button>
                   </div>
