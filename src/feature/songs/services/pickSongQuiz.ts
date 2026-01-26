@@ -1,5 +1,4 @@
-import { collection, getDocs, query, where, limit } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
+import { getSongs } from "feature/songs/services/getSongs";
 import type { Song } from "feature/songs/types/songs.type";
 
 export interface QuizFilters {
@@ -10,41 +9,54 @@ export interface QuizFilters {
 
 export const getQuizRecommendations = async (filters: QuizFilters): Promise<Song[]> => {
   try {
-    const songsRef = collection(db, "songs");
-    let q = query(songsRef, where("isVerified", "==", true));
-
-    // Map difficulty to tiers
+    // Map difficulty to tiers - using broader ranges to ensure results
     let tiers: string[] = [];
-    if (filters.difficulty === "beginner") tiers = ["D"];
-    else if (filters.difficulty === "intermediate") tiers = ["C", "B"];
-    else if (filters.difficulty === "advanced") tiers = ["A", "S"];
+    if (filters.difficulty === "beginner") tiers = ["D", "C"];
+    else if (filters.difficulty === "intermediate") tiers = ["C", "B", "A"];
+    else if (filters.difficulty === "advanced") tiers = ["B", "A", "S"];
 
-    q = query(q, where("tier", "in", tiers));
+    const genreFilters = filters.genre === "Any" ? [] : [filters.genre];
 
-    // Firestore doesn't support multiple disjunctions (in + array-contains-any) well together without indexes.
-    // We'll fetch more and filter genre/popularity locally to keep it simple and flexible.
+    // Use the main getSongs logic to fetch a targeted pool of 30 songs
+    const { songs: pool } = await getSongs(
+      "popularity",
+      "desc",
+      "",
+      "",
+      1,
+      30, // Optimized limit
+      tiers.length > 0 ? tiers : undefined,
+      "all",
+      genreFilters
+    );
 
-    const snapshot = await getDocs(q);
-    let songs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Song));
+    let results = [...pool];
 
-    // Filter by genre
-    if (filters.genre !== "Any") {
-      songs = songs.filter(song => song.genres?.includes(filters.genre));
+    // Fallback: If no results with genre + tiers, try just tiers (fetch 30)
+    if (results.length === 0 && genreFilters.length > 0) {
+      const { songs: fallbackPool } = await getSongs(
+        "popularity",
+        "desc",
+        "",
+        "",
+        1,
+        30,
+        tiers,
+        "all",
+        []
+      );
+      results = fallbackPool;
     }
 
-    // Filter by popularity
+    // Sort or shuffle based on preference
     if (filters.popularity === "classic") {
-      songs = songs.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+      results.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
     } else {
-      // For discovery, we can shuffle or take lower popularity
-      songs = songs.sort(() => Math.random() - 0.5);
+      results.sort(() => Math.random() - 0.5);
     }
 
-    // Return 3 random songs from the top matching ones
-    const topMatches = songs.slice(0, 15);
-    const shuffled = topMatches.sort(() => Math.random() - 0.5);
-
-    return shuffled.slice(0, 3);
+    // Return 3 random songs from the targeted pool
+    return results.sort(() => Math.random() - 0.5).slice(0, 3);
   } catch (error) {
     console.error("Error getting quiz recommendations:", error);
     return [];
