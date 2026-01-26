@@ -15,38 +15,47 @@ export const getQuizRecommendations = async (filters: QuizFilters): Promise<Song
     else if (filters.difficulty === "intermediate") tiers = ["C", "B", "A"];
     else if (filters.difficulty === "advanced") tiers = ["B", "A", "S"];
 
-    const genreFilters = filters.genres.includes("Any") ? [] : filters.genres;
+    const genreFilters = filters.genres.filter(g => g !== "Any");
 
-    // Use the main getSongs logic to fetch a targeted pool of 30 songs
-    const { songs: pool } = await getSongs(
-      "popularity",
-      "desc",
-      "",
-      "",
-      1,
-      40, // Slightly larger pool since we might have multiple genres
-      tiers.length > 0 ? tiers : undefined,
-      "all",
-      genreFilters
-    );
+    let pool: Song[] = [];
 
-    let results = [...pool];
-
-    // Fallback: If no results with combinations, try just tiers
-    if (results.length === 0 && genreFilters.length > 0) {
-      const { songs: fallbackPool } = await getSongs(
+    if (genreFilters.length > 0) {
+      // Priority: Genres. Fetch songs matching chosen genres (up to 100)
+      const { songs } = await getSongs(
         "popularity",
         "desc",
         "",
         "",
         1,
-        30,
+        100,
+        [], // Skip tiers on server to allow genre filter to work
+        "all",
+        genreFilters
+      );
+      // Filter tiers locally
+      pool = songs.filter((s: Song) => tiers.includes(s.tier || ""));
+
+      // If pool is empty after tier filtering, relax tier requirements for these genres
+      if (pool.length === 0) {
+        pool = songs;
+      }
+    } else {
+      // No genres selected (or "Any"): Fetch by tiers
+      const { songs } = await getSongs(
+        "popularity",
+        "desc",
+        "",
+        "",
+        1,
+        50,
         tiers,
         "all",
         []
       );
-      results = fallbackPool;
+      pool = songs;
     }
+
+    let results = [...pool];
 
     // Sort or shuffle based on preference
     if (filters.popularity === "classic") {
