@@ -1,7 +1,6 @@
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DashboardContainer, DashboardSection } from "components/Layout";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
-import { OnboardingCards } from "feature/dashboard/components/OnboardingCards";
 import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
@@ -111,38 +110,23 @@ const ProfileLandingLayout = ({
               </div>
             )}
 
-              {userStats.points > 0 && (
                 <div className="space-y-4">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 pl-1">
                     Choose how you want to practice today
                   </h3>
                   <NavigationCards />
                 </div>
-              )}
           </div>
 
           <div>
             <DashboardSection compact>
-            {userStats.points === 0 && <OnboardingCards />}
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
               <ActiveChallengeWidget />
               <DailyQuestWidget />
             </div>
 
-            <StatsSection
-              statsField={statsField}
-              statistics={userStats}
-              datasWithReports={datasWithReports}
-              userSongs={songs}
-              onSongsChange={refreshSongs}
-              userAuth={userAuth}
-              achievements={achievements}
-              year={year}
-              setYear={setYear}
-              isLoadingActivity={isLoading}
-              mode="practice"
-            />
+
           </DashboardSection>
 
           </div>
