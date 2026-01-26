@@ -6,7 +6,6 @@ import { TooltipProvider } from "assets/components/ui/tooltip";
 import ErrorBoundary from "components/ErrorBoundary/ErrorBoundary";
 import { Inter, Teko } from "next/font/google";
 import Head from "next/head";
-import Script from "next/script";
 import { SessionProvider } from "next-auth/react";
 import NextTopLoader from "nextjs-toploader";
 import { useState } from "react";
@@ -90,15 +89,6 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
           />
           <meta name='keywords' content='practice, guitar' />
         </Head>
-          <Script id='microsoft-clarity-analytics'>
-          {`
-            (function(c,l,a,r,i,t,y){
-                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "plp3vbsypt");
-          `}
-          </Script>{" "}
         <ErrorBoundary>
           <ThemeModeProvider>
             <AuthSyncWrapper>
