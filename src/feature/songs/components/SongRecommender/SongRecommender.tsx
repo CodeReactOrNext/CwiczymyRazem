@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { 
@@ -21,28 +21,52 @@ import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import { toast } from "sonner";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
 
 interface SongRecommenderProps {
   onSuccess?: () => void;
   variant?: 'inline' | 'modal';
 }
 
-const GENRES = [
-  "Rock", "Metal", "Pop", "Blues", "Jazz", "Funk", "Alternative", "Metalcore", "Punk", "Acoustic", "Any"
-];
-
 export const SongRecommender = ({ onSuccess, variant = 'modal' }: SongRecommenderProps) => {
   const currentUserId = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
   const [step, setStep] = useState(0);
-  const [filters, setFilters] = useState<QuizFilters>({
-    genre: "Rock",
+  const [filters, setFilters] = useState<{
+    genres: string[];
+    difficulty: "beginner" | "intermediate" | "advanced";
+    popularity: "classic" | "discovery";
+  }>({
+    genres: ["Any"],
     difficulty: "beginner",
     popularity: "classic"
   });
+  const [availableGenres, setAvailableGenres] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<Song[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      const genres = await getGlobalGenres();
+      if (genres.length > 0) {
+        setAvailableGenres(["Any", ...genres]);
+      }
+    };
+    fetchGenres();
+  }, []);
+
+  const toggleGenre = (genre: string) => {
+    setFilters(prev => {
+      if (genre === "Any") return { ...prev, genres: ["Any"] };
+      
+      const newGenres = prev.genres.includes(genre)
+        ? prev.genres.filter(g => g !== genre)
+        : [...prev.genres.filter(g => g !== "Any"), genre];
+      
+      return { ...prev, genres: newGenres.length > 0 ? newGenres : ["Any"] };
+    });
+  };
 
   const nextStep = () => setStep(prev => prev + 1);
   const prevStep = () => setStep(prev => prev - 1);
@@ -50,7 +74,11 @@ export const SongRecommender = ({ onSuccess, variant = 'modal' }: SongRecommende
   const handleFinish = async () => {
     setIsLoading(true);
     setStep(4);
-    const results = await getQuizRecommendations(filters);
+    // Transform state to service filter format
+    const results = await getQuizRecommendations({
+        ...filters,
+        genres: filters.genres
+    } as any);
     setRecommendations(results);
     setIsLoading(false);
   };
@@ -88,28 +116,32 @@ export const SongRecommender = ({ onSuccess, variant = 'modal' }: SongRecommende
               <h3 className="text-3xl font-black italic tracking-tighter text-white uppercase">
                 Pick your <span className="text-cyan-500">poison</span>
               </h3>
-              <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">What genre are we shredding today?</p>
+              <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Select one or more vibes</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {GENRES.map(genre => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 no-scrollbar">
+              {availableGenres.map(genre => (
                 <button
                   key={genre}
-                  onClick={() => {
-                    setFilters(f => ({ ...f, genre }));
-                    nextStep();
-                  }}
+                  onClick={() => toggleGenre(genre)}
                   className={cn(
-                    "p-4 rounded-xl border-2 transition-all hover:scale-105 active:scale-95 text-xs font-black uppercase tracking-tight flex flex-col items-center gap-2",
-                    filters.genre === genre 
+                    "p-3 rounded-xl border-2 transition-all hover:scale-105 active:scale-95 text-[10px] font-black uppercase tracking-tight flex flex-col items-center gap-2",
+                    filters.genres.includes(genre) 
                       ? "border-cyan-500 bg-cyan-500/10 text-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.2)]" 
                       : "border-white/5 bg-zinc-900/50 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
                   )}
                 >
-                  <Music className={cn("w-4 h-4", filters.genre === genre ? "text-cyan-400" : "text-zinc-600")} />
+                  <Music className={cn("w-3 h-3", filters.genres.includes(genre) ? "text-cyan-400" : "text-zinc-600")} />
                   {genre}
                 </button>
               ))}
             </div>
+            <Button 
+                onClick={nextStep} 
+                disabled={filters.genres.length === 0}
+                className="w-full h-12 text-xs font-black uppercase tracking-widest bg-cyan-600 hover:bg-cyan-500"
+            >
+              CONTINUE
+            </Button>
           </div>
         );
       case 1:
@@ -227,7 +259,7 @@ export const SongRecommender = ({ onSuccess, variant = 'modal' }: SongRecommende
           <div className="space-y-6 animate-in fade-in duration-700">
             <div className="text-center space-y-2">
               <h3 className="text-3xl font-black italic tracking-tighter text-white uppercase">The <span className="text-cyan-500">Shortlist</span></h3>
-              <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">Curation: {filters.genre} / {filters.difficulty}</p>
+              <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">Curation: {filters.genres.join(', ')} / {filters.difficulty}</p>
             </div>
             
             {isLoading ? (
@@ -239,46 +271,96 @@ export const SongRecommender = ({ onSuccess, variant = 'modal' }: SongRecommende
             ) : recommendations.length > 0 ? (
               <div className="grid grid-cols-1 gap-4">
                 {recommendations.map((song, idx) => {
-                  const tier = getSongTier(song.tier || song.avgDifficulty || 0);
+                  const avgDifficulty = song.avgDifficulty || 0;
+                  const tier = getSongTier(avgDifficulty === 0 ? "?" : (song.tier || avgDifficulty));
                   return (
-                    <Card 
+                    <div 
                       key={song.id} 
-                      className="group overflow-hidden border-white/5 bg-zinc-900/80 backdrop-blur-sm hover:border-cyan-500/50 transition-all duration-300"
+                      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-4 transition-all duration-300 hover:border-cyan-500/30 hover:bg-zinc-900 shadow-xl"
                       style={{ animationDelay: `${idx * 150}ms` }}
                     >
-                      <div className="p-4 flex items-center gap-4">
-                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-800">
-                          {song.coverUrl ? (
-                            <img src={song.coverUrl} alt={song.title} className="h-full w-full object-cover transition-transform group-hover:scale-110" />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center">
-                              <Music className="h-8 w-8 text-zinc-700" />
-                            </div>
-                          )}
+                      {/* Cover Background Blur */}
+                      {song.coverUrl && (
+                        <div className="absolute inset-0 z-0 opacity-10 transition-opacity group-hover:opacity-20">
+                          <img src={song.coverUrl} className="h-full w-full object-cover blur-2xl" alt="" />
+                        </div>
+                      )}
+
+                      <div className="relative z-10 flex gap-4">
+                        {/* Cover Image Wrapper */}
+                        <div className="relative shrink-0">
+                          <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-white/10 shadow-lg">
+                            {song.coverUrl ? (
+                              <img src={song.coverUrl} alt={song.title} className="h-full w-full object-cover transition-transform group-hover:scale-110" />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center bg-zinc-800">
+                                <Music className="h-6 w-6 text-zinc-600" />
+                              </div>
+                            )}
+                          </div>
+                          {/* Tier Badge */}
                           <div 
-                            className="absolute bottom-0 right-0 p-1 px-1.5 text-[10px] font-black"
-                            style={{ backgroundColor: tier.color, color: '#000' }}
+                            className="absolute -bottom-1 -right-1 z-20 flex h-6 w-6 items-center justify-center rounded-lg border text-[9px] font-black shadow-lg backdrop-blur-xl"
+                            style={{
+                              borderColor: `${tier.color}40`,
+                              backgroundColor: `rgba(10, 10, 10, 0.9)`,
+                              color: tier.color,
+                            }}
                           >
                             {tier.tier}
                           </div>
                         </div>
+
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-white truncate text-lg leading-tight">{song.title}</h4>
-                          <p className="text-zinc-500 truncate font-medium">{song.artist}</p>
+                          <h4 className="font-bold text-white truncate text-base leading-tight group-hover:text-cyan-400 transition-colors uppercase italic">{song.title}</h4>
+                          <p className="text-zinc-500 truncate text-xs font-bold uppercase tracking-tight">{song.artist}</p>
+                          <div className="mt-2 flex items-center gap-3">
+                            <div className="flex items-center gap-1.5 opacity-60">
+                              <TrendingUp className="h-3 w-3 text-cyan-500" />
+                              <span className="text-[10px] font-black text-zinc-500">{song.popularity || 0}</span>
+                            </div>
+                            {song.genres && song.genres.length > 0 && (
+                                <span className="px-2 py-0.5 rounded-md bg-white/5 border border-white/5 text-[9px] font-black text-zinc-400">
+                                  {song.genres[0]}
+                                </span>
+                            )}
+                          </div>
                         </div>
-                        <Button
-                          size="sm"
-                          disabled={isAdding === song.id}
-                          onClick={() => handleAddSong(song)}
-                          className={cn(
-                            "rounded-full px-4 font-bold transition-all active:scale-90",
-                            isAdding === song.id ? "bg-zinc-800" : "bg-cyan-600 hover:bg-cyan-500 text-white"
-                          )}
-                        >
-                          {isAdding === song.id ? "..." : "Learn"}
-                        </Button>
                       </div>
-                    </Card>
+
+                      {/* Difficulty Stats */}
+                      <div className="relative z-10 mt-4 space-y-1.5">
+                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                          <span>Difficulty</span>
+                          <span style={{ color: tier.color }}>{avgDifficulty.toFixed(1)}</span>
+                        </div>
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-black/40">
+                          <div
+                            className="h-full rounded-full transition-all duration-1000"
+                            style={{
+                              width: `${Math.min(avgDifficulty * 10, 100)}%`,
+                              backgroundColor: tier.color,
+                              boxShadow: `0 0 10px ${tier.color}40`,
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Call to action */}
+                      <Button
+                        size="sm"
+                        disabled={isAdding === song.id}
+                        onClick={() => handleAddSong(song)}
+                        className={cn(
+                          "relative z-10 mt-4 h-9 w-full rounded-xl font-black uppercase tracking-widest text-[10px] transition-all",
+                          isAdding === song.id 
+                            ? "bg-zinc-800 text-zinc-500" 
+                            : "bg-cyan-600/10 border border-cyan-500/20 text-cyan-400 hover:bg-cyan-600 hover:text-white"
+                        )}
+                      >
+                        {isAdding === song.id ? "Adding..." : "Add to learn"}
+                      </Button>
+                    </div>
                   );
                 })}
               </div>
