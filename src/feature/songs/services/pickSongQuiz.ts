@@ -2,7 +2,7 @@ import { getSongs } from "feature/songs/services/getSongs";
 import type { Song } from "feature/songs/types/songs.type";
 
 export interface QuizFilters {
-  genre: string;
+  genres: string[];
   difficulty: "beginner" | "intermediate" | "advanced";
   popularity: "classic" | "discovery";
 }
@@ -15,7 +15,7 @@ export const getQuizRecommendations = async (filters: QuizFilters): Promise<Song
     else if (filters.difficulty === "intermediate") tiers = ["C", "B", "A"];
     else if (filters.difficulty === "advanced") tiers = ["B", "A", "S"];
 
-    const genreFilters = filters.genre === "Any" ? [] : [filters.genre];
+    const genreFilters = filters.genres.includes("Any") ? [] : filters.genres;
 
     // Use the main getSongs logic to fetch a targeted pool of 30 songs
     const { songs: pool } = await getSongs(
@@ -24,7 +24,7 @@ export const getQuizRecommendations = async (filters: QuizFilters): Promise<Song
       "",
       "",
       1,
-      30, // Optimized limit
+      40, // Slightly larger pool since we might have multiple genres
       tiers.length > 0 ? tiers : undefined,
       "all",
       genreFilters
@@ -32,7 +32,7 @@ export const getQuizRecommendations = async (filters: QuizFilters): Promise<Song
 
     let results = [...pool];
 
-    // Fallback: If no results with genre + tiers, try just tiers (fetch 30)
+    // Fallback: If no results with combinations, try just tiers
     if (results.length === 0 && genreFilters.length > 0) {
       const { songs: fallbackPool } = await getSongs(
         "popularity",
