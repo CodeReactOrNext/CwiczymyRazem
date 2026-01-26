@@ -23,8 +23,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect,useState } from "react";
-
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "assets/components/ui/dialog";
+import { SongRecommender } from "feature/songs/components/SongRecommender/SongRecommender";
+import { Sparkles } from "lucide-react";
 
 const SongsView = () => {
   const { t } = useTranslation("songs");
@@ -61,6 +69,7 @@ const SongsView = () => {
   } = useSongs();
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -105,6 +114,24 @@ const SongsView = () => {
                         <span className="text-xs font-bold uppercase tracking-wider">How it works</span>
                       </Link>
                     </Button>
+                    <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          className="border-cyan-500/30 bg-cyan-500/5 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300"
+                        >
+                          <Sparkles className="mr-2 h-4 w-4" />
+                          <span className="text-xs font-bold uppercase tracking-wider">Song Wizard</span>
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md bg-zinc-950 border-white/10 p-4 pt-12">
+                         <SongRecommender onSuccess={() => {
+                            refreshSongs();
+                            setIsWizardOpen(false);
+                         }} />
+                      </DialogContent>
+                    </Dialog>
                     <Button 
                       onClick={() => router.push("/songs?view=library")}
                       
