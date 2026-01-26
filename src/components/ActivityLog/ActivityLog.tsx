@@ -67,7 +67,7 @@ export const ActivityLogView = ({
   }
 
   return (
-    <Card className='relative w-full overflow-hidden rounded-xl border-white/5 bg-zinc-900/50 backdrop-blur-md p-0'>
+    <Card className='relative w-full p-4'>
       <AnimatePresence mode="wait">
         {isLoading && (
           <motion.div
@@ -89,7 +89,7 @@ export const ActivityLogView = ({
         )}
       </AnimatePresence>
 
-      <div className={`p-4 transition-all duration-500 ${isLoading ? 'blur-[1.5px] opacity-40 grayscale-[0.5] pointer-events-none scale-[0.995]' : 'blur-0 opacity-100 grayscale-0'}`}>
+      <div className={`transition-all duration-500 ${isLoading ? 'blur-[1.5px] opacity-40 grayscale-[0.5] pointer-events-none scale-[0.995]' : 'blur-0 opacity-100 grayscale-0'}`}>
         <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
           <h3 className='text-xl font-semibold text-white mr-2'>Activity</h3>
 
