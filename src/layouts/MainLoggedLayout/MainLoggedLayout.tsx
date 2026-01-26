@@ -8,7 +8,7 @@ import type { NavPagesTypes } from "types/layout.types";
 import DesktopHeaderWrapper from "./components/DesktopHeaderWrapper";
 import type { LandingNavObjectInterface } from "./components/LandingNav/LandingNav";
 import MainLoggedWrapper from "./components/MainLoggedWrapper";
-import MobileHeaderWrapper from "./components/MobileHeaderWrapper";
+
 import UserHeader from "./components/UserHeader/UserHeader";
 
 interface LandingLayoutProps {
@@ -98,15 +98,9 @@ const MainLoggedLayout = ({
                 userName={userName}
               />
             </DesktopHeaderWrapper>
-            <MobileHeaderWrapper>
-              <UserHeader
-                avatar={userAvatar}
-                userStats={userStats}
-                userName={userName}
-              />
-            </MobileHeaderWrapper>
 
-            <div className='z-20 mx-auto w-full max-w-[1490px] px-0 pb-24 pt-8 md:pb-8 lg:px-8'>
+
+            <div className='z-20 mx-auto w-full max-w-[1490px] px-0 pb-24 md:pt-8 md:pb-8 lg:px-8'>
                 <div
                   className='relative z-10'>
                   {children}
