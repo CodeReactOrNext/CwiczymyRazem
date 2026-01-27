@@ -415,6 +415,7 @@ export const FeaturesSection = () => {
                                  avgDifficulty: song.avgDifficulty,
                                  coverUrl: song.coverUrl,
                               }}
+                              priority={song.id === "1"}
                            />
                         </motion.div>
                       ))}

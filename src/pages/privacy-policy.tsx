@@ -15,8 +15,17 @@ const PrivacyPolicyPage: NextPageWithLayout = () => {
     <>
       <Head>
         <title>Privacy Policy - Riff Quest</title>
-        <meta name="description" content="Privacy Policy for Riff Quest. We value your privacy and are transparent about how we handle your data." />
+        <meta name="description" content="Privacy Policy for Riff Quest. We value your privacy and are transparent about how we handle your data. Learn how we protect your guitar practice information and personal details." />
         <link rel='canonical' href='https://riff.quest/privacy-policy' />
+        <meta property="og:title" content="Privacy Policy - Riff Quest" />
+        <meta property="og:description" content="Privacy Policy for Riff Quest. We value your privacy and are transparent about how we handle your data." />
+        <meta property="og:url" content="https://riff.quest/privacy-policy" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://riff.quest/images/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Privacy Policy - Riff Quest" />
+        <meta name="twitter:description" content="Privacy Policy for Riff Quest. We value your privacy and are transparent about how we handle your data." />
+        <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
       </Head>
       
       <div className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
@@ -30,6 +39,7 @@ const PrivacyPolicyPage: NextPageWithLayout = () => {
                     width={120}
                     height={32}
                     className='h-6 w-auto'
+                    priority
                   />
                </Link>
                <div className="flex items-center gap-4">

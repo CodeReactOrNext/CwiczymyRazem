@@ -18,8 +18,17 @@ const GuidePage: NextPageWithLayout = () => {
     <>
       <Head>
         <title>Riff Quest - App Guide</title>
-        <meta name="description" content="Master Riff Quest: Learn how to track progress, manage songs, and create custom practice plans." />
+        <meta name="description" content="Master Riff Quest with our comprehensive guide. Learn how to track guitar practice progress, manage songs, create custom practice plans, and level up your skills effectively." />
         <link rel='canonical' href='https://riff.quest/guide' />
+        <meta property="og:title" content="Riff Quest App Guide - Master Guitar Practice Tracking" />
+        <meta property="og:description" content="Master Riff Quest with our comprehensive guide. Learn how to track guitar practice progress, manage songs, and create custom practice plans." />
+        <meta property="og:url" content="https://riff.quest/guide" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://riff.quest/images/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Riff Quest App Guide - Master Guitar Practice Tracking" />
+        <meta name="twitter:description" content="Master Riff Quest with our comprehensive guide. Learn how to track guitar practice progress, manage songs, and create custom practice plans." />
+        <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
       </Head>
       
       <div className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
@@ -34,6 +43,7 @@ const GuidePage: NextPageWithLayout = () => {
                     width={120}
                     height={32}
                     className='h-6 w-auto'
+                    priority
                   />
                </Link>
                <div className="flex items-center gap-4">
