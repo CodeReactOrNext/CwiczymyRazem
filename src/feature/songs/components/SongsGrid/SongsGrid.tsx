@@ -1,3 +1,4 @@
+import { Button } from "assets/components/ui/button";
 import {
   Pagination,
   PaginationContent,
@@ -20,7 +21,7 @@ interface SongsGridProps {
   songs: Song[];
   hasFilters: boolean;
   currentPage: number;
-  totalPages: number;
+  hasMore: boolean;
   onPageChange: (page: number) => void;
   onAddSong: () => void;
   onStatusChange: () => void;
@@ -34,7 +35,7 @@ interface SongsGridProps {
 export const SongsGrid = ({
   songs,
   currentPage,
-  totalPages,
+  hasMore,
   onPageChange,
   onAddSong,
   hasFilters,
@@ -107,77 +108,32 @@ export const SongsGrid = ({
         }
       />
 
-      {/* Pagination Container - Always rendered with fixed height to prevent jumps */}
+      {/* Pagination Container */}
       <div className='mt-auto pt-8'>
-        {totalPages > 0 && (
+        {(currentPage > 1 || hasMore) && (
           <div className='flex justify-center'>
-            <div className='rounded-2xl border border-white/5 bg-zinc-900/40 p-3 backdrop-blur-sm'>
-              <Pagination>
-                <PaginationContent className='gap-2'>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => onPageChange(currentPage - 1)}
-                      className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 [&>span]:hidden sm:[&>span]:inline ${
-                        currentPage <= 1
-                          ? "pointer-events-none opacity-50"
-                          : "cursor-pointer hover:border-cyan-500/30 hover:text-cyan-300"
-                      }`}
-                    />
-                  </PaginationItem>
+            <div className='rounded-2xl border border-white/5 bg-zinc-900/40 p-2 backdrop-blur-sm flex items-center gap-4'>
+              <Button
+                variant="ghost"
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage <= 1}
+                className="h-10 px-4 border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
+              >
+                Previous
+              </Button>
+              
+              <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest px-2">
+                Page {currentPage}
+              </div>
 
-                  {[...Array(totalPages)].map((_, index) => {
-                    const pageNumber = index + 1;
-                    const isCurrent = currentPage === pageNumber;
-                    const isFirst = pageNumber === 1;
-                    const isLast = pageNumber === totalPages;
-                    const isNeighbor =
-                      pageNumber === currentPage - 1 ||
-                      pageNumber === currentPage + 1;
-                    const isEllipsis =
-                      pageNumber === currentPage - 2 ||
-                      pageNumber === currentPage + 2;
-
-                    if (isFirst || isLast || isCurrent || isNeighbor) {
-                      return (
-                        <PaginationItem
-                          key={pageNumber}
-                          className={isNeighbor ? "hidden sm:block" : ""}>
-                          <PaginationLink
-                            onClick={() => onPageChange(pageNumber)}
-                            isActive={isCurrent}
-                            className={`cursor-pointer border border-white/5 bg-zinc-800/50 hover:border-cyan-500/30 hover:bg-zinc-700/50 hover:text-cyan-300 ${
-                              isCurrent
-                                ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
-                                : ""
-                            }`}>
-                            {pageNumber}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    } else if (isEllipsis) {
-                      return (
-                        <PaginationItem
-                          key={pageNumber}
-                          className='hidden sm:block'>
-                          <PaginationEllipsis className='text-zinc-600' />
-                        </PaginationItem>
-                      );
-                    }
-                    return null;
-                  })}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => onPageChange(currentPage + 1)}
-                      className={`border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 [&>span]:hidden sm:[&>span]:inline ${
-                        currentPage >= totalPages
-                          ? "pointer-events-none opacity-50"
-                          : "cursor-pointer hover:border-cyan-500/30 hover:text-cyan-300"
-                      }`}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+              <Button
+                variant="ghost"
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={!hasMore}
+                className="h-10 px-4 border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
+              >
+                Next
+              </Button>
             </div>
           </div>
         )}

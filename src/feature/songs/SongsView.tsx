@@ -42,7 +42,6 @@ const SongsView = () => {
     page,
     isLoading,
     userSongs,
-    totalPages,
     hasFilters,
     titleQuery,
     setTitleQuery,
@@ -56,6 +55,7 @@ const SongsView = () => {
     handleClearFilters,
     tierFilters,
     setTierFilters,
+    hasMore,
     handleStatusUpdate,
     refreshSongs,
     refreshSongsWithoutLoading,
@@ -311,7 +311,7 @@ const SongsView = () => {
                       key={filteredSongs.toString()}
                       songs={filteredSongs}
                       currentPage={page}
-                      totalPages={totalPages}
+                      hasMore={hasMore}
                       onPageChange={handlePageChange}
                       onAddSong={() => setIsModalOpen(true)}
                       hasFilters={hasFilters}
