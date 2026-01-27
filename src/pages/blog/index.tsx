@@ -19,6 +19,7 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
       <Head>
         <title>Blog | Riff Quest</title>
         <meta name="description" content="Learn more about guitar playing, learning and motivation." />
+        <link rel='canonical' href='https://riff.quest/blog' />
       </Head>
 
       <main className="min-h-screen bg-zinc-950 text-zinc-300">
