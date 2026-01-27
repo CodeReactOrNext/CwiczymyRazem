@@ -30,7 +30,13 @@ export const Footer = () => {
                     <Link href="/what-guitar-song-to-learn" className="text-xs sm:text-sm font-bold text-cyan-500/80 hover:text-cyan-400 transition-colors">
                       What to play?
                     </Link>
-                    <Link href="https://www.buymeacoffee.com/riffquest" target="_blank" className="text-xs sm:text-sm font-bold text-amber-400/80 hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                    <Link href="/about" className="text-xs sm:text-sm font-bold text-zinc-500 hover:text-cyan-400 transition-colors">
+                      About
+                    </Link>
+                    <Link href="/privacy-policy" className="text-xs sm:text-sm font-bold text-zinc-500 hover:text-cyan-400 transition-colors">
+                      Privacy Policy
+                    </Link>
+                    <Link href="https://www.buymeacoffee.com/riffquest" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm font-bold text-amber-400/80 hover:text-amber-400 transition-colors flex items-center gap-1.5">
                       ☕ Buy me a coffee
                     </Link>
                   </nav>

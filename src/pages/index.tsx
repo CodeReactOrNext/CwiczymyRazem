@@ -1,19 +1,8 @@
 import type { NextPage } from "next";
-import Head from "next/head";
-
-import LandingPage from "./landing";
+import LandingPage from "feature/landing/LandingPage";
 
 const Home: NextPage = () => {
-  const siteUrl = "https://riff.quest";
-
-  return (
-    <>
-      <Head>
-        <link rel='canonical' href={siteUrl} />
-      </Head>
-      <LandingPage />
-    </>
-  );
+  return <LandingPage />;
 };
 
 export default Home;

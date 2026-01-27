@@ -49,6 +49,7 @@ export const HeroSection = () => {
           fill
           className='object-cover object-center grayscale-[30%]'
           priority
+          sizes="(max-width: 768px) 100vw, 60vw"
         />
       </div>
 
@@ -64,16 +65,16 @@ export const HeroSection = () => {
           {/* Header & Description Group */}
           <div className="space-y-4 mb-10">
             <h1 className='text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1]'>
-              Build a daily guitar practice <br />
-              <span className='bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent italic'>routine that actually works</span>
+              Stop guessing if you're improving. <br />
+              <span className='bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent italic'>Start seeing it.</span>
             </h1>
 
             <div className="max-w-2xl space-y-3">
               <h2 className='text-lg sm:text-xl font-bold text-zinc-200 leading-snug'>
-                Track your practice, skills, and song difficulty — and stay motivated without rigid plans or pressure.
+                Riff Quest turns your messy practice sessions into visible progress. Track songs, level up skills, and stay consistent without the pressure of rigid plans.
               </h2>
               <p className='text-base text-zinc-500 leading-relaxed font-semibold'>
-                A free guitar practice app for guitarists who struggle with motivation and visible progress.
+                Built by a guitarist, for guitarists who want to practice smarter, not longer.
               </p>
             </div>
           </div>

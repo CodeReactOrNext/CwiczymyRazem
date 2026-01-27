@@ -4,22 +4,22 @@ import { BarChart3, Heart,Star } from "lucide-react";
 
 const points = [
   {
-    title: "Lack of motivation",
-    description: "Most guitarists quit because they don’t see progress. Riff Quest makes every session visible.",
+    title: "Progress You Can See",
+    description: "Most guitarists quit because they don’t see progress. Riff Quest makes every session visible and rewarding.",
     icon: Star,
     color: "text-amber-400",
     bg: "bg-amber-400/10"
   },
   {
-    title: "No sense of improvement",
-    description: "Track skills, practice time, and song difficulty to see how you’re actually getting better.",
+    title: "No More Guesswork",
+    description: "Picked up your guitar but don't know what to play? Our community-rated song difficulty helps you pick the right challenge.",
     icon: BarChart3,
     color: "text-cyan-400",
     bg: "bg-cyan-400/10"
   },
   {
-    title: "No pressure to be perfect",
-    description: "No daily streak stress. Practice when you can — progress still counts.",
+    title: "Zero Streak Pressure",
+    description: "Life happens. We track your long-term growth, not just how many days in a row you practiced. No stress, just guitar.",
     icon: Heart,
     color: "text-rose-400",
     bg: "bg-rose-400/10"
