@@ -3,7 +3,6 @@ import { Card, CardContent } from "assets/components/ui/card";
 import { ArrowRight, Clock } from "lucide-react";
 import Link from "next/link";
 import NextImage from "next/image";
-import { motion } from "framer-motion";
 
 const articles = [
   {
@@ -45,16 +44,12 @@ export const BlogSection = () => {
     <section className="py-24 bg-black border-t border-white/5">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-4">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
+          <div>
             <h2 className="text-4xl font-bold tracking-tighter text-white leading-tight font-display">
               Knowledge <br />
               <span className="text-zinc-600">for the journey.</span>
             </h2>
-          </motion.div>
+          </div>
           <Link href="/blog" className="text-sm font-bold text-zinc-500 hover:text-white transition-colors flex items-center gap-2 uppercase tracking-widest">
             View all articles <ArrowRight className="w-4 h-4" />
           </Link>
@@ -62,13 +57,7 @@ export const BlogSection = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {articles.map((article, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-            >
+            <div key={index}>
               <Link href={article.link} className="group block">
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-zinc-900 mb-4 border border-white/5 group-hover:border-white/20 transition-colors">
                   <NextImage 
@@ -89,7 +78,7 @@ export const BlogSection = () => {
                   </h3>
                 </div>
               </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

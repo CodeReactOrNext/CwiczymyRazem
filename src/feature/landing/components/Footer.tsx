@@ -54,18 +54,17 @@ export const Footer = () => {
                   {/* Navigation Links */}
                   <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-12">
                       <div className="space-y-6">
-                          <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Product</h4>
+                          <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Platform</h4>
                           <ul className="space-y-4">
                               <li><Link href="/guide" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Guide <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
-                              <li><Link href="/songs" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Songs <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
-                              <li><Link href="/guitar-practice-builder" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Builder <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                              <li><Link href="/guitar-practice-builder" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Practice Builder <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                           </ul>
                       </div>
                       <div className="space-y-6">
                         <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Community</h4>
                         <ul className="space-y-4">
                             <li><Link href="/blog" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Blog <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
-                            <li><Link href="/what-guitar-song-to-learn" className="text-sm font-bold text-cyan-500/80 hover:text-cyan-400 transition-colors flex items-center group">Finder <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/what-guitar-song-to-learn" className="text-sm font-bold text-cyan-500/80 hover:text-cyan-400 transition-colors flex items-center group">Song Suggester <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                             <li><Link href="/about" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">About <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                         </ul>
                       </div>
