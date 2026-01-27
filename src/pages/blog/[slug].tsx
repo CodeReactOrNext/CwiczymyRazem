@@ -34,6 +34,7 @@ const BlogPost = ({ frontmatter, mdxSource, relatedBlogs = [] }: BlogPostProps) 
         <meta property="og:description" content={frontmatter.description} />
         <meta property="og:image" content={frontmatter.image} />
         <meta property="og:type" content="article" />
+        <link rel='canonical' href={`https://riff.quest/blog/${frontmatter.slug}`} />
       </Head>
 
       <main className="min-h-screen bg-zinc-950 text-zinc-300">
