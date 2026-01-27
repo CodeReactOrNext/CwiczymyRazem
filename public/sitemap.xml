@@ -68,4 +68,19 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- Legal & Info -->
+  <url>
+    <loc>https://riff.quest/about</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/privacy-policy</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
 </urlset>

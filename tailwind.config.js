@@ -197,7 +197,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
         teko: ['var(--font-teko)', ...defaultTheme.fontFamily.sans],
       },
@@ -253,7 +254,8 @@ module.exports = {
     },
     fontFamily: {
       sans: ['Inter', 'system-ui', 'sans-serif'],
-      display: ['Inter', 'system-ui', 'sans-serif'],
+      display: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+      jakarta: ['Plus Jakarta Sans', 'sans-serif'],
       body: ['Inter', 'system-ui', 'sans-serif'],
       teko: ['var(--font-teko)', 'sans-serif']
     }

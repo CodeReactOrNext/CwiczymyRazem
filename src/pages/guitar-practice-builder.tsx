@@ -111,13 +111,22 @@ export default function GuitarPracticeBuilderPage() {
         <meta name="description" content="Build specialized guitar practice routines in seconds. Tell us your goals and time availability, and get a printable, step-by-step practice plan." />
         <meta name="keywords" content="guitar practice builder, guitar routine generator, guitar practice schedule, guitar lesson plan, systematic guitar practice" />
         <link rel="canonical" href="https://riff.quest/guitar-practice-builder" />
+        <meta property="og:title" content="Guitar Practice Builder | Create Systematic Routines | Riff Quest" />
+        <meta property="og:description" content="Build specialized guitar practice routines in seconds. Tell us your goals and time availability, and get a printable, step-by-step practice plan." />
+        <meta property="og:url" content="https://riff.quest/guitar-practice-builder" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://riff.quest/images/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Guitar Practice Builder | Create Systematic Routines" />
+        <meta name="twitter:description" content="Build specialized guitar practice routines in seconds. Tell us your goals and time availability, and get a printable, step-by-step practice plan." />
+        <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
       </Head>
 
       <main className="min-h-screen bg-[#050505] text-zinc-300 selection:bg-cyan-500/30">
         <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-xl no-print">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
             <Link href="/" className="transition-opacity hover:opacity-80">
-              <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={30} className='h-6 w-auto' />
+              <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={30} className='h-6 w-auto' priority />
             </Link>
             <div className="flex items-center gap-4 sm:gap-6">
                 <Link href="/guide" className="hidden sm:inline text-xs font-bold text-zinc-500 hover:text-white transition-colors">Guide</Link>
