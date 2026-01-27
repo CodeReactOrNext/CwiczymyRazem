@@ -94,10 +94,10 @@ export const FeaturesSection = () => {
         <div className='mx-auto max-w-2xl text-center mb-20'>
           <span className='text-base font-semibold leading-7 text-cyan-500 tracking-wider uppercase'>Features</span>
           <h2 className='mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl'>
-            The complete system to track guitar practice effectively
+            Everything you need to stop feeling stuck
           </h2>
           <p className='mt-6 text-lg leading-8 text-zinc-400'>
-            A complete ecosystem designed to make your practice structured and effective.
+            A complete ecosystem designed to make your guitar practice structured, effective, and visible.
           </p>
         </div>
 
@@ -114,8 +114,10 @@ export const FeaturesSection = () => {
               loop
               playsInline
               preload="metadata"
+              poster="/images/video-poster.png"
             >
               <source src="/demo.webm" type="video/webm" />
+              <track kind="captions" src="/captions.vtt" srcLang="en" label="English" />
               Your browser does not support the video tag.
             </video>
           </div>
@@ -154,8 +156,8 @@ export const FeaturesSection = () => {
                        <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-900/20 group-hover:border-cyan-500/30 transition-all duration-300">
                            <Clock className="w-8 h-8 text-cyan-400" />
                        </div>
-                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Track your practice</h4>
-                       <p className="text-sm text-zinc-400 px-4">Log practice time and sessions automatically to build awareness and consistency.</p>
+                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Log the effort</h4>
+                       <p className="text-sm text-zinc-400 px-4">Track every session automatically to build awareness and real consistency.</p>
                     </div>
 
                     {/* Item 2: Develop your skills */}
@@ -163,8 +165,8 @@ export const FeaturesSection = () => {
                        <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-900/20 group-hover:border-amber-500/30 transition-all duration-300">
                            <Zap className="w-8 h-8 text-amber-400" />
                        </div>
-                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Develop your skills</h4>
-                       <p className="text-sm text-zinc-400 px-4">Earn skill points and see how your abilities grow over time.</p>
+                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Level up skills</h4>
+                       <p className="text-sm text-zinc-400 px-4">Earn skill points in Technique, Theory, and more as you practice.</p>
                     </div>
 
                     {/* Item 3: Track song difficulty */}
@@ -172,8 +174,8 @@ export const FeaturesSection = () => {
                        <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-900/20 group-hover:border-purple-500/30 transition-all duration-300">
                            <Music2 className="w-8 h-8 text-purple-400" />
                        </div>
-                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Track song difficulty</h4>
-                       <p className="text-sm text-zinc-400 px-4">Songs are rated by the community, so you know what’s easy, hard, and worth practicing next.</p>
+                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Pick the right songs</h4>
+                       <p className="text-sm text-zinc-400 px-4">Community-rated difficulties ensure you always know what’s worth practicing next.</p>
                     </div>
 
                     {/* Item 4: See real progress */}
@@ -183,8 +185,8 @@ export const FeaturesSection = () => {
                              <TrendingUp className="w-8 h-8 text-emerald-400" />
                            </div>
                        </div>
-                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">See real progress</h4>
-                       <p className="text-sm text-zinc-400 px-4">Clear stats and history show your improvement — not just effort.</p>
+                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Proof of growth</h4>
+                       <p className="text-sm text-zinc-400 px-4">Clear stats and history show exactly how much you've improved over time.</p>
                     </div>
                  </div>
             </div>
@@ -373,7 +375,7 @@ export const FeaturesSection = () => {
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-gradient-to-b from-purple-500/5 to-amber-500/5 blur-3xl rounded-[100px] pointer-events-none -z-10 opacity-60"></div>
 
             <div className="text-center mb-16 relative z-10">
-               <h2 className="text-2xl font-bold text-white mb-2">Track song difficulty and build your repertoire</h2>
+               <h3 className="text-2xl font-bold text-white mb-2">Track song difficulty and build your repertoire</h3>
                <p className="text-zinc-400 max-w-2xl mx-auto">
                   Songs are rated by the community, so difficulty reflects real player experience. Track which songs you know, what level they belong to, and how your repertoire grows over time.
                </p>

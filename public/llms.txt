@@ -21,6 +21,8 @@
 - [Practice Habits](https://riff.quest/blog/practice-habits) - Comprehensive guide on building effective guitar practice habits.
 - [Guitar Practice Routine](https://riff.quest/blog/guitar-practice-routine) - Expert advice on structuring your daily practice routine.
 - [Guitar Practice Tracker](https://riff.quest/blog/guitar-practice-tracker) - Detailed information on how to use the Riff Quest tracking features.
+- [About](https://riff.quest/about) - Learn about the mission and vision behind Riff Quest.
+- [Privacy Policy](https://riff.quest/privacy-policy) - Information on how we handle and protect your data.
 
 ## Technical Details
 

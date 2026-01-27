@@ -37,9 +37,10 @@ export const LandingSongCard = ({
       {/* Premium Blurred Background Cover */}
       {song.coverUrl && (
         <div className="absolute inset-0 z-0 overflow-hidden opacity-[0.12] transition-opacity duration-1000 group-hover:opacity-[0.22]">
-          <img 
+          <Image 
             src={song.coverUrl} 
-            alt=""
+            alt={song.title ? `${song.title} background` : "Song background"}
+            fill
             className="h-full w-full object-cover blur-premium saturate-[1.1] scale-[1.2] transition-transform duration-1000 group-hover:scale-[1.4]"
           />
           <div className="absolute inset-0 bg-zinc-950/30" />
@@ -55,7 +56,8 @@ export const LandingSongCard = ({
               <Image 
                 src={song.coverUrl} 
                 alt={`${song.title} cover`}
-                fill
+                width={80}
+                height={80}
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 unoptimized={true}
               />

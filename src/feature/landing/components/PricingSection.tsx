@@ -13,7 +13,7 @@ export const PricingSection = () => {
             Start your journey today
           </h2>
           <p className='mt-4 text-lg text-zinc-400'>
-            Everything you need to master guitar. Completely free.
+            No credit card, no pressure. Just a better way to track your guitar journey.
           </p>
         </div>
 

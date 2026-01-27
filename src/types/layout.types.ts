@@ -14,4 +14,6 @@ export type NavPagesTypes =
   | "challenges"
   | "settings"
   | "recordings"
+  | "about"
+  | "privacy-policy"
   | null;

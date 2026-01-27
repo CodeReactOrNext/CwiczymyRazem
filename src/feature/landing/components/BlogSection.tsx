@@ -2,6 +2,7 @@ import { Badge } from "assets/components/ui/badge";
 import { Card, CardContent } from "assets/components/ui/card";
 import { ArrowRight, Clock } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const articles = [
   {
@@ -58,23 +59,24 @@ export const BlogSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {articles.map((article, index) => (
             <div key={index}>
               <Link href={article.link} className="block group h-full">
                 <Card className={`h-full flex flex-col overflow-hidden bg-zinc-900/50 border-white/5 transition-all duration-300 ${article.borderColor} hover:bg-zinc-900`}>
                   
                   {/* Image Section */}
-                  <div className="relative h-48 w-full overflow-hidden">
+                  <div className="relative h-64 w-full overflow-hidden">
                     <div className="absolute inset-0 bg-black/20 z-10 group-hover:bg-transparent transition-colors duration-500" />
-                    <img 
+                    <Image 
                       src={article.image} 
                       alt={article.title}
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
 
-                  <CardContent className="p-6 flex flex-col flex-grow">
+                  <CardContent className="p-8 flex flex-col flex-grow">
                     <div className="flex items-center gap-4 mb-4 text-xs font-medium text-zinc-500">
                       <span className="flex items-center gap-1">
                         <Clock size={12} /> {article.readTime}
@@ -84,15 +86,15 @@ export const BlogSection = () => {
                       </Badge>
                     </div>
 
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors line-clamp-2">
+                    <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">
                        {article.title}
                     </h3>
-                    <p className="text-zinc-400 mb-6 flex-grow line-clamp-3 text-sm">
+                    <p className="text-zinc-400 mb-8 flex-grow text-base leading-relaxed">
                       {article.excerpt}
                     </p>
 
                     <div className="flex items-center text-sm font-bold text-cyan-400 mt-auto">
-                      Read Article <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                      Read about {article.tag.toLowerCase()} <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </CardContent>
                 </Card>
