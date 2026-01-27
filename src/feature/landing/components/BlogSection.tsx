@@ -51,9 +51,9 @@ export const BlogSection = () => {
           <Badge variant="outline" className="mb-4 border-zinc-700 text-zinc-400">
             Knowledge Base
           </Badge>
-          <h2 className="text-3xl font-bold text-white sm:text-4xl mb-4">
+          <h3 className="text-3xl font-bold text-white sm:text-4xl mb-4">
             Knowledge & <span className="text-cyan-400">Inspiration</span>
-          </h2>
+          </h3>
           <p className="text-lg text-zinc-400">
             Discover articles that will help you become a better guitarist. From technique to practice psychology.
           </p>
@@ -72,6 +72,7 @@ export const BlogSection = () => {
                       src={article.image} 
                       alt={article.title}
                       fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>

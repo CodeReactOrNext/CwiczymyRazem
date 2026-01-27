@@ -15,8 +15,17 @@ const AboutPage: NextPageWithLayout = () => {
     <>
       <Head>
         <title>About Riff Quest - Built by Guitarists</title>
-        <meta name="description" content="Learn about Riff Quest, the ultimate guitar practice tracker built to help you see visible progress." />
+        <meta name="description" content="Learn about Riff Quest, the ultimate guitar practice tracker built by guitarists for guitarists. Track progress, compete with friends, and see visible improvement. 100% free." />
         <link rel='canonical' href='https://riff.quest/about' />
+        <meta property="og:title" content="About Riff Quest - Built by Guitarists" />
+        <meta property="og:description" content="Learn about Riff Quest, the ultimate guitar practice tracker built by guitarists for guitarists. Track progress, compete with friends, and see visible improvement." />
+        <meta property="og:url" content="https://riff.quest/about" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://riff.quest/images/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="About Riff Quest - Built by Guitarists" />
+        <meta name="twitter:description" content="Learn about Riff Quest, the ultimate guitar practice tracker built by guitarists for guitarists." />
+        <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
       </Head>
       
       <div className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
@@ -30,6 +39,7 @@ const AboutPage: NextPageWithLayout = () => {
                     width={120}
                     height={32}
                     className='h-6 w-auto'
+                    priority
                   />
                </Link>
                <div className="flex items-center gap-4">

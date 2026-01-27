@@ -15,10 +15,12 @@ interface LandingSongCardProps {
     coverUrl?: string;
     popularity?: number;
   };
+  priority?: boolean;
 }
 
 export const LandingSongCard = ({
   song,
+  priority,
 }: LandingSongCardProps) => {
   const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty);
@@ -42,6 +44,7 @@ export const LandingSongCard = ({
             alt={song.title ? `${song.title} background` : "Song background"}
             fill
             className="h-full w-full object-cover blur-premium saturate-[1.1] scale-[1.2] transition-transform duration-1000 group-hover:scale-[1.4]"
+            priority={priority}
           />
           <div className="absolute inset-0 bg-zinc-950/30" />
         </div>
@@ -60,6 +63,7 @@ export const LandingSongCard = ({
                 height={80}
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 unoptimized={true}
+                priority={priority}
               />
             </div>
           ) : (
