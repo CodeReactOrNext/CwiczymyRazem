@@ -19,6 +19,7 @@ const GuidePage: NextPageWithLayout = () => {
       <Head>
         <title>Riff Quest - App Guide</title>
         <meta name="description" content="Master Riff Quest: Learn how to track progress, manage songs, and create custom practice plans." />
+        <link rel='canonical' href='https://riff.quest/guide' />
       </Head>
       
       <div className={!isLogged ? "min-h-screen bg-zinc-950 text-zinc-100" : ""}>
