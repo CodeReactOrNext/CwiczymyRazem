@@ -6,8 +6,8 @@ import { Logo } from "components/Logo/Logo";
 import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
 import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
 import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
-import { Zap } from "lucide-react";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { Music2, Zap } from "lucide-react";
+import { ChevronRight, Loader2, Clock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -45,7 +45,7 @@ export const HeroSection = () => {
         <div className='absolute inset-0 bg-gradient-to-b from-[#0d0d0c]/10 via-transparent to-[#0d0d0c] z-10'></div>
         <Image
           src='/images/hero-image.png'
-          alt='Guitarist'
+          alt='Guitarist practicing with Riff Quest app to track progress'
           fill
           className='object-cover object-center grayscale-[30%]'
           priority
@@ -161,7 +161,7 @@ export const HeroSection = () => {
                     ) : (
                       <FcGoogle className="h-5 w-5" />
                     )}
-                    Sign in with Google
+                    Continue with Google
                   </Button>
                 </div>
 
