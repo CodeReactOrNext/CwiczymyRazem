@@ -2,12 +2,10 @@
 
 import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
 import { cn } from "assets/lib/utils";
-import { motion } from "framer-motion";
 import { 
-    Brain, Music2, TrendingUp, Zap, Target, Flame, 
-    Sparkles, Search, ClipboardCheck, ClipboardList, 
-    Library, ChevronRight, LayoutGrid, Clock, Star,
-    CheckCircle2, Trophy
+    Music2, Target, Flame, 
+    Sparkles, ClipboardCheck, ClipboardList, 
+    Library, ChevronRight, CheckCircle2, Trophy
 } from "lucide-react";
 import { useMemo } from "react";
 import { LandingSongCard } from "./LandingSongCard";
@@ -74,11 +72,7 @@ export const FeaturesSection = () => {
       <div className='mx-auto max-w-7xl px-6 lg:px-8 relative z-10'>
         {/* Header Section */}
         <div className='max-w-3xl mb-12'>
-           <motion.div
-             initial={{ opacity: 0, y: 20 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-           >
+          <div>
             <h2 className='text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500 mb-6'>
                 The Platform
             </h2>
@@ -86,7 +80,7 @@ export const FeaturesSection = () => {
               Unfair advantage <br />
               <span className="text-zinc-600">for your practice.</span>
             </h3>
-          </motion.div>
+          </div>
         </div>
 
         {/* Portal-like Layout */}

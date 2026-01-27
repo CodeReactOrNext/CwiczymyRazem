@@ -50,33 +50,35 @@ export const HeroSection = () => {
         />
       </div>
 
-      {/* Floating Glow Animation (Flow) */}
+      {/* Floating Glow Animation (Flow) - ULTRA INTENSE */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div 
           animate={{ 
-            x: ['-20%', '20%'],
+            x: ['-15%', '15%'],
             y: ['-10%', '10%'],
+            opacity: [0.2, 0.4, 0.2]
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity, 
+            repeatType: "mirror",
+            ease: "easeInOut" 
+          }}
+          className="absolute -top-[15%] -left-[10%] w-[120%] sm:w-[80%] h-[70%] bg-cyan-500/30 blur-[150px] rounded-full"
+        />
+        <motion.div 
+          animate={{ 
+            x: ['15%', '-15%'],
+            y: ['10%', '-10%'],
+            opacity: [0.15, 0.3, 0.15]
           }}
           transition={{ 
             duration: 10, 
             repeat: Infinity, 
             repeatType: "mirror",
-            ease: "linear" 
+            ease: "easeInOut" 
           }}
-          className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-cyan-500/10 blur-[120px] rounded-full"
-        />
-        <motion.div 
-          animate={{ 
-            x: ['20%', '-20%'],
-            y: ['10%', '-10%'],
-          }}
-          transition={{ 
-            duration: 12, 
-            repeat: Infinity, 
-            repeatType: "mirror",
-            ease: "linear" 
-          }}
-          className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-teal-500/10 blur-[120px] rounded-full"
+          className="absolute -bottom-[15%] -right-[10%] w-[120%] sm:w-[80%] h-[70%] bg-teal-500/20 blur-[150px] rounded-full"
         />
       </div>
 
