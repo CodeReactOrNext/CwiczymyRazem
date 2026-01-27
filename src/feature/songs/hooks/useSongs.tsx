@@ -123,7 +123,7 @@ export const useSongs = () => {
     page,
     userSongs,
     isLoading: isSongsLoading,
-    totalPages,
+    hasMore: !!songsData?.hasMore,
     hasFilters,
     titleQuery,
     setTitleQuery,
