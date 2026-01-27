@@ -1,30 +1,23 @@
 "use client";
 
-import { BarChart3, Heart, Star } from "lucide-react";
-import { motion } from "framer-motion";
+import { Brain, Music2, TrendingUp } from "lucide-react";
 
-const points = [
+const reasons = [
   {
-    title: "Progress You Can See",
-    description: "Most guitarists quit because they don’t see progress. Riff Quest makes every session visible and rewarding.",
-    icon: Star,
-    color: "text-cyan-400",
-    bg: "bg-cyan-400/10"
+    title: "Focus on what matters",
+    description: "Don't waste time on generic exercises. Tracker helps you focus on the techniques that actually improve your playing.",
+    icon: <Brain className="w-6 h-6 text-cyan-400" />,
   },
   {
-    title: "No More Guesswork",
-    description: "Picked up your guitar but don't know what to play? Our community-rated song difficulty helps you pick the right challenge.",
-    icon: BarChart3,
-    color: "text-teal-400",
-    bg: "bg-teal-400/10"
+    title: "Track your progress",
+    description: "See your improvement over time with detailed practice logs and frequency charts. Motivation comes from seeing results.",
+    icon: <TrendingUp className="w-6 h-6 text-emerald-400" />,
   },
   {
-    title: "Zero Streak Pressure",
-    description: "Life happens. We track your long-term growth, not just how many days in a row you practiced. No stress, just guitar.",
-    icon: Heart,
-    color: "text-emerald-400",
-    bg: "bg-emerald-400/10"
-  }
+    title: "Build consistent habits",
+    description: "The secret to guitar mastery is consistency. Our tools are designed to keep you picking up your guitar every single day.",
+    icon: <Music2 className="w-6 h-6 text-purple-400" />,
+  },
 ];
 
 export const WhySection = () => {
@@ -32,38 +25,34 @@ export const WhySection = () => {
 
   return (
     <section className={`py-32 bg-zinc-950 relative overflow-hidden ${grainOverlay}`}>
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-        <div className="max-w-3xl mb-24">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display"
-          >
-            Designed for the <br /> 
-            <span className="text-zinc-600">modern guitarist.</span>
-          </motion.h2>
+      {/* Subtle background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+
+      <div className='mx-auto max-w-7xl px-6 lg:px-8 relative z-10'>
+        <div className='max-w-3xl mb-24'>
+          <h2 className='text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display'>
+            Built for those who <br />
+            <span className="text-zinc-600">refuse to plateau.</span>
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 lg:gap-24">
-          {points.map((point, index) => (
-            <motion.div 
-                key={index} 
-                className="flex flex-col group"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-16'>
+          {reasons.map((reason, index) => (
+            <div 
+              key={index} 
+              className='flex flex-col'
             >
-              <div className="mb-8 relative">
-                 <div className={`absolute inset-0 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity ${point.bg} rounded-full`}></div>
-                 <point.icon className={`w-12 h-12 relative z-10 ${point.color} transition-transform duration-500 group-hover:scale-110`} />
+              <div className='w-14 h-14 rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center mb-8 shadow-xl relative group'>
+                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
+                 {reason.icon}
               </div>
-              <h3 className="text-2xl font-bold text-white mb-6 tracking-tight">{point.title}</h3>
-              <p className="text-zinc-500 leading-relaxed text-lg font-medium">
-                {point.description}
+              <h3 className='text-2xl font-bold text-white tracking-tight mb-4'>
+                {reason.title}
+              </h3>
+              <p className='text-zinc-400 text-lg leading-relaxed'>
+                {reason.description}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

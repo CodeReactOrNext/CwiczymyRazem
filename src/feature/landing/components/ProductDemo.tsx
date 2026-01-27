@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Play } from "lucide-react";
 
 export const ProductDemo = () => {
@@ -10,13 +9,7 @@ export const ProductDemo = () => {
       
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="relative mx-auto max-w-5xl">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="relative rounded-[2rem] border border-white/10 bg-zinc-900/50 p-2 backdrop-blur-sm overflow-hidden shadow-[0_0_100px_-20px_rgba(6,182,212,0.15)]"
-          >
+          <div className="relative rounded-[2rem] border border-white/10 bg-zinc-900/50 p-2 backdrop-blur-sm overflow-hidden shadow-[0_0_100px_-20px_rgba(6,182,212,0.15)]">
             <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/5 via-transparent to-teal-500/5 pointer-events-none z-10"></div>
             
             <div className="relative aspect-video rounded-[1.5rem] overflow-hidden bg-zinc-950">
@@ -32,7 +25,7 @@ export const ProductDemo = () => {
                     Your browser does not support the video tag.
                 </video>
             </div>
-          </motion.div>
+          </div>
 
           {/* Floating Accents */}
           <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
