@@ -79,14 +79,42 @@ export const getSongs = async (
       baseQuery = query(baseQuery, where("popularity", ">=", 0));
     }
 
-    // 2. Search Path: Optimized for Native Pagination
+    // 2. Search Path: Optimized for Correctness and Selectivity
     if (hasSearch) {
       const t = titleQuery.toLowerCase();
       const a = artistQuery.toLowerCase();
 
-      // Determine which field to use for the native query
-      // If both are present, we use artist as primary and title as local filter for simplicity
-      // but still use native paging on the artist query
+      // If both are present, search by TITLE in DB (more selective) and filter artist locally.
+      // We fetch a larger pool (200) to ensure we don't miss the artist/title combo.
+      if (t && a) {
+        let q = query(
+          baseQuery,
+          where("title_lowercase", ">=", t),
+          where("title_lowercase", "<=", t + "\uf8ff"),
+          orderBy("title_lowercase", "asc"),
+          limit(200)
+        );
+
+        const snapshot = await trackedGetDocs(q);
+        let docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
+
+        // Local intersection
+        const filtered = docs.filter(s => s.artist_lowercase?.includes(a));
+
+        // Local pagination for the intersection results
+        const startIndex = (page - 1) * itemsPerPage;
+        const pagedDocs = filtered.slice(startIndex, startIndex + itemsPerPage);
+
+        const result = {
+          songs: pagedDocs,
+          total: filtered.length,
+          lastDoc: null // Local paging doesn't use cursors
+        };
+        memoryCache.set(cacheKey, result, 5 * 60 * 1000);
+        return result;
+      }
+
+      // Single field search: 100% Native with cursors
       const searchField = a ? "artist_lowercase" : "title_lowercase";
       const searchValue = a || t;
 
@@ -104,22 +132,13 @@ export const getSongs = async (
       }
 
       const snapshot = await trackedGetDocs(q);
-      let docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
+      const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Song));
 
-      // If searching for both, apply the second filter locally
-      if (t && a) {
-        docs = docs.filter(s => s.title_lowercase?.includes(t));
-      }
-
-      // Note: total count with filters is hard in Firestore without fetching all.
-      // We use a safe estimate or the count from the current snapshot size for now,
-      // but for better UX we can keep the totalCount from the baseQuery (though it won't be 100% accurate for search)
       const result = {
         songs: docs,
-        total: (page * itemsPerPage) + (docs.length === itemsPerPage ? 100 : 0), // Fake total to keep pagination alive
+        total: (page * itemsPerPage) + (docs.length === itemsPerPage ? 100 : 0),
         lastDoc: snapshot.docs[snapshot.docs.length - 1]
       };
-
       memoryCache.set(cacheKey, result, 5 * 60 * 1000);
       return result;
     }
