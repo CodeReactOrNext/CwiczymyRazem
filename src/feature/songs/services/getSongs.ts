@@ -107,8 +107,8 @@ export const getSongs = async (
 
         const result = {
           songs: pagedDocs,
-          total: filtered.length,
-          lastDoc: null // Local paging doesn't use cursors
+          hasMore: filtered.length > startIndex + itemsPerPage,
+          lastDoc: null
         };
         memoryCache.set(cacheKey, result, 5 * 60 * 1000);
         return result;
@@ -136,7 +136,7 @@ export const getSongs = async (
 
       const result = {
         songs: docs,
-        total: (page * itemsPerPage) + (docs.length === itemsPerPage ? 100 : 0),
+        hasMore: docs.length === itemsPerPage,
         lastDoc: snapshot.docs[snapshot.docs.length - 1]
       };
       memoryCache.set(cacheKey, result, 5 * 60 * 1000);
@@ -171,6 +171,7 @@ export const getSongs = async (
     const result = {
       songs: docs,
       total: totalCountPool,
+      hasMore: docs.length === itemsPerPage,
       lastDoc
     };
 
