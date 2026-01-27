@@ -7,6 +7,8 @@ const SignUpPage: NextPage = () => {
   return (
     <>
       <Head>
+        <title>Start Free - Join Riff Quest Guitar Tracker</title>
+        <meta name="description" content="Create your free Riff Quest account and start tracking guitar practice. No credit card required. Join thousands of guitarists leveling up." />
         <meta name="robots" content="noindex, nofollow" />
       </Head>
       <SingupView />
