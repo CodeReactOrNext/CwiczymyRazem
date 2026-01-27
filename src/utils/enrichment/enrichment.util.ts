@@ -24,7 +24,7 @@ export async function fetchEnrichmentData(artist: string, title: string) {
   const accessToken = tokenResponse.data.access_token;
 
   // 2. Search Spotify (Track first for better song matching)
-  const searchTerm = encodeURIComponent(`track:${title} artist:${artist}`);
+  const searchTerm = encodeURIComponent(`track:"${title}" artist:"${artist}"`);
   const searchResponse = await axios.get(
     `https://api.spotify.com/v1/search?q=${searchTerm}&type=track&limit=5&market=PL`,
     { headers: { Authorization: `Bearer ${accessToken}` } }

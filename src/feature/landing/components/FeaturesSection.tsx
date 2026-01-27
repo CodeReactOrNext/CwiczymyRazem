@@ -92,10 +92,10 @@ export const FeaturesSection = () => {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none"></div>
       <div className='mx-auto max-w-7xl px-6 lg:px-8'>
         <div className='mx-auto max-w-2xl text-center mb-20'>
-          <h2 className='text-base font-semibold leading-7 text-cyan-500 tracking-wider uppercase'>Features</h2>
-          <p className='mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl'>
+          <span className='text-base font-semibold leading-7 text-cyan-500 tracking-wider uppercase'>Features</span>
+          <h2 className='mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl'>
             The complete system to track guitar practice effectively
-          </p>
+          </h2>
           <p className='mt-6 text-lg leading-8 text-zinc-400'>
             A complete ecosystem designed to make your practice structured and effective.
           </p>
@@ -373,7 +373,7 @@ export const FeaturesSection = () => {
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-gradient-to-b from-purple-500/5 to-amber-500/5 blur-3xl rounded-[100px] pointer-events-none -z-10 opacity-60"></div>
 
             <div className="text-center mb-16 relative z-10">
-               <h3 className="text-2xl font-bold text-white mb-2">Track song difficulty and build your repertoire</h3>
+               <h2 className="text-2xl font-bold text-white mb-2">Track song difficulty and build your repertoire</h2>
                <p className="text-zinc-400 max-w-2xl mx-auto">
                   Songs are rated by the community, so difficulty reflects real player experience. Track which songs you know, what level they belong to, and how your repertoire grows over time.
                </p>
