@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
@@ -15,12 +14,7 @@ export const PricingSection = () => {
 
       <div className='mx-auto max-w-7xl px-6 lg:px-8 text-center relative z-10'>
         <div className='max-w-4xl mx-auto'>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
+          <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black uppercase tracking-widest mb-8">
                <Sparkles className="w-3 h-3" /> Fully Operational
             </div>
@@ -50,21 +44,18 @@ export const PricingSection = () => {
               ))}
             </div>
 
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
+            <div>
               <Link href='/signup'>
-                <Button className='h-20 px-16 bg-white text-black hover:bg-zinc-100 font-bold text-2xl transition-all rounded-lg shadow-[0_0_40px_-5px_rgba(255,255,255,0.3)]'>
+                <Button className='h-16 sm:h-20 w-full sm:w-auto px-8 sm:px-16 bg-white text-black hover:bg-zinc-100 font-bold text-xl sm:text-2xl transition-all rounded-lg shadow-[0_0_40px_-5px_rgba(255,255,255,0.3)]'>
                   Launch Your Journey
                 </Button>
               </Link>
-            </motion.div>
+            </div>
             
             <p className="mt-12 text-zinc-600 text-sm font-bold uppercase tracking-widest">
                 No Credit Card Required • Join 600+ Guitarists
             </p>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
