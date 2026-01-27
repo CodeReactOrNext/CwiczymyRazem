@@ -14,12 +14,13 @@
 ## Main Content
 
 - [Home](https://riff.quest/) - The landing page and entry point to the platform.
-- [FAQ](https://riff.quest/faq) - Frequently asked questions about the platform and practice tracking.
+- [Guitar Practice Builder](https://riff.quest/guitar-practice-builder) - Interactive tool to create specialized, printable guitar practice routines.
+- [Song Recommender](https://riff.quest/what-guitar-song-to-learn) - Find the perfect song to learn based on your skill level and genre.
+- [Blog](https://riff.quest/blog) - Knowledge hub for guitarists, featuring technique tips and practice psychology.
 - [Guide](https://riff.quest/guide) - A step-by-step guide for new users to get started with Riff Quest.
-- [Practice Habits](https://riff.quest/practice-habits) - Comprehensive guide on building effective guitar practice habits.
-- [Guitar Practice Routine](https://riff.quest/guitar-practice-routine) - Expert advice on structuring your daily practice routine.
-- [Guitar Practice Tracker](https://riff.quest/guitar-practice-tracker) - Detailed information on how to use the Riff Quest tracking features.
-- [Streak Challenge](https://riff.quest/guitar-practice-streak-challenge) - Information about the guitar practice streak challenge and its benefits.
+- [Practice Habits](https://riff.quest/blog/practice-habits) - Comprehensive guide on building effective guitar practice habits.
+- [Guitar Practice Routine](https://riff.quest/blog/guitar-practice-routine) - Expert advice on structuring your daily practice routine.
+- [Guitar Practice Tracker](https://riff.quest/blog/guitar-practice-tracker) - Detailed information on how to use the Riff Quest tracking features.
 
 ## Technical Details
 
