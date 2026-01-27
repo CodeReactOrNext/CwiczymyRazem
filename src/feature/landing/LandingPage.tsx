@@ -10,6 +10,8 @@ import { HeroSection } from "feature/landing/components/HeroSection";
 import { PricingSection } from "feature/landing/components/PricingSection";
 import { WhySection } from "feature/landing/components/WhySection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
+import { FinalCTASection } from "feature/landing/components/FinalCTASection";
+import { ProductDemo } from "feature/landing/components/ProductDemo";
 
 const LandingPage = () => {
   const faqQuestions: faqQuestionInterface[] = [
@@ -60,11 +62,13 @@ const LandingPage = () => {
       <LandingSEO faqQuestions={faqQuestions} />
       <div className='min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30'>
         <HeroSection />
+        <ProductDemo />
         <WhySection />
         <FeaturesSection />
         <PricingSection />
         <FaqSection questions={faqQuestions} />
         <BlogSection />
+        <FinalCTASection />
         <Footer />
         <CookieBanner />
       </div>

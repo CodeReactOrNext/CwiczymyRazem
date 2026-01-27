@@ -1,453 +1,339 @@
 "use client";
 
 import { AchievementCard } from "feature/achievements/components/Card/AchievementCard";
-import { AnimatePresence,motion } from "framer-motion";
-import {Brain, Clock, Music2, TrendingUp, Zap } from "lucide-react";
-import { useEffect, useMemo,useState } from "react";
-
+import { cn } from "assets/lib/utils";
+import { motion } from "framer-motion";
+import { 
+    Brain, Music2, TrendingUp, Zap, Target, Flame, 
+    Sparkles, Search, ClipboardCheck, ClipboardList, 
+    Library, ChevronRight, LayoutGrid, Clock, Star,
+    CheckCircle2, Trophy
+} from "lucide-react";
+import { useMemo } from "react";
 import { LandingSongCard } from "./LandingSongCard";
 
 export const FeaturesSection = () => {
-  const skillCategories = [
-    { name: 'Technique', time: '12:30', percent: '50%', color: 'border-red-500/50 text-red-400', dot: 'bg-red-500', active: true },
-    { name: 'Theory', time: '45:00', percent: '49%', color: 'border-blue-500/50 text-blue-400', dot: 'bg-blue-500' },
-    { name: 'Hearing', time: '20:15', percent: '0%', color: 'border-teal-500/50 text-teal-400', dot: 'bg-teal-500' },
-    { name: 'Creative work', time: '10:00', percent: '0%', color: 'border-purple-500/50 text-purple-400', dot: 'bg-purple-500' },
-  ];
-
-
-  const skills = [
-    { name: 'Technique', percent: 4, time: '107h 44m', color: 'bg-red-500' },
-    { name: 'Theory', percent: 4, time: '107h 44m', color: 'bg-blue-500' },
-    { name: 'Creativity', percent: 2, time: '53h 52m', color: 'bg-purple-500' },
-    { name: 'Hearing', percent: 90, time: '2423h 58m', color: 'bg-teal-500' },
-  ];
-
   const MOCK_SONGS = [
     {
       id: "1",
       title: "Master of Puppets",
       artist: "Metallica",
       avgDifficulty: 8.9,
-      coverUrl: "https://i.scdn.co/image/ab67616d0000b273668e3aca3167e6e569a9aa20"
+      coverUrl: "https://i.scdn.co/image/ab67616d0000b273668e3aca3167e6e569a9aa20",
+      popularity: 1240
     },
     {
       id: "2",
       title: "Wish You Were Here",
       artist: "Pink Floyd",
       avgDifficulty: 3.5,
-      coverUrl: "https://i.scdn.co/image/ab67616d0000b273828e52cfb7bf22869349799e"
+      coverUrl: "https://i.scdn.co/image/ab67616d0000b273828e52cfb7bf22869349799e",
+      popularity: 850
     },
     {
-      id: "3",
-      title: "Scarlet",
-      artist: "Periphery",
-      avgDifficulty: 9.2,
-      coverUrl: "https://i.scdn.co/image/ab67616d0000b2735e07ee269b03adc236d0d6ae"
-    },
-    {
-      id: "4",
-      title: "Nothing Else Matters",
-      artist: "Metallica",
-      avgDifficulty: 4.2,
-      coverUrl: "https://i.scdn.co/image/ab67616d0000b273c1a13209dfe146aef3296e34"
-    },
-    {
-      id: "5",
-      title: "Sweet Child O' Mine",
-      artist: "Guns N' Roses",
-      avgDifficulty: 7.8,
-      coverUrl: "https://i.scdn.co/image/ab67616d0000b27321ebf49b3292c3f0f575f0f5"
+        id: "3",
+        title: "Scarlet",
+        artist: "Periphery",
+        avgDifficulty: 9.2,
+        coverUrl: "https://i.scdn.co/image/ab67616d0000b2735e07ee269b03adc236d0d6ae",
+        popularity: 420
     }
   ];
 
-  const [startIndex, setStartIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setStartIndex((prev) => (prev + 1) % MOCK_SONGS.length);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const visibleSongs = useMemo(() => {
-    const result = [];
-    for (let i = 0; i < 3; i++) {
-        result.push(MOCK_SONGS[(startIndex + i) % MOCK_SONGS.length]);
-    }
-    return result;
-  }, [startIndex]);
-
   const activityData = useMemo(() => {
-    return Array.from({ length: 30 }).map(() => 
-        Array.from({ length: 7 }).map(() => 
-            Math.random() > 0.7 ? Math.floor(Math.random() * 4) : 0
-        )
+    return Array.from({ length: 42 }).map(() => 
+      Array.from({ length: 7 }).map(() => 
+        Math.random() > 0.7 ? Math.floor(Math.random() * 5) + 1 : 0
+      )
     );
   }, []);
 
+  const grainOverlay = "before:content-[''] before:absolute before:inset-0 before:opacity-[0.03] before:pointer-events-none before:bg-[url('/static/images/old_effect_dark.webp')] before:z-50";
+
+  const navigationCards = [
+    { title: "Report Practice", desc: "Save and log your manual practice session.", icon: <ClipboardCheck className="w-5 h-5" />, color: "cyan", action: "Log Now" },
+    { title: "Play Songs", desc: "Practice real songs from your library.", icon: <Music2 className="w-5 h-5" />, color: "purple", action: "Choose a Song" },
+    { title: "Guided Routine", desc: "Follow a structured daily workout.", icon: <ClipboardList className="w-5 h-5" />, color: "green", action: "Start Plan" },
+    { title: "Generate Session", desc: "A ready-to-play session prepared for you.", icon: <Sparkles className="w-5 h-5" />, color: "amber", action: "Start Auto" }
+  ];
+
+  const dailyQuests = [
+    { title: "Complete a Practice Plan", pts: "100", done: true },
+    { title: "Generate & Practice Auto Plan", pts: "100", done: false },
+    { title: "Add song to 'Want to Learn'", pts: "50", done: false },
+  ];
+
   return (
-    <section id='features' className='relative py-24 sm:py-32 bg-[#0d0d0c] overflow-hidden'>
-      {/* Global Background Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none"></div>
-      <div className='mx-auto max-w-7xl px-6 lg:px-8'>
-        <div className='mx-auto max-w-2xl text-center mb-20'>
-          <span className='text-base font-semibold leading-7 text-cyan-500 tracking-wider uppercase'>Features</span>
-          <h2 className='mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl'>
-            Everything you need to stop feeling stuck
-          </h2>
-          <p className='mt-6 text-lg leading-8 text-zinc-400'>
-            A complete ecosystem designed to make your guitar practice structured, effective, and visible.
-          </p>
+    <section id='features' className={`relative py-32 overflow-hidden bg-zinc-950 ${grainOverlay}`}>
+      {/* Background Ambience */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
+        <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full"></div>
+        <div className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-teal-500/5 blur-[150px] rounded-full"></div>
+      </div>
+
+      <div className='mx-auto max-w-7xl px-6 lg:px-8 relative z-10'>
+        {/* Header Section */}
+        <div className='max-w-3xl mb-12'>
+           <motion.div
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+           >
+            <h2 className='text-[10px] font-black uppercase tracking-[0.4em] text-cyan-500 mb-6'>
+                The Platform
+            </h2>
+            <h3 className='text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display mb-6'>
+              Unfair advantage <br />
+              <span className="text-zinc-600">for your practice.</span>
+            </h3>
+          </motion.div>
         </div>
 
-        {/* Demo Video Showcase */}
-        <div className="relative mb-24 w-[100vw] ml-[calc(50%-50vw)] sm:ml-auto sm:w-auto sm:mx-auto sm:max-w-4xl">
-          <div className="relative rounded-none sm:rounded-2xl border-x-0 sm:border-x border-y border-white/10 bg-zinc-900/50 p-0 sm:p-2 backdrop-blur-sm overflow-hidden shadow-2xl h-[500px] sm:h-auto">
-            <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-amber-500/5 pointer-events-none z-10"></div>
+        {/* Portal-like Layout */}
+        <div className="flex flex-col gap-6">
             
-            <video
-              className="w-full h-full sm:h-auto rounded-none sm:rounded-xl shadow-inner block object-cover sm:object-contain"
-              style={{ objectPosition: '10% 50%' }}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              poster="/images/video-poster.png"
-            >
-              <source src="/demo.webm" type="video/webm" />
-              <track kind="captions" src="/captions.vtt" srcLang="en" label="English" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-          
-          <div className="absolute -bottom-6 -right-6 -z-10 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl"></div>
-          <div className="absolute -top-6 -left-6 -z-10 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="space-y-32">
-          {/* GROUP 4: PROGRESSION FLOW -> BENEFITS */}
-          <div className="relative pb-20">
-             <div className="text-center mb-16">
-               <h3 className="text-2xl font-bold text-white mb-2">Build your guitar practice routine</h3>
-               <p className="text-zinc-400">Everything you need to stay consistent and see your progress as a guitarist.</p>
-            </div>
-
-            <div className='relative'>
-                 {/* Connection Line (Desktop) with Animated Beam */}
-                 <div className="hidden lg:block absolute top-[2.5rem] left-0 w-full h-0.5 bg-zinc-800/50 overflow-hidden rounded-full">
-                    <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent w-[50%] animate-beam"></div>
-                 </div>
-                 {/* Inject animation styles locally since we can't touch tailwind config easily */}
-                 <style dangerouslySetInnerHTML={{__html: `
-                    @keyframes beam {
-                      0% { transform: translateX(-100%); }
-                      100% { transform: translateX(200%); }
-                    }
-                    .animate-beam {
-                      animation: beam 3s infinite linear;
-                    }
-                 `}} />
-
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
-                    {/* Item 1: Track your practice */}
-                    <div className="relative group text-center">
-                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-900/20 group-hover:border-cyan-500/30 transition-all duration-300">
-                           <Clock className="w-8 h-8 text-cyan-400" />
-                       </div>
-                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Log the effort</h4>
-                       <p className="text-sm text-zinc-400 px-4">Track every session automatically to build awareness and real consistency.</p>
-                    </div>
-
-                    {/* Item 2: Develop your skills */}
-                    <div className="relative group text-center">
-                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-900/20 group-hover:border-amber-500/30 transition-all duration-300">
-                           <Zap className="w-8 h-8 text-amber-400" />
-                       </div>
-                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Level up skills</h4>
-                       <p className="text-sm text-zinc-400 px-4">Earn skill points in Technique, Theory, and more as you practice.</p>
-                    </div>
-
-                    {/* Item 3: Track song difficulty */}
-                    <div className="relative group text-center">
-                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-900/20 group-hover:border-purple-500/30 transition-all duration-300">
-                           <Music2 className="w-8 h-8 text-purple-400" />
-                       </div>
-                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Pick the right songs</h4>
-                       <p className="text-sm text-zinc-400 px-4">Community-rated difficulties ensure you always know what’s worth practicing next.</p>
-                    </div>
-
-                    {/* Item 4: See real progress */}
-                     <div className="relative group text-center">
-                       <div className="w-20 h-20 mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-900/20 group-hover:border-emerald-500/30 transition-all duration-300">
-                           <div className="relative">
-                             <TrendingUp className="w-8 h-8 text-emerald-400" />
-                           </div>
-                       </div>
-                       <h4 className="text-lg font-bold text-white mb-2 text-nowrap">Proof of growth</h4>
-                       <p className="text-sm text-zinc-400 px-4">Clear stats and history show exactly how much you've improved over time.</p>
-                    </div>
-                 </div>
-            </div>
-          </div>
-
-          {/* GROUP 1: PRACTICE TOOLS */}
-          <div>
-            <div className="text-center mb-12">
-               <h3 className="text-2xl font-bold text-white mb-2">Effective Guitar Practice Tools</h3>
-               <p className="text-zinc-400">Track guitar practice every second with our intelligent timer system.</p>
-            </div>
-            
-            <div className='overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-br from-zinc-900/80 via-zinc-900/60 to-zinc-950 p-8'>
-              <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'>
-                {/* Timer Circle */}
-                <div className='flex flex-col items-center justify-center'>
-                  <div className='relative w-64 h-64'>
-                    <div className='absolute inset-0 rounded-full bg-cyan-500/10 blur-xl'></div>
-                    <div className='absolute inset-4 rounded-full border-4 border-cyan-500/30 bg-zinc-950 flex items-center justify-center'>
-                      <div className='text-center'>
-                        <div className='text-6xl font-mono font-bold text-white tracking-tight'>12:30</div>
-                        <div className='text-sm text-cyan-500 mt-2 font-medium uppercase tracking-widest'>Technique</div>
-                      </div>
-                    </div>
-                    <svg className='absolute inset-0 -rotate-90 w-full h-full' viewBox='0 0 100 100'>
-                      <circle cx='50' cy='50' r='46' fill='none' stroke='#06b6d4' strokeWidth='2' strokeDasharray='289' strokeDashoffset='72' strokeLinecap='round' opacity='0.8' />
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Categories */}
-                <div className='grid grid-cols-2 gap-4'>
-                  {skillCategories.map((cat, i) => (
+            {/* Top Navigation Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {navigationCards.map((card, i) => (
                     <div 
-                      key={i} 
-                      className={`relative rounded-xl border-2 ${cat.active ? 'border-cyan-500/40 bg-cyan-900/10' : 'border-zinc-800 bg-zinc-900/30'} p-5 transition-all outline-none`}
+                        key={i}
+                        className={cn(
+                            "group relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/5 bg-zinc-900/40 p-4 shadow-lg transition-all duration-300",
+                            "hover:ring-1 hover:ring-white/10"
+                        )}
                     >
-                      <div className='flex items-center gap-3 mb-3'>
-                        <div className={`w-3 h-3 rounded-full ${cat.dot}`}></div>
-                        <span className='font-medium text-zinc-200'>{cat.name}</span>
-                      </div>
-                      <div className='text-2xl font-mono font-bold text-white'>{cat.time}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* GROUP 2: TRACKING & ANALYTICS */}
-          <div className="relative">
-             {/* Background glow for analytics */}
-             <div className="absolute -top-24 -left-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none opacity-50"></div>
-             
-            <div className="text-center mb-12 relative z-10">
-               <h3 className="text-2xl font-bold text-white mb-2">Guitar Practice Statistics</h3>
-               <p className="text-zinc-400">Visualize your consistency and guitar progress tracking with detailed analytics.</p>
-            </div>
-
-            <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10'>
-              {/* Heatmap Card */}
-              <div className='lg:col-span-2 rounded-2xl border border-white/5 bg-gradient-to-b from-zinc-900/80 to-zinc-950/80 backdrop-blur-xl p-8 hover:border-cyan-500/20 transition-colors duration-500 group'>
-                <div className="flex items-center gap-3 mb-6">
-                   <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:text-cyan-300 transition-colors">
-                     <Clock className="w-5 h-5"/>
-                   </div>
-                   <h4 className="font-semibold text-white group-hover:text-cyan-100 transition-colors">Activity History</h4>
-                </div>
-                <div className='w-full mb-8 overflow-hidden'>
-                   <div className="flex gap-2">
-                      {/* Day Labels */}
-                      <div className="flex flex-col justify-between py-[2px] pr-2 text-xs text-zinc-600 font-medium">
-                         <span>Mon</span>
-                         <span>Wed</span>
-                         <span>Fri</span>
-                      </div>
-                      
-                      {/* The Grid */}
-                      <div className="flex-1 flex gap-[3px] overflow-hidden mask-linear-fade">
-                         {activityData.map((week, weekIndex) => (
-                            <div key={weekIndex} className="flex flex-col gap-[3px]">
-                               {week.map((intensity, dayIndex) => {
-                                  const colors = [
-                                     'bg-zinc-800/50', // 0: empty
-                                     'bg-cyan-900/40', // 1: light
-                                     'bg-cyan-700/60', // 2: medium
-                                     'bg-cyan-500',    // 3: high
-                                  ];
-                                  
-                                  return (
-                                     <div 
-                                        key={dayIndex} 
-                                        className={`w-3 h-3 rounded-sm ${colors[intensity]} transition-colors duration-300 hover:opacity-80`}
-                                     ></div>
-                                  );
-                               })}
+                        <div className="relative z-10 flex items-start justify-between gap-4">
+                            <div className="space-y-1">
+                                <h4 className="text-[12px] font-black tracking-wider text-white uppercase">{card.title}</h4>
+                                <p className="text-[10px] font-medium text-zinc-500 leading-relaxed max-w-[150px]">{card.desc}</p>
                             </div>
-                         ))}
-                      </div>
-                   </div>
-                   <div className="flex items-center gap-2 mt-4 text-xs text-zinc-500 justify-end">
-                      <span>Less</span>
-                      <div className="flex gap-1">
-                         <div className="w-3 h-3 rounded-sm bg-zinc-800/50"></div>
-                         <div className="w-3 h-3 rounded-sm bg-cyan-900/40"></div>
-                         <div className="w-3 h-3 rounded-sm bg-cyan-700/60"></div>
-                         <div className="w-3 h-3 rounded-sm bg-cyan-500"></div>
-                      </div>
-                      <span>More</span>
-                   </div>
+                            <div className={cn(
+                                "rounded-xl p-2.5 shadow-2xl transition-all duration-500 group-hover:scale-110",
+                                card.color === "cyan" && "bg-cyan-500/10 text-cyan-400",
+                                card.color === "purple" && "bg-purple-500/10 text-purple-400",
+                                card.color === "green" && "bg-emerald-500/10 text-emerald-400",
+                                card.color === "amber" && "bg-amber-500/10 text-amber-400"
+                            )}>
+                                {card.icon}
+                            </div>
+                        </div>
+                        <div className="relative z-10 mt-6 flex items-center gap-2 text-[9px] font-black tracking-[0.2em] text-zinc-500 transition-colors group-hover:text-white uppercase">
+                            <span>{card.action}</span>
+                            <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+                        </div>
+                        <div className={cn(
+                            "absolute top-0 right-0 -mt-10 -mr-10 w-24 h-24 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity rounded-full",
+                            card.color === "cyan" && "bg-cyan-500",
+                            card.color === "purple" && "bg-purple-500",
+                            card.color === "green" && "bg-emerald-500",
+                            card.color === "amber" && "bg-amber-500"
+                        )} />
+                    </div>
+                ))}
+            </div>
+
+            {/* Main Activity Area */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                {/* Daily Quests - Left Column */}
+                <div className="lg:col-span-4 flex flex-col gap-6">
+                    <div className="rounded-xl border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-sm">
+                        <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center gap-2">
+                                <Target className="w-4 h-4 text-zinc-400" />
+                                <h4 className="text-[11px] font-black text-white/50 uppercase tracking-widest">Daily Quests</h4>
+                            </div>
+                            <span className="text-[9px] font-bold text-zinc-600">27.01.2026</span>
+                        </div>
+                        <div className="space-y-3">
+                            {dailyQuests.map((quest, i) => (
+                                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5 group hover:border-white/10 transition-colors">
+                                    <div className="flex items-center gap-3">
+                                        <div className={cn(
+                                            "w-4 h-4 rounded-full border flex items-center justify-center transition-colors",
+                                            quest.done ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-400" : "border-zinc-800 text-transparent"
+                                        )}>
+                                            <CheckCircle2 className="w-3 h-3" />
+                                        </div>
+                                        <span className={cn("text-[11px] font-bold transition-opacity", quest.done ? "text-zinc-300" : "text-zinc-500")}>{quest.title}</span>
+                                    </div>
+                                    <span className="text-[9px] font-black text-emerald-500/60 uppercase">+{quest.pts} XP</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl border border-white/5 bg-gradient-to-br from-orange-500/10 to-transparent p-6 flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                            <Flame className="w-5 h-5 text-orange-500" />
+                        </div>
+                        <div>
+                            <div className="text-sm font-black text-white uppercase tracking-tighter">24 Day Streak</div>
+                            <div className="text-[10px] font-bold text-zinc-600 uppercase">Limitless Potential</div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Additional Stats / Focus Areas */}
-                <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/5">
-                   {skills.slice(0, 4).map((skill, i) => (
-                      <div key={i} className="bg-zinc-900/40 rounded-lg p-3">
-                         <div className="flex justify-between items-center mb-2">
-                            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">{skill.name}</span>
-                            <span className="text-xs text-white">{skill.percent}%</span>
-                         </div>
-                         <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                            <div className={`h-full ${skill.color} opacity-80`} style={{ width: `${skill.percent * 10}%` }}></div>
-                         </div>
-                      </div>
-                   ))}
+                {/* Growth Pulse Activity - Main Center Column */}
+                <div className="lg:col-span-8 rounded-xl border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-sm relative overflow-hidden">
+                    <div className="flex items-center justify-between mb-8">
+                        <h4 className="text-xl font-bold text-white tracking-tight">Activity</h4>
+                        <div className="flex gap-1 bg-white/5 p-1 rounded-lg">
+                            {['2024', '2025', '2026'].map((year) => (
+                                <div key={year} className={cn(
+                                    "px-3 py-1 text-[10px] font-bold rounded-md transition-colors",
+                                    year === '2026' ? "bg-white/10 text-white" : "text-zinc-600"
+                                )}>{year}</div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                        {/* Day Labels */}
+                        <div className="flex flex-col justify-between text-[11px] font-bold text-zinc-600 h-[128px] py-1 shrink-0">
+                            <span>Mon</span>
+                            <span>Thu</span>
+                            <span>Sun</span>
+                        </div>
+                        
+                        {/* Heatmap Grid - Exact Portal Specs */}
+                        <div className="flex-1 overflow-hidden">
+                            <div className="flex gap-[5px] h-[128px]">
+                                {activityData.map((week, i) => (
+                                    <div key={i} className="flex flex-col gap-[5px] shrink-0">
+                                        {week.map((level, j) => (
+                                            <div 
+                                                key={j}
+                                                className={cn(
+                                                    "w-[14px] h-[14px] rounded-[3px] transition-colors duration-300",
+                                                    level === 0 ? "bg-[#3f3f46]/30" :
+                                                    level === 1 ? "bg-[#A5F3FC]" :
+                                                    level === 2 ? "bg-[#67E8F9]" :
+                                                    level === 3 ? "bg-[#22D3EE]" :
+                                                    level === 4 ? "bg-[#06B6D4]" : "bg-[#0891B2]"
+                                                )}
+                                            />
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-8 flex items-center justify-end gap-3">
+                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Less</span>
+                        <div className="flex gap-[5px]">
+                            {['#3f3f46', '#A5F3FC', '#67E8F9', '#22D3EE', '#06B6D4', '#0891B2'].map((color, i) => (
+                                <div key={i} className="w-[14px] h-[14px] rounded-[3px]" style={{ backgroundColor: i === 0 ? color + '4d' : color }} />
+                            ))}
+                        </div>
+                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">More</span>
+                    </div>
                 </div>
-              </div>
-
-              {/* Stats Card */}
-              <div className='rounded-2xl border border-white/5 bg-gradient-to-b from-zinc-900/80 to-zinc-950/80 backdrop-blur-xl p-8 flex flex-col justify-between hover:border-amber-500/20 transition-colors duration-500 gap-6'>
-                 
-                 {/* Stat 1 */}
-                 <div className="bg-zinc-900/40 rounded-xl p-4 border border-white/5">
-                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1 font-medium uppercase tracking-wider">
-                      <Clock className="w-3 h-3" />
-                      Avg Session
-                    </div>
-                    <div className="text-2xl font-bold text-white tracking-tight">60:23</div>
-                    <div className="text-xs text-zinc-500 mt-1">Typical practice duration</div>
-                 </div>
-
-                 {/* Stat 2 */}
-                 <div className="bg-zinc-900/40 rounded-xl p-4 border border-white/5">
-                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1 font-medium uppercase tracking-wider">
-                      <Brain className="w-3 h-3" />
-                      Strongest Area
-                    </div>
-                    <div className="text-2xl font-bold text-teal-400 tracking-tight">Hearing</div>
-                    <div className="text-xs text-zinc-500 mt-1">Most improved skill this week</div>
-                 </div>
-                 
-                 {/* Stat 3 */}
-                 <div className="bg-zinc-900/40 rounded-xl p-4 border border-white/5">
-                     <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1 font-medium uppercase tracking-wider">
-                      <Zap className="w-3 h-3" />
-                      Points / Hour
-                    </div>
-                    <div className="text-2xl font-bold text-amber-400 tracking-tight">197</div>
-                    <div className="text-xs text-zinc-500 mt-1">Efficiency score</div>
-                 </div>
-
-                 {/* Stat 4 */}
-                 <div className="bg-zinc-900/40 rounded-xl p-4 border border-white/5">
-                    <div className="flex items-center gap-2 text-zinc-500 text-xs mb-1 font-medium uppercase tracking-wider">
-                      <TrendingUp className="w-3 h-3" />
-                      Current Streak
-                    </div>
-                    <div className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                       12 <span className="text-sm text-zinc-600 font-normal">days</span>
-                    </div>
-                 </div>
-              </div>
             </div>
 
-            {/* TASK 4: STATISTICS SECTION (SEO AKAPIT) */}
-            <div className="mt-12 max-w-4xl mx-auto text-center">
-               <p className="text-zinc-500 text-sm leading-relaxed">
-                  Riff Quest helps guitarists track their guitar practice routine over time. By visualizing daily guitar practice, skills, and focus areas, you can clearly see what you practice and how it affects your progress.
-               </p>
-            </div>
-          </div>
-
-          {/* GROUP 3: SONGS & PROGRESSION */}
-          <div className="relative">
-             {/* Background glow for songs */}
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-gradient-to-b from-purple-500/5 to-amber-500/5 blur-3xl rounded-[100px] pointer-events-none -z-10 opacity-60"></div>
-
-            <div className="text-center mb-16 relative z-10">
-               <h3 className="text-2xl font-bold text-white mb-2">Track song difficulty and build your repertoire</h3>
-               <p className="text-zinc-400 max-w-2xl mx-auto">
-                  Songs are rated by the community, so difficulty reflects real player experience. Track which songs you know, what level they belong to, and how your repertoire grows over time.
-               </p>
-            </div>
-
-            <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 items-start relative z-10'>
-               {/* Songs Column */}
-               <div className='space-y-8'>
-                  <div className="flex items-center gap-3 mb-2 px-2">
-                    <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
-                      <Music2 className="w-5 h-5" />
+            {/* Achievements & Library Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                {/* Achievement Showcase - Balanced Size */}
+                <div className="lg:col-span-5 rounded-2xl border border-white/5 bg-zinc-900/20 p-8 backdrop-blur-xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4">
+                        <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">128 Unlocked</span>
+                        </div>
                     </div>
-                    <h4 className="font-semibold text-xl text-white">Song Library</h4>
-                  </div>
-                  
-                  <div className="h-[750px] overflow-hidden relative flex flex-col gap-4 p-4 [mask-image:linear-gradient(to_bottom,black_80%,transparent)]">
-                    <AnimatePresence mode='popLayout'>
-                      {visibleSongs.map((song) => (
-                        <motion.div
-                          key={song.id}
-                          layout
-                          initial={{ opacity: 0, y: 30, scale: 0.98 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: -30, scale: 0.98 }}
-                          transition={{ 
-                            duration: 0.8, 
-                            ease: [0.22, 1, 0.36, 1],
-                            opacity: { duration: 0.4 }
-                          }}
-                          className="w-full"
-                        >
-                           <LandingSongCard 
-                              song={{
-                                 id: song.id,
-                                 title: song.title,
-                                 artist: song.artist,
-                                 avgDifficulty: song.avgDifficulty,
-                                 coverUrl: song.coverUrl,
-                              }}
-                              priority={song.id === "1"}
-                           />
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                  </div>
-               </div>
 
-               {/* Achievements Column */}
-               <div className='space-y-8'>
-                  <div className="flex items-center gap-3 mb-2 px-2">
-                    <div className="p-2 bg-amber-500/10 rounded-lg text-amber-400">
-                       <TrendingUp className="w-5 h-5" />
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-8">
+                            <Trophy className="w-4 h-4 text-amber-500" />
+                            <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Achievements Map</h4>
+                        </div>
+
+                        <div className="flex justify-between items-center py-6 px-4 gap-4">
+                            <div className="flex flex-col items-center gap-4 group cursor-pointer lg:scale-100 scale-90">
+                                <div className="p-1 rounded-2xl transition-all duration-500 bg-white/5 group-hover:bg-white/10 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+                                    <div className="scale-[1.8] py-4 px-3 flex items-center justify-center">
+                                         <AchievementCard id="fire" />
+                                    </div>
+                                </div>
+                                <div className="text-center group-hover:translate-y-[-2px] transition-transform duration-500">
+                                    <div className="text-[11px] font-black text-white uppercase tracking-wider mb-0.5">Fire Practice</div>
+                                    <div className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Very Rare</div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center gap-4 group cursor-pointer lg:scale-110 scale-95">
+                                <div className="p-1 rounded-2xl transition-all duration-500 bg-purple-500/5 group-hover:bg-purple-500/10 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.1)]">
+                                    <div className="scale-[2.4] py-6 px-4 flex items-center justify-center">
+                                         <AchievementCard id="lvl100" />
+                                    </div>
+                                </div>
+                                <div className="text-center group-hover:translate-y-[-2px] transition-transform duration-500">
+                                    <div className="text-[12px] font-black text-white uppercase tracking-wider mb-0.5">Elite Master</div>
+                                    <div className="text-[8px] font-bold text-purple-400 uppercase tracking-widest">Epic Rarity</div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center gap-4 group cursor-pointer lg:scale-100 scale-90">
+                                <div className="p-1 rounded-2xl transition-all duration-500 bg-cyan-500/5 group-hover:bg-cyan-500/10 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.05)]">
+                                    <div className="scale-[1.8] py-4 px-3 flex items-center justify-center">
+                                         <AchievementCard id="diamond" />
+                                    </div>
+                                </div>
+                                <div className="text-center group-hover:translate-y-[-2px] transition-transform duration-500">
+                                    <div className="text-[11px] font-black text-white uppercase tracking-wider mb-0.5">Diamond Pick</div>
+                                    <div className="text-[8px] font-bold text-cyan-400 uppercase tracking-widest">Rare</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p className="mt-6 text-[9px] font-black text-zinc-700 text-center uppercase tracking-[0.4em] leading-relaxed">
+                            Collect 3D Holo Achievements <br /> with every milestone reached.
+                        </p>
                     </div>
-                    <h4 className="font-semibold text-xl text-white">Recent Achievements</h4>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-x-5 gap-y-10 p-6 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm mb-12 justify-items-center">
-                     <div className="h-[50px] "><AchievementCard id="lvl100" /></div>
-                     <div className="h-[50px] "><AchievementCard id="fireSession" /></div>
-                     <div className="h-[50px] "><AchievementCard id="time_3" /></div>
-                     <div className="h-[50px] "><AchievementCard id="points_3" /></div>
-                     <div className="h-[50px] "><AchievementCard id="diamond" /></div>
-                     <div className="h-[50px] "><AchievementCard id="scientist" /></div>
-                     <div className="h-[50px] "><AchievementCard id="wizard" /></div>
-                     <div className="h-[50px] "><AchievementCard id="medal" /></div>
-                  </div>
-               </div>
-            </div>
-          </div>
+                </div>
 
+                {/* Song Library */}
+                <div className="lg:col-span-7 rounded-2xl border border-white/5 bg-zinc-900/20 p-8 backdrop-blur-xl">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                            <Library className="w-5 h-5 text-cyan-400" />
+                            <h4 className="text-[11px] font-black text-zinc-500 uppercase tracking-widest">Intelligence</h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                             <div className="text-[10px] font-black text-white uppercase tracking-widest opacity-40">Filters Active:</div>
+                             <span className="text-[9px] font-black text-cyan-400 bg-cyan-400/10 px-2 py-0.5 rounded uppercase">Technique Level 8</span>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {MOCK_SONGS.slice(0, 2).map((song) => (
+                            <div key={song.id} className="h-44">
+                                <LandingSongCard song={song} />
+                            </div>
+                        ))}
+                        <div className="h-44 rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-3 group cursor-pointer hover:border-white/20 transition-all bg-white/[0.02] hover:bg-white/[0.04]">
+                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-zinc-600 group-hover:translate-y-[-2px] transition-transform">
+                                <Plus className="w-5 h-5" />
+                            </div>
+                            <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Explore Library</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* Technical Footer Trace */}
+        <div className="mt-24 pt-8 border-t border-white/5 flex justify-between items-center opacity-30">
+            <div className="text-[8px] font-black uppercase tracking-[0.5em] text-zinc-500">SYSTEM.LOG_v.2.0.4</div>
+            <div className="text-[8px] font-black uppercase tracking-[0.5em] text-zinc-500">SYNC_STATUS: 100%_SECURE</div>
         </div>
       </div>
     </section>
   );
 };
+
+const Plus = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 5v14m-7-7h14"/></svg>
+);
