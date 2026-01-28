@@ -3,7 +3,7 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { Award, Calendar, CheckCircle2, Flame, Lock, Sparkles } from "lucide-react";
+import { Award, Calendar, CheckCircle2, Flame, Lock, Sparkles, Target } from "lucide-react";
 
 import type { Challenge } from "../../../backend/domain/models/Challenge";
 
@@ -37,7 +37,7 @@ export const ChallengeCard = ({
   };
 
   const skillData = guitarSkills.find(s => s.id === challenge.requiredSkillId);
-  const _SkillIcon = skillData?.icon;
+  const SkillIcon = skillData?.icon;
 
   const getBenefit = (category: string) => {
     switch (category.toLowerCase()) {
@@ -61,52 +61,46 @@ export const ChallengeCard = ({
   return (
     <div
       className={cn(
-        "relative flex flex-col h-full rounded-lg transition-all group overflow-hidden bg-zinc-900",
+        "relative flex flex-col h-full rounded-lg transition-all duration-300 group overflow-hidden border border-zinc-900",
         isCompleted
-          ? "opacity-60 bg-zinc-950"
+          ? "opacity-60 bg-[#0a0a0a]"
           : isActive
-            ? "ring-2 ring-main shadow-[0_0_20px_rgba(var(--main-rgb),0.1)]"
+            ? "bg-[#0c0c0c] border-white/10 shadow-lg"
             : isUnlocked 
-              ? "hover:bg-zinc-800/80 shadow-xl"
-              : "opacity-40 grayscale-[0.8]"
+              ? "bg-[#0f0f0f] hover:bg-[#121212]"
+              : "bg-[#080808] opacity-50 grayscale"
       )}
     >
-      {isActive && (
-        <div className="absolute top-0 right-0 p-3">
-            <Sparkles size={14} className="text-main" />
-        </div>
+      {/* Visual Decoration for Unlocked Cards */}
+      {isUnlocked && !isCompleted && (
+        <div className="absolute top-0 right-0 w-24 h-24 bg-white/[0.02] blur-2xl rounded-full -mr-12 -mt-12 pointer-events-none group-hover:bg-white/[0.04] transition-colors" />
       )}
 
-      {isCompleted && (
-        <div className="absolute top-3 right-3">
-            <CheckCircle2 size={14} className="text-main/40" />
-        </div>
-      )}
-      
-      <div className="flex flex-col h-full p-6">
-        <div className="flex items-center justify-between mb-4">
-            {!isUnlocked ? (
-              <div className="flex items-center gap-1 text-[10px] font-bold tracking-wide text-zinc-600">
-                  <Lock size={10} />
-                  <span>Locked</span>
+      <div className="flex flex-col h-full p-6 relative z-10">
+        <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2.5">
+              <div className={cn(
+                "w-9 h-9 rounded-lg flex items-center justify-center border transition-colors",
+                isActive ? "bg-white border-white text-black" : "bg-zinc-900 border-zinc-800 text-zinc-500"
+              )}>
+                {SkillIcon ? <SkillIcon size={18} strokeWidth={1.5} /> : <Target size={18} />}
               </div>
-            ) : isActive ? (
-                <div className="flex items-center gap-1.5 text-main text-[10px] font-bold tracking-wide">
-                    <Flame size={12} className="fill-main" />
-                    Focus
-                </div>
-            ) : (
-                <div className="flex items-center gap-1 text-[10px] font-bold tracking-wide text-zinc-500">
-                    <Calendar size={12} className="opacity-50" />
-                    {challenge.streakDays}d
-                </div>
-            )}
+              <div className="flex flex-col">
+                <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest leading-none mb-1">Theme</span>
+                <span className={cn(
+                   "text-[9px] font-bold uppercase tracking-wider leading-none",
+                   isActive ? "text-white" : "text-zinc-500"
+                )}>
+                  {challenge.category}
+                </span>
+              </div>
+            </div>
 
             <Badge 
-              variant="outline"
-              className="font-black text-[9px] border-none px-2"
+              className="font-bold text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-sm border"
               style={{
-                backgroundColor: `${tier.color}15`,
+                backgroundColor: `${tier.color}05`,
+                borderColor: `${tier.color}20`,
                 color: tier.color,
               }}
             >
@@ -115,105 +109,85 @@ export const ChallengeCard = ({
         </div>
 
         <div className="mb-6">
-          <h3 className={cn(
-            "font-black text-white leading-tight mb-1",
-            isUnlocked ? "text-lg" : "text-base"
-          )}>
-            {challenge.title}
-          </h3>
-          <p className="text-main text-[10px] font-bold tracking-wide mb-3 leading-none italic">
-            {getBenefit(challenge.category)}
-          </p>
-          <p className={cn(
-            "text-[12px] leading-relaxed line-clamp-3",
-            isUnlocked ? "text-zinc-500 font-medium" : "text-zinc-600"
-          )}>
+          <div className="flex items-center gap-2 mb-2">
+            {!isUnlocked && <Lock size={12} className="text-zinc-700" />}
+            <h3 className="font-bold text-white text-lg tracking-tight leading-tight transition-colors">
+              {challenge.title}
+            </h3>
+          </div>
+          <p className="text-zinc-600 text-[11px] font-medium leading-relaxed line-clamp-2">
             {challenge.description}
           </p>
         </div>
 
-        <div className="mt-auto space-y-4">
+        <div className="mt-auto space-y-5">
           {!isUnlocked ? (
-            <div className="p-4 rounded-lg bg-zinc-950/30">
-                <div className="flex items-center justify-between text-[11px]">
-                    <div className="flex items-center gap-1.5 text-zinc-600 font-bold tracking-tight">
-                        <Lock size={12} />
-                        <span>{formatSkillName(challenge.requiredSkillId)}</span>
+            <div className="p-4 rounded-lg bg-zinc-900/50 border border-zinc-800/50">
+                <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-1">
+                        <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest leading-none">Requirement</span>
+                        <span className="text-[10px] font-bold text-zinc-500">{formatSkillName(challenge.requiredSkillId)}</span>
                     </div>
-                    <span className={cn(
-                        "font-black px-2 py-0.5 rounded bg-zinc-900",
-                        currentLevel >= challenge.requiredLevel ? "text-emerald-500" : "text-red-400"
+                    <div className={cn(
+                        "px-2 py-1 rounded-sm border text-[10px] font-bold uppercase tracking-wider",
+                        currentLevel >= challenge.requiredLevel ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500" : "border-red-500/20 bg-red-500/10 text-red-400"
                     )}>
                         Lvl {challenge.requiredLevel}
-                    </span>
+                    </div>
                 </div>
             </div>
           ) : (
             <>
-              {/* Reward Section */}
-              <div className="p-4 rounded-lg bg-zinc-950/50 flex flex-col gap-3">
-                <div className="flex items-center justify-between pb-1">
-                   <div className="flex items-center gap-2 text-[10px] font-bold text-zinc-600 tracking-wide uppercase">
-                      <Award size={12} className="text-amber-500/50" />
-                      <span>Unlock Reward</span>
-                   </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs font-medium text-zinc-300 truncate">{challenge.rewardDescription || "Performance Mastery"}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-white/5 px-2 py-0.5 rounded text-[9px] font-black text-white">
-                        <Sparkles size={10} className="text-amber-400" />
-                        <span>XP</span>
-                    </div>
+              {/* Reward Mini Panel */}
+              <div className="flex items-center justify-between p-3.5 rounded-lg bg-zinc-950 border border-zinc-900">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Reward</span>
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles size={11} className="text-zinc-500" />
+                    <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-tight">{challenge.rewardDescription} XP</span>
                   </div>
-                  {challenge.rewardSkillId && (
-                    <div className="flex items-center justify-between pt-1">
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
-                        <span className="text-[10px] font-bold text-zinc-500">
-                          {formatSkillName(challenge.rewardSkillId)}
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-black text-emerald-400">+{challenge.rewardLevel}pts</span>
-                    </div>
-                  )}
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Duration</span>
+                  <div className="flex items-center gap-1.5">
+                    <Calendar size={11} className="text-zinc-500" />
+                    <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-tight">{challenge.streakDays} Days</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2">
                   {isActive ? (
                       <Button
-                          size="sm"
+                          size="lg"
                           onClick={() => onPractice(challenge)}
                           disabled={isTodayDone}
                           className={cn(
-                            "flex-1 h-10 font-bold tracking-wide text-[10px] rounded-lg",
-                            isTodayDone ? "bg-zinc-800 text-zinc-500" : "bg-main text-black"
+                            "w-full h-11 font-bold tracking-widest text-[10px] uppercase rounded-lg transition-all",
+                            isTodayDone ? "bg-zinc-900 text-zinc-600 border border-zinc-800" : "bg-white text-black hover:bg-zinc-100 shadow-lg"
                           )}
                       >
-                          {isTodayDone ? "Daily Goal Done" : "Continue"}
+                          {isTodayDone ? "Goal reached" : "Resume"}
                       </Button>
                   ) : isCompleted ? (
                       <Button 
                           onClick={() => onReset?.(challenge.id)}
-                          size="sm" 
-                          className="w-full h-10 font-bold text-[10px] tracking-wide bg-zinc-800 text-zinc-400 hover:text-white rounded-lg"
+                          size="lg"
+                          className="w-full h-11 font-bold tracking-widest text-[10px] uppercase bg-zinc-900 text-zinc-500 hover:text-zinc-300 border border-zinc-800 rounded-lg"
                       >
-                          Mastered (Redo)
+                          Mastery Redo
                       </Button>
                   ) : hasActiveChallenge ? (
-                      <div className="w-full h-10 flex items-center justify-center rounded-lg bg-zinc-950">
-                          <span className="text-[10px] font-bold text-zinc-700 tracking-wide">Focus Limit</span>
+                      <div className="w-full h-11 flex items-center justify-center rounded-lg bg-zinc-900/50 border border-zinc-800/50">
+                          <span className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest">Limit reached</span>
                       </div>
                   ) : (
                       <Button
-                          size="sm"
+                          size="lg"
                           onClick={() => onStart(challenge)}
-                          className="w-full h-10 font-bold tracking-wide text-[10px] bg-white text-black hover:bg-main rounded-lg"
+                          className="w-full h-11 font-bold tracking-widest text-[10px] uppercase bg-white text-black hover:bg-zinc-100 rounded-lg shadow-lg transition-all"
                       >
-                          Start Challenge
+                          Start Journey
                       </Button>
                   )}
               </div>
