@@ -3,6 +3,10 @@ import { cn } from "assets/lib/utils";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import { ArrowUpCircle, Gift, Lock, Play, Shield, Star, Swords, Trophy, Wand2, X, Sparkles, ChevronRight, Zap } from "lucide-react";
+import CreativityIcon from "components/Icon/CreativityIcon";
+import HearingIcon from "components/Icon/HearingIcon";
+import TechniqueIcon from "components/Icon/TechniqueIcon";
+import TheoryIcon from "components/Icon/TheoryIcon";
 import { useEffect,useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -37,10 +41,10 @@ export const ChallengeRPGMap = ({
   }, []);
 
   const categories = [
-    { id: 'technique', name: 'Technique', icon: Swords },
-    { id: 'theory', name: 'Theory', icon: Shield },
-    { id: 'hearing', name: 'Hearing', icon: Wand2 },
-    { id: 'creativity', name: 'Creativity', icon: Star },
+    { id: 'technique', name: 'Technique', icon: TechniqueIcon },
+    { id: 'theory', name: 'Theory', icon: TheoryIcon },
+    { id: 'hearing', name: 'Hearing', icon: HearingIcon },
+    { id: 'creativity', name: 'Creativity', icon: CreativityIcon },
   ];
 
   const handleNodeClick = (e: React.MouseEvent, challenge: Challenge, cat: any, theme: any) => {
@@ -94,7 +98,7 @@ export const ChallengeRPGMap = ({
                        "w-14 h-14 rounded-lg bg-zinc-900 border border-zinc-900 flex items-center justify-center shadow-lg",
                        theme.primary
                      )}>
-                        <CatIcon size={28} strokeWidth={1.5} />
+                        <CatIcon size="large" className="text-[28px]" />
                      </div>
                      <div className="flex flex-col gap-0.5">
                        <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest leading-none">Map Track</span>
@@ -125,7 +129,7 @@ export const ChallengeRPGMap = ({
                 <div className="flex flex-wrap gap-x-12 md:gap-x-16 gap-y-20 flex-1 items-start justify-center md:justify-start relative z-10 px-4">
                   {skillIds.map((skillId) => {
                     const skillData = guitarSkills.find(s => s.id === skillId);
-                    const SkillIcon = skillData?.icon || CatIcon;
+                    const SkillIcon = skillData?.icon || Trophy;
                     const challenges = [...skillsMap[skillId]].sort((a, b) => a.requiredLevel - b.requiredLevel);
                     const currentSkillLevel = userSkills ? (userSkills[skillId] || 0) : 0;
 
@@ -138,7 +142,7 @@ export const ChallengeRPGMap = ({
                             currentSkillLevel > 0 ? theme.border : "border-zinc-800 text-zinc-700",
                             currentSkillLevel > 0 && theme.primary
                           )}>
-                             <SkillIcon size={18} strokeWidth={1.5} />
+                             <SkillIcon size={18} />
                           </div>
                           <div className="flex flex-col items-center gap-0.5">
                             <span className="text-[9px] font-bold text-white uppercase tracking-tight text-center leading-tight max-w-[90px]">
@@ -181,7 +185,7 @@ export const ChallengeRPGMap = ({
                                       : "bg-[#050505] border-zinc-900 text-zinc-800 opacity-40 cursor-not-allowed",
                                 isSelected && "ring-2 ring-white/20 ring-offset-2 ring-offset-[#0a0a0a]"
                               )}>
-                                 <SkillIcon size={22} strokeWidth={isDone ? 2 : 1.5} />
+                                 <SkillIcon size={18} strokeWidth={1.5} />
                                  
                                  {isActive && (
                                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded flex items-center justify-center text-white shadow-lg">
