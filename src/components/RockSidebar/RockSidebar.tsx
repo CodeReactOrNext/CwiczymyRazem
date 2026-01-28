@@ -31,6 +31,7 @@ import {
   User,
   X,
   Video,
+  LogOut,
 } from "lucide-react";
 import { Heart, Zap } from "lucide-react";
 import Image from "next/image";
@@ -38,9 +39,10 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { FaDiscord } from "react-icons/fa";
-import { useAppSelector } from "store/hooks";
+import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
+import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 
 import { CommunityModal } from "./CommunityModal";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
@@ -62,6 +64,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   // User data
   const userStats = useAppSelector(selectCurrentUserStats);
@@ -806,6 +809,20 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                 </div>
 
                 <PWASidebarItem />
+                
+                <Separator className='bg-white/10' />
+                
+                <button
+                    onClick={() => {
+                        handleLinkClick();
+                        dispatch(logUserOff());
+                    }}
+                    className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 mb-12'>
+                    <span className='text-zinc-500 group-hover:text-red-500'>
+                        <LogOut size={16} />
+                    </span>
+                    <span>Sign Out</span>
+                </button>
               </nav>
             </motion.aside>
           </>

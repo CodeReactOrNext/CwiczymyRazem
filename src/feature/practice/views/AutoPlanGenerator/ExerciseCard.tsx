@@ -57,7 +57,7 @@ export const ExerciseCard = ({
           <div className='flex flex-wrap items-center gap-2'>
             <span className='whitespace-nowrap text-xs text-muted-foreground sm:text-sm'>
               <FaClock className='mr-1 inline h-3 w-3' />
-              {exercise.timeInMinutes} {t("common:min")}
+              {exercise.timeInMinutes} min
             </span>
             <span
               className={`rounded-full px-2 py-0.5 text-xs ${

@@ -95,7 +95,7 @@ export const PlanSetup = ({
               </Button>
 
               <div className='w-20 text-center font-medium'>
-                {time} {t("common:min")}
+                {time} min
               </div>
             </div>
           </div>
