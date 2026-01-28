@@ -2,7 +2,7 @@ import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { selectCurrentUserStats,selectUserAuth } from "feature/user/store/userSlice";
-import { Play,Trophy } from "lucide-react";
+import { ChevronRight, Play, Trophy, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect,useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -111,7 +111,7 @@ export const ChallengesView = () => {
         <ChallengeHeader onBack={handleBack} />
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 bg-zinc-900 p-1 rounded-lg w-fit mb-12">
+        <div className="flex items-center gap-2 bg-[#0a0a0a] p-1.5 rounded-xl w-fit mb-16 border border-zinc-900 shadow-2xl">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -120,13 +120,13 @@ export const ChallengesView = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "flex items-center gap-2 px-6 py-2.5 rounded-lg text-[10px] font-bold tracking-wide transition-all",
+                  "flex items-center gap-2.5 px-8 py-3 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300",
                   isActive 
-                    ? "bg-zinc-800 text-white shadow-lg" 
-                    : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"
+                    ? "bg-white text-black shadow-[0_10px_20px_-5px_rgba(255,255,255,0.2)]" 
+                    : "text-zinc-500 hover:text-white hover:bg-zinc-800/50"
                 )}
               >
-                <Icon size={14} className={isActive ? "text-main" : ""} />
+                <Icon size={14} strokeWidth={isActive ? 3 : 2} className={cn("transition-colors", isActive ? "text-black" : "text-zinc-600")} />
                 {tab.label}
               </button>
             );
@@ -135,7 +135,7 @@ export const ChallengesView = () => {
 
         <div className="space-y-16">
           {activeTab === 'ACTIVE' && (
-            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-out">
               {hasActiveChallenge ? (
                 <div className="space-y-6">
                   {activeChallengesData.map(({ data, ...ac }) => data && (
@@ -149,17 +149,23 @@ export const ChallengesView = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-20 bg-zinc-950/30 rounded-2xl flex flex-col items-center">
-                  <div className="w-16 h-16 bg-zinc-900 rounded-2xl flex items-center justify-center mb-6 text-zinc-700">
-                    <Trophy size={32} strokeWidth={1} />
+                <div className="text-center py-24 bg-[#0a0a0a] border border-zinc-900 rounded-[2.5rem] flex flex-col items-center relative overflow-hidden">
+                  {/* Subtle background glow */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-zinc-800/20 blur-[100px] pointer-events-none" />
+                  
+                  <div className="w-20 h-20 bg-zinc-900 border border-zinc-800 rounded-3xl flex items-center justify-center mb-8 text-zinc-600 shadow-2xl relative z-10">
+                    <Trophy size={40} strokeWidth={1} />
                   </div>
-                  <h3 className="text-xl font-black text-white italic mb-2">No active challenges</h3>
-                  <p className="text-zinc-500 text-sm mb-8">Pick a challenge to start your daily practice routine.</p>
+                  <div className="relative z-10 mb-10">
+                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter mb-3">No Active Journeys</h3>
+                    <p className="text-zinc-500 text-sm max-w-md mx-auto leading-relaxed">Your quest log is empty. Dive into the mastery map to start your next challenge.</p>
+                  </div>
                   <button 
                     onClick={() => setActiveTab('PROGRESS')}
-                    className="px-8 py-3 bg-main text-black rounded-lg font-bold text-[10px] tracking-wide hover:scale-105 transition-transform"
+                    className="relative z-10 px-10 h-14 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-2xl flex items-center gap-3"
                   >
-                    Browse Catalog
+                    Explore Challenges
+                    <ChevronRight size={18} strokeWidth={3} />
                   </button>
                 </div>
               )}

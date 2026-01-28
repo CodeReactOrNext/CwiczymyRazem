@@ -5,23 +5,18 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
 export const PricingSection = () => {
-  const grainOverlay = "before:content-[''] before:absolute before:inset-0 before:opacity-[0.03] before:pointer-events-none before:bg-[url('/static/images/old_effect_dark.webp')] before:z-50";
+
 
   return (
-    <section className={`py-32 bg-zinc-950 relative overflow-hidden ${grainOverlay}`}>
+    <section className="py-32 bg-zinc-950 relative overflow-hidden">
       {/* Background Ambience */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 blur-[150px] rounded-full pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-teal-500/[0.12] blur-[150px] rounded-full pointer-events-none"></div>
 
       <div className='mx-auto max-w-7xl px-6 lg:px-8 text-center relative z-10'>
         <div className='max-w-4xl mx-auto'>
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black uppercase tracking-widest mb-8">
-               <Sparkles className="w-3 h-3" /> Fully Operational
-            </div>
-            
             <h2 className='text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight mb-8 font-display'>
               Professional tracking, <br />
-              <span className="text-zinc-600">at zero cost.</span>
+              <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">at zero cost.</span>
             </h2>
             
             <p className='text-xl sm:text-2xl text-zinc-400 font-medium leading-relaxed mb-20 max-w-2xl mx-auto'>
@@ -55,7 +50,6 @@ export const PricingSection = () => {
             <p className="mt-12 text-zinc-600 text-sm font-bold uppercase tracking-widest">
                 No Credit Card Required • Join 600+ Guitarists
             </p>
-          </div>
         </div>
       </div>
     </section>
