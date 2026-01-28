@@ -1,7 +1,8 @@
 import { Badge } from "assets/components/ui/badge";
 import { cn } from "assets/lib/utils";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
-import { ArrowUpCircle, Gift, Lock, Play, Shield, Star, Swords, Trophy, Wand2, X } from "lucide-react";
+import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
+import { ArrowUpCircle, Gift, Lock, Play, Shield, Star, Swords, Trophy, Wand2, X, Sparkles, ChevronRight, Zap } from "lucide-react";
 import { useEffect,useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -25,7 +26,7 @@ export const ChallengeRPGMap = ({
   onPractice,
   onStart
  }: ChallengeRPGMapProps) => {
-  const [activeNode, setActiveNode] = useState<{ challenge: Challenge; rect: DOMRect; cat: any } | null>(null);
+  const [activeNode, setActiveNode] = useState<{ challenge: Challenge; rect: DOMRect; cat: any; theme: any } | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -36,38 +37,40 @@ export const ChallengeRPGMap = ({
   }, []);
 
   const categories = [
-    { id: 'technique', name: 'Technique', icon: Swords, color: 'text-blue-400', accent: 'blue' },
-    { id: 'theory', name: 'Theory', icon: Shield, color: 'text-amber-400', accent: 'amber' },
-    { id: 'hearing', name: 'Hearing', icon: Wand2, color: 'text-emerald-400', accent: 'emerald' },
-    { id: 'creativity', name: 'Creativity', icon: Star, color: 'text-purple-400', accent: 'purple' },
+    { id: 'technique', name: 'Technique', icon: Swords },
+    { id: 'theory', name: 'Theory', icon: Shield },
+    { id: 'hearing', name: 'Hearing', icon: Wand2 },
+    { id: 'creativity', name: 'Creativity', icon: Star },
   ];
 
-  const handleNodeClick = (e: React.MouseEvent, challenge: Challenge, cat: any) => {
+  const handleNodeClick = (e: React.MouseEvent, challenge: Challenge, cat: any, theme: any) => {
     e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     if (activeNode?.challenge.id === challenge.id) {
       setActiveNode(null);
     } else {
-      setActiveNode({ challenge, rect, cat });
+      setActiveNode({ challenge, rect, cat, theme });
     }
   };
 
   return (
-    <div className="mb-20 space-y-12">
+    <div className="mb-24 space-y-12">
       <div className="flex flex-col gap-1 px-1">
-         <h2 className="text-2xl font-black text-white italic tracking-tighter">Skill Mapping</h2>
-         <p className="text-[11px] font-bold text-zinc-500 tracking-wide leading-none opacity-80">Track your evolution & start practice</p>
+         <h2 className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2">
+            <Zap size={12} className="text-blue-500" />
+            Skill Mapping
+         </h2>
+         <p className="text-xl font-bold text-white tracking-tight">Your evolution journey</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-12">
+      <div className="grid grid-cols-1 gap-16">
           {Object.entries(challengesByCategory).map(([catId, skillsMap]) => {
             const predefined = categories.find(c => c.id === catId);
+            const theme = getSkillTheme(catId as any);
             const cat = predefined || { 
               id: catId, 
               name: catId.charAt(0).toUpperCase() + catId.slice(1), 
-              icon: Trophy, 
-              color: 'text-zinc-400', 
-              accent: 'zinc' 
+              icon: Trophy
             };
             
             const skillIds = Object.keys(skillsMap);
@@ -77,36 +80,49 @@ export const ChallengeRPGMap = ({
             const CatIcon = cat.icon;
 
             return (
-              <div key={cat.id} className="w-full rounded-xl bg-zinc-900/50 p-8 flex flex-col gap-10 relative overflow-hidden shadow-2xl">
+              <div key={cat.id} className="w-full rounded-lg bg-[#0a0a0a] border border-zinc-900 p-6 md:p-8 flex flex-col gap-10 relative overflow-hidden shadow-xl">
+                {/* Visual Background Decoration */}
+                <div className={cn(
+                  "absolute top-0 left-0 w-48 h-48 blur-[80px] opacity-[0.05] pointer-events-none",
+                  theme.glow
+                )} />
+
                 {/* Header Section */}
-                <div className="flex items-start justify-between relative z-10">
-                  <div className="flex items-center gap-4">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10">
+                  <div className="flex items-center gap-5">
                      <div className={cn(
-                       "w-12 h-12 rounded-xl bg-zinc-950 flex items-center justify-center",
-                       cat.color
+                       "w-14 h-14 rounded-lg bg-zinc-900 border border-zinc-900 flex items-center justify-center shadow-lg",
+                       theme.primary
                      )}>
-                        <CatIcon size={24} strokeWidth={2} />
+                        <CatIcon size={28} strokeWidth={1.5} />
                      </div>
                      <div className="flex flex-col gap-0.5">
-                       <h3 className="text-lg font-black text-white italic tracking-tight">{cat.name}</h3>
-                       <span className="text-[10px] font-bold text-zinc-500 tracking-wide leading-none">
-                         {completedCount} / {allChallenges.length} Mastered
-                       </span>
+                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest leading-none">Map Track</span>
+                       <h3 className="text-2xl font-bold text-white uppercase tracking-tight leading-none">{cat.name}</h3>
+                       <div className="flex items-center gap-3 mt-1">
+                          <span className="text-[11px] font-bold text-zinc-500">
+                            {completedCount} <span className="text-zinc-700">/ {allChallenges.length} Mastered</span>
+                          </span>
+                       </div>
                      </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <div className="text-xs font-black text-white tracking-widest">{Math.round(progress * 100)}%</div>
-                    <div className="h-1.5 w-24 bg-zinc-950 rounded-full overflow-hidden">
+
+                  <div className="flex flex-col items-end gap-2.5 min-w-[180px]">
+                    <div className="flex items-center justify-between w-full">
+                       <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest leading-none">Category Completion</span>
+                       <span className="text-[11px] font-bold text-white tracking-widest">{Math.round(progress * 100)}%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-zinc-950 rounded-full overflow-hidden">
                        <div 
-                        className={cn("h-full rounded-full transition-all duration-700", `bg-${cat.accent}-400`)}
+                        className={cn("h-full rounded-full transition-all duration-1000 ease-out", theme.glow)}
                         style={{ width: `${progress * 100}%` }}
                        />
                     </div>
                   </div>
                 </div>
 
-                {/* Skill Columns Journey */}
-                <div className="flex flex-wrap gap-x-16 gap-y-24 flex-1 items-start justify-center relative z-10">
+                {/* Skill Journey Grid */}
+                <div className="flex flex-wrap gap-x-12 md:gap-x-16 gap-y-20 flex-1 items-start justify-center md:justify-start relative z-10 px-4">
                   {skillIds.map((skillId) => {
                     const skillData = guitarSkills.find(s => s.id === skillId);
                     const SkillIcon = skillData?.icon || CatIcon;
@@ -114,31 +130,28 @@ export const ChallengeRPGMap = ({
                     const currentSkillLevel = userSkills ? (userSkills[skillId] || 0) : 0;
 
                     return (
-                      <div key={skillId} className="flex flex-col items-center gap-6 min-w-[70px]">
-                        {/* Skill Header with Level */}
-                        <div className="flex flex-col items-center gap-1.5">
+                      <div key={skillId} className="flex flex-col items-center gap-8 min-w-[70px]">
+                        {/* Skill Node Hub */}
+                        <div className="flex flex-col items-center gap-3 group/hub">
                           <div className={cn(
-                            "w-8 h-8 rounded-lg flex items-center justify-center bg-zinc-950",
-                            currentSkillLevel > 0 ? cat.color : "text-zinc-800"
+                            "w-9 h-9 rounded-lg flex items-center justify-center bg-zinc-900 border transition-all duration-300 shadow-md",
+                            currentSkillLevel > 0 ? theme.border : "border-zinc-800 text-zinc-700",
+                            currentSkillLevel > 0 && theme.primary
                           )}>
-                             <SkillIcon size={16} />
+                             <SkillIcon size={18} strokeWidth={1.5} />
                           </div>
-                          <span className="text-[9px] font-bold text-zinc-500 text-center leading-tight max-w-[80px] truncate">
-                            {skillData?.name || skillId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                          </span>
-                          <Badge 
-                            variant="secondary"
-                            className={cn(
-                              "font-black text-[10px] border-none px-2 py-0",
-                              currentSkillLevel > 0 ? `bg-${cat.accent}-500/20 text-${cat.accent}-400` : "bg-zinc-800 text-zinc-500"
-                            )}
-                          >
-                            Lvl {currentSkillLevel}
-                          </Badge>
+                          <div className="flex flex-col items-center gap-0.5">
+                            <span className="text-[9px] font-bold text-white uppercase tracking-tight text-center leading-tight max-w-[90px]">
+                              {skillData?.name || skillId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                            </span>
+                            <span className="text-[8px] font-bold text-zinc-700 uppercase tracking-widest">
+                              Lvl {currentSkillLevel}
+                            </span>
+                          </div>
                         </div>
                         
-                        {/* Challenge Nodes */}
-                        <div className="flex flex-col items-center gap-14">
+                        {/* Journey Nodes */}
+                        <div className="flex flex-col items-center gap-16 w-full">
                         {challenges.map((challenge, cIdx) => {
                           const isDone = completedChallenges.includes(challenge.id);
                           const isActive = activeChallenges.some(ac => ac.challengeId === challenge.id);
@@ -148,37 +161,43 @@ export const ChallengeRPGMap = ({
 
                           return (
                             <div key={challenge.id} className="relative">
-                              {/* Vertical Connector */}
+                              {/* Connector Logic */}
                               {cIdx > 0 && (
                                 <div className={cn(
-                                  "absolute -top-14 left-1/2 -translate-x-1/2 w-0.5 h-14",
-                                  isDone ? `bg-${cat.accent}-500/40` : isAvailable ? `bg-${cat.accent}-500/20` : "bg-zinc-800"
+                                  "absolute -top-16 left-1/2 -translate-x-1/2 w-[2px] h-16",
+                                  isDone ? theme.bg : isAvailable ? "bg-zinc-800" : "bg-zinc-900/40"
                                 )} />
                               )}
 
-                              {/* Node Element */}
+                              {/* Target Node */}
                               <button 
-                                onClick={(e) => handleNodeClick(e, challenge, cat)}
+                                onClick={(e) => handleNodeClick(e, challenge, cat, theme)}
                                 className={cn(
-                                "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 relative z-10 shadow-lg",
+                                "w-14 h-14 rounded-lg flex items-center justify-center transition-all duration-300 relative z-10 shadow-lg border-2",
                                 isDone 
-                                    ? `bg-${cat.accent}-950 text-${cat.accent}-400` 
+                                    ? "bg-white border-white text-black" 
                                     : isAvailable
-                                      ? "bg-zinc-800 text-zinc-300 shadow-lg"
-                                      : "bg-zinc-950 text-zinc-800 opacity-40",
-                                isSelected && "ring-2 ring-white/20 ring-offset-4 ring-offset-zinc-900"
+                                      ? "bg-[#111111] border-zinc-800 text-white hover:border-zinc-700"
+                                      : "bg-[#050505] border-zinc-900 text-zinc-800 opacity-40 cursor-not-allowed",
+                                isSelected && "ring-2 ring-white/20 ring-offset-2 ring-offset-[#0a0a0a]"
                               )}>
-                                 <SkillIcon size={24} />
+                                 <SkillIcon size={22} strokeWidth={isDone ? 2 : 1.5} />
                                  
                                  {isActive && (
-                                   <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center text-black shadow-lg">
+                                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded flex items-center justify-center text-white shadow-lg">
                                       <Play size={10} fill="currentColor" />
                                    </div>
                                  )}
 
                                  {!isDone && !isAvailable && (
-                                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-black rounded-lg flex items-center justify-center">
-                                     <Lock size={12} className="text-zinc-600" />
+                                   <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-zinc-900 rounded-sm flex items-center justify-center border border-zinc-800">
+                                      <Lock size={10} className="text-zinc-600" />
+                                   </div>
+                                 )}
+
+                                 {isDone && (
+                                   <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-sm flex items-center justify-center text-white shadow-md">
+                                      <Zap size={10} fill="currentColor" />
                                    </div>
                                  )}
                               </button>
@@ -195,14 +214,14 @@ export const ChallengeRPGMap = ({
           })}
       </div>
 
-      {/* Portal Tooltip */}
+      {/* Simplified RPG Tooltip */}
       {mounted && activeNode && createPortal(
          <div 
-          className="fixed inset-0 z-[99999] pointer-events-auto bg-black/50 sm:bg-transparent flex items-center justify-center sm:block"
+          className="fixed inset-0 z-[99999] pointer-events-auto bg-black/40 backdrop-blur-sm sm:bg-transparent flex items-center justify-center sm:block"
           onClick={() => setActiveNode(null)}
          >
             <div 
-              className="animate-in fade-in slide-in-from-bottom-4 sm:slide-in-from-top-2 duration-200 sm:absolute mx-4 sm:mx-0"
+              className="animate-in fade-in slide-in-from-bottom-2 duration-200 sm:absolute mx-4 sm:mx-0"
               style={{
                 ...(typeof window !== 'undefined' && window.innerWidth >= 640 ? {
                   top: activeNode.rect.top + activeNode.rect.height / 2,
@@ -216,78 +235,65 @@ export const ChallengeRPGMap = ({
               }}
               onClick={(e) => e.stopPropagation()}
             >
-               <div className="bg-zinc-950 p-5 rounded-2xl shadow-2xl flex flex-col gap-4 w-[300px] sm:min-w-[240px] sm:max-w-[300px] relative">
+               <div className="bg-[#111111] p-6 rounded-lg shadow-2xl flex flex-col gap-5 w-[320px] relative border border-zinc-800">
                   <button 
                     onClick={() => setActiveNode(null)}
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-zinc-800 rounded-full flex items-center justify-center text-zinc-400 hover:text-white shadow-lg"
+                    className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
                   >
-                    <X size={12} />
+                    <X size={16} />
                   </button>
 
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[11px] font-black text-white tracking-wide">{activeNode.challenge.title}</span>
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        "w-1.5 h-1.5 rounded-full",
-                        completedChallenges.includes(activeNode.challenge.id) ? `bg-${activeNode.cat.accent}-500` : "bg-amber-500"
-                      )} />
-                      <span className="text-[9px] font-bold text-zinc-500">
-                        {completedChallenges.includes(activeNode.challenge.id) ? 'Completed' : 'Next Milestone'}
-                      </span>
+                  <div className="pr-6">
+                    <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest block mb-1">Module {activeNode.challenge.requiredLevel}</span>
+                    <h4 className="text-lg font-bold text-white tracking-tight mb-2">{activeNode.challenge.title}</h4>
+                    <p className="text-zinc-500 text-[11px] font-medium leading-normal">{activeNode.challenge.description}</p>
+                  </div>
+
+                  {/* Requirements */}
+                  <div className="bg-zinc-900/50 p-4 rounded-lg flex flex-col gap-3 border border-zinc-800/50">
+                      <div className="flex items-center justify-between">
+                         <div className="flex flex-col">
+                            <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Mastery Gate</span>
+                            <span className="text-xs font-bold text-zinc-300">Requires Rank {activeNode.challenge.requiredLevel}</span>
+                         </div>
+                         <div className={cn(
+                            "w-8 h-8 rounded-lg flex items-center justify-center border",
+                            (userSkills[activeNode.challenge.requiredSkillId] || 0) >= activeNode.challenge.requiredLevel ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" : "bg-zinc-900 border-zinc-800 text-zinc-700"
+                         )}>
+                            <Trophy size={14} />
+                         </div>
+                      </div>
+                      <div className="h-1 w-full bg-zinc-950 rounded-full overflow-hidden">
+                          <div 
+                            className={cn("h-full transition-all duration-700", (userSkills[activeNode.challenge.requiredSkillId] || 0) >= activeNode.challenge.requiredLevel ? "bg-emerald-500" : "bg-zinc-700")}
+                            style={{ width: `${Math.min(((userSkills[activeNode.challenge.requiredSkillId] || 0) / activeNode.challenge.requiredLevel) * 100, 100)}%` }}
+                          />
+                      </div>
+                  </div>
+
+                  {/* Reward */}
+                  <div className="flex items-center gap-3 p-3 bg-zinc-900 rounded-lg border border-transparent">
+                    <div className="w-8 h-8 rounded-md bg-zinc-800 flex items-center justify-center text-zinc-400">
+                        <Gift size={16} />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Reward</span>
+                        <div className="flex items-center gap-2">
+                           <span className="text-xs font-bold text-zinc-200">{activeNode.challenge.rewardDescription || "Mastery Points"}</span>
+                           <Sparkles size={11} className="text-zinc-500" />
+                        </div>
                     </div>
                   </div>
 
-                  {/* Requirements & Progress */}
-                  {activeNode.challenge.requiredLevel > 0 && (
-                    <div className="bg-zinc-900/50 p-2.5 rounded-xl flex flex-col gap-2">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[9px] font-bold text-zinc-500 flex items-center gap-1.5">
-                              <ArrowUpCircle size={10} /> Requirement
-                            </span>
-                            <span className={cn("text-[10px] font-black", (userSkills[activeNode.challenge.requiredSkillId] || 0) >= activeNode.challenge.requiredLevel ? "text-emerald-400" : "text-amber-400")}>
-                              Lvl {activeNode.challenge.requiredLevel}
-                            </span>
-                        </div>
-                        <div className="h-1 bg-zinc-950 rounded-full overflow-hidden">
-                            <div 
-                              className={cn("h-full rounded-full transition-all", (userSkills[activeNode.challenge.requiredSkillId] || 0) >= activeNode.challenge.requiredLevel ? "bg-emerald-500" : "bg-zinc-800")}
-                              style={{ width: `${Math.min(((userSkills[activeNode.challenge.requiredSkillId] || 0) / activeNode.challenge.requiredLevel) * 100, 100)}%` }}
-                            />
-                        </div>
-                        <span className="text-[8px] font-bold text-zinc-600 text-center">
-                            Your Current: Lvl {userSkills ? (userSkills[activeNode.challenge.requiredSkillId] || 0) : 0}
-                        </span>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col gap-2 p-3 bg-zinc-900/40 rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-lg bg-zinc-950 text-amber-500 shrink-0">
-                          <Gift size={14} />
-                      </div>
-                      <div className="flex flex-col gap-0.5 min-w-0">
-                          <span className="text-[8px] font-black text-zinc-500 tracking-wide">Reward</span>
-                          <p className="text-[10px] text-zinc-300 font-medium leading-tight truncate">{activeNode.challenge.rewardDescription || "XP & Mastery Badge"}</p>
-                      </div>
-                    </div>
-                    {activeNode.challenge.rewardSkillId && (
-                      <div className="flex items-center justify-between px-2 py-1.5 bg-zinc-950 rounded-lg">
-                        <span className="text-[9px] font-bold text-zinc-500 truncate">
-                          {activeNode.challenge.rewardSkillId.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                        </span>
-                        <span className="text-[10px] font-black text-emerald-400">+{activeNode.challenge.rewardLevel} pts</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col gap-2 mt-2">
+                  {/* Actions */}
+                  <div className="flex flex-col gap-2">
                     {activeChallenges.some(ac => ac.challengeId === activeNode.challenge.id) ? (
                       <button 
                         onClick={() => { onPractice(activeNode.challenge); setActiveNode(null); }}
-                        className="w-full py-2.5 bg-white text-black rounded-lg font-bold text-[10px] tracking-wide hover:bg-zinc-200"
+                        className="w-full h-11 bg-white text-black rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-zinc-100 transition-all shadow-lg flex items-center justify-center gap-2"
                       >
-                        Practice Now
+                        <Play size={14} fill="currentColor" />
+                        Resume Training
                       </button>
                     ) : (completedChallenges.includes(activeNode.challenge.id) || ((userSkills[activeNode.challenge.requiredSkillId] || 0) >= activeNode.challenge.requiredLevel)) ? (
                       <button 
@@ -297,19 +303,23 @@ export const ChallengeRPGMap = ({
                           setActiveNode(null); 
                         }}
                         className={cn(
-                          "w-full py-2.5 rounded-lg font-bold text-[10px] tracking-wide transition-colors",
-                          completedChallenges.includes(activeNode.challenge.id) ? "border border-white/10 text-white hover:bg-white/5" : "bg-emerald-500 text-black hover:bg-emerald-400"
+                          "w-full h-11 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg",
+                          completedChallenges.includes(activeNode.challenge.id) 
+                            ? "bg-zinc-800 text-white hover:bg-zinc-700" 
+                            : "bg-white text-black hover:bg-zinc-100"
                         )}
                       >
-                        {completedChallenges.includes(activeNode.challenge.id) ? 'Mastery Review' : 'Start Challenge'}
+                        {completedChallenges.includes(activeNode.challenge.id) ? (
+                          <>Mastery Rewatch <ChevronRight size={14} /></>
+                        ) : (
+                          <>Unlock Node <ChevronRight size={14} /></>
+                        )}
                       </button>
                     ) : (
-                      <button 
-                        disabled
-                        className="w-full py-2.5 bg-zinc-800 text-zinc-600 rounded-lg font-bold text-[10px] tracking-wide cursor-not-allowed"
-                      >
-                        Path Locked
-                      </button>
+                      <div className="w-full h-11 bg-zinc-900/50 border border-zinc-800/50 rounded-lg flex items-center justify-center gap-2">
+                        <Lock size={12} className="text-zinc-700" />
+                        <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Locked</span>
+                      </div>
                     )}
                   </div>
                </div>

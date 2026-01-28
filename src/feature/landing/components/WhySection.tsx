@@ -21,18 +21,18 @@ const reasons = [
 ];
 
 export const WhySection = () => {
-  const grainOverlay = "before:content-[''] before:absolute before:inset-0 before:opacity-[0.03] before:pointer-events-none before:bg-[url('/static/images/old_effect_dark.webp')] before:z-50";
+
 
   return (
-    <section className={`py-32 bg-zinc-950 relative overflow-hidden ${grainOverlay}`}>
+    <section className="py-32 bg-zinc-950 relative overflow-hidden">
       {/* Subtle background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/[0.15] blur-[140px] rounded-full pointer-events-none"></div>
 
       <div className='mx-auto max-w-7xl px-6 lg:px-8 relative z-10'>
         <div className='max-w-3xl mb-24'>
           <h2 className='text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight font-display'>
             Built for those who <br />
-            <span className="text-zinc-600">refuse to plateau.</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">refuse to plateau.</span>
           </h2>
         </div>
 

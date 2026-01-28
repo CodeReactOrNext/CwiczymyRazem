@@ -244,12 +244,21 @@ module.exports = {
             transform: "scale(1)"
           },
         },
+        "gradient": {
+          "0%, 100%": {
+            "background-position": "0% 50%"
+          },
+          "50%": {
+            "background-position": "100% 50%"
+          }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "ping-slow": "ping-slow 0.8s ease-out",
         "skill-upgraded": "skill-upgraded 0.5s ease-in-out",
+        "gradient": "gradient 6s linear infinite",
       },
     },
     fontFamily: {

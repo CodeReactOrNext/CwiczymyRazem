@@ -8,6 +8,7 @@ import { cn } from "assets/lib/utils";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import type { GuitarSkill } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
+import { ArrowUpRight } from "lucide-react";
 
 interface SkillCardProps {
   skill: GuitarSkill;
@@ -26,52 +27,75 @@ export const SkillCard = ({
   const progress = Math.min((currentPoints / visualMax) * 100, 100);
 
   return (
-    <div className="bg-[#141414] rounded-lg p-5 flex flex-col gap-4 transition-colors group relative overflow-hidden shadow-lg">
-      <div className="flex items-start gap-3 sm:gap-4 z-10">
-        <div className={cn(
-            "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center bg-zinc-900/50 flex-shrink-0",
-            theme.primary
-        )}>
-           {Icon && <Icon className="w-5 h-5 sm:w-6 sm:h-6" />}
-        </div>
-        <div className="flex-1 min-w-0">
-            <h3 className="text-sm sm:text-base text-white font-bold leading-tight truncate">{skill.name || t(`skills.${skill.id}.name` as any)}</h3>
+    <div className="group relative bg-[#0f0f0f] border border-zinc-900 rounded-lg p-5 transition-all duration-300 overflow-hidden">
+      {/* Hover Background Decor */}
+      <div className={cn(
+        "absolute inset-0 opacity-0 group-hover:opacity-[0.03] transition-opacity duration-700 bg-gradient-to-br",
+        theme.glow
+      )} />
+
+      <div className="relative z-10 flex flex-col gap-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1.5">
+              <h3 className="text-white font-bold text-base tracking-tight leading-tight transition-colors">
+                {skill.name || t(`skills.${skill.id}.name` as any)}
+              </h3>
+            </div>
+            
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className="text-zinc-500 text-xs mt-1 line-clamp-2 cursor-help">
+                  <p className="text-zinc-500 text-[12px] line-clamp-2 cursor-help font-medium leading-normal">
                     {t(`skills.${skill.id}.description` as any)}
                   </p>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p className="text-sm">{t(`skills.${skill.id}.description` as any)}</p>
+                <TooltipContent side="bottom" className="max-w-[260px] bg-black border border-zinc-800 text-zinc-300 p-3 shadow-2xl rounded-lg">
+                  <p className="text-xs leading-relaxed">{t(`skills.${skill.id}.description` as any)}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+          </div>
+
+          <div className={cn(
+            "w-12 h-12 rounded-lg flex items-center justify-center bg-zinc-950 border border-zinc-800/80 transition-all duration-500 relative overflow-hidden",
+            theme.primary
+          )}>
+            {/* Subtle Pattern in Icon Box */}
+            <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
+               <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                  <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
+                    <path d="M 8 0 L 0 0 0 8" fill="none" stroke="currentColor" strokeWidth="0.5"/>
+                  </pattern>
+                  <rect width="100%" height="100%" fill="url(#grid)" />
+               </svg>
+            </div>
+            {Icon && <Icon className="w-5 h-5 relative z-10" strokeWidth={1.5} />}
+          </div>
         </div>
-        <div className="flex flex-col items-end flex-shrink-0">
-             <span className="text-xl sm:text-2xl font-bold text-white">{currentPoints}</span>
-             <span className="text-[10px] text-zinc-500 uppercase tracking-widest">Level</span>
+
+        <div className="space-y-3">
+          <div className="flex items-end justify-between">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[9px] text-zinc-600 uppercase tracking-widest font-bold">Progress</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xl font-bold text-white leading-none">{currentPoints}</span>
+                <span className="text-zinc-600 text-[10px] font-bold">/ {visualMax} XP</span>
+              </div>
+            </div>
+            <div className="px-2 py-0.5 rounded-sm bg-zinc-900 border border-zinc-800 text-[9px] font-bold text-zinc-500 uppercase tracking-wider">
+              Tier {Math.floor(currentPoints / 10) + 1}
+            </div>
+          </div>
+          
+          <div className="h-1 w-full bg-zinc-900/50 rounded-full overflow-hidden">
+            <div 
+              className={cn("h-full transition-all duration-1000 ease-out", theme.glow)}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
         </div>
       </div>
-
-      <div className="flex flex-col gap-1.5 z-10">
-         <div className="flex justify-between text-xs text-zinc-400">
-            <span>Progress</span>
-            <span>{currentPoints} / {visualMax} (Milestone)</span>
-         </div>
-         <div className="h-2 bg-zinc-900 rounded-full overflow-hidden">
-             <div 
-               className={cn("h-full transition-all duration-500", theme.glow)}
-               style={{ width: `${progress}%` }}
-             />
-         </div>
-      </div>
-
-       <div className={cn(
-         "absolute -top-20 -right-20 w-40 h-40 blur-[80px] rounded-full pointer-events-none opacity-10 transition-opacity group-hover:opacity-20",
-         theme.glow
-       )} />
     </div>
   );
 };
