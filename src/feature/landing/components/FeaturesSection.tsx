@@ -46,7 +46,7 @@ export const FeaturesSection = () => {
     );
   }, []);
 
-  const grainOverlay = "before:content-[''] before:absolute before:inset-0 before:opacity-[0.03] before:pointer-events-none before:bg-[url('/static/images/old_effect_dark.webp')] before:z-50";
+
 
   const navigationCards = [
     { title: "Report Practice", desc: "Save and log your manual practice session.", icon: <ClipboardCheck className="w-5 h-5" />, color: "cyan", action: "Log Now" },
@@ -62,7 +62,7 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section id='features' className={`relative py-32 overflow-hidden bg-zinc-950 ${grainOverlay}`}>
+    <section id='features' className="relative py-32 overflow-hidden bg-zinc-950">
       {/* Background Ambience */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none">
         <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full"></div>
@@ -230,7 +230,7 @@ export const FeaturesSection = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
                 {/* Achievement Showcase - Balanced Size */}
-                <div className="lg:col-span-5 rounded-2xl border border-white/5 bg-zinc-900/20 p-8 backdrop-blur-xl relative overflow-hidden">
+                <div className="lg:col-span-5 rounded-2xl border border-white/5 bg-zinc-900/20 p-6 backdrop-blur-xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4">
                         <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -246,50 +246,48 @@ export const FeaturesSection = () => {
 
                         <div className="flex justify-between items-center py-6 px-4 gap-4">
                             <div className="flex flex-col items-center gap-4 group cursor-pointer lg:scale-100 scale-90">
-                                <div className="p-1 rounded-2xl transition-all duration-500 bg-white/5 group-hover:bg-white/10 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]">
+                                <div className="relative z-20 p-1 rounded-2xl transition-all duration-500 bg-white/5 group-hover:bg-white/10 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.05)]">
                                     <div className="scale-[1.8] py-4 px-3 flex items-center justify-center">
                                          <AchievementCard id="fire" />
                                     </div>
                                 </div>
-                                <div className="text-center group-hover:translate-y-[-2px] transition-transform duration-500">
+                                <div className="relative z-10 text-center group-hover:translate-y-[-2px] transition-transform duration-500">
                                     <div className="text-[11px] font-black text-white uppercase tracking-wider mb-0.5">Fire Practice</div>
                                     <div className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Very Rare</div>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col items-center gap-4 group cursor-pointer lg:scale-110 scale-95">
-                                <div className="p-1 rounded-2xl transition-all duration-500 bg-purple-500/5 group-hover:bg-purple-500/10 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.1)]">
+                            <div className="flex flex-col items-center gap-4 group cursor-pointer lg:scale-105 scale-95">
+                                <div className="relative z-20 p-1 rounded-2xl transition-all duration-500 bg-purple-500/5 group-hover:bg-purple-500/10 group-hover:shadow-[0_0_30px_rgba(168,85,247,0.1)]">
                                     <div className="scale-[2.4] py-6 px-4 flex items-center justify-center">
                                          <AchievementCard id="lvl100" />
                                     </div>
                                 </div>
-                                <div className="text-center group-hover:translate-y-[-2px] transition-transform duration-500">
+                                <div className="relative z-10 text-center group-hover:translate-y-[-2px] transition-transform duration-500">
                                     <div className="text-[12px] font-black text-white uppercase tracking-wider mb-0.5">Elite Master</div>
                                     <div className="text-[8px] font-bold text-purple-400 uppercase tracking-widest">Epic Rarity</div>
                                 </div>
                             </div>
 
                             <div className="flex flex-col items-center gap-4 group cursor-pointer lg:scale-100 scale-90">
-                                <div className="p-1 rounded-2xl transition-all duration-500 bg-cyan-500/5 group-hover:bg-cyan-500/10 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.05)]">
+                                <div className="relative z-20 p-1 rounded-2xl transition-all duration-500 bg-cyan-500/5 group-hover:bg-cyan-500/10 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.05)]">
                                     <div className="scale-[1.8] py-4 px-3 flex items-center justify-center">
                                          <AchievementCard id="diamond" />
                                     </div>
                                 </div>
-                                <div className="text-center group-hover:translate-y-[-2px] transition-transform duration-500">
+                                <div className="relative z-10 text-center group-hover:translate-y-[-2px] transition-transform duration-500">
                                     <div className="text-[11px] font-black text-white uppercase tracking-wider mb-0.5">Diamond Pick</div>
                                     <div className="text-[8px] font-bold text-cyan-400 uppercase tracking-widest">Rare</div>
                                 </div>
                             </div>
                         </div>
 
-                        <p className="mt-6 text-[9px] font-black text-zinc-700 text-center uppercase tracking-[0.4em] leading-relaxed">
-                            Collect 3D Holo Achievements <br /> with every milestone reached.
-                        </p>
+
                     </div>
                 </div>
 
                 {/* Song Library */}
-                <div className="lg:col-span-7 rounded-2xl border border-white/5 bg-zinc-900/20 p-8 backdrop-blur-xl">
+                <div className="lg:col-span-7 rounded-2xl border border-white/5 bg-zinc-900/20 p-6 backdrop-blur-xl">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
                             <Library className="w-5 h-5 text-cyan-400" />
@@ -303,26 +301,15 @@ export const FeaturesSection = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {MOCK_SONGS.slice(0, 2).map((song) => (
-                            <div key={song.id} className="h-44">
+                            <div key={song.id} className="h-40">
                                 <LandingSongCard song={song} />
                             </div>
                         ))}
-                        <div className="h-44 rounded-xl border border-dashed border-white/10 flex flex-col items-center justify-center gap-3 group cursor-pointer hover:border-white/20 transition-all bg-white/[0.02] hover:bg-white/[0.04]">
-                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-zinc-600 group-hover:translate-y-[-2px] transition-transform">
-                                <Plus className="w-5 h-5" />
-                            </div>
-                            <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Explore Library</span>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        {/* Technical Footer Trace */}
-        <div className="mt-24 pt-8 border-t border-white/5 flex justify-between items-center opacity-30">
-            <div className="text-[8px] font-black uppercase tracking-[0.5em] text-zinc-500">SYSTEM.LOG_v.2.0.4</div>
-            <div className="text-[8px] font-black uppercase tracking-[0.5em] text-zinc-500">SYNC_STATUS: 100%_SECURE</div>
-        </div>
       </div>
     </section>
   );

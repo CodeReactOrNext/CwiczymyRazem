@@ -8,7 +8,7 @@ import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap"
 import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
 import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
 import { Music2, Zap } from "lucide-react";
-import { ChevronRight, Loader2, Clock } from "lucide-react";
+import { ChevronRight, Loader2, Clock, LayoutDashboard } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -64,13 +64,13 @@ export const HeroSection = () => {
             repeatType: "mirror",
             ease: "easeInOut" 
           }}
-          className="absolute -top-[15%] -left-[10%] w-[120%] sm:w-[80%] h-[70%] bg-cyan-500/30 blur-[150px] rounded-full"
+          className="absolute -top-[15%] -left-[10%] w-[120%] sm:w-[80%] h-[70%] bg-cyan-500/30 blur-[130px] rounded-full"
         />
         <motion.div 
           animate={{ 
             x: ['15%', '-15%'],
             y: ['10%', '-10%'],
-            opacity: [0.15, 0.3, 0.15]
+            opacity: [0.15, 0.35, 0.15]
           }}
           transition={{ 
             duration: 10, 
@@ -78,7 +78,7 @@ export const HeroSection = () => {
             repeatType: "mirror",
             ease: "easeInOut" 
           }}
-          className="absolute -bottom-[15%] -right-[10%] w-[120%] sm:w-[80%] h-[70%] bg-teal-500/20 blur-[150px] rounded-full"
+          className="absolute -bottom-[15%] -right-[10%] w-[120%] sm:w-[80%] h-[70%] bg-teal-500/20 blur-[130px] rounded-full"
         />
       </div>
 
@@ -92,7 +92,7 @@ export const HeroSection = () => {
           {/* Header - Reduced Size */}
           <h1 className='text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-[1.1] mb-8 font-display'>
             Stop guessing. <br />
-            <span className='text-zinc-400'>Start seeing it.</span>
+            <span className='bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent'>Start seeing it.</span>
           </h1>
 
           <p className='max-w-2xl text-xl sm:text-2xl text-zinc-400 font-medium leading-relaxed mb-12 tracking-tight'>
@@ -103,34 +103,51 @@ export const HeroSection = () => {
           {/* Action Group */}
           <div className='flex flex-col items-center gap-8'>
             {isLoggedIn ? (
-              <Button
-                onClick={handleGoToDashboard}
-                disabled={isDashboardLoading}
-                className='h-14 px-10 bg-white text-black hover:bg-zinc-200 font-bold text-lg transition-all rounded-lg'
-              >
-                {isDashboardLoading ? <Loader2 className='animate-spin' /> : "Go to Dashboard"}
-              </Button>
+              <div className="relative p-[1px] overflow-hidden rounded-lg group">
+                {/* Vibrant Rotating Border Beam */}
+                <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)]" />
+                
+                <Button
+                  onClick={handleGoToDashboard}
+                  disabled={isDashboardLoading}
+                  className='relative h-14 px-10 bg-zinc-950 hover:bg-zinc-900 text-white border-none font-bold text-lg transition-all rounded-[7px] shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)] overflow-hidden'
+                >
+                  {isDashboardLoading ? (
+                    <Loader2 className='animate-spin' />
+                  ) : (
+                    <span className='relative z-10 flex items-center gap-2'>
+                      <LayoutDashboard className='w-5 h-5 transition-transform group-hover:scale-110' />
+                      Go to Dashboard
+                    </span>
+                  )}
+                </Button>
+              </div>
             ) : (
               <div className="flex flex-col items-center gap-6">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   <Link href='/signup'>
-                    <Button className='h-14 px-12 bg-white hover:bg-zinc-200 text-black font-bold text-lg transition-all rounded-lg shadow-2xl shadow-white/10'>
-                      Start Free
-                    </Button>
+                    <div className="relative p-[1px] overflow-hidden rounded-lg group">
+                        {/* Vibrant Rotating Border Beam - Updated for White Button */}
+                        <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
+                        
+                        <Button className='relative h-14 px-10 bg-white hover:bg-zinc-100 text-black border-none font-bold text-lg transition-all rounded-[7px] shadow-2xl overflow-hidden'>
+                            <span className="relative z-10">Start Free</span>
+                        </Button>
+                    </div>
                   </Link>
                   <Button
                     onClick={handleGoogleLogin}
                     disabled={isGoogleFetching}
-                    className="h-14 px-8 bg-zinc-900 text-white hover:bg-zinc-800 font-semibold text-base transition-all rounded-lg flex items-center gap-3"
+                    className="h-14 px-8 bg-zinc-950 text-white hover:bg-zinc-900 border border-white/10 font-semibold text-base transition-all rounded-lg flex items-center gap-3 shadow-lg"
                   >
                     <FcGoogle className="h-5 w-5" /> Continue with Google
                   </Button>
                 </div>
                 
-                <div className="flex items-center gap-6 text-zinc-400 text-sm font-bold uppercase tracking-widest">
-                  <Link href="/login" className="hover:text-white transition-colors">Sign In</Link>
-                  <span className="w-1 h-1 rounded-full bg-zinc-800"></span>
-                  <Link href="#features" className="hover:text-white transition-colors">How it works</Link>
+                <div className="flex items-center gap-6 text-white text-sm font-bold uppercase tracking-widest">
+                  <Link href="/login" className="hover:text-cyan-400 transition-colors">Sign In</Link>
+                  <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                  <Link href="#features" className="hover:text-cyan-400 transition-colors">How it works</Link>
                 </div>
               </div>
             )}
