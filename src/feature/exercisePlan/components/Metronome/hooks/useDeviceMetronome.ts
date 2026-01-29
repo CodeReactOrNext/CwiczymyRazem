@@ -9,16 +9,17 @@ interface UseDeviceMetronomeProps {
   minBpm?: number;
   maxBpm?: number;
   recommendedBpm?: number;
+  isMuted?: boolean;
 }
 
 export const useDeviceMetronome = (props: UseDeviceMetronomeProps) => {
   // Use useState to ensure the device detection only runs once on component mount
   const [isMobile] = useState(() => isMobileDevice());
-  
+
   // Use the appropriate hook based on device type
   const mobileMetronome = useMobileMetronome(props);
   const desktopMetronome = useMetronome(props);
-  
+
   // On mobile, we need to initialize audio on the first user interaction
   useEffect(() => {
     if (isMobile) {
@@ -27,13 +28,13 @@ export const useDeviceMetronome = (props: UseDeviceMetronomeProps) => {
           mobileMetronome.initializeAudio();
         }
       };
-      
+
       // Add event listeners for common user interactions
       const events = ["touchstart", "mousedown", "keydown"];
       events.forEach(event => {
         document.addEventListener(event, handleUserInteraction, { once: true });
       });
-      
+
       return () => {
         events.forEach(event => {
           document.removeEventListener(event, handleUserInteraction);
@@ -41,7 +42,7 @@ export const useDeviceMetronome = (props: UseDeviceMetronomeProps) => {
       };
     }
   }, [isMobile, mobileMetronome]);
-  
+
   // Return the appropriate metronome hook based on device type
   return isMobile ? mobileMetronome : desktopMetronome;
 }; 

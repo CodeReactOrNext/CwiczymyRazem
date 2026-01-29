@@ -15,6 +15,7 @@ import { musicianFitnessLvl1S8Plan } from "feature/exercisePlan/data/plans/metal
 import { pentatonicPlayalongPlan } from "feature/exercisePlan/data/plans/pentatonicPlayalong/pentatonicPlayalongPlan";
 import { rhythmicPrecisionPlan } from "feature/exercisePlan/data/plans/rhythmicPrecision/rhythmicPrecision";
 import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
+import { spiderMasterPlan } from "feature/exercisePlan/data/plans/spiderMasterPlan/spiderMasterPlan";
 import { theIntervalMapPlan } from "feature/exercisePlan/data/plans/theIntervalMap/theIntervalMap";
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
@@ -28,6 +29,7 @@ const difficultyOrder: Record<string, number> = {
 };
 
 export const defaultPlans: ExercisePlan[] = [
+  spiderMasterPlan,
   spiderPermutationPlan,
   basicImprovisationPractice,
   warmUp15MinutesPlan,
