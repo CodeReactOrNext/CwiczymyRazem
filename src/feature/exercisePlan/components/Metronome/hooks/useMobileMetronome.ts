@@ -7,6 +7,7 @@ interface UseMobileMetronomeProps {
   minBpm?: number;
   maxBpm?: number;
   recommendedBpm?: number;
+  isMuted?: boolean;
 }
 
 export const useMobileMetronome = ({
@@ -14,31 +15,45 @@ export const useMobileMetronome = ({
   minBpm = 40,
   maxBpm = 208,
   recommendedBpm = 60,
+  isMuted = false,
 }: UseMobileMetronomeProps) => {
   const [bpm, setBpm] = useState(initialBpm);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [countInRemaining, setCountInRemaining] = useState<number>(0);
   const [audioInitialized, setAudioInitialized] = useState(false);
-  
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
   const timeoutRef = useRef<number | null>(null);
   const nextNoteTimeRef = useRef<number>(0);
+  const startTimeRef = useRef<number | null>(null);
+  const countInTargetRef = useRef<number>(0);
   const isIOS = isIOSDevice();
-  
+
+  // Handle Mute
+  useEffect(() => {
+    if (gainNodeRef.current && audioContextRef.current) {
+      const targetGain = isMuted ? 0 : 0.3; // Default mobile volume was 0.3 in ramps
+      // Note: We use 0.3 because linearRampToValueAtTime uses 0.3
+      // Actually, it's better to just use gainNodeRef for global mute
+      gainNodeRef.current.gain.setTargetAtTime(isMuted ? 0 : 1, audioContextRef.current.currentTime, 0.01);
+    }
+  }, [isMuted]);
+
   // Initialize audio (must be called on user gesture)
   const initializeAudio = useCallback(() => {
     if (audioInitialized) return true;
-    
+
     try {
-      audioContextRef.current = new (window.AudioContext || 
+      audioContextRef.current = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
-      
+
       // Create persistent nodes for better performance on mobile
       gainNodeRef.current = audioContextRef.current.createGain();
-      gainNodeRef.current.gain.value = 0;
+      gainNodeRef.current.gain.value = isMuted ? 0 : 1;
       gainNodeRef.current.connect(audioContextRef.current.destination);
-      
+
       // For iOS, we need to play a silent sound to unlock the audio
       if (isIOS) {
         const silentOscillator = audioContextRef.current.createOscillator();
@@ -50,7 +65,7 @@ export const useMobileMetronome = ({
         silentOscillator.start(0);
         silentOscillator.stop(audioContextRef.current.currentTime + 0.001);
       }
-      
+
       setAudioInitialized(true);
       return true;
     } catch (error) {
@@ -58,46 +73,59 @@ export const useMobileMetronome = ({
       return false;
     }
   }, [audioInitialized, isIOS]);
-  
+
   // Schedule next note with precise timing
-  const scheduleNote = useCallback((time: number) => {
+  const scheduleNote = useCallback((time: number, isAccent: boolean = false) => {
     if (!audioContextRef.current || !gainNodeRef.current) return;
-    
+
     const oscillator = audioContextRef.current.createOscillator();
     oscillator.type = 'sine';
-    oscillator.frequency.value = 800;
-    
+    oscillator.frequency.value = isAccent ? 1200 : 800;
+
     // Connect to the persistent gain node
     oscillator.connect(gainNodeRef.current);
-    
+
     // Schedule precise gain envelope
     gainNodeRef.current.gain.cancelScheduledValues(time);
     gainNodeRef.current.gain.setValueAtTime(0, time);
     gainNodeRef.current.gain.linearRampToValueAtTime(0.3, time + 0.001);
     gainNodeRef.current.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
-    
+
     oscillator.start(time);
     oscillator.stop(time + 0.1);
   }, []);
-  
+
   // Advanced timing mechanism using AudioContext's currentTime
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;
-    
+
     const context = audioContextRef.current;
     const currentTime = context.currentTime;
     const secondsPerBeat = 60.0 / bpm;
-    
+
     // Schedule notes ahead of time for precise timing
     while (nextNoteTimeRef.current < currentTime + 0.1) {
-      scheduleNote(nextNoteTimeRef.current);
+      if (countInTargetRef.current > 0) {
+        scheduleNote(nextNoteTimeRef.current, countInTargetRef.current === 4);
+        setCountInRemaining(countInTargetRef.current);
+        countInTargetRef.current -= 1;
+      } else {
+        if (startTimeRef.current === null) {
+          startTimeRef.current = Date.now();
+          setCountInRemaining(0);
+          scheduleNote(nextNoteTimeRef.current, true); // Accent first beat of exercise
+        } else {
+          scheduleNote(nextNoteTimeRef.current, false);
+        }
+      }
+
       nextNoteTimeRef.current += secondsPerBeat;
     }
-    
+
     // Use lookahead scheduling for better timing accuracy on mobile
     timeoutRef.current = window.setTimeout(scheduler, 25);
   }, [bpm, scheduleNote]);
-  
+
   // Resume audio context if suspended (common on mobile)
   const resumeAudioContext = useCallback(async () => {
     if (audioContextRef.current?.state === 'suspended') {
@@ -108,39 +136,45 @@ export const useMobileMetronome = ({
       }
     }
   }, []);
-  
+
   const startMetronome = useCallback(() => {
     if (!initializeAudio()) return;
-    
+
     resumeAudioContext();
-    
+
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current);
     }
-    
+
     if (audioContextRef.current) {
       nextNoteTimeRef.current = audioContextRef.current.currentTime;
+      countInTargetRef.current = 4;
+      setCountInRemaining(4);
+      startTimeRef.current = null;
       scheduler();
     }
-    
+
     setIsPlaying(true);
   }, [initializeAudio, resumeAudioContext, scheduler]);
-  
+
   const stopMetronome = useCallback(() => {
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    
+
     // Silence any ongoing sound
     if (gainNodeRef.current && audioContextRef.current) {
       gainNodeRef.current.gain.cancelScheduledValues(audioContextRef.current.currentTime);
       gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current.currentTime);
     }
-    
+
+    startTimeRef.current = null;
+    countInTargetRef.current = 0;
+    setCountInRemaining(0);
     setIsPlaying(false);
   }, []);
-  
+
   const toggleMetronome = useCallback(() => {
     if (isPlaying) {
       stopMetronome();
@@ -148,7 +182,7 @@ export const useMobileMetronome = ({
       startMetronome();
     }
   }, [isPlaying, startMetronome, stopMetronome]);
-  
+
   // Handle visibility change (audio often pauses when app goes to background on mobile)
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -157,39 +191,39 @@ export const useMobileMetronome = ({
       } else if (!document.hidden && isPlaying) {
         resumeAudioContext();
       }
-       
+
     };
-    
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [isPlaying, stopMetronome, resumeAudioContext]);
-  
+
   // Clean up resources
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);
       }
-      
+
       if (oscillatorRef.current) {
         oscillatorRef.current.stop();
         oscillatorRef.current.disconnect();
       }
-      
+
       audioContextRef.current?.close();
     };
   }, []);
-  
+
   // Handle BPM changes while playing
   useEffect(() => {
-    if (isPlaying) {
+    if (isPlaying && countInRemaining === 0 && startTimeRef.current) {
       stopMetronome();
       startMetronome();
     }
-  }, [bpm, isPlaying, startMetronome, stopMetronome]);
-  
+  }, [bpm]);
+
   // Space key handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -198,21 +232,22 @@ export const useMobileMetronome = ({
         toggleMetronome();
       }
     };
-    
+
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [toggleMetronome]);
-  
+
   const handleSetRecommendedBpm = useCallback(() => {
     setBpm(recommendedBpm);
   }, [recommendedBpm]);
-  
+
   // Expose the same interface as the original hook
   return {
     bpm,
     isPlaying,
+    countInRemaining,
     minBpm,
     maxBpm,
     setBpm,
@@ -220,6 +255,7 @@ export const useMobileMetronome = ({
     handleSetRecommendedBpm,
     recommendedBpm,
     initializeAudio,
-    audioInitialized
+    audioInitialized,
+    startTime: startTimeRef.current
   };
 }; 

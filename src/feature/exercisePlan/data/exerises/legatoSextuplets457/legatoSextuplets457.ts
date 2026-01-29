@@ -24,6 +24,252 @@ export const legatoSextuplets457Exercise: Exercise = {
     "Count the sextuplets internally to keep timing stable."
   ],
   metronomeSpeed: { min: 60, max: 180, recommended: 60 },
-  relatedSkills: [ ],
+  relatedSkills: ["legato", "rhythm", "technique"],
+  tablature: [
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "beats": [
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 4,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 4,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 4,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 4,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.16666666666666666,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
   image: legatoSextupletsImage
 };
