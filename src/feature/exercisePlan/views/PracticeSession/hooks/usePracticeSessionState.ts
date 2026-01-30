@@ -60,11 +60,13 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
 
   const { exerciseTimeSpent } = useTimeTracking(timer, currentExercise);
 
-  const toggleTimer = () => {
+  const toggleTimer = (metronomeToggle?: () => void) => {
     if (timer.timerEnabled) {
       timer.stopTimer();
+      if (metronomeToggle) metronomeToggle();
     } else {
       timer.startTimer();
+      if (metronomeToggle) metronomeToggle();
     }
   }
 

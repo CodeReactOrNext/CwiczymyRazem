@@ -28,6 +28,615 @@ export const spiderOneStringExercise: Exercise = {
     max: 180,
     recommended: 80
   },
-  relatedSkills: ["alternate_picking",  "picking"],
-  image: spiderBasicImage
+  tablature: [
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "beats": [
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 1
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 2
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 3
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 2
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 3
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 3
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "beats": [
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 7
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 8
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 7
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 8
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 9
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 7
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 8
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 9
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 10
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 8
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 9
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 10
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 11
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "beats": [
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 9
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 10
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 11
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 12
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 8
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 9
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 10
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 9
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 7
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 8
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 9
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 10
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 7
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 8
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 9
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "beats": [
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 7
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 8
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 7
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 3
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 5
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 6
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 2
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 3
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 4
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 1,
+              "fret": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  relatedSkills: ["alternate_picking", "picking"],
 };
