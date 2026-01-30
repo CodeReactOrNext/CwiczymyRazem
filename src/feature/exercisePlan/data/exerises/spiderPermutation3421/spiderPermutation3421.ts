@@ -13,7 +13,7 @@ export const spiderPermutation3421Exercise: Exercise = {
     "Place your left hand fingers on four consecutive frets of one string.",
     "Start playing according to the permutation 3-4-2-1, which means: finger 3, finger 4, finger 2, finger 1.",
 
-   
+
   ],
   tips: [
     "This permutation contains a backward sequence 4-2-1, which is particularly demanding.",
@@ -25,6 +25,6 @@ export const spiderPermutation3421Exercise: Exercise = {
     max: 180,
     recommended: 80
   },
-  relatedSkills: ["finger_independence", "technique"],
+  relatedSkills: ["finger_independence", "technique", "picking"],
   image: spiderPermutation3421Image,
 }; 

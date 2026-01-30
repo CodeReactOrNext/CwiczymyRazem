@@ -12,18 +12,18 @@ export const spiderPermutation4231Exercise: Exercise = {
   instructions: [
     "Place your left hand fingers on four consecutive frets of one string.",
     "Start playing according to the permutation 4-2-3-1, which means: finger 4, finger 2, finger 3, finger 1.",
-  
+
   ],
   tips: [
     "Ending the sequence with finger 1 after finger 3 requires precise movement under the other fingers.",
     "Maintain even tempo and spacing between notes - use a metronome.",
-   
+
   ],
   metronomeSpeed: {
     min: 60,
     max: 180,
     recommended: 80
   },
-  relatedSkills: ["finger_independence", "technique"],
+  relatedSkills: ["finger_independence", "technique", "picking"],
   image: spiderPermutation4231Image,
 }; 

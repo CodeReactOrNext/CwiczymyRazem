@@ -30,5 +30,5 @@ export const spiderRhythmicProgressionExercise: Exercise = {
     max: 120,
     recommended: 60
   },
-  relatedSkills: ["finger_independence", "technique", "rhythm"],
+  relatedSkills: ["finger_independence", "technique", "rhythm", "picking"],
 }; 

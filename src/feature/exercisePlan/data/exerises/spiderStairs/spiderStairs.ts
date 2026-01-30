@@ -20,7 +20,7 @@ export const spiderStairsExercise: Exercise = {
     "Keep all fingers close to the fretboard when changing strings.",
     "Make sure each note rings out clearly and distinctly.",
     "Work on maintaining even tempo, especially during string changes.",
-   
+
     "Start at a slow tempo and gradually increase speed."
   ],
   metronomeSpeed: {
@@ -28,6 +28,6 @@ export const spiderStairsExercise: Exercise = {
     max: 160,
     recommended: 80,
   },
-  relatedSkills: ["alternate_picking", "picking",],
+  relatedSkills: ["alternate_picking", "picking", "finger_independence"],
   image: spiderBasicImage,
 };

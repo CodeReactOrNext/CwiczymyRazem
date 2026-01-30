@@ -28,6 +28,6 @@ export const spiderPermutation4123Exercise: Exercise = {
     max: 180,
     recommended: 80
   },
-  relatedSkills: ["finger_independence", "technique"],
+  relatedSkills: ["finger_independence", "technique", "picking"],
   image: spiderPermutation4123Image,
 }; 

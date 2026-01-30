@@ -40,22 +40,32 @@ const ExerciseControls = ({
 
   return (
     <div className={containerClasses}>
-      <Button
-        size={size === "lg" ? "lg" : "default"}
-        onClick={toggleTimer}
-        className={cn(
-          variant === "centered" ? btnSizes[size] : "flex-1",
-          "radius-premium transition-background click-behavior",
-          isPlaying 
-            ? "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20" 
-            : "bg-zinc-800/40 hover:bg-zinc-700/60 text-white border border-white/5 backdrop-blur-sm"
-        )}>
-        {isPlaying ? (
-          <FaPause className={iconSizes[size]} />
-        ) : (
-          <FaPlay className={cn(iconSizes[size], "ml-1")} />
+      <div className="relative">
+        {!isPlaying && (
+          <div className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap animate-bounce pointer-events-none">
+            <div className="bg-cyan-500 text-black px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/50">
+              ▶ Press PLAY to Start
+            </div>
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-cyan-500"></div>
+          </div>
         )}
-      </Button>
+        <Button
+          size={size === "lg" ? "lg" : "default"}
+          onClick={toggleTimer}
+          className={cn(
+            variant === "centered" ? btnSizes[size] : "flex-1",
+            "radius-premium transition-background click-behavior",
+            isPlaying 
+              ? "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20" 
+              : "bg-cyan-500 hover:bg-cyan-400 text-black shadow-2xl shadow-cyan-500/30 animate-pulse"
+          )}>
+          {isPlaying ? (
+            <FaPause className={iconSizes[size]} />
+          ) : (
+            <FaPlay className={cn(iconSizes[size], "ml-1")} />
+          )}
+        </Button>
+      </div>
 
       {/* Primary Action Button - ONLY if NOT centered deck (where it's separate) */}
       {variant !== "centered" && !isLastExercise && (

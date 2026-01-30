@@ -17,7 +17,7 @@ export const spiderPermutation1432Exercise: Exercise = {
     "Continue throughout the length of the fretboard, then try the exercise on other strings."
   ],
   tips: [
-  
+
     "Maintain even tempo and spacing between notes - use a metronome.",
     "Use minimal pressure on the frets - only as much as needed for a clean sound.",
     "Try to keep other fingers close to the strings, ready to use.",
@@ -28,6 +28,6 @@ export const spiderPermutation1432Exercise: Exercise = {
     max: 180,
     recommended: 80
   },
-  relatedSkills: ["finger_independence", "technique"],
+  relatedSkills: ["finger_independence", "technique", "picking"],
   image: spiderPermutation1432Image,
 }; 

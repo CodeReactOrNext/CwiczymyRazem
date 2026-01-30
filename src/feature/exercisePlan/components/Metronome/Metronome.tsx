@@ -10,19 +10,26 @@ interface MetronomeProps {
   minBpm?: number;
   maxBpm?: number;
   recommendedBpm?: number;
+  // Controlled state props
+  bpm?: number;
+  isPlaying?: boolean;
+  onBpmChange?: (bpm: number) => void;
+  onToggle?: () => void;
+  startTime?: number | null;
 }
 
 export const Metronome = (props: MetronomeProps) => {
-  const {
-    bpm,
-    isPlaying,
-    minBpm,
-    maxBpm,
-    setBpm,
-    toggleMetronome,
-    handleSetRecommendedBpm,
-    recommendedBpm,
-  } = useDeviceMetronome(props);
+  const device = useDeviceMetronome(props);
+  
+  // Use props if controlled, otherwise use internal state
+  const bpm = props.bpm !== undefined ? props.bpm : device.bpm;
+  const isPlaying = props.isPlaying !== undefined ? props.isPlaying : device.isPlaying;
+  const setBpm = props.onBpmChange || device.setBpm;
+  const toggleMetronome = props.onToggle || device.toggleMetronome;
+  const recommendedBpm = props.recommendedBpm || device.recommendedBpm;
+  const minBpm = props.minBpm || device.minBpm;
+  const maxBpm = props.maxBpm || device.maxBpm;
+  const handleSetRecommendedBpm = device.handleSetRecommendedBpm; // This might need adjustment if fully controlled, but fine for now
 
   return (
     <Card className='overflow-hidden rounded-xl border bg-card/80 p-4 shadow-md'>

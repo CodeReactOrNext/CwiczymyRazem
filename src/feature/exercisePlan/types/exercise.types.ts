@@ -7,6 +7,24 @@ export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing"
 
 export type LocalizedContent = string;
 
+export interface TablatureNote {
+  string: number; // 1-6 (1 is high E)
+  fret: number;
+  isAccented?: boolean;
+  isHammerOn?: boolean;
+  isPullOff?: boolean;
+}
+
+export interface TablatureBeat {
+  notes: TablatureNote[];
+  duration: number; // 1 = quarter note, 0.5 = eighth note
+}
+
+export interface TablatureMeasure {
+  beats: TablatureBeat[];
+  timeSignature: [number, number]; // e.g. [4, 4]
+}
+
 export interface Exercise {
   id: string;
   title: LocalizedContent;
@@ -32,6 +50,7 @@ export interface Exercise {
     label: string;
     url: string;
   }[];
+  tablature?: TablatureMeasure[];
 }
 
 export interface ExercisePlan {

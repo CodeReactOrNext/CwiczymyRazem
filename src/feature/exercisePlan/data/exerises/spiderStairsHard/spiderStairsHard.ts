@@ -21,13 +21,13 @@ export const spiderStairsHardExercise: Exercise = {
     "Maintain proper wrist position despite larger distances.",
     "Control pressure - it's easy to press too hard with wider stretches.",
     "If you feel discomfort, reduce tempo.",
-  
+
   ],
   metronomeSpeed: {
     min: 60,
     max: 200,
     recommended: 90,
   },
-  relatedSkills: ["alternate_picking", "picking", "legato"],
+  relatedSkills: ["alternate_picking", "picking", "legato", "technique"],
   image: spiderBasicImage,
 };

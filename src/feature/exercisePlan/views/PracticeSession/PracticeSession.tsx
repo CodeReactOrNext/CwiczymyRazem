@@ -16,8 +16,9 @@ import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import { Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect,useRef } from "react";
-import { FaCheck, FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaStepForward, FaTwitter } from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
+import { FaCheck, FaExternalLinkAlt, FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaStepForward, FaTwitter, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
+import { GiGuitar } from "react-icons/gi";
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
 import { Metronome } from "../../components/Metronome/Metronome";
@@ -34,14 +35,16 @@ import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
 import ImageModal from "./modals/ImageModal";
 import SessionModal from "./modals/SessionModal";
 
+import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
+import { TablatureViewer } from "./components/TablatureViewer";
+import { useTablatureAudio } from "../../hooks/useTablatureAudio";
+
 interface PracticeSessionProps {
   plan: ExercisePlan;
   onFinish: () => void;
   isFinishing?: boolean;
   autoReport?: boolean;
 }
-
-
 
 export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: PracticeSessionProps) => {
   const { t } = useTranslation(["exercises", "common"]);
@@ -87,6 +90,25 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
     canSkipExercise
   } = usePracticeSessionState({ plan, onFinish, autoReport });
 
+  const [isAudioMuted, setIsAudioMuted] = useState(true);
+
+  // Metronome State
+  const metronome = useDeviceMetronome({
+    initialBpm: currentExercise.metronomeSpeed?.recommended || 60,
+    minBpm: currentExercise.metronomeSpeed?.min,
+    maxBpm: currentExercise.metronomeSpeed?.max,
+    recommendedBpm: currentExercise.metronomeSpeed?.recommended
+  });
+
+  // Audio Playback
+  useTablatureAudio({
+    measures: currentExercise.tablature,
+    bpm: metronome.bpm,
+    isPlaying: metronome.isPlaying && !!metronome.startTime,
+    startTime: metronome.startTime || null,
+    isMuted: isAudioMuted
+  });
+
   const {
     imageScale,
     setImageScale,
@@ -100,16 +122,23 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
     const handleKeyDown = (e: KeyboardEvent) => {
         // Ignore if focus is in an input or similar (though not many here)
         if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+        if (e.code === "Space") {
+            e.preventDefault();
+            return;
+        }
 
         if (e.key === "ArrowRight") {
             if (!isLastExercise) {
-                handleNextExercise(resetTimer);
+                handleNextExerciseClick();
             } else {
                 // optional: finish session
             }
         } 
         if (e.key === "ArrowLeft") {
             if (currentExerciseIndex > 0) {
+                if (metronome.isPlaying) {
+                  metronome.toggleMetronome();
+                }
                 jumpToExercise(currentExerciseIndex - 1);
             }
         }
@@ -117,9 +146,24 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLastExercise, currentExerciseIndex, handleNextExercise, jumpToExercise, resetTimer]);
+  }, [isLastExercise, currentExerciseIndex, handleNextExercise, jumpToExercise, resetTimer, metronome]);
 
   const category = currentExercise.category || "mixed";
+
+  const handleToggleTimer = () => {
+    if (currentExercise.tablature && currentExercise.metronomeSpeed) {
+      toggleTimer(metronome.toggleMetronome);
+    } else {
+      toggleTimer();
+    }
+  };
+
+  const handleNextExerciseClick = () => {
+    if (metronome.isPlaying) {
+      metronome.toggleMetronome();
+    }
+    handleNextExercise(resetTimer);
+  };
 
   return (
     <>
@@ -175,8 +219,8 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
             isLastExercise={isLastExercise}
             isPlaying={isPlaying}
             formattedTimeLeft={formattedTimeLeft}
-            toggleTimer={toggleTimer}
-            handleNextExercise={() => handleNextExercise(resetTimer)}
+            toggleTimer={handleToggleTimer}
+            handleNextExercise={handleNextExerciseClick}
             sessionTimerData={sessionTimerData}
             exerciseTimeSpent={exerciseTimeSpent}
             setVideoDuration={setVideoDuration}
@@ -306,12 +350,21 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                       "relative w-full overflow-hidden radius-premium bg-zinc-900 shadow-2xl",
                       currentExercise.isPlayalong ? "" : "border border-white/10 glass-card"
                     )}>
-                         {currentExercise.isPlayalong && currentExercise.youtubeVideoId ? (
+                         {currentExercise.tablature && currentExercise.tablature.length > 0 ? (
+                           <TablatureViewer
+                              measures={currentExercise.tablature}
+                              bpm={metronome.bpm}
+                              isPlaying={metronome.isPlaying}
+                              startTime={metronome.startTime || null}
+                              countInRemaining={(metronome as any).countInRemaining}
+                              className="w-full"
+                           />
+                         ) : currentExercise.isPlayalong && currentExercise.youtubeVideoId ? (
                              !isMobileView && (
                                 <YouTubePlayalong
                                     videoId={currentExercise.youtubeVideoId}
                                     isPlaying={isPlaying}
-                                    onEnd={() => handleNextExercise(resetTimer)}
+                                    onEnd={handleNextExerciseClick}
                                     onReady={(duration) => setVideoDuration(duration)}
                                     onSeek={(time) => setTimerTime(time * 1000)}
                                     onStateChange={(state) => {
@@ -422,10 +475,30 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                      minBpm={currentExercise.metronomeSpeed.min}
                                      maxBpm={currentExercise.metronomeSpeed.max}
                                      recommendedBpm={currentExercise.metronomeSpeed.recommended}
+                                     bpm={metronome.bpm}
+                                     isPlaying={metronome.isPlaying}
+                                     onBpmChange={metronome.setBpm}
+                                     onToggle={metronome.toggleMetronome}
+                                     startTime={metronome.startTime}
                                  />
+                                  <div className="mt-4 flex justify-center">
+                                      <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className={cn(
+                                              "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                                              isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
+                                          )}
+                                          onClick={() => setIsAudioMuted(!isAudioMuted)}
+                                      >
+                                          <GiGuitar className="text-base" />
+                                          {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+                                          {isAudioMuted ? "Guitar Off" : "Guitar On"}
+                                      </Button>
+                                 </div>
                              </div>
                         )}
-
+                        
                         {currentExercise.links && currentExercise.links.length > 0 && (
                             <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-6 backdrop-blur-sm space-y-4">
                                 <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
@@ -479,8 +552,8 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                  isPlaying={isPlaying}
                                  timerProgressValue={timerProgressValue}
                                  formattedTimeLeft={formattedTimeLeft}
-                                 toggleTimer={toggleTimer}
-                                 handleNextExercise={() => handleNextExercise(resetTimer)}
+                                 toggleTimer={handleToggleTimer}
+                                 handleNextExercise={handleNextExerciseClick}
                                  showExerciseInfo={false}
                                  variant="compact"
                                  sessionTimerData={sessionTimerData}
@@ -504,7 +577,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                   if (isLastExercise) {
                                     autoSubmitReport();
                                   } else {
-                                    handleNextExercise(resetTimer);
+                                    handleNextExerciseClick();
                                   }
                                 }}
                                 disabled={!canSkipExercise}
