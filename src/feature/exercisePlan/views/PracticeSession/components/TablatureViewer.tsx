@@ -29,13 +29,14 @@ export const TablatureViewer = ({
   const NOTE_RADIUS = 11;
   const STAFF_TOP_OFFSET = 60;
 
-  const { totalBeats, processedData } = useMemo(() => {
-    if (!measures) return { totalBeats: 1, processedData: { measureLines: [], rhythmItems: [], noteItems: [] } };
+  const { totalBeats, processedData, hasAccentedNotes } = useMemo(() => {
+    if (!measures) return { totalBeats: 1, processedData: { measureLines: [], rhythmItems: [], noteItems: [] }, hasAccentedNotes: false };
 
     let currentWidth = 0;
     const measureLines: number[] = [];
     const rhythmItems: any[] = [];
     const noteItems: any[] = [];
+    let hasAccents = false;
 
     measures.forEach((measure) => {
       measure.beats.forEach((beat) => {
@@ -47,6 +48,8 @@ export const TablatureViewer = ({
         });
 
         beat.notes.forEach((note) => {
+          if (note.isAccented) hasAccents = true;
+          
           noteItems.push({
             left: beatStart + 10,
             y: STAFF_TOP_OFFSET + (note.string - 1) * STRING_SPACING,
@@ -64,7 +67,8 @@ export const TablatureViewer = ({
 
     return { 
       totalBeats: currentWidth / BEAT_WIDTH, 
-      processedData: { measureLines, rhythmItems, noteItems } 
+      processedData: { measureLines, rhythmItems, noteItems },
+      hasAccentedNotes: hasAccents
     };
   }, [measures]);
 
@@ -216,7 +220,7 @@ export const TablatureViewer = ({
               ctx.textBaseline = "middle";
               
               let text = note.fret.toString();
-              if (!note.isAccented && !isActive) {
+              if (hasAccentedNotes && !note.isAccented && !isActive) {
                   text = `(${text})`; 
               }
               ctx.fillText(text, beatLeft, noteY);
@@ -276,7 +280,7 @@ export const TablatureViewer = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData]);
+  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes]);
 
   return (
     <div 

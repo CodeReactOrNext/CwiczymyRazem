@@ -30,52 +30,5 @@ export const spiderRhythmicProgressionExercise: Exercise = {
     max: 120,
     recommended: 60
   },
-  tablature: [
-    { // M1: Whole notes (1 note per beat but duration 1? No, 1 note per MEASURE)
-      // Actually duration 1.0 means full measure.
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 1.0, notes: [{ string: 6, fret: 1 }] },
-      ]
-    },
-    { // M2: Whole notes continue
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 1.0, notes: [{ string: 6, fret: 2 }] },
-      ]
-    },
-    { // M3: Half notes (2 notes per measure)
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.5, notes: [{ string: 6, fret: 3 }] },
-        { duration: 0.5, notes: [{ string: 6, fret: 4 }] },
-      ]
-    },
-    { // M4: Quarter notes (4 notes per measure)
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.25, notes: [{ string: 5, fret: 1 }] },
-        { duration: 0.25, notes: [{ string: 5, fret: 2 }] },
-        { duration: 0.25, notes: [{ string: 5, fret: 3 }] },
-        { duration: 0.25, notes: [{ string: 5, fret: 4 }] },
-      ]
-    },
-    { // M5: Eighth notes (8 notes per measure)
-      timeSignature: [4, 4],
-      beats: [
-        { duration: 0.125, notes: [{ string: 4, fret: 1 }] }, { duration: 0.125, notes: [{ string: 4, fret: 2 }] },
-        { duration: 0.125, notes: [{ string: 4, fret: 3 }] }, { duration: 0.125, notes: [{ string: 4, fret: 4 }] },
-        { duration: 0.125, notes: [{ string: 3, fret: 1 }] }, { duration: 0.125, notes: [{ string: 3, fret: 2 }] },
-        { duration: 0.125, notes: [{ string: 3, fret: 3 }] }, { duration: 0.125, notes: [{ string: 3, fret: 4 }] },
-      ]
-    },
-    { // M6: Sixteenth notes (16 notes per measure)
-      timeSignature: [4, 4],
-      beats: Array.from({ length: 16 }).map((_, i) => ({
-        duration: 0.0625,
-        notes: [{ string: 2 - Math.floor(i / 8), fret: (i % 4) + 1 }]
-      }))
-    }
-  ],
   relatedSkills: ["finger_independence", "technique", "rhythm", "picking"],
 }; 

@@ -18,6 +18,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { FaCheck, FaExternalLinkAlt, FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaStepForward, FaTwitter, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
+import { GiGuitar } from "react-icons/gi";
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
 import { Metronome } from "../../components/Metronome/Metronome";
@@ -89,7 +90,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
     canSkipExercise
   } = usePracticeSessionState({ plan, onFinish, autoReport });
 
-  const [isAudioMuted, setIsAudioMuted] = useState(false);
+  const [isAudioMuted, setIsAudioMuted] = useState(true);
 
   // Metronome State
   const metronome = useDeviceMetronome({
@@ -121,16 +122,20 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
     const handleKeyDown = (e: KeyboardEvent) => {
         // Ignore if focus is in an input or similar (though not many here)
         if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+        if (e.code === "Space") return;
 
         if (e.key === "ArrowRight") {
             if (!isLastExercise) {
-                handleNextExercise(resetTimer);
+                handleNextExerciseClick();
             } else {
                 // optional: finish session
             }
         } 
         if (e.key === "ArrowLeft") {
             if (currentExerciseIndex > 0) {
+                if (metronome.isPlaying) {
+                  metronome.toggleMetronome();
+                }
                 jumpToExercise(currentExerciseIndex - 1);
             }
         }
@@ -138,9 +143,24 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLastExercise, currentExerciseIndex, handleNextExercise, jumpToExercise, resetTimer]);
+  }, [isLastExercise, currentExerciseIndex, handleNextExercise, jumpToExercise, resetTimer, metronome]);
 
   const category = currentExercise.category || "mixed";
+
+  const handleToggleTimer = () => {
+    if (currentExercise.tablature && currentExercise.metronomeSpeed) {
+      toggleTimer(metronome.toggleMetronome);
+    } else {
+      toggleTimer();
+    }
+  };
+
+  const handleNextExerciseClick = () => {
+    if (metronome.isPlaying) {
+      metronome.toggleMetronome();
+    }
+    handleNextExercise(resetTimer);
+  };
 
   return (
     <>
@@ -196,8 +216,8 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
             isLastExercise={isLastExercise}
             isPlaying={isPlaying}
             formattedTimeLeft={formattedTimeLeft}
-            toggleTimer={toggleTimer}
-            handleNextExercise={() => handleNextExercise(resetTimer)}
+            toggleTimer={handleToggleTimer}
+            handleNextExercise={handleNextExerciseClick}
             sessionTimerData={sessionTimerData}
             exerciseTimeSpent={exerciseTimeSpent}
             setVideoDuration={setVideoDuration}
@@ -341,7 +361,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                 <YouTubePlayalong
                                     videoId={currentExercise.youtubeVideoId}
                                     isPlaying={isPlaying}
-                                    onEnd={() => handleNextExercise(resetTimer)}
+                                    onEnd={handleNextExerciseClick}
                                     onReady={(duration) => setVideoDuration(duration)}
                                     onSeek={(time) => setTimerTime(time * 1000)}
                                     onStateChange={(state) => {
@@ -458,19 +478,20 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                      onToggle={metronome.toggleMetronome}
                                      startTime={metronome.startTime}
                                  />
-                                 <div className="mt-4 flex justify-center">
-                                     <Button
-                                         variant="ghost"
-                                         size="sm"
-                                         className={cn(
-                                             "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
-                                             isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
-                                         )}
-                                         onClick={() => setIsAudioMuted(!isAudioMuted)}
-                                     >
-                                         {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
-                                         {isAudioMuted ? "Sound Off" : "Sound On"}
-                                     </Button>
+                                  <div className="mt-4 flex justify-center">
+                                      <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className={cn(
+                                              "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                                              isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
+                                          )}
+                                          onClick={() => setIsAudioMuted(!isAudioMuted)}
+                                      >
+                                          <GiGuitar className="text-base" />
+                                          {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+                                          {isAudioMuted ? "Guitar Off" : "Guitar On"}
+                                      </Button>
                                  </div>
                              </div>
                         )}
@@ -528,8 +549,8 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                  isPlaying={isPlaying}
                                  timerProgressValue={timerProgressValue}
                                  formattedTimeLeft={formattedTimeLeft}
-                                 toggleTimer={toggleTimer}
-                                 handleNextExercise={() => handleNextExercise(resetTimer)}
+                                 toggleTimer={handleToggleTimer}
+                                 handleNextExercise={handleNextExerciseClick}
                                  showExerciseInfo={false}
                                  variant="compact"
                                  sessionTimerData={sessionTimerData}
@@ -553,7 +574,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                   if (isLastExercise) {
                                     autoSubmitReport();
                                   } else {
-                                    handleNextExercise(resetTimer);
+                                    handleNextExerciseClick();
                                   }
                                 }}
                                 disabled={!canSkipExercise}

@@ -43,6 +43,7 @@ export const useDeviceMetronome = (props: UseDeviceMetronomeProps) => {
     }
   }, [isMobile, mobileMetronome]);
 
-  // Return the appropriate metronome hook based on device type
-  return isMobile ? mobileMetronome : desktopMetronome;
+  const metronome = isMobile ? mobileMetronome : desktopMetronome;
+
+  return metronome;
 }; 

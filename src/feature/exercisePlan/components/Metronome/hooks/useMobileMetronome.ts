@@ -224,21 +224,6 @@ export const useMobileMetronome = ({
     }
   }, [bpm]);
 
-  // Space key handler
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        toggleMetronome();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [toggleMetronome]);
-
   const handleSetRecommendedBpm = useCallback(() => {
     setBpm(recommendedBpm);
   }, [recommendedBpm]);
