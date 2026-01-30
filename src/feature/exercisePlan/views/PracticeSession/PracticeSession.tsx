@@ -122,7 +122,10 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
     const handleKeyDown = (e: KeyboardEvent) => {
         // Ignore if focus is in an input or similar (though not many here)
         if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-        if (e.code === "Space") return;
+        if (e.code === "Space") {
+            e.preventDefault();
+            return;
+        }
 
         if (e.key === "ArrowRight") {
             if (!isLastExercise) {

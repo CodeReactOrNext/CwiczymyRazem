@@ -20,15 +20,6 @@ import type { Exercise } from "../types/exercise.types";
 
 interface ExtendedExercise extends Exercise {
   tab?: string[];
-  tablature?: {
-    bars: Array<{
-      notes: Array<{
-        string: number;
-        fret: number | string;
-      }>;
-    }>;
-  };
-  imageUrl?: string | null;
 }
 
 interface ExerciseDetailsDialogProps {
