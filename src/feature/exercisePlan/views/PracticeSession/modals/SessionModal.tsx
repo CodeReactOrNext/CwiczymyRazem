@@ -106,6 +106,13 @@ const SessionModal = ({
     }
   };
 
+  const handleBpmChange = (newBpm: number) => {
+    if (isPlaying) {
+      handleToggleTimer();
+    }
+    metronome.setBpm(newBpm);
+  };
+
   const handleNextExerciseClick = () => {
     if (metronome.isPlaying) {
       metronome.toggleMetronome();
@@ -247,7 +254,7 @@ const SessionModal = ({
                       recommendedBpm={currentExercise.metronomeSpeed.recommended}
                       bpm={metronome.bpm}
                       isPlaying={metronome.isPlaying}
-                      onBpmChange={metronome.setBpm}
+                      onBpmChange={handleBpmChange}
                       onToggle={metronome.toggleMetronome}
                       startTime={metronome.startTime}
                     />

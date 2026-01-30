@@ -53,26 +53,7 @@ export const Metronome = (props: MetronomeProps) => {
         </div>
       </div>
 
-      <div className='flex justify-between'>
-        <Button
-          variant={isPlaying ? "default" : "outline"}
-          size='sm'
-          onClick={toggleMetronome}
-          aria-label={isPlaying ? "Stop metronome" : "Start metronome"}
-          tabIndex={0}>
-          {isPlaying ? (
-            <>
-              <FaPause className='mr-2 h-3 w-3' />
-              <span>Stop</span>
-            </>
-          ) : (
-            <>
-              <FaPlay className='mr-2 h-3 w-3' />
-              <span>Start</span>
-            </>
-          )}
-        </Button>
-
+      <div className='flex justify-end'>
         {recommendedBpm !== bpm && (
           <Button
             variant='ghost'
