@@ -25,8 +25,543 @@ export const hammerOnSequence579Exercise: Exercise = {
     "Mute unused strings with both hands to keep the exercise clean."
   ],
   metronomeSpeed: { min: 60, max: 180, recommended: 60 },
-  relatedSkills: [
-
+  relatedSkills: ["legato", "rhythm", "technique"],
+  tablature: [
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "beats": [
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "beats": [
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 9,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isAccented": false,
+              "isHammerOn": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "timeSignature": [
+        4,
+        4
+      ],
+      "beats": [
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 9,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 9,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 9,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 9,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 4,
+              "fret": 9,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 5,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 7,
+              "isHammerOn": true
+            }
+          ]
+        },
+        {
+          "duration": 0.25,
+          "notes": [
+            {
+              "string": 3,
+              "fret": 9,
+              "isHammerOn": true
+            }
+          ]
+        }
+      ]
+    }
   ],
   image: hammerOnSequenceImage
 };

@@ -19,13 +19,13 @@ export const spiderPermutation3241Exercise: Exercise = {
     "Maintain even tempo and spacing between notes - use a metronome.",
     "Use minimal pressure on the frets - only as much as needed for a clean sound.",
     "Try to keep other fingers close to the strings, ready to use.",
-    
+
   ],
   metronomeSpeed: {
     min: 60,
     max: 180,
     recommended: 80
   },
-  relatedSkills: ["finger_independence", "technique"],
+  relatedSkills: ["finger_independence", "technique", "picking"],
   image: spiderPermutation3241Image,
 }; 

@@ -16,7 +16,7 @@ export const spiderPermutation4312Exercise: Exercise = {
   ],
   tips: [
     "The 3-1-2 transition after the initial finger 4 requires smooth coordination.",
-    "Maintain even tempo and spacing between notes - use a metronome.",  
+    "Maintain even tempo and spacing between notes - use a metronome.",
 
   ],
   metronomeSpeed: {
@@ -24,6 +24,6 @@ export const spiderPermutation4312Exercise: Exercise = {
     max: 180,
     recommended: 80
   },
-  relatedSkills: ["finger_independence", "technique"],
+  relatedSkills: ["finger_independence", "technique", "picking"],
   image: spiderPermutation4312Image,
 }; 

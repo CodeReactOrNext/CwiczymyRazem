@@ -13,14 +13,18 @@ import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import Image from "next/image";
-import { FaExpand } from "react-icons/fa";
+import { useState } from "react";
+import { FaExpand, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaTwitter } from "react-icons/fa";
+import { GiGuitar } from "react-icons/gi";
 
+import { useDeviceMetronome } from "../../../components/Metronome/hooks/useDeviceMetronome";
+import { useTablatureAudio } from "../../../hooks/useTablatureAudio";
 import { categoryGradients } from "../../../constants/categoryStyles";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
-import { NextExerciseCard } from "../components/NextExerciseCard";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
+import { TablatureViewer } from "../components/TablatureViewer";
 
 interface SessionModalProps {
   isOpen: boolean;
@@ -76,6 +80,38 @@ const SessionModal = ({
   if (!isOpen || !isMounted) return null;
 
   const { t } = useTranslation(["exercises", "common"]);
+  const [isAudioMuted, setIsAudioMuted] = useState(true);
+
+  const metronome = useDeviceMetronome({
+    initialBpm: currentExercise.metronomeSpeed?.recommended || 60,
+    minBpm: currentExercise.metronomeSpeed?.min,
+    maxBpm: currentExercise.metronomeSpeed?.max,
+    recommendedBpm: currentExercise.metronomeSpeed?.recommended
+  });
+
+  useTablatureAudio({
+    measures: currentExercise.tablature,
+    bpm: metronome.bpm,
+    isPlaying: metronome.isPlaying && !!metronome.startTime,
+    startTime: metronome.startTime || null,
+    isMuted: isAudioMuted
+  });
+
+  const handleToggleTimer = () => {
+    if (currentExercise.tablature && currentExercise.metronomeSpeed) {
+      toggleTimer();
+      metronome.toggleMetronome();
+    } else {
+      toggleTimer();
+    }
+  };
+
+  const handleNextExerciseClick = () => {
+    if (metronome.isPlaying) {
+      metronome.toggleMetronome();
+    }
+    handleNextExercise();
+  };
 
   const category = currentExercise.category || "mixed";
 
@@ -103,12 +139,21 @@ const SessionModal = ({
 
             <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5 pb-[76px]'>
               <div className='space-y-6 p-4'>
-                {currentExercise.youtubeVideoId ? (
+                {currentExercise.tablature && currentExercise.tablature.length > 0 ? (
+                  <TablatureViewer
+                    measures={currentExercise.tablature}
+                    bpm={metronome.bpm}
+                    isPlaying={metronome.isPlaying}
+                    startTime={metronome.startTime || null}
+                    countInRemaining={(metronome as any).countInRemaining}
+                    className="w-full"
+                  />
+                ) : currentExercise.youtubeVideoId ? (
                    <div className="w-full radius-premium overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
                       <YouTubePlayalong
                           videoId={currentExercise.youtubeVideoId}
                           isPlaying={isPlaying}
-                          onEnd={handleNextExercise}
+                          onEnd={handleNextExerciseClick}
                           onReady={(duration: number) => setVideoDuration(duration)}
                           onSeek={(time: number) => setTimerTime(time * 1000)}
                           onStateChange={(state: number) => {
@@ -122,7 +167,7 @@ const SessionModal = ({
                     <div className='aspect-video w-full'>
                       {(() => {
                         const regExp =
-                          /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                          /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&?]*).*/;
                         const match = currentExercise.videoUrl?.match(regExp);
                         const videoId =
                           match && match[2].length === 11 ? match[2] : null;
@@ -193,6 +238,37 @@ const SessionModal = ({
                     exerciseTimeSpent={exerciseTimeSpent}
                   />
 
+                {currentExercise.metronomeSpeed && (
+                  <div className='mb-6'>
+                    <Metronome
+                      initialBpm={currentExercise.metronomeSpeed.recommended}
+                      minBpm={currentExercise.metronomeSpeed.min}
+                      maxBpm={currentExercise.metronomeSpeed.max}
+                      recommendedBpm={currentExercise.metronomeSpeed.recommended}
+                      bpm={metronome.bpm}
+                      isPlaying={metronome.isPlaying}
+                      onBpmChange={metronome.setBpm}
+                      onToggle={metronome.toggleMetronome}
+                      startTime={metronome.startTime}
+                    />
+                    <div className="mt-4 flex justify-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                          isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
+                        )}
+                        onClick={() => setIsAudioMuted(!isAudioMuted)}
+                      >
+                        <GiGuitar className="text-base" />
+                        {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+                        {isAudioMuted ? "Guitar Off" : "Guitar On"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 <Accordion type="single" collapsible defaultValue="instructions" className="w-full space-y-3">
                     <AccordionItem value="instructions" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
                         <AccordionTrigger className="px-4 py-3 hover:bg-white/5 transition-colors group">
@@ -239,24 +315,6 @@ const SessionModal = ({
                     </AccordionItem>
                  </Accordion>
 
-                {nextExercise && (
-                  <NextExerciseCard
-                    nextExercise={nextExercise}
-                  />
-                )}
-
-                {currentExercise.metronomeSpeed && (
-                  <div className='mb-20'>
-                    <Metronome
-                      initialBpm={currentExercise.metronomeSpeed.recommended}
-                      minBpm={currentExercise.metronomeSpeed.min}
-                      maxBpm={currentExercise.metronomeSpeed.max}
-                      recommendedBpm={
-                        currentExercise.metronomeSpeed.recommended
-                      }
-                    />
-                  </div>
-                )}
 
                 {currentExercise.links && currentExercise.links.length > 0 && (
                      <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-5 backdrop-blur-sm space-y-4 mb-20">
@@ -302,8 +360,8 @@ const SessionModal = ({
               isLastExercise={isLastExercise}
               onClose={onClose}
               onFinish={onFinish}
-              toggleTimer={toggleTimer}
-              handleNextExercise={handleNextExercise}
+              toggleTimer={handleToggleTimer}
+              handleNextExercise={handleNextExerciseClick}
               isFinishing={isFinishing}
               isSubmittingReport={isSubmittingReport}
               canSkipExercise={canSkipExercise}

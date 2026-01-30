@@ -16,14 +16,14 @@ export const spiderPermutation3412Exercise: Exercise = {
   ],
   tips: [
     "The 4-1-2 transition requires special attention - it's a sequence of two challenging movements.",
-      "Maintain even tempo and spacing between notes - use a metronome.",
-      "Use minimal pressure on the frets - only as much as needed for a clean sound.",
+    "Maintain even tempo and spacing between notes - use a metronome.",
+    "Use minimal pressure on the frets - only as much as needed for a clean sound.",
   ],
   metronomeSpeed: {
     min: 60,
     max: 180,
     recommended: 80
   },
-  relatedSkills: ["finger_independence", "technique"],
+  relatedSkills: ["finger_independence", "technique", "picking"],
   image: spiderPermutation3412Image,
 }; 
