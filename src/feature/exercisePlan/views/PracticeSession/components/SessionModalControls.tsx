@@ -43,42 +43,38 @@ export const SessionModalControls = ({
           {t("common:practice.exit")}
         </Button>
 
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-3'>
           <Button
             onClick={toggleTimer}
-            variant="ghost"
-            size="icon"
             className={cn(
-              "h-12 w-12 rounded-full border border-white/5 bg-white/5 transition-all duration-300",
-              isPlaying ? "text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.2)]" : "text-zinc-400"
+              "h-12 px-8 radius-premium font-black text-[10px] tracking-[0.2em] transition-all uppercase click-behavior",
+              isPlaying 
+                ? "bg-white text-black shadow-lg shadow-white/10" 
+                : "bg-cyan-500 text-black shadow-lg shadow-cyan-500/20"
             )}>
             {isPlaying ? (
-              <FaPause className='h-5 w-5' />
+              <span className="flex items-center gap-2">PAUSE <FaPause className='h-3 w-3' /></span>
             ) : (
-              <FaPlay className='h-5 w-5 ml-1' />
+              <span className="flex items-center gap-2">START <FaPlay className='h-3 w-3' /></span>
             )}
           </Button>
 
           <Button
             onClick={isLastExercise ? onFinish : handleNextExercise}
             disabled={isFinishing || isSubmittingReport || !canSkipExercise}
-            className={cn(
-              "h-12 px-6 radius-premium font-black text-[10px] tracking-[0.2em] transition-all uppercase click-behavior",
-              isLastExercise 
-                ? "bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400" 
-                : "bg-white text-black shadow-lg shadow-white/10 hover:bg-zinc-200",
-              !canSkipExercise && "opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500 hover:bg-zinc-800 shadow-none border border-white/5"
+            variant="ghost"
+            size="icon"
+             className={cn(
+              "h-12 w-12 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-all",
+              !canSkipExercise && "opacity-50 cursor-not-allowed"
             )}
           >
             {isFinishing || isSubmittingReport ? (
-              <div className="flex items-center gap-2">
-                <div className="h-3 w-3 border-2 border-black/20 border-t-black animate-spin rounded-full" />
-                <span>Saving...</span>
-              </div>
+              <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-full" />
             ) : isLastExercise ? (
-              <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck className="h-3 w-3" /></span>
+              <FaCheck className="h-5 w-5" />
             ) : (
-              <span className="flex items-center gap-2">{t("common:next_step")} <FaStepForward className="h-3 w-3" /></span>
+              <FaStepForward className="h-5 w-5" />
             )}
           </Button>
         </div>
