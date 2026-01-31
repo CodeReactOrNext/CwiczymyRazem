@@ -183,6 +183,7 @@
   },
   "finish_session": "FINISH SESSION",
   "next_step": "NEXT STEP",
+  "skip": "SKIP",
   "seo": {
     "title": "Riff Quest - See Your Guitar Progress",
     "description": "The free guitar practice tracker that turns random sessions into visible progress. Track songs, skills, and streaks without the stress.",
