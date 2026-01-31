@@ -571,14 +571,13 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
 
                           <div className="flex-1 flex justify-end items-center">
                              <Button
-                                 size="lg"
+                                 size="sm"
+                                 variant="ghost"
                                  loading={isFinishing || isSubmittingReport}
                                  className={cn(
-                                 "h-14 min-w-[200px] px-8 radius-premium font-black text-xs tracking-[0.2em] transition-all click-behavior uppercase",
-                                 isLastExercise 
-                                     ? "bg-cyan-500 text-black shadow-xl shadow-cyan-500/20 hover:bg-cyan-400" 
-                                     : "bg-white text-black shadow-xl shadow-white/10 hover:bg-zinc-200",
-                                 !canSkipExercise && "opacity-50 cursor-not-allowed bg-zinc-800 text-zinc-500 hover:bg-zinc-800 shadow-none border border-white/5"
+                                 "radius-premium font-black text-[10px] tracking-[0.2em] transition-all click-behavior uppercase text-zinc-500 hover:text-white",
+                                 isLastExercise && "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black",
+                                 !canSkipExercise && "opacity-50 cursor-not-allowed"
                                  )}
                                  onClick={() => {
                                   if (isLastExercise) {
@@ -594,7 +593,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                  ) : isLastExercise ? (
                                      <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
                                  ) : (
-                                     <span className="flex items-center gap-2">{t("common:next_step")} <FaStepForward /></span>
+                                     <span className="flex items-center gap-2">{t("common:skip")} <FaStepForward /></span>
                                  )}
                              </Button>
                           </div>

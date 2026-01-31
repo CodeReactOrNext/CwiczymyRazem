@@ -61,7 +61,7 @@ export const Metronome = (props: MetronomeProps) => {
             onClick={handleSetRecommendedBpm}
             aria-label={`Set recommended tempo (${recommendedBpm} BPM)`}
             tabIndex={0}>
-            Zalecane tempo ({recommendedBpm})
+            Recommended tempo ({recommendedBpm})
           </Button>
         )}
       </div>

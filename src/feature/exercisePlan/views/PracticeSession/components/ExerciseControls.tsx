@@ -53,16 +53,22 @@ const ExerciseControls = ({
           size={size === "lg" ? "lg" : "default"}
           onClick={toggleTimer}
           className={cn(
-            variant === "centered" ? btnSizes[size] : "flex-1",
-            "radius-premium transition-background click-behavior",
+            variant === "centered" ? (size === "lg" ? "h-14 px-8 w-auto" : "h-12 px-6 w-auto") : "flex-1",
+            "radius-premium transition-background click-behavior font-black text-[10px] tracking-[0.2em] uppercase",
             isPlaying 
               ? "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20" 
               : "bg-cyan-500 hover:bg-cyan-400 text-black shadow-2xl shadow-cyan-500/30 animate-pulse"
           )}>
           {isPlaying ? (
-            <FaPause className={iconSizes[size]} />
+            <div className="flex items-center gap-2">
+              <span>Pause</span>
+              <FaPause className={iconSizes[size]} />
+            </div>
           ) : (
-            <FaPlay className={cn(iconSizes[size], "ml-1")} />
+             <div className="flex items-center gap-2">
+              <span>Start</span>
+              <FaPlay className={cn(iconSizes[size], "ml-0.5")} />
+            </div>
           )}
         </Button>
       </div>
