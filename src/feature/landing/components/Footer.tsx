@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Coffee, Send, ChevronRight } from "lucide-react";
+import { Badge } from "assets/components/ui/badge";
 
 export const Footer = () => {
     return (
@@ -59,6 +60,7 @@ export const Footer = () => {
                       <div className="space-y-6">
                           <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Platform</h4>
                           <ul className="space-y-4">
+                              <li><Link href="/exercises" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Exercises <Badge className="ml-2 bg-cyan-500/10 text-cyan-500 text-[8px] h-3 px-1 border-none">NEW</Badge> <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                               <li><Link href="/guide" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Guide <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                               <li><Link href="/guitar-practice-builder" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Practice Builder <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                           </ul>

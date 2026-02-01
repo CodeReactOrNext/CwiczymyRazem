@@ -1,0 +1,35 @@
+# Task: Refine Exercise Hub Design
+
+- [x] Refining Exercise Hub Design
+    - [x] Update `ExercisesHubView.tsx`
+        - [x] Replace `uppercase` classes with standard casing
+        - [x] Change `rounded-*` to `rounded-lg` (8px)
+        - [x] Make layout more compact (reduce padding, margins)
+        - [x] Add "Home" link/button
+        - [x] Correct brand color in hero/background
+    - [x] Update `ExerciseDetailView.tsx`
+        - [x] Replace `uppercase` classes with standard casing
+        - [x] Change `rounded-*` to `rounded-lg` (8px)
+        - [x] Remove "Tracked" badge from skills
+        - [x] Redesign "Ready to Start" section (remove blue gradient, use brand-consistent colors)
+        - [x] Make layout more compact
+    - [x] Update `ExerciseCard.tsx`
+        - [x] Change `rounded-*` to `rounded-lg` (8px)
+        - [x] Replace `uppercase` classes if any
+- [x] Refine Preview Mode Information
+    - [x] Update `ExerciseDetailView.tsx`
+        - [x] Make "Preview Mode" label much clearer/prominent
+        - [x] Add explicit mention that full interactive features (metronome, playback) are available after login/in practice mode
+        - [x] Improve empty state when no tablature/image is available
+- [x] Final Polish & Links
+    - [x] Fix missing translations for `phrasing` and `articulation` in `common.json`
+    - [x] Update `ExerciseDetailView.tsx`:
+        - [x] Add link/scroll-to-CTA in the Preview Mode disclaimer
+        - [x] Reduce size of "Interactive session only" empty state
+    - [x] Update `HeroSection.tsx` or `LandingPage.tsx`:
+        - [x] Add link to Exercise Hub on the landing page
+- [x] Final Verification
+    - [x] Check Hub view for casing and radius
+    - [x] Check Detail view for casing, radius, and skills
+    - [x] Verify navigation back to home
+    - [x] Verify Preview Mode clarity

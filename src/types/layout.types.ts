@@ -16,4 +16,5 @@ export type NavPagesTypes =
   | "recordings"
   | "about"
   | "privacy-policy"
+  | "exercises"
   | null;
