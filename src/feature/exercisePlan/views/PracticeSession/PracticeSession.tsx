@@ -42,11 +42,12 @@ import { useTablatureAudio } from "../../hooks/useTablatureAudio";
 interface PracticeSessionProps {
   plan: ExercisePlan;
   onFinish: () => void;
+  onClose?: () => void;
   isFinishing?: boolean;
   autoReport?: boolean;
 }
 
-export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: PracticeSessionProps) => {
+export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoReport }: PracticeSessionProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -215,7 +216,7 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
 
           <SessionModal
             isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult}
-            onClose={() => router.push("/report")}
+            onClose={onClose || (() => router.push("/report"))}
             onFinish={isLastExercise ? autoSubmitReport : onFinish}
             onImageClick={() => setIsImageModalOpen(true)}
             isMounted={isMounted}
@@ -488,21 +489,23 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                                      onToggle={metronome.toggleMetronome}
                                      startTime={metronome.startTime}
                                  />
-                                  <div className="mt-4 flex justify-center">
-                                      <Button
+                                  {currentExercise.tablature && currentExercise.tablature.length > 0 && (
+                                    <div className="mt-4 flex justify-center">
+                                        <Button
                                           variant="ghost"
                                           size="sm"
                                           className={cn(
-                                              "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
-                                              isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
+                                            "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                                            isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
                                           )}
                                           onClick={() => setIsAudioMuted(!isAudioMuted)}
-                                      >
+                                        >
                                           <GiGuitar className="text-base" />
                                           {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
                                           {isAudioMuted ? "Guitar Off" : "Guitar On"}
-                                      </Button>
-                                 </div>
+                                        </Button>
+                                   </div>
+                                  )}
                              </div>
                         )}
                         
@@ -549,6 +552,14 @@ export const PracticeSession = ({ plan, onFinish, isFinishing, autoReport }: Pra
                 <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
                      <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
                           <div className="flex-1 hidden xl:flex items-center justify-start gap-4">
+                             <Button
+                                 size="sm"
+                                 variant="ghost"
+                                 className="radius-premium font-bold text-[10px] tracking-[0.2em] transition-all click-behavior uppercase text-zinc-500 hover:text-white"
+                                 onClick={onClose}
+                             >
+                                 {t("common:practice.exit")}
+                             </Button>
                           </div>
 
                           <div className="flex-none flex justify-center">

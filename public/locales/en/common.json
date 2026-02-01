@@ -167,7 +167,13 @@
   },
   "filters": {
     "category": "Category",
-    "all": "All"
+    "all": "All",
+    "difficulty": "Difficulty"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
   },
   "categories": {
     "technique": "Technique",

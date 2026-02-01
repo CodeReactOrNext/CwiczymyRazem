@@ -258,21 +258,23 @@ const SessionModal = ({
                       onToggle={metronome.toggleMetronome}
                       startTime={metronome.startTime}
                     />
-                    <div className="mt-4 flex justify-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className={cn(
-                          "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
-                          isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
-                        )}
-                        onClick={() => setIsAudioMuted(!isAudioMuted)}
-                      >
-                        <GiGuitar className="text-base" />
-                        {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
-                        {isAudioMuted ? "Guitar Off" : "Guitar On"}
-                      </Button>
-                    </div>
+                    {currentExercise.tablature && currentExercise.tablature.length > 0 && (
+                      <div className="mt-4 flex justify-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={cn(
+                            "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                            isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
+                          )}
+                          onClick={() => setIsAudioMuted(!isAudioMuted)}
+                        >
+                          <GiGuitar className="text-base" />
+                          {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+                          {isAudioMuted ? "Guitar Off" : "Guitar On"}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
 
