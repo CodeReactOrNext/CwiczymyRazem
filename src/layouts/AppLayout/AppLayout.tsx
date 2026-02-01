@@ -60,6 +60,7 @@ const AppLayout = ({
       { id: "library", name: "Library", href: "/songs?view=library" },
       { id: "my_songs", name: "My Songs", href: "/songs?view=management" },
       { id: "leadboard", name: t("nav.leadboard"), href: "/leaderboard" },
+      { id: "exercises", name: "Exercise Hub", href: "/exercises" },
       { id: "faq", name: t("nav.faq"), href: "/faq" },
     ],
   };

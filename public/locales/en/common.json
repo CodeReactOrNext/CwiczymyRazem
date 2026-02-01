@@ -156,7 +156,9 @@
     "picking": "Picking",
     "finger_independence": "Finger Independence",
     "string_skipping": "String Skipping",
-    "technique": "Technique"
+    "technique": "Technique",
+    "phrasing": "Phrasing",
+    "articulation": "Articulation"
   },
   "back": "Back",
   "next": "Next",

@@ -103,24 +103,26 @@ export const HeroSection = () => {
           {/* Action Group */}
           <div className='flex flex-col items-center gap-8'>
             {isLoggedIn ? (
-              <div className="relative p-[1px] overflow-hidden rounded-lg group">
-                {/* Vibrant Rotating Border Beam */}
-                <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)]" />
-                
-                <Button
-                  onClick={handleGoToDashboard}
-                  disabled={isDashboardLoading}
-                  className='relative h-14 px-10 bg-zinc-950 hover:bg-zinc-900 text-white border-none font-bold text-lg transition-all rounded-[7px] shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)] overflow-hidden'
-                >
-                  {isDashboardLoading ? (
-                    <Loader2 className='animate-spin' />
-                  ) : (
-                    <span className='relative z-10 flex items-center gap-2'>
-                      <LayoutDashboard className='w-5 h-5 transition-transform group-hover:scale-110' />
-                      Go to Dashboard
-                    </span>
-                  )}
-                </Button>
+              <div className="flex flex-col items-center">
+                <div className="relative p-[1px] overflow-hidden rounded-lg group">
+                  {/* Vibrant Rotating Border Beam */}
+                  <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)]" />
+                  
+                  <Button
+                    onClick={handleGoToDashboard}
+                    disabled={isDashboardLoading}
+                    className='relative h-14 px-10 bg-zinc-950 hover:bg-zinc-900 text-white border-none font-bold text-lg transition-all rounded-[7px] shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)] overflow-hidden'
+                  >
+                    {isDashboardLoading ? (
+                      <Loader2 className='animate-spin' />
+                    ) : (
+                      <span className='relative z-10 flex items-center gap-2'>
+                        <LayoutDashboard className='w-5 h-5 transition-transform group-hover:scale-110' />
+                        Go to Dashboard
+                      </span>
+                    )}
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-6">
@@ -138,7 +140,7 @@ export const HeroSection = () => {
                   <Button
                     onClick={handleGoogleLogin}
                     disabled={isGoogleFetching}
-                    className="h-14 px-8 bg-zinc-950 text-white hover:bg-zinc-900 border border-white/10 font-semibold text-base transition-all rounded-lg flex items-center gap-3 shadow-lg"
+                    className="h-14 px-8 bg-black text-white hover:bg-zinc-900 border border-white/10 font-semibold text-base transition-all rounded-lg flex items-center gap-3 shadow-lg"
                   >
                     <FcGoogle className="h-5 w-5" /> Continue with Google
                   </Button>
