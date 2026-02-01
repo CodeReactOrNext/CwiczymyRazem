@@ -46,7 +46,7 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
 
         <div className="pt-32 pb-24 container mx-auto px-4">
           <div className="mb-16 text-center">
-            <h1 className="mb-4 text-5xl font-bold text-white md:text-7xl font-teko uppercase tracking-tight">
+            <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl font-teko uppercase tracking-tight">
               Knowledge and <span className="text-cyan-400">Inspiration</span>
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-zinc-400">
