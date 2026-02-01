@@ -66,7 +66,7 @@ const categoryStyles = {
     badge: "bg-red-500/10 text-red-200 border-red-500/20",
   },
   playalong: {
-    gradient: "from-red-600/20 via-zinc-950/60 to-zinc-950",
+    gradient: "from-red-500/10 via-zinc-950/50 to-zinc-950",
     border: "border-red-500/40",
     icon: FaYoutube,
     text: "text-red-500",
@@ -115,7 +115,7 @@ export const PlanCard = ({
         "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-xl p-4 glass-card radius-premium click-behavior",
         style.border,
         style.gradient,
-        hasPlayalong && "shadow-[0_0_20px_-3px_rgba(239,68,68,0.3)] border-red-500/30 ring-1 ring-red-500/10",
+        hasPlayalong && "border-red-500/30",
         isLoading && "opacity-80 pointer-events-none"
       )}
       onClick={onSelect}>
