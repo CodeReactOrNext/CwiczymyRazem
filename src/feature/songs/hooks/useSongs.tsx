@@ -30,8 +30,8 @@ export const useSongs = () => {
   useEffect(() => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     debounceTimeout.current = setTimeout(() => {
-      setDebouncedTitle(titleQuery);
-      setDebouncedArtist(artistQuery);
+      setDebouncedTitle(titleQuery.trim());
+      setDebouncedArtist(artistQuery.trim());
     }, 800);
     return () => {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
@@ -102,8 +102,8 @@ export const useSongs = () => {
     difficultyFilter !== "all" ||
     tierFilters.length > 0 ||
     genreFilters.length > 0 ||
-    titleQuery !== "" ||
-    artistQuery !== "";
+    titleQuery.trim() !== "" ||
+    artistQuery.trim() !== "";
 
   const getSongStatus = (songId: string) => {
     if (userSongs.wantToLearn.some((song) => song.id === songId)) return "wantToLearn";

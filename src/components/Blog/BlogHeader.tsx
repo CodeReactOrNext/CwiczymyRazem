@@ -65,7 +65,7 @@ export const BlogHeader = ({ title, description, date, image, author, readTime =
             </div>
 
             {/* Title */}
-            <h1 className="mb-6 text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl font-teko uppercase leading-[0.9]">
+            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl font-teko uppercase leading-[0.9]">
               {title}
             </h1>
             
