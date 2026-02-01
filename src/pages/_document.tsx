@@ -52,20 +52,12 @@ class MyDocument extends Document {
           <link rel='mask-icon' href='/images/logolight.svg' color='#06b6d4' />
           {process.env.NODE_ENV === "production" && (
             <script
-              id="microsoft-clarity-analytics"
-              dangerouslySetInnerHTML={{
-                __html: `
-                  (function(c,l,a,r,i,t,y){
-                      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-                  })(window, document, "clarity", "script", "plp3vbsypt");
-                `,
-              }}
+              async
+              src="https://t.contentsquare.net/uxa/9e03f79f1b59f.js"
             />
           )}
         </Head>
-        <body data-clarity-unmask="true">
+        <body>
           <Main />
           <div id="overlays" />
           <NextScript />

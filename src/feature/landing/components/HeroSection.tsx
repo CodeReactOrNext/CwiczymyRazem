@@ -1,14 +1,13 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
+import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Logo } from "components/Logo/Logo";
 import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
 import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
 import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
-import { Music2, Zap } from "lucide-react";
-import { ChevronRight, Loader2, Clock, LayoutDashboard } from "lucide-react";
+import { Loader2, LayoutDashboard } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -22,7 +21,10 @@ export const HeroSection = () => {
   const [isDashboardLoading, setIsDashboardLoading] = useState(false);
   const dispatch = useAppDispatch();
   const isGoogleFetching = useAppSelector(selectIsFetching) === "google";
+  const { status } = useSession();
   const userAuth = useAppSelector(selectUserAuth);
+  
+  const isSyncing = status === "authenticated" && !userAuth;
   const isLoggedIn = !!userAuth;
 
   const handleGoToDashboard = () => {
@@ -102,7 +104,11 @@ export const HeroSection = () => {
 
           {/* Action Group */}
           <div className='flex flex-col items-center gap-8'>
-            {isLoggedIn ? (
+            {isSyncing ? (
+               <div className="h-14 w-48 flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-cyan-400 opacity-50" />
+               </div>
+            ) : isLoggedIn ? (
               <div className="flex flex-col items-center">
                 <div className="relative p-[1px] overflow-hidden rounded-lg group">
                   {/* Vibrant Rotating Border Beam */}
