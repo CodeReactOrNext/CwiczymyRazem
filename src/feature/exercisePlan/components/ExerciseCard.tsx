@@ -22,6 +22,7 @@ import {
 interface ExerciseCardProps {
   exercise: Exercise;
   onSelect?: () => void;
+  disableDialog?: boolean;
 }
 
 const categoryStyles = {
@@ -62,9 +63,14 @@ const categoryStyles = {
   },
 };
 
-export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
+export const ExerciseCard = ({ exercise, disableDialog }: ExerciseCardProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (disableDialog) return;
+    setIsDetailsOpen(true);
+  };
 
   const exerciseSkills = exercise.relatedSkills
     .map((skillId) => guitarSkills.find((skill) => skill.id === skillId))
@@ -77,35 +83,35 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
     <>
       <Card
         className={cn(
-          "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-xl p-6 glass-card radius-premium click-behavior",
+          "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-xl p-6 glass-card rounded-lg click-behavior",
           style.border,
           style.gradient
         )}
-        onClick={() => setIsDetailsOpen(true)}>
+        onClick={handleCardClick}>
         
         {/* Header: Category Icon & Badges */}
         <div className="mb-5 flex items-start justify-between">
             <div className="flex items-center gap-3">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg border bg-zinc-950/50 shadow-sm ${style.border}`}>
+                <div className={`flex h-8 w-8 items-center justify-center rounded-md border bg-zinc-950/50 shadow-sm ${style.border}`}>
                     <Icon className={`h-4 w-4 ${style.text}`} />
                 </div>
-                <Badge variant="secondary" className={`capitalize tracking-wide ${style.badge}`}>
-                    {t(`exercises:categories.${exercise.category}` as any)}
+                <Badge variant="secondary" className={`capitalize tracking-wide font-bold ${style.badge}`}>
+                    {t(`exercises:categories.${exercise.category}` as any).toLowerCase()}
                 </Badge>
                 {exercise.isPlayalong && (
-                  <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 flex items-center gap-1.5 px-2 py-0.5 text-[10px] h-5">
+                  <Badge variant="secondary" className="bg-red-500/20 text-red-300 border-red-500/30 flex items-center gap-1.5 px-2 py-0.5 text-[10px] h-5 font-bold">
                     <FaYoutube className="h-3 w-3" />
-                    PLAYALONG
+                    Playalong
                   </Badge>
                 )}
                 {exercise.videoUrl && !exercise.isPlayalong && (
-                  <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 flex items-center gap-1.5 px-2 py-0.5 text-[10px] h-5">
+                  <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 flex items-center gap-1.5 px-2 py-0.5 text-[10px] h-5 font-bold">
                     <FaVideo className="h-3 w-3" />
-                    VIDEO
+                    Video
                   </Badge>
                 )}
             </div>
-            <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-xs font-bold capitalize text-muted-foreground">
                  {t(`exercises:difficulty.${exercise.difficulty}` as any)}
             </Badge>
         </div>
@@ -131,7 +137,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
                 <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground p-0"
+                    className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground p-0 font-bold"
                 >
                     {t("common:details")} <FaArrowRight className="ml-1 h-3 w-3" />
                 </Button>
@@ -141,7 +147,7 @@ export const ExerciseCard = ({ exercise }: ExerciseCardProps) => {
             <div className="flex flex-wrap gap-2">
                 {exerciseSkills.slice(0, 3).map((skill) => (
                     skill && (
-                        <div key={skill.id} className="flex items-center gap-1.5 rounded-full bg-zinc-900/60 px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground border border-white/5">
+                        <div key={skill.id} className="flex items-center gap-1.5 rounded-lg bg-zinc-900/60 px-2 py-1 text-[10px] font-bold text-muted-foreground border border-white/5">
                             {skill.icon && <skill.icon className="h-2.5 w-2.5" />}
                             {t(`common:skills.${skill.id}` as any)}
                         </div>
