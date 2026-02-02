@@ -13,6 +13,11 @@ export const useFCM = () => {
     useState<NotificationPermission>("default");
 
   useEffect(() => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      console.log("This browser does not support desktop notification");
+      return;
+    }
+
     const requestPermission = async () => {
       try {
         const permission = await Notification.requestPermission();
@@ -22,12 +27,7 @@ export const useFCM = () => {
           const msg = await messaging();
           if (msg) {
             const token = await getToken(msg, {
-              vapidKey:
-                "BKy9Q8rXUe1eF7g9d8c7b6a5", // You might need a VAPID key here if you haven't generated one in Firebase Console. 
-              // For now I'll leave it undefined or use a placeholder if required. 
-              // Actually getToken requires a vapidKey usually for web push certificates.
-              // Since I don't have it, I'll comment it out and let the user know they might need it, 
-              // or I can try to find if it exists in the codebase.
+              vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
             });
             if (token) {
               setFcmToken(token);
