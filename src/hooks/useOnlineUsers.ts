@@ -2,7 +2,7 @@ import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { getDatabase, onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
-import { firebaseApp } from "utils/firebase/client/firebase.cofig";
+import { firebaseApp } from "utils/firebase/client/firebase.config";
 
 export interface OnlineUser {
   uid: string;
