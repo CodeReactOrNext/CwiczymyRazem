@@ -31,7 +31,7 @@ export default async function handler(
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    snapshot.docs.forEach((doc) => {
+    snapshot.docs.forEach((doc: any) => {
       const data = doc.data();
       const tokens = data.fcmData?.tokens || [];
       if (!tokens.length) return;
