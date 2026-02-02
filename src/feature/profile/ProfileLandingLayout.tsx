@@ -79,7 +79,7 @@ const ProfileLandingLayout = ({
 
         <button
           onClick={() => {
-            if (notificationPermission !== 'granted') {
+            if (typeof window !== 'undefined' && 'Notification' in window && notificationPermission !== 'granted') {
               Notification.requestPermission();
             }
           }}
