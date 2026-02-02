@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { cn } from "assets/lib/utils";
 import { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { NoteData, getFrequencyFromTab, getNoteFromFrequency } from "utils/audio/noteUtils";
 
 interface TablatureViewerProps {
   measures?: TablatureMeasure[];
@@ -9,6 +10,10 @@ interface TablatureViewerProps {
   startTime: number | null;
   countInRemaining?: number;
   className?: string;
+  detectedNote?: NoteData | null;
+  isListening?: boolean;
+  hitNotes?: Record<string, boolean>;
+  currentBeatsElapsed?: number;
 }
 
 export const TablatureViewer = ({
@@ -17,7 +22,11 @@ export const TablatureViewer = ({
   isPlaying,
   startTime,
   countInRemaining = 0,
-  className
+  className,
+  detectedNote,
+  isListening,
+  hitNotes = {},
+  currentBeatsElapsed = 0
 }: TablatureViewerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -167,8 +176,8 @@ export const TablatureViewer = ({
       ctx.lineWidth = 2;
 
       let currentOffset = 0;
-      measures?.forEach(measure => {
-        measure.beats.forEach(beat => {
+      measures?.forEach((measure, mIdx) => {
+        measure.beats.forEach((beat, bIdx) => {
           const beatLeft = currentOffset + 10;
           if (beatLeft >= scrollX - 50 && beatLeft <= scrollX + containerSize.width + 50) {
             ctx.beginPath();
@@ -187,17 +196,22 @@ export const TablatureViewer = ({
           }
 
           // 4. Draw Beat Notes and Highlight
-          beat.notes.forEach(note => {
+          beat.notes.forEach((note, nIdx) => {
             const noteY = STAFF_TOP_OFFSET + (note.string - 1) * STRING_SPACING;
             
-            // Check if active (cursor is within this beat's range and very close to start)
+            // Check if active (cursor is within this beat's range)
             const isActive = isPlaying && startTime &&
                              cursorPosition >= currentOffset && 
                              cursorPosition < (currentOffset + beat.duration * dynamicBeatWidth);
 
+            const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
+            const isHit = hitNotes[noteKey];
+            
             if (beatLeft >= scrollX - 50 && beatLeft <= scrollX + containerSize.width + 50) {
               // Note Background
-              if (isActive) {
+              if (isHit) {
+                ctx.fillStyle = "#10b981"; // Emerald for success
+              } else if (isActive) {
                 // Glow effect for active note
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = "#06b6d4";
@@ -214,13 +228,13 @@ export const TablatureViewer = ({
               ctx.shadowBlur = 0; // Reset shadow
 
               // Fret Number
-              ctx.fillStyle = isActive ? "#ffffff" : "#000000";
+              ctx.fillStyle = (isActive || isHit) ? "#ffffff" : "#000000";
               ctx.font = "bold 13px Inter, sans-serif";
               ctx.textAlign = "center";
               ctx.textBaseline = "middle";
               
               let text = note.fret.toString();
-              if (hasAccentedNotes && !note.isAccented && !isActive) {
+              if (hasAccentedNotes && !note.isAccented && !isActive && !isHit) {
                   text = `(${text})`; 
               }
               ctx.fillText(text, beatLeft, noteY);
@@ -231,11 +245,11 @@ export const TablatureViewer = ({
                  ctx.fillText(">", beatLeft, noteY - 18); 
               }
               if (note.isHammerOn) {
-                 ctx.fillStyle = "#fbbf24";
+                 ctx.fillStyle = isHit ? "#064e3b" : "#fbbf24";
                  ctx.fillText("H", beatLeft, noteY - 20);
               }
               if (note.isPullOff) {
-                 ctx.fillStyle = "#f87171";
+                 ctx.fillStyle = isHit ? "#7f1d1d" : "#f87171";
                  ctx.fillText("P", beatLeft, noteY - 20);
               }
             }
@@ -245,7 +259,13 @@ export const TablatureViewer = ({
         });
       });
 
-      // 5. Draw Cursor & Pulse
+      // 5. Progress Overlay (Passed Box)
+      if (isPlaying && startTime && cursorPosition > 0) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.45)"; // Semi-transparent black box
+        ctx.fillRect(0, 0, cursorPosition, containerSize.height);
+      }
+
+      // 6. Draw Cursor & Pulse
       if (isPlaying && startTime) {
         // Cursor Line
         ctx.strokeStyle = "#06b6d4"; 
@@ -268,6 +288,7 @@ export const TablatureViewer = ({
         }
       }
 
+
       ctx.restore();
 
       animationFrameRef.current = requestAnimationFrame(render);
@@ -280,7 +301,7 @@ export const TablatureViewer = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes]);
+  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes, detectedNote, isListening]);
 
   return (
     <div 
