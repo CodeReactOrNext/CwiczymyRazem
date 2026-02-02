@@ -16,6 +16,10 @@ export interface FirebaseUserDataInterface {
   selectedGuitar?: number;
   statistics: StatisticsDataInterface;
   songLists: UserSongLists;
+  fcmData?: {
+    tokens: string[];
+    notificationsEnabled: boolean;
+  };
 }
 
 export interface FirebaseEventsInteface {

@@ -29,7 +29,7 @@ import {
 } from "firebase/firestore";
 import { getStorage, } from "firebase/storage";
 
-import { firebaseApp } from "./firebase.cofig";
+import { firebaseApp } from "./firebase.config";
 import type {
   FirebaseUserDataInterface,
 } from "./firebase.types";
