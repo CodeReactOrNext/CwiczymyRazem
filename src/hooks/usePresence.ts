@@ -2,7 +2,7 @@ import { selectCurrentActivity, selectUserAuth, selectUserInfo } from "feature/u
 import { getDatabase, onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
 import { useEffect } from "react";
 import { useAppSelector } from "store/hooks";
-import { firebaseApp } from "utils/firebase/client/firebase.cofig";
+import { firebaseApp } from "utils/firebase/client/firebase.config";
 
 export const usePresence = () => {
   const userInfo = useAppSelector(selectUserInfo);

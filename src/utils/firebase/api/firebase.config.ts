@@ -59,4 +59,5 @@ const getAuth = () => {
 const firestore = getFirestore();
 const auth = getAuth();
 
-export { auth, firestore };
+const messaging = admin.messaging();
+export { auth, firestore, messaging };
