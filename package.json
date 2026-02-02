@@ -11,7 +11,13 @@
     "lint:fix": "eslint src --fix",
     "format": "npm run lint:fix && prettier '**/*.{json,yaml}' --write --ignore-path .gitignore",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "postinstall": "node patch-aubio.js"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
   },
   "engines": {
     "node": ">=20.0.0"
@@ -47,6 +53,7 @@
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-query-devtools": "^5.91.1",
     "@tremor/react": "^3.18.6",
+    "aubiojs": "^0.2.1",
     "axios": "^1.2.2",
     "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.1",
