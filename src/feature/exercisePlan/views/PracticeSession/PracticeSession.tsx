@@ -10,7 +10,7 @@ import { Button } from "assets/components/ui/button";
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import { Timer } from "lucide-react";
@@ -38,6 +38,9 @@ import SessionModal from "./modals/SessionModal";
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import { TablatureViewer } from "./components/TablatureViewer";
 import { useTablatureAudio } from "../../hooks/useTablatureAudio";
+import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
+import { useMemo } from "react";
+import { getNoteFromFrequency, getFrequencyFromTab } from "utils/audio/noteUtils";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
@@ -172,6 +175,212 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     }
     handleNextExercise(resetTimer);
   };
+
+  const {
+    frequency,
+    volume,
+    isOnset,
+    confidence, // eslint-disable-line @typescript-eslint/no-unused-vars
+    isListening,
+    error: audioError, // eslint-disable-line @typescript-eslint/no-unused-vars
+    init: initAudio,
+    close: closeAudio
+  } = useAudioAnalyzer();
+
+  const [isMicEnabled, setIsMicEnabled] = useState(false);
+  const LATENCY_MS = 150; // Compensate for audio buffer + processing delay
+  const CENTS_TOLERANCE = 50; // Increased tolerance (half a semitone)
+  const WINDOW_MS = 200; // Time window in ms to allow hitting notes early/late
+
+  const toggleMic = async () => {
+    if (isListening) {
+        closeAudio();
+        setIsMicEnabled(false);
+    } else {
+        await initAudio();
+        setIsMicEnabled(true);
+    }
+  };
+
+  const detectedNoteData = useMemo(() => {
+     if (!frequency || frequency < 50) return null;
+     return getNoteFromFrequency(frequency);
+  }, [frequency]);
+
+  const [hitNotes, setHitNotes] = useState<Record<string, boolean>>({});
+  const [sessionAccuracy, setSessionAccuracy] = useState(100);
+  const [sessionStats, setSessionStats] = useState({ hits: 0, misses: 0 });
+  const [gameState, setGameState] = useState({
+    score: 0,
+    combo: 0,
+    multiplier: 1,
+    lastFeedback: "",
+    feedbackId: 0
+  });
+  const lastLoopedBeatsRef = useRef(0);
+  const processedNotesRef = useRef<Set<string>>(new Set());
+
+  const totalNotes = useMemo(() => {
+    if (!currentExercise.tablature) return 0;
+    return currentExercise.tablature.reduce((acc, m) => 
+      acc + m.beats.reduce((acc2, b) => acc2 + b.notes.length, 0), 0
+    );
+  }, [currentExercise.tablature]);
+
+  useEffect(() => {
+    setHitNotes({});
+    setSessionAccuracy(100);
+    setSessionStats({ hits: 0, misses: 0 });
+    setGameState({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
+    lastLoopedBeatsRef.current = 0;
+    processedNotesRef.current.clear();
+  }, [currentExerciseIndex]);
+
+  // Clear feedback after a delay
+  useEffect(() => {
+      if (gameState.lastFeedback) {
+          const timer = setTimeout(() => {
+              setGameState(prev => ({ ...prev, lastFeedback: "" }));
+          }, 1500);
+          return () => clearTimeout(timer);
+      }
+  }, [gameState.feedbackId]);
+
+  useEffect(() => {
+    if (!isPlaying || !metronome.startTime || !currentExercise.tablature || !detectedNoteData || !isMicEnabled) return;
+
+    const now = Date.now();
+    const compensatedNow = now - LATENCY_MS;
+    
+    const totalExerciseBeats = currentExercise.tablature.reduce((acc, m) => 
+      acc + m.beats.reduce((acc2, b) => acc2 + b.duration, 0), 0
+    );
+    if (totalExerciseBeats === 0) return;
+
+    const beatsPerSecond = metronome.bpm / 60;
+    const windowBeats = (WINDOW_MS / 1000) * beatsPerSecond;
+
+    const elapsedSeconds = (compensatedNow - metronome.startTime) / 1000;
+    const totalBeatsElapsed = elapsedSeconds * beatsPerSecond;
+    const loopedBeatsElapsed = totalBeatsElapsed % totalExerciseBeats;
+    
+    // Detect loop restart (more robust check)
+    const hasLooped = loopedBeatsElapsed < lastLoopedBeatsRef.current - 0.1;
+    if (hasLooped) {
+       setHitNotes({});
+       processedNotesRef.current.clear();
+       setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 })); // Keep score, reset streak
+    }
+    lastLoopedBeatsRef.current = loopedBeatsElapsed;
+
+    let currentBeatTotal = 0;
+
+    for (let mIdx = 0; mIdx < currentExercise.tablature.length; mIdx++) {
+      const measure = currentExercise.tablature[mIdx];
+      for (let bIdx = 0; bIdx < measure.beats.length; bIdx++) {
+        const beat = measure.beats[bIdx];
+        const beatStart = currentBeatTotal;
+        const beatEnd = currentBeatTotal + beat.duration;
+        
+        const isWithinWindow = 
+          (loopedBeatsElapsed >= beatStart - windowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
+          (loopedBeatsElapsed + totalExerciseBeats >= beatStart - windowBeats && loopedBeatsElapsed + totalExerciseBeats <= beatEnd + windowBeats);
+
+        const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
+
+        beat.notes.forEach((note, nIdx) => {
+          const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
+          
+          // Skip if already processed in this loop
+          if (processedNotesRef.current.has(noteKey)) return;
+
+          // 1. Check for Hit
+          if (isWithinWindow) {
+            const targetFreq = getFrequencyFromTab(note.string, note.fret);
+            const targetNote = getNoteFromFrequency(targetFreq);
+            
+            if (targetNote && 
+                targetNote.note === detectedNoteData.note && 
+                Math.abs(detectedNoteData.cents) <= CENTS_TOLERANCE &&
+                volume > 0.05) { // Ensure clear signal
+              
+              processedNotesRef.current.add(noteKey);
+              setHitNotes(prev => ({ ...prev, [noteKey]: true }));
+              
+              setSessionStats(prev => {
+                const newHits = prev.hits + 1;
+                const total = newHits + prev.misses;
+                setSessionAccuracy(Math.round((newHits / total) * 100));
+                return { ...prev, hits: newHits };
+              });
+
+              setGameState(prev => {
+                  const newCombo = prev.combo + 1;
+                  const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
+                  
+                  let feedback = prev.lastFeedback;
+                  let fId = prev.feedbackId;
+                  
+                  if (newMultiplier > prev.multiplier) {
+                      feedback = "MULTIPLIER UP!";
+                      fId++;
+                  } else if (newCombo % 10 === 0) {
+                      feedback = "AWESOME!";
+                      fId++;
+                  } else if (newCombo % 5 === 0) {
+                      feedback = "PERFECT";
+                      fId++;
+                  }
+
+                  return {
+                      ...prev,
+                      score: prev.score + (100 * newMultiplier),
+                      combo: newCombo,
+                      multiplier: newMultiplier,
+                      lastFeedback: feedback,
+                      feedbackId: fId
+                  };
+              });
+            }
+          } 
+          
+          // 2. Check for Miss (window passed without hit)
+          else if (isPassed && !hitNotes[noteKey]) {
+            processedNotesRef.current.add(noteKey);
+            setSessionStats(prev => {
+              const newMisses = prev.misses + 1;
+              const total = prev.hits + newMisses;
+              setSessionAccuracy(Math.round((prev.hits / total) * 100));
+              return { ...prev, misses: newMisses };
+            });
+            setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 }));
+          }
+        });
+
+        currentBeatTotal += beat.duration;
+      }
+    }
+  }, [isPlaying, metronome.startTime, metronome.bpm, currentExercise.tablature, detectedNoteData, isMicEnabled, currentExerciseIndex, totalNotes, volume]);
+
+  // Pass progress for gray-out effect
+  const beatsPerSecond = metronome.bpm / 60;
+  const elapsedSeconds = (isPlaying && metronome.startTime) ? (Date.now() - metronome.startTime) / 1000 : 0;
+  const totalExerciseBeats = useMemo(() => {
+    if (!currentExercise.tablature) return 0;
+    return currentExercise.tablature.reduce((acc, m) => 
+      acc + m.beats.reduce((acc2, b) => acc2 + b.duration, 0), 0
+    );
+  }, [currentExercise.tablature]);
+  
+  const currentBeatsElapsed = totalExerciseBeats > 0 ? (elapsedSeconds * beatsPerSecond) % totalExerciseBeats : 0;
+
+  // Auto-stop metronome when time ends
+  useEffect(() => {
+    if (timeLeft <= 0 && metronome.isPlaying) {
+      metronome.toggleMetronome();
+    }
+  }, [timeLeft, metronome.isPlaying]);
+
 
   return (
     <>
@@ -354,6 +563,119 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                       </motion.div>
                     )}
                     
+                     {isMicEnabled && (
+                        <div className="w-full max-w-5xl mb-6 animate-in fade-in slide-in-from-top-6 duration-700">
+                            <div className="flex items-end justify-between gap-8">
+                                {/* Left: Score & Accuracy */}
+                                <div className="flex-1 flex items-center gap-6">
+                                    <div className="relative group">
+                                        <div className="absolute -inset-2 bg-white/5 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Total Score</span>
+                                        <span className="text-4xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                                            {gameState.score.toLocaleString()}
+                                        </span>
+                                    </div>
+                                    <div className="h-10 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+                                    <div>
+                                        <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Accuracy</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-2xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Center: Dynamic Feedback */}
+                                <div className="flex-[0.5] flex flex-col items-center justify-center -mb-2 relative">
+                                    <div className="absolute top-[-50px] whitespace-nowrap">
+                                        <AnimatePresence mode="wait">
+                                            {gameState.lastFeedback && (
+                                                <motion.div 
+                                                    key={gameState.feedbackId}
+                                                    initial={{ 
+                                                        y: 40, 
+                                                        opacity: 0, 
+                                                        scale: 0.3, 
+                                                        filter: "blur(10px)" 
+                                                    }}
+                                                    animate={{ 
+                                                        y: 0, 
+                                                        opacity: 1, 
+                                                        scale: 1.4, 
+                                                        filter: "blur(0px)",
+                                                        transition: {
+                                                            type: "spring",
+                                                            stiffness: 300,
+                                                            damping: 15
+                                                        }
+                                                    }}
+                                                    exit={{ 
+                                                        y: -40, 
+                                                        opacity: 0, 
+                                                        scale: 2, 
+                                                        filter: "blur(5px)",
+                                                        transition: { duration: 0.4 }
+                                                    }}
+                                                    className={cn(
+                                                        "text-4xl font-black uppercase italic tracking-tighter drop-shadow-[0_0_20px_rgba(34,211,238,0.8)]",
+                                                        gameState.lastFeedback === "MULTIPLIER UP!" ? "text-main" : "text-cyan-400"
+                                                    )}
+                                                >
+                                                    {gameState.lastFeedback}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                    <div className="mt-8 h-1 w-32 bg-zinc-900 rounded-full overflow-hidden border border-white/5">
+                                        <motion.div 
+                                            className="h-full bg-cyan-400 shadow-[0_0_15px_#22d3ee]"
+                                            animate={{ width: `${(gameState.combo % 5) * 20 || (gameState.combo > 0 ? 100 : 0)}%` }}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Right: Streak & Multiplier */}
+                                <div className="flex-1 flex items-center justify-end gap-6">
+                                    <div className="text-right">
+                                        <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Note Streak</span>
+                                        <div className="flex items-center justify-end gap-3">
+                                            <span className="text-3xl font-black text-cyan-400 tabular-nums">{gameState.combo}</span>
+                                            <div className="flex flex-col gap-0.5">
+                                                {[...Array(3)].map((_, i) => (
+                                                    <div 
+                                                        key={i} 
+                                                        className={cn(
+                                                            "w-1 h-3 rounded-full transition-all duration-300",
+                                                            gameState.combo > i ? "bg-cyan-400 shadow-[0_0_8px_#22d3ee]" : "bg-zinc-800"
+                                                        )} 
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="relative">
+                                        <div className={cn(
+                                            "absolute -inset-4 rounded-2xl blur-2xl transition-all duration-500",
+                                            gameState.multiplier >= 4 ? "bg-main/30 opacity-100" : "bg-cyan-500/20 opacity-0"
+                                        )} />
+                                        <div className={cn(
+                                            "relative flex flex-col items-center justify-center w-20 h-20 rounded-2xl border-2 transition-all duration-500 overflow-hidden",
+                                            gameState.multiplier >= 4 
+                                                ? "bg-main border-white/40 shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-110" 
+                                                : "bg-zinc-950 border-white/10"
+                                        )}>
+                                            <span className="text-[10px] font-black uppercase tracking-tighter text-white/50 -mb-1">Multiplier</span>
+                                            <span className="text-4xl font-black text-white italic tracking-tighter">x{gameState.multiplier}</span>
+                                            {gameState.multiplier >= 8 && (
+                                                <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent animate-pulse" />
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                     )}
+
                     <div className={cn(
                       "relative w-full overflow-hidden radius-premium bg-zinc-900 shadow-2xl",
                       currentExercise.isPlayalong ? "" : "border border-white/10 glass-card"
@@ -366,6 +688,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                               startTime={metronome.startTime || null}
                               countInRemaining={(metronome as any).countInRemaining}
                               className="w-full"
+                              detectedNote={detectedNoteData}
+                              isListening={isListening}
+                              hitNotes={hitNotes}
+                              currentBeatsElapsed={currentBeatsElapsed}
                            />
                          ) : currentExercise.isPlayalong && currentExercise.youtubeVideoId ? (
                              !isMobileView && (
@@ -490,19 +816,64 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                      startTime={metronome.startTime}
                                  />
                                   {currentExercise.tablature && currentExercise.tablature.length > 0 && (
-                                    <div className="mt-4 flex justify-center">
+                                    <div className="mt-4 flex flex-col gap-2">
                                         <Button
                                           variant="ghost"
                                           size="sm"
                                           className={cn(
-                                            "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                                            "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
                                             isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
                                           )}
                                           onClick={() => setIsAudioMuted(!isAudioMuted)}
                                         >
                                           <GiGuitar className="text-base" />
                                           {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
-                                          {isAudioMuted ? "Guitar Off" : "Guitar On"}
+                                          {isAudioMuted ? "Guitar Playback Off" : "Guitar Playback On"}
+                                        </Button>
+
+                                        <Button
+                                            variant="ghost"
+                                            size="sm" 
+                                            className={cn(
+                                                "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                                                !isMicEnabled ? "text-zinc-500 hover:text-zinc-400" : "text-emerald-400 hover:text-emerald-300 bg-emerald-500/10"
+                                            )}
+                                            onClick={toggleMic}
+                                        >
+                                            <span className={cn("w-2 h-2 rounded-full", isMicEnabled ? "bg-emerald-500 animate-pulse" : "bg-zinc-600")} />
+                                            {isMicEnabled ? "Mic Listen On" : "Enable Mic"}
+                                            {isMicEnabled && (
+                                                <div className="flex items-center gap-3 ml-auto">
+                                                    <div className="flex flex-col items-end">
+                                                        <div className="flex items-center gap-1.5 mb-1">
+                                                            <div className="w-12 h-1 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
+                                                                <motion.div 
+                                                                    className={cn(
+                                                                        "h-full transition-all duration-150",
+                                                                        volume > 0.1 ? "bg-emerald-400 shadow-[0_0_8px_#34d399]" : "bg-zinc-600"
+                                                                    )}
+                                                                    animate={{ width: `${Math.min(100, volume * 300)}%` }} // Boost for visibility
+                                                                />
+                                                            </div>
+                                                            <span className="text-[8px] font-bold text-zinc-500 uppercase tracking-tighter">Level</span>
+                                                        </div>
+                                                        <span className="text-[10px] font-bold text-emerald-400 leading-none">
+                                                            {sessionAccuracy}% Accuracy
+                                                        </span>
+                                                        {detectedNoteData && volume > 0.05 && (
+                                                            <span className={cn(
+                                                                "text-[8px] font-mono px-1 py-0 mt-1 rounded border",
+                                                                Math.abs(detectedNoteData.cents) <= CENTS_TOLERANCE 
+                                                                    ? "text-emerald-400 border-emerald-500/20 bg-emerald-500/10"
+                                                                    : "text-amber-400 border-amber-500/20 bg-amber-500/10"
+                                                            )}>
+                                                                {detectedNoteData.note}{detectedNoteData.octave} 
+                                                                {detectedNoteData.cents > 0 ? '+' : ''}{detectedNoteData.cents}c
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </Button>
                                    </div>
                                   )}
