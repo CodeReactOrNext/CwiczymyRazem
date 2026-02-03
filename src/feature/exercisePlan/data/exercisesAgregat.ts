@@ -56,6 +56,7 @@ import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStai
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
+import { spiderPermutation1234Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1234/spiderPermutation1234";
 
 export const exercisesAgregat: Exercise[] = [
   spiderOneStringExercise,
@@ -91,7 +92,8 @@ export const exercisesAgregat: Exercise[] = [
   rhythmicMotifDisplacementExercise,
   intervalStringJumpsExercise,
   singWhatYouPlayExercise,
-
+  
+  spiderPermutation1234Exercise,
   spiderPermutation1243Exercise,
   spiderPermutation1324Exercise,
   spiderPermutation1342Exercise,
