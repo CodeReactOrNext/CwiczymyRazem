@@ -32,6 +32,17 @@ export default function TabEditor() {
   const [isDragging, setIsDragging] = useState(false);
   const [toast, setToast] = useState<{ message: string, type: 'info' | 'success' | 'error' } | null>(null);
   const [contextMenu, setContextMenu] = useState<{ x: number, y: number } | null>(null);
+  const [isSpiderModalOpen, setIsSpiderModalOpen] = useState(false);
+  const [spiderConfig, setSpiderConfig] = useState({
+    permutation: "1234",
+    startFret: 1,
+    endFret: 12,
+    strings: [6, 5, 4, 3, 2, 1],
+    includeReturn: true,
+    returnStrings: true,
+    duration: 0.25
+  });
+
 
   const showToast = useCallback((message: string, type: 'info' | 'success' | 'error' = 'info') => {
     setToast({ message, type });
@@ -298,6 +309,71 @@ export default function TabEditor() {
     }
 
     setMeasures(newMeasures);
+  };
+
+  const generateSpider = () => {
+    const { permutation, startFret, endFret, strings, includeReturn, duration } = spiderConfig;
+    const fingerDelta = permutation.split('').map(char => parseInt(char) - 1);
+    const newMeasures: TablatureMeasure[] = [];
+    
+    const frets = [];
+    for (let f = startFret; f <= endFret; f++) frets.push(f);
+    if (includeReturn) {
+      for (let f = endFret - 1; f >= startFret; f--) frets.push(f);
+    }
+
+    let currentMeasure: TablatureMeasure = {
+      timeSignature: [4, 4],
+      beats: []
+    };
+
+    frets.forEach(baseFret => {
+      // Forward strings
+      strings.forEach(stringIdx => {
+        fingerDelta.forEach(delta => {
+          currentMeasure.beats.push({
+            duration,
+            notes: [{ string: stringIdx, fret: baseFret + delta }]
+          });
+
+          if (currentMeasure.beats.length === 16) {
+            newMeasures.push(currentMeasure);
+            currentMeasure = { timeSignature: [4, 4], beats: [] };
+          }
+        });
+      });
+
+      // Backward strings (String Return)
+      if (spiderConfig.returnStrings) {
+        // Skip the very last string played to avoid duplicate beat on turnaround
+        const returnStringsList = [...strings].reverse().slice(1);
+        returnStringsList.forEach(stringIdx => {
+          fingerDelta.forEach(delta => {
+            currentMeasure.beats.push({
+              duration,
+              notes: [{ string: stringIdx, fret: baseFret + delta }]
+            });
+
+            if (currentMeasure.beats.length === 16) {
+              newMeasures.push(currentMeasure);
+              currentMeasure = { timeSignature: [4, 4], beats: [] };
+            }
+          });
+        });
+      }
+    });
+
+    if (currentMeasure.beats.length > 0) {
+      while (currentMeasure.beats.length < 16) {
+        currentMeasure.beats.push({ duration: 0.25, notes: [] });
+      }
+      newMeasures.push(currentMeasure);
+    }
+
+    setMeasures(newMeasures);
+    saveHistory(newMeasures);
+    setIsSpiderModalOpen(false);
+    showToast("Spider patterns generated!", "success");
   };
 
   const generateBasicPattern = () => {
@@ -691,11 +767,11 @@ export default function TabEditor() {
               </button>
               <div className="h-6 w-px bg-white/10 mx-1 hidden sm:block" />
               <button
-                onClick={generateBasicPattern}
-                className="flex items-center gap-2 px-3 py-1.5 hover:bg-white/10 border border-white/10 rounded-xl transition-all text-[10px] font-bold text-white/60 hover:text-white"
+                onClick={() => setIsSpiderModalOpen(true)}
+                className="flex items-center gap-2 px-3 py-1.5 hover:bg-cyan-500/10 border border-cyan-500/20 rounded-xl transition-all text-[10px] font-bold text-cyan-400"
               >
                 <LucideWand2 size={12} />
-                <span>1234</span>
+                <span>SPIDER GEN</span>
               </button>
               <button
                 onClick={clearAll}
@@ -814,7 +890,117 @@ export default function TabEditor() {
             )}
           </AnimatePresence>
 
+          {/* Spider Generator Modal */}
+          <AnimatePresence>
+            {isSpiderModalOpen && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+              >
+                <motion.div 
+                  initial={{ scale: 0.9, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.9, y: 20 }}
+                  className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-8 max-w-2xl w-full space-y-6 shadow-2xl"
+                >
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-black uppercase tracking-tighter italic text-cyan-400">Spider Exercise Generator</h3>
+                    <p className="text-sm text-white/40 font-medium">Configure your spider pattern parameters.</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-white/40">Finger Permutation</label>
+                        <input 
+                          type="text" 
+                          value={spiderConfig.permutation} 
+                          onChange={(e) => setSpiderConfig({...spiderConfig, permutation: e.target.value})}
+                          placeholder="e.g. 1234, 1324"
+                          className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black uppercase text-white/40">Start Fret</label>
+                          <input 
+                            type="number" 
+                            value={spiderConfig.startFret} 
+                            onChange={(e) => setSpiderConfig({...spiderConfig, startFret: parseInt(e.target.value) || 1})}
+                            className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black uppercase text-white/40">End Fret</label>
+                          <input 
+                            type="number" 
+                            value={spiderConfig.endFret} 
+                            onChange={(e) => setSpiderConfig({...spiderConfig, endFret: parseInt(e.target.value) || 12})}
+                            className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-white/40">Rhythm (Duration)</label>
+                        <select 
+                          value={spiderConfig.duration}
+                          onChange={(e) => setSpiderConfig({...spiderConfig, duration: parseFloat(e.target.value)})}
+                          className="w-full bg-black/50 border border-white/10 rounded-xl p-3 text-cyan-100 outline-none focus:border-cyan-500/50"
+                        >
+                          <option value={0.5}>1/8 (Eighth)</option>
+                          <option value={0.25}>1/16 (Sixteenth)</option>
+                          <option value={0.125}>1/32 (Thirty-second)</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-3 py-2">
+                        <input 
+                          type="checkbox" 
+                          id="includeReturn"
+                          checked={spiderConfig.includeReturn} 
+                          onChange={(e) => setSpiderConfig({...spiderConfig, includeReturn: e.target.checked})}
+                          className="w-5 h-5 accent-cyan-500"
+                        />
+                        <label htmlFor="includeReturn" className="text-sm font-bold text-white/60">Fret Return (Loop Down)</label>
+                      </div>
+                      <div className="flex items-center gap-3 py-2">
+                        <input 
+                          type="checkbox" 
+                          id="returnStrings"
+                          checked={spiderConfig.returnStrings} 
+                          onChange={(e) => setSpiderConfig({...spiderConfig, returnStrings: e.target.checked})}
+                          className="w-5 h-5 accent-cyan-500"
+                        />
+                        <label htmlFor="returnStrings" className="text-sm font-bold text-white/60">Return Across Strings</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <button
+                      onClick={() => setIsSpiderModalOpen(false)}
+                      className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-black transition-all uppercase tracking-widest"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={generateSpider}
+                      className="flex-1 py-3 bg-cyan-500 text-black hover:bg-cyan-400 rounded-xl text-xs font-black shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all uppercase tracking-widest"
+                    >
+                      Generate Spider
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Live Preview Section */}
+
           <section className="space-y-4">
               <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
