@@ -447,6 +447,17 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             isFinishing={isFinishing}
             isSubmittingReport={isSubmittingReport}
             canSkipExercise={canSkipExercise}
+            metronome={metronome}
+            isMicEnabled={isMicEnabled}
+            toggleMic={toggleMic}
+            gameState={gameState}
+            sessionAccuracy={sessionAccuracy}
+            detectedNoteData={detectedNoteData}
+            isListening={isListening}
+            hitNotes={hitNotes}
+            currentBeatsElapsed={currentBeatsElapsed}
+            isAudioMuted={isAudioMuted}
+            setIsAudioMuted={setIsAudioMuted}
           />
         </>
       )}

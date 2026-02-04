@@ -19,6 +19,7 @@ import { spiderMasterPlan } from "feature/exercisePlan/data/plans/spiderMasterPl
 import { theIntervalMapPlan } from "feature/exercisePlan/data/plans/theIntervalMap/theIntervalMap";
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
+import { megaBeginnerFirstStepsPlan } from "feature/exercisePlan/data/plans/megaBeginnerFirstSteps/megaBeginnerFirstSteps";
 
 import type { ExercisePlan } from "../types/exercise.types";
 
@@ -42,6 +43,7 @@ export const defaultPlans: ExercisePlan[] = [
   expressiveLeadPlayingPlan,
   rhythmicPrecisionPlan,
   theIntervalMapPlan,
+  megaBeginnerFirstStepsPlan,
   // metalGuitarExercisesPlan,
   musicianFitnessLvl1S1Plan,
   musicianFitnessLvl1S2Plan,

@@ -50,6 +50,18 @@ interface SessionModalProps {
   isFinishing?: boolean;
   isSubmittingReport?: boolean;
   canSkipExercise?: boolean;
+  // Shared Tracking & Metronome Props
+  metronome: any;
+  isMicEnabled: boolean;
+  toggleMic: () => Promise<void>;
+  gameState: any;
+  sessionAccuracy: number;
+  detectedNoteData: any;
+  isListening: boolean;
+  hitNotes: Record<string, boolean>;
+  currentBeatsElapsed: number;
+  isAudioMuted: boolean;
+  setIsAudioMuted: (bool: boolean) => void;
 }
 
 const SessionModal = ({
@@ -75,27 +87,22 @@ const SessionModal = ({
   stopTimer,
   isFinishing,
   isSubmittingReport,
-  canSkipExercise
+  canSkipExercise,
+  metronome,
+  isMicEnabled,
+  toggleMic,
+  gameState,
+  sessionAccuracy,
+  detectedNoteData,
+  isListening,
+  hitNotes,
+  currentBeatsElapsed,
+  isAudioMuted,
+  setIsAudioMuted
 }: SessionModalProps) => {
   if (!isOpen || !isMounted) return null;
 
   const { t } = useTranslation(["exercises", "common"]);
-  const [isAudioMuted, setIsAudioMuted] = useState(true);
-
-  const metronome = useDeviceMetronome({
-    initialBpm: currentExercise.metronomeSpeed?.recommended || 60,
-    minBpm: currentExercise.metronomeSpeed?.min,
-    maxBpm: currentExercise.metronomeSpeed?.max,
-    recommendedBpm: currentExercise.metronomeSpeed?.recommended
-  });
-
-  useTablatureAudio({
-    measures: currentExercise.tablature,
-    bpm: metronome.bpm,
-    isPlaying: metronome.isPlaying && !!metronome.startTime,
-    startTime: metronome.startTime || null,
-    isMuted: isAudioMuted
-  });
 
   const handleToggleTimer = () => {
     if (currentExercise.tablature && currentExercise.metronomeSpeed) {
@@ -154,6 +161,10 @@ const SessionModal = ({
                     startTime={metronome.startTime || null}
                     countInRemaining={(metronome as any).countInRemaining}
                     className="w-full"
+                    detectedNote={detectedNoteData}
+                    isListening={isListening}
+                    hitNotes={hitNotes}
+                    currentBeatsElapsed={currentBeatsElapsed}
                   />
                 ) : currentExercise.youtubeVideoId ? (
                    <div className="w-full radius-premium overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
@@ -238,6 +249,51 @@ const SessionModal = ({
                   </div>
                 )}
 
+                {isMicEnabled && (
+                  <div className="mb-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1">
+                        <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Score</span>
+                        <span className="text-2xl font-black text-white tabular-nums tracking-tighter">
+                          {gameState.score.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex-1 text-center">
+                        <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Accuracy</span>
+                        <span className="text-xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
+                      </div>
+                      <div className="flex-1 text-right">
+                        <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Streak</span>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <span className="text-2xl font-black text-cyan-400 tabular-nums">{gameState.combo}</span>
+                          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-main/20 border border-main/20">
+                            <span className="text-xs font-black text-white italic">x{gameState.multiplier}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative h-10 flex items-center justify-center">
+                      <AnimatePresence mode="wait">
+                          {gameState.lastFeedback && (
+                              <motion.div 
+                                  key={gameState.feedbackId}
+                                  initial={{ y: 20, opacity: 0, scale: 0.5 }}
+                                  animate={{ y: 0, opacity: 1, scale: 1.2 }}
+                                  exit={{ y: -20, opacity: 0, scale: 1.5 }}
+                                  className={cn(
+                                      "text-xl font-black uppercase italic tracking-tighter",
+                                      gameState.lastFeedback === "MULTIPLIER UP!" ? "text-main" : "text-cyan-400"
+                                  )}
+                              >
+                                  {gameState.lastFeedback}
+                              </motion.div>
+                          )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                )}
+
                   <MobileTimerDisplay
                     formattedTimeLeft={formattedTimeLeft}
                     isPlaying={isPlaying}
@@ -259,12 +315,12 @@ const SessionModal = ({
                       startTime={metronome.startTime}
                     />
                     {currentExercise.tablature && currentExercise.tablature.length > 0 && (
-                      <div className="mt-4 flex justify-center">
+                      <div className="mt-4 flex justify-center gap-4">
                         <Button
                           variant="ghost"
                           size="sm"
                           className={cn(
-                            "gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                            "gap-2 text-[10px] font-bold uppercase tracking-widest transition-all h-9",
                             isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
                           )}
                           onClick={() => setIsAudioMuted(!isAudioMuted)}
@@ -272,6 +328,19 @@ const SessionModal = ({
                           <GiGuitar className="text-base" />
                           {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
                           {isAudioMuted ? "Guitar Off" : "Guitar On"}
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={cn(
+                            "gap-2 text-[10px] font-bold uppercase tracking-widest transition-all h-9",
+                            !isMicEnabled ? "text-zinc-500 hover:text-zinc-400" : "text-emerald-400 hover:text-emerald-300 bg-emerald-500/10"
+                          )}
+                          onClick={toggleMic}
+                        >
+                          <div className={cn("h-1.5 w-1.5 rounded-full", isMicEnabled ? "bg-emerald-500 animate-pulse" : "bg-zinc-600")} />
+                          {isMicEnabled ? "Tracking On" : "Tracking Off"}
                         </Button>
                       </div>
                     )}
