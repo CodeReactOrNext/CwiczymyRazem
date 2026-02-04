@@ -45,6 +45,9 @@ import { spiderRhythmicProgressionExercise } from "feature/exercisePlan/data/exe
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
 import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
+import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
+import { stringRepetitionExercise } from "feature/exercisePlan/data/exerises/stringRepetition/stringRepetition";
+import { spiderChromaticsExercise } from "feature/exercisePlan/data/exerises/spiderChromatics/spiderChromatics";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 import { spiderOneStringExercise } from "./exerises/spiderOneString/spiderOneString";
@@ -92,7 +95,9 @@ export const exercisesAgregat: Exercise[] = [
   rhythmicMotifDisplacementExercise,
   intervalStringJumpsExercise,
   singWhatYouPlayExercise,
-  
+  openGRepetitionExercise,
+  stringRepetitionExercise,
+
   spiderPermutation1234Exercise,
   spiderPermutation1243Exercise,
   spiderPermutation1324Exercise,
@@ -120,6 +125,5 @@ export const exercisesAgregat: Exercise[] = [
   spiderPermutation4231Exercise,
   spiderPermutation4312Exercise,
   spiderPermutation4321Exercise,
-
-
+  spiderChromaticsExercise,
 ];
