@@ -27,6 +27,7 @@ const teko = Teko({
 });
 
 import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
+import Analytics from "components/Analytics/Analytics";
 import useAuthSync from "hooks/useAuthSync";
 import type { AppPropsWithLayout } from "types/page";
 
@@ -92,6 +93,7 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
         <ErrorBoundary>
           <ThemeModeProvider>
             <AuthSyncWrapper>
+               <Analytics />
                <ResponsiveInitializer />
                <TooltipProvider>
                   <main className={`${teko.variable} ${inter.variable} min-h-[100dvh] bg-zinc-950 text-foreground`}>
