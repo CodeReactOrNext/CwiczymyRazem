@@ -48,14 +48,7 @@ class MyDocument extends Document {
           <meta name="msapplication-TileColor" content="#0a0a0a" />
           <meta name="msapplication-tap-highlight" content="no" />
           <meta name="theme-color" content="#0a0a0a" />
-<script type="text/javascript" src="//script.crazyegg.com/pages/scripts/0132/0608.js" async></script>
           <link rel='mask-icon' href='/images/logolight.svg' color='#06b6d4' />
-          {(process.env.NODE_ENV === "production" ) && (
-            <script
-              async
-              src="https://t.contentsquare.net/uxa/9e03f79f1b59f.js"
-            />
-          )}
         </Head>
         <body>
           <Main />
