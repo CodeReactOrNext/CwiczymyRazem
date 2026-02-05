@@ -50,7 +50,7 @@ class MyDocument extends Document {
           <meta name="theme-color" content="#0a0a0a" />
 
           <link rel='mask-icon' href='/images/logolight.svg' color='#06b6d4' />
-          {(process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_ENABLE_CONTENTSQUARE === "true") && (
+          {(process.env.NODE_ENV === "production" ) && (
             <script
               async
               src="https://t.contentsquare.net/uxa/9e03f79f1b59f.js"
