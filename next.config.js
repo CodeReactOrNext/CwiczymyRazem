@@ -59,8 +59,8 @@ const nextConfig = {
         source: "/(.*)",
         headers: [
           {
-            key: "X-Frame-Options",
-            value: "DENY",
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self' https://*.contentsquare.net https://*.contentsquare.com https://app.contentsquare.com",
           },
           {
             key: "X-Content-Type-Options",
