@@ -39,11 +39,11 @@ const ProfileLandingLayout = ({
   const router = useRouter();
   const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
   const { achievements } = userStats;
-  const [_userSkills, setUserSkills] = useState<UserSkills>();
   const [activeTab, setActiveTab] = useState<"practice" | "review">("practice");
 
   const todayStr = new Date().toDateString();
-  const isTodayCompleted = datasWithReports.some(d => d.date.toDateString() === todayStr && d.report);
+  const lastReportDate = userStats?.lastReportDate ? new Date(userStats.lastReportDate).toDateString() : null;
+  const isTodayCompleted = lastReportDate === todayStr || datasWithReports.some(d => d.date.toDateString() === todayStr && d.report);
 
   /* eslint-disable unused-imports/no-unused-vars */
   const { data: songs, refetch: refreshSongs } = useQuery({
@@ -53,10 +53,6 @@ const ProfileLandingLayout = ({
   });
   /* eslint-enable unused-imports/no-unused-vars */
 
-  useEffect(() => {
-    getUserSongs(userAuth);
-    getUserSkills(userAuth).then((skills) => setUserSkills(skills));
-  }, [userAuth]);
 
   return (
     <DashboardContainer>
