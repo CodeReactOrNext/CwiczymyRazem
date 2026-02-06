@@ -48,6 +48,19 @@ import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibra
 import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
 import { stringRepetitionExercise } from "feature/exercisePlan/data/exerises/stringRepetition/stringRepetition";
 import { spiderChromaticsExercise } from "feature/exercisePlan/data/exerises/spiderChromatics/spiderChromatics";
+import {
+  metalPlayalongExercise,
+  musicianFitnessLvl1S1Exercise,
+  musicianFitnessLvl1S2Exercise,
+  musicianFitnessLvl1S3Exercise,
+  musicianFitnessLvl1S4Exercise,
+  musicianFitnessLvl1S5Exercise,
+  musicianFitnessLvl1S6Exercise,
+  musicianFitnessLvl1S7Exercise,
+  musicianFitnessLvl1S8Exercise,
+} from "feature/exercisePlan/data/exerises/metalPlayalong/metalPlayalong";
+import { pentatonicPlayalongExercise } from "feature/exercisePlan/data/exerises/pentatonicPlayalong/pentatonicPlayalong";
+import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 import { spiderOneStringExercise } from "./exerises/spiderOneString/spiderOneString";
@@ -126,4 +139,15 @@ export const exercisesAgregat: Exercise[] = [
   spiderPermutation4312Exercise,
   spiderPermutation4321Exercise,
   spiderChromaticsExercise,
+  metalPlayalongExercise,
+  musicianFitnessLvl1S1Exercise,
+  musicianFitnessLvl1S2Exercise,
+  musicianFitnessLvl1S3Exercise,
+  musicianFitnessLvl1S4Exercise,
+  musicianFitnessLvl1S5Exercise,
+  musicianFitnessLvl1S6Exercise,
+  musicianFitnessLvl1S7Exercise,
+  musicianFitnessLvl1S8Exercise,
+  pentatonicPlayalongExercise,
+  jpStretching,
 ];
