@@ -84,16 +84,16 @@ export default async function handler(
     // Calculate points gained in this session - use the points from current report only
     const pointsGained = report.raitingData.totalPoints || 0; // Use points from current session only
 
-    await firebaseUpdateUserStats(
+    const writePromises = [];
+
+    writePromises.push(firebaseUpdateUserStats(
       userUid,
       updatedStats,
       report.timeSummary,
       pointsGained
-    );
+    ));
 
-
-
-    await firebaseSetUserExerciseRaprot(
+    writePromises.push(firebaseSetUserExerciseRaprot(
       userUid,
       { ...report.raitingData, skillPointsGained },
       inputData.reportTitle,
@@ -105,12 +105,10 @@ export default async function handler(
         songTitle: inputData.songTitle,
         songArtist: inputData.songArtist
       } : undefined
-    );
-
-    invalidateActivityLogsCache(userUid);
+    ));
 
     if (!report.isDateBackReport) {
-      await firebaseAddLogReport(
+      writePromises.push(firebaseAddLogReport(
         userUid,
         report.currentUserStats.lastReportDate,
         report.raitingData.totalPoints,
@@ -128,8 +126,12 @@ export default async function handler(
           songArtist: inputData.songArtist
         } : undefined,
         report.raitingData.bonusPoints.streak
-      );
+      ));
     }
+
+    await Promise.all(writePromises);
+
+    invalidateActivityLogsCache(userUid);
 
     res.status(200).json({
       ...report,

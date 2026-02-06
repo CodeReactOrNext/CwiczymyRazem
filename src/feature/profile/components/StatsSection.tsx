@@ -15,7 +15,7 @@ import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
 
@@ -102,19 +102,21 @@ export const StatsSection = ({
     return 0;
   });
 
-  const statsWithTrends = sortedStats.map((stat) => {
-    if (!stat.key) return stat;
+  const statsWithTrends = useMemo(() => {
+    return sortedStats.map((stat) => {
+      if (!stat.key) return stat;
 
-    const trendData = getTrendData(
-      datasWithReports,
-      stat.key as "points" | "time"
-    );
+      const trendData = getTrendData(
+        datasWithReports,
+        stat.key as "points" | "time"
+      );
 
-    return {
-      ...stat,
-      trendData,
-    };
-  });
+      return {
+        ...stat,
+        trendData,
+      };
+    });
+  }, [sortedStats, datasWithReports]);
 
   if (mode === "practice") {
     return (
