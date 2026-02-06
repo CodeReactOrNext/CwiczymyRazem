@@ -10,6 +10,12 @@ interface AudioAnalyzerState {
   error: string | null;
 }
 
+export interface AudioRefs {
+  frequencyRef: React.MutableRefObject<number>;
+  volumeRef: React.MutableRefObject<number>;
+  lastOnsetTimeRef: React.MutableRefObject<number>;
+}
+
 export const useAudioAnalyzer = () => {
   const [state, setState] = useState<AudioAnalyzerState>({
     frequency: 0,
@@ -27,6 +33,12 @@ export const useAudioAnalyzer = () => {
   const onsetDetectorRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const lastFrequenciesRef = useRef<number[]>([]);
+
+  // Real-time refs for fast access without triggering re-renders
+  const frequencyRef = useRef<number>(0);
+  const volumeRef = useRef<number>(0);
+  const lastOnsetTimeRef = useRef<number>(0);
+  const lastStateUpdateRef = useRef<number>(0);
 
   const init = useCallback(async () => {
     try {
@@ -91,21 +103,36 @@ export const useAudioAnalyzer = () => {
             lastFrequenciesRef.current.shift();
           }
 
-          // Simple smoothing: average of last 3 frames
-          stabilizedFreq = lastFrequenciesRef.current.reduce((a, b) => a + b, 0) / lastFrequenciesRef.current.length;
+          // Median filter: rejects outlier spikes while preserving true pitch
+          const sorted = [...lastFrequenciesRef.current].sort((a, b) => a - b);
+          stabilizedFreq = sorted[Math.floor(sorted.length / 2)];
         } else {
           lastFrequenciesRef.current = [];
         }
 
-        setState(prev => ({
-          ...prev,
-          frequency: stabilizedFreq,
-          volume: volume,
-          isOnset: !!isOnset,
-          confidence: stabilizedFreq > 0 ? 1 : 0,
-          isListening: true,
-          error: null
-        }));
+        // Update refs immediately for real-time access
+        frequencyRef.current = stabilizedFreq;
+        volumeRef.current = volume;
+
+        // Track onset timestamps
+        if (isOnset) {
+          lastOnsetTimeRef.current = Date.now();
+        }
+
+        // Throttle React state updates to ~10Hz (every ~100ms)
+        const now = Date.now();
+        if (now - lastStateUpdateRef.current >= 100) {
+          lastStateUpdateRef.current = now;
+          setState(prev => ({
+            ...prev,
+            frequency: stabilizedFreq,
+            volume: volume,
+            isOnset: !!isOnset,
+            confidence: stabilizedFreq > 0 ? 1 : 0,
+            isListening: true,
+            error: null
+          }));
+        }
       };
 
       source.connect(scriptProcessor);
@@ -138,11 +165,14 @@ export const useAudioAnalyzer = () => {
       streamRef.current = null;
     }
 
-    // We don't necessarily destroy the pitchDetector instance as it's just a WASM wrapper, 
+    // We don't necessarily destroy the pitchDetector instance as it's just a WASM wrapper,
     // but we lose the reference.
     pitchDetectorRef.current = null;
     onsetDetectorRef.current = null;
     lastFrequenciesRef.current = [];
+    frequencyRef.current = 0;
+    volumeRef.current = 0;
+    lastOnsetTimeRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false, frequency: 0, volume: 0, isOnset: false }));
   }, []);
@@ -153,9 +183,19 @@ export const useAudioAnalyzer = () => {
     };
   }, [close]);
 
+  const getLatencyMs = useCallback(() => {
+    const ctx = audioContextRef.current;
+    if (!ctx) return 150;
+    return ((ctx as any).baseLatency || 0) * 1000 + 85; // baseLatency (sec->ms) + processing estimate
+  }, []);
+
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, lastOnsetTimeRef };
+
   return {
     ...state,
     init,
     close,
+    audioRefs,
+    getLatencyMs,
   };
 };

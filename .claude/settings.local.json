@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /S \"C:\\\\cw\\\\CwiczymyRazem\\\\src\\\\feature\\\\exercisePlan\")",
+      "Bash(find:*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}
