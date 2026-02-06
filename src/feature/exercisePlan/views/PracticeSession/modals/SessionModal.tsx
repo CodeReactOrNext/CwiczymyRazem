@@ -127,6 +127,23 @@ const SessionModal = ({
     handleNextExercise();
   };
 
+  const mobileFeedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
+    "NICE!":          { color: "text-emerald-400", dropShadow: "drop-shadow-[0_0_12px_rgba(52,211,153,0.6)]", scale: 1.15 },
+    "GREAT!":         { color: "text-cyan-400",    dropShadow: "drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]", scale: 1.2 },
+    "AMAZING!":       { color: "text-purple-400",  dropShadow: "drop-shadow-[0_0_12px_rgba(192,132,252,0.6)]", scale: 1.25 },
+    "ON FIRE!":       { color: "text-orange-400",  dropShadow: "drop-shadow-[0_0_12px_rgba(251,146,60,0.6)]", scale: 1.3 },
+    "UNSTOPPABLE!":   { color: "text-amber-400",   dropShadow: "drop-shadow-[0_0_12px_rgba(251,191,36,0.6)]", scale: 1.35 },
+    "MULTIPLIER UP!": { color: "text-main",        dropShadow: "drop-shadow-[0_0_12px_rgba(239,68,68,0.6)]", scale: 1.3 },
+  };
+
+  const getPerformanceGrade = (accuracy: number) => {
+    if (accuracy >= 95) return { letter: 'S', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30', glow: 'shadow-[0_0_12px_rgba(251,191,36,0.4)]' };
+    if (accuracy >= 85) return { letter: 'A', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', glow: '' };
+    if (accuracy >= 70) return { letter: 'B', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', glow: '' };
+    if (accuracy >= 50) return { letter: 'C', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/30', glow: '' };
+    return { letter: 'D', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30', glow: '' };
+  };
+
   const category = currentExercise.category || "mixed";
 
   const gradientClasses =
@@ -254,13 +271,41 @@ const SessionModal = ({
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex-1">
                         <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Score</span>
-                        <span className="text-2xl font-black text-white tabular-nums tracking-tighter">
+                        <motion.span
+                          key={gameState.score}
+                          initial={{ scale: 1.12 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                          className="text-2xl font-black text-white tabular-nums tracking-tighter inline-block"
+                        >
                           {gameState.score.toLocaleString()}
-                        </span>
+                        </motion.span>
                       </div>
                       <div className="flex-1 text-center">
                         <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Accuracy</span>
-                        <span className="text-xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <span className="text-xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
+                          <AnimatePresence mode="wait">
+                            {(() => {
+                              const grade = getPerformanceGrade(sessionAccuracy);
+                              return (
+                                <motion.span
+                                  key={grade.letter}
+                                  initial={{ scale: 1.4, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  exit={{ scale: 0.8, opacity: 0 }}
+                                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                                  className={cn(
+                                    "inline-flex items-center justify-center w-6 h-6 rounded-md border text-[10px] font-black",
+                                    grade.color, grade.bg, grade.border, grade.glow
+                                  )}
+                                >
+                                  {grade.letter}
+                                </motion.span>
+                              );
+                            })()}
+                          </AnimatePresence>
+                        </div>
                       </div>
                       <div className="flex-1 text-right">
                         <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Streak</span>
@@ -275,20 +320,24 @@ const SessionModal = ({
 
                     <div className="relative h-10 flex items-center justify-center">
                       <AnimatePresence mode="wait">
-                          {gameState.lastFeedback && (
-                              <motion.div 
-                                  key={gameState.feedbackId}
-                                  initial={{ y: 20, opacity: 0, scale: 0.5 }}
-                                  animate={{ y: 0, opacity: 1, scale: 1.2 }}
-                                  exit={{ y: -20, opacity: 0, scale: 1.5 }}
-                                  className={cn(
-                                      "text-xl font-black uppercase italic tracking-tighter",
-                                      gameState.lastFeedback === "MULTIPLIER UP!" ? "text-main" : "text-cyan-400"
-                                  )}
-                              >
-                                  {gameState.lastFeedback}
-                              </motion.div>
-                          )}
+                          {gameState.lastFeedback && (() => {
+                              const style = mobileFeedbackStyles[gameState.lastFeedback] || { color: "text-cyan-400", dropShadow: "drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]", scale: 1.2 };
+                              return (
+                                  <motion.div
+                                      key={gameState.feedbackId}
+                                      initial={{ y: 20, opacity: 0, scale: 0.5 }}
+                                      animate={{ y: 0, opacity: 1, scale: style.scale }}
+                                      exit={{ y: -20, opacity: 0, scale: style.scale + 0.3 }}
+                                      className={cn(
+                                          "text-xl font-black uppercase italic tracking-tighter",
+                                          style.color,
+                                          style.dropShadow
+                                      )}
+                                  >
+                                      {gameState.lastFeedback}
+                                  </motion.div>
+                              );
+                          })()}
                       </AnimatePresence>
                     </div>
                   </div>
