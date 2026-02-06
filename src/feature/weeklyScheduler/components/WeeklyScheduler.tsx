@@ -113,10 +113,22 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
   };
 
   const handleSelectPlan = async (plan: ExercisePlan) => {
-    if (!selectedDay || !schedule) return;
+    if (!selectedDay) return;
     
     // Optimistic update
-    const updatedSchedule = { ...schedule };
+    const currentSchedule = schedule || { 
+      days: {
+        monday: { completed: false },
+        tuesday: { completed: false },
+        wednesday: { completed: false },
+        thursday: { completed: false },
+        friday: { completed: false },
+        saturday: { completed: false },
+        sunday: { completed: false },
+      }
+    } as any;
+
+    const updatedSchedule = { ...currentSchedule };
     updatedSchedule.days[selectedDay] = {
       ...updatedSchedule.days[selectedDay],
       planId: plan.id,
@@ -135,10 +147,22 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
   };
 
   const handleSelectSong = async (song: Song) => {
-    if (!selectedDay || !schedule) return;
+    if (!selectedDay) return;
 
     // Optimistic update
-    const updatedSchedule = { ...schedule };
+    const currentSchedule = schedule || { 
+      days: {
+        monday: { completed: false },
+        tuesday: { completed: false },
+        wednesday: { completed: false },
+        thursday: { completed: false },
+        friday: { completed: false },
+        saturday: { completed: false },
+        sunday: { completed: false },
+      }
+    } as any;
+
+    const updatedSchedule = { ...currentSchedule };
     updatedSchedule.days[selectedDay] = {
       ...updatedSchedule.days[selectedDay],
       planId: undefined,
@@ -277,6 +301,10 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
           const daySchedule = schedule?.days[dayKey] || { completed: false };
           const isCollapsed = isMobile && expandedDay !== dayKey;
           
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const isFuture = date > today;
+          
           return (
             <DayBlock
               key={dayKey}
@@ -284,6 +312,7 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
               daySchedule={daySchedule}
               isToday={isToday(date)}
               isCollapsed={isCollapsed}
+              isFuture={isFuture}
               onClick={() => handleDayClick(dayKey)}
               onToggleComplete={(e) => {
                 e.stopPropagation();

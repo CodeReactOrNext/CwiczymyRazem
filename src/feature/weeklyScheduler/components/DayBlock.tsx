@@ -15,6 +15,7 @@ interface DayBlockProps {
   selectedItem?: Exercise | ExercisePlan | Song;
   dayColor: string;
   isCollapsed?: boolean;
+  isFuture?: boolean;
 }
 
 export const DayBlock = ({
@@ -28,6 +29,7 @@ export const DayBlock = ({
   selectedItem,
   dayColor,
   isCollapsed = false,
+  isFuture = false,
 }: DayBlockProps) => {
   const hasSchedule = !!(daySchedule.planId || daySchedule.exerciseId || daySchedule.songId);
   const isCompleted = daySchedule.completed;
@@ -130,7 +132,7 @@ export const DayBlock = ({
           {isToday && !isCompleted && <div className={`h-1 w-1 rounded-full animate-pulse ${colorClasses.text.replace("text-", "bg-")}`} />}
           {isCompleted ? (
             <Check size={14} className="text-emerald-500" strokeWidth={3} />
-          ) : hasSchedule ? (
+          ) : hasSchedule && !isFuture ? (
             <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
           ) : null}
         </div>
@@ -176,13 +178,15 @@ export const DayBlock = ({
             )}
             {hasSchedule && (
               <div className="flex items-center gap-1">
-                <button 
-                  onClick={(e) => { e.stopPropagation(); onToggleComplete(e); }} 
-                  className={`p-1.5 rounded transition-all ${isCompleted ? "text-emerald-400 hover:bg-emerald-500/10" : "text-zinc-600 hover:text-white hover:bg-white/10"}`}
-                  title={isCompleted ? "Mark incomplete" : "Mark complete"}
-                >
-                  <Check size={14} strokeWidth={isCompleted ? 3 : 2} />
-                </button>
+                {!isFuture && (
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onToggleComplete(e); }} 
+                    className={`p-1.5 rounded transition-all ${isCompleted ? "text-emerald-400 hover:bg-emerald-500/10" : "text-zinc-600 hover:text-white hover:bg-white/10"}`}
+                    title={isCompleted ? "Mark incomplete" : "Mark complete"}
+                  >
+                    <Check size={14} strokeWidth={isCompleted ? 3 : 2} />
+                  </button>
+                )}
                 <button 
                   onClick={(e) => { e.stopPropagation(); onClear(e); }} 
                   className="p-1.5 hover:bg-white/10 rounded text-zinc-600 hover:text-white"
