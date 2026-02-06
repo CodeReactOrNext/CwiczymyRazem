@@ -26,6 +26,7 @@ import { ActiveChallengeWidget } from "feature/challenges/frontend/infrastructur
 import { BarChart3, ChevronRight, Play, Bell } from "lucide-react";
 import { GiMetronome } from "react-icons/gi";
 import { useFCM } from "hooks/useFCM";
+import { WeeklyScheduler } from "feature/weeklyScheduler/components/WeeklyScheduler";
 
 const ProfileLandingLayout = ({
   statsField,
@@ -126,6 +127,10 @@ const ProfileLandingLayout = ({
                   </div>
               </div>
             )}
+
+            <div className="mb-8">
+              <WeeklyScheduler userAuth={userAuth as string} />
+            </div>
 
                 <div className="space-y-4">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 pl-1">
