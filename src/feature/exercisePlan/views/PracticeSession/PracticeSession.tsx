@@ -184,13 +184,15 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     isListening,
     error: audioError, // eslint-disable-line @typescript-eslint/no-unused-vars
     init: initAudio,
-    close: closeAudio
+    close: closeAudio,
+    audioRefs,
+    getLatencyMs
   } = useAudioAnalyzer();
 
   const [isMicEnabled, setIsMicEnabled] = useState(false);
-  const LATENCY_MS = 150; // Compensate for audio buffer + processing delay
   const CENTS_TOLERANCE = 50; // Increased tolerance (half a semitone)
   const WINDOW_MS = 200; // Time window in ms to allow hitting notes early/late
+  const ONSET_RECENCY_MS = 200; // Max time since last onset to allow a hit
 
   const toggleMic = async () => {
     if (isListening) {
@@ -202,6 +204,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     }
   };
 
+  // detectedNoteData derived from throttled state — used only for UI display
   const detectedNoteData = useMemo(() => {
      if (!frequency || frequency < 50) return null;
      return getNoteFromFrequency(frequency);
@@ -219,16 +222,19 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   });
   const lastLoopedBeatsRef = useRef(0);
   const processedNotesRef = useRef<Set<string>>(new Set());
+  const hitNotesRef = useRef<Record<string, boolean>>({});
+  const rafIdRef = useRef<number>(0);
 
   const totalNotes = useMemo(() => {
     if (!currentExercise.tablature) return 0;
-    return currentExercise.tablature.reduce((acc, m) => 
+    return currentExercise.tablature.reduce((acc, m) =>
       acc + m.beats.reduce((acc2, b) => acc2 + b.notes.length, 0), 0
     );
   }, [currentExercise.tablature]);
 
   useEffect(() => {
     setHitNotes({});
+    hitNotesRef.current = {};
     setSessionAccuracy(100);
     setSessionStats({ hits: 0, misses: 0 });
     setGameState({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
@@ -246,121 +252,150 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       }
   }, [gameState.feedbackId]);
 
+  // Note matching via requestAnimationFrame — reads real-time values from refs
   useEffect(() => {
-    if (!isPlaying || !metronome.startTime || !currentExercise.tablature || !detectedNoteData || !isMicEnabled) return;
+    if (!isPlaying || !metronome.startTime || !currentExercise.tablature || !isMicEnabled) return;
 
-    const now = Date.now();
-    const compensatedNow = now - LATENCY_MS;
-    
-    const totalExerciseBeats = currentExercise.tablature.reduce((acc, m) => 
+    const tablature = currentExercise.tablature;
+    const totalExBeats = tablature.reduce((acc, m) =>
       acc + m.beats.reduce((acc2, b) => acc2 + b.duration, 0), 0
     );
-    if (totalExerciseBeats === 0) return;
+    if (totalExBeats === 0) return;
 
-    const beatsPerSecond = metronome.bpm / 60;
-    const windowBeats = (WINDOW_MS / 1000) * beatsPerSecond;
+    const bpm = metronome.bpm;
+    const startTime = metronome.startTime;
 
-    const elapsedSeconds = (compensatedNow - metronome.startTime) / 1000;
-    const totalBeatsElapsed = elapsedSeconds * beatsPerSecond;
-    const loopedBeatsElapsed = totalBeatsElapsed % totalExerciseBeats;
-    
-    // Detect loop restart (more robust check)
-    const hasLooped = loopedBeatsElapsed < lastLoopedBeatsRef.current - 0.1;
-    if (hasLooped) {
-       setHitNotes({});
-       processedNotesRef.current.clear();
-       setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 })); // Keep score, reset streak
-    }
-    lastLoopedBeatsRef.current = loopedBeatsElapsed;
+    const tick = () => {
+      const now = Date.now();
+      const latencyMs = getLatencyMs();
+      const compensatedNow = now - latencyMs;
 
-    let currentBeatTotal = 0;
+      // Read real-time audio data from refs (no React re-render needed)
+      const currentFreq = audioRefs.frequencyRef.current;
+      const currentVolume = audioRefs.volumeRef.current;
+      const lastOnsetTime = audioRefs.lastOnsetTimeRef.current;
 
-    for (let mIdx = 0; mIdx < currentExercise.tablature.length; mIdx++) {
-      const measure = currentExercise.tablature[mIdx];
-      for (let bIdx = 0; bIdx < measure.beats.length; bIdx++) {
-        const beat = measure.beats[bIdx];
-        const beatStart = currentBeatTotal;
-        const beatEnd = currentBeatTotal + beat.duration;
-        
-        const isWithinWindow = 
-          (loopedBeatsElapsed >= beatStart - windowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
-          (loopedBeatsElapsed + totalExerciseBeats >= beatStart - windowBeats && loopedBeatsElapsed + totalExerciseBeats <= beatEnd + windowBeats);
+      const beatsPerSecond = bpm / 60;
+      const windowBeats = (WINDOW_MS / 1000) * beatsPerSecond;
 
-        const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
+      const elapsedSeconds = (compensatedNow - startTime) / 1000;
+      const totalBeatsElapsed = elapsedSeconds * beatsPerSecond;
+      const loopedBeatsElapsed = totalBeatsElapsed % totalExBeats;
 
-        beat.notes.forEach((note, nIdx) => {
-          const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
-          
-          // Skip if already processed in this loop
-          if (processedNotesRef.current.has(noteKey)) return;
+      // Detect loop restart
+      const hasLooped = loopedBeatsElapsed < lastLoopedBeatsRef.current - 0.1;
+      if (hasLooped) {
+        hitNotesRef.current = {};
+        setHitNotes({});
+        processedNotesRef.current.clear();
+        setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 }));
+      }
+      lastLoopedBeatsRef.current = loopedBeatsElapsed;
 
-          // 1. Check for Hit
-          if (isWithinWindow) {
-            const targetFreq = getFrequencyFromTab(note.string, note.fret);
-            const targetNote = getNoteFromFrequency(targetFreq);
-            
-            if (targetNote && 
-                targetNote.note === detectedNoteData.note && 
-                Math.abs(detectedNoteData.cents) <= CENTS_TOLERANCE &&
-                volume > 0.05) { // Ensure clear signal
-              
-              processedNotesRef.current.add(noteKey);
-              setHitNotes(prev => ({ ...prev, [noteKey]: true }));
-              
-              setSessionStats(prev => {
-                const newHits = prev.hits + 1;
-                const total = newHits + prev.misses;
-                setSessionAccuracy(Math.round((newHits / total) * 100));
-                return { ...prev, hits: newHits };
-              });
+      // Derive detected note from real-time ref frequency
+      const liveNoteData = currentFreq > 50 ? getNoteFromFrequency(currentFreq) : null;
 
-              setGameState(prev => {
+      // Onset gating: only allow hits if a string attack was detected recently
+      const timeSinceOnset = now - lastOnsetTime;
+      const hasRecentOnset = timeSinceOnset < ONSET_RECENCY_MS;
+
+      let currentBeatTotal = 0;
+
+      for (let mIdx = 0; mIdx < tablature.length; mIdx++) {
+        const measure = tablature[mIdx];
+        for (let bIdx = 0; bIdx < measure.beats.length; bIdx++) {
+          const beat = measure.beats[bIdx];
+          const beatStart = currentBeatTotal;
+          const beatEnd = currentBeatTotal + beat.duration;
+
+          const isWithinWindow =
+            (loopedBeatsElapsed >= beatStart - windowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
+            (loopedBeatsElapsed + totalExBeats >= beatStart - windowBeats && loopedBeatsElapsed + totalExBeats <= beatEnd + windowBeats);
+
+          const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
+
+          beat.notes.forEach((note, nIdx) => {
+            const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
+
+            if (processedNotesRef.current.has(noteKey)) return;
+
+            // 1. Check for Hit
+            if (isWithinWindow && liveNoteData && hasRecentOnset) {
+              const targetFreq = getFrequencyFromTab(note.string, note.fret);
+              const targetNote = getNoteFromFrequency(targetFreq);
+
+              if (targetNote &&
+                  targetNote.note === liveNoteData.note &&
+                  Math.abs(liveNoteData.cents) <= CENTS_TOLERANCE &&
+                  currentVolume > 0.05) {
+
+                processedNotesRef.current.add(noteKey);
+                hitNotesRef.current[noteKey] = true;
+                setHitNotes(prev => ({ ...prev, [noteKey]: true }));
+
+                setSessionStats(prev => {
+                  const newHits = prev.hits + 1;
+                  const total = newHits + prev.misses;
+                  setSessionAccuracy(Math.round((newHits / total) * 100));
+                  return { ...prev, hits: newHits };
+                });
+
+                setGameState(prev => {
                   const newCombo = prev.combo + 1;
                   const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
-                  
+
                   let feedback = prev.lastFeedback;
                   let fId = prev.feedbackId;
-                  
+
                   if (newMultiplier > prev.multiplier) {
-                      feedback = "MULTIPLIER UP!";
-                      fId++;
+                    feedback = "MULTIPLIER UP!";
+                    fId++;
                   } else if (newCombo % 10 === 0) {
-                      feedback = "AWESOME!";
-                      fId++;
+                    feedback = "AWESOME!";
+                    fId++;
                   } else if (newCombo % 5 === 0) {
-                      feedback = "PERFECT";
-                      fId++;
+                    feedback = "PERFECT";
+                    fId++;
                   }
 
                   return {
-                      ...prev,
-                      score: prev.score + (100 * newMultiplier),
-                      combo: newCombo,
-                      multiplier: newMultiplier,
-                      lastFeedback: feedback,
-                      feedbackId: fId
+                    ...prev,
+                    score: prev.score + (100 * newMultiplier),
+                    combo: newCombo,
+                    multiplier: newMultiplier,
+                    lastFeedback: feedback,
+                    feedbackId: fId
                   };
-              });
+                });
+              }
             }
-          } 
-          
-          // 2. Check for Miss (window passed without hit)
-          else if (isPassed && !hitNotes[noteKey]) {
-            processedNotesRef.current.add(noteKey);
-            setSessionStats(prev => {
-              const newMisses = prev.misses + 1;
-              const total = prev.hits + newMisses;
-              setSessionAccuracy(Math.round((prev.hits / total) * 100));
-              return { ...prev, misses: newMisses };
-            });
-            setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 }));
-          }
-        });
 
-        currentBeatTotal += beat.duration;
+            // 2. Check for Miss (window passed without hit)
+            else if (isPassed && !hitNotesRef.current[noteKey]) {
+              processedNotesRef.current.add(noteKey);
+              setSessionStats(prev => {
+                const newMisses = prev.misses + 1;
+                const total = prev.hits + newMisses;
+                setSessionAccuracy(Math.round((prev.hits / total) * 100));
+                return { ...prev, misses: newMisses };
+              });
+              setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 }));
+            }
+          });
+
+          currentBeatTotal += beat.duration;
+        }
       }
-    }
-  }, [isPlaying, metronome.startTime, metronome.bpm, currentExercise.tablature, detectedNoteData, isMicEnabled, currentExerciseIndex, totalNotes, volume]);
+
+      rafIdRef.current = requestAnimationFrame(tick);
+    };
+
+    rafIdRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(rafIdRef.current);
+    };
+  }, [isPlaying, metronome.startTime, metronome.bpm, currentExercise.tablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs]);
 
   // Pass progress for gray-out effect
   const beatsPerSecond = metronome.bpm / 60;
