@@ -42,7 +42,6 @@ export const PlanSetup = ({
     "theory",
     "creativity",
     "hearing",
-    "mixed",
   ];
 
   const difficulties: (DifficultyLevel | "all")[] = ["easy", "medium", "hard", "all"];
