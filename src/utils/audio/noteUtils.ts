@@ -49,6 +49,16 @@ export const getNoteFromFrequency = (frequency: number): NoteData | null => {
 };
 
 /**
+ * Returns the distance in cents between two frequencies.
+ * Positive means freqA is sharp of freqB, negative means flat.
+ * Returns Infinity if either frequency is invalid.
+ */
+export const getCentsDistance = (freqA: number, freqB: number): number => {
+  if (freqA <= 0 || freqB <= 0) return Infinity;
+  return 1200 * Math.log2(freqA / freqB);
+};
+
+/**
  * Calculates the frequency of a specific note on a guitar string and fret.
  * Assumes Standard Tuning (E A D G B E).
  * @param string - String number (1-6, 1 is High E).
