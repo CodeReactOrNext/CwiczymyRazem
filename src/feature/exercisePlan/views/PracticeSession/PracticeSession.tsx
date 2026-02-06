@@ -40,7 +40,8 @@ import { TablatureViewer } from "./components/TablatureViewer";
 import { useTablatureAudio } from "../../hooks/useTablatureAudio";
 import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
 import { useMemo } from "react";
-import { getNoteFromFrequency, getFrequencyFromTab } from "utils/audio/noteUtils";
+import confetti from "canvas-confetti";
+import { getNoteFromFrequency, getFrequencyFromTab, getCentsDistance } from "utils/audio/noteUtils";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
@@ -190,9 +191,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   } = useAudioAnalyzer();
 
   const [isMicEnabled, setIsMicEnabled] = useState(false);
-  const CENTS_TOLERANCE = 50; // Increased tolerance (half a semitone)
-  const WINDOW_MS = 200; // Time window in ms to allow hitting notes early/late
-  const ONSET_RECENCY_MS = 200; // Max time since last onset to allow a hit
+  const CENTS_TOLERANCE = 60; // Tolerance in cents (~over half a semitone)
 
   const toggleMic = async () => {
     if (isListening) {
@@ -209,6 +208,32 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
      if (!frequency || frequency < 50) return null;
      return getNoteFromFrequency(frequency);
   }, [frequency]);
+
+  const getFeedbackForCombo = (combo: number): { text: string } | null => {
+    if (combo >= 25 && combo % 5 === 0) return { text: "UNSTOPPABLE!" };
+    if (combo === 20) return { text: "ON FIRE!" };
+    if (combo === 15) return { text: "AMAZING!" };
+    if (combo === 10) return { text: "GREAT!" };
+    if (combo === 5) return { text: "NICE!" };
+    return null;
+  };
+
+  const feedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
+    "NICE!":          { color: "text-emerald-400", dropShadow: "drop-shadow-[0_0_20px_rgba(52,211,153,0.8)]", scale: 1.35 },
+    "GREAT!":         { color: "text-cyan-400",    dropShadow: "drop-shadow-[0_0_20px_rgba(34,211,238,0.8)]", scale: 1.45 },
+    "AMAZING!":       { color: "text-purple-400",  dropShadow: "drop-shadow-[0_0_20px_rgba(192,132,252,0.8)]", scale: 1.5 },
+    "ON FIRE!":       { color: "text-orange-400",  dropShadow: "drop-shadow-[0_0_20px_rgba(251,146,60,0.8)]", scale: 1.55 },
+    "UNSTOPPABLE!":   { color: "text-amber-400",   dropShadow: "drop-shadow-[0_0_20px_rgba(251,191,36,0.8)]", scale: 1.6 },
+    "MULTIPLIER UP!": { color: "text-main",        dropShadow: "drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]", scale: 1.5 },
+  };
+
+  const getPerformanceGrade = (accuracy: number) => {
+    if (accuracy >= 95) return { letter: 'S', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30', glow: 'shadow-[0_0_12px_rgba(251,191,36,0.4)]' };
+    if (accuracy >= 85) return { letter: 'A', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', glow: '' };
+    if (accuracy >= 70) return { letter: 'B', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', glow: '' };
+    if (accuracy >= 50) return { letter: 'C', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/30', glow: '' };
+    return { letter: 'D', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30', glow: '' };
+  };
 
   const [hitNotes, setHitNotes] = useState<Record<string, boolean>>({});
   const [sessionAccuracy, setSessionAccuracy] = useState(100);
@@ -252,6 +277,19 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       }
   }, [gameState.feedbackId]);
 
+  // Combo milestone confetti
+  useEffect(() => {
+    if (gameState.combo === 25 || gameState.combo === 50) {
+      confetti({
+        particleCount: gameState.combo === 50 ? 50 : 30,
+        spread: 60,
+        origin: { y: 0.7 },
+        colors: ['#22d3ee', '#a78bfa', '#fbbf24', '#34d399'],
+        zIndex: 99999999,
+      });
+    }
+  }, [gameState.combo]);
+
   // Note matching via requestAnimationFrame — reads real-time values from refs
   useEffect(() => {
     if (!isPlaying || !metronome.startTime || !currentExercise.tablature || !isMicEnabled) return;
@@ -274,9 +312,15 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       const currentFreq = audioRefs.frequencyRef.current;
       const currentVolume = audioRefs.volumeRef.current;
       const lastOnsetTime = audioRefs.lastOnsetTimeRef.current;
+      const currentConfidence = audioRefs.confidenceRef.current;
 
       const beatsPerSecond = bpm / 60;
-      const windowBeats = (WINDOW_MS / 1000) * beatsPerSecond;
+
+      // BPM-adaptive timing windows
+      const beatDurationMs = 60000 / bpm;
+      const onsetRecencyMs = Math.min(800, Math.max(200, beatDurationMs * 0.8));
+      const windowMs = Math.min(500, Math.max(150, beatDurationMs * 0.35));
+      const windowBeats = (windowMs / 1000) * beatsPerSecond;
 
       const elapsedSeconds = (compensatedNow - startTime) / 1000;
       const totalBeatsElapsed = elapsedSeconds * beatsPerSecond;
@@ -292,12 +336,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       }
       lastLoopedBeatsRef.current = loopedBeatsElapsed;
 
-      // Derive detected note from real-time ref frequency
-      const liveNoteData = currentFreq > 50 ? getNoteFromFrequency(currentFreq) : null;
-
       // Onset gating: only allow hits if a string attack was detected recently
       const timeSinceOnset = now - lastOnsetTime;
-      const hasRecentOnset = timeSinceOnset < ONSET_RECENCY_MS;
+      const hasRecentOnset = timeSinceOnset < onsetRecencyMs;
 
       let currentBeatTotal = 0;
 
@@ -308,9 +349,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
           const beatStart = currentBeatTotal;
           const beatEnd = currentBeatTotal + beat.duration;
 
+          // Fix wraparound: second condition only applies at the loop boundary
           const isWithinWindow =
             (loopedBeatsElapsed >= beatStart - windowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
-            (loopedBeatsElapsed + totalExBeats >= beatStart - windowBeats && loopedBeatsElapsed + totalExBeats <= beatEnd + windowBeats);
+            (loopedBeatsElapsed < windowBeats && beatEnd + windowBeats >= totalExBeats);
 
           const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
 
@@ -319,15 +361,19 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
             if (processedNotesRef.current.has(noteKey)) return;
 
-            // 1. Check for Hit
-            if (isWithinWindow && liveNoteData && hasRecentOnset) {
-              const targetFreq = getFrequencyFromTab(note.string, note.fret);
-              const targetNote = getNoteFromFrequency(targetFreq);
+            // Hammer-ons and pull-offs don't produce pick attacks
+            const requiresOnset = !note.isHammerOn && !note.isPullOff;
 
-              if (targetNote &&
-                  targetNote.note === liveNoteData.note &&
-                  Math.abs(liveNoteData.cents) <= CENTS_TOLERANCE &&
-                  currentVolume > 0.05) {
+            // 1. Check for Hit
+            if (isWithinWindow && currentFreq > 50 && (hasRecentOnset || !requiresOnset)) {
+              const targetFreq = getFrequencyFromTab(note.string, note.fret);
+
+              // Direct semitone-distance comparison (octave-aware)
+              const centsOff = Math.abs(getCentsDistance(currentFreq, targetFreq));
+
+              if (centsOff <= CENTS_TOLERANCE &&
+                  currentVolume > 0.02 &&
+                  currentConfidence > 0.4) {
 
                 processedNotesRef.current.add(noteKey);
                 hitNotesRef.current[noteKey] = true;
@@ -350,12 +396,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                   if (newMultiplier > prev.multiplier) {
                     feedback = "MULTIPLIER UP!";
                     fId++;
-                  } else if (newCombo % 10 === 0) {
-                    feedback = "AWESOME!";
-                    fId++;
-                  } else if (newCombo % 5 === 0) {
-                    feedback = "PERFECT";
-                    fId++;
+                  } else {
+                    const tier = getFeedbackForCombo(newCombo);
+                    if (tier) { feedback = tier.text; fId++; }
                   }
 
                   return {
@@ -617,15 +660,41 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                     <div className="relative group">
                                         <div className="absolute -inset-2 bg-white/5 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                                         <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Total Score</span>
-                                        <span className="text-4xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                                        <motion.span
+                                            key={gameState.score}
+                                            initial={{ scale: 1.15, filter: "brightness(1.5)" }}
+                                            animate={{ scale: 1, filter: "brightness(1)" }}
+                                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                                            className="text-4xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] inline-block"
+                                        >
                                             {gameState.score.toLocaleString()}
-                                        </span>
+                                        </motion.span>
                                     </div>
                                     <div className="h-10 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
                                     <div>
                                         <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Accuracy</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-2xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
+                                            <AnimatePresence mode="wait">
+                                                {(() => {
+                                                    const grade = getPerformanceGrade(sessionAccuracy);
+                                                    return (
+                                                        <motion.span
+                                                            key={grade.letter}
+                                                            initial={{ scale: 1.4, opacity: 0 }}
+                                                            animate={{ scale: 1, opacity: 1 }}
+                                                            exit={{ scale: 0.8, opacity: 0 }}
+                                                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                                                            className={cn(
+                                                                "inline-flex items-center justify-center w-8 h-8 rounded-lg border text-sm font-black",
+                                                                grade.color, grade.bg, grade.border, grade.glow
+                                                            )}
+                                                        >
+                                                            {grade.letter}
+                                                        </motion.span>
+                                                    );
+                                                })()}
+                                            </AnimatePresence>
                                         </div>
                                     </div>
                                 </div>
@@ -634,41 +703,45 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                 <div className="flex-[0.5] flex flex-col items-center justify-center -mb-2 relative">
                                     <div className="absolute top-[-50px] whitespace-nowrap">
                                         <AnimatePresence mode="wait">
-                                            {gameState.lastFeedback && (
-                                                <motion.div 
-                                                    key={gameState.feedbackId}
-                                                    initial={{ 
-                                                        y: 40, 
-                                                        opacity: 0, 
-                                                        scale: 0.3, 
-                                                        filter: "blur(10px)" 
-                                                    }}
-                                                    animate={{ 
-                                                        y: 0, 
-                                                        opacity: 1, 
-                                                        scale: 1.4, 
-                                                        filter: "blur(0px)",
-                                                        transition: {
-                                                            type: "spring",
-                                                            stiffness: 300,
-                                                            damping: 15
-                                                        }
-                                                    }}
-                                                    exit={{ 
-                                                        y: -40, 
-                                                        opacity: 0, 
-                                                        scale: 2, 
-                                                        filter: "blur(5px)",
-                                                        transition: { duration: 0.4 }
-                                                    }}
-                                                    className={cn(
-                                                        "text-4xl font-black uppercase italic tracking-tighter drop-shadow-[0_0_20px_rgba(34,211,238,0.8)]",
-                                                        gameState.lastFeedback === "MULTIPLIER UP!" ? "text-main" : "text-cyan-400"
-                                                    )}
-                                                >
-                                                    {gameState.lastFeedback}
-                                                </motion.div>
-                                            )}
+                                            {gameState.lastFeedback && (() => {
+                                                const style = feedbackStyles[gameState.lastFeedback] || { color: "text-cyan-400", dropShadow: "drop-shadow-[0_0_20px_rgba(34,211,238,0.8)]", scale: 1.4 };
+                                                return (
+                                                    <motion.div
+                                                        key={gameState.feedbackId}
+                                                        initial={{
+                                                            y: 40,
+                                                            opacity: 0,
+                                                            scale: 0.3,
+                                                            filter: "blur(10px)"
+                                                        }}
+                                                        animate={{
+                                                            y: 0,
+                                                            opacity: 1,
+                                                            scale: style.scale,
+                                                            filter: "blur(0px)",
+                                                            transition: {
+                                                                type: "spring",
+                                                                stiffness: 300,
+                                                                damping: 15
+                                                            }
+                                                        }}
+                                                        exit={{
+                                                            y: -40,
+                                                            opacity: 0,
+                                                            scale: style.scale + 0.6,
+                                                            filter: "blur(5px)",
+                                                            transition: { duration: 0.4 }
+                                                        }}
+                                                        className={cn(
+                                                            "text-4xl font-black uppercase italic tracking-tighter",
+                                                            style.color,
+                                                            style.dropShadow
+                                                        )}
+                                                    >
+                                                        {gameState.lastFeedback}
+                                                    </motion.div>
+                                                );
+                                            })()}
                                         </AnimatePresence>
                                     </div>
                                     <div className="mt-8 h-1 w-32 bg-zinc-900 rounded-full overflow-hidden border border-white/5">

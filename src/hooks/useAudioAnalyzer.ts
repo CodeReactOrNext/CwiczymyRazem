@@ -14,6 +14,7 @@ export interface AudioRefs {
   frequencyRef: React.MutableRefObject<number>;
   volumeRef: React.MutableRefObject<number>;
   lastOnsetTimeRef: React.MutableRefObject<number>;
+  confidenceRef: React.MutableRefObject<number>;
 }
 
 export const useAudioAnalyzer = () => {
@@ -37,12 +38,20 @@ export const useAudioAnalyzer = () => {
   // Real-time refs for fast access without triggering re-renders
   const frequencyRef = useRef<number>(0);
   const volumeRef = useRef<number>(0);
+  const confidenceRef = useRef<number>(0);
   const lastOnsetTimeRef = useRef<number>(0);
   const lastStateUpdateRef = useRef<number>(0);
+  const prevVolumeRef = useRef<number>(0);
 
   const init = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        }
+      });
       streamRef.current = stream;
 
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -62,18 +71,20 @@ export const useAudioAnalyzer = () => {
       const Aubio = AubioModule.default || AubioModule;
       const aubio = await Aubio();
       const pitchDetector = new aubio.Pitch(
-        "default",
+        "yinfft",
         2048,
         512,
         audioContext.sampleRate
       );
+      (pitchDetector as any).setTolerance(0.7);
       pitchDetectorRef.current = pitchDetector;
       const onsetDetector = new (aubio.Onset as any)(
-        "default",
+        "hfc",
         2048,
         512,
         audioContext.sampleRate
       );
+      onsetDetector.setThreshold(0.3);
       onsetDetectorRef.current = onsetDetector;
 
       scriptProcessor.onaudioprocess = (event) => {
@@ -92,14 +103,15 @@ export const useAudioAnalyzer = () => {
 
         // 3. Detect Pitch
         const frequency = pitchDetector.do(inputBuffer);
+        const pitchConfidence = (pitchDetector as any).getConfidence();
 
         // 4. Threshold & Stabilization
-        const VOLUME_THRESHOLD = 0.015;
+        const VOLUME_THRESHOLD = 0.008;
         let stabilizedFreq = 0;
 
-        if (rms > VOLUME_THRESHOLD && frequency > 50) {
+        if (rms > VOLUME_THRESHOLD && frequency > 50 && pitchConfidence > 0.5) {
           lastFrequenciesRef.current.push(frequency);
-          if (lastFrequenciesRef.current.length > 3) {
+          if (lastFrequenciesRef.current.length > 5) {
             lastFrequenciesRef.current.shift();
           }
 
@@ -113,9 +125,14 @@ export const useAudioAnalyzer = () => {
         // Update refs immediately for real-time access
         frequencyRef.current = stabilizedFreq;
         volumeRef.current = volume;
+        confidenceRef.current = stabilizedFreq > 0 ? pitchConfidence : 0;
 
-        // Track onset timestamps
-        if (isOnset) {
+        // Track onset timestamps — combine aubio onset with volume-delta detection
+        const volumeDelta = volume - prevVolumeRef.current;
+        prevVolumeRef.current = volume;
+        const isSoftOnset = volumeDelta > 0.025 && volume > 0.025;
+
+        if (isOnset || isSoftOnset) {
           lastOnsetTimeRef.current = Date.now();
         }
 
@@ -128,7 +145,7 @@ export const useAudioAnalyzer = () => {
             frequency: stabilizedFreq,
             volume: volume,
             isOnset: !!isOnset,
-            confidence: stabilizedFreq > 0 ? 1 : 0,
+            confidence: stabilizedFreq > 0 ? pitchConfidence : 0,
             isListening: true,
             error: null
           }));
@@ -172,6 +189,7 @@ export const useAudioAnalyzer = () => {
     lastFrequenciesRef.current = [];
     frequencyRef.current = 0;
     volumeRef.current = 0;
+    confidenceRef.current = 0;
     lastOnsetTimeRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false, frequency: 0, volume: 0, isOnset: false }));
@@ -185,11 +203,14 @@ export const useAudioAnalyzer = () => {
 
   const getLatencyMs = useCallback(() => {
     const ctx = audioContextRef.current;
-    if (!ctx) return 150;
-    return ((ctx as any).baseLatency || 0) * 1000 + 85; // baseLatency (sec->ms) + processing estimate
+    if (!ctx) return 120;
+    const bufferLatency = (2048 / ctx.sampleRate) * 1000; // ~46ms at 44100Hz
+    const baseLatency = ((ctx as any).baseLatency || 0) * 1000;
+    const outputLatency = ((ctx as any).outputLatency || 0) * 1000;
+    return baseLatency + outputLatency + bufferLatency + 30; // +30ms for processing overhead
   }, []);
 
-  const audioRefs: AudioRefs = { frequencyRef, volumeRef, lastOnsetTimeRef };
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, lastOnsetTimeRef, confidenceRef };
 
   return {
     ...state,
