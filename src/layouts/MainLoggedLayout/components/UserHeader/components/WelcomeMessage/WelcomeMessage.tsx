@@ -9,6 +9,12 @@ import {
   checkIsPracticeToday,
   getUpdatedActualDayWithoutBreak,
 } from "utils/gameLogic";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 
 
 interface WelcomeMessageProps {
@@ -102,12 +108,21 @@ export const WelcomeMessage = ({
       </div>
 
       {/* Fame - Compact Card */}
-      <div className='hidden h-10 items-center justify-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2 shadow-sm backdrop-blur-sm md:flex'>
-        <FaGem className='text-xs text-amber-500' />
-        <span className='text-xs font-bold text-amber-400'>
-          {fame.toLocaleString()}
-        </span>
-      </div>
+      <TooltipProvider>
+        <Tooltip delayDuration={300}>
+          <TooltipTrigger asChild>
+            <div className='hidden h-10 cursor-help items-center justify-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2 shadow-sm backdrop-blur-sm md:flex'>
+              <FaGem className='text-xs text-amber-500' />
+              <span className='text-xs font-bold text-amber-400'>
+                {fame.toLocaleString()}
+              </span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className='max-w-[200px] text-center'>
+            <p>{useTranslation("common").t("tooltip.fame_description")}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 };

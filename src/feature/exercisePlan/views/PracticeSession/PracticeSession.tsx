@@ -40,7 +40,8 @@ import { TablatureViewer } from "./components/TablatureViewer";
 import { useTablatureAudio } from "../../hooks/useTablatureAudio";
 import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
 import { useMemo } from "react";
-import { getNoteFromFrequency, getFrequencyFromTab } from "utils/audio/noteUtils";
+import confetti from "canvas-confetti";
+import { getNoteFromFrequency, getFrequencyFromTab, getCentsDistance } from "utils/audio/noteUtils";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
@@ -184,13 +185,13 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     isListening,
     error: audioError, // eslint-disable-line @typescript-eslint/no-unused-vars
     init: initAudio,
-    close: closeAudio
+    close: closeAudio,
+    audioRefs,
+    getLatencyMs
   } = useAudioAnalyzer();
 
   const [isMicEnabled, setIsMicEnabled] = useState(false);
-  const LATENCY_MS = 150; // Compensate for audio buffer + processing delay
-  const CENTS_TOLERANCE = 50; // Increased tolerance (half a semitone)
-  const WINDOW_MS = 200; // Time window in ms to allow hitting notes early/late
+  const CENTS_TOLERANCE = 60; // Tolerance in cents (~over half a semitone)
 
   const toggleMic = async () => {
     if (isListening) {
@@ -202,10 +203,37 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     }
   };
 
+  // detectedNoteData derived from throttled state — used only for UI display
   const detectedNoteData = useMemo(() => {
      if (!frequency || frequency < 50) return null;
      return getNoteFromFrequency(frequency);
   }, [frequency]);
+
+  const getFeedbackForCombo = (combo: number): { text: string } | null => {
+    if (combo >= 25 && combo % 5 === 0) return { text: "UNSTOPPABLE!" };
+    if (combo === 20) return { text: "ON FIRE!" };
+    if (combo === 15) return { text: "AMAZING!" };
+    if (combo === 10) return { text: "GREAT!" };
+    if (combo === 5) return { text: "NICE!" };
+    return null;
+  };
+
+  const feedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
+    "NICE!":          { color: "text-emerald-400", dropShadow: "drop-shadow-[0_0_20px_rgba(52,211,153,0.8)]", scale: 1.35 },
+    "GREAT!":         { color: "text-cyan-400",    dropShadow: "drop-shadow-[0_0_20px_rgba(34,211,238,0.8)]", scale: 1.45 },
+    "AMAZING!":       { color: "text-purple-400",  dropShadow: "drop-shadow-[0_0_20px_rgba(192,132,252,0.8)]", scale: 1.5 },
+    "ON FIRE!":       { color: "text-orange-400",  dropShadow: "drop-shadow-[0_0_20px_rgba(251,146,60,0.8)]", scale: 1.55 },
+    "UNSTOPPABLE!":   { color: "text-amber-400",   dropShadow: "drop-shadow-[0_0_20px_rgba(251,191,36,0.8)]", scale: 1.6 },
+    "MULTIPLIER UP!": { color: "text-main",        dropShadow: "drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]", scale: 1.5 },
+  };
+
+  const getPerformanceGrade = (accuracy: number) => {
+    if (accuracy >= 95) return { letter: 'S', color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/30', glow: 'shadow-[0_0_12px_rgba(251,191,36,0.4)]' };
+    if (accuracy >= 85) return { letter: 'A', color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/30', glow: '' };
+    if (accuracy >= 70) return { letter: 'B', color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/30', glow: '' };
+    if (accuracy >= 50) return { letter: 'C', color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/30', glow: '' };
+    return { letter: 'D', color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/30', glow: '' };
+  };
 
   const [hitNotes, setHitNotes] = useState<Record<string, boolean>>({});
   const [sessionAccuracy, setSessionAccuracy] = useState(100);
@@ -219,16 +247,19 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   });
   const lastLoopedBeatsRef = useRef(0);
   const processedNotesRef = useRef<Set<string>>(new Set());
+  const hitNotesRef = useRef<Record<string, boolean>>({});
+  const rafIdRef = useRef<number>(0);
 
   const totalNotes = useMemo(() => {
     if (!currentExercise.tablature) return 0;
-    return currentExercise.tablature.reduce((acc, m) => 
+    return currentExercise.tablature.reduce((acc, m) =>
       acc + m.beats.reduce((acc2, b) => acc2 + b.notes.length, 0), 0
     );
   }, [currentExercise.tablature]);
 
   useEffect(() => {
     setHitNotes({});
+    hitNotesRef.current = {};
     setSessionAccuracy(100);
     setSessionStats({ hits: 0, misses: 0 });
     setGameState({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
@@ -246,121 +277,168 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       }
   }, [gameState.feedbackId]);
 
+  // Combo milestone confetti
   useEffect(() => {
-    if (!isPlaying || !metronome.startTime || !currentExercise.tablature || !detectedNoteData || !isMicEnabled) return;
+    if (gameState.combo === 25 || gameState.combo === 50) {
+      confetti({
+        particleCount: gameState.combo === 50 ? 50 : 30,
+        spread: 60,
+        origin: { y: 0.7 },
+        colors: ['#22d3ee', '#a78bfa', '#fbbf24', '#34d399'],
+        zIndex: 99999999,
+      });
+    }
+  }, [gameState.combo]);
 
-    const now = Date.now();
-    const compensatedNow = now - LATENCY_MS;
-    
-    const totalExerciseBeats = currentExercise.tablature.reduce((acc, m) => 
+  // Note matching via requestAnimationFrame — reads real-time values from refs
+  useEffect(() => {
+    if (!isPlaying || !metronome.startTime || !currentExercise.tablature || !isMicEnabled) return;
+
+    const tablature = currentExercise.tablature;
+    const totalExBeats = tablature.reduce((acc, m) =>
       acc + m.beats.reduce((acc2, b) => acc2 + b.duration, 0), 0
     );
-    if (totalExerciseBeats === 0) return;
+    if (totalExBeats === 0) return;
 
-    const beatsPerSecond = metronome.bpm / 60;
-    const windowBeats = (WINDOW_MS / 1000) * beatsPerSecond;
+    const bpm = metronome.bpm;
+    const startTime = metronome.startTime;
 
-    const elapsedSeconds = (compensatedNow - metronome.startTime) / 1000;
-    const totalBeatsElapsed = elapsedSeconds * beatsPerSecond;
-    const loopedBeatsElapsed = totalBeatsElapsed % totalExerciseBeats;
-    
-    // Detect loop restart (more robust check)
-    const hasLooped = loopedBeatsElapsed < lastLoopedBeatsRef.current - 0.1;
-    if (hasLooped) {
-       setHitNotes({});
-       processedNotesRef.current.clear();
-       setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 })); // Keep score, reset streak
-    }
-    lastLoopedBeatsRef.current = loopedBeatsElapsed;
+    const tick = () => {
+      const now = Date.now();
+      const latencyMs = getLatencyMs();
+      const compensatedNow = now - latencyMs;
 
-    let currentBeatTotal = 0;
+      // Read real-time audio data from refs (no React re-render needed)
+      const currentFreq = audioRefs.frequencyRef.current;
+      const currentVolume = audioRefs.volumeRef.current;
+      const lastOnsetTime = audioRefs.lastOnsetTimeRef.current;
+      const currentConfidence = audioRefs.confidenceRef.current;
 
-    for (let mIdx = 0; mIdx < currentExercise.tablature.length; mIdx++) {
-      const measure = currentExercise.tablature[mIdx];
-      for (let bIdx = 0; bIdx < measure.beats.length; bIdx++) {
-        const beat = measure.beats[bIdx];
-        const beatStart = currentBeatTotal;
-        const beatEnd = currentBeatTotal + beat.duration;
-        
-        const isWithinWindow = 
-          (loopedBeatsElapsed >= beatStart - windowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
-          (loopedBeatsElapsed + totalExerciseBeats >= beatStart - windowBeats && loopedBeatsElapsed + totalExerciseBeats <= beatEnd + windowBeats);
+      const beatsPerSecond = bpm / 60;
 
-        const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
+      // BPM-adaptive timing windows
+      const beatDurationMs = 60000 / bpm;
+      const onsetRecencyMs = Math.min(800, Math.max(200, beatDurationMs * 0.8));
+      const windowMs = Math.min(500, Math.max(150, beatDurationMs * 0.35));
+      const windowBeats = (windowMs / 1000) * beatsPerSecond;
 
-        beat.notes.forEach((note, nIdx) => {
-          const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
-          
-          // Skip if already processed in this loop
-          if (processedNotesRef.current.has(noteKey)) return;
+      const elapsedSeconds = (compensatedNow - startTime) / 1000;
+      const totalBeatsElapsed = elapsedSeconds * beatsPerSecond;
+      const loopedBeatsElapsed = totalBeatsElapsed % totalExBeats;
 
-          // 1. Check for Hit
-          if (isWithinWindow) {
-            const targetFreq = getFrequencyFromTab(note.string, note.fret);
-            const targetNote = getNoteFromFrequency(targetFreq);
-            
-            if (targetNote && 
-                targetNote.note === detectedNoteData.note && 
-                Math.abs(detectedNoteData.cents) <= CENTS_TOLERANCE &&
-                volume > 0.05) { // Ensure clear signal
-              
-              processedNotesRef.current.add(noteKey);
-              setHitNotes(prev => ({ ...prev, [noteKey]: true }));
-              
-              setSessionStats(prev => {
-                const newHits = prev.hits + 1;
-                const total = newHits + prev.misses;
-                setSessionAccuracy(Math.round((newHits / total) * 100));
-                return { ...prev, hits: newHits };
-              });
+      // Detect loop restart
+      const hasLooped = loopedBeatsElapsed < lastLoopedBeatsRef.current - 0.1;
+      if (hasLooped) {
+        hitNotesRef.current = {};
+        setHitNotes({});
+        processedNotesRef.current.clear();
+        setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 }));
+      }
+      lastLoopedBeatsRef.current = loopedBeatsElapsed;
 
-              setGameState(prev => {
+      // Onset gating: only allow hits if a string attack was detected recently
+      const timeSinceOnset = now - lastOnsetTime;
+      const hasRecentOnset = timeSinceOnset < onsetRecencyMs;
+
+      let currentBeatTotal = 0;
+
+      for (let mIdx = 0; mIdx < tablature.length; mIdx++) {
+        const measure = tablature[mIdx];
+        for (let bIdx = 0; bIdx < measure.beats.length; bIdx++) {
+          const beat = measure.beats[bIdx];
+          const beatStart = currentBeatTotal;
+          const beatEnd = currentBeatTotal + beat.duration;
+
+          // Fix wraparound: second condition only applies at the loop boundary
+          const isWithinWindow =
+            (loopedBeatsElapsed >= beatStart - windowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
+            (loopedBeatsElapsed < windowBeats && beatEnd + windowBeats >= totalExBeats);
+
+          const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
+
+          beat.notes.forEach((note, nIdx) => {
+            const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
+
+            if (processedNotesRef.current.has(noteKey)) return;
+
+            // Hammer-ons and pull-offs don't produce pick attacks
+            const requiresOnset = !note.isHammerOn && !note.isPullOff;
+
+            // 1. Check for Hit
+            if (isWithinWindow && currentFreq > 50 && (hasRecentOnset || !requiresOnset)) {
+              const targetFreq = getFrequencyFromTab(note.string, note.fret);
+
+              // Direct semitone-distance comparison (octave-aware)
+              const centsOff = Math.abs(getCentsDistance(currentFreq, targetFreq));
+
+              if (centsOff <= CENTS_TOLERANCE &&
+                  currentVolume > 0.02 &&
+                  currentConfidence > 0.4) {
+
+                processedNotesRef.current.add(noteKey);
+                hitNotesRef.current[noteKey] = true;
+                setHitNotes(prev => ({ ...prev, [noteKey]: true }));
+
+                setSessionStats(prev => {
+                  const newHits = prev.hits + 1;
+                  const total = newHits + prev.misses;
+                  setSessionAccuracy(Math.round((newHits / total) * 100));
+                  return { ...prev, hits: newHits };
+                });
+
+                setGameState(prev => {
                   const newCombo = prev.combo + 1;
                   const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
-                  
+
                   let feedback = prev.lastFeedback;
                   let fId = prev.feedbackId;
-                  
+
                   if (newMultiplier > prev.multiplier) {
-                      feedback = "MULTIPLIER UP!";
-                      fId++;
-                  } else if (newCombo % 10 === 0) {
-                      feedback = "AWESOME!";
-                      fId++;
-                  } else if (newCombo % 5 === 0) {
-                      feedback = "PERFECT";
-                      fId++;
+                    feedback = "MULTIPLIER UP!";
+                    fId++;
+                  } else {
+                    const tier = getFeedbackForCombo(newCombo);
+                    if (tier) { feedback = tier.text; fId++; }
                   }
 
                   return {
-                      ...prev,
-                      score: prev.score + (100 * newMultiplier),
-                      combo: newCombo,
-                      multiplier: newMultiplier,
-                      lastFeedback: feedback,
-                      feedbackId: fId
+                    ...prev,
+                    score: prev.score + (100 * newMultiplier),
+                    combo: newCombo,
+                    multiplier: newMultiplier,
+                    lastFeedback: feedback,
+                    feedbackId: fId
                   };
-              });
+                });
+              }
             }
-          } 
-          
-          // 2. Check for Miss (window passed without hit)
-          else if (isPassed && !hitNotes[noteKey]) {
-            processedNotesRef.current.add(noteKey);
-            setSessionStats(prev => {
-              const newMisses = prev.misses + 1;
-              const total = prev.hits + newMisses;
-              setSessionAccuracy(Math.round((prev.hits / total) * 100));
-              return { ...prev, misses: newMisses };
-            });
-            setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 }));
-          }
-        });
 
-        currentBeatTotal += beat.duration;
+            // 2. Check for Miss (window passed without hit)
+            else if (isPassed && !hitNotesRef.current[noteKey]) {
+              processedNotesRef.current.add(noteKey);
+              setSessionStats(prev => {
+                const newMisses = prev.misses + 1;
+                const total = prev.hits + newMisses;
+                setSessionAccuracy(Math.round((prev.hits / total) * 100));
+                return { ...prev, misses: newMisses };
+              });
+              setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 }));
+            }
+          });
+
+          currentBeatTotal += beat.duration;
+        }
       }
-    }
-  }, [isPlaying, metronome.startTime, metronome.bpm, currentExercise.tablature, detectedNoteData, isMicEnabled, currentExerciseIndex, totalNotes, volume]);
+
+      rafIdRef.current = requestAnimationFrame(tick);
+    };
+
+    rafIdRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(rafIdRef.current);
+    };
+  }, [isPlaying, metronome.startTime, metronome.bpm, currentExercise.tablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs]);
 
   // Pass progress for gray-out effect
   const beatsPerSecond = metronome.bpm / 60;
@@ -582,15 +660,41 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                     <div className="relative group">
                                         <div className="absolute -inset-2 bg-white/5 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                                         <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Total Score</span>
-                                        <span className="text-4xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                                        <motion.span
+                                            key={gameState.score}
+                                            initial={{ scale: 1.15, filter: "brightness(1.5)" }}
+                                            animate={{ scale: 1, filter: "brightness(1)" }}
+                                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                                            className="text-4xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] inline-block"
+                                        >
                                             {gameState.score.toLocaleString()}
-                                        </span>
+                                        </motion.span>
                                     </div>
                                     <div className="h-10 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
                                     <div>
                                         <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Accuracy</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-2xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
+                                            <AnimatePresence mode="wait">
+                                                {(() => {
+                                                    const grade = getPerformanceGrade(sessionAccuracy);
+                                                    return (
+                                                        <motion.span
+                                                            key={grade.letter}
+                                                            initial={{ scale: 1.4, opacity: 0 }}
+                                                            animate={{ scale: 1, opacity: 1 }}
+                                                            exit={{ scale: 0.8, opacity: 0 }}
+                                                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                                                            className={cn(
+                                                                "inline-flex items-center justify-center w-8 h-8 rounded-lg border text-sm font-black",
+                                                                grade.color, grade.bg, grade.border, grade.glow
+                                                            )}
+                                                        >
+                                                            {grade.letter}
+                                                        </motion.span>
+                                                    );
+                                                })()}
+                                            </AnimatePresence>
                                         </div>
                                     </div>
                                 </div>
@@ -599,41 +703,45 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                 <div className="flex-[0.5] flex flex-col items-center justify-center -mb-2 relative">
                                     <div className="absolute top-[-50px] whitespace-nowrap">
                                         <AnimatePresence mode="wait">
-                                            {gameState.lastFeedback && (
-                                                <motion.div 
-                                                    key={gameState.feedbackId}
-                                                    initial={{ 
-                                                        y: 40, 
-                                                        opacity: 0, 
-                                                        scale: 0.3, 
-                                                        filter: "blur(10px)" 
-                                                    }}
-                                                    animate={{ 
-                                                        y: 0, 
-                                                        opacity: 1, 
-                                                        scale: 1.4, 
-                                                        filter: "blur(0px)",
-                                                        transition: {
-                                                            type: "spring",
-                                                            stiffness: 300,
-                                                            damping: 15
-                                                        }
-                                                    }}
-                                                    exit={{ 
-                                                        y: -40, 
-                                                        opacity: 0, 
-                                                        scale: 2, 
-                                                        filter: "blur(5px)",
-                                                        transition: { duration: 0.4 }
-                                                    }}
-                                                    className={cn(
-                                                        "text-4xl font-black uppercase italic tracking-tighter drop-shadow-[0_0_20px_rgba(34,211,238,0.8)]",
-                                                        gameState.lastFeedback === "MULTIPLIER UP!" ? "text-main" : "text-cyan-400"
-                                                    )}
-                                                >
-                                                    {gameState.lastFeedback}
-                                                </motion.div>
-                                            )}
+                                            {gameState.lastFeedback && (() => {
+                                                const style = feedbackStyles[gameState.lastFeedback] || { color: "text-cyan-400", dropShadow: "drop-shadow-[0_0_20px_rgba(34,211,238,0.8)]", scale: 1.4 };
+                                                return (
+                                                    <motion.div
+                                                        key={gameState.feedbackId}
+                                                        initial={{
+                                                            y: 40,
+                                                            opacity: 0,
+                                                            scale: 0.3,
+                                                            filter: "blur(10px)"
+                                                        }}
+                                                        animate={{
+                                                            y: 0,
+                                                            opacity: 1,
+                                                            scale: style.scale,
+                                                            filter: "blur(0px)",
+                                                            transition: {
+                                                                type: "spring",
+                                                                stiffness: 300,
+                                                                damping: 15
+                                                            }
+                                                        }}
+                                                        exit={{
+                                                            y: -40,
+                                                            opacity: 0,
+                                                            scale: style.scale + 0.6,
+                                                            filter: "blur(5px)",
+                                                            transition: { duration: 0.4 }
+                                                        }}
+                                                        className={cn(
+                                                            "text-4xl font-black uppercase italic tracking-tighter",
+                                                            style.color,
+                                                            style.dropShadow
+                                                        )}
+                                                    >
+                                                        {gameState.lastFeedback}
+                                                    </motion.div>
+                                                );
+                                            })()}
                                         </AnimatePresence>
                                     </div>
                                     <div className="mt-8 h-1 w-32 bg-zinc-900 rounded-full overflow-hidden border border-white/5">

@@ -8,7 +8,9 @@
     "sign_up": "Sign Up",
     "edit": "Edit",
     "logout": "Log out",
-    "link_copy_profile": "Copy link to your profil"
+    "link_copy_profile": "Copy link to your profil",
+    "random": "Randomize",
+    "remove": "Remove"
   },
   "google_button": {
     "sign_in": "Sign In With Google",
@@ -104,7 +106,8 @@
     "sessions": "Sessions",
     "habits": "Habits",
     "userNotFound": "User not found",
-    "actual_streak": "Streak"
+    "actual_streak": "Streak",
+    "fame_description": "Fame points are awarded for likes received and community activity."
   },
   "song_status": {
     "move_to": "Move to",

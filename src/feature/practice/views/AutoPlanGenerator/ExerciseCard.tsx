@@ -105,9 +105,9 @@ export const ExerciseCard = ({
                 onReplace(index);
               }}>
               <FaRandom className='mr-1 h-3.5 w-3.5' />
-              <span className='text-xs'>Losuj</span>
+              <span className='text-xs'>{t("button.random")}</span>
             </Button>
-
+ 
             <Button
               variant='ghost'
               size='sm'
@@ -117,7 +117,7 @@ export const ExerciseCard = ({
                 onRemove(index);
               }}>
               <FaTrash className='mr-1 h-3.5 w-3.5' />
-              <span className='text-xs'>Usuń</span>
+              <span className='text-xs'>{t("button.remove")}</span>
             </Button>
           </div>
 
