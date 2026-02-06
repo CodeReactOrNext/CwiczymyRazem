@@ -28,20 +28,23 @@ export const AutoPlanGenerator = ({
   const [generatedPlan, setGeneratedPlan] = useState<ExercisePlan | null>(null);
 
   const generatePlan = () => {
-    let filteredExercises = [...exercisesAgregat];
+    let filteredExercises = exercisesAgregat.filter(ex => !!ex);
 
-    // Filter by categories if any selected
     if (selectedCategories.length > 0) {
       filteredExercises = filteredExercises.filter((ex) =>
         selectedCategories.includes(ex.category)
       );
     }
 
-    // Filter by difficulty if specific one selected
     if (selectedDifficulty !== "all") {
       filteredExercises = filteredExercises.filter(
         (ex) => ex.difficulty === selectedDifficulty
       );
+    }
+
+    if (filteredExercises.length === 0) {
+      alert("No exercises found for the selected criteria.");
+      return;
     }
 
     const allExercises = filteredExercises.sort(() => Math.random() - 0.5);
@@ -55,6 +58,10 @@ export const AutoPlanGenerator = ({
       }
 
       if (totalTime >= time * 0.9) break;
+    }
+
+    if (selectedExercises.length === 0 && allExercises.length > 0) {
+       selectedExercises.push(allExercises[0]);
     }
 
     const categoryCount: Record<string, number> = {};
@@ -151,14 +158,32 @@ export const AutoPlanGenerator = ({
   const replaceExercise = (index: number) => {
     if (!generatedPlan) return;
 
-    const availableExercises = exercisesAgregat.filter(
-      (e) => !generatedPlan.exercises.some((ge) => ge.id === e.id)
+    let filteredAvailable = exercisesAgregat.filter(
+      (e) => e && !generatedPlan.exercises.some((ge) => ge.id === e.id)
     );
 
-    if (availableExercises.length === 0) return;
+    if (selectedCategories.length > 0) {
+      filteredAvailable = filteredAvailable.filter((ex) =>
+        selectedCategories.includes(ex.category)
+      );
+    }
 
-    const randomIndex = Math.floor(Math.random() * availableExercises.length);
-    const newExercise = availableExercises[randomIndex];
+    if (selectedDifficulty !== "all") {
+       filteredAvailable = filteredAvailable.filter((ex) =>
+          ex.difficulty === selectedDifficulty
+       );
+    }
+
+    if (filteredAvailable.length === 0) {
+      filteredAvailable = exercisesAgregat.filter(
+        (e) => e && !generatedPlan.exercises.some((ge) => ge.id === e.id)
+      );
+    }
+
+    if (filteredAvailable.length === 0) return;
+
+    const randomIndex = Math.floor(Math.random() * filteredAvailable.length);
+    const newExercise = filteredAvailable[randomIndex];
 
     const updatedExercises = [...generatedPlan.exercises];
     updatedExercises[index] = newExercise;
