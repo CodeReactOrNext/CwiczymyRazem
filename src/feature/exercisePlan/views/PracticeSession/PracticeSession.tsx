@@ -42,6 +42,10 @@ import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
 import { useMemo } from "react";
 import confetti from "canvas-confetti";
 import { getNoteFromFrequency, getFrequencyFromTab, getCentsDistance } from "utils/audio/noteUtils";
+import { useCalibration } from "./hooks/useCalibration";
+import { MicModeDialog } from "./components/MicModeDialog";
+import { CalibrationChoiceDialog } from "./components/CalibrationChoiceDialog";
+import { CalibrationWizard } from "./components/CalibrationWizard";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
@@ -122,6 +126,11 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     resetImagePosition,
   } = useImageHandling();
 
+  const planHasTablature = useMemo(
+    () => plan.exercises.some(ex => ex.tablature && ex.tablature.length > 0),
+    [plan.exercises]
+  );
+
   // Keyboard Navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -187,21 +196,41 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     init: initAudio,
     close: closeAudio,
     audioRefs,
-    getLatencyMs
+    getLatencyMs,
+    inputGain,
+    setInputGain,
   } = useAudioAnalyzer();
 
-  const [isMicEnabled, setIsMicEnabled] = useState(false);
+  const {
+    sessionPhase,
+    isMicEnabled,
+    calibrationData,
+    handleEnableMic,
+    handleSkipMic,
+    handleReuseCalibration,
+    handleRecalibrate,
+    handleCalibrationComplete,
+    handleCalibrationCancel,
+    getAdjustedTargetFreq,
+    existingCalibrationTimestamp,
+  } = useCalibration(planHasTablature);
+
   const CENTS_TOLERANCE = 60; // Tolerance in cents (~over half a semitone)
 
   const toggleMic = async () => {
     if (isListening) {
-        closeAudio();
-        setIsMicEnabled(false);
+      closeAudio();
     } else {
-        await initAudio();
-        setIsMicEnabled(true);
+      await initAudio();
     }
   };
+
+  // Auto-init audio when mic enabled via calibration flow
+  useEffect(() => {
+    if (isMicEnabled && !isListening) {
+      initAudio();
+    }
+  }, [isMicEnabled]);
 
   // detectedNoteData derived from throttled state — used only for UI display
   const detectedNoteData = useMemo(() => {
@@ -250,6 +279,12 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const hitNotesRef = useRef<Record<string, boolean>>({});
   const rafIdRef = useRef<number>(0);
 
+  // Refs for throttled UI updates — detection at 60fps, React flushes at ~10fps
+  const gameStateRef = useRef({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
+  const statsRef = useRef({ hits: 0, misses: 0 });
+  const lastFlushRef = useRef(0);
+  const needsFlushRef = useRef(false);
+
   const totalNotes = useMemo(() => {
     if (!currentExercise.tablature) return 0;
     return currentExercise.tablature.reduce((acc, m) =>
@@ -263,6 +298,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     setSessionAccuracy(100);
     setSessionStats({ hits: 0, misses: 0 });
     setGameState({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
+    gameStateRef.current = { score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 };
+    statsRef.current = { hits: 0, misses: 0 };
+    needsFlushRef.current = false;
     lastLoopedBeatsRef.current = 0;
     processedNotesRef.current.clear();
   }, [currentExerciseIndex]);
@@ -312,7 +350,6 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       const currentFreq = audioRefs.frequencyRef.current;
       const currentVolume = audioRefs.volumeRef.current;
       const lastOnsetTime = audioRefs.lastOnsetTimeRef.current;
-      const currentConfidence = audioRefs.confidenceRef.current;
 
       const beatsPerSecond = bpm / 60;
 
@@ -330,9 +367,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       const hasLooped = loopedBeatsElapsed < lastLoopedBeatsRef.current - 0.1;
       if (hasLooped) {
         hitNotesRef.current = {};
-        setHitNotes({});
         processedNotesRef.current.clear();
-        setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 }));
+        needsFlushRef.current = true;
       }
       lastLoopedBeatsRef.current = loopedBeatsElapsed;
 
@@ -341,6 +377,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       const hasRecentOnset = timeSinceOnset < onsetRecencyMs;
 
       let currentBeatTotal = 0;
+      const gs = gameStateRef.current;
+      const s = statsRef.current;
 
       for (let mIdx = 0; mIdx < tablature.length; mIdx++) {
         const measure = tablature[mIdx];
@@ -366,68 +404,64 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
             // 1. Check for Hit
             if (isWithinWindow && currentFreq > 50 && (hasRecentOnset || !requiresOnset)) {
-              const targetFreq = getFrequencyFromTab(note.string, note.fret);
+              const baseTargetFreq = getFrequencyFromTab(note.string, note.fret);
+              const targetFreq = getAdjustedTargetFreq(note.string, baseTargetFreq);
 
               // Direct semitone-distance comparison (octave-aware)
               const centsOff = Math.abs(getCentsDistance(currentFreq, targetFreq));
 
               if (centsOff <= CENTS_TOLERANCE &&
-                  currentVolume > 0.02 &&
-                  currentConfidence > 0.4) {
+                  currentVolume > 0.02) {
 
                 processedNotesRef.current.add(noteKey);
                 hitNotesRef.current[noteKey] = true;
-                setHitNotes(prev => ({ ...prev, [noteKey]: true }));
+                needsFlushRef.current = true;
 
-                setSessionStats(prev => {
-                  const newHits = prev.hits + 1;
-                  const total = newHits + prev.misses;
-                  setSessionAccuracy(Math.round((newHits / total) * 100));
-                  return { ...prev, hits: newHits };
-                });
+                s.hits++;
 
-                setGameState(prev => {
-                  const newCombo = prev.combo + 1;
-                  const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
+                const newCombo = gs.combo + 1;
+                const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
 
-                  let feedback = prev.lastFeedback;
-                  let fId = prev.feedbackId;
+                if (newMultiplier > gs.multiplier) {
+                  gs.lastFeedback = "MULTIPLIER UP!";
+                  gs.feedbackId++;
+                } else {
+                  const tier = getFeedbackForCombo(newCombo);
+                  if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; }
+                }
 
-                  if (newMultiplier > prev.multiplier) {
-                    feedback = "MULTIPLIER UP!";
-                    fId++;
-                  } else {
-                    const tier = getFeedbackForCombo(newCombo);
-                    if (tier) { feedback = tier.text; fId++; }
-                  }
-
-                  return {
-                    ...prev,
-                    score: prev.score + (100 * newMultiplier),
-                    combo: newCombo,
-                    multiplier: newMultiplier,
-                    lastFeedback: feedback,
-                    feedbackId: fId
-                  };
-                });
+                gs.score += 100 * newMultiplier;
+                gs.combo = newCombo;
+                gs.multiplier = newMultiplier;
               }
             }
 
             // 2. Check for Miss (window passed without hit)
             else if (isPassed && !hitNotesRef.current[noteKey]) {
               processedNotesRef.current.add(noteKey);
-              setSessionStats(prev => {
-                const newMisses = prev.misses + 1;
-                const total = prev.hits + newMisses;
-                setSessionAccuracy(Math.round((prev.hits / total) * 100));
-                return { ...prev, misses: newMisses };
-              });
-              setGameState(prev => ({ ...prev, combo: 0, multiplier: 1 }));
+              needsFlushRef.current = true;
+              s.misses++;
+              gs.combo = 0;
+              gs.multiplier = 1;
             }
           });
 
           currentBeatTotal += beat.duration;
         }
+      }
+
+      // Throttled flush to React state (~10Hz) — keeps detection at 60fps
+      if (needsFlushRef.current && now - lastFlushRef.current >= 100) {
+        lastFlushRef.current = now;
+        needsFlushRef.current = false;
+
+        setHitNotes({ ...hitNotesRef.current });
+
+        setSessionStats({ hits: s.hits, misses: s.misses });
+        const total = s.hits + s.misses;
+        setSessionAccuracy(total > 0 ? Math.round((s.hits / total) * 100) : 100);
+
+        setGameState({ ...gs });
       }
 
       rafIdRef.current = requestAnimationFrame(tick);
@@ -438,7 +472,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     return () => {
       cancelAnimationFrame(rafIdRef.current);
     };
-  }, [isPlaying, metronome.startTime, metronome.bpm, currentExercise.tablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs]);
+  }, [isPlaying, metronome.startTime, metronome.bpm, currentExercise.tablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq]);
 
   // Pass progress for gray-out effect
   const beatsPerSecond = metronome.bpm / 60;
@@ -452,12 +486,12 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   
   const currentBeatsElapsed = totalExerciseBeats > 0 ? (elapsedSeconds * beatsPerSecond) % totalExerciseBeats : 0;
 
-  // Auto-stop metronome when time ends
+  // Auto-stop everything when time runs out
   useEffect(() => {
-    if (timeLeft <= 0 && metronome.isPlaying) {
-      metronome.toggleMetronome();
-    }
-  }, [timeLeft, metronome.isPlaying]);
+    if (timeLeft > 0) return;
+    if (isPlaying) stopTimer();
+    if (metronome.isPlaying) metronome.toggleMetronome();
+  }, [timeLeft, isPlaying, metronome.isPlaying, stopTimer]);
 
 
   return (
@@ -1121,6 +1155,30 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
         }}
         exerciseTitle={currentExercise.title}
         duration={currentExercise.timeInMinutes}
+      />
+
+      <MicModeDialog
+        isOpen={sessionPhase === 'mic_prompt'}
+        onEnableMic={handleEnableMic}
+        onSkipMic={handleSkipMic}
+      />
+      <CalibrationChoiceDialog
+        isOpen={sessionPhase === 'calibration_choice'}
+        calibrationTimestamp={existingCalibrationTimestamp}
+        onReuse={handleReuseCalibration}
+        onRecalibrate={handleRecalibrate}
+        onCancel={handleCalibrationCancel}
+      />
+      <CalibrationWizard
+        isOpen={sessionPhase === 'calibrating'}
+        onComplete={handleCalibrationComplete}
+        onCancel={handleCalibrationCancel}
+        audioInit={initAudio}
+        audioClose={closeAudio}
+        audioRefs={audioRefs}
+        isListening={isListening}
+        inputGain={inputGain}
+        onInputGainChange={setInputGain}
       />
     </>
   );

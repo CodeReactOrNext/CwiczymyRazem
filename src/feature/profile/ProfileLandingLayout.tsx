@@ -23,9 +23,9 @@ interface LandingLayoutProps {
 
 import { useQuery } from "@tanstack/react-query";
 import { ActiveChallengeWidget } from "feature/challenges/frontend/infrastructure/ui/ActiveChallengeWidget";
-import { BarChart3, ChevronRight, Play, Bell } from "lucide-react";
+import { BarChart3, ChevronRight, Play } from "lucide-react";
 import { GiMetronome } from "react-icons/gi";
-import { useFCM } from "hooks/useFCM";
+
 import { WeeklyScheduler } from "feature/weeklyScheduler/components/WeeklyScheduler";
 
 const ProfileLandingLayout = ({
@@ -34,8 +34,6 @@ const ProfileLandingLayout = ({
   userAuth,
   featSlot,
 }: LandingLayoutProps) => {
-  const { notificationPermission } = useFCM();
-
   const router = useRouter();
   const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
   const { achievements } = userStats;
@@ -72,19 +70,6 @@ const ProfileLandingLayout = ({
           See your stats
         </button>
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
-
-        <button
-          onClick={() => {
-            if (typeof window !== 'undefined' && 'Notification' in window && notificationPermission !== 'granted') {
-              Notification.requestPermission();
-            }
-          }}
-          title={notificationPermission === 'granted' ? "Notifications enabled" : "Enable notifications"}
-          className={`p-2.5 rounded-xl transition-all duration-300 ${notificationPermission === 'granted' ? 'text-green-400 bg-green-400/10 hover:bg-green-400/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'}`}
-        >
-          <Bell size={16} className={notificationPermission === 'granted' ? "fill-current" : ""} />
-        </button>
       </div>
 
       {activeTab === "practice" && (
