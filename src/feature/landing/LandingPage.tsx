@@ -12,8 +12,13 @@ import { WhySection } from "feature/landing/components/WhySection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
 import { FinalCTASection } from "feature/landing/components/FinalCTASection";
 import { ProductDemo } from "feature/landing/components/ProductDemo";
+import { BlogFrontmatter } from "lib/blog";
 
-const LandingPage = () => {
+interface LandingPageProps {
+  blogs: BlogFrontmatter[];
+}
+
+const LandingPage = ({ blogs }: LandingPageProps) => {
   const faqQuestions: faqQuestionInterface[] = [
     {
       title: "Is Riff Quest really free?",
@@ -70,7 +75,7 @@ const LandingPage = () => {
         <FeaturesSection />
         <PricingSection />
         <FaqSection questions={faqQuestions} />
-        <BlogSection />
+        <BlogSection blogs={blogs} />
         <FinalCTASection />
         <Footer />
         <CookieBanner />
