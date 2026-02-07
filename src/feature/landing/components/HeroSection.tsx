@@ -52,35 +52,37 @@ export const HeroSection = () => {
         />
       </div>
 
-      {/* Floating Glow Animation (Flow) - ULTRA INTENSE */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div 
-          animate={{ 
+      {/* Floating Glow Animation (Flow) - hidden on mobile, fade-in on desktop */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{
             x: ['-15%', '15%'],
             y: ['-10%', '10%'],
             opacity: [0.2, 0.4, 0.2]
           }}
-          transition={{ 
-            duration: 8, 
-            repeat: Infinity, 
+          transition={{
+            duration: 8,
+            repeat: Infinity,
             repeatType: "mirror",
-            ease: "easeInOut" 
+            ease: "easeInOut"
           }}
-          className="absolute -top-[15%] -left-[10%] w-[120%] sm:w-[80%] h-[70%] bg-cyan-500/30 blur-[130px] rounded-full"
+          className="absolute -top-[15%] -left-[10%] w-[80%] h-[70%] bg-cyan-500/30 blur-[130px] rounded-full"
         />
-        <motion.div 
-          animate={{ 
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{
             x: ['15%', '-15%'],
             y: ['10%', '-10%'],
             opacity: [0.15, 0.35, 0.15]
           }}
-          transition={{ 
-            duration: 10, 
-            repeat: Infinity, 
+          transition={{
+            duration: 10,
+            repeat: Infinity,
             repeatType: "mirror",
-            ease: "easeInOut" 
+            ease: "easeInOut"
           }}
-          className="absolute -bottom-[15%] -right-[10%] w-[120%] sm:w-[80%] h-[70%] bg-teal-500/20 blur-[130px] rounded-full"
+          className="absolute -bottom-[15%] -right-[10%] w-[80%] h-[70%] bg-teal-500/20 blur-[130px] rounded-full"
         />
       </div>
 
@@ -112,7 +114,7 @@ export const HeroSection = () => {
               <div className="flex flex-col items-center">
                 <div className="relative p-[1px] overflow-hidden rounded-lg group">
                   {/* Vibrant Rotating Border Beam */}
-                  <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)]" />
+                  {!isDashboardLoading && <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)]" />}
                   
                   <Button
                     onClick={handleGoToDashboard}

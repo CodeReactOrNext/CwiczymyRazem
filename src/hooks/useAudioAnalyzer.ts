@@ -8,6 +8,7 @@ interface AudioAnalyzerState {
   isOnset: boolean;
   isListening: boolean;
   error: string | null;
+  inputGain: number;
 }
 
 export interface AudioRefs {
@@ -15,6 +16,20 @@ export interface AudioRefs {
   volumeRef: React.MutableRefObject<number>;
   lastOnsetTimeRef: React.MutableRefObject<number>;
   confidenceRef: React.MutableRefObject<number>;
+}
+
+const GAIN_STORAGE_KEY = "audio_input_gain";
+const DEFAULT_GAIN = 1.0;
+
+function loadPersistedGain(): number {
+  try {
+    const stored = localStorage.getItem(GAIN_STORAGE_KEY);
+    if (stored !== null) {
+      const val = parseFloat(stored);
+      if (!isNaN(val) && val >= 0.5 && val <= 5.0) return val;
+    }
+  } catch { /* ignore */ }
+  return DEFAULT_GAIN;
 }
 
 export const useAudioAnalyzer = () => {
@@ -25,11 +40,13 @@ export const useAudioAnalyzer = () => {
     isOnset: false,
     isListening: false,
     error: null,
+    inputGain: loadPersistedGain(),
   });
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const inputGainRef = useRef<number>(loadPersistedGain());
   const pitchDetectorRef = useRef<any>(null);
   const onsetDetectorRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -87,29 +104,49 @@ export const useAudioAnalyzer = () => {
       onsetDetector.setThreshold(0.3);
       onsetDetectorRef.current = onsetDetector;
 
+      const normalizedBuf = new Float32Array(2048);
+
       scriptProcessor.onaudioprocess = (event) => {
         const inputBuffer = event.inputBuffer.getChannelData(0);
 
-        // 1. Calculate Volume (RMS)
+        // 1. Calculate Volume (RMS) — apply gain as display multiplier only
         let sum = 0;
+        let peak = 0;
         for (let i = 0; i < inputBuffer.length; i++) {
           sum += inputBuffer[i] * inputBuffer[i];
+          const abs = Math.abs(inputBuffer[i]);
+          if (abs > peak) peak = abs;
         }
         const rms = Math.sqrt(sum / inputBuffer.length);
-        const volume = Math.max(0, Math.min(1, rms * 10)); // Scale to 0-1 range
+        const gain = inputGainRef.current;
+        const volume = Math.max(0, Math.min(1, rms * 10 * gain)); // gain boosts displayed volume only
 
-        // 2. Detect Onset (Attack)
-        const isOnset = onsetDetector.do(inputBuffer);
+        // 2. Normalize buffer copy for pitch/onset detection
+        //    Aubio needs a strong signal; mic input can be very quiet (rms ~0.01).
+        //    Scaling to peak=0.9 gives aubio a clean, loud signal without clipping.
+        const scale = peak > 0.001 ? 0.9 / peak : 0;
+        for (let i = 0; i < inputBuffer.length; i++) {
+          normalizedBuf[i] = inputBuffer[i] * scale;
+        }
 
-        // 3. Detect Pitch
-        const frequency = pitchDetector.do(inputBuffer);
-        const pitchConfidence = (pitchDetector as any).getConfidence();
+        // 3. Detect Onset & Pitch — process in hop-size chunks (512)
+        //    aubio expects do() to be called with hopSize samples, not bufferSize.
+        let isOnset = false;
+        let frequency = 0;
+        let pitchConfidence = 0;
+        const HOP = 512;
+        for (let offset = 0; offset < 2048; offset += HOP) {
+          const chunk = normalizedBuf.subarray(offset, offset + HOP);
+          if (onsetDetector.do(chunk)) isOnset = true;
+          frequency = pitchDetector.do(chunk);
+          pitchConfidence = (pitchDetector as any).getConfidence();
+        }
 
         // 4. Threshold & Stabilization
         const VOLUME_THRESHOLD = 0.008;
         let stabilizedFreq = 0;
 
-        if (rms > VOLUME_THRESHOLD && frequency > 50 && pitchConfidence > 0.5) {
+        if (rms > VOLUME_THRESHOLD && frequency > 50) {
           lastFrequenciesRef.current.push(frequency);
           if (lastFrequenciesRef.current.length > 5) {
             lastFrequenciesRef.current.shift();
@@ -182,8 +219,6 @@ export const useAudioAnalyzer = () => {
       streamRef.current = null;
     }
 
-    // We don't necessarily destroy the pitchDetector instance as it's just a WASM wrapper,
-    // but we lose the reference.
     pitchDetectorRef.current = null;
     onsetDetectorRef.current = null;
     lastFrequenciesRef.current = [];
@@ -200,6 +235,15 @@ export const useAudioAnalyzer = () => {
       close();
     };
   }, [close]);
+
+  const setInputGain = useCallback((value: number) => {
+    const clamped = Math.max(0.5, Math.min(5.0, value));
+    inputGainRef.current = clamped;
+    try {
+      localStorage.setItem(GAIN_STORAGE_KEY, String(clamped));
+    } catch { /* ignore */ }
+    setState(prev => ({ ...prev, inputGain: clamped }));
+  }, []);
 
   const getLatencyMs = useCallback(() => {
     const ctx = audioContextRef.current;
@@ -218,5 +262,6 @@ export const useAudioAnalyzer = () => {
     close,
     audioRefs,
     getLatencyMs,
+    setInputGain,
   };
 };
