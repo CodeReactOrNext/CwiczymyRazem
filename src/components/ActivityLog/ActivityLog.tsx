@@ -122,11 +122,27 @@ export const ActivityLogView = ({
           <div
             className='flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/20'
             style={{ height: CALENDAR_HEIGHT + 8 }}>
-            <ActivityCalendarCanvas
-              datasWithReports={datasWithReports}
-              onHover={handleHover}
-              onClick={handleDayClick}
-            />
+            {isLoading && datasWithReports.length === 0 ? (
+              <div className='flex gap-[5px]' style={{ height: CALENDAR_HEIGHT }}>
+                {Array.from({ length: 53 }).map((_, col) => (
+                  <div key={col} className='flex flex-col gap-[5px]'>
+                    {Array.from({ length: 7 }).map((_, row) => (
+                      <div
+                        key={row}
+                        className='animate-pulse rounded-[3px] bg-zinc-800'
+                        style={{ width: 14, height: 14 }}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <ActivityCalendarCanvas
+                datasWithReports={datasWithReports}
+                onHover={handleHover}
+                onClick={handleDayClick}
+              />
+            )}
           </div>
         </div>
 
