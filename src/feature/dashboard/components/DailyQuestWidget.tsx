@@ -4,9 +4,20 @@ import { cn } from "assets/lib/utils";
 import { selectDailyQuest } from "feature/user/store/userSlice";
 import { claimQuestRewardAction,initializeDailyQuestAction } from "feature/user/store/userSlice.asyncThunk";
 import { useTranslation } from "hooks/useTranslation";
-import { CheckCircle2, Gift, Swords } from "lucide-react";
+import { ArrowRight, CheckCircle2, Gift, Swords } from "lucide-react";
+import Router from "next/router";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
+import type { DailyQuestTaskType } from "types/api.types";
+
+const questRoutes: Record<DailyQuestTaskType, string> = {
+    rate_song: "/songs?view=library",
+    add_want_to_learn: "/songs?view=management",
+    practice_any_song: "/timer/song-select",
+    healthy_habits: "/report",
+    auto_plan: "/timer/auto",
+    practice_plan: "/timer/plans",
+};
 
 export const DailyQuestWidget = () => {
     const dispatch = useAppDispatch();
@@ -57,13 +68,25 @@ export const DailyQuestWidget = () => {
 
             <div className="space-y-2 mb-4">
                 {dailyQuest.tasks.map((task) => (
-                    <div 
+                    <div
                         key={task.id}
+                        role={!task.isCompleted ? "button" : undefined}
+                        tabIndex={!task.isCompleted ? 0 : undefined}
+                        onClick={() => {
+                            if (!task.isCompleted) {
+                                Router.push(questRoutes[task.type]);
+                            }
+                        }}
+                        onKeyDown={(e) => {
+                            if (!task.isCompleted && (e.key === "Enter" || e.key === " ")) {
+                                Router.push(questRoutes[task.type]);
+                            }
+                        }}
                         className={cn(
                             "flex items-center justify-between p-2.5 rounded-sm transition-all",
-                            task.isCompleted 
-                                ? "bg-zinc-800/40 text-zinc-500" 
-                                : "bg-zinc-800/80 text-zinc-300"
+                            task.isCompleted
+                                ? "bg-zinc-800/40 text-zinc-500"
+                                : "bg-zinc-800/80 text-zinc-300 cursor-pointer hover:bg-zinc-700/80"
                         )}
                     >
                         <span className={cn(
@@ -72,13 +95,16 @@ export const DailyQuestWidget = () => {
                         )}>
                             {task.title}
                         </span>
-                        
+
                         {task.isCompleted ? (
                              <CheckCircle2 size={14} className="text-green-500" />
                         ) : (
-                            <span className="text-[10px] font-bold text-zinc-500">
-                                {task.progress}/{task.target}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-zinc-500">
+                                    {task.progress}/{task.target}
+                                </span>
+                                <ArrowRight size={12} className="text-zinc-600" />
+                            </div>
                         )}
                     </div>
                 ))}
