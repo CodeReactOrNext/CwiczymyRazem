@@ -31,17 +31,11 @@ export const MobileTimerDisplay = ({
           }`}>
               {formattedTimeLeft}
           </div>
-          <div className={`text-[10px] font-bold uppercase tracking-[0.4em] mt-2 ${
-              isPlaying ? "text-cyan-400 animate-pulse" : "text-zinc-600"
-          }`}>
-              {isPlaying ? "Running" : "Paused"}
-          </div>
       </div>
       
       {/* Stats Row */}
       <div className="grid grid-cols-2 gap-4 w-full">
           <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-900/50 border border-white/5">
-             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-1">Active</span>
              <div className="flex items-center gap-2 text-zinc-300">
                  <FaDumbbell className="h-3 w-3 text-white/50" />
                  <span className="text-sm font-mono font-black">{formattedElapsed}</span>

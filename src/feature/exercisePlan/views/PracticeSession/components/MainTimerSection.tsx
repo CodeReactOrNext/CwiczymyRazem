@@ -98,11 +98,6 @@ export const MainTimerSection = ({
                    <div className={`h-1.5 w-1.5 rounded-full transition-all ${
                        isPlaying ? "bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.6)]" : "bg-zinc-600"
                    }`} />
-                   <span className={`text-[10px] uppercase tracking-[0.2em] font-black ${
-                       isPlaying ? "text-cyan-400" : "text-zinc-500"
-                   }`}>
-                        {isPlaying ? t("common:timer_status.active") : t("common:timer_status.paused")}
-                   </span>
                </div>
           </div>
       </div>
@@ -204,12 +199,6 @@ export const MainTimerSection = ({
                       : "bg-zinc-500"
                   }`}
                 />
-                <span
-                  className={`text-[10px] font-black uppercase tracking-widest ${
-                    isPlaying ? "text-cyan-300" : "text-zinc-500"
-                  }`}>
-                  {isPlaying ? t("common:timer_status.active") : t("common:timer_status.paused")}
-                </span>
               </div>
             </div>
           </Card>

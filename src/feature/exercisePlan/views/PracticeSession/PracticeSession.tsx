@@ -1009,6 +1009,12 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                             onClick={() => {
                                               const newMuted = !isAudioMuted;
                                               setIsAudioMuted(newMuted);
+                                              
+                                              // If we are disabling sound while playing, pause everything
+                                              if (newMuted && isPlaying) {
+                                                stopTimer();
+                                              }
+                                              
                                               // If we are enabling sound, reset the current repetition/timer
                                               if (!newMuted) {
                                                 resetTimer();
