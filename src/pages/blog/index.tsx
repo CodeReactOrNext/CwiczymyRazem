@@ -31,7 +31,7 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
         <meta name="twitter:image" content="https://riff.quest/images/og-image.png" />
       </Head>
 
-      <main className="min-h-screen bg-zinc-950 text-zinc-300">
+      <main className="min-h-screen bg-zinc-950 text-zinc-300 overflow-x-hidden">
         <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-zinc-950/90 backdrop-blur-sm">
           <div className="mx-auto flex h-16 max-w-4xl items-center justify-between px-6">
             <Link href="/" className="transition-opacity hover:opacity-70">
@@ -44,11 +44,12 @@ const BlogIndex = ({ blogs }: BlogIndexProps) => {
           </div>
         </nav>
 
-        <div className="pt-32 pb-24 container mx-auto px-4">
+        <div className="pt-32 pb-24 container mx-auto px-4 overflow-x-hidden min-w-0">
           <div className="mb-16 text-center">
-            <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl font-teko uppercase tracking-tight">
+            <h1 className="mb-4 text-4xl font-bold text-white md:text-6xl tracking-tight leading-[1.1]">
               Knowledge and <span className="text-cyan-400">Inspiration</span>
             </h1>
+
             <p className="mx-auto max-w-2xl text-lg text-zinc-400">
               Discover articles that will help you become a better guitarist. From technique to practice psychology.
             </p>
