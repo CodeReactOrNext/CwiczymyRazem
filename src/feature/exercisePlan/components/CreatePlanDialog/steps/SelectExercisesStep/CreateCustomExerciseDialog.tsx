@@ -25,19 +25,23 @@ import type {
 } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
 import { AlignLeft, Clock, Dumbbell, HelpCircle, Image as ImageIcon,List, Plus, Tag, Trash2, Youtube } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 interface CreateCustomExerciseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onExerciseCreate: (exercise: Exercise) => void;
+  initialData?: Exercise;
+  mode?: "create" | "edit" | "clone";
 }
 
 export const CreateCustomExerciseDialog = ({
   open,
   onOpenChange,
   onExerciseCreate,
+  initialData,
+  mode = "create",
 }: CreateCustomExerciseDialogProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const [title, setTitle] = useState("");
@@ -54,6 +58,25 @@ export const CreateCustomExerciseDialog = ({
   const [videoUrl, setVideoUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [isImageValid, setIsImageValid] = useState(true);
+
+  // Effect to reset/initialize when open status changes
+  useEffect(() => {
+    if (open) {
+      if (initialData && (mode === "edit" || mode === "clone")) {
+        setTitle(initialData.title);
+        setDescription(initialData.description);
+        setDuration(initialData.timeInMinutes.toString());
+        setCategory(initialData.category);
+        setDifficulty(initialData.difficulty);
+        setInstructions(initialData.instructions);
+        setTips(initialData.tips);
+        setVideoUrl(initialData.videoUrl || "");
+        setImageUrl(initialData.imageUrl || "");
+      } else if (mode === "create") {
+          resetForm();
+      }
+    }
+  }, [open, initialData, mode]);
 
   const handleAddInstruction = () => {
       if (currentInstruction.trim()) {
@@ -86,7 +109,7 @@ export const CreateCustomExerciseDialog = ({
     }
 
     const newExercise: Exercise = {
-      id: `custom-${Date.now()}`,
+      id: mode === "edit" ? (initialData?.id || `custom-${Date.now()}`) : `custom-${Date.now()}`,
       title: title,
       description: description,
       difficulty,
@@ -102,8 +125,16 @@ export const CreateCustomExerciseDialog = ({
 
     onExerciseCreate(newExercise);
     onOpenChange(false);
+    
+    if (mode === "edit") {
+        toast.success(t("exercises:custom_exercise.edit_success"));
+    } else if (mode === "clone") {
+        toast.success(t("exercises:custom_exercise.clone_success"));
+    } else {
+        toast.success(t("exercises:custom_exercise.created_success"));
+    }
+    
     resetForm();
-    toast.success(t("exercises:custom_exercise.created_success"));
   };
 
   const resetForm = () => {
@@ -126,7 +157,9 @@ export const CreateCustomExerciseDialog = ({
       <SheetContent className="w-full sm:max-w-xl bg-zinc-950 border-l border-white/10 text-zinc-100 flex flex-col h-full p-0">
         <div className="px-6 pt-6 pb-4 border-b border-white/10 shrink-0">
             <SheetHeader>
-                <SheetTitle className="text-xl">{t("exercises:custom_exercise.title")}</SheetTitle>
+                <SheetTitle className="text-xl">
+                    {mode === "edit" ? t("exercises:custom_exercise.edit_button") : t("exercises:custom_exercise.title")}
+                </SheetTitle>
                 <SheetDescription>
                     {t("exercises:custom_exercise.description")}
                 </SheetDescription>
@@ -360,7 +393,7 @@ export const CreateCustomExerciseDialog = ({
                     {t("common:cancel" as any)}
                 </Button>
                 <Button type="submit" form="create-exercise-form" className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200">
-                    {t("common:create" as any)}
+                    {mode === "edit" ? t("exercises:custom_exercise.save_button") : t("common:create" as any)}
                 </Button>
             </SheetFooter>
         </div>

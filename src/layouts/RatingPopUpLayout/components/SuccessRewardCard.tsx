@@ -117,32 +117,21 @@ export const SuccessRewardCard = ({
            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-1">
               Great Progress!
            </h1>
-           <p className="text-[10px] sm:text-[11px] font-medium text-zinc-500">
-              You showed up today and logged your practice.
-           </p>
+           
         </div>
 
         <div className="flex flex-col items-center relative z-10 text-center mb-10">
            <div className="flex items-center gap-4">
               <span className="text-8xl sm:text-9xl font-black text-white tracking-tighter drop-shadow-[0_0_40px_rgba(6,182,212,0.2)] transition-transform group-hover:scale-105 duration-700">{displayedPoints}</span>
-              <div className="flex flex-col items-start">
-                 <span className="text-3xl font-black text-cyan-500 uppercase tracking-tighter leading-none">XP</span>
-                 <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mt-1">Points</span>
-              </div>
+              <span className="text-3xl font-black text-cyan-500 uppercase tracking-tighter leading-none">XP</span>
            </div>
         </div>
         
         <div className='max-w-xl w-full relative z-10 space-y-5'>
             <div className="space-y-4">
                 <div className="flex justify-between items-end px-1">
-                    <div className="space-y-0.5">
-                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-600">Level Progression</span>
-                        <h4 className="text-lg font-bold text-white tracking-tight">Level {currentLevel} <span className="text-zinc-500 mx-2">→</span> {currentLevel+1}</h4>
-                    </div>
-                    <div className="flex flex-col items-end">
-                       <span className="text-xl font-black text-cyan-500 tabular-nums leading-none">{Math.round(currProgressPercent)}%</span>
-                       <span className="text-[8px] font-bold text-zinc-700 uppercase tracking-widest mt-1">to next level</span>
-                    </div>
+                    <h4 className="text-lg font-bold text-white tracking-tight">Level {currentLevel} <span className="text-zinc-500 mx-2">→</span> {currentLevel+1}</h4>
+                    <span className="text-xl font-black text-cyan-500 tabular-nums leading-none">{Math.round(currProgressPercent)}%</span>
                 </div>
                 
                 <div className='relative h-3 w-full rounded-full bg-zinc-950 p-0.5 overflow-hidden border border-white/5'>
