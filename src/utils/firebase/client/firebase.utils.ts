@@ -56,7 +56,15 @@ export const firebaseSignInWithCredential = (credential: any) =>
 export const db = getFirestore(firebaseApp);
 
 if (typeof window !== 'undefined') {
-  enableIndexedDbPersistence(db).catch(() => { });
+  enableIndexedDbPersistence(db, { forceOwnership: true }).catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn("Firestore persistence failed: multiple tabs open or quota exceeded.");
+    } else if (err.code === 'unimplemented') {
+      console.warn("Firestore persistence not supported in this browser.");
+    } else {
+      console.warn("Firestore persistence failed:", err);
+    }
+  });
 }
 
 export const storage = getStorage(firebaseApp);
@@ -171,14 +179,26 @@ export const firebaseReauthenticateUser = async ({
   return null;
 };
 
-export const firebaseGetCurrentUser = (): Promise<import("firebase/auth").User | null> => {
+export const firebaseGetCurrentUser = (
+  timeoutMs = 10000
+): Promise<import("firebase/auth").User | null> => {
   return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      unsubscribe();
+      reject(new Error("Firebase auth state timeout - no response within " + timeoutMs + "ms"));
+    }, timeoutMs);
+
     const unsubscribe = auth.onAuthStateChanged(
       (userAuth) => {
+        clearTimeout(timeout);
         unsubscribe();
         resolve(userAuth);
       },
-      reject
+      (error) => {
+        clearTimeout(timeout);
+        unsubscribe();
+        reject(error);
+      }
     );
   });
 };

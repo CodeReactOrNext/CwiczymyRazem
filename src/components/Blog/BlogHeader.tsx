@@ -57,15 +57,15 @@ export const BlogHeader = ({ title, description, date, image, author, readTime =
           >
             {/* Breadcrumb-ish / Top Meta */}
             <div className="mb-6 flex items-center gap-2 text-sm font-medium text-cyan-400">
-              <Link href="/blog" className="hover:text-cyan-300 transition-colors uppercase tracking-widest text-xs">
+              <Link href="/blog" className="hover:text-cyan-300 transition-colors tracking-widest text-xs">
                 Blog
               </Link>
               <ChevronRight className="h-3 w-3 text-zinc-600" />
-              <span className="text-zinc-400 uppercase tracking-widest text-xs">Article</span>
+              <span className="text-zinc-400 tracking-widest text-xs">Article</span>
             </div>
 
             {/* Title */}
-            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl font-teko uppercase leading-[0.9]">
+            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl leading-[1.1]">
               {title}
             </h1>
             
