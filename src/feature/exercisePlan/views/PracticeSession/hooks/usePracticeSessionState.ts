@@ -27,6 +27,7 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
 
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
   const [reportResult, setReportResult] = useState<ReportDataInterface | null>(null);
+  const [exerciseTimes, setExerciseTimes] = useState<Record<number, number>>({});
 
   const userAuth = useAppSelector(selectUserAuth);
   const { reportList } = useActivityLog(userAuth as string);
@@ -182,7 +183,26 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
     timerProgressValue,
     setShowCompleteDialog,
     setIsImageModalOpen,
-    handleNextExercise: (resetTimerFn: () => void) => baseHandleNextExercise(resetTimerFn, onFinish),
+    handleNextExercise: (resetTimerFn: () => void) => {
+      // Save current time before moving next
+      setExerciseTimes(prev => ({
+        ...prev,
+        [currentExerciseIndex]: timer.time
+      }));
+
+      // In useExerciseNavigation, handleNextExercise calls resetTimerFn()
+      // We will override this by loading the next saved time right after if possible, 
+      // but the base hook is simple. We'll handle the load in an effect or here.
+      baseHandleNextExercise(() => {
+        const nextIndex = currentExerciseIndex + 1;
+        if (nextIndex < plan.exercises.length) {
+          const savedTime = exerciseTimes[nextIndex] || 0;
+          timer.setInitialStartTime(savedTime);
+        } else {
+          resetTimerFn();
+        }
+      }, onFinish);
+    },
     toggleTimer,
     startTimer: timer.startTimer,
     stopTimer: timer.stopTimer,
@@ -203,7 +223,15 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
     exerciseTimeSpent,
     activityDataToUse,
     jumpToExercise: (index: number) => {
-      timer.restartTime();
+      // Save current exercise time
+      setExerciseTimes(prev => ({
+        ...prev,
+        [currentExerciseIndex]: timer.time
+      }));
+
+      // Load target exercise time
+      const savedTime = exerciseTimes[index] || 0;
+      timer.setInitialStartTime(savedTime);
       setCurrentExerciseIndex(index);
     }
   };

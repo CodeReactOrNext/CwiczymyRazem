@@ -5,87 +5,56 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 interface ExerciseProgressProps {
   plan: ExercisePlan;
   currentExerciseIndex: number;
-  formattedTimeLeft: string;
   onExerciseSelect: (index: number) => void;
 }
 
 export const ExerciseProgress = ({
   plan,
   currentExerciseIndex,
-  formattedTimeLeft,
   onExerciseSelect,
 }: ExerciseProgressProps) => {
-  const progressPercentage =
-    ((currentExerciseIndex + 1) / plan.exercises.length) * 100;
-
   return (
-    <div className='flex items-center gap-6 py-2 px-1 relative'>
-      {/* Background line for overall feel */}
-      <div className="absolute inset-x-0 bottom-0 h-px bg-white/5" />
-
-      {/* Progress info */}
-      <div className='flex items-center gap-4 min-w-[120px]'>
-        <div>
-          <h3 className='text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]'>
-            Exercise {currentExerciseIndex + 1}/{plan.exercises.length}
-          </h3>
-          <p className='text-[10px] text-zinc-600 font-bold'>
-            {Math.round(progressPercentage)}% completed
-          </p>
-        </div>
+    <div className='w-full max-w-4xl mx-auto py-4 px-1'>
+      <div className="flex items-center justify-between mb-2 px-1">
+          <span className="text-[12px] font-bold text-white tracking-wide">
+            Session Progress
+          </span>
+          <span className="text-[12px] font-bold text-white tracking-wider">
+            {currentExerciseIndex + 1} <span className="text-white/30">/</span> {plan.exercises.length}
+          </span>
       </div>
+      <div className='flex items-center w-full h-8'>
+        {plan.exercises.map((_, idx) => {
+          const isActive = idx === currentExerciseIndex;
+          const isVisited = idx < currentExerciseIndex;
 
-      {/* Progress bar - takes remaining space */}
-      <div className='flex-1 space-y-1.5'>
-        <div className='relative h-1 w-full overflow-hidden rounded-full bg-zinc-900/50'>
-          {plan.exercises.map((exercise, idx) => {
-            const width = (1 / plan.exercises.length) * 100;
-            const left = (idx / plan.exercises.length) * 100;
-
-            return (
-              <div
-                key={idx}
-                style={{
-                  width: `${width}%`,
-                  left: `${left}%`,
-                }}
-                className={cn(
-                  "absolute h-full transition-all duration-500",
-                  idx < currentExerciseIndex
-                    ? "bg-white"
-                    : idx === currentExerciseIndex
-                    ? "bg-white/70"
-                    : "bg-zinc-800"
-                )}
-              />
-            );
-          })}
-        </div>
-
-        {/* Exercise dots below progress bar */}
-        <div className='flex justify-between px-0.5'>
-          {plan.exercises.map((_, idx) => (
+          return (
             <button
               key={idx}
               onClick={() => onExerciseSelect(idx)}
-              className={cn(
-                "h-2 w-2 rounded-full transition-all duration-300 hover:scale-150 focus:outline-none focus:ring-2 focus:ring-cyan-500/50",
-                idx <= currentExerciseIndex 
-                  ? "bg-white/90 shadow-[0_0_8px_rgba(255,255,255,0.5)]" 
-                  : "bg-zinc-800 hover:bg-zinc-700"
-              )}
+              className="group relative flex-1 h-full px-1.5 focus:outline-none transition-all"
               aria-label={`Go to exercise ${idx + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Time info - compact */}
-      <div className='text-right min-w-[80px]'>
-        <div className='font-mono text-sm font-bold text-white'>
-          {formattedTimeLeft}
-        </div>
-        <div className='text-[9px] text-zinc-600 uppercase tracking-wider font-bold'>remaining</div>
+            >
+              {/* Background slot highlight on hover */}
+              <div className="absolute inset-y-0 inset-x-1.5 rounded-lg bg-white/0 group-hover:bg-white/5 transition-colors" />
+              
+              {/* The Visual Bar */}
+              <div className={cn(
+                "relative h-2.5 w-full rounded-full transition-all duration-300",
+                isActive 
+                  ? "bg-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.7)]" 
+                  : isVisited
+                  ? "bg-zinc-500 hover:bg-zinc-400"
+                  : "bg-zinc-800 hover:bg-zinc-700"
+              )} />
+              
+              {/* Subtle hover tooltip showing exercise number */}
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-zinc-900 border border-white/10 text-[10px] font-black text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                Exercise {idx + 1}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
