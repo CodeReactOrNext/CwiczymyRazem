@@ -57,7 +57,7 @@ export const SessionModalHeader = ({
 
         <div className='relative z-10 mr-6 flex min-w-[52px] items-center gap-2'>
           <Badge variant='outline' className='shadow-sm'>
-            {currentExerciseIndex + 1} z {totalExercises}
+            {currentExerciseIndex + 1} of {totalExercises}
           </Badge>
         </div>
       </div>
