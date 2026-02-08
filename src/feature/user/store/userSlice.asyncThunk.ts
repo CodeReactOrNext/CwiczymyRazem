@@ -105,9 +105,16 @@ export const logInViaEmail = createAsyncThunk(
 
 export const autoLogIn = createAsyncThunk(
   "user/autoLogin",
-  async (user: User) => {
-    const userData = await fetchUserData(user);
-    return userData as UserDataInterface;
+  async (user: User, { rejectWithValue }) => {
+    try {
+      const userData = await fetchUserData(user);
+      return userData as UserDataInterface;
+    } catch (error) {
+      console.error("autoLogIn failed:", error);
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Auto login failed"
+      );
+    }
   }
 );
 

@@ -80,6 +80,8 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
         unreadCount: count,
         hasNewMessages: count > 0
       }));
+    }, (error) => {
+      console.error(`Unread messages listener (${collectionName}) failed:`, error);
     });
 
     return () => unsubscribe();

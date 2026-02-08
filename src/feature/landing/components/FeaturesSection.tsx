@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 import { LandingSongCard } from "./LandingSongCard";
+import Link from "next/link";
 
 export const FeaturesSection = () => {
   const MOCK_SONGS = [
@@ -89,8 +90,9 @@ export const FeaturesSection = () => {
             {/* Top Navigation Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {navigationCards.map((card, i) => (
-                    <div 
+                    <Link 
                         key={i}
+                        href="/signup"
                         className={cn(
                             "group relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/5 bg-zinc-900/40 p-4 shadow-lg transition-all duration-300",
                             "hover:ring-1 hover:ring-white/10"
@@ -122,7 +124,7 @@ export const FeaturesSection = () => {
                             card.color === "green" && "bg-emerald-500",
                             card.color === "amber" && "bg-amber-500"
                         )} />
-                    </div>
+                    </Link>
                 ))}
             </div>
 

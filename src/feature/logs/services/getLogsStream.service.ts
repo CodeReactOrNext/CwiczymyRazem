@@ -33,6 +33,9 @@ export const firebaseGetLogsStream = (
     });
 
     callback(logsArr);
+  }, (error) => {
+    console.error("Logs stream listener failed:", error);
+    callback([]);
   });
 };
 

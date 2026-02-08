@@ -370,6 +370,13 @@ export const userSlice = createSlice({
           }
         }
       })
+      .addCase(autoLogIn.rejected, (state) => {
+        state.isFetching = null;
+        state.userAuth = null;
+        state.userInfo = null;
+        state.currentUserStats = null;
+        state.autoLogInFailed = true;
+      })
 
       .addMatcher(
         isAnyOf(
@@ -420,6 +427,7 @@ export const userSlice = createSlice({
         ),
         (state, action) => {
           state.isFetching = null;
+          state.autoLogInFailed = false;
           state.userInfo = action.payload.userInfo;
           state.currentUserStats = action.payload.currentUserStats;
           state.userAuth = action.payload.userAuth;
@@ -461,5 +469,6 @@ export const selectActiveChallenges = (state: RootState) =>
 export const selectDailyQuest = (state: RootState) =>
   state.user.currentUserStats?.dailyQuest;
 export const selectIsLoggedOut = (state: RootState) => state.user.isLoggedOut;
+export const selectAutoLogInFailed = (state: RootState) => state.user.autoLogInFailed;
 
 export default userSlice.reducer;

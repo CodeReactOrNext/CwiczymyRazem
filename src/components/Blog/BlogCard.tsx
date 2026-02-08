@@ -30,7 +30,7 @@ export const BlogCard = ({ blog }: BlogCardProps) => {
             <span>{format(new Date(blog.date), 'MMM dd, yyyy')}</span>
           </div>
           
-          <h3 className="mb-2 text-2xl font-bold leading-tight group-hover:text-primary font-teko uppercase tracking-wide">
+          <h3 className="mb-2 text-xl font-bold leading-tight group-hover:text-primary tracking-wide">
             {blog.title}
           </h3>
           

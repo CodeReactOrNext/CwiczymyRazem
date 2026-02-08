@@ -25,6 +25,9 @@ export const fetchChatMessages = (
       (doc) => ({ id: doc.id, ...doc.data() } as ChatMessageType)
     );
     callback(messages.reverse());
+  }, (error) => {
+    console.error("Chat messages listener failed:", error);
+    callback([]);
   });
 };
 
