@@ -1,5 +1,6 @@
 
 import { Button } from "assets/components/ui/button";
+import { Checkbox } from "assets/components/ui/checkbox";
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import {
@@ -59,6 +60,11 @@ export const CreateCustomExerciseDialog = ({
   const [imageUrl, setImageUrl] = useState("");
   const [isImageValid, setIsImageValid] = useState(true);
 
+  const [useMetronome, setUseMetronome] = useState(false);
+  const [minBpm, setMinBpm] = useState("60");
+  const [maxBpm, setMaxBpm] = useState("180");
+  const [recommendedBpm, setRecommendedBpm] = useState("80");
+
   // Effect to reset/initialize when open status changes
   useEffect(() => {
     if (open) {
@@ -72,6 +78,15 @@ export const CreateCustomExerciseDialog = ({
         setTips(initialData.tips);
         setVideoUrl(initialData.videoUrl || "");
         setImageUrl(initialData.imageUrl || "");
+        
+        if (initialData.metronomeSpeed) {
+          setUseMetronome(true);
+          setMinBpm(initialData.metronomeSpeed.min.toString());
+          setMaxBpm(initialData.metronomeSpeed.max.toString());
+          setRecommendedBpm(initialData.metronomeSpeed.recommended.toString());
+        } else {
+          setUseMetronome(false);
+        }
       } else if (mode === "create") {
           resetForm();
       }
@@ -117,7 +132,11 @@ export const CreateCustomExerciseDialog = ({
       timeInMinutes: parseInt(duration) || 5,
       instructions: instructions,
       tips: tips,
-      metronomeSpeed: null,
+      metronomeSpeed: useMetronome ? {
+        min: parseInt(minBpm) || 60,
+        max: parseInt(maxBpm) || 180,
+        recommended: parseInt(recommendedBpm) || 80,
+      } : null,
       relatedSkills: [],
       videoUrl: videoUrl.trim() || null,
       imageUrl: imageUrl.trim() || null,
@@ -150,6 +169,10 @@ export const CreateCustomExerciseDialog = ({
       setVideoUrl("");
       setImageUrl("");
       setIsImageValid(true);
+      setUseMetronome(false);
+      setMinBpm("60");
+      setMaxBpm("180");
+      setRecommendedBpm("80");
   };
 
   return (
@@ -297,6 +320,57 @@ export const CreateCustomExerciseDialog = ({
                         </SelectContent>
                     </Select>
                 </div>
+            </div>
+
+            {/* Metronome Settings */}
+            <div className="space-y-4 p-5 bg-zinc-900/30 rounded-xl border border-white/5">
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="metronome" className="flex items-center gap-2 text-zinc-300 font-medium">
+                        <Clock className="h-4 w-4 text-cyan-500" />
+                        {t("exercises:custom_exercise.use_metronome", { defaultValue: "Use Metronome" })}
+                    </Label>
+                    <Checkbox 
+                        id="metronome" 
+                        checked={useMetronome} 
+                        onCheckedChange={(checked) => setUseMetronome(!!checked)}
+                        className="border-zinc-700 data-[state=checked]:bg-cyan-500 data-[state=checked]:border-cyan-500"
+                    />
+                </div>
+
+                {useMetronome && (
+                    <div className="grid grid-cols-3 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="space-y-2">
+                            <Label htmlFor="minBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Min BPM</Label>
+                            <Input
+                                id="minBpm"
+                                type="number"
+                                value={minBpm}
+                                onChange={(e) => setMinBpm(e.target.value)}
+                                className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 h-9 text-sm"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="maxBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Max BPM</Label>
+                            <Input
+                                id="maxBpm"
+                                type="number"
+                                value={maxBpm}
+                                onChange={(e) => setMaxBpm(e.target.value)}
+                                className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 h-9 text-sm"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="recBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Rec. BPM</Label>
+                            <Input
+                                id="recBpm"
+                                type="number"
+                                value={recommendedBpm}
+                                onChange={(e) => setRecommendedBpm(e.target.value)}
+                                className="bg-zinc-900 border-zinc-800 focus:ring-cyan-500/50 h-9 text-sm"
+                            />
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Instructions */}
