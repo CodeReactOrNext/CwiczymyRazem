@@ -100,8 +100,8 @@ export const SelectExercisesStep = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <div className="lg:col-span-4 sticky top-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <div className="lg:col-span-5 sticky top-6 min-w-0">
           <SelectedExercisesList
             selectedExercises={selectedExercises}
             onToggleExercise={handleExerciseToggle}
@@ -110,7 +110,7 @@ export const SelectExercisesStep = ({
           />
         </div>
 
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-7 space-y-6 min-w-0">
           <ExerciseFilters
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}

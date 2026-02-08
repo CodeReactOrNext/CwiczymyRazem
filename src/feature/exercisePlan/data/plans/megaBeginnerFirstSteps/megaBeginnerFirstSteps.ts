@@ -1,6 +1,8 @@
 import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
 import { stringRepetitionExercise } from "feature/exercisePlan/data/exerises/stringRepetition/stringRepetition";
 import { spiderChromaticsExercise } from "feature/exercisePlan/data/exerises/spiderChromatics/spiderChromatics";
+import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
+
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -13,7 +15,9 @@ export const megaBeginnerFirstStepsPlan: ExercisePlan = {
   exercises: [
     openGRepetitionExercise,
     stringRepetitionExercise,
-    spiderChromaticsExercise
+    spiderChromaticsExercise,
+    randomNoteHuntExercise,
+
   ],
   userId: "system",
   image: null, // Image will be added once approved or handled

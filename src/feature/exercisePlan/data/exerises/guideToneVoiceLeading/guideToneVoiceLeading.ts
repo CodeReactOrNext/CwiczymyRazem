@@ -5,7 +5,7 @@ export const guideToneVoiceLeadingExercise: Exercise = {
   title: "Guide Tone Voice-Leading Drill",
   description:
     "Exercise focused on voice leading and harmonic awareness by using only guide tones (3rds and 7ths) to outline chord progressions with minimal melodic movement.",
-  difficulty: "medium",
+  difficulty: "hard",
   category: "theory",
   timeInMinutes: 10,
   instructions: [
