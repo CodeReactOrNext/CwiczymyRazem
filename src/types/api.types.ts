@@ -153,6 +153,7 @@ export interface userSliceInitialState {
     timestamp: number;
   } | null;
   isLoggedOut: true | null;
+  autoLogInFailed?: boolean;
   currentUserStats: StatisticsDataInterface | null;
   previousUserStats: StatisticsDataInterface | null;
   raitingData: ReportDataInterface | null;
