@@ -12,7 +12,7 @@ export const warmUp30MinutesPlan: ExercisePlan = {
   id: "warm_up_30_minutes",
   title: "Warm-up - 30 Minutes",
   description: "Basic 30-minute warm-up before your main practice session",
-  difficulty: "easy",
+  difficulty: "medium",
   category: "technique",
   exercises: [
     spiderXExercise,

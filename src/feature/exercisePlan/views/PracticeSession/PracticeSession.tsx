@@ -654,6 +654,30 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                         {currentExercise.title}
                     </h2>
 
+                    {currentExercise.customGoal && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        key={currentExercise.customGoal}
+                        className="mb-12 flex flex-col items-center gap-4"
+                      >
+                         <div className="relative group">
+                            <div className="absolute -inset-8 bg-cyan-500/20 blur-[40px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
+                            <div className="relative w-32 h-32 rounded-3xl bg-zinc-900/80 border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+                                <span className="text-6xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+                                    {currentExercise.customGoal}
+                                </span>
+                            </div>
+                         </div>
+                         {currentExercise.customGoalDescription && (
+                           <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-2">
+                              {currentExercise.customGoalDescription}
+                           </p>
+                         )}
+                      </motion.div>
+                    )}
+
                     {/* Simple Challenge Banner */}
                     {(plan as any).streakDays && (
                       <motion.div 

@@ -51,6 +51,8 @@ export interface Exercise {
     url: string;
   }[];
   tablature?: TablatureMeasure[];
+  customGoal?: string;
+  customGoalDescription?: string;
 }
 
 export interface ExercisePlan {

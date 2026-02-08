@@ -228,7 +228,7 @@ const SessionModal = ({
                       })()}
                     </div>
                   </div>
-                ) : (currentExercise.imageUrl || currentExercise.image) && (
+                ) : (currentExercise.imageUrl || currentExercise.image) ? (
                   <div
                     className='relative mb-4 w-full cursor-pointer overflow-hidden rounded-xl border border-muted/30 bg-white/5 shadow-md backdrop-blur-[1px] transition-all duration-200 hover:shadow-lg'
                     onClick={onImageClick}>
@@ -246,12 +246,36 @@ const SessionModal = ({
                           variant='secondary'
                           size='sm'
                           className='pointer-events-none opacity-90 shadow-lg'>
-                          <span className='mr-2'>Powiększ</span>
+                          <span className='mr-2'>Zoom</span>
                           <FaExpand className='h-4 w-4' />
                         </Button>
                       </div>
                     </div>
                   </div>
+                ) : null}
+
+                {currentExercise.customGoal && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    key={currentExercise.customGoal}
+                    className="mb-8 flex flex-col items-center gap-3"
+                  >
+                     <div className="relative group">
+                        <div className="absolute -inset-6 bg-cyan-500/20 blur-[30px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
+                        <div className="relative w-24 h-24 rounded-2xl bg-zinc-900/80 border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+                            <span className="text-5xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+                                {currentExercise.customGoal}
+                            </span>
+                        </div>
+                     </div>
+                     {currentExercise.customGoalDescription && (
+                       <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                          {currentExercise.customGoalDescription}
+                       </p>
+                     )}
+                  </motion.div>
                 )}
 
                 {currentExercise.spotifyId && (
