@@ -1,4 +1,4 @@
-import { selectCurrentUserStats, selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
+import { selectAutoLogInFailed, selectCurrentUserStats, selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import type { LandingNavObjectInterface } from "layouts/MainLoggedLayout/components/LandingNav";
 import MainLoggedLayout from "layouts/MainLoggedLayout/MainLoggedLayout";
@@ -33,6 +33,7 @@ const AppLayout = ({
   const userStats = useAppSelector(selectCurrentUserStats);
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
+  const autoLogInFailed = useAppSelector(selectAutoLogInFailed);
 
   const isAuthenticated = !!(userAuth && userStats && userName);
 
@@ -41,6 +42,13 @@ const AppLayout = ({
       router.push("/");
     }
   }, [status, router, isPublic]);
+
+  // If auto login failed, redirect to home instead of showing spinner forever
+  useEffect(() => {
+    if (autoLogInFailed && !isAuthenticated && !isPublic) {
+      router.push("/");
+    }
+  }, [autoLogInFailed, isAuthenticated, isPublic, router]);
 
   const navigation: LandingNavObjectInterface = {
     leftSideLinks: [

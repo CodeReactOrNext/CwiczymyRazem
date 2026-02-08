@@ -3,7 +3,6 @@ import {
   selectUserAuth,
   updateLocalTimer,
 } from "feature/user/store/userSlice";
-import { autoLogIn } from "feature/user/store/userSlice.asyncThunk";
 import Router from "next/router";
 import { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -30,9 +29,8 @@ const useAutoLogIn = (props: useAutoLogInProps) => {
         );
       }
     }
-    if (user && !isUserLoggedIn && !isLoggedOut) {
-      dispatch(autoLogIn(user));
-    }
+    // autoLogIn is now handled globally by useAuthSync in _app.tsx
+    // This hook only handles redirects
     if (user && isUserLoggedIn && !loading && props?.redirects?.loggedIn) {
       Router.push(props.redirects.loggedIn);
     }
