@@ -9,11 +9,11 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
   const lastTickRef = useRef<number | null>(null);
   const [exerciseTimeSpent, setExerciseTimeSpent] = useState(0);
 
-  // Reset exercise-specific time when the exercise changes
+  // Sync exercise-specific time display with the timer
   useEffect(() => {
-    setExerciseTimeSpent(0);
+    setExerciseTimeSpent(timer.time);
     lastTickRef.current = null;
-  }, [currentExercise.id]);
+  }, [currentExercise.id, timer.time === 0]);
 
   useEffect(() => {
     if (!timer.timerEnabled) {

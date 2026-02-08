@@ -41,6 +41,7 @@ interface SessionModalProps {
   formattedTimeLeft: string;
   toggleTimer: () => void;
   handleNextExercise: () => void;
+  handleBackExercise: () => void;
   sessionTimerData: any;
   exerciseTimeSpent: number;
   setVideoDuration: (duration: number) => void;
@@ -79,6 +80,7 @@ const SessionModal = ({
   formattedTimeLeft,
   toggleTimer,
   handleNextExercise,
+  handleBackExercise,
   sessionTimerData,
   exerciseTimeSpent,
   setVideoDuration,
@@ -125,6 +127,13 @@ const SessionModal = ({
       metronome.toggleMetronome();
     }
     handleNextExercise();
+  };
+
+  const handleBackExerciseClick = () => {
+    if (metronome.isPlaying) {
+      metronome.toggleMetronome();
+    }
+    handleBackExercise();
   };
 
   const mobileFeedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
@@ -513,6 +522,8 @@ const SessionModal = ({
               onFinish={onFinish}
               toggleTimer={handleToggleTimer}
               handleNextExercise={handleNextExerciseClick}
+              handleBackExercise={handleBackExerciseClick}
+              currentExerciseIndex={currentExerciseIndex}
               isFinishing={isFinishing}
               isSubmittingReport={isSubmittingReport}
               canSkipExercise={canSkipExercise}
