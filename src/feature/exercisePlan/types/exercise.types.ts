@@ -25,6 +25,13 @@ export interface TablatureMeasure {
   timeSignature: [number, number]; // e.g. [4, 4]
 }
 
+export interface ExerciseRiddleConfig {
+  mode: 'sequenceRepeat'; // Expandable for future modes
+  difficulty: 'easy' | 'medium' | 'hard';
+  noteCount: number;
+  range?: { minFret: number; maxFret: number; strings: number[] };
+}
+
 export interface Exercise {
   id: string;
   title: LocalizedContent;
@@ -53,6 +60,7 @@ export interface Exercise {
   tablature?: TablatureMeasure[];
   customGoal?: string;
   customGoalDescription?: string;
+  riddleConfig?: ExerciseRiddleConfig;
 }
 
 export interface ExercisePlan {
