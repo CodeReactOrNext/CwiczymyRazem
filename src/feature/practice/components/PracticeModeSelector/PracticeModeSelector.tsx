@@ -67,7 +67,7 @@ export const PracticeModeSelector = ({
     {
       id: "timer" as const,
       icon: FaClock,
-      title: "Standard Practice",
+      title: "Practice with timer",
       description: "Start the timer and practice freely.",
       colors: colorClasses.indigo,
     },
