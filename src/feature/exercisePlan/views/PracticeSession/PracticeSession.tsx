@@ -46,6 +46,9 @@ import { useCalibration } from "./hooks/useCalibration";
 import { MicModeDialog } from "./components/MicModeDialog";
 import { CalibrationChoiceDialog } from "./components/CalibrationChoiceDialog";
 import { CalibrationWizard } from "./components/CalibrationWizard";
+import { generateRiddle } from "feature/exercisePlan/logic/riddleGenerator";
+import { EarTrainingView } from "./components/EarTrainingView";
+import type { TablatureMeasure } from "../../types/exercise.types";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
@@ -101,21 +104,64 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
   const [isAudioMuted, setIsAudioMuted] = useState(true);
 
+  // --- Ear Training / Riddle State ---
+  const [riddleMeasures, setRiddleMeasures] = useState<TablatureMeasure[] | null>(null);
+  const [isRiddleRevealed, setIsRiddleRevealed] = useState(false);
+  const [earTrainingScore, setEarTrainingScore] = useState(0);
+  const [hasPlayedRiddleOnce, setHasPlayedRiddleOnce] = useState(false);
+
+  useEffect(() => {
+    if (currentExercise.riddleConfig) {
+       // Generate new riddle when exercise changes
+       setRiddleMeasures(generateRiddle(currentExercise.riddleConfig));
+       setIsRiddleRevealed(false);
+       setHasPlayedRiddleOnce(false); // Reset
+       setIsAudioMuted(false); 
+       
+       if (metronome.bpm !== 108) metronome.setBpm(108);
+    } else {
+       setRiddleMeasures(null); 
+    }
+  }, [currentExercise.id, currentExercise.riddleConfig]); // Use ID to trigger on exercise change
+
+  const activeTablature = riddleMeasures || currentExercise.tablature;
+
+  const handleNextRiddle = () => {
+    if (currentExercise.riddleConfig) {
+      setRiddleMeasures(generateRiddle(currentExercise.riddleConfig));
+      setIsRiddleRevealed(false);
+      setHasPlayedRiddleOnce(false); // Reset on next riddle
+
+      // Restart audio securely
+      if (metronome.isPlaying) {
+         metronome.stopMetronome();
+      }
+      setTimeout(() => {
+          metronome.startMetronome();
+      }, 100);
+    }
+  };
+
+  const handleRevealRiddle = () => setIsRiddleRevealed(true);
+  // -----------------------------------
+
   // Metronome State
   const metronome = useDeviceMetronome({
     initialBpm: currentExercise.metronomeSpeed?.recommended || 60,
     minBpm: currentExercise.metronomeSpeed?.min,
     maxBpm: currentExercise.metronomeSpeed?.max,
-    recommendedBpm: currentExercise.metronomeSpeed?.recommended
+    recommendedBpm: currentExercise.metronomeSpeed?.recommended,
+    isMuted: isAudioMuted 
   });
 
   // Audio Playback
   useTablatureAudio({
-    measures: currentExercise.tablature,
+    measures: activeTablature,
     bpm: metronome.bpm,
-    isPlaying: metronome.isPlaying && !!metronome.startTime,
-    startTime: metronome.startTime || null,
-    isMuted: isAudioMuted
+    isPlaying: metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime, // Only play when count-in finished
+    startTime: metronome.startTime,
+    isMuted: isAudioMuted,
+    onLoopComplete: () => setHasPlayedRiddleOnce(true)
   });
 
   const {
@@ -127,7 +173,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   } = useImageHandling();
 
   const planHasTablature = useMemo(
-    () => plan.exercises.some(ex => ex.tablature && ex.tablature.length > 0),
+    () => plan.exercises.some(ex => (ex.tablature && ex.tablature.length > 0) || ex.riddleConfig),
     [plan.exercises]
   );
 
@@ -165,7 +211,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const category = currentExercise.category || "mixed";
 
   const handleToggleTimer = () => {
-    if (currentExercise.tablature && currentExercise.metronomeSpeed) {
+    if ((activeTablature && activeTablature.length > 0) && currentExercise.metronomeSpeed) {
       toggleTimer(metronome.toggleMetronome);
     } else {
       toggleTimer();
@@ -286,11 +332,11 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const needsFlushRef = useRef(false);
 
   const totalNotes = useMemo(() => {
-    if (!currentExercise.tablature) return 0;
-    return currentExercise.tablature.reduce((acc, m) =>
+    if (!activeTablature) return 0;
+    return activeTablature.reduce((acc, m) =>
       acc + m.beats.reduce((acc2, b) => acc2 + b.notes.length, 0), 0
     );
-  }, [currentExercise.tablature]);
+  }, [activeTablature]);
 
   useEffect(() => {
     setHitNotes({});
@@ -330,9 +376,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
   // Note matching via requestAnimationFrame — reads real-time values from refs
   useEffect(() => {
-    if (!isPlaying || !metronome.startTime || !currentExercise.tablature || !isMicEnabled) return;
+    if (!isPlaying || !metronome.startTime || !activeTablature || !isMicEnabled) return;
 
-    const tablature = currentExercise.tablature;
+    const tablature = activeTablature;
     const totalExBeats = tablature.reduce((acc, m) =>
       acc + m.beats.reduce((acc2, b) => acc2 + b.duration, 0), 0
     );
@@ -472,17 +518,17 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     return () => {
       cancelAnimationFrame(rafIdRef.current);
     };
-  }, [isPlaying, metronome.startTime, metronome.bpm, currentExercise.tablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq]);
+  }, [isPlaying, metronome.startTime, metronome.bpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq]);
 
   // Pass progress for gray-out effect
   const beatsPerSecond = metronome.bpm / 60;
   const elapsedSeconds = (isPlaying && metronome.startTime) ? (Date.now() - metronome.startTime) / 1000 : 0;
   const totalExerciseBeats = useMemo(() => {
-    if (!currentExercise.tablature) return 0;
-    return currentExercise.tablature.reduce((acc, m) => 
+    if (!activeTablature) return 0;
+    return activeTablature.reduce((acc, m) => 
       acc + m.beats.reduce((acc2, b) => acc2 + b.duration, 0), 0
     );
-  }, [currentExercise.tablature]);
+  }, [activeTablature]);
   
   const currentBeatsElapsed = totalExerciseBeats > 0 ? (elapsedSeconds * beatsPerSecond) % totalExerciseBeats : 0;
 
@@ -862,9 +908,29 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                       "relative w-full overflow-hidden radius-premium bg-zinc-900 shadow-2xl",
                       currentExercise.isPlayalong ? "" : "border border-white/10 glass-card"
                     )}>
-                         {currentExercise.tablature && currentExercise.tablature.length > 0 ? (
+                        {/* Ear Training View */}
+                        {currentExercise.riddleConfig && (
+                            <div className="p-4 border-b border-white/5">
+                                <EarTrainingView 
+                                    difficulty={currentExercise.riddleConfig.difficulty}
+                                    isRevealed={isRiddleRevealed}
+                                    isPlaying={isPlaying}
+                                    onPlayRiddle={handleToggleTimer}
+                                    onReveal={handleRevealRiddle}
+                                    onNextRiddle={handleNextRiddle}
+                                    onGuessed={() => {
+                                      setEarTrainingScore(s => s + 1);
+                                      handleNextRiddle();
+                                    }}
+                                    score={earTrainingScore}
+                                    canGuess={hasPlayedRiddleOnce}
+                                />
+                            </div>
+                        )}
+
+                         {(activeTablature && activeTablature.length > 0 && (!currentExercise.riddleConfig || isRiddleRevealed)) ? (
                            <TablatureViewer
-                              measures={currentExercise.tablature}
+                              measures={activeTablature}
                               bpm={metronome.bpm}
                               isPlaying={metronome.isPlaying}
                               startTime={metronome.startTime || null}
@@ -1004,8 +1070,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                             size="sm"
                                             className={cn(
                                               "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
-                                              isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
+                                              isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10",
+                                              currentExercise.riddleConfig && "opacity-50 cursor-not-allowed" // Disable button if forced on
                                             )}
+                                            disabled={!!currentExercise.riddleConfig} // Disable if Ear Training
                                             onClick={() => {
                                               const newMuted = !isAudioMuted;
                                               setIsAudioMuted(newMuted);
