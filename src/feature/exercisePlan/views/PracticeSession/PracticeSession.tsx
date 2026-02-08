@@ -1110,8 +1110,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                  variant="ghost"
                                  loading={isFinishing || isSubmittingReport}
                                  className={cn(
-                                 "radius-premium font-black text-[10px] tracking-[0.2em] transition-all click-behavior uppercase text-zinc-500 hover:text-white",
-                                 isLastExercise && "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black",
+                                 "radius-premium font-black text-[11px] tracking-[0.1em] transition-all click-behavior uppercase",
+                                 isLastExercise ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black" : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
                                  !canSkipExercise && "opacity-50 cursor-not-allowed"
                                  )}
                                  onClick={() => {

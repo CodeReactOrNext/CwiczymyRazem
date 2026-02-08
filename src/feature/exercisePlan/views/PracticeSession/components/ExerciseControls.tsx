@@ -42,7 +42,7 @@ const ExerciseControls = ({
     <div className={containerClasses}>
       <div className="relative">
         {!isPlaying && (
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 whitespace-nowrap animate-bounce pointer-events-none">
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 whitespace-nowrap animate-bounce pointer-events-none z-[60]">
             <div className="bg-cyan-500 text-black px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider shadow-lg shadow-cyan-500/50">
               ▶ Press PLAY to Start
             </div>
