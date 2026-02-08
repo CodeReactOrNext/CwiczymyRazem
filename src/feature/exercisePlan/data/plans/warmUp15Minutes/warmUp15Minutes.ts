@@ -10,7 +10,7 @@ export const warmUp15MinutesPlan: ExercisePlan = {
   id: "warm_up_15_minutes",
   title: "Warm-up - 15 Minutes",
   description: "Basic 15-minute warm-up before your main practice session",
-  difficulty: "easy",
+  difficulty: "medium",
   category: "technique",
   exercises: [
     jpStretching,

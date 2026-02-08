@@ -73,6 +73,8 @@ import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/sp
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
 import { spiderPermutation1234Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1234/spiderPermutation1234";
+import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
+
 
 export const exercisesAgregat: Exercise[] = [
   spiderOneStringExercise,
@@ -110,6 +112,8 @@ export const exercisesAgregat: Exercise[] = [
   singWhatYouPlayExercise,
   openGRepetitionExercise,
   stringRepetitionExercise,
+  randomNoteHuntExercise,
+
 
   spiderPermutation1234Exercise,
   spiderPermutation1243Exercise,
