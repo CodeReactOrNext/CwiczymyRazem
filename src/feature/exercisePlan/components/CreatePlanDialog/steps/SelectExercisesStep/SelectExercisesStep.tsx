@@ -24,78 +24,117 @@ export const SelectExercisesStep = ({
 }: SelectExercisesStepProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const [isCustomExerciseDialogOpen, setIsCustomExerciseDialogOpen] = useState(false);
+  const [editingExercise, setEditingExercise] = useState<Exercise | undefined>(undefined);
+  const [customExerciseMode, setCustomExerciseMode] = useState<"create" | "edit" | "clone">("create");
 
   const {
     searchQuery,
     selectedCategory,
+    selectedDifficulty,
     groupedExercises,
     filteredExercises,
     handleExerciseToggle,
     setSearchQuery,
     setSelectedCategory,
+    setSelectedDifficulty,
   } = useExerciseSelection({
     selectedExercises,
     onExercisesSelect,
   });
 
   const handleCustomExerciseCreate = (exercise: Exercise) => {
-    onExercisesSelect([...selectedExercises, exercise]);
+    if (customExerciseMode === "edit") {
+        onExercisesSelect(selectedExercises.map(e => e.id === exercise.id ? exercise : e));
+    } else {
+        onExercisesSelect([...selectedExercises, exercise]);
+    }
+  };
+
+  const handleEditExercise = (exercise: Exercise) => {
+      setEditingExercise(exercise);
+      setCustomExerciseMode("edit");
+      setIsCustomExerciseDialogOpen(true);
+  };
+
+  const handleCloneExercise = (exercise: Exercise) => {
+      setEditingExercise(exercise);
+      setCustomExerciseMode("clone");
+      setIsCustomExerciseDialogOpen(true);
+  };
+
+  const handleCreateCustomOpen = () => {
+      setEditingExercise(undefined);
+      setCustomExerciseMode("create");
+      setIsCustomExerciseDialogOpen(true);
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className='space-y-6'>
-      <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
-        <div>
-          <h2 className='text-2xl font-bold'>
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className='space-y-8'>
+      <div className='flex flex-col gap-6 sm:flex-row sm:items-end justify-between border-b border-white/5 pb-6'>
+        <div className="space-y-1">
+          <h2 className='text-3xl font-black tracking-tighter text-zinc-100'>
             {t("exercises:my_plans.create_dialog.exercises")}
           </h2>
-          <p className='mt-2 text-sm text-muted-foreground'>
+          <p className='text-sm text-zinc-500 font-medium max-w-md leading-relaxed'>
             {t("exercises:my_plans.create_dialog.select_exercises_description")}
           </p>
         </div>
-        <div className='flex items-center gap-3'>
+        <div className='flex items-center gap-3 shrink-0'>
           <Button
-            onClick={() => setIsCustomExerciseDialogOpen(true)}
+            onClick={handleCreateCustomOpen}
             variant="outline"
-            className='whitespace-nowrap'>
-            <FaPlus className="mr-2 h-4 w-4" />
+            className='bg-zinc-900/50 border-white/10 hover:bg-zinc-800 hover:border-cyan-500/50 hover:text-cyan-400 transition-all gap-2 h-11 px-5 font-bold tracking-tight'>
+            <FaPlus className="h-3.5 w-3.5" />
             {t("exercises:custom_exercise.button_label")}
           </Button>
           <Button
             onClick={onNext}
-            disabled={selectedExercises.length === 0}>
+            disabled={selectedExercises.length === 0}
+            className="h-11 px-8 bg-white text-black hover:bg-zinc-200 font-bold tracking-widest transition-all disabled:opacity-50">
             {t("common:next")}
           </Button>
         </div>
       </div>
 
-      <SelectedExercisesList
-        selectedExercises={selectedExercises}
-        onToggleExercise={handleExerciseToggle}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="lg:col-span-4 sticky top-6">
+          <SelectedExercisesList
+            selectedExercises={selectedExercises}
+            onToggleExercise={handleExerciseToggle}
+            onEditExercise={handleEditExercise}
+            onCloneExercise={handleCloneExercise}
+          />
+        </div>
 
-      <ExerciseFilters
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        groupedExercises={groupedExercises}
-      />
+        <div className="lg:col-span-8 space-y-6">
+          <ExerciseFilters
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            selectedDifficulty={selectedDifficulty}
+            onDifficultyChange={setSelectedDifficulty}
+            groupedExercises={groupedExercises}
+          />
 
-      <ExerciseGrid
-        exercises={filteredExercises}
-        selectedExercises={selectedExercises}
-        onToggleExercise={handleExerciseToggle}
-      />
+          <ExerciseGrid
+            exercises={filteredExercises}
+            selectedExercises={selectedExercises}
+            onToggleExercise={handleExerciseToggle}
+          />
+        </div>
+      </div>
 
       <CreateCustomExerciseDialog 
         open={isCustomExerciseDialogOpen} 
         onOpenChange={setIsCustomExerciseDialogOpen} 
         onExerciseCreate={handleCustomExerciseCreate}
+        initialData={editingExercise}
+        mode={customExerciseMode}
       />
     </motion.div>
   );

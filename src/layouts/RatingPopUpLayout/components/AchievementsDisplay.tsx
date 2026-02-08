@@ -28,7 +28,7 @@ export const AchievementsDisplay = ({ achievements }: AchievementsDisplayProps) 
               <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
                   <Trophy className="h-4 w-4 text-amber-500" />
               </div>
-              <h3 className='text-[10px] font-black uppercase tracking-[0.3em] text-amber-500/80'>
+              <h3 className='text-sm font-semibold text-amber-500/80'>
                 {t("report:rating_popup.new_achievements")}
               </h3>
           </div>

@@ -1,7 +1,12 @@
 import { Card } from "assets/components/ui/card";
+import CreativityIcon from "components/Icon/CreativityIcon";
+import HearingIcon from "components/Icon/HearingIcon";
+import TechniqueIcon from "components/Icon/TechniqueIcon";
+import TheoryIcon from "components/Icon/TheoryIcon";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { Activity, BookOpen, Clock, Headphones, Minus,Sparkles, TrendingDown, TrendingUp } from "lucide-react";
+import { Clock, Minus, Sparkles, TrendingDown, TrendingUp } from "lucide-react";
+import type { ComponentType } from "react";
 import { convertMsToHM } from "utils/converter";
 
 interface SessionStatsProps {
@@ -34,15 +39,15 @@ export const SessionStats = ({
     return `${mins}m`;
   };
 
-  const performanceDiff = averageWeeklyTime > 0 
-    ? ((todayTotalTime - averageWeeklyTime) / averageWeeklyTime) * 100 
+  const performanceDiff = averageWeeklyTime > 0
+    ? ((todayTotalTime - averageWeeklyTime) / averageWeeklyTime) * 100
     : 0;
 
-  const practiceCategories = [
-    { key: "technique", label: t("timer:technique"), value: breakdown?.technique || 0, icon: Activity, color: "text-amber-400", bg: "bg-amber-400/10" },
-    { key: "hearing", label: t("timer:hearing"), value: breakdown?.hearing || 0, icon: Headphones, color: "text-cyan-400", bg: "bg-cyan-400/10" },
-    { key: "theory", label: t("timer:theory"), value: breakdown?.theory || 0, icon: BookOpen, color: "text-purple-400", bg: "bg-purple-400/10" },
-    { key: "creativity", label: t("timer:creativity"), value: breakdown?.creativity || 0, icon: Sparkles, color: "text-emerald-400", bg: "bg-emerald-400/10" },
+  const practiceCategories: { key: string; label: string; value: number; icon: ComponentType<{ className?: string; size?: "small" | "medium" | "large" }>; color: string; bg: string }[] = [
+    { key: "technique", label: t("timer:technique"), value: breakdown?.technique || 0, icon: TechniqueIcon, color: "text-amber-400", bg: "bg-amber-400/10" },
+    { key: "hearing", label: t("timer:hearing"), value: breakdown?.hearing || 0, icon: HearingIcon, color: "text-cyan-400", bg: "bg-cyan-400/10" },
+    { key: "theory", label: t("timer:theory"), value: breakdown?.theory || 0, icon: TheoryIcon, color: "text-purple-400", bg: "bg-purple-400/10" },
+    { key: "creativity", label: t("timer:creativity"), value: breakdown?.creativity || 0, icon: CreativityIcon, color: "text-emerald-400", bg: "bg-emerald-400/10" },
   ].filter(cat => cat.value > 0);
 
   return (
@@ -59,13 +64,13 @@ export const SessionStats = ({
 
         <div className='p-8'>
           <div className="mb-10">
-              <h3 className='text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-2'>{t("timer:practice_session")}</h3>
+              <h3 className='text-sm font-semibold text-zinc-400 mb-2'>{t("timer:practice_session")}</h3>
               <div className="flex items-baseline gap-4">
                 <span className="text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{convertMsToHM(time)}</span>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5" title="vs. weekly average">
                     {performanceDiff > 5 ? <TrendingUp className="h-3.5 w-3.5 text-emerald-400" /> : performanceDiff < -5 ? <TrendingDown className="h-3.5 w-3.5 text-orange-400" /> : <Minus className="h-3.5 w-3.5 text-zinc-500" />}
                     <span className={`text-[11px] font-black ${performanceDiff > 5 ? 'text-emerald-400' : performanceDiff < -5 ? 'text-orange-400' : 'text-zinc-500'}`}>
-                        {Math.abs(performanceDiff).toFixed(0)}%
+                        {Math.abs(performanceDiff).toFixed(0)}% vs avg
                     </span>
                 </div>
               </div>
@@ -73,34 +78,23 @@ export const SessionStats = ({
 
           <div className="grid gap-6">
              {practiceCategories.map((cat, index) => (
-                <motion.div 
+                <motion.div
                     key={cat.key}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 + (index * 0.1) }}
                     className="group"
                 >
-                    <div className="flex items-center justify-between mb-3 px-1">
+                    <div className="flex items-center justify-between px-1">
                         <div className="flex items-center gap-4">
                             <div className={`h-10 w-10 rounded-lg ${cat.bg} flex items-center justify-center border-none group-hover:scale-110 transition-transform duration-300`}>
-                                <cat.icon className={`h-5 w-5 ${cat.color}`} />
+                                <cat.icon className={`${cat.color}`} size="large" />
                             </div>
-                            <div className="flex flex-col">
-                                <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest leading-none mb-1.5">{cat.key}</span>
-                                <span className="text-sm font-bold text-zinc-200 uppercase tracking-tight">{cat.label}</span>
-                            </div>
+                            <span className="text-sm font-bold text-zinc-200 uppercase tracking-tight">{cat.label}</span>
                         </div>
                         <div className="text-right">
                             <span className="text-base font-black text-white">{formatMs(cat.value)}</span>
                         </div>
-                    </div>
-                    <div className="relative h-1 w-full bg-white/[0.04] rounded-full overflow-hidden">
-                        <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            transition={{ duration: 1.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                            className={`h-full bg-gradient-to-r from-transparent via-white/20 to-white/60 opacity-20`}
-                        />
                     </div>
                 </motion.div>
              ))}

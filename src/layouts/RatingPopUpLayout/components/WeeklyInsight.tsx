@@ -49,23 +49,16 @@ export function WeeklyInsight({ activityData }: WeeklyInsightProps) {
         <div className='p-6'>
           <div className="flex items-center justify-between mb-6">
               <div className="space-y-1">
-                  <div className="flex items-center gap-2 mb-1">
-                      <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                      <h4 className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Your weekly habit is building</h4>
-                  </div>
-                  <h3 className='text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500'>
-                    {completedDaysCount}/7 Days Completed
+                  <h3 className='text-sm font-semibold text-zinc-400'>
+                    {completedDaysCount}/7 Days
                   </h3>
-                  <div className="flex items-baseline gap-3 pt-1">
-                    <span className="text-2xl font-black text-white">{convertMsToHM(totalWeekTime)}</span>
-                    <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Cumulative Time</span>
-                  </div>
+                  <span className="text-2xl font-black text-white">{convertMsToHM(totalWeekTime)}</span>
               </div>
           </div>
 
           <ChartContainer
             config={{ totalTime: { label: "Time spent", color: "rgb(6, 182, 212)" } }}
-            className='aspect-auto h-[100px] w-full mb-6'>
+            className='aspect-auto h-[100px] w-full'>
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
               <defs>
                 <linearGradient id='fillTotal' x1='0' y1='0' x2='0' y2='1'>
@@ -123,14 +116,6 @@ export function WeeklyInsight({ activityData }: WeeklyInsightProps) {
             </AreaChart>
           </ChartContainer>
 
-          <div className="grid grid-cols-7 gap-2">
-             {chartData.map((day, i) => (
-                <div key={i} className="flex flex-col items-center gap-2">
-                    <div className={`h-1 w-full rounded-full transition-all duration-1000 ${day.totalTime > 0 ? 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.4)]' : 'bg-white/5'}`} />
-                    <span className={`text-[9px] font-black uppercase tracking-tighter ${day.isToday ? 'text-cyan-500' : 'text-zinc-700'}`}>{day.date}</span>
-                </div>
-             ))}
-          </div>
         </div>
       </Card>
     </motion.div>
