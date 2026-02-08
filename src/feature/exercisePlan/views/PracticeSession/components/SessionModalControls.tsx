@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { FaCheck,FaPause, FaPlay, FaStepForward } from "react-icons/fa";
+import { FaCheck, FaPause, FaPlay, FaStepBackward, FaStepForward } from "react-icons/fa";
 
 interface SessionModalControlsProps {
   isPlaying: boolean;
@@ -11,6 +11,8 @@ interface SessionModalControlsProps {
   onFinish: () => void;
   toggleTimer: () => void;
   handleNextExercise: () => void;
+  handleBackExercise: () => void;
+  currentExerciseIndex: number;
   isFinishing?: boolean;
   isSubmittingReport?: boolean;
   canSkipExercise?: boolean;
@@ -26,6 +28,8 @@ export const SessionModalControls = ({
   isFinishing,
   isSubmittingReport,
   canSkipExercise = true,
+  handleBackExercise,
+  currentExerciseIndex,
 }: SessionModalControlsProps) => {
   const { t } = useTranslation(["common", "exercises"]);
 
@@ -43,7 +47,18 @@ export const SessionModalControls = ({
           {t("common:practice.exit")}
         </Button>
 
-        <div className='flex items-center gap-3'>
+        <div className='flex items-center gap-2'>
+          {currentExerciseIndex > 0 && (
+            <Button
+              onClick={handleBackExercise}
+              variant="ghost"
+              size="icon"
+              className="h-12 w-12 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-all"
+            >
+              <FaStepBackward className="h-4 w-4" />
+            </Button>
+          )}
+
           <Button
             onClick={toggleTimer}
             className={cn(

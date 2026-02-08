@@ -17,7 +17,7 @@ import { Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { FaCheck, FaExternalLinkAlt, FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaStepForward, FaTwitter, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
+import { FaCheck, FaExternalLinkAlt, FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaStepBackward, FaStepForward, FaTwitter, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
 
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
@@ -550,6 +550,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             formattedTimeLeft={formattedTimeLeft}
             toggleTimer={handleToggleTimer}
             handleNextExercise={handleNextExerciseClick}
+            handleBackExercise={() => jumpToExercise(currentExerciseIndex - 1)}
             sessionTimerData={sessionTimerData}
             exerciseTimeSpent={exerciseTimeSpent}
             setVideoDuration={setVideoDuration}
@@ -629,8 +630,12 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                    <ExerciseProgress
                         plan={plan}
                         currentExerciseIndex={currentExerciseIndex}
-                        formattedTimeLeft={formattedTimeLeft}
-                        onExerciseSelect={jumpToExercise}
+                        onExerciseSelect={(idx) => {
+                            if (metronome.isPlaying) {
+                              metronome.toggleMetronome();
+                            }
+                            jumpToExercise(idx);
+                         }}
                    />
                </div>
 
@@ -994,19 +999,26 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                  />
                                   {currentExercise.tablature && currentExercise.tablature.length > 0 && (
                                     <div className="mt-4 flex flex-col gap-2">
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          className={cn(
-                                            "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
-                                            isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
-                                          )}
-                                          onClick={() => setIsAudioMuted(!isAudioMuted)}
-                                        >
-                                          <GiGuitar className="text-base" />
-                                          {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
-                                          {isAudioMuted ? "Guitar Playback Off" : "Guitar Playback On"}
-                                        </Button>
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className={cn(
+                                              "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                                              isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
+                                            )}
+                                            onClick={() => {
+                                              const newMuted = !isAudioMuted;
+                                              setIsAudioMuted(newMuted);
+                                              // If we are enabling sound, reset the current repetition/timer
+                                              if (!newMuted) {
+                                                resetTimer();
+                                              }
+                                            }}
+                                          >
+                                            <GiGuitar className="text-base" />
+                                            {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+                                            {isAudioMuted ? "Guitar Playback Off" : "Guitar Playback On"}
+                                          </Button>
 
                                         <Button
                                             variant="ghost"
@@ -1128,7 +1140,23 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                              />
                           </div>
 
-                          <div className="flex-1 flex justify-end items-center">
+                          <div className="flex-1 flex justify-end items-center gap-3">
+                             {currentExerciseIndex > 0 && (
+                               <Button
+                                   size="sm"
+                                   variant="ghost"
+                                   className="radius-premium font-black text-[11px] tracking-[0.1em] transition-all click-behavior uppercase text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
+                                   onClick={() => {
+                                      if (metronome.isPlaying) {
+                                        metronome.toggleMetronome();
+                                      }
+                                      jumpToExercise(currentExerciseIndex - 1);
+                                   }}
+                               >
+                                   <FaStepBackward /> {t("common:back") || "Back"}
+                               </Button>
+                             )}
+
                              <Button
                                  size="sm"
                                  variant="ghost"
