@@ -3,8 +3,6 @@ import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
 import { motion } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
-import { Trophy } from "lucide-react";
 import Router from "next/router";
 import type { StatisticsDataInterface } from "types/api.types";
 
@@ -80,48 +78,33 @@ const RatingPopUpLayout = ({
       {/* Core Insights Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-5 h-full">
-              <SessionStats 
+              <SessionStats
                   time={ratingData.bonusPoints.time}
                   todayTotalTime={ratingData.bonusPoints.time}
                   averageWeeklyTime={avgTime}
                   breakdown={sessionBreakdown}
               />
           </div>
-          
+
           <div className="lg:col-span-7 space-y-6">
               <WeeklyInsight activityData={activityData} />
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <NextMilestone currentUserStats={currentUserStats} />
-                  <div className="bg-zinc-900/40 rounded-lg p-8 flex flex-col justify-center backdrop-blur-xl border-none">
-                       <div className="flex items-center gap-4 mb-4">
-                          <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
-                              <Trophy className="h-5 w-5" />
-                          </div>
-                          <h4 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Practice Goal</h4>
-                       </div>
-                       <p className="text-lg font-bold text-zinc-300 leading-snug">
-                          Active <span className="text-white font-black">{currentUserStats.actualDayWithoutBreak} day</span> streak! 
-                          <br/>Stay consistent Riffer!
-                       </p>
-                  </div>
-              </div>
+              <NextMilestone currentUserStats={currentUserStats} />
           </div>
       </div>
 
-      <div className='grid gap-6 grid-cols-1 lg:grid-cols-3'>
-         <div className="lg:col-span-2">
+      <div className={`grid gap-6 grid-cols-1 ${newAchievements.length > 0 ? 'lg:grid-cols-3' : ''}`}>
+         <div className={newAchievements.length > 0 ? "lg:col-span-2" : ""}>
               <SkillBalance activityData={activityData} />
          </div>
-         
-         <div className="h-full">
-              {newAchievements.length > 0 && (
+
+         {newAchievements.length > 0 && (
+              <div className="h-full">
                   <AchievementsDisplay achievements={newAchievements} />
-              )}
-         </div>
+              </div>
+         )}
       </div>
 
-      <div className='flex justify-center pt-10 border-t border-white/5'>
+      <div className='flex justify-center pt-10'>
         <Button
           onClick={() => {
             if (onClick) {

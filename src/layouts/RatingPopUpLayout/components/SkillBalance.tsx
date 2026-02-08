@@ -48,8 +48,8 @@ export function SkillBalance({ activityData = [] }: SkillBalanceProps) {
       transition={{ duration: 0.5, delay: 1.0 }}>
       <Card className='border-none bg-zinc-900/50 backdrop-blur-xl rounded-lg h-full'>
         <div className='p-8'>
-          <h3 className='mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500'>
-            Skill Balance (7d)
+          <h3 className='mb-6 text-sm font-semibold text-zinc-400'>
+            Skill Balance — Last 7 Days
           </h3>
           <div className="flex items-center justify-center">
             <ChartContainer

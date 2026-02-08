@@ -11,11 +11,13 @@ interface UseExerciseSelectionProps {
 interface UseExerciseSelectionReturn {
   searchQuery: string;
   selectedCategory: string;
+  selectedDifficulty: string;
   groupedExercises: Record<string, Exercise[]>;
   filteredExercises: Exercise[];
   handleExerciseToggle: (exercise: Exercise) => void;
   setSearchQuery: (query: string) => void;
   setSelectedCategory: (category: string) => void;
+  setSelectedDifficulty: (difficulty: string) => void;
 }
 
 export const useExerciseSelection = ({
@@ -24,6 +26,7 @@ export const useExerciseSelection = ({
   /* Removed currentLang */
 }: UseExerciseSelectionProps): UseExerciseSelectionReturn => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const exercises = exercisesAgregat;
@@ -55,17 +58,23 @@ export const useExerciseSelection = ({
 
       const matchesCategory =
         selectedCategory === "all" || exercise.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+
+      const matchesDifficulty =
+        selectedDifficulty === "all" || exercise.difficulty === selectedDifficulty;
+
+      return matchesSearch && matchesCategory && matchesDifficulty;
     });
-  }, [exercises, searchQuery, selectedCategory]);
+  }, [exercises, searchQuery, selectedCategory, selectedDifficulty]);
 
   return {
     searchQuery,
     selectedCategory,
+    selectedDifficulty,
     groupedExercises,
     filteredExercises,
     handleExerciseToggle,
     setSearchQuery,
     setSelectedCategory,
+    setSelectedDifficulty,
   };
-}; 
+};
