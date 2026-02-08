@@ -91,6 +91,7 @@ export const MainTimerSection = ({
                   size="md"
                   variant="centered"
                   canSkipExercise={canSkipExercise}
+                  hidePlayButton={!!currentExercise.riddleConfig}
                 />
                
                {/* Status Pill (Compact) - Integrated */}
@@ -183,6 +184,7 @@ export const MainTimerSection = ({
                   handleNextExercise={handleNextExercise}
                   size='lg'
                   canSkipExercise={canSkipExercise}
+                  hidePlayButton={!!currentExercise.riddleConfig}
                 />
               </motion.div>
 

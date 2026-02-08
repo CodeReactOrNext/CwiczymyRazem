@@ -237,6 +237,8 @@ export const useMobileMetronome = ({
     maxBpm,
     setBpm,
     toggleMetronome,
+    startMetronome,
+    stopMetronome,
     handleSetRecommendedBpm,
     recommendedBpm,
     initializeAudio,
