@@ -7,6 +7,7 @@ interface UseTablatureAudioProps {
   isPlaying: boolean;
   startTime: number | null;
   isMuted?: boolean;
+  onLoopComplete?: () => void;
 }
 
 const STRING_FREQS = [
@@ -23,7 +24,8 @@ export const useTablatureAudio = ({
   bpm,
   isPlaying,
   startTime,
-  isMuted = false
+  isMuted = false,
+  onLoopComplete
 }: UseTablatureAudioProps) => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
@@ -128,52 +130,182 @@ export const useTablatureAudio = ({
     noise.stop(time + 0.01);
   }, [isMuted]);
 
+  // Pre-calculate cumulative beat durations to allow absolute time scheduling
+  const cumulativeBeatsRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    if (!measures) {
+      flattenedBeatsRef.current = [];
+      cumulativeBeatsRef.current = [];
+      return;
+    }
+    const flattened = measures.flatMap(m => m.beats);
+    flattenedBeatsRef.current = flattened;
+
+    // Calculate cumulative duration in beats for each note/beat event
+    let total = 0;
+    const cumulatives = [0];
+    flattened.forEach(b => {
+      total += b.duration;
+      cumulatives.push(total);
+    });
+    cumulativeBeatsRef.current = cumulatives;
+  }, [measures]);
+
   const scheduler = useCallback(() => {
-    if (!audioContextRef.current || !isPlaying || flattenedBeatsRef.current.length === 0) return;
+    if (!audioContextRef.current || !isPlaying || flattenedBeatsRef.current.length === 0 || !startTime) return;
 
     const ctx = audioContextRef.current;
     const lookahead = 0.1; // 100ms window
 
+    // 1. Calculate the "Anchor Time" in AudioContext coordinates
+    // This is the moment in ctx.currentTime when the metronome started (startTime)
+    // We assume audioContext runs in real-time seconds, same as Date.now() / 1000 roughly
+    // drift calculation:
+    const timeSinceStart = (Date.now() - startTime) / 1000;
+    const anchorTime = ctx.currentTime - timeSinceStart;
+
+    const secondsPerBeat = 60 / bpm;
+    const totalDurationBeats = cumulativeBeatsRef.current[cumulativeBeatsRef.current.length - 1];
+
+    // We only need to check beats that fall within [currentTime, currentTime + lookahead]
+    // But since it's a loop, we calculate time modulo total duration
+
+    // Optimization: Instead of modulo math on every frame for every note (can be expensive if track is long),
+    // we determine which "copy" of the loop we are in or just check the next expected note index.
+    // However, to strictly fix drift, we shouldn't rely on "nextNoteTimeRef" incrementing. 
+    // We should calculate "absolute time of beat N" and see if it's due.
+
+    // For this implementation, since riddles are short, we can iterate properly.
+    // Let's stick thereto the robust "nextNoteTime" but RE-ALIGN it to anchor every frame if needed?
+    // actually, best way is to calculate nextNoteTimeRef based on currentBeatIndex and anchor.
+
+    // Let's assume we are just scheduling the NEXT beat.
+    // Absolute time of the current beat index in the CURRENT loop iteration:
+    // We need to track how many full loops have passed? 
+    // Or just: timeSinceStart / totalDurationSeconds -> integer part is loops.
+
+    const totalDurationSeconds = totalDurationBeats * secondsPerBeat;
+
+    // Find the start time of the current loop iteration
+    const loopsCompleted = Math.floor(timeSinceStart / totalDurationSeconds);
+    const currentLoopStart = anchorTime + (loopsCompleted * totalDurationSeconds);
+    const nextLoopStart = currentLoopStart + totalDurationSeconds;
+
+    // Check notes in current loop
+    // But wait, if we are near the end of a loop, we might need to schedule start of NEXT loop.
+
+    // Let's look at the beat index we are currently tracking.
+    let beatIndex = currentBeatIndexRef.current;
+
+    // Calculate absolute scheduled time for this beat
+    // relative beat start (beats) * secondsPerBeat + loopStart
+    let beatStartTime = cumulativeBeatsRef.current[beatIndex] * secondsPerBeat;
+
+    // We need to resolve which "loop" this beat belongs to. 
+    // It should be the one strictly after ctx.currentTime (or just before).
+    // Actually, simply:
+    // ScheduledTime = anchorTime + (loopsCompleted * totalDurationSeconds) + beatStartTime
+    // If this time is in the past, maybe it's the NEXT loop? 
+    // If (ScheduledTime < ctx.currentTime - tolerance), it means we missed it or likely belong to next loop.
+
+    // Easier approach: Just keep incrementing "next absolute time"
+    // To fix drift: Re-calculate "next absolute time" if it drifts too far? 
+    // No, better: "Expected Time" = anchor + absolute_beat_count * secondsPerBeat.
+
+    // Let's stick to the simplest Robust Logic:
+    // Use `nextNoteTimeRef` but INITIALIZE it accurately from `startTime` whenever we reset.
+    // And to prevent drift, we refrain from "adding" to it, and instead re-compute it from index?
+    // `nextNoteTime = anchorTime + (totalBeatsPlayed * secondsPerBeat)`
+
+    // But we don't track totalBeatsPlayed easily across loops.
+    // Let's try the Hybrid:
+    // Sync `nextNoteTimeRef` to `anchorTime` on first run, then just increment.
+    // AudioClock is precise. Drift usually comes from `Date.now` vs `AudioClock` mismatch in the METRONOME hook.
+    // HERE, if we strictly use `secondsPerBeat`, we are internally consistent.
+    // The issue is `useDeviceMetronome` creates `startTime` based on `Date.now()`.
+
+    // CRITICAL FIX: If `startTime` changes, we MUST reset our scheduling cursor.
+    // This is handled in the effect below.
+
+    // Just ensure we don't schedule if startTime is in the future (count-in).
+    // (Handled by `if (!startTime)` check - startTime is null during count-in).
+
     while (nextNoteTimeRef.current < ctx.currentTime + lookahead) {
       const beat = flattenedBeatsRef.current[currentBeatIndexRef.current];
 
-      // Schedule current beat notes
+      // Schedule notes
       beat.notes.forEach((n: any) => {
         const baseFreq = STRING_FREQS[n.string - 1];
         const freq = baseFreq * Math.pow(2, n.fret / 12);
         playNote(freq, nextNoteTimeRef.current);
       });
 
-      // Move to next beat
-      const secondsPerBeat = (60 / bpm) * beat.duration;
-      nextNoteTimeRef.current += secondsPerBeat;
+      // Advance
+      nextNoteTimeRef.current += beat.duration * secondsPerBeat;
       currentBeatIndexRef.current = (currentBeatIndexRef.current + 1) % flattenedBeatsRef.current.length;
+
+      // If we wrapped around, loop complete
+      if (currentBeatIndexRef.current === 0 && flattenedBeatsRef.current.length > 0) {
+        onLoopComplete?.();
+      }
     }
 
     timeoutRef.current = window.setTimeout(scheduler, 25);
-  }, [bpm, isPlaying, playNote]);
+  }, [bpm, isPlaying, playNote, startTime, onLoopComplete]);
 
   useEffect(() => {
-    if (isPlaying) {
+    if (isPlaying && startTime) { // Only start if we have a startTime (count-in done)
       if (audioContextRef.current?.state === "suspended") {
         audioContextRef.current.resume();
       }
 
-      // Sync with visual cursor
       if (audioContextRef.current) {
-        nextNoteTimeRef.current = audioContextRef.current.currentTime;
+        // RESET Logic:
+        // Calculate where we should be exactly based on startTime
+        const ctx = audioContextRef.current;
+        const timeSinceStart = (Date.now() - startTime) / 1000;
+
+        // This is tricky because "timeSinceStart" might be middle of a measures if we unpaused?
+        // But for Ear Training, we always restart from 0 on "Guessed" (new riddle).
+        // For simple pause/play, `startTime` in metronome is reset to "now - elapsed".
+        // So `timeSinceStart` should effectively be "how long have we been playing this track".
+
+        // However, `useDeviceMetronome` manages `startTime` logic.
+        // If we just started (or count-in finished), `timeSinceStart` is ~0.
+        // We want to schedule the FIRST beat at `ctx.currentTime + (0 - small_delay?)` or just `ctx.currentTime`.
+        // Actually, we want to align with `startTime`.
+        // `AudioContextTime` corresponding to `startTime` is `ctx.currentTime - timeSinceStart`.
+
+        const anchorTime = ctx.currentTime - timeSinceStart;
+
+        // If we are starting fresh (timeSinceStart is small), start at index 0
+        // If resuming, we technically need to seek, but Ear Training is short loops.
+        // Let's assume restart from 0 for consistency with the "Next Riddle" flow.
+
+        // To strictly sync first beat:
+        // nextNoteTime should be exactly anchorTime (plus maybe existing played beats duration if seeking).
+        // Assuming playback always starts from beat 0 when startTime resets:
+
+        // FIX: Do NOT clamp to ctx.currentTime. If we are slightly late (offset), we must schedule in the "past" (anchor)
+        // so that the AudioContext catches up and subsequent notes are aligned to the grid, not to the "late start".
+        nextNoteTimeRef.current = anchorTime;
+
         currentBeatIndexRef.current = 0;
         scheduler();
       }
-    }
-
-    return () => {
+    } else {
+      // Stop/Pause
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
+    }
+
+    return () => {
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     };
-  }, [isPlaying, scheduler]);
+  }, [isPlaying, scheduler, measures, startTime]); // triggered when startTime updates (count-in finishes)
 
   return null;
 };

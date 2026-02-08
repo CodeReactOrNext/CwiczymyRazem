@@ -74,6 +74,7 @@ import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
 import { spiderPermutation1234Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1234/spiderPermutation1234";
 import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
+import { earTrainingEasy, earTrainingMedium, earTrainingHard } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
 
 
 export const exercisesAgregat: Exercise[] = [
@@ -154,4 +155,7 @@ export const exercisesAgregat: Exercise[] = [
   musicianFitnessLvl1S8Exercise,
   pentatonicPlayalongExercise,
   jpStretching,
+  earTrainingEasy,
+  earTrainingMedium,
+  earTrainingHard
 ];
