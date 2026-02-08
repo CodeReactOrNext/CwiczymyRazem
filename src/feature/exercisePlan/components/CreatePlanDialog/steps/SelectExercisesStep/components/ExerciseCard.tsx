@@ -69,7 +69,7 @@ export const ExerciseCard = ({
            </div>
            
            <Badge variant="outline" className={cn(
-               "border-white/5 bg-zinc-950/50 px-2 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400",
+               "border-white/5 bg-zinc-950/50 px-2 py-0.5 text-[10px] text-zinc-400 font-medium",
                 exercise.category === 'technique' && "text-emerald-400/90 border-emerald-500/20 bg-emerald-950/10",
                 exercise.category === 'theory' && "text-blue-400/90 border-blue-500/20 bg-blue-950/10",
                 exercise.category === 'creativity' && "text-purple-400/90 border-purple-500/20 bg-purple-950/10",
@@ -79,7 +79,7 @@ export const ExerciseCard = ({
            </Badge>
 
            <Badge variant="outline" className={cn(
-               "border-white/5 bg-zinc-950/50 px-2 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400",
+               "border-white/5 bg-zinc-950/50 px-2 py-0.5 text-[10px] text-zinc-400 font-medium",
                 exercise.difficulty === 'easy' && "text-green-400/80",
                 exercise.difficulty === 'medium' && "text-yellow-400/80",
                 exercise.difficulty === 'hard' && "text-red-400/80",
@@ -88,13 +88,13 @@ export const ExerciseCard = ({
            </Badge>
 
            {exercise.isPlayalong && (
-               <Badge className="bg-red-500/10 text-red-400 border-red-500/20 text-[9px] px-1.5 h-5 font-bold uppercase">
+               <Badge className="bg-red-500/10 text-red-400 border-red-500/20 text-[9px] px-1.5 h-5 font-bold">
                    <Youtube className="mr-1 h-2.5 w-2.5" />
                    Playalong
                </Badge>
            )}
            {exercise.videoUrl && !exercise.isPlayalong && (
-               <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[9px] px-1.5 h-5 font-bold uppercase">
+               <Badge className="bg-cyan-500/10 text-cyan-400 border-cyan-500/20 text-[9px] px-1.5 h-5 font-bold">
                    <Video className="mr-1 h-2.5 w-2.5" />
                    Video
                </Badge>

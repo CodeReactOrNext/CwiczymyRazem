@@ -71,7 +71,7 @@ export const CreatePlan = ({ initialPlan, onSubmit, onUpdate }: CreatePlanProps)
                   </div>
                   <span 
                     className={`
-                      text-xs font-medium uppercase tracking-wider
+                      text-xs font-medium
                       ${isCurrent ? "text-cyan-400" : "text-zinc-500"}
                     `}
                   >
