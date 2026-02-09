@@ -4,7 +4,7 @@ import { checkAndSaveChallengeProgress, updateQuestProgress, updateUserStats } f
 import { setActivity } from 'feature/user/store/userSlice';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import useTimer from 'hooks/useTimer';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
@@ -26,6 +26,7 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
   const previousUserStats = useAppSelector(selectPreviousUserStats);
 
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+  const isSubmittingRef = useRef(false);
   const [reportResult, setReportResult] = useState<ReportDataInterface | null>(null);
   const [exerciseTimes, setExerciseTimes] = useState<Record<number, number>>({});
 
@@ -113,7 +114,8 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
   }, []);
 
   const handleFinishSession = useCallback(async () => {
-    if (isSubmittingReport) return;
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     timer.stopTimer();
 
     const planTitle = typeof plan.title === 'string'
@@ -153,6 +155,7 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
 
     } catch (error) {
       console.error("Auto report failed:", error);
+      isSubmittingRef.current = false;
     } finally {
       setIsSubmittingReport(false);
     }
