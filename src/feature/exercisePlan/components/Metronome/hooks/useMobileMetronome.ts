@@ -30,13 +30,13 @@ export const useMobileMetronome = ({
   const startTimeRef = useRef<number | null>(null);
   const countInTargetRef = useRef<number>(0);
   const isIOS = isIOSDevice();
+  const isMutedRef = useRef(isMuted);
 
-  // Handle Mute
   useEffect(() => {
+    isMutedRef.current = isMuted;
+
+    // Also update global gain node if it exists (for extra safety)
     if (gainNodeRef.current && audioContextRef.current) {
-      const targetGain = isMuted ? 0 : 0.3; // Default mobile volume was 0.3 in ramps
-      // Note: We use 0.3 because linearRampToValueAtTime uses 0.3
-      // Actually, it's better to just use gainNodeRef for global mute
       gainNodeRef.current.gain.setTargetAtTime(isMuted ? 0 : 1, audioContextRef.current.currentTime, 0.01);
     }
   }, [isMuted]);
@@ -51,7 +51,7 @@ export const useMobileMetronome = ({
 
       // Create persistent nodes for better performance on mobile
       gainNodeRef.current = audioContextRef.current.createGain();
-      gainNodeRef.current.gain.value = isMuted ? 0 : 1;
+      gainNodeRef.current.gain.value = isMutedRef.current ? 0 : 1;
       gainNodeRef.current.connect(audioContextRef.current.destination);
 
       // For iOS, we need to play a silent sound to unlock the audio
@@ -76,20 +76,21 @@ export const useMobileMetronome = ({
 
   // Schedule next note with precise timing
   const scheduleNote = useCallback((time: number, isAccent: boolean = false) => {
-    if (!audioContextRef.current || !gainNodeRef.current) return;
+    if (!audioContextRef.current || isMutedRef.current) return;
 
     const oscillator = audioContextRef.current.createOscillator();
+    const noteGain = audioContextRef.current.createGain();
+
     oscillator.type = 'sine';
     oscillator.frequency.value = isAccent ? 1200 : 800;
 
-    // Connect to the persistent gain node
-    oscillator.connect(gainNodeRef.current);
+    // Use a per-note gain node to avoid interfering with global gain or concurrent notes
+    noteGain.gain.setValueAtTime(0, time);
+    noteGain.gain.linearRampToValueAtTime(0.3, time + 0.001);
+    noteGain.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
 
-    // Schedule precise gain envelope
-    gainNodeRef.current.gain.cancelScheduledValues(time);
-    gainNodeRef.current.gain.setValueAtTime(0, time);
-    gainNodeRef.current.gain.linearRampToValueAtTime(0.3, time + 0.001);
-    gainNodeRef.current.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+    oscillator.connect(noteGain);
+    noteGain.connect(gainNodeRef.current || audioContextRef.current.destination);
 
     oscillator.start(time);
     oscillator.stop(time + 0.1);
