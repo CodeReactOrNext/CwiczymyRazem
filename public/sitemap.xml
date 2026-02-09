@@ -68,6 +68,13 @@
     <priority>0.8</priority>
   </url>
 
+  <url>
+    <loc>https://riff.quest/blog/how-long-practice-guitar-daily</loc>
+    <lastmod>2026-02-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Exercise Hub -->
   <url>
     <loc>https://riff.quest/exercises</loc>
