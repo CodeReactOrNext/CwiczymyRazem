@@ -10,6 +10,7 @@ import { Metronome } from "feature/exercisePlan/components/Metronome/Metronome";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
+import { EarTrainingView } from "../components/EarTrainingView";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import Image from "next/image";
@@ -70,6 +71,7 @@ interface SessionModalProps {
   isRiddleRevealed?: boolean;
   hasPlayedRiddleOnce?: boolean;
   handleNextRiddle?: () => void;
+  earTrainingScore?: number;
   handleRevealRiddle?: () => void;
 }
 
@@ -115,7 +117,8 @@ const SessionModal = ({
   isRiddleRevealed,
   hasPlayedRiddleOnce,
   handleNextRiddle,
-  handleRevealRiddle
+  handleRevealRiddle,
+  earTrainingScore
 }: SessionModalProps) => {
   if (!isOpen || !isMounted) return null;
 
@@ -195,7 +198,24 @@ const SessionModal = ({
 
             <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5 pb-[76px]'>
               <div className='space-y-6 p-4'>
-                {activeTablature && activeTablature.length > 0 ? (
+                {currentExercise.riddleConfig && (
+                  <div className="mb-4">
+                    <EarTrainingView 
+                      difficulty={currentExercise.riddleConfig.difficulty}
+                      isRevealed={isRiddleRevealed || false}
+                      isPlaying={isPlaying}
+                      onPlayRiddle={handleToggleTimer}
+                      onReveal={handleRevealRiddle || (() => {})}
+                      onNextRiddle={handleNextRiddle || (() => {})}
+                      onGuessed={() => {
+                        if (handleNextRiddle) handleNextRiddle();
+                      }}
+                      score={earTrainingScore || 0}
+                      canGuess={hasPlayedRiddleOnce || false}
+                    />
+                  </div>
+                )}
+                {activeTablature && activeTablature.length > 0 && (!currentExercise.riddleConfig || isRiddleRevealed) ? (
                   <TablatureViewer
                     measures={activeTablature}
                     bpm={metronome.bpm}
@@ -208,7 +228,7 @@ const SessionModal = ({
                     hitNotes={hitNotes}
                     currentBeatsElapsed={currentBeatsElapsed}
                   />
-                ) : currentExercise.youtubeVideoId ? (
+                ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
                    <div className="w-full radius-premium overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
                       <YouTubePlayalong
                           videoId={currentExercise.youtubeVideoId}

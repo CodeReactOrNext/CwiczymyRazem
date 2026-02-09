@@ -644,6 +644,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             hasPlayedRiddleOnce={hasPlayedRiddleOnce}
             handleNextRiddle={handleNextRiddle}
             handleRevealRiddle={handleRevealRiddle}
+            earTrainingScore={earTrainingScore}
           />
         </>
       )}
