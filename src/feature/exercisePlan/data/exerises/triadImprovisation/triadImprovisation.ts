@@ -4,7 +4,7 @@ export const triadImprovisationExercise: Exercise = {
   id: "triad_improvisation",
   title: "Triad Improvisation",
   description: "Exercise developing improvisation skills using chord triads, strengthening harmonic awareness and melodic fluency.",
-  difficulty: "medium",
+  difficulty: "hard",
   category: "creativity",
   timeInMinutes: 12,
   instructions: [
