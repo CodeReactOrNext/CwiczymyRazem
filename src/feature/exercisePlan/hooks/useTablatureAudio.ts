@@ -66,6 +66,12 @@ export const useTablatureAudio = ({
     }
   }, [isMuted]);
 
+  // Stabilize callbacks to prevent unnecessary scheduler restarts
+  const onLoopCompleteRef = useRef(onLoopComplete);
+  useEffect(() => {
+    onLoopCompleteRef.current = onLoopComplete;
+  }, [onLoopComplete]);
+
   const playNote = useCallback((freq: number, time: number) => {
     if (!audioContextRef.current || !gainNodeRef.current || isMuted) return;
     const ctx = audioContextRef.current;
@@ -247,12 +253,12 @@ export const useTablatureAudio = ({
 
       // If we wrapped around, loop complete
       if (currentBeatIndexRef.current === 0 && flattenedBeatsRef.current.length > 0) {
-        onLoopComplete?.();
+        onLoopCompleteRef.current?.();
       }
     }
 
     timeoutRef.current = window.setTimeout(scheduler, 25);
-  }, [bpm, isPlaying, playNote, startTime, onLoopComplete]);
+  }, [bpm, isPlaying, playNote, startTime]);
 
   useEffect(() => {
     if (isPlaying && startTime) { // Only start if we have a startTime (count-in done)
@@ -261,37 +267,18 @@ export const useTablatureAudio = ({
       }
 
       if (audioContextRef.current) {
-        // RESET Logic:
-        // Calculate where we should be exactly based on startTime
         const ctx = audioContextRef.current;
         const timeSinceStart = (Date.now() - startTime) / 1000;
-
-        // This is tricky because "timeSinceStart" might be middle of a measures if we unpaused?
-        // But for Ear Training, we always restart from 0 on "Guessed" (new riddle).
-        // For simple pause/play, `startTime` in metronome is reset to "now - elapsed".
-        // So `timeSinceStart` should effectively be "how long have we been playing this track".
-
-        // However, `useDeviceMetronome` manages `startTime` logic.
-        // If we just started (or count-in finished), `timeSinceStart` is ~0.
-        // We want to schedule the FIRST beat at `ctx.currentTime + (0 - small_delay?)` or just `ctx.currentTime`.
-        // Actually, we want to align with `startTime`.
-        // `AudioContextTime` corresponding to `startTime` is `ctx.currentTime - timeSinceStart`.
-
         const anchorTime = ctx.currentTime - timeSinceStart;
 
-        // If we are starting fresh (timeSinceStart is small), start at index 0
-        // If resuming, we technically need to seek, but Ear Training is short loops.
-        // Let's assume restart from 0 for consistency with the "Next Riddle" flow.
+        // CRITICAL: Only reset nextNoteTime if it hasn't been initialized or is significantly off
+        // This prevents double scheduling the same temporal window on re-renders
+        const threshold = 0.05; // 50ms tolerance
+        if (Math.abs(nextNoteTimeRef.current - anchorTime) > threshold || currentBeatIndexRef.current === 0) {
+          nextNoteTimeRef.current = anchorTime;
+          currentBeatIndexRef.current = 0;
+        }
 
-        // To strictly sync first beat:
-        // nextNoteTime should be exactly anchorTime (plus maybe existing played beats duration if seeking).
-        // Assuming playback always starts from beat 0 when startTime resets:
-
-        // FIX: Do NOT clamp to ctx.currentTime. If we are slightly late (offset), we must schedule in the "past" (anchor)
-        // so that the AudioContext catches up and subsequent notes are aligned to the grid, not to the "late start".
-        nextNoteTimeRef.current = anchorTime;
-
-        currentBeatIndexRef.current = 0;
         scheduler();
       }
     } else {
@@ -300,12 +287,15 @@ export const useTablatureAudio = ({
         window.clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
+      // Reset scheduling cursor when stopped so it starts fresh next time
+      nextNoteTimeRef.current = 0;
+      currentBeatIndexRef.current = 0;
     }
 
     return () => {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     };
-  }, [isPlaying, scheduler, measures, startTime]); // triggered when startTime updates (count-in finishes)
+  }, [isPlaying, scheduler, startTime]); // measures is handled via flattenedBeatsRef useEffect
 
   return null;
 };

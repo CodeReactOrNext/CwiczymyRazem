@@ -13,7 +13,7 @@ import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaExpand, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaTwitter } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
@@ -63,6 +63,14 @@ interface SessionModalProps {
   currentBeatsElapsed: number;
   isAudioMuted: boolean;
   setIsAudioMuted: (bool: boolean) => void;
+  isMetronomeMuted: boolean;
+  setIsMetronomeMuted: (bool: boolean) => void;
+  // Riddle Props
+  activeTablature?: any;
+  isRiddleRevealed?: boolean;
+  hasPlayedRiddleOnce?: boolean;
+  handleNextRiddle?: () => void;
+  handleRevealRiddle?: () => void;
 }
 
 const SessionModal = ({
@@ -100,18 +108,28 @@ const SessionModal = ({
   hitNotes,
   currentBeatsElapsed,
   isAudioMuted,
-  setIsAudioMuted
+  setIsAudioMuted,
+  isMetronomeMuted,
+  setIsMetronomeMuted,
+  activeTablature,
+  isRiddleRevealed,
+  hasPlayedRiddleOnce,
+  handleNextRiddle,
+  handleRevealRiddle
 }: SessionModalProps) => {
   if (!isOpen || !isMounted) return null;
 
   const { t } = useTranslation(["exercises", "common"]);
 
   const handleToggleTimer = () => {
-    if (currentExercise.tablature && currentExercise.metronomeSpeed) {
-      toggleTimer();
-      metronome.toggleMetronome();
+    if (isPlaying) {
+      stopTimer();
+      metronome.stopMetronome();
     } else {
-      toggleTimer();
+      startTimer();
+      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig) {
+        metronome.startMetronome();
+      }
     }
   };
 
@@ -123,16 +141,14 @@ const SessionModal = ({
   };
 
   const handleNextExerciseClick = () => {
-    if (metronome.isPlaying) {
-      metronome.toggleMetronome();
-    }
+    stopTimer();
+    metronome.stopMetronome();
     handleNextExercise();
   };
 
   const handleBackExerciseClick = () => {
-    if (metronome.isPlaying) {
-      metronome.toggleMetronome();
-    }
+    stopTimer();
+    metronome.stopMetronome();
     handleBackExercise();
   };
 
@@ -179,9 +195,9 @@ const SessionModal = ({
 
             <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5 pb-[76px]'>
               <div className='space-y-6 p-4'>
-                {currentExercise.tablature && currentExercise.tablature.length > 0 ? (
+                {activeTablature && activeTablature.length > 0 ? (
                   <TablatureViewer
-                    measures={currentExercise.tablature}
+                    measures={activeTablature}
                     bpm={metronome.bpm}
                     isPlaying={metronome.isPlaying}
                     startTime={metronome.startTime || null}
@@ -386,15 +402,11 @@ const SessionModal = ({
                 {currentExercise.metronomeSpeed && (
                   <div className='mb-6'>
                     <Metronome
-                      initialBpm={currentExercise.metronomeSpeed.recommended}
-                      minBpm={currentExercise.metronomeSpeed.min}
-                      maxBpm={currentExercise.metronomeSpeed.max}
+                      metronome={metronome}
+                      showStartStop={!currentExercise.tablature || currentExercise.tablature.length === 0}
+                      isMuted={isMetronomeMuted}
+                      onMuteToggle={setIsMetronomeMuted}
                       recommendedBpm={currentExercise.metronomeSpeed.recommended}
-                      bpm={metronome.bpm}
-                      isPlaying={metronome.isPlaying}
-                      onBpmChange={handleBpmChange}
-                      onToggle={metronome.toggleMetronome}
-                      startTime={metronome.startTime}
                     />
                     {currentExercise.tablature && currentExercise.tablature.length > 0 && (
                       <div className="mt-4 flex justify-center gap-4">

@@ -23,6 +23,7 @@ interface MainTimerSectionProps {
   sessionTimerData?: TimerInterface;
   exerciseTimeSpent?: number;
   canSkipExercise?: boolean;
+  isFinished?: boolean;
 }
 
 export const MainTimerSection = ({
@@ -38,12 +39,16 @@ export const MainTimerSection = ({
   variant = "default",
   sessionTimerData,
   exerciseTimeSpent = 0,
-  canSkipExercise = true
+  canSkipExercise = true,
+  isFinished = false
 }: MainTimerSectionProps) => {
   const { t } = useTranslation(["common"]);
 
   const totalSessionMs = sessionTimerData 
-    ? (sessionTimerData.creativity + sessionTimerData.hearing + sessionTimerData.technique + sessionTimerData.theory)
+    ? ((sessionTimerData.creativity || 0) + 
+       (sessionTimerData.hearing || 0) + 
+       (sessionTimerData.technique || 0) + 
+       (sessionTimerData.theory || 0))
     : 0;
 
   if (variant === "compact") {
@@ -83,7 +88,7 @@ export const MainTimerSection = ({
 
           {/* Compact Inline Controls */}
           <div className="flex items-center gap-4">
-               <ExerciseControls
+                <ExerciseControls
                   isPlaying={isPlaying}
                   isLastExercise={isLastExercise}
                   toggleTimer={toggleTimer}
@@ -92,14 +97,8 @@ export const MainTimerSection = ({
                   variant="centered"
                   canSkipExercise={canSkipExercise}
                   hidePlayButton={!!currentExercise.riddleConfig}
+                  isFinished={isFinished}
                 />
-               
-               {/* Status Pill (Compact) - Integrated */}
-               <div className="flex items-center gap-2 px-1 transition-colors">
-                   <div className={`h-1.5 w-1.5 rounded-full transition-all ${
-                       isPlaying ? "bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.6)]" : "bg-zinc-600"
-                   }`} />
-               </div>
           </div>
       </div>
     );
@@ -185,23 +184,9 @@ export const MainTimerSection = ({
                   size='lg'
                   canSkipExercise={canSkipExercise}
                   hidePlayButton={!!currentExercise.riddleConfig}
+                  isFinished={isFinished}
                 />
               </motion.div>
-
-              {/* TERTIARY: Status indicator - least important */}
-              <div className={`flex items-center gap-2 rounded-full border px-3 py-1.5 transition-all duration-500 ${
-                  isPlaying 
-                    ? "border-cyan-500/40 bg-cyan-500/20 shadow-[0_0_20px_rgba(6,182,212,0.15)] scale-105" 
-                    : "border-white/5 bg-zinc-800/40"
-              }`}>
-                <div
-                  className={`h-2 w-2 rounded-full shadow-[0_0_8px_currentColor] transition-all duration-300 ${
-                    isPlaying
-                      ? "animate-pulse bg-cyan-400"
-                      : "bg-zinc-500"
-                  }`}
-                />
-              </div>
             </div>
           </Card>
         )}

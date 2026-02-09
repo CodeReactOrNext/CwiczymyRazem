@@ -16,7 +16,10 @@ export const MobileTimerDisplay = ({
   exerciseTimeSpent = 0
 }: MobileTimerDisplayProps) => {
   const totalSessionMs = sessionTimerData 
-    ? (sessionTimerData.creativity + sessionTimerData.hearing + sessionTimerData.technique + sessionTimerData.theory)
+    ? ((sessionTimerData.creativity || 0) + 
+       (sessionTimerData.hearing || 0) + 
+       (sessionTimerData.technique || 0) + 
+       (sessionTimerData.theory || 0))
     : 0;
 
   const formattedElapsed = convertMsToHMS(exerciseTimeSpent);

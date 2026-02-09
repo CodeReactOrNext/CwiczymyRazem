@@ -24,6 +24,11 @@ export const useMetronome = ({
   const timerIDRef = useRef<number | null>(null);
   const countInTargetRef = useRef<number>(0);
   const startTimeRef = useRef<number | null>(null);
+  const isMutedRef = useRef(isMuted);
+
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+  }, [isMuted]);
 
   useEffect(() => {
     audioContextRef.current = new (window.AudioContext ||
@@ -38,7 +43,7 @@ export const useMetronome = ({
   }, []);
 
   const playSound = useCallback((time: number, isAccent: boolean = false) => {
-    if (!audioContextRef.current || isMuted) return;
+    if (!audioContextRef.current || isMutedRef.current) return;
 
     const context = audioContextRef.current;
     const oscillator = context.createOscillator();
@@ -56,7 +61,7 @@ export const useMetronome = ({
 
     oscillator.start(time);
     oscillator.stop(time + 0.1);
-  }, [isMuted]);
+  }, []);
 
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;

@@ -1,35 +1,45 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
+import { cn } from "assets/lib/utils";
+import { Volume2, VolumeX } from "lucide-react";
+import { useState } from "react";
 import { FaPause, FaPlay } from "react-icons/fa";
 
-import { useDeviceMetronome } from "./hooks/useDeviceMetronome";
+
 
 interface MetronomeProps {
-  initialBpm?: number;
-  minBpm?: number;
-  maxBpm?: number;
+  metronome: any; // The object from useDeviceMetronome
+  showStartStop?: boolean;
+  isMuted?: boolean;
+  onMuteToggle?: (muted: boolean) => void;
+  // Fallbacks for specific values if needed, though metronome should have them
   recommendedBpm?: number;
-  // Controlled state props
-  bpm?: number;
-  isPlaying?: boolean;
-  onBpmChange?: (bpm: number) => void;
-  onToggle?: () => void;
-  startTime?: number | null;
 }
 
-export const Metronome = (props: MetronomeProps) => {
-  const device = useDeviceMetronome(props);
-  
-  // Use props if controlled, otherwise use internal state
-  const bpm = props.bpm !== undefined ? props.bpm : device.bpm;
-  const isPlaying = props.isPlaying !== undefined ? props.isPlaying : device.isPlaying;
-  const setBpm = props.onBpmChange || device.setBpm;
-  const toggleMetronome = props.onToggle || device.toggleMetronome;
-  const recommendedBpm = props.recommendedBpm || device.recommendedBpm;
-  const minBpm = props.minBpm || device.minBpm;
-  const maxBpm = props.maxBpm || device.maxBpm;
-  const handleSetRecommendedBpm = device.handleSetRecommendedBpm; // This might need adjustment if fully controlled, but fine for now
+export const Metronome = ({ 
+  metronome, 
+  showStartStop = true, 
+  isMuted = false, 
+  onMuteToggle,
+  recommendedBpm: propsRecommendedBpm
+}: MetronomeProps) => {
+  const bpm = metronome.bpm;
+  const isPlaying = metronome.isPlaying;
+  const setBpm = metronome.setBpm;
+  const toggleMetronome = metronome.toggleMetronome;
+  const recommendedBpm = propsRecommendedBpm || metronome.recommendedBpm;
+  const minBpm = metronome.minBpm;
+  const maxBpm = metronome.maxBpm;
+  const handleSetRecommendedBpm = metronome.handleSetRecommendedBpm;
+
+  const effectiveIsMuted = isMuted;
+
+  const handleMuteToggle = () => {
+    if (onMuteToggle) {
+      onMuteToggle(!effectiveIsMuted);
+    }
+  };
 
   return (
     <Card className='overflow-hidden rounded-xl border bg-card/80 p-4 shadow-md'>
@@ -53,7 +63,33 @@ export const Metronome = (props: MetronomeProps) => {
         </div>
       </div>
 
-      <div className='flex justify-end'>
+      <div className='flex justify-between items-center'>
+        <div className="flex items-center gap-2">
+          {showStartStop && (
+            <Button
+              variant={isPlaying ? "destructive" : "default"}
+              size='sm'
+              onClick={toggleMetronome}
+              className="gap-2"
+            >
+              {isPlaying ? <FaPause /> : <FaPlay />}
+              {isPlaying ? "Stop" : "Start"}
+            </Button>
+          )}
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleMuteToggle}
+            className={cn(
+               "w-9 px-0",
+               effectiveIsMuted ? "text-zinc-500" : "text-cyan-400"
+            )}
+          >
+            {effectiveIsMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          </Button>
+        </div>
+
         {recommendedBpm !== bpm && (
           <Button
             variant='ghost'
@@ -61,7 +97,7 @@ export const Metronome = (props: MetronomeProps) => {
             onClick={handleSetRecommendedBpm}
             aria-label={`Set recommended tempo (${recommendedBpm} BPM)`}
             tabIndex={0}>
-            Recommended tempo ({recommendedBpm})
+            Recommended ({recommendedBpm})
           </Button>
         )}
       </div>

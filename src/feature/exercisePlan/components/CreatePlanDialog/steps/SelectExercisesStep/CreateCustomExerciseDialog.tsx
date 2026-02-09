@@ -360,7 +360,7 @@ export const CreateCustomExerciseDialog = ({
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="recBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Rec. BPM</Label>
+                            <Label htmlFor="recBpm" className="text-zinc-400 text-[10px] uppercase font-bold tracking-wider">Recommended BPM</Label>
                             <Input
                                 id="recBpm"
                                 type="number"
