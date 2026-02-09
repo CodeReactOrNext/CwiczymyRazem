@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
-import { Volume2, VolumeX } from "lucide-react";
+import { Minus, Plus, Volume2, VolumeX } from "lucide-react";
 import { useState } from "react";
 import { FaPause, FaPlay } from "react-icons/fa";
 
@@ -49,14 +49,34 @@ export const Metronome = ({
       </div>
 
       <div className='mb-4'>
-        <Slider
-          value={[bpm]}
-          min={minBpm}
-          max={maxBpm}
-          step={1}
-          onValueChange={(value) => setBpm(value[0])}
-          className='py-2'
-        />
+        <div className='flex items-center gap-2'>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0 shrink-0"
+            onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
+            disabled={bpm <= minBpm}
+          >
+            <Minus className="h-3.5 w-3.5" />
+          </Button>
+          <Slider
+            value={[bpm]}
+            min={minBpm}
+            max={maxBpm}
+            step={1}
+            onValueChange={(value) => setBpm(value[0])}
+            className='py-2'
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0 shrink-0"
+            onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
+            disabled={bpm >= maxBpm}
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </Button>
+        </div>
         <div className='flex items-center justify-between text-xs text-muted-foreground'>
           <span>{minBpm}</span>
           <span>{maxBpm}</span>

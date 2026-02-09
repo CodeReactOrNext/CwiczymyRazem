@@ -588,7 +588,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             resetTimer();
             startTimer();
           }}
-          isLoading={isFinishing}
+          isLoading={isFinishing || isSubmittingReport}
         />
       )}
 
