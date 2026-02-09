@@ -49,6 +49,7 @@ import { CalibrationWizard } from "./components/CalibrationWizard";
 import { generateRiddle } from "feature/exercisePlan/logic/riddleGenerator";
 import { EarTrainingView } from "./components/EarTrainingView";
 import type { TablatureMeasure } from "../../types/exercise.types";
+import { playCompletionSound } from "utils/audioUtils";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
@@ -103,6 +104,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   } = usePracticeSessionState({ plan, onFinish, autoReport });
 
   const [isAudioMuted, setIsAudioMuted] = useState(true);
+  const [isMetronomeMuted, setIsMetronomeMuted] = useState(false);
 
   // --- Ear Training / Riddle State ---
   const [riddleMeasures, setRiddleMeasures] = useState<TablatureMeasure[] | null>(null);
@@ -111,18 +113,20 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const [hasPlayedRiddleOnce, setHasPlayedRiddleOnce] = useState(false);
 
   useEffect(() => {
+    // Reset flags and UI state on ANY exercise change
+    setIsAudioMuted(true);
+    setIsMetronomeMuted(false);
+    setHasPlayedRiddleOnce(false);
+    setIsRiddleRevealed(false);
+
     if (currentExercise.riddleConfig) {
        // Generate new riddle when exercise changes
        setRiddleMeasures(generateRiddle(currentExercise.riddleConfig));
-       setIsRiddleRevealed(false);
-       setHasPlayedRiddleOnce(false); // Reset
-       setIsAudioMuted(false); 
-       
        if (metronome.bpm !== 108) metronome.setBpm(108);
     } else {
        setRiddleMeasures(null); 
     }
-  }, [currentExercise.id, currentExercise.riddleConfig]); // Use ID to trigger on exercise change
+  }, [currentExercise.id]); // Use ID to trigger on exercise change
 
   const activeTablature = riddleMeasures || currentExercise.tablature;
 
@@ -145,13 +149,26 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const handleRevealRiddle = () => setIsRiddleRevealed(true);
   // -----------------------------------
 
+  // --- Completion Notification ---
+  const [showCompletionNotification, setShowCompletionNotification] = useState(false);
+
+  useEffect(() => {
+    if (timeLeft <= 0 && isMounted && !showCompleteDialog && !reportResult && !showSuccessView) {
+      playCompletionSound();
+      setShowCompletionNotification(true);
+      const timer = setTimeout(() => setShowCompletionNotification(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft, isMounted, showCompleteDialog, reportResult, showSuccessView]);
+  // -----------------------------------
+
   // Metronome State
   const metronome = useDeviceMetronome({
     initialBpm: currentExercise.metronomeSpeed?.recommended || 60,
     minBpm: currentExercise.metronomeSpeed?.min,
     maxBpm: currentExercise.metronomeSpeed?.max,
     recommendedBpm: currentExercise.metronomeSpeed?.recommended,
-    isMuted: isAudioMuted 
+    isMuted: isMetronomeMuted 
   });
 
   // Audio Playback
@@ -196,9 +213,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
         } 
         if (e.key === "ArrowLeft") {
             if (currentExerciseIndex > 0) {
-                if (metronome.isPlaying) {
-                  metronome.toggleMetronome();
-                }
+                stopTimer();
+                metronome.stopMetronome();
                 jumpToExercise(currentExerciseIndex - 1);
             }
         }
@@ -211,10 +227,14 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const category = currentExercise.category || "mixed";
 
   const handleToggleTimer = () => {
-    if ((activeTablature && activeTablature.length > 0) && currentExercise.metronomeSpeed) {
-      toggleTimer(metronome.toggleMetronome);
+    if (isPlaying) {
+      stopTimer();
+      metronome.stopMetronome();
     } else {
-      toggleTimer();
+      startTimer();
+      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig) {
+        metronome.startMetronome();
+      }
     }
   };
 
@@ -226,9 +246,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   };
 
   const handleNextExerciseClick = () => {
-    if (metronome.isPlaying) {
-      metronome.toggleMetronome();
-    }
+    stopTimer();
+    metronome.stopMetronome();
     handleNextExercise(resetTimer);
   };
 
@@ -617,6 +636,13 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             currentBeatsElapsed={currentBeatsElapsed}
             isAudioMuted={isAudioMuted}
             setIsAudioMuted={setIsAudioMuted}
+            isMetronomeMuted={isMetronomeMuted}
+            setIsMetronomeMuted={setIsMetronomeMuted}
+            activeTablature={activeTablature}
+            isRiddleRevealed={isRiddleRevealed}
+            hasPlayedRiddleOnce={hasPlayedRiddleOnce}
+            handleNextRiddle={handleNextRiddle}
+            handleRevealRiddle={handleRevealRiddle}
           />
         </>
       )}
@@ -1049,19 +1075,15 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                          </Accordion>
                      </div>
 
-                     <div className="lg:col-span-4 space-y-6">
+                      <div className="lg:col-span-4 space-y-6">
                         {currentExercise.metronomeSpeed && (
                              <div className="radius-premium bg-zinc-900/40 border border-white/5 p-6 backdrop-blur-sm">
                                  <Metronome
-                                     initialBpm={currentExercise.metronomeSpeed.recommended}
-                                     minBpm={currentExercise.metronomeSpeed.min}
-                                     maxBpm={currentExercise.metronomeSpeed.max}
+                                     metronome={metronome}
+                                     showStartStop={!currentExercise.tablature || currentExercise.tablature.length === 0}
+                                     isMuted={isMetronomeMuted}
+                                     onMuteToggle={setIsMetronomeMuted}
                                      recommendedBpm={currentExercise.metronomeSpeed.recommended}
-                                     bpm={metronome.bpm}
-                                     isPlaying={metronome.isPlaying}
-                                     onBpmChange={handleBpmChange}
-                                     onToggle={metronome.toggleMetronome}
-                                     startTime={metronome.startTime}
                                  />
                                   {currentExercise.tablature && currentExercise.tablature.length > 0 && (
                                     <div className="mt-4 flex flex-col gap-2">
@@ -1077,68 +1099,44 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                             onClick={() => {
                                               const newMuted = !isAudioMuted;
                                               setIsAudioMuted(newMuted);
-                                              
-                                              // If we are disabling sound while playing, pause everything
-                                              if (newMuted && isPlaying) {
-                                                stopTimer();
-                                              }
-                                              
-                                              // If we are enabling sound, reset the current repetition/timer
-                                              if (!newMuted) {
-                                                resetTimer();
-                                              }
                                             }}
                                           >
                                             <GiGuitar className="text-base" />
                                             {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
                                             {isAudioMuted ? "Guitar Playback Off" : "Guitar Playback On"}
                                           </Button>
+                                    </div>
+                                  )}
 
-                                        <Button
-                                            variant="ghost"
-                                            size="sm" 
-                                            className={cn(
-                                                "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
-                                                !isMicEnabled ? "text-zinc-500 hover:text-zinc-400" : "text-emerald-400 hover:text-emerald-300 bg-emerald-500/10"
-                                            )}
-                                            onClick={toggleMic}
-                                        >
-                                            <span className={cn("w-2 h-2 rounded-full", isMicEnabled ? "bg-emerald-500 animate-pulse" : "bg-zinc-600")} />
-                                            {isMicEnabled ? "Mic Listen On" : "Enable Mic"}
-                                            {isMicEnabled && (
-                                                <div className="flex items-center gap-3 ml-auto">
-                                                    <div className="flex flex-col items-end">
-                                                        <div className="flex items-center gap-1.5 mb-1">
-                                                            <div className="w-12 h-1 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
-                                                                <motion.div 
-                                                                    className={cn(
-                                                                        "h-full transition-all duration-150",
-                                                                        volume > 0.1 ? "bg-emerald-400 shadow-[0_0_8px_#34d399]" : "bg-zinc-600"
-                                                                    )}
-                                                                    animate={{ width: `${Math.min(100, volume * 300)}%` }} // Boost for visibility
-                                                                />
-                                                            </div>
-                                                            <span className="text-[8px] font-bold text-zinc-500 uppercase tracking-tighter">Level</span>
-                                                        </div>
-                                                        <span className="text-[10px] font-bold text-emerald-400 leading-none">
-                                                            {sessionAccuracy}% Accuracy
-                                                        </span>
-                                                        {detectedNoteData && volume > 0.05 && (
-                                                            <span className={cn(
-                                                                "text-[8px] font-mono px-1 py-0 mt-1 rounded border",
-                                                                Math.abs(detectedNoteData.cents) <= CENTS_TOLERANCE 
-                                                                    ? "text-emerald-400 border-emerald-500/20 bg-emerald-500/10"
-                                                                    : "text-amber-400 border-amber-500/20 bg-amber-500/10"
-                                                            )}>
-                                                                {detectedNoteData.note}{detectedNoteData.octave} 
-                                                                {detectedNoteData.cents > 0 ? '+' : ''}{detectedNoteData.cents}c
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </Button>
-                                   </div>
+                                  {isMicEnabled && isListening && (
+                                    <div className="mt-4 flex flex-col items-end gap-1">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <div className="w-12 h-1 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
+                                                <motion.div 
+                                                    className={cn(
+                                                        "h-full transition-all duration-150",
+                                                        volume > 0.1 ? "bg-emerald-400 shadow-[0_0_8px_#34d399]" : "bg-zinc-600"
+                                                    )}
+                                                    animate={{ width: `${Math.min(100, volume * 300)}%` }} // Boost for visibility
+                                                />
+                                            </div>
+                                            <span className="text-[8px] font-bold text-zinc-500 uppercase tracking-tighter">Level</span>
+                                        </div>
+                                        <span className="text-[10px] font-bold text-emerald-400 leading-none">
+                                            {sessionAccuracy}% Accuracy
+                                        </span>
+                                        {detectedNoteData && volume > 0.05 && (
+                                            <span className={cn(
+                                                "text-[8px] font-mono px-1 py-0 mt-1 rounded border",
+                                                Math.abs(detectedNoteData.cents) <= CENTS_TOLERANCE 
+                                                    ? "text-emerald-400 border-emerald-500/20 bg-emerald-500/10"
+                                                    : "text-amber-400 border-amber-500/20 bg-amber-500/10"
+                                            )}>
+                                                {detectedNoteData.note}{detectedNoteData.octave} 
+                                                {detectedNoteData.cents > 0 ? '+' : ''}{detectedNoteData.cents}c
+                                            </span>
+                                        )}
+                                    </div>
                                   )}
                              </div>
                         )}
@@ -1211,6 +1209,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                  sessionTimerData={sessionTimerData}
                                  exerciseTimeSpent={exerciseTimeSpent}
                                  canSkipExercise={canSkipExercise}
+                                 isFinished={timeLeft === 0}
                              />
                           </div>
 
@@ -1306,6 +1305,32 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
         inputGain={inputGain}
         onInputGainChange={setInputGain}
       />
+
+      {/* Completion Notification */}
+      <AnimatePresence>
+        {showCompletionNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, x: "-50%" }}
+            animate={{ opacity: 1, y: 50, x: "-50%" }}
+            exit={{ opacity: 0, y: -50, x: "-50%" }}
+            className="fixed top-0 left-1/2 z-[99999] px-8 py-4 bg-cyan-500 rounded-2xl shadow-[0_0_30px_rgba(34,211,238,0.5)] border border-white/20"
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <FaCheck className="text-black h-6 w-6" />
+              </div>
+              <div>
+                <h4 className="text-xl font-black text-black uppercase tracking-tighter leading-none">
+                  Exercise Finished!
+                </h4>
+                <p className="text-[10px] font-bold text-black/60 uppercase tracking-widest mt-1">
+                  Great job on this one!
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

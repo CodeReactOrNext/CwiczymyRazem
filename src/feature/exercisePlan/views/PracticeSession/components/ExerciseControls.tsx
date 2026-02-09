@@ -11,6 +11,7 @@ interface ExerciseControlsProps {
   variant?: "default" | "centered";
   canSkipExercise?: boolean;
   hidePlayButton?: boolean;
+  isFinished?: boolean;
   riddleConfig?: any; // Added riddleConfig prop
 }
 
@@ -22,7 +23,8 @@ const ExerciseControls = ({
   size = "md",
   variant = "default",
   canSkipExercise = true,
-  hidePlayButton = false
+  hidePlayButton = false,
+  isFinished = false
 }: ExerciseControlsProps) => {
   const btnSizes = {
     sm: "h-10 w-10",
@@ -43,7 +45,7 @@ const ExerciseControls = ({
 
   return (
     <div className={containerClasses}>
-      {!hidePlayButton && (
+      {!hidePlayButton && !isFinished && (
         <div className={cn("relative", variant !== "centered" && "flex-1")}>
           <Button
             size={size === "lg" ? "lg" : "default"}
