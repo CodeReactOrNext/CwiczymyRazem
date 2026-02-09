@@ -31,16 +31,16 @@ export const EarTrainingView = ({
   className
 }: EarTrainingViewProps) => {
   return (
-    <div className={cn("flex flex-col items-center justify-center w-full max-w-2xl mx-auto p-6", className)}>
+    <div className={cn("flex flex-col items-center justify-center w-full max-w-2xl mx-auto p-4 sm:p-6", className)}>
       
       {/* Score Display */}
-      <div className="absolute top-4 right-4 bg-zinc-800/80 px-4 py-2 rounded-full border border-white/10 backdrop-blur-md z-10">
-          <span className="text-xs font-bold uppercase tracking-widest text-zinc-400 mr-2">Score</span>
-          <span className="text-xl font-black text-emerald-400">{score}</span>
+      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-zinc-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 backdrop-blur-md z-10">
+          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-zinc-400 mr-1.5 sm:mr-2">Score</span>
+          <span className="text-lg sm:text-xl font-black text-emerald-400">{score}</span>
       </div>
 
       {/* Visualizer / Mystery Box */}
-      <div className="relative w-full aspect-video max-h-[300px] mb-8 group">
+      <div className="relative w-full aspect-video max-h-[200px] sm:max-h-[300px] mb-6 sm:mb-8 group">
           <div className={cn(
             "absolute inset-0 bg-gradient-to-br rounded-3xl blur-2xl opacity-20 transition-all duration-1000",
              difficulty === 'easy' && "from-emerald-500 to-cyan-500",
@@ -80,8 +80,8 @@ export const EarTrainingView = ({
                          </div>
 
                          <div className="text-center">
-                            <h3 className="text-2xl font-bold text-white mb-2">Listen & Repeat</h3>
-                            <p className="text-zinc-400 text-sm">
+                            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Listen & Repeat</h3>
+                            <p className="text-zinc-400 text-xs sm:text-sm">
                                 {isPlaying ? "Listening..." : "Press Play to hear the melody"}
                             </p>
                          </div>
@@ -93,9 +93,9 @@ export const EarTrainingView = ({
                         animate={{ opacity: 1, scale: 1 }}
                         className="flex flex-col items-center gap-4 text-center p-8"
                       >
-                          <Music className="w-16 h-16 text-emerald-400 mb-2" />
-                          <h3 className="text-2xl font-bold text-white">Revealed!</h3>
-                          <p className="text-zinc-400">
+                          <Music className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-400 mb-2" />
+                          <h3 className="text-xl sm:text-2xl font-bold text-white">Revealed!</h3>
+                          <p className="text-zinc-400 text-xs sm:text-sm">
                              Check the tablature below. No points for this one.
                           </p>
                       </motion.div>
@@ -109,14 +109,14 @@ export const EarTrainingView = ({
       <div className="flex items-center gap-4 w-full">
           {/* Play/Replay Button */}
           <Button 
-            className="flex-1 h-14 text-lg font-bold tracking-wide uppercase"
+            className="flex-1 h-12 sm:h-14 text-base sm:text-lg font-bold tracking-wide uppercase"
             variant={isPlaying ? "destructive" : "default"}
             onClick={onPlayRiddle}
           >
              {isPlaying ? (
                  <>Stop</>
              ) : (
-                 <><FaPlay className="mr-2 w-4 h-4" /> Play</>
+                 <><FaPlay className="mr-2 w-3 h-3 sm:w-4 sm:h-4" /> Play</>
              )}
           </Button>
 
@@ -125,18 +125,18 @@ export const EarTrainingView = ({
             <div className="flex gap-4">
               <Button 
                 variant="outline"
-                className="h-14 px-8 border-white/10 hover:bg-white/5"
+                className="h-12 sm:h-14 px-4 sm:px-8 border-white/10 hover:bg-white/5 text-sm sm:text-base"
                 onClick={onReveal}
               >
-                  <Eye className="mr-2 w-5 h-5 text-zinc-400" />
+                  <Eye className="mr-2 w-4 h-4 sm:w-5 sm:h-5 text-zinc-400" />
                   Reveal
               </Button>
                 <Button 
-                    className="h-14 px-6 bg-emerald-500 hover:bg-emerald-400 text-black font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-12 sm:h-14 px-4 sm:px-6 bg-emerald-500 hover:bg-emerald-400 text-black font-bold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     disabled={!canGuess}
                     onClick={onGuessed}
                 >
-                    <RefreshCw className="mr-2 w-5 h-5" />
+                    <RefreshCw className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
                     Guessed! (+1)
                 </Button>
             </div>
@@ -145,10 +145,10 @@ export const EarTrainingView = ({
                     {/* Only Show Next if Revealed (No Points) */}
                     <Button 
                         variant="secondary" 
-                        className="h-14 px-8 bg-zinc-800 hover:bg-zinc-700 text-white w-full"
+                        className="h-12 sm:h-14 px-6 sm:px-8 bg-zinc-800 hover:bg-zinc-700 text-white w-full text-sm sm:text-base"
                         onClick={onNextRiddle}
                     >
-                        <RefreshCw className="mr-2 w-5 h-5" />
+                        <RefreshCw className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
                         Next Riddle
                     </Button>
                 </div>
