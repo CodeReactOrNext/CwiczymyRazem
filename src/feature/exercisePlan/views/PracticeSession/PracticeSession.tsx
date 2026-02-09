@@ -114,7 +114,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
   useEffect(() => {
     // Reset flags and UI state on ANY exercise change
-    setIsAudioMuted(true);
+    // For Ear Training (riddleConfig), enable playback by default, otherwise disable
+    setIsAudioMuted(!currentExercise.riddleConfig);
     setIsMetronomeMuted(false);
     setHasPlayedRiddleOnce(false);
     setIsRiddleRevealed(false);
