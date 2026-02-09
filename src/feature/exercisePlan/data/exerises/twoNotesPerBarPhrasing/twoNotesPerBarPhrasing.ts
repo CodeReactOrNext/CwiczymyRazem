@@ -5,7 +5,7 @@ export const twoNotesPerBarPhrasingExercise: Exercise = {
   title: "Two-Notes-Per-Bar Phrasing",
   description:
     "Exercise developing phrasing, space, and musical decision-making by strictly limiting you to a maximum of two notes per bar.",
-  difficulty: "medium",
+  difficulty: "easy",
   category: "creativity",
   timeInMinutes: 10,
   instructions: [
