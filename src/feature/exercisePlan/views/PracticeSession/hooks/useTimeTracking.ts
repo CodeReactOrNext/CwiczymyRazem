@@ -13,7 +13,7 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
   useEffect(() => {
     setExerciseTimeSpent(timer.time);
     lastTickRef.current = null;
-  }, [currentExercise.id, timer.time === 0]);
+  }, [currentExercise.id]);
 
   useEffect(() => {
     if (!timer.timerEnabled) {
@@ -31,7 +31,12 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
       const delta = now - (lastTickRef.current || now);
 
       if (delta >= 1000) {
-        const skillType = currentExercise.category as SkillsType;
+        let skillType = currentExercise.category as SkillsType;
+
+        // Fallback for "mixed" or missing category
+        if (skillType === "mixed" as any || !skillType) {
+          skillType = "technique";
+        }
 
         dispatch(
           increaseTimerTime({
