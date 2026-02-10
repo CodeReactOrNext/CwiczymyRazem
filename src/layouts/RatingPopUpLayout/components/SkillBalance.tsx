@@ -15,8 +15,16 @@ interface SkillBalanceProps {
 }
 
 export function SkillBalance({ activityData = [] }: SkillBalanceProps) {
-  const last7Days = activityData.slice(-7);
-  
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+  const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+
+  const last7Days = activityData.filter(d => {
+    const dateStr = new Date(d.date).toISOString().split('T')[0];
+    return dateStr >= sevenDaysAgoStr;
+  });
+
   const totals = last7Days.reduce(
     (acc, day) => ({
       technique: acc.technique + day.techniqueTime,

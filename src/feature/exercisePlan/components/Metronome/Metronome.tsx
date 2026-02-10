@@ -43,13 +43,13 @@ export const Metronome = ({
 
   return (
     <Card className='overflow-hidden rounded-xl border bg-card/80 p-4 shadow-md'>
-      <div className='mb-4 flex items-center justify-between'>
+      <div className='mb-6 flex items-center justify-between'>
         <h3 className='text-sm font-medium'>Metronom</h3>
         <div className='text-sm font-semibold'>{bpm} BPM</div>
       </div>
 
       <div className='mb-4'>
-        <div className='flex items-center gap-2'>
+        <div className='flex items-center gap-3 mb-3'>
           <Button
             variant="outline"
             size="sm"
