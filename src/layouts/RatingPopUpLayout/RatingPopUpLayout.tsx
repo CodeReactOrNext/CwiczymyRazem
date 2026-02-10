@@ -80,7 +80,7 @@ const RatingPopUpLayout = ({
           <div className="lg:col-span-5 h-full">
               <SessionStats
                   time={ratingData.bonusPoints.time}
-                  todayTotalTime={ratingData.bonusPoints.time}
+                  todayTotalTime={activityData.filter(d => new Date(d.date).toDateString() === new Date().toDateString()).reduce((acc, d) => acc + d.techniqueTime + d.theoryTime + d.hearingTime + d.creativityTime, 0)}
                   averageWeeklyTime={avgTime}
                   breakdown={sessionBreakdown}
               />
