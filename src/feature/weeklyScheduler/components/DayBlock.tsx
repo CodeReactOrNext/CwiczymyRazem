@@ -237,7 +237,6 @@ export const DayBlock = ({
           ) : (
             <div className="flex flex-col items-center gap-2 py-4 rounded border-2 border-dashed border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors">
               <Plus size={18} className="text-zinc-700" />
-              <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Add Schedule</span>
             </div>
           )}
         </div>
