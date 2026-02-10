@@ -70,11 +70,7 @@ export const ChallengeMap = ({
     return (
       <div className="space-y-12 relative">
         <div className="flex flex-col gap-2 px-4">
-            <h2 className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2">
-              <Trophy className="text-blue-500" size={14} />
-              Personalized Recommendations 
-            </h2>
-            <p className="text-2xl font-black text-white uppercase tracking-tight">Ready to master</p>
+            <h2 className="text-xl font-bold text-white tracking-tight">Recommendation</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">

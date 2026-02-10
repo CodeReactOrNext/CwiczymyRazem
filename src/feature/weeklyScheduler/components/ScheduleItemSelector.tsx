@@ -1,7 +1,11 @@
 import { useState, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Search, Timer, TrendingUp, Music } from "lucide-react";
+import { X, Search, Timer, TrendingUp, Music, Layers, Play } from "lucide-react";
+import TechniqueIcon from "components/Icon/TechniqueIcon";
+import TheoryIcon from "components/Icon/TheoryIcon";
+import CreativityIcon from "components/Icon/CreativityIcon";
+import HearingIcon from "components/Icon/HearingIcon";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import type { Song } from "feature/songs/types/songs.type";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
@@ -209,31 +213,48 @@ export const ScheduleItemSelector = ({
                       No plans found
                     </div>
                   ) : (
-                    filteredPlans.map((plan) => (
-                      <motion.button
-                        key={plan.id}
-                        onClick={() => {
-                          onSelectPlan(plan);
-                          onClose();
-                        }}
-                        whileHover={{ x: 4 }}
-                        className="w-full p-4 bg-zinc-900/50 hover:bg-zinc-900 border border-white/5 hover:border-white/10 rounded-xl text-left transition-all group"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-base font-black text-white tracking-tight mb-1 group-hover:text-cyan-400 transition-colors">
-                              {renderLocalized(plan.title)}
-                            </h3>
-                            <p className="text-xs text-zinc-500 line-clamp-2 mb-2">
-                              {renderLocalized(plan.description)}
-                            </p>
+                    filteredPlans.map((plan) => {
+                      const isPlayalong = (plan.title || "").toLowerCase().includes("playalong") || 
+                                          (plan.exercises && plan.exercises.some(e => e?.isPlayalong));
+                      
+                      return (
+                        <motion.button
+                          key={plan.id}
+                          onClick={() => {
+                            onSelectPlan(plan);
+                            onClose();
+                          }}
+                          whileHover={{ x: 4 }}
+                          className="w-full p-4 bg-zinc-900/50 hover:bg-zinc-900 border border-white/5 hover:border-white/10 rounded-xl text-left transition-all group"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-base font-black text-white tracking-tight mb-1 group-hover:text-cyan-400 transition-colors">
+                                {renderLocalized(plan.title)}
+                              </h3>
+                              <p className="text-xs text-zinc-500 line-clamp-2 mb-2">
+                                {renderLocalized(plan.description)}
+                              </p>
+                            </div>
+                            <div className={`flex-shrink-0 w-12 h-12 rounded-lg border flex items-center justify-center ${
+                              isPlayalong ? "bg-red-500/20 border-red-500/20 text-red-500" :
+                              plan.category === "technique" ? "bg-blue-500/20 border-blue-500/20 text-blue-400" :
+                              plan.category === "theory" ? "bg-emerald-500/20 border-emerald-500/20 text-emerald-400" :
+                              plan.category === "creativity" ? "bg-purple-500/20 border-purple-500/20 text-purple-400" :
+                              plan.category === "hearing" ? "bg-orange-500/20 border-orange-500/20 text-orange-400" :
+                              "bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border-cyan-500/20 text-cyan-400"
+                            }`}>
+                              {isPlayalong ? <Play size={20} fill="currentColor" /> :
+                               plan.category === "technique" ? <TechniqueIcon size="large" /> :
+                               plan.category === "theory" ? <TheoryIcon size="large" /> :
+                               plan.category === "creativity" ? <CreativityIcon size="large" /> :
+                               plan.category === "hearing" ? <HearingIcon size="large" /> :
+                               <TrendingUp size={20} />}
+                            </div>
                           </div>
-                          <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/20 flex items-center justify-center">
-                            <TrendingUp size={20} className="text-cyan-400" />
-                          </div>
-                        </div>
-                      </motion.button>
-                    ))
+                        </motion.button>
+                      );
+                    })
                   )}
                 </>
               )}

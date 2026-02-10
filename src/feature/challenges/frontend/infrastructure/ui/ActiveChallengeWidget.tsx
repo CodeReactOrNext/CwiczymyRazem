@@ -166,7 +166,7 @@ export const ActiveChallengeWidget = () => {
                                     size="sm"
                                     className="w-full sm:w-auto"
                                 >
-                                    {ac.currentDay === 1 ? `Start Day 1` : `Continue (Day ${ac.currentDay})`}
+                                    {ac.currentDay === 1 ? `Start` : `Continue (Day ${ac.currentDay})`}
                                     <ChevronRight size={14} strokeWidth={3} className="ml-1" />
                                 </Button>
                             ) : (

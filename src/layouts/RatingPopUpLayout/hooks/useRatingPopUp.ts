@@ -1,5 +1,5 @@
 import type { ReportDataInterface } from "feature/user/view/ReportView/ReportView.types";
-import { useEffect, useRef,useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import { getPointsToLvlUp } from "utils/gameLogic";
 
@@ -85,10 +85,10 @@ export const useRatingPopUp = ({
     : 0;
 
   const sessionBreakdown = {
-    technique: (currentUserStats.time?.technique || 0) - (previousUserStats.time?.technique || 0),
-    theory: (currentUserStats.time?.theory || 0) - (previousUserStats.time?.theory || 0),
-    hearing: (currentUserStats.time?.hearing || 0) - (previousUserStats.time?.hearing || 0),
-    creativity: (currentUserStats.time?.creativity || 0) - (previousUserStats.time?.creativity || 0),
+    technique: (currentUserStats.time?.technique || 0) - (previousUserStats?.time?.technique || 0),
+    theory: (currentUserStats.time?.theory || 0) - (previousUserStats?.time?.theory || 0),
+    hearing: (currentUserStats.time?.hearing || 0) - (previousUserStats?.time?.hearing || 0),
+    creativity: (currentUserStats.time?.creativity || 0) - (previousUserStats?.time?.creativity || 0),
   };
 
   return {

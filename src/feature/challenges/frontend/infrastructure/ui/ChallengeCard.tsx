@@ -138,21 +138,28 @@ export const ChallengeCard = ({
             </div>
           ) : (
             <>
-              {/* Reward Mini Panel */}
-              <div className="flex items-center justify-between p-3.5 rounded-lg bg-zinc-950 border border-zinc-900">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Reward</span>
-                  <div className="flex items-center gap-1.5">
-                    <Sparkles size={11} className="text-zinc-500" />
-                    <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-tight">{challenge.rewardDescription} XP</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between p-3.5 rounded-lg bg-zinc-950 border border-zinc-900">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Daily</span>
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles size={11} className="text-zinc-500" />
+                      <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-tight">{challenge.rewardDescription} XP</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Duration</span>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar size={11} className="text-zinc-500" />
+                      <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-tight">{challenge.streakDays} Days</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Duration</span>
-                  <div className="flex items-center gap-1.5">
-                    <Calendar size={11} className="text-zinc-500" />
-                    <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-tight">{challenge.streakDays} Days</span>
-                  </div>
+                <div className="flex items-center justify-between px-3.5 py-2 rounded-lg bg-zinc-950 border border-zinc-900">
+                  <span className="text-[8px] font-bold text-zinc-600 uppercase tracking-widest">Completion</span>
+                  <span className="text-[11px] font-bold text-emerald-400">
+                    +{challenge.rewardLevel || 10} {challenge.rewardSkillId?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || "Skill"}
+                  </span>
                 </div>
               </div>
 

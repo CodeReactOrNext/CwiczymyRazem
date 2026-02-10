@@ -47,9 +47,7 @@ export const DailyQuestWidget = () => {
                     </div>
                     <div>
                         <h3 className="text-sm font-bold text-zinc-200 tracking-wider">Daily Quests</h3>
-                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                            {new Date().toLocaleDateString()}
-                        </p>
+
                     </div>
                 </div>
                 <div className="flex items-center gap-3">

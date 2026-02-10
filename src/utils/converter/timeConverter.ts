@@ -3,24 +3,22 @@ export const padTo2Digits = (number: number) => {
 };
 
 export const convertMsToHM = (milliseconds: number) => {
-  let seconds = Math.floor(milliseconds / 1000);
-  let totalMinutes = Math.floor(seconds / 60);
-  let hours = Math.floor(totalMinutes / 60);
-  let minutes = totalMinutes % 60;
+  const totalMinutes = Math.round(milliseconds / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
 
   return `${padTo2Digits(hours)}:${padTo2Digits(minutes)}`;
 };
 
 export const convertMsToHMObject = (milliseconds: number) => {
-  let seconds = Math.floor(milliseconds / 1000);
-  let totalMinutes = Math.floor(seconds / 60);
-  let hours = Math.floor(totalMinutes / 60);
-  let minutes = totalMinutes % 60;
+  const totalMinutes = Math.round(milliseconds / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
 
   return {
     hours: padTo2Digits(hours),
     minutes: padTo2Digits(minutes),
-    seconds: seconds % 60,
+    seconds: Math.floor((milliseconds % 60000) / 1000),
   };
 };
 

@@ -69,7 +69,8 @@
     "next-env.d.ts",
     "**/*.ts",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "index.tsx"
   ],
   "exclude": [
     "node_modules"
