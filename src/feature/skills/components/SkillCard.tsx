@@ -1,19 +1,39 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import type { GuitarSkill } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowUpRight } from "lucide-react";
 
 interface SkillCardProps {
   skill: GuitarSkill;
   currentPoints: number;
 }
+
+const COLOR_CLASSES: Record<string, { iconBg: string; iconText: string; blur: string; ring: string }> = {
+  technique: {
+    iconBg: "bg-red-500/20",
+    iconText: "text-red-400",
+    blur: "bg-red-500/25",
+    ring: "hover:ring-red-500/40",
+  },
+  theory: {
+    iconBg: "bg-blue-500/20",
+    iconText: "text-blue-400",
+    blur: "bg-blue-500/25",
+    ring: "hover:ring-blue-500/40",
+  },
+  hearing: {
+    iconBg: "bg-emerald-500/20",
+    iconText: "text-emerald-400",
+    blur: "bg-emerald-500/25",
+    ring: "hover:ring-emerald-500/40",
+  },
+  creativity: {
+    iconBg: "bg-purple-500/20",
+    iconText: "text-purple-400",
+    blur: "bg-purple-500/25",
+    ring: "hover:ring-purple-500/40",
+  },
+};
 
 export const SkillCard = ({
   skill,
@@ -21,79 +41,53 @@ export const SkillCard = ({
 }: SkillCardProps) => {
   const { t } = useTranslation("skills");
   const theme = getSkillTheme(skill.category);
+  const colors = COLOR_CLASSES[skill.category] || COLOR_CLASSES.technique;
   const Icon = skill.icon;
-
-  const visualMax = 50; 
+  const visualMax = 50;
   const progress = Math.min((currentPoints / visualMax) * 100, 100);
 
   return (
-    <div className="group relative bg-[#0f0f0f] border border-zinc-900 rounded-lg p-5 transition-all duration-300 overflow-hidden">
-      {/* Hover Background Decor */}
-      <div className={cn(
-        "absolute inset-0 opacity-0 group-hover:opacity-[0.03] transition-opacity duration-700 bg-gradient-to-br",
-        theme.glow
-      )} />
+    <div
+      className={cn(
+        "group relative flex flex-col justify-between overflow-hidden rounded-xl",
+        "border border-second-400/10 bg-gradient-to-br from-card via-second-500/95 to-second-600",
+        "p-4 shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2",
+        colors.ring
+      )}
+    >
+      <div className={cn(colors.blur, "absolute right-0 top-0 -mr-10 -mt-10 h-32 w-32 rounded-full blur-2xl")} />
 
-      <div className="relative z-10 flex flex-col gap-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1.5">
-              <h3 className="text-white font-bold text-base tracking-tight leading-tight transition-colors">
-                {skill.name || t(`skills.${skill.id}.name` as any)}
-              </h3>
-            </div>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <p className="text-zinc-500 text-[12px] line-clamp-2 cursor-help font-medium leading-normal">
-                    {t(`skills.${skill.id}.description` as any)}
-                  </p>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-[260px] bg-black border border-zinc-800 text-zinc-300 p-3 shadow-2xl rounded-lg">
-                  <p className="text-xs leading-relaxed">{t(`skills.${skill.id}.description` as any)}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+      <div className="relative z-10 flex items-center gap-4">
+        <div className={cn(
+          "rounded-xl p-2.5 shadow-2xl transition-all duration-500 group-hover:scale-110",
+          colors.iconBg,
+          colors.iconText
+        )}>
+          {Icon && <Icon className="w-5 h-5" strokeWidth={1.5} />}
+        </div>
 
-          <div className={cn(
-            "w-12 h-12 rounded-lg flex items-center justify-center bg-zinc-950 border border-zinc-800/80 transition-all duration-500 relative overflow-hidden",
-            theme.primary
-          )}>
-            {/* Subtle Pattern in Icon Box */}
-            <div className="absolute inset-0 opacity-[0.02] pointer-events-none">
-               <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                  <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
-                    <path d="M 8 0 L 0 0 0 8" fill="none" stroke="currentColor" strokeWidth="0.5"/>
-                  </pattern>
-                  <rect width="100%" height="100%" fill="url(#grid)" />
-               </svg>
-            </div>
-            {Icon && <Icon className="w-5 h-5 relative z-10" strokeWidth={1.5} />}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-bold tracking-tight text-white truncate">
+            {skill.name || t(`skills.${skill.id}.name` as any)}
+          </h3>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <div className={cn("w-1 h-1 rounded-full", colors.iconBg)} />
+            <span className="text-zinc-300 text-xs font-medium">Level {Math.floor(currentPoints / 10) + 1}</span>
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-end justify-between">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[9px] text-zinc-600 uppercase tracking-widest font-bold">Progress</span>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-xl font-bold text-white leading-none">{currentPoints}</span>
-                <span className="text-zinc-600 text-[10px] font-bold">/ {visualMax} XP</span>
-              </div>
-            </div>
-            <div className="px-2 py-0.5 rounded-sm bg-zinc-900 border border-zinc-800 text-[9px] font-bold text-zinc-500 uppercase tracking-wider">
-              Tier {Math.floor(currentPoints / 10) + 1}
-            </div>
-          </div>
-          
-          <div className="h-1 w-full bg-zinc-900/50 rounded-full overflow-hidden">
-            <div 
-              className={cn("h-full transition-all duration-1000 ease-out", theme.glow)}
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+        <div className="flex flex-col items-end">
+          <span className="text-white text-xl font-bold tabular-nums leading-none">{currentPoints}</span>
+          <span className="text-zinc-500 text-[10px] font-semibold mt-0.5">{visualMax} XP</span>
+        </div>
+      </div>
+
+      <div className="relative z-10 mt-4">
+        <div className="h-1 w-full bg-second-400/20 rounded-full overflow-hidden">
+          <div
+            className={cn("h-full rounded-full transition-all duration-1000 ease-out", theme.glow)}
+            style={{ width: `${progress}%` }}
+          />
         </div>
       </div>
     </div>

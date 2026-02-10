@@ -23,22 +23,12 @@ export const SkillCategoryGroup = ({
 
   return (
     <div className="mb-16 last:mb-0">
-      <div className="flex flex-col mb-6 sticky top-[-1px] z-20 bg-[#0a0a0a]/80 backdrop-blur-xl py-4 -mx-4 px-4 lg:-mx-6 lg:px-6 border-b border-zinc-900/50">
-         <div className="flex items-center justify-between">
-           <div className="flex flex-col gap-0.5">
-              <span className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Category</span>
-              <h2 className={cn("text-xl sm:text-2xl font-bold tracking-tight", theme.primary)}>
-                 {t(`categories.${category}` as any)}
-              </h2>
-           </div>
-           
-           <div className="hidden sm:flex items-center gap-4">
-              <div className="flex flex-col items-end">
-                 <span className="text-[9px] text-zinc-600 uppercase tracking-widest font-bold">Skills In Group</span>
-                 <span className="text-xs text-zinc-400 font-medium">{skills.length} Mastery Nodes</span>
-              </div>
-           </div>
-         </div>
+      <div className="flex items-center gap-3 mb-6">
+         <div className={cn("w-1 h-5 rounded-full", theme.glow)} />
+         <h2 className={cn("text-lg font-bold tracking-tight", theme.primary)}>
+            {t(`categories.${category}` as any)}
+         </h2>
+         <div className="flex-1 h-px bg-zinc-800/50" />
       </div>
 
       <div className="flex flex-col xl:flex-row gap-8 items-start">
@@ -51,25 +41,18 @@ export const SkillCategoryGroup = ({
                  />
              ))}
          </div>
-         <div className="w-full xl:w-80 flex-shrink-0 sticky top-28">
-            <div className="relative group">
-                <div className={cn(
-                  "absolute -inset-0.5 rounded-lg opacity-10 blur-xl",
-                  theme.glow
-                )} />
-                <div className="relative bg-[#0d0d0d] rounded-lg p-5 backdrop-blur-sm overflow-hidden shadow-xl">
-                    <div className="flex items-center justify-between mb-4">
-                        <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest leading-none">Category Analysis</span>
-                        <div className={cn("w-1.5 h-1.5 rounded-full", theme.glow)} />
-                    </div>
-                    <SkillRadarChart 
-                        category={category}
-                        skills={skills}
-                        userSkills={userSkills}
-                    />
-                </div>
-            </div>
-         </div>
+         <div className="w-full xl:w-[540px] flex-shrink-0 sticky top-28">
+             <div className="relative bg-zinc-950/50 rounded-lg p-5 border border-zinc-800/30 overflow-hidden">
+                 <div className="flex items-center justify-between mb-4">
+                     <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest leading-none">Category Analysis</span>
+                 </div>
+                 <SkillRadarChart 
+                     category={category}
+                     skills={skills}
+                     userSkills={userSkills}
+                 />
+             </div>
+          </div>
       </div>
     </div>
   );
