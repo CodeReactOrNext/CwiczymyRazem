@@ -1,22 +1,11 @@
-import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { useTranslation } from "hooks/useTranslation";
-import { ClipboardCheck, ClipboardList, Library, Loader2, Music, Play, Sparkles } from "lucide-react";
+import { ArrowRight, ClipboardCheck, ClipboardList, Loader2, Music, Sparkles } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
 interface NavigationCardProps {
   title: string;
-  description: string;
   icon: React.ReactNode;
-  primaryAction?: {
-    label: string;
-    onClick: () => void;
-  };
-  secondaryAction?: {
-    label: string;
-    onClick: () => void;
-  };
   onClick?: () => void;
   colorAccent?: "cyan" | "purple" | "green" | "amber";
   isLoading?: boolean;
@@ -25,7 +14,6 @@ interface NavigationCardProps {
 
 export const NavigationCard = ({
   title,
-  description,
   icon,
   onClick,
   colorAccent = "cyan",
@@ -85,12 +73,9 @@ export const NavigationCard = ({
           <h3 className="text-sm font-black tracking-wider text-white">
             {title}
           </h3>
-          <p className="text-[11px] font-medium leading-relaxed text-zinc-400">
-            {description}
-          </p>
         </div>
         <div className={cn(
-          "rounded-xl p-2.5 shadow-2xl transition-all duration-500 group-hover:scale-110",
+          "rounded-xl p-2 shadow-2xl transition-all duration-500 group-hover:scale-110",
           colors.iconBg,
           colors.iconText
         )}>
@@ -98,11 +83,9 @@ export const NavigationCard = ({
         </div>
       </div>
 
-      <div className="relative z-10 mt-6 flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-zinc-500 transition-colors group-hover:text-white">
+      <div className="relative z-10 mt-3 flex items-center gap-2 text-xs font-bold text-zinc-300 transition-all duration-300 group-hover:text-white group-hover:gap-3">
         <span>{actionLabel}</span>
-        <svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='3' strokeLinecap='round' strokeLinejoin='round' className="transition-transform group-hover:translate-x-1">
-          <path d='M5 12h14m-7-7l7 7-7 7' />
-        </svg>
+        <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
       </div>
     </div>
   );
@@ -121,7 +104,6 @@ export const NavigationCards = () => {
     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
       <NavigationCard
         title="Report Practice"
-        description="Save and log your manual practice session."
         icon={<ClipboardCheck className='h-5 w-5' />}
         onClick={() => handleNavigation("/report", "report")}
         colorAccent='cyan'
@@ -131,17 +113,15 @@ export const NavigationCards = () => {
 
       <NavigationCard
         title="Play Songs"
-        description="Practice real songs from your library."
         icon={<Music className='h-5 w-5' />}
         onClick={() => handleNavigation("/timer/song-select", "songs")}
         colorAccent='purple'
         isLoading={loadingCard === "songs"}
-        actionLabel="Choose a Song"
+        actionLabel="Choose Song"
       />
 
       <NavigationCard
         title="Guided Routine"
-        description="Follow a structured daily workout."
         icon={<ClipboardList className='h-5 w-5' />}
         onClick={() => handleNavigation("/timer/plans", "plans")}
         colorAccent='green'
@@ -151,12 +131,11 @@ export const NavigationCards = () => {
 
       <NavigationCard
         title="Generate Session"
-        description="A ready-to-play session prepared for you."
         icon={<Sparkles className='h-5 w-5' fill="currentColor" />}
         onClick={() => handleNavigation("/timer/auto", "exercises")}
         colorAccent='amber'
         isLoading={loadingCard === "exercises"}
-        actionLabel="Start Auto Practice"
+        actionLabel="Start Auto"
       />
     </div>
   );

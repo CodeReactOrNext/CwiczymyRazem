@@ -63,13 +63,6 @@ export const ChallengesView = () => {
     router.push("/report");
   };
 
-  const handleBack = () => {
-    if (selectedChallenge) {
-      setSelectedChallenge(null);
-    } else {
-      router.push("/timer");
-    }
-  };
 
   const onPractice = (challenge: Challenge) => {
     setSelectedChallenge(challenge);
@@ -108,7 +101,7 @@ export const ChallengesView = () => {
   return (
     <MainContainer>
       <div className="container mx-auto max-w-7xl px-4 py-12">
-        <ChallengeHeader onBack={handleBack} />
+        <ChallengeHeader />
 
         {/* Tab Switcher */}
         <div className="flex items-center gap-2 bg-[#0a0a0a] p-1.5 rounded-xl w-fit mb-16 border border-zinc-900 shadow-2xl">
@@ -149,23 +142,20 @@ export const ChallengesView = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-24 bg-[#0a0a0a] border border-zinc-900 rounded-[2.5rem] flex flex-col items-center relative overflow-hidden">
-                  {/* Subtle background glow */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-zinc-800/20 blur-[100px] pointer-events-none" />
-                  
-                  <div className="w-20 h-20 bg-zinc-900 border border-zinc-800 rounded-3xl flex items-center justify-center mb-8 text-zinc-600 shadow-2xl relative z-10">
-                    <Trophy size={40} strokeWidth={1} />
+                <div className="py-10 bg-[#0a0a0a] border border-zinc-900 rounded-lg flex flex-col items-center relative overflow-hidden">
+                  <div className="w-12 h-12 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center mb-4 text-zinc-600 relative z-10">
+                    <Trophy size={22} strokeWidth={1.5} />
                   </div>
-                  <div className="relative z-10 mb-10">
-                    <h3 className="text-3xl font-black text-white uppercase tracking-tighter mb-3">No Active Journeys</h3>
-                    <p className="text-zinc-500 text-sm max-w-md mx-auto leading-relaxed">Your quest log is empty. Dive into the mastery map to start your next challenge.</p>
+                  <div className="relative z-10 mb-5 text-center">
+                    <h3 className="text-lg font-bold text-white mb-1">No Active Journeys</h3>
+                    <p className="text-zinc-600 text-xs max-w-sm mx-auto">Pick a challenge below to start your streak.</p>
                   </div>
                   <button 
                     onClick={() => setActiveTab('PROGRESS')}
-                    className="relative z-10 px-10 h-14 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-2xl flex items-center gap-3"
+                    className="relative z-10 px-6 h-9 bg-white text-black rounded-lg font-semibold text-xs hover:bg-zinc-100 transition-all flex items-center gap-2"
                   >
                     Explore Challenges
-                    <ChevronRight size={18} strokeWidth={3} />
+                    <ChevronRight size={14} strokeWidth={2.5} />
                   </button>
                 </div>
               )}
