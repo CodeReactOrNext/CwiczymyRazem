@@ -15,7 +15,6 @@ interface WeeklyInsightProps {
 }
 
 export function WeeklyInsight({ activityData }: WeeklyInsightProps) {
-  const last7Days = activityData.slice(-7);
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
 
@@ -27,8 +26,8 @@ export function WeeklyInsight({ activityData }: WeeklyInsightProps) {
 
   const chartData = weekDayLabels.map((date) => {
     const dateStr = date.toISOString().split('T')[0];
-    const item = last7Days.find(d => new Date(d.date).toISOString().split('T')[0] === dateStr);
-    
+    const item = activityData.find(d => new Date(d.date).toISOString().split('T')[0] === dateStr);
+
     return {
       date: date.toLocaleDateString("en", { weekday: "short" }),
       fullName: date.toLocaleDateString("en", { month: "short", day: "numeric" }),
