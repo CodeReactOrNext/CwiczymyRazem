@@ -154,13 +154,13 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
 
   useEffect(() => {
-    if (timeLeft <= 0 && isMounted && !showCompleteDialog && !reportResult && !showSuccessView) {
+    if (timeLeft <= 0 && isMounted && !showCompleteDialog && !reportResult && !showSuccessView && !isLastExercise) {
       playCompletionSound();
       setShowCompletionNotification(true);
       const timer = setTimeout(() => setShowCompletionNotification(false), 3000);
       return () => clearTimeout(timer);
     }
-  }, [timeLeft, isMounted, showCompleteDialog, reportResult, showSuccessView]);
+  }, [timeLeft, isMounted, showCompleteDialog, reportResult, showSuccessView, isLastExercise]);
   // -----------------------------------
 
   // Metronome State
