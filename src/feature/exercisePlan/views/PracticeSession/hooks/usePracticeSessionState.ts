@@ -4,7 +4,7 @@ import { checkAndSaveChallengeProgress, updateQuestProgress, updateUserStats } f
 import { setActivity } from 'feature/user/store/userSlice';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import useTimer from 'hooks/useTimer';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
@@ -163,7 +163,42 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
 
   const autoSubmitReport = handleFinishSession;
 
-  const activityDataToUse = reportList as any;
+  const activityDataToUse = useMemo(() => {
+    if (!reportList || (reportList as any[]).length === 0) return [];
+    if (!reportResult) return reportList as any;
+
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    const newEntry = {
+      date: today.toISOString(),
+      techniqueTime: timerData.technique,
+      theoryTime: timerData.theory,
+      hearingTime: timerData.hearing,
+      creativityTime: timerData.creativity,
+    };
+
+    const exists = (reportList as any[]).some(item =>
+      new Date(item.date).toISOString().split('T')[0] === todayStr
+    );
+
+    if (exists) {
+      return (reportList as any[]).map(item => {
+        if (new Date(item.date).toISOString().split('T')[0] === todayStr) {
+          return {
+            ...item,
+            techniqueTime: Number(item.techniqueTime || 0) + newEntry.techniqueTime,
+            theoryTime: Number(item.theoryTime || 0) + newEntry.theoryTime,
+            hearingTime: Number(item.hearingTime || 0) + newEntry.hearingTime,
+            creativityTime: Number(item.creativityTime || 0) + newEntry.creativityTime,
+          };
+        }
+        return item;
+      });
+    }
+
+    return [...(reportList as any), newEntry];
+  }, [reportList, reportResult, timerData]);
 
   const planTitleString = typeof plan.title === 'string'
     ? plan.title
