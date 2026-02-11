@@ -1,5 +1,3 @@
-import { Card } from "assets/components/ui/card";
-
 import type { DateWithReport } from "components/ActivityLog/activityLog.types";
 import { StatsCard } from "components/Cards";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
@@ -9,18 +7,15 @@ import {
   StatsField,
   type StatsFieldProps,
 } from "feature/profile/components/StatsField";
-import { RecommendationSkeleton } from "feature/songs/components/DailyRecommendation/RecommendationSkeleton";
 import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useTranslation } from "hooks/useTranslation";
 import { useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
 
 import { getTrendData } from "../utils/getTrendData";
-import { MySongsProgress } from "./MySongsProgress";
 import { RecommendationsSection } from "./Recommendations/RecommendationsSection";
 
 interface StatsSectionProps {
@@ -209,14 +204,6 @@ export const StatsSection = ({
                 />
               ))}
           </div>
-
-          {!userSongs ? (
-            <RecommendationSkeleton type="progress" />
-          ) : (
-            <Card className='p-4 group relative transition-all duration-300'>
-              <MySongsProgress userSongs={userSongs} isOwnProfile={isOwnProfile} />
-            </Card>
-          )}
 
           {/* Skills Chart - Mobile */}
           <div className='lg:hidden'>
