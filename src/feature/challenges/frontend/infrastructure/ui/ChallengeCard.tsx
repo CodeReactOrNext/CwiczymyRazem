@@ -86,7 +86,6 @@ export const ChallengeCard = ({
                 {SkillIcon ? <SkillIcon size={18} strokeWidth={1.5} /> : <Target size={18} />}
               </div>
               <div className="flex flex-col">
-                <span className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest leading-none mb-1">Theme</span>
                 <span className={cn(
                    "text-[9px] font-bold uppercase tracking-wider leading-none",
                    isActive ? "text-white" : "text-zinc-500"
@@ -96,16 +95,6 @@ export const ChallengeCard = ({
               </div>
             </div>
 
-            <Badge 
-              className="font-bold text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-sm border"
-              style={{
-                backgroundColor: `${tier.color}05`,
-                borderColor: `${tier.color}20`,
-                color: tier.color,
-              }}
-            >
-              Tier {tier.tier}
-            </Badge>
         </div>
 
         <div className="mb-6">

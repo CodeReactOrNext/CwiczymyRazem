@@ -1,6 +1,6 @@
 import { useTranslation } from "hooks/useTranslation";
 import { useMemo } from "react";
-import { FaBrain, FaClock, FaRegLightbulb, FaTrophy } from "react-icons/fa";
+import { FaBrain, FaClock, FaTrophy } from "react-icons/fa";
 import { convertMsToHM } from "utils/converter";
 
 import { calculateMetrics } from "./calculateMetrics";
@@ -25,7 +25,7 @@ export const PracticeInsights = ({ statistics }: PracticeInsightsProps) => {
 
   const { time, points, sessionCount } = statistics;
 
-  const { avgSessionLength, avgPointsPerHour, strongestArea, focusSuggestion } =
+  const { avgSessionLength, avgPointsPerHour, strongestArea } =
     useMemo(
       () => calculateMetrics(time, points, sessionCount),
       [time, points, sessionCount]
@@ -49,11 +49,6 @@ export const PracticeInsights = ({ statistics }: PracticeInsightsProps) => {
       label: t("insights.strongest_area"),
       value: t(`${strongestArea.name}` as any),
       description: t("insights.strongest_area_desc"),
-    },
-    {
-      icon: <FaRegLightbulb className='h-5 w-5' />,
-      label: t("insights.focus_suggestion"),
-      value: t(`insights.advice.${focusSuggestion.advice}` as any),
     },
   ];
 
