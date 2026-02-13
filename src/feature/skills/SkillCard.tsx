@@ -9,15 +9,11 @@ import { useState } from "react";
 interface SkillCardProps {
   skill: GuitarSkill;
   userSkills: UserSkills;
-  canUpgrade: boolean;
-  onUpgrade: () => void;
 }
 
 export const SkillCard = ({
   skill,
   userSkills,
-  canUpgrade,
-  onUpgrade,
 }: SkillCardProps) => {
   const { t } = useTranslation();
   const currentLevel = userSkills.unlockedSkills[skill.id] || 0;
@@ -106,7 +102,6 @@ export const SkillCard = ({
 
   const handleUpgrade = () => {
     setIsUpgraded(true);
-    onUpgrade();
 
     setTimeout(() => {
       setIsUpgraded(false);
@@ -181,23 +176,6 @@ export const SkillCard = ({
           </div>
         </div>
 
-        {/* Action Section */}
-        {canUpgrade && (
-          <div className='flex justify-end border-t border-zinc-700/30 pt-2'>
-            <Button
-              size='sm'
-              onClick={handleUpgrade}
-              title={t("skills:upgrade_skill" as any)}
-              className={cn(
-                "h-8 rounded-lg border px-4 py-0 text-xs font-semibold",
-                "shadow-sm transition-all duration-200 hover:scale-105",
-                getButtonColors()
-              )}>
-              <Plus className='mr-1.5 h-3 w-3' />
-              {t("skills:upgrade" as any)}
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Upgrade Animation Effects */}

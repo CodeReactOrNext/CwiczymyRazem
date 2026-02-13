@@ -290,19 +290,7 @@ export const firebaseGetUserTooltipData = async (
   }
 };
 
-export const canUpgradeSkill = (
-  skill: GuitarSkill,
-  userSkills: UserSkills,
-  cost: number = 1
-): boolean => {
-  if (!skill) return false;
 
-  if (userSkills.availablePoints[skill.category] < cost) {
-    return false;
-  }
-
-  return true;
-};
 
 
 

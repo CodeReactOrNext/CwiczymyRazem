@@ -1,7 +1,7 @@
 import type { SerializedError } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { challengesList, challengeUseCases } from "feature/challenges";
+// Challenges removed
 import { invalidateActivityLogsCache } from "feature/logs/services/getUserRaprotsLogs.service";
 import { firebaseRestartUserStats, firebaseUpdateBand, firebaseUpdateProfileCustomization, firebaseUpdateSoundCloudLink, firebaseUpdateUserDisplayName, firebaseUpdateUserEmail, firebaseUpdateUserPassword, firebaseUpdateYouTubeLink, firebaseUploadAvatar } from "feature/settings/services/settings.service";
 import type { FirebaseError } from "firebase/app";
@@ -11,7 +11,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { signIn, signOut } from "next-auth/react";
 import type { RootState } from "store/store";
 import type {
-  ActiveChallenge,
+  // Challenges removed
   DailyQuestTaskType,
   FetchedReportDataInterface,
   updateSocialInterface,
@@ -340,90 +340,11 @@ export const rateSong = createAsyncThunk(
 
 
 
-export const saveActiveChallenge = createAsyncThunk(
-  "user/saveActiveChallenge",
-  async (payload: { challenge: ActiveChallenge | null; quitId?: string }, { rejectWithValue }) => {
-    try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) {
-        throw new Error("User not authenticated");
-      }
+// saveActiveChallenge removed
 
-      if (payload.quitId) {
-        await challengeUseCases.abandonChallenge(userId, payload.quitId);
-      } else if (payload.challenge) {
-        // We need the full challenge object to start it, but payload only has ActiveChallenge
-        // Let's find the full challenge
-        const fullChallenge = challengesList.find(c => c.id === payload.challenge!.challengeId);
-        if (!fullChallenge) throw new Error("Challenge definition not found");
-        await challengeUseCases.startChallenge(userId, fullChallenge);
-      }
+// checkAndSaveChallengeProgress removed
 
-      // Return the updated list of active challenges
-      return await challengeUseCases.getActiveChallenges(userId);
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to save active challenge"
-      );
-    }
-  }
-);
-
-export const checkAndSaveChallengeProgress = createAsyncThunk(
-  "user/checkAndSaveChallengeProgress",
-  async (planId: string | undefined, { getState, rejectWithValue }) => {
-    try {
-      const state = getState() as RootState;
-      const currentUserStats = state.user.currentUserStats;
-      const userId = auth.currentUser?.uid;
-
-      if (!userId || !currentUserStats?.activeChallenges || currentUserStats.activeChallenges.length === 0) {
-        return;
-      }
-
-      // Find challenge that matches the planId
-      const challengeToUpdate = planId
-        ? currentUserStats.activeChallenges.find(c => c.challengeId === planId)
-        : null;
-
-      if (!challengeToUpdate) return;
-
-      const result = await challengeUseCases.completeProgress(userId, challengeToUpdate.challengeId);
-
-      return {
-        challenge: result.activeChallenge,
-        challengeFinished: result.finished,
-        pointsToAdd: result.rewardPoints,
-        rewardLevel: result.rewardLevel,
-        rewardSkillId: result.rewardSkillId,
-      };
-
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to update challenge progress"
-      );
-    }
-  }
-);
-
-export const resetChallenge = createAsyncThunk(
-  "user/resetChallenge",
-  async (challengeId: string, { rejectWithValue }) => {
-    try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) {
-        throw new Error("User not authenticated");
-      }
-
-      await challengeUseCases.resetChallenge(userId, challengeId);
-      return challengeId;
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to reset challenge"
-      );
-    }
-  }
-);
+// resetChallenge removed
 
 export const saveDailyQuestAction = createAsyncThunk(
   "user/saveDailyQuest",

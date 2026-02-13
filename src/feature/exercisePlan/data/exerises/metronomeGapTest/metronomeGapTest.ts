@@ -25,5 +25,5 @@ export const metronomeGapTestExercise: Exercise = {
     max: 120,
     recommended: 80,
   },
-  relatedSkills: ["rhythm", "ear_training"],
+  relatedSkills: ["rhythm"],
 };

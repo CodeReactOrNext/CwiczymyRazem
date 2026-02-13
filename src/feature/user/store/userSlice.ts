@@ -3,7 +3,6 @@ import { createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { statisticsInitial } from "constants/userStatisticsInitialData";
 import type { RootState } from "store/store";
 import type {
-  ActiveChallenge,
   DailyQuest,
   DailyQuestTaskType,
   StatisticsDataInterface,
@@ -16,7 +15,6 @@ import type { SkillsType } from "types/skillsTypes";
 import {
   autoLogIn,
   changeUserDisplayName,
-  checkAndSaveChallengeProgress,
   createAccount,
   getUserProvider,
   logInViaEmail,
@@ -24,9 +22,7 @@ import {
   logInViaGoogleCredential,
   logUserOff,
   rateSong,
-  resetChallenge,
   restartUserStats,
-  saveActiveChallenge,
   updateUserEmail,
   updateUserPassword,
   updateUserStats,
@@ -125,11 +121,7 @@ export const userSlice = createSlice({
         state.currentUserStats.points = (state.currentUserStats.points || 0) + payload;
       }
     },
-    setActiveChallenges: (state, { payload }: PayloadAction<ActiveChallenge[] | null>) => {
-      if (state.currentUserStats) {
-        state.currentUserStats.activeChallenges = payload;
-      }
-    },
+    // Challenges removed
     generateDailyQuest: (state) => {
       if (!state.currentUserStats) return;
       const today = new Date().toISOString().split('T')[0];
@@ -210,52 +202,7 @@ export const userSlice = createSlice({
           state.currentUserStats.points = (state.currentUserStats.points || 0) - 25;
         }
       })
-      .addCase(saveActiveChallenge.fulfilled, (state, { payload }) => {
-        if (state.currentUserStats) {
-          state.currentUserStats.activeChallenges = payload;
-        }
-      })
-      .addCase(checkAndSaveChallengeProgress.fulfilled, (state, { payload }) => {
-        if (!state.currentUserStats || !payload) return;
-
-        const { challenge, challengeFinished, pointsToAdd, rewardLevel, rewardSkillId } = payload;
-
-        if (challengeFinished) {
-          state.currentUserStats.activeChallenges = (state.currentUserStats.activeChallenges || []).filter(c => c.challengeId !== challenge.challengeId);
-
-          if (!state.currentUserStats.completedChallenges) {
-            state.currentUserStats.completedChallenges = [];
-          }
-          if (!state.currentUserStats.completedChallenges.includes(challenge.challengeId)) {
-            state.currentUserStats.completedChallenges.push(challenge.challengeId);
-          }
-
-          if (rewardSkillId) {
-            if (!state.currentUserStats.skills) {
-              state.currentUserStats.skills = { unlockedSkills: {} };
-            }
-            const currentLevel = state.currentUserStats.skills.unlockedSkills[rewardSkillId] || 0;
-            state.currentUserStats.skills.unlockedSkills[rewardSkillId] = currentLevel + (rewardLevel || 0);
-          }
-
-          if (pointsToAdd > 0) {
-            state.currentUserStats.points = (state.currentUserStats.points || 0) + pointsToAdd;
-          }
-        } else {
-          if (!state.currentUserStats.activeChallenges) state.currentUserStats.activeChallenges = [];
-          const index = state.currentUserStats.activeChallenges.findIndex(c => c.challengeId === challenge.challengeId);
-          if (index !== -1) {
-            state.currentUserStats.activeChallenges[index] = challenge;
-          } else {
-            state.currentUserStats.activeChallenges.push(challenge);
-          }
-        }
-      })
-      .addCase(resetChallenge.fulfilled, (state, { payload }) => {
-        if (state.currentUserStats) {
-          state.currentUserStats.completedChallenges = (state.currentUserStats.completedChallenges || []).filter(id => id !== payload);
-        }
-      })
+      // Challenges removed
       .addCase(logInViaGoogle.pending, (state) => {
         state.isFetching = "google";
       })
@@ -268,7 +215,8 @@ export const userSlice = createSlice({
       .addCase(createAccount.pending, (state) => {
         state.isFetching = "createAccount";
       })
-      .addCase(updateUserStats.fulfilled, (state, { payload }) => {
+      .addCase(updateUserStats.fulfilled, (state, action) => {
+        const { payload } = action;
         state.timer.technique = 0;
         state.timer.creativity = 0;
         state.timer.hearing = 0;
@@ -277,18 +225,14 @@ export const userSlice = createSlice({
         if (payload?.currentUserStats && state.currentUserStats) {
           const prevStats = { ...state.currentUserStats };
 
-          const currentActiveChallenge = prevStats?.activeChallenges;
           const currentDailyQuest = prevStats?.dailyQuest;
           const currentSkills = prevStats?.skills;
-          const currentAvailablePoints = prevStats?.availablePoints;
           const today = new Date().toISOString().split('T')[0];
 
           state.currentUserStats = {
             ...payload.currentUserStats,
-            activeChallenges: payload.currentUserStats.activeChallenges || currentActiveChallenge,
             dailyQuest: (currentDailyQuest && currentDailyQuest.date === today) ? currentDailyQuest : payload.currentUserStats.dailyQuest,
-            skills: payload.currentUserStats.skills || currentSkills,
-            availablePoints: payload.currentUserStats.availablePoints || currentAvailablePoints,
+            skills: payload.currentUserStats.skills?.unlockedSkills ? payload.currentUserStats.skills : currentSkills,
           };
 
           state.previousUserStats = prevStats;
@@ -443,7 +387,6 @@ export const {
   increaseTimerTime,
   updateLocalTimer,
   updatePoints,
-  setActiveChallenges,
   generateDailyQuest,
   completeQuestTask,
   claimQuestReward,
@@ -464,8 +407,6 @@ export const selectUserInfo = (state: RootState) => state.user.userInfo;
 export const selectUserAvatar = (state: RootState) =>
   state.user.userInfo?.avatar;
 export const selectCurrentActivity = (state: RootState) => state.user.currentActivity;
-export const selectActiveChallenges = (state: RootState) =>
-  state.user.currentUserStats?.activeChallenges;
 export const selectDailyQuest = (state: RootState) =>
   state.user.currentUserStats?.dailyQuest;
 export const selectIsLoggedOut = (state: RootState) => state.user.isLoggedOut;

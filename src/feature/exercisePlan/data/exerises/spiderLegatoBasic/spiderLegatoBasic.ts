@@ -25,7 +25,7 @@ export const spiderLegatoBasicExercise: Exercise = {
     max: 120,
     recommended: 60,
   },
-  relatedSkills: ["finger_independence", "picking"],
+  relatedSkills: ["legato"],
   tablature: [
     {
       timeSignature: [4, 4],

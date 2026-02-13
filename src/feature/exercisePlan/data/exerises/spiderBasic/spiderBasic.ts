@@ -27,7 +27,7 @@ export const spiderBasicExercise: Exercise = {
     max: 180,
     recommended: 80,
   },
-  relatedSkills: ["alternate_picking", "finger_independence", "picking"],
+  relatedSkills: ["alternate_picking", "finger_independence"],
   tablature: [
     {
       timeSignature: [4, 4],

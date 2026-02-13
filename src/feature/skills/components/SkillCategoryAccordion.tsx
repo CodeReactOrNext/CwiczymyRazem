@@ -12,7 +12,6 @@ interface SkillCategoryAccordionProps {
   category: CategoryKeys;
   skills: GuitarSkill[];
   userSkills: UserSkills;
-  onSkillUpgrade?: (skillId: string) => void;
 }
 
 // RPG-style currency icons for each category
@@ -80,12 +79,9 @@ export const SkillCategoryAccordion = ({
   category,
   skills,
   userSkills,
-  onSkillUpgrade,
 }: SkillCategoryAccordionProps) => {
   const { t } = useTranslation("skills");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [upgradingSkill, setUpgradingSkill] = useState<string | null>(null);
-  const [showPlusOne, setShowPlusOne] = useState<string | null>(null);
 
   const CategoryIcon =
     SKILL_CATEGORY_ICONS[category as keyof typeof SKILL_CATEGORY_ICONS];
@@ -99,35 +95,10 @@ export const SkillCategoryAccordion = ({
   );
   const categoryLevel = Math.floor(totalLevels / 10);
   const progressToNextLevel = totalLevels % 10;
-  const availablePoints = userSkills.availablePoints[category] || 0;
 
-  // Show all skills, not just those with points
+  // Show all skills
   const allSkills = skills;
 
-  const _canUpgradeSkills = skills.filter((skill) => {
-    const hasPoints = availablePoints > 0;
-    return hasPoints && (userSkills.unlockedSkills[skill.id] || 0) > 0;
-  });
-
-  const handleSkillUpgrade = async (skillId: string) => {
-    // Start upgrade animation
-    setUpgradingSkill(skillId);
-    setShowPlusOne(skillId);
-
-    // Call the upgrade function
-    if (onSkillUpgrade) {
-      onSkillUpgrade(skillId);
-    }
-
-    // Reset animations after delay
-    setTimeout(() => {
-      setUpgradingSkill(null);
-    }, 300);
-
-    setTimeout(() => {
-      setShowPlusOne(null);
-    }, 1000);
-  };
 
   return (
     <div
@@ -205,13 +176,6 @@ export const SkillCategoryAccordion = ({
           </div>
 
           <div className='flex items-center gap-4'>
-            {/* Available Points - Simple */}
-            {availablePoints > 0 && (
-              <div className='flex items-center gap-1 rounded border border-emerald-600 bg-emerald-900/30 px-2 py-1 text-xs'>
-                <span className='text-emerald-300'>{availablePoints}</span>
-                <span className='text-emerald-400'>pts</span>
-              </div>
-            )}
 
             {/* Skills Count - Simple */}
             <div className='text-xs text-slate-500'>
@@ -248,7 +212,6 @@ export const SkillCategoryAccordion = ({
               <div className='grid gap-3 sm:grid-cols-2'>
                 {allSkills.map((skill) => {
                   const level = userSkills.unlockedSkills[skill.id] || 0;
-                  const canUpgrade = availablePoints > 0;
                   const hasPoints = level > 0;
 
                   return (
@@ -258,8 +221,7 @@ export const SkillCategoryAccordion = ({
                         "group rounded-lg border p-3 transition-colors duration-200",
                         hasPoints
                           ? "border-slate-700/50 bg-slate-900/50 hover:bg-slate-800/60"
-                          : "border-slate-800/30 bg-slate-950/30 hover:bg-slate-900/40",
-                        canUpgrade && "border-l-2 border-l-emerald-500/60"
+                          : "border-slate-800/30 bg-slate-950/30 hover:bg-slate-900/40"
                       )}>
                       {/* Skill Content */}
                       <div className='flex items-center justify-between'>
@@ -296,85 +258,14 @@ export const SkillCategoryAccordion = ({
 
                         <div className='flex items-center gap-2'>
                           {/* Level Badge - Simple */}
-                          <div className='relative'>
-                            <motion.div
-                              key={`level-${skill.id}-${level}`}
-                              initial={{ scale: 1 }}
-                              animate={{
-                                scale:
-                                  upgradingSkill === skill.id ? [1, 1.2, 1] : 1,
-                                backgroundColor:
-                                  upgradingSkill === skill.id
-                                    ? [
-                                        "rgb(39 39 42)",
-                                        "rgb(34 197 94)",
-                                        "rgb(39 39 42)",
-                                      ]
-                                    : undefined,
-                              }}
-                              transition={{ duration: 0.3 }}
-                              className={cn(
-                                "flex h-7 min-w-[1.75rem] items-center justify-center rounded border px-2 text-xs font-medium",
-                                hasPoints
-                                  ? "border-slate-600 bg-slate-700 text-slate-200"
-                                  : "border-slate-700 bg-slate-800 text-slate-400"
-                              )}>
-                              {level}
-                            </motion.div>
-
-                            {/* +1 Animation */}
-                            <AnimatePresence>
-                              {showPlusOne === skill.id && (
-                                <motion.div
-                                  initial={{ opacity: 0, y: 0, scale: 0.5 }}
-                                  animate={{ opacity: 1, y: -20, scale: 1 }}
-                                  exit={{ opacity: 0, y: -30, scale: 0.5 }}
-                                  transition={{
-                                    duration: 0.8,
-                                    ease: "easeOut",
-                                  }}
-                                  className='pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2'>
-                                  <span className='text-sm font-bold text-emerald-400 drop-shadow-lg'>
-                                    +1
-                                  </span>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
+                          <div className={cn(
+                            "flex h-7 min-w-[1.75rem] items-center justify-center rounded border px-2 text-xs font-medium",
+                            hasPoints
+                              ? "border-slate-600 bg-slate-700 text-slate-200"
+                              : "border-slate-700 bg-slate-800 text-slate-400"
+                          )}>
+                            {level}
                           </div>
-
-                          {/* Upgrade Button */}
-                          {canUpgrade && (
-                            <motion.button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSkillUpgrade(skill.id);
-                              }}
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              animate={{
-                                rotate:
-                                  upgradingSkill === skill.id
-                                    ? [0, -10, 10, 0]
-                                    : 0,
-                                scale:
-                                  upgradingSkill === skill.id ? [1, 1.2, 1] : 1,
-                              }}
-                              transition={{ duration: 0.3 }}
-                              className={cn(
-                                "flex h-7 w-7 items-center justify-center rounded border border-emerald-600 bg-emerald-900/50 text-emerald-200 transition-colors hover:bg-emerald-800/60",
-                                upgradingSkill === skill.id &&
-                                  "border-emerald-400 bg-emerald-600/70"
-                              )}
-                              title={t("upgrade_skill")}>
-                              <motion.div
-                                animate={{
-                                  rotate: upgradingSkill === skill.id ? 180 : 0,
-                                }}
-                                transition={{ duration: 0.3 }}>
-                                <FaPlus className='h-2.5 w-2.5' />
-                              </motion.div>
-                            </motion.button>
-                          )}
                         </div>
                       </div>
                     </div>

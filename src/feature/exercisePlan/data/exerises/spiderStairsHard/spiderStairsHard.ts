@@ -28,6 +28,6 @@ export const spiderStairsHardExercise: Exercise = {
     max: 200,
     recommended: 90,
   },
-  relatedSkills: ["alternate_picking", "picking", "legato", "technique"],
+  relatedSkills: ["finger_independence"],
   image: spiderBasicImage,
 };

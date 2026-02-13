@@ -21,8 +21,8 @@ export const makeRatingData = (
   return {
     totalPoints: totalPoints,
     reportDate: data.countBackDays
-    ? getDateFromPast(data.countBackDays)
-    : new Date(),
+      ? getDateFromPast(data.countBackDays)
+      : new Date(),
     bonusPoints: {
       streak: streak,
       multiplier: multipler,
@@ -31,5 +31,6 @@ export const makeRatingData = (
       time: totalTime,
       timePoints: timePoints,
     },
+    skillPointsGained: data.skillPointsGained
   };
 };

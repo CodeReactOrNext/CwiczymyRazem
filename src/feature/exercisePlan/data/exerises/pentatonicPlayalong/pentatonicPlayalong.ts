@@ -14,7 +14,7 @@ export const pentatonicPlayalongExercise: Exercise = {
   ],
   tips: [],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "scales", "picking"],
+  relatedSkills: [],
   youtubeVideoId: "nMV64UCrtFw",
   isPlayalong: true,
   videoUrl: "https://www.youtube.com/watch?v=nMV64UCrtFw",

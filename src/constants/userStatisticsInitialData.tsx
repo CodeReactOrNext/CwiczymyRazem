@@ -25,13 +25,5 @@ export const statisticsInitial: StatisticsDataInterface = {
     learning: [],
   },
   guitarStartDate: Timestamp.now(),
-  availablePoints: {
-    technique: 0,
-    theory: 0,
-    hearing: 0,
-    creativity: 0,
-  },
-  activeChallenges: [],
-  completedChallenges: [],
   fame: 0,
 };

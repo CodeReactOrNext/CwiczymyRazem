@@ -22,7 +22,7 @@ export const spiderChromaticsExercise: Exercise = {
     max: 200,
     recommended: 80
   },
-  relatedSkills: ["finger_independence", "technique", "picking", "technique"],
+  relatedSkills: ["finger_independence", "alternate_picking"],
   tablature: [
     {
       "timeSignature": [4, 4],
