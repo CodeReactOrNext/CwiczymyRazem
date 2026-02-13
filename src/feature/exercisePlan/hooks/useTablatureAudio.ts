@@ -72,9 +72,17 @@ export const useTablatureAudio = ({
     onLoopCompleteRef.current = onLoopComplete;
   }, [onLoopComplete]);
 
-  const playNote = useCallback((freq: number, time: number) => {
+  const playNote = useCallback((freq: number, time: number, options?: {
+    bendSemitones?: number;
+    isPreBend?: boolean;
+    isRelease?: boolean;
+    isVibrato?: boolean;
+    duration?: number;
+  }) => {
     if (!audioContextRef.current || !gainNodeRef.current || isMuted) return;
     const ctx = audioContextRef.current;
+
+    const noteDuration = options?.duration ?? 1.5;
 
     // Clean Electric Synthesis
     const osc1 = ctx.createOscillator(); // Fundamental
@@ -84,15 +92,62 @@ export const useTablatureAudio = ({
     const bodyFilter = ctx.createBiquadFilter();
     const pluckGain = ctx.createGain();
 
+    // Determine initial and target frequencies for bends
+    const bendSemitones = options?.bendSemitones ?? 2;
+    const bentFreq = freq * Math.pow(2, bendSemitones / 12);
+    let startFreq = freq;
+    let startFreq2 = freq * 2;
+
+    if (options?.isPreBend) {
+      // Pre-bend: start at bent pitch immediately
+      startFreq = bentFreq;
+      startFreq2 = bentFreq * 2;
+    } else if (options?.isRelease) {
+      // Release: start at bent pitch
+      startFreq = bentFreq;
+      startFreq2 = bentFreq * 2;
+    }
+
     // Fundamental (Triangle for string body)
     osc1.type = "triangle";
-    osc1.frequency.setValueAtTime(freq, time);
+    osc1.frequency.setValueAtTime(startFreq, time);
 
     // Overtone (Sine for warmth)
     osc2.type = "sine";
-    osc2.frequency.setValueAtTime(freq * 2, time);
+    osc2.frequency.setValueAtTime(startFreq2, time);
     const osc2Gain = ctx.createGain();
     osc2Gain.gain.setValueAtTime(0.1, time); // Subtle harmonic
+
+    // Apply bend ramps
+    const bendDuration = 0.15;
+    if (options?.bendSemitones && !options?.isPreBend && !options?.isRelease) {
+      // Normal bend: ramp UP from fret pitch to bent pitch
+      osc1.frequency.exponentialRampToValueAtTime(bentFreq, time + bendDuration);
+      osc2.frequency.exponentialRampToValueAtTime(bentFreq * 2, time + bendDuration);
+    } else if (options?.isRelease) {
+      // Release: ramp DOWN from bent pitch back to fret pitch
+      osc1.frequency.exponentialRampToValueAtTime(freq, time + bendDuration);
+      osc2.frequency.exponentialRampToValueAtTime(freq * 2, time + bendDuration);
+    }
+
+    // Vibrato LFO
+    let lfo: OscillatorNode | null = null;
+    let lfoGain: GainNode | null = null;
+    if (options?.isVibrato) {
+      lfo = ctx.createOscillator();
+      lfo.type = "sine";
+      lfo.frequency.setValueAtTime(5.5, time);
+
+      lfoGain = ctx.createGain();
+      lfoGain.gain.setValueAtTime(0, time);
+      // Fade in vibrato slightly after attack
+      lfoGain.gain.linearRampToValueAtTime(0, time + 0.08);
+      lfoGain.gain.linearRampToValueAtTime(startFreq * 0.015, time + 0.15);
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc1.frequency);
+      lfoGain.connect(osc2.frequency);
+    }
 
     // Pick Attack (White Noise Burst - very short)
     const bufferSize = ctx.sampleRate * 0.01;
@@ -114,9 +169,10 @@ export const useTablatureAudio = ({
     bodyFilter.gain.value = 3;
 
     // Volume Envelope
+    const decayTime = Math.max(noteDuration, 0.5);
     pluckGain.gain.setValueAtTime(0, time);
     pluckGain.gain.linearRampToValueAtTime(0.25, time + 0.003); // Quick attack
-    pluckGain.gain.exponentialRampToValueAtTime(0.001, time + 1.5); // Natural decay
+    pluckGain.gain.exponentialRampToValueAtTime(0.001, time + decayTime); // Natural decay
 
     osc1.connect(filter);
     osc2.connect(osc2Gain);
@@ -130,10 +186,12 @@ export const useTablatureAudio = ({
     osc1.start(time);
     osc2.start(time);
     noise.start(time);
+    if (lfo) lfo.start(time);
 
-    osc1.stop(time + 1.5);
-    osc2.stop(time + 1.5);
+    osc1.stop(time + decayTime);
+    osc2.stop(time + decayTime);
     noise.stop(time + 0.01);
+    if (lfo) lfo.stop(time + decayTime);
   }, [isMuted]);
 
   // Pre-calculate cumulative beat durations to allow absolute time scheduling
@@ -244,7 +302,13 @@ export const useTablatureAudio = ({
       beat.notes.forEach((n: any) => {
         const baseFreq = STRING_FREQS[n.string - 1];
         const freq = baseFreq * Math.pow(2, n.fret / 12);
-        playNote(freq, nextNoteTimeRef.current);
+        playNote(freq, nextNoteTimeRef.current, {
+          bendSemitones: n.isBend ? n.bendSemitones : undefined,
+          isPreBend: n.isPreBend,
+          isRelease: n.isRelease,
+          isVibrato: n.isVibrato,
+          duration: beat.duration * secondsPerBeat,
+        });
       });
 
       // Advance

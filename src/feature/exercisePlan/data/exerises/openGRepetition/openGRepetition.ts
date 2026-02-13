@@ -22,7 +22,7 @@ export const openGRepetitionExercise: Exercise = {
     max: 120,
     recommended: 60
   },
-  relatedSkills: ["rhythm", "technique", "picking"],
+  relatedSkills: ["rhythm", 'alternate_picking'],
   tablature: [
     {
       timeSignature: [4, 4],

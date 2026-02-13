@@ -25,5 +25,5 @@ export const vibratoMasteryExercise: Exercise = {
     max: 80,
     recommended: 60,
   },
-  relatedSkills: ["vibrato", "articulation", "phrasing"],
+  relatedSkills: ["vibrato"],
 };

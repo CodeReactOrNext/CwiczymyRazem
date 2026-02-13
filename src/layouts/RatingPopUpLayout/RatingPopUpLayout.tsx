@@ -73,6 +73,9 @@ const RatingPopUpLayout = ({
         currentLevel={currentLevel}
         prevProgressPercent={prevProgressPercent}
         currProgressPercent={currProgressPercent}
+        skillRewardSkillId={ratingData.skillRewardSkillId}
+        skillRewardAmount={ratingData.skillRewardAmount}
+        skillPointsGained={ratingData.skillPointsGained}
       />
 
       {/* Core Insights Grid */}

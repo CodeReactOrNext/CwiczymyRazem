@@ -27,7 +27,7 @@ export const minimalMotionVoiceLeadingExercise: Exercise = {
   ],
   metronomeSpeed: null,
   relatedSkills: [
-    "chord_theory",
+    "chords",
     "harmony",
     "music_theory",
     "ear_training",

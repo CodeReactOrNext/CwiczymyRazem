@@ -1,7 +1,5 @@
 import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
 import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
-import { rhythmicMotifDisplacementExercise } from "feature/exercisePlan/data/exerises/rhythmicMotifDisplacement/rhythmicMotifDisplacement";
-import { spiderRhythmicProgressionExercise } from "feature/exercisePlan/data/exerises/spiderRhythmicProgression/spiderRhythmicProgression";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 
@@ -13,8 +11,6 @@ export const rhythmicPrecisionPlan: ExercisePlan = {
   category: "theory",
   exercises: [
     metronomeGapTestExercise,
-    rhythmicMotifDisplacementExercise,
-    spiderRhythmicProgressionExercise,
     chromaticAccentsExercise
   ],
   userId: "system",

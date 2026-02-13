@@ -3,7 +3,7 @@ import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
-import { challengesList } from 'feature/challenges';
+// challengesList removed
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
@@ -254,13 +254,7 @@ const FirebaseLogsItem = ({
   const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, userAvatarFrame } = log;
   const date = new Date(data);
 
-  let plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
-  let isChallenge = false;
-  
-  if (!plan && planId) {
-      plan = challengesList.find(c => c.id === planId);
-      if (plan) isChallenge = true;
-  }
+  const plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
 
   const _currentLang = (i18n.language === 'pl' || i18n.language === 'en') ? i18n.language : 'en';
   
@@ -290,14 +284,9 @@ const FirebaseLogsItem = ({
         </span>
         
         {planTitle && (
-            <span className={cn(
-                "ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded border opacity-90",
-                isChallenge 
-                    ? "text-orange-400 bg-orange-950/30 border-orange-500/20" 
-                    : "text-cyan-400 bg-cyan-950/30 border-cyan-500/20"
-            )}>
+            <span className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20">
               <span className="uppercase tracking-widest text-[9px] opacity-70">
-                  {isChallenge ? "CHALLENGE" : "PLAN"}
+                  PLAN
               </span>
               <span className="font-medium">{planTitle}</span>
             </span>

@@ -3,7 +3,10 @@
     "allow": [
       "Bash(dir /S \"C:\\\\cw\\\\CwiczymyRazem\\\\src\\\\feature\\\\exercisePlan\")",
       "Bash(find:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(dir /s /b \"C:\\\\cw\\\\CwiczymyRazem\\\\src\\\\feature\\\\skills\\\\*.ts\")",
+      "Bash(node:*)",
+      "Bash(dir:*)"
     ]
   }
 }

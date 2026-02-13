@@ -26,5 +26,5 @@ export const twoNotesPerBarPhrasingExercise: Exercise = {
     "If you catch yourself playing habitual licks, slow down and reset the exercise."
   ],
   metronomeSpeed: null,
-  relatedSkills: ["phrasing", "rhythm", "improvisation"],
+  relatedSkills: ["phrasing", "improvisation"],
 };

@@ -13,11 +13,19 @@ export interface TablatureNote {
   isAccented?: boolean;
   isHammerOn?: boolean;
   isPullOff?: boolean;
+  isBend?: boolean;
+  bendSemitones?: number; // 1 = half step, 2 = whole step, 3 = step-and-a-half
+  isPreBend?: boolean;
+  isRelease?: boolean;
+  isVibrato?: boolean;
+  isTap?: boolean;
+  dynamics?: number; // 0.0 (pp) to 1.0 (ff) — expected volume level
 }
 
 export interface TablatureBeat {
   notes: TablatureNote[];
   duration: number; // 1 = quarter note, 0.5 = eighth note
+  chordName?: string;
 }
 
 export interface TablatureMeasure {
@@ -25,12 +33,27 @@ export interface TablatureMeasure {
   timeSignature: [number, number]; // e.g. [4, 4]
 }
 
-export interface ExerciseRiddleConfig {
-  mode: 'sequenceRepeat'; // Expandable for future modes
+export interface ImprovPrompt {
+  text: string;
+  category: 'notes' | 'rhythm' | 'dynamics' | 'phrasing' | 'position' | 'technique' | 'behavior';
+}
+
+export interface SequenceRepeatRiddleConfig {
+  mode: 'sequenceRepeat';
   difficulty: 'easy' | 'medium' | 'hard';
   noteCount: number;
   range?: { minFret: number; maxFret: number; strings: number[] };
 }
+
+export interface ImprovPromptRiddleConfig {
+  mode: 'improvPrompt';
+  difficulty: 'easy' | 'medium' | 'hard';
+  promptIntervalSeconds: number;
+  prompts: ImprovPrompt[];
+  simultaneousPrompts: number;
+}
+
+export type ExerciseRiddleConfig = SequenceRepeatRiddleConfig | ImprovPromptRiddleConfig;
 
 export interface Exercise {
   id: string;
@@ -58,6 +81,7 @@ export interface Exercise {
     url: string;
   }[];
   tablature?: TablatureMeasure[];
+  hideTablatureNotes?: boolean;
   customGoal?: string;
   customGoalDescription?: string;
   riddleConfig?: ExerciseRiddleConfig;

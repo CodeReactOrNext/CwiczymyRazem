@@ -11,12 +11,14 @@ interface SkillCategoryGroupProps {
   category: CategoryKeys;
   skills: GuitarSkill[];
   userSkills: UserSkills;
+  onSkillClick: (skillId: string) => void;
 }
 
 export const SkillCategoryGroup = ({
   category,
   skills,
   userSkills,
+  onSkillClick,
 }: SkillCategoryGroupProps) => {
   const { t } = useTranslation("skills");
   const theme = getSkillTheme(category);
@@ -38,6 +40,7 @@ export const SkillCategoryGroup = ({
                     key={skill.id}
                     skill={skill}
                     currentPoints={userSkills.unlockedSkills[skill.id] || 0}
+                    onSkillClick={() => onSkillClick(skill.id)}
                  />
              ))}
          </div>

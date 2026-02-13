@@ -112,13 +112,10 @@ export const SkillsList = ({
             <div className='flex-shrink-0'>
               <span
                 className={cn(
-                  "flex h-5 min-w-[1.5rem] items-center justify-center rounded bg-black/20 px-1.5 text-[10px] font-medium",
+                  "flex h-5 min-w-[1.5rem] items-center justify-center rounded bg-black/20 px-1.5 text-[10px] font-bold",
                   getBadgeStyles(hasPoints)
                 )}>
-                {isMaxed && (
-                  <FaStar className='mr-0.5 h-2.5 w-2.5 text-yellow-400' />
-                )}
-                {level}
+                {level} XP
               </span>
             </div>
           </div>

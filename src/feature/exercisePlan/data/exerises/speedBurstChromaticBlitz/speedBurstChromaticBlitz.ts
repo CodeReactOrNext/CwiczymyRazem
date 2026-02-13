@@ -1,0 +1,120 @@
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+
+export const speedBurstChromaticBlitzExercise: Exercise = {
+  id: "speed_burst_chromatic_blitz",
+  title: "Speed Burst Chromatic Blitz",
+  description: "Short explosive chromatic bursts followed by rests. Train your hands to fire fast and reset cleanly.",
+  difficulty: "hard",
+  category: "technique",
+  timeInMinutes: 5,
+  instructions: [
+    "Each burst is a short explosive sprint — play the notes as fast and clean as you can.",
+    "Use the rests to completely relax your hands before the next burst.",
+    "Measures 1-3: 4-note bursts on single strings with a full beat of rest between each.",
+    "Measures 4-5: 6-note cross-string bursts (3 notes per string, Paul Gilbert style) with a half-beat rest.",
+    "The goal is maximum speed during the burst and total relaxation during the rest.",
+  ],
+  tips: [
+    "The rest is just as important as the burst — use it to fully reset tension.",
+    "Think of each burst as one explosive gesture, not individual notes.",
+    "Relax your picking hand completely between bursts — shake it out if needed.",
+    "On cross-string bursts, focus on a seamless string transition with no gap.",
+    "If a burst feels sloppy, drop tempo by 20 BPM. Speed without clarity is useless.",
+  ],
+  metronomeSpeed: {
+    min: 100,
+    max: 160,
+    recommended: 120,
+  },
+  relatedSkills: ["alternate_picking"],
+  tablature: [
+    // M1: 4-note bursts ascending — string 6, rest, string 5, rest
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.25, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.25, notes: [{ string: 6, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 6, fret: 8 }] },
+        { duration: 1, notes: [] },
+        { duration: 0.25, notes: [{ string: 5, fret: 5 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 8 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    // M2: 4-note bursts continuing ascending — string 4, rest, string 3, rest
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.25, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 8 }] },
+        { duration: 1, notes: [] },
+        { duration: 0.25, notes: [{ string: 3, fret: 5 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 8 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    // M3: 4-note bursts descending — reverse back down
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.25, notes: [{ string: 3, fret: 8 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 5 }] },
+        { duration: 1, notes: [] },
+        { duration: 0.25, notes: [{ string: 4, fret: 8 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 5 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    // M4: 6-note cross-string bursts (3nps) — strings 6+5, rest, strings 4+3, rest
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.25, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.25, notes: [{ string: 6, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 5 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 7 }] },
+        { duration: 0.5, notes: [] },
+        { duration: 0.25, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 5 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 6 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 7 }] },
+        { duration: 0.5, notes: [] },
+      ],
+    },
+    // M5: 6-note cross-string bursts — shifted to position 7
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.25, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 6, fret: 8 }] },
+        { duration: 0.25, notes: [{ string: 6, fret: 9 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 8 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 9 }] },
+        { duration: 0.5, notes: [] },
+        { duration: 0.25, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 8 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 9 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 7 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 8 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 9 }] },
+        { duration: 0.5, notes: [] },
+      ],
+    },
+  ],
+};

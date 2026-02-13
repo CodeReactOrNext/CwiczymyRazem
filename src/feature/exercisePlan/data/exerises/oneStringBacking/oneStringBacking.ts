@@ -22,5 +22,5 @@ export const oneStringBackingExercise: Exercise = {
     "Try to imitate vocal phrasing - think of your playing as singing."
   ],
   metronomeSpeed: null,
-  relatedSkills: ["phrasing", "improvisation",  "ear_training"],
+  relatedSkills: ["phrasing", "improvisation"],
 }; 

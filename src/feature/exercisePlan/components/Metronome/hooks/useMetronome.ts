@@ -24,6 +24,7 @@ export const useMetronome = ({
   const timerIDRef = useRef<number | null>(null);
   const countInTargetRef = useRef<number>(0);
   const startTimeRef = useRef<number | null>(null);
+  const beatCounterRef = useRef<number>(0);
   const isMutedRef = useRef(isMuted);
 
   useEffect(() => {
@@ -99,11 +100,11 @@ export const useMetronome = ({
         // Main Metronome
         if (startTimeRef.current === null) {
           startTimeRef.current = Date.now();
+          beatCounterRef.current = 0;
           setTimeout(() => setCountInRemaining(0), 0);
-          playSound(nextNoteTimeRef.current, true); // Beat 1
-        } else {
-          playSound(nextNoteTimeRef.current, false); // Other beats
         }
+        playSound(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0);
+        beatCounterRef.current += 1;
       }
 
       nextNoteTimeRef.current += secondsPerBeat;
@@ -123,6 +124,7 @@ export const useMetronome = ({
       nextNoteTimeRef.current = audioContextRef.current.currentTime;
       countInTargetRef.current = 4;
       startTimeRef.current = null;
+      beatCounterRef.current = 0;
       setCountInRemaining(4);
       scheduler();
     }
@@ -136,6 +138,7 @@ export const useMetronome = ({
       timerIDRef.current = null;
     }
     startTimeRef.current = null;
+    beatCounterRef.current = 0;
     countInTargetRef.current = 0;
     setCountInRemaining(0);
     setIsPlaying(false);
