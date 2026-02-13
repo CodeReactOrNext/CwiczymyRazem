@@ -815,6 +815,6 @@ export const chromaticAccentsExercise: Exercise = {
       ]
     }
   ],
-  relatedSkills: ["alternate_picking", "rhythm", "technique"],
+  relatedSkills: ["alternate_picking", "articulation"],
   image: chromaticAccentsImage,
 }; 

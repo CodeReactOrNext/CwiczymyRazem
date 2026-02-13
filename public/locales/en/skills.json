@@ -56,7 +56,7 @@
       "description": "Understanding chord construction and progressions"
     },
     "scales": {
-      "name": "Scales Mastery",
+      "name": "Scales",
       "description": "Learn and master essential guitar scales"
     },
     "rhythm": {
@@ -80,7 +80,7 @@
       "description": "Master the art of bending strings for expressive playing"
     },
     "tapping": {
-      "name": "Two-Hand Tapping",
+      "name": "Tapping",
       "description": "Advanced technique using both hands on the fretboard"
     },
     "improvisation": {
@@ -108,15 +108,15 @@
       "description": "Develop perfect pitch and relative pitch abilities"
     },
     "harmony": {
-      "name": "Advanced Harmony",
+      "name": "Harmony",
       "description": "Master complex chord progressions and voice leading"
     },
     "vibrato": {
-      "name": "Vibrato Technique",
+      "name": "Vibrato",
       "description": "Master the art of adding expression through string vibration"
     },
     "music_theory": {
-      "name": "Advanced Music Theory",
+      "name": "Guitar Theory",
       "description": "Deep understanding of musical concepts and composition"
     },
     "rhythm_variations": {
@@ -136,16 +136,20 @@
       "description": "Understanding and application of musical modes"
     },
     "audio_production": {
-      "name": "Audio Production",
+      "name": "Tone",
       "description": "Learn to record and produce guitar tracks"
     },
     "hybrid_picking": {
-      "name": "Hybrid Picking",
+      "name": "Picking Control",
       "description": "Combine pick and fingerpicking techniques"
     },
-    "rythm_recognition": {
-      "name": "Rhythm Recognition",
-      "description": "Develop the ability to recognize and reproduce complex rhythms"
+    "harmony-ear": {
+      "name": "Harmony",
+      "description": "Develop the ability to recognize chords and progressions by ear"
+    },
+    "chords": {
+      "name": "Chords",
+      "description": "Master chord construction and progressions"
     },
     "transcription": {
       "name": "Transcription",
@@ -190,6 +194,10 @@
     "rhythm_advanced": {
       "name": "Advanced Rhythm",
       "description": "Polyrhythms and advanced timing concepts"
+    },
+    "rythm-recognition": {
+      "name": "Rhythm Recognition",
+      "description": "Mastering complex rhythmic patterns and timing"
     },
     "music_theory_basics": {
       "name": "Theory Basics",

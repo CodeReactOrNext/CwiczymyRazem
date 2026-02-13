@@ -25,7 +25,7 @@ export const economyPickingAngularExercise: Exercise = {
     "Stop if excessive tension appears in the picking hand."
   ],
   metronomeSpeed: { min: 60, max: 180, recommended: 60 },
-  relatedSkills: ["picking", "rhythm", "technique"],
+  relatedSkills: ["hybrid_picking"],
   tablature: [
     {
       "timeSignature": [

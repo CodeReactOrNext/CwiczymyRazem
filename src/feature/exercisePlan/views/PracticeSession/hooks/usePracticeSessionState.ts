@@ -1,6 +1,6 @@
 import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
 import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAuth, selectUserAvatar } from 'feature/user/store/userSlice';
-import { checkAndSaveChallengeProgress, updateQuestProgress, updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
+import { updateQuestProgress, updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
 import { setActivity } from 'feature/user/store/userSlice';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import useTimer from 'hooks/useTimer';
@@ -16,9 +16,12 @@ interface UsePracticeSessionStateProps {
   plan: ExercisePlan;
   onFinish?: () => void;
   autoReport?: boolean;
+  forceFullDuration?: boolean;
+  skillRewardSkillId?: string;
+  skillRewardAmount?: number;
 }
 
-export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionStateProps) => {
+export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, skillRewardSkillId, skillRewardAmount }: UsePracticeSessionStateProps) => {
   const dispatch = useAppDispatch();
   const timerData = useAppSelector(selectTimerData);
   const avatar = useAppSelector(selectUserAvatar);
@@ -29,11 +32,12 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
   const isSubmittingRef = useRef(false);
   const [reportResult, setReportResult] = useState<ReportDataInterface | null>(null);
   const [exerciseTimes, setExerciseTimes] = useState<Record<number, number>>({});
+  const [completedExercises, setCompletedExercises] = useState<number[]>([]);
 
   const userAuth = useAppSelector(selectUserAuth);
   const { reportList } = useActivityLog(userAuth as string);
 
-  const isChallenge = (currentUserStats?.activeChallenges || []).some(ac => ac.challengeId === plan.id);
+  // Challenges removed
 
   const {
     currentExerciseIndex,
@@ -80,7 +84,7 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
   const formattedTimeLeft = `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`;
   const timerProgressValue = Math.min(100, (timer.time / (effectiveTotalSeconds * 1000)) * 100);
 
-  const canSkipExercise = !isChallenge || timeLeft <= 0;
+  const canSkipExercise = !forceFullDuration || timeLeft <= 0;
 
   const checkForSuccess = useCallback(() => {
     if (isLastExercise && timeLeft <= 0) {
@@ -91,6 +95,13 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
   useEffect(() => {
     checkForSuccess();
   }, [checkForSuccess]);
+
+  // Track completion
+  useEffect(() => {
+    if (timeLeft <= 0 && !completedExercises.includes(currentExerciseIndex)) {
+      setCompletedExercises(prev => [...prev, currentExerciseIndex]);
+    }
+  }, [timeLeft, currentExerciseIndex, completedExercises]);
 
   // Update online activity
   useEffect(() => {
@@ -142,14 +153,31 @@ export const usePracticeSessionState = ({ plan, onFinish }: UsePracticeSessionSt
         reportTitle: planTitle,
         habbits: ["exercise_plan"],
         avatarUrl: avatar || null,
-        planId: plan.id
+        planId: plan.id,
+        skillPointsGained: plan.exercises.reduce((acc, exercise, index) => {
+          // Only award points if exercise was completed
+          if (!completedExercises.includes(index)) {
+            return acc;
+          }
+
+          let points = 0;
+          if (exercise.difficulty === 'easy') points = 1;
+          else if (exercise.difficulty === 'medium') points = 2;
+          else if (exercise.difficulty === 'hard') points = 3;
+
+          if (points > 0 && exercise.relatedSkills) {
+            exercise.relatedSkills.forEach(skillId => {
+              acc[skillId] = (acc[skillId] || 0) + points;
+            });
+          }
+          return acc;
+        }, {} as Record<string, number>)
       };
 
       const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();
       setReportResult(result.raitingData);
 
-      // Update challenges and quests
-      dispatch(checkAndSaveChallengeProgress(plan.id));
+      // Challenges removed
       dispatch(updateQuestProgress({ type: 'practice_plan' }));
       dispatch(updateQuestProgress({ type: 'practice_any_song' }));
 

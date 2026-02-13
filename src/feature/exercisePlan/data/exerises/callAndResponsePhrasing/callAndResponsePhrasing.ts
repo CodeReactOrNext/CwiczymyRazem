@@ -29,8 +29,6 @@ export const callAndResponsePhrasingExercise: Exercise = {
   relatedSkills: [
     "phrasing",
     "improvisation",
-    "articulation",
-    "rhythm",
-    "ear_training"
+
   ],
 };

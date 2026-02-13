@@ -27,7 +27,7 @@ export const spiderPermutation2134Exercise: Exercise = {
     max: 180,
     recommended: 80
   },
-  relatedSkills: ["finger_independence", "technique", "picking"],
+  relatedSkills: ["finger_independence"],
   tablature: [
     {
       "timeSignature": [

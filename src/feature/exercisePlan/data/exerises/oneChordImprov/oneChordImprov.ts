@@ -22,6 +22,5 @@ export const oneChordImprovExercise: Exercise = {
     "Experiment with rhythm - even on one chord, changing rhythm can create a sense of development."
   ],
   metronomeSpeed: null,
-  relatedSkills: ["improvisation", "harmony"
-    , "chord_theory"],
+  relatedSkills: ["improvisation", "phrasing"],
 }; 

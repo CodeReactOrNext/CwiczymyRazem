@@ -27,6 +27,6 @@ export const spiderXExercise: Exercise = {
     max: 140,
     recommended: 80,
   },
-  relatedSkills: ["alternate_picking", "picking", "finger_independence"],
+  relatedSkills: ["finger_independence"],
   image: spiderBasicImage,
 };

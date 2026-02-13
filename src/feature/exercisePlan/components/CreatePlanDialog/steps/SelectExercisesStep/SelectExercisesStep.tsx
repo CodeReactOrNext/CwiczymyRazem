@@ -10,6 +10,8 @@ import { ExerciseGrid } from "./components/ExerciseGrid";
 import { SelectedExercisesList } from "./components/SelectedExercisesList";
 import { CreateCustomExerciseDialog } from "./CreateCustomExerciseDialog";
 import { useExerciseSelection } from "./hooks/useExerciseSelection";
+import { ScaleSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ScaleSelectionDialog";
+import { ChordSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ChordSelectionDialog";
 
 interface SelectExercisesStepProps {
   selectedExercises: Exercise[];
@@ -26,6 +28,8 @@ export const SelectExercisesStep = ({
   const [isCustomExerciseDialogOpen, setIsCustomExerciseDialogOpen] = useState(false);
   const [editingExercise, setEditingExercise] = useState<Exercise | undefined>(undefined);
   const [customExerciseMode, setCustomExerciseMode] = useState<"create" | "edit" | "clone">("create");
+  const [isScaleDialogOpen, setIsScaleDialogOpen] = useState(false);
+  const [isChordDialogOpen, setIsChordDialogOpen] = useState(false);
 
   const {
     searchQuery,
@@ -68,6 +72,18 @@ export const SelectExercisesStep = ({
       setIsCustomExerciseDialogOpen(true);
   };
 
+  const handleScaleGenerated = (generatedExercise: Exercise) => {
+      // Add the configured scale exercise to selected exercises
+      onExercisesSelect([...selectedExercises, generatedExercise]);
+      setIsScaleDialogOpen(false);
+  };
+
+  const handleChordGenerated = (generatedExercise: Exercise) => {
+      // Add the configured chord exercise to selected exercises
+      onExercisesSelect([...selectedExercises, generatedExercise]);
+      setIsChordDialogOpen(false);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -85,9 +101,23 @@ export const SelectExercisesStep = ({
         </div>
         <div className='flex items-center gap-3 shrink-0'>
           <Button
+            onClick={() => setIsScaleDialogOpen(true)}
+            variant="outline"
+            className='bg-gradient-to-br from-indigo-900/50 to-blue-900/50 border-indigo-500/30 hover:border-indigo-400/50 hover:from-indigo-800/60 hover:to-blue-800/60 text-indigo-300 hover:text-indigo-200 transition-all gap-2 h-11 px-5 font-bold tracking-tight shadow-lg shadow-indigo-500/10'>
+            <FaPlus className="h-3.5 w-3.5" />
+            Create Scale
+          </Button>
+          <Button
+            onClick={() => setIsChordDialogOpen(true)}
+            variant="outline"
+            className='bg-gradient-to-br from-emerald-900/50 to-teal-900/50 border-emerald-500/30 hover:border-emerald-400/50 hover:from-emerald-800/60 hover:to-teal-800/60 text-emerald-300 hover:text-emerald-200 transition-all gap-2 h-11 px-5 font-bold tracking-tight shadow-lg shadow-emerald-500/10'>
+            <FaPlus className="h-3.5 w-3.5" />
+            Create Chords
+          </Button>
+          <Button
             onClick={handleCreateCustomOpen}
             variant="outline"
-            className='bg-zinc-900/50 border-white/10 hover:bg-zinc-800 hover:border-cyan-500/50 hover:text-cyan-400 transition-all gap-2 h-11 px-5 font-bold tracking-tight'>
+            className='bg-zinc-900/50 border-white/10 hover:bg-zinc-800 hover:border-zinc-500/50 hover:text-zinc-200 transition-all gap-2 h-11 px-5 font-bold tracking-tight'>
             <FaPlus className="h-3.5 w-3.5" />
             {t("exercises:custom_exercise.button_label")}
           </Button>
@@ -129,12 +159,24 @@ export const SelectExercisesStep = ({
         </div>
       </div>
 
-      <CreateCustomExerciseDialog 
-        open={isCustomExerciseDialogOpen} 
-        onOpenChange={setIsCustomExerciseDialogOpen} 
+      <CreateCustomExerciseDialog
+        open={isCustomExerciseDialogOpen}
+        onOpenChange={setIsCustomExerciseDialogOpen}
         onExerciseCreate={handleCustomExerciseCreate}
         initialData={editingExercise}
         mode={customExerciseMode}
+      />
+
+      <ScaleSelectionDialog
+        isOpen={isScaleDialogOpen}
+        onClose={() => setIsScaleDialogOpen(false)}
+        onExerciseGenerated={handleScaleGenerated}
+      />
+
+      <ChordSelectionDialog
+        isOpen={isChordDialogOpen}
+        onClose={() => setIsChordDialogOpen(false)}
+        onExerciseGenerated={handleChordGenerated}
       />
     </motion.div>
   );

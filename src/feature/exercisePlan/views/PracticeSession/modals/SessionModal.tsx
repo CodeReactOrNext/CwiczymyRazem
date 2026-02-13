@@ -11,6 +11,7 @@ import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalo
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { EarTrainingView } from "../components/EarTrainingView";
+import { ImprovPromptView } from "../components/ImprovPromptView";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import Image from "next/image";
@@ -130,7 +131,7 @@ const SessionModal = ({
       metronome.stopMetronome();
     } else {
       startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig) {
+      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
         metronome.startMetronome();
       }
     }
@@ -198,9 +199,9 @@ const SessionModal = ({
 
             <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5 pb-[76px]'>
               <div className='space-y-6 p-4'>
-                {currentExercise.riddleConfig && (
+                {currentExercise.riddleConfig?.mode === 'sequenceRepeat' && (
                   <div className="mb-4">
-                    <EarTrainingView 
+                    <EarTrainingView
                       difficulty={currentExercise.riddleConfig.difficulty}
                       isRevealed={isRiddleRevealed || false}
                       isPlaying={isPlaying}
@@ -215,7 +216,12 @@ const SessionModal = ({
                     />
                   </div>
                 )}
-                {activeTablature && activeTablature.length > 0 && (!currentExercise.riddleConfig || isRiddleRevealed) ? (
+                {currentExercise.riddleConfig?.mode === 'improvPrompt' && (
+                  <div className="mb-4">
+                    <ImprovPromptView config={currentExercise.riddleConfig} isRunning={isPlaying} />
+                  </div>
+                )}
+                {activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
                   <TablatureViewer
                     measures={activeTablature}
                     bpm={metronome.bpm}

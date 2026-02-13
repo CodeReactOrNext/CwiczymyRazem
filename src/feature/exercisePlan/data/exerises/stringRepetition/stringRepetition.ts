@@ -22,7 +22,7 @@ export const stringRepetitionExercise: Exercise = {
     max: 140,
     recommended: 70
   },
-  relatedSkills: ["rhythm", "technique", "picking",],
+  relatedSkills: ["rhythm"],
   tablature: [
     {
       timeSignature: [4, 4],

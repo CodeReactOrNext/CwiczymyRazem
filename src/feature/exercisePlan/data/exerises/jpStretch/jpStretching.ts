@@ -20,10 +20,10 @@ export const jpStretching: Exercise = {
     "Focus on stretching your fingers, not on speed.",
     "Keep your wrist in a neutral position to avoid tension.",
     "If you feel pain (not discomfort), stop the exercise.",
-   
+
     "Remember to relax your hand between repetitions."
   ],
   metronomeSpeed: null,
-  relatedSkills: [],
+  relatedSkills: ['finger_independence'],
   image: jpStretchingImage
 };

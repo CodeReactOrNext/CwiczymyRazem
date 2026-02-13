@@ -1,20 +1,25 @@
 import type { GuitarSkill, } from "feature/skills/skills.types";
 import {
-  GiBookmarklet,
+  GiBrain,
   GiCompactDisc,
+  GiDrum,
+  GiGClef,
   GiGuitarHead,
   GiHand,
-  GiHandOk,
-  GiHeadShot,
+  GiHeadphones,
+  GiLightBulb,
   GiMetronome,
-  GiMusicalKeyboard,
+  GiMicrophone,
   GiMusicalNotes,
   GiMusicalScore,
-  GiMusicSpell,
+  GiOpenBook,
+  GiPaintBrush,
+  GiPickOfDestiny,
   GiQuillInk,
+  GiRadarSweep,
   GiSoundOn,
   GiSoundWaves,
-  GiSpellBook,
+  GiStairsGoal,
   GiSteelClaws,
   GiVibratingBall
 } from "react-icons/gi";
@@ -28,7 +33,7 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "phrasing",
     category: "creativity",
-    icon: GiGuitarHead,
+    icon: GiPaintBrush,
   },
   {
     id: "finger_independence",
@@ -43,17 +48,17 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "sweep_picking",
     category: "technique",
-    icon: GiMusicSpell,
+    icon: GiRadarSweep,
   },
   {
-    id: "chord_theory",
+    id: "chords",
     category: "theory",
     icon: GiMusicalScore,
   },
   {
     id: "scales",
     category: "theory",
-    icon: GiSpellBook,
+    icon: GiStairsGoal,
   },
   {
     id: "rhythm",
@@ -68,27 +73,17 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "tapping",
     category: "technique",
-    icon: GiHandOk,
+    icon: GiSteelClaws,
   },
   {
     id: "improvisation",
     category: "creativity",
-    icon: GiMusicSpell,
+    icon: GiLightBulb,
   },
   {
     id: "ear_training",
     category: "hearing",
-    icon: GiHeadShot,
-  },
-  {
-    id: "sight_reading",
-    category: "theory",
-    icon: GiMusicalScore,
-  },
-  {
-    id: "fingerpicking",
-    category: "technique",
-    icon: GiGuitarHead,
+    icon: GiBrain,
   },
   {
     id: "composition",
@@ -98,17 +93,26 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "articulation",
     category: "technique",
-    icon: GiSoundWaves,
-  },
-  {
-    id: "pitch_recognition",
+    icon: GiMicrophone,
+  }, {
+    id: "harmony-ear",
     category: "hearing",
     icon: GiSoundOn,
   },
   {
+    id: "transcription",
+    category: "hearing",
+    icon: GiHeadphones,
+  },
+  {
+    id: "rythm-recognition",
+    category: "hearing",
+    icon: GiDrum,
+  },
+  {
     id: "harmony",
     category: "theory",
-    icon: GiMusicalNotes,
+    icon: GiGClef,
   },
   {
     id: "vibrato",
@@ -118,14 +122,8 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "music_theory",
     category: "theory",
-    icon: GiBookmarklet,
+    icon: GiOpenBook,
   },
-  {
-    id: "slide_guitar",
-    category: "technique",
-    icon: GiSteelClaws,
-  },
-
   {
     id: "audio_production",
     category: "creativity",
@@ -134,21 +132,8 @@ export const guitarSkills: GuitarSkill[] = [
   {
     id: "hybrid_picking",
     category: "technique",
-    icon: GiMusicalKeyboard,
+    icon: GiPickOfDestiny,
   },
-  {
-    id: "transcription",
-    category: "hearing",
-    icon: GiMusicalScore,
-  },
-  {
-    id: "rythm_recognition",
-    category: "hearing",
-    icon: GiMetronome,
-  },
-  {
-    id: "picking",
-    category: "technique",
-    icon: GiGuitarHead,
-  },
+
+
 ];

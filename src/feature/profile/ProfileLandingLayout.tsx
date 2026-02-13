@@ -6,7 +6,7 @@ import { NavigationCards } from "feature/profile/components/NavigationCards/Navi
 import { useRouter } from "next/router";
 import type { StatisticsDataInterface } from "types/api.types";
 
-import { ActiveChallengeWidget } from "feature/challenges/frontend/infrastructure/ui/ActiveChallengeWidget";
+// ActiveChallengeWidget removed
 import { ChevronRight } from "lucide-react";
 import { GiMetronome } from "react-icons/gi";
 
@@ -71,8 +71,7 @@ const ProfileLandingLayout = ({
 
         <div>
           <DashboardSection compact>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-              <ActiveChallengeWidget />
+            <div className="grid grid-cols-1 gap-4 mb-6">
               <DailyQuestWidget />
             </div>
           </DashboardSection>

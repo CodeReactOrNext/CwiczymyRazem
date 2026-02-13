@@ -22,5 +22,5 @@ export const triadImprovisationExercise: Exercise = {
     "Pay attention to the tonal character of each triad - major, minor, diminished or augmented."
   ],
   metronomeSpeed: null,
-  relatedSkills: ["harmony", "improvisation", "chord_theory", ],
+  relatedSkills: ["harmony", "improvisation", "chords", ],
 }; 

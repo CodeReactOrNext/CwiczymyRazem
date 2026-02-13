@@ -26,5 +26,5 @@ export const guideToneVoiceLeadingExercise: Exercise = {
     "With so few notes, use dynamics and sustain to keep the line musical."
   ],
   metronomeSpeed: null,
-  relatedSkills: ["chord_theory", "harmony", "music_theory", "ear_training"],
+  relatedSkills: ["chords", "harmony", "music_theory", "ear_training"],
 };

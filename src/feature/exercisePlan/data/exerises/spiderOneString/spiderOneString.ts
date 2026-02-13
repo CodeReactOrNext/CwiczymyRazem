@@ -638,5 +638,5 @@ export const spiderOneStringExercise: Exercise = {
       ]
     }
   ],
-  relatedSkills: ["alternate_picking", "picking"],
+  relatedSkills: ["alternate_picking"],
 };

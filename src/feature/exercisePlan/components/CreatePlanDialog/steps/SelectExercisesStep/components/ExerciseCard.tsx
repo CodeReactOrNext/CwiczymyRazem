@@ -3,7 +3,7 @@ import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Clock, Video,Youtube } from "lucide-react";
+import { Check, Clock, Video, Youtube } from "lucide-react";
 
 interface ExerciseCardProps {
   exercise: Exercise;
@@ -37,8 +37,8 @@ export const ExerciseCard = ({
       {/* Selection Checkbox */}
       <div className={cn(
         "absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full border transition-all duration-200",
-        isSelected 
-            ? "border-cyan-500 bg-cyan-500 text-white" 
+        isSelected
+            ? "border-cyan-500 bg-cyan-500 text-white"
             : "border-zinc-700 bg-zinc-950/50 text-transparent opacity-50 group-hover:block group-hover:opacity-100"
       )}>
         <Check className="h-3.5 w-3.5" strokeWidth={3} />

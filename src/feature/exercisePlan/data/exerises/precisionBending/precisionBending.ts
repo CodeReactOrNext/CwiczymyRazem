@@ -22,5 +22,5 @@ export const precisionBendingExercise: Exercise = {
     "Regularly check your accuracy by comparing your bend with the target note."
   ],
   metronomeSpeed: null,
-  relatedSkills: ["bending",   "technique"],
+  relatedSkills: ["bending"],
 }; 

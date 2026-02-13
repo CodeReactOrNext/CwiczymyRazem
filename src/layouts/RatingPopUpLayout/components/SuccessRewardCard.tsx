@@ -8,6 +8,9 @@ interface SuccessRewardCardProps {
   currentLevel: number;
   prevProgressPercent: number;
   currProgressPercent: number;
+  skillRewardSkillId?: string;
+  skillRewardAmount?: number;
+  skillPointsGained?: Record<string, number>;
 }
 
 export const SuccessRewardCard = ({
@@ -15,7 +18,12 @@ export const SuccessRewardCard = ({
   currentLevel,
   prevProgressPercent,
   currProgressPercent,
+  skillRewardSkillId,
+  skillRewardAmount,
+  skillPointsGained
 }: SuccessRewardCardProps) => {
+  const skillName = skillRewardSkillId ? skillRewardSkillId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : "";
+
   useEffect(() => {
     const timer = setTimeout(() => {
         const end = Date.now() + 2 * 1000;
@@ -121,12 +129,40 @@ export const SuccessRewardCard = ({
         </div>
 
         <div className="flex flex-col items-center relative z-10 text-center mb-10">
-           <div className="flex items-center gap-4">
-              <span className="text-8xl sm:text-9xl font-black text-white tracking-tighter drop-shadow-[0_0_40px_rgba(6,182,212,0.2)] transition-transform group-hover:scale-105 duration-700">{displayedPoints}</span>
-              <span className="text-3xl font-black text-cyan-500 uppercase tracking-tighter leading-none">XP</span>
-           </div>
-        </div>
-        
+               {skillPointsGained && Object.keys(skillPointsGained).length > 0 && (
+                 <div className="flex flex-col items-center gap-2 mt-4">
+                    {Object.entries(skillPointsGained).map(([skillId, points], index) => {
+                      const name = skillId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                      return (
+                        <motion.div
+                          key={skillId}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 1 + (index * 0.2), duration: 0.5 }}
+                          className="flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/30 px-4 py-1.5 rounded-full backdrop-blur-md"
+                        >
+                          <span className="text-cyan-400 font-black text-xs uppercase tracking-widest">
+                             +{points} {name}
+                          </span>
+                        </motion.div>
+                      );
+                    })}
+                 </div>
+               )}
+
+               {skillRewardSkillId && !skillPointsGained && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1, duration: 0.5 }}
+                    className="flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/30 px-4 py-1.5 rounded-full backdrop-blur-md"
+                  >
+                    <span className="text-cyan-400 font-black text-xs uppercase tracking-widest">
+                       +{skillRewardAmount} {skillName}
+                    </span>
+                  </motion.div>
+               )}
+            </div>
         <div className='max-w-xl w-full relative z-10 space-y-5'>
             <div className="space-y-4">
                 <div className="flex justify-between items-end px-1">
@@ -145,7 +181,7 @@ export const SuccessRewardCard = ({
                     </motion.div>
                 </div>
             </div>
-        </div>
-    </motion.div>
+            </div>
+        </motion.div>
   );
 };

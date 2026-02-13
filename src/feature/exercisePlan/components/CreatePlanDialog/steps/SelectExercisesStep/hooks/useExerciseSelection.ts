@@ -29,7 +29,11 @@ export const useExerciseSelection = ({
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const exercises = exercisesAgregat;
+  // Filter out the configurable templates - they have dedicated buttons in the creator
+  const exercises = exercisesAgregat.filter(ex =>
+    ex.id !== 'scale_practice_configurable' &&
+    ex.id !== 'chord_practice_configurable'
+  );
 
   const groupedExercises = useMemo(() => {
     return exercises.reduce((acc, exercise) => {

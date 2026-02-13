@@ -29,7 +29,6 @@ export const chordToneImprovisationExercise: Exercise = {
   relatedSkills: [
     "harmony",
     "improvisation",
-    "chord_theory",
-    "ear_training"
+    "chords",
   ],
 };

@@ -1,0 +1,165 @@
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+
+export const sweep5StringCascadeExercise: Exercise = {
+  id: "sweep_5_string_cascade",
+  title: "5-String Sweep Cascades",
+  description: "Extended 5-string arpeggio sweep patterns. Am and Dm shapes across strings 5-1 with hammer-on turnaround at the top. Builds endurance and cross-string muting discipline.",
+  difficulty: "hard",
+  category: "technique",
+  timeInMinutes: 10,
+  instructions: [
+    "Measures 1-2: Am 5-string arpeggio (strings 5-4-3-2-1). Sweep down through all 5, hammer at top, pull-off, sweep back up.",
+    "Measures 3-4: Dm 5-string shape. Same sweep motion, shifted position.",
+    "Measures 5-6: Am → Dm → C → Em progression, each arpeggio sweeps across all 5 strings.",
+    "One note per string — no two notes should ring at the same time (except the top hammer/pull).",
+  ],
+  tips: [
+    "Use palm muting with your right hand to kill each string immediately after picking it.",
+    "The fretting hand rolls across the barre — each finger lifts right after its note sounds.",
+    "At the turnaround (top string), the hammer-on and pull-off must be crisp and clear.",
+    "Think of the sweep as one long stroke, not five individual picks.",
+  ],
+  metronomeSpeed: { min: 60, max: 120, recommended: 80 },
+  relatedSkills: ["sweep_picking"],
+  tablature: [
+    // M1: Am 5-string sweep down and up
+    {
+      timeSignature: [4, 4],
+      beats: [
+        // Down sweep: 5→4→3→2→1, hammer at top
+        { duration: 0.25, notes: [{ string: 5, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 15, isHammerOn: true }] },
+        // Up sweep: 1→2→3→4→5
+        { duration: 0.25, notes: [{ string: 1, fret: 12, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 12 }] },
+        // Start again
+        { duration: 0.25, notes: [{ string: 5, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12 }] },
+      ],
+    },
+    // M2: Am continued — second half + turnaround
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.25, notes: [{ string: 1, fret: 15, isHammerOn: true }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 15, isHammerOn: true }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 14 }] },
+      ],
+    },
+    // M3: Dm 5-string sweep (str5 f10, str4 f12, str3 f11, str2 f10, str1 f10→13)
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.25, notes: [{ string: 5, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 11 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 13, isHammerOn: true }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 10, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 11 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 11 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 10 }] },
+      ],
+    },
+    // M4: Dm continued
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.25, notes: [{ string: 1, fret: 13, isHammerOn: true }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 10, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 11 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 5, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 11 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 13, isHammerOn: true }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 10, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 11 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 12 }] },
+      ],
+    },
+    // M5: Progression — Am down, Dm down
+    {
+      timeSignature: [4, 4],
+      beats: [
+        // Am down
+        { duration: 0.25, notes: [{ string: 5, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 15, isHammerOn: true }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        // Dm down
+        { duration: 0.25, notes: [{ string: 5, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 11 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 10 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 13, isHammerOn: true }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 10, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 10 }] },
+      ],
+    },
+    // M6: C down, Em down
+    {
+      timeSignature: [4, 4],
+      beats: [
+        // C (str5 f12, str4 f14, str3 f12, str2 f13, str1 f12→15)
+        { duration: 0.25, notes: [{ string: 5, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 14 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 15, isHammerOn: true }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 13 }] },
+        // Em (str5 f12, str4 f12, str3 f12, str2 f12, str1 f12→15)
+        { duration: 0.25, notes: [{ string: 5, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 4, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 3, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12 }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 15, isHammerOn: true }] },
+        { duration: 0.25, notes: [{ string: 1, fret: 12, isPullOff: true }] },
+        { duration: 0.25, notes: [{ string: 2, fret: 12 }] },
+      ],
+    },
+  ],
+};

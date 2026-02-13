@@ -48,8 +48,12 @@ import { CalibrationChoiceDialog } from "./components/CalibrationChoiceDialog";
 import { CalibrationWizard } from "./components/CalibrationWizard";
 import { generateRiddle } from "feature/exercisePlan/logic/riddleGenerator";
 import { EarTrainingView } from "./components/EarTrainingView";
+import { ImprovPromptView } from "./components/ImprovPromptView";
 import type { TablatureMeasure } from "../../types/exercise.types";
 import { playCompletionSound } from "utils/audioUtils";
+import { ScaleSelectionDialog } from "./components/ScaleSelectionDialog";
+import { ChordSelectionDialog } from "./components/ChordSelectionDialog";
+import type { Exercise } from "../../types/exercise.types";
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
@@ -57,9 +61,12 @@ interface PracticeSessionProps {
   onClose?: () => void;
   isFinishing?: boolean;
   autoReport?: boolean;
+  forceFullDuration?: boolean;
+  skillRewardSkillId?: string;
+  skillRewardAmount?: number;
 }
 
-export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoReport }: PracticeSessionProps) => {
+export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoReport, forceFullDuration, skillRewardSkillId, skillRewardAmount }: PracticeSessionProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -101,10 +108,15 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     activityDataToUse,
     jumpToExercise,
     canSkipExercise
-  } = usePracticeSessionState({ plan, onFinish, autoReport });
+  } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, skillRewardSkillId, skillRewardAmount });
 
   const [isAudioMuted, setIsAudioMuted] = useState(true);
   const [isMetronomeMuted, setIsMetronomeMuted] = useState(false);
+
+  // --- Scale Selection State ---
+  const [showScaleDialog, setShowScaleDialog] = useState(false);
+  const [showChordDialog, setShowChordDialog] = useState(false);
+  const [generatedExercise, setGeneratedExercise] = useState<Exercise | null>(null);
 
   // --- Ear Training / Riddle State ---
   const [riddleMeasures, setRiddleMeasures] = useState<TablatureMeasure[] | null>(null);
@@ -112,27 +124,54 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const [earTrainingScore, setEarTrainingScore] = useState(0);
   const [hasPlayedRiddleOnce, setHasPlayedRiddleOnce] = useState(false);
 
+  // Detect configurable scale exercise - removed auto-popup as requested by user
+  /*
+  useEffect(() => {
+    if (currentExercise.id === 'scale_practice_configurable') {
+      setShowScaleDialog(true);
+      setShowChordDialog(false);
+      setGeneratedExercise(null);
+    } else if (currentExercise.id === 'chord_practice_configurable') {
+      setShowChordDialog(true);
+      setShowScaleDialog(false);
+      setGeneratedExercise(null);
+    } else {
+      setShowScaleDialog(false);
+      setShowChordDialog(false);
+    }
+  }, [currentExercise.id]);
+  */
+
+  const handleGenerated = (genExercise: Exercise) => {
+    setGeneratedExercise(genExercise);
+    setShowScaleDialog(false);
+    setShowChordDialog(false);
+  };
+
+  // Use generated exercise if available, otherwise use current exercise
+  const activeExercise = generatedExercise || currentExercise;
+
   useEffect(() => {
     // Reset flags and UI state on ANY exercise change
     // For Ear Training (riddleConfig), enable playback by default, otherwise disable
-    setIsAudioMuted(!currentExercise.riddleConfig);
+    setIsAudioMuted(!(currentExercise.riddleConfig?.mode === 'sequenceRepeat' || (currentExercise.tablature && currentExercise.tablature.length > 0)));
     setIsMetronomeMuted(false);
     setHasPlayedRiddleOnce(false);
     setIsRiddleRevealed(false);
 
-    if (currentExercise.riddleConfig) {
+    if (currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
        // Generate new riddle when exercise changes
        setRiddleMeasures(generateRiddle(currentExercise.riddleConfig));
        if (metronome.bpm !== 108) metronome.setBpm(108);
     } else {
-       setRiddleMeasures(null); 
+       setRiddleMeasures(null);
     }
   }, [currentExercise.id]); // Use ID to trigger on exercise change
 
-  const activeTablature = riddleMeasures || currentExercise.tablature;
+  const activeTablature = riddleMeasures || activeExercise.tablature;
 
   const handleNextRiddle = () => {
-    if (currentExercise.riddleConfig) {
+    if (currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
       setRiddleMeasures(generateRiddle(currentExercise.riddleConfig));
       setIsRiddleRevealed(false);
       setHasPlayedRiddleOnce(false); // Reset on next riddle
@@ -165,10 +204,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
   // Metronome State
   const metronome = useDeviceMetronome({
-    initialBpm: currentExercise.metronomeSpeed?.recommended || 60,
-    minBpm: currentExercise.metronomeSpeed?.min,
-    maxBpm: currentExercise.metronomeSpeed?.max,
-    recommendedBpm: currentExercise.metronomeSpeed?.recommended,
+    initialBpm: activeExercise.metronomeSpeed?.recommended || 60,
+    minBpm: activeExercise.metronomeSpeed?.min,
+    maxBpm: activeExercise.metronomeSpeed?.max,
+    recommendedBpm: activeExercise.metronomeSpeed?.recommended,
     isMuted: isMetronomeMuted 
   });
 
@@ -179,7 +218,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     isPlaying: metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime, // Only play when count-in finished
     startTime: metronome.startTime,
     isMuted: isAudioMuted,
-    onLoopComplete: () => setHasPlayedRiddleOnce(true)
+    onLoopComplete: () => setHasPlayedRiddleOnce(true),
+    audioContext: metronome.audioContext,
+    audioStartTime: metronome.audioStartTime,
   });
 
   const {
@@ -191,7 +232,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   } = useImageHandling();
 
   const planHasTablature = useMemo(
-    () => plan.exercises.some(ex => (ex.tablature && ex.tablature.length > 0) || ex.riddleConfig),
+    () => plan.exercises.some(ex => (ex.tablature && ex.tablature.length > 0) || ex.riddleConfig?.mode === 'sequenceRepeat'),
     [plan.exercises]
   );
 
@@ -202,6 +243,15 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
         if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
         if (e.code === "Space") {
             e.preventDefault();
+            if (isPlaying) {
+              stopTimer();
+              metronome.stopMetronome();
+            } else {
+              startTimer();
+              if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
+                metronome.startMetronome();
+              }
+            }
             return;
         }
 
@@ -223,7 +273,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLastExercise, currentExerciseIndex, handleNextExercise, jumpToExercise, resetTimer, metronome]);
+  }, [isLastExercise, currentExerciseIndex, handleNextExercise, jumpToExercise, resetTimer, metronome, isPlaying, startTimer, stopTimer, currentExercise]);
 
   const category = currentExercise.category || "mixed";
 
@@ -233,7 +283,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       metronome.stopMetronome();
     } else {
       startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig) {
+      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
         metronome.startMetronome();
       }
     }
@@ -563,8 +613,22 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   return (
     <>
       <Head>
-        <title>{formattedTimeLeft} | {currentExercise.title}</title>
+        <title>{formattedTimeLeft} | {activeExercise.title}</title>
       </Head>
+
+      {/* Scale Selection Dialog */}
+      <ScaleSelectionDialog
+        isOpen={showScaleDialog}
+        onClose={() => setShowScaleDialog(false)}
+        onExerciseGenerated={handleGenerated}
+      />
+
+      <ChordSelectionDialog
+        isOpen={showChordDialog}
+        onClose={() => setShowChordDialog(false)}
+        onExerciseGenerated={handleGenerated}
+      />
+
       {isMobileView && reportResult && currentUserStats && previousUserStats && (
         <div className="fixed inset-0 z-[999999999] overflow-y-auto bg-zinc-950">
           <RatingPopUp 
@@ -730,10 +794,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                               </span>
                            </div>
                         )}
-                        {currentExercise.title}
+                        {activeExercise.title}
                     </h2>
 
-                    {currentExercise.customGoal && (
+                    {activeExercise.customGoal && (
                       <motion.div 
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -937,9 +1001,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                       currentExercise.isPlayalong ? "" : "border border-white/10 glass-card"
                     )}>
                         {/* Ear Training View */}
-                        {currentExercise.riddleConfig && (
+                        {/* Ear Training View */}
+                        {currentExercise.riddleConfig?.mode === 'sequenceRepeat' && (
                             <div className="p-4 border-b border-white/5">
-                                <EarTrainingView 
+                                <EarTrainingView
                                     difficulty={currentExercise.riddleConfig.difficulty}
                                     isRevealed={isRiddleRevealed}
                                     isPlaying={isPlaying}
@@ -956,7 +1021,14 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                             </div>
                         )}
 
-                         {(activeTablature && activeTablature.length > 0 && (!currentExercise.riddleConfig || isRiddleRevealed)) ? (
+                        {/* Improv Prompt View */}
+                        {currentExercise.riddleConfig?.mode === 'improvPrompt' && (
+                            <div className="p-4">
+                                <ImprovPromptView config={currentExercise.riddleConfig} isRunning={isPlaying} />
+                            </div>
+                        )}
+
+                         {(activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed)) ? (
                            <TablatureViewer
                               measures={activeTablature}
                               bpm={metronome.bpm}
@@ -968,6 +1040,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                               isListening={isListening}
                               hitNotes={hitNotes}
                               currentBeatsElapsed={currentBeatsElapsed}
+                              hideNotes={activeExercise.hideTablatureNotes}
+                              audioContext={metronome.audioContext}
+                              audioStartTime={metronome.audioStartTime}
                            />
                          ) : currentExercise.isPlayalong && currentExercise.youtubeVideoId ? (
                              !isMobileView && (
@@ -1024,8 +1099,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
                      <div className="lg:col-span-8 space-y-8">
-                         <Accordion type="single" collapsible defaultValue={currentExercise.instructions?.length > 0 ? "instructions" : (currentExercise.tips?.length > 0 ? "tips" : undefined)} className="w-full space-y-4">
-                            {currentExercise.instructions && currentExercise.instructions.length > 0 && (
+                         <Accordion type="single" collapsible defaultValue={activeExercise.instructions?.length > 0 ? "instructions" : (activeExercise.tips?.length > 0 ? "tips" : undefined)} className="w-full space-y-4">
+                            {activeExercise.instructions && activeExercise.instructions.length > 0 && (
                                 <AccordionItem value="instructions" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
                                     <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
                                         <div className="flex items-center gap-3">
@@ -1040,7 +1115,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                            "prose prose-invert max-w-none",
                                            currentExercise.isPlayalong ? "text-sm leading-relaxed opacity-70" : ""
                                          )}>
-                                            {currentExercise.instructions.map((instruction, idx) => (
+                                            {activeExercise.instructions.map((instruction, idx) => (
                                                 <p key={idx} className="mb-4 last:mb-0">
                                                     {instruction}
                                                 </p>
@@ -1050,7 +1125,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                 </AccordionItem>
                             )}
 
-                            {currentExercise.tips && currentExercise.tips.length > 0 && (
+                            {activeExercise.tips && activeExercise.tips.length > 0 && (
                                 <AccordionItem value="tips" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
                                     <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
                                         <div className="flex items-center gap-3">
@@ -1065,7 +1140,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                            "list-inside list-disc",
                                            currentExercise.isPlayalong ? "space-y-1 text-sm" : "space-y-2"
                                          )}>
-                                            {currentExercise.tips.map((tip, idx) => (
+                                            {activeExercise.tips.map((tip, idx) => (
                                                 <li key={idx} className="marker:text-amber-500/50">
                                                     {tip}
                                                 </li>
@@ -1095,9 +1170,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                             className={cn(
                                               "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
                                               isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10",
-                                              currentExercise.riddleConfig && "opacity-50 cursor-not-allowed" // Disable button if forced on
+                                              currentExercise.riddleConfig?.mode === 'sequenceRepeat' && "opacity-50 cursor-not-allowed" // Disable button if forced on
                                             )}
-                                            disabled={!!currentExercise.riddleConfig} // Disable if Ear Training
+                                            disabled={currentExercise.riddleConfig?.mode === 'sequenceRepeat'} // Disable if Ear Training
                                             onClick={() => {
                                               const newMuted = !isAudioMuted;
                                               setIsAudioMuted(newMuted);

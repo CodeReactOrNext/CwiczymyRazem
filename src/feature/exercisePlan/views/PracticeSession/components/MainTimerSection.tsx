@@ -96,7 +96,7 @@ export const MainTimerSection = ({
                   size="md"
                   variant="centered"
                   canSkipExercise={canSkipExercise}
-                  hidePlayButton={!!currentExercise.riddleConfig}
+                  hidePlayButton={currentExercise.riddleConfig?.mode === 'sequenceRepeat'}
                   isFinished={isFinished}
                 />
           </div>
@@ -183,7 +183,7 @@ export const MainTimerSection = ({
                   handleNextExercise={handleNextExercise}
                   size='lg'
                   canSkipExercise={canSkipExercise}
-                  hidePlayButton={!!currentExercise.riddleConfig}
+                  hidePlayButton={currentExercise.riddleConfig?.mode === 'sequenceRepeat'}
                   isFinished={isFinished}
                 />
               </motion.div>

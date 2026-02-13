@@ -43,11 +43,6 @@ export const SkillCategoryCard = ({
 
   const categoryLevel = Math.floor(displayTotalLevels / POINTS_PER_LEVEL);
 
-  const availablePoints =
-    userSkills.availablePoints[
-      category as keyof typeof userSkills.availablePoints
-    ] || 0;
-
   const getCategoryColors = () => {
     switch (category) {
       case "technique":
@@ -115,13 +110,7 @@ export const SkillCategoryCard = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {availablePoints > 0 && (
-              <div className="rounded-lg bg-emerald-500/20 border border-emerald-500/30 px-2.5 py-1">
-                <span className="text-xs font-bold text-emerald-400">
-                  +{availablePoints}
-                </span>
-              </div>
-            )}
+       
             <div className={cn("rounded-lg border px-3 py-1", colors.border, colors.iconBg)}>
               <span className={cn("text-sm font-bold", colors.iconText)}>
                 {categoryLevel}
