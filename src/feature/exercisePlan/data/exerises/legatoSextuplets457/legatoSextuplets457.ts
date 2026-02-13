@@ -24,7 +24,7 @@ export const legatoSextuplets457Exercise: Exercise = {
     "Count the sextuplets internally to keep timing stable."
   ],
   metronomeSpeed: { min: 60, max: 180, recommended: 60 },
-  relatedSkills: ["legato", "rhythm", "technique"],
+  relatedSkills: ["legato"],
   tablature: [
     {
       "timeSignature": [

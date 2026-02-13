@@ -28,7 +28,7 @@ export const smoothChordTransitionsExercise: Exercise = {
   metronomeSpeed: null,
   relatedSkills: [
     "harmony",
-    "chord_theory",
-    "rhythm"
+    "chords",
+    "improvisation"
   ],
 };

@@ -5,13 +5,6 @@ export type HabbitsType =
   | "metronome"
   | "recording";
 
-interface SkillPointsGained {
-  technique: number;
-  theory: number;
-  hearing: number;
-  creativity: number;
-}
-
 export interface ReportFormikInterface {
   techniqueHours: string;
   techniqueMinutes: string;
@@ -29,7 +22,9 @@ export interface ReportFormikInterface {
   songId?: string;
   songTitle?: string;
   songArtist?: string;
+  skillPointsGained?: Record<string, number>;
 }
+
 export interface ReportDataInterface {
   reportDate: Date;
   totalPoints: number;
@@ -40,5 +35,7 @@ export interface ReportDataInterface {
     time: number;
     timePoints: number;
   };
-  skillPointsGained: SkillPointsGained;
+  skillRewardSkillId?: string; // Legacy support or new usage? keeping for now just in case
+  skillRewardAmount?: number; // Legacy support or new usage? keeping for now just in case
+  skillPointsGained?: Record<string, number>;
 }

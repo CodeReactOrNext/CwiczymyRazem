@@ -41,45 +41,46 @@ export default async function handler(
     ))
     const userSongLists = await getUserSongs(userUid);
 
-
-    const currentUserStats = {
-      ...(userData?.statistics as StatisticsDataInterface),
+    const currentUserStats: StatisticsDataInterface = {
+      lvl: 1,
+      points: 0,
+      sessionCount: 0,
+      habitsCount: 0,
+      dayWithoutBreak: 0,
+      actualDayWithoutBreak: 0,
+      maxPoints: 0,
+      currentLevelMaxPoints: 100,
+      lastReportDate: new Date().toISOString(),
+      guitarStartDate: null,
+      achievements: [],
+      time: {
+        technique: 0,
+        theory: 0,
+        hearing: 0,
+        creativity: 0,
+        longestSession: 0
+      },
+      ...(userData?.statistics || {}),
       skills: userData?.skills || { unlockedSkills: {} }
     };
-    const currentUserSongLists = userSongLists as unknown as SongListInterface;
+    const currentUserSongLists = (userSongLists || {
+      wantToLearn: [],
+      learned: [],
+      learning: []
+    }) as unknown as SongListInterface;
 
+    let report;
+    try {
+      report = reportUpdateUserStats({
+        currentUserStats,
+        inputData,
+        currentUserSongLists
+      });
+    } catch (error) {
+      console.error("reportUpdateUserStats failed:", error);
+      return res.status(500).json({ error: "Game logic processing failed", details: error instanceof Error ? error.message : String(error) });
+    }
 
-    const report = reportUpdateUserStats({
-      currentUserStats,
-      inputData,
-      currentUserSongLists
-    });
-
-
-    const skillPointsGained: SkillPointsGained = {
-      technique: Math.floor(report.timeSummary.techniqueTime / 3600000),
-      theory: Math.floor(report.timeSummary.theoryTime / 3600000),
-      hearing: Math.floor(report.timeSummary.hearingTime / 3600000),
-      creativity: Math.floor(report.timeSummary.creativityTime / 3600000),
-    };
-
-    const updatedStats = {
-      ...report.currentUserStats,
-      availablePoints: {
-        technique:
-          (currentUserStats.availablePoints?.technique || 0) +
-          skillPointsGained.technique,
-        theory:
-          (currentUserStats.availablePoints?.theory || 0) +
-          skillPointsGained.theory,
-        hearing:
-          (currentUserStats.availablePoints?.hearing || 0) +
-          skillPointsGained.hearing,
-        creativity:
-          (currentUserStats.availablePoints?.creativity || 0) +
-          skillPointsGained.creativity,
-      },
-    };
 
     // Calculate points gained in this session - use the points from current report only
     const pointsGained = report.raitingData.totalPoints || 0; // Use points from current session only
@@ -88,14 +89,14 @@ export default async function handler(
 
     writePromises.push(firebaseUpdateUserStats(
       userUid,
-      updatedStats,
+      report.currentUserStats,
       report.timeSummary,
       pointsGained
     ));
 
     writePromises.push(firebaseSetUserExerciseRaprot(
       userUid,
-      { ...report.raitingData, skillPointsGained },
+      report.raitingData,
       inputData.reportTitle,
       report.isDateBackReport,
       report.timeSummary,
@@ -135,7 +136,6 @@ export default async function handler(
 
     res.status(200).json({
       ...report,
-      skillPointsGained,
     });
   }
   res.status(400);

@@ -22,7 +22,7 @@ export const earTrainingEasy: Exercise = {
     max: 120,
     recommended: 80
   },
-  relatedSkills: [],
+  relatedSkills: ['ear_training'],
   riddleConfig: {
     mode: "sequenceRepeat",
     difficulty: "easy",
@@ -48,7 +48,7 @@ export const earTrainingMedium: Exercise = {
     max: 120,
     recommended: 90
   },
-  relatedSkills: [],
+  relatedSkills: ['ear_training'],
   riddleConfig: {
     mode: "sequenceRepeat",
     difficulty: "medium",
@@ -74,7 +74,7 @@ export const earTrainingHard: Exercise = {
     max: 140,
     recommended: 100
   },
-  relatedSkills: [],
+  relatedSkills: ['ear_training'],
   riddleConfig: {
     mode: "sequenceRepeat",
     difficulty: "hard",

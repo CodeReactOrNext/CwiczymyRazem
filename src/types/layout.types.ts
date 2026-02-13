@@ -11,7 +11,6 @@ export type NavPagesTypes =
   | "my_songs"
   | "seasons"
   | "timer"
-  | "challenges"
   | "settings"
   | "recordings"
   | "about"

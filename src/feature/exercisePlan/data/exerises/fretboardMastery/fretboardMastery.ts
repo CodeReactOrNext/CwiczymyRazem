@@ -29,7 +29,6 @@ export const fretboardMasteryExercise: Exercise = {
   metronomeSpeed: null,
   relatedSkills: [
     "music_theory",
-    "ear_training",
-    "improvisation"
+    "ear_training", "transcription",
   ],
 };

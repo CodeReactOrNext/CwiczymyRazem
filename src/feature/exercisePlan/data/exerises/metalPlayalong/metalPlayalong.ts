@@ -19,7 +19,7 @@ export const metalPlayalongExercise: Exercise = {
     "Pay attention to the instructor's right and left hand technique"
   ],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "alternate_picking"],
+  relatedSkills: [],
   youtubeVideoId: "aHaPgeCbEMQ",
   isPlayalong: true,
   videoUrl: "https://www.youtube.com/watch?v=aHaPgeCbEMQ",
@@ -48,7 +48,7 @@ export const musicianFitnessLvl1S1Exercise: Exercise = {
     "Make sure your thumb is correctly positioned behind the neck"
   ],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "picking"],
+  relatedSkills: [],
   youtubeVideoId: "PiY1uDAGhVM",
   isPlayalong: true,
   videoUrl: "https://www.youtube.com/watch?v=PiY1uDAGhVM",
@@ -74,7 +74,7 @@ export const musicianFitnessLvl1S2Exercise: Exercise = {
     "Use 'pivot fingers' technique during chord changes"
   ],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "rhythm"],
+  relatedSkills: [],
   youtubeVideoId: "QWSfpBlzj20",
   isPlayalong: true,
   videoUrl: "https://youtu.be/QWSfpBlzj20",
@@ -100,7 +100,7 @@ export const musicianFitnessLvl1S3Exercise: Exercise = {
     "Pay attention to the dynamics of your strumming"
   ],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "rhythm"],
+  relatedSkills: [],
   youtubeVideoId: "4e9RvY0ko08",
   isPlayalong: true,
   videoUrl: "https://youtu.be/4e9RvY0ko08",
@@ -126,7 +126,7 @@ export const musicianFitnessLvl1S4Exercise: Exercise = {
     "Practice chord changes slowly, ensuring every note is clean"
   ],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "picking"],
+  relatedSkills: [],
   youtubeVideoId: "l3TKHRUlK9U",
   isPlayalong: true,
   videoUrl: "https://youtu.be/l3TKHRUlK9U",
@@ -152,7 +152,7 @@ export const musicianFitnessLvl1S5Exercise: Exercise = {
     "Focus on clean notes when shifting between positions"
   ],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "picking"],
+  relatedSkills: [],
   youtubeVideoId: "YnNdHcxiJTY",
   isPlayalong: true,
   videoUrl: "https://youtu.be/YnNdHcxiJTY",
@@ -178,7 +178,7 @@ export const musicianFitnessLvl1S6Exercise: Exercise = {
     "Concentrate on hand synchronization during riffs"
   ],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "picking"],
+  relatedSkills: [],
   youtubeVideoId: "d1Vtdtx_Xwo",
   isPlayalong: true,
   videoUrl: "https://youtu.be/d1Vtdtx_Xwo",
@@ -204,7 +204,7 @@ export const musicianFitnessLvl1S7Exercise: Exercise = {
     "Use the minimum pressure needed to get a clean sound"
   ],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "picking"],
+  relatedSkills: [],
   youtubeVideoId: "GqorA0S2bj4",
   isPlayalong: true,
   videoUrl: "https://youtu.be/GqorA0S2bj4",
@@ -230,7 +230,7 @@ export const musicianFitnessLvl1S8Exercise: Exercise = {
     "Focus on the clarity of every pick stroke"
   ],
   metronomeSpeed: null,
-  relatedSkills: ["technique", "picking"],
+  relatedSkills: [],
   youtubeVideoId: "DoVmZ1XNBj4",
   isPlayalong: true,
   videoUrl: "https://youtu.be/DoVmZ1XNBj4",

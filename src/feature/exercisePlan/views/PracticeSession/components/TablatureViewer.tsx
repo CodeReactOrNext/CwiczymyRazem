@@ -14,6 +14,9 @@ interface TablatureViewerProps {
   isListening?: boolean;
   hitNotes?: Record<string, boolean>;
   currentBeatsElapsed?: number;
+  hideNotes?: boolean;
+  audioContext?: AudioContext | null;
+  audioStartTime?: number | null;
 }
 
 export const TablatureViewer = ({
@@ -26,7 +29,10 @@ export const TablatureViewer = ({
   detectedNote,
   isListening,
   hitNotes = {},
-  currentBeatsElapsed = 0
+  currentBeatsElapsed = 0,
+  hideNotes = false,
+  audioContext,
+  audioStartTime
 }: TablatureViewerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -38,14 +44,15 @@ export const TablatureViewer = ({
   const NOTE_RADIUS = 11;
   const STAFF_TOP_OFFSET = 60;
 
-  const { totalBeats, processedData, hasAccentedNotes } = useMemo(() => {
-    if (!measures) return { totalBeats: 1, processedData: { measureLines: [], rhythmItems: [], noteItems: [] }, hasAccentedNotes: false };
+  const { totalBeats, processedData, hasAccentedNotes, hasDynamics } = useMemo(() => {
+    if (!measures) return { totalBeats: 1, processedData: { measureLines: [], rhythmItems: [], noteItems: [] }, hasAccentedNotes: false, hasDynamics: false };
 
     let currentWidth = 0;
     const measureLines: number[] = [];
     const rhythmItems: any[] = [];
     const noteItems: any[] = [];
     let hasAccents = false;
+    let hasDyn = false;
 
     measures.forEach((measure) => {
       measure.beats.forEach((beat) => {
@@ -58,6 +65,7 @@ export const TablatureViewer = ({
 
         beat.notes.forEach((note) => {
           if (note.isAccented) hasAccents = true;
+          if (note.dynamics !== undefined) hasDyn = true;
           
           noteItems.push({
             left: beatStart + 10,
@@ -77,7 +85,8 @@ export const TablatureViewer = ({
     return { 
       totalBeats: currentWidth / BEAT_WIDTH, 
       processedData: { measureLines, rhythmItems, noteItems },
-      hasAccentedNotes: hasAccents
+      hasAccentedNotes: hasAccents,
+      hasDynamics: hasDyn
     };
   }, [measures]);
 
@@ -117,8 +126,9 @@ export const TablatureViewer = ({
       const dynamicBeatWidth = Math.max(100, Math.min(180, containerSize.width / 4));
 
       if (isPlaying && startTime) {
-        const now = Date.now();
-        const elapsedSeconds = (now - startTime) / 1000;
+        const elapsedSeconds = (audioContext && audioStartTime != null)
+          ? audioContext.currentTime - audioStartTime
+          : (Date.now() - startTime) / 1000;
         const beatsPerSecond = bpm / 60;
         const totalDurationInBeats = totalBeats;
         totalBeatsElapsed = elapsedSeconds * beatsPerSecond;
@@ -136,14 +146,16 @@ export const TablatureViewer = ({
       const totalWidth = totalBeats * dynamicBeatWidth;
 
       // 1. Draw Staff Lines
-      ctx.strokeStyle = "#404040"; 
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 6; i++) {
-        const y = STAFF_TOP_OFFSET + i * STRING_SPACING;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(totalWidth, y);
-        ctx.stroke();
+      if (!hideNotes) {
+        ctx.strokeStyle = "#404040"; 
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 6; i++) {
+          const y = STAFF_TOP_OFFSET + i * STRING_SPACING;
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(totalWidth, y);
+          ctx.stroke();
+        }
       }
 
       // 2. Draw Measure Lines
@@ -198,15 +210,19 @@ export const TablatureViewer = ({
           // 4. Draw Beat Notes and Highlight
           beat.notes.forEach((note, nIdx) => {
             const noteY = STAFF_TOP_OFFSET + (note.string - 1) * STRING_SPACING;
-            
+
+            // Dynamics-based scaling
+            const dyn = (hasDynamics && note.dynamics !== undefined) ? note.dynamics : 1.0;
+            const noteR = hasDynamics ? NOTE_RADIUS * (0.7 + 0.3 * dyn) : NOTE_RADIUS;
+
             // Check if active (cursor is within this beat's range)
             const isActive = isPlaying && startTime &&
-                             cursorPosition >= currentOffset && 
+                             cursorPosition >= currentOffset &&
                              cursorPosition < (currentOffset + beat.duration * dynamicBeatWidth);
 
             const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
             const isHit = hitNotes[noteKey];
-            
+
             if (beatLeft >= scrollX - 50 && beatLeft <= scrollX + containerSize.width + 50) {
               // Note Background
               if (isHit) {
@@ -218,46 +234,236 @@ export const TablatureViewer = ({
                 ctx.fillStyle = "#06b6d4";
               } else if (note.isAccented) {
                 ctx.fillStyle = "#22d3ee";
+              } else if (hasDynamics && note.dynamics !== undefined) {
+                const a = 0.3 + 0.7 * dyn;
+                ctx.fillStyle = `rgba(255, 255, 255, ${a})`;
               } else {
                 ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
               }
-              
-              ctx.beginPath();
-              ctx.arc(beatLeft, noteY, NOTE_RADIUS, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.shadowBlur = 0; // Reset shadow
 
-              // Fret Number
-              ctx.fillStyle = (isActive || isHit) ? "#ffffff" : "#000000";
-              ctx.font = "bold 13px Inter, sans-serif";
-              ctx.textAlign = "center";
-              ctx.textBaseline = "middle";
-              
-              let text = note.fret.toString();
-              if (hasAccentedNotes && !note.isAccented && !isActive && !isHit) {
-                  text = `(${text})`; 
-              }
-              ctx.fillText(text, beatLeft, noteY);
+              if (!hideNotes) {
+                ctx.beginPath();
+                ctx.arc(beatLeft, noteY, noteR, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset shadow
 
-              // Symbols (Accent, H, P)
-              ctx.font = "bold 10px Inter";
-              if (note.isAccented) {
-                 ctx.fillText(">", beatLeft, noteY - 18); 
-              }
-              if (note.isHammerOn) {
-                 ctx.fillStyle = isHit ? "#064e3b" : "#fbbf24";
-                 ctx.fillText("H", beatLeft, noteY - 20);
-              }
-              if (note.isPullOff) {
-                 ctx.fillStyle = isHit ? "#7f1d1d" : "#f87171";
-                 ctx.fillText("P", beatLeft, noteY - 20);
+                // Fret Number
+                ctx.fillStyle = (isActive || isHit) ? "#ffffff" : "#000000";
+                const fontSize = hasDynamics ? Math.max(9, Math.round(13 * (0.75 + 0.25 * dyn))) : 13;
+                ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                
+                let text = note.fret.toString();
+                if (hasAccentedNotes && !note.isAccented && !isActive && !isHit) {
+                    text = `(${text})`; 
+                }
+                ctx.fillText(text, beatLeft, noteY);
+
+                // Symbols (Accent, H, P, Bend, Vibrato, Tap)
+                ctx.font = "bold 10px Inter";
+                if (note.isAccented) {
+                   ctx.fillText(">", beatLeft, noteY - 18);
+                }
+                if (note.isHammerOn) {
+                   ctx.fillStyle = isHit ? "#064e3b" : "#fbbf24";
+                   ctx.fillText("H", beatLeft, noteY - 20);
+                }
+                if (note.isPullOff) {
+                   ctx.fillStyle = isHit ? "#7f1d1d" : "#f87171";
+                   ctx.fillText("P", beatLeft, noteY - 20);
+                }
+
+                // === Bend / Pre-bend / Release badge helper ===
+                const drawBendBadge = (label: string, icon: string, bgColor: string, textColor: string, badgeX: number, badgeY: number) => {
+                  const fontSize = 16;
+                  ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+                  const fullText = `${icon} ${label}`;
+                  const textWidth = ctx.measureText(fullText).width;
+                  const padX = 8;
+                  const badgeW = textWidth + padX * 2;
+                  const badgeH = 24;
+                  const r = 6;
+
+                  // Badge background (rounded rect)
+                  ctx.fillStyle = bgColor;
+                  ctx.beginPath();
+                  ctx.moveTo(badgeX - badgeW / 2 + r, badgeY - badgeH / 2);
+                  ctx.lineTo(badgeX + badgeW / 2 - r, badgeY - badgeH / 2);
+                  ctx.arcTo(badgeX + badgeW / 2, badgeY - badgeH / 2, badgeX + badgeW / 2, badgeY - badgeH / 2 + r, r);
+                  ctx.lineTo(badgeX + badgeW / 2, badgeY + badgeH / 2 - r);
+                  ctx.arcTo(badgeX + badgeW / 2, badgeY + badgeH / 2, badgeX + badgeW / 2 - r, badgeY + badgeH / 2, r);
+                  ctx.lineTo(badgeX - badgeW / 2 + r, badgeY + badgeH / 2);
+                  ctx.arcTo(badgeX - badgeW / 2, badgeY + badgeH / 2, badgeX - badgeW / 2, badgeY + badgeH / 2 - r, r);
+                  ctx.lineTo(badgeX - badgeW / 2, badgeY - badgeH / 2 + r);
+                  ctx.arcTo(badgeX - badgeW / 2, badgeY - badgeH / 2, badgeX - badgeW / 2 + r, badgeY - badgeH / 2, r);
+                  ctx.closePath();
+                  ctx.fill();
+
+                  // Badge border
+                  ctx.strokeStyle = textColor;
+                  ctx.lineWidth = 2;
+                  ctx.stroke();
+
+                  // Badge text
+                  ctx.fillStyle = "#ffffff";
+                  ctx.textAlign = "center";
+                  ctx.textBaseline = "middle";
+                  ctx.fillText(fullText, badgeX, badgeY + 1);
+
+                  // Connector line from badge to note (with arrowhead)
+                  const lineStartY = badgeY + badgeH / 2;
+                  const lineEndY = noteY - NOTE_RADIUS - 1;
+                  if (lineEndY > lineStartY + 2) {
+                    ctx.strokeStyle = textColor;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 3]);
+                    ctx.beginPath();
+                    ctx.moveTo(badgeX, lineStartY);
+                    ctx.lineTo(badgeX, lineEndY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Small arrowhead at note end
+                    ctx.fillStyle = textColor;
+                    ctx.beginPath();
+                    ctx.moveTo(badgeX, lineEndY);
+                    ctx.lineTo(badgeX - 3, lineEndY - 6);
+                    ctx.lineTo(badgeX + 3, lineEndY - 6);
+                    ctx.closePath();
+                    ctx.fill();
+                  }
+                };
+
+                // Badge Y: above the topmost note in this beat so it never overlaps any note
+                const topStringInBeat = Math.min(...beat.notes.map(n => n.string));
+                const topNoteYInBeat = STAFF_TOP_OFFSET + (topStringInBeat - 1) * STRING_SPACING;
+                const bendBadgeY = topNoteYInBeat - NOTE_RADIUS - 24;
+
+                // Bend indicator
+                if (note.isBend) {
+                  const bendLabel = note.bendSemitones
+                    ? (note.bendSemitones === 2 ? "full" : note.bendSemitones === 1 ? "½" : `${note.bendSemitones / 2}`)
+                    : "";
+                  drawBendBadge(
+                    bendLabel,
+                    "\u2191",  // ↑ arrow
+                    isHit ? "#064e3b" : "#7e22ce",
+                    isHit ? "#34d399" : "#f0abfc",
+                    beatLeft, bendBadgeY
+                  );
+                }
+
+                // Pre-bend indicator
+                if (note.isPreBend) {
+                  drawBendBadge(
+                    "PB",
+                    "\u2191",  // ↑ arrow
+                    isHit ? "#064e3b" : "#4c1d95",
+                    isHit ? "#34d399" : "#ddd6fe",
+                    beatLeft, bendBadgeY
+                  );
+                }
+
+                // Release indicator
+                if (note.isRelease) {
+                  drawBendBadge(
+                    "R",
+                    "\u2193",  // ↓ arrow
+                    isHit ? "#064e3b" : "#312e81",
+                    isHit ? "#34d399" : "#c7d2fe",
+                    beatLeft, bendBadgeY
+                  );
+                }
+
+                // Vibrato indicator (wavy line under the note)
+                if (note.isVibrato) {
+                  const vibratoColor = isHit ? "#064e3b" : "#a78bfa";
+                  ctx.strokeStyle = vibratoColor;
+                  ctx.lineWidth = 1.5;
+                  ctx.beginPath();
+                  const waveY = noteY + NOTE_RADIUS + 6;
+                  const waveWidth = 16;
+                  const waveAmplitude = 3;
+                  for (let w = -waveWidth / 2; w <= waveWidth / 2; w += 1) {
+                    const wy = waveY + Math.sin((w / waveWidth) * Math.PI * 4) * waveAmplitude;
+                    if (w === -waveWidth / 2) {
+                      ctx.moveTo(beatLeft + w, wy);
+                    } else {
+                      ctx.lineTo(beatLeft + w, wy);
+                    }
+                  }
+                  ctx.stroke();
+                }
+
+                // Tap indicator
+                if (note.isTap) {
+                  ctx.fillStyle = isHit ? "#064e3b" : "#34d399"; // emerald-400
+                  ctx.font = "bold 10px Inter";
+                  ctx.textAlign = "center";
+                  ctx.fillText("T", beatLeft, noteY - 20);
+                }
               }
             }
           });
 
+          // Draw Chord Name
+          if (beat.chordName) {
+            // Shadow/Glow for readability
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "rgba(34, 211, 238, 0.4)";
+            
+            ctx.fillStyle = "#22d3ee"; // Cyan-400
+            ctx.font = "black 22px Inter, system-ui, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(beat.chordName, beatLeft, STAFF_TOP_OFFSET - 35);
+            
+            ctx.shadowBlur = 0; // Reset
+          }
+
           currentOffset += beat.duration * dynamicBeatWidth;
         });
       });
+
+      // 4.5: Dynamics Lane — volume bars below the staff
+      if (hasDynamics) {
+        const DYNAMICS_BASELINE = STAFF_TOP_OFFSET + 5 * STRING_SPACING + 36;
+        const DYNAMICS_MAX_H = 24;
+        const BAR_W = 6;
+
+        // Faint baseline
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, DYNAMICS_BASELINE);
+        ctx.lineTo(totalWidth, DYNAMICS_BASELINE);
+        ctx.stroke();
+
+        let dynOffset = 0;
+        measures?.forEach((measure) => {
+          measure.beats.forEach((beat) => {
+            const x = dynOffset + 10;
+            if (x >= scrollX - 50 && x <= scrollX + containerSize.width + 50) {
+              beat.notes.forEach((note) => {
+                if (note.dynamics !== undefined && note.dynamics > 0) {
+                  const barH = Math.max(2, note.dynamics * DYNAMICS_MAX_H);
+                  const alpha = 0.2 + note.dynamics * 0.8;
+
+                  if (note.dynamics > 0.7) {
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = `rgba(6, 182, 212, ${note.dynamics * 0.4})`;
+                  }
+
+                  ctx.fillStyle = `rgba(6, 182, 212, ${alpha})`;
+                  ctx.fillRect(x - BAR_W / 2, DYNAMICS_BASELINE - barH, BAR_W, barH);
+                  ctx.shadowBlur = 0;
+                }
+              });
+            }
+            dynOffset += beat.duration * dynamicBeatWidth;
+          });
+        });
+      }
 
       // 5. Progress Overlay (Passed Box)
       if (isPlaying && startTime && cursorPosition > 0) {
@@ -301,7 +507,7 @@ export const TablatureViewer = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes, detectedNote, isListening]);
+  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes, hasDynamics, detectedNote, isListening, hideNotes, audioContext, audioStartTime]);
 
   return (
     <div 

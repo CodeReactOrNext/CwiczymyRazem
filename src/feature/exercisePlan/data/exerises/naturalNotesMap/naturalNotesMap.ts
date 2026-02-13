@@ -26,5 +26,5 @@ export const naturalNotesMapExercise: Exercise = {
     "Recording a short fragment can reveal where your rhythm breaks during harder areas."
   ],
   metronomeSpeed: null,
-  relatedSkills: ["music_theory", "rhythm"],
+  relatedSkills: ["music_theory"],
 };

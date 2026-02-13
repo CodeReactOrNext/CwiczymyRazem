@@ -25,7 +25,7 @@ export const hammerOnSequence579Exercise: Exercise = {
     "Mute unused strings with both hands to keep the exercise clean."
   ],
   metronomeSpeed: { min: 60, max: 180, recommended: 60 },
-  relatedSkills: ["legato", "rhythm", "technique"],
+  relatedSkills: ["legato"],
   tablature: [
     {
       "timeSignature": [

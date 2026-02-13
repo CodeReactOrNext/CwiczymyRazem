@@ -86,7 +86,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
       if (view === "management") return "my_songs";
       return "library";
     }
-    if (pathname.startsWith("/timer/challenges")) return "challenges";
     if (pathname === "/timer") return "timer";
     if (pathname.startsWith("/report")) return "report";
     if (pathname.startsWith("/guide")) return "guide";
@@ -132,12 +131,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
       icon: <Activity size={16} />,
     },
     {
-      id: "skills",
-      name: "Skills",
-      href: "/profile/skills",
-      icon: <Brain size={16} />,
-    },
-    {
       id: "leaderboard" as NavPagesTypes,
       name: "Leaderboard",
       href: "/leaderboard",
@@ -160,15 +153,15 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
     },
     {
       id: "exercises",
-      name: "Exercises",
+      name: "Plans",
       href: "/profile/exercises",
       icon: <Dumbbell size={16} />,
     },
     {
-      id: "challenges" as NavPagesTypes,
-      name: "Challenges",
-      href: "/timer/challenges",
-      icon: <Flame size={18} />,
+      id: "skills",
+      name: "Skills",
+      href: "/profile/skills",
+      icon: <Brain size={16} />,
     },
     {
       id: "report" as NavPagesTypes,
@@ -339,11 +332,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
             <div className='space-y-1'>
               {practiceSections.map(({ id, name, href, icon }) => {
                 const isActive = isLinkActive(id, href);
-                const isChallenges = id === 'challenges';
-                const activeChallengesCount = userStats?.activeChallenges?.length || 0;
-                const today = new Date().toISOString().split('T')[0];
-                const doneTodayCount = userStats?.activeChallenges?.filter(ac => ac.lastCompletedDate === today).length || 0;
-
                 return (
                   <Link
                     key={id}
@@ -359,18 +347,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                     </span>
                     <span className="flex-1">{name}</span>
                     
-                    {isChallenges && activeChallengesCount > 0 && (
-                      <div className="flex items-center gap-1">
-                        <span className={cn(
-                          "text-[9px] font-black px-1.5 py-0.5 rounded",
-                          doneTodayCount === activeChallengesCount ? "bg-emerald-500/20 text-emerald-400" : "bg-main/20 text-main"
-                        )}>
-                          {doneTodayCount}/{activeChallengesCount}
-                        </span>
-                      </div>
-                    )}
-
-                    {isActive && !isChallenges && (
+                    {isActive && (
                       <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
                     )}
                   </Link>
@@ -645,10 +622,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                   <div className='space-y-1'>
                     {practiceSections.map(({ id, name, href, icon }) => {
                       const isActive = isLinkActive(id, href);
-                      const isChallenges = id === 'challenges';
-                      const activeChallengesCount = userStats?.activeChallenges?.length || 0;
-                      const today = new Date().toISOString().split('T')[0];
-                      const doneTodayCount = userStats?.activeChallenges?.filter(ac => ac.lastCompletedDate === today).length || 0;
 
                       return (
                         <Link
@@ -670,18 +643,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                           </span>
                           <span className="flex-1">{name}</span>
                           
-                          {isChallenges && activeChallengesCount > 0 && (
-                            <div className="flex items-center gap-1">
-                              <span className={cn(
-                                "text-[9px] font-black px-1.5 py-0.5 rounded",
-                                doneTodayCount === activeChallengesCount ? "bg-emerald-500/20 text-emerald-400" : "bg-main/20 text-main"
-                              )}>
-                                {doneTodayCount}/{activeChallengesCount}
-                              </span>
-                            </div>
-                          )}
-
-                          {isActive && !isChallenges && (
+                          {isActive && (
                             <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
                           )}
                         </Link>

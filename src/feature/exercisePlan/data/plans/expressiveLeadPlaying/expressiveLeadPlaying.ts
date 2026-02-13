@@ -1,5 +1,3 @@
-import { articulationContrastExercise } from "feature/exercisePlan/data/exerises/articulationContrast/articulationContrast";
-import { dynamicControlExercise } from "feature/exercisePlan/data/exerises/dynamicControl/dynamicControl";
 import { precisionBendingExercise } from "feature/exercisePlan/data/exerises/precisionBending/precisionBending";
 import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
 
@@ -13,9 +11,7 @@ export const expressiveLeadPlayingPlan: ExercisePlan = {
   category: "technique",
   exercises: [
     vibratoMasteryExercise,
-    articulationContrastExercise,
     precisionBendingExercise,
-    dynamicControlExercise
   ],
   userId: "system",
   image: null,

@@ -7,13 +7,7 @@ import type { SignUpCredentials } from "feature/user/view/SingupView/SingupView"
 import type { IdTokenResult } from "firebase/auth";
 import type { Timestamp } from "firebase/firestore";
 
-export interface ActiveChallenge {
-  challengeId: string;
-  startDate: string; // ISO date string
-  lastCompletedDate: string | null;
-  currentDay: number; // 1-indexed
-  totalDays: number;
-}
+// Challenges removed
 
 export type DailyQuestTaskType =
   | 'rate_song'
@@ -84,20 +78,12 @@ export interface StatisticsDataInterface {
     learned: string[];
     learning: string[];
   };
-  availablePoints: {
-    technique: number;
-    theory: number;
-    hearing: number;
-    creativity: number;
-  };
   skills?: {
     unlockedSkills: {
       [key: string]: number;
     };
   };
-  activeChallenges?: ActiveChallenge[] | null;
   dailyQuest?: DailyQuest | null;
-  completedChallenges?: string[];
   fame?: number;
 }
 

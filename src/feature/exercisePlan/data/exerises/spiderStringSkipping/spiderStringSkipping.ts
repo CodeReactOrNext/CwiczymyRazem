@@ -28,6 +28,6 @@ export const SpiderStringSkippingExercise: Exercise = {
     max: 160,
     recommended: 80,
   },
-  relatedSkills: ["alternate_picking", "picking", "string_skipping", "finger_independence"],
+  relatedSkills: ["string_skipping", "finger_independence"],
   image: spiderBasicImage,
 };

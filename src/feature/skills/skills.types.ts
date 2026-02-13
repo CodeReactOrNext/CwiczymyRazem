@@ -5,30 +5,25 @@ export type GuitarSkillId =
   | "alternate_picking"
   | "legato"
   | "sweep_picking"
-  | "chord_theory"
+  | "chords"
   | "scales"
   | "rhythm"
   | "ear_training"
-  | "sight_reading"
   | "improvisation"
   | "composition"
   | "harmony"
   | "vibrato"
   | "music_theory"
-  | "slide_guitar"
   | "audio_production"
   | "hybrid_picking"
-  | "transcription"
-  | "rythm_recognition"
-  | "picking"
   | "finger_independence"
   | "string_skipping"
-  | "technique"
   | "bending"
   | "tapping"
-  | "pitch_recognition"
-  | "fingerpicking"
   | "phrasing"
+  | "harmony-ear"
+  | "transcription"
+  | "rythm-recognition"
   | "articulation";
 
 export interface GuitarSkill {
@@ -39,8 +34,7 @@ export interface GuitarSkill {
 }
 
 export interface UserSkills {
-  availablePoints: Record<CategoryKeys, number>;
   unlockedSkills: {
     [skillId in GuitarSkillId]?: number;
-  };
+  } & { [key: string]: number };
 }

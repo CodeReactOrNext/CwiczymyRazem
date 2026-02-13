@@ -1,12 +1,12 @@
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronRight,HelpCircle } from "lucide-react";
+import { ChevronRight, HelpCircle, Brain } from "lucide-react";
 import Link from "next/link";
 import { FaClock, FaList, FaRandom, FaStar } from "react-icons/fa";
 
 interface PracticeModeSelectorProps {
-  onSelectMode: (mode: "timer" | "plan" | "auto" | "song" | "challenges") => void;
-  loadingMode?: "timer" | "plan" | "auto" | "song" | "challenges" | null;
+  onSelectMode: (mode: "timer" | "plan" | "auto" | "song" | "skills") => void;
+  loadingMode?: "timer" | "plan" | "auto" | "song" | "skills" | null;
 }
 
 export const PracticeModeSelector = ({
@@ -61,6 +61,15 @@ export const PracticeModeSelector = ({
       via: "via-cyan-950/40",
       to: "to-slate-950",
     },
+    violet: {
+      iconBg: "bg-violet-800/30",
+      iconText: "text-violet-400/90",
+      blur: "bg-violet-700/15",
+      ring: "hover:ring-violet-700/30",
+      from: "from-violet-950/60",
+      via: "via-violet-950/40",
+      to: "to-slate-950",
+    },
   };
 
   const modes = [
@@ -93,11 +102,11 @@ export const PracticeModeSelector = ({
       colors: colorClasses.emerald,
     },
     {
-      id: "challenges" as const,
-      icon: FaStar,
-      title: "Challenges",
-      description: "Complete challenges earn skills points and extra XP.",
-      colors: colorClasses.cyan,
+      id: "skills" as const,
+      icon: Brain,
+      title: "Practice Skills",
+      description: "Focus on specific techniques and skills.",
+      colors: colorClasses.violet,
     },
   ] as const;
 

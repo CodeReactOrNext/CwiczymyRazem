@@ -12,7 +12,7 @@ import {
   selectUserAuth,
   selectUserAvatar,
 } from "feature/user/store/userSlice";
-import { checkAndSaveChallengeProgress,updateQuestProgress, updateUserStats } from "feature/user/store/userSlice.asyncThunk";
+import { updateQuestProgress, updateUserStats } from "feature/user/store/userSlice.asyncThunk";
 import { Formik } from "formik";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
@@ -220,7 +220,6 @@ const ReportView = () => {
     if (isFetching) return;
 
     await dispatch(updateUserStats({ inputData }));
-    await dispatch(checkAndSaveChallengeProgress(inputData.planId ?? undefined));
     
     // Quest Trigger
     if (inputData.habbits && inputData.habbits.length >= 2) {

@@ -23,23 +23,27 @@ export const reportUpdateUserStats = ({
   currentUserSongLists
 }: updateUserStatsProps) => {
   const {
-    time,
-    habitsCount,
-    maxPoints,
-    sessionCount,
-    points,
-    lvl,
-    lastReportDate,
-    actualDayWithoutBreak,
-    dayWithoutBreak,
-    achievements,
-    availablePoints,
-  } = currentUserStats;
+    time = { technique: 0, theory: 0, hearing: 0, creativity: 0, longestSession: 0 },
+    habitsCount = 0,
+    maxPoints = 0,
+    sessionCount = 0,
+    points = 0,
+    lvl = 1,
+    lastReportDate = new Date().toISOString(),
+    actualDayWithoutBreak = 0,
+    dayWithoutBreak = 0,
+    achievements = [],
+  } = currentUserStats || {};
   const isDateBackReport = inputData.countBackDays;
   const timeSummary = inputTimeConverter(inputData);
   const userLastReportDate = new Date(lastReportDate!);
-  const { techniqueTime, theoryTime, hearingTime, creativityTime, sumTime } =
-    timeSummary;
+  const {
+    techniqueTime = 0,
+    theoryTime = 0,
+    hearingTime = 0,
+    creativityTime = 0,
+    sumTime = 0
+  } = timeSummary || {};
   const didPracticeToday = isDateBackReport
     ? false
     : checkIsPracticeToday(userLastReportDate);
@@ -53,12 +57,6 @@ export const reportUpdateUserStats = ({
     ...(isDateBackReport
       ? makeRatingData(inputData, sumTime, 1)
       : makeRatingData(inputData, sumTime, updatedActualDayWithoutBreak)),
-    skillPointsGained: {
-      technique: 0,
-      theory: 0,
-      hearing: 0,
-      creativity: 0,
-    },
   };
   const updatedLevel = levelUpUser(lvl, points + raiting.totalPoints);
   const isNewLevel = updatedLevel > lvl;
@@ -72,7 +70,17 @@ export const reportUpdateUserStats = ({
       creativity: time.creativity + creativityTime,
       longestSession: time.longestSession < sumTime ? sumTime : time.longestSession,
     },
-    availablePoints: availablePoints,
+    skills: {
+      ...currentUserStats.skills,
+      unlockedSkills: {
+        ...(currentUserStats.skills?.unlockedSkills || {}),
+        ...(inputData.skillPointsGained ? Object.entries(inputData.skillPointsGained).reduce((acc, [skillId, pointsGained]) => {
+          const currentPoints = (currentUserStats.skills?.unlockedSkills?.[skillId] || 0);
+          acc[skillId] = currentPoints + pointsGained;
+          return acc;
+        }, {} as Record<string, number>) : {})
+      }
+    },
     points: points + raiting.totalPoints,
     lvl: updatedLevel,
     currentLevelMaxPoints: getPointsToLvlUp(updatedLevel + 1),

@@ -1,4 +1,3 @@
-import { intervalStringJumpsExercise } from "feature/exercisePlan/data/exerises/intervalStringJumps/intervalStringJumps";
 import { playByEarExercise } from "feature/exercisePlan/data/exerises/playByEar/playByEar";
 import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
 
@@ -11,7 +10,6 @@ export const theIntervalMapPlan: ExercisePlan = {
   difficulty: "hard",
   category: "hearing",
   exercises: [
-    intervalStringJumpsExercise,
     singWhatYouPlayExercise,
     playByEarExercise
   ],

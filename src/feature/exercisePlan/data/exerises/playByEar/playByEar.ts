@@ -19,8 +19,8 @@ export const playByEarExercise: Exercise = {
     "Use technology - apps allowing song slowdown or isolating fragments can be helpful.",
     "Sing the notes you hear before playing them on guitar - this helps internalize the sounds.",
     "Don't be afraid to experiment on different strings and positions to find the right notes.",
-  
+
   ],
   metronomeSpeed: null,
-  relatedSkills: ["ear_training", "transcription"],
+  relatedSkills: ["ear_training"],
 }; 
