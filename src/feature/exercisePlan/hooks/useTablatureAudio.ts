@@ -8,6 +8,8 @@ interface UseTablatureAudioProps {
   startTime: number | null;
   isMuted?: boolean;
   onLoopComplete?: () => void;
+  audioContext?: AudioContext | null;
+  audioStartTime?: number | null;
 }
 
 const STRING_FREQS = [
@@ -25,8 +27,11 @@ export const useTablatureAudio = ({
   isPlaying,
   startTime,
   isMuted = false,
-  onLoopComplete
+  onLoopComplete,
+  audioContext: externalAudioContext,
+  audioStartTime
 }: UseTablatureAudioProps) => {
+  const ownAudioContextRef = useRef<AudioContext | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const timeoutRef = useRef<number | null>(null);
@@ -36,17 +41,27 @@ export const useTablatureAudio = ({
   const currentBeatIndexRef = useRef<number>(0);
   const flattenedBeatsRef = useRef<any[]>([]);
 
-  // Initialize Audio
+  // Initialize Audio - use shared AudioContext if provided, otherwise create own
   useEffect(() => {
-    audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    gainNodeRef.current = audioContextRef.current.createGain();
-    gainNodeRef.current.connect(audioContextRef.current.destination);
+    if (externalAudioContext) {
+      audioContextRef.current = externalAudioContext;
+    } else {
+      ownAudioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = ownAudioContextRef.current;
+    }
+
+    if (audioContextRef.current) {
+      gainNodeRef.current = audioContextRef.current.createGain();
+      gainNodeRef.current.connect(audioContextRef.current.destination);
+    }
 
     return () => {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-      audioContextRef.current?.close();
+      // Only close the AudioContext if we created it ourselves
+      ownAudioContextRef.current?.close();
+      ownAudioContextRef.current = null;
     };
-  }, []);
+  }, [externalAudioContext]);
 
   // Pre-process beats for easier scheduling
   useEffect(() => {
@@ -223,31 +238,13 @@ export const useTablatureAudio = ({
     const lookahead = 0.1; // 100ms window
 
     // 1. Calculate the "Anchor Time" in AudioContext coordinates
-    // This is the moment in ctx.currentTime when the metronome started (startTime)
-    // We assume audioContext runs in real-time seconds, same as Date.now() / 1000 roughly
-    // drift calculation:
-    const timeSinceStart = (Date.now() - startTime) / 1000;
-    const anchorTime = ctx.currentTime - timeSinceStart;
+    // Use audioStartTime from the metronome's AudioContext clock when available (drift-free)
+    // Fall back to Date.now()-based calculation for backwards compatibility
+    const anchorTime = audioStartTime ?? (ctx.currentTime - (Date.now() - startTime) / 1000);
+    const timeSinceStart = ctx.currentTime - anchorTime;
 
     const secondsPerBeat = 60 / bpm;
     const totalDurationBeats = cumulativeBeatsRef.current[cumulativeBeatsRef.current.length - 1];
-
-    // We only need to check beats that fall within [currentTime, currentTime + lookahead]
-    // But since it's a loop, we calculate time modulo total duration
-
-    // Optimization: Instead of modulo math on every frame for every note (can be expensive if track is long),
-    // we determine which "copy" of the loop we are in or just check the next expected note index.
-    // However, to strictly fix drift, we shouldn't rely on "nextNoteTimeRef" incrementing. 
-    // We should calculate "absolute time of beat N" and see if it's due.
-
-    // For this implementation, since riddles are short, we can iterate properly.
-    // Let's stick thereto the robust "nextNoteTime" but RE-ALIGN it to anchor every frame if needed?
-    // actually, best way is to calculate nextNoteTimeRef based on currentBeatIndex and anchor.
-
-    // Let's assume we are just scheduling the NEXT beat.
-    // Absolute time of the current beat index in the CURRENT loop iteration:
-    // We need to track how many full loops have passed? 
-    // Or just: timeSinceStart / totalDurationSeconds -> integer part is loops.
 
     const totalDurationSeconds = totalDurationBeats * secondsPerBeat;
 
@@ -322,7 +319,7 @@ export const useTablatureAudio = ({
     }
 
     timeoutRef.current = window.setTimeout(scheduler, 25);
-  }, [bpm, isPlaying, playNote, startTime]);
+  }, [bpm, isPlaying, playNote, startTime, audioStartTime]);
 
   useEffect(() => {
     if (isPlaying && startTime) { // Only start if we have a startTime (count-in done)
@@ -332,8 +329,7 @@ export const useTablatureAudio = ({
 
       if (audioContextRef.current) {
         const ctx = audioContextRef.current;
-        const timeSinceStart = (Date.now() - startTime) / 1000;
-        const anchorTime = ctx.currentTime - timeSinceStart;
+        const anchorTime = audioStartTime ?? (ctx.currentTime - (Date.now() - startTime) / 1000);
 
         // CRITICAL: Only reset nextNoteTime if it hasn't been initialized or is significantly off
         // This prevents double scheduling the same temporal window on re-renders
@@ -359,7 +355,7 @@ export const useTablatureAudio = ({
     return () => {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     };
-  }, [isPlaying, scheduler, startTime]); // measures is handled via flattenedBeatsRef useEffect
+  }, [isPlaying, scheduler, startTime, audioStartTime]); // measures is handled via flattenedBeatsRef useEffect
 
   return null;
 };

@@ -218,7 +218,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     isPlaying: metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime, // Only play when count-in finished
     startTime: metronome.startTime,
     isMuted: isAudioMuted,
-    onLoopComplete: () => setHasPlayedRiddleOnce(true)
+    onLoopComplete: () => setHasPlayedRiddleOnce(true),
+    audioContext: metronome.audioContext,
+    audioStartTime: metronome.audioStartTime,
   });
 
   const {
@@ -1039,6 +1041,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                               hitNotes={hitNotes}
                               currentBeatsElapsed={currentBeatsElapsed}
                               hideNotes={activeExercise.hideTablatureNotes}
+                              audioContext={metronome.audioContext}
+                              audioStartTime={metronome.audioStartTime}
                            />
                          ) : currentExercise.isPlayalong && currentExercise.youtubeVideoId ? (
                              !isMobileView && (

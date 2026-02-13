@@ -15,6 +15,8 @@ interface TablatureViewerProps {
   hitNotes?: Record<string, boolean>;
   currentBeatsElapsed?: number;
   hideNotes?: boolean;
+  audioContext?: AudioContext | null;
+  audioStartTime?: number | null;
 }
 
 export const TablatureViewer = ({
@@ -28,7 +30,9 @@ export const TablatureViewer = ({
   isListening,
   hitNotes = {},
   currentBeatsElapsed = 0,
-  hideNotes = false
+  hideNotes = false,
+  audioContext,
+  audioStartTime
 }: TablatureViewerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -122,8 +126,9 @@ export const TablatureViewer = ({
       const dynamicBeatWidth = Math.max(100, Math.min(180, containerSize.width / 4));
 
       if (isPlaying && startTime) {
-        const now = Date.now();
-        const elapsedSeconds = (now - startTime) / 1000;
+        const elapsedSeconds = (audioContext && audioStartTime != null)
+          ? audioContext.currentTime - audioStartTime
+          : (Date.now() - startTime) / 1000;
         const beatsPerSecond = bpm / 60;
         const totalDurationInBeats = totalBeats;
         totalBeatsElapsed = elapsedSeconds * beatsPerSecond;
@@ -269,78 +274,111 @@ export const TablatureViewer = ({
                    ctx.fillText("P", beatLeft, noteY - 20);
                 }
 
-                // Bend indicator (arrow + semitone label)
-                if (note.isBend) {
-                  const bendColor = isHit ? "#064e3b" : "#c084fc"; // purple-400
-                  ctx.strokeStyle = bendColor;
-                  ctx.fillStyle = bendColor;
+                // === Bend / Pre-bend / Release badge helper ===
+                const drawBendBadge = (label: string, icon: string, bgColor: string, textColor: string, badgeX: number, badgeY: number) => {
+                  const fontSize = 16;
+                  ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+                  const fullText = `${icon} ${label}`;
+                  const textWidth = ctx.measureText(fullText).width;
+                  const padX = 8;
+                  const badgeW = textWidth + padX * 2;
+                  const badgeH = 24;
+                  const r = 6;
+
+                  // Badge background (rounded rect)
+                  ctx.fillStyle = bgColor;
+                  ctx.beginPath();
+                  ctx.moveTo(badgeX - badgeW / 2 + r, badgeY - badgeH / 2);
+                  ctx.lineTo(badgeX + badgeW / 2 - r, badgeY - badgeH / 2);
+                  ctx.arcTo(badgeX + badgeW / 2, badgeY - badgeH / 2, badgeX + badgeW / 2, badgeY - badgeH / 2 + r, r);
+                  ctx.lineTo(badgeX + badgeW / 2, badgeY + badgeH / 2 - r);
+                  ctx.arcTo(badgeX + badgeW / 2, badgeY + badgeH / 2, badgeX + badgeW / 2 - r, badgeY + badgeH / 2, r);
+                  ctx.lineTo(badgeX - badgeW / 2 + r, badgeY + badgeH / 2);
+                  ctx.arcTo(badgeX - badgeW / 2, badgeY + badgeH / 2, badgeX - badgeW / 2, badgeY + badgeH / 2 - r, r);
+                  ctx.lineTo(badgeX - badgeW / 2, badgeY - badgeH / 2 + r);
+                  ctx.arcTo(badgeX - badgeW / 2, badgeY - badgeH / 2, badgeX - badgeW / 2 + r, badgeY - badgeH / 2, r);
+                  ctx.closePath();
+                  ctx.fill();
+
+                  // Badge border
+                  ctx.strokeStyle = textColor;
                   ctx.lineWidth = 2;
-                  // Draw bend arrow (curved upward line)
-                  const arrowStartY = noteY - NOTE_RADIUS - 2;
-                  const arrowEndY = arrowStartY - 16;
-                  ctx.beginPath();
-                  ctx.moveTo(beatLeft, arrowStartY);
-                  ctx.quadraticCurveTo(beatLeft + 8, arrowEndY - 4, beatLeft, arrowEndY);
                   ctx.stroke();
-                  // Arrowhead
-                  ctx.beginPath();
-                  ctx.moveTo(beatLeft - 3, arrowEndY + 5);
-                  ctx.lineTo(beatLeft, arrowEndY);
-                  ctx.lineTo(beatLeft + 3, arrowEndY + 5);
-                  ctx.stroke();
-                  // Semitone label
-                  if (note.bendSemitones) {
-                    const bendLabel = note.bendSemitones === 2 ? "full" : note.bendSemitones === 1 ? "½" : `${note.bendSemitones / 2}`;
-                    ctx.font = "bold 8px Inter";
-                    ctx.textAlign = "center";
-                    ctx.fillText(bendLabel, beatLeft + 12, arrowEndY + 2);
+
+                  // Badge text
+                  ctx.fillStyle = "#ffffff";
+                  ctx.textAlign = "center";
+                  ctx.textBaseline = "middle";
+                  ctx.fillText(fullText, badgeX, badgeY + 1);
+
+                  // Connector line from badge to note (with arrowhead)
+                  const lineStartY = badgeY + badgeH / 2;
+                  const lineEndY = noteY - NOTE_RADIUS - 1;
+                  if (lineEndY > lineStartY + 2) {
+                    ctx.strokeStyle = textColor;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 3]);
+                    ctx.beginPath();
+                    ctx.moveTo(badgeX, lineStartY);
+                    ctx.lineTo(badgeX, lineEndY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Small arrowhead at note end
+                    ctx.fillStyle = textColor;
+                    ctx.beginPath();
+                    ctx.moveTo(badgeX, lineEndY);
+                    ctx.lineTo(badgeX - 3, lineEndY - 6);
+                    ctx.lineTo(badgeX + 3, lineEndY - 6);
+                    ctx.closePath();
+                    ctx.fill();
                   }
+                };
+
+                // Badge Y: above the topmost note in this beat so it never overlaps any note
+                const topStringInBeat = Math.min(...beat.notes.map(n => n.string));
+                const topNoteYInBeat = STAFF_TOP_OFFSET + (topStringInBeat - 1) * STRING_SPACING;
+                const bendBadgeY = topNoteYInBeat - NOTE_RADIUS - 24;
+
+                // Bend indicator
+                if (note.isBend) {
+                  const bendLabel = note.bendSemitones
+                    ? (note.bendSemitones === 2 ? "full" : note.bendSemitones === 1 ? "½" : `${note.bendSemitones / 2}`)
+                    : "";
+                  drawBendBadge(
+                    bendLabel,
+                    "\u2191",  // ↑ arrow
+                    isHit ? "#064e3b" : "#7e22ce",
+                    isHit ? "#34d399" : "#f0abfc",
+                    beatLeft, bendBadgeY
+                  );
                 }
 
                 // Pre-bend indicator
                 if (note.isPreBend) {
-                  const preBendColor = isHit ? "#064e3b" : "#a78bfa"; // violet-400
-                  ctx.strokeStyle = preBendColor;
-                  ctx.fillStyle = preBendColor;
-                  ctx.lineWidth = 2;
-                  const arrowY = noteY - NOTE_RADIUS - 2;
-                  // Straight vertical arrow for pre-bend
-                  ctx.beginPath();
-                  ctx.moveTo(beatLeft, arrowY);
-                  ctx.lineTo(beatLeft, arrowY - 14);
-                  ctx.stroke();
-                  ctx.beginPath();
-                  ctx.moveTo(beatLeft - 3, arrowY - 9);
-                  ctx.lineTo(beatLeft, arrowY - 14);
-                  ctx.lineTo(beatLeft + 3, arrowY - 9);
-                  ctx.stroke();
-                  ctx.font = "bold 8px Inter";
-                  ctx.textAlign = "center";
-                  ctx.fillText("PB", beatLeft, arrowY - 17);
+                  drawBendBadge(
+                    "PB",
+                    "\u2191",  // ↑ arrow
+                    isHit ? "#064e3b" : "#4c1d95",
+                    isHit ? "#34d399" : "#ddd6fe",
+                    beatLeft, bendBadgeY
+                  );
                 }
 
                 // Release indicator
                 if (note.isRelease) {
-                  const releaseColor = isHit ? "#064e3b" : "#818cf8"; // indigo-400
-                  ctx.strokeStyle = releaseColor;
-                  ctx.lineWidth = 2;
-                  const arrowStartY = noteY - NOTE_RADIUS - 14;
-                  const arrowEndY = noteY - NOTE_RADIUS - 2;
-                  // Downward curved arrow
-                  ctx.beginPath();
-                  ctx.moveTo(beatLeft, arrowStartY);
-                  ctx.quadraticCurveTo(beatLeft + 8, arrowEndY + 4, beatLeft, arrowEndY);
-                  ctx.stroke();
-                  ctx.beginPath();
-                  ctx.moveTo(beatLeft - 3, arrowEndY - 5);
-                  ctx.lineTo(beatLeft, arrowEndY);
-                  ctx.lineTo(beatLeft + 3, arrowEndY - 5);
-                  ctx.stroke();
+                  drawBendBadge(
+                    "R",
+                    "\u2193",  // ↓ arrow
+                    isHit ? "#064e3b" : "#312e81",
+                    isHit ? "#34d399" : "#c7d2fe",
+                    beatLeft, bendBadgeY
+                  );
                 }
 
                 // Vibrato indicator (wavy line under the note)
                 if (note.isVibrato) {
-                  const vibratoColor = isHit ? "#064e3b" : "#f472b6"; // pink-400
+                  const vibratoColor = isHit ? "#064e3b" : "#a78bfa";
                   ctx.strokeStyle = vibratoColor;
                   ctx.lineWidth = 1.5;
                   ctx.beginPath();
@@ -469,7 +507,7 @@ export const TablatureViewer = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes, hasDynamics, detectedNote, isListening, hideNotes]);
+  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes, hasDynamics, detectedNote, isListening, hideNotes, audioContext, audioStartTime]);
 
   return (
     <div 
