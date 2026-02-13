@@ -28,6 +28,7 @@ export const useMobileMetronome = ({
   const timeoutRef = useRef<number | null>(null);
   const nextNoteTimeRef = useRef<number>(0);
   const startTimeRef = useRef<number | null>(null);
+  const audioStartTimeRef = useRef<number | null>(null);
   const countInTargetRef = useRef<number>(0);
   const beatCounterRef = useRef<number>(0);
   const isIOS = isIOSDevice();
@@ -114,6 +115,7 @@ export const useMobileMetronome = ({
       } else {
         if (startTimeRef.current === null) {
           startTimeRef.current = Date.now();
+          audioStartTimeRef.current = audioContextRef.current.currentTime;
           beatCounterRef.current = 0;
           setCountInRemaining(0);
         }
@@ -153,6 +155,7 @@ export const useMobileMetronome = ({
       countInTargetRef.current = 4;
       setCountInRemaining(4);
       startTimeRef.current = null;
+      audioStartTimeRef.current = null;
       beatCounterRef.current = 0;
       scheduler();
     }
@@ -173,6 +176,7 @@ export const useMobileMetronome = ({
     }
 
     startTimeRef.current = null;
+    audioStartTimeRef.current = null;
     beatCounterRef.current = 0;
     countInTargetRef.current = 0;
     setCountInRemaining(0);
@@ -247,6 +251,8 @@ export const useMobileMetronome = ({
     recommendedBpm,
     initializeAudio,
     audioInitialized,
-    startTime: startTimeRef.current
+    startTime: startTimeRef.current,
+    audioContext: audioContextRef.current,
+    audioStartTime: audioStartTimeRef.current,
   };
 }; 
