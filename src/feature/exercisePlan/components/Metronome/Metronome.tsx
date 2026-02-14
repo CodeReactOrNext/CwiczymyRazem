@@ -15,14 +15,18 @@ interface MetronomeProps {
   onMuteToggle?: (muted: boolean) => void;
   // Fallbacks for specific values if needed, though metronome should have them
   recommendedBpm?: number;
+  isHalfSpeed?: boolean;
+  onHalfSpeedToggle?: (value: boolean) => void;
 }
 
-export const Metronome = ({ 
-  metronome, 
-  showStartStop = true, 
-  isMuted = false, 
+export const Metronome = ({
+  metronome,
+  showStartStop = true,
+  isMuted = false,
   onMuteToggle,
-  recommendedBpm: propsRecommendedBpm
+  recommendedBpm: propsRecommendedBpm,
+  isHalfSpeed = false,
+  onHalfSpeedToggle
 }: MetronomeProps) => {
   const bpm = metronome.bpm;
   const isPlaying = metronome.isPlaying;
@@ -45,7 +49,9 @@ export const Metronome = ({
     <Card className='overflow-hidden rounded-xl border bg-card/80 p-4 shadow-md'>
       <div className='mb-6 flex items-center justify-between'>
         <h3 className='text-sm font-medium'>Metronom</h3>
-        <div className='text-sm font-semibold'>{bpm} BPM</div>
+        <div className='text-sm font-semibold'>
+          {bpm} BPM{isHalfSpeed && <span className="text-xs text-cyan-400 ml-1">(effective: {Math.round(bpm / 2)})</span>}
+        </div>
       </div>
 
       <div className='mb-4'>
@@ -121,6 +127,24 @@ export const Metronome = ({
           </Button>
         )}
       </div>
+
+      {onHalfSpeedToggle && (
+        <div className="mt-3 pt-3 border-t border-white/5">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+              isHalfSpeed
+                ? "text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 hover:text-cyan-300"
+                : "text-zinc-500 hover:text-zinc-400"
+            )}
+            onClick={() => onHalfSpeedToggle(!isHalfSpeed)}
+          >
+            1/2x Half Speed
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };

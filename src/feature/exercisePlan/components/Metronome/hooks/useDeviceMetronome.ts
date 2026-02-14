@@ -10,6 +10,7 @@ interface UseDeviceMetronomeProps {
   maxBpm?: number;
   recommendedBpm?: number;
   isMuted?: boolean;
+  speedMultiplier?: number;
 }
 
 export const useDeviceMetronome = (props: UseDeviceMetronomeProps) => {

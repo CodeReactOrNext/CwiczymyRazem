@@ -55,6 +55,7 @@ interface SessionModalProps {
   canSkipExercise?: boolean;
   // Shared Tracking & Metronome Props
   metronome: any;
+  effectiveBpm?: number;
   isMicEnabled: boolean;
   toggleMic: () => Promise<void>;
   gameState: any;
@@ -67,6 +68,8 @@ interface SessionModalProps {
   setIsAudioMuted: (bool: boolean) => void;
   isMetronomeMuted: boolean;
   setIsMetronomeMuted: (bool: boolean) => void;
+  isHalfSpeed?: boolean;
+  onHalfSpeedToggle?: (value: boolean) => void;
   // Riddle Props
   activeTablature?: any;
   isRiddleRevealed?: boolean;
@@ -102,6 +105,7 @@ const SessionModal = ({
   isSubmittingReport,
   canSkipExercise,
   metronome,
+  effectiveBpm,
   isMicEnabled,
   toggleMic,
   gameState,
@@ -114,6 +118,8 @@ const SessionModal = ({
   setIsAudioMuted,
   isMetronomeMuted,
   setIsMetronomeMuted,
+  isHalfSpeed,
+  onHalfSpeedToggle,
   activeTablature,
   isRiddleRevealed,
   hasPlayedRiddleOnce,
@@ -224,7 +230,7 @@ const SessionModal = ({
                 {activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed) ? (
                   <TablatureViewer
                     measures={activeTablature}
-                    bpm={metronome.bpm}
+                    bpm={effectiveBpm || metronome.bpm}
                     isPlaying={metronome.isPlaying}
                     startTime={metronome.startTime || null}
                     countInRemaining={(metronome as any).countInRemaining}
@@ -433,6 +439,8 @@ const SessionModal = ({
                       isMuted={isMetronomeMuted}
                       onMuteToggle={setIsMetronomeMuted}
                       recommendedBpm={currentExercise.metronomeSpeed.recommended}
+                      isHalfSpeed={isHalfSpeed}
+                      onHalfSpeedToggle={onHalfSpeedToggle}
                     />
                     {currentExercise.tablature && currentExercise.tablature.length > 0 && (
                       <div className="mt-4 flex justify-center gap-4">
