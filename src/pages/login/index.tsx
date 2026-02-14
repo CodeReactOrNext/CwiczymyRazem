@@ -14,7 +14,7 @@ const LoginPage: NextPage = () => {
       <Head>
         <title>Login to Riff Quest - Track Your Guitar Progress</title>
         <meta name="description" content="Sign in to Riff Quest and continue your guitar practice journey. Track progress, unlock achievements, and level up your skills." />
-        <meta name="robots" content="noindex, nofollow" />
+
       </Head>
       <LoginView />
     </>
