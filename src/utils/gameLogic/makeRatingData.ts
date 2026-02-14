@@ -31,6 +31,6 @@ export const makeRatingData = (
       time: totalTime,
       timePoints: timePoints,
     },
-    skillPointsGained: data.skillPointsGained
+    ...(data.skillPointsGained ? { skillPointsGained: data.skillPointsGained } : {}),
   };
 };
