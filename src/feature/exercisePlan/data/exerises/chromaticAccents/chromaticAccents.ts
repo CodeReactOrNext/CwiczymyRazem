@@ -724,7 +724,8 @@ export const chromaticAccentsExercise: Exercise = {
           "notes": [
             {
               "string": 3,
-              "fret": 5
+              "fret": 3
+              
             }
           ]
         },

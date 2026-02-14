@@ -6,6 +6,7 @@ interface UseMetronomeProps {
   maxBpm?: number;
   recommendedBpm?: number;
   isMuted?: boolean;
+  speedMultiplier?: number;
 }
 
 export const useMetronome = ({
@@ -14,6 +15,7 @@ export const useMetronome = ({
   maxBpm = 208,
   recommendedBpm = 60,
   isMuted = false,
+  speedMultiplier = 1,
 }: UseMetronomeProps) => {
   const [bpm, setBpm] = useState(initialBpm);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -71,7 +73,7 @@ export const useMetronome = ({
     // While there are notes that will need to play before the next interval, 
     // schedule them and advance the pointer.
     const lookahead = 0.1; // 100ms
-    const secondsPerBeat = 60.0 / bpm;
+    const secondsPerBeat = 60.0 / (bpm * speedMultiplier);
     const ctx = audioContextRef.current;
 
     while (nextNoteTimeRef.current < ctx.currentTime + lookahead) {
@@ -113,7 +115,7 @@ export const useMetronome = ({
     }
 
     timerIDRef.current = window.setTimeout(scheduler, 25);
-  }, [bpm, playSound]);
+  }, [bpm, speedMultiplier, playSound]);
 
   const startMetronome = useCallback(() => {
     if (audioContextRef.current?.state === 'suspended') {
