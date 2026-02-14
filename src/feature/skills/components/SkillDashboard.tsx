@@ -247,9 +247,9 @@ export const SkillDashboard = ({
                                   </p>
 
                                   <div className="flex items-center gap-2">
-                                     <div className="bg-zinc-900 px-3 py-2 rounded-xl flex items-center gap-2 border border-zinc-800/50">
-                                        <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Practice</span>
-                                        <span className="text-xs font-black text-white">400 XP</span>
+                                     <div className="bg-emerald-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-emerald-500/20">
+                                        <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider">Skill Points</span>
+                                        <span className="text-xs font-black text-emerald-400">+{challenge.difficulty === 'easy' ? 1 : challenge.difficulty === 'medium' ? 2 : 3}</span>
                                      </div>
                                   </div>
                                 </div>
