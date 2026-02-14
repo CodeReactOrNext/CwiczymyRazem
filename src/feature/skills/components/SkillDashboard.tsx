@@ -225,8 +225,7 @@ export const SkillDashboard = ({
 
                       <div className="flex flex-col gap-3">
                         {levelChallenges.map((challenge) => {
-                          const isRequirementMet = (userSkills.unlockedSkills[challenge.requiredSkillId] || 0) >= challenge.requiredLevel;
-                          const isAvailable = isRequirementMet;
+                          const isAvailable = true;
                           
                           return (
                             <div 

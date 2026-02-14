@@ -35,7 +35,7 @@ export interface TablatureMeasure {
 
 export interface ImprovPrompt {
   text: string;
-  category: 'notes' | 'rhythm' | 'dynamics' | 'phrasing' | 'position' | 'technique' | 'behavior';
+  category: 'notes' | 'rhythm' | 'dynamics' | 'phrasing' | 'position' | 'technique' | 'behavior' | 'style' | 'form' | 'harmony' | 'melody';
 }
 
 export interface SequenceRepeatRiddleConfig {
