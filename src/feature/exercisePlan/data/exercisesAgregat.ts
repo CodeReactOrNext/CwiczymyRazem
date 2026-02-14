@@ -101,9 +101,11 @@ import { pinkyPowerDrillExercise } from "feature/exercisePlan/data/exerises/pink
 import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
 import { dynamicCrescendoExercise } from "feature/exercisePlan/data/exerises/dynamicCrescendo/dynamicCrescendo";
 import { toneColorExplorationExercise } from "feature/exercisePlan/data/exerises/toneColorExploration/toneColorExploration";
+import { toneMatchingExercise } from "feature/exercisePlan/data/exerises/toneMatching/toneMatching";
 import { scalePracticeExercise } from "feature/exercisePlan/data/exerises/scalePractice/scalePractice";
 import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordPractice/chordPractice";
 import { improvPromptEasy, improvPromptMedium, improvPromptHard } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
+import { compositionChallengeExercise } from "feature/exercisePlan/data/exerises/compositionChallenge/compositionChallenge";
 import { rhythmTrainingEasy, rhythmTrainingMedium, rhythmTrainingHard } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
 
 
@@ -211,6 +213,7 @@ export const exercisesAgregat: Exercise[] = [
   fretStretchDrillExercise,
   dynamicCrescendoExercise,
   toneColorExplorationExercise,
+  toneMatchingExercise,
   scalePracticeExercise,
   improvPromptEasy,
   improvPromptMedium,
@@ -218,5 +221,6 @@ export const exercisesAgregat: Exercise[] = [
   rhythmTrainingEasy,
   rhythmTrainingMedium,
   rhythmTrainingHard,
-  chordPracticeExercise
+  chordPracticeExercise,
+  compositionChallengeExercise
 ];
