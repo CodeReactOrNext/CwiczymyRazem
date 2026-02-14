@@ -112,6 +112,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
   const [isAudioMuted, setIsAudioMuted] = useState(true);
   const [isMetronomeMuted, setIsMetronomeMuted] = useState(false);
+  const [isHalfSpeed, setIsHalfSpeed] = useState(false);
 
   // --- Scale Selection State ---
   const [showScaleDialog, setShowScaleDialog] = useState(false);
@@ -154,6 +155,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     // For Ear Training (riddleConfig), enable playback by default, otherwise disable
     setIsAudioMuted(!(currentExercise.riddleConfig?.mode === 'sequenceRepeat' || (currentExercise.tablature && currentExercise.tablature.length > 0)));
     setIsMetronomeMuted(false);
+    setIsHalfSpeed(false);
     setHasPlayedRiddleOnce(false);
     setIsRiddleRevealed(false);
 
@@ -206,13 +208,16 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     minBpm: activeExercise.metronomeSpeed?.min,
     maxBpm: activeExercise.metronomeSpeed?.max,
     recommendedBpm: activeExercise.metronomeSpeed?.recommended,
-    isMuted: isMetronomeMuted 
+    isMuted: isMetronomeMuted,
+    speedMultiplier: isHalfSpeed ? 0.5 : 1,
   });
+
+  const effectiveBpm = isHalfSpeed ? metronome.bpm / 2 : metronome.bpm;
 
   // Audio Playback
   useTablatureAudio({
     measures: activeTablature,
-    bpm: metronome.bpm,
+    bpm: effectiveBpm,
     isPlaying: metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime, // Only play when count-in finished
     startTime: metronome.startTime,
     isMuted: isAudioMuted,
@@ -452,7 +457,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     );
     if (totalExBeats === 0) return;
 
-    const bpm = metronome.bpm;
+    const bpm = effectiveBpm;
     const startTime = metronome.startTime;
 
     const tick = () => {
@@ -586,10 +591,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     return () => {
       cancelAnimationFrame(rafIdRef.current);
     };
-  }, [isPlaying, metronome.startTime, metronome.bpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq]);
+  }, [isPlaying, metronome.startTime, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq]);
 
   // Pass progress for gray-out effect
-  const beatsPerSecond = metronome.bpm / 60;
+  const beatsPerSecond = effectiveBpm / 60;
   const elapsedSeconds = (isPlaying && metronome.startTime) ? (Date.now() - metronome.startTime) / 1000 : 0;
   const totalExerciseBeats = useMemo(() => {
     if (!activeTablature) return 0;
@@ -689,6 +694,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             isSubmittingReport={isSubmittingReport}
             canSkipExercise={canSkipExercise}
             metronome={metronome}
+            effectiveBpm={effectiveBpm}
             isMicEnabled={isMicEnabled}
             toggleMic={toggleMic}
             gameState={gameState}
@@ -701,6 +707,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             setIsAudioMuted={setIsAudioMuted}
             isMetronomeMuted={isMetronomeMuted}
             setIsMetronomeMuted={setIsMetronomeMuted}
+            isHalfSpeed={isHalfSpeed}
+            onHalfSpeedToggle={setIsHalfSpeed}
             activeTablature={activeTablature}
             isRiddleRevealed={isRiddleRevealed}
             hasPlayedRiddleOnce={hasPlayedRiddleOnce}
@@ -1029,7 +1037,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                          {(activeTablature && activeTablature.length > 0 && (currentExercise.riddleConfig?.mode !== 'sequenceRepeat' || isRiddleRevealed)) ? (
                            <TablatureViewer
                               measures={activeTablature}
-                              bpm={metronome.bpm}
+                              bpm={effectiveBpm}
                               isPlaying={metronome.isPlaying}
                               startTime={metronome.startTime || null}
                               countInRemaining={(metronome as any).countInRemaining}
@@ -1159,6 +1167,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                      isMuted={isMetronomeMuted}
                                      onMuteToggle={setIsMetronomeMuted}
                                      recommendedBpm={currentExercise.metronomeSpeed.recommended}
+                                     isHalfSpeed={isHalfSpeed}
+                                     onHalfSpeedToggle={setIsHalfSpeed}
                                  />
                                   {currentExercise.tablature && currentExercise.tablature.length > 0 && (
                                     <div className="mt-4 flex flex-col gap-2">
