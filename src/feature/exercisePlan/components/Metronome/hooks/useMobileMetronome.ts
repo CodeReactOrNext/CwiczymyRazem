@@ -8,6 +8,7 @@ interface UseMobileMetronomeProps {
   maxBpm?: number;
   recommendedBpm?: number;
   isMuted?: boolean;
+  speedMultiplier?: number;
 }
 
 export const useMobileMetronome = ({
@@ -16,6 +17,7 @@ export const useMobileMetronome = ({
   maxBpm = 208,
   recommendedBpm = 60,
   isMuted = false,
+  speedMultiplier = 1,
 }: UseMobileMetronomeProps) => {
   const [bpm, setBpm] = useState(initialBpm);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -104,7 +106,7 @@ export const useMobileMetronome = ({
 
     const context = audioContextRef.current;
     const currentTime = context.currentTime;
-    const secondsPerBeat = 60.0 / bpm;
+    const secondsPerBeat = 60.0 / (bpm * speedMultiplier);
 
     // Schedule notes ahead of time for precise timing
     while (nextNoteTimeRef.current < currentTime + 0.1) {
@@ -128,7 +130,7 @@ export const useMobileMetronome = ({
 
     // Use lookahead scheduling for better timing accuracy on mobile
     timeoutRef.current = window.setTimeout(scheduler, 25);
-  }, [bpm, scheduleNote]);
+  }, [bpm, speedMultiplier, scheduleNote]);
 
   // Resume audio context if suspended (common on mobile)
   const resumeAudioContext = useCallback(async () => {

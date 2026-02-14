@@ -24,9 +24,9 @@ export const spiderOneStringExercise: Exercise = {
     "Practice also in reverse direction (4-3-2-1, 1-2-3-4)."
   ],
   metronomeSpeed: {
-    min: 60,
-    max: 180,
-    recommended: 80
+    min: 40,
+    max: 140,
+    recommended: 70
   },
   tablature: [
     {
