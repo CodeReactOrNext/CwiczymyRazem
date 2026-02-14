@@ -125,7 +125,6 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const [hasPlayedRiddleOnce, setHasPlayedRiddleOnce] = useState(false);
 
   // Detect configurable scale exercise - removed auto-popup as requested by user
-  /*
   useEffect(() => {
     if (currentExercise.id === 'scale_practice_configurable') {
       setShowScaleDialog(true);
@@ -140,7 +139,6 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       setShowChordDialog(false);
     }
   }, [currentExercise.id]);
-  */
 
   const handleGenerated = (genExercise: Exercise) => {
     setGeneratedExercise(genExercise);
