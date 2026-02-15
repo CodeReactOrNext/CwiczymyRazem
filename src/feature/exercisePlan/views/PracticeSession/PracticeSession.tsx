@@ -146,10 +146,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       setEarTrainingHighScore(null);
       return;
     }
-    getExerciseBpmProgress(userAuth, activeExercise.id).then((data) => {
+    getExerciseBpmProgress(userAuth, currentExercise.id).then((data) => {
       setEarTrainingHighScore(data?.earTrainingHighScore ?? null);
     });
-  }, [userAuth, activeExercise.id]);
+  }, [userAuth, currentExercise.id]);
 
   // Detect configurable scale exercise - removed auto-popup as requested by user
   useEffect(() => {
