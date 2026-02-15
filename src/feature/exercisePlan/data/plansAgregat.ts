@@ -20,6 +20,10 @@ import { theIntervalMapPlan } from "feature/exercisePlan/data/plans/theIntervalM
 import { warmUp15MinutesPlan } from "feature/exercisePlan/data/plans/warmUp15Minutes/warmUp15Minutes";
 import { warmUp30MinutesPlan } from "feature/exercisePlan/data/plans/warmUp30Minutes/warmUp30Minutes";
 import { megaBeginnerFirstStepsPlan } from "feature/exercisePlan/data/plans/megaBeginnerFirstSteps/megaBeginnerFirstSteps";
+import { earRhythmFundamentalsPlan } from "feature/exercisePlan/data/plans/earRhythmFundamentals/earRhythmFundamentals";
+import { handHealthStrengthPlan } from "feature/exercisePlan/data/plans/handHealthStrength/handHealthStrength";
+import { dailyDexterityStarterPlan } from "feature/exercisePlan/data/plans/dailyDexterityStarter/dailyDexterityStarter";
+import { soloingExplorerPlan } from "feature/exercisePlan/data/plans/soloingExplorer/soloingExplorer";
 
 import type { ExercisePlan } from "../types/exercise.types";
 
@@ -44,6 +48,10 @@ export const defaultPlans: ExercisePlan[] = [
   rhythmicPrecisionPlan,
   theIntervalMapPlan,
   megaBeginnerFirstStepsPlan,
+  earRhythmFundamentalsPlan,
+  handHealthStrengthPlan,
+  dailyDexterityStarterPlan,
+  soloingExplorerPlan,
   // metalGuitarExercisesPlan,
   musicianFitnessLvl1S1Plan,
   musicianFitnessLvl1S2Plan,

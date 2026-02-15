@@ -2,6 +2,7 @@
 import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
 import { spiderLegatoBasicExercise } from "feature/exercisePlan/data/exerises/spiderLegatoBasic/spiderLegatoBasic";
+import { mutingDisciplineDrillExercise } from "feature/exercisePlan/data/exerises/mutingDisciplineDrill/mutingDisciplineDrill";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 import warmUpImage from "./image.webp";
@@ -15,7 +16,8 @@ export const warmUp15MinutesPlan: ExercisePlan = {
   exercises: [
     jpStretching,
     spiderBasicExercise,
-    spiderLegatoBasicExercise
+    spiderLegatoBasicExercise,
+    mutingDisciplineDrillExercise
   ],
   userId: "system",
   image: warmUpImage,
