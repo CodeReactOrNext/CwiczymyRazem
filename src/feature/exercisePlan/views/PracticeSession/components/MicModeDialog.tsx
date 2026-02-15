@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "assets/components/ui/dialog";
-import { FaMicrophone } from "react-icons/fa";
+import Image from "next/image";
 
 interface MicModeDialogProps {
   isOpen: boolean;
@@ -20,8 +20,14 @@ export const MicModeDialog = ({ isOpen, onEnableMic, onSkipMic }: MicModeDialogP
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onSkipMic(); }}>
       <DialogContent className="sm:max-w-md z-[99999999]">
         <DialogHeader>
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-cyan-500/10 border border-cyan-500/20">
-            <FaMicrophone className="h-6 w-6 text-cyan-400" />
+          <div className="mx-auto mb-4 flex justify-center">
+            <Image
+              src="/images/ilustration/plugin.png"
+              alt="Mic illustration"
+              width={300}
+              height={300}
+              className="w-[300px] h-auto object-contain"
+            />
           </div>
           <DialogTitle className="text-center text-xl">Mic Tracking</DialogTitle>
           <DialogDescription className="text-center text-zinc-400 leading-relaxed pt-2">
