@@ -15,7 +15,11 @@ export const useActivityLogData = (
     const reportMap = new Map<string, ReportListInterfaceWithTimeSumary[]>();
     reportList.forEach((report) => {
       const reportDate = new Date(report.date);
-      const key = reportDate.toISOString().split("T")[0];
+      const key = formatDateKey(
+        reportDate.getFullYear(),
+        reportDate.getMonth(),
+        reportDate.getDate()
+      );
 
       if (!reportMap.has(key)) {
         reportMap.set(key, []);
