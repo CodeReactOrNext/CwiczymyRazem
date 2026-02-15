@@ -40,7 +40,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 1
+              "fret": 1,
+              "isAccented": false
             }
           ]
         },
@@ -49,7 +50,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 2
+              "fret": 2,
+              "isAccented": false
             }
           ]
         },
@@ -58,7 +60,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 3
+              "fret": 3,
+              "isAccented": false
             }
           ]
         },
@@ -67,7 +70,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 4,
+              "isAccented": false
             }
           ]
         },
@@ -76,7 +80,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 2
+              "fret": 2,
+              "isAccented": false
             }
           ]
         },
@@ -85,7 +90,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 3
+              "fret": 3,
+              "isAccented": false
             }
           ]
         },
@@ -94,7 +100,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 4,
+              "isAccented": false
             }
           ]
         },
@@ -103,7 +110,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 5,
+              "isAccented": false
             }
           ]
         },
@@ -112,7 +120,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 3
+              "fret": 3,
+              "isAccented": false
             }
           ]
         },
@@ -121,7 +130,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 4,
+              "isAccented": false
             }
           ]
         },
@@ -130,7 +140,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 5,
+              "isAccented": false
             }
           ]
         },
@@ -139,7 +150,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 6,
+              "isAccented": false
             }
           ]
         },
@@ -148,7 +160,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 4,
+              "isAccented": false
             }
           ]
         },
@@ -157,7 +170,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 5,
+              "isAccented": false
             }
           ]
         },
@@ -166,7 +180,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 6,
+              "isAccented": false
             }
           ]
         },
@@ -175,7 +190,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 7,
+              "isAccented": false
             }
           ]
         }
@@ -192,7 +208,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 5,
+              "isAccented": false
             }
           ]
         },
@@ -201,7 +218,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 6,
+              "isAccented": false
             }
           ]
         },
@@ -210,7 +228,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 7,
+              "isAccented": false
             }
           ]
         },
@@ -219,7 +238,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 8
+              "fret": 8,
+              "isAccented": false
             }
           ]
         },
@@ -228,7 +248,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 6,
+              "isAccented": false
             }
           ]
         },
@@ -237,7 +258,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 7,
+              "isAccented": false
             }
           ]
         },
@@ -246,7 +268,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 8
+              "fret": 8,
+              "isAccented": false
             }
           ]
         },
@@ -255,7 +278,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 9
+              "fret": 9,
+              "isAccented": false
             }
           ]
         },
@@ -264,7 +288,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 7,
+              "isAccented": false
             }
           ]
         },
@@ -273,7 +298,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 8
+              "fret": 8,
+              "isAccented": false
             }
           ]
         },
@@ -282,7 +308,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 9
+              "fret": 9,
+              "isAccented": false
             }
           ]
         },
@@ -291,7 +318,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 10
+              "fret": 10,
+              "isAccented": false
             }
           ]
         },
@@ -300,7 +328,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 8
+              "fret": 8,
+              "isAccented": false
             }
           ]
         },
@@ -309,7 +338,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 9
+              "fret": 9,
+              "isAccented": false
             }
           ]
         },
@@ -318,7 +348,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 10
+              "fret": 10,
+              "isAccented": false
             }
           ]
         },
@@ -327,7 +358,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 11
+              "fret": 11,
+              "isAccented": false
             }
           ]
         }
@@ -344,7 +376,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 9
+              "fret": 9,
+              "isAccented": false
             }
           ]
         },
@@ -353,7 +386,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 10
+              "fret": 10,
+              "isAccented": false
             }
           ]
         },
@@ -362,7 +396,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 11
+              "fret": 11,
+              "isAccented": false
             }
           ]
         },
@@ -371,7 +406,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 12
+              "fret": 12,
+              "isAccented": false
             }
           ]
         },
@@ -380,7 +416,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 8
+              "fret": 8,
+              "isAccented": false
             }
           ]
         },
@@ -389,7 +426,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 9
+              "fret": 9,
+              "isAccented": false
             }
           ]
         },
@@ -398,7 +436,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 10
+              "fret": 10,
+              "isAccented": false
             }
           ]
         },
@@ -407,7 +446,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 9
+              "fret": 11,
+              "isAccented": false
             }
           ]
         },
@@ -416,7 +456,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 7,
+              "isAccented": false
             }
           ]
         },
@@ -425,7 +466,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 8
+              "fret": 8,
+              "isAccented": false
             }
           ]
         },
@@ -434,7 +476,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 9
+              "fret": 9,
+              "isAccented": false
             }
           ]
         },
@@ -443,7 +486,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 10
+              "fret": 10,
+              "isAccented": false
             }
           ]
         },
@@ -452,7 +496,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 6,
+              "isAccented": false
             }
           ]
         },
@@ -461,7 +506,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 7,
+              "isAccented": false
             }
           ]
         },
@@ -470,7 +516,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 8
+              "fret": 8,
+              "isAccented": false
             }
           ]
         },
@@ -479,7 +526,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 9
+              "fret": 9,
+              "isAccented": false
             }
           ]
         }
@@ -496,7 +544,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 5,
+              "isAccented": false
             }
           ]
         },
@@ -505,7 +554,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 6,
+              "isAccented": false
             }
           ]
         },
@@ -514,7 +564,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 7,
+              "isAccented": false
             }
           ]
         },
@@ -523,7 +574,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 8
+              "fret": 8,
+              "isAccented": false
             }
           ]
         },
@@ -532,7 +584,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 4,
+              "isAccented": false
             }
           ]
         },
@@ -541,7 +594,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 5,
+              "isAccented": false
             }
           ]
         },
@@ -550,7 +604,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 6,
+              "isAccented": false
             }
           ]
         },
@@ -559,7 +614,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 7
+              "fret": 7,
+              "isAccented": false
             }
           ]
         },
@@ -568,7 +624,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 3
+              "fret": 3,
+              "isAccented": false
             }
           ]
         },
@@ -577,7 +634,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 4,
+              "isAccented": false
             }
           ]
         },
@@ -586,7 +644,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 5,
+              "isAccented": false
             }
           ]
         },
@@ -595,7 +654,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 6
+              "fret": 6,
+              "isAccented": false
             }
           ]
         },
@@ -604,7 +664,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 2
+              "fret": 2,
+              "isAccented": false
             }
           ]
         },
@@ -613,7 +674,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 3
+              "fret": 3,
+              "isAccented": false
             }
           ]
         },
@@ -622,7 +684,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 4
+              "fret": 4,
+              "isAccented": false
             }
           ]
         },
@@ -631,7 +694,8 @@ export const spiderOneStringExercise: Exercise = {
           "notes": [
             {
               "string": 1,
-              "fret": 5
+              "fret": 5,
+              "isAccented": false
             }
           ]
         }
