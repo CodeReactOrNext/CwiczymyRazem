@@ -1,5 +1,4 @@
 
-import { precisionBendingExercise } from "feature/exercisePlan/data/exerises/precisionBending/precisionBending";
 import { spiderLegatoBasicExercise } from "feature/exercisePlan/data/exerises/spiderLegatoBasic/spiderLegatoBasic";
 import { spiderXExercise } from "feature/exercisePlan/data/exerises/spiderX/spiderX";
 
@@ -16,7 +15,6 @@ export const warmUp30MinutesPlan: ExercisePlan = {
   exercises: [
     spiderXExercise,
     spiderLegatoBasicExercise,
-    precisionBendingExercise
   ],
   userId: "system",
   image: warmUpImage,

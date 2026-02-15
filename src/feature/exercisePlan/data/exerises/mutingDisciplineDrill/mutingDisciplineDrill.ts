@@ -21,11 +21,11 @@ export const mutingDisciplineDrillExercise: Exercise = {
     "Start very slowly — clean muting at 80 BPM is far more valuable than sloppy playing at 140 BPM.",
   ],
   metronomeSpeed: {
-    min: 80,
+    min: 60,
     max: 140,
-    recommended: 110,
+    recommended: 80,
   },
-  relatedSkills: ["alternate_picking", 'hybrid_picking'],
+  relatedSkills: ['hybrid_picking'],
   tablature: [
     // M1: String-skip between strings 6 and 4 (E minor: E-G-B pattern)
     {

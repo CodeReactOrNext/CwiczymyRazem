@@ -19,7 +19,6 @@ import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/natu
 import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
 import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { playByEarExercise } from "feature/exercisePlan/data/exerises/playByEar/playByEar";
-import { precisionBendingExercise } from "feature/exercisePlan/data/exerises/precisionBending/precisionBending";
 
 import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
 import { speedBurstChromaticBlitzExercise } from "feature/exercisePlan/data/exerises/speedBurstChromaticBlitz/speedBurstChromaticBlitz";
@@ -121,7 +120,6 @@ export const exercisesAgregat: Exercise[] = [
   oneChordImprovExercise,
   triadImprovisationExercise,
   chromaticAccentsExercise,
-  precisionBendingExercise,
   spiderLegatoBasicExercise,
 
   economyPickingAngularExercise,
