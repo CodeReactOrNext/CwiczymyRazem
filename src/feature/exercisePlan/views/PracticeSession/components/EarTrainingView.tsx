@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Copy, Ear, Eye, EyeOff, HelpCircle, Music, Play, RefreshCw, Volume2 } from "lucide-react";
+import { Copy, Ear, Eye, EyeOff, HelpCircle, Music, Play, RefreshCw, Trophy, Volume2 } from "lucide-react";
 import { useState } from "react";
 import { FaPlay } from "react-icons/fa";
 
@@ -11,11 +11,14 @@ interface EarTrainingViewProps {
   onNextRiddle: () => void;
   onGuessed: () => void;
   score: number;
+  highScore?: number | null;
+  exerciseUrl?: string;
   isRevealed: boolean;
   isPlaying: boolean;
   canGuess: boolean;
   difficulty: "easy" | "medium" | "hard";
   className?: string;
+  onRecordsClick?: () => void;
 }
 
 export const EarTrainingView = ({
@@ -24,19 +27,44 @@ export const EarTrainingView = ({
   onNextRiddle,
   onGuessed,
   score,
+  highScore,
+  exerciseUrl,
   isRevealed,
   isPlaying,
   canGuess,
   difficulty,
-  className
+  className,
+  onRecordsClick
 }: EarTrainingViewProps) => {
   return (
     <div className={cn("flex flex-col items-center justify-center w-full max-w-2xl mx-auto p-4 sm:p-6", className)}>
       
       {/* Score Display */}
-      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-zinc-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 backdrop-blur-md z-10">
-          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-zinc-400 mr-1.5 sm:mr-2">Score</span>
-          <span className="text-lg sm:text-xl font-black text-emerald-400">{score}</span>
+      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center gap-2 z-10">
+          <div className="bg-zinc-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 backdrop-blur-md">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-zinc-400 mr-1.5 sm:mr-2">Score</span>
+              <span className="text-lg sm:text-xl font-black text-emerald-400">{score}</span>
+          </div>
+          {highScore != null && highScore > 0 && (
+            <div className={cn(
+              "bg-purple-950/60 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border backdrop-blur-md flex items-center gap-1.5",
+              score > highScore ? "border-amber-500/30 bg-amber-950/60" : "border-purple-500/20"
+            )}>
+              <Trophy className={cn("w-3 h-3 sm:w-3.5 sm:h-3.5", score > highScore ? "text-amber-400" : "text-purple-400")} />
+              <span className={cn("text-[10px] sm:text-xs font-bold uppercase tracking-widest mr-1", score > highScore ? "text-amber-400" : "text-purple-400")}>
+                {score > highScore ? "New!" : "Best"}
+              </span>
+              <span className={cn("text-lg sm:text-xl font-black", score > highScore ? "text-amber-400" : "text-purple-300")}>{highScore}</span>
+            </div>
+          )}
+          {(exerciseUrl || onRecordsClick) && (
+            <button
+              onClick={onRecordsClick}
+              className="bg-zinc-800/80 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 backdrop-blur-md text-[10px] sm:text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-white hover:border-white/20 transition-colors"
+            >
+              Records
+            </button>
+          )}
       </div>
 
       {/* Visualizer / Mystery Box */}

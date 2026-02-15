@@ -6,7 +6,9 @@
       "Bash(npx tsc:*)",
       "Bash(dir /s /b \"C:\\\\cw\\\\CwiczymyRazem\\\\src\\\\feature\\\\skills\\\\*.ts\")",
       "Bash(node:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(xargs cat:*)",
+      "Bash(grep:*)"
     ]
   }
 }

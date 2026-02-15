@@ -1,22 +1,27 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import Head from "next/head";
 import { Exercise } from "../../types/exercise.types";
 import { TablatureViewer } from "../PracticeSession/components/TablatureViewer";
 import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
-import { 
-  FaClock, 
-  FaArrowLeft, 
-  FaGuitar, 
-  FaLightbulb, 
+import {
+  FaClock,
+  FaArrowLeft,
+  FaGuitar,
+  FaLightbulb,
   FaPlay,
   FaCheckCircle,
   FaYoutube
 } from "react-icons/fa";
+import { Ear, Trophy } from "lucide-react";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
+import { BpmProgressOverview } from "../../components/BpmProgressOverview";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
+import { getExerciseBpmProgress } from "../../services/bpmProgressService";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { useAppSelector } from "store/hooks";
 
 interface ExerciseDetailViewProps {
   exercise: Exercise;
@@ -24,12 +29,21 @@ interface ExerciseDetailViewProps {
 
 export const ExerciseDetailView = ({ exercise }: ExerciseDetailViewProps) => {
   const { t } = useTranslation(["exercises", "common"]);
+  const userAuth = useAppSelector(selectUserAuth);
+  const [earTrainingHighScore, setEarTrainingHighScore] = useState<number | null>(null);
 
   const skills = useMemo(() => {
     return exercise.relatedSkills
       .map((skillId) => guitarSkills.find((s) => s.id === skillId))
       .filter(Boolean);
   }, [exercise.relatedSkills]);
+
+  useEffect(() => {
+    if (!userAuth || exercise.riddleConfig?.mode !== 'sequenceRepeat') return;
+    getExerciseBpmProgress(userAuth, exercise.id).then((data) => {
+      setEarTrainingHighScore(data?.earTrainingHighScore ?? null);
+    });
+  }, [userAuth, exercise.id]);
 
   return (
     <div className="min-h-screen bg-[#020202] pb-20">
@@ -205,6 +219,32 @@ export const ExerciseDetailView = ({ exercise }: ExerciseDetailViewProps) => {
 
           {/* Sidebar: Skills, Video, CTA */}
           <div className="space-y-8">
+             {/* BPM Progress */}
+             {exercise.metronomeSpeed && (
+               <div className="rounded-lg border border-white/5 bg-zinc-900/50 p-8">
+                 <BpmProgressOverview />
+               </div>
+             )}
+             {/* Ear Training Record */}
+             {exercise.riddleConfig?.mode === 'sequenceRepeat' && userAuth && (
+               <div className="rounded-lg border border-purple-500/20 bg-purple-950/10 p-8">
+                 <h3 className="mb-4 flex items-center gap-2 text-sm font-bold text-purple-400">
+                   <Ear className="h-4 w-4" /> Ear Training Record
+                 </h3>
+                 {earTrainingHighScore != null && earTrainingHighScore > 0 ? (
+                   <div className="flex items-center gap-3">
+                     <Trophy className="h-5 w-5 text-purple-400" />
+                     <span className="text-2xl font-black text-white">{earTrainingHighScore}</span>
+                     <span className="text-xs text-zinc-500 font-bold">correct guesses</span>
+                   </div>
+                 ) : (
+                   <p className="text-xs text-zinc-500">
+                     No record yet. Start a practice session and guess the melodies!
+                   </p>
+                 )}
+               </div>
+             )}
+
              {/* Related Skills */}
              <div className="rounded-lg border border-white/5 bg-zinc-900/50 p-8">
                 <h3 className="mb-6 text-sm font-bold text-zinc-500">Target Skills</h3>
