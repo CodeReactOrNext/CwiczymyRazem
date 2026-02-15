@@ -1,15 +1,22 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
 import { Button } from "assets/components/ui/button";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
+import { getAllBpmProgress, type BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
+import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { UserSkills } from "feature/skills/skills.types";
-import { Brain, ChevronRight, Ear, Guitar, Target, Zap, Lock, Star, ChevronLeft } from "lucide-react";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { Brain, ChevronRight, Ear, Guitar, Target, Zap, Lock, Star, ChevronLeft, Mic, Trophy } from "lucide-react";
+
 import { useRouter } from "next/router";
+import { FaCheck } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { SkillCategoryGroup } from "./SkillCategoryGroup";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { cn } from "assets/lib/utils";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 
 interface DashboardExercise {
   id: string;
@@ -42,6 +49,15 @@ export const SkillDashboard = ({
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
   const [selectedChallenge, setSelectedChallenge] = useState<DashboardExercise | null>(null);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [leaderboardExercise, setLeaderboardExercise] = useState<{ id: string; title: string } | null>(null);
+
+  const userAuth = useAppSelector(selectUserAuth);
+  const [progressMap, setProgressMap] = useState<Map<string, BpmProgressData>>(new Map());
+
+  useEffect(() => {
+    if (!userAuth) return;
+    getAllBpmProgress(userAuth).then(setProgressMap);
+  }, [userAuth]);
 
   const totalXP = Object.values(userSkills.unlockedSkills).reduce((sum: number, val: number) => sum + val, 0);
 
@@ -226,14 +242,22 @@ export const SkillDashboard = ({
                       <div className="flex flex-col gap-3">
                         {levelChallenges.map((challenge) => {
                           const isAvailable = true;
-                          
+                          const exerciseDef = exercisesAgregat.find(e => e.id === challenge.id);
+                          const progress = progressMap.get(challenge.id);
+                          const bpmStages = exerciseDef?.metronomeSpeed ? generateBpmStages(exerciseDef.metronomeSpeed) : [];
+                          const completedBpms = progress?.completedBpms || [];
+                          const hasBpmProgress = bpmStages.length > 0 && completedBpms.length > 0;
+                          const micHighScore = progress?.micHighScore;
+                          const micAccuracy = progress?.micHighScoreAccuracy;
+                          const earTrainingHighScore = progress?.earTrainingHighScore;
+
                           return (
-                            <div 
+                            <div
                               key={challenge.id}
                               className={cn(
                                 "group relative p-6 rounded-3xl border transition-all duration-300",
-                                isAvailable 
-                                    ? "bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/80" 
+                                isAvailable
+                                    ? "bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/80"
                                     : "bg-zinc-950 border-zinc-900 opacity-60 grayscale"
                               )}
                             >
@@ -246,16 +270,53 @@ export const SkillDashboard = ({
                                     {challenge.description}
                                   </p>
 
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2 flex-wrap">
                                      <div className="bg-emerald-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-emerald-500/20">
                                         <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider">Skill Points</span>
                                         <span className="text-xs font-black text-emerald-400">+{challenge.difficulty === 'easy' ? 1 : challenge.difficulty === 'medium' ? 2 : 3}</span>
                                      </div>
+
+                                     {hasBpmProgress && (
+                                       <div className="bg-cyan-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-cyan-500/20">
+                                         <FaCheck className="h-2.5 w-2.5 text-cyan-400" />
+                                         <span className="text-[9px] font-bold text-cyan-500 uppercase tracking-wider">BPM</span>
+                                         <span className="text-xs font-black text-cyan-400">{completedBpms.length}/{bpmStages.length}</span>
+                                       </div>
+                                     )}
+
+                                     {micHighScore != null && micHighScore > 0 && (
+                                       <div className="bg-amber-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-amber-500/20">
+                                         <Mic className="h-2.5 w-2.5 text-amber-400" />
+                                         <span className="text-[9px] font-bold text-amber-500 uppercase tracking-wider">Record</span>
+                                         <span className="text-xs font-black text-amber-400">{micHighScore.toLocaleString()}</span>
+                                         {micAccuracy != null && (
+                                           <span className="text-[9px] font-bold text-amber-600">({micAccuracy}%)</span>
+                                         )}
+                                       </div>
+                                     )}
+
+                                     {earTrainingHighScore != null && earTrainingHighScore > 0 && (
+                                       <div className="bg-purple-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-purple-500/20">
+                                         <Ear className="h-2.5 w-2.5 text-purple-400" />
+                                         <span className="text-[9px] font-bold text-purple-500 uppercase tracking-wider">Ear Record</span>
+                                         <span className="text-xs font-black text-purple-400">{earTrainingHighScore}</span>
+                                       </div>
+                                     )}
+
+                                     {(hasBpmProgress || (micHighScore != null && micHighScore > 0) || (earTrainingHighScore != null && earTrainingHighScore > 0)) && (
+                                       <button
+                                         onClick={() => setLeaderboardExercise({ id: challenge.id, title: challenge.title as string })}
+                                         className="bg-zinc-800/60 px-3 py-2 rounded-xl flex items-center gap-1.5 border border-white/5 hover:border-white/15 hover:bg-zinc-800 transition-colors"
+                                       >
+                                         <Trophy className="h-2.5 w-2.5 text-zinc-500" />
+                                         <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Records</span>
+                                       </button>
+                                     )}
                                   </div>
                                 </div>
 
                                 {isAvailable ? (
-                                  <Button 
+                                  <Button
                                     size="sm"
                                     onClick={() => handleStartChallenge(challenge)}
                                     className={cn(
@@ -287,6 +348,15 @@ export const SkillDashboard = ({
             </div>
           </DialogContent>
         </Dialog>
+
+        {leaderboardExercise && (
+          <EarTrainingLeaderboardDialog
+            isOpen={!!leaderboardExercise}
+            onClose={() => setLeaderboardExercise(null)}
+            exerciseId={leaderboardExercise.id}
+            exerciseTitle={leaderboardExercise.title}
+          />
+        )}
     </div>
   );
 };

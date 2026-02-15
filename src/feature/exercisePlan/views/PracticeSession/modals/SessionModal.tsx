@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/accordion";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { BpmProgressGrid } from "feature/exercisePlan/components/BpmProgressGrid";
 import { Metronome } from "feature/exercisePlan/components/Metronome/Metronome";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
@@ -59,6 +60,7 @@ interface SessionModalProps {
   isMicEnabled: boolean;
   toggleMic: () => Promise<void>;
   gameState: any;
+  maxPossibleScore?: number;
   sessionAccuracy: number;
   detectedNoteData: any;
   isListening: boolean;
@@ -76,7 +78,16 @@ interface SessionModalProps {
   hasPlayedRiddleOnce?: boolean;
   handleNextRiddle?: () => void;
   earTrainingScore?: number;
+  earTrainingHighScore?: number | null;
+  exerciseUrl?: string;
   handleRevealRiddle?: () => void;
+  onEarTrainingGuessed?: () => void;
+  // BPM Progress Props
+  bpmStages?: number[];
+  completedBpms?: number[];
+  isBpmLoading?: boolean;
+  onBpmToggle?: (bpm: number) => void;
+  onRecordsClick?: () => void;
 }
 
 const SessionModal = ({
@@ -109,6 +120,7 @@ const SessionModal = ({
   isMicEnabled,
   toggleMic,
   gameState,
+  maxPossibleScore,
   sessionAccuracy,
   detectedNoteData,
   isListening,
@@ -125,7 +137,15 @@ const SessionModal = ({
   hasPlayedRiddleOnce,
   handleNextRiddle,
   handleRevealRiddle,
-  earTrainingScore
+  earTrainingScore,
+  earTrainingHighScore,
+  exerciseUrl,
+  onEarTrainingGuessed,
+  bpmStages,
+  completedBpms,
+  isBpmLoading,
+  onBpmToggle,
+  onRecordsClick
 }: SessionModalProps) => {
   if (!isOpen || !isMounted) return null;
 
@@ -215,10 +235,14 @@ const SessionModal = ({
                       onReveal={handleRevealRiddle || (() => {})}
                       onNextRiddle={handleNextRiddle || (() => {})}
                       onGuessed={() => {
-                        if (handleNextRiddle) handleNextRiddle();
+                        if (onEarTrainingGuessed) onEarTrainingGuessed();
+                        else if (handleNextRiddle) handleNextRiddle();
                       }}
                       score={earTrainingScore || 0}
+                      highScore={earTrainingHighScore}
+                      exerciseUrl={exerciseUrl}
                       canGuess={hasPlayedRiddleOnce || false}
+                      onRecordsClick={onRecordsClick}
                     />
                   </div>
                 )}
@@ -352,15 +376,20 @@ const SessionModal = ({
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex-1">
                         <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Score</span>
-                        <motion.span
-                          key={gameState.score}
-                          initial={{ scale: 1.12 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                          className="text-2xl font-black text-white tabular-nums tracking-tighter inline-block"
-                        >
-                          {gameState.score.toLocaleString()}
-                        </motion.span>
+                        <div className="flex items-baseline gap-1">
+                          <motion.span
+                            key={gameState.score}
+                            initial={{ scale: 1.12 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                            className="text-2xl font-black text-white tabular-nums tracking-tighter inline-block"
+                          >
+                            {gameState.score.toLocaleString()}
+                          </motion.span>
+                          {maxPossibleScore != null && maxPossibleScore > 0 && (
+                            <span className="text-[10px] font-bold text-zinc-600 tabular-nums">/ {maxPossibleScore.toLocaleString()}</span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex-1 text-center">
                         <span className="block text-[8px] font-black uppercase tracking-[0.2em] text-zinc-500 mb-0.5">Accuracy</span>
@@ -472,6 +501,18 @@ const SessionModal = ({
                         </Button>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {currentExercise.metronomeSpeed && bpmStages && bpmStages.length > 0 && onBpmToggle && (
+                  <div className="mb-6">
+                    <BpmProgressGrid
+                      bpmStages={bpmStages}
+                      completedBpms={completedBpms || []}
+                      recommendedBpm={currentExercise.metronomeSpeed.recommended}
+                      onToggle={onBpmToggle}
+                      isLoading={isBpmLoading}
+                    />
                   </div>
                 )}
 

@@ -20,9 +20,12 @@ import { useEffect, useRef, useState } from "react";
 import { FaCheck, FaExternalLinkAlt, FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaStepBackward, FaStepForward, FaTwitter, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
 
+import { BpmProgressGrid } from "../../components/BpmProgressGrid";
 import { ExerciseCompleteDialog } from "../../components/ExerciseCompleteDialog";
 import { Metronome } from "../../components/Metronome/Metronome";
 import { YouTubePlayalong } from "../../components/YouTubePlayalong";
+import { useBpmProgress } from "../../hooks/useBpmProgress";
+import { updateMicHighScore, updateEarTrainingHighScore, getExerciseBpmProgress, saveLeaderboardEntry } from "../../services/bpmProgressService";
 import type {
   ExercisePlan,
 } from "../../types/exercise.types";
@@ -35,6 +38,8 @@ import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
 import ImageModal from "./modals/ImageModal";
 import SessionModal from "./modals/SessionModal";
 
+import { selectUserAuth, selectUserName, selectUserAvatar } from "feature/user/store/userSlice";
+import { useAppSelector } from "store/hooks";
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import { TablatureViewer } from "./components/TablatureViewer";
 import { useTablatureAudio } from "../../hooks/useTablatureAudio";
@@ -48,6 +53,7 @@ import { CalibrationChoiceDialog } from "./components/CalibrationChoiceDialog";
 import { CalibrationWizard } from "./components/CalibrationWizard";
 import { generateRiddle } from "feature/exercisePlan/logic/riddleGenerator";
 import { EarTrainingView } from "./components/EarTrainingView";
+import { EarTrainingLeaderboardDialog } from "../../components/EarTrainingLeaderboardDialog";
 import { ImprovPromptView } from "./components/ImprovPromptView";
 import type { TablatureMeasure } from "../../types/exercise.types";
 import { playCompletionSound } from "utils/audioUtils";
@@ -110,6 +116,14 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     canSkipExercise
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, skillRewardSkillId, skillRewardAmount });
 
+  const userAuth = useAppSelector(selectUserAuth);
+  const userName = useAppSelector(selectUserName);
+  const userAvatar = useAppSelector(selectUserAvatar);
+  const { bpmStages, completedBpms, isLoading: isBpmLoading, handleToggleBpm } = useBpmProgress(currentExercise);
+
+  // Leaderboard dialog state
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+
   const [isAudioMuted, setIsAudioMuted] = useState(true);
   const [isMetronomeMuted, setIsMetronomeMuted] = useState(false);
   const [isHalfSpeed, setIsHalfSpeed] = useState(false);
@@ -123,7 +137,19 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const [riddleMeasures, setRiddleMeasures] = useState<TablatureMeasure[] | null>(null);
   const [isRiddleRevealed, setIsRiddleRevealed] = useState(false);
   const [earTrainingScore, setEarTrainingScore] = useState(0);
+  const [earTrainingHighScore, setEarTrainingHighScore] = useState<number | null>(null);
   const [hasPlayedRiddleOnce, setHasPlayedRiddleOnce] = useState(false);
+
+  // Fetch ear training high score from Firebase
+  useEffect(() => {
+    if (!userAuth || currentExercise.riddleConfig?.mode !== 'sequenceRepeat') {
+      setEarTrainingHighScore(null);
+      return;
+    }
+    getExerciseBpmProgress(userAuth, activeExercise.id).then((data) => {
+      setEarTrainingHighScore(data?.earTrainingHighScore ?? null);
+    });
+  }, [userAuth, activeExercise.id]);
 
   // Detect configurable scale exercise - removed auto-popup as requested by user
   useEffect(() => {
@@ -299,7 +325,22 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     metronome.setBpm(newBpm);
   };
 
+  const saveCurrentScores = () => {
+    const exId = activeExercise.id;
+    const exTitle = activeExercise.title;
+    const exCategory = activeExercise.category;
+    if (userAuth && isMicEnabled && gameState.score > 0) {
+      updateMicHighScore(userAuth, exId, gameState.score, sessionAccuracy, exTitle, exCategory);
+      saveLeaderboardEntry(userAuth, exId, gameState.score, userName || "Anonymous", userAvatar || "");
+    }
+    if (userAuth && currentExercise.riddleConfig?.mode === 'sequenceRepeat' && earTrainingScore > 0) {
+      updateEarTrainingHighScore(userAuth, exId, earTrainingScore, exTitle, exCategory);
+      saveLeaderboardEntry(userAuth, exId, earTrainingScore, userName || "Anonymous", userAvatar || "");
+    }
+  };
+
   const handleNextExerciseClick = () => {
+    saveCurrentScores();
     stopTimer();
     metronome.stopMetronome();
     handleNextExercise(resetTimer);
@@ -411,6 +452,18 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     );
   }, [activeTablature]);
 
+  const maxPossibleScore = useMemo(() => {
+    if (totalNotes === 0) return 0;
+    const halfPenalty = isHalfSpeed ? 0.5 : 1;
+    const bpmB = 1 + (metronome.bpm - 100) * 0.001;
+    let total = 0;
+    for (let i = 0; i < totalNotes; i++) {
+      const mult = Math.min(8, Math.floor(i / 5) + 1);
+      total += Math.round(100 * mult * halfPenalty * bpmB);
+    }
+    return total;
+  }, [totalNotes, isHalfSpeed, metronome.bpm]);
+
   useEffect(() => {
     setHitNotes({});
     hitNotesRef.current = {};
@@ -422,6 +475,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     needsFlushRef.current = false;
     lastLoopedBeatsRef.current = 0;
     processedNotesRef.current.clear();
+    setEarTrainingScore(0);
   }, [currentExerciseIndex]);
 
   // Clear feedback after a delay
@@ -459,6 +513,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
     const bpm = effectiveBpm;
     const startTime = metronome.startTime;
+    const halfSpeedPenalty = isHalfSpeed ? 0.5 : 1;
+    // Subtle BPM bonus: 1.0x at 100 BPM, ~1.15x at 160, ~0.9x at 60
+    const bpmBonus = 1 + (metronome.bpm - 100) * 0.001;
 
     const tick = () => {
       const now = Date.now();
@@ -549,7 +606,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                   if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; }
                 }
 
-                gs.score += 100 * newMultiplier;
+                gs.score += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
                 gs.combo = newCombo;
                 gs.multiplier = newMultiplier;
               }
@@ -591,7 +648,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     return () => {
       cancelAnimationFrame(rafIdRef.current);
     };
-  }, [isPlaying, metronome.startTime, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq]);
+  }, [isPlaying, metronome.startTime, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, isHalfSpeed, metronome.bpm]);
 
   // Pass progress for gray-out effect
   const beatsPerSecond = effectiveBpm / 60;
@@ -649,7 +706,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       {showSuccessView && !reportResult && (
         <ExerciseSuccessView
           planTitle={planTitleString}
-          onFinish={autoSubmitReport}
+          onFinish={() => { saveCurrentScores(); autoSubmitReport(); }}
           onRestart={() => {
             resetSuccessView();
             resetTimer();
@@ -671,7 +728,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
           <SessionModal
             isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult}
             onClose={onClose || (() => router.push("/report"))}
-            onFinish={isLastExercise ? autoSubmitReport : onFinish}
+            onFinish={isLastExercise ? () => { saveCurrentScores(); autoSubmitReport(); } : onFinish}
             onImageClick={() => setIsImageModalOpen(true)}
             isMounted={isMounted}
             currentExercise={currentExercise}
@@ -698,6 +755,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             isMicEnabled={isMicEnabled}
             toggleMic={toggleMic}
             gameState={gameState}
+            maxPossibleScore={maxPossibleScore}
             sessionAccuracy={sessionAccuracy}
             detectedNoteData={detectedNoteData}
             isListening={isListening}
@@ -715,6 +773,14 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             handleNextRiddle={handleNextRiddle}
             handleRevealRiddle={handleRevealRiddle}
             earTrainingScore={earTrainingScore}
+            earTrainingHighScore={earTrainingHighScore}
+            exerciseUrl={`/exercises/${activeExercise.id.replace(/_/g, "-")}`}
+            onEarTrainingGuessed={() => { setEarTrainingScore(s => s + 1); handleNextRiddle(); }}
+            bpmStages={bpmStages}
+            completedBpms={completedBpms}
+            isBpmLoading={isBpmLoading}
+            onBpmToggle={handleToggleBpm}
+            onRecordsClick={() => setLeaderboardOpen(true)}
           />
         </>
       )}
@@ -867,15 +933,20 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                     <div className="relative group">
                                         <div className="absolute -inset-2 bg-white/5 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                                         <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Total Score</span>
-                                        <motion.span
-                                            key={gameState.score}
-                                            initial={{ scale: 1.15, filter: "brightness(1.5)" }}
-                                            animate={{ scale: 1, filter: "brightness(1)" }}
-                                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                                            className="text-4xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] inline-block"
-                                        >
-                                            {gameState.score.toLocaleString()}
-                                        </motion.span>
+                                        <div className="flex items-baseline gap-1">
+                                          <motion.span
+                                              key={gameState.score}
+                                              initial={{ scale: 1.15, filter: "brightness(1.5)" }}
+                                              animate={{ scale: 1, filter: "brightness(1)" }}
+                                              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                                              className="text-4xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] inline-block"
+                                          >
+                                              {gameState.score.toLocaleString()}
+                                          </motion.span>
+                                          {maxPossibleScore > 0 && (
+                                            <span className="text-sm font-bold text-zinc-600 tabular-nums">/ {maxPossibleScore.toLocaleString()}</span>
+                                          )}
+                                        </div>
                                     </div>
                                     <div className="h-10 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
                                     <div>
@@ -1022,7 +1093,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                       handleNextRiddle();
                                     }}
                                     score={earTrainingScore}
+                                    highScore={earTrainingHighScore}
+                                    exerciseUrl={`/exercises/${activeExercise.id.replace(/_/g, "-")}`}
                                     canGuess={hasPlayedRiddleOnce}
+                                    onRecordsClick={() => setLeaderboardOpen(true)}
                                 />
                             </div>
                         )}
@@ -1225,7 +1299,19 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                   )}
                              </div>
                         )}
-                        
+
+                        {currentExercise.metronomeSpeed && bpmStages.length > 0 && (
+                          <div className="radius-premium bg-zinc-900/40 border border-white/5 p-6 backdrop-blur-sm">
+                            <BpmProgressGrid
+                              bpmStages={bpmStages}
+                              completedBpms={completedBpms}
+                              recommendedBpm={currentExercise.metronomeSpeed.recommended}
+                              onToggle={handleToggleBpm}
+                              isLoading={isBpmLoading}
+                            />
+                          </div>
+                        )}
+
                         {currentExercise.links && currentExercise.links.length > 0 && (
                             <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-6 backdrop-blur-sm space-y-4">
                                 <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
@@ -1326,6 +1412,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                  )}
                                  onClick={() => {
                                   if (isLastExercise) {
+                                    saveCurrentScores();
                                     autoSubmitReport();
                                   } else {
                                     handleNextExerciseClick();
@@ -1389,6 +1476,13 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
         isListening={isListening}
         inputGain={inputGain}
         onInputGainChange={setInputGain}
+      />
+
+      <EarTrainingLeaderboardDialog
+        isOpen={leaderboardOpen}
+        onClose={() => setLeaderboardOpen(false)}
+        exerciseId={activeExercise.id}
+        exerciseTitle={activeExercise.title}
       />
 
       {/* Completion Notification */}
