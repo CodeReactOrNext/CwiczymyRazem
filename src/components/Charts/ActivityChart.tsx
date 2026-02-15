@@ -71,13 +71,19 @@ export function ActivityChart({ data }: ActivityChartProps) {
   };
 
   const processedData =
-    data?.map((report) => ({
-      date: new Date(report.date).toISOString().split("T")[0],
-      technique: report.techniqueTime,
-      theory: report.theoryTime,
-      hearing: report.hearingTime,
-      creativity: report.creativityTime,
-    })) || [];
+    data?.map((report) => {
+      const d = new Date(report.date);
+      const dateStr = `${d.getFullYear()}-${(d.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
+      return {
+        date: dateStr,
+        technique: report.techniqueTime,
+        theory: report.theoryTime,
+        hearing: report.hearingTime,
+        creativity: report.creativityTime,
+      };
+    }) || [];
 
   const filteredData = processedData.filter((item) => {
     if (timeRange === "all") return true;

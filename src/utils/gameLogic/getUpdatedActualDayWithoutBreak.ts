@@ -3,14 +3,20 @@ export const getUpdatedActualDayWithoutBreak = (
   userLastReportDate: Date,
   didPracticeToday: boolean
 ) => {
-  const isNewDayStreak =
-    new Date().getDate() - userLastReportDate.getDate() === 1 &&
-    !didPracticeToday;
-
   if (didPracticeToday) {
     return actualDayWithoutBreak;
   }
-  if (isNewDayStreak) {
+
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const isYesterday =
+    userLastReportDate.getDate() === yesterday.getDate() &&
+    userLastReportDate.getMonth() === yesterday.getMonth() &&
+    userLastReportDate.getFullYear() === yesterday.getFullYear();
+
+  if (isYesterday) {
     return actualDayWithoutBreak + 1;
   }
   return 1;
