@@ -18,10 +18,11 @@ export function SkillBalance({ activityData = [] }: SkillBalanceProps) {
   const today = new Date();
   const sevenDaysAgo = new Date(today);
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-  const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+  const sevenDaysAgoStr = `${sevenDaysAgo.getFullYear()}-${(sevenDaysAgo.getMonth() + 1).toString().padStart(2, "0")}-${sevenDaysAgo.getDate().toString().padStart(2, "0")}`;
 
   const last7Days = activityData.filter(d => {
-    const dateStr = new Date(d.date).toISOString().split('T')[0];
+    const dd = new Date(d.date);
+    const dateStr = `${dd.getFullYear()}-${(dd.getMonth() + 1).toString().padStart(2, "0")}-${dd.getDate().toString().padStart(2, "0")}`;
     return dateStr >= sevenDaysAgoStr;
   });
 

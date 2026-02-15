@@ -1,6 +1,7 @@
 
 import { spiderLegatoBasicExercise } from "feature/exercisePlan/data/exerises/spiderLegatoBasic/spiderLegatoBasic";
 import { spiderXExercise } from "feature/exercisePlan/data/exerises/spiderX/spiderX";
+import { mutingDisciplineDrillExercise } from "feature/exercisePlan/data/exerises/mutingDisciplineDrill/mutingDisciplineDrill";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 import warmUpImage from "./image.webp";
@@ -15,6 +16,7 @@ export const warmUp30MinutesPlan: ExercisePlan = {
   exercises: [
     spiderXExercise,
     spiderLegatoBasicExercise,
+    mutingDisciplineDrillExercise
   ],
   userId: "system",
   image: warmUpImage,

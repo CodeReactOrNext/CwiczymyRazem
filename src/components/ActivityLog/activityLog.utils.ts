@@ -3,8 +3,7 @@ import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
 import type { DateWithReport, ReportListInterfaceWithTimeSumary } from "./activityLog.types";
 
 export const getEmptySlots = (dayOfWeek: number): DateWithReport[] => {
-  const numOfDayWhereUiStart = 6;
-  const slotsNeeded = numOfDayWhereUiStart - dayOfWeek;
+  const slotsNeeded = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
 
   if (slotsNeeded <= 0) return [];
 

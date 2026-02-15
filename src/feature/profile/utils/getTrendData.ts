@@ -13,8 +13,10 @@ interface TrendDataOptions {
 
 const getDayKey = (date: Date): string => {
   const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d.toISOString().split('T')[0];
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1).toString().padStart(2, "0");
+  const day = d.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
 const getValueFromReport = (report: ReportListInterface | undefined, key: TrendDataKey): number => {
@@ -24,7 +26,7 @@ const getValueFromReport = (report: ReportListInterface | undefined, key: TrendD
     return report.totalTime / 3600000;
   }
 
-  return report.points; 
+  return report.points;
 };
 
 export const getTrendData = (
@@ -33,10 +35,10 @@ export const getTrendData = (
   options: TrendDataOptions = { days: 14 }
 ): number[] => {
   if (!datasWithReports) return [];
-  
+
   const { days = 14 } = options;
   const now = new Date();
-  
+
   const reportMap = datasWithReports.reduce((acc, dayReport) => {
     if (dayReport && dayReport.date) {
       acc[getDayKey(dayReport.date)] = dayReport.report;
@@ -48,7 +50,7 @@ export const getTrendData = (
     const date = new Date(now);
     date.setDate(date.getDate() - (days - 1 - index));
     const dayKey = getDayKey(date);
-    
+
     const dayReport = reportMap[dayKey];
     return getValueFromReport(dayReport, key);
   });

@@ -894,7 +894,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                     )}
 
                     {/* Simple Challenge Banner */}
-                    {(plan as any).streakDays && (
+                    {!!(plan as any).streakDays && (
                       <motion.div 
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -1385,7 +1385,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                           </div>
 
                           <div className="flex-1 flex justify-end items-center gap-3">
-                             {currentExerciseIndex > 0 && (
+                             {currentExerciseIndex > 0 ? (
                                <Button
                                    size="sm"
                                    variant="ghost"
@@ -1399,7 +1399,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                >
                                    <FaStepBackward /> {t("common:back") || "Back"}
                                </Button>
-                             )}
+                             ) : null}
 
                              <Button
                                  size="sm"
