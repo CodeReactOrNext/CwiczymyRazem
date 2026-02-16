@@ -41,7 +41,9 @@ export const firebaseAddLogReport = async (
     micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
     earTrainingHighScore?: { exerciseTitle: string; score: number };
   },
-  exerciseTitle?: string
+  exerciseTitle?: string,
+  micPerformance?: { score: number; accuracy: number },
+  earTrainingPerformance?: { score: number }
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -64,6 +66,8 @@ export const firebaseAddLogReport = async (
     planId,
     streak,
     exerciseTitle,
+    micPerformance,
+    earTrainingPerformance,
     ...songDetails,
     ...(skillPointsGained && Object.keys(skillPointsGained).length > 0 && { skillPointsGained }),
     ...(newRecords && { newRecords }),

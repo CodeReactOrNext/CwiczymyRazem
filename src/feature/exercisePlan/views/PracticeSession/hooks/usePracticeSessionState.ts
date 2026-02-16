@@ -124,10 +124,14 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
     setShowSuccessView(false);
   }, []);
 
-  const handleFinishSession = useCallback(async (exerciseRecords?: {
-    micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
-    earTrainingHighScore?: { exerciseTitle: string; score: number };
-  } | null) => {
+  const handleFinishSession = useCallback(async (
+    exerciseRecords?: {
+      micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
+      earTrainingHighScore?: { exerciseTitle: string; score: number };
+    } | null,
+    micPerformance?: { score: number; accuracy: number } | null,
+    earTrainingPerformance?: { score: number } | null
+  ) => {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     timer.stopTimer();
@@ -176,6 +180,8 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
           return acc;
         }, {} as Record<string, number>),
         ...(exerciseRecords && { exerciseRecords }),
+        ...(micPerformance && { micPerformance }),
+        ...(earTrainingPerformance && { earTrainingPerformance }),
       };
 
       const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();

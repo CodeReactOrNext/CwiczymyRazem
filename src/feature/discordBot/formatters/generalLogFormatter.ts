@@ -159,6 +159,36 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
       }
     }
 
+    // Performance Field (Non-records)
+    {
+      const performanceLines: string[] = [];
+      const hasMicRecord = !!log.exerciseRecords?.micHighScore;
+      const hasEtRecord = !!log.exerciseRecords?.earTrainingHighScore;
+
+      if (log.micPerformance && !hasMicRecord) {
+        performanceLines.push(
+          isEn
+            ? `🎤 Mic: **${log.micPerformance.score}** pts (${log.micPerformance.accuracy}%)`
+            : `🎤 Mic: **${log.micPerformance.score}** pkt (${log.micPerformance.accuracy}%)`
+        );
+      }
+      if (log.earTrainingPerformance && !hasEtRecord) {
+        performanceLines.push(
+          isEn
+            ? `🎧 Ear training: **${log.earTrainingPerformance.score}** correct`
+            : `🎧 Ear training: **${log.earTrainingPerformance.score}** poprawnych`
+        );
+      }
+
+      if (performanceLines.length > 0) {
+        embed.fields?.push({
+          name: isEn ? "✨ **Session Results**" : "✨ **Wyniki Sesji**",
+          value: performanceLines.join("\n"),
+          inline: false,
+        });
+      }
+    }
+
     // Random Motivational Quote/Joke
     if (!isEn) {
       embed.fields?.push({
