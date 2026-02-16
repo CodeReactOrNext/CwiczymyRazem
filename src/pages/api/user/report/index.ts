@@ -130,7 +130,9 @@ export default async function handler(
         inputData.skillPointsGained,
         report.newRecords,
         inputData.exerciseRecords,
-        inputData.reportTitle
+        inputData.reportTitle,
+        inputData.micPerformance,
+        inputData.earTrainingPerformance
       ));
     }
 

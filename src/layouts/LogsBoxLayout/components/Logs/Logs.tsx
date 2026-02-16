@@ -251,7 +251,7 @@ const FirebaseLogsItem = ({
   currentUserId: string;
 }) => {
   const { t, i18n } = useTranslation(["common", "exercises"]);
-  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, exerciseTitle, userAvatarFrame } = log;
+  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame } = log;
   const date = new Date(data);
 
   const plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
@@ -298,6 +298,26 @@ const FirebaseLogsItem = ({
                   EXERCISE
               </span>
               <span className="font-medium">{exerciseTitle}</span>
+            </span>
+        )}
+
+        {micPerformance && (
+            <span className="ml-2 inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
+               <span className="flex items-center gap-1">
+                  <span className="font-bold text-main">{micPerformance.score}</span>
+                  <span className="text-[9px] uppercase opacity-70 tracking-tighter">pts</span>
+               </span>
+               <span className="w-px h-2.5 bg-blue-500/30" />
+               <span className="flex items-center gap-1 text-[10px] font-bold">
+                  {micPerformance.accuracy}%
+               </span>
+            </span>
+        )}
+
+        {earTrainingPerformance && (
+            <span className="ml-2 inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
+               <span className="text-[9px] uppercase opacity-70 tracking-widest">Score:</span>
+               <span className="font-bold">{earTrainingPerformance.score}</span>
             </span>
         )}
 

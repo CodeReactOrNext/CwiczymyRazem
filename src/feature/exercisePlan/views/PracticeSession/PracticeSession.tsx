@@ -723,7 +723,14 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       {showSuccessView && !reportResult && (
         <ExerciseSuccessView
           planTitle={planTitleString}
-          onFinish={async () => { await saveCurrentScores(); autoSubmitReport(exerciseRecordsRef.current); }}
+          onFinish={async () => { 
+            await saveCurrentScores(); 
+            autoSubmitReport(
+              exerciseRecordsRef.current, 
+              isMicEnabled ? { score: gameState.score, accuracy: sessionAccuracy } : null,
+              currentExercise.riddleConfig?.mode === 'sequenceRepeat' ? { score: earTrainingScore } : null
+            ); 
+          }}
           onRestart={() => {
             resetSuccessView();
             resetTimer();
@@ -745,7 +752,14 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
           <SessionModal
             isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult}
             onClose={onClose || (() => router.push("/report"))}
-            onFinish={isLastExercise ? async () => { await saveCurrentScores(); autoSubmitReport(exerciseRecordsRef.current); } : onFinish}
+            onFinish={isLastExercise ? async () => { 
+              await saveCurrentScores(); 
+              autoSubmitReport(
+                exerciseRecordsRef.current,
+                isMicEnabled ? { score: gameState.score, accuracy: sessionAccuracy } : null,
+                currentExercise.riddleConfig?.mode === 'sequenceRepeat' ? { score: earTrainingScore } : null
+              ); 
+            } : onFinish}
             onImageClick={() => setIsImageModalOpen(true)}
             isMounted={isMounted}
             currentExercise={currentExercise}
