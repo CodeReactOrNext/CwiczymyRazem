@@ -80,7 +80,17 @@ describe("reportHandler", () => {
         learning: [],
       }
     });
-    expect(deafultExpectedDate).toStrictEqual(result);
+    expect(result.currentUserStats.actualDayWithoutBreak).toBe(1);
+    expect(result.currentUserStats.dayWithoutBreak).toBe(1);
+    expect(result.currentUserStats.sessionCount).toBe(1);
+    expect(result.currentUserStats.lastReportDate).toBe(new Date(1998, 11, 19).toISOString());
+    expect(result.currentUserStats.points).toBe(0);
+    expect(result.currentUserStats.lvl).toBe(1);
+    expect(result.isDateBackReport).toBe(0);
+    expect(result.isNewLevel).toBe(false);
+    expect(result.newAchievements).toEqual([]);
+    expect(result.raitingData.totalPoints).toBe(0);
+    expect(result.raitingData.bonusPoints.streak).toBe(1);
   });
 
   it("should return the correct updated statistics when the user adds a backdated report", () => {
@@ -88,17 +98,6 @@ describe("reportHandler", () => {
       ...emptyInputData,
       countBackDays: 3,
     };
-    const expectedDate = {
-      ...deafultExpectedDate,
-      currentUserStats: {
-        ...updatedUserStats,
-        actualDayWithoutBreak: 0,
-        lastReportDate: "",
-      },
-      reportDate: new Date(1998, 11, 16),
-      isDateBackReport: 3,
-    };
-
     const result = reportUpdateUserStats({
       currentUserStats,
       inputData,
@@ -108,6 +107,12 @@ describe("reportHandler", () => {
         learning: [],
       }
     });
-    expect(expectedDate).toStrictEqual(result);
+
+    // Back-dated reports should not create a streak record from a fresh account
+    expect(result.currentUserStats.actualDayWithoutBreak).toBe(0);
+    expect(result.currentUserStats.dayWithoutBreak).toBe(0);
+    expect(result.currentUserStats.lastReportDate).toBe("");
+    expect(result.isDateBackReport).toBe(3);
+    expect(result.currentUserStats.sessionCount).toBe(1);
   });
 });

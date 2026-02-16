@@ -53,6 +53,38 @@ export const reportUpdateUserStats = ({
     userLastReportDate,
     didPracticeToday
   );
+
+  // Handle back-dated reports: update streak and lastReportDate when appropriate
+  let backDateStreak = actualDayWithoutBreak;
+  let backDateLastReport = lastReportDate!;
+
+  if (isDateBackReport) {
+    const reportDate = getDateFromPast(isDateBackReport);
+    const lastReport = new Date(lastReportDate!);
+
+    // Calculate the day just before the current streak started
+    const streakStart = new Date(lastReport);
+    streakStart.setDate(streakStart.getDate() - (actualDayWithoutBreak - 1));
+    const dayBeforeStreak = new Date(streakStart);
+    dayBeforeStreak.setDate(dayBeforeStreak.getDate() - 1);
+
+    const isSameDay = (d1: Date, d2: Date) =>
+      d1.getDate() === d2.getDate() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getFullYear() === d2.getFullYear();
+
+    if (isSameDay(reportDate, dayBeforeStreak)) {
+      backDateStreak = actualDayWithoutBreak + 1;
+    }
+
+    // Update lastReportDate if the back-dated report is more recent
+    if (reportDate.getTime() > lastReport.getTime()) {
+      backDateLastReport = reportDate.toISOString();
+    }
+  }
+
+  const finalStreak = isDateBackReport ? backDateStreak : updatedActualDayWithoutBreak;
+
   const raiting = {
     ...(isDateBackReport
       ? makeRatingData(inputData, sumTime, 1)
@@ -86,16 +118,14 @@ export const reportUpdateUserStats = ({
     currentLevelMaxPoints: getPointsToLvlUp(updatedLevel + 1),
     sessionCount: didPracticeToday ? sessionCount : sessionCount + 1,
     habitsCount: habitsCount + raiting.bonusPoints.habitsCount,
-    dayWithoutBreak: dayWithoutBreak < updatedActualDayWithoutBreak
-      ? updatedActualDayWithoutBreak
+    dayWithoutBreak: dayWithoutBreak < finalStreak
+      ? finalStreak
       : dayWithoutBreak,
     maxPoints: maxPoints < raiting.totalPoints ? raiting.totalPoints : maxPoints,
-    actualDayWithoutBreak: isDateBackReport
-      ? actualDayWithoutBreak
-      : updatedActualDayWithoutBreak,
+    actualDayWithoutBreak: finalStreak,
     achievements: achievements,
     lastReportDate: isDateBackReport
-      ? lastReportDate
+      ? backDateLastReport
       : new Date().toISOString(),
     guitarStartDate: null
   };
