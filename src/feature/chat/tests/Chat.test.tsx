@@ -2,13 +2,21 @@ import { fireEvent,render, screen } from "@testing-library/react";
 import { beforeEach,describe, expect, it, vi } from "vitest";
 
 import Chat from "../Chat";
-import { useChat } from "../hooks/useChat";
+import { useChat } from "feature/chat/hooks/useChat";
 
-vi.mock("../hooks/useChat");
+vi.mock("feature/chat/hooks/useChat");
+
+vi.mock("hooks/useTranslation", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
 
 
 describe("Chat Component", () => {
-  const mockSendMessage = vi.fn();
+  const mockSendMessage = vi.fn((e) => {
+    e?.preventDefault();
+  });
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -22,7 +30,7 @@ describe("Chat Component", () => {
           timestamp: new Date(),
         },
       ],
-      newMessage: "",
+      newMessage: "Some message",
       sendMessage: mockSendMessage,
       setNewMessage: vi.fn(),
       currentUserId: "user1",
@@ -35,13 +43,12 @@ describe("Chat Component", () => {
     expect(screen.getByText("Test Message")).toBeDefined();
   });
 
-  it("should send message", () => {
-    render(<Chat />);
-    const form = screen.getByRole("form");
-    const input = screen.getByPlaceholderText("send_placeholder");
+  it("should send message", async () => {
+    const { container } = render(<Chat />);
+    const button = container.querySelector('button[type="submit"]');
+    if (!button) throw new Error("Button not found");
     
-    fireEvent.change(input, { target: { value: "New message" } });
-    fireEvent.submit(form);
+    fireEvent.click(button);
     
     expect(mockSendMessage).toHaveBeenCalled();
   });

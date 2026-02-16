@@ -3,7 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ActivityLogFormatter } from "../formatters/generalLogFormatter";
 import { getUserDisplayName } from "../utils/userUtils";
 
+vi.mock("../utils/userUtils", () => ({
+  getUserDisplayName: vi.fn(),
+}));
+
 describe("ActivityLogFormatter", () => {
+  const mockDate = new Date(2024, 0, 15);
+  vi.useFakeTimers();
+  vi.setSystemTime(mockDate);
+
   const mockLog = {
     uid: "testUser",
     points: 75,
@@ -18,6 +26,7 @@ describe("ActivityLogFormatter", () => {
       level: 5,
     },
     newAchievements: ["achievement1", "achievement2"],
+    streak: 10,
   };
 
   beforeEach(() => {
@@ -29,12 +38,15 @@ describe("ActivityLogFormatter", () => {
     const result = await formatter.format(mockLog as any);
 
     expect(result.embeds[0]).toMatchObject({
-      title: expect.stringContaining("Raport Aktywności"),
-      description: expect.stringContaining("Test User"),
+      author: {
+        name: "Test User",
+      },
+      title: expect.stringContaining("Raport Sesji"),
+      description: expect.stringContaining("75 PKT"),
       color: 0x3498db,
       fields: expect.arrayContaining([
-        expect.objectContaining({ name: "🏅 **Nowy Poziom**" }),
-        expect.objectContaining({ name: "🌟 **2 Nowe Osiągnięcia!**" }),
+        expect.objectContaining({ name: "🎉 **POZIOM W GÓRĘ!**" }),
+        expect.objectContaining({ name: "🏅 **Osiągnięcia**" }),
       ]),
     });
   });

@@ -1,9 +1,13 @@
 import {
   LearnedSongFormatter,
   WantToLearnSongFormatter,
-} from "feature/discordBot/formatters/songFormatters";
-import { getUserDisplayName } from "feature/discordBot/utils/userUtils";
+} from "../formatters/songFormatters";
+import { getUserDisplayName } from "../utils/userUtils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("../utils/userUtils", () => ({
+  getUserDisplayName: vi.fn(),
+}));
 
 describe("SongFormatters", () => {
   const mockLog = {
@@ -23,7 +27,7 @@ describe("SongFormatters", () => {
       const result = await formatter.format(mockLog as any);
 
       expect(result.embeds[0]).toMatchObject({
-        title: "Utwór Opanowany",
+        title: "🎉 Utwór Opanowany!",
         description: expect.stringContaining("Test User"),
         color: 0x2ecc71,
       });
@@ -36,7 +40,7 @@ describe("SongFormatters", () => {
       const result = await formatter.format(mockLog as any);
 
       expect(result.embeds[0]).toMatchObject({
-        title: "Nauka Utworu",
+        title: "✨ Nowy Cel!",
         description: expect.stringContaining("Test User"),
         color: 0xf1c40f,
       });
