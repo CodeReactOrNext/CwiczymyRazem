@@ -102,9 +102,9 @@ export default async function handler(
       report.timeSummary,
       inputData.planId ?? null,
       inputData.songId || inputData.songTitle || inputData.songArtist ? {
-        songId: inputData.songId,
-        songTitle: inputData.songTitle,
-        songArtist: inputData.songArtist
+        ...(inputData.songId && { songId: inputData.songId }),
+        ...(inputData.songTitle && { songTitle: inputData.songTitle }),
+        ...(inputData.songArtist && { songArtist: inputData.songArtist })
       } : undefined
     ));
 
@@ -122,9 +122,9 @@ export default async function handler(
         inputData.avatarUrl ?? null,
         inputData.planId ?? null,
         inputData.songId || inputData.songTitle || inputData.songArtist ? {
-          songId: inputData.songId,
-          songTitle: inputData.songTitle,
-          songArtist: inputData.songArtist
+          ...(inputData.songId && { songId: inputData.songId }),
+          ...(inputData.songTitle && { songTitle: inputData.songTitle }),
+          ...(inputData.songArtist && { songArtist: inputData.songArtist })
         } : undefined,
         report.raitingData.bonusPoints.streak,
         inputData.skillPointsGained,
