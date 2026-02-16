@@ -91,7 +91,7 @@ export const updateMicHighScore = async (
   accuracy: number,
   exerciseTitle: string,
   exerciseCategory: string
-): Promise<void> => {
+): Promise<{ isNewRecord: boolean; previousScore: number }> => {
   try {
     const docRef = doc(
       db,
@@ -105,7 +105,7 @@ export const updateMicHighScore = async (
     const existing = snapshot.exists() ? snapshot.data() : {};
     const currentHighScore = existing.micHighScore || 0;
 
-    if (score <= currentHighScore) return;
+    if (score <= currentHighScore) return { isNewRecord: false, previousScore: currentHighScore };
 
     await trackedSetDoc(docRef, {
       ...existing,
@@ -116,8 +116,10 @@ export const updateMicHighScore = async (
       micHighScoreAccuracy: accuracy,
       lastUpdated: Timestamp.now(),
     });
+    return { isNewRecord: true, previousScore: currentHighScore };
   } catch (error) {
     logger.error(error, { context: "updateMicHighScore" });
+    return { isNewRecord: false, previousScore: 0 };
   }
 };
 
@@ -127,7 +129,7 @@ export const updateEarTrainingHighScore = async (
   score: number,
   exerciseTitle: string,
   exerciseCategory: string
-): Promise<void> => {
+): Promise<{ isNewRecord: boolean; previousScore: number }> => {
   try {
     const docRef = doc(
       db,
@@ -141,7 +143,7 @@ export const updateEarTrainingHighScore = async (
     const existing = snapshot.exists() ? snapshot.data() : {};
     const currentHighScore = existing.earTrainingHighScore || 0;
 
-    if (score <= currentHighScore) return;
+    if (score <= currentHighScore) return { isNewRecord: false, previousScore: currentHighScore };
 
     await trackedSetDoc(docRef, {
       ...existing,
@@ -151,8 +153,10 @@ export const updateEarTrainingHighScore = async (
       earTrainingHighScore: score,
       lastUpdated: Timestamp.now(),
     });
+    return { isNewRecord: true, previousScore: currentHighScore };
   } catch (error) {
     logger.error(error, { context: "updateEarTrainingHighScore" });
+    return { isNewRecord: false, previousScore: 0 };
   }
 };
 

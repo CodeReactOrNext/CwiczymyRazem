@@ -91,6 +91,84 @@ describe("reportHandler", () => {
     expect(result.newAchievements).toEqual([]);
     expect(result.raitingData.totalPoints).toBe(0);
     expect(result.raitingData.bonusPoints.streak).toBe(1);
+    expect(result.newRecords).toEqual({
+      maxPoints: false,
+      longestSession: false,
+      maxStreak: true, // streak goes 0 → 1, which exceeds previous dayWithoutBreak of 0
+      newLevel: false,
+    });
+  });
+
+  it("should detect new records when user beats previous stats", () => {
+    const statsWithHistory: StatisticsDataInterface = {
+      ...statisticsInitial,
+      maxPoints: 5,
+      time: {
+        technique: 0,
+        theory: 0,
+        hearing: 0,
+        creativity: 0,
+        longestSession: 60000, // 1 minute
+      },
+      dayWithoutBreak: 2,
+      actualDayWithoutBreak: 2,
+      lastReportDate: new Date(1998, 11, 18).toISOString(), // yesterday
+    };
+
+    const inputWithTime: ReportFormikInterface = {
+      ...emptyInputData,
+      techniqueHours: "1",
+      techniqueMinutes: "30",
+      habbits: ["exercise_plan", "warmup", "metronome"],
+    };
+
+    const result = reportUpdateUserStats({
+      currentUserStats: statsWithHistory,
+      inputData: inputWithTime,
+      currentUserSongLists: {
+        wantToLearn: [],
+        learned: [],
+        learning: [],
+      }
+    });
+
+    // Session time is 90min = 5400000ms > longestSession 60000ms
+    expect(result.newRecords.longestSession).toBe(true);
+    // Points from 1.5h technique + 3 habits should exceed maxPoints of 5
+    expect(result.newRecords.maxPoints).toBe(true);
+    // Streak should go from 2 to 3, exceeding dayWithoutBreak of 2
+    expect(result.newRecords.maxStreak).toBe(true);
+  });
+
+  it("should not detect records when user does not beat previous stats", () => {
+    const statsWithHighRecords: StatisticsDataInterface = {
+      ...statisticsInitial,
+      maxPoints: 999,
+      time: {
+        technique: 0,
+        theory: 0,
+        hearing: 0,
+        creativity: 0,
+        longestSession: 999999999,
+      },
+      dayWithoutBreak: 999,
+      lastReportDate: new Date(1998, 11, 18).toISOString(),
+    };
+
+    const result = reportUpdateUserStats({
+      currentUserStats: statsWithHighRecords,
+      inputData: emptyInputData,
+      currentUserSongLists: {
+        wantToLearn: [],
+        learned: [],
+        learning: [],
+      }
+    });
+
+    expect(result.newRecords.maxPoints).toBe(false);
+    expect(result.newRecords.longestSession).toBe(false);
+    expect(result.newRecords.maxStreak).toBe(false);
+    expect(result.newRecords.newLevel).toBe(false);
   });
 
   it("should return the correct updated statistics when the user adds a backdated report", () => {

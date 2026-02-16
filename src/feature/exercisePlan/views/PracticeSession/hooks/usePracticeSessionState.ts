@@ -124,7 +124,10 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
     setShowSuccessView(false);
   }, []);
 
-  const handleFinishSession = useCallback(async () => {
+  const handleFinishSession = useCallback(async (exerciseRecords?: {
+    micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
+    earTrainingHighScore?: { exerciseTitle: string; score: number };
+  } | null) => {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     timer.stopTimer();
@@ -171,7 +174,8 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
             });
           }
           return acc;
-        }, {} as Record<string, number>)
+        }, {} as Record<string, number>),
+        ...(exerciseRecords && { exerciseRecords }),
       };
 
       const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();
