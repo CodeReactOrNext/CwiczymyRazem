@@ -29,7 +29,14 @@ export const firebaseSetUserExerciseRaprot = async (
     songArtist?: string;
   }
 ) => {
-  const dataRaport = { ...raport, exceriseTitle, timeSumary, isDateBackReport, planId, ...songDetails };
+  const dataRaport = {
+    ...raport,
+    exceriseTitle,
+    timeSumary,
+    isDateBackReport,
+    ...(planId !== undefined && { planId }),
+    ...songDetails
+  };
 
   const userDocRef = doc(db, "users", userAuth, "exerciseData", raport.reportDate.toISOString());
 
