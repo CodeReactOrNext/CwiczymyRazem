@@ -13,6 +13,17 @@ interface ActivityMessage {
       level: number;
     };
     newAchievements?: any[];
+    skillPointsGained?: Record<string, number>;
+    newRecords?: {
+      maxPoints?: boolean;
+      longestSession?: boolean;
+      maxStreak?: boolean;
+      newLevel?: boolean;
+    };
+    exerciseRecords?: {
+      micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
+      earTrainingHighScore?: { exerciseTitle: string; score: number };
+    };
   }) => boolean;
   message: string;
 }
