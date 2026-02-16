@@ -27,6 +27,8 @@ export interface ReportFormikInterface {
     micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
     earTrainingHighScore?: { exerciseTitle: string; score: number };
   };
+  micPerformance?: { score: number; accuracy: number };
+  earTrainingPerformance?: { score: number };
 }
 
 export interface ReportDataInterface {
