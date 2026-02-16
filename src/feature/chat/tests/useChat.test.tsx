@@ -4,13 +4,19 @@ import { beforeEach,describe, expect, it, vi } from "vitest";
 import { useChat } from "../hooks/useChat";
 import { sendChatMessage } from "../services/chatService";
 
-vi.mock("../../services/chatService");
+vi.mock("../services/chatService");
 vi.mock("store/hooks", () => ({
   useAppSelector: (selector: any) => {
     if (selector.name === "selectUserAuth") return "user123";
     if (selector.name === "selectUserName") return "Test User";
     return null;
   },
+}));
+
+vi.mock("hooks/useTranslation", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
 }));
 
 
