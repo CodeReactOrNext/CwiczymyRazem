@@ -21,7 +21,7 @@ export const getUserStatsField = (userStats: StatisticsDataInterface) => {
     habitsCount,
     achievements,
     time,
-    actualDayWithoutBreak: dayWithoutBreak,
+    dayWithoutBreak,
     maxPoints,
     fame,
   } = userStats;

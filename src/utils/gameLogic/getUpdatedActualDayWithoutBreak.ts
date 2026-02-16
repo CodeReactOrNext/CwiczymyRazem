@@ -19,5 +19,6 @@ export const getUpdatedActualDayWithoutBreak = (
   if (isYesterday) {
     return actualDayWithoutBreak + 1;
   }
+
   return 1;
 };

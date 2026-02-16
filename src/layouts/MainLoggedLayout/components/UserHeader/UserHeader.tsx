@@ -1,13 +1,12 @@
 import { Separator } from "assets/components/ui/separator";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
-import { HeaderLevelBar } from "components/LevelBar/HeaderLevelBar";
 import UserNav from "components/UserNav";
-import { WelcomeMessage } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/WelcomeMessage";
 import Image from "next/image";
 import type { StatisticsDataInterface } from "types/api.types";
-import { convertMsToHM } from "utils/converter";
-
 import { ActivitySheet } from "./components/ActivitySheet";
+import { StreakBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/StreakBox";
+import { PointsBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/PointsBox";
+import { FameBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/FameBox";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;
@@ -48,15 +47,12 @@ export const UserHeader = ({
    
           </div>
 
-          {/* Center Section - Welcome Message with Weekly Progress */}
           <div className='hidden flex-1 justify-center px-6 md:flex'>
-            <WelcomeMessage
-              userName={userName}
-              lastReportDate={lastReportDate}
-              points={points}
-              actualDayWithoutBreak={actualDayWithoutBreak}
-              fame={fame || 0}
-            />
+             <div className='flex items-center gap-4'>
+      <StreakBox />
+      <PointsBox />
+      <FameBox />
+    </div>
           </div>
 
           {/* Right Section - Actions */}
