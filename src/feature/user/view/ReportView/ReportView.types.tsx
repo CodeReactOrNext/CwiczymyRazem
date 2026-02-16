@@ -23,6 +23,10 @@ export interface ReportFormikInterface {
   songTitle?: string;
   songArtist?: string;
   skillPointsGained?: Record<string, number>;
+  exerciseRecords?: {
+    micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
+    earTrainingHighScore?: { exerciseTitle: string; score: number };
+  };
 }
 
 export interface ReportDataInterface {

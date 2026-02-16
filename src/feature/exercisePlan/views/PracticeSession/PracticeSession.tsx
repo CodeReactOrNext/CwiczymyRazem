@@ -325,22 +325,39 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     metronome.setBpm(newBpm);
   };
 
-  const saveCurrentScores = () => {
+  const exerciseRecordsRef = useRef<{
+    micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
+    earTrainingHighScore?: { exerciseTitle: string; score: number };
+  }>({});
+
+  const saveCurrentScores = async () => {
     const exId = activeExercise.id;
     const exTitle = activeExercise.title;
     const exCategory = activeExercise.category;
     if (userAuth && isMicEnabled && gameState.score > 0) {
-      updateMicHighScore(userAuth, exId, gameState.score, sessionAccuracy, exTitle, exCategory);
+      const result = await updateMicHighScore(userAuth, exId, gameState.score, sessionAccuracy, exTitle, exCategory);
       saveLeaderboardEntry(userAuth, exId, gameState.score, userName || "Anonymous", userAvatar || "");
+      if (result.isNewRecord) {
+        exerciseRecordsRef.current = {
+          ...exerciseRecordsRef.current,
+          micHighScore: { exerciseTitle: exTitle, score: gameState.score, accuracy: sessionAccuracy },
+        };
+      }
     }
     if (userAuth && currentExercise.riddleConfig?.mode === 'sequenceRepeat' && earTrainingScore > 0) {
-      updateEarTrainingHighScore(userAuth, exId, earTrainingScore, exTitle, exCategory);
+      const result = await updateEarTrainingHighScore(userAuth, exId, earTrainingScore, exTitle, exCategory);
       saveLeaderboardEntry(userAuth, exId, earTrainingScore, userName || "Anonymous", userAvatar || "");
+      if (result.isNewRecord) {
+        exerciseRecordsRef.current = {
+          ...exerciseRecordsRef.current,
+          earTrainingHighScore: { exerciseTitle: exTitle, score: earTrainingScore },
+        };
+      }
     }
   };
 
-  const handleNextExerciseClick = () => {
-    saveCurrentScores();
+  const handleNextExerciseClick = async () => {
+    await saveCurrentScores();
     stopTimer();
     metronome.stopMetronome();
     handleNextExercise(resetTimer);
@@ -706,7 +723,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       {showSuccessView && !reportResult && (
         <ExerciseSuccessView
           planTitle={planTitleString}
-          onFinish={() => { saveCurrentScores(); autoSubmitReport(); }}
+          onFinish={async () => { await saveCurrentScores(); autoSubmitReport(exerciseRecordsRef.current); }}
           onRestart={() => {
             resetSuccessView();
             resetTimer();
@@ -728,7 +745,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
           <SessionModal
             isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult}
             onClose={onClose || (() => router.push("/report"))}
-            onFinish={isLastExercise ? () => { saveCurrentScores(); autoSubmitReport(); } : onFinish}
+            onFinish={isLastExercise ? async () => { await saveCurrentScores(); autoSubmitReport(exerciseRecordsRef.current); } : onFinish}
             onImageClick={() => setIsImageModalOpen(true)}
             isMounted={isMounted}
             currentExercise={currentExercise}
@@ -1410,10 +1427,10 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                  isLastExercise ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black" : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
                                  !canSkipExercise && "opacity-50 cursor-not-allowed"
                                  )}
-                                 onClick={() => {
+                                 onClick={async () => {
                                   if (isLastExercise) {
-                                    saveCurrentScores();
-                                    autoSubmitReport();
+                                    await saveCurrentScores();
+                                    autoSubmitReport(exerciseRecordsRef.current);
                                   } else {
                                     handleNextExerciseClick();
                                   }

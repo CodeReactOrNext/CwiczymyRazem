@@ -105,6 +105,60 @@ export class ActivityLogFormatter implements GeneralLogFormatter {
       })
     }
 
+    // Skills Field
+    if (log.skillPointsGained && Object.keys(log.skillPointsGained).length > 0) {
+      const skillEntries = Object.entries(log.skillPointsGained)
+        .filter(([, pts]) => pts > 0)
+        .map(([skillId, pts]) => {
+          const name = skillId.replace(/_/g, " ").replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+          return `**${name}** +${pts}`;
+        });
+      if (skillEntries.length > 0) {
+        embed.fields?.push({
+          name: isEn ? "🎯 **Skills**" : "🎯 **Skille**",
+          value: skillEntries.join("  •  "),
+          inline: false,
+        });
+      }
+    }
+
+    // Records Field
+    {
+      const recordLines: string[] = [];
+      if (log.newRecords?.maxPoints) {
+        recordLines.push(isEn ? "🏆 New points record!" : "🏆 Nowy rekord punktów!");
+      }
+      if (log.newRecords?.longestSession) {
+        recordLines.push(isEn ? "⏱️ Longest session ever!" : "⏱️ Najdłuższa sesja w historii!");
+      }
+      if (log.newRecords?.maxStreak) {
+        recordLines.push(isEn ? "🔥 New streak record!" : "🔥 Nowy rekord serii!");
+      }
+      if (log.exerciseRecords?.micHighScore) {
+        const r = log.exerciseRecords.micHighScore;
+        recordLines.push(
+          isEn
+            ? `🎤 New mic high score on **${r.exerciseTitle}**: ${r.score} pts (${r.accuracy}%)`
+            : `🎤 Nowy rekord mic w **${r.exerciseTitle}**: ${r.score} pkt (${r.accuracy}%)`
+        );
+      }
+      if (log.exerciseRecords?.earTrainingHighScore) {
+        const r = log.exerciseRecords.earTrainingHighScore;
+        recordLines.push(
+          isEn
+            ? `🎧 New ear training high score on **${r.exerciseTitle}**: ${r.score} pts`
+            : `🎧 Nowy rekord ear training w **${r.exerciseTitle}**: ${r.score} pkt`
+        );
+      }
+      if (recordLines.length > 0) {
+        embed.fields?.push({
+          name: isEn ? "📈 **New Records!**" : "📈 **Nowe Rekordy!**",
+          value: recordLines.join("\n"),
+          inline: false,
+        });
+      }
+    }
+
     // Random Motivational Quote/Joke
     if (!isEn) {
       embed.fields?.push({

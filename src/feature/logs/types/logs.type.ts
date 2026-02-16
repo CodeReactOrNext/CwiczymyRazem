@@ -77,6 +77,18 @@ export interface FirebaseLogsInterface {
   songId?: string;
   songTitle?: string;
   songArtist?: string;
+  exerciseTitle?: string;
+  skillPointsGained?: Record<string, number>;
+  newRecords?: {
+    maxPoints?: boolean;
+    longestSession?: boolean;
+    maxStreak?: boolean;
+    newLevel?: boolean;
+  };
+  exerciseRecords?: {
+    micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
+    earTrainingHighScore?: { exerciseTitle: string; score: number };
+  };
 }
 
 export interface FirebaseLogsAchievementsInterface {

@@ -251,7 +251,7 @@ const FirebaseLogsItem = ({
   currentUserId: string;
 }) => {
   const { t, i18n } = useTranslation(["common", "exercises"]);
-  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, userAvatarFrame } = log;
+  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, exerciseTitle, userAvatarFrame } = log;
   const date = new Date(data);
 
   const plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
@@ -289,6 +289,15 @@ const FirebaseLogsItem = ({
                   PLAN
               </span>
               <span className="font-medium">{planTitle}</span>
+            </span>
+        )}
+
+        {exerciseTitle && !exerciseTitle.includes("Practicing: ") && (
+            <span className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20">
+              <span className="uppercase tracking-widest text-[9px] opacity-70">
+                  EXERCISE
+              </span>
+              <span className="font-medium">{exerciseTitle}</span>
             </span>
         )}
 
