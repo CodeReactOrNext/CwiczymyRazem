@@ -7,11 +7,15 @@ import type {
   HabbitsType,
   ReportFormikInterface,
 } from "feature/user/view/ReportView/ReportView.types";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { makeRatingData } from "../makeRatingData";
 
 describe("makeRatingData", () => {
+  const mockDate = new Date(2024, 0, 15);
+  vi.useFakeTimers();
+  vi.setSystemTime(mockDate);
+
   const emptyInputData: ReportFormikInterface = {
     techniqueHours: "0",
     techniqueMinutes: " 0",

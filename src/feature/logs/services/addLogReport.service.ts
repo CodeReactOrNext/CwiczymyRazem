@@ -29,7 +29,19 @@ export const firebaseAddLogReport = async (
     songTitle?: string;
     songArtist?: string;
   },
-  streak?: number
+  streak?: number,
+  skillPointsGained?: Record<string, number>,
+  newRecords?: {
+    maxPoints?: boolean;
+    longestSession?: boolean;
+    maxStreak?: boolean;
+    newLevel?: boolean;
+  },
+  exerciseRecords?: {
+    micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
+    earTrainingHighScore?: { exerciseTitle: string; score: number };
+  },
+  exerciseTitle?: string
 ) => {
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
@@ -51,7 +63,11 @@ export const firebaseAddLogReport = async (
     avatarUrl: avatarUrl ?? null,
     planId,
     streak,
-    ...songDetails
+    exerciseTitle,
+    ...songDetails,
+    ...(skillPointsGained && Object.keys(skillPointsGained).length > 0 && { skillPointsGained }),
+    ...(newRecords && { newRecords }),
+    ...(exerciseRecords && { exerciseRecords }),
   };
 
   await trackedSetDoc(logsDocRef, logData);

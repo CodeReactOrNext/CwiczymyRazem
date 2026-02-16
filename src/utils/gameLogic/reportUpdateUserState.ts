@@ -144,6 +144,12 @@ export const reportUpdateUserStats = ({
     ? getDateFromPast(isDateBackReport)
     : new Date();
 
+  const newRecords = {
+    maxPoints: raiting.totalPoints > maxPoints,
+    longestSession: sumTime > time.longestSession,
+    maxStreak: finalStreak > dayWithoutBreak,
+    newLevel: isNewLevel,
+  };
 
   return {
     currentUserStats: updatedUserDataWithAchievements,
@@ -154,5 +160,6 @@ export const reportUpdateUserStats = ({
     timeSummary,
     newAchievements,
     isNewLevel,
+    newRecords,
   };
 };

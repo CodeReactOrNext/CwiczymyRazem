@@ -10,7 +10,8 @@
       "Bash(xargs cat:*)",
       "Bash(grep:*)",
       "Bash(npx jest:*)",
-      "Bash(npx vitest run:*)"
+      "Bash(npx vitest run:*)",
+      "Bash(ls:*)"
     ]
   }
 }
