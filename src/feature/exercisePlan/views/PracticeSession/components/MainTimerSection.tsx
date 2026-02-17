@@ -24,6 +24,7 @@ interface MainTimerSectionProps {
   exerciseTimeSpent?: number;
   canSkipExercise?: boolean;
   isFinished?: boolean;
+  handleRestart?: () => void;
 }
 
 export const MainTimerSection = ({
@@ -40,7 +41,8 @@ export const MainTimerSection = ({
   sessionTimerData,
   exerciseTimeSpent = 0,
   canSkipExercise = true,
-  isFinished = false
+  isFinished = false,
+  handleRestart
 }: MainTimerSectionProps) => {
   const { t } = useTranslation(["common"]);
 
@@ -98,6 +100,7 @@ export const MainTimerSection = ({
                   canSkipExercise={canSkipExercise}
                   hidePlayButton={currentExercise.riddleConfig?.mode === 'sequenceRepeat'}
                   isFinished={isFinished}
+                  handleRestart={handleRestart}
                 />
           </div>
       </div>
@@ -185,6 +188,7 @@ export const MainTimerSection = ({
                   canSkipExercise={canSkipExercise}
                   hidePlayButton={currentExercise.riddleConfig?.mode === 'sequenceRepeat'}
                   isFinished={isFinished}
+                  handleRestart={handleRestart}
                 />
               </motion.div>
             </div>
