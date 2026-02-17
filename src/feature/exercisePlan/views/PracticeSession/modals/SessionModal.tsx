@@ -150,6 +150,7 @@ const SessionModal = ({
   if (!isOpen || !isMounted) return null;
 
   const { t } = useTranslation(["exercises", "common"]);
+  const [tabResetKey, setTabResetKey] = useState(0);
 
   const handleToggleTimer = () => {
     if (isPlaying) {
@@ -180,6 +181,14 @@ const SessionModal = ({
     stopTimer();
     metronome.stopMetronome();
     handleBackExercise();
+  };
+
+  const handleRestart = () => {
+    if (metronome.restartMetronome) {
+      metronome.restartMetronome();
+    }
+    stopTimer();
+    setTabResetKey(prev => prev + 1);
   };
 
   const mobileFeedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
@@ -263,6 +272,7 @@ const SessionModal = ({
                     isListening={isListening}
                     hitNotes={hitNotes}
                     currentBeatsElapsed={currentBeatsElapsed}
+                    resetKey={tabResetKey}
                   />
                 ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
                    <div className="w-full radius-premium overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
@@ -614,6 +624,7 @@ const SessionModal = ({
               isFinishing={isFinishing}
               isSubmittingReport={isSubmittingReport}
               canSkipExercise={canSkipExercise}
+              onRestart={activeTablature && activeTablature.length > 0 ? handleRestart : undefined}
             />
           </motion.div>
         )}

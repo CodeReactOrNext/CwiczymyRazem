@@ -29,6 +29,8 @@ export const useMetronome = ({
   const audioStartTimeRef = useRef<number | null>(null);
   const beatCounterRef = useRef<number>(0);
   const isMutedRef = useRef(isMuted);
+  const pausedElapsedTimeRef = useRef<number>(0);
+  const pausedAudioElapsedRef = useRef<number>(0);
 
   useEffect(() => {
     isMutedRef.current = isMuted;
@@ -102,8 +104,10 @@ export const useMetronome = ({
       } else {
         // Main Metronome
         if (startTimeRef.current === null) {
-          startTimeRef.current = Date.now();
-          audioStartTimeRef.current = audioContextRef.current.currentTime;
+          startTimeRef.current = Date.now() - pausedElapsedTimeRef.current;
+          if (audioContextRef.current) {
+            audioStartTimeRef.current = audioContextRef.current.currentTime - (pausedAudioElapsedRef.current / 1000);
+          }
           beatCounterRef.current = 0;
           setTimeout(() => setCountInRemaining(0), 0);
         }
@@ -142,13 +146,25 @@ export const useMetronome = ({
       window.clearTimeout(timerIDRef.current);
       timerIDRef.current = null;
     }
+    if (startTimeRef.current !== null) {
+      pausedElapsedTimeRef.current = Date.now() - startTimeRef.current;
+    }
+    if (audioStartTimeRef.current !== null && audioContextRef.current) {
+      pausedAudioElapsedRef.current = (audioContextRef.current.currentTime - audioStartTimeRef.current) * 1000;
+    }
     startTimeRef.current = null;
     audioStartTimeRef.current = null;
-    beatCounterRef.current = 0;
     countInTargetRef.current = 0;
     setCountInRemaining(0);
     setIsPlaying(false);
   }, []);
+
+  const restartMetronome = useCallback(() => {
+    pausedElapsedTimeRef.current = 0;
+    pausedAudioElapsedRef.current = 0;
+    beatCounterRef.current = 0;
+    stopMetronome();
+  }, [stopMetronome]);
 
   const toggleMetronome = useCallback(() => {
     if (isPlaying) {
@@ -179,6 +195,7 @@ export const useMetronome = ({
     toggleMetronome,
     startMetronome,
     stopMetronome,
+    restartMetronome,
     handleSetRecommendedBpm,
     recommendedBpm,
     startTime: startTimeRef.current,
