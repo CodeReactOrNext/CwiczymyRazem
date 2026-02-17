@@ -303,7 +303,7 @@ export const SkillDashboard = ({
                                        </div>
                                      )}
 
-                                     {(hasBpmProgress || (micHighScore != null && micHighScore > 0) || (earTrainingHighScore != null && earTrainingHighScore > 0)) && (
+                                     {(bpmStages.length > 0 || !!exerciseDef?.riddleConfig || (exerciseDef?.tablature && exerciseDef.tablature.length > 0)) && (
                                        <button
                                          onClick={() => setLeaderboardExercise({ id: challenge.id, title: challenge.title as string })}
                                          className="bg-zinc-800/60 px-3 py-2 rounded-xl flex items-center gap-1.5 border border-white/5 hover:border-white/15 hover:bg-zinc-800 transition-colors"
