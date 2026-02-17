@@ -65,7 +65,7 @@ const LandingPage = ({ blogs }: LandingPageProps) => {
   return (
     <>
       <LandingSEO faqQuestions={faqQuestions} />
-      <div className='min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 relative overflow-x-hidden'>
+      <main className='min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-cyan-500/30 relative overflow-x-hidden'>
         {/* Aggressive Global Noise to eliminate banding */}
         <div className="fixed inset-0 pointer-events-none z-[100] opacity-[0.08] bg-[url('/static/images/old_effect_dark.webp')] mix-blend-overlay scale-[1.5]"></div>
         
@@ -79,7 +79,7 @@ const LandingPage = ({ blogs }: LandingPageProps) => {
         <FinalCTASection />
         <Footer />
         <CookieBanner />
-      </div>
+      </main>
     </>
   );
 };
