@@ -52,7 +52,7 @@ const TimerPractice: NextPageWithLayout = () => {
         time: timer.time,
       }));
     }
-    router.push("/report");
+    router.push("/report?applyTimer=true");
   }, [timer, chosenSkill, dispatch, router]);
 
   return (

@@ -42,6 +42,7 @@ import {
 } from "utils/converter";
 import { i18n } from "utils/translation";
 
+import SavedTimeBanner from "./SavedTimeBanner";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import { RaportSchema } from "./helpers/RaportShcema";
 import type { ReportFormikInterface } from "./ReportView.types";
@@ -50,12 +51,14 @@ type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
 const ReportView = () => {
   const router = useRouter();
-  const { songId, songTitle, songArtist, planId, planTitle } = router.query;
+  const { songId, songTitle, songArtist, planId, planTitle, applyTimer } = router.query;
   const [view, setView] = useState<'form' | 'success'>('form');
   const [acceptPopUpVisible, setAcceptPopUpVisible] = useState(false);
   const [exceedingTime, setExceedingTime] = useState<number | null>(null);
   const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
   const [submittedValues, setSubmittedValues] = useState<ReportFormikInterface | null>(null);
+  const [savedTimeApplied, setSavedTimeApplied] = useState(false);
+  const autoApplyTimer = applyTimer === "true";
   const { t } = useTranslation("report");
 
   const dispatch = useAppDispatch();
@@ -67,11 +70,13 @@ const ReportView = () => {
   const timerData = useAppSelector(selectTimerData);
   const isFetching = useAppSelector(selectIsFetching) === "updateData";
   const { reportList } = useActivityLog(userAuth as string);
-  const sumTime =
+  const savedTimerSum =
     timerData.creativity +
     timerData.hearing +
     timerData.theory +
     timerData.technique;
+
+  const hasSavedTime = savedTimerSum > 0 && !savedTimeApplied && !autoApplyTimer;
 
   const techniqueTime = convertMsToHMObject(timerData.technique);
   const theoryTime = convertMsToHMObject(timerData.theory);
@@ -79,14 +84,14 @@ const ReportView = () => {
   const creativityTime = convertMsToHMObject(timerData.creativity);
 
   const formikInitialValues: ReportFormikInterface = {
-    techniqueHours: techniqueTime.hours,
-    techniqueMinutes: techniqueTime.minutes,
-    theoryHours: theoryTime.hours,
-    theoryMinutes: theoryTime.minutes,
-    hearingHours: hearingTime.hours,
-    hearingMinutes: hearingTime.minutes,
-    creativityHours: creativityTime.hours,
-    creativityMinutes: creativityTime.minutes,
+    techniqueHours: autoApplyTimer ? techniqueTime.hours : "00",
+    techniqueMinutes: autoApplyTimer ? techniqueTime.minutes : "00",
+    theoryHours: autoApplyTimer ? theoryTime.hours : "00",
+    theoryMinutes: autoApplyTimer ? theoryTime.minutes : "00",
+    hearingHours: autoApplyTimer ? hearingTime.hours : "00",
+    hearingMinutes: autoApplyTimer ? hearingTime.minutes : "00",
+    creativityHours: autoApplyTimer ? creativityTime.hours : "00",
+    creativityMinutes: autoApplyTimer ? creativityTime.minutes : "00",
     habbits: [],
     countBackDays: 0,
     reportTitle: planTitle ? (planTitle as string) : (songTitle && songArtist ? `Practicing: ${songArtist} - ${songTitle}` : ""),
@@ -238,13 +243,17 @@ const ReportView = () => {
     setView('success');
   };
 
-  useEffect(() => {
-    if (sumTime) {
-      toast.info(t("toast.stoper_entered"), {
-        duration: 3000,
-      });
-    }
-  }, [sumTime, t]);
+  const applySavedTime = (setFieldValue: (field: string, value: any) => void) => {
+    setFieldValue("techniqueHours", techniqueTime.hours);
+    setFieldValue("techniqueMinutes", techniqueTime.minutes);
+    setFieldValue("theoryHours", theoryTime.hours);
+    setFieldValue("theoryMinutes", theoryTime.minutes);
+    setFieldValue("hearingHours", hearingTime.hours);
+    setFieldValue("hearingMinutes", hearingTime.minutes);
+    setFieldValue("creativityHours", creativityTime.hours);
+    setFieldValue("creativityMinutes", creativityTime.minutes);
+    setSavedTimeApplied(true);
+  };
 
   const getUpdatedActivityData = () => {
     if (!reportList) return [];
@@ -344,6 +353,14 @@ const ReportView = () => {
                         </p>
                     </div>
                     
+                    {hasSavedTime && (
+                      <SavedTimeBanner
+                        timerData={timerData}
+                        onApply={() => applySavedTime(setFieldValue)}
+                        onDismiss={() => setSavedTimeApplied(true)}
+                      />
+                    )}
+
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
                       {timeInputList.map(
                         (
