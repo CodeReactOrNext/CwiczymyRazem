@@ -89,7 +89,7 @@ const MainLoggedLayout = ({
       <div className='relative flex h-full w-full'>
         <RockSidebar  pageId={pageId} />
 
-        <div className='relative flex h-full flex-1 flex-col overflow-y-auto overflow-x-hidden scrollbar-hide'>
+        <div className='relative flex h-full flex-1 flex-col overflow-hidden'>
           <MainLoggedWrapper>
             <DesktopHeaderWrapper>
               <UserHeader

@@ -48,5 +48,12 @@
     "important_login": "Important: Log in via Browser",
     "login_description": "To listen to full tracks (not just 30s previews), make sure you are logged into <1>Spotify.com</1> with an active Premium account."
   },
-  "rating_summary": "Practice Summary"
+  "rating_summary": "Practice Summary",
+  "reset_button": "Reset",
+  "reset_dialog": {
+    "title": "Reset timer?",
+    "description": "This will clear all tracked time for every skill in this session. This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Reset"
+  }
 }

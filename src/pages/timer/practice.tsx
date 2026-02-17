@@ -1,4 +1,4 @@
-import { selectTimerData, selectUserAvatar, updateTimerTime } from "feature/user/store/userSlice";
+import { selectTimerData, selectUserAvatar, updateLocalTimer, updateTimerTime } from "feature/user/store/userSlice";
 import useTimer from "hooks/useTimer";
 import AppLayout from "layouts/AppLayout";
 import TimerLayout from "layouts/TimerLayout/TimerLayout";
@@ -55,6 +55,12 @@ const TimerPractice: NextPageWithLayout = () => {
     router.push("/report?applyTimer=true");
   }, [timer, chosenSkill, dispatch, router]);
 
+  const resetTimerHandler = useCallback(() => {
+    timer.restartTime();
+    setChosenSkill(null);
+    dispatch(updateLocalTimer({ creativity: 0, hearing: 0, technique: 0, theory: 0 }));
+  }, [timer, dispatch]);
+
   return (
     <TimerLayout
       timer={timer}
@@ -63,6 +69,7 @@ const TimerPractice: NextPageWithLayout = () => {
       timerSubmitHandler={timerSubmitHandler}
       choseSkillHandler={choseSkillHandler}
       onBack={onBack}
+      onResetTimer={resetTimerHandler}
       isFinishing={isFinishing}
     />
   );

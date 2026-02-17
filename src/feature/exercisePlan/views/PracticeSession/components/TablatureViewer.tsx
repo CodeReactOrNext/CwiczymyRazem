@@ -17,6 +17,7 @@ interface TablatureViewerProps {
   hideNotes?: boolean;
   audioContext?: AudioContext | null;
   audioStartTime?: number | null;
+  resetKey?: number;
 }
 
 export const TablatureViewer = ({
@@ -32,12 +33,14 @@ export const TablatureViewer = ({
   currentBeatsElapsed = 0,
   hideNotes = false,
   audioContext,
-  audioStartTime
+  audioStartTime,
+  resetKey
 }: TablatureViewerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 256 });
   const animationFrameRef = useRef<number | null>(null);
+  const lastPausedPositionRef = useRef({ cursorPosition: 0, scrollX: 0, totalBeatsElapsed: 0 });
 
   const BEAT_WIDTH = 140; 
   const STRING_SPACING = 30;
@@ -106,6 +109,10 @@ export const TablatureViewer = ({
   }, []);
 
   useEffect(() => {
+    lastPausedPositionRef.current = { cursorPosition: 0, scrollX: 0, totalBeatsElapsed: 0 };
+  }, [measures, resetKey]);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || containerSize.width === 0) return;
 
@@ -125,7 +132,7 @@ export const TablatureViewer = ({
       // Dynamic Beat Width calculation
       const dynamicBeatWidth = Math.max(100, Math.min(180, containerSize.width / 4));
 
-      if (isPlaying && startTime) {
+      if (isPlaying && startTime && countInRemaining === 0) {
         const elapsedSeconds = (audioContext && audioStartTime != null)
           ? audioContext.currentTime - audioStartTime
           : (Date.now() - startTime) / 1000;
@@ -136,6 +143,12 @@ export const TablatureViewer = ({
         
         cursorPosition = loopedBeats * dynamicBeatWidth;
         scrollX = Math.max(0, cursorPosition - containerSize.width / 4);
+        
+        lastPausedPositionRef.current = { cursorPosition, scrollX, totalBeatsElapsed };
+      } else {
+        cursorPosition = lastPausedPositionRef.current.cursorPosition;
+        scrollX = lastPausedPositionRef.current.scrollX;
+        totalBeatsElapsed = lastPausedPositionRef.current.totalBeatsElapsed;
       }
 
       ctx.clearRect(0, 0, containerSize.width, containerSize.height);
@@ -466,31 +479,33 @@ export const TablatureViewer = ({
       }
 
       // 5. Progress Overlay (Passed Box)
-      if (isPlaying && startTime && cursorPosition > 0) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.45)"; // Semi-transparent black box
+      if (cursorPosition > 0) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.45)"; 
         ctx.fillRect(0, 0, cursorPosition, containerSize.height);
       }
 
       // 6. Draw Cursor & Pulse
-      if (isPlaying && startTime) {
+      if (cursorPosition > 0 || isPlaying) {
         // Cursor Line
-        ctx.strokeStyle = "#06b6d4"; 
+        ctx.strokeStyle = isPlaying ? "#06b6d4" : "#ef4444"; 
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(cursorPosition, 0);
         ctx.lineTo(cursorPosition, containerSize.height);
         ctx.stroke();
 
-        // Beat Pulse Ripple
-        const beatProgress = totalBeatsElapsed % 1;
-        if (beatProgress < 0.3) { // Ripple lasts for first 30% of each beat
-          const rippleRadius = beatProgress * 100;
-          const opacity = 1 - (beatProgress / 0.3);
-          ctx.strokeStyle = `rgba(6, 182, 212, ${opacity})`;
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(cursorPosition, containerSize.height / 2, rippleRadius, 0, Math.PI * 2);
-          ctx.stroke();
+        // Beat Pulse Ripple (only when playing)
+        if (isPlaying) {
+          const beatProgress = totalBeatsElapsed % 1;
+          if (beatProgress < 0.3) {
+            const rippleRadius = beatProgress * 100;
+            const opacity = 1 - (beatProgress / 0.3);
+            ctx.strokeStyle = `rgba(6, 182, 212, ${opacity})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(cursorPosition, containerSize.height / 2, rippleRadius, 0, Math.PI * 2);
+            ctx.stroke();
+          }
         }
       }
 
@@ -507,7 +522,7 @@ export const TablatureViewer = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes, hasDynamics, detectedNote, isListening, hideNotes, audioContext, audioStartTime]);
+  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes, hasDynamics, detectedNote, isListening, hideNotes, audioContext, audioStartTime, countInRemaining, resetKey]);
 
   return (
     <div 
