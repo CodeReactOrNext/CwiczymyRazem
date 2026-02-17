@@ -35,6 +35,8 @@ export const useMobileMetronome = ({
   const beatCounterRef = useRef<number>(0);
   const isIOS = isIOSDevice();
   const isMutedRef = useRef(isMuted);
+  const pausedElapsedTimeRef = useRef<number>(0);
+  const pausedAudioElapsedRef = useRef<number>(0);
 
   useEffect(() => {
     isMutedRef.current = isMuted;
@@ -116,8 +118,10 @@ export const useMobileMetronome = ({
         countInTargetRef.current -= 1;
       } else {
         if (startTimeRef.current === null) {
-          startTimeRef.current = Date.now();
-          audioStartTimeRef.current = audioContextRef.current.currentTime;
+          startTimeRef.current = Date.now() - pausedElapsedTimeRef.current;
+          if (audioContextRef.current) {
+            audioStartTimeRef.current = audioContextRef.current.currentTime - (pausedAudioElapsedRef.current / 1000);
+          }
           beatCounterRef.current = 0;
           setCountInRemaining(0);
         }
@@ -177,13 +181,26 @@ export const useMobileMetronome = ({
       gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current.currentTime);
     }
 
+    if (startTimeRef.current !== null) {
+      pausedElapsedTimeRef.current = Date.now() - startTimeRef.current;
+    }
+    if (audioStartTimeRef.current !== null && audioContextRef.current) {
+      pausedAudioElapsedRef.current = (audioContextRef.current.currentTime - audioStartTimeRef.current) * 1000;
+    }
+
     startTimeRef.current = null;
     audioStartTimeRef.current = null;
-    beatCounterRef.current = 0;
     countInTargetRef.current = 0;
     setCountInRemaining(0);
     setIsPlaying(false);
   }, []);
+
+  const restartMetronome = useCallback(() => {
+    pausedElapsedTimeRef.current = 0;
+    pausedAudioElapsedRef.current = 0;
+    beatCounterRef.current = 0;
+    stopMetronome();
+  }, [stopMetronome]);
 
   const toggleMetronome = useCallback(() => {
     if (isPlaying) {
@@ -249,6 +266,7 @@ export const useMobileMetronome = ({
     toggleMetronome,
     startMetronome,
     stopMetronome,
+    restartMetronome,
     handleSetRecommendedBpm,
     recommendedBpm,
     initializeAudio,

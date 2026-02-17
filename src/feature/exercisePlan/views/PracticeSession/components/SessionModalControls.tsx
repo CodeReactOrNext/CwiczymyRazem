@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { FaCheck, FaPause, FaPlay, FaStepBackward, FaStepForward } from "react-icons/fa";
+import { FaCheck, FaPause, FaPlay, FaStepBackward, FaStepForward, FaUndo } from "react-icons/fa";
 
 interface SessionModalControlsProps {
   isPlaying: boolean;
@@ -16,6 +16,7 @@ interface SessionModalControlsProps {
   isFinishing?: boolean;
   isSubmittingReport?: boolean;
   canSkipExercise?: boolean;
+  onRestart?: () => void;
 }
 
 export const SessionModalControls = ({
@@ -30,6 +31,7 @@ export const SessionModalControls = ({
   canSkipExercise = true,
   handleBackExercise,
   currentExerciseIndex,
+  onRestart,
 }: SessionModalControlsProps) => {
   const { t } = useTranslation(["common", "exercises"]);
 
@@ -56,6 +58,17 @@ export const SessionModalControls = ({
               className="h-12 w-12 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-all"
             >
               <FaStepBackward className="h-4 w-4" />
+            </Button>
+          )}
+
+          {onRestart && (
+            <Button
+              onClick={onRestart}
+              variant="ghost"
+              size="icon"
+              className="h-12 w-12 rounded-full border border-white/5 bg-white/5 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all"
+            >
+              <FaUndo className="h-4 w-4" />
             </Button>
           )}
 

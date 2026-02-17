@@ -6,7 +6,7 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -20,18 +20,29 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
   const [state, setState] = useState<UnreadMessagesState>({
     unreadCount: 0,
     hasNewMessages: false,
-    lastReadTime: new Date(Date.now() - 3600000), // 1 hour ago default
+    lastReadTime: new Date(Date.now() - 3600000),
   });
   const currentUserId = useAppSelector(selectUserAuth);
+  const lastReadTimeRef = useRef<Date>(new Date(Date.now() - 3600000));
 
   useEffect(() => {
     if (!currentUserId) return;
 
     const lastReadKey = `${collectionName}_lastRead_${currentUserId}`;
     const lastRead = localStorage.getItem(lastReadKey);
-    const lastReadTime = lastRead ? new Date(parseInt(lastRead)) : new Date(Date.now() - 3600000);
+    const initialTime = lastRead ? new Date(parseInt(lastRead)) : new Date(Date.now() - 3600000);
 
-    setState(prev => ({ ...prev, lastReadTime }));
+    lastReadTimeRef.current = initialTime;
+    setState(prev => ({ ...prev, lastReadTime: initialTime }));
+
+    const handleExternalMarkAsRead = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail.collectionName === collectionName && detail.userId === currentUserId) {
+        lastReadTimeRef.current = new Date(detail.time);
+        setState({ unreadCount: 0, hasNewMessages: false, lastReadTime: new Date(detail.time) });
+      }
+    };
+    window.addEventListener("unreadMessagesMarkAsRead", handleExternalMarkAsRead);
 
     const messagesRef = collection(db, collectionName);
     const limitedQuery = query(
@@ -41,6 +52,7 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
     );
 
     const unsubscribe = onSnapshot(limitedQuery, (snapshot) => {
+      const currentLastReadTime = lastReadTimeRef.current;
       let count = 0;
 
       if (collectionName === "logs") {
@@ -52,11 +64,10 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
 
         count = sortedDocs.filter((doc) => {
           const logDate = new Date(doc.data().data);
-          return logDate > lastReadTime;
+          return logDate > currentLastReadTime;
         }).length;
       } else {
         const sortedDocs = snapshot.docs.sort((a, b) => {
-          // timestamp can be null during local write with serverTimestamp()
           const dataA = a.data();
           const dataB = b.data();
 
@@ -68,10 +79,10 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
 
         count = sortedDocs.filter((doc) => {
           const data = doc.data();
-          // Safety check: if timestamp is missing/null (pending write), treat as new (now)
-          if (!data.timestamp || !data.timestamp.toDate) return true;
+          // Fix: skip pending writes (null timestamp) instead of treating them as new
+          if (!data.timestamp || !data.timestamp.toDate) return false;
 
-          return data.timestamp.toDate() > lastReadTime;
+          return data.timestamp.toDate() > currentLastReadTime;
         }).length;
       }
 
@@ -84,7 +95,10 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
       console.error(`Unread messages listener (${collectionName}) failed:`, error);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      window.removeEventListener("unreadMessagesMarkAsRead", handleExternalMarkAsRead);
+    };
   }, [collectionName, currentUserId]);
 
   const markAsRead = () => {
@@ -92,11 +106,15 @@ export const useUnreadMessages = (collectionName: "chats" | "logs") => {
     const lastReadKey = `${collectionName}_lastRead_${currentUserId}`;
     const now = Date.now();
     localStorage.setItem(lastReadKey, now.toString());
+    lastReadTimeRef.current = new Date(now);
     setState({
       unreadCount: 0,
       hasNewMessages: false,
       lastReadTime: new Date(now)
     });
+    window.dispatchEvent(new CustomEvent("unreadMessagesMarkAsRead", {
+      detail: { collectionName, userId: currentUserId, time: now }
+    }));
   };
 
   const isNewMessage = (messageDate: string | Date) => {
