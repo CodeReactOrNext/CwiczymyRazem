@@ -154,7 +154,7 @@ export function ScaleSelectionDialog({
             <Select
               value={config.position?.toString()}
               onValueChange={(value) =>
-                setConfig({ ...config, position: parseInt(value) })
+                setConfig({ ...config, position: value === 'all' ? 'all' : parseInt(value) })
               }
             >
               <SelectTrigger id="position">
@@ -162,14 +162,16 @@ export function ScaleSelectionDialog({
               </SelectTrigger>
               <SelectContent>
                 {positions.map((pos) => (
-                  <SelectItem key={pos} value={pos.toString()}>
-                    Position {pos} (frets {pos}-{pos + 4})
+                  <SelectItem key={pos.toString()} value={pos.toString()}>
+                    {pos === 'all' ? 'Full Fretboard (All Positions)' : `Position ${pos} (frets ${pos}-${pos + 4})`}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">
-              Position determines where on the fretboard you practice the scale
+              {config.position === 'all' 
+                ? "This will generate a longer exercise covering all main positions across the neck"
+                : "Position determines where on the fretboard you practice the scale"}
             </p>
           </div>
         </div>
