@@ -12,7 +12,8 @@ interface ExerciseControlsProps {
   canSkipExercise?: boolean;
   hidePlayButton?: boolean;
   isFinished?: boolean;
-  riddleConfig?: any; // Added riddleConfig prop
+  riddleConfig?: any;
+  handleRestart?: () => void;
 }
 
 const ExerciseControls = ({
@@ -24,7 +25,8 @@ const ExerciseControls = ({
   variant = "default",
   canSkipExercise = true,
   hidePlayButton = false,
-  isFinished = false
+  isFinished = false,
+  handleRestart
 }: ExerciseControlsProps) => {
   const btnSizes = {
     sm: "h-10 w-10",
@@ -79,9 +81,35 @@ const ExerciseControls = ({
                 <FaPlay className={cn(iconSizes[size], "ml-0.5")} />
               </div>
             )}
-          </Button>
-        </div>
-      )}
+           </Button>
+         </div>
+       )}
+ 
+       {handleRestart && (
+         <Button
+           size={size === "lg" ? "lg" : "default"}
+           variant="ghost"
+           onClick={handleRestart}
+           className={cn(
+             btnSizes[size],
+             "radius-premium transition-all click-behavior text-zinc-400 hover:text-white hover:bg-white/5 border border-white/5"
+           )}
+           title="Restart Exercise"
+         >
+           <svg 
+             className={iconSizes[size]} 
+             viewBox="0 0 24 24" 
+             fill="none" 
+             stroke="currentColor" 
+             strokeWidth="2.5" 
+             strokeLinecap="round" 
+             strokeLinejoin="round"
+           >
+             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+             <path d="M3 3v5h5" />
+           </svg>
+         </Button>
+       )}
 
       {/* Primary Action Button - ONLY if NOT centered deck (where it's separate) */}
       {variant !== "centered" && !isLastExercise && (

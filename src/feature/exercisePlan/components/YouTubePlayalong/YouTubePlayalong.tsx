@@ -10,6 +10,7 @@ interface YouTubePlayalongProps {
   onEnd?: () => void;
   onProgressUpdate?: (currentTime: number, duration: number) => void;
   onSeek?: (timeInSeconds: number) => void;
+  resetKey?: number;
 }
 
 export const YouTubePlayalong = ({
@@ -20,6 +21,7 @@ export const YouTubePlayalong = ({
   onEnd,
   onProgressUpdate,
   onSeek,
+  resetKey = 0,
 }: YouTubePlayalongProps) => {
   const playerRef = useRef<any>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -30,6 +32,13 @@ export const YouTubePlayalong = ({
     setIsPlayerReady(false);
     stopProgressTracking();
   }, [videoId]);
+
+  useEffect(() => {
+    if (playerRef.current && typeof playerRef.current.seekTo === 'function') {
+      playerRef.current.seekTo(0);
+      lastTimeRef.current = 0;
+    }
+  }, [resetKey]);
 
   useEffect(() => {
     if (!playerRef.current || !isPlayerReady) return;
