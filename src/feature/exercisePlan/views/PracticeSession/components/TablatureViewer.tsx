@@ -41,6 +41,32 @@ export const TablatureViewer = ({
   const [containerSize, setContainerSize] = useState({ width: 0, height: 256 });
   const animationFrameRef = useRef<number | null>(null);
   const lastPausedPositionRef = useRef({ cursorPosition: 0, scrollX: 0, totalBeatsElapsed: 0 });
+  const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const initialScrollXRef = useRef(0);
+
+  const handleDragStart = (clientX: number) => {
+    if (isPlaying) return;
+    isDraggingRef.current = true;
+    dragStartXRef.current = clientX;
+    initialScrollXRef.current = lastPausedPositionRef.current.scrollX;
+  };
+
+  const handleDragMove = (clientX: number) => {
+    if (!isDraggingRef.current) return;
+    const dx = clientX - dragStartXRef.current;
+    // We subtract dx to make it feel like "pulling" the content
+    const newScrollX = Math.max(0, initialScrollXRef.current - dx);
+    
+    lastPausedPositionRef.current = {
+      ...lastPausedPositionRef.current,
+      scrollX: newScrollX
+    };
+  };
+
+  const handleDragEnd = () => {
+    isDraggingRef.current = false;
+  };
 
   const BEAT_WIDTH = 140; 
   const STRING_SPACING = 30;
@@ -526,8 +552,19 @@ export const TablatureViewer = ({
 
   return (
     <div 
-      className={cn("w-full bg-[#0a0a0a] rounded-xl border border-white/10 p-4 relative h-64 select-none overflow-hidden", className)} 
+      className={cn(
+        "w-full bg-[#0a0a0a] rounded-xl border border-white/10 p-4 relative h-64 select-none overflow-hidden",
+        !isPlaying && "cursor-grab active:cursor-grabbing",
+        className
+      )} 
       ref={containerRef}
+      onMouseDown={(e) => handleDragStart(e.clientX)}
+      onMouseMove={(e) => handleDragMove(e.clientX)}
+      onMouseUp={handleDragEnd}
+      onMouseLeave={handleDragEnd}
+      onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
+      onTouchMove={(e) => handleDragMove(e.touches[0].clientX)}
+      onTouchEnd={handleDragEnd}
     >
       <canvas 
         ref={canvasRef}
