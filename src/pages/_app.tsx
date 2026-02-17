@@ -96,12 +96,12 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                <Analytics />
                <ResponsiveInitializer />
                <TooltipProvider>
-                  <main className={`${teko.variable} ${inter.variable} h-[100dvh] overflow-hidden bg-zinc-950 text-foreground`}>
+                  <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground`}>
                      <Toaster theme='dark' position='top-right' />
                      <NextTopLoader color='#06b6d4' />
                      <div id='overlays'></div>
                      {getLayout(<Component {...pageProps} />)}
-                  </main>
+                  </div>
                </TooltipProvider>
             </AuthSyncWrapper>
             <ReactQueryDevtools initialIsOpen={false} />
