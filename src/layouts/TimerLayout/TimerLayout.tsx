@@ -1,5 +1,15 @@
 import "react-circular-progressbar/dist/styles.css";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "assets/components/ui/alert-dialog";
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
@@ -9,8 +19,9 @@ import { PageHeader } from "constants/PageHeader";
 import { AnimatePresence, motion } from "framer-motion";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { MdAccessTime } from "react-icons/md";
 import type { TimerInterface } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
@@ -27,6 +38,7 @@ interface TimerLayoutProps {
   timerSubmitHandler: () => void;
   choseSkillHandler: (chosenSkill: SkillsType) => void;
   onBack: () => void;
+  onResetTimer?: () => void;
   isFinishing?: boolean;
 }
 
@@ -280,10 +292,12 @@ const TimerLayout = ({
   chosenSkill,
   choseSkillHandler,
   onBack,
+  onResetTimer,
   isFinishing
 }: TimerLayoutProps) => {
   const { t } = useTranslation("timer");
   const { time, startTimer, stopTimer, timerEnabled } = timer;
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   const getSkillName = (chosenSkill: SkillsType) => {
     switch (chosenSkill) {
@@ -410,7 +424,19 @@ const TimerLayout = ({
         </div>
 
         <div className='mx-auto mt-4 w-full max-w-3xl space-y-6 px-4 sm:mt-6 sm:space-y-8'>
-          <div className='flex justify-center py-2'>
+          <div className='flex items-center justify-center gap-3 py-2'>
+            {onResetTimer && (
+              <Button
+                onClick={() => setResetDialogOpen(true)}
+                variant='outline'
+                size='lg'
+                className='px-4 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base text-zinc-400 hover:text-white border-white/10'
+                disabled={isFinishing || sumTime === 0}
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                {t("reset_button")}
+              </Button>
+            )}
             <Button
               onClick={timerSubmitHandler}
               className='px-6 py-2.5 text-sm sm:px-8 sm:py-3 sm:text-base min-w-[140px]'
@@ -431,6 +457,31 @@ const TimerLayout = ({
               )}
             </Button>
           </div>
+
+          {onResetTimer && (
+            <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("reset_dialog.title")}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("reset_dialog.description")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("reset_dialog.cancel")}</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      onResetTimer();
+                      setResetDialogOpen(false);
+                    }}
+                    className="bg-red-600 hover:bg-red-500"
+                  >
+                    {t("reset_dialog.confirm")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
 
           <p className='text-center text-xs text-muted-foreground sm:text-sm'>
             {t("info_about_repot ")}{" "}
