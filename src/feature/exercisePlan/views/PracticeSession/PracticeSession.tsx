@@ -139,6 +139,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const [earTrainingScore, setEarTrainingScore] = useState(0);
   const [earTrainingHighScore, setEarTrainingHighScore] = useState<number | null>(null);
   const [hasPlayedRiddleOnce, setHasPlayedRiddleOnce] = useState(false);
+  const [tabResetKey, setTabResetKey] = useState(0);
 
   // Fetch ear training high score from Firebase
   useEffect(() => {
@@ -354,6 +355,20 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
         };
       }
     }
+  };
+
+  const handleRestart = () => {
+    stopTimer();
+    metronome.restartMetronome();
+    resetTimer();
+    setTabResetKey(prev => prev + 1);
+    
+    setTimeout(() => {
+      startTimer();
+      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
+        metronome.startMetronome();
+      }
+    }, 100);
   };
 
   const handleNextExerciseClick = async () => {
@@ -1154,6 +1169,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                               hideNotes={activeExercise.hideTablatureNotes}
                               audioContext={metronome.audioContext}
                               audioStartTime={metronome.audioStartTime}
+                              resetKey={tabResetKey}
                            />
                          ) : currentExercise.isPlayalong && currentExercise.youtubeVideoId ? (
                              !isMobileView && (
@@ -1405,6 +1421,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                  timerProgressValue={timerProgressValue}
                                  formattedTimeLeft={formattedTimeLeft}
                                  toggleTimer={handleToggleTimer}
+                                 handleRestart={handleRestart}
                                  handleNextExercise={handleNextExerciseClick}
                                  showExerciseInfo={false}
                                  variant="compact"

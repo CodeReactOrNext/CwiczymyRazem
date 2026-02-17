@@ -16,13 +16,11 @@ import { ImprovPromptView } from "../components/ImprovPromptView";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { FaExpand, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { FaExternalLinkAlt,FaFacebook, FaHeart, FaInfoCircle, FaInstagram, FaLightbulb, FaTwitter } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
 
-import { useDeviceMetronome } from "../../../components/Metronome/hooks/useDeviceMetronome";
-import { useTablatureAudio } from "../../../hooks/useTablatureAudio";
 import { categoryGradients } from "../../../constants/categoryStyles";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
 import { SessionModalControls } from "../components/SessionModalControls";
@@ -184,11 +182,17 @@ const SessionModal = ({
   };
 
   const handleRestart = () => {
-    if (metronome.restartMetronome) {
-      metronome.restartMetronome();
-    }
     stopTimer();
+    metronome.restartMetronome();
+    setTimerTime(0);
     setTabResetKey(prev => prev + 1);
+    
+    setTimeout(() => {
+      startTimer();
+      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
+        metronome.startMetronome();
+      }
+    }, 100);
   };
 
   const mobileFeedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
@@ -286,6 +290,7 @@ const SessionModal = ({
                             if (state === 1) startTimer();
                             if (state === 2) stopTimer();
                           }}
+                          resetKey={tabResetKey}
                       />
                    </div>
                 ) : currentExercise.videoUrl ? (
