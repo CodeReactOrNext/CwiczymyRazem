@@ -41,10 +41,10 @@
     "challenges": "Challenges"
   },
   "day_since": {
-    "no_practice": "Player hasn't practiced",
-    "pracitce_last_24": "Practiced in last 24h",
-    "practice_day": "Practiced {{days}} days ago",
-    "actual_streak": "Actual streak:"
+    "no_practice": "No activity",
+    "practice_last_24": "Active today",
+    "practice_day": "Active {{days}} days ago",
+    "actual_streak": "Current streak:"
   },
   "discord_event": {
     "active": "Active",
