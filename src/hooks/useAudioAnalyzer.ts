@@ -143,10 +143,11 @@ export const useAudioAnalyzer = () => {
         }
 
         // 4. Threshold & Stabilization
+        // Effective threshold scales with gain — higher gain allows quieter mic signals through
         const VOLUME_THRESHOLD = 0.008;
         let stabilizedFreq = 0;
 
-        if (rms > VOLUME_THRESHOLD && frequency > 50) {
+        if (rms * gain > VOLUME_THRESHOLD && frequency > 50) {
           lastFrequenciesRef.current.push(frequency);
           if (lastFrequenciesRef.current.length > 5) {
             lastFrequenciesRef.current.shift();
