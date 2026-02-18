@@ -292,7 +292,7 @@ const FirebaseLogsItem = ({
             </span>
         )}
 
-        {exerciseTitle && !exerciseTitle.includes("Practicing: ") && (
+        {exerciseTitle && !exerciseTitle.includes("Practicing: ") && !planTitle && !songTitle && (
             <span className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20">
               <span className="uppercase tracking-widest text-[9px] opacity-70">
                   EXERCISE
