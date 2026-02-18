@@ -26,7 +26,7 @@ function loadPersistedGain(): number {
     const stored = localStorage.getItem(GAIN_STORAGE_KEY);
     if (stored !== null) {
       const val = parseFloat(stored);
-      if (!isNaN(val) && val >= 0.5 && val <= 5.0) return val;
+      if (!isNaN(val) && val >= 0.5 && val <= 10.0) return val;
     }
   } catch { /* ignore */ }
   return DEFAULT_GAIN;
@@ -108,25 +108,26 @@ export const useAudioAnalyzer = () => {
 
       scriptProcessor.onaudioprocess = (event) => {
         const inputBuffer = event.inputBuffer.getChannelData(0);
+        const gain = inputGainRef.current;
 
-        // 1. Calculate Volume (RMS) — apply gain as display multiplier only
+        // 1. Apply gain and calculate Volume (RMS) + Peak from gained signal
         let sum = 0;
         let peak = 0;
         for (let i = 0; i < inputBuffer.length; i++) {
-          sum += inputBuffer[i] * inputBuffer[i];
-          const abs = Math.abs(inputBuffer[i]);
+          const s = inputBuffer[i] * gain;
+          sum += s * s;
+          const abs = Math.abs(s);
           if (abs > peak) peak = abs;
         }
         const rms = Math.sqrt(sum / inputBuffer.length);
-        const gain = inputGainRef.current;
-        const volume = Math.max(0, Math.min(1, rms * 10 * gain)); // gain boosts displayed volume only
+        const volume = Math.max(0, Math.min(1, rms * 10));
 
-        // 2. Normalize buffer copy for pitch/onset detection
+        // 2. Normalize gained buffer for pitch/onset detection
         //    Aubio needs a strong signal; mic input can be very quiet (rms ~0.01).
         //    Scaling to peak=0.9 gives aubio a clean, loud signal without clipping.
-        const scale = peak > 0.001 ? 0.9 / peak : 0;
+        const scale = peak > 0.0001 ? 0.9 / peak : 0;
         for (let i = 0; i < inputBuffer.length; i++) {
-          normalizedBuf[i] = inputBuffer[i] * scale;
+          normalizedBuf[i] = inputBuffer[i] * gain * scale;
         }
 
         // 3. Detect Onset & Pitch — process in hop-size chunks (512)
@@ -143,11 +144,10 @@ export const useAudioAnalyzer = () => {
         }
 
         // 4. Threshold & Stabilization
-        // Effective threshold scales with gain — higher gain allows quieter mic signals through
         const VOLUME_THRESHOLD = 0.008;
         let stabilizedFreq = 0;
 
-        if (rms * gain > VOLUME_THRESHOLD && frequency > 50) {
+        if (rms > VOLUME_THRESHOLD && frequency > 50) {
           lastFrequenciesRef.current.push(frequency);
           if (lastFrequenciesRef.current.length > 5) {
             lastFrequenciesRef.current.shift();
@@ -238,7 +238,7 @@ export const useAudioAnalyzer = () => {
   }, [close]);
 
   const setInputGain = useCallback((value: number) => {
-    const clamped = Math.max(0.5, Math.min(5.0, value));
+    const clamped = Math.max(0.5, Math.min(10.0, value));
     inputGainRef.current = clamped;
     try {
       localStorage.setItem(GAIN_STORAGE_KEY, String(clamped));
