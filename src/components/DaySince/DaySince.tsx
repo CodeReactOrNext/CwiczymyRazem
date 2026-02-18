@@ -16,7 +16,7 @@ export const DaySinceMessage = ({ date }: { date: Date }) => {
     <p className='font-openSans text-[0.6rem] text-secondText  xs:text-[0.65rem] sm:text-xs '>
       {!daysSinceNumber && t("day_since.no_practice")}
 
-      {daysSinceNumber === 1 && t("day_since.pracitce_last_24")}
+      {daysSinceNumber === 1 && t("day_since.practice_last_24")}
 
       {daysSinceNumber > 1 &&
         t("day_since.practice_day", {

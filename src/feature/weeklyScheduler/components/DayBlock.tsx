@@ -114,7 +114,7 @@ export const DayBlock = ({
         `}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className={`text-[10px] font-black uppercase tracking-widest ${isToday ? colorClasses.text : "text-zinc-500"}`}>
+          <div className={`text-[10px] font-black tracking-widest ${isToday ? colorClasses.text : "text-zinc-500"}`}>
             {dayName.substring(0, 3)}
           </div>
           <div className="flex-1 min-w-0">
@@ -123,7 +123,7 @@ export const DayBlock = ({
                 {renderLocalized(selectedItem.title)}
               </p>
             ) : (
-              <p className="text-[10px] text-zinc-700 font-bold uppercase tracking-wider">Rest Day</p>
+              <p className="text-[10px] text-zinc-700 font-bold  tracking-wider">Rest Day</p>
             )}
           </div>
         </div>
@@ -145,13 +145,13 @@ export const DayBlock = ({
       <div
         onClick={onClick}
         className={`
-          relative flex flex-col justify-between overflow-hidden 
-          rounded-lg border transition-all duration-500 cursor-pointer
+       relative flex flex-col justify-between overflow-hidden 
+          rounded-lg  cursor-pointer
           ${isCompleted 
-            ? "border-emerald-500/50 bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.1)]" 
+            ? " bg-emerald-500/5 " 
             : isToday 
-              ? `${colorClasses.border} ${colorClasses.gradient} ring-1 ring-white/10 shadow-2xl` 
-              : "border-white/5 bg-zinc-950/40 hover:bg-zinc-900/60"
+              ? `${colorClasses.border} ${colorClasses.gradient} ring-1 ring-white/10 ` 
+              : "border-white/5 bg-card "
           }
           p-4 min-h-[140px] md:min-h-[160px]
         `}
@@ -164,8 +164,8 @@ export const DayBlock = ({
         )}
 
         <div className="flex items-center justify-between mb-3 relative z-10 w-full">
-          <h3 className={`text-[10px] font-black uppercase tracking-[0.2em] 
-            ${isCompleted ? "text-emerald-400" : isToday ? colorClasses.text : "text-zinc-500"}
+          <h3 className={`text-[12px]  
+            ${isCompleted ? "text-emerald-400" : isToday ? colorClasses.text : "text-white"}
           `}>
             {dayName}
           </h3>
@@ -181,7 +181,11 @@ export const DayBlock = ({
                 {!isFuture && (
                   <button 
                     onClick={(e) => { e.stopPropagation(); onToggleComplete(e); }} 
-                    className={`p-1.5 rounded transition-all ${isCompleted ? "text-emerald-400 hover:bg-emerald-500/10" : "text-zinc-600 hover:text-white hover:bg-white/10"}`}
+                    className={`p-1.5 rounded-lg transition-all ${
+                      isCompleted 
+                        ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" 
+                        : "bg-zinc-800/80 text-zinc-500 hover:text-white hover:bg-zinc-700"
+                    }`}
                     title={isCompleted ? "Mark incomplete" : "Mark complete"}
                   >
                     <Check size={14} strokeWidth={isCompleted ? 3 : 2} />
@@ -189,7 +193,7 @@ export const DayBlock = ({
                 )}
                 <button 
                   onClick={(e) => { e.stopPropagation(); onClear(e); }} 
-                  className="p-1.5 hover:bg-white/10 rounded text-zinc-600 hover:text-white"
+                  className="p-1.5 bg-zinc-800/80 hover:bg-rose-500/10 rounded-lg text-zinc-500 hover:text-rose-400 transition-all"
                   title="Clear day"
                 >
                   <X size={14} />
@@ -228,7 +232,7 @@ export const DayBlock = ({
               )}
 
               {isCompleted && (
-                <div className="flex items-center gap-1.5 text-emerald-400 font-black text-[9px] uppercase tracking-widest mt-auto">
+                <div className="flex items-center gap-1.5 text-emerald-400 font-black text-[11px]   mt-auto">
                   <div className="h-1 w-1 rounded-full bg-emerald-400" />
                   Session Finished
                 </div>

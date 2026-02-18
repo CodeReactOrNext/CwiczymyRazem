@@ -272,7 +272,7 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
         <div className="h-8 bg-zinc-900 rounded w-48 mb-6" />
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {Array.from({ length: 7 }).map((_, i) => (
-            <div key={i} className="h-48 bg-zinc-900 rounded-xl" />
+            <div key={i} className="h-[160px] bg-zinc-900 rounded-xl" />
           ))}
         </div>
       </div>
@@ -280,10 +280,10 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-1 flex items-center gap-3">
+          <h2 className="text-xl md:text-3xl font-black text-white tracking-tight mb-1 flex items-center gap-3">
             Your Week
             <span className="text-base font-bold text-zinc-600 flex items-center gap-1.5">
               <Calendar size={14} />
