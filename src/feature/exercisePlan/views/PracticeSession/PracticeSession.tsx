@@ -864,7 +864,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             className="border-b border-white/5 bg-zinc-950/20 backdrop-blur-md sticky top-0 z-50">
             
             <div className={cn(
-              'mx-auto max-w-6xl px-6 pb-64 pt-4 relative z-10',
+              'mx-auto max-w-8xl px-6 pb-64 pt-4 relative z-10',
               reportResult && "max-w-7xl px-4 pt-8"
             )}>
               
