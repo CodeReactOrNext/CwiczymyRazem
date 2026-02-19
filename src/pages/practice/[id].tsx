@@ -48,6 +48,7 @@ export default function PracticePage() {
   return (
     <PracticeSession 
       plan={plan} 
+      onClose={() => router.push("/exercises")}
       onFinish={() => {
         setIsFinishing(true);
         router.push("/report");
