@@ -68,34 +68,60 @@ export const TablatureViewer = ({
     isDraggingRef.current = false;
   };
 
-  const BEAT_WIDTH = 140; 
-  const STRING_SPACING = 30;
+  const BEAT_WIDTH = 240;
+  const STRING_SPACING = 32;
   const NOTE_RADIUS = 11;
-  const STAFF_TOP_OFFSET = 60;
+  const STAFF_TOP_OFFSET = 85;
 
-  const { totalBeats, processedData, hasAccentedNotes, hasDynamics } = useMemo(() => {
-    if (!measures) return { totalBeats: 1, processedData: { measureLines: [], rhythmItems: [], noteItems: [] }, hasAccentedNotes: false, hasDynamics: false };
+  const STRING_COLORS = [
+    "#f87171", // 1: E wysoka  – czerwony
+    "#fb923c", // 2: B         – pomarańczowy
+    "#facc15", // 3: G         – żółty
+    "#4ade80", // 4: D         – zielony
+    "#60a5fa", // 5: A         – niebieski
+    "#c084fc", // 6: E niska   – fioletowy
+  ];
+
+  const STRING_DARK_COLORS = [
+    "#7f1d1d", // 1: E wysoka  – ciemny czerwony
+    "#7c2d12", // 2: B         – ciemny pomarańczowy
+    "#713f12", // 3: G         – ciemny żółty
+    "#14532d", // 4: D         – ciemny zielony
+    "#1e3a5f", // 5: A         – ciemny niebieski
+    "#4a1d96", // 6: E niska   – ciemny fioletowy
+  ];
+
+  const { totalBeats, processedData, hasAccentedNotes, hasDynamics, rhythmBeats } = useMemo(() => {
+    if (!measures) return { totalBeats: 1, processedData: { measureLines: [], rhythmItems: [], noteItems: [] }, hasAccentedNotes: false, hasDynamics: false, rhythmBeats: [] };
 
     let currentWidth = 0;
     const measureLines: number[] = [];
     const rhythmItems: any[] = [];
     const noteItems: any[] = [];
+    const rhythmBeats: { duration: number; beamRight: boolean; beamRight2: boolean }[] = [];
     let hasAccents = false;
     let hasDyn = false;
 
     measures.forEach((measure) => {
-      measure.beats.forEach((beat) => {
+      measure.beats.forEach((beat, i) => {
         const beatStart = currentWidth;
-        
+        const next = measure.beats[i + 1];
+
         rhythmItems.push({
           left: beatStart + 10,
           duration: beat.duration,
         });
 
+        rhythmBeats.push({
+          duration: beat.duration,
+          beamRight:  beat.duration <= 0.5  && !!next && next.duration <= 0.5,
+          beamRight2: beat.duration <= 0.25 && !!next && next.duration <= 0.25,
+        });
+
         beat.notes.forEach((note) => {
           if (note.isAccented) hasAccents = true;
           if (note.dynamics !== undefined) hasDyn = true;
-          
+
           noteItems.push({
             left: beatStart + 10,
             y: STAFF_TOP_OFFSET + (note.string - 1) * STRING_SPACING,
@@ -111,11 +137,12 @@ export const TablatureViewer = ({
       measureLines.push(currentWidth);
     });
 
-    return { 
-      totalBeats: currentWidth / BEAT_WIDTH, 
+    return {
+      totalBeats: currentWidth / BEAT_WIDTH,
       processedData: { measureLines, rhythmItems, noteItems },
       hasAccentedNotes: hasAccents,
-      hasDynamics: hasDyn
+      hasDynamics: hasDyn,
+      rhythmBeats
     };
   }, [measures]);
 
@@ -155,8 +182,7 @@ export const TablatureViewer = ({
       let scrollX = 0;
       let totalBeatsElapsed = 0;
 
-      // Dynamic Beat Width calculation
-      const dynamicBeatWidth = Math.max(100, Math.min(180, containerSize.width / 4));
+      const dynamicBeatWidth = Math.max(120, Math.min(200, containerSize.width / 4));
 
       if (isPlaying && startTime && countInRemaining === 0) {
         const elapsedSeconds = (audioContext && audioStartTime != null)
@@ -184,12 +210,14 @@ export const TablatureViewer = ({
 
       const totalWidth = totalBeats * dynamicBeatWidth;
 
-      // 1. Draw Staff Lines
+      // 1. Draw Staff Lines (gradient opacity — outer strings brighter)
       if (!hideNotes) {
-        ctx.strokeStyle = "#404040"; 
         ctx.lineWidth = 1;
         for (let i = 0; i < 6; i++) {
           const y = STAFF_TOP_OFFSET + i * STRING_SPACING;
+          const dist = Math.abs(i - 2.5); // 0=środek, 2.5=skrajne
+          const alpha = 0.15 + dist * 0.12; // 0.15 (środek) → 0.45 (skrajne)
+          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
           ctx.beginPath();
           ctx.moveTo(0, y);
           ctx.lineTo(totalWidth, y);
@@ -198,8 +226,8 @@ export const TablatureViewer = ({
       }
 
       // 2. Draw Measure Lines
-      ctx.strokeStyle = "#ffffff"; 
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+      ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(0, STAFF_TOP_OFFSET);
       ctx.lineTo(0, STAFF_TOP_OFFSET + 5 * STRING_SPACING);
@@ -220,29 +248,79 @@ export const TablatureViewer = ({
         ctx.stroke();
       });
 
-      // 3. Draw Rhythm (Stems & Beams)
-      const RHYTHM_Y = 15;
-      ctx.strokeStyle = "#ffffff";
-      ctx.fillStyle = "#ffffff";
-      ctx.lineWidth = 2;
+      // 3. Draw Rhythm Notation (standard tab style)
+      const STEM_TOP_Y = 12;
+      const RHY_HEAD_Y = STAFF_TOP_OFFSET - 36; // 49px — tuż nad pięciolinią
+      const RHY_HEAD_R = 3.5;
+      const BEAM_H = 3;
+      const BEAM_GAP = 4.5;
+      const RHYTHM_COLOR = "rgba(255, 255, 255, 0.4)";
 
       let currentOffset = 0;
+      let beatGlobalIdx = 0;
       measures?.forEach((measure, mIdx) => {
         measure.beats.forEach((beat, bIdx) => {
           const beatLeft = currentOffset + 10;
-          if (beatLeft >= scrollX - 50 && beatLeft <= scrollX + containerSize.width + 50) {
-            ctx.beginPath();
-            ctx.moveTo(beatLeft, RHYTHM_Y);
-            ctx.lineTo(beatLeft, RHYTHM_Y + 25);
-            ctx.stroke();
+          const rd = rhythmBeats[beatGlobalIdx];
+          const prevRd = beatGlobalIdx > 0 ? rhythmBeats[beatGlobalIdx - 1] : null;
+          const nextBeatLeft = beatLeft + beat.duration * dynamicBeatWidth;
 
-            if (beat.duration <= 0.25) { 
-              ctx.fillRect(beatLeft, RHYTHM_Y, beat.duration * dynamicBeatWidth, 4);
-              if (beat.duration === 0.0625 || beat.duration === 0.125) { // 16th and 8th
-                 ctx.fillRect(beatLeft, RHYTHM_Y + 8, beat.duration * dynamicBeatWidth, 4);
+          if (rd && beatLeft >= scrollX - 50 && beatLeft <= scrollX + containerSize.width + 50) {
+            const dur = rd.duration;
+            ctx.strokeStyle = RHYTHM_COLOR;
+            ctx.fillStyle = RHYTHM_COLOR;
+
+            if (dur >= 4.0) {
+              // Cała nuta: otwarta elipsa, bez laski
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              ctx.ellipse(beatLeft, RHY_HEAD_Y, RHY_HEAD_R * 1.5, RHY_HEAD_R, 0, 0, Math.PI * 2);
+              ctx.stroke();
+            } else {
+              // Laska
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              ctx.moveTo(beatLeft, RHY_HEAD_Y - RHY_HEAD_R);
+              ctx.lineTo(beatLeft, STEM_TOP_Y);
+              ctx.stroke();
+
+              if (dur >= 2.0) {
+                // Półnuta: otwarty okrąg
+                ctx.beginPath();
+                ctx.arc(beatLeft, RHY_HEAD_Y, RHY_HEAD_R, 0, Math.PI * 2);
+                ctx.stroke();
+              } else {
+                // Ćwierćnuta i krótsze: wypełniony okrąg
+                ctx.beginPath();
+                ctx.arc(beatLeft, RHY_HEAD_Y, RHY_HEAD_R, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Ogonki / belki
+                const flagCount = dur < 0.25 ? 3 : dur < 0.5 ? 2 : dur < 1.0 ? 1 : 0;
+                for (let f = 0; f < flagCount; f++) {
+                  const beamY = STEM_TOP_Y + f * (BEAM_H + BEAM_GAP);
+                  const drawRight = f === 0 ? rd.beamRight : rd.beamRight2;
+                  const leftBeamed = f === 0 ? prevRd?.beamRight : prevRd?.beamRight2;
+
+                  if (drawRight) {
+                    // Belka do następnej nuty
+                    ctx.fillStyle = RHYTHM_COLOR;
+                    ctx.fillRect(beatLeft, beamY, nextBeatLeft - beatLeft, BEAM_H);
+                  } else if (!leftBeamed) {
+                    // Ogonek (poprzednia nuta nie rysowała belki do tej)
+                    ctx.strokeStyle = RHYTHM_COLOR;
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(beatLeft, beamY);
+                    ctx.bezierCurveTo(
+                      beatLeft + 10, beamY + 3,
+                      beatLeft + 8,  beamY + 8,
+                      beatLeft + 2,  beamY + 12
+                    );
+                    ctx.stroke();
+                  }
+                }
               }
-            } else if (beat.duration === 0.5) {
-              ctx.fillRect(beatLeft, RHYTHM_Y, beat.duration * dynamicBeatWidth, 4);
             }
           }
 
@@ -259,25 +337,28 @@ export const TablatureViewer = ({
                              cursorPosition >= currentOffset &&
                              cursorPosition < (currentOffset + beat.duration * dynamicBeatWidth);
 
+
             const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
             const isHit = hitNotes[noteKey];
 
             if (beatLeft >= scrollX - 50 && beatLeft <= scrollX + containerSize.width + 50) {
               // Note Background
+              const stringColor = STRING_COLORS[note.string - 1] ?? "#ffffff";
+              const dynAlpha = (hasDynamics && note.dynamics !== undefined) ? (0.3 + 0.7 * dyn) : 1.0;
+
               if (isHit) {
                 ctx.fillStyle = "#10b981"; // Emerald for success
+                ctx.globalAlpha = 1;
               } else if (isActive) {
                 // Glow effect for active note
                 ctx.shadowBlur = 15;
-                ctx.shadowColor = "#06b6d4";
-                ctx.fillStyle = "#06b6d4";
-              } else if (note.isAccented) {
-                ctx.fillStyle = "#22d3ee";
-              } else if (hasDynamics && note.dynamics !== undefined) {
-                const a = 0.3 + 0.7 * dyn;
-                ctx.fillStyle = `rgba(255, 255, 255, ${a})`;
+                ctx.shadowColor = stringColor;
+                ctx.fillStyle = stringColor;
+                ctx.globalAlpha = 1;
               } else {
-                ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+                ctx.fillStyle = stringColor;
+                const accentDim = hasAccentedNotes && !note.isAccented ? 0.25 : 1.0;
+                ctx.globalAlpha = dynAlpha * accentDim;
               }
 
               if (!hideNotes) {
@@ -285,6 +366,7 @@ export const TablatureViewer = ({
                 ctx.arc(beatLeft, noteY, noteR, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0; // Reset shadow
+                ctx.globalAlpha = 1; // Reset alpha
 
                 // Fret Number
                 ctx.fillStyle = (isActive || isHit) ? "#ffffff" : "#000000";
@@ -455,11 +537,12 @@ export const TablatureViewer = ({
             ctx.fillStyle = "#22d3ee"; // Cyan-400
             ctx.font = "black 22px Inter, system-ui, sans-serif";
             ctx.textAlign = "center";
-            ctx.fillText(beat.chordName, beatLeft, STAFF_TOP_OFFSET - 35);
+            ctx.fillText(beat.chordName, beatLeft, STAFF_TOP_OFFSET - 58);
             
             ctx.shadowBlur = 0; // Reset
           }
 
+          beatGlobalIdx++;
           currentOffset += beat.duration * dynamicBeatWidth;
         });
       });
@@ -504,9 +587,12 @@ export const TablatureViewer = ({
         });
       }
 
-      // 5. Progress Overlay (Passed Box)
+      // 5. Progress Overlay (gradient fade — starsze nuty ciemniejsze)
       if (cursorPosition > 0) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.45)"; 
+        const overlayGrad = ctx.createLinearGradient(scrollX, 0, cursorPosition, 0);
+        overlayGrad.addColorStop(0, "rgba(0, 0, 0, 0.7)");
+        overlayGrad.addColorStop(1, "rgba(0, 0, 0, 0.15)");
+        ctx.fillStyle = overlayGrad;
         ctx.fillRect(0, 0, cursorPosition, containerSize.height);
       }
 
@@ -548,12 +634,12 @@ export const TablatureViewer = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes, hasDynamics, detectedNote, isListening, hideNotes, audioContext, audioStartTime, countInRemaining, resetKey]);
+  }, [isPlaying, startTime, bpm, totalBeats, containerSize, processedData, hasAccentedNotes, hasDynamics, rhythmBeats, detectedNote, isListening, hideNotes, audioContext, audioStartTime, countInRemaining, resetKey]);
 
   return (
     <div 
       className={cn(
-        "w-full bg-[#0a0a0a] rounded-xl border border-white/10 p-4 relative h-64 select-none overflow-hidden",
+        "w-full bg-[#0a0a0a] rounded-xl  p-4 relative h-[300px] select-none overflow-hidden",
         !isPlaying && "cursor-grab active:cursor-grabbing",
         className
       )} 
