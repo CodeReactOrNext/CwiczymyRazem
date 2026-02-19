@@ -42,7 +42,7 @@ export const SelectedExercisesList = ({
   };
 
   return (
-    <div className='rounded-xl border border-white/10 bg-zinc-900/20 p-5 shadow-inner min-h-[200px] flex flex-col'>
+    <div className='rounded-xl border border-white/10 bg-zinc-900/20 p-5 shadow-inner min-h-[200px] flex flex-col min-w-0'>
       <div className='flex items-center justify-between mb-5 shrink-0'>
         <div className="space-y-0.5">
           <h3 className='text-sm font-semibold text-zinc-100 flex items-center gap-2'>
@@ -78,14 +78,14 @@ export const SelectedExercisesList = ({
                         animate="show"
                         variants={item}
                         key={exercise.id}
-                        className='group relative flex items-center gap-4 rounded-xl border border-white/5 bg-zinc-900/40 p-3 transition-all hover:border-zinc-700 hover:bg-zinc-900/80 shadow-sm'>
+                        className='group relative flex items-start gap-4 rounded-xl border border-white/5 bg-zinc-900/40 p-3 transition-all hover:border-zinc-700 hover:bg-zinc-900/80 shadow-sm min-w-0'>
                         
-                        <div className="text-zinc-700 group-hover:text-zinc-500 transition-colors">
+                        <div className="text-zinc-700 group-hover:text-zinc-500 transition-colors shrink-0 pt-1">
                         <GripVertical className="h-4 w-4" />
                         </div>
 
-                        <div className="flex-1 min-w-0 pr-2">
-                        <h4 className='font-bold text-zinc-100 truncate text-sm sm:text-base leading-tight'>
+                        <div className="flex-1 min-w-0">
+                        <h4 className='font-bold text-zinc-100 text-sm sm:text-base leading-tight break-words' title={exercise.title}>
                             {exercise.title}
                         </h4>
                         <div className='flex items-center gap-3 mt-1 text-[11px] font-medium text-zinc-500 tracking-wide'>
@@ -101,7 +101,7 @@ export const SelectedExercisesList = ({
                         </div>
                         </div>
                         
-                        <div className="flex items-center gap-1 shrink-0">
+                        <div className="flex items-center gap-1 shrink-0 pt-0.5">
                         {isCustom && (
                             <>
                             <Button
