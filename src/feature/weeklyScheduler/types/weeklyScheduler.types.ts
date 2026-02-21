@@ -3,10 +3,18 @@ import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise
 
 export type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
 
+export interface ScheduleItemEntry {
+  id: string;
+  type: "plan" | "exercise" | "song";
+  completed: boolean;
+  completedAt?: Timestamp;
+}
+
 export interface DaySchedule {
   planId?: string;
   exerciseId?: string;
   songId?: string;
+  items?: ScheduleItemEntry[];
   completed: boolean;
   completedAt?: Timestamp;
 }
