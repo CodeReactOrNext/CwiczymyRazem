@@ -3,8 +3,8 @@ import { Calendar } from "lucide-react";
 import { DayBlock } from "./DayBlock";
 import { ScheduleItemSelector } from "./ScheduleItemSelector";
 import { getCurrentWeekStart, getWeekDays, formatDayName, isToday, getDayOfWeekKey, formatWeekRange } from "../utils/dateUtils";
-import { getWeeklySchedule, updateDaySchedule, toggleDayCompletion, clearDaySchedule } from "../services/weeklyScheduler.service";
-import type { WeeklySchedule, DayOfWeek } from "../types/weeklyScheduler.types";
+import { getWeeklySchedule, addItemToDaySchedule, removeItemFromDaySchedule, toggleItemCompletion, toggleDayCompletion, clearDaySchedule } from "../services/weeklyScheduler.service";
+import type { WeeklySchedule, DayOfWeek, ScheduleItemEntry } from "../types/weeklyScheduler.types";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import type { Song } from "feature/songs/types/songs.type";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
@@ -115,30 +115,8 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
   const handleSelectPlan = async (plan: ExercisePlan) => {
     if (!selectedDay) return;
     
-    // Optimistic update
-    const currentSchedule = schedule || { 
-      days: {
-        monday: { completed: false },
-        tuesday: { completed: false },
-        wednesday: { completed: false },
-        thursday: { completed: false },
-        friday: { completed: false },
-        saturday: { completed: false },
-        sunday: { completed: false },
-      }
-    } as any;
-
-    const updatedSchedule = { ...currentSchedule };
-    updatedSchedule.days[selectedDay] = {
-      ...updatedSchedule.days[selectedDay],
-      planId: plan.id,
-      exerciseId: undefined,
-      songId: undefined
-    };
-    setSchedule(updatedSchedule);
-
     try {
-      await updateDaySchedule(userAuth, weekStartDate, selectedDay, plan.id, undefined);
+      await addItemToDaySchedule(userAuth, weekStartDate, selectedDay, { id: plan.id, type: "plan" });
       await loadSchedule(true);
     } catch (error) {
       console.error("Failed to update schedule:", error);
@@ -149,30 +127,8 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
   const handleSelectSong = async (song: Song) => {
     if (!selectedDay) return;
 
-    // Optimistic update
-    const currentSchedule = schedule || { 
-      days: {
-        monday: { completed: false },
-        tuesday: { completed: false },
-        wednesday: { completed: false },
-        thursday: { completed: false },
-        friday: { completed: false },
-        saturday: { completed: false },
-        sunday: { completed: false },
-      }
-    } as any;
-
-    const updatedSchedule = { ...currentSchedule };
-    updatedSchedule.days[selectedDay] = {
-      ...updatedSchedule.days[selectedDay],
-      planId: undefined,
-      exerciseId: undefined,
-      songId: song.id
-    };
-    setSchedule(updatedSchedule);
-
     try {
-      await updateDaySchedule(userAuth, weekStartDate, selectedDay, undefined, undefined, song.id);
+      await addItemToDaySchedule(userAuth, weekStartDate, selectedDay, { id: song.id, type: "song" });
       await loadSchedule(true);
     } catch (error) {
       console.error("Failed to update schedule:", error);
@@ -180,22 +136,22 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
     }
   };
 
-  const handleToggleComplete = async (day: DayOfWeek, currentStatus: boolean) => {
-    if (!schedule) return;
-
-    // Optimistic update
-    const updatedSchedule = { ...schedule };
-    updatedSchedule.days[day] = {
-      ...updatedSchedule.days[day],
-      completed: !currentStatus
-    };
-    setSchedule(updatedSchedule);
-
+  const handleRemoveItem = async (day: DayOfWeek, itemId: string) => {
     try {
-      await toggleDayCompletion(userAuth, weekStartDate, day, !currentStatus);
+      await removeItemFromDaySchedule(userAuth, weekStartDate, day, itemId);
       await loadSchedule(true);
     } catch (error) {
-      console.error("Failed to toggle completion:", error);
+      console.error("Failed to remove item:", error);
+      await loadSchedule();
+    }
+  };
+
+  const handleToggleItemComplete = async (day: DayOfWeek, itemId: string, currentStatus: boolean) => {
+    try {
+      await toggleItemCompletion(userAuth, weekStartDate, day, itemId, !currentStatus);
+      await loadSchedule(true);
+    } catch (error) {
+      console.error("Failed to toggle item completion:", error);
       await loadSchedule();
     }
   };
@@ -222,10 +178,7 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
     }
   };
 
-  const handleStart = async (day: DayOfWeek) => {
-    const item = getSelectedItem(day);
-    if (!item || !schedule) return;
-
+  const handleStart = async (item: Exercise | ExercisePlan | Song) => {
     // Determine path
     let path = "/dashboard";
     if ("exercises" in item) {
@@ -243,25 +196,40 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
     router.push(path);
   };
 
-  const getSelectedItem = (day: DayOfWeek): Exercise | ExercisePlan | Song | undefined => {
-    if (!schedule) return undefined;
+  const getSelectedItems = (day: DayOfWeek): (Exercise | ExercisePlan | Song)[] => {
+    if (!schedule) return [];
     const daySchedule = schedule.days[day];
-    
-    if (daySchedule.planId) {
-      const allPlans = [...defaultPlans, ...userPlans];
-      return allPlans.find(p => p.id === daySchedule.planId);
-    }
-    
-    if (daySchedule.exerciseId) {
-      return allExercises.find(e => e.id === daySchedule.exerciseId);
+    const items = daySchedule.items || [];
+
+    // Migrate legacy if necessary
+    if (items.length === 0) {
+      if (daySchedule.planId) {
+        const plan = [...defaultPlans, ...userPlans].find(p => p.id === daySchedule.planId);
+        if (plan) return [plan];
+      }
+      if (daySchedule.exerciseId) {
+        const exercise = allExercises.find(e => e.id === daySchedule.exerciseId);
+        if (exercise) return [exercise];
+      }
+      if (daySchedule.songId) {
+        const song = [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned].find(s => s.id === daySchedule.songId);
+        if (song) return [song];
+      }
+      return [];
     }
 
-    if (daySchedule.songId) {
-      const allSongs = [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned];
-      return allSongs.find(s => s.id === daySchedule.songId);
-    }
-    
-    return undefined;
+    return items.map(itemEntry => {
+      if (itemEntry.type === "plan") {
+        return [...defaultPlans, ...userPlans].find(p => p.id === itemEntry.id);
+      }
+      if (itemEntry.type === "song") {
+        return [...userSongs.wantToLearn, ...userSongs.learning, ...userSongs.learned].find(s => s.id === itemEntry.id);
+      }
+      if (itemEntry.type === "exercise") {
+        return allExercises.find(e => e.id === itemEntry.id);
+      }
+      return undefined;
+    }).filter(Boolean) as (Exercise | ExercisePlan | Song)[];
   };
 
 
@@ -314,19 +282,20 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
               isCollapsed={isCollapsed}
               isFuture={isFuture}
               onClick={() => handleDayClick(dayKey)}
-              onToggleComplete={(e) => {
-                e.stopPropagation();
-                handleToggleComplete(dayKey, daySchedule.completed);
-              }}
               onClear={(e) => {
                 e.stopPropagation();
                 handleClearDay(dayKey);
               }}
-              onStart={(e) => {
-                e.stopPropagation();
-                handleStart(dayKey);
+              onStart={(item: Exercise | ExercisePlan | Song) => {
+                handleStart(item);
               }}
-              selectedItem={getSelectedItem(dayKey)}
+              onRemoveItem={(itemId: string) => {
+                handleRemoveItem(dayKey, itemId);
+              }}
+              onToggleItemComplete={(itemId: string, currentStatus: boolean) => {
+                handleToggleItemComplete(dayKey, itemId, currentStatus);
+              }}
+              selectedItems={getSelectedItems(dayKey)}
               dayColor={DAY_COLORS[index]}
             />
           );
