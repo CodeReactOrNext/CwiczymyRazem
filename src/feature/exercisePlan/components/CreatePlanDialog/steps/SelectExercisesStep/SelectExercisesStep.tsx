@@ -131,7 +131,7 @@ export const SelectExercisesStep = ({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-        <div className="lg:col-span-5 sticky top-6 min-w-0">
+        <div className="lg:col-span-5 lg:sticky top-6 min-w-0">
           <SelectedExercisesList
             selectedExercises={selectedExercises}
             onToggleExercise={handleExerciseToggle}

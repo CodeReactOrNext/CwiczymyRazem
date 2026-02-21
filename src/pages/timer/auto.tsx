@@ -38,7 +38,7 @@ const TimerAuto: NextPageWithLayout = () => {
 
   return selectedPlan ? (
     <MainContainer>
-      <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
+      <PracticeSession onClose={handleBack} plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
     </MainContainer>
   ) : (
     <AutoPlanGenerator
