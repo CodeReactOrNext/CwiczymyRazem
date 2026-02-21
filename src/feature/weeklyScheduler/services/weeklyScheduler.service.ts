@@ -72,13 +72,11 @@ export const createWeeklySchedule = async (
   }
 };
 
-export const updateDaySchedule = async (
+export const addItemToDaySchedule = async (
   userId: string,
   weekStartDate: Date,
   day: DayOfWeek,
-  planId?: string,
-  exerciseId?: string,
-  songId?: string
+  item: { id: string; type: "plan" | "exercise" | "song" }
 ): Promise<void> => {
   try {
     const docId = getWeeklyScheduleDocId(weekStartDate);
@@ -89,14 +87,119 @@ export const updateDaySchedule = async (
       await createWeeklySchedule(userId, weekStartDate);
     }
 
+    const currentScheduleRef = await getDoc(scheduleRef);
+    const currentData = currentScheduleRef.exists() ? (currentScheduleRef.data() as WeeklySchedule) : null;
+    const currentDaySchedule = currentData?.days[day] || { completed: false };
+    const currentItems = currentDaySchedule.items || [];
+
+    // Migrate old fields to items if they exist and items is empty
+    const itemsToSave = [...currentItems];
+    if (itemsToSave.length === 0) {
+      if (currentDaySchedule.planId) itemsToSave.push({ id: currentDaySchedule.planId, type: "plan", completed: currentDaySchedule.completed });
+      if (currentDaySchedule.exerciseId) itemsToSave.push({ id: currentDaySchedule.exerciseId, type: "exercise", completed: currentDaySchedule.completed });
+      if (currentDaySchedule.songId) itemsToSave.push({ id: currentDaySchedule.songId, type: "song", completed: currentDaySchedule.completed });
+    }
+
+    // Add new item if not already there
+    if (!itemsToSave.find(i => i.id === item.id)) {
+      itemsToSave.push({ ...item, completed: false });
+    }
+
+    // Update legacy fields for compatibility (using the first item)
+    const firstItem = itemsToSave[0];
+    const updates: any = {
+      [`days.${day}.items`]: itemsToSave,
+      [`days.${day}.planId`]: firstItem?.type === "plan" ? firstItem.id : null,
+      [`days.${day}.exerciseId`]: firstItem?.type === "exercise" ? firstItem.id : null,
+      [`days.${day}.songId`]: firstItem?.type === "song" ? firstItem.id : null,
+      updatedAt: serverTimestamp(),
+    };
+
+    await updateDoc(scheduleRef, updates);
+  } catch (error) {
+    console.error("Error adding item to day schedule:", error);
+    throw error;
+  }
+};
+
+export const removeItemFromDaySchedule = async (
+  userId: string,
+  weekStartDate: Date,
+  day: DayOfWeek,
+  itemId: string
+): Promise<void> => {
+  try {
+    const docId = getWeeklyScheduleDocId(weekStartDate);
+    const scheduleRef = doc(db, "users", userId, "weeklySchedules", docId);
+
+    const scheduleSnap = await getDoc(scheduleRef);
+    if (!scheduleSnap.exists()) return;
+
+    const currentData = scheduleSnap.data() as WeeklySchedule;
+    const currentDaySchedule = currentData.days[day];
+    const currentItems = currentDaySchedule.items || [];
+
+    const updatedItems = currentItems.filter((i) => i.id !== itemId);
+
+    const updates: any = {
+      [`days.${day}.items`]: updatedItems,
+      updatedAt: serverTimestamp(),
+    };
+
+    // Update legacy fields
+    if (updatedItems.length === 0) {
+      updates[`days.${day}.planId`] = null;
+      updates[`days.${day}.exerciseId`] = null;
+      updates[`days.${day}.songId`] = null;
+    } else {
+      const firstItem = updatedItems[0];
+      updates[`days.${day}.planId`] = firstItem.type === "plan" ? firstItem.id : null;
+      updates[`days.${day}.exerciseId`] = firstItem.type === "exercise" ? firstItem.id : null;
+      updates[`days.${day}.songId`] = firstItem.type === "song" ? firstItem.id : null;
+    }
+
+    await updateDoc(scheduleRef, updates);
+  } catch (error) {
+    console.error("Error removing item from day schedule:", error);
+    throw error;
+  }
+};
+
+export const toggleItemCompletion = async (
+  userId: string,
+  weekStartDate: Date,
+  day: DayOfWeek,
+  itemId: string,
+  completed: boolean
+): Promise<void> => {
+  try {
+    const docId = getWeeklyScheduleDocId(weekStartDate);
+    const scheduleRef = doc(db, "users", userId, "weeklySchedules", docId);
+
+    const scheduleSnap = await getDoc(scheduleRef);
+    if (!scheduleSnap.exists()) return;
+
+    const currentData = scheduleSnap.data() as WeeklySchedule;
+    const currentDaySchedule = currentData.days[day];
+    const currentItems = currentDaySchedule.items || [];
+
+    const updatedItems = currentItems.map((item) =>
+      item.id === itemId
+        ? { ...item, completed, completedAt: completed ? Timestamp.now() : null }
+        : item
+    );
+
+    // If all items are completed, mark the day as completed
+    const allCompleted = updatedItems.length > 0 && updatedItems.every((i) => i.completed);
+
     await updateDoc(scheduleRef, {
-      [`days.${day}.planId`]: planId || null,
-      [`days.${day}.exerciseId`]: exerciseId || null,
-      [`days.${day}.songId`]: songId || null,
+      [`days.${day}.items`]: updatedItems,
+      [`days.${day}.completed`]: allCompleted,
+      [`days.${day}.completedAt`]: allCompleted ? serverTimestamp() : null,
       updatedAt: serverTimestamp(),
     });
   } catch (error) {
-    console.error("Error updating day schedule:", error);
+    console.error("Error toggling item completion:", error);
     throw error;
   }
 };
@@ -140,6 +243,7 @@ export const clearDaySchedule = async (
       [`days.${day}.planId`]: null,
       [`days.${day}.exerciseId`]: null,
       [`days.${day}.songId`]: null,
+      [`days.${day}.items`]: [],
       [`days.${day}.completed`]: false,
       [`days.${day}.completedAt`]: null,
       updatedAt: serverTimestamp(),
