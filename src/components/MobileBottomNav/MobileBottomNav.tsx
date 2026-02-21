@@ -27,7 +27,7 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
       icon: FileText,
     },
     {
-      label: "My list",
+      label: "My Songs",
       href: "/songs?view=management",
       icon: LayoutGrid,
     },
