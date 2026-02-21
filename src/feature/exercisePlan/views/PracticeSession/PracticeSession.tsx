@@ -60,6 +60,25 @@ import { playCompletionSound } from "utils/audioUtils";
 import { ScaleSelectionDialog } from "./components/ScaleSelectionDialog";
 import { ChordSelectionDialog } from "./components/ChordSelectionDialog";
 import type { Exercise } from "../../types/exercise.types";
+import { FaMicrophone, FaSync } from "react-icons/fa";
+
+const GUITAR_PLAYBACK_KEY = "guitar_playback_enabled";
+
+function loadGuitarPlaybackPreference(): boolean | null {
+  try {
+    const raw = localStorage.getItem(GUITAR_PLAYBACK_KEY);
+    if (raw === null) return null;
+    return raw === "true";
+  } catch {
+    return null;
+  }
+}
+
+function saveGuitarPlaybackPreference(enabled: boolean): void {
+  try {
+    localStorage.setItem(GUITAR_PLAYBACK_KEY, String(enabled));
+  } catch {}
+}
 
 interface PracticeSessionProps {
   plan: ExercisePlan;
@@ -180,7 +199,12 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   useEffect(() => {
     // Reset flags and UI state on ANY exercise change
     // For Ear Training (riddleConfig), enable playback by default, otherwise disable
-    setIsAudioMuted(!(currentExercise.riddleConfig?.mode === 'sequenceRepeat' || (currentExercise.tablature && currentExercise.tablature.length > 0)));
+    const playbackPref = loadGuitarPlaybackPreference();
+    if (playbackPref !== null) {
+      setIsAudioMuted(!playbackPref);
+    } else {
+      setIsAudioMuted(!(currentExercise.riddleConfig?.mode === 'sequenceRepeat' || (currentExercise.tablature && currentExercise.tablature.length > 0)));
+    }
     setIsMetronomeMuted(false);
     setIsHalfSpeed(false);
     setHasPlayedRiddleOnce(false);
@@ -405,6 +429,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     handleCalibrationCancel,
     getAdjustedTargetFreq,
     existingCalibrationTimestamp,
+    setIsMicEnabled: updateMicPersistence,
+    setSessionPhase,
   } = useCalibration(planHasTablature);
 
   const CENTS_TOLERANCE = 60; // Tolerance in cents (~over half a semitone)
@@ -1305,12 +1331,40 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                             onClick={() => {
                                               const newMuted = !isAudioMuted;
                                               setIsAudioMuted(newMuted);
+                                              saveGuitarPlaybackPreference(!newMuted);
                                             }}
                                           >
                                             <GiGuitar className="text-base" />
                                             {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
                                             {isAudioMuted ? "Guitar Playback Off" : "Guitar Playback On"}
                                           </Button>
+
+                                          <div className="flex gap-2">
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              className={cn(
+                                                "flex-1 gap-2 text-[10px] font-bold uppercase tracking-widest transition-all",
+                                                isMicEnabled ? "text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20" : "text-zinc-500 hover:text-zinc-400"
+                                              )}
+                                              onClick={() => updateMicPersistence(!isMicEnabled)}
+                                            >
+                                              <FaMicrophone className="text-xs" />
+                                              {isMicEnabled ? "Mic On" : "Mic Off"}
+                                            </Button>
+
+                                            {isMicEnabled && (
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-300"
+                                                onClick={() => setSessionPhase("calibrating")}
+                                              >
+                                                <FaSync className="text-xs" />
+                                                Recalibrate
+                                              </Button>
+                                            )}
+                                          </div>
                                     </div>
                                   )}
 
