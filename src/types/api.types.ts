@@ -15,7 +15,10 @@ export type DailyQuestTaskType =
   | 'practice_any_song'
   | 'healthy_habits'
   | 'auto_plan'
-  | 'practice_plan';
+  | 'practice_plan'
+  | 'practice_total_time'
+  | 'practice_technique_time'
+  | 'practice_specific_exercise';
 
 export interface DailyQuestTask {
   id: string;
@@ -24,6 +27,7 @@ export interface DailyQuestTask {
   isCompleted: boolean;
   progress: number;
   target: number;
+  exerciseId?: string;
 }
 
 export interface DailyQuest {

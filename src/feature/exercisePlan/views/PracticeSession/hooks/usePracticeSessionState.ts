@@ -31,6 +31,12 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
   const isSubmittingRef = useRef(false);
   const [reportResult, setReportResult] = useState<ReportDataInterface | null>(null);
+  const [sessionTimeSnapshot, setSessionTimeSnapshot] = useState<{
+    technique: number;
+    theory: number;
+    hearing: number;
+    creativity: number;
+  } | null>(null);
   const [exerciseTimes, setExerciseTimes] = useState<Record<number, number>>({});
   const [completedExercises, setCompletedExercises] = useState<number[]>([]);
 
@@ -140,12 +146,20 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
       ? plan.title
       : plan.title;
 
+    // Capture timer values before dispatch resets them to zero
+    const capturedTimerData = {
+      technique: timerData.technique,
+      theory: timerData.theory,
+      hearing: timerData.hearing,
+      creativity: timerData.creativity,
+    };
+
     setIsSubmittingReport(true);
     try {
-      const techMin = Math.floor(timerData.technique / 60000);
-      const theoryMin = Math.floor(timerData.theory / 60000);
-      const hearMin = Math.floor(timerData.hearing / 60000);
-      const creatMin = Math.floor(timerData.creativity / 60000);
+      const techMin = Math.floor(capturedTimerData.technique / 60000);
+      const theoryMin = Math.floor(capturedTimerData.theory / 60000);
+      const hearMin = Math.floor(capturedTimerData.hearing / 60000);
+      const creatMin = Math.floor(capturedTimerData.creativity / 60000);
 
       const reportData: ReportFormikInterface = {
         techniqueHours: Math.floor(techMin / 60).toString(),
@@ -185,11 +199,25 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
       };
 
       const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();
+      // Store snapshot before reportResult triggers activityDataToUse recompute
+      setSessionTimeSnapshot(capturedTimerData);
       setReportResult(result.raitingData);
 
       // Challenges removed
       dispatch(updateQuestProgress({ type: 'practice_plan' }));
-      dispatch(updateQuestProgress({ type: 'practice_any_song' }));
+
+      if (plan.id.startsWith('auto')) {
+        dispatch(updateQuestProgress({ type: 'auto_plan' }));
+      }
+
+      // Check if it's a specific exercise task completion (from Daily Quest or Skill Dashboard)
+      // Usually these have the exercise ID as plan.id
+      dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId: plan.id }));
+
+      const hasSongs = plan.exercises.some(ex => ex.isPlayalong || (ex.tablature && ex.tablature.length > 0));
+      if (hasSongs) {
+        dispatch(updateQuestProgress({ type: 'practice_any_song' }));
+      }
 
     } catch (error) {
       console.error("Auto report failed:", error);
@@ -202,26 +230,27 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
   const autoSubmitReport = handleFinishSession;
 
   const activityDataToUse = useMemo(() => {
-    if (!reportList || (reportList as any[]).length === 0) return [];
-    if (!reportResult) return reportList as any;
+    const existingList: any[] = (reportList as any[]) ?? [];
+
+    if (!reportResult || !sessionTimeSnapshot) return existingList;
 
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
 
     const newEntry = {
       date: today.toISOString(),
-      techniqueTime: timerData.technique,
-      theoryTime: timerData.theory,
-      hearingTime: timerData.hearing,
-      creativityTime: timerData.creativity,
+      techniqueTime: sessionTimeSnapshot.technique,
+      theoryTime: sessionTimeSnapshot.theory,
+      hearingTime: sessionTimeSnapshot.hearing,
+      creativityTime: sessionTimeSnapshot.creativity,
     };
 
-    const exists = (reportList as any[]).some(item =>
+    const exists = existingList.some(item =>
       new Date(item.date).toISOString().split('T')[0] === todayStr
     );
 
     if (exists) {
-      return (reportList as any[]).map(item => {
+      return existingList.map(item => {
         if (new Date(item.date).toISOString().split('T')[0] === todayStr) {
           return {
             ...item,
@@ -235,8 +264,8 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
       });
     }
 
-    return [...(reportList as any), newEntry];
-  }, [reportList, reportResult, timerData]);
+    return [...existingList, newEntry];
+  }, [reportList, reportResult, sessionTimeSnapshot]);
 
   const planTitleString = typeof plan.title === 'string'
     ? plan.title

@@ -1,6 +1,6 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { useState } from "react";
-
+import MainContainer from "components/MainContainer";
 import type {
   DifficultyLevel,
   Exercise,
@@ -200,17 +200,19 @@ export const AutoPlanGenerator = ({
 
   if (generatedPlan) {
     return (
-      <GeneratedPlan
-        plan={generatedPlan}
-        onBack={() => setGeneratedPlan(null)}
-        onRegenerate={generatePlan}
-        onStart={handleStart}
-        onMoveExerciseUp={moveExerciseUp}
-        onMoveExerciseDown={moveExerciseDown}
-        onReplaceExercise={replaceExercise}
-        onRemoveExercise={removeExercise}
-        isStarting={isStarting}
-      />
+      <MainContainer>
+        <GeneratedPlan
+          plan={generatedPlan}
+          onBack={() => setGeneratedPlan(null)}
+          onRegenerate={generatePlan}
+          onStart={handleStart}
+          onMoveExerciseUp={moveExerciseUp}
+          onMoveExerciseDown={moveExerciseDown}
+          onReplaceExercise={replaceExercise}
+          onRemoveExercise={removeExercise}
+          isStarting={isStarting}
+        />
+      </MainContainer>
     );
   }
 

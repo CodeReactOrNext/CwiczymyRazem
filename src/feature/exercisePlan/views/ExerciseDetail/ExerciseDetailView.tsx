@@ -299,7 +299,7 @@ export const ExerciseDetailView = ({ exercise }: ExerciseDetailViewProps) => {
                         Sign in to track your progress, save your best BPM, and compete on the leaderboard.
                     </p>
                     <Link 
-                        href="/login" 
+                        href={`/practice/exercise/${exercise.id.replace(/_/g, '-')}`}
                         className="flex h-14 w-full items-center justify-center rounded-lg bg-white text-black font-bold transition-all hover:bg-zinc-100"
                     >
                         Practice this now

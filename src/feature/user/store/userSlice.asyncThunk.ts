@@ -377,9 +377,25 @@ export const saveDailyQuestAction = createAsyncThunk(
  */
 export const updateQuestProgress = createAsyncThunk(
   "user/updateQuestProgress",
-  async (payload: { type: DailyQuestTaskType; amount?: number }, { dispatch }) => {
-    const { completeQuestTask } = await import("./userSlice");
+  async (payload: { type: DailyQuestTaskType; amount?: number; exerciseId?: string }, { dispatch, getState }) => {
+    const { completeQuestTask, claimQuestReward } = await import("./userSlice");
     dispatch(completeQuestTask(payload));
+
+    // Check if everything is completed now
+    const state = getState() as RootState;
+    const quest = state.user.currentUserStats?.dailyQuest;
+    if (quest && !quest.isRewardClaimed) {
+      const allDone = quest.tasks.every(t => t.isCompleted);
+      if (allDone) {
+        const { firebaseAddQuestLog } = await import("../../logs/services/addQuestLog.service");
+        const userId = state.user.userAuth;
+        if (userId) {
+          await firebaseAddQuestLog(userId);
+        }
+        dispatch(claimQuestReward());
+      }
+    }
+
     dispatch(saveDailyQuestAction());
   }
 );
@@ -388,7 +404,17 @@ export const initializeDailyQuestAction = createAsyncThunk(
   "user/initializeDailyQuest",
   async (_, { dispatch }) => {
     const { generateDailyQuest } = await import("./userSlice");
-    dispatch(generateDailyQuest());
+    const { exercisesAgregat } = await import("../../exercisePlan/data/exercisesAgregat");
+
+    // Select random exercise
+    const randomExercise = exercisesAgregat[Math.floor(Math.random() * exercisesAgregat.length)];
+
+    dispatch(generateDailyQuest({
+      randomExercise: {
+        id: randomExercise.id,
+        title: randomExercise.title
+      }
+    }));
     dispatch(saveDailyQuestAction());
   }
 );

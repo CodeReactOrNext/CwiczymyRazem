@@ -59,6 +59,38 @@ export const SkillDashboard = ({
     getAllBpmProgress(userAuth).then(setProgressMap);
   }, [userAuth]);
 
+  useEffect(() => {
+    if (!router.isReady) return;
+    
+    const { exerciseId } = router.query;
+    if (exerciseId && typeof exerciseId === "string") {
+      const exercise = exercisesAgregat.find(e => e.id === exerciseId);
+      if (exercise) {
+        const skillId = exercise.relatedSkills[0] || 'general';
+        const skillData = guitarSkills.find(s => s.id === skillId);
+        const category = skillData?.category || (exercise.category !== 'mixed' ? exercise.category : 'technique');
+        
+        const challengeLike: DashboardExercise = {
+            id: exercise.id,
+            title: exercise.title as any,
+            description: exercise.description as any,
+            category: category as any,
+            requiredSkillId: skillId,
+            requiredLevel: exercise.difficulty === 'easy' ? 0 : exercise.difficulty === 'medium' ? 1 : 2,
+            rewardDescription: 'Practice complete',
+            exercises: [exercise],
+            unlockDescription: "",
+            streakDays: 0,
+            intensity: "medium",
+            shortGoal: "",
+            accentColor: "#ffffff",
+            difficulty: exercise.difficulty
+        };
+        setSelectedChallenge(challengeLike);
+      }
+    }
+  }, [router.isReady, router.query]);
+
   const totalXP = Object.values(userSkills.unlockedSkills).reduce((sum: number, val: number) => sum + val, 0);
 
   const exercisesByCategory = useMemo(() => {

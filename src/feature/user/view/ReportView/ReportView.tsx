@@ -236,6 +236,27 @@ const ReportView = () => {
         if (inputData.planId.startsWith('auto')) {
             dispatch(updateQuestProgress({ type: 'auto_plan' }));
         }
+
+        // Handle specific exercise quests
+        // Case 1: Started from Library (prefix 'exercise-')
+        if (inputData.planId.startsWith('exercise-')) {
+            const exerciseId = inputData.planId.replace('exercise-', '');
+            dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId, amount: 1 }));
+        } 
+        // Case 2: Started from Skill Dashboard / Daily Quest (no prefix, planId is exerciseId)
+        else {
+            dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId: inputData.planId, amount: 1 }));
+        }
+    }
+
+    const totalMinutes = Math.floor(sumTime / 60000);
+    if (totalMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMinutes }));
+    }
+
+    const techMinutes = Number(inputData.techniqueHours || 0) * 60 + Number(inputData.techniqueMinutes || 0);
+    if (techMinutes > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: techMinutes }));
     }
 
     setSubmittedValues(inputData);
