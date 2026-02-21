@@ -12,7 +12,8 @@ import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
-  FirebaseLogsRecordingsInterface
+  FirebaseLogsRecordingsInterface,
+  FirebaseLogsDailyQuestInterface
 } from "feature/logs/types/logs.type";
 import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
@@ -31,33 +32,27 @@ import { useState } from "react";
 import { addZeroToTime } from "utils/converter";
 
 const isFirebaseLogsSongs = (
-  log:
-    | FirebaseLogsInterface
-    | FirebaseLogsSongsInterface
-    | FirebaseLogsTopPlayersInterface
-    | FirebaseLogsRecordingsInterface
+  log: any
 ): log is FirebaseLogsSongsInterface => {
   return (log as FirebaseLogsSongsInterface).status !== undefined;
 };
 
 const isFirebaseLogsTopPlayers = (
-  log:
-    | FirebaseLogsInterface
-    | FirebaseLogsSongsInterface
-    | FirebaseLogsTopPlayersInterface
-    | FirebaseLogsRecordingsInterface
+  log: any
 ): log is FirebaseLogsTopPlayersInterface => {
   return (log as FirebaseLogsTopPlayersInterface).type === "top_players_update";
 };
 
 const isFirebaseLogsRecording = (
-  log:
-    | FirebaseLogsInterface
-    | FirebaseLogsSongsInterface
-    | FirebaseLogsTopPlayersInterface
-    | FirebaseLogsRecordingsInterface
+  log: any
 ): log is FirebaseLogsRecordingsInterface => {
   return (log as FirebaseLogsRecordingsInterface).type === "recording_added";
+};
+
+const isFirebaseLogsDailyQuest = (
+  log: any
+): log is FirebaseLogsDailyQuestInterface => {
+  return (log as FirebaseLogsDailyQuestInterface).type === "daily_quest_completed";
 };
 
 interface LogsBoxLayoutProps {
@@ -66,6 +61,7 @@ interface LogsBoxLayoutProps {
     | FirebaseLogsInterface
     | FirebaseLogsTopPlayersInterface
     | FirebaseLogsRecordingsInterface
+    | FirebaseLogsDailyQuestInterface
   )[];
   marksLogsAsRead: () => void;
   currentUserId: string;
@@ -584,6 +580,47 @@ const FirebaseLogsTopPlayersItem = ({
     </div>
   );
 };
+const FirebaseLogsDailyQuestItem = ({
+  log,
+  isNew,
+  currentUserId,
+}: {
+  log: FirebaseLogsDailyQuestInterface;
+  isNew: boolean;
+  currentUserId: string;
+}) => {
+  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, points } = log;
+  const date = new Date(timestamp);
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className='flex w-full flex-wrap items-center gap-2 sm:w-[80%]'>
+        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
+          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+        </span>
+        <div className='flex items-center gap-2'>
+            <p className='text-secondText'>
+                completed all <span className="text-yellow-400 font-bold italic tracking-tighter">Daily Quests!</span>
+            </p>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-black uppercase">
+               <FaTrophy className="h-2.5 w-2.5" />
+               Claimed +{points} PKT
+            </span>
+        </div>
+        
+        {log.id && (
+          <LogReaction 
+            logId={log.id} 
+            reactions={log.reactions} 
+            currentUserId={currentUserId} 
+          />
+        )}
+      </div>
+    </LogItem>
+  );
+};
+
 const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
   const { isNewMessage } = useUnreadMessages("logs");
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
@@ -623,12 +660,12 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
       <div ref={spanRef} className='h-1' />
       {logs.map((log) => (
         <div
-          key={log.data + (log as any).userName || "topPlayers"}
+          key={(log as any).data || (log as any).timestamp + (log as any).userName || "topPlayers"}
           className='mr-2'>
           {isFirebaseLogsSongs(log) ? (
             <FirebaseLogsSongItem 
               log={log} 
-              isNew={isNewMessage(log.data)} 
+              isNew={isNewMessage(log.data || (log as any).timestamp)} 
               currentUserId={currentUserId}
             />
           ) : isFirebaseLogsTopPlayers(log) ? (
@@ -639,14 +676,20 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
            ) : isFirebaseLogsRecording(log) ? (
              <FirebaseLogsRecordingItem
                log={log}
-               isNew={isNewMessage(log.data)}
+               isNew={isNewMessage((log as any).data || (log as any).timestamp)}
                currentUserId={currentUserId}
                onView={setActiveRecordingId}
              />
+          ) : isFirebaseLogsDailyQuest(log) ? (
+            <FirebaseLogsDailyQuestItem
+              log={log}
+              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
+              currentUserId={currentUserId}
+            />
           ) : (
             <FirebaseLogsItem 
-              log={log} 
-              isNew={isNewMessage(log.data)} 
+              log={log as FirebaseLogsInterface} 
+              isNew={isNewMessage((log as any).data || (log as any).timestamp)} 
               currentUserId={currentUserId}
             />
           )}

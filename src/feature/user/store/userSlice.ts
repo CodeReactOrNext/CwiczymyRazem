@@ -122,12 +122,9 @@ export const userSlice = createSlice({
       }
     },
     // Challenges removed
-    generateDailyQuest: (state) => {
+    generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
       const today = new Date().toISOString().split('T')[0];
-
-      // If quest exists for today, do nothing
-      if (state.currentUserStats.dailyQuest?.date === today) return;
 
       // Templates
       const taskTemplates: { type: DailyQuestTaskType; title: string; target: number }[] = [
@@ -137,28 +134,50 @@ export const userSlice = createSlice({
         { type: 'healthy_habits', title: 'Use 2 Healthy Habits', target: 2 },
         { type: 'auto_plan', title: 'Generate & Practice Auto Plan', target: 1 },
         { type: 'practice_plan', title: 'Complete a Practice Plan', target: 1 },
+        { type: 'practice_total_time', title: 'Practice for 15 minutes', target: 15 },
+        { type: 'practice_technique_time', title: 'Practice Technique for 10 minutes', target: 10 },
+        { type: 'practice_specific_exercise', title: 'Practice specific exercise', target: 1 },
       ];
+
+      // If quest exists for today, do nothing
+      if (state.currentUserStats.dailyQuest?.date === today && state.currentUserStats.dailyQuest?.tasks?.length > 0) return;
 
       // Shuffle and pick 3
       const shuffled = [...taskTemplates].sort(() => 0.5 - Math.random());
       const selected = shuffled.slice(0, 3);
 
-      const newQuest: DailyQuest = {
-        date: today,
-        isRewardClaimed: false,
-        tasks: selected.map((t, index) => ({
+      const tasks = selected.map((t, index) => {
+        const taskObj: import("types/api.types").DailyQuestTask = {
           id: `quest_${today}_${index}`,
           type: t.type,
           title: t.title,
           isCompleted: false,
           progress: 0,
           target: t.target
-        }))
+        };
+
+        if (t.type === 'practice_specific_exercise') {
+          if (action.payload?.randomExercise) {
+            taskObj.exerciseId = action.payload.randomExercise.id;
+            taskObj.title = `Practice: ${action.payload.randomExercise.title}`;
+          } else {
+            taskObj.exerciseId = 'spiderPermutation1234';
+            taskObj.title = `Practice: Spider Walk 1-2-3-4`;
+          }
+        }
+
+        return taskObj;
+      });
+
+      const newQuest: DailyQuest = {
+        date: today,
+        isRewardClaimed: false,
+        tasks
       };
 
       state.currentUserStats.dailyQuest = newQuest;
     },
-    completeQuestTask: (state, { payload }: PayloadAction<{ type: DailyQuestTaskType; amount?: number }>) => {
+    completeQuestTask: (state, { payload }: PayloadAction<{ type: DailyQuestTaskType; amount?: number; exerciseId?: string }>) => {
       if (!state.currentUserStats?.dailyQuest) return;
 
       // Check if today
@@ -167,7 +186,14 @@ export const userSlice = createSlice({
 
       const quest = state.currentUserStats.dailyQuest;
 
-      const task = quest.tasks.find(t => t.type === payload.type);
+      // Find the task. If exerciseId is provided, match by both type AND exerciseId.
+      const task = quest.tasks.find(t => {
+        if (payload.type === 'practice_specific_exercise' && payload.exerciseId) {
+          return t.type === 'practice_specific_exercise' && t.exerciseId === payload.exerciseId;
+        }
+        return t.type === payload.type;
+      });
+
       if (task && !task.isCompleted) {
         const amount = payload.amount || 1;
         task.progress = Math.min(task.progress + amount, task.target);
