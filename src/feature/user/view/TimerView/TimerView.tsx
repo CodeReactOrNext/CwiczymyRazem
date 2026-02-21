@@ -111,7 +111,7 @@ const TimerView = () => {
     if (selectedPlan) {
       return (
         <MainContainer>
-          <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} />
+          <PracticeSession onClose={handleBack} plan={selectedPlan} onFinish={handlePlanFinish} />
         </MainContainer>
       );
     }
