@@ -125,6 +125,15 @@ const SongPracticeTimer: NextPageWithLayout = () => {
 
         try {
             dispatch(updateQuestProgress({ type: 'practice_any_song' }));
+            
+            const totalMins = Math.floor(tMins + hMins);
+            if (totalMins > 0) {
+               dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMins }));
+            }
+            if (tMins > 0) {
+               dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: tMins }));
+            }
+
             await dispatch(updateUserStats({ inputData })).unwrap();
             setIsSplitterOpen(false);
             setShowSuccess(true);
