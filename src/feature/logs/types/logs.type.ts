@@ -140,3 +140,16 @@ export interface FirebaseLogsRecordingsInterface {
   id?: string;
   reactions?: string[];
 }
+
+export interface FirebaseLogsDailyQuestInterface {
+  uid: string;
+  userName: string;
+  timestamp: string | number | Date;
+  type: "daily_quest_completed";
+  data: string;
+  points: number;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  id?: string;
+  reactions?: string[];
+}

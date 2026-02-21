@@ -17,6 +17,9 @@ const questRoutes: Record<DailyQuestTaskType, string> = {
     healthy_habits: "/report",
     auto_plan: "/timer/auto",
     practice_plan: "/timer/plans",
+    practice_total_time: "/timer/song-select",
+    practice_technique_time: "/timer/plans",
+    practice_specific_exercise: "/profile/skills", // Base path, handled dynamically
 };
 
 export const DailyQuestWidget = () => {
@@ -72,12 +75,20 @@ export const DailyQuestWidget = () => {
                         tabIndex={!task.isCompleted ? 0 : undefined}
                         onClick={() => {
                             if (!task.isCompleted) {
-                                Router.push(questRoutes[task.type]);
+                                if (task.type === 'practice_specific_exercise' && task.exerciseId) {
+                                  Router.push(`/profile/skills?exerciseId=${task.exerciseId}`);
+                                } else {
+                                  Router.push(questRoutes[task.type]);
+                                }
                             }
                         }}
                         onKeyDown={(e) => {
                             if (!task.isCompleted && (e.key === "Enter" || e.key === " ")) {
-                                Router.push(questRoutes[task.type]);
+                                if (task.type === 'practice_specific_exercise' && task.exerciseId) {
+                                  Router.push(`/profile/skills?exerciseId=${task.exerciseId}`);
+                                } else {
+                                  Router.push(questRoutes[task.type]);
+                                }
                             }
                         }}
                         className={cn(
