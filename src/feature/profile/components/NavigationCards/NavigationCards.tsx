@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { ArrowRight, ClipboardCheck, ClipboardList, Loader2, Music, Sparkles } from "lucide-react";
+import { ArrowRight, Bot, ClipboardCheck, ClipboardList, Loader2, Music, Sparkles, Wand2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -101,7 +101,7 @@ export const NavigationCards = () => {
   };
 
   return (
-    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5'>
       <NavigationCard
         title="Report Practice"
         icon={<ClipboardCheck className='h-5 w-5' />}
@@ -109,6 +109,15 @@ export const NavigationCards = () => {
         colorAccent='cyan'
         isLoading={loadingCard === "report"}
         actionLabel="Log Now"
+      />
+
+      <NavigationCard
+        title="AI Coach"
+        icon={<Bot className='h-5 w-5' />}
+        onClick={() => handleNavigation("/ai-coach", "ai-coach")}
+        colorAccent='green'
+        isLoading={loadingCard === "ai-coach"}
+        actionLabel="Get Advice"
       />
 
       <NavigationCard

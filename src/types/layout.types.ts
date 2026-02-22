@@ -16,4 +16,5 @@ export type NavPagesTypes =
   | "about"
   | "privacy-policy"
   | "exercises"
+  | "ai-coach"
   | null;
