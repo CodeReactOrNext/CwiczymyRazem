@@ -23,27 +23,43 @@ export const usePresence = () => {
     const connectedRef = ref(db, ".info/connected");
     const userStatusRef = ref(db, `status/${userAuth}`);
 
-    const unsubscribe = onValue(connectedRef, (snap) => {
-      if (snap.val() === true) {
-        // When I disconnect, remove this device
-        onDisconnect(userStatusRef).remove();
+    const setOnline = () => {
+      onDisconnect(userStatusRef).remove();
+      set(userStatusRef, {
+        uid: userAuth,
+        displayName: userInfo.displayName,
+        avatar: userInfo.avatar,
+        state: "online",
+        last_changed: serverTimestamp(),
+        currentActivity: currentActivity || null,
+      });
+    };
 
-        // Set user as online
-        set(userStatusRef, {
-          uid: userAuth,
-          displayName: userInfo.displayName,
-          avatar: userInfo.avatar,
-          state: "online",
-          last_changed: serverTimestamp(),
-          currentActivity: currentActivity || null,
-        });
+    const setOffline = () => {
+      onDisconnect(userStatusRef).cancel();
+      set(userStatusRef, null);
+    };
+
+    const unsubscribe = onValue(connectedRef, (snap) => {
+      if (snap.val() === true && !document.hidden) {
+        setOnline();
       }
     });
 
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setOffline();
+      } else {
+        setOnline();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       unsubscribe();
-      onDisconnect(userStatusRef).cancel();
-      set(userStatusRef, null);
+      setOffline();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [userAuth, userInfo, currentActivity]);
 };

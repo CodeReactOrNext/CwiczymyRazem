@@ -67,7 +67,7 @@ export const ActivityLogView = ({
   }
 
   return (
-    <Card className='relative w-full p-4'>
+    <Card className='relative w-full p-5 sm:p-6 mb-4'>
       <AnimatePresence mode="wait">
         {isLoading && (
           <motion.div
@@ -90,7 +90,7 @@ export const ActivityLogView = ({
       </AnimatePresence>
 
       <div className={`transition-all duration-500 ${isLoading ? 'blur-[1.5px] opacity-40 grayscale-[0.5] pointer-events-none scale-[0.995]' : 'blur-0 opacity-100 grayscale-0'}`}>
-        <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
+         <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
           <h3 className='text-xl font-semibold text-white mr-2'>Activity</h3>
 
           <div className='flex gap-1 rounded-lg bg-white/10 p-1'>
@@ -112,7 +112,7 @@ export const ActivityLogView = ({
 
         <div className='flex items-start gap-3'>
           <div
-            className='flex shrink-0 flex-col justify-between text-xs text-white/60'
+            className='flex shrink-0 flex-col justify-between text-[10px] text-zinc-500 font-medium pr-2'
             style={{ height: CALENDAR_HEIGHT, paddingTop: 2, paddingBottom: 2 }}>
             <span>{t("calendar.monday")}</span>
             <span>{t("calendar.thursday")}</span>
@@ -146,32 +146,34 @@ export const ActivityLogView = ({
           </div>
         </div>
 
-        <div className='mt-4 flex flex-wrap gap-4 text-xs text-white/60'>
-          <div className='flex items-center gap-2'>
-            <div className='relative h-3 w-3 rounded bg-cyan-500'>
-              <div className='absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white' />
+        <div className='mt-5 flex w-full flex-wrap items-center justify-between gap-4'>
+          <div className='flex flex-wrap items-center gap-4'>
+            <div className='flex items-center gap-1.5'>
+              <div className='relative h-3.5 w-3.5 rounded-[3px] bg-cyan-500'>
+                <div className='absolute left-1/2 top-1/2 h-[4px] w-[4px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white' />
+              </div>
+              <span className='text-[10px] font-medium text-zinc-400'>{t("calendar.hasTitle")}</span>
             </div>
-            <span>{t("calendar.hasTitle")}</span>
-          </div>
-          <div className='flex items-center gap-2'>
-            <div className='relative h-3 w-3 rounded bg-cyan-500'>
-              <div className='absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white' />
+            <div className='flex items-center gap-1.5'>
+              <div className='relative h-3.5 w-3.5 rounded-[3px] bg-cyan-500'>
+                <div className='absolute left-1/2 top-1/2 h-[5px] w-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white' />
+              </div>
+              <span className='text-[10px] font-medium text-zinc-400'>{t("calendar.backDate")}</span>
             </div>
-            <span>{t("calendar.backDate")}</span>
           </div>
-        </div>
 
-        <div className='mt-4 flex w-full items-center justify-end gap-2 text-xs text-zinc-500'>
-          <span>Less</span>
-          <div className='flex gap-1'>
-            <div className='h-3 w-3 rounded-[3px] bg-[#3f3f46]' />
-            <div className='h-3 w-3 rounded-[3px] bg-[#A5F3FC]' />
-            <div className='h-3 w-3 rounded-[3px] bg-[#67E8F9]' />
-            <div className='h-3 w-3 rounded-[3px] bg-[#22D3EE]' />
-            <div className='h-3 w-3 rounded-[3px] bg-[#06B6D4]' />
-            <div className='h-3 w-3 rounded-[3px] bg-[#0891B2]' />
+          <div className='flex items-center gap-2 text-[10px] font-medium text-zinc-500'>
+            <span>Less</span>
+            <div className='flex gap-[4px]'>
+              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#3f3f46]' />
+              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#A5F3FC]' />
+              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#67E8F9]' />
+              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#22D3EE]' />
+              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#06B6D4]' />
+              <div className='h-3.5 w-3.5 rounded-[3px] bg-[#0891B2]' />
+            </div>
+            <span>More</span>
           </div>
-          <span>More</span>
         </div>
       </div>
 

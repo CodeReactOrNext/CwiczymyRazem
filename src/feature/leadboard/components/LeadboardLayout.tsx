@@ -1,5 +1,4 @@
 import { TableSkeleton } from "assets/components/ui/table-skeleton";
-import MainContainer from "components/MainContainer";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
 import { useTranslation } from "hooks/useTranslation";
@@ -8,6 +7,7 @@ import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.t
 
 import SeasonSelect from "./SeasonSelect";
 import UserStats from "./UserStats";
+import { HeroBanner } from "components/UI/HeroBanner";
 
 export type SortByType = "points" | "sessionCount";
 
@@ -43,42 +43,48 @@ export const LeadboardLayout = ({
   const { t } = useTranslation("leadboard");
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
 
+  const currentSeason = seasons.find(s => s.seasonId === selectedSeason);
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString();
+  };
+
   return (
-    <MainContainer title='Leadboard'>
-      <div className='min-h-screen'>
-        {/* Enhanced Header - Zen Aesthetic */}
-        <div className='mb-12 mx-auto max-w-7xl px-4'>
-          <div className='rounded-2xl '>
-            <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'>
-              {/* Left Section - Controls */}
-              <div className='flex flex-wrap items-center gap-6'>
-           
-
-
-                {isSeasonalView && (
-                  <SeasonSelect
-                    seasons={seasons}
-                    selectedSeason={selectedSeason}
-                    setSelectedSeason={setSelectedSeason}
-                    isLoading={isLoading}
-                  />
-                )}
-              </div>
-
-              {/* Right Section - Stats */}
-              <div className='flex items-center gap-4 bg-white/5 rounded-xl px-6 py-4'>
-                <UserStats
-                  currentPage={currentPage}
-                  itemsPerPage={itemsPerPage}
-                  totalUsers={totalUsers}
-                />
-              </div>
+    <div className='min-h-screen flex flex-col'>
+      {isSeasonalView && (
+        <HeroBanner
+          title={currentSeason?.name || "Season"}
+          subtitle={currentSeason ? `Current season started on ${formatDate(currentSeason.startDate)} and ends on ${formatDate(currentSeason.endDate)}.` : "Practice to climb the leaderboard."}
+          backgroundImage="/headers/seasons.png"
+          className="w-full !rounded-none !shadow-none"
+          rightContent={
+            <div className='flex items-center gap-4 bg-black/20 backdrop-blur-md rounded-xl px-6 py-4 border border-white/5'>
+              <UserStats
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                totalUsers={totalUsers}
+              />
             </div>
+          }
+        />
+      )}
+
+      <div className='mt-8 mx-auto max-w-7xl px-4 w-full'>
+        <div className='flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between mb-8'>
+          <div className='flex flex-wrap items-center gap-6'>
+            {isSeasonalView && (
+              <SeasonSelect
+                seasons={seasons}
+                selectedSeason={selectedSeason}
+                setSelectedSeason={setSelectedSeason}
+                isLoading={isLoading}
+              />
+            )}
           </div>
         </div>
 
         {/* Enhanced Content Container */}
-        <div className='mx-auto max-w-7xl px-4 pb-20'>
+        <div className='pb-20'>
           {isLoading ? (
             <>
               <ul className='flex flex-col gap-6'>
@@ -137,6 +143,6 @@ export const LeadboardLayout = ({
           )}
         </div>
       </div>
-    </MainContainer>
+    </div>
   );
 };
