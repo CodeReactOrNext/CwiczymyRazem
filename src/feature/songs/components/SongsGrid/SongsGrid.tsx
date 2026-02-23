@@ -12,6 +12,7 @@ import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
+import posthog from "posthog-js";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useState } from "react";
@@ -72,6 +73,7 @@ export const SongsGrid = ({
                 song={song}
                 userStatus={userStatus}
                 onOpenDetails={() => {
+                  posthog.capture("song_library_action", { action: "open_details", song_id: song.id });
                   setSelectedSong(song);
                   setIsDetailsOpen(true);
                 }}
@@ -115,7 +117,10 @@ export const SongsGrid = ({
             <div className='rounded-2xl border border-white/5 bg-zinc-900/40 p-2 backdrop-blur-sm flex items-center gap-4'>
               <Button
                 variant="ghost"
-                onClick={() => onPageChange(currentPage - 1)}
+                onClick={() => {
+                  posthog.capture("song_library_action", { action: "page_change", direction: "prev", page: currentPage - 1 });
+                  onPageChange(currentPage - 1);
+                }}
                 disabled={currentPage <= 1}
                 className="h-10 px-4 border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
               >
@@ -128,7 +133,10 @@ export const SongsGrid = ({
 
               <Button
                 variant="ghost"
-                onClick={() => onPageChange(currentPage + 1)}
+                onClick={() => {
+                  posthog.capture("song_library_action", { action: "page_change", direction: "next", page: currentPage + 1 });
+                  onPageChange(currentPage + 1);
+                }}
                 disabled={!hasMore}
                 className="h-10 px-4 border border-white/5 bg-zinc-800/50 hover:bg-zinc-700/50 disabled:opacity-30"
               >

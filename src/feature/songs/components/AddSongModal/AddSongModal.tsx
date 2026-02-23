@@ -17,6 +17,7 @@ import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
+import posthog from "posthog-js";
 import debounce from "lodash/debounce";
 import { ArrowRight, Check, Music, Search, SkipForward } from "lucide-react";
 import { useCallback,useEffect, useState } from "react";
@@ -115,6 +116,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
 
     try {
       setIsLoading(true);
+      posthog.capture("song_addition_flow", { action: "submit_info", title: title.trim(), artist: artist.trim() });
       const songId = await addSong(title.trim(), artist.trim(), userId, avatar, undefined);
       
       // Trigger enrichment in the background (no await)
@@ -136,6 +138,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   };
 
   const handleSelectMatch = (song: Song) => {
+    posthog.capture("song_addition_flow", { action: "select_match", song_id: song.id });
     setAddedSongId(song.id);
     setTitle(song.title);
     setArtist(song.artist);
@@ -144,6 +147,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
 
   const handleSelectCategory = async (status: SongStatus | "skip") => {
     if (status === "skip") {
+      posthog.capture("song_addition_flow", { action: "skip_status", song_id: addedSongId });
       toast.success('Song added to library');
       onSuccess();
       handleClose();
@@ -154,6 +158,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
 
     try {
       setIsLoading(true);
+      posthog.capture("song_addition_flow", { action: "set_status", status, song_id: addedSongId });
       await updateSongStatus(userId, addedSongId, title, artist, status, avatar);
       toast.success(t("status_updated"));
       onSuccess();
