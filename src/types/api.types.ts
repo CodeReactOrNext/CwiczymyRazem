@@ -89,6 +89,12 @@ export interface StatisticsDataInterface {
   };
   dailyQuest?: DailyQuest | null;
   fame?: number;
+  availablePoints?: {
+    technique: number;
+    theory: number;
+    hearing: number;
+    creativity: number;
+  };
 }
 
 export interface TimerInterface {
@@ -169,7 +175,8 @@ export interface updateSocialInterface {
 }
 
 export interface SeasonDataInterface {
-  seasonId: string; // Format: "2024-03" for March 2024
+  name: string;
+  seasonId: string;
   startDate: string;
   endDate: string;
   isActive: boolean;

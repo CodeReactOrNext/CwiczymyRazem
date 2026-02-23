@@ -1,5 +1,6 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+import type { SeasonDataInterface } from "types/api.types";
 
 export const getCurrentSeason = async () => {
   try {
@@ -27,7 +28,7 @@ export const getCurrentSeason = async () => {
       return seasonData;
     }
 
-    return { seasonId, ...seasonDoc.data() };
+    return { seasonId, ...seasonDoc.data() } as SeasonDataInterface;
   } catch (error) {
     throw error;
   }
