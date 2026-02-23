@@ -9,6 +9,7 @@ import type { User } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { signIn, signOut } from "next-auth/react";
+import posthog from "posthog-js";
 import type { RootState } from "store/store";
 import type {
   // Challenges removed
@@ -62,6 +63,8 @@ export const logInViaGoogle = createAsyncThunk(
       const token = await user.getIdToken();
       await signIn("credentials", { idToken: token, callbackUrl: "/dashboard" });
       const userData = await fetchUserData(user);
+      posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });
+      posthog.capture("user_logged_in", { method: "google", email: user.email });
       return userData as UserDataInterface;
     } catch (error) {
       loginViaGoogleErrorHandler(error as FirebaseError);
@@ -79,6 +82,8 @@ export const logInViaGoogleCredential = createAsyncThunk(
       const token = await user.getIdToken();
       await signIn("credentials", { idToken: token, callbackUrl: "/dashboard" });
       const userData = await fetchUserData(user);
+      posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });
+      posthog.capture("user_logged_in", { method: "google_credential", email: user.email });
       return userData as UserDataInterface;
     } catch (error) {
       loginViaGoogleErrorHandler(error as FirebaseError);
@@ -95,6 +100,8 @@ export const logInViaEmail = createAsyncThunk(
       const token = await user.getIdToken();
       await signIn("credentials", { idToken: token, callbackUrl: "/dashboard" });
       const userData = await fetchUserData(user);
+      posthog.identify(user.uid, { email: user.email ?? undefined, name: user.displayName ?? undefined });
+      posthog.capture("user_logged_in", { method: "email", email: user.email });
       return userData as UserDataInterface;
     } catch (error) {
       loginViaEmailErrorHandler(error as FirebaseError);
@@ -130,6 +137,8 @@ export const createAccount = createAsyncThunk(
       await signIn("credentials", { idToken: token, redirect: false });
       const userWithDisplayName = { ...user, displayName: login };
       const userData = await fetchUserData(userWithDisplayName);
+      posthog.identify(user.uid, { email: user.email ?? undefined, name: login });
+      posthog.capture("user_signed_up", { method: "email", email: user.email, login });
       signUpSuccess();
       return userData as UserDataInterface;
     } catch (error) {
@@ -223,6 +232,8 @@ export const getUserProvider = createAsyncThunk(
 
 export const logUserOff = createAsyncThunk("user/logUserOff", async () => {
   try {
+    posthog.capture("user_logged_out");
+    posthog.reset();
     await signOut({ redirect: false });
     await firebaseLogUserOut();
     logOutInfo();
@@ -330,6 +341,15 @@ export const rateSong = createAsyncThunk(
         token,
       });
 
+      posthog.capture("song_rated", {
+        song_id: payload.songId,
+        song_title: payload.title,
+        artist: payload.artist,
+        rating: payload.rating,
+        tier: payload.tier,
+        is_new_rating: payload.isNewRating,
+      });
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error);
@@ -433,6 +453,9 @@ export const claimQuestRewardAction = createAsyncThunk(
         const userRef = doc(db, "users", userId);
         await updateDoc(userRef, {
           "statistics.points": state.user.currentUserStats.points
+        });
+        posthog.capture("daily_quest_claimed", {
+          points: state.user.currentUserStats.points,
         });
       }
     } catch (error) {

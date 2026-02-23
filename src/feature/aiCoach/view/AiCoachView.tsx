@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Sparkles, KeySquare, Bot, Map, Loader2, ChevronDown, ChevronUp, Eye, EyeOff, MessageSquare } from "lucide-react";
-import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { generateAiSummary } from "../services/generateAiSummary";
-import { firebaseSaveRoadmap, firebaseGetUserRoadmaps } from "../services/roadmap.service";
+import { Bot, ChevronDown, ChevronUp, Eye, EyeOff, KeySquare, Loader2, Map, MessageSquare,Sparkles } from "lucide-react";
+import posthog from "posthog-js";
+import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
-import RoadmapView from "./RoadmapView/RoadmapView";
-import RoadmapInterview from "./RoadmapInterview/RoadmapInterview";
-import type { Roadmap, RoadmapMilestone } from "../types/roadmap.types";
+import { useAppSelector } from "store/hooks";
 import { v4 as uuidv4 } from "uuid";
+
+import { generateAiSummary } from "../services/generateAiSummary";
+import { firebaseGetUserRoadmaps,firebaseSaveRoadmap } from "../services/roadmap.service";
+import type { Roadmap, RoadmapMilestone } from "../types/roadmap.types";
+import RoadmapInterview from "./RoadmapInterview/RoadmapInterview";
+import RoadmapView from "./RoadmapView/RoadmapView";
 
 const AiCoachView = () => {
   const userAuth = useAppSelector(selectUserAuth);
@@ -76,6 +78,7 @@ const AiCoachView = () => {
 
   const handleStartInterview = () => {
     if (!apiKey) { toast.error("Wprowadź klucz API OpenAI."); setApiKeyOpen(true); return; }
+    posthog.capture("ai_coach_roadmap_started", { has_goal: !!goal });
     setShowInterview(true);
     setActiveTab("roadmap");
   };

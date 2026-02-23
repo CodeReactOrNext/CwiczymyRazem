@@ -1,3 +1,4 @@
+import { getPostHogClient, shutdownPostHog } from "lib/posthog-server";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth } from "utils/firebase/api/firebase.config";
 
@@ -40,6 +41,24 @@ export default async function handler(
       `session=${sessionCookie}; Max-Age=${expiresIn / 1000}; Path=/; HttpOnly; ${options.secure ? "Secure;" : ""
       } SameSite=Lax`
     );
+
+    // Capture server-side login event
+    try {
+      const decodedToken = await auth.verifyIdToken(idToken);
+      const posthog = getPostHogClient();
+      posthog.capture({
+        distinctId: decodedToken.uid,
+        event: "server_login",
+        properties: {
+          email: decodedToken.email,
+          $current_url: req.headers.referer,
+        },
+      });
+      await shutdownPostHog();
+    } catch (phError) {
+      // Non-blocking: PostHog errors should not affect auth
+      console.error("PostHog capture error:", phError);
+    }
 
     res.status(200).json({ status: "success" });
   } catch (error) {
