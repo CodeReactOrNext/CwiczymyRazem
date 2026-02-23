@@ -43,7 +43,7 @@ export const LeadboardLayout = ({
   const { t } = useTranslation("leadboard");
   const totalPages = Math.ceil(totalUsers / itemsPerPage);
 
-  const currentSeason = seasons.find(s => s.seasonId === selectedSeason);
+  const currentSeason = seasons.find(s => s.seasonId === selectedSeason) as SeasonDataInterface | undefined;
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString();
@@ -53,7 +53,7 @@ export const LeadboardLayout = ({
     <div className='min-h-screen flex flex-col'>
       {isSeasonalView && (
         <HeroBanner
-          title={currentSeason?.name || "Season"}
+          title={currentSeason?.name ?? "Season"}
           subtitle={currentSeason ? `Current season started on ${formatDate(currentSeason.startDate)} and ends on ${formatDate(currentSeason.endDate)}.` : "Practice to climb the leaderboard."}
           backgroundImage="/headers/seasons.png"
           className="w-full !rounded-none !shadow-none"
