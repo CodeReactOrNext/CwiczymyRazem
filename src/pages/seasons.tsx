@@ -9,12 +9,12 @@ const SeasonsPage: NextPageWithLayout = () => {
   const siteUrl = "https://riff.quest/seasons";
 
   return (
-    <>
+    <div className="bg-second-600 radius-default overflow-hidden flex flex-col border-none shadow-sm min-h-screen">
       <Head>
         <link rel='canonical' href={siteUrl} />
       </Head>
       <LeadboardView defaultView='seasonal' />
-    </>
+    </div>
   );
 };
 
