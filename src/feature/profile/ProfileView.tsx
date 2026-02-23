@@ -4,6 +4,7 @@ import ProfileLayout from "feature/profile/ProfileLayout";
 import AppLayout from "layouts/AppLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useRouter } from "next/router";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { firebaseGetUserDocument } from "utils/firebase/client/firebase.utils";
@@ -22,6 +23,9 @@ const ProfileView = () => {
     }
     if (profileId) {
       getUserDoc();
+      posthog.capture("profile_viewed", {
+        profile_id: profileId,
+      });
     }
   }, [profileId]);
 

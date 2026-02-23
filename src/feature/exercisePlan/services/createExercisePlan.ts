@@ -1,6 +1,7 @@
 import { EXERCISE_PLANS_COLLECTION } from "feature/exercisePlan/services/constants";
 import { logger } from "feature/logger/Logger";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
+import posthog from "posthog-js";
 import { db } from "utils/firebase/client/firebase.utils";
 
 import type { ExercisePlan } from "../types/exercise.types";
@@ -41,6 +42,12 @@ export const createExercisePlan = async (
       collection(db, EXERCISE_PLANS_COLLECTION),
       planToSave
     );
+
+    posthog.capture("exercise_plan_created", {
+      plan_title: plan.title,
+      exercise_count: plan.exercises?.length ?? 0,
+    });
+
     return docRef.id;
   } catch (error) {
     logger.error(error, { context: "createExercisePlan" });

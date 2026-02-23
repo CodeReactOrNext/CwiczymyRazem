@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import posthog from "posthog-js";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -79,6 +80,12 @@ const SongsView = () => {
     fetchGenres();
   }, []);
 
+  useEffect(() => {
+    posthog.capture("songs_view_opened", {
+      view: activeTab,
+    });
+  }, [activeTab]);
+
 
   return (
     <MainContainer title={t("songs")}>
@@ -120,6 +127,7 @@ const SongsView = () => {
                           variant="outline"
                           size="sm"
                           className="flex-1 sm:flex-initial border-cyan-500/30 bg-cyan-500/5 text-cyan-400 hover:bg-cyan-500/10"
+                          onClick={() => posthog.capture("song_wizard_opened")}
                         >
                           <Sparkles className="mr-2 h-4 w-4" />
                           <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Song Wizard</span>
@@ -133,7 +141,10 @@ const SongsView = () => {
                       </DialogContent>
                     </Dialog>
                     <Button 
-                      onClick={() => router.push("/songs?view=library")}
+                      onClick={() => {
+                        posthog.capture("song_management_action", { action: "add_song_transition" });
+                        router.push("/songs?view=library");
+                      }}
                       className="w-full sm:w-auto"
                       size="sm"
                     >
@@ -189,6 +200,7 @@ const SongsView = () => {
                             if (isActive) {
                               setTierFilters(tierFilters.filter((t: string) => t !== tier.tier));
                             } else {
+                              posthog.capture("song_library_action", { action: "filter_tier", tier: tier.tier });
                               setTierFilters([...tierFilters, tier.tier]);
                             }
                           }}
@@ -251,7 +263,10 @@ const SongsView = () => {
                       {/* Filter Toggle Button */}
                       <Button
                         variant="outline"
-                        onClick={() => setIsFilterSheetOpen(true)}
+                        onClick={() => {
+                          posthog.capture("song_library_action", { action: "open_filters" });
+                          setIsFilterSheetOpen(true);
+                        }}
                         className={cn(
                           "relative h-12 flex-1  border-white/5 bg-zinc-900/60 px-6 font-bold text-zinc-300 shadow-lg hover:bg-zinc-800 md:flex-initial transition-all active:scale-95",
                           hasFilters && "border-cyan-500/30 bg-cyan-500/5 text-cyan-400"
@@ -268,7 +283,10 @@ const SongsView = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={handleClearFilters}
+                          onClick={() => {
+                            posthog.capture("song_library_action", { action: "clear_filters" });
+                            handleClearFilters();
+                          }}
                           className="h-12 w-12 shrink-0  border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
                           title="Clear all filters"
                         >

@@ -25,13 +25,13 @@ import {
 } from "layouts/ReportFormLayout/components";
 import type { HealthHabbitsBoxProps } from "layouts/ReportFormLayout/components/HealthHabbitsBox/HealthHabbitsBox";
 import type { TimeInputBoxProps } from "layouts/ReportFormLayout/components/TimeInputBox/TimeInpuBox";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { FaBrain, FaMusic } from "react-icons/fa";
-import { GrDocumentUpload } from "react-icons/gr";
-import { IoMdHand } from "react-icons/io";
-import { MdSchool, MdTitle } from "react-icons/md";
 import { ArrowDown, Check } from "lucide-react";
+import { useRouter } from "next/router";
+import posthog from "posthog-js";
+import { useState } from "react";
+import { FaBrain, FaMusic } from "react-icons/fa";
+import { IoMdHand } from "react-icons/io";
+import { MdSchool } from "react-icons/md";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import {
@@ -42,10 +42,10 @@ import {
 } from "utils/converter";
 import { i18n } from "utils/translation";
 
-import SavedTimeBanner from "./SavedTimeBanner";
 import { isLastReportTimeExceeded } from "./helpers/isLastReportTimeExceeded";
 import { RaportSchema } from "./helpers/RaportShcema";
 import type { ReportFormikInterface } from "./ReportView.types";
+import SavedTimeBanner from "./SavedTimeBanner";
 
 type TimeInputProps = Omit<TimeInputBoxProps, "errors">;
 
@@ -258,6 +258,18 @@ const ReportView = () => {
     if (techMinutes > 0) {
         dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: techMinutes }));
     }
+
+    const totalMinutesForCapture =
+      Number(inputData.techniqueHours || 0) * 60 + Number(inputData.techniqueMinutes || 0) +
+      Number(inputData.theoryHours || 0) * 60 + Number(inputData.theoryMinutes || 0) +
+      Number(inputData.hearingHours || 0) * 60 + Number(inputData.hearingMinutes || 0) +
+      Number(inputData.creativityHours || 0) * 60 + Number(inputData.creativityMinutes || 0);
+    posthog.capture("practice_session_completed", {
+      total_minutes: totalMinutesForCapture,
+      has_song: !!inputData.songTitle,
+      has_plan: !!inputData.planId,
+      habit_count: inputData.habbits?.length ?? 0,
+    });
 
     setSubmittedValues(inputData);
     setAcceptPopUpVisible(false);

@@ -1,4 +1,5 @@
 import "react-circular-progressbar/dist/styles.css";
+import posthog from "posthog-js";
 
 import {
   Accordion,
@@ -139,6 +140,15 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
   const { bpmStages, completedBpms, isLoading: isBpmLoading, handleToggleBpm } = useBpmProgress(currentExercise);
+
+  // Track practice session start
+  useEffect(() => {
+    posthog.capture("practice_session_started", {
+      plan_title: plan.title,
+      exercise_count: plan.exercises.length,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Leaderboard dialog state
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
