@@ -30,6 +30,7 @@ import { ResponsiveInitializer } from "components/ResponsiveInitializer/Responsi
 import Analytics from "components/Analytics/Analytics";
 import useAuthSync from "hooks/useAuthSync";
 import type { AppPropsWithLayout } from "types/page";
+import { PostHogProvider } from "../providers/PostHogProvider";
 
 const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {
     useAuthSync();
@@ -73,43 +74,45 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
   }));
 
   return (
-    <SessionProvider session={session}>
-      <Provider store={store}>
-        <QueryClientProvider client={queryClient}>
-        
-        <Head>
-          <meta name='viewport' content='initial-scale=1.0, width=device-width' />
-          <meta
-            name='google-signin-client_id'
-            content={process.env.NEXT_PUBLIC_GOOGLE_QAUTH}
-          />
-          <title>Riff Quest</title>
-          <meta
-            name='description'
-            content='Practice, track progress, compete! Guitar in hand! 🎸'
-          />
-          <meta name='keywords' content='practice, guitar' />
-        </Head>
-        <ErrorBoundary>
-          <ThemeModeProvider>
-            <AuthSyncWrapper>
-               <Analytics />
-               <ResponsiveInitializer />
-               <TooltipProvider>
-                  <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground`}>
-                     <Toaster theme='dark' position='top-right' />
-                     <NextTopLoader color='#06b6d4' />
-                     <div id='overlays'></div>
-                     {getLayout(<Component {...pageProps} />)}
-                  </div>
-               </TooltipProvider>
-            </AuthSyncWrapper>
-            <ReactQueryDevtools initialIsOpen={false} />
-          </ThemeModeProvider>
-        </ErrorBoundary>
-      </QueryClientProvider>
-      </Provider>
-    </SessionProvider>
+    <PostHogProvider>
+      <SessionProvider session={session}>
+        <Provider store={store}>
+          <QueryClientProvider client={queryClient}>
+          
+          <Head>
+            <meta name='viewport' content='initial-scale=1.0, width=device-width' />
+            <meta
+              name='google-signin-client_id'
+              content={process.env.NEXT_PUBLIC_GOOGLE_QAUTH}
+            />
+            <title>Riff Quest</title>
+            <meta
+              name='description'
+              content='Practice, track progress, compete! Guitar in hand! 🎸'
+            />
+            <meta name='keywords' content='practice, guitar' />
+          </Head>
+          <ErrorBoundary>
+            <ThemeModeProvider>
+              <AuthSyncWrapper>
+                 <Analytics />
+                 <ResponsiveInitializer />
+                 <TooltipProvider>
+                    <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground`}>
+                       <Toaster theme='dark' position='top-right' />
+                       <NextTopLoader color='#06b6d4' />
+                       <div id='overlays'></div>
+                       {getLayout(<Component {...pageProps} />)}
+                    </div>
+                 </TooltipProvider>
+              </AuthSyncWrapper>
+              <ReactQueryDevtools initialIsOpen={false} />
+            </ThemeModeProvider>
+          </ErrorBoundary>
+        </QueryClientProvider>
+        </Provider>
+      </SessionProvider>
+    </PostHogProvider>
   );
 }
 
