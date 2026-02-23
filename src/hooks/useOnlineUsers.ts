@@ -36,7 +36,9 @@ export const useOnlineUsers = () => {
     const unsubscribe = onValue(allStatusRef, (snapshot) => {
       const val = snapshot.val();
       if (val) {
-        const users: OnlineUser[] = Object.values(val);
+        const users: OnlineUser[] = (Object.values(val) as OnlineUser[]).filter(
+          (u) => u.state === "online"
+        );
         setOnlineUsers(users);
       } else {
         setOnlineUsers([]);
