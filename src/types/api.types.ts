@@ -175,8 +175,8 @@ export interface updateSocialInterface {
 }
 
 export interface SeasonDataInterface {
-  seasonId: string; // Format: "2024-03" for March 2024
-  name?: string;
+  name: string;
+  seasonId: string;
   startDate: string;
   endDate: string;
   isActive: boolean;
