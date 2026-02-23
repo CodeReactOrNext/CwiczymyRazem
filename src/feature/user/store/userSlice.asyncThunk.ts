@@ -407,12 +407,18 @@ export const updateQuestProgress = createAsyncThunk(
     if (quest && !quest.isRewardClaimed) {
       const allDone = quest.tasks.every(t => t.isCompleted);
       if (allDone) {
+        // Dispatch reward claim immediately to prevent duplicate logging
+        dispatch(claimQuestReward());
+
         const { firebaseAddQuestLog } = await import("../../logs/services/addQuestLog.service");
         const userId = state.user.userAuth;
         if (userId) {
-          await firebaseAddQuestLog(userId);
+          try {
+            await firebaseAddQuestLog(userId);
+          } catch (e) {
+            console.error("Quest logging failed", e);
+          }
         }
-        dispatch(claimQuestReward());
       }
     }
 
