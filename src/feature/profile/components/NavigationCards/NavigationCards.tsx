@@ -111,14 +111,7 @@ export const NavigationCards = () => {
         actionLabel="Log Now"
       />
 
-      <NavigationCard
-        title="AI Coach"
-        icon={<Bot className='h-5 w-5' />}
-        onClick={() => handleNavigation("/ai-coach", "ai-coach")}
-        colorAccent='green'
-        isLoading={loadingCard === "ai-coach"}
-        actionLabel="Get Advice"
-      />
+  
 
       <NavigationCard
         title="Play Songs"
