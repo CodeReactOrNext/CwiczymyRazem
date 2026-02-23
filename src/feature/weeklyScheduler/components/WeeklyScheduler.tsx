@@ -11,6 +11,7 @@ import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 import { useRouter } from "next/router";
+import posthog from "posthog-js";
 
 interface WeeklySchedulerProps {
   userAuth: string;
@@ -117,6 +118,11 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
     
     try {
       await addItemToDaySchedule(userAuth, weekStartDate, selectedDay, { id: plan.id, type: "plan" });
+      posthog.capture("calendar_task_added", {
+        item_id: plan.id,
+        item_type: "plan",
+        day: selectedDay,
+      });
       await loadSchedule(true);
     } catch (error) {
       console.error("Failed to update schedule:", error);
@@ -129,6 +135,11 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
 
     try {
       await addItemToDaySchedule(userAuth, weekStartDate, selectedDay, { id: song.id, type: "song" });
+      posthog.capture("calendar_task_added", {
+        item_id: song.id,
+        item_type: "song",
+        day: selectedDay,
+      });
       await loadSchedule(true);
     } catch (error) {
       console.error("Failed to update schedule:", error);

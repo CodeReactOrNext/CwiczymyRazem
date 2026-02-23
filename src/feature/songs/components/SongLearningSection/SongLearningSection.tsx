@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { Music, Plus } from "lucide-react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { useEffect, useMemo,useState } from "react";
 import { useAppSelector } from "store/hooks";
 
@@ -97,7 +98,11 @@ const FilterBar = ({
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600">Filters</span>
             {hasActiveFilters && (
                 <button 
-                   onClick={() => { setSearchQuery(""); setTierFilters([]); }}
+                   onClick={() => { 
+                      posthog.capture("song_management_action", { action: "reset_filters" });
+                      setSearchQuery(""); 
+                      setTierFilters([]); 
+                   }}
                    className="text-[10px] font-bold uppercase tracking-wider text-red-400 hover:text-red-300 transition-colors"
                 >
                   Reset
@@ -111,6 +116,9 @@ const FilterBar = ({
                     <button
                         key={tier.tier}
                         onClick={() => {
+                            if (!isActive) {
+                                posthog.capture("song_management_action", { action: "filter_tier", tier: tier.tier });
+                            }
                             setTierFilters(prev => 
                                 isActive ? prev.filter(t => t !== tier.tier) : [...prev, tier.tier]
                             );
@@ -152,11 +160,14 @@ const EmptyState = () => (
      <p className="max-w-md text-sm text-zinc-400 mb-8">
        Your song board is empty. Add songs from the library to track your progress and manage your learning journey.
      </p>
-     <Link href="/songs?view=library">
-        <button className="h-12 rounded-xl bg-cyan-500 hover:bg-cyan-600 px-8 text-black font-bold transition-all active:scale-95 shadow-lg shadow-cyan-500/10">
+      <Link href="/songs?view=library">
+        <button 
+          onClick={() => posthog.capture("song_management_action", { action: "browse_library_empty" })}
+          className="h-12 rounded-xl bg-cyan-500 hover:bg-cyan-600 px-8 text-black font-bold transition-all active:scale-95 shadow-lg shadow-cyan-500/10"
+        >
           Browse Library
         </button>
-     </Link>
+      </Link>
   </div>
 );
 
@@ -205,6 +216,15 @@ export const SongLearningSection = ({
       learned: userSongs.learned.filter(filterFn),
     };
   }, [userSongs, searchQuery, tierFilters]);
+
+  useEffect(() => {
+    if (searchQuery.length > 2) {
+      const timer = setTimeout(() => {
+        posthog.capture("song_management_action", { action: "search", query: searchQuery });
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchQuery]);
 
   // Use filtered songs for the lists to prevent "ghost" items, 
   // but we still iterate over ALL userSongs for finding logic/API ops 
@@ -308,6 +328,12 @@ export const SongLearningSection = ({
 
         // API Update: Log + Status Change
         try {
+            posthog.capture("song_management_action", { 
+              action: "move_song", 
+              from: activeContainer, 
+              to: overContainer,
+              song_id: activeId 
+            });
             await handleStatusChange(
               activeId,
               overContainer,
