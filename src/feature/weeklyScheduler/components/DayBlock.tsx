@@ -158,7 +158,7 @@ export const DayBlock = ({
         )}
 
         <div className="flex items-center justify-between mb-3 relative z-10 w-full shrink-0">
-          <h3 className={`text-base font-bold tracking-tight
+          <h3 className={`text-[12px] font-bold tracking-tight
             ${isCompleted ? "text-emerald-400" : isToday ? colorClasses.text : "text-zinc-300"}
           `}>
             {dayName}
