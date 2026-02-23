@@ -127,13 +127,13 @@ export const ScheduleItemSelector = ({
               </div>
 
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                 <input
                   type="text"
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900 border border-white/10 rounded-lg text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-white/20 transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-900 border border-white/10 rounded-lg text-sm text-white placeholder:text-zinc-400 focus:outline-none focus:border-white/20 transition-colors"
                 />
               </div>
 
@@ -143,7 +143,7 @@ export const ScheduleItemSelector = ({
                   className={`flex-1 px-4 py-2 rounded-lg text-sm font-black uppercase tracking-wider transition-all ${
                     activeTab === "plans"
                       ? "bg-white text-zinc-950"
-                      : "bg-zinc-900 text-zinc-500 hover:bg-zinc-800"
+                      : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
                   }`}
                 >
                   Plans ({filteredPlans.length})
@@ -153,7 +153,7 @@ export const ScheduleItemSelector = ({
                   className={`flex-1 px-4 py-2 rounded-lg text-sm font-black uppercase tracking-wider transition-all ${
                     activeTab === "songs"
                       ? "bg-white text-zinc-950"
-                      : "bg-zinc-900 text-zinc-500 hover:bg-zinc-800"
+                      : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
                   }`}
                 >
                   Songs ({filteredSongs.length})
@@ -163,7 +163,7 @@ export const ScheduleItemSelector = ({
               {activeTab === "plans" && (
                 <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-white/5">
                   <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-                    <span className="text-[10px] font-black uppercase text-zinc-500 mr-1 shrink-0">Difficulty:</span>
+                    <span className="text-[10px] font-black uppercase text-zinc-400 mr-1 shrink-0">Difficulty:</span>
                     {["easy", "medium", "hard"].map((diff) => (
                       <button
                         key={diff}
@@ -171,7 +171,7 @@ export const ScheduleItemSelector = ({
                         className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all shrink-0 ${
                           difficultyFilter === diff
                             ? getDifficultyColor(diff)
-                            : "bg-zinc-900 text-zinc-500 border-white/5 hover:border-white/10"
+                            : "bg-zinc-900 text-zinc-400 border-white/5 hover:border-white/10"
                         }`}
                       >
                         {diff}
@@ -185,7 +185,7 @@ export const ScheduleItemSelector = ({
                       className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all ${
                         sourceFilter === "user"
                           ? "bg-violet-500/20 text-violet-400 border-violet-500/30"
-                          : "bg-zinc-900 text-zinc-500 border-white/5 hover:border-white/10"
+                          : "bg-zinc-900 text-zinc-400 border-white/5 hover:border-white/10"
                       }`}
                     >
                       My Plans
@@ -195,7 +195,7 @@ export const ScheduleItemSelector = ({
                       className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all ${
                         playalongOnly
                           ? "bg-red-500/20 text-red-400 border-red-500/30"
-                          : "bg-zinc-900 text-zinc-500 border-white/5 hover:border-white/10"
+                          : "bg-zinc-900 text-zinc-400 border-white/5 hover:border-white/10"
                       }`}
                     >
                       Playalongs
@@ -209,7 +209,7 @@ export const ScheduleItemSelector = ({
               {activeTab === "plans" && (
                 <>
                   {filteredPlans.length === 0 ? (
-                    <div className="text-center py-12 text-zinc-500">
+                    <div className="text-center py-12 text-zinc-400">
                       No plans found
                     </div>
                   ) : (
@@ -232,7 +232,7 @@ export const ScheduleItemSelector = ({
                               <h3 className="text-base font-black text-white tracking-tight mb-1 group-hover:text-cyan-400 transition-colors">
                                 {renderLocalized(plan.title)}
                               </h3>
-                              <p className="text-xs text-zinc-500 line-clamp-2 mb-2">
+                              <p className="text-xs text-zinc-400 line-clamp-2 mb-2">
                                 {renderLocalized(plan.description)}
                               </p>
                             </div>
@@ -264,7 +264,7 @@ export const ScheduleItemSelector = ({
               {activeTab === "songs" && (
                 <>
                   {filteredSongs.length === 0 ? (
-                    <div className="text-center py-12 text-zinc-500">
+                    <div className="text-center py-12 text-zinc-400">
                       {allUserSongs.length === 0 ? "No songs in your library" : "No songs found"}
                     </div>
                   ) : (
@@ -289,7 +289,7 @@ export const ScheduleItemSelector = ({
                               <h3 className="text-base font-black text-white tracking-tight mb-1 group-hover:text-violet-400 transition-colors">
                                 {song.title}
                               </h3>
-                              <p className="text-xs text-zinc-500 mb-2">
+                              <p className="text-xs text-zinc-400 mb-2">
                                 {song.artist}
                               </p>
                               <div className="flex items-center gap-2 flex-wrap">

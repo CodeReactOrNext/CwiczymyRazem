@@ -45,7 +45,7 @@ export const DailyQuestWidget = () => {
         <Card className="flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-sm bg-orange-500/5 text-zinc-500">
+                    <div className="p-2 rounded-sm bg-orange-500/5 text-zinc-400">
                         <Swords size={18} />
                     </div>
                     <div>
@@ -61,7 +61,7 @@ export const DailyQuestWidget = () => {
                             </span>
                         </div>
                     )}
-                    <div className="text-xs font-bold text-zinc-500">
+                    <div className="text-xs font-bold text-zinc-400">
                         {dailyQuest.tasks.filter(t => t.isCompleted).length}/{dailyQuest.tasks.length}
                     </div>
                 </div>
@@ -94,7 +94,7 @@ export const DailyQuestWidget = () => {
                         className={cn(
                             "flex items-center justify-between p-2.5 rounded-sm transition-all",
                             task.isCompleted
-                                ? "bg-zinc-800/40 text-zinc-500"
+                                ? "bg-zinc-800/40 text-zinc-400"
                                 : "bg-zinc-800/80 text-zinc-300 cursor-pointer hover:bg-zinc-700/80"
                         )}
                     >
@@ -109,10 +109,10 @@ export const DailyQuestWidget = () => {
                              <CheckCircle2 size={14} className="text-green-500" />
                         ) : (
                             <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-zinc-500">
+                                <span className="text-[10px] font-bold text-zinc-400">
                                     {task.progress}/{task.target}
                                 </span>
-                                <ArrowRight size={12} className="text-zinc-600" />
+                                <ArrowRight size={12} className="text-zinc-400" />
                             </div>
                         )}
                     </div>
@@ -132,7 +132,7 @@ export const DailyQuestWidget = () => {
             )}
 
             {isClaimed && (
-                 <div className="w-full h-10 flex items-center justify-center gap-2 rounded-sm bg-zinc-800/40 text-[10px] font-black uppercase tracking-widest text-zinc-500 border border-white/5">
+                 <div className="w-full h-10 flex items-center justify-center gap-2 rounded-sm bg-zinc-800/40 text-[10px] font-black uppercase tracking-widest text-zinc-400 border border-white/5">
                      <CheckCircle2 size={14} className="text-emerald-500" />
                      Reward Claimed
                  </div>
