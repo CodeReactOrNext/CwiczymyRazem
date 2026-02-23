@@ -1,4 +1,4 @@
-import { Check, Plus, X, Music, TrendingUp, Play, Circle, CircleCheck } from "lucide-react";
+import { Check, Plus, X, Music, TrendingUp, Play, Square, CheckSquare } from "lucide-react";
 import { FaGuitar } from "react-icons/fa";
 import type { DaySchedule } from "../types/weeklyScheduler.types";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
@@ -99,17 +99,17 @@ export const DayBlock = ({
       <div
         onClick={onClick}
         className={`
-          relative flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer
+          relative flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer
           ${isCompleted 
             ? "border-emerald-500/30 bg-emerald-500/5" 
             : isToday 
               ? `${colorClasses.border} bg-white/5` 
-              : "border-white/5 bg-zinc-950/20"
+              : "border-border bg-zinc-800/40"
           }
         `}
       >
         <div className="flex items-center gap-3 min-w-0">
-          <div className={`text-[10px] font-black tracking-widest ${isToday ? colorClasses.text : "text-zinc-500"}`}>
+          <div className={`text-[10px] font-black tracking-widest ${isToday ? colorClasses.text : "text-zinc-400"}`}>
             {dayName.substring(0, 3)}
           </div>
           <div className="flex-1 min-w-0">
@@ -118,7 +118,7 @@ export const DayBlock = ({
                 {selectedItems.length > 1 ? `${selectedItems.length} Tasks` : renderLocalized(selectedItems[0].title)}
               </p>
             ) : (
-              <p className="text-[10px] text-zinc-700 font-bold  tracking-wider">Rest Day</p>
+              <p className="text-[10px] text-zinc-400 font-bold  tracking-wider">Rest Day</p>
             )}
           </div>
         </div>
@@ -141,14 +141,14 @@ export const DayBlock = ({
         onClick={onClick}
         className={`
        relative flex flex-col overflow-hidden 
-          rounded-xl border cursor-pointer
+          rounded-xl border cursor-pointer group/card
           ${isCompleted 
-            ? "border-emerald-500/10 bg-emerald-500/[0.02]" 
+            ? "border-emerald-500/10 bg-zinc-800/40" 
             : isToday 
-              ? `${colorClasses.border} ${colorClasses.gradient} shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] bg-black/40` 
-              : "border-white/5 bg-zinc-950/40 hover:bg-zinc-900/50"
+              ? `border-transparent ring-1 ring-white/10 ${colorClasses.gradient} bg-zinc-800/40` 
+              : "border-transparent bg-zinc-800/40 hover:bg-zinc-800/20"
           }
-          p-3 min-h-[140px] md:min-h-[160px] transition-colors
+          p-4 min-h-[160px] md:min-h-[180px] transition-all duration-300
         `}
       >
         {isCompleted && (
@@ -157,28 +157,17 @@ export const DayBlock = ({
           </div>
         )}
 
-        <div className="flex items-center justify-between mb-2 relative z-10 w-full shrink-0">
-          <h3 className={`text-[12px] font-bold tracking-tight
+        <div className="flex items-center justify-between mb-3 relative z-10 w-full shrink-0">
+          <h3 className={`text-base font-bold tracking-tight
             ${isCompleted ? "text-emerald-400" : isToday ? colorClasses.text : "text-zinc-300"}
           `}>
             {dayName}
           </h3>
           <div className="flex items-center gap-2">
             {isToday && !isCompleted && (
-              <div className="relative flex h-1.5 w-1.5">
+              <div className="relative flex h-2 w-2">
                 <div className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${colorClasses.text.replace("text-", "bg-")}`} />
-                <div className={`relative inline-flex h-1.5 w-1.5 rounded-full ${colorClasses.text.replace("text-", "bg-")}`} />
-              </div>
-            )}
-            {hasSchedule && (
-              <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={(e) => { e.stopPropagation(); onClear(e); }} 
-                  className="p-1 rounded bg-zinc-800/50 hover:bg-rose-500/20 text-zinc-500 hover:text-rose-400 transition-all"
-                  title="Clear day"
-                >
-                  <X size={12} />
-                </button>
+                <div className={`relative inline-flex h-2 w-2 rounded-full ${colorClasses.text.replace("text-", "bg-")}`} />
               </div>
             )}
           </div>
@@ -202,16 +191,16 @@ export const DayBlock = ({
                         </div>
                       ) : (
                         <div className="w-6 h-6 shrink-0 rounded-[4px] bg-white/5 flex items-center justify-center mt-0.5">
-                          {"artist" in item ? <Music size={12} className="text-zinc-500" /> : <TrendingUp size={12} className="text-zinc-500" />}
+                          {"artist" in item ? <Music size={12} className="text-zinc-400" /> : <TrendingUp size={12} className="text-zinc-400" />}
                         </div>
                       )}
                       
-                      <div className="min-w-0 flex-1 flex flex-col">
-                        <h4 className={`text-[11px] sm:text-xs font-semibold leading-snug transition-colors ${itemCompleted ? "text-emerald-500 line-through opacity-60" : "text-zinc-200 group-hover/item:text-white"}`}>
+                      <div className="min-w-0 flex-1 flex flex-col justify-center">
+                        <h4 className={`text-xs sm:text-sm font-semibold leading-snug transition-colors ${itemCompleted ? "text-emerald-500 line-through opacity-60" : "text-zinc-200 group-hover/item:text-white"}`}>
                           {renderLocalized(item.title)}
                         </h4>
                         {"artist" in item && !itemCompleted && (
-                          <span className="text-[9px] text-zinc-500 mt-0.5 truncate">{(item as Song).artist}</span>
+                          <span className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5 truncate">{(item as Song).artist}</span>
                         )}
                       </div>
                     </div>
@@ -241,16 +230,16 @@ export const DayBlock = ({
                           }`}
                           title={itemCompleted ? "Mark incomplete" : "Mark complete"}
                         >
-                          {itemCompleted ? <CircleCheck size={14} strokeWidth={2.5} /> : <Circle size={14} strokeWidth={2} />}
+                          {itemCompleted ? <CheckSquare size={16} strokeWidth={2.5} /> : <Square size={16} strokeWidth={2} />}
                         </button>
                       )}
                       
                       <button 
                         onClick={(e) => { e.stopPropagation(); onRemoveItem(item.id); }} 
-                        className="p-2 text-zinc-500 bg-zinc-800/40 hover:text-rose-400 transition-all transform hover:scale-105 hover:bg-zinc-800/80 rounded-md"
+                        className="p-2 text-zinc-400 bg-zinc-800/40 hover:text-rose-400 transition-all transform hover:scale-105 hover:bg-zinc-800/80 rounded-md"
                         title="Remove"
                       >
-                        <X size={14} strokeWidth={2.5} />
+                        <X size={16} strokeWidth={2.5} />
                       </button>
                     </div>
                   </div>
@@ -258,17 +247,17 @@ export const DayBlock = ({
               })}
               
               <div 
-                className="mt-1 flex items-center justify-center gap-1.5 p-1 rounded-md border border-dashed border-white/5 hover:border-white/10 text-zinc-600 hover:text-zinc-400 transition-colors mx-0.5 opacity-0 group-hover:opacity-100"
+                className="mt-2 flex items-center justify-center gap-1.5 p-2 rounded-md border border-dashed border-zinc-700/60 hover:border-zinc-500/60 text-zinc-400 hover:text-zinc-300 transition-colors mx-0.5 opacity-0 group-hover/card:opacity-100"
               >
-                <Plus size={10} /> <span className="text-[9px] font-bold uppercase tracking-wider">Add</span>
+                <Plus size={14} /> <span className="text-[10px] font-bold uppercase tracking-wider">Add Task</span>
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full min-h-[60px] rounded-lg border-2 border-dashed border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10 transition-all group/empty">
-              <div className="bg-white/5 p-2 rounded-full mb-1.5 group-hover/empty:bg-white/10 transition-colors">
-                <Plus size={14} className="text-zinc-500 group-hover/empty:text-zinc-300" />
+            <div className="flex flex-col items-center justify-center h-full min-h-[60px] rounded-xl border-2 border-dashed border-border bg-transparent hover:bg-zinc-800/30 hover:border-zinc-600 transition-all group/empty">
+              <div className="bg-zinc-800/50 p-2 rounded-full mb-1.5 group-hover/empty:bg-zinc-700/50 transition-colors">
+                <Plus size={14} className="text-zinc-400 group-hover/empty:text-zinc-300" />
               </div>
-              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600 group-hover/empty:text-zinc-400">Add Tasks</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 group-hover/empty:text-zinc-300">Add Tasks</span>
             </div>
           )}
         </div>

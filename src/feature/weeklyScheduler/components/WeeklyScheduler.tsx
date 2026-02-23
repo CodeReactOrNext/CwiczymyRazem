@@ -259,16 +259,16 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="text-xl md:text-3xl font-black text-white tracking-tight mb-1 flex items-center gap-3">
+    <div className="w-full mb-4 space-y-6">
+      <div className="flex items-start justify-between gap-4 flex-wrap mb-2">
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-bold text-white tracking-wide">
             Your Week
-            <span className="text-base font-bold text-zinc-600 flex items-center gap-1.5">
-              <Calendar size={14} />
-              {formatWeekRange(weekStartDate)}
-            </span>
-          </h2>
+          </h3>
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-400 flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800/40 border border-white/5">
+            <Calendar size={12} className="opacity-80" />
+            {formatWeekRange(weekStartDate)}
+          </span>
         </div>
       </div>
 
