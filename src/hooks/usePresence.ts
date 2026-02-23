@@ -42,6 +42,8 @@ export const usePresence = () => {
 
     return () => {
       unsubscribe();
+      onDisconnect(userStatusRef).cancel();
+      set(userStatusRef, null);
     };
   }, [userAuth, userInfo, currentActivity]);
 };
