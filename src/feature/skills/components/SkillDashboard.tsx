@@ -17,6 +17,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { cn } from "assets/lib/utils";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
+import { HeroBanner } from "components/UI/HeroBanner";
 
 interface DashboardExercise {
   id: string;
@@ -183,41 +184,27 @@ export const SkillDashboard = ({
   }
 
   return (
-    <div className="w-full pb-24">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-            <div className="mb-12 pt-6">
-              <div className="bg-white rounded-lg p-6 md:p-8 overflow-hidden relative border border-zinc-200 shadow-sm">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-zinc-100 rounded-full blur-2xl -mr-24 -mt-24 pointer-events-none" />
-
-                <div className="absolute right-1/4 top-1/2 -translate-y-1/2 pointer-events-none hidden md:flex items-center gap-6 opacity-[0.04]">
-                  <Target size={80} strokeWidth={0.8} className="text-black -rotate-12" />
-                  <Guitar size={100} strokeWidth={0.6} className="text-black rotate-6" />
-                  <Brain size={70} strokeWidth={0.8} className="text-black -rotate-6" />
-                  <Ear size={60} strokeWidth={0.8} className="text-black rotate-12" />
-                </div>
-
-                <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
-                  <div className="flex-1">
-                    <h1 className="text-2xl md:text-3xl font-bold text-black tracking-tight leading-none">
-                      Skills overview
-                    </h1>
-                    <p className="text-zinc-500 text-sm mt-2 max-w-md font-medium">
-                      Practice exercises to earn XP and level up your skills.
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-5">
-                    <div className="flex flex-col items-end">
-                      <span className="text-black text-2xl font-bold tabular-nums leading-none">{totalXP}</span>
-                      <span className="text-zinc-400 text-xs font-semibold mt-0.5 uppercase tracking-wider">XP total</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-12">
+    <div className="w-full pb-24 flex flex-col">
+      <HeroBanner
+        title="Skills & Progress"
+        subtitle="Practice exercises to earn XP and level up your skills."
+        backgroundImage="/headers/skills.png"
+        className="w-full !rounded-none !shadow-none"
+        rightContent={
+          <div className="flex flex-col items-end mr-2">
+            <span className="text-white text-3xl md:text-4xl font-black tabular-nums leading-none">
+              {totalXP}
+            </span>
+            <span className="text-zinc-400 text-[10px] font-bold mt-2 uppercase tracking-[0.2em]">
+              XP total
+            </span>
+          </div>
+        }
+      />
+      
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-12">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-12">
                 {CATEGORIES.map((category) => {
                     const categorySkills = guitarSkills.filter(s => s.category === category);
                     if (categorySkills.length === 0) return null;

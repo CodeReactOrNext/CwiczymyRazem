@@ -1,4 +1,3 @@
-import MainContainer from "components/MainContainer";
 import { SkillDashboard } from "feature/skills/components/SkillDashboard";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
@@ -26,11 +25,11 @@ const ProfileSkillsPage: NextPageWithLayout = () => {
   }, [userAuth]);
 
   return (
-    <MainContainer title={"Skills"}>
-    { userSkills ? <SkillDashboard
-        userSkills={userSkills as UserSkills}
-      /> : null}
-    </MainContainer>
+    <div className="bg-second-600 radius-default overflow-hidden flex flex-col border-none shadow-sm min-h-screen">
+      {userSkills ? (
+        <SkillDashboard userSkills={userSkills as UserSkills} />
+      ) : null}
+    </div>
   );
 };
 
