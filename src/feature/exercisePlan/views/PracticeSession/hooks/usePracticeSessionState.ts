@@ -196,6 +196,7 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
         ...(exerciseRecords && { exerciseRecords }),
         ...(micPerformance && { micPerformance }),
         ...(earTrainingPerformance && { earTrainingPerformance }),
+        clientTodayISO: new Date().toISOString(),
       };
 
       const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();

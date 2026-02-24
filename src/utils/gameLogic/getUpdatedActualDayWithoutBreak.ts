@@ -1,14 +1,15 @@
 export const getUpdatedActualDayWithoutBreak = (
   actualDayWithoutBreak: number,
   userLastReportDate: Date,
-  didPracticeToday: boolean
+  didPracticeToday: boolean,
+  baseDate?: Date
 ) => {
   if (didPracticeToday) {
     return actualDayWithoutBreak;
   }
 
-  const today = new Date();
-  const yesterday = new Date();
+  const today = baseDate || new Date();
+  const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
 
   const isYesterday =
