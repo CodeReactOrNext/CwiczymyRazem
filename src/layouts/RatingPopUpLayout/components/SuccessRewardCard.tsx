@@ -122,9 +122,18 @@ export const SuccessRewardCard = ({
               ))}
            </motion.div>
 
-           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-1">
-              Great Progress!
+           <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-2">
+               Great Progress!
            </h1>
+           <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.6, type: "spring", stiffness: 200, damping: 15 }}
+              className="flex items-center gap-2 text-cyan-400"
+           >
+              <span className="text-4xl sm:text-5xl font-bold tabular-nums tracking-tight">+{displayedPoints}</span>
+              <span className="text-sm font-semibold text-cyan-500/70">XP</span>
+           </motion.div>
            
         </div>
 
@@ -141,7 +150,7 @@ export const SuccessRewardCard = ({
                           transition={{ delay: 1 + (index * 0.2), duration: 0.5 }}
                           className="flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/30 px-4 py-1.5 rounded-full backdrop-blur-md"
                         >
-                          <span className="text-cyan-400 font-black text-xs uppercase tracking-widest">
+                          <span className="text-cyan-400 font-bold text-xs tracking-wide">
                              +{points} {name}
                           </span>
                         </motion.div>
@@ -157,7 +166,7 @@ export const SuccessRewardCard = ({
                     transition={{ delay: 1, duration: 0.5 }}
                     className="flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/30 px-4 py-1.5 rounded-full backdrop-blur-md"
                   >
-                    <span className="text-cyan-400 font-black text-xs uppercase tracking-widest">
+                    <span className="text-cyan-400 font-bold text-xs tracking-wide">
                        +{skillRewardAmount} {skillName}
                     </span>
                   </motion.div>
@@ -167,7 +176,7 @@ export const SuccessRewardCard = ({
             <div className="space-y-4">
                 <div className="flex justify-between items-end px-1">
                     <h4 className="text-lg font-bold text-white tracking-tight">Level {currentLevel} <span className="text-zinc-500 mx-2">→</span> {currentLevel+1}</h4>
-                    <span className="text-xl font-black text-cyan-500 tabular-nums leading-none">{Math.round(currProgressPercent)}%</span>
+                    <span className="text-xl font-bold text-cyan-500 tabular-nums leading-none">{Math.round(currProgressPercent)}%</span>
                 </div>
                 
                 <div className='relative h-3 w-full rounded-full bg-zinc-950 p-0.5 overflow-hidden border border-white/5'>

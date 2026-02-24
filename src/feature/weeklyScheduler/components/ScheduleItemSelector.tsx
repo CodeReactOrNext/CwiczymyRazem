@@ -109,12 +109,12 @@ export const ScheduleItemSelector = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="w-full max-w-3xl max-h-[80vh] bg-zinc-950 border-2 border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
+              className="w-full max-w-3xl max-h-[80vh] bg-zinc-950 border border-white/10 rounded-xl shadow-2xl flex flex-col overflow-hidden pointer-events-auto"
             >
             <div className="p-6 border-b border-white/10">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-black text-white tracking-tight">
+                  <h2 className="text-lg font-bold text-white tracking-tight">
                     Choose Your Practice
                   </h2>
                 </div>
@@ -140,7 +140,7 @@ export const ScheduleItemSelector = ({
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => setActiveTab("plans")}
-                  className={`flex-1 px-4 py-2 rounded-lg text-sm font-black uppercase tracking-wider transition-all ${
+                  className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                     activeTab === "plans"
                       ? "bg-white text-zinc-950"
                       : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
@@ -150,7 +150,7 @@ export const ScheduleItemSelector = ({
                 </button>
                 <button
                   onClick={() => setActiveTab("songs")}
-                  className={`flex-1 px-4 py-2 rounded-lg text-sm font-black uppercase tracking-wider transition-all ${
+                  className={`flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                     activeTab === "songs"
                       ? "bg-white text-zinc-950"
                       : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
@@ -163,12 +163,12 @@ export const ScheduleItemSelector = ({
               {activeTab === "plans" && (
                 <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-white/5">
                   <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-                    <span className="text-[10px] font-black uppercase text-zinc-400 mr-1 shrink-0">Difficulty:</span>
+                    <span className="text-[10px] font-semibold uppercase text-zinc-500 mr-1 shrink-0">Difficulty:</span>
                     {["easy", "medium", "hard"].map((diff) => (
                       <button
                         key={diff}
                         onClick={() => setDifficultyFilter(difficultyFilter === diff ? null : diff)}
-                        className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all shrink-0 ${
+                        className={`px-3 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wider border transition-all shrink-0 ${
                           difficultyFilter === diff
                             ? getDifficultyColor(diff)
                             : "bg-zinc-900 text-zinc-400 border-white/5 hover:border-white/10"
@@ -182,7 +182,7 @@ export const ScheduleItemSelector = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setSourceFilter(sourceFilter === "user" ? "all" : "user")}
-                      className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all ${
+                      className={`px-3 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wider border transition-all ${
                         sourceFilter === "user"
                           ? "bg-violet-500/20 text-violet-400 border-violet-500/30"
                           : "bg-zinc-900 text-zinc-400 border-white/5 hover:border-white/10"
@@ -192,7 +192,7 @@ export const ScheduleItemSelector = ({
                     </button>
                     <button
                       onClick={() => setPlayalongOnly(!playalongOnly)}
-                      className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all ${
+                      className={`px-3 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wider border transition-all ${
                         playalongOnly
                           ? "bg-red-500/20 text-red-400 border-red-500/30"
                           : "bg-zinc-900 text-zinc-400 border-white/5 hover:border-white/10"
@@ -229,7 +229,7 @@ export const ScheduleItemSelector = ({
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-base font-black text-white tracking-tight mb-1 group-hover:text-cyan-400 transition-colors">
+                              <h3 className="text-sm font-bold text-white tracking-tight mb-1 group-hover:text-cyan-400 transition-colors">
                                 {renderLocalized(plan.title)}
                               </h3>
                               <p className="text-xs text-zinc-400 line-clamp-2 mb-2">
@@ -286,14 +286,14 @@ export const ScheduleItemSelector = ({
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-base font-black text-white tracking-tight mb-1 group-hover:text-violet-400 transition-colors">
+                              <h3 className="text-sm font-bold text-white tracking-tight mb-1 group-hover:text-violet-400 transition-colors">
                                 {song.title}
                               </h3>
                               <p className="text-xs text-zinc-400 mb-2">
                                 {song.artist}
                               </p>
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${statusColor}`}>
+                                <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded ${statusColor}`}>
                                   {status}
                                 </span>
                               </div>

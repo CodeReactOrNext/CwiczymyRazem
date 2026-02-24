@@ -49,7 +49,7 @@ export const ExerciseProgress = ({
               )} />
               
               {/* Subtle hover tooltip showing exercise number */}
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-zinc-900 border border-white/10 text-[10px] font-black text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-zinc-900 border border-white/10 text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
                 Exercise {idx + 1}
               </div>
             </button>
