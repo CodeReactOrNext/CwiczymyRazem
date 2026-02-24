@@ -117,7 +117,7 @@ const RatingPopUpLayout = ({
             }
           }}
           size='lg'
-          className='bg-white text-zinc-950 hover:bg-white/90 px-16 h-14 rounded-lg text-xs font-black uppercase tracking-[0.3em] shadow-2xl transition-all active:scale-95'>
+          className='bg-white text-zinc-950 hover:bg-white/90 px-16 h-14 rounded-lg text-xs font-bold tracking-wide shadow-2xl transition-all active:scale-95'>
           Continue
         </Button>
       </div>
