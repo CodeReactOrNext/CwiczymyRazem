@@ -14,6 +14,7 @@ interface EarTrainingViewProps {
   highScore?: number | null;
   exerciseUrl?: string;
   isRevealed: boolean;
+  isGuessed?: boolean;
   isPlaying: boolean;
   canGuess: boolean;
   difficulty: "easy" | "medium" | "hard";
@@ -30,6 +31,7 @@ export const EarTrainingView = ({
   highScore,
   exerciseUrl,
   isRevealed,
+  isGuessed,
   isPlaying,
   canGuess,
   difficulty,
@@ -121,11 +123,23 @@ export const EarTrainingView = ({
                         animate={{ opacity: 1, scale: 1 }}
                         className="flex flex-col items-center gap-4 text-center p-8"
                       >
-                          <Music className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-400 mb-2" />
-                          <h3 className="text-xl sm:text-2xl font-bold text-white">Revealed!</h3>
-                          <p className="text-zinc-400 text-xs sm:text-sm">
-                             Check the tablature below. No points for this one.
-                          </p>
+                          {isGuessed ? (
+                            <>
+                                <Trophy className="w-12 h-12 sm:w-16 sm:h-16 text-amber-400 mb-2" />
+                                <h3 className="text-xl sm:text-2xl font-bold text-white">Correct! (+1)</h3>
+                                <p className="text-zinc-400 text-xs sm:text-sm">
+                                    Impressive! You've got a great ear.
+                                </p>
+                            </>
+                          ) : (
+                            <>
+                                <Music className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-400 mb-2" />
+                                <h3 className="text-xl sm:text-2xl font-bold text-white">Revealed!</h3>
+                                <p className="text-zinc-400 text-xs sm:text-sm">
+                                    Check the tablature below. No points for this one.
+                                </p>
+                            </>
+                          )}
                       </motion.div>
                   )}
               </AnimatePresence>

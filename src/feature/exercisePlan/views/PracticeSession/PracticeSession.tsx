@@ -165,6 +165,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   // --- Ear Training / Riddle State ---
   const [riddleMeasures, setRiddleMeasures] = useState<TablatureMeasure[] | null>(null);
   const [isRiddleRevealed, setIsRiddleRevealed] = useState(false);
+  const [isRiddleGuessed, setIsRiddleGuessed] = useState(false);
   const [earTrainingScore, setEarTrainingScore] = useState(0);
   const [earTrainingHighScore, setEarTrainingHighScore] = useState<number | null>(null);
   const [hasPlayedRiddleOnce, setHasPlayedRiddleOnce] = useState(false);
@@ -235,6 +236,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     if (currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
       setRiddleMeasures(generateRiddle(currentExercise.riddleConfig));
       setIsRiddleRevealed(false);
+      setIsRiddleGuessed(false);
       setHasPlayedRiddleOnce(false); // Reset on next riddle
 
       // Restart audio securely
@@ -851,13 +853,18 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             onHalfSpeedToggle={setIsHalfSpeed}
             activeTablature={activeTablature}
             isRiddleRevealed={isRiddleRevealed}
+            isRiddleGuessed={isRiddleGuessed}
             hasPlayedRiddleOnce={hasPlayedRiddleOnce}
             handleNextRiddle={handleNextRiddle}
             handleRevealRiddle={handleRevealRiddle}
             earTrainingScore={earTrainingScore}
             earTrainingHighScore={earTrainingHighScore}
             exerciseUrl={`/exercises/${activeExercise.id.replace(/_/g, "-")}`}
-            onEarTrainingGuessed={() => { setEarTrainingScore(s => s + 1); handleNextRiddle(); }}
+            onEarTrainingGuessed={() => {
+              setEarTrainingScore(s => s + 1);
+              setIsRiddleGuessed(true);
+              handleRevealRiddle();
+            }}
             bpmStages={bpmStages}
             completedBpms={completedBpms}
             isBpmLoading={isBpmLoading}
@@ -1166,13 +1173,15 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                 <EarTrainingView
                                     difficulty={currentExercise.riddleConfig.difficulty}
                                     isRevealed={isRiddleRevealed}
+                                    isGuessed={isRiddleGuessed}
                                     isPlaying={isPlaying}
                                     onPlayRiddle={handleToggleTimer}
                                     onReveal={handleRevealRiddle}
                                     onNextRiddle={handleNextRiddle}
                                     onGuessed={() => {
                                       setEarTrainingScore(s => s + 1);
-                                      handleNextRiddle();
+                                      setIsRiddleGuessed(true);
+                                      handleRevealRiddle();
                                     }}
                                     score={earTrainingScore}
                                     highScore={earTrainingHighScore}

@@ -73,6 +73,7 @@ interface SessionModalProps {
   // Riddle Props
   activeTablature?: any;
   isRiddleRevealed?: boolean;
+  isRiddleGuessed?: boolean;
   hasPlayedRiddleOnce?: boolean;
   handleNextRiddle?: () => void;
   earTrainingScore?: number;
@@ -132,6 +133,7 @@ const SessionModal = ({
   onHalfSpeedToggle,
   activeTablature,
   isRiddleRevealed,
+  isRiddleGuessed,
   hasPlayedRiddleOnce,
   handleNextRiddle,
   handleRevealRiddle,
@@ -243,13 +245,13 @@ const SessionModal = ({
                     <EarTrainingView
                       difficulty={currentExercise.riddleConfig.difficulty}
                       isRevealed={isRiddleRevealed || false}
+                      isGuessed={isRiddleGuessed || false}
                       isPlaying={isPlaying}
                       onPlayRiddle={handleToggleTimer}
                       onReveal={handleRevealRiddle || (() => {})}
                       onNextRiddle={handleNextRiddle || (() => {})}
                       onGuessed={() => {
                         if (onEarTrainingGuessed) onEarTrainingGuessed();
-                        else if (handleNextRiddle) handleNextRiddle();
                       }}
                       score={earTrainingScore || 0}
                       highScore={earTrainingHighScore}
