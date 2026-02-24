@@ -70,7 +70,7 @@ export const NavigationCard = ({
 
       <div className="relative z-10 flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h3 className="text-sm font-black tracking-wider text-white">
+          <h3 className="text-sm font-black font-normal  text-white">
             {title}
           </h3>
         </div>
@@ -101,7 +101,7 @@ export const NavigationCards = () => {
   };
 
   return (
-    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5'>
+    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
       <NavigationCard
         title="Report Practice"
         icon={<ClipboardCheck className='h-5 w-5' />}

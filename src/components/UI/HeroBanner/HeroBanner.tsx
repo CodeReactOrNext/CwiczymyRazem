@@ -22,7 +22,7 @@ export const HeroBanner = ({
 }: HeroBannerProps) => {
   return (
     <div
-      className={`relative flex overflow-hidden rounded-xl border-none shadow-[0_20px_50px_rgba(0,0,0,0.3)] md:min-h-[160px] lg:min-h-[180px] ${className}`}
+      className={`relative flex overflow-hidden rounded-xl border-none shadow-[0_20px_50px_rgba(0,0,0,0.3)] min-h-[220px] md:min-h-[160px] lg:min-h-[180px] ${className}`}
     >
       {/* Background Image with Overlay */}
       <div
@@ -35,13 +35,13 @@ export const HeroBanner = ({
       <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-900/60 to-transparent md:to-transparent" />
 
       {/* Content */}
-      <div className="relative z-10 flex w-full flex-col md:flex-row items-start md:items-center justify-between gap-6 p-6 md:p-8 lg:px-10 lg:py-12">
-        <div className="space-y-2 max-w-2xl">
-          <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-widest">
+      <div className="relative z-10 flex w-full flex-col md:flex-row items-start md:items-center justify-between gap-8 p-8 md:p-8 lg:px-10 lg:py-12">
+        <div className="space-y-2 max-w-2xl w-full md:w-auto text-center md:text-left">
+          <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-widest drop-shadow-lg">
             {title}
           </h3>
           {subtitle && (
-            <p className="text-zinc-200 text-sm md:text-base lg:text-lg font-medium">
+            <p className="text-zinc-200 text-sm md:text-base lg:text-lg font-medium drop-shadow-md">
               {subtitle}
             </p>
           )}
