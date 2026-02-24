@@ -29,6 +29,7 @@ export interface ReportFormikInterface {
   };
   micPerformance?: { score: number; accuracy: number };
   earTrainingPerformance?: { score: number };
+  clientTodayISO?: string;
 }
 
 export interface ReportDataInterface {

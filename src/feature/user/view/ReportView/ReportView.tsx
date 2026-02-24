@@ -224,7 +224,12 @@ const ReportView = () => {
 
     if (isFetching) return;
 
-    await dispatch(updateUserStats({ inputData }));
+    const enrichedInputData = {
+      ...inputData,
+      clientTodayISO: new Date().toISOString(),
+    };
+
+    await dispatch(updateUserStats({ inputData: enrichedInputData }));
     
     // Quest Trigger
     if (inputData.habbits && inputData.habbits.length >= 2) {
