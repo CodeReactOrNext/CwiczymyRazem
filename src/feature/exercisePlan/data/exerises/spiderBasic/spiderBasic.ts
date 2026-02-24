@@ -23,7 +23,7 @@ export const spiderBasicExercise: Exercise = {
     "You can freely change position on the fretboard to practice different hand arrangements.",
   ],
   metronomeSpeed: {
-    min: 60,
+    min: 40,
     max: 180,
     recommended: 80,
   },
