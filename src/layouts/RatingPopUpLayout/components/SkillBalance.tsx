@@ -74,10 +74,10 @@ export function SkillBalance({ activityData = [] }: SkillBalanceProps) {
                        return (
                          <div className='rounded-lg bg-zinc-950/95 p-3 shadow-2xl backdrop-blur-xl border-none'>
                            <div className='flex flex-col gap-0.5'>
-                             <span className='text-[10px] font-black uppercase tracking-widest text-zinc-500'>
+                             <span className='text-[10px] font-semibold tracking-wide text-zinc-500'>
                                {payload[0].payload.skill}
                              </span>
-                             <span className='text-sm font-black text-cyan-400'>
+                             <span className='text-sm font-bold text-cyan-400'>
                                {convertMsToHM(Number(payload[0].value) || 0)}
                              </span>
                            </div>

@@ -80,7 +80,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                {/* Activity Section */}
                {currentActivity && (
                 <div className="mb-2 p-3 rounded-lg bg-cyan-50 border border-cyan-100">
-                  <div className="flex items-center gap-2 text-cyan-600 font-bold text-[10px] uppercase tracking-widest mb-1.5">
+                  <div className="flex items-center gap-2 text-cyan-600 font-bold text-[12px]  mb-1.5">
                     <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
                     Live Now
                   </div>

@@ -949,11 +949,11 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                     )}>
                         {currentExercise.isPlayalong && (
                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/20 bg-red-500/10 backdrop-blur-sm">
-                              <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
-                                  Playalong
-                              </span>
-                           </div>
+                               <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+                               <span className="text-[10px] font-bold tracking-wide text-red-400">
+                                   Playalong
+                               </span>
+                            </div>
                         )}
                         {activeExercise.title}
                     </h2>
@@ -975,7 +975,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                             </div>
                          </div>
                          {currentExercise.customGoalDescription && (
-                           <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-2">
+                            <p className="text-xs text-zinc-500 font-semibold tracking-wide mt-2">
                               {currentExercise.customGoalDescription}
                            </p>
                          )}
@@ -1000,7 +1000,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                <p className="text-sm text-zinc-400 leading-relaxed">
                                  {typeof (plan as any).description === 'string' ? (plan as any).description : (plan as any).description}
                                </p>
-                               <p className="text-xs text-main font-bold uppercase tracking-widest">
+                                <p className="text-xs text-main font-semibold tracking-wide">
                                  Reward: {(plan as any).rewardDescription}
                                </p>
                             </div>
@@ -1021,14 +1021,14 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                 <div className="flex-1 flex items-center gap-6">
                                     <div className="relative group">
                                         <div className="absolute -inset-2 bg-white/5 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Total Score</span>
+                                        <span className="block text-[10px] font-semibold tracking-wide text-zinc-500 mb-1">Total Score</span>
                                         <div className="flex items-baseline gap-1">
                                           <motion.span
                                               key={gameState.score}
                                               initial={{ scale: 1.15, filter: "brightness(1.5)" }}
                                               animate={{ scale: 1, filter: "brightness(1)" }}
                                               transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                                              className="text-4xl font-black text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] inline-block"
+                                              className="text-4xl font-bold text-white tabular-nums tracking-tighter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] inline-block"
                                           >
                                               {gameState.score.toLocaleString()}
                                           </motion.span>
@@ -1039,7 +1039,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                     </div>
                                     <div className="h-10 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
                                     <div>
-                                        <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Accuracy</span>
+                                        <span className="block text-[10px] font-semibold tracking-wide text-zinc-500 mb-1">Accuracy</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-2xl font-bold text-emerald-400 tabular-nums">{sessionAccuracy}%</span>
                                             <AnimatePresence mode="wait">
@@ -1053,7 +1053,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                                             exit={{ scale: 0.8, opacity: 0 }}
                                                             transition={{ type: "spring", stiffness: 400, damping: 15 }}
                                                             className={cn(
-                                                                "inline-flex items-center justify-center w-8 h-8 rounded-lg border text-sm font-black",
+                                                                "inline-flex items-center justify-center w-8 h-8 rounded-lg border text-sm font-bold",
                                                                 grade.color, grade.bg, grade.border, grade.glow
                                                             )}
                                                         >
@@ -1100,7 +1100,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                                             transition: { duration: 0.4 }
                                                         }}
                                                         className={cn(
-                                                            "text-4xl font-black uppercase italic tracking-tighter",
+                                                            "text-4xl font-bold italic tracking-tighter",
                                                             style.color,
                                                             style.dropShadow
                                                         )}
@@ -1120,11 +1120,11 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                 </div>
 
                                 {/* Right: Streak & Multiplier */}
-                                <div className="flex-1 flex items-center justify-end gap-6">
+                                <div className="flex-1 flex justify-end items-center gap-6">
                                     <div className="text-right">
-                                        <span className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 mb-1">Note Streak</span>
+                                        <span className="block text-[10px] font-semibold tracking-wide text-zinc-500 mb-1">Note Streak</span>
                                         <div className="flex items-center justify-end gap-3">
-                                            <span className="text-3xl font-black text-cyan-400 tabular-nums">{gameState.combo}</span>
+                                            <span className="text-3xl font-bold text-cyan-400 tabular-nums">{gameState.combo}</span>
                                             <div className="flex flex-col gap-0.5">
                                                 {[...Array(3)].map((_, i) => (
                                                     <div 
@@ -1150,8 +1150,8 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                                 ? "bg-main border-white/40 shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-110" 
                                                 : "bg-zinc-950 border-white/10"
                                         )}>
-                                            <span className="text-[10px] font-black uppercase tracking-tighter text-white/50 -mb-1">Multiplier</span>
-                                            <span className="text-4xl font-black text-white italic tracking-tighter">x{gameState.multiplier}</span>
+                                            <span className="text-[10px] font-semibold tracking-tight text-white/50 -mb-1">Multiplier</span>
+                                            <span className="text-4xl font-bold text-white italic tracking-tighter">x{gameState.multiplier}</span>
                                             {gameState.multiplier >= 8 && (
                                                 <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent animate-pulse" />
                                             )}
@@ -1326,7 +1326,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
                       <div className="lg:col-span-4 space-y-6">
                         {currentExercise.metronomeSpeed && (
-                             <div className="radius-premium bg-zinc-900/40 border border-white/5 p-6 backdrop-blur-sm">
+                             <div className="radius-premium bg-zinc-900/40 p-6 backdrop-blur-sm">
                                  <Metronome
                                      metronome={metronome}
                                      showStartStop={!currentExercise.tablature || currentExercise.tablature.length === 0}
@@ -1342,7 +1342,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                             variant="ghost"
                                             size="sm"
                                             className={cn(
-                                              "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
+                                              "w-full gap-2 text-xs font-bold tracking-wide transition-all",
                                               isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10",
                                               currentExercise.riddleConfig?.mode === 'sequenceRepeat' && "opacity-50 cursor-not-allowed" // Disable button if forced on
                                             )}
@@ -1363,7 +1363,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                               variant="ghost"
                                               size="sm"
                                               className={cn(
-                                                "flex-1 gap-2 text-[10px] font-bold uppercase tracking-widest transition-all",
+                                                "flex-1 gap-2 text-[10px] font-bold tracking-wide transition-all",
                                                 isMicEnabled ? "text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20" : "text-zinc-500 hover:text-zinc-400"
                                               )}
                                               onClick={() => updateMicPersistence(!isMicEnabled)}
@@ -1376,7 +1376,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                               <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-300"
+                                                className="gap-2 text-[10px] font-bold tracking-wide text-zinc-500 hover:text-zinc-300"
                                                 onClick={() => setSessionPhase("calibrating")}
                                               >
                                                 <FaSync className="text-xs" />
@@ -1399,7 +1399,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                                     animate={{ width: `${Math.min(100, volume * 300)}%` }} // Boost for visibility
                                                 />
                                             </div>
-                                            <span className="text-[8px] font-bold text-zinc-500 uppercase tracking-tighter">Level</span>
+                                            <span className="text-[8px] font-bold text-zinc-500 tracking-tight">Level</span>
                                         </div>
                                         <span className="text-[10px] font-bold text-emerald-400 leading-none">
                                             {sessionAccuracy}% Accuracy
@@ -1421,7 +1421,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                         )}
 
                         {currentExercise.metronomeSpeed && bpmStages.length > 0 && (
-                          <div className="radius-premium bg-zinc-900/40 border border-white/5 p-6 backdrop-blur-sm">
+                          <div className="radius-premium bg-zinc-900/40 p-6 backdrop-blur-sm">
                             <BpmProgressGrid
                               bpmStages={bpmStages}
                               completedBpms={completedBpms}
@@ -1434,7 +1434,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
                         {currentExercise.links && currentExercise.links.length > 0 && (
                             <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-6 backdrop-blur-sm space-y-4">
-                                <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
+                                 <div className="flex items-center gap-2 text-red-400 font-bold text-xs tracking-wide">
                                     <FaHeart className="animate-pulse" />
                                     <span>Support Author</span>
                                 </div>
@@ -1478,7 +1478,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                              <Button
                                  size="sm"
                                  variant="ghost"
-                                 className="radius-premium font-bold text-[10px] tracking-[0.2em] transition-all click-behavior uppercase text-zinc-500 hover:text-white"
+                                 className="radius-premium font-bold text-[10px] tracking-wide transition-all click-behavior text-zinc-500 hover:text-white"
                                  onClick={onClose}
                              >
                                  {t("common:practice.exit")}
@@ -1510,7 +1510,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                <Button
                                    size="sm"
                                    variant="ghost"
-                                   className="radius-premium font-black text-[11px] tracking-[0.1em] transition-all click-behavior uppercase text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
+                                   className="radius-premium font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
                                    onClick={() => {
                                       if (metronome.isPlaying) {
                                         metronome.toggleMetronome();
@@ -1527,7 +1527,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                  variant="ghost"
                                  loading={isFinishing || isSubmittingReport}
                                  className={cn(
-                                 "radius-premium font-black text-[11px] tracking-[0.1em] transition-all click-behavior uppercase",
+                                 "radius-premium font-bold text-[11px] tracking-wide transition-all click-behavior",
                                  isLastExercise ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black" : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
                                  !canSkipExercise && "opacity-50 cursor-not-allowed"
                                  )}
@@ -1613,17 +1613,17 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             initial={{ opacity: 0, y: -50, x: "-50%" }}
             animate={{ opacity: 1, y: 50, x: "-50%" }}
             exit={{ opacity: 0, y: -50, x: "-50%" }}
-            className="fixed top-0 left-1/2 z-[99999] px-8 py-4 bg-cyan-500 rounded-2xl shadow-[0_0_30px_rgba(34,211,238,0.5)] border border-white/20"
+            className="fixed top-0 left-1/2 z-[99999] px-8 py-4 bg-cyan-500 rounded-xl shadow-[0_0_30px_rgba(34,211,238,0.5)] border border-white/20"
           >
             <div className="flex items-center gap-4">
               <div className="p-2 bg-white/20 rounded-lg">
                 <FaCheck className="text-black h-6 w-6" />
               </div>
               <div>
-                <h4 className="text-xl font-black text-black uppercase tracking-tighter leading-none">
+                <h4 className="text-lg font-bold text-black tracking-tight leading-none">
                   Exercise Finished!
                 </h4>
-                <p className="text-[10px] font-bold text-black/60 uppercase tracking-widest mt-1">
+                <p className="text-[10px] font-semibold text-black/60 tracking-wide mt-1">
                   Great job on this one!
                 </p>
               </div>

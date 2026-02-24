@@ -423,10 +423,10 @@ const ReportView = () => {
                       <div className="flex flex-col items-center md:items-end gap-4">
                         <div className='flex items-center rounded-2xl border border-white/10 bg-zinc-900/60 p-1 px-4 py-2 shadow-2xl backdrop-blur-md'>
                           <div className="flex flex-col items-start mr-6">
-                            <span className='text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 mb-0.5'>
+                            <span className='text-[9px] font-semibold tracking-wide text-zinc-600 mb-0.5'>
                               {t("total_time")}
                             </span>
-                            <span className='font-mono text-2xl font-black text-white leading-none'>
+                            <span className='font-mono text-2xl font-bold text-white leading-none'>
                                {convertMsToHM(getSumTime(values))}
                             </span>
                           </div>
@@ -435,7 +435,7 @@ const ReportView = () => {
                             <Button
                               type='submit'
                               loading={isFetching}
-                              className="h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all animate-in zoom-in-95 duration-300"
+                              className="h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wide shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all animate-in zoom-in-95 duration-300"
                             >
                               <Check className="mr-2 h-4 w-4" />
                               Save Now
@@ -445,13 +445,13 @@ const ReportView = () => {
 
                         {isStep1Done ? (
                           <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-700 pr-4 mt-2">
-                             <p className="text-[10px] font-black text-emerald-500/80 uppercase tracking-[0.15em]">
+                             <p className="text-[10px] font-semibold text-emerald-500/80 tracking-wide">
                                 Or add more details below
                              </p>
                              <ArrowDown className="h-5 w-5 text-emerald-500 animate-bounce" />
                           </div>
                         ) : (
-                          <p className="text-[10px] font-bold text-zinc-700 uppercase tracking-widest italic pr-4 mt-2">Complete Step 1 to continue</p>
+                          <p className="text-[10px] font-semibold text-zinc-700 tracking-wide italic pr-4 mt-2">Complete Step 1 to continue</p>
                         )}
                       </div>
                     </div>
@@ -495,7 +495,7 @@ const ReportView = () => {
                               onChange={(e) => setFieldValue("reportTitle", e.target.value)}
                             />
                             {errors.reportTitle && (
-                              <p className="mt-1.5 text-[10px] font-bold uppercase tracking-wider text-red-500">
+                              <p className="mt-1.5 text-[10px] font-semibold tracking-wide text-red-500">
                                 {errors.reportTitle}
                               </p>
                             )}
@@ -519,7 +519,7 @@ const ReportView = () => {
                                     key={tag.label}
                                     type="button"
                                     onClick={() => setFieldValue("reportTitle", tag.label)}
-                                    className="group flex items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500 transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
+                                    className="group flex items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-bold tracking-wide text-zinc-500 transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
                                   >
                                     <span className="opacity-70 group-hover:opacity-100">{tag.icon}</span>
                                     {tag.label}
@@ -564,13 +564,13 @@ const ReportView = () => {
                           <h3 className='font-openSans text-lg font-bold text-white'>
                              Finalize Log
                           </h3>
-                          <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded border border-white/5 whitespace-nowrap">Optional Details</span>
+                          <span className="text-[10px] font-semibold text-zinc-600 tracking-wide bg-white/5 px-2 py-0.5 rounded border border-white/5 whitespace-nowrap">Optional Details</span>
                         </div>
                       </div>
 
                       <div className='flex flex-col items-center gap-8 py-4'>
                           <div className='flex flex-col items-center gap-4'>
-                            <p className='text-xs font-bold uppercase tracking-widest text-zinc-500'>When did this happen?</p>
+                            <p className='text-xs font-semibold text-zinc-500 tracking-wide'>When did this happen?</p>
                             <div className='flex flex-wrap items-center justify-center gap-3'>
                               {[0, 1, 2, 3, 4].map((days) => {
                                 const isSelected = values.countBackDays === days;
@@ -585,7 +585,7 @@ const ReportView = () => {
                                     className={cn(
                                       "relative rounded-full border px-6 transition-all",
                                       isSelected
-                                        ? "border-transparent bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] font-black"
+                                        ? "border-transparent bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] font-bold"
                                         : "border-white/10 bg-zinc-900/50 text-zinc-400 hover:text-white"
                                     )}>
                                     {label}
@@ -607,7 +607,7 @@ const ReportView = () => {
                               type='submit'
                               loading={isFetching}
                               disabled={Object.keys(errors).length !== 0 || !isStep1Done}
-                              className='h-14 min-w-[280px] rounded-2xl bg-white text-black font-black text-lg transition-all hover:scale-[1.02] active:scale-95 shadow-xl disabled:opacity-50'>
+                              className='h-14 min-w-[280px] rounded-xl bg-white text-black font-bold text-lg transition-all hover:scale-[1.02] active:scale-95 shadow-xl disabled:opacity-50'>
                               <div className="flex items-center gap-2">
                                 <Check className='h-6 w-6 text-emerald-600' />
                                 <span>{isFetching ? "Saving..." : "Finish & Save Practice"}</span>

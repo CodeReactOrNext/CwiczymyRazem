@@ -173,7 +173,7 @@ export const DayBlock = ({
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col relative z-10 w-full space-y-1 overflow-y-auto no-scrollbar pb-1">
+        <div className="flex-1 flex flex-col relative z-10 w-full space-y-1 overflow-y-auto overflow-x-hidden no-scrollbar pb-1">
           {hasSchedule ? (
             <>
               {selectedItems.map((item, idx) => {
@@ -182,7 +182,7 @@ export const DayBlock = ({
                 const itemCompleted = itemEntry?.completed || (daySchedule.items?.length === 0 && daySchedule.completed);
 
                 return (
-                  <div key={`${item.id}-${idx}`} className="group/item flex flex-col gap-1.5 py-2 border-b border-white/5 last:border-b-0 relative">
+                  <div key={`${item.id}-${idx}`} className="group/item flex flex-col gap-1.5 py-2 last:border-b-0 relative">
                     {/* Top part - info */}
                     <div className="flex items-start gap-2 w-full">
                       {("coverUrl" in item && (item as any).coverUrl) ? (
@@ -237,7 +237,7 @@ export const DayBlock = ({
                       <button 
                         onClick={(e) => { e.stopPropagation(); onRemoveItem(item.id); }} 
                         className="p-2 text-zinc-400 bg-zinc-800/40 hover:text-rose-400 transition-all transform hover:scale-105 hover:bg-zinc-800/80 rounded-md"
-                        title="Remove"
+                        title="Remove Task"
                       >
                         <X size={16} strokeWidth={2.5} />
                       </button>
@@ -247,17 +247,17 @@ export const DayBlock = ({
               })}
               
               <div 
-                className="mt-2 flex items-center justify-center gap-1.5 p-2 rounded-md border border-dashed border-zinc-700/60 hover:border-zinc-500/60 text-zinc-400 hover:text-zinc-300 transition-colors mx-0.5 opacity-0 group-hover/card:opacity-100"
+                className="mt-2 flex items-center justify-center gap-1.5 p-2 rounded-md border border-dashed border-white/10 hover:border-white/20 text-zinc-500 hover:text-zinc-300 transition-all mx-0.5 opacity-0 group-hover/card:opacity-40 hover:!opacity-100"
               >
                 <Plus size={14} /> <span className="text-[10px] font-bold uppercase tracking-wider">Add Task</span>
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full min-h-[60px] rounded-xl border-2 border-dashed border-border bg-transparent hover:bg-zinc-800/30 hover:border-zinc-600 transition-all group/empty">
+            <div className="flex flex-col items-center justify-center h-full min-h-[100px] rounded-xl border-2 border-dashed border-border bg-transparent hover:bg-zinc-800/30 hover:border-zinc-600 transition-all group/empty">
               <div className="bg-zinc-800/50 p-2 rounded-full mb-1.5 group-hover/empty:bg-zinc-700/50 transition-colors">
                 <Plus size={14} className="text-zinc-400 group-hover/empty:text-zinc-300" />
               </div>
-              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 group-hover/empty:text-zinc-300">Add Tasks</span>
+              <span className="text-[9px] font-black tracking-widest text-zinc-400 group-hover/empty:text-zinc-300">Add Tasks</span>
             </div>
           )}
         </div>

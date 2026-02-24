@@ -18,8 +18,8 @@ export const FameBox = () => {
     <TooltipProvider>
       <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>
-          <div className='hidden h-10 cursor-help items-center justify-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2 shadow-sm backdrop-blur-sm md:flex'>
-            <FaGem className='text-xs text-amber-500' />
+          <div className='hidden h-10 cursor-help items-center justify-center gap-2 rounded-lg bg-amber-500/10  px-3 py-2 shadow-sm backdrop-blur-sm md:flex'>
+            <FaGem size={18} className='text-xs text-amber-500' />
             <span className='text-xs font-bold text-amber-400'>
               {fame.toLocaleString()}
             </span>

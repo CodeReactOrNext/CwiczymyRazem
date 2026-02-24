@@ -55,7 +55,7 @@ export function WeeklyInsight({ activityData }: WeeklyInsightProps) {
                   <h3 className='text-sm font-semibold text-zinc-400'>
                     {completedDaysCount}/7 Days
                   </h3>
-                  <span className="text-2xl font-black text-white">{convertMsToHM(totalWeekTime)}</span>
+                  <span className="text-2xl font-bold text-white">{convertMsToHM(totalWeekTime)}</span>
               </div>
           </div>
 
@@ -86,10 +86,10 @@ export function WeeklyInsight({ activityData }: WeeklyInsightProps) {
                     return (
                       <div className='rounded-lg bg-zinc-950/90 p-4 shadow-2xl backdrop-blur-xl border-none'>
                         <div className='flex flex-col gap-1'>
-                          <span className='text-[10px] font-black uppercase tracking-widest text-zinc-500'>
+                          <span className='text-[10px] font-semibold tracking-wide text-zinc-500'>
                             {payload[0].payload.fullName}
                           </span>
-                          <span className='text-xl font-black text-white'>
+                          <span className='text-xl font-bold text-white'>
                             {convertMsToHM(Number(payload[0].value) || 0)}
                           </span>
                         </div>
