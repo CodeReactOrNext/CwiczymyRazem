@@ -1,4 +1,5 @@
 import { ActivityLogView } from "components/ActivityLog/ActivityLog";
+import { ArrowRight, Plus } from "lucide-react";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DashboardSection } from "components/Layout";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
@@ -36,10 +37,26 @@ const ProfileLandingLayout = ({
       {!isTodayCompleted && (
         <HeroBanner
           title="Start today's practice"
-          buttonText="Choose mode"
           backgroundImage="/headers/practice.png"
-          onClick={() => router.push("/timer")}
-          className="w-full !rounded-none !shadow-none md:min-h-[240px] lg:min-h-[280px]"
+          className="w-full !rounded-none !shadow-none min-h-[280px] md:min-h-[240px] lg:min-h-[300px]"
+          rightContent={
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-end sm:items-center mt-auto sm:mt-0">
+              <button 
+                onClick={() => router.push("/profile/exercises?view=create")}
+                className="group/btn rounded-xl bg-zinc-900/40 backdrop-blur-md border border-white/10 text-white px-8 py-3.5 text-base font-bold shadow-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:bg-zinc-900/60 active:scale-95 whitespace-nowrap w-fit sm:w-auto min-w-[160px]"
+              >
+                Create plan
+                <Plus className="h-5 w-5" />
+              </button>
+              <button 
+                onClick={() => router.push("/timer")}
+                className="group/btn rounded-xl bg-white text-zinc-950 px-8 py-3.5 text-base font-bold shadow-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap w-fit sm:w-auto min-w-[160px]"
+              >
+                Choose mode
+                <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover/btn:translate-x-1" />
+              </button>
+            </div>
+          }
         />
       )}
       
