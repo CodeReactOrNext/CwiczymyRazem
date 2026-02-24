@@ -22,6 +22,7 @@ export const reportUpdateUserStats = ({
   inputData,
   currentUserSongLists
 }: updateUserStatsProps) => {
+  const clientToday = inputData.clientTodayISO ? new Date(inputData.clientTodayISO) : new Date();
   const {
     time = { technique: 0, theory: 0, hearing: 0, creativity: 0, longestSession: 0 },
     habitsCount = 0,
@@ -29,7 +30,7 @@ export const reportUpdateUserStats = ({
     sessionCount = 0,
     points = 0,
     lvl = 1,
-    lastReportDate = new Date().toISOString(),
+    lastReportDate = clientToday.toISOString(),
     actualDayWithoutBreak = 0,
     dayWithoutBreak = 0,
     achievements = [],
@@ -46,12 +47,13 @@ export const reportUpdateUserStats = ({
   } = timeSummary || {};
   const didPracticeToday = isDateBackReport
     ? false
-    : checkIsPracticeToday(userLastReportDate);
+    : checkIsPracticeToday(userLastReportDate, clientToday);
 
   const updatedActualDayWithoutBreak = getUpdatedActualDayWithoutBreak(
     actualDayWithoutBreak,
     userLastReportDate,
-    didPracticeToday
+    didPracticeToday,
+    clientToday
   );
 
   // Handle back-dated reports: update streak and lastReportDate when appropriate
@@ -59,7 +61,7 @@ export const reportUpdateUserStats = ({
   let backDateLastReport = lastReportDate!;
 
   if (isDateBackReport) {
-    const reportDate = getDateFromPast(isDateBackReport);
+    const reportDate = getDateFromPast(isDateBackReport, clientToday);
     const lastReport = new Date(lastReportDate!);
 
     // Calculate the day just before the current streak started
@@ -73,7 +75,10 @@ export const reportUpdateUserStats = ({
       d1.getMonth() === d2.getMonth() &&
       d1.getFullYear() === d2.getFullYear();
 
-    if (isSameDay(reportDate, dayBeforeStreak)) {
+    const dayAfterLastReport = new Date(lastReport);
+    dayAfterLastReport.setDate(dayAfterLastReport.getDate() + 1);
+
+    if (isSameDay(reportDate, dayBeforeStreak) || isSameDay(reportDate, dayAfterLastReport)) {
       backDateStreak = actualDayWithoutBreak + 1;
     }
 
@@ -126,7 +131,7 @@ export const reportUpdateUserStats = ({
     achievements: achievements,
     lastReportDate: isDateBackReport
       ? backDateLastReport
-      : new Date().toISOString(),
+      : clientToday.toISOString(),
     guitarStartDate: null
   };
 
