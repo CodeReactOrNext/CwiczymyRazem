@@ -5,11 +5,12 @@ export const localStorageMiddleware: Middleware =
     const result = next(action) as any; // yes,yes I know...
     if (
       result.type.startsWith("user/updateTimerTime") ||
+      result.type.startsWith("user/increaseTimerTime") ||
       result.type.startsWith("user/updateUserStats/fulfilled")
     ) {
       const timer = store.getState().user.timer;
       localStorage.setItem("userSlice.timer", JSON.stringify(timer));
     }
-  
+
     return result;
   };

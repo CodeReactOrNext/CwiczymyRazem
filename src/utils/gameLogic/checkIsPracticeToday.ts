@@ -1,5 +1,5 @@
-export const checkIsPracticeToday = (date: Date) => {
-  const today = new Date();
+export const checkIsPracticeToday = (date: Date, baseDate?: Date) => {
+  const today = baseDate || new Date();
   if (
     date.getDate() === today.getDate() &&
     date.getMonth() === today.getMonth() &&
