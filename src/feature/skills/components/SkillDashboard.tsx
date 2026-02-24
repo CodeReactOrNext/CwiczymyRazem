@@ -224,15 +224,15 @@ export const SkillDashboard = ({
         </div>
 
         <Dialog open={!!selectedSkillId} onOpenChange={(open) => !open && setSelectedSkillId(null)}>
-          <DialogContent className="max-w-[100dvw] sm:max-w-[700px] h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto bg-[#0a0a0a] border-zinc-900 p-0 sm:rounded-[2.5rem] shadow-3xl">
+            <DialogContent className="max-w-[100dvw] sm:max-w-[700px] h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto bg-[#0a0a0a] border-zinc-900 p-0 sm:rounded-xl shadow-2xl">
             <div className="p-6 md:p-10">
               <DialogHeader className="mb-10 text-left">
                 <div className="flex flex-col gap-2">
                    <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-1 bg-white/20 rounded-full" />
-                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Mastery Progress</span>
+                       <span className="text-[10px] font-semibold text-zinc-500 tracking-wide">Mastery Progress</span>
                    </div>
-                   <DialogTitle className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter text-left">
+                   <DialogTitle className="text-2xl md:text-3xl font-bold text-white tracking-tight text-left">
                       {selectedSkillName}
                    </DialogTitle>
                 </div>
@@ -247,8 +247,8 @@ export const SkillDashboard = ({
                   return (
                     <div key={difficulty} className="flex flex-col gap-5">
                       <div className="flex items-center gap-4">
-                        <div className={cn(
-                          "px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-widest",
+                         <div className={cn(
+                           "px-3 py-1 rounded-md border text-[10px] font-semibold tracking-wider",
                           difficulty === 'easy' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" :
                           difficulty === 'medium' ? "bg-amber-500/10 border-amber-500/20 text-amber-400" :
                           "bg-rose-500/10 border-rose-500/20 text-rose-400"
@@ -274,7 +274,7 @@ export const SkillDashboard = ({
                             <div
                               key={challenge.id}
                               className={cn(
-                                "group relative p-6 rounded-3xl border transition-all duration-300",
+                                "group relative p-5 rounded-xl border transition-all duration-300",
                                 isAvailable
                                     ? "bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/80"
                                     : "bg-zinc-950 border-zinc-900 opacity-60 grayscale"
@@ -291,23 +291,23 @@ export const SkillDashboard = ({
 
                                   <div className="flex items-center gap-2 flex-wrap">
                                      <div className="bg-emerald-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-emerald-500/20">
-                                        <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-wider">Skill Points</span>
-                                        <span className="text-xs font-black text-emerald-400">+{challenge.difficulty === 'easy' ? 1 : challenge.difficulty === 'medium' ? 2 : 3}</span>
+                                         <span className="text-[9px] font-semibold text-emerald-500 tracking-wider">Skill Points</span>
+                                         <span className="text-xs font-bold text-emerald-400">+{challenge.difficulty === 'easy' ? 1 : challenge.difficulty === 'medium' ? 2 : 3}</span>
                                      </div>
 
                                      {hasBpmProgress && (
                                        <div className="bg-cyan-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-cyan-500/20">
                                          <FaCheck className="h-2.5 w-2.5 text-cyan-400" />
-                                         <span className="text-[9px] font-bold text-cyan-500 uppercase tracking-wider">BPM</span>
-                                         <span className="text-xs font-black text-cyan-400">{completedBpms.length}/{bpmStages.length}</span>
+                                          <span className="text-[9px] font-semibold text-cyan-500 tracking-wider">BPM</span>
+                                          <span className="text-xs font-bold text-cyan-400">{completedBpms.length}/{bpmStages.length}</span>
                                        </div>
                                      )}
 
                                      {micHighScore != null && micHighScore > 0 && (
                                        <div className="bg-amber-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-amber-500/20">
                                          <Mic className="h-2.5 w-2.5 text-amber-400" />
-                                         <span className="text-[9px] font-bold text-amber-500 uppercase tracking-wider">Record</span>
-                                         <span className="text-xs font-black text-amber-400">{micHighScore.toLocaleString()}</span>
+                                          <span className="text-[9px] font-semibold text-amber-500 tracking-wider">Record</span>
+                                          <span className="text-xs font-bold text-amber-400">{micHighScore.toLocaleString()}</span>
                                          {micAccuracy != null && (
                                            <span className="text-[9px] font-bold text-amber-600">({micAccuracy}%)</span>
                                          )}
@@ -317,8 +317,8 @@ export const SkillDashboard = ({
                                      {earTrainingHighScore != null && earTrainingHighScore > 0 && (
                                        <div className="bg-purple-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-purple-500/20">
                                          <Ear className="h-2.5 w-2.5 text-purple-400" />
-                                         <span className="text-[9px] font-bold text-purple-500 uppercase tracking-wider">Ear Record</span>
-                                         <span className="text-xs font-black text-purple-400">{earTrainingHighScore}</span>
+                                          <span className="text-[9px] font-semibold text-purple-500 tracking-wider">Ear Record</span>
+                                          <span className="text-xs font-bold text-purple-400">{earTrainingHighScore}</span>
                                        </div>
                                      )}
 
@@ -328,7 +328,7 @@ export const SkillDashboard = ({
                                          className="bg-zinc-800/60 px-3 py-2 rounded-xl flex items-center gap-1.5 border border-white/5 hover:border-white/15 hover:bg-zinc-800 transition-colors"
                                        >
                                          <Trophy className="h-2.5 w-2.5 text-zinc-500" />
-                                         <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider">Records</span>
+                                          <span className="text-[9px] font-semibold text-zinc-400 tracking-wider">Records</span>
                                        </button>
                                      )}
                                   </div>
@@ -339,14 +339,14 @@ export const SkillDashboard = ({
                                     size="sm"
                                     onClick={() => handleStartChallenge(challenge)}
                                     className={cn(
-                                      "w-12 h-12 rounded-2xl transition-all flex-shrink-0 flex items-center justify-center",
+                                       "w-12 h-12 rounded-xl transition-all flex-shrink-0 flex items-center justify-center",
                                       "bg-white hover:bg-zinc-200 text-black border-none shadow-[0_10px_20px_rgba(255,255,255,0.1)]"
                                     )}
                                   >
                                     <ChevronRight size={20} strokeWidth={3} />
                                   </Button>
                                 ) : (
-                                  <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-zinc-950 border border-zinc-900/50 text-zinc-800 flex-shrink-0">
+                                   <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-zinc-950 border border-zinc-900/50 text-zinc-800 flex-shrink-0">
                                     <Lock size={18} />
                                   </div>
                                 )}
@@ -360,7 +360,7 @@ export const SkillDashboard = ({
                 }) : (
                   <div className="flex flex-col items-center justify-center py-24 text-zinc-600">
                     <Star size={32} className="mb-4 opacity-10" />
-                    <p className="text-sm font-bold uppercase tracking-widest">Growth in progress</p>
+                     <p className="text-sm font-semibold text-zinc-500">Growth in progress</p>
                   </div>
                 )}
               </div>

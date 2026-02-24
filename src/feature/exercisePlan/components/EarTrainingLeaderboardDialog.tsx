@@ -36,14 +36,14 @@ export const EarTrainingLeaderboardDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md bg-[#0a0a0a] border-zinc-900 p-0 sm:rounded-3xl shadow-3xl">
+      <DialogContent className="max-w-md bg-[#0a0a0a] border-zinc-900 p-0 sm:rounded-xl shadow-2xl">
         <div className="p-6">
           <DialogHeader className="mb-6 text-left">
             <div className="flex items-center gap-3 mb-2">
               <Trophy className="w-5 h-5 text-amber-400" />
-              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Leaderboard</span>
+              <span className="text-[10px] font-semibold text-zinc-500 tracking-wide">Leaderboard</span>
             </div>
-            <DialogTitle className="text-xl font-black text-white tracking-tight text-left">
+            <DialogTitle className="text-lg font-bold text-white tracking-tight text-left">
               {exerciseTitle}
             </DialogTitle>
           </DialogHeader>
@@ -51,7 +51,7 @@ export const EarTrainingLeaderboardDialog = ({
           {isLoading ? (
             <div className="flex flex-col gap-3">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-2xl bg-zinc-900/40 animate-pulse">
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/40 animate-pulse">
                   <div className="w-8 h-8 rounded-full bg-zinc-800" />
                   <div className="w-8 h-8 rounded-full bg-zinc-800" />
                   <div className="flex-1 h-4 rounded bg-zinc-800" />
@@ -62,7 +62,7 @@ export const EarTrainingLeaderboardDialog = ({
           ) : entries.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-zinc-600">
               <Trophy size={32} className="mb-4 opacity-10" />
-              <p className="text-sm font-bold uppercase tracking-widest">No scores yet</p>
+              <p className="text-sm font-semibold text-zinc-500">No scores yet</p>
               <p className="text-xs text-zinc-700 mt-1">Be the first to set a record!</p>
             </div>
           ) : (
@@ -75,7 +75,7 @@ export const EarTrainingLeaderboardDialog = ({
                   <div
                     key={entry.userId}
                     className={cn(
-                      "flex items-center gap-3 p-3 rounded-2xl border transition-all",
+                      "flex items-center gap-3 p-3 rounded-xl border transition-all",
                       isCurrentUser
                         ? "bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20 border-cyan-500/20"
                         : "bg-zinc-900/40 border-zinc-800/50"
@@ -83,7 +83,7 @@ export const EarTrainingLeaderboardDialog = ({
                   >
                     {/* Rank Badge */}
                     <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0",
+                      "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0",
                       isCurrentUser
                         ? "bg-cyan-500 text-black"
                         : place <= 3
@@ -112,7 +112,7 @@ export const EarTrainingLeaderboardDialog = ({
 
                     {/* Score */}
                     <span className={cn(
-                      "text-lg font-black tabular-nums",
+                      "text-lg font-bold tabular-nums",
                       isCurrentUser ? "text-cyan-400" : "text-white"
                     )}>
                       {entry.score}

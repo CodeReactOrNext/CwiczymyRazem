@@ -66,10 +66,10 @@ export const SessionStats = ({
           <div className="mb-10">
               <h3 className='text-sm font-semibold text-zinc-400 mb-2'>{t("timer:practice_session")}</h3>
               <div className="flex items-baseline gap-4">
-                <span className="text-5xl font-black text-white tracking-tighter drop-shadow-2xl">{convertMsToHM(time)}</span>
+                <span className="text-5xl font-bold text-white tracking-tighter drop-shadow-2xl">{convertMsToHM(time)}</span>
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5" title="vs. weekly average">
                     {performanceDiff > 5 ? <TrendingUp className="h-3.5 w-3.5 text-emerald-400" /> : performanceDiff < -5 ? <TrendingDown className="h-3.5 w-3.5 text-orange-400" /> : <Minus className="h-3.5 w-3.5 text-zinc-500" />}
-                    <span className={`text-[11px] font-black ${performanceDiff > 5 ? 'text-emerald-400' : performanceDiff < -5 ? 'text-orange-400' : 'text-zinc-500'}`}>
+                    <span className={`text-[11px] font-bold ${performanceDiff > 5 ? 'text-emerald-400' : performanceDiff < -5 ? 'text-orange-400' : 'text-zinc-500'}`}>
                         {Math.abs(performanceDiff).toFixed(0)}% vs avg
                     </span>
                 </div>
@@ -90,10 +90,10 @@ export const SessionStats = ({
                             <div className={`h-10 w-10 rounded-lg ${cat.bg} flex items-center justify-center border-none group-hover:scale-110 transition-transform duration-300`}>
                                 <cat.icon className={`${cat.color}`} size="large" />
                             </div>
-                            <span className="text-sm font-bold text-zinc-200 uppercase tracking-tight">{cat.label}</span>
+                            <span className="text-sm font-bold text-zinc-200 tracking-tight">{cat.label}</span>
                         </div>
                         <div className="text-right">
-                            <span className="text-base font-black text-white">{formatMs(cat.value)}</span>
+                            <span className="text-base font-bold text-white">{formatMs(cat.value)}</span>
                         </div>
                     </div>
                 </motion.div>
@@ -103,7 +103,7 @@ export const SessionStats = ({
           {practiceCategories.length === 0 && (
              <div className="py-12 text-center bg-white/5 rounded-lg border-none mt-6">
                 <Sparkles className="h-8 w-8 text-zinc-800 mx-auto mb-4" />
-                <p className="text-[11px] text-zinc-600 font-black uppercase tracking-[0.2em]">Data unavailable</p>
+                <p className="text-[11px] text-zinc-600 font-semibold tracking-wide">Data unavailable</p>
              </div>
           )}
         </div>

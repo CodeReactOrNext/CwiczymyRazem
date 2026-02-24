@@ -27,13 +27,13 @@ export function NextMilestone({ currentUserStats }: NextMilestoneProps) {
           </div>
 
           <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-4xl font-black text-white">{currentStreakCount}</span>
-            <span className="text-xs font-bold text-zinc-500 uppercase tracking-tight">days</span>
+            <span className="text-4xl font-bold text-white">{currentStreakCount}</span>
+            <span className="text-xs font-bold text-zinc-500 tracking-tight">days</span>
           </div>
 
           {multiplier > 0 && (
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs font-black text-amber-400">+{Math.round(multiplier * 100)}% XP</span>
+              <span className="text-xs font-bold text-amber-400">+{Math.round(multiplier * 100)}% XP</span>
               <span className="text-[10px] font-bold text-zinc-600">bonus</span>
             </div>
           )}

@@ -131,6 +131,15 @@ a {
   .shake-animation {
     animation: shake 3s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.57);
   }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 .toastify-custom {
