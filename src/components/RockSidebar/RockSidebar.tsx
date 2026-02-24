@@ -1,11 +1,8 @@
 import { Button } from "assets/components/ui/button";
 import { Separator } from "assets/components/ui/separator";
-import { cn } from "assets/lib/utils";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
-import { PWASidebarItem } from "components/PWA/PWASidebarItem";
 import Avatar from "components/UI/Avatar";
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import {
   selectCurrentUserStats,
   selectUserAvatar,
@@ -259,13 +256,12 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                     </div>
 
 
-                <div className='min-w-0 flex-1'>
-                  <span className='truncate text-sm font-semibold text-white'>
+                <div className='min-w-0 flex-1 flex flex-col justify-center'>
+                  <span className='truncate text-[15px] font-bold text-white tracking-wide'>
                     {userName}
                   </span>
                   <div className="mt-1 flex items-center gap-1.5">
-                    <Zap size={10} className="text-yellow-400 fill-yellow-400" />
-                    <span className="text-[10px] font-bold text-zinc-400">LVL {userStats.lvl}</span>
+                    <span className="text-[12px] font-bold text-zinc-400">LVL {userStats.lvl}</span>
                   </div>
                 </div>
               </div>
@@ -273,15 +269,18 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
               {/* Enhanced XP Bar */}
               <div className="mt-4 space-y-1.5">
                 <div className="flex items-center justify-between px-0.5">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-zinc-500">Progress</span>
-                  <span className="text-[10px] font-bold text-cyan-400">{Math.floor(userStats.points)} / {nextLvlPoints} XP</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm font-bold text-cyan-400 drop-shadow-sm">{Math.floor(userStats.points)}</span>
+                    <span className="text-[11px] font-semibold text-zinc-300">/ {nextLvlPoints} XP</span>
+                  </div>
                 </div>
+                
                 <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.3)]"
+                    transition={{ duration: 1, ease: "easeOut", delay: 0.1 }}
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6)]"
                   />
                 </div>
               </div>
@@ -464,7 +463,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
             </div>
           </div>
 
-          <PWASidebarItem />
         </nav>
       </aside>
 
@@ -538,9 +536,12 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                       </div>
 
                       <div className='min-w-0 flex-1'>
-                        <span className='truncate text-sm font-semibold text-white'>
+                        <span className='truncate text-[15px] font-bold text-white tracking-wide'>
                           {userName}
                         </span>
+                        <div className="mt-1 flex items-center gap-1.5">
+                          <span className="text-[12px] font-bold text-zinc-400">LVL {userStats.lvl}</span>
+                        </div>
                         <div className='mt-2 flex items-center gap-2'>
                           <Link 
                             href="/settings" 
@@ -558,17 +559,20 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                     </div>
 
                     {/* Progress Bar - Mobile */}
-                    <div className="mt-4 space-y-1.5">
+                    <div className="mt-4 space-y-1.5 px-0.5">
                       <div className="flex items-center justify-between px-0.5">
-                        <span className="text-[10px] font-bold text-zinc-500 uppercase">Level Progress</span>
-                        <span className="text-[10px] font-bold text-cyan-400">{Math.floor(userStats.points)} / {nextLvlPoints} XP</span>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-sm font-bold text-cyan-400 drop-shadow-sm">{Math.floor(userStats.points)}</span>
+                          <span className="text-[11px] font-semibold text-zinc-300">/ {nextLvlPoints} XP</span>
+                        </div>
                       </div>
-                      <div className="relative h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+                      
+                      <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
                         <motion.div 
                           initial={{ width: 0 }}
                           animate={{ width: `${progress}%` }}
-                          transition={{ duration: 1, ease: "easeOut" }}
-                          className="absolute inset-y-0 left-0 bg-cyan-500"
+                          transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
+                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6)]"
                         />
                       </div>
                     </div>
@@ -770,7 +774,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                   </div>
                 </div>
 
-                <PWASidebarItem />
                 
                 <Separator className='bg-white/10' />
                 

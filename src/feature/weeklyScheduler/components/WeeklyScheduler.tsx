@@ -265,7 +265,7 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
           <h3 className="text-lg font-bold text-white tracking-wide">
             Your Week
           </h3>
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-400 flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-800/40 border border-white/5">
+          <span className="text-[10px] sm:text-xs font-bold text-zinc-400 flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-800/40 ">
             <Calendar size={12} className="opacity-80" />
             {formatWeekRange(weekStartDate)}
           </span>

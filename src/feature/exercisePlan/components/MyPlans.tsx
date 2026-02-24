@@ -15,6 +15,7 @@ import { Flame, Music, Zap } from "lucide-react";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
+import { useRouter } from "next/router";
 
 import { toast } from "sonner";
 import { getUserExercisePlans } from "../services/getUserExercisePlans";
@@ -42,6 +43,18 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
   const [isCreating, setIsCreating] = useState(false);
   const [editingPlan, setEditingPlan] = useState<ExercisePlan | null>(null);
   const userAuth = useAppSelector(selectUserAuth);
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState("routines");
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    
+    const { view } = router.query;
+    if (view === "create") {
+      setIsCreating(true);
+      setActiveTab("my_plans");
+    }
+  }, [router.isReady, router.query]);
 
   useEffect(() => {
     const loadPlans = async () => {
@@ -208,7 +221,7 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
 
   return (
     <ExerciseLayout title={t("exercises:tabs.my_plans")}>
-      <Tabs defaultValue="routines" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         {/* Navigation Switcher */}
         <div className="mb-10 md:mb-12 sticky top-4 z-40 md:static">
           <TabsList className="bg-zinc-900/80 backdrop-blur-md border border-white/5 p-1 rounded-2xl h-auto md:bg-transparent md:border-none md:p-0 md:rounded-none md:justify-start md:space-x-12 md:w-full overflow-hidden shadow-2xl md:shadow-none w-full flex">
