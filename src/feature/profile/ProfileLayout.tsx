@@ -1,3 +1,4 @@
+import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DaySinceMessage } from "components/DaySince/DaySince";
 import { LevelBar } from "components/LevelBar/LevelBar";
@@ -173,6 +174,16 @@ const ProfileLayout = ({
               <PracticeInsights statistics={statistics} />
             </div>
           </div>
+        </div>
+
+        {/* Activity Heatmap */}
+        <div>
+          <ActivityLogView
+            year={year}
+            setYear={setYear}
+            datasWithReports={datasWithReports}
+            isLoading={isLoading}
+          />
         </div>
 
         {/* Enhanced Stats Section */}
