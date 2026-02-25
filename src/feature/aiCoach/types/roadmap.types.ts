@@ -1,3 +1,9 @@
+export interface ExerciseOption {
+  exerciseId: string;
+  exerciseTitle: string;
+  description?: string;
+}
+
 export interface RoadmapMilestone {
   id: string;
   title: string;
@@ -7,15 +13,18 @@ export interface RoadmapMilestone {
   isCompleted: boolean;
   order: number;
   children?: RoadmapMilestone[];
+
   successCriteria?: string;
-  targetBpm?: number;
-  exerciseId?: string;
-  exerciseTitle?: string;
-  startDate?: string;
-  endDate?: string;
   successTrigger?: string | null;
   failTrigger?: string | null;
-  youtubeUrl?: string | null;
+  selfCheckMethod?: string | null;
+
+  sessionsRequired?: number;
+  sessionsCompleted?: number;
+  exerciseOptions?: ExerciseOption[];
+
+  exerciseId?: string;
+  exerciseTitle?: string;
 }
 
 export interface Roadmap {
