@@ -2,27 +2,44 @@ import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprots
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { RoadmapMilestone } from "../types/roadmap.types";
 import { v4 as uuidv4 } from "uuid";
-import { addDays, format } from "date-fns";
 
 export interface InterviewMessage {
   role: "assistant" | "user";
   content: string;
 }
 
+export interface InterviewQuestion {
+  question: string;
+  suggestions: string[];
+}
+
 export type GenerationPhase =
-  | "analyzing"
   | "drafting"
-  | "enriching"
+  | "detailing"
   | "finalizing";
 
-const INTERVIEWER_SYSTEM = `Jesteś doświadczonym trenerem gitary, który prowadzi krótki wywiad (maks. 5 pytań) z uczniem przed stworzeniem spersonalizowanego planu nauki.
+const INTERVIEWER_SYSTEM = `Jesteś doświadczonym trenerem gitary prowadzącym otwarty, spersonalizowany wywiad przed stworzeniem planu nauki.
 
-ZASADY:
-- Zadaj JEDNO konkretne pytanie na raz.
-- Każde pytanie powinno wynikać z poprzednich odpowiedzi i pogłębiać Twoją wiedzę o uczniu.
-- Skup się na: poziomie zaawansowania, celach, dostępnym czasie (ile godzin/minut dziennie lub tygodniowo), problemach, stylu muzycznym.
-- Pytania krótkie, przyjazne, po POLSKU.
-- Zwróć TYLKO treść pytania — żadnych wstępów, po prostu samo pytanie.`;
+ZAWSZE odpowiadaj WYŁĄCZNIE w formacie JSON (zero tekstu poza JSON):
+{
+  "question": "treść pytania po polsku",
+  "suggestions": ["sugestia 1", "sugestia 2", "sugestia 3"]
+}
+
+ZASADY DLA PYTAŃ:
+- Pierwsze pytanie (brak historii): zawsze zapytaj o główny cel — co uczeń chce konkretnie osiągnąć. Pytanie szerokie i otwarte, nie zawężaj.
+- Kolejne pytania: adaptacyjne, wynikające BEZPOŚREDNIO z poprzednich odpowiedzi. Każde odkrywa coś nowego.
+- Naturalna kolejność wątków (nie sztywna): cel → konkretyzacja celu lub inspiracja → aktualny poziom i blokada → co już próbował → preferencje co do ćwiczeń.
+- Nie pytaj o czas ani harmonogram — plan jest oparty na sesjach, nie na tygodniach.
+- Nie pytaj osobno o "styl muzyczny" — styl wynika naturalnie z celu i inspiracji.
+- Pytania krótkie, konkretne, przyjazne. Po polsku.
+
+ZASADY DLA SUGESTII:
+- 3–4 sugestie, zawsze konkretne i różnorodne — to PRZYKŁADY, nie wyczerpująca lista.
+- Użytkownik może zignorować sugestie i napisać własną odpowiedź.
+- Sugestie to inspiracje, nie kategorie: "Zagrać solo z Comfortably Numb" zamiast "Nauka solówek".
+- Pierwsze pytanie (brak historii): sugestie różnorodne, obejmują różne style i poziomy.
+- Kolejne pytania: sugestie dostosowane do tego co uczeń już powiedział.`;
 
 const compact = (text: string, max = 3000) =>
   text.length > max ? text.slice(0, max) + "…" : text;
@@ -33,7 +50,7 @@ async function callOpenAI(
   user: string,
   opts: { model?: string; temp?: number; json?: boolean; maxTokens?: number } = {}
 ): Promise<string> {
-  const { model = "gpt-4o", temp = 0.7, json = false, maxTokens = 2000 } = opts;
+  const { model = "gpt-4o", temp, json = false, maxTokens = 2000 } = opts;
 
   const body: Record<string, any> = {
     model,
@@ -41,10 +58,10 @@ async function callOpenAI(
       { role: "system", content: system },
       { role: "user", content: user },
     ],
-    temperature: temp,
-    max_tokens: maxTokens,
+    max_completion_tokens: maxTokens,
   };
 
+  if (temp !== undefined) body.temperature = temp;
   if (json) body.response_format = { type: "json_object" };
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -54,23 +71,22 @@ async function callOpenAI(
   });
 
   if (!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error?.message || "Błąd API OpenAI");
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Błąd API OpenAI (${response.status})`);
   }
 
   const data = await response.json();
-  return data.choices?.[0]?.message?.content?.trim() ?? "";
+  const content = data.choices?.[0]?.message?.content?.trim() ?? "";
+
+  if (!content) {
+    console.error("[callOpenAI] Empty content for model:", model, "| finish_reason:", data.choices?.[0]?.finish_reason);
+  }
+
+  return content;
 }
 
-const buildMilestones = (phases: any[], startDate: Date): RoadmapMilestone[] => {
-  let current = startDate;
-
+const buildMilestones = (phases: any[]): RoadmapMilestone[] => {
   return phases.map((p: any, i: number) => {
-    const weeksEstimate = parseInt(p.weeksEstimate) || 2;
-    const phaseStart = format(current, "yyyy-MM-dd");
-    const phaseEnd = format(addDays(current, weeksEstimate * 7 - 1), "yyyy-MM-dd");
-    current = addDays(current, weeksEstimate * 7);
-
     const children: RoadmapMilestone[] | undefined =
       Array.isArray(p.children) && p.children.length > 0
         ? p.children.map((c: any, j: number) => ({
@@ -82,14 +98,22 @@ const buildMilestones = (phases: any[], startDate: Date): RoadmapMilestone[] => 
           isCompleted: false,
           order: j,
           successCriteria: c.successCriteria || undefined,
-          targetBpm: c.targetBpm ? Number(c.targetBpm) : null,
-          exerciseId: c.exerciseId || null,
-          exerciseTitle: c.exerciseTitle || null,
           successTrigger: c.successTrigger || null,
           failTrigger: c.failTrigger || null,
-          youtubeUrl: c.youtubeUrl || null,
+          selfCheckMethod: c.selfCheckMethod || null,
+          sessionsRequired: typeof c.sessionsRequired === "number" ? c.sessionsRequired : 7,
+          sessionsCompleted: 0,
+          exerciseOptions: Array.isArray(c.exerciseOptions)
+            ? c.exerciseOptions.filter((o: any) => o.exerciseId && !String(o.exerciseId).includes("null")).map((o: any) => ({
+              exerciseId: String(o.exerciseId),
+              exerciseTitle: o.exerciseTitle || "",
+              description: o.description || "",
+            }))
+            : [],
+          exerciseId: c.exerciseId || null,
+          exerciseTitle: c.exerciseTitle || null,
         }))
-        : null;
+        : [];
 
     return {
       id: uuidv4(),
@@ -99,12 +123,9 @@ const buildMilestones = (phases: any[], startDate: Date): RoadmapMilestone[] => 
       cardDetailedText: p.cardDetailedText || "",
       isCompleted: false,
       order: i,
-      startDate: phaseStart,
-      endDate: phaseEnd,
       successCriteria: p.successCriteria || null,
       successTrigger: p.successTrigger || null,
       failTrigger: p.failTrigger || null,
-      youtubeUrl: p.youtubeUrl || null,
       children: children || [],
     };
   });
@@ -125,16 +146,23 @@ const cleanObject = (obj: any): any => {
 export const getNextInterviewQuestion = async (
   apiKey: string,
   history: InterviewMessage[]
-): Promise<string> => {
+): Promise<InterviewQuestion> => {
   const messages = [
     { role: "system", content: INTERVIEWER_SYSTEM },
     ...history.map((m) => ({ role: m.role, content: m.content })),
+    ...(history.length === 0 ? [{ role: "user", content: "Zacznij wywiad." }] : []),
   ];
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({ model: "gpt-4o-mini", messages, temperature: 0.6, max_tokens: 120 }),
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages,
+      temperature: 0.75,
+      max_tokens: 300,
+      response_format: { type: "json_object" },
+    }),
   });
 
   if (!response.ok) {
@@ -143,7 +171,17 @@ export const getNextInterviewQuestion = async (
   }
 
   const data = await response.json();
-  return data.choices?.[0]?.message?.content?.trim() || "Opowiedz mi coś więcej o sobie.";
+  const content = data.choices?.[0]?.message?.content?.trim() ?? "{}";
+
+  try {
+    const parsed = JSON.parse(content);
+    return {
+      question: parsed.question || "Opowiedz mi więcej o swoich celach.",
+      suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions.slice(0, 4) : [],
+    };
+  } catch {
+    return { question: content, suggestions: [] };
+  }
 };
 
 export const generateRoadmapFromInterview = async (
@@ -166,120 +204,109 @@ export const generateRoadmapFromInterview = async (
     .map((ex) => `[${ex.id}] ${ex.title} (${ex.category ?? "brak kategorii"})`)
     .join("\n");
 
-  onPhase?.("analyzing");
-
-  const studentProfile = await callOpenAI(
-    apiKey,
-    `Jesteś psychologiem sportu i ekspertem ds. nauki gitary. Na podstawie wywiadu napisz KRÓTKI (max 200 słów), precyzyjny profil ucznia:
-1. Mocne strony i co już umie
-2. Słabe strony i luki w wiedzy
-3. Przeszkody (techniczne, czasowe, mentalne)
-4. Oszacowanie czasu dostępnego tygodniowo (w minutach)
-5. Styl muzyczny i motywacja
-Odpowiedz po polsku. Bez kodu, tylko tekst.`,
-    `WYWIAD:\n${conversation}`,
-    { temp: 0.5, maxTokens: 500 }
-  );
-
   onPhase?.("drafting");
 
-  const draft = await callOpenAI(
+  const outlineStr = await callOpenAI(
     apiKey,
-    `Jesteś ekspertem ds. nauki gitary. Masz profil ucznia. Stwórz BARDZO SZCZEGÓŁOWY, długi narracyjny plan nauki (min. 1200 słów) w języku polskim.
+    `Jesteś ekspertem ds. nauki gitary. Na podstawie wywiadu stwórz spersonalizowany szkielet planu nauki jako listę etapów.
 
-Plan musi zawierać:
-- 5-8 GŁÓWNYCH ETAPÓW (od najłatwiejszego do najtrudniejszego). Zbuduj długofalową i głęboką strukturę.
-- Dla każdego etapu: szacowany czas (ile tygodni), dogłębnie opisane techniki, BPM targets, jak obiektywnie mierzyć postęp.
-- TRIGGERY: co zrobić jeśli etap przejdzie ("jeśli osiągniesz X → ...") i co jeśli utkniesz ("jeśli po Y tygodniach nie umiesz Z → wróć do...")
-- Każdy etap ma 3-5 pod-kroków z konkretnymi ćwiczeniami.
-- Powiązania z ćwiczeniami z aplikacji (użyj ich nazw z listy, aby potem łatwo je zmapować na ID).
-
-PROFIL UCZNIA:
-${studentProfile}
+WYWIAD:
+${conversation}
 
 OSTATNIO ĆWICZONE:
 ${logContext || "brak danych"}`,
-    `Napisz pełny, bardzo rozbudowany plan.`,
-    { temp: 0.8, maxTokens: 4000 }
+    `Stwórz 4-7 etapów planu nauki gitary, od najłatwiejszego do najtrudniejszego.
+Dla każdego etapu podaj:
+- title: krótki tytuł (max 6 słów)
+- description: 2-3 zdania — co konkretnie jest celem tego etapu, jakie umiejętności są ćwiczone i dlaczego w tej kolejności
+
+Zwróć TYLKO JSON:
+{"phases":[{"title":"...","description":"..."}]}`,
+    { json: true, maxTokens: 4000 }
   );
 
-  onPhase?.("enriching");
+  let outlinePhases: Array<{ title: string; description: string }>;
+  try {
+    const parsed = JSON.parse(outlineStr);
+    outlinePhases = parsed.phases ?? parsed;
+    if (!Array.isArray(outlinePhases) || outlinePhases.length === 0) throw new Error();
+  } catch {
+    console.error("[outline] parse failed:", outlineStr);
+    throw new Error("Nie udało się wygenerować struktury planu. Spróbuj ponownie.");
+  }
 
-  const enriched = await callOpenAI(
-    apiKey,
-    `Jesteś recenzentem planu nauki gitary. Przejrzyj plan i DOPRACUJ go:
-1. Dodaj konkretne BPM (np. zacznij od 60 BPM, cel: 100 BPM) gdzie pasuje
-2. Upewnij się, że każdy etap ma jasne KRYTERIUM SUKCESU (kiedy wiem, że mogę przejść dalej?)
-3. Każdy etap: dodaj SUCCESS TRIGGER (co dalej po sukcesie) i FAIL TRIGGER (co jeśli utknę)
-4. Powiąż konkretne kroki z ćwiczeniami z listy — podaj DOKŁADNE ID ćwiczenia z nawiasów kwadratowych.
+  onPhase?.("detailing");
 
-DOSTĘPNE ĆWICZENIA (ID — nazwa):
-${exerciseList}
+  const phaseDetails = await Promise.all(
+    outlinePhases.map(async (phase, i) => {
+      const phaseStr = await callOpenAI(
+        apiKey,
+        `Jesteś ekspertem ds. nauki gitary. Generujesz JEDEN szczegółowy etap planu nauki opartego na SESJACH ćwiczeniowych.
 
-Zwróć ulepszony, kompletny plan narracyjny po polsku.`,
-    `PLAN DO ULEPSZENIA:\n${draft}`,
-    { temp: 0.5, maxTokens: 4000 }
-  );
+DOSTĘPNE ĆWICZENIA (ID — nazwa — kategoria):
+${exerciseList}`,
+        `Wygeneruj kompletny JSON dla etapu ${i + 1} planu nauki.
 
-  onPhase?.("finalizing");
+ETAP:
+Tytuł: ${phase.title}
+Opis: ${phase.description}
 
-  const today = format(new Date(), "yyyy-MM-dd");
+WAŻNE ZASADY DOTYCZĄCE MODELU SESJI:
+- Każdy pod-krok (child) ma SESJE zamiast czasu. Użytkownik zalicza krok wykonując N sesji.
+- sessionsRequired: ile sesji trzeba wykonać żeby zaliczyć krok (zazwyczaj 5–10, dostosuj do trudności)
+- exerciseOptions: 3–5 ćwiczeń z listy pasujących do tego kroku — użytkownik wybierze jedno na każdą sesję
+- Każde ćwiczenie w exerciseOptions musi mieć opis co konkretnie ćwiczyć podczas tej sesji (1-2 zdania)
+- Główny etap (parent) NIE ma sesji — zalicza się automatycznie gdy wszystkie pod-kroki mają pełną liczbę sesji
 
-  const jsonStr = await callOpenAI(
-    apiKey,
-    `Przekształć plan nauki gitary w strukturalny JSON. Data startu planu: ${today}.
-
-WYMAGANA STRUKTURA:
+Zwróć TYLKO poprawny JSON (bez tekstu dookoła):
 {
-  "phases": [
+  "title": "${phase.title}",
+  "cardTitle": "Etap ${i + 1}",
+  "cardDetailedText": "Minimum 4 zdania: co konkretnie ćwiczysz w tym etapie, jak przebiega typowa sesja, typowe błędy i jak ich unikać, jak ten etap przygotowuje do kolejnego.",
+  "successCriteria": "Konkretny mierzalny cel całego etapu",
+  "successTrigger": "Co robić po zaliczeniu wszystkich kroków etapu",
+  "failTrigger": "Co robić jeśli utknąłeś",
+  "children": [
     {
-      "title": "Krótki tytuł etapu (max 6 słów)",
-      "cardTitle": "Etap 1 · Tydzień 1-3",
-      "cardDetailedText": "Bogaty opis. Co ćwiczyć, jak, na co uważać. Min. 3 zdania.",
-      "weeksEstimate": 3,
-      "successCriteria": "Konkretny, mierzalny cel np. zagraj X w 80 BPM",
-      "successTrigger": "Po osiągnięciu celu: przejdź do etapu 2",
-      "failTrigger": "Jeśli po 3 tygodniach nie ma postępu: wróć do ćwiczenia ID",
-      "youtubeUrl": "Tylko jeśli znasz konkretny, BARDZO DOBRY film na YT na ten temat (link), inaczej null",
-      "children": [
+      "title": "Konkretna umiejętność (max 5 słów)",
+      "cardTitle": "Krok ${i + 1}.1",
+      "cardDetailedText": "3-5 zdań: dokładna instrukcja, na czym się skupić podczas każdej sesji, wskazówki techniczne.",
+      "successCriteria": "Konkretny cel — jak poznasz że opanowałeś",
+      "sessionsRequired": 7,
+      "exerciseOptions": [
         {
-          "title": "Konkretna umiejętność (max 5 słów)",
-          "cardTitle": "Krok 1.1",
-          "cardDetailedText": "Szczegółowy opis: ile minut/dzień, BPM start i cel, wskazówki. Min. 2 zdania.",
-          "successCriteria": "Mierzalny cel np. 60 BPM bez pomyłek przez 30 sek",
-          "targetBpm": 80,
-          "exerciseId": "exercise_id_z_listy_lub_null",
-          "exerciseTitle": "Nazwa ćwiczenia lub null",
-          "successTrigger": "Przejdź do kroku 1.2",
-          "failTrigger": "Ćwicz wolniej, cofnij BPM o 10",
-          "youtubeUrl": "Prawdziwy link youtube ułatwiający naukę tego kroku lub null"
+          "exerciseId": "id_z_listy",
+          "exerciseTitle": "nazwa ćwiczenia",
+          "description": "Co konkretnie ćwiczysz tym ćwiczeniem w kontekście tego kroku (1-2 zdania)"
         }
-      ]
+      ],
+      "selfCheckMethod": "Konkretna metoda samooceny. Max 2 zdania.",
+      "successTrigger": "Co po zaliczeniu kroku",
+      "failTrigger": "Co jeśli nie wychodzi"
     }
   ]
 }
 
 ZASADY:
-- 5-8 faz, każda mająca 3-5 pod-kroków.
-- weeksEstimate: liczba tygodni na ten etap (integer)
-- exerciseId: Użyj IDEALNEGO DOPASOWANIA z przekazanej w wywiadzie listy ID (np. "spider_basic"). Jeśli nie ma odpowiedniego ćwiczenia w aplikacji, zostaw null.
-- WYŁĄCZNIE JSON bez żadnego tekstu dookoła`,
-    `PLAN:\n${enriched}`,
-    { temp: 0.2, json: true, maxTokens: 7000 }
+- children: 3-5 elementów
+- exerciseOptions: użyj DOKŁADNYCH ID z listy ćwiczeń, dobierz pasujące do umiejętności kroku
+- sessionsRequired: dostosuj do trudności (proste = 5 sesji, trudne = 10 sesji)`,
+        { json: true, maxTokens: 16384 }
+      );
+
+      try {
+        return JSON.parse(phaseStr);
+      } catch {
+        console.error(`[phase ${i + 1}] parse failed:`, phaseStr);
+        throw new Error(`Błąd generowania etapu ${i + 1}. Spróbuj ponownie.`);
+      }
+    })
   );
 
-  try {
-    const parsed = JSON.parse(jsonStr);
-    const arr = Array.isArray(parsed)
-      ? parsed
-      : parsed.phases || parsed.steps || (Object.values(parsed)[0] as any[]);
+  onPhase?.("finalizing");
 
-    if (!Array.isArray(arr) || arr.length === 0) throw new Error("Pusta roadmapa");
+  if (!phaseDetails.length) throw new Error("Pusta roadmapa.");
 
-    const milestones = buildMilestones(arr, new Date());
-    return cleanObject(milestones);
-  } catch {
-    console.error("JSON parse failed:", jsonStr);
-    throw new Error("Nie udało się sparsować planu. Spróbuj ponownie.");
-  }
+  const milestones = buildMilestones(phaseDetails);
+  return cleanObject(milestones);
 };
