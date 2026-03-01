@@ -23,6 +23,7 @@ import { spiderPermutation2314Exercise } from "../../exerises/spiderPermutation2
 import { spiderPermutation2341Exercise } from "../../exerises/spiderPermutation2341/spiderPermutation2341";
 import { spiderPermutation2413Exercise } from "../../exerises/spiderPermutation2413/spiderPermutation2413";
 import { spiderPermutation2431Exercise } from "../../exerises/spiderPermutation2431/spiderPermutation2431";
+import { spiderPermutation1234Exercise } from "../../exerises/spiderPermutation1234/spiderPermutation1234";
 import spiderPermutationImage from "./image.webp";
 
 
@@ -33,6 +34,7 @@ export const spiderPermutationPlan: ExercisePlan = {
   difficulty: "medium",
   category: "technique",
   exercises: [
+    spiderPermutation1234Exercise,
     spiderPermutation1243Exercise,
     spiderPermutation1324Exercise,
     spiderPermutation1342Exercise,

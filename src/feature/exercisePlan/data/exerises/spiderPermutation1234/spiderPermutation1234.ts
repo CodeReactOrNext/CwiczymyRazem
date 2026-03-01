@@ -3794,5 +3794,6 @@ export const spiderPermutation1234Exercise: Exercise = {
       ]
     }
   ],
+  image: spiderPermutation1234Image,
 };
 

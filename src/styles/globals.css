@@ -215,6 +215,23 @@ a {
   }
 }
 
+/* ── AlphaTab playback cursor ─────────────────────────────────────────────── */
+.at-cursor-bar {
+  background: rgba(255, 211, 0, 0.2);
+}
+.at-cursor-beat {
+  background: rgba(64, 120, 255, 0.85);
+  width: 3px;
+}
+.at-selection div {
+  background: rgba(64, 64, 255, 0.12);
+}
+.at-highlight * {
+  fill: #3b82f6;
+  stroke: #3b82f6;
+}
+/* ─────────────────────────────────────────────────────────────────────────── */
+
 @keyframes music-pulse {
 
   0%,

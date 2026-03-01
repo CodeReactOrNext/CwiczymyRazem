@@ -217,7 +217,7 @@ export interface UserTooltipData {
   avatar: string | null;
   band: string;
   selectedFrame?: number;
-  selectedGuitar?: number;
+  selectedGuitar?: number | string;
   statistics: {
     totalPracticeTime: number;
     totalPoints: number;

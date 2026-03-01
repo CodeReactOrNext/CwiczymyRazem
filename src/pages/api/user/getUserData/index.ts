@@ -25,6 +25,7 @@ export default async function handler(
           guitarStartDate: userData!.guitarStartDate,
           selectedFrame: userData!.selectedFrame,
           selectedGuitar: userData!.selectedGuitar,
+          role: userData!.role,
         },
         userAuth,
         currentUserStats: {
