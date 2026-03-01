@@ -1,11 +1,12 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { 
+import {
   ChevronLeft,
   ChevronRight,
+  Crown,
   LogOut,
   Menu,
-  Music, 
+  Music,
   SearchCheck,
   ShieldCheck,
   Users} from "lucide-react";
@@ -24,9 +25,10 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
   const router = useRouter();
 
   const menuItems = [
-    { name: "Inventory", href: "/admin", icon: Music },
-    { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Discovery", href: "/admin/discovery", icon: SearchCheck },
+    { name: "Inventory", href: "/admin",          icon: Music        },
+    { name: "Users",     href: "/admin/users",    icon: Users        },
+    { name: "Premium",   href: "/admin/premium",  icon: Crown        },
+    { name: "Discovery", href: "/admin/discovery",icon: SearchCheck  },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

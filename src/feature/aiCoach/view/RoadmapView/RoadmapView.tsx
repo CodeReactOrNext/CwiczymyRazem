@@ -1,703 +1,782 @@
-import React, { useState, useMemo } from "react";
-import {
-  CheckCircle2,
-  Trash2,
-  X,
-  Target,
-  ChevronDown,
-  ArrowRight,
-  RotateCcw,
-  Lock,
-  Dumbbell,
-  Flag,
-  Eye,
-  Edit2,
-  Activity,
-  Play,
-  Zap,
-} from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChevronRight, Dumbbell, Sparkles, Target, X, Zap } from "lucide-react";
 import { useRouter } from "next/router";
-import type { Roadmap, RoadmapMilestone } from "../../types/roadmap.types";
-import { firebaseUpdateRoadmap, firebaseDeleteRoadmap } from "../../services/roadmap.service";
 import { toast } from "sonner";
+import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
+import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+
+// ─── AI Generating Loader ───────────────────────────────────────────────────
+
+const AI_MESSAGES = [
+  "Analyzing your learning goal...",
+  "Identifying key techniques...",
+  "Writing practice exercises...",
+  "Calibrating difficulty to your level...",
+  "Setting success criteria...",
+  "Almost there...",
+];
+
+const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
+  const [msgIdx, setMsgIdx] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setMsgIdx((i) => (i + 1) % AI_MESSAGES.length);
+        setFade(true);
+      }, 300);
+    }, 2200);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-6 pt-2">
+      {/* Icon + message */}
+      <div className="flex flex-col items-center gap-4 py-4">
+        <div className="relative flex items-center justify-center">
+          {/* Outer glow rings */}
+          <span className="absolute h-16 w-16 animate-ping rounded-full bg-emerald-500/10" />
+          <span className="absolute h-12 w-12 animate-pulse rounded-full bg-emerald-500/15" />
+          {/* Icon */}
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/40">
+            <Sparkles className="h-5 w-5 text-emerald-400" />
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-500/70">
+            AI Coach is thinking
+          </p>
+          <p
+            className="text-sm text-zinc-400 transition-opacity duration-300"
+            style={{ opacity: fade ? 1 : 0 }}
+          >
+            {AI_MESSAGES[msgIdx]}
+          </p>
+        </div>
+
+        {/* Typing dots */}
+        <div className="flex items-center gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-1.5 w-1.5 rounded-full bg-emerald-500/60"
+              style={{
+                animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Context hint */}
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3">
+        <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+          Generating details for
+        </p>
+        <p className="text-sm font-medium text-zinc-300">{stepTitle}</p>
+      </div>
+
+      {/* Shimmer skeleton */}
+      <div className="flex flex-col gap-2.5">
+        {[92, 100, 78, 95, 65, 88].map((w, i) => (
+          <div
+            key={i}
+            className="h-3 overflow-hidden rounded-full bg-zinc-800/60"
+            style={{ width: `${w}%` }}
+          >
+            <div
+              className="h-full w-full rounded-full"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent 0%, rgba(16,185,129,0.12) 50%, transparent 100%)",
+                backgroundSize: "200% 100%",
+                animation: `shimmer 1.8s ease-in-out ${i * 0.15}s infinite`,
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        @keyframes bounce {
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+          40% { transform: translateY(-5px); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// ───────────────────────────────────────────────────────────────────────────
+
+type StepStatus = "not-started" | "in-progress" | "done";
+
+function getStatus(step: RoadmapStep): StepStatus {
+  if (step.sessionsCompleted >= step.sessionsRequired) return "done";
+  if (step.sessionsCompleted > 0) return "in-progress";
+  return "not-started";
+}
+
+const STEP_CLS: Record<StepStatus, string> = {
+  "not-started":
+    "border-zinc-700/80 bg-zinc-900 text-zinc-300 hover:border-zinc-500 hover:bg-zinc-800/80",
+  "in-progress":
+    "border-amber-500/50 bg-amber-500/10 text-amber-200 hover:border-amber-400/70",
+  done: "border-emerald-800/50 bg-emerald-950/30 text-zinc-500",
+};
+
+const STATUS_DOT: Record<StepStatus, string> = {
+  "not-started": "bg-zinc-600",
+  "in-progress": "bg-amber-400 shadow-sm shadow-amber-500/40",
+  done: "bg-emerald-500",
+};
+
+const STATUS_LABEL: Record<StepStatus, string> = {
+  "not-started": "To do",
+  "in-progress": "In progress",
+  done: "Done",
+};
+
+const STATUS_BTNS: { status: StepStatus; label: string }[] = [
+  { status: "not-started", label: "To do" },
+  { status: "in-progress", label: "In progress" },
+  { status: "done", label: "✓ Done" },
+];
+
+const PATH_COLOR: Record<StepStatus, string> = {
+  "not-started": "#3f3f46",
+  "in-progress": "#78350f",
+  done: "#14532d",
+};
+
+interface SvgPath {
+  d: string;
+  key: string;
+  status: StepStatus;
+}
 
 interface RoadmapViewProps {
   roadmap: Roadmap;
   onDelete: () => void;
-  onRefresh: () => void;
+  onUpdate?: (roadmap: Roadmap) => void;
 }
 
-function computeLockStates(milestones: RoadmapMilestone[]): Map<string, boolean> {
-  const map = new Map<string, boolean>();
-  let allPrevCompleted = true;
-  for (const m of milestones) {
-    const isLocked = !allPrevCompleted;
-    map.set(m.id, isLocked);
-    let allPrevChildCompleted = true;
-    for (const c of m.children ?? []) {
-      map.set(c.id, isLocked || !allPrevChildCompleted);
-      if (!c.isCompleted) allPrevChildCompleted = false;
-    }
-    if (!m.isCompleted) allPrevCompleted = false;
-  }
-  return map;
-}
-
-function isChildDone(c: RoadmapMilestone): boolean {
-  const req = c.sessionsRequired ?? 1;
-  const done = c.sessionsCompleted ?? 0;
-  return done >= req;
-}
-
-const STYLES = `
-@keyframes checkPop {
-  0%   { transform: scale(0.5); opacity: 0; }
-  60%  { transform: scale(1.15); }
-  100% { transform: scale(1); opacity: 1; }
-}
-@keyframes focusPulse {
-  0%, 100% { border-color: rgba(16,185,129,0.35); }
-  50%       { border-color: rgba(16,185,129,0.8); }
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes sessionFill {
-  from { width: 0%; }
-  to   { width: var(--target-w); }
-}
-.check-pop   { animation: checkPop 400ms cubic-bezier(0.34,1.56,0.64,1) both; }
-.focus-pulse { animation: focusPulse 2.2s ease-in-out infinite; }
-.slide-down  { animation: slideDown 200ms ease both; }
-`;
-
-const EditModal: React.FC<{
-  milestone: RoadmapMilestone;
-  onSave: (m: RoadmapMilestone) => void;
-  onClose: () => void;
-}> = ({ milestone, onSave, onClose }) => {
-  const [local, setLocal] = useState(milestone);
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)" }}>
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
-          <span className="font-semibold text-zinc-100">Edytuj krok</span>
-          <button onClick={onClose} className="text-zinc-500 hover:text-zinc-200 transition-colors"><X className="h-5 w-5" /></button>
-        </div>
-        <div className="flex max-h-[70vh] flex-col gap-4 overflow-y-auto p-6">
-          {([
-            { label: "Tytuł", key: "title" },
-            { label: "Etap", key: "cardTitle" },
-            { label: "Kryterium sukcesu", key: "successCriteria" },
-            { label: "Kiedy przejść dalej", key: "successTrigger" },
-            { label: "Kiedy utknąłem", key: "failTrigger" },
-          ] as const).map(({ label, key }) => (
-            <div key={key} className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-zinc-500">{label}</label>
-              <input
-                className="rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-emerald-500"
-                value={(local as any)[key] || ""}
-                onChange={(e) => setLocal({ ...local, [key]: e.target.value })}
-              />
-            </div>
-          ))}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-500">Opis</label>
-            <textarea
-              className="resize-none rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-emerald-500"
-              rows={5}
-              value={local.cardDetailedText || ""}
-              onChange={(e) => setLocal({ ...local, cardDetailedText: e.target.value })}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-zinc-500">Wymagana liczba sesji</label>
-            <input
-              type="number"
-              min={1}
-              max={30}
-              className="rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-emerald-500"
-              value={local.sessionsRequired ?? 7}
-              onChange={(e) => setLocal({ ...local, sessionsRequired: parseInt(e.target.value) || 7 })}
-            />
-          </div>
-        </div>
-        <div className="flex justify-end gap-3 border-t border-zinc-800 px-6 py-4">
-          <button onClick={onClose} className="rounded-xl border border-zinc-700 bg-zinc-800 px-5 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-700 transition-colors">Anuluj</button>
-          <button onClick={() => onSave(local)} className="rounded-xl bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-500 transition-colors">Zapisz</button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const SessionBar: React.FC<{
-  done: number;
-  required: number;
-  compact?: boolean;
-}> = ({ done, required, compact }) => {
-  const pct = Math.min(100, Math.round((done / required) * 100));
-  const dots = Math.min(required, 12);
-  const filledDots = Math.round((done / required) * dots);
-
-  if (compact) {
-    return (
-      <div className="flex items-center gap-2">
-        <div className="flex gap-0.5">
-          {Array.from({ length: dots }).map((_, i) => (
-            <div
-              key={i}
-              className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${i < filledDots ? "bg-emerald-500" : "bg-zinc-700"}`}
-            />
-          ))}
-        </div>
-        <span className="text-xs text-zinc-500">{done}/{required}</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-zinc-400">Sesje</span>
-        <span className={`text-xs font-bold ${pct === 100 ? "text-emerald-400" : "text-zinc-400"}`}>
-          {done} / {required}
-        </span>
-      </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
-        <div
-          className="h-full rounded-full bg-emerald-500 transition-all duration-500"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <div className="flex gap-1">
-        {Array.from({ length: Math.min(required, 20) }).map((_, i) => (
-          <div
-            key={i}
-            className={`h-2 flex-1 rounded-sm transition-colors duration-300 ${i < done ? "bg-emerald-500" : "bg-zinc-800"}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const ChildDetail: React.FC<{
-  milestone: RoadmapMilestone;
-  isLocked: boolean;
-  onAddSession: () => void;
-  onResetSessions: () => void;
-  onEdit: () => void;
-  onExerciseClick: (id: string) => void;
-}> = ({ milestone: m, isLocked, onAddSession, onResetSessions, onEdit, onExerciseClick }) => {
-  const done = m.sessionsCompleted ?? 0;
-  const required = m.sessionsRequired ?? 7;
-  const completed = isChildDone(m);
-  const validOptions = (m.exerciseOptions ?? []).filter(
-    (o) => o.exerciseId && !o.exerciseId.includes("null")
-  );
-
-  const validOptionsWithTitle = validOptions.map((o) => {
-    const found = exercisesAgregat.find((ex) => ex.id === o.exerciseId);
-    return { ...o, exerciseTitle: found?.title || o.exerciseTitle || o.exerciseId };
-  });
-
-  return (
-    <div className="slide-down mt-1 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
-      <div className="grid grid-cols-1 gap-0 divide-y divide-zinc-800 md:grid-cols-[1fr_260px] md:divide-x md:divide-y-0">
-
-        {/* LEFT — opis */}
-        <div className="flex flex-col gap-5 p-5">
-          {m.cardDetailedText && (
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Opis kroku</p>
-              <div className="text-sm leading-relaxed text-zinc-300">
-                {m.cardDetailedText.split("\n").map((line, i) => (
-                  <p key={i} className={i > 0 ? "mt-2" : ""}>{line}</p>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {m.successCriteria && (
-            <div className="flex items-start gap-3 rounded-xl border border-emerald-900/40 bg-emerald-950/20 px-4 py-3">
-              <Target className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-              <div className="flex flex-col gap-0.5">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-500/70">Jak poznam że umiem</p>
-                <p className="text-sm text-zinc-200">{m.successCriteria}</p>
-              </div>
-            </div>
-          )}
-
-          {m.selfCheckMethod && (
-            <div className="flex items-start gap-3 rounded-xl border border-zinc-800 bg-zinc-800/30 px-4 py-3">
-              <Eye className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />
-              <div className="flex flex-col gap-0.5">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">Samokontrola</p>
-                <p className="text-sm italic text-zinc-400">{m.selfCheckMethod}</p>
-              </div>
-            </div>
-          )}
-
-          {(m.successTrigger || m.failTrigger) && (
-            <div className="flex flex-col gap-2">
-              {m.successTrigger && (
-                <div className="flex items-start gap-3 rounded-xl border border-emerald-900/30 bg-emerald-950/10 px-4 py-3 text-sm">
-                  <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                  <span className="text-zinc-300"><span className="font-semibold text-emerald-400">Po ukończeniu: </span>{m.successTrigger}</span>
-                </div>
-              )}
-              {m.failTrigger && (
-                <div className="flex items-start gap-3 rounded-xl border border-amber-900/30 bg-amber-950/10 px-4 py-3 text-sm">
-                  <RotateCcw className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-                  <span className="text-zinc-300"><span className="font-semibold text-amber-400">Gdy utknąłem: </span>{m.failTrigger}</span>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT — sesje + ćwiczenia + akcje */}
-        <div className="flex flex-col gap-4 p-5">
-          <SessionBar done={done} required={required} />
-
-          {validOptionsWithTitle.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                Ćwiczenia do wyboru na sesję
-              </p>
-              <div className="flex flex-col gap-2">
-                {validOptionsWithTitle.map((opt) => (
-                  <button
-                    key={opt.exerciseId}
-                    onClick={() => onExerciseClick(opt.exerciseId)}
-                    className="flex items-start gap-2.5 rounded-xl border border-zinc-800 bg-zinc-800/40 px-3 py-2.5 text-left transition-colors hover:border-emerald-800/60 hover:bg-emerald-950/20"
-                  >
-                    <Dumbbell className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-sm font-medium text-zinc-200">{opt.exerciseTitle}</span>
-                      {opt.description && (
-                        <span className="text-xs leading-snug text-zinc-500">{opt.description}</span>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {isLocked && (
-            <div className="rounded-xl border border-red-900/30 bg-red-950/20 px-4 py-3 text-xs text-red-400">
-              🔒 Ukończ poprzedni krok żeby odblokować.
-            </div>
-          )}
-
-          {completed && (
-            <div className="rounded-xl border border-emerald-800/40 bg-emerald-950/20 px-4 py-3 text-sm font-semibold text-emerald-400 text-center">
-              ✓ Krok zaliczony!
-            </div>
-          )}
-
-          <div className="mt-auto flex flex-col gap-2 pt-2">
-            {!completed && !isLocked && (
-              <button
-                onClick={onAddSession}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-900/30 transition-all hover:bg-emerald-500 active:scale-95"
-              >
-                <Play className="h-4 w-4" />
-                Zalicz sesję dzisiaj
-              </button>
-            )}
-            {done > 0 && !completed && (
-              <button
-                onClick={onResetSessions}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-800 py-2 text-xs text-zinc-600 transition-colors hover:text-zinc-400"
-              >
-                <RotateCcw className="h-3 w-3" /> Cofnij ostatnią sesję
-              </button>
-            )}
-            <button
-              onClick={onEdit}
-              className="flex w-full items-center justify-center gap-2 rounded-xl py-2 text-xs text-zinc-600 transition-colors hover:text-zinc-400"
-            >
-              <Edit2 className="h-3.5 w-3.5" /> Edytuj krok
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const Connector: React.FC<{ done: boolean }> = ({ done }) => (
-  <div className={`mx-auto h-8 w-0.5 rounded-full transition-colors duration-700 ${done ? "bg-emerald-600" : "bg-zinc-800"}`} />
-);
-
-const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onDelete }) => {
+const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
   const router = useRouter();
-  const [items, setItems] = useState(roadmap.milestones);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [editingMilestone, setEditingMilestone] = useState<RoadmapMilestone | null>(null);
-  const [animatingIds, setAnimatingIds] = useState<Set<string>>(new Set());
+  const [phases, setPhases] = useState<RoadmapPhase[]>(roadmap.phases ?? []);
+  const [drawerStepId, setDrawerStepId] = useState<string | null>(null);
+  const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
+  const [loadingExerciseId, setLoadingExerciseId] = useState<string | null>(null);
 
-  const lockStates = useMemo(() => computeLockStates(items), [items]);
+  // SVG overlay refs
+  const containerRef = useRef<HTMLDivElement>(null);
+  const phaseNodeRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const stepBtnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [svgPaths, setSvgPaths] = useState<SvgPath[]>([]);
+  const [svgDims, setSvgDims] = useState({ w: 0, h: 0 });
 
-  const allChildren = useMemo(() => {
-    const all: RoadmapMilestone[] = [];
-    for (const m of items) for (const c of m.children ?? []) all.push(c);
-    return all;
-  }, [items]);
+  // Lock body scroll when drawer open
+  useEffect(() => {
+    document.body.style.overflow = drawerStepId ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [drawerStepId]);
 
-  const totalSessions = allChildren.reduce((s, c) => s + (c.sessionsRequired ?? 7), 0);
-  const doneSessions = allChildren.reduce((s, c) => s + Math.min(c.sessionsCompleted ?? 0, c.sessionsRequired ?? 7), 0);
-  const progress = totalSessions > 0 ? Math.round((doneSessions / totalSessions) * 100) : 0;
-
-  const focusId = useMemo(() => {
-    for (const m of items) {
-      if (lockStates.get(m.id)) continue;
-      if (!m.isCompleted) {
-        for (const c of m.children ?? []) {
-          if (!(lockStates.get(c.id) ?? false) && !isChildDone(c)) return c.id;
-        }
-      }
+  // Drawer info derived from phases — always fresh
+  const drawerInfo = useMemo((): {
+    step: RoadmapStep;
+    phase: RoadmapPhase;
+    stepIdx: number;
+    phaseIdx: number;
+  } | null => {
+    if (!drawerStepId) return null;
+    for (let pi = 0; pi < phases.length; pi++) {
+      const stepIdx = phases[pi].steps.findIndex((s) => s.id === drawerStepId);
+      if (stepIdx !== -1)
+        return { step: phases[pi].steps[stepIdx], phase: phases[pi], stepIdx, phaseIdx: pi };
     }
     return null;
-  }, [items, lockStates]);
+  }, [drawerStepId, phases]);
 
-  const updateNested = (list: RoadmapMilestone[], id: string, fn: (m: RoadmapMilestone) => RoadmapMilestone): RoadmapMilestone[] =>
-    list.map((m) => m.id === id ? fn(m) : { ...m, children: m.children ? updateNested(m.children, id, fn) : m.children });
+  // ─── SVG path calculation ───
+  const recalcPaths = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
 
-  const findMilestone = (list: RoadmapMilestone[], id: string): RoadmapMilestone | undefined => {
-    for (const m of list) { if (m.id === id) return m; const f = findMilestone(m.children ?? [], id); if (f) return f; }
-  };
+    const cRect = container.getBoundingClientRect();
+    if (cRect.width === 0) return;
 
-  const recalcParentCompletion = (milestones: RoadmapMilestone[]): RoadmapMilestone[] =>
-    milestones.map((m) => {
-      const children = m.children ?? [];
-      if (children.length === 0) return m;
-      const allDone = children.every(isChildDone);
-      return { ...m, isCompleted: allDone, children: recalcParentCompletion(children) };
+    const newPaths: SvgPath[] = [];
+
+    phases.forEach((phase, phaseIdx) => {
+      const phaseEl = phaseNodeRefs.current.get(phase.id);
+      if (!phaseEl) return;
+
+      const pRect = phaseEl.getBoundingClientRect();
+      const pCY = pRect.top + pRect.height / 2 - cRect.top;
+      const pLX = pRect.left - cRect.left;
+      const pRX = pRect.right - cRect.left;
+
+      // Alternate: even phases → steps on RIGHT, odd → steps on LEFT
+      const stepsRight = phaseIdx % 2 === 0;
+
+      phase.steps.forEach((step) => {
+        const stepEl = stepBtnRefs.current.get(step.id);
+        if (!stepEl) return;
+
+        const sRect = stepEl.getBoundingClientRect();
+        const sCY = sRect.top + sRect.height / 2 - cRect.top;
+        const status = getStatus(step);
+
+        let d: string;
+        if (stepsRight) {
+          // Phase RIGHT → Step LEFT, curving outward
+          const x0 = pRX;
+          const x3 = sRect.left - cRect.left;
+          const cpX = x0 + (x3 - x0) * 0.55;
+          d = `M ${x0} ${pCY} C ${cpX} ${pCY} ${cpX} ${sCY} ${x3} ${sCY}`;
+        } else {
+          // Phase LEFT → Step RIGHT, curving outward
+          const x0 = pLX;
+          const x3 = sRect.right - cRect.left;
+          const cpX = x0 - (x0 - x3) * 0.55;
+          d = `M ${x0} ${pCY} C ${cpX} ${pCY} ${cpX} ${sCY} ${x3} ${sCY}`;
+        }
+
+        newPaths.push({ d, key: `${phase.id}-${step.id}`, status });
+      });
     });
 
-  const triggerAnim = (id: string) => {
-    setAnimatingIds((p) => new Set(p).add(id));
-    setTimeout(() => setAnimatingIds((p) => { const n = new Set(p); n.delete(id); return n; }), 600);
+    setSvgPaths(newPaths);
+    setSvgDims({ w: cRect.width, h: cRect.height });
+  }, [phases]);
+
+  useEffect(() => {
+    const t = setTimeout(recalcPaths, 60);
+    return () => clearTimeout(t);
+  }, [recalcPaths]);
+
+  useEffect(() => {
+    window.addEventListener("resize", recalcPaths);
+    return () => window.removeEventListener("resize", recalcPaths);
+  }, [recalcPaths]);
+
+  // ─── Metrics ───
+  const allSteps = useMemo(() => phases.flatMap((p) => p.steps), [phases]);
+  const doneCount = useMemo(
+    () => allSteps.filter((s) => getStatus(s) === "done").length,
+    [allSteps]
+  );
+  const inProgressCount = useMemo(
+    () => allSteps.filter((s) => getStatus(s) === "in-progress").length,
+    [allSteps]
+  );
+  const progress =
+    allSteps.length > 0 ? Math.round((doneCount / allSteps.length) * 100) : 0;
+
+  // ─── Lazy detail fetch ───
+  const openDrawer = async (
+    step: RoadmapStep,
+    phase: RoadmapPhase,
+    stepIdx: number,
+    phaseIdx: number
+  ) => {
+    setDrawerStepId(step.id);
+    if (step.description || loadingDetailId) return;
+
+    setLoadingDetailId(step.id);
+    let enrichedStep = step;
+    try {
+      const res = await fetch("/api/generate-step-detail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          goal: roadmap.goal,
+          level: roadmap.level,
+          phaseIndex: phaseIdx,
+          phaseName: phase.title,
+          totalPhases: phases.length,
+          stepTitle: step.title,
+          prevSteps: phase.steps.slice(0, stepIdx).map((s) => s.title),
+          nextSteps: phase.steps.slice(stepIdx + 1).map((s) => s.title),
+          allPhases: phases.map((p) => ({
+            title: p.title,
+            steps: p.steps.map((s) => s.title),
+          })),
+        }),
+      });
+      const data = await res.json();
+
+      enrichedStep = {
+        ...step,
+        description: data.description || "",
+        successCriteria: data.successCriteria || "",
+        sessionsRequired: Number(data.sessionsRequired) || 8,
+      };
+
+      const newPhases = phases.map((p) =>
+        p.id !== phase.id
+          ? p
+          : { ...p, steps: p.steps.map((s) => (s.id !== step.id ? s : enrichedStep)) }
+      );
+
+      setPhases(newPhases);
+      onUpdate?.({ ...roadmap, phases: newPhases, updatedAt: new Date().toISOString() });
+      await firebaseUpdateRoadmap(roadmap.id, { phases: newPhases });
+    } catch (err) {
+      console.warn("Failed to fetch step detail:", err);
+    } finally {
+      setLoadingDetailId(null);
+    }
+
+    if (enrichedStep.suggestedExerciseId || step.suggestedExerciseId) return;
+    setLoadingExerciseId(step.id);
+    try {
+      const exRes = await fetch("/api/search-exercise", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          stepTitle: step.title,
+          description: enrichedStep.description || step.description || "",
+          goal: roadmap.goal,
+          level: roadmap.level,
+        }),
+      });
+      const exData = await exRes.json();
+      if (!exData.exercise_id) return;
+
+      setPhases((prev) => {
+        const phasesWithEx = prev.map((p) =>
+          p.id !== phase.id
+            ? p
+            : {
+                ...p,
+                steps: p.steps.map((s) =>
+                  s.id !== step.id ? s : { ...s, suggestedExerciseId: exData.exercise_id }
+                ),
+              }
+        );
+        firebaseUpdateRoadmap(roadmap.id, { phases: phasesWithEx });
+        onUpdate?.({ ...roadmap, phases: phasesWithEx, updatedAt: new Date().toISOString() });
+        return phasesWithEx;
+      });
+    } catch (err) {
+      console.warn("Failed to search exercise:", err);
+    } finally {
+      setLoadingExerciseId(null);
+    }
   };
 
-  const addSession = async (childId: string) => {
-    const child = findMilestone(items, childId);
-    if (!child) return;
-    const done = child.sessionsCompleted ?? 0;
-    const req = child.sessionsRequired ?? 7;
-    if (done >= req) return;
-
-    const newDone = done + 1;
-    let updated = updateNested(items, childId, (c) => ({ ...c, sessionsCompleted: newDone, isCompleted: newDone >= req }));
-    updated = recalcParentCompletion(updated);
-    setItems(updated);
-
-    if (newDone >= req) triggerAnim(childId);
-
-    try { await firebaseUpdateRoadmap(roadmap.id, { milestones: updated }); }
-    catch { toast.error("Błąd zapisu."); }
+  const setStepStatus = async (phaseId: string, stepId: string, status: StepStatus) => {
+    const newPhases = phases.map((phase) =>
+      phase.id !== phaseId
+        ? phase
+        : {
+            ...phase,
+            steps: phase.steps.map((step) => {
+              if (step.id !== stepId) return step;
+              const sessionsCompleted =
+                status === "done"
+                  ? step.sessionsRequired
+                  : status === "in-progress"
+                    ? 1
+                    : 0;
+              return { ...step, sessionsCompleted };
+            }),
+          }
+    );
+    setPhases(newPhases);
+    try {
+      await firebaseUpdateRoadmap(roadmap.id, { phases: newPhases });
+    } catch {
+      toast.error("Failed to save.");
+    }
   };
 
-  const removeSession = async (childId: string) => {
-    const child = findMilestone(items, childId);
-    if (!child) return;
-    const done = child.sessionsCompleted ?? 0;
-    if (done === 0) return;
-
-    let updated = updateNested(items, childId, (c) => ({ ...c, sessionsCompleted: done - 1, isCompleted: false }));
-    updated = recalcParentCompletion(updated);
-    setItems(updated);
-
-    try { await firebaseUpdateRoadmap(roadmap.id, { milestones: updated }); }
-    catch { toast.error("Błąd zapisu."); }
-  };
-
-  const handleSaveEdit = async (updated: RoadmapMilestone) => {
-    let updatedList = updateNested(items, updated.id, () => updated);
-    updatedList = recalcParentCompletion(updatedList);
-    setItems(updatedList);
-    setEditingMilestone(null);
-    setExpandedId(null);
-    try { await firebaseUpdateRoadmap(roadmap.id, { milestones: updatedList }); toast.success("Zapisano."); }
-    catch { toast.error("Błąd zapisu."); }
-  };
-
-  const handleDelete = async () => {
-    if (!window.confirm("Usunąć tę roadmapę?")) return;
-    try { await firebaseDeleteRoadmap(roadmap.id); onDelete(); toast.success("Usunięto."); }
-    catch { toast.error("Błąd usuwania."); }
-  };
-
-  const toggle = (id: string) => setExpandedId((p) => (p === id ? null : id));
+  const markerId = `arr-${roadmap.id.slice(0, 8)}`;
 
   return (
     <>
-      <style>{STYLES}</style>
-      <div className="flex flex-col gap-6 rounded-2xl border border-zinc-800 bg-zinc-950 p-5 md:p-8">
-
-        {/* HEADER */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-1.5">
-            <h2 className="text-xl font-bold text-zinc-100">{roadmap.title}</h2>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-              <span className="flex items-center gap-1.5">
-                <Zap className="h-4 w-4 text-emerald-500" />
-                <span className="font-semibold text-emerald-500">{progress}%</span> ukończono
-              </span>
-              <span className="text-zinc-700">·</span>
-              <span className="flex items-center gap-1.5">
-                <Activity className="h-4 w-4" />
-                {doneSessions} / {totalSessions} sesji
-              </span>
-            </div>
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-5 md:p-8">
+        {/* ─── Header ─── */}
+        <div className="mb-5 flex flex-col gap-1">
+          <h2 className="text-xl font-bold text-zinc-100">{roadmap.title}</h2>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500">
+            <span className="flex items-center gap-1.5">
+              <Zap className="h-4 w-4 text-emerald-500" />
+              <span className="font-semibold text-emerald-500">{progress}%</span>
+            </span>
+            <span className="text-zinc-700">·</span>
+            <span>{doneCount}/{allSteps.length} steps</span>
+            {inProgressCount > 0 && (
+              <>
+                <span className="text-zinc-700">·</span>
+                <span className="text-amber-400">{inProgressCount} in progress</span>
+              </>
+            )}
+            {roadmap.level && (
+              <>
+                <span className="text-zinc-700">·</span>
+                <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs">
+                  {roadmap.level}
+                </span>
+              </>
+            )}
           </div>
-          <button
-            onClick={handleDelete}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-600 transition-colors hover:bg-red-950/40 hover:text-red-500"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
         </div>
 
-        {/* PROGRESS BAR */}
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+        {/* ─── Progress bar ─── */}
+        <div className="mb-6 h-1 w-full overflow-hidden rounded-full bg-zinc-800">
           <div
             className="h-full rounded-full bg-emerald-500 transition-all duration-700"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        {/* GOAL */}
-        <div className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/60 px-5 py-4">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
-            <Flag className="h-4 w-4 text-emerald-500" />
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600">Cel końcowy</p>
-            <p className="text-sm font-semibold text-zinc-100">{roadmap.goal}</p>
-          </div>
+        {/* ─── Legend ─── */}
+        <div className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-xl border border-zinc-800/60 bg-zinc-900/40 px-4 py-2.5">
+          <span className="text-xs font-medium text-zinc-500">Status:</span>
+          {(
+            [
+              { dot: "bg-zinc-600", label: "To do" },
+              { dot: "bg-amber-400", label: "In progress" },
+              { dot: "bg-emerald-500", label: "Done" },
+            ] as { dot: string; label: string }[]
+          ).map(({ dot, label }) => (
+            <span key={label} className="flex items-center gap-1.5 text-xs text-zinc-400">
+              <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+              {label}
+            </span>
+          ))}
+          <span className="ml-auto text-xs text-zinc-600">Click step → details</span>
         </div>
 
-        {/* ROADMAP */}
-        <div className="flex flex-col">
-          {items.map((milestone, mIdx) => {
-            const mLocked = lockStates.get(milestone.id) ?? false;
-            const prevDone = mIdx === 0 ? true : items[mIdx - 1].isCompleted;
-            const children = milestone.children ?? [];
-            const mExpanded = expandedId === milestone.id;
-
-            const totalChildSessions = children.reduce((s, c) => s + (c.sessionsRequired ?? 7), 0);
-            const doneChildSessions = children.reduce((s, c) => s + Math.min(c.sessionsCompleted ?? 0, c.sessionsRequired ?? 7), 0);
-            const mPct = totalChildSessions > 0 ? Math.round((doneChildSessions / totalChildSessions) * 100) : 0;
-
-            return (
-              <React.Fragment key={milestone.id}>
-                {mIdx > 0 && <Connector done={prevDone} />}
-
-                {/* MILESTONE HEADER */}
-                <div
-                  className={`flex cursor-pointer items-center gap-4 rounded-2xl border px-5 py-4 transition-all duration-300
-                    ${mLocked
-                      ? "cursor-not-allowed border-zinc-800/40 bg-zinc-900/20 opacity-40"
-                      : milestone.isCompleted
-                        ? "border-emerald-900/40 bg-emerald-950/10 hover:bg-emerald-950/20"
-                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
-                    }
-                  `}
-                  onClick={() => !mLocked && toggle(milestone.id)}
+        {/* ─── Graph ─── */}
+        <div ref={containerRef} className="relative">
+          {/* SVG overlay with bezier arrows */}
+          {svgDims.w > 0 && (
+            <svg
+              className="pointer-events-none absolute left-0 top-0 overflow-visible"
+              width={svgDims.w}
+              height={svgDims.h}
+              style={{ zIndex: 0 }}
+            >
+              <defs>
+                <marker
+                  id={markerId}
+                  markerWidth="5"
+                  markerHeight="4"
+                  refX="5"
+                  refY="2"
+                  orient="auto"
                 >
-                  {/* Status circle */}
-                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold transition-all duration-500 ${
-                    milestone.isCompleted
-                      ? "bg-emerald-500 text-white"
-                      : mLocked
-                        ? "border border-zinc-700 bg-zinc-800 text-zinc-700"
-                        : "border border-zinc-700 bg-zinc-800/50 text-zinc-400"
-                  }`}>
-                    {milestone.isCompleted ? <CheckCircle2 className="h-5 w-5" /> : mLocked ? <Lock className="h-4 w-4" /> : mIdx + 1}
-                  </div>
-
-                  {/* Title + progress */}
-                  <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                    <div className="flex items-center gap-2">
-                      {milestone.cardTitle && (
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600">{milestone.cardTitle}</p>
-                      )}
-                      {milestone.isCompleted && (
-                        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-500">GOTOWE</span>
-                      )}
-                    </div>
-                    <p className={`font-semibold ${milestone.isCompleted ? "text-zinc-500" : mLocked ? "text-zinc-700" : "text-zinc-100"}`}>
-                      {milestone.title}
-                    </p>
-                    {children.length > 0 && !mLocked && (
-                      <div className="flex items-center gap-2">
-                        <div className="h-1 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                          <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${mPct}%` }} />
-                        </div>
-                        <span className="shrink-0 text-xs text-zinc-600">{mPct}%</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {!mLocked && (
-                    <ChevronDown className={`h-5 w-5 shrink-0 text-zinc-600 transition-transform duration-300 ${mExpanded ? "-rotate-180" : ""}`} />
-                  )}
-                </div>
-
-                {/* MILESTONE DETAIL — opis etapu */}
-                {mExpanded && !mLocked && (
-                  <div className="slide-down mt-1 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-                    <div className="flex flex-col gap-4">
-                      {milestone.cardDetailedText && (
-                        <div className="flex flex-col gap-2">
-                          <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">O tym etapie</p>
-                          <p className="text-sm leading-relaxed text-zinc-300">{milestone.cardDetailedText}</p>
-                        </div>
-                      )}
-                      {milestone.successCriteria && (
-                        <div className="flex items-start gap-3 rounded-xl border border-emerald-900/40 bg-emerald-950/20 px-4 py-3">
-                          <Target className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                          <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-500/70">Cel etapu</p>
-                            <p className="mt-0.5 text-sm text-zinc-200">{milestone.successCriteria}</p>
-                          </div>
-                        </div>
-                      )}
-                      {(milestone.successTrigger || milestone.failTrigger) && (
-                        <div className="flex flex-col gap-2">
-                          {milestone.successTrigger && (
-                            <div className="flex items-start gap-3 rounded-xl border border-emerald-900/30 bg-emerald-950/10 px-4 py-3 text-sm">
-                              <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                              <span className="text-zinc-300"><span className="font-semibold text-emerald-400">Po ukończeniu: </span>{milestone.successTrigger}</span>
-                            </div>
-                          )}
-                          {milestone.failTrigger && (
-                            <div className="flex items-start gap-3 rounded-xl border border-amber-900/30 bg-amber-950/10 px-4 py-3 text-sm">
-                              <RotateCcw className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-                              <span className="text-zinc-300"><span className="font-semibold text-amber-400">Gdy utknąłem: </span>{milestone.failTrigger}</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      <p className="text-xs font-medium text-zinc-600">
-                        ↓ Etap zalicza się automatycznie gdy ukończysz wszystkie poniższe kroki
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* CHILDREN */}
-                {children.length > 0 && (
-                  <div className="ml-5 mt-1 flex flex-col border-l border-zinc-800 pl-5">
-                    {children.map((child, cIdx) => {
-                      const cLocked = lockStates.get(child.id) ?? false;
-                      const cFocus = focusId === child.id;
-                      const cDone = isChildDone(child);
-                      const cExpanded = expandedId === child.id;
-                      const sessDone = child.sessionsCompleted ?? 0;
-                      const sessReq = child.sessionsRequired ?? 7;
-
-                      return (
-                        <React.Fragment key={child.id}>
-                          <div className="mb-1 mt-2" />
-                          <div
-                            onClick={() => !cLocked && toggle(child.id)}
-                            className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-all duration-300
-                              ${cLocked
-                                ? "cursor-not-allowed border-zinc-800/30 bg-zinc-900/20 opacity-40"
-                                : cDone
-                                  ? "border-emerald-900/30 bg-emerald-950/10 hover:bg-emerald-950/20"
-                                  : cFocus
-                                    ? "focus-pulse border-emerald-500/40 bg-zinc-900 hover:bg-zinc-800/80"
-                                    : "border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 hover:bg-zinc-800/60"
-                              }
-                            `}
-                          >
-                            {/* Status */}
-                            <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-all duration-500 ${
-                              cDone ? "bg-emerald-500 text-white" : cLocked ? "bg-zinc-800 text-zinc-700" : "border border-zinc-700 bg-zinc-800/50 text-zinc-600"
-                            }`}>
-                              <span className={animatingIds.has(child.id) && cDone ? "check-pop" : ""}>
-                                {cDone ? <CheckCircle2 className="h-3.5 w-3.5" /> : cLocked ? <Lock className="h-3 w-3" /> : <span className="text-[10px] font-bold">{cIdx + 1}</span>}
-                              </span>
-                            </div>
-
-                            {/* Title + session bar */}
-                            <div className="flex min-w-0 flex-1 flex-col gap-1">
-                              <div className="flex items-center gap-2">
-                                {child.cardTitle && <p className="text-[9px] font-semibold uppercase tracking-widest text-zinc-600">{child.cardTitle}</p>}
-                                {cFocus && !cLocked && !cDone && (
-                                  <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400 ring-1 ring-emerald-500/20">TERAZ</span>
-                                )}
-                              </div>
-                              <p className={`text-sm font-medium ${cDone ? "text-zinc-500 line-through" : cLocked ? "text-zinc-700" : "text-zinc-100"}`}>
-                                {child.title}
-                              </p>
-                              {!cLocked && <SessionBar done={sessDone} required={sessReq} compact />}
-                            </div>
-
-                            {!cLocked && (
-                              <ChevronDown className={`h-4 w-4 shrink-0 text-zinc-700 transition-transform duration-300 ${cExpanded ? "-rotate-180" : ""}`} />
-                            )}
-                          </div>
-
-                          {cExpanded && !cLocked && (
-                            <ChildDetail
-                              milestone={child}
-                              isLocked={cLocked}
-                              onAddSession={() => addSession(child.id)}
-                              onResetSessions={() => removeSession(child.id)}
-                              onEdit={() => { setEditingMilestone(child); setExpandedId(null); }}
-                              onExerciseClick={(id) => router.push(`/profile/exercises?exerciseId=${id}`)}
-                            />
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                  </div>
-                )}
-              </React.Fragment>
-            );
-          })}
-
-          {/* FINISH */}
-          {items.length > 0 && (
-            <>
-              <Connector done={items[items.length - 1].isCompleted} />
-              <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 transition-all duration-700 ${
-                progress === 100
-                  ? "border-emerald-500/30 bg-emerald-950/20"
-                  : "border-zinc-800 bg-zinc-900/30 opacity-40 grayscale"
-              }`}>
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl ${progress === 100 ? "bg-emerald-500" : "bg-zinc-800"}`}>
-                  🏆
-                </div>
-                <div>
-                  <p className={`text-sm font-bold ${progress === 100 ? "text-zinc-100" : "text-zinc-600"}`}>
-                    {progress === 100 ? "Cel osiągnięty!" : "Meta"}
-                  </p>
-                  <p className="text-xs text-zinc-600">{roadmap.goal}</p>
-                </div>
-              </div>
-            </>
+                  <polygon points="0 0, 5 2, 0 4" />
+                </marker>
+              </defs>
+              {svgPaths.map((path) => (
+                <path
+                  key={path.key}
+                  d={path.d}
+                  stroke={PATH_COLOR[path.status]}
+                  strokeWidth="1.5"
+                  fill="none"
+                  strokeDasharray="5 3"
+                  markerEnd={`url(#${markerId})`}
+                  opacity="0.8"
+                />
+              ))}
+            </svg>
           )}
+
+          {/* Nodes */}
+          <div className="relative flex flex-col items-center" style={{ zIndex: 1 }}>
+            {/* Root node */}
+            <div className="rounded-xl border border-zinc-600 bg-zinc-800 px-7 py-3 text-center text-sm font-bold text-zinc-100 shadow-md">
+              {roadmap.goal}
+            </div>
+
+            {phases.map((phase, phaseIdx) => {
+              const stepsRight = phaseIdx % 2 === 0;
+
+              return (
+                <div key={phase.id} className="flex w-full flex-col items-center">
+                  {/* Spine segment */}
+                  <div className="h-8 w-px bg-zinc-800" />
+
+                  {/* 3-column row: [left steps] [phase node] [right steps] */}
+                  <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-x-6">
+                    {/* LEFT column */}
+                    <div className="flex flex-col items-end gap-1.5">
+                      {!stepsRight &&
+                        phase.steps.map((step, stepIdx) => {
+                          const status = getStatus(step);
+                          const isActive = drawerStepId === step.id;
+                          const isLoading = loadingDetailId === step.id;
+                          return (
+                            <button
+                              key={step.id}
+                              ref={(el) => {
+                                if (el) stepBtnRefs.current.set(step.id, el);
+                                else stepBtnRefs.current.delete(step.id);
+                              }}
+                              onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
+                              className={`
+                                flex max-w-[220px] items-center gap-2 rounded-md border
+                                px-2.5 py-1.5 text-[11px] font-medium transition-all
+                                duration-150 text-right
+                                ${STEP_CLS[status]}
+                                ${isActive ? "ring-1 ring-emerald-500/40 ring-offset-1 ring-offset-zinc-950" : ""}
+                              `}
+                            >
+                              {isLoading && (
+                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-zinc-500" />
+                              )}
+                              {!isLoading && (
+                                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
+                              )}
+                              <span>{step.title}</span>
+                            </button>
+                          );
+                        })}
+                    </div>
+
+                    {/* CENTER — phase node */}
+                    <div
+                      ref={(el) => {
+                        if (el) phaseNodeRefs.current.set(phase.id, el);
+                        else phaseNodeRefs.current.delete(phase.id);
+                      }}
+                      className="flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-xl border border-zinc-500 bg-zinc-800 px-4 py-3 shadow-md"
+                    >
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[10px] font-bold text-zinc-300">
+                        {phaseIdx + 1}
+                      </span>
+                      <span className="h-3.5 w-px bg-zinc-600" />
+                      <span className="text-sm font-semibold text-zinc-100">
+                        {phase.title}
+                      </span>
+                    </div>
+
+                    {/* RIGHT column */}
+                    <div className="flex flex-col items-start gap-1.5">
+                      {stepsRight &&
+                        phase.steps.map((step, stepIdx) => {
+                          const status = getStatus(step);
+                          const isActive = drawerStepId === step.id;
+                          const isLoading = loadingDetailId === step.id;
+                          return (
+                            <button
+                              key={step.id}
+                              ref={(el) => {
+                                if (el) stepBtnRefs.current.set(step.id, el);
+                                else stepBtnRefs.current.delete(step.id);
+                              }}
+                              onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
+                              className={`
+                                flex max-w-[220px] items-center gap-2 rounded-md border
+                                px-2.5 py-1.5 text-[11px] font-medium transition-all
+                                duration-150 text-left
+                                ${STEP_CLS[status]}
+                                ${isActive ? "ring-1 ring-emerald-500/40 ring-offset-1 ring-offset-zinc-950" : ""}
+                              `}
+                            >
+                              {isLoading ? (
+                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-zinc-500" />
+                              ) : (
+                                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
+                              )}
+                              <span>{step.title}</span>
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Finish node */}
+            {phases.length > 0 && (
+              <>
+                <div className="h-8 w-px bg-zinc-800" />
+                <div
+                  className={`rounded-xl border px-7 py-3 text-center text-sm font-semibold transition-all duration-700 ${
+                    progress === 100
+                      ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-400"
+                      : "border-zinc-800 bg-zinc-900/30 text-zinc-600 opacity-40"
+                  }`}
+                >
+                  {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      {editingMilestone && (
-        <EditModal
-          milestone={editingMilestone}
-          onSave={handleSaveEdit}
-          onClose={() => setEditingMilestone(null)}
-        />
-      )}
+      {/* ─── Drawer overlay ─── */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
+          drawerInfo ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={() => setDrawerStepId(null)}
+      />
+
+      {/* ─── Drawer panel ─── */}
+      <div
+        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-zinc-800 bg-zinc-950 shadow-2xl transition-transform duration-300 ${
+          drawerInfo ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {drawerInfo && (
+          <>
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 border-b border-zinc-800 p-6">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-md bg-zinc-800 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                    Phase {drawerInfo.phaseIdx + 1}
+                  </span>
+                  <span className="text-[10px] text-zinc-600">
+                    · step {drawerInfo.stepIdx + 1}
+                  </span>
+                </div>
+                <h2 className="text-base font-bold leading-snug text-zinc-100">
+                  {drawerInfo.step.title}
+                </h2>
+                <span
+                  className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
+                    getStatus(drawerInfo.step) === "done"
+                      ? "bg-emerald-900/40 text-emerald-400"
+                      : getStatus(drawerInfo.step) === "in-progress"
+                        ? "bg-amber-500/15 text-amber-300"
+                        : "bg-zinc-800 text-zinc-500"
+                  }`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[getStatus(drawerInfo.step)]}`}
+                  />
+                  {STATUS_LABEL[getStatus(drawerInfo.step)]}
+                </span>
+              </div>
+              <button
+                onClick={() => setDrawerStepId(null)}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Status buttons */}
+            <div className="border-b border-zinc-800 px-6 py-4">
+              <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+                Change status
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {STATUS_BTNS.map(({ status: s, label }) => {
+                  const isActive = getStatus(drawerInfo.step) === s;
+                  return (
+                    <button
+                      key={s}
+                      onClick={() =>
+                        setStepStatus(drawerInfo.phase.id, drawerInfo.step.id, s)
+                      }
+                      className={`rounded-lg border py-2 text-xs font-medium transition-all ${
+                        isActive
+                          ? s === "not-started"
+                            ? "border-zinc-500 bg-zinc-700 text-zinc-200"
+                            : s === "in-progress"
+                              ? "border-amber-500/50 bg-amber-500/15 text-amber-300"
+                              : "border-emerald-700/50 bg-emerald-900/30 text-emerald-400"
+                          : "border-zinc-800 bg-zinc-900 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {loadingDetailId === drawerInfo.step.id ? (
+                <AiGeneratingLoader stepTitle={drawerInfo.step.title} />
+              ) : drawerInfo.step.description ? (
+                <>
+                  <p className="text-sm leading-relaxed text-zinc-300">
+                    {drawerInfo.step.description}
+                  </p>
+                  {drawerInfo.step.successCriteria && (
+                    <div className="mt-5 flex items-start gap-3 rounded-xl border border-emerald-900/40 bg-emerald-950/20 px-4 py-3">
+                      <Target className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                      <div>
+                        <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-emerald-500/70">
+                          Success criteria
+                        </p>
+                        <p className="text-sm text-zinc-200">
+                          {drawerInfo.step.successCriteria}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ─── Suggested Exercise ─── */}
+                  {loadingExerciseId === drawerInfo.step.id ? (
+                    <div className="mt-5 flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-emerald-500" />
+                      <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
+                    </div>
+                  ) : drawerInfo.step.suggestedExerciseId ? (() => {
+                    const ex = exercisesAgregat.find(e => e.id === drawerInfo.step.suggestedExerciseId);
+                    if (!ex) return null;
+                    return (
+                      <div className="mt-5">
+                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+                          Recommended exercise
+                        </p>
+                        <button
+                          onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}`)}
+                          className="group flex w-full items-center gap-3 rounded-xl border border-zinc-700/60 bg-zinc-900 px-4 py-3 text-left transition hover:border-emerald-500/40 hover:bg-emerald-950/20"
+                        >
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20 transition group-hover:bg-emerald-500/20">
+                            <Dumbbell className="h-4 w-4 text-emerald-400" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold text-zinc-100">{ex.title}</p>
+                            {ex.difficulty && (
+                              <p className="mt-0.5 text-[10px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>
+                            )}
+                          </div>
+                          <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition group-hover:text-emerald-400" />
+                        </button>
+                      </div>
+                    );
+                  })() : null}
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-3 py-8 text-center">
+                  <p className="text-sm text-zinc-500">
+                    Detailed description will be generated.
+                  </p>
+                  <p className="text-xs text-zinc-700">
+                    Close and reopen this step to load the description.
+                  </p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </>
   );
 };

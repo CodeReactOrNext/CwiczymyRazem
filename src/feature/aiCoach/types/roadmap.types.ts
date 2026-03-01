@@ -1,30 +1,19 @@
-export interface ExerciseOption {
-  exerciseId: string;
-  exerciseTitle: string;
-  description?: string;
-}
-
-export interface RoadmapMilestone {
+export interface RoadmapStep {
   id: string;
   title: string;
-  cardTitle?: string;
-  cardSubtitle?: string;
-  cardDetailedText?: string;
-  isCompleted: boolean;
+  description: string;
+  successCriteria: string;
+  sessionsRequired: number;
+  sessionsCompleted: number;
   order: number;
-  children?: RoadmapMilestone[];
+  suggestedExerciseId?: string;
+}
 
-  successCriteria?: string;
-  successTrigger?: string | null;
-  failTrigger?: string | null;
-  selfCheckMethod?: string | null;
-
-  sessionsRequired?: number;
-  sessionsCompleted?: number;
-  exerciseOptions?: ExerciseOption[];
-
-  exerciseId?: string;
-  exerciseTitle?: string;
+export interface RoadmapPhase {
+  id: string;
+  title: string;
+  order: number;
+  steps: RoadmapStep[];
 }
 
 export interface Roadmap {
@@ -32,7 +21,8 @@ export interface Roadmap {
   userId: string;
   title: string;
   goal: string;
+  level: string;
   createdAt: string;
   updatedAt: string;
-  milestones: RoadmapMilestone[];
+  phases: RoadmapPhase[];
 }

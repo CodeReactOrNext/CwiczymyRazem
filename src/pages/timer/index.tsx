@@ -8,9 +8,9 @@ import { withAuth } from "utils/auth/serverAuth";
 
 const Timer: NextPageWithLayout = () => {
   const router = useRouter();
-  const [loadingMode, setLoadingMode] = useState<"timer" | "plan" | "auto" | "song" | "skills" | null>(null);
+  const [loadingMode, setLoadingMode] = useState<"timer" | "plan" | "auto" | "song" | "skills" | "gp" | null>(null);
 
-  const handleModeSelect = (mode: "timer" | "plan" | "auto" | "song" | "skills") => {
+  const handleModeSelect = (mode: "timer" | "plan" | "auto" | "song" | "skills" | "gp") => {
     setLoadingMode(mode);
     switch (mode) {
       case "timer":
@@ -27,6 +27,9 @@ const Timer: NextPageWithLayout = () => {
         break;
       case "skills":
         router.push("/profile/skills");
+        break;
+      case "gp":
+        router.push("/practice/custom");
         break;
       default:
         setLoadingMode(null);

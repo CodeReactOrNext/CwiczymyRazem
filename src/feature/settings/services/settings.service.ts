@@ -77,7 +77,7 @@ export const firebaseUpdateSoundCloudLink = async (soundCloudLink: string) => {
   await updateDoc(userDocRef, { soundCloudLink: soundCloudLink });
 }; export const firebaseUpdateProfileCustomization = async (
   selectedFrame?: number,
-  selectedGuitar?: number
+  selectedGuitar?: number | string
 ) => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   const updateData: any = {};

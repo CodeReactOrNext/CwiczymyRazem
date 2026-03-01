@@ -13,13 +13,11 @@ import { AnimatePresence,motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
-  BookOpen,
   Brain,
   Calendar,
   Coffee,
   Dumbbell,
   FileText,
-  Flame,
   LayoutGrid,
   Music,
   Settings,
@@ -29,6 +27,8 @@ import {
   X,
   Video,
   LogOut,
+  Sparkles,
+  BarChart2,
 } from "lucide-react";
 import { Heart, Zap } from "lucide-react";
 import Image from "next/image";
@@ -84,8 +84,9 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
       return "library";
     }
     if (pathname === "/timer") return "timer";
+    if (pathname === "/ai-coach") return "ai-coach";
+    if (pathname === "/summary") return "summary";
     if (pathname.startsWith("/report")) return "report";
-    if (pathname.startsWith("/guide")) return "guide";
     if (pathname.startsWith("/leaderboard")) return "leaderboard";
     if (pathname.startsWith("/seasons")) return "seasons";
     if (pathname.startsWith("/settings")) return "settings";
@@ -166,6 +167,18 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
       href: "/report",
       icon: <FileText size={18} />,
     },
+    {
+      id: "ai-coach" as NavPagesTypes,
+      name: "AI Coach",
+      href: "/ai-coach",
+      icon: <Sparkles size={18} className="text-amber-400" />,
+    },
+    {
+      id: "summary" as NavPagesTypes,
+      name: "Summary",
+      href: "/summary",
+      icon: <BarChart2 size={16} />,
+    },
   ];
 
   const songsSections = [
@@ -190,12 +203,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
   ];
 
   const otherSections = [
-    {
-      id: "guide" as NavPagesTypes,
-      name: "Guide",
-      href: "/guide",
-      icon: <BookOpen size={16} />,
-    },
     {
       id: "settings" as NavPagesTypes,
       name: "Settings",

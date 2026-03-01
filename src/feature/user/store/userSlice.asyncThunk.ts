@@ -211,7 +211,7 @@ export const updateUserPassword = createAsyncThunk(
 
 export const updateProfileCustomization = createAsyncThunk(
   "user/updateProfileCustomization",
-  async ({ selectedFrame, selectedGuitar }: { selectedFrame?: number; selectedGuitar?: number }) => {
+  async ({ selectedFrame, selectedGuitar }: { selectedFrame?: number; selectedGuitar?: number | string }) => {
     try {
       await firebaseUpdateProfileCustomization(selectedFrame, selectedGuitar);
       return { selectedFrame, selectedGuitar };

@@ -7,7 +7,6 @@ export type NavPagesTypes =
   | "faq"
   | "songs"
   | "library"
-  | "guide"
   | "my_songs"
   | "seasons"
   | "timer"
@@ -17,4 +16,5 @@ export type NavPagesTypes =
   | "privacy-policy"
   | "exercises"
   | "ai-coach"
+  | "summary"
   | null;

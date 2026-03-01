@@ -1,0 +1,749 @@
+[
+  {
+    "id": "spider_one_string",
+    "title": "Single String Spider Exercise",
+    "description": "Chromatic exercise on a single string developing finger independence and left hand precision.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "spider_stairs_hard",
+    "title": "Advanced Spider Stairs Exercise",
+    "description": "Advanced version of the stairs exercise with wider note intervals and faster tempo.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_string_skipping",
+    "title": "String Skipping Spider Exercise",
+    "description": "Exercise developing coordination in string skipping and right hand precision.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_x",
+    "title": "Spider X Pattern Exercise",
+    "description": "Exercise using X-pattern to develop finger independence and hand coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_x_extended",
+    "title": "Extended Spider X Exercise",
+    "description": "Advanced version of X exercise with wider stretches and complex patterns.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_basic",
+    "title": "Horizontal Spider Exercise",
+    "description": "Exercise developing left hand precision and synchronization with right hand.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "play_by_ear",
+    "title": "Playing By Ear",
+    "description": "Exercise developing the ability to listen and reproduce music without sheet music.",
+    "difficulty": "medium",
+    "category": "hearing"
+  },
+  {
+    "id": "one_string_backing",
+    "title": "Single String Phrasing",
+    "description": "Exercise developing phrasing skills and musical expression by restricting playing to a single string.",
+    "difficulty": "medium",
+    "category": "creativity"
+  },
+  {
+    "id": "one_chord_improv",
+    "title": "Single Chord Improvisation",
+    "description": "Exercise developing creativity and harmonic understanding through improvisation over a single, unchanging chord.",
+    "difficulty": "medium",
+    "category": "creativity"
+  },
+  {
+    "id": "triad_improvisation",
+    "title": "Triad Improvisation",
+    "description": "Exercise developing improvisation skills using chord triads, strengthening harmonic awareness and melodic fluency.",
+    "difficulty": "hard",
+    "category": "creativity"
+  },
+  {
+    "id": "chromatic_accents",
+    "title": "Chromatic Accent Dynamics",
+    "description": "Exercise developing dynamic control through playing chromatic sequences with shifting accents.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "spider_legato_basic",
+    "title": "Spider Legato - Basic",
+    "description": "Exercise developing left hand strength and legato technique (hammer-ons and pull-offs).",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "economy_picking_angular",
+    "title": "Angular / Economy Picking",
+    "description": "Angular (economy) picking exercise focused on efficient string crossing, smooth sweep motions, and right-hand economy.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "hammer_on_sequence_5_7_9",
+    "title": "Hammer-ons – 5-7-9 Sequence",
+    "description": "Hammer-on focused exercise using a 5-7-9 sequence across strings, designed to build left-hand strength, finger independence, and legato clarity.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "legato_sextuplets_4_5_7",
+    "title": "Legato Sextuplets – 4-5-7",
+    "description": "Legato exercise based on 4-5-7 fingerings played in sextuplets, combining hammer-ons and pull-offs to develop left-hand strength, control, and rhythmic precision.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "guide_tone_voice_leading",
+    "title": "Guide Tone Voice-Leading Drill",
+    "description": "Exercise focused on voice leading and harmonic awareness by using only guide tones (3rds and 7ths) to outline chord progressions with minimal melodic movement.",
+    "difficulty": "hard",
+    "category": "theory"
+  },
+  {
+    "id": "two_notes_per_bar_phrasing",
+    "title": "Two-Notes-Per-Bar Phrasing",
+    "description": "Exercise developing phrasing, space, and musical decision-making by strictly limiting you to a maximum of two notes per bar.",
+    "difficulty": "easy",
+    "category": "creativity"
+  },
+  {
+    "id": "chord_tone_improvisation",
+    "title": "Chord Tone Improvisation",
+    "description": "Advanced harmonic awareness exercise focused on strict chord-tone improvisation over faster chord changes and increased cognitive load.",
+    "difficulty": "hard",
+    "category": "theory"
+  },
+  {
+    "id": "call_and_response_phrasing",
+    "title": "Call and Response Phrasing",
+    "description": "Exercise developing musical phrasing through a call-and-response approach, teaching how to create tension and resolution by treating phrases as questions and answers.",
+    "difficulty": "medium",
+    "category": "creativity"
+  },
+  {
+    "id": "minimal_motion_voice_leading",
+    "title": "Minimal-Motion Voice Leading",
+    "description": "Advanced voice-leading drill: connect chord changes with the smallest possible melodic movement to create smooth, harmonically aware lines.",
+    "difficulty": "hard",
+    "category": "theory"
+  },
+  {
+    "id": "natural_notes_map",
+    "title": "Natural Notes Map",
+    "description": "Exercise for fretboard mapping: systematically find and play only natural notes (A–G) across the entire guitar neck to build fast note-location awareness.",
+    "difficulty": "medium",
+    "category": "theory"
+  },
+  {
+    "id": "fretboard_mastery",
+    "title": "Fretboard Mastery",
+    "description": "Exercise developing full fretboard awareness by playing the same melodic phrase in multiple positions, forcing note-based thinking instead of relying on shapes.",
+    "difficulty": "hard",
+    "category": "theory"
+  },
+  {
+    "id": "smooth_chord_transitions",
+    "title": "Smooth Chord Transitions",
+    "description": "Exercise focused on practical voice leading by connecting chord shapes with minimal finger movement and preserving common tones between chords.",
+    "difficulty": "hard",
+    "category": "theory"
+  },
+  {
+    "id": "vibrato_mastery",
+    "title": "Vibrato Mastery",
+    "description": "Exercise focusing on control of width and speed of your vibrato for maximum expression.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "metronome_gap_test",
+    "title": "Metronome Gap Test",
+    "description": "Advanced timing exercise: maintain a steady pulse when the metronome stops/silences.",
+    "difficulty": "medium",
+    "category": "theory"
+  },
+  {
+    "id": "sing_what_you_play",
+    "title": "Sing What You Play",
+    "description": "Advanced ear-training and phrasing drill: connect your voice to your fingers.",
+    "difficulty": "hard",
+    "category": "hearing"
+  },
+  {
+    "id": "open_g_repetition",
+    "title": "Open G String Repetition",
+    "description": "Basic exercise focusing on rhythmic consistency by repeating the open G string.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "all_strings_open_repetition",
+    "title": "All Strings Open Repetition",
+    "description": "Advanced rhythm exercise moving across all strings using open notes.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "random_note_hunt",
+    "title": "Random Note Hunt: D",
+    "description": "Improve your fretboard knowledge by finding all occurrences of the selected note across the neck.",
+    "difficulty": "easy",
+    "category": "theory",
+    "customGoal": "D",
+    "customGoalDescription": "Find this note everywhere on the neck"
+  },
+  {
+    "id": "spider_permutation_1234",
+    "title": "Spider Exercise - 1-2-3-4 Permutation",
+    "description": "Basic chromatic exercise using finger permutation 1-2-3-4, developing finger independence and coordination.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_1243",
+    "title": "Spider Exercise - 1-2-4-3 Permutation",
+    "description": "Chromatic exercise using finger permutation 1-2-4-3, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_1324",
+    "title": "Spider Exercise - 1-3-2-4 Permutation",
+    "description": "Chromatic exercise using finger permutation 1-3-2-4, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_1342",
+    "title": "Spider Exercise - 1-3-4-2 Permutation",
+    "description": "Chromatic exercise using finger permutation 1-3-4-2, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_1423",
+    "title": "Spider Exercise - 1-4-2-3 Permutation",
+    "description": "Chromatic exercise using finger permutation 1-4-2-3, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_1432",
+    "title": "Spider Exercise - 1-4-3-2 Permutation",
+    "description": "Chromatic exercise using finger permutation 1-4-3-2, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_2134",
+    "title": "Spider Exercise - 2-1-3-4 Permutation",
+    "description": "Chromatic exercise using finger permutation 2-1-3-4, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_2143",
+    "title": "Spider Exercise - 2-1-4-3 Permutation",
+    "description": "Chromatic exercise using finger permutation 2-1-4-3, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_2314",
+    "title": "Spider Exercise - 2-3-1-4 Permutation",
+    "description": "Chromatic exercise using finger permutation 2-3-1-4, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_2341",
+    "title": "Spider Exercise - 2-3-4-1 Permutation",
+    "description": "Chromatic exercise using finger permutation 2-3-4-1, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_2413",
+    "title": "Spider Exercise - 2-4-1-3 Permutation",
+    "description": "Chromatic exercise using finger permutation 2-4-1-3, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_2431",
+    "title": "Spider Exercise - 2-4-3-1 Permutation",
+    "description": "Chromatic exercise using finger permutation 2-4-3-1, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_3124",
+    "title": "Spider Exercise - 3-1-2-4 Permutation",
+    "description": "Chromatic exercise using finger permutation 3-1-2-4, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_3142",
+    "title": "Spider Exercise - 3-1-4-2 Permutation",
+    "description": "Chromatic exercise using finger permutation 3-1-4-2, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_3214",
+    "title": "Spider Exercise - 3-2-1-4 Permutation",
+    "description": "Chromatic exercise using finger permutation 3-2-1-4, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_3241",
+    "title": "Spider Exercise - 3-2-4-1 Permutation",
+    "description": "Chromatic exercise using finger permutation 3-2-4-1, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_3412",
+    "title": "Spider Exercise - 3-4-1-2 Permutation",
+    "description": "Chromatic exercise using finger permutation 3-4-1-2, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_3421",
+    "title": "Spider Exercise - 3-4-2-1 Permutation",
+    "description": "Chromatic exercise using finger permutation 3-4-2-1, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_4123",
+    "title": "Spider Exercise - 4-1-2-3 Permutation",
+    "description": "Chromatic exercise using finger permutation 4-1-2-3, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_4132",
+    "title": "Spider Exercise - 4-1-3-2 Permutation",
+    "description": "Chromatic exercise using finger permutation 4-1-3-2, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_4213",
+    "title": "Spider Exercise - 4-2-1-3 Permutation",
+    "description": "Chromatic exercise using finger permutation 4-2-1-3, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_4231",
+    "title": "Spider Exercise - 4-2-3-1 Permutation",
+    "description": "Chromatic exercise using finger permutation 4-2-3-1, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_4312",
+    "title": "Spider Exercise - 4-3-1-2 Permutation",
+    "description": "Chromatic exercise using finger permutation 4-3-1-2, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_permutation_4321",
+    "title": "Spider Exercise - 4-3-2-1 Permutation",
+    "description": "Chromatic exercise using finger permutation 4-3-2-1, developing finger independence and coordination.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "spider_chromatics",
+    "title": "Spider Chromatics - 1-2-3-4",
+    "description": "Classic chromatic spider exercise involving fingers 1-2-3-4 moving across all strings.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "metal_playalong_basic",
+    "title": "Metal Guitar Playalong",
+    "description": "Practice along with video - metal guitar exercises. Play synchronously with the instructor and develop your technique.",
+    "difficulty": "medium",
+    "category": "technique",
+    "youtubeVideoId": "aHaPgeCbEMQ"
+  },
+  {
+    "id": "musician_fitness_lvl1_s1",
+    "title": "Level #1 Session #1 - Spider Crawls, Strumming, Chords",
+    "description": "Beginner practice session: Spider Crawls, strumming, Power chords, and riffs. Play along with the instructor.",
+    "difficulty": "easy",
+    "category": "technique",
+    "youtubeVideoId": "PiY1uDAGhVM"
+  },
+  {
+    "id": "musician_fitness_lvl1_s2",
+    "title": "Level #1 Session #2 - Speeding Up & Changing Chords",
+    "description": "Level 1 Session 2: Increasing speed and smooth chord transitions.",
+    "difficulty": "easy",
+    "category": "technique",
+    "youtubeVideoId": "QWSfpBlzj20"
+  },
+  {
+    "id": "musician_fitness_lvl1_s3",
+    "title": "Level #1 Session #3 - Open Chords, Powerchords, Strumming",
+    "description": "Level 1 Session 3: Open Chords, Powerchords, strumming, and a full song. Play along with the instructor.",
+    "difficulty": "easy",
+    "category": "technique",
+    "youtubeVideoId": "4e9RvY0ko08"
+  },
+  {
+    "id": "musician_fitness_lvl1_s4",
+    "title": "Level #1 Session #4 - Pinky Control, Smooth Chord Changes",
+    "description": "Level 1 Session 4: Pinky control and smooth chord changes. Play along with the instructor.",
+    "difficulty": "easy",
+    "category": "technique",
+    "youtubeVideoId": "l3TKHRUlK9U"
+  },
+  {
+    "id": "musician_fitness_lvl1_s5",
+    "title": "Level #1 Session #5 - Smoke on the Water",
+    "description": "Level 1 Session 5: Learn Smoke on the Water! Play along with the instructor.",
+    "difficulty": "easy",
+    "category": "technique",
+    "youtubeVideoId": "YnNdHcxiJTY"
+  },
+  {
+    "id": "musician_fitness_lvl1_s6",
+    "title": "Level #1 Session #6 - Riffs, Chords, Spider Crawls",
+    "description": "Level 1 Session 6: Riffs, chord changes, Spider Crawls, and more. Play along with the instructor.",
+    "difficulty": "easy",
+    "category": "technique",
+    "youtubeVideoId": "d1Vtdtx_Xwo"
+  },
+  {
+    "id": "musician_fitness_lvl1_s7",
+    "title": "Level #1 Session #7 - Spider Crawls, Common Chords, Songs",
+    "description": "Level 1 Session 7: Spider Crawls, common chord changes, and easy songs. Play along with the instructor.",
+    "difficulty": "easy",
+    "category": "technique",
+    "youtubeVideoId": "GqorA0S2bj4"
+  },
+  {
+    "id": "musician_fitness_lvl1_s8",
+    "title": "Level #1 Session #8 - Practice Session",
+    "description": "Level 1 Session 8: Comprehensive practice session for beginners. Play along with the instructor.",
+    "difficulty": "easy",
+    "category": "technique",
+    "youtubeVideoId": "DoVmZ1XNBj4"
+  },
+  {
+    "id": "pentatonic_playalong_best_of",
+    "title": "Pentatonic Best Of - Guitar Playalongs",
+    "description": "Practice pentatonic scales along with the video. The best pentatonic exercises in one place.",
+    "difficulty": "medium",
+    "category": "technique",
+    "youtubeVideoId": "nMV64UCrtFw"
+  },
+  {
+    "id": "jp_stretching",
+    "title": "Petrucci Stretching Exercise",
+    "description": "John Petrucci's stretching exercise from Rock Discipline - helps improve finger flexibility and reach.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "alternate_picking_cross_string",
+    "title": "Alternate Picking Cross-String",
+    "description": "A minor scale-based alternate picking exercise across all 6 strings. Progresses from 2-note-per-string pentatonic patterns to 3-note-per-string natural minor, training inside and outside picking.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "muting_discipline_drill",
+    "title": "Muting Discipline Drill",
+    "description": "String-skipping patterns on E minor that force clean muting of unused strings. Progresses from small skips to maximum skips (string 6 to string 1), building right and left hand muting technique.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "speed_burst_chromatic_blitz",
+    "title": "Speed Burst Chromatic Blitz",
+    "description": "Short explosive chromatic bursts followed by rests. Train your hands to fire fast and reset cleanly.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "legato_hammer_pull_run",
+    "title": "Legato Hammer-Pull Scale Run",
+    "description": "4-note hammer-on / pull-off groups across A natural minor 3nps positions. Pick only the first note of each group, then hammer up and pull back. Builds left-hand strength and legato clarity.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "legato_trill_sprint",
+    "title": "Legato Trill Sprints",
+    "description": "Sextuplet trill patterns across strings for building legato speed and endurance. Single-string trills progressing to cross-string 3nps sextuplet runs.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "legato_continuous_flow",
+    "title": "Continuous Legato Flow",
+    "description": "Non-stop 3nps legato runs across the full fretboard. Pick only the first note of each string — everything else is hammer-ons and pull-offs. Builds extreme left-hand endurance and seamless string transitions.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "earTrainingEasy",
+    "title": "Ear Training Level 1",
+    "description": "Listen to 2 notes and repeat them correctly.",
+    "difficulty": "easy",
+    "category": "hearing"
+  },
+  {
+    "id": "earTrainingMedium",
+    "title": "Ear Training Level 2",
+    "description": "Listen to a short melody and repeat it.",
+    "difficulty": "medium",
+    "category": "hearing"
+  },
+  {
+    "id": "earTrainingHard",
+    "title": "Ear Training Level 3",
+    "description": "Complex intervals and wider range.",
+    "difficulty": "hard",
+    "category": "hearing"
+  },
+  {
+    "id": "precision_bending_drill",
+    "title": "Precision Bend Targeting",
+    "description": "Half-step and whole-step bends on strings 2-3 at 5th and 7th positions. Play the target note first, then bend up to match its pitch. Progresses from single bends to bend-release sequences.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "vibrato_control_drill",
+    "title": "Vibrato Control",
+    "description": "Long sustained notes with vibrato on different strings and frets. Practice slow wide vibrato and fast narrow vibrato. Builds expressive control and consistency.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "expressive_bend_phrasing",
+    "title": "Expressive Bend Phrasing",
+    "description": "Pre-bends, release bends, bend-release-bend sequences, and compound phrases. Bluesy phrasing on Am pentatonic at 5th and 8th position.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "unison_bend_drill",
+    "title": "Unison Bending",
+    "description": "Unison bends — play a note on one string while bending the adjacent string to match its pitch. Two-note simultaneous hits that create a dramatic unison effect. Progresses across string pairs.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "tapping_triadic_cascade",
+    "title": "Tapping Triadic Cascades",
+    "description": "Two-handed tapping triads on strings 1-2. Tap the high note with your picking hand, then pull-off and hammer-on with the fretting hand. Builds clean articulation and muting control.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "tapping_melodic_lines",
+    "title": "Melodic Tapping Compositions",
+    "description": "Flowing melodic lines using tapping as the primary technique. Move beyond patterns into actual musical phrases across multiple strings.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "sweep_picking_3_string",
+    "title": "3-String Sweep Synchronization",
+    "description": "Clean 3-string sweep picking arpeggios focusing on right-left hand coordination. Am, C, and Dm triad shapes ascending and descending with one note per string.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "sweep_5_string_cascade",
+    "title": "5-String Sweep Cascades",
+    "description": "Extended 5-string arpeggio sweep patterns. Am and Dm shapes across strings 5-1 with hammer-on turnaround at the top. Builds endurance and cross-string muting discipline.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "sweep_neoclassical",
+    "title": "Neoclassical Sweep Master",
+    "description": "Complex sweep picking figures inspired by neoclassical shred. Diminished and minor arpeggio shapes across 5 strings with position shifts and legato turnarounds.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "rhythmic_pocket_mastery",
+    "title": "Subdivision Control",
+    "description": "Switch between triplets, eighths, and sixteenths without delays.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "hybrid_picking_independence",
+    "title": "String Skipping",
+    "description": "Use the pick on bass strings and fingers (m, a) on treble strings.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "chicken_pickin",
+    "title": "Snap and Pop",
+    "description": "Practice snapping strings with fingers for that classic country 'pop' sound.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "jazz_chord_melody",
+    "title": "Bass and Chords",
+    "description": "Play bass notes with pick while comping chords with fingers.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "string_skipping_basic",
+    "title": "Pentatonic String Skips",
+    "description": "Master the fundamental string skipping motion with pentatonic patterns.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "string_skipping_arpeggios",
+    "title": "Spread Triad Arpeggios",
+    "description": "Create wide intervallic sounds by playing triads across non-adjacent strings.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "string_skipping_melodic",
+    "title": "Melodic Skip Sequences",
+    "description": "Transform scale patterns into dramatic melodic lines using string skipping.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "chromatic_spider_walk",
+    "title": "Chromatic Spider Drill",
+    "description": "Build finger independence with chromatic permutation patterns.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "pinky_power_drill",
+    "title": "Pinky-Led Patterns",
+    "description": "Strengthen your weakest finger by making it lead every phrase.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "fret_stretch_drill",
+    "title": "Wide Fret Span Sequences",
+    "description": "Gradually expand your fret reach with controlled stretching patterns.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "dynamic_crescendo",
+    "title": "Dynamic Range Control",
+    "description": "Master the full spectrum from whisper-quiet to aggressive attack. The volume bars below the tab show exactly how loud each note should be.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "tone_color_exploration",
+    "title": "Tonal Palette Discovery",
+    "description": "Explore the full spectrum of tones available from picking position and technique.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "tone_matching_challenge",
+    "title": "Tone Matching Challenge",
+    "description": "Select any song and copy the sound of a selected fragment. This exercise focuses on recreating the timbre and nuance of a specific guitar part.",
+    "difficulty": "medium",
+    "category": "hearing"
+  },
+  {
+    "id": "scale_practice_configurable",
+    "title": "Scale Practice (Configurable)",
+    "description": "Choose your scale, pattern, and position for customized scale practice.",
+    "difficulty": "medium",
+    "category": "theory"
+  },
+  {
+    "id": "improv_prompt_easy",
+    "title": "Improv Prompts — Easy",
+    "description": "Follow rotating creative constraints while improvising. Simple, single rules that focus your playing.",
+    "difficulty": "easy",
+    "category": "creativity"
+  },
+  {
+    "id": "improv_prompt_medium",
+    "title": "Improv Prompts — Medium",
+    "description": "Musical concept prompts that push your vocabulary. Faster rotation keeps you on your toes.",
+    "difficulty": "medium",
+    "category": "creativity"
+  },
+  {
+    "id": "improv_prompt_hard",
+    "title": "Improv Prompts — Hard",
+    "description": "Two simultaneous advanced constraints. Demands real-time creative problem-solving.",
+    "difficulty": "hard",
+    "category": "creativity"
+  },
+  {
+    "id": "rhythm_training_easy",
+    "title": "Rhythm Training — Easy",
+    "description": "Build a solid sense of pulse with simple note values. Play on a muted string along with the metronome.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "rhythm_training_medium",
+    "title": "Rhythm Training — Medium",
+    "description": "Eighth-note subdivisions and syncopation. Develop an internal clock that holds up under rhythmic variety.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "rhythm_training_hard",
+    "title": "Rhythm Training — Hard",
+    "description": "Sixteenth-note subdivisions, triplets, and polyrhythmic patterns. Push your internal clock to its limits.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "chord_practice_configurable",
+    "title": "Chord Practice (Configurable)",
+    "description": "Choose your chords and timing to practice transitions with a metronome.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "composition_challenge",
+    "title": "Composition Challenge",
+    "description": "Compose a piece in 40 minutes guided by 5 random constraints — style, form, harmony, melody, and rhythm. Every session generates a unique creative brief.",
+    "difficulty": "hard",
+    "category": "creativity"
+  }
+]

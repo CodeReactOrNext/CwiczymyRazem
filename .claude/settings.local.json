@@ -11,7 +11,16 @@
       "Bash(grep:*)",
       "Bash(npx jest:*)",
       "Bash(npx vitest run:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(tail:*)",
+      "Bash(echo no pages dir:*)",
+      "Bash(python3:*)",
+      "Bash(npm install:*)",
+      "Bash(mkdir:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:www.alphatab.net)",
+      "WebSearch",
+      "WebFetch(domain:coderline.github.io)"
     ]
   }
 }

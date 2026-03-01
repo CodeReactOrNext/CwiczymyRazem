@@ -214,7 +214,12 @@ export const userSlice = createSlice({
     },
     setActivity: (state, { payload }: PayloadAction<userSliceInitialState["currentActivity"]>) => {
       state.currentActivity = payload;
-    }
+    },
+    setUserRole: (state, { payload }: PayloadAction<"admin" | "premium" | "user">) => {
+      if (state.userInfo) {
+        state.userInfo.role = payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -416,7 +421,8 @@ export const {
   generateDailyQuest,
   completeQuestTask,
   claimQuestReward,
-  setActivity
+  setActivity,
+  setUserRole,
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
