@@ -460,6 +460,10 @@ export const claimQuestRewardAction = createAsyncThunk(
         await updateDoc(userRef, {
           "statistics.points": state.user.currentUserStats.points
         });
+
+        const { updateSeasonalPoints } = await import("../../report/services/updateSeasonalPoints");
+        await updateSeasonalPoints(userId, 100);
+
         posthog.capture("daily_quest_claimed", {
           points: state.user.currentUserStats.points,
         });
