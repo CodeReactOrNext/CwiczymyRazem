@@ -1,4 +1,5 @@
-import { arrayRemove, deleteDoc, doc, getDoc,increment, updateDoc } from "firebase/firestore";
+import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
+import { arrayRemove, deleteDoc, doc, getDoc, increment, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const removeUserSong = async (userId: string, songId: string) => {
@@ -7,7 +8,7 @@ export const removeUserSong = async (userId: string, songId: string) => {
     const userSongRef = doc(userDocRef, "userSongs", songId);
 
     const songRef = doc(db, "songs", songId);
-    
+
     // 1. Fetch current status to handle point changes
     const currentStatusSnap = await getDoc(userSongRef);
     const oldStatus = currentStatusSnap.exists() ? currentStatusSnap.data().status : null;
@@ -19,6 +20,7 @@ export const removeUserSong = async (userId: string, songId: string) => {
         "statistics.points": increment(-200)
       });
       pointsAdded = -200;
+      await updateSeasonalPoints(userId, -200);
     }
 
     await updateDoc(songRef, {
