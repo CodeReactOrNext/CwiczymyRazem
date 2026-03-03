@@ -1,5 +1,6 @@
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
+import { FaSync } from "react-icons/fa";
 import { Zap } from "lucide-react";
 import React, { useEffect } from "react";
 
@@ -11,6 +12,7 @@ interface SuccessRewardCardProps {
   skillRewardSkillId?: string;
   skillRewardAmount?: number;
   skillPointsGained?: Record<string, number>;
+  onRestart?: () => void;
 }
 
 export const SuccessRewardCard = ({
@@ -20,7 +22,8 @@ export const SuccessRewardCard = ({
   currProgressPercent,
   skillRewardSkillId,
   skillRewardAmount,
-  skillPointsGained
+  skillPointsGained,
+  onRestart
 }: SuccessRewardCardProps) => {
   const skillName = skillRewardSkillId ? skillRewardSkillId.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : "";
 
@@ -189,6 +192,20 @@ export const SuccessRewardCard = ({
                         <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.05)_75%,transparent_75%,transparent)] bg-[length:12px_12px] animate-[progress-stripe_2s_linear_infinite]" />
                     </motion.div>
                 </div>
+
+            {onRestart && (
+              <div className="flex justify-center pt-2">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={onRestart}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold text-sm transition-colors hover:bg-cyan-500/20"
+                >
+                  <FaSync className="h-3.5 w-3.5" />
+                  Repeat Session
+                </motion.button>
+              </div>
+            )}
             </div>
             </div>
         </motion.div>

@@ -90,7 +90,7 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
   const formattedTimeLeft = `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`;
   const timerProgressValue = Math.min(100, (timer.time / (effectiveTotalSeconds * 1000)) * 100);
 
-  const canSkipExercise = !forceFullDuration || timeLeft <= 0;
+  const canSkipExercise = !isLastExercise || (timeLeft <= 0) || (exerciseTimeSpent >= 20000 && !forceFullDuration);
 
   const checkForSuccess = useCallback(() => {
     if (isLastExercise && timeLeft <= 0) {
@@ -102,12 +102,13 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
     checkForSuccess();
   }, [checkForSuccess]);
 
-  // Track completion
+  // Track completion - 20 seconds threshold
   useEffect(() => {
-    if (timeLeft <= 0 && !completedExercises.includes(currentExerciseIndex)) {
+    const MIN_TIME_FOR_COMPLETION = 20000; // 20 seconds in ms
+    if (exerciseTimeSpent >= MIN_TIME_FOR_COMPLETION && !completedExercises.includes(currentExerciseIndex)) {
       setCompletedExercises(prev => [...prev, currentExerciseIndex]);
     }
-  }, [timeLeft, currentExerciseIndex, completedExercises]);
+  }, [exerciseTimeSpent, currentExerciseIndex, completedExercises]);
 
   // Update online activity
   useEffect(() => {
@@ -129,6 +130,18 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
   const resetSuccessView = useCallback(() => {
     setShowSuccessView(false);
   }, []);
+
+  const restartFullSession = useCallback(() => {
+    setReportResult(null);
+    setIsSubmittingReport(false);
+    isSubmittingRef.current = false;
+    setSessionTimeSnapshot(null);
+    setShowSuccessView(false);
+    setCurrentExerciseIndex(0);
+    setExerciseTimes({});
+    setCompletedExercises([]);
+    timer.restartTime();
+  }, [timer, setCurrentExerciseIndex]);
 
   const handleFinishSession = useCallback(async (
     exerciseRecords?: {
@@ -316,11 +329,13 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
     setTimerTime: timer.setInitialStartTime,
     showSuccessView,
     setShowSuccessView,
+    restartFullSession,
     resetSuccessView,
     setVideoDuration,
     autoSubmitReport,
     canSkipExercise,
     isSubmittingReport,
+    completedExercises,
     reportResult,
     currentUserStats,
     previousUserStats,

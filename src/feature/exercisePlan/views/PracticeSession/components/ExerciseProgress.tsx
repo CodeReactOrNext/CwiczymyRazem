@@ -5,12 +5,14 @@ import type { ExercisePlan } from "../../../types/exercise.types";
 interface ExerciseProgressProps {
   plan: ExercisePlan;
   currentExerciseIndex: number;
+  completedExercises: number[];
   onExerciseSelect: (index: number) => void;
 }
 
 export const ExerciseProgress = ({
   plan,
   currentExerciseIndex,
+  completedExercises,
   onExerciseSelect,
 }: ExerciseProgressProps) => {
   return (
@@ -26,7 +28,7 @@ export const ExerciseProgress = ({
       <div className='flex items-center w-full h-8'>
         {plan.exercises.map((_, idx) => {
           const isActive = idx === currentExerciseIndex;
-          const isVisited = idx < currentExerciseIndex;
+          const isCompleted = completedExercises.includes(idx);
 
           return (
             <button
@@ -43,8 +45,8 @@ export const ExerciseProgress = ({
                 "relative h-2.5 w-full rounded-full transition-all duration-300",
                 isActive 
                   ? "bg-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.7)]" 
-                  : isVisited
-                  ? "bg-zinc-500 hover:bg-zinc-400"
+                  : isCompleted
+                  ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]"
                   : "bg-zinc-800 hover:bg-zinc-700"
               )} />
               
