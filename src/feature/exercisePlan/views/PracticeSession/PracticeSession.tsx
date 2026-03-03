@@ -1,4 +1,4 @@
-import "react-circular-progressbar/dist/styles.css";
+﻿import "react-circular-progressbar/dist/styles.css";
 import posthog from "posthog-js";
 
 import {
@@ -8,7 +8,7 @@ import {
   AccordionTrigger,
 } from "assets/components/ui/accordion";
 import { Button } from "assets/components/ui/button";
-import { TooltipProvider } from "assets/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { motion, AnimatePresence } from "framer-motion";
@@ -121,10 +121,12 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     resetTimer,
     showSuccessView,
     resetSuccessView,
+    restartFullSession,
     setVideoDuration,
     setTimerTime,
     autoSubmitReport,
     isSubmittingReport,
+    completedExercises,
     reportResult,
     currentUserStats,
     previousUserStats,
@@ -251,6 +253,19 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
 
   const handleRevealRiddle = () => setIsRiddleRevealed(true);
   // -----------------------------------
+
+    // --- Qualification Notification ---
+  const [showQualifiedNotification, setShowQualifiedNotification] = useState(false);
+  const lastQualifiedIndex = useRef<number>(-1);
+
+  useEffect(() => {
+    if (completedExercises.includes(currentExerciseIndex) && lastQualifiedIndex.current !== currentExerciseIndex) {
+      lastQualifiedIndex.current = currentExerciseIndex;
+      setShowQualifiedNotification(true);
+      const timer = setTimeout(() => setShowQualifiedNotification(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [completedExercises, currentExerciseIndex]);
 
   // --- Completion Notification ---
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
@@ -462,7 +477,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     }
   }, [isMicEnabled]);
 
-  // detectedNoteData derived from throttled state — used only for UI display
+  // detectedNoteData derived from throttled state â€” used only for UI display
   const detectedNoteData = useMemo(() => {
      if (!frequency || frequency < 50) return null;
      return getNoteFromFrequency(frequency);
@@ -509,7 +524,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
   const hitNotesRef = useRef<Record<string, boolean>>({});
   const rafIdRef = useRef<number>(0);
 
-  // Refs for throttled UI updates — detection at 60fps, React flushes at ~10fps
+  // Refs for throttled UI updates â€” detection at 60fps, React flushes at ~10fps
   const gameStateRef = useRef({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
   const statsRef = useRef({ hits: 0, misses: 0 });
   const lastFlushRef = useRef(0);
@@ -571,7 +586,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     }
   }, [gameState.combo]);
 
-  // Note matching via requestAnimationFrame — reads real-time values from refs
+  // Note matching via requestAnimationFrame â€” reads real-time values from refs
   useEffect(() => {
     if (!isPlaying || !metronome.startTime || !activeTablature || !isMicEnabled) return;
 
@@ -696,7 +711,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
         }
       }
 
-      // Throttled flush to React state (~10Hz) — keeps detection at 60fps
+      // Throttled flush to React state (~10Hz) â€” keeps detection at 60fps
       if (needsFlushRef.current && now - lastFlushRef.current >= 100) {
         lastFlushRef.current = now;
         needsFlushRef.current = false;
@@ -767,6 +782,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
             previousUserStats={previousUserStats}
             onClick={() => router.push("/dashboard")}
             activityData={activityDataToUse}
+            onRestart={restartFullSession}
           />
         </div>
       )}
@@ -920,6 +936,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                           onClick={() => router.push("/dashboard")}
                           activityData={activityDataToUse}
                           hideWrapper={true}
+                          onRestart={restartFullSession}
                       />
                   </div>
                ) : (
@@ -928,6 +945,7 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                <div className="mb-8">
                    <ExerciseProgress
                         plan={plan}
+                        completedExercises={completedExercises}
                         currentExerciseIndex={currentExerciseIndex}
                         onExerciseSelect={(idx) => {
                             if (metronome.isPlaying) {
@@ -1522,33 +1540,51 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
                                </Button>
                              ) : null}
 
-                             <Button
-                                 size="sm"
-                                 variant="ghost"
-                                 loading={isFinishing || isSubmittingReport}
-                                 className={cn(
-                                 "radius-premium font-bold text-[11px] tracking-wide transition-all click-behavior",
-                                 isLastExercise ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black" : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
-                                 !canSkipExercise && "opacity-50 cursor-not-allowed"
-                                 )}
-                                 onClick={async () => {
-                                  if (isLastExercise) {
-                                    await saveCurrentScores();
-                                    autoSubmitReport(exerciseRecordsRef.current);
-                                  } else {
-                                    handleNextExerciseClick();
-                                  }
-                                }}
-                                disabled={!canSkipExercise}
-                             >
-                                 {(isFinishing || isSubmittingReport) ? (
-                                     <span>Saving...</span>
-                                 ) : isLastExercise ? (
-                                     <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
-                                 ) : (
-                                     <span className="flex items-center gap-2">{t("common:skip")} <FaStepForward /></span>
-                                 )}
-                             </Button>
+                             <Tooltip delayDuration={0}>
+                                <TooltipTrigger asChild>
+                                  <div 
+                                    className={cn("inline-block", !canSkipExercise && "cursor-not-allowed")}
+                                    style={{ pointerEvents: 'auto' }}
+                                  >
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        loading={isFinishing || isSubmittingReport}
+                                        className={cn(
+                                        "radius-premium font-bold text-[11px] tracking-wide transition-all click-behavior",
+                                        isLastExercise ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black" : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
+                                        !canSkipExercise && "opacity-50"
+                                        )}
+                                        style={{ pointerEvents: !canSkipExercise ? 'none' : 'auto' }}
+                                        onClick={async () => {
+                                          if (isLastExercise) {
+                                            await saveCurrentScores();
+                                            autoSubmitReport(exerciseRecordsRef.current);
+                                          } else {
+                                            handleNextExerciseClick();
+                                          }
+                                        }}
+                                        disabled={!canSkipExercise}
+                                    >
+                                        {(isFinishing || isSubmittingReport) ? (
+                                            <span>Saving...</span>
+                                        ) : isLastExercise ? (
+                                            <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">{t("common:skip")} <FaStepForward /></span>
+                                        )}
+                                    </Button>
+                                  </div>
+                                </TooltipTrigger>
+                                {!canSkipExercise && (
+                                  <TooltipContent side="top" sideOffset={10} className="z-[999999] bg-zinc-900 border border-white/20 text-white shadow-2xl px-4 py-2">
+                                    <div className="flex items-center gap-2">
+                                      <FaInfoCircle className="text-cyan-400 h-3 w-3" />
+                                      <p className="text-xs font-bold leading-none">Practice at least 20 seconds to finish session</p>
+                                    </div>
+                                  </TooltipContent>
+                                )}
+                             </Tooltip>
                           </div>
                      </div>
                 </div>
@@ -1607,6 +1643,22 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
       />
 
       {/* Completion Notification */}
+      {/* Qualification Notification */}
+      <AnimatePresence>
+        {showQualifiedNotification && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, x: "-50%", y: 20 }}
+            animate={{ opacity: 1, scale: 1, x: "-50%", y: 40 }}
+            exit={{ opacity: 0, scale: 0.8, x: "-50%", y: 20 }}
+            className="fixed bottom-32 left-1/2 z-[99999] px-6 py-3 bg-emerald-500 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.4)] border border-white/20 flex items-center gap-3"
+          >
+            <div className="h-6 w-6 rounded-full bg-white/20 flex items-center justify-center">
+              <FaCheck className="text-white h-3 w-3" />
+            </div>
+            <span className="text-sm font-bold text-white tracking-wide">Exercise Qualified! +XP earned</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {showCompletionNotification && (
           <motion.div
@@ -1634,3 +1686,9 @@ export const PracticeSession = ({ plan, onFinish, onClose, isFinishing, autoRepo
     </>
   );
 };
+
+
+
+
+
+

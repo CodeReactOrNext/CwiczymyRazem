@@ -108,8 +108,6 @@ export const ExerciseSuccessView = ({
           </div>
 
           <div className='flex w-full flex-col justify-center gap-3 pt-4 sm:flex-row'>
-   
-
             <Button onClick={onFinish} disabled={isLoading} className='flex items-center gap-2 radius-default bg-cyan-500 hover:bg-cyan-600 text-black font-bold'>
                {isLoading ? (
                   <>
