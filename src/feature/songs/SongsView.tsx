@@ -110,17 +110,7 @@ const SongsView = () => {
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 sm:flex-initial"
-                      asChild
-                    >
-                      <Link href="/guide?tab=songs">
-                        <HelpCircle size={16} className="mr-2 text-cyan-400" />
-                        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">How it works</span>
-                      </Link>
-                    </Button>
+              
                     <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
                       <DialogTrigger asChild>
                         <Button 

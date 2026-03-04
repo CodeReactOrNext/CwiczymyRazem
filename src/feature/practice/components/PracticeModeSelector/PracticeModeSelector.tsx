@@ -134,17 +134,7 @@ export const PracticeModeSelector = ({
               <p className='text-sm text-gray-400 sm:text-lg'>
                 {t("timer:choose_practice_description")}
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="h-7 gap-1.5 px-2.5 bg-cyan-500/5 border-cyan-500/20 hover:bg-cyan-500/10 hover:border-cyan-500/40 text-cyan-400 transition-all rounded-md"
-              >
-                <Link href="/guide?tab=practice">
-                  <HelpCircle size={13} strokeWidth={2.5} />
-                  <span className="text-[10px] font-black uppercase tracking-wider">How it works</span>
-                </Link>
-              </Button>
+            
             </div>
           </div>
 
