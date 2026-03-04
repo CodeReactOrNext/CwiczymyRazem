@@ -251,7 +251,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                         name={userName}
                         lvl={userStats.lvl}
                         selectedFrame={userInfo?.selectedFrame}
-                        selectedGuitar={userInfo?.selectedGuitar}
+                        selectedGuitar={userInfo?.selectedGuitar as number}
                       />
                     </div>
 
