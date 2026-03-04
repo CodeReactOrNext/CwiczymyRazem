@@ -30,6 +30,8 @@ import {
   uploadUserSocialData,
   updateProfileCustomization,
 } from "./userSlice.asyncThunk";
+import { levelUpUser } from "utils/gameLogic/levelUpUser";
+
 
 
 const initialState: userSliceInitialState = {
@@ -209,7 +211,11 @@ export const userSlice = createSlice({
       const allCompleted = quest.tasks.every(t => t.isCompleted);
       if (allCompleted && !quest.isRewardClaimed) {
         quest.isRewardClaimed = true;
-        state.currentUserStats.points = (state.currentUserStats.points || 0) + 100;
+        const newPoints = (state.currentUserStats.points || 0) + 100;
+        state.currentUserStats.points = newPoints;
+
+        const newLvl = levelUpUser(state.currentUserStats.lvl || 1, newPoints);
+        state.currentUserStats.lvl = newLvl;
       }
     },
     setActivity: (state, { payload }: PayloadAction<userSliceInitialState["currentActivity"]>) => {
