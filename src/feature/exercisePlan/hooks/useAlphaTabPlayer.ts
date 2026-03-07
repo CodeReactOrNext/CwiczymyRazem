@@ -1,0 +1,186 @@
+import { useEffect, useRef } from 'react';
+import * as alphaTabLib from '@coderline/alphatab';
+
+export interface AlphaTabTrackConfig {
+  isMuted: boolean;
+  volume: number;
+}
+
+export interface UseAlphaTabPlayerProps {
+  rawGpFile: File | null;
+  /** User-set BPM (from metronome). AlphaTab playbackSpeed = bpm / originalBpm */
+  bpm: number;
+  /** True only when audio should play (after count-in) */
+  isPlaying: boolean;
+  /** startTime changes on each new play session — used to restart AlphaTab */
+  startTime: number | null;
+  onLoopComplete?: () => void;
+  /** Per-track mute/volume — MUST be memoized by the caller to avoid effect loops */
+  trackConfigs?: Record<string, AlphaTabTrackConfig>;
+  /** MUST be memoized by the caller */
+  backingTrackIds?: string[];
+}
+
+/**
+ * Drives AlphaTab's built-in AlphaSynth synthesizer (sonivox.sf2) for GP file playback.
+ * AlphaTabApi is created only when rawGpFile is first provided — never for regular exercises.
+ * display:none prevents score rendering (no canvas OOM).
+ */
+export const useAlphaTabPlayer = ({
+  rawGpFile,
+  bpm,
+  isPlaying,
+  startTime,
+  onLoopComplete,
+  trackConfigs = {},
+  backingTrackIds = [],
+}: UseAlphaTabPlayerProps) => {
+  const apiRef            = useRef<any>(null);
+  const scoreRef          = useRef<any>(null);
+  const originalBpmRef    = useRef<number>(120);
+  const isReadyRef        = useRef(false);
+  const pendingPlayRef    = useRef(false);
+  const currentFileRef    = useRef<File | null>(null);
+  const isPlayingRef      = useRef(isPlaying);
+  const bpmRef            = useRef(bpm);
+  const onLoopCompleteRef = useRef(onLoopComplete);
+
+  useEffect(() => { isPlayingRef.current      = isPlaying;       }, [isPlaying]);
+  useEffect(() => { bpmRef.current            = bpm;             }, [bpm]);
+  useEffect(() => { onLoopCompleteRef.current = onLoopComplete;  }, [onLoopComplete]);
+
+  // ── Create AlphaTabApi — only when rawGpFile first arrives ────────────────
+  // Guard: apiRef.current !== null prevents re-creation if rawGpFile object changes
+  // (file reloads are handled by the separate load effect below).
+  useEffect(() => {
+    if (!rawGpFile || apiRef.current || typeof window === 'undefined') return;
+
+    const AlphaTabApi = (alphaTabLib as any).AlphaTabApi;
+    if (!AlphaTabApi) return;
+
+    const div = document.createElement('div');
+    // display:none prevents score rendering — canvas is never created → no OOM.
+    // AlphaSynth initialises independently and still fires playerReady.
+    div.style.cssText = 'display:none;';
+    document.body.appendChild(div);
+
+    // scriptFile must be an absolute URL — blob: workers cannot resolve relative paths.
+    const origin = window.location.origin;
+    const api = new AlphaTabApi(div, {
+      core: {
+        // Standalone script so AlphaTab can spawn its rendering web worker from it.
+        // Must be an absolute URL — blob: workers cannot resolve relative paths.
+        scriptFile:    `${origin}/alphatab/alphaTab.min.js`,
+        fontDirectory: `${origin}/alphatab/font/`,
+      },
+      player: {
+        enablePlayer: true,
+        soundFont:    `${origin}/soundfont/sonivox.sf2`,
+        // AudioWorklets run on a dedicated audio thread — no main-thread blocking.
+        // outputMode: 0 = WebAudioAudioWorklets (default)
+        outputMode: 0,
+        scrollElement: div,
+      },
+    });
+
+    apiRef.current = api;
+
+    api.scoreLoaded.on((score: any) => {
+      scoreRef.current = score;
+      if (score?.tempo > 0) originalBpmRef.current = score.tempo;
+    });
+
+    api.playerReady.on(() => {
+      isReadyRef.current = true;
+      if (pendingPlayRef.current) {
+        pendingPlayRef.current = false;
+        api.playbackSpeed = bpmRef.current / (originalBpmRef.current || 120);
+        api.play();
+      }
+    });
+
+    api.playerFinished.on(() => {
+      onLoopCompleteRef.current?.();
+      if (isPlayingRef.current) {
+        api.stop();
+        api.play();
+      }
+    });
+
+    return () => {
+      try { api.stop();    } catch { /* ignore */ }
+      try { api.destroy(); } catch { /* ignore */ }
+      isReadyRef.current     = false;
+      pendingPlayRef.current = false;
+      currentFileRef.current = null;
+      div.remove();
+      apiRef.current   = null;
+      scoreRef.current = null;
+    };
+  // rawGpFile in deps: effect re-evaluates when file arrives (null→File transition).
+  // The apiRef.current guard prevents double-creation if deps fire again with same state.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rawGpFile]);
+
+  // ── Load file into existing API ───────────────────────────────────────────
+  useEffect(() => {
+    const api = apiRef.current;
+    if (!rawGpFile || !api || rawGpFile === currentFileRef.current) return;
+
+    currentFileRef.current = rawGpFile;
+    isReadyRef.current     = false;
+    pendingPlayRef.current = false;
+
+    rawGpFile.arrayBuffer().then(buf => {
+      if (apiRef.current === api) api.load(new Uint8Array(buf));
+    });
+  }, [rawGpFile]);
+
+  // ── Playback control ──────────────────────────────────────────────────────
+  useEffect(() => {
+    const api = apiRef.current;
+    if (!api) return;
+
+    if (isPlaying) {
+      api.playbackSpeed = bpm / (originalBpmRef.current || 120);
+      if (isReadyRef.current) {
+        api.stop();
+        api.play();
+      } else {
+        pendingPlayRef.current = true;
+      }
+    } else {
+      pendingPlayRef.current = false;
+      try { api.stop(); } catch { /* ignore */ }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying, startTime, bpm]);
+
+  // ── Per-track mute / volume ───────────────────────────────────────────────
+  // trackConfigs and backingTrackIds MUST be memoized by the caller.
+  useEffect(() => {
+    const api   = apiRef.current;
+    const score = scoreRef.current;
+    if (!api || !score?.tracks) return;
+
+    const backingIndices = new Set(
+      backingTrackIds
+        .map(id => parseInt(id.replace('track-', ''), 10))
+        .filter(n => !isNaN(n))
+    );
+    let mainTrackIdx = -1;
+    for (let i = 0; i < score.tracks.length; i++) {
+      if (!backingIndices.has(i)) { mainTrackIdx = i; break; }
+    }
+
+    score.tracks.forEach((track: any, idx: number) => {
+      const config = idx === mainTrackIdx
+        ? trackConfigs['main']
+        : trackConfigs[`track-${idx}`];
+      if (config) {
+        api.changeTrackMute([track], config.isMuted);
+        api.changeTrackVolume([track], Math.max(0, config.volume));
+      }
+    });
+  }, [trackConfigs, backingTrackIds]);
+};

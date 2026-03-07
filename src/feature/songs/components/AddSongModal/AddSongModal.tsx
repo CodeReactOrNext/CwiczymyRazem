@@ -25,6 +25,8 @@ import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
 import { SpotifyPlayer } from "../SpotifyPlayer";
+import { ImportTablature } from "../ImportTablature/ImportTablature";
+import { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 
 interface AddSongModalProps {
   isOpen: boolean;
@@ -49,6 +51,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
   const [isSearching, setIsSearching] = useState(false);
   const [addedSongId, setAddedSongId] = useState<string | null>(null);
   const [currentMatch, setCurrentMatch] = useState<Song | null>(null);
+  const [importedTab, setImportedTab] = useState<TablatureMeasure[] | null>(null);
 
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -116,8 +119,8 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
 
     try {
       setIsLoading(true);
-      posthog.capture("song_addition_flow", { action: "submit_info", title: title.trim(), artist: artist.trim() });
-      const songId = await addSong(title.trim(), artist.trim(), userId, avatar, undefined);
+      posthog.capture("song_addition_flow", { action: "submit_info", title: title.trim(), artist: artist.trim(), has_tab: !!importedTab });
+      const songId = await addSong(title.trim(), artist.trim(), userId, avatar, undefined, importedTab || undefined);
       
       // Trigger enrichment in the background (no await)
       enrichSong(songId, artist.trim(), title.trim()).catch((err) => {
@@ -208,6 +211,17 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                     className="h-12 border-white/5 bg-white/5 focus:border-cyan-500/50 transition-all font-medium"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <Label className="text-zinc-400 font-bold ml-1 flex items-center gap-2">
+                  Guitar Pro Tablature (Optional)
+                  <span className="text-[10px] font-bold text-cyan-500 uppercase tracking-wider bg-cyan-500/10 px-2 py-0.5 rounded-full">New</span>
+                </Label>
+                <ImportTablature 
+                  onImported={(measures, filename, tempo, trackName) => setImportedTab(measures)}
+                  className="animate-in fade-in slide-in-from-top-4 duration-500"
+                />
               </div>
 
               {currentMatch?.spotifyId && (
