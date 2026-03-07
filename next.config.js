@@ -33,6 +33,7 @@ const nextConfig = {
   },
   turbopack: {},
   bundlePagesRouterDependencies: true,
+  serverExternalPackages: ["@openai/agents"],
   webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,

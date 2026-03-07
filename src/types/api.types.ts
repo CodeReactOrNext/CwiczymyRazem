@@ -44,7 +44,7 @@ export interface UserDataInterface {
     youTubeLink?: string;
     band?: string;
     selectedFrame?: number;
-    selectedGuitar?: number;
+    selectedGuitar?: number | string;
   };
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
@@ -138,8 +138,9 @@ export interface userSliceInitialState {
     youTubeLink?: string;
     band?: string;
     selectedFrame?: number;
-    selectedGuitar?: number 
-    role?: "admin" | "user";
+    selectedGuitar?: number | string;
+    role?: "admin" | "premium" | "user";
+    premiumUntil?: string | null; // ISO date string, null = no expiry (forever)
   } | null;
   timer: TimerInterface;
   currentActivity: {

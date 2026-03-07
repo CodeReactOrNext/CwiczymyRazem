@@ -11,11 +11,12 @@ import PasswordChange from "feature/settings/components/PasswordChange";
 import ProfileBasics from "feature/settings/components/ProfileBasics";
 import ProfileCustomization from "feature/settings/components/ProfileCustomization";
 import StatisticRestart from "feature/settings/components/StatisticsRestart";
+import SubscriptionSettings from "feature/settings/components/SubscriptionSettings";
 import SettingsLayout from "feature/settings/SettingsLayout";
 import { getUserProvider } from "feature/user/store/userSlice.asyncThunk";
 import type { UserInfo } from "firebase/auth";
 import { useTranslation } from "hooks/useTranslation";
-import { User, Palette, Share2, Settings as SettingsIcon, ShieldAlert, Lock } from "lucide-react";
+import { User, Palette, Share2, Settings as SettingsIcon, ShieldAlert, Lock, CreditCard } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "store/hooks";
 
@@ -89,11 +90,21 @@ const SettingsView = () => {
                   <span className="font-bold">Security</span>
                 </TabsTrigger>
                 
+                <TabsTrigger
+                  value="subscription"
+                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
+                >
+                  <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-emerald-500/10 group-data-[state=active]:text-emerald-500 transition-colors">
+                    <CreditCard className="h-4 w-4" />
+                  </div>
+                  <span className="font-bold">Subscription</span>
+                </TabsTrigger>
+
                 <div className="py-2 px-4">
                    <div className="h-px w-full bg-zinc-800" />
                 </div>
 
-                <TabsTrigger 
+                <TabsTrigger
                   value="danger" 
                   className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:text-red-500 data-[state=active]:bg-red-500/10 hover:bg-red-500/5 border border-transparent group text-muted-foreground font-bold"
                 >
@@ -140,6 +151,10 @@ const SettingsView = () => {
                     <PasswordChange />
                  </div>
                )}
+            </TabsContent>
+
+            <TabsContent value="subscription" className="mt-0">
+              <SubscriptionSettings />
             </TabsContent>
 
             <TabsContent value="danger" className="mt-0">

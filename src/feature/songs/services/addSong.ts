@@ -26,7 +26,8 @@ export const addSong = async (
   artist: string,
   userId: string,
   avatarUrl: string | undefined,
-  difficulty_rate: number | undefined
+  difficulty_rate: number | undefined,
+  tablature?: any[]
 ) => {
   try {
     const exists = await checkSongExists(title, artist);
@@ -47,6 +48,7 @@ export const addSong = async (
       tier: "?",
       isVerified: false,
       coverUrl: null,
+      tablature: tablature || null,
     };
 
     const docRef = await addDoc(songsRef, newSong);

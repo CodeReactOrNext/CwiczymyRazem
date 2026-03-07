@@ -16,7 +16,7 @@ interface LeadboardColumnProps {
   profileId?: string;
   currentUserId: string | null;
   selectedFrame?: number;
-  selectedGuitar?: number;
+  selectedGuitar?: number | string;
 }
 
 export const LeadboardRow = ({

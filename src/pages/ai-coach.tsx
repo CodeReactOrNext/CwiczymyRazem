@@ -1,11 +1,16 @@
 import AiCoachView from "feature/aiCoach/view/AiCoachView";
+import { PremiumGate } from "feature/premium/components/PremiumGate";
 import AppLayout from "layouts/AppLayout/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
 
 const AiCoachPage: NextPageWithLayout = () => {
-  return <AiCoachView />;
+  return (
+    <PremiumGate feature="ai-coach">
+      <AiCoachView />
+    </PremiumGate>
+  );
 };
 
 AiCoachPage.getLayout = function getLayout(page: ReactElement) {

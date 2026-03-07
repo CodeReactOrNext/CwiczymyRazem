@@ -1,12 +1,14 @@
 import { Button } from "assets/components/ui/button";
+import { selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronRight, HelpCircle, Brain } from "lucide-react";
+import { ChevronRight, HelpCircle, Brain, Lock } from "lucide-react";
 import Link from "next/link";
-import { FaClock, FaList, FaRandom, FaStar } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
+import { FaClock, FaGuitar, FaList, FaRandom } from "react-icons/fa";
 
 interface PracticeModeSelectorProps {
-  onSelectMode: (mode: "timer" | "plan" | "auto" | "song" | "skills") => void;
-  loadingMode?: "timer" | "plan" | "auto" | "song" | "skills" | null;
+  onSelectMode: (mode: "timer" | "plan" | "auto" | "song" | "skills" | "gp") => void;
+  loadingMode?: "timer" | "plan" | "auto" | "song" | "skills" | "gp" | null;
 }
 
 export const PracticeModeSelector = ({
@@ -14,6 +16,8 @@ export const PracticeModeSelector = ({
   loadingMode
 }: PracticeModeSelectorProps) => {
   const { t } = useTranslation(["common", "timer"]);
+  const userInfo = useAppSelector(selectUserInfo);
+  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
 
   const colorClasses = {
     indigo: {
@@ -108,6 +112,14 @@ export const PracticeModeSelector = ({
       description: "Focus on specific techniques and skills.",
       colors: colorClasses.violet,
     },
+    {
+      id: "gp" as const,
+      icon: FaGuitar,
+      title: "Guitar Pro File",
+      description: "Import a .gp5 / .gpx file and practice interactively.",
+      colors: colorClasses.cyan,
+      premium: true,
+    },
   ] as const;
 
   return (
@@ -122,34 +134,33 @@ export const PracticeModeSelector = ({
               <p className='text-sm text-gray-400 sm:text-lg'>
                 {t("timer:choose_practice_description")}
               </p>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="h-7 gap-1.5 px-2.5 bg-cyan-500/5 border-cyan-500/20 hover:bg-cyan-500/10 hover:border-cyan-500/40 text-cyan-400 transition-all rounded-md"
-              >
-                <Link href="/guide?tab=practice">
-                  <HelpCircle size={13} strokeWidth={2.5} />
-                  <span className="text-[10px] font-black uppercase tracking-wider">How it works</span>
-                </Link>
-              </Button>
+            
             </div>
           </div>
 
           <div className='flex flex-col gap-3 sm:gap-6 md:grid md:grid-cols-2 lg:grid-cols-3'>
-            {modes.map((mode) => (
+            {modes.map((mode) => {
+              const isLocked = "premium" in mode && mode.premium && !isPremium;
+              return (
               <div
                 key={mode.id}
-                className={`${mode.colors.ring} font-openSans relative flex h-24 transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-second-500 via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2 sm:h-full sm:p-6`}
-                onClick={() => onSelectMode(mode.id)}
+                className={`${isLocked ? "opacity-75 cursor-default" : mode.colors.ring} font-openSans relative flex h-24 transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-second-500 via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-300 hover:shadow-xl ${!isLocked ? "hover:ring-2" : ""} sm:h-full sm:p-6`}
+                onClick={() => isLocked ? window.location.href = "/premium" : onSelectMode(mode.id)}
                 tabIndex={0}
                 role='button'
                 aria-label={mode.title}
-                onKeyDown={(e) => e.key === "Enter" && onSelectMode(mode.id)}>
+                onKeyDown={(e) => e.key === "Enter" && (isLocked ? window.location.href = "/premium" : onSelectMode(mode.id))}>
                 <div
                   className={`${mode.colors.blur} absolute right-0 top-0 -mr-6 -mt-6 h-20 w-20 rounded-full blur-2xl sm:h-32 sm:w-32`}></div>
                 <div
                   className={`${mode.colors.blur} absolute left-0 top-24 -mr-6 -mt-6 h-8 w-20 rounded-full blur-3xl sm:h-12 sm:w-32`}></div>
+                {isLocked && (
+                  <div className="absolute right-3 top-3 z-20 flex items-center gap-1 rounded-full bg-amber-500/20 px-2 py-0.5 ring-1 ring-amber-500/30">
+                    <Lock className="h-3 w-3 text-amber-400" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Premium</span>
+                  </div>
+                )}
+
                 <div className='relative z-10 flex w-full flex-row items-center justify-between sm:flex-col sm:items-stretch'>
                   <div className='flex flex-row items-center gap-3 sm:mb-6 sm:flex-col sm:gap-0'>
                     <div className={`relative flex-shrink-0`}>
@@ -175,9 +186,14 @@ export const PracticeModeSelector = ({
                   <Button
                     className={`w-auto border border-white/10 bg-white/5 py-1.5 text-xs backdrop-blur-sm transition-all duration-300 hover:bg-white/10 sm:w-full sm:py-3 sm:text-base gap-2 group`}
                     variant='outline'
-                    disabled={!!loadingMode}
+                    disabled={!!loadingMode && !isLocked}
                   >
-                    {loadingMode === mode.id ? (
+                    {isLocked ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <Lock size={14} />
+                        Upgrade
+                      </div>
+                    ) : loadingMode === mode.id ? (
                         <div className="flex items-center gap-2">
                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           Loading...
@@ -196,7 +212,8 @@ export const PracticeModeSelector = ({
                 <div
                   className={`${mode.colors.blur} absolute -bottom-4 -left-4 h-20 w-20 rounded-full opacity-20 blur-3xl sm:-bottom-8 sm:-left-8 sm:h-36 sm:w-36`}></div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

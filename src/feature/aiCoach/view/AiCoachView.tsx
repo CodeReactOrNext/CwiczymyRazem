@@ -1,42 +1,113 @@
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { Bot, ChevronDown, ChevronUp, Eye, EyeOff, KeySquare, Loader2, Map, MessageSquare,Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Map, Plus, Sparkles } from "lucide-react";
 import posthog from "posthog-js";
 import React, { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 import { v4 as uuidv4 } from "uuid";
 
-import { generateAiSummary } from "../services/generateAiSummary";
-import { firebaseGetUserRoadmaps,firebaseSaveRoadmap } from "../services/roadmap.service";
-import type { Roadmap, RoadmapMilestone } from "../types/roadmap.types";
-import RoadmapInterview from "./RoadmapInterview/RoadmapInterview";
+import { generateAiRoadmap } from "../services/generateRoadmap";
+import { firebaseDeleteRoadmap, firebaseGetUserRoadmaps, firebaseSaveRoadmap } from "../services/roadmap.service";
+import type { Roadmap } from "../types/roadmap.types";
+import RoadmapCard from "./RoadmapCard/RoadmapCard";
 import RoadmapView from "./RoadmapView/RoadmapView";
+
+const PLAN_GEN_MESSAGES = [
+  "Planning your learning journey...",
+  "Structuring phases & milestones...",
+  "Tailoring content to your level...",
+  "Organizing step progression...",
+  "Selecting key techniques...",
+  "Finalizing your roadmap...",
+];
+
+const PlanGeneratingOverlay: React.FC<{ goal: string }> = ({ goal }) => {
+  const [msgIdx, setMsgIdx] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setMsgIdx((i) => (i + 1) % PLAN_GEN_MESSAGES.length);
+        setFade(true);
+      }, 300);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center gap-5 py-6">
+      <div className="relative flex items-center justify-center">
+        <span className="absolute h-20 w-20 animate-ping rounded-full bg-emerald-500/8" />
+        <span className="absolute h-14 w-14 animate-pulse rounded-full bg-emerald-500/15" />
+        <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/40">
+          <Sparkles className="h-6 w-6 text-emerald-400" />
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center gap-1.5 text-center">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-500/70">
+          AI Coach is building your plan
+        </p>
+        <p
+          className="text-sm text-zinc-400 transition-opacity duration-300"
+          style={{ opacity: fade ? 1 : 0 }}
+        >
+          {PLAN_GEN_MESSAGES[msgIdx]}
+        </p>
+      </div>
+
+      <div className="w-full max-w-xs rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2 text-center">
+        <p className="truncate text-xs text-zinc-500">"{goal}"</p>
+      </div>
+
+      <div className="flex items-center gap-1.5">
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="h-1.5 w-1.5 rounded-full bg-emerald-500/60"
+            style={{ animation: `aicoach-bounce 1.2s ease-in-out ${i * 0.2}s infinite` }}
+          />
+        ))}
+      </div>
+
+      <style jsx>{`
+        @keyframes aicoach-bounce {
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+          40% { transform: translateY(-5px); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+const LEVELS = ["Absolute Beginner", "Beginner", "Intermediate", "Advanced"] as const;
+type Level = typeof LEVELS[number];
+
+const LEVEL_TOOLTIPS: Record<Level, string> = {
+  "Absolute Beginner": "Never touched a guitar before. We start from zero — posture, how to hold a pick, first notes.",
+  "Beginner": "Less than 1 year of playing. You know a few open chords and basic strumming patterns.",
+  "Intermediate": "1–3 years of playing. Comfortable with chords and basic scales, working on technique.",
+  "Advanced": "3+ years of playing. Strong technique, familiar with scales and music theory.",
+};
 
 const AiCoachView = () => {
   const userAuth = useAppSelector(selectUserAuth);
 
-  const [apiKey, setApiKey] = useState("");
-  const [showKey, setShowKey] = useState(false);
-  const [goal, setGoal] = useState("");
-  const [activeTab, setActiveTab] = useState<"summary" | "roadmap">("summary");
-
-  const [loadingSummary, setLoadingSummary] = useState(false);
-  const [summary, setSummary] = useState<string | null>(null);
-
   const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
   const [loadingRoadmaps, setLoadingRoadmaps] = useState(false);
-  const [showInterview, setShowInterview] = useState(false);
 
-  const [apiKeyOpen, setApiKeyOpen] = useState(false);
+  // Detail view
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // Form
+  const [showForm, setShowForm] = useState(false);
+  const [goal, setGoal] = useState("");
+  const [level, setLevel] = useState<Level>("Beginner");
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
-    const savedKey = localStorage.getItem("openai_api_key");
-    if (savedKey) {
-      setApiKey(savedKey);
-    } else {
-      setApiKeyOpen(true);
-    }
     if (userAuth) fetchUserRoadmaps();
   }, [userAuth]);
 
@@ -53,225 +124,199 @@ const AiCoachView = () => {
     }
   };
 
-  const handleSaveKey = (key: string) => {
-    setApiKey(key);
-    localStorage.setItem("openai_api_key", key);
-  };
-
-  const handleGenerateSummary = async () => {
-    if (!apiKey) { toast.error("Wprowadź klucz API OpenAI."); setApiKeyOpen(true); return; }
-    if (!userAuth) return;
-    setLoadingSummary(true);
-    setSummary(null);
-    setActiveTab("summary");
-    try {
-      const result = await generateAiSummary({ apiKey, goal, userAuth: userAuth as string });
-      setSummary(result);
-      toast.success("Podsumowanie wygenerowane!");
-    } catch (err: any) {
-      toast.error(err.message || "Błąd generowania");
-      console.error(err);
-    } finally {
-      setLoadingSummary(false);
+  const handleGenerate = async () => {
+    if (!goal.trim()) {
+      toast.error("Enter your guitar goal.");
+      return;
     }
-  };
-
-  const handleStartInterview = () => {
-    if (!apiKey) { toast.error("Wprowadź klucz API OpenAI."); setApiKeyOpen(true); return; }
-    posthog.capture("ai_coach_roadmap_started", { has_goal: !!goal });
-    setShowInterview(true);
-    setActiveTab("roadmap");
-  };
-
-  const handleInterviewComplete = async (milestones: RoadmapMilestone[]) => {
-    if (!userAuth) return;
-    if (!milestones || milestones.length === 0) {
-      toast.error("AI nie wygenerowało roadmapy. Spróbuj ponownie.");
-      setShowInterview(false);
+    if (!userAuth) {
+      toast.error("You must be logged in.");
       return;
     }
 
-    const newRoadmap: Roadmap = {
-      id: uuidv4(),
-      userId: userAuth as string,
-      title: goal ? `Plan: ${goal.slice(0, 40)}` : `Plan ${new Date().toLocaleDateString("pl-PL")}`,
-      goal: goal || "Ogólny rozwój",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      milestones,
-    };
-
-    setRoadmaps((prev) => [newRoadmap, ...prev]);
-    setShowInterview(false);
-    setActiveTab("roadmap");
-    toast.success("Roadmapa wygenerowana!");
+    setGenerating(true);
+    posthog.capture("ai_coach_roadmap_started", { level });
 
     try {
+      const phases = await generateAiRoadmap({ goal: goal.trim(), level });
+
+      const newRoadmap: Roadmap = {
+        id: uuidv4(),
+        userId: userAuth as string,
+        title: `Plan: ${goal.trim().slice(0, 40)}`,
+        goal: goal.trim(),
+        level,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        phases,
+      };
+
+      setRoadmaps((prev) => [newRoadmap, ...prev]);
+      setGoal("");
+      setShowForm(false);
+      toast.success("Plan generated! Click a step to see details.");
+
       await firebaseSaveRoadmap(newRoadmap);
-    } catch (err) {
-      console.error("Firebase save failed:", err);
-      toast.error("Nie udało się zapisać w chmurze — odśwież stronę.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to generate plan. Please try again.");
+    } finally {
+      setGenerating(false);
     }
   };
 
-  return (
-    <div className="mx-auto flex w-full flex-col gap-6 p-4 pt-16 sm:p-6 sm:pt-20 md:gap-8 md:p-10 md:pt-24 lg:p-12 lg:pt-28">
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/30">
-            <Sparkles className="h-5 w-5 text-emerald-500" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-100">AI Coach</h1>
-        </div>
-        <p className="pl-[46px] text-sm text-zinc-500">
-          Analizuj postępy i buduj swoją ścieżkę do mistrzostwa.
-        </p>
-      </div>
+  const handleDelete = async (roadmapId: string) => {
+    if (!window.confirm("Delete this roadmap? This action cannot be undone.")) return;
+    try {
+      await firebaseDeleteRoadmap(roadmapId);
+      setRoadmaps((prev) => prev.filter((r) => r.id !== roadmapId));
+      if (selectedId === roadmapId) setSelectedId(null);
+      toast.success("Roadmap deleted.");
+    } catch {
+      toast.error("Failed to delete.");
+    }
+  };
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60">
+  const selectedRoadmap = roadmaps.find((r) => r.id === selectedId) ?? null;
+
+  // ─── Detail view ───
+  if (selectedRoadmap) {
+    return (
+      <div className="mx-auto flex w-full flex-col gap-6 p-4 pt-16 sm:p-6 sm:pt-20 md:gap-8 md:p-10 md:pt-24 lg:p-12 lg:pt-28">
         <button
-          className="flex w-full items-center justify-between px-5 py-4 text-left"
-          onClick={() => setApiKeyOpen((v) => !v)}
+          onClick={() => setSelectedId(null)}
+          className="flex w-fit items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200"
         >
-          <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-            <KeySquare className="h-4 w-4 text-zinc-500" />
-            Klucz API OpenAI
-            {apiKey && (
-              <span className="ml-2 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-500 ring-1 ring-emerald-500/20">
-                ✓ Zapisany
-              </span>
-            )}
-          </div>
-          {apiKeyOpen ? <ChevronUp className="h-4 w-4 text-zinc-600" /> : <ChevronDown className="h-4 w-4 text-zinc-600" />}
+          <ArrowLeft className="h-4 w-4" />
+          Back to all plans
         </button>
 
-        {apiKeyOpen && (
-          <div className="flex flex-col gap-3 border-t border-zinc-800 px-5 pb-5 pt-4">
-            <div className="relative">
-              <input
-                type={showKey ? "text" : "password"}
-                placeholder="sk-..."
-                value={apiKey}
-                onChange={(e) => handleSaveKey(e.target.value)}
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-800 py-2.5 pl-4 pr-10 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-              />
-              <button
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition"
-                onClick={() => setShowKey((v) => !v)}
-              >
-                {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-            <p className="text-xs text-zinc-600">Klucz zapisany lokalnie — nie trafia na nasz serwer.</p>
-          </div>
-        )}
-      </div>
-
-      {!showInterview && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
-          <label className="text-sm font-medium text-zinc-300">Twój cel lub priorytet (opcjonalne)</label>
-          <textarea
-            className="w-full resize-none rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-            rows={2}
-            placeholder="Np. Chcę nauczyć się improwizacji, albo poprawić technikę..."
-            value={goal}
-            onChange={(e) => setGoal(e.target.value)}
-          />
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-            <button
-              onClick={handleGenerateSummary}
-              disabled={loadingSummary}
-              className="flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-medium text-zinc-200 transition hover:bg-zinc-700 disabled:opacity-40"
-            >
-              {loadingSummary ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
-              Analizuj postępy
-            </button>
-
-            <button
-              onClick={handleStartInterview}
-              className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500"
-            >
-              <MessageSquare className="h-4 w-4" />
-              Stwórz Roadmapę (Wywiad AI)
-            </button>
-          </div>
-        </div>
-      )}
-
-      {showInterview && (
-        <RoadmapInterview
-          apiKey={apiKey}
-          userAuth={userAuth as string}
-          onComplete={handleInterviewComplete}
-          onCancel={() => setShowInterview(false)}
+        <RoadmapView
+          roadmap={selectedRoadmap}
+          onDelete={() => handleDelete(selectedRoadmap.id)}
+          onUpdate={(updated) =>
+            setRoadmaps((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))
+          }
         />
-      )}
+      </div>
+    );
+  }
 
-      <div className="flex gap-1 rounded-xl border border-zinc-800 bg-zinc-900/60 p-1">
-        {(["summary", "roadmap"] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all"
-            style={{
-              background: activeTab === tab ? "rgba(16,185,129,0.12)" : "transparent",
-              color: activeTab === tab ? "#10b981" : "#71717a",
-              border: activeTab === tab ? "1px solid rgba(16,185,129,0.25)" : "1px solid transparent",
-            }}
-          >
-            {tab === "summary" ? <Bot className="h-4 w-4" /> : <Map className="h-4 w-4" />}
-            {tab === "summary" ? "Podsumowanie AI" : `Roadmapy (${roadmaps.length})`}
-          </button>
-        ))}
+  // ─── List view ───
+  return (
+    <div className="mx-auto flex w-full flex-col gap-6 p-4 pt-16 sm:p-6 sm:pt-20 md:gap-8 md:p-10 md:pt-24 lg:p-12 lg:pt-28">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/30">
+              <Sparkles className="h-5 w-5 text-emerald-500" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-100">AI Coach</h1>
+          </div>
+          <p className="pl-[46px] text-sm text-zinc-500">
+            Your personalized guitar learning plans.
+          </p>
+        </div>
+
+        <button
+          onClick={() => setShowForm((v) => !v)}
+          className="flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500"
+        >
+          <Plus className="h-4 w-4" />
+          New plan
+        </button>
       </div>
 
-      {activeTab === "summary" && (
-        <div>
-          {loadingSummary ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-16 text-zinc-600">
-              <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
-              <span className="text-sm">AI analizuje Twoje postępy...</span>
-            </div>
-          ) : summary ? (
-            <div
-              className="rounded-2xl border p-6"
-              style={{ borderColor: "rgba(16,185,129,0.2)", background: "rgba(16,185,129,0.04)" }}
-            >
-              <div className="prose prose-sm prose-invert max-w-none prose-emerald prose-headings:text-emerald-400 prose-headings:font-semibold prose-strong:text-emerald-300 prose-p:text-zinc-300 prose-li:text-zinc-300">
-                <ReactMarkdown>{summary}</ReactMarkdown>
+      {/* Generate form */}
+      {showForm && (
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5">
+          {generating ? (
+            <PlanGeneratingOverlay goal={goal} />
+          ) : (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-zinc-300">Your guitar goal</label>
+                <textarea
+                  className="w-full resize-none rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                  rows={3}
+                  placeholder="E.g. I want to learn blues improvisation, play solos like SRV..."
+                  value={goal}
+                  onChange={(e) => setGoal(e.target.value)}
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-zinc-300">Skill level</label>
+                <div className="flex flex-wrap gap-2">
+                  {LEVELS.map((l) => (
+                    <div key={l} className="group relative">
+                      <button
+                        onClick={() => setLevel(l)}
+                        className={`rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${
+                          level === l
+                            ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                            : "border-zinc-700 bg-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
+                        }`}
+                      >
+                        {l}
+                      </button>
+                      <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs leading-relaxed text-zinc-300 opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100">
+                        {LEVEL_TOOLTIPS[l]}
+                        <div className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-zinc-700" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => { setShowForm(false); setGoal(""); }}
+                  className="rounded-xl border border-zinc-700 px-4 py-2.5 text-sm text-zinc-400 transition hover:border-zinc-600 hover:text-zinc-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleGenerate}
+                  className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Generate plan
+                </button>
               </div>
             </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-3 py-16 text-zinc-700">
-              <Bot className="h-10 w-10 opacity-30" />
-              <span className="text-sm">Kliknij "Analizuj postępy", aby otrzymać ocenę od AI.</span>
-            </div>
           )}
         </div>
       )}
 
-      {activeTab === "roadmap" && !showInterview && (
-        <div className="flex flex-col gap-6">
-          {loadingRoadmaps ? (
-            <div className="flex justify-center py-10">
-              <Loader2 className="h-7 w-7 animate-spin text-emerald-500" />
-            </div>
-          ) : roadmaps.length > 0 ? (
-            roadmaps.map((rm) => (
-              <RoadmapView
-                key={rm.id}
-                roadmap={rm}
-                onRefresh={fetchUserRoadmaps}
-                onDelete={() => setRoadmaps((prev) => prev.filter((r) => r.id !== rm.id))}
-              />
-            ))
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-3 py-16 text-zinc-700">
-              <Map className="h-10 w-10 opacity-30" />
-              <span className="text-sm">Brak roadmap. Stwórz pierwszą przez Wywiad AI!</span>
-            </div>
-          )}
+      {/* Roadmap cards */}
+      {loadingRoadmaps ? (
+        <div className="flex justify-center py-16">
+          <Loader2 className="h-7 w-7 animate-spin text-emerald-500" />
+        </div>
+      ) : roadmaps.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {roadmaps.map((rm) => (
+            <RoadmapCard
+              key={rm.id}
+              roadmap={rm}
+              onOpen={() => setSelectedId(rm.id)}
+              onDelete={() => handleDelete(rm.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center gap-3 py-20 text-zinc-700">
+          <Map className="h-10 w-10 opacity-30" />
+          <span className="text-sm">No plans yet.</span>
+          <button
+            onClick={() => setShowForm(true)}
+            className="mt-1 flex items-center gap-2 rounded-xl border border-zinc-800 px-4 py-2 text-sm text-zinc-500 transition hover:border-zinc-700 hover:text-zinc-300"
+          >
+            <Plus className="h-4 w-4" />
+            Create your first plan
+          </button>
         </div>
       )}
     </div>

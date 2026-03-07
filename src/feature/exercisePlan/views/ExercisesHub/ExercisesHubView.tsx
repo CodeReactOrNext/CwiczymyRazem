@@ -72,9 +72,26 @@ export const ExercisesHubView = () => {
           <h1 className="mb-6 text-4xl font-bold italic tracking-tighter text-white sm:text-6xl lg:text-7xl">
             Interactive <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent">Guitar Exercise Library</span>
           </h1>
-          <p className="mx-auto max-w-2xl text-base text-zinc-400 sm:text-lg">
+          <p className="mx-auto max-w-2xl text-base text-zinc-400 sm:text-lg mb-10">
             Browse through our curated collection of 60+ specialized guitar exercises. From spider walks to modal improvisation, we have everything you need to level up.
           </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+             <Link 
+                href="/practice/custom" 
+                className="group relative flex h-12 items-center justify-center gap-3 overflow-hidden rounded-xl bg-cyan-500 px-8 text-sm font-bold text-black transition-all hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]"
+             >
+                <div className="absolute inset-x-0 -top-full h-full bg-gradient-to-b from-white/20 to-transparent transition-all group-hover:top-0" />
+                <FaGuitar className="h-4 w-4" />
+                Quick Practice (GP5)
+                <Badge variant="secondary" className="bg-black/20 text-[10px] text-black">Beta</Badge>
+             </Link>
+             <Link 
+                href="/guitar-practice-builder" 
+                className="flex h-12 items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 px-8 text-sm font-bold text-white transition-all hover:bg-white/10"
+             >
+                Practice Generator
+             </Link>
+          </div>
         </div>
       </div>
 

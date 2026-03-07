@@ -129,7 +129,6 @@ export default function GuitarPracticeBuilderPage() {
               <Image src='/images/longlightlogo.svg' alt='Riff Quest' width={120} height={30} className='h-6 w-auto' priority />
             </Link>
             <div className="flex items-center gap-4 sm:gap-6">
-                <Link href="/guide" className="hidden sm:inline text-xs font-bold text-zinc-500 hover:text-white transition-colors">Guide</Link>
                 <Link href="/login" className="text-xs font-bold text-zinc-500 hover:text-white transition-colors">Login</Link>
                 <Link href="/signup">
                     <Button className="rounded-full bg-white text-black font-black h-9 px-4 sm:px-6 text-xs hover:bg-zinc-200">Start Free</Button>

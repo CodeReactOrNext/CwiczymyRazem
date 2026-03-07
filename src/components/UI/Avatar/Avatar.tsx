@@ -8,7 +8,7 @@ interface AvatarProps {
   size?: "sm" | "2xl";
   className?: string;
   selectedFrame?: number;
-  selectedGuitar?: number;
+  selectedGuitar?: number | string;
 }
 
 const getRankImgPath = (lvl: number) => {

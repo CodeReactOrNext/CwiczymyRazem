@@ -32,7 +32,7 @@ function pickRandomPrompts(prompts: ImprovPrompt[], count: number, exclude: Impr
   const byCategory = new Map<string, ImprovPrompt[]>();
   for (const p of pool) {
     const list = byCategory.get(p.category) ?? [];
-    list.push(p);
+    list.push(p); 
     byCategory.set(p.category, list);
   }
 

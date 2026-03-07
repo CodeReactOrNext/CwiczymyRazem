@@ -52,6 +52,7 @@ const FRAMES = [
 ];
 
 const GUITAR_COUNT = 28;
+const SPECIAL_GUITARS = ["special-1"];
 
 const ProfileCustomization = () => {
   const { t } = useTranslation(["settings", "common"]);
@@ -62,7 +63,7 @@ const ProfileCustomization = () => {
 
   const currentLevel = userStats?.lvl || 0;
   const [selectedFrame, setSelectedFrame] = useState<number | undefined>(userInfo?.selectedFrame);
-  const [selectedGuitar, setSelectedGuitar] = useState<number | undefined>(userInfo?.selectedGuitar);
+  const [selectedGuitar, setSelectedGuitar] = useState<number | string | undefined>(userInfo?.selectedGuitar);
 
   const handleSave = () => {
     dispatch(updateProfileCustomization({ selectedFrame, selectedGuitar }));
@@ -209,9 +210,9 @@ const ProfileCustomization = () => {
 
                 <ScrollArea className="h-[280px] w-full rounded-2xl border border-zinc-800/50 bg-zinc-950/30 p-2">
                   <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-3 p-2">
-                    {Array.from({ length: GUITAR_COUNT + 1 }).map((_, i) => {
-                      const isUnlocked = currentLevel >= i;
-                      const isSelected = selectedGuitar === i || (selectedGuitar === undefined && i === (currentLevel > GUITAR_COUNT ? GUITAR_COUNT : currentLevel));
+                    {[...Array.from({ length: GUITAR_COUNT + 1 }).map((_, i) => i), ...SPECIAL_GUITARS].map((i) => {
+                      const isUnlocked = typeof i === 'number' ? currentLevel >= i : currentLevel >= 1; // Special guitars unlocked at lvl 50
+                      const isSelected = selectedGuitar === i || (selectedGuitar === undefined && typeof i === 'number' && i === (currentLevel > GUITAR_COUNT ? GUITAR_COUNT : currentLevel));
 
                       return (
                         <button
@@ -254,7 +255,7 @@ const ProfileCustomization = () => {
                                "text-[10px] font-bold text-center px-2 py-0.5 rounded-full transition-colors",
                                isSelected ? "bg-cyan-500/10 text-cyan-400" : "text-zinc-600 bg-zinc-900/30"
                              )}>
-                                Rank #{i}
+                                {typeof i === 'number' ? `Rank #${i}` : "Special"}
                              </div>
                           </div>
 

@@ -7,6 +7,13 @@ export type ExerciseCategory = "technique" | "theory" | "creativity" | "hearing"
 
 export type LocalizedContent = string;
 
+export interface BendPoint {
+  /** Relative position in the note: 0.0 = note start, 1.0 = note end */
+  position: number;
+  /** Pitch shift in cents (100 = 1 semitone, 200 = 1 whole step) */
+  cents: number;
+}
+
 export interface TablatureNote {
   string: number; // 1-6 (1 is high E)
   fret: number;
@@ -14,23 +21,40 @@ export interface TablatureNote {
   isHammerOn?: boolean;
   isPullOff?: boolean;
   isBend?: boolean;
-  bendSemitones?: number; // 1 = half step, 2 = whole step, 3 = step-and-a-half
+  /** Full bend automation curve — preferred over bendSemitones when present */
+  bendCurve?: BendPoint[];
+  bendSemitones?: number; // 1 = half step, 2 = whole step (kept for display badge)
   isPreBend?: boolean;
   isRelease?: boolean;
   isVibrato?: boolean;
   isTap?: boolean;
   dynamics?: number; // 0.0 (pp) to 1.0 (ff) — expected volume level
+  midiNote?: number; // GM MIDI note number — for drums (35=kick, 38=snare, 42=hi-hat, etc.)
+  // Extended techniques
+  isDead?: boolean;       // muted/dead note — shown as X, percussive thud sound
+  isGhost?: boolean;      // ghost note — softer, shown semi-transparent
+  isPalmMute?: boolean;   // palm mute — heavy muting, very short decay
+  isLetRing?: boolean;    // let ring — sustained beyond beat duration
+  isStaccato?: boolean;   // staccato — very short, detached
+  harmonicType?: number;  // 0=None, 1=Natural, 2=Artificial, 3=Tapped, 4=Pinch, 5=Semi
+  slideIn?: number;       // 0=None, 1=IntoFromBelow, 2=IntoFromAbove
+  slideOut?: number;      // 0=None, 1=Shift, 2=Legato, 3=SlideTo
 }
 
 export interface TablatureBeat {
   notes: TablatureNote[];
   duration: number; // 1 = quarter note, 0.5 = eighth note
   chordName?: string;
+  tuplet?: number; // e.g. 3 = triplet, 5 = quintuplet
 }
 
 export interface TablatureMeasure {
   beats: TablatureBeat[];
   timeSignature: [number, number]; // e.g. [4, 4]
+  /** Tempo ratio relative to score.tempo (e.g. 0.869 = 146/168). Present only when the
+   *  tempo changes at this measure. The cursor uses it to compute effective BPM so that
+   *  playback speed-scaling (bpm / originalBpm) stays in sync with AlphaTabPlayer. */
+  tempoChange?: number;
 }
 
 export interface ImprovPrompt {
@@ -54,6 +78,14 @@ export interface ImprovPromptRiddleConfig {
 }
 
 export type ExerciseRiddleConfig = SequenceRepeatRiddleConfig | ImprovPromptRiddleConfig;
+
+export interface BackingTrack {
+  id: string;
+  name: string;
+  measures: TablatureMeasure[];
+  trackType?: 'guitar' | 'bass' | 'drums' | 'vocals';
+  pan?: number; // -1.0 (left) to 1.0 (right)
+}
 
 export interface Exercise {
   id: string;
@@ -81,6 +113,7 @@ export interface Exercise {
     url: string;
   }[];
   tablature?: TablatureMeasure[];
+  backingTracks?: BackingTrack[];
   hideTablatureNotes?: boolean;
   customGoal?: string;
   customGoalDescription?: string;
