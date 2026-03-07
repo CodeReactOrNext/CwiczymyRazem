@@ -83,7 +83,7 @@ export default function PremiumSuccessPage() {
                 </div>
                 {[
                   "AI Practice Summary (codzienny i tygodniowy)",
-                  "AI Coach — spersonalizowany roadmap",
+                  "Roadmap — Twój spersonalizowany plan nauki",
                   "Ocena sesji ćwiczeń przez AI",
                   "Szczegółowe wskazówki do każdego etapu nauki",
                 ].map((f) => (

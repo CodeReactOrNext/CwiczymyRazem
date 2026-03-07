@@ -1,16 +1,17 @@
 import { cn } from "assets/lib/utils";
 import { toggleLogReaction } from "feature/logs/services/toggleLogReaction.service";
-import { AnimatePresence,motion } from "framer-motion";
-import { ThumbsUp } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { FaGem } from "react-icons/fa";
 import { useState } from "react";
 
 interface LogReactionProps {
   logId: string;
   reactions?: string[];
   currentUserId: string;
+  disabled?: boolean;
 }
 
-export const LogReaction = ({ logId, reactions = [], currentUserId }: LogReactionProps) => {
+export const LogReaction = ({ logId, reactions = [], currentUserId, disabled }: LogReactionProps) => {
   const isReacted = reactions.includes(currentUserId);
   const [localReactions, setLocalReactions] = useState(reactions);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -18,60 +19,61 @@ export const LogReaction = ({ logId, reactions = [], currentUserId }: LogReactio
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+    if (disabled) return;
+
     const nowReacted = !localReactions.includes(currentUserId);
-    
+
     if (nowReacted) {
       setLocalReactions([...localReactions, currentUserId]);
       setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), 1000);
+      setTimeout(() => setIsAnimating(false), 600);
     } else {
-      setLocalReactions(localReactions.filter(id => id !== currentUserId));
+      setLocalReactions(localReactions.filter((id) => id !== currentUserId));
     }
-    
+
     await toggleLogReaction(logId, currentUserId, !nowReacted);
   };
 
-  // Consolidate rendering to always show a visible button
+  if (disabled && localReactions.length === 0) return null;
+
   return (
     <button
       onClick={handleToggle}
       className={cn(
-        "group relative ml-2 flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold transition-all hover:scale-105 active:scale-95",
-        isReacted
-          ? "border-orange-500/30 bg-orange-500/10 text-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.1)]"
-          : "border-zinc-700 bg-zinc-800/50 text-zinc-400 hover:border-orange-500/30 hover:bg-zinc-800 hover:text-orange-400"
+        "group relative ml-2 flex min-h-[36px] items-center justify-center gap-1.5 rounded-full border px-3 text-sm font-semibold transition-all duration-150",
+        disabled
+          ? "cursor-default border-amber-500/50 bg-amber-500/15 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.2)]"
+          : isReacted
+          ? "cursor-pointer border-amber-500/50 bg-amber-500/15 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.2)] active:scale-90"
+          : "cursor-pointer border-zinc-600 bg-zinc-800 text-zinc-400 shadow-sm hover:border-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 active:scale-90"
       )}
-      title={isReacted ? "Remove reaction" : "High five!"}
+      title={disabled ? undefined : isReacted ? "Cofnij reakcję" : "Daj ognia!"}
     >
-      <div className="relative flex items-center justify-center">
-        <ThumbsUp  
-          size={14} 
-          className={cn(
-            "transition-colors duration-300", 
-  
-          )} 
-        />
-        
-        <AnimatePresence>
-          {isAnimating && (
-            <motion.div
-              initial={{ opacity: 1, scale: 1, y: 0 }}
-              animate={{ opacity: 0, scale: 2.5, y: -10 }}
-              className="absolute inset-0 pointer-events-none"
-            >
-              <ThumbsUp  size={14} className="text-orange-500" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-      
+      <AnimatePresence>
+        {isAnimating && (
+          <motion.span
+            key="burst"
+            initial={{ opacity: 1, scale: 1, y: 0 }}
+            animate={{ opacity: 0, scale: 2, y: -18 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="pointer-events-none absolute"
+          >
+            <FaGem size={13} className="text-amber-400" />
+          </motion.span>
+        )}
+      </AnimatePresence>
+      <FaGem
+        size={13}
+        className={cn(
+          "transition-colors duration-200",
+          isReacted ? "text-amber-400" : "text-zinc-500 group-hover:text-zinc-300"
+        )}
+      />
       {localReactions.length > 0 ? (
-        <span>{localReactions.length}</span>
+        <span className="text-xs font-bold">{localReactions.length}</span>
       ) : (
-        <span className="opacity-0 w-0 overflow-hidden group-hover:w-auto group-hover:opacity-100 transition-all duration-300">
-           React
-        </span>
+        <span className="text-xs font-semibold">+1</span>
       )}
     </button>
   );

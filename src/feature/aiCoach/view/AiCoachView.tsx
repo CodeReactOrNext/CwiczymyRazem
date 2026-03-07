@@ -48,7 +48,7 @@ const PlanGeneratingOverlay: React.FC<{ goal: string }> = ({ goal }) => {
 
       <div className="flex flex-col items-center gap-1.5 text-center">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-500/70">
-          AI Coach is building your plan
+          Roadmap is building your plan
         </p>
         <p
           className="text-sm text-zinc-400 transition-opacity duration-300"
@@ -211,7 +211,7 @@ const AiCoachView = () => {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/30">
               <Sparkles className="h-5 w-5 text-emerald-500" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-100">AI Coach</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Roadmap</h1>
           </div>
           <p className="pl-[46px] text-sm text-zinc-500">
             Your personalized guitar learning plans.

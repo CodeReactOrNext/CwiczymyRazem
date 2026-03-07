@@ -11,7 +11,7 @@ import type { StatisticsDataInterface } from "types/api.types";
 import { ChevronRight } from "lucide-react";
 import { GiMetronome } from "react-icons/gi";
 
-import { WeeklyScheduler } from "feature/weeklyScheduler/components/WeeklyScheduler";
+import { WeeklyHorizontalTimeline } from "feature/weeklyScheduler/components/WeeklyHorizontalTimeline";
 import { HeroBanner } from "components/UI/HeroBanner";
 
 interface LandingLayoutProps {
@@ -63,9 +63,7 @@ const ProfileLandingLayout = ({
       <div className="md:mt-6 space-y-6 p-4 md:p-6">
         <div className="relative z-10">
           <div className="space-y-6">
-            <div className="mb-6">
-              <WeeklyScheduler userAuth={userAuth as string} />
-            </div>
+            <WeeklyHorizontalTimeline userAuth={userAuth as string} />
 
             <NavigationCards />
           </div>

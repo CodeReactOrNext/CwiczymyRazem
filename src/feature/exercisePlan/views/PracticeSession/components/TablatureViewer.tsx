@@ -18,6 +18,7 @@ interface TablatureViewerProps {
   audioContext?: AudioContext | null;
   audioStartTime?: number | null;
   resetKey?: number;
+  hideDynamicsLane?: boolean;
 }
 
 // ── Pre-computed per-beat types (shared with worker via postMessage) ──────────
@@ -85,6 +86,7 @@ const TablatureViewerInner = ({
   audioContext: _audioContext,
   audioStartTime: _audioStartTime,
   resetKey,
+  hideDynamicsLane = false,
 }: TablatureViewerProps) => {
   const canvasRef      = useRef<HTMLCanvasElement>(null);
   const containerRef   = useRef<HTMLDivElement>(null);
@@ -227,7 +229,7 @@ const TablatureViewerInner = ({
     });
 
     return { totalBeats: currentX, renderBeats, measureEndXs, timeSigMarkers, tupletGroups, tempoMap, hasAccentedNotes: hasAccents, hasDynamics: hasDyn };
-  }, [measures]);
+  }, [measures, hideDynamicsLane]);
 
   // ── Create worker once ────────────────────────────────────────────────────
   useEffect(() => {
@@ -269,9 +271,11 @@ const TablatureViewerInner = ({
 
   // ── Send render data ──────────────────────────────────────────────────────
   useEffect(() => {
-    workerRef.current?.postMessage({ type: 'DATA', renderBeats, measureEndXs, totalBeats, hasAccentedNotes, hasDynamics, timeSigMarkers, tupletGroups, tempoMap });
+    const finalDynamics = hideDynamicsLane ? false : hasDynamics;
+    const finalAccents = hideDynamicsLane ? false : hasAccentedNotes;
+    workerRef.current?.postMessage({ type: 'DATA', renderBeats, measureEndXs, totalBeats, hasAccentedNotes: finalAccents, hasDynamics: finalDynamics, timeSigMarkers, tupletGroups, tempoMap });
     workerRef.current?.postMessage({ type: 'RESET' });
-  }, [renderBeats, measureEndXs, totalBeats, hasAccentedNotes, hasDynamics, timeSigMarkers, tupletGroups, tempoMap]);
+  }, [renderBeats, measureEndXs, totalBeats, hasAccentedNotes, hasDynamics, timeSigMarkers, tupletGroups, tempoMap, hideDynamicsLane]);
 
   // ── Playback state ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -364,5 +368,6 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.hideNotes        === next.hideNotes          &&
   prev.resetKey         === next.resetKey           &&
   prev.className        === next.className          &&
-  prev.hitNotes         === next.hitNotes
+  prev.hitNotes         === next.hitNotes           &&
+  prev.hideDynamicsLane === next.hideDynamicsLane
 );
