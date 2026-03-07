@@ -42,8 +42,8 @@ import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
 import ImageModal from "./modals/ImageModal";
 import SessionModal from "./modals/SessionModal";
-import { PremiumGate } from "feature/premium/components/PremiumGate";
-import { selectUserAuth, selectUserName, selectUserAvatar, selectUserInfo } from "feature/user/store/userSlice";
+
+import { selectUserAuth, selectUserName, selectUserAvatar } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import { AlphaTabScoreViewer } from "./components/AlphaTabScoreViewer";
@@ -144,25 +144,6 @@ export const PracticeSession = ({
   const userAuth   = useAppSelector(selectUserAuth);
   const userName   = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
-  const userInfo   = useAppSelector(selectUserInfo);
-
-  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
-
-  if (rawGpFile && !isPremium) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
-        <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500">
-          <PremiumGate feature="gp-practice" children={<div />} />
-          <button 
-            onClick={() => router.back()} 
-            className="mt-8 flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-200 transition-colors w-full font-bold uppercase tracking-widest text-[10px]"
-          >
-            ← Wróć do biblioteki
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const { bpmStages, completedBpms, isLoading: isBpmLoading, handleToggleBpm } = useBpmProgress(currentExercise);
 
