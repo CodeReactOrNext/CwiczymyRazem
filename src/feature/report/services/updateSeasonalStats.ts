@@ -1,5 +1,5 @@
 import { getCurrentSeason } from "feature/leadboard/services/getCurrentSeason";
-import {  doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import type { StatisticsDataInterface } from "types/api.types";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -26,17 +26,17 @@ export const updateSeasonalStats = async (
   const currentSeasonData = userSeasonDoc.exists()
     ? userSeasonDoc.data()
     : {
-        points: 0,
-        sessionCount: 0,
-        time: {
-          creativity: 0,
-          hearing: 0,
-          technique: 0,
-          theory: 0,
-          longestSession: 0,
-        },
-        achievements: [],
-      };
+      points: 0,
+      sessionCount: 0,
+      time: {
+        creativity: 0,
+        hearing: 0,
+        technique: 0,
+        theory: 0,
+        longestSession: 0,
+      },
+      achievements: [],
+    };
 
   const updatedSeasonData = {
     ...currentSeasonData,

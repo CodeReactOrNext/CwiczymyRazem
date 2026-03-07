@@ -1,9 +1,10 @@
 import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
+import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
 import type { Song } from "feature/songs/types/songs.type";
 import { doc, getDoc, increment, Timestamp, updateDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { auth } from "utils/firebase/api/firebase.config"; // Admin Auth for verification
-import { db } from "utils/firebase/client/firebase.utils"; // Client DB for operations
+import { auth } from "utils/firebase/api/firebase.config";
+import { db } from "utils/firebase/client/firebase.utils";
 
 export interface RateSongInput {
   songId: string;
@@ -111,6 +112,7 @@ export default async function handler(
         "statistics.points": increment(25)
       });
       addedPoints = 25;
+      await updateSeasonalPoints(userId, 25);
     }
 
     // Add Log ...
