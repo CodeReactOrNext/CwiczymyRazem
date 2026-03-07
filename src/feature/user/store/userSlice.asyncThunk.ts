@@ -32,6 +32,8 @@ import {
   firebaseSignInWithGooglePopup,
 } from "utils/firebase/client/firebase.utils";
 import { firebaseGetCurrentUser } from "utils/firebase/client/firebase.utils";
+import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
+
 
 import type { ReportFormikInterface } from "../view/ReportView/ReportView.types";
 import type { SignUpCredentials } from "../view/SingupView/SingupView";
@@ -397,31 +399,9 @@ export const saveDailyQuestAction = createAsyncThunk(
  */
 export const updateQuestProgress = createAsyncThunk(
   "user/updateQuestProgress",
-  async (payload: { type: DailyQuestTaskType; amount?: number; exerciseId?: string }, { dispatch, getState }) => {
-    const { completeQuestTask, claimQuestReward } = await import("./userSlice");
+  async (payload: { type: DailyQuestTaskType; amount?: number; exerciseId?: string }, { dispatch }) => {
+    const { completeQuestTask } = await import("./userSlice");
     dispatch(completeQuestTask(payload));
-
-    // Check if everything is completed now
-    const state = getState() as RootState;
-    const quest = state.user.currentUserStats?.dailyQuest;
-    if (quest && !quest.isRewardClaimed) {
-      const allDone = quest.tasks.every(t => t.isCompleted);
-      if (allDone) {
-        // Dispatch reward claim immediately to prevent duplicate logging
-        dispatch(claimQuestReward());
-
-        const { firebaseAddQuestLog } = await import("../../logs/services/addQuestLog.service");
-        const userId = state.user.userAuth;
-        if (userId) {
-          try {
-            await firebaseAddQuestLog(userId);
-          } catch (e) {
-            console.error("Quest logging failed", e);
-          }
-        }
-      }
-    }
-
     dispatch(saveDailyQuestAction());
   }
 );
@@ -450,6 +430,13 @@ export const claimQuestRewardAction = createAsyncThunk(
   async (_, { dispatch, getState, rejectWithValue }) => {
     try {
       const { claimQuestReward } = await import("./userSlice");
+      const stateBefore = getState() as RootState;
+      const quest = stateBefore.user.currentUserStats?.dailyQuest;
+
+      if (!quest || quest.isRewardClaimed) {
+        return;
+      }
+
       dispatch(claimQuestReward());
       dispatch(saveDailyQuestAction());
 
@@ -457,9 +444,20 @@ export const claimQuestRewardAction = createAsyncThunk(
       const userId = auth.currentUser?.uid;
       if (userId && state.user.currentUserStats) {
         const userRef = doc(db, "users", userId);
+
+        // Update seasonal points
+        await updateSeasonalPoints(userId, 100);
+
+        // Update user document
         await updateDoc(userRef, {
-          "statistics.points": state.user.currentUserStats.points
+          "statistics.points": state.user.currentUserStats.points,
+          "statistics.lvl": state.user.currentUserStats.lvl,
         });
+
+        // Add quest log
+        const { firebaseAddQuestLog } = await import("../../logs/services/addQuestLog.service");
+        await firebaseAddQuestLog(userId);
+
         posthog.capture("daily_quest_claimed", {
           points: state.user.currentUserStats.points,
         });
