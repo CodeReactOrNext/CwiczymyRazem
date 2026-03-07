@@ -28,6 +28,7 @@ interface RatingPopUpProps {
     creativityTime: number;
   }[];
   hideWrapper?: boolean;
+  onRestart?: () => void;
 }
 
 const RatingPopUpLayout = ({
@@ -37,6 +38,7 @@ const RatingPopUpLayout = ({
   onClick,
   activityData = [],
   hideWrapper = false,
+  onRestart,
 }: RatingPopUpProps) => {
   const {
     currentLevel,
@@ -76,6 +78,7 @@ const RatingPopUpLayout = ({
         skillRewardSkillId={ratingData.skillRewardSkillId}
         skillRewardAmount={ratingData.skillRewardAmount}
         skillPointsGained={ratingData.skillPointsGained}
+        onRestart={onRestart}
       />
 
       {/* Core Insights Grid */}

@@ -1,4 +1,5 @@
 import { firebaseAddSongsLog } from "feature/logs/services/addSongsLog.service";
+import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
 import type { SongStatus } from "feature/songs/types/songs.type";
 import { arrayUnion, doc, getDoc, increment,setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
@@ -37,17 +38,17 @@ export const updateSongStatus = async (
 
     let pointsAdded = 0;
     if (status === "learned" && oldStatus !== "learned") {
-      // Marked as learned -> +100 points
       await updateDoc(userDocRef, {
         "statistics.points": increment(100)
       });
       pointsAdded = 100;
+      await updateSeasonalPoints(userId, 100);
     } else if (oldStatus === "learned" && status !== "learned") {
-      // Moved away from learned -> -100 points
       await updateDoc(userDocRef, {
         "statistics.points": increment(-100)
       });
       pointsAdded = -100;
+      await updateSeasonalPoints(userId, -100);
     }
 
     await setDoc(userSongsRef, {
