@@ -17,7 +17,7 @@ AiCoachPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout
       pageId="ai-coach"
-      subtitle="AI Coach"
+      subtitle="Roadmap"
       variant="secondary"
     >
       {page}

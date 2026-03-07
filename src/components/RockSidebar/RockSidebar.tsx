@@ -29,6 +29,7 @@ import {
   LogOut,
   Sparkles,
   BarChart2,
+  Map,
 } from "lucide-react";
 import { Heart, Zap } from "lucide-react";
 import Image from "next/image";
@@ -169,9 +170,9 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
     },
     {
       id: "ai-coach" as NavPagesTypes,
-      name: "AI Coach",
+      name: "Roadmap",
       href: "/ai-coach",
-      icon: <Sparkles size={18} className="text-amber-400" />,
+      icon: <Map size={18} className="text-zinc-500" />,
     },
     {
       id: "summary" as NavPagesTypes,
@@ -277,11 +278,11 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
               <div className="mt-4 space-y-1.5">
                 <div className="flex items-center justify-between px-0.5">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-sm font-bold text-cyan-400 drop-shadow-sm">{Math.floor(userStats.points)}</span>
-                    <span className="text-[11px] font-semibold text-zinc-300">/ {nextLvlPoints} XP</span>
+                    <span className="text-sm font-bold text-cyan-400 drop-shadow-sm">{Math.floor(pointsInCurrentLvl)}</span>
+                    <span className="text-[11px] font-semibold text-zinc-300">/ {pointsNeededForNextLvl} XP</span>
                   </div>
                 </div>
-                
+
                 <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
                   <motion.div 
                     initial={{ width: 0 }}
@@ -569,8 +570,8 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                     <div className="mt-4 space-y-1.5 px-0.5">
                       <div className="flex items-center justify-between px-0.5">
                         <div className="flex items-baseline gap-1">
-                          <span className="text-sm font-bold text-cyan-400 drop-shadow-sm">{Math.floor(userStats.points)}</span>
-                          <span className="text-[11px] font-semibold text-zinc-300">/ {nextLvlPoints} XP</span>
+                          <span className="text-sm font-bold text-cyan-400 drop-shadow-sm">{Math.floor(pointsInCurrentLvl)}</span>
+                          <span className="text-[11px] font-semibold text-zinc-300">/ {pointsNeededForNextLvl} XP</span>
                         </div>
                       </div>
                       

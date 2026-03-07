@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronRight, Dumbbell, Sparkles, Target, X, Zap } from "lucide-react";
+import { ChevronRight, Dumbbell, Map, Sparkles, Target, X, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
@@ -42,13 +42,13 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
           <span className="absolute h-12 w-12 animate-pulse rounded-full bg-emerald-500/15" />
           {/* Icon */}
           <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/40">
-            <Sparkles className="h-5 w-5 text-emerald-400" />
+            <Map className="h-5 w-5 text-emerald-400" />
           </div>
         </div>
 
         <div className="flex flex-col items-center gap-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-500/70">
-            AI Coach is thinking
+            Roadmap is thinking
           </p>
           <p
             className="text-sm text-zinc-400 transition-opacity duration-300"

@@ -1,6 +1,6 @@
 import { selectUserAuth, selectUserInfo, setUserRole } from "feature/user/store/userSlice";
 import { doc, onSnapshot } from "firebase/firestore";
-import { CalendarDays, Lock, Map } from "lucide-react";
+import { CalendarDays, Lock, Map, FileCode } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
@@ -20,8 +20,13 @@ const FEATURE_META: Record<
   },
   "ai-coach": {
     icon: <Map size={18} className="text-violet-400" />,
-    name: "AI Coach",
+    name: "Roadmap",
     desc: "Generate a personalized guitar learning roadmap tailored to your goals.",
+  },
+  "gp-practice": {
+    icon: <FileCode size={18} className="text-amber-400" />,
+    name: "Guitar Pro Practice",
+    desc: "Practice with interactive notation — playback, tempo control, and loop sections. Save songs to your profile for quick access.",
   },
 };
 
@@ -68,7 +73,7 @@ export function PremiumGate({ feature, children }: PremiumGateProps) {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-col items-center gap-6 px-4 pt-20 pb-16 sm:pt-28">
+    <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-6 px-4 pt-20 pb-16 sm:pt-28">
       {/* Feature badge */}
       <div className="flex items-center gap-2 rounded-full border border-zinc-700/60 bg-zinc-900 px-3.5 py-1.5">
         <Lock size={11} className="text-zinc-500" />

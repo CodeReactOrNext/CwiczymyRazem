@@ -5,7 +5,6 @@ import {
   BookOpen,
   CalendarDays,
   Check,
-  CreditCard,
   ExternalLink,
   FileMusic,
   Loader2,
@@ -25,7 +24,7 @@ const FEATURES = [
   {
     icon: <FileMusic size={15} />,
     title: "Tablature Viewer",
-    desc: "Open .gp5, .gpx & .gp files and practice with an interactive score — playback, tempo control, loop sections.",
+    desc: "Open .gp5, .gpx & .gp files and practice with an interactive score — playback, tempo control, loop sections. Save them to your profile for quick access.",
     iconBg: "bg-cyan-500/10",
     iconText: "text-cyan-400",
     accent: "border-cyan-500/20",
@@ -40,7 +39,7 @@ const FEATURES = [
   },
   {
     icon: <Map size={15} />,
-    title: "AI Coach",
+    title: "Roadmap",
     desc: "Generate a personalized guitar learning roadmap tailored to your goals and current skill level.",
     iconBg: "bg-violet-500/10",
     iconText: "text-violet-400",
@@ -82,7 +81,6 @@ const BULLETS = [
 
 export function UpgradeContent() {
   const [isLoading, setIsLoading] = useState(false);
-  const [isPortalLoading, setIsPortalLoading] = useState(false);
 
   const handleUpgrade = async () => {
     const user = auth.currentUser;
@@ -113,31 +111,10 @@ export function UpgradeContent() {
     }
   };
 
-  const handleManageSubscription = async () => {
-    const user = auth.currentUser;
-    if (!user) return;
 
-    setIsPortalLoading(true);
-    try {
-      const idToken = await getIdToken(user);
-      const res = await fetch("/api/stripe/customer-portal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
-      });
-
-      if (!res.ok) throw new Error("Failed to open portal");
-
-      const { url } = await res.json();
-      window.location.href = url;
-    } catch (error: any) {
-      toast.error(error.message || "Could not open Stripe portal");
-      setIsPortalLoading(false);
-    }
-  };
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-6 sm:p-8">
       {/* Header */}
       <div className="flex flex-col items-center gap-3 text-center">
         <div className="relative flex items-center justify-center">
@@ -157,7 +134,7 @@ export function UpgradeContent() {
       </div>
 
       {/* Feature list */}
-      <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {FEATURES.map((f, i) => (
           <div
             key={i}
@@ -188,30 +165,34 @@ export function UpgradeContent() {
       </div>
 
       {/* Trust bullets */}
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5 px-2">
         {BULLETS.map((b, i) => (
           <div key={i} className="flex items-center gap-2">
             <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
               <Check size={10} className="text-emerald-400" />
             </div>
-            <span className="text-xs text-zinc-500">{b}</span>
+            <span className="text-[11px] font-medium text-zinc-500">{b}</span>
           </div>
         ))}
       </div>
 
       {/* Pricing */}
-      <div className="rounded-xl border border-zinc-700 bg-zinc-900/60 p-4 flex items-center justify-between">
-        <div>
-          <p className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">Monthly plan</p>
-          <div className="flex items-baseline gap-1 mt-0.5">
-            <span className="text-3xl font-black text-zinc-100">€10</span>
-            <span className="text-sm text-zinc-500">/ month</span>
+      <div className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 transition-all hover:bg-emerald-500/10">
+        <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-emerald-500/10 blur-2xl transition-all group-hover:bg-emerald-500/20" />
+        <div className="relative flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Monthly plan</p>
+            <div className="mt-1 flex items-baseline gap-1">
+              <span className="text-4xl font-black tracking-tight text-zinc-100">€9.99</span>
+              <span className="text-sm font-medium text-zinc-500">/ month</span>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col items-end gap-1">
-          <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400 ring-1 ring-emerald-500/20">
-            Cancel anytime
-          </span>
+          <div className="flex flex-col items-end gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400 ring-1 ring-emerald-500/20">
+              <Check size={10} />
+              Cancel anytime
+            </span>
+          </div>
         </div>
       </div>
 
@@ -234,19 +215,6 @@ export function UpgradeContent() {
               <ExternalLink size={12} className="opacity-60" />
             </>
           )}
-        </button>
-
-        <button
-          onClick={handleManageSubscription}
-          disabled={isPortalLoading}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-transparent px-4 py-2.5 text-xs font-medium text-zinc-500 transition hover:border-zinc-600 hover:text-zinc-300 disabled:opacity-40"
-        >
-          {isPortalLoading ? (
-            <Loader2 size={12} className="animate-spin" />
-          ) : (
-            <CreditCard size={12} />
-          )}
-          Manage existing subscription
         </button>
 
         <div className="flex items-center justify-center gap-1.5 pt-1">
@@ -279,7 +247,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
       />
 
       {/* Card */}
-      <div className="relative w-full max-w-md rounded-2xl border border-zinc-700 bg-zinc-950 shadow-2xl shadow-black/60 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-2xl rounded-3xl border border-zinc-700 bg-zinc-950 shadow-2xl shadow-black/60 max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 z-10 flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 transition hover:bg-zinc-800 hover:text-zinc-300"

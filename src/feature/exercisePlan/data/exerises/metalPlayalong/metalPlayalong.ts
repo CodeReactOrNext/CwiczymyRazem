@@ -240,6 +240,210 @@ export const musicianFitnessLvl1S8Exercise: Exercise = {
   ]
 };
 
+export const musicianFitnessLvl2S9Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s9",
+  title: "[Level 2] Beginner Guitar Workout #9 | 7th Chords, Syncopated Strumming",
+  description: "Level 2 Workout #9: Mastering 7th chords and syncopated strumming patterns.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Follow the instructor for 7th chord shapes", "Focus on the syncopated rhythm during strumming"],
+  tips: ["Keep your strumming hand loose for better syncopation"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "1Yrp9BwgNOw",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/1Yrp9BwgNOw",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S10Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s10",
+  title: "[Level 2] Beginner Guitar Workout #10 | Chord Progressions, Pentatonic Scale",
+  description: "Level 2 Workout #10: Combining chord progressions with basic pentatonic scale patterns.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Transition smoothly between chords", "Practice pentatonic scale positions shown in video"],
+  tips: ["Listen carefully to the rhythm of the progressions"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "Jr-iBwMRCN8",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/Jr-iBwMRCN8",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S11Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s11",
+  title: "[Level 2] Beginner Guitar Workout #11 | Chord Progressions, Pentatonic Scale",
+  description: "Level 2 Workout #11: Further exploration of chord progressions and pentatonic drills.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Combine chords and scale fragments", "Focus on clean execution"],
+  tips: ["Practice the pentatonic shapes slowly before speeding up"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "IwmRsgcz8eo",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/IwmRsgcz8eo",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S12Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s12",
+  title: "[Level 2] Beginner Guitar Practice Session Week #12",
+  description: "Level 2 Week 12: A comprehensive practice session wrapping up the initial Level 2 concepts.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Follow the full practice routine", "Pay attention to hand synchronization"],
+  tips: ["Stay relaxed throughout the entire 20-minute session"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "wf5O7BBeK6g",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/wf5O7BBeK6g",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S13Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s13",
+  title: "[Level 2] Week 13 | Power Chords, Dominant 7ths & Syncopated Strumming",
+  description: "Level 2 Week 13: Focus on Power Chords, Dominant 7th transitions and advanced strumming.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Focus on Power Chord accuracy", "Apply syncopation to your dominant 7th rhythms"],
+  tips: ["Power chords should sound punchy but clean"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "5-mmWbdGa9U",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/5-mmWbdGa9U",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S14Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s14",
+  title: "[Level 2] Week 14 | Pentatonic Triplets, Smooth Chord Changes",
+  description: "Level 2 Week 14: Integrating pentatonic triplets into your playing along with chord transitions.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Focus on the timing of triplets", "Keep chord changes fluid"],
+  tips: ["Use a metronome feel even when playing along with the video"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "OH9G_1PeotU",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/OH9G_1PeotU",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S15Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s15",
+  title: "[Level 2] Week 15 | Rhythm Changes, Smooth Strumming",
+  description: "Level 2 Week 15: Mastering rhythm changes and improving your strumming smoothness.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Switch rhythms as indicated in the video", "Focus on a consistent strumming motion"],
+  tips: ["Your arm should act like a pendulum during strumming"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "wGuQaeAc4kQ",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/wGuQaeAc4kQ",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S16Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s16",
+  title: "COMPLETE 20 Min Guitar Workout | Week 16",
+  description: "Level 2 Week 16: Full 20-minute step-by-step practice routine with no talking.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Play along with the continuous routine", "Maintain focus without verbal cues"],
+  tips: ["Watch the visual cues for exercise changes"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "SPfYWqwAMh0",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/SPfYWqwAMh0",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S17Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s17",
+  title: "COMPLETE 20 Min Guitar Workout | Week 17",
+  description: "Level 2 Week 17: Full 20-minute trening gry na gitarze – 19 exercises, no talking!",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Engage with all 19 exercises in sequence", "Keep the rhythm steady throughout"],
+  tips: ["This is a high-repetition workout, keep your hands relaxed"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "r33hHBSyOU8",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/r33hHBSyOU8",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S18Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s18",
+  title: "20 min Guitar Workout - Fundamentals (Week 18)",
+  description: "Level 2 Week 18: Mastering the fundamentals in a concentrated 20-minute session.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Focus on technical fundamentals", "Follow the instructor's hand positioning"],
+  tips: ["Fundamentals are key to advanced playing, don't skip the details"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "hR-Cs4Lly9s",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/hR-Cs4Lly9s",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S19Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s19",
+  title: "20 min Guitar Workout - Fundamentals (Week 19)",
+  description: "Level 2 Week 19: Continued fundamental mastery and technical drills.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 20,
+  instructions: ["Execute all technical drills with precision", "Pay attention to pick stroke directions"],
+  tips: ["Alternate picking should be consistent throughout"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "wcemjCGnmA4",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/wcemjCGnmA4",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
+export const musicianFitnessLvl2S20Exercise: Exercise = {
+  id: "musician_fitness_lvl2_s20",
+  title: "Guitar Fundamentals Mastered? Try To Keep Up! (Week 20)",
+  description: "Level 2 Week 20: The final challenge of the fundamentals series. High-intensity practice.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 22,
+  instructions: ["Keep up with the fast-paced transitions", "Ensure every note rings out clearly"],
+  tips: ["This is a test of your progress, give it your full focus"],
+  metronomeSpeed: null,
+  relatedSkills: [],
+  youtubeVideoId: "bY3B9gzo5eM",
+  isPlayalong: true,
+  videoUrl: "https://youtu.be/bY3B9gzo5eM",
+  links: [{ label: "YouTube", url: "https://www.youtube.com/@MusicianFitness" }]
+};
+
 
 
 

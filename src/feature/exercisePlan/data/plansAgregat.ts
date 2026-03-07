@@ -12,6 +12,18 @@ import { musicianFitnessLvl1S5Plan } from "feature/exercisePlan/data/plans/metal
 import { musicianFitnessLvl1S6Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S6";
 import { musicianFitnessLvl1S7Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S7";
 import { musicianFitnessLvl1S8Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl1S8";
+import { musicianFitnessLvl2S9Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S9";
+import { musicianFitnessLvl2S10Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S10";
+import { musicianFitnessLvl2S11Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S11";
+import { musicianFitnessLvl2S12Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S12";
+import { musicianFitnessLvl2S13Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S13";
+import { musicianFitnessLvl2S14Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S14";
+import { musicianFitnessLvl2S15Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S15";
+import { musicianFitnessLvl2S16Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S16";
+import { musicianFitnessLvl2S17Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S17";
+import { musicianFitnessLvl2S18Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S18";
+import { musicianFitnessLvl2S19Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S19";
+import { musicianFitnessLvl2S20Plan } from "feature/exercisePlan/data/plans/metalGuitarExercises/musicianFitnessLvl2S20";
 import { pentatonicPlayalongPlan } from "feature/exercisePlan/data/plans/pentatonicPlayalong/pentatonicPlayalongPlan";
 import { rhythmicPrecisionPlan } from "feature/exercisePlan/data/plans/rhythmicPrecision/rhythmicPrecision";
 import { spiderPermutationPlan } from "feature/exercisePlan/data/plans/spiderPermutationPlan/spiderPermutationPlan";
@@ -61,6 +73,18 @@ export const defaultPlans: ExercisePlan[] = [
   musicianFitnessLvl1S6Plan,
   musicianFitnessLvl1S7Plan,
   musicianFitnessLvl1S8Plan,
+  musicianFitnessLvl2S9Plan,
+  musicianFitnessLvl2S10Plan,
+  musicianFitnessLvl2S11Plan,
+  musicianFitnessLvl2S12Plan,
+  musicianFitnessLvl2S13Plan,
+  musicianFitnessLvl2S14Plan,
+  musicianFitnessLvl2S15Plan,
+  musicianFitnessLvl2S16Plan,
+  musicianFitnessLvl2S17Plan,
+  musicianFitnessLvl2S18Plan,
+  musicianFitnessLvl2S19Plan,
+  musicianFitnessLvl2S20Plan,
 ].sort((a, b) => (difficultyOrder[a.difficulty] || 0) - (difficultyOrder[b.difficulty] || 0));
 
 

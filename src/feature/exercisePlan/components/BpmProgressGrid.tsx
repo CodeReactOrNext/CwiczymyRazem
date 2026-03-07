@@ -90,12 +90,7 @@ export const BpmProgressGrid = ({
                 )}
               </AnimatePresence>
 
-              {/* REC label for recommended */}
-              {isRecommended && !isCompleted && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[6px] font-bold uppercase tracking-wider text-cyan-400 bg-zinc-950 px-1 rounded">
-                  rec
-                </span>
-              )}
+
             </button>
           );
         })}
