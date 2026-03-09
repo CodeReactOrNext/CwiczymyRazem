@@ -20,7 +20,12 @@
       "Bash(curl:*)",
       "WebFetch(domain:www.alphatab.net)",
       "WebSearch",
-      "WebFetch(domain:coderline.github.io)"
+      "WebFetch(domain:coderline.github.io)",
+      "Bash(sed 's/.*collection\\(db, //')",
+      "Bash(sed 's/[,\\)\"\"].*//')",
+      "Bash(sed 's/doc\\(db, //')",
+      "Bash(sed 's/\"\"$//')",
+      "Bash(sed 's/collection\\(db, //')"
     ]
   }
 }

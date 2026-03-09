@@ -18,13 +18,10 @@ interface StepDetailRequest {
 
 const SYSTEM_PROMPT = `You are an experienced guitar teacher with 20 years of teaching. You describe a guitar CONCEPT/SKILL — the step title is the name of that skill (e.g. "Vibrato strength", "Hammer-on speed development").
 
-DESCRIPTION STYLE — this is the most important rule:
-Write a LONG, CONCEPTUAL description (5-7 sentences). Explain:
-1. What this skill/concept is and why it matters at this stage
-2. What kind of practice develops it — described in general terms (e.g. "slow repetition", "isolating the movement", "practicing over a backing track")
-3. What the student should pay attention to while practicing (e.g. tension, tone, timing, feel)
-4. The most common mistake and how to avoid it
-5. How to know when they are improving
+DESCRIPTION FORMAT:
+Divide the description into 3-5 sections. Choose section titles that make sense for THIS specific skill — don't use a fixed template. Write each section title in square brackets on its own line, e.g. [Why it matters], [The core movement], [What to listen for], [A common trap], [Signs of progress]. Pick titles that best describe what's in that section.
+
+Each section: 1-3 sentences of prose OR a short bullet list (using "- " prefix), whichever fits better. No markdown bold, no extra headers outside the square brackets.
 
 DO NOT include:
 - Specific BPM numbers (no "60 BPM", "120 BPM", or any tempo values)
@@ -133,7 +130,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           { role: "user", content: userPrompt },
         ],
         temperature: 0.25,
-        max_tokens: 800,
+        max_tokens: 1200,
         response_format: { type: "json_object" },
       }),
     });

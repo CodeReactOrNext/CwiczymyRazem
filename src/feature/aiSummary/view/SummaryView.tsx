@@ -15,7 +15,6 @@ import { firebaseGetAllDailySummaries, firebaseGetAllSummaries, firebaseGetDaily
 import { firebaseGetAllDailyRatings } from "../services/rating.service";
 import type { SavedDailySummary, SavedSummary } from "../services/summary.service";
 import type { DailySummaryResponse, SessionGrade } from "../types/summary.types";
-import { SeedSummariesButton } from "../components/SeedSummariesButton";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -1240,8 +1239,6 @@ export const SummaryView = () => {
         </div>
       )}
 
-      {/* DEV ONLY — remove after testing */}
-      {userAuth && <SeedSummariesButton userId={userAuth} />}
     </div>
   );
 };

@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, Zap } from "lucide-react";
+import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, Youtube, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
 import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
+import { firebaseGetLessonsByIds } from "../../services/youtubeLesson.service";
+import YouTubeLessonCard from "./components/YouTubeLessonCard";
 
 // ─── AI Generating Loader ───────────────────────────────────────────────────
 
@@ -184,6 +187,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
   const [drawerStepId, setDrawerStepId] = useState<string | null>(null);
   const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
   const [loadingExerciseId, setLoadingExerciseId] = useState<string | null>(null);
+  const [lessonsCache, setLessonsCache] = useState<Record<string, YouTubeLessonResult[]>>({});
+  const [loadingLessonsId, setLoadingLessonsId] = useState<string | null>(null);
 
   // SVG overlay refs
   const containerRef = useRef<HTMLDivElement>(null);
@@ -302,6 +307,66 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
     phaseIdx: number
   ) => {
     setDrawerStepId(step.id);
+
+    // Fetch YouTube lessons independently (cached per step)
+    if (!lessonsCache[step.id] && !loadingLessonsId) {
+      setLoadingLessonsId(step.id);
+
+      const fetchLessons = async () => {
+        // If already saved in Firebase – load from Firestore, skip Upstash
+        if (step.suggestedLessonIds?.length) {
+          const firestoreLessons = await firebaseGetLessonsByIds(step.suggestedLessonIds);
+          return firestoreLessons.map((l) => ({
+            videoId: l.videoId,
+            title: l.title,
+            channelName: l.channelName,
+            thumbnailUrl: l.thumbnailUrl,
+            duration: l.duration,
+            level: l.level,
+            topics: l.topics,
+            score: l.qualityScore ?? 0,
+          })) as YouTubeLessonResult[];
+        }
+
+        // First time – search Upstash, then save IDs to Firebase
+        const res = await fetch("/api/search-youtube-lessons", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            stepTitle: step.title,
+            stepDescription: step.description || "",
+            roadmapGoal: roadmap.goal,
+            roadmapLevel: roadmap.level,
+          }),
+        });
+        const data = await res.json();
+        const lessons: YouTubeLessonResult[] = data.lessons ?? [];
+
+        if (lessons.length > 0) {
+          const lessonIds = lessons.map((l) => l.videoId);
+          const newPhases = phases.map((p) =>
+            p.id !== phase.id
+              ? p
+              : {
+                  ...p,
+                  steps: p.steps.map((s) =>
+                    s.id !== step.id ? s : { ...s, suggestedLessonIds: lessonIds }
+                  ),
+                }
+          );
+          setPhases(newPhases);
+          firebaseUpdateRoadmap(roadmap.id, { phases: newPhases });
+        }
+
+        return lessons;
+      };
+
+      fetchLessons()
+        .then((lessons) => setLessonsCache((prev) => ({ ...prev, [step.id]: lessons })))
+        .catch(() => setLessonsCache((prev) => ({ ...prev, [step.id]: [] })))
+        .finally(() => setLoadingLessonsId(null));
+    }
+
     if (step.description || loadingDetailId) return;
 
     setLoadingDetailId(step.id);
@@ -385,6 +450,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
     } finally {
       setLoadingExerciseId(null);
     }
+
   };
 
   const setStepStatus = async (phaseId: string, stepId: string, status: StepStatus) => {
@@ -772,9 +838,28 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                 <AiGeneratingLoader stepTitle={drawerInfo.step.title} />
               ) : drawerInfo.step.description ? (
                 <>
-                  <p className="text-sm leading-relaxed text-zinc-300">
-                    {drawerInfo.step.description}
-                  </p>
+                  <div className="space-y-3 text-sm leading-relaxed text-zinc-300">
+                    {drawerInfo.step.description.split("\n").map((line, i) => {
+                      const sectionMatch = line.match(/^\[(.+)\]$/);
+                      if (sectionMatch) {
+                        return (
+                          <p key={i} className="mt-4 text-[10px] font-semibold uppercase tracking-widest text-zinc-500 first:mt-0">
+                            {sectionMatch[1]}
+                          </p>
+                        );
+                      }
+                      if (line.startsWith("- ")) {
+                        return (
+                          <div key={i} className="flex items-start gap-2">
+                            <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-zinc-500" />
+                            <span>{line.slice(2)}</span>
+                          </div>
+                        );
+                      }
+                      if (line.trim() === "") return null;
+                      return <p key={i}>{line}</p>;
+                    })}
+                  </div>
                   {drawerInfo.step.successCriteria && (
                     <div className="mt-5 flex items-start gap-3 rounded-xl border border-emerald-900/40 bg-emerald-950/20 px-4 py-3">
                       <Target className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
@@ -786,6 +871,39 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                           {drawerInfo.step.successCriteria}
                         </p>
                       </div>
+                    </div>
+                  )}
+
+                  {/* ─── Suggested YouTube Lessons ─── */}
+                  {(loadingLessonsId === drawerInfo.step.id ||
+                    (lessonsCache[drawerInfo.step.id] && lessonsCache[drawerInfo.step.id].length > 0)) && (
+                    <div className="mt-5">
+                      <p className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+                        <Youtube className="h-3 w-3 text-red-500" />
+                        YouTube Lessons
+                      </p>
+                      {loadingLessonsId === drawerInfo.step.id ? (
+                        <div className="space-y-2">
+                          {[0, 1, 2].map((i) => (
+                            <div
+                              key={i}
+                              className="flex h-[61px] animate-pulse items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-3"
+                            >
+                              <div className="h-[45px] w-[80px] shrink-0 rounded-lg bg-zinc-800" />
+                              <div className="flex-1 space-y-2">
+                                <div className="h-3 w-3/4 rounded bg-zinc-800" />
+                                <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {lessonsCache[drawerInfo.step.id].map((lesson) => (
+                            <YouTubeLessonCard key={lesson.videoId} lesson={lesson} />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
