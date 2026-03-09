@@ -33,6 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   process.env.OPENAI_API_KEY = apiKey;
 
+  const ALLOWED_LEVELS = ["Absolute Beginner", "Beginner", "Intermediate", "Advanced"];
+
   const { stepTitle, description, goal, level } = req.body as {
     stepTitle: string;
     description: string;
@@ -42,6 +44,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!stepTitle) {
     return res.status(400).json({ error: "Missing stepTitle" });
+  }
+
+  if (typeof stepTitle !== "string" || stepTitle.length > 100) {
+    return res.status(400).json({ error: "Invalid stepTitle." });
+  }
+
+  if (goal && (typeof goal !== "string" || goal.length > 500)) {
+    return res.status(400).json({ error: "Goal too long." });
+  }
+
+  if (description && (typeof description !== "string" || description.length > 1000)) {
+    return res.status(400).json({ error: "Description too long." });
+  }
+
+  if (level && !ALLOWED_LEVELS.includes(level)) {
+    return res.status(400).json({ error: "Invalid skill level." });
   }
 
   const query = `Roadmap step: "${stepTitle}". Student goal: "${goal}". Level: ${level}. Description: ${description}. Find the best matching guitar exercise.`;

@@ -8,14 +8,30 @@ import { firebaseGetRating, firebaseSaveRating } from "../services/rating.servic
 import {
   CheckCircle2,
   Lightbulb,
-  RefreshCw,
   Sparkles,
-  TrendingUp,
   TriangleAlert,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
-import type { SessionGrade, SessionRatingResponse } from "../types/summary.types";
+import type { DailySummaryResponse, SessionGrade, SessionRatingResponse } from "../types/summary.types";
+
+// ─── Mood config (used by DailyAssessmentCard) ────────────────────────────────
+
+const MOOD_CHIP: Record<DailySummaryResponse["mood"], string> = {
+  excellent: "bg-orange-500/10 text-orange-400 border-orange-500/25",
+  good:      "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
+  solid:     "bg-cyan-500/10 text-cyan-400 border-cyan-500/25",
+  light:     "bg-yellow-500/10 text-yellow-400 border-yellow-500/25",
+  rest:      "bg-zinc-800 text-zinc-500 border-zinc-700",
+};
+
+const MOOD_LABEL: Record<DailySummaryResponse["mood"], string> = {
+  excellent: "Excellent session",
+  good:      "Good practice",
+  solid:     "Solid session",
+  light:     "Light practice",
+  rest:      "Rest day",
+};
 
 // ─── Score ring ───────────────────────────────────────────────────────────────
 
@@ -92,11 +108,10 @@ function RatingSkeleton() {
 
 // ─── Shared rating body ───────────────────────────────────────────────────────
 
-function RatingBody({ rating, ringAnimated, cfg, onRegenerate, compact = false }: {
+function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
   rating: SessionRatingResponse;
   ringAnimated: boolean;
   cfg: typeof GRADE_COLOR[SessionGrade];
-  onRegenerate: () => void;
   compact?: boolean;
 }) {
   return (
@@ -110,10 +125,6 @@ function RatingBody({ rating, ringAnimated, cfg, onRegenerate, compact = false }
             <span className={cn("text-lg font-semibold", cfg.text)}>
               {rating.verdict}
             </span>
-            <div className="flex items-center gap-1 opacity-70">
-              <Sparkles size={11} className="text-violet-400" />
-              <span className="text-xs text-violet-400">AI Assessment</span>
-            </div>
           </div>
           {!compact && (
             <p className="text-sm leading-relaxed text-zinc-300">{rating.feedback}</p>
@@ -125,13 +136,13 @@ function RatingBody({ rating, ringAnimated, cfg, onRegenerate, compact = false }
         {rating.strengths.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-1.5">
-              <CheckCircle2 size={16} className="text-emerald-400" />
-              <h4 className="text-sm font-medium text-emerald-400">Strengths</h4>
+              <CheckCircle2 size={15} className="text-emerald-400" />
+              <h4 className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Strengths</h4>
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {rating.strengths.map((s, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-zinc-300 leading-snug">
-                  <span className="text-emerald-500/50 mt-1 shrink-0 text-[10px]">●</span>
+                <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-200 leading-snug">
+                  <span className="text-emerald-500/60 mt-[5px] shrink-0 text-[8px]">▸</span>
                   <span>{s}</span>
                 </li>
               ))}
@@ -141,13 +152,13 @@ function RatingBody({ rating, ringAnimated, cfg, onRegenerate, compact = false }
         {rating.improvements.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-1.5">
-              <TriangleAlert size={16} className="text-yellow-400" />
-              <h4 className="text-sm font-medium text-yellow-400">To Improve</h4>
+              <TriangleAlert size={15} className="text-yellow-400" />
+              <h4 className="text-sm font-semibold text-yellow-400 uppercase tracking-wide">To Improve</h4>
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {rating.improvements.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-zinc-300 leading-snug">
-                  <span className="text-yellow-500/50 mt-1 shrink-0 text-[10px]">●</span>
+                <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-200 leading-snug">
+                  <span className="text-yellow-500/60 mt-[5px] shrink-0 text-[8px]">▸</span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -168,15 +179,6 @@ function RatingBody({ rating, ringAnimated, cfg, onRegenerate, compact = false }
         </div>
       )}
 
-      <div className="flex items-center justify-end mt-4">
-        <button
-          onClick={onRegenerate}
-          className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-300 transition-colors"
-        >
-          <RefreshCw size={12} />
-          Regenerate
-        </button>
-      </div>
     </>
   );
 }
@@ -258,7 +260,7 @@ export function SessionRatingCard({ log }: SessionRatingCardProps) {
   return (
     <div className={cn(
       "mt-2 rounded-2xl border p-5 space-y-5 transition-all duration-500",
-      cfg ? cn(cfg.border, cfg.bg) : "border-zinc-800 bg-zinc-900"
+      "border-zinc-800 bg-zinc-900"
     )}>
       {loading && <RatingSkeleton />}
       {error && (
@@ -270,7 +272,7 @@ export function SessionRatingCard({ log }: SessionRatingCardProps) {
         </div>
       )}
       {rating && !loading && cfg && (
-        <RatingBody rating={rating} ringAnimated={ringAnimated} cfg={cfg} onRegenerate={fetchRating} />
+        <RatingBody rating={rating} ringAnimated={ringAnimated} cfg={cfg} />
       )}
     </div>
   );
@@ -291,6 +293,158 @@ export interface PeriodRatingCardProps {
   userLevel?: number;
   compact?: boolean;
 }
+
+// ─── Daily assessment card (merged: rating + coach summary) ───────────────────
+
+export interface DailyAssessmentCardProps extends PeriodRatingCardProps {
+  daily: DailySummaryResponse | null;
+  dailyLoading: boolean;
+  onRatingReady?: () => void;
+}
+
+export function DailyAssessmentCard({
+  ratingId, label, techniqueTime, theoryTime, hearingTime, creativityTime,
+  totalTime, points, streak = 0, userLevel = 1,
+  daily, dailyLoading, onRatingReady,
+}: DailyAssessmentCardProps) {
+  const userAuth = useAppSelector(selectUserAuth) as string | null;
+  const [rating, setRating] = useState<SessionRatingResponse | null>(null);
+  const [ratingLoading, setRatingLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [ringAnimated, setRingAnimated] = useState(false);
+  const hasFetched = useRef(false);
+
+  const fetchRating = async () => {
+    setRatingLoading(true);
+    setError(null);
+    setRingAnimated(false);
+    try {
+      if (userAuth) {
+        const cached = await firebaseGetRating(userAuth, ratingId);
+        if (cached) {
+          setRating(cached);
+          setTimeout(() => setRingAnimated(true), 100);
+          setRatingLoading(false);
+          onRatingReady?.();
+          return;
+        }
+      }
+      const res = await fetch("/api/rate-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ exerciseTitle: label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak, userLevel }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json() as SessionRatingResponse;
+      setRating(data);
+      setTimeout(() => setRingAnimated(true), 100);
+      if (userAuth) {
+        await firebaseSaveRating(userAuth, ratingId, data);
+        onRatingReady?.();
+      }
+    } catch {
+      setError("Could not generate rating. Try again.");
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchRating();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const isLoading = ratingLoading || dailyLoading;
+  const cfg = rating ? GRADE_COLOR[rating.grade] : null;
+
+  return (
+    <div className={cn(
+      "rounded-2xl border overflow-hidden transition-all duration-500",
+      "border-zinc-800 bg-zinc-900"
+    )}>
+
+      {isLoading && <div className="p-5"><RatingSkeleton /></div>}
+
+      {error && !isLoading && (
+        <div className="flex items-center justify-between gap-3 p-5">
+          <p className="text-sm text-zinc-500">{error}</p>
+          <button onClick={fetchRating} className="text-xs font-bold text-zinc-400 hover:text-zinc-200 underline underline-offset-2">Try again</button>
+        </div>
+      )}
+
+      {!isLoading && rating && cfg && (
+        <div className="p-5 space-y-5">
+          {/* Hero: ring + verdict + daily summary */}
+          <div className="flex items-start gap-5">
+            <ScoreRing score={rating.score} grade={rating.grade} animated={ringAnimated} />
+            <div className="flex-1 min-w-0 space-y-2">
+              <span className={cn("text-lg font-semibold leading-tight", cfg.text)}>{rating.verdict}</span>
+              {daily?.summary && (
+                <p className="text-sm leading-relaxed text-zinc-300">{daily.summary}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Strengths / To Improve */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 pt-1">
+            {rating.strengths.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 size={15} className="text-emerald-400" />
+                  <h4 className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Strengths</h4>
+                </div>
+                <ul className="space-y-2.5">
+                  {rating.strengths.map((s, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-200 leading-snug">
+                      <span className="text-emerald-500/60 mt-[5px] shrink-0 text-[8px]">▸</span>
+                      <span>{s}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {rating.improvements.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-1.5">
+                  <TriangleAlert size={15} className="text-yellow-400" />
+                  <h4 className="text-sm font-semibold text-yellow-400 uppercase tracking-wide">To Improve</h4>
+                </div>
+                <ul className="space-y-2.5">
+                  {rating.improvements.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-200 leading-snug">
+                      <span className="text-yellow-500/60 mt-[5px] shrink-0 text-[8px]">▸</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Tip: daily highlight OR rating nextSessionTip */}
+          <div className="pt-3 border-t border-zinc-800/50">
+            <div className="flex items-start gap-3 rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3">
+              <Lightbulb size={15} className="text-amber-400 mt-0.5 shrink-0" />
+              <div>
+                <span className="text-sm font-medium text-amber-500 mr-2">
+                  {daily?.highlight ? "Today's tip:" : "Next session tip:"}
+                </span>
+                <span className="text-sm text-zinc-300">
+                  {daily?.highlight ?? rating.nextSessionTip}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Period rating card (whole day / whole week) ───────────────────────────────
 
 export function PeriodRatingCard({
   ratingId, label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak = 0, userLevel = 1, compact = false,
@@ -349,7 +503,7 @@ export function PeriodRatingCard({
   return (
     <div className={cn(
       "rounded-2xl border p-5 space-y-5 transition-all duration-500",
-      cfg ? cn(cfg.border, cfg.bg) : "border-zinc-800 bg-zinc-900"
+      "border-zinc-800 bg-zinc-900"
     )}>
       {loading && <RatingSkeleton />}
       {error && (
@@ -361,7 +515,7 @@ export function PeriodRatingCard({
         </div>
       )}
       {rating && !loading && cfg && (
-        <RatingBody rating={rating} ringAnimated={ringAnimated} cfg={cfg} onRegenerate={fetchRating} compact={compact} />
+        <RatingBody rating={rating} ringAnimated={ringAnimated} cfg={cfg} compact={compact} />
       )}
     </div>
   );

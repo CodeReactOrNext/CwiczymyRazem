@@ -9,13 +9,12 @@ export const getUpdatedActualDayWithoutBreak = (
   }
 
   const today = baseDate || new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
+  const yesterday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - 1));
 
   const isYesterday =
-    userLastReportDate.getDate() === yesterday.getDate() &&
-    userLastReportDate.getMonth() === yesterday.getMonth() &&
-    userLastReportDate.getFullYear() === yesterday.getFullYear();
+    userLastReportDate.getUTCDate() === yesterday.getUTCDate() &&
+    userLastReportDate.getUTCMonth() === yesterday.getUTCMonth() &&
+    userLastReportDate.getUTCFullYear() === yesterday.getUTCFullYear();
 
   if (isYesterday) {
     return actualDayWithoutBreak + 1;

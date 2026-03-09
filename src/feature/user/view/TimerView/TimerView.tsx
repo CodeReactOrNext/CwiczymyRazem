@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { SkillsType } from "types/skillsTypes";
 import { convertMsToHMS } from "utils/converter";
 
-type PracticeMode = "timer" | "plan" | "auto" | "song" | "skills" | null;
+type PracticeMode = "timer" | "plan" | "auto" | "song" | "skills" | "gp" | null;
 
 const TimerView = () => {
   const [mode, setMode] = useState<PracticeMode>(null);
