@@ -3,19 +3,28 @@ import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprots
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
 import {
-  BarChart2, Brain, Calendar, CalendarDays, CheckCircle2, Clock,
+  BarChart2, Brain, Calendar, CalendarDays, CheckCircle2, ChevronDown, Clock,
   Flame, Guitar, Headphones, Lightbulb, ListMusic, Music2,
-  Sparkles, Star, Target, TrendingUp, TriangleAlert, Zap,
+  Sparkles, Star, Target, TrendingDown, TrendingUp, TriangleAlert, Trophy, Zap,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { WeeklySummaryResponse } from "../types/summary.types";
-import { PeriodRatingCard } from "../components/SessionRatingCard";
+import { DailyAssessmentCard, PeriodRatingCard } from "../components/SessionRatingCard";
+import { firebaseGetAllDailySummaries, firebaseGetAllSummaries, firebaseGetDailySummary, firebaseGetSummary, firebaseSaveDailySummary, firebaseSaveSummary } from "../services/summary.service";
+import { firebaseGetAllDailyRatings } from "../services/rating.service";
+import type { SavedDailySummary, SavedSummary } from "../services/summary.service";
+import type { DailySummaryResponse, SessionGrade } from "../types/summary.types";
+import { SeedSummariesButton } from "../components/SeedSummariesButton";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 function isSameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 }
 
 function fmtMs(ms: number) {
@@ -40,6 +49,16 @@ function weekStartDate(date: Date): string {
   return d.toISOString().split("T")[0];
 }
 
+// ─── mood config ──────────────────────────────────────────────────────────────
+
+const MOOD_CFG: Record<DailySummaryResponse["mood"], { label: string; chip: string; accent: string }> = {
+  excellent: { label: "Excellent session",   chip: "bg-orange-500/10 text-orange-400 border-orange-500/25",   accent: "border-orange-500/40" },
+  good:      { label: "Good practice",       chip: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25", accent: "border-emerald-500/40" },
+  solid:     { label: "Solid session",       chip: "bg-cyan-500/10 text-cyan-400 border-cyan-500/25",          accent: "border-cyan-500/40" },
+  light:     { label: "Light practice",      chip: "bg-yellow-500/10 text-yellow-400 border-yellow-500/25",    accent: "border-yellow-500/40" },
+  rest:      { label: "Rest day",            chip: "bg-zinc-800 text-zinc-500 border-zinc-700",                accent: "border-zinc-700/60" },
+};
+
 // ─── week config ──────────────────────────────────────────────────────────────
 
 const WEEK_CFG = {
@@ -50,18 +69,306 @@ const WEEK_CFG = {
   minimal:      { label:"Minimal practice", chip:"bg-zinc-800 text-zinc-500 border-zinc-700",               accent:"border-l-zinc-700" },
 } satisfies Record<WeeklySummaryResponse["weekScore"], { label:string; chip:string; accent:string }>;
 
+// ─── Day activity dot color ────────────────────────────────────────────────────
+
+function dayDotClass(minutes: number): string {
+  if (minutes === 0)          return "bg-zinc-800 border border-zinc-700";
+  if (minutes < 15)           return "bg-yellow-500/40 border border-yellow-500/30";
+  if (minutes < 30)           return "bg-yellow-500/70 border border-yellow-500/50";
+  if (minutes < 60)           return "bg-cyan-500/60 border border-cyan-500/40";
+  if (minutes < 120)          return "bg-emerald-500/70 border border-emerald-500/50";
+  return "bg-orange-500/80 border border-orange-500/60";
+}
+
+// ─── DayActivityStrip ─────────────────────────────────────────────────────────
+
+const DAY_SHORT = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+
+const GRADE_DOT_TEXT: Record<SessionGrade, string> = {
+  S: "text-amber-300", "A+": "text-emerald-300", A: "text-emerald-400",
+  "A-": "text-emerald-400", "B+": "text-cyan-300", B: "text-cyan-400",
+  "B-": "text-cyan-400", "C+": "text-yellow-300", C: "text-yellow-400",
+  D: "text-orange-400", F: "text-red-400",
+};
+
+const GRADE_RING_COLOR: Record<SessionGrade, string> = {
+  S:   "#f59e0b",
+  "A+":"#10b981", A: "#10b981", "A-":"#34d399",
+  "B+":"#22d3ee", B: "#22d3ee", "B-":"#67e8f9",
+  "C+":"#fbbf24", C: "#fbbf24",
+  D:   "#f97316",
+  F:   "#ef4444",
+};
+
+const GRADE_RING_PCT: Record<SessionGrade, number> = {
+  S: 1.0,
+  "A+": 0.95, A: 0.90, "A-": 0.85,
+  "B+": 0.80, B: 0.75, "B-": 0.70,
+  "C+": 0.65, C: 0.60,
+  D: 0.45,
+  F: 0.25,
+};
+
+function minutesRingColor(minutes: number): string {
+  if (minutes === 0)   return "#3f3f46";
+  if (minutes < 15)    return "#eab308";
+  if (minutes < 30)    return "#eab308";
+  if (minutes < 60)    return "#06b6d4";
+  if (minutes < 120)   return "#10b981";
+  return "#f97316";
+}
+
+const DAY_RING_R = 20;
+const DAY_RING_CIRC = 2 * Math.PI * DAY_RING_R;
+
+function DayActivityStrip({
+  logs, today, ratings = {}, selectedDate, onSelectDay,
+}: {
+  logs: FirebaseUserExceriseLog[];
+  today: Date;
+  ratings?: Record<string, SessionGrade>;
+  selectedDate: Date;
+  onSelectDay: (d: Date) => void;
+}) {
+  const days = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - (13 - i));
+    d.setHours(0,0,0,0);
+    return d;
+  });
+
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-4 py-4">
+      <div className="flex items-end gap-2 min-w-0">
+        {days.map((day, i) => {
+          const isSelected = isSameDay(day, selectedDate);
+          const isToday    = isSameDay(day, today);
+          const dayLogs    = logs.filter(l => isSameDay(new Date(l.reportDate.seconds * 1000), day));
+          const minutes    = Math.round(dayLogs.reduce((s, l) => s + (l.timeSumary?.sumTime || 0), 0) / 60000);
+          const dateKey    = localDateStr(day);
+          const grade      = ratings[dateKey];
+          const shortName  = DAY_SHORT[day.getDay()];
+          const dayNum     = day.getDate();
+
+          const ringColor = grade ? GRADE_RING_COLOR[grade] : minutesRingColor(minutes);
+          const ringPct   = grade ? GRADE_RING_PCT[grade] : Math.min(minutes / 90, 1);
+          const offset    = DAY_RING_CIRC - ringPct * DAY_RING_CIRC;
+          const hasActivity = minutes > 0;
+
+          return (
+            <div
+              key={i}
+              className={cn("flex flex-col items-center gap-1.5 flex-1 min-w-[48px]", !isToday && "cursor-pointer group/dot")}
+              onClick={() => !isToday && onSelectDay(day)}
+            >
+              <span className={cn("text-[9px] font-semibold uppercase tracking-wide transition-colors", isSelected ? "text-zinc-200" : "text-zinc-600 group-hover/dot:text-zinc-400")}>
+                {shortName}
+              </span>
+
+              {/* Ring */}
+              <div className={cn("relative flex items-center justify-center w-12 h-12 shrink-0 transition-opacity", isToday && "opacity-40")}>
+                <svg viewBox="0 0 48 48" className="absolute inset-0 w-full h-full -rotate-90" overflow="visible">
+                  {/* Selection outer glow */}
+                  {isSelected && (
+                    <circle cx="24" cy="24" r={DAY_RING_R + 4} fill="none" stroke="#ffffff18" strokeWidth="1.5" />
+                  )}
+                  {/* Track */}
+                  <circle cx="24" cy="24" r={DAY_RING_R} fill="none" stroke="#27272a" strokeWidth="3.5" />
+                  {/* Progress */}
+                  {hasActivity && (
+                    <circle
+                      cx="24" cy="24" r={DAY_RING_R}
+                      fill="none"
+                      stroke={ringColor}
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeDasharray={DAY_RING_CIRC}
+                      strokeDashoffset={offset}
+                      style={{ filter: `drop-shadow(0 0 4px ${ringColor}80)` }}
+                    />
+                  )}
+                </svg>
+                <div className="relative flex flex-col items-center justify-center">
+                  {grade ? (
+                    <span className={cn("text-xs font-black leading-none", GRADE_DOT_TEXT[grade])}>
+                      {grade}
+                    </span>
+                  ) : minutes > 0 ? (
+                    <span className="text-[10px] font-bold text-white/70 tabular-nums leading-none">
+                      {minutes >= 60 ? `${Math.floor(minutes/60)}h` : `${minutes}m`}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+
+              <span className={cn("text-[9px] tabular-nums transition-colors", isSelected ? "text-zinc-300" : "text-zinc-600 group-hover/dot:text-zinc-500")}>
+                {dayNum}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── ActivityHeatmap ─────────────────────────────────────────────────────────
+
+const WEEK_DOT_TEXT: Record<WeeklySummaryResponse["weekScore"], string> = {
+  excellent:    "text-orange-400",
+  strong:       "text-emerald-400",
+  good:         "text-cyan-400",
+  inconsistent: "text-yellow-400",
+  minimal:      "text-zinc-500",
+};
+
+function ActivityHeatmap({
+  logs, today, summaries, weekOffset, onSelectWeek,
+}: {
+  logs: FirebaseUserExceriseLog[];
+  today: Date;
+  summaries: SavedSummary[];
+  weekOffset: number;
+  onSelectWeek: (offset: number) => void;
+}) {
+  const WEEKS = 8;
+  const DAY_ABBR = ["Mo","Tu","We","Th","Fr","Sa","Su"];
+
+  const weeks = Array.from({ length: WEEKS }, (_, col) => {
+    const offset = WEEKS - col; // col 0 = oldest (offset 8), col 7 = newest (offset 1)
+    const currentDay = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - ((currentDay === 0 ? 6 : currentDay - 1) + offset * 7));
+    monday.setHours(0, 0, 0, 0);
+
+    const days = Array.from({ length: 7 }, (_, dayIdx) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + dayIdx);
+      const dayLogs = logs.filter(l => isSameDay(new Date(l.reportDate.seconds * 1000), d));
+      const totalMin = Math.round(dayLogs.reduce((s, l) => s + (l.timeSumary?.sumTime || 0), 0) / 60000);
+      return { date: d, totalMin };
+    });
+
+    const weekId = `weekly-${localDateStr(monday)}`;
+    const saved = summaries.find(s => s.id === weekId);
+    const monthLabel = monday.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+    return { offset, monday, days, saved, monthLabel };
+  });
+
+  return (
+    <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-4 py-4">
+      <div className="flex gap-2">
+        {/* Day labels */}
+        <div className="flex flex-col gap-1 shrink-0">
+          {DAY_ABBR.map(d => (
+            <div key={d} className="h-5 flex items-center">
+              <span className="text-[9px] text-zinc-600 font-medium w-5">{d}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Week columns */}
+        <div className="flex gap-1.5 flex-1 min-w-0">
+          {weeks.map(w => {
+            const isSelected = weekOffset === w.offset;
+            const scoreKey = w.saved?.summary.weekScore;
+            return (
+              <div
+                key={w.offset}
+                className={cn(
+                  "flex flex-col gap-1 flex-1 min-w-[24px] cursor-pointer rounded-lg px-0.5 pt-0.5 pb-1 transition-all",
+                  isSelected ? "bg-zinc-800/80 ring-1 ring-zinc-600/60" : "hover:bg-zinc-800/40"
+                )}
+                onClick={() => onSelectWeek(w.offset)}
+              >
+                {w.days.map((day, dayIdx) => (
+                  <div
+                    key={dayIdx}
+                    className={cn(
+                      "h-5 w-full rounded-sm transition-all",
+                      dayDotClass(day.totalMin).split(" ").find(c => c.startsWith("bg-")) ?? "bg-zinc-800"
+                    )}
+                    title={`${day.date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}: ${day.totalMin > 0 ? fmtMinAsTime(day.totalMin) : "no practice"}`}
+                  />
+                ))}
+                <span className={cn(
+                  "text-[8px] tabular-nums font-medium text-center mt-0.5 truncate transition-colors block",
+                  isSelected ? "text-zinc-300" : scoreKey ? WEEK_DOT_TEXT[scoreKey] : "text-zinc-700"
+                )}>
+                  {w.monthLabel}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── WeekDayGrid ──────────────────────────────────────────────────────────────
+
+function WeekDayGrid({ weekDays }: { weekDays: { date: Date; dayName: string; totalMinutes: number; totalPoints: number }[] }) {
+  const maxMin = Math.max(...weekDays.map(d => d.totalMinutes), 1);
+  const DAY_ABBR = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+  return (
+    <div className="grid grid-cols-7 gap-2 rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-4 py-4">
+      {weekDays.map((d, i) => {
+        const barH = Math.max(Math.round((d.totalMinutes / maxMin) * 64), d.totalMinutes > 0 ? 6 : 2);
+        const dotCls = dayDotClass(d.totalMinutes).split(" ").find(c => c.startsWith("bg-")) ?? "bg-zinc-700";
+
+        return (
+          <div key={i} className="flex flex-col items-center gap-1">
+            <span className="text-[9px] font-medium text-zinc-500 uppercase tracking-wide">{DAY_ABBR[i]}</span>
+            <div className="flex items-end w-full justify-center h-16">
+              <div
+                className={cn("w-full rounded-lg transition-all", dotCls)}
+                style={{ height: `${barH}px`, maxHeight: "64px" }}
+              />
+            </div>
+            <span className="text-[9px] text-zinc-500 tabular-nums font-medium">
+              {d.totalMinutes > 0 ? fmtMinAsTime(d.totalMinutes) : "–"}
+            </span>
+            {d.totalPoints > 0 && (
+              <span className="text-[9px] text-amber-400/80 tabular-nums font-semibold">+{d.totalPoints}</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Stats strip ──────────────────────────────────────────────────────────────
 
-function StatStrip({ stats }: { stats: { icon: React.ReactNode; value: string; label: string }[] }) {
+function StatStrip({ stats }: {
+  stats: { icon: React.ReactNode; value: string; label: string; trend?: { diff: string; positive: boolean | null } }[]
+}) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {stats.map((s, i) => (
-        <div key={i} className="flex flex-col gap-2 rounded-2xl bg-zinc-900 border border-zinc-800/60 p-4">
-          <div className="flex items-center gap-2 text-zinc-400">
+        <div key={i} className="flex flex-col gap-3 rounded-2xl bg-zinc-900 border border-zinc-800/60 p-5">
+          <div className="flex items-center gap-2 text-zinc-500">
             {s.icon}
-            <span className="text-xs font-medium">{s.label}</span>
+            <span className="text-xs font-medium uppercase tracking-wide">{s.label}</span>
           </div>
-          <p className="text-2xl font-semibold text-zinc-100 tabular-nums leading-none">{s.value}</p>
+          <p className="text-3xl font-bold text-zinc-100 tabular-nums leading-none">{s.value}</p>
+          {s.trend && (
+            <div className={cn(
+              "flex items-center gap-1 text-xs font-semibold leading-none",
+              s.trend.positive === true ? "text-emerald-400" :
+              s.trend.positive === false ? "text-red-400" : "text-zinc-600"
+            )}>
+              {s.trend.positive === true
+                ? <TrendingUp size={13}/>
+                : s.trend.positive === false
+                ? <TrendingDown size={13}/>
+                : <span className="w-[10px] text-center">–</span>}
+              <span>{s.trend.diff}</span>
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -117,6 +424,159 @@ function CategoryBars({ rows }: {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ─── Day timeline ─────────────────────────────────────────────────────────────
+
+const SESSION_PALETTE = ["#10b981", "#22d3ee", "#a78bfa", "#f59e0b", "#f97316", "#ec4899"];
+
+function DayTimeline({ logs }: { logs: FirebaseUserExceriseLog[] }) {
+  if (!logs.length) return null;
+
+  const sessions = logs.map((log, i) => {
+    const endMs    = log.reportDate.seconds * 1000;
+    const durMs    = log.timeSumary?.sumTime || 0;
+    const startMs  = endMs - durMs;
+    // Use end time as the pin position (when session was logged)
+    const pinMin   = new Date(endMs).getHours() * 60 + new Date(endMs).getMinutes();
+    const color    = SESSION_PALETTE[i % SESSION_PALETTE.length];
+    const tech    = log.timeSumary?.techniqueTime  || 0;
+    const theory  = log.timeSumary?.theoryTime     || 0;
+    const hearing = log.timeSumary?.hearingTime    || 0;
+    const creat   = log.timeSumary?.creativityTime || 0;
+    const chips = [
+      tech    && { label:"Tech",       val:tech,    cls:"text-cyan-400 bg-cyan-500/10" },
+      theory  && { label:"Theory",     val:theory,  cls:"text-violet-400 bg-violet-500/10" },
+      hearing && { label:"Ear",        val:hearing, cls:"text-emerald-400 bg-emerald-500/10" },
+      creat   && { label:"Creativity", val:creat,   cls:"text-amber-400 bg-amber-500/10" },
+    ].filter(Boolean) as { label:string; val:number; cls:string }[];
+    return { log, startMs, endMs, pinMin, durMs, color, chips };
+  });
+
+  const fmt = (ms: number) =>
+    new Date(ms).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+
+  // Smart hour range
+  const allMins    = sessions.map(s => s.pinMin);
+  const rangeStart = Math.max(0,    Math.floor((Math.min(...allMins) - 60) / 60) * 60);
+  const rangeEnd   = Math.min(1440, Math.ceil ((Math.max(...allMins) + 60) / 60) * 60);
+  const rangeDur   = Math.max(rangeEnd - rangeStart, 1);
+
+  const VW = 1000;
+  // Pins: alternating tall (TALL) / short (SHORT) heights above axis
+  const AXIS_Y  = 90;
+  const TALL    = 65;
+  const SHORT   = 38;
+  const R       = 12;   // circle radius
+  const LABEL_Y = AXIS_Y + 20;
+  const VH      = LABEL_Y + 8;
+
+  const toX = (min: number) => ((min - rangeStart) / rangeDur) * VW;
+
+  const hourMarks = Array.from(
+    { length: Math.floor(rangeDur / 60) + 1 },
+    (_, i) => rangeStart + i * 60
+  );
+
+  return (
+    <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 overflow-hidden">
+      {/* SVG chart */}
+      <div className="px-5 pt-6 pb-3">
+        <svg viewBox={`0 0 ${VW} ${VH}`} className="w-full overflow-visible" style={{ height: VH }}>
+          <defs>
+            {sessions.map((s, i) => (
+              <linearGradient key={i} id={`pin-grad-${i}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor={s.color} stopOpacity="1" />
+                <stop offset="100%" stopColor={s.color} stopOpacity="0.5" />
+              </linearGradient>
+            ))}
+          </defs>
+
+          {/* Axis base line */}
+          <line x1={0} y1={AXIS_Y} x2={VW} y2={AXIS_Y} stroke="#3f3f46" strokeWidth="1.5" />
+
+          {/* Hour ticks + labels */}
+          {hourMarks.map(m => (
+            <g key={m}>
+              <line x1={toX(m)} y1={AXIS_Y - 4} x2={toX(m)} y2={AXIS_Y + 4}
+                stroke="#52525b" strokeWidth="1.5" />
+              <text x={toX(m)} y={LABEL_Y} textAnchor="middle" fontSize="10" fill="#52525b">
+                {`${String(Math.floor(m / 60)).padStart(2, "0")}:00`}
+              </text>
+            </g>
+          ))}
+
+          {/* Session pins */}
+          {sessions.map((s, i) => {
+            const x      = toX(s.pinMin);
+            const pinH   = i % 2 === 0 ? TALL : SHORT;
+            const pinTop = AXIS_Y - pinH;
+            const cx     = x;
+            const cy     = pinTop;
+            return (
+              <g key={i}>
+                {/* glow circle behind */}
+                <circle cx={cx} cy={cy} r={R + 4} fill={s.color} opacity="0.15" />
+                {/* stem */}
+                <line x1={cx} y1={cy + R} x2={cx} y2={AXIS_Y}
+                  stroke={s.color} strokeWidth="2" strokeDasharray="3,2" opacity="0.6" />
+                {/* axis dot */}
+                <circle cx={cx} cy={AXIS_Y} r="3.5" fill={s.color} />
+                {/* main circle */}
+                <circle cx={cx} cy={cy} r={R} fill={`url(#pin-grad-${i})`} />
+                <circle cx={cx} cy={cy} r={R} fill="none" stroke={s.color} strokeWidth="1.5" opacity="0.5" />
+                {/* number */}
+                <text x={cx} y={cy + 4} textAnchor="middle" fontSize="10" fontWeight="800" fill="#fff">
+                  {i + 1}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* Session cards — 2-col grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-zinc-800/40">
+        {sessions.map((s, i) => (
+          <div key={i} className="flex items-center gap-3 px-4 py-3.5 bg-zinc-900/80">
+            {/* Number badge */}
+            <div
+              className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-black"
+              style={{ backgroundColor: `${s.color}22`, color: s.color, boxShadow: `0 0 0 1.5px ${s.color}40` }}
+            >
+              {i + 1}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-zinc-200 truncate leading-snug">
+                {s.log.exceriseTitle || "Practice session"}
+              </p>
+              {s.log.songTitle && (
+                <p className="text-xs text-zinc-600 truncate">
+                  {s.log.songArtist ? `${s.log.songArtist} — ` : ""}{s.log.songTitle}
+                </p>
+              )}
+              <p className="text-xs tabular-nums mt-0.5" style={{ color: `${s.color}aa` }}>
+                {fmt(s.endMs)}
+                {s.durMs > 0 && ` · ${fmtMs(s.durMs)}`}
+              </p>
+              {s.chips.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {s.chips.map(c => (
+                    <span key={c.label} className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded", c.cls)}>
+                      {c.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <p className="text-xs font-semibold text-amber-400/80 tabular-nums shrink-0">+{s.log.totalPoints}pts</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -177,7 +637,7 @@ function SessionRow({ log }: { log: FirebaseUserExceriseLog }) {
 
 function PointsChart({ logs, today }: { logs: FirebaseUserExceriseLog[]; today: Date }) {
   const DAYS = 7;
-  const VW = 600, VH = 90, PAD_T = 8, PAD_B = 20;
+  const VW = 600, VH = 140, PAD_T = 12, PAD_B = 24;
 
   const days = Array.from({ length: DAYS }, (_, i) => {
     const d = new Date(today);
@@ -205,34 +665,37 @@ function PointsChart({ logs, today }: { logs: FirebaseUserExceriseLog[]; today: 
   const totalPts   = data.reduce((s, d) => s + d.pts, 0);
 
   return (
-    <div>
-      <SectionHeading icon={<TrendingUp size={16}/>}>
-        Points — last week
-      </SectionHeading>
-      <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-5 pt-5 pb-4 relative">
-        <div className="absolute top-4 right-5 text-sm font-medium text-zinc-400">
-          <span className="text-amber-400 font-semibold">{totalPts} pts</span> · {activeDays} active day{activeDays !== 1 ? "s" : ""}
+    <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-5 pt-5 pb-4 relative">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
+          <TrendingUp size={14} className="text-zinc-500"/>
+          Points — last week
+        </p>
+        <div className="text-sm text-zinc-400">
+          <span className="text-amber-400 font-semibold">{totalPts} pts</span>
+          <span className="text-zinc-600 mx-1">·</span>
+          <span>{activeDays} active day{activeDays !== 1 ? "s" : ""}</span>
         </div>
-        <svg viewBox={`0 0 ${VW} ${VH}`} className="w-full overflow-visible" style={{ height: 90 }}>
-          <defs>
-            <linearGradient id="ptsFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="#f59e0b" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <line x1="0" y1={VH - PAD_B} x2={VW} y2={VH - PAD_B} stroke="#27272a" strokeWidth="1" />
-          <path d={fillPath} fill="url(#ptsFill)" />
-          <path d={linePath} fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
-          {pts.filter(p => p.pts > 0).map((p, i) => (
-            <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="3" fill="#f59e0b" />
-          ))}
-          {data.map((d, idx) => (
-            <text key={idx} x={pts[idx].x.toFixed(1)} y={VH} textAnchor="middle" fontSize="8" fill="#52525b">
-              {d.day.toLocaleDateString("en-US", { weekday: "short" })}
-            </text>
-          ))}
-        </svg>
       </div>
+      <svg viewBox={`0 0 ${VW} ${VH}`} className="w-full overflow-visible" style={{ height: 140 }}>
+        <defs>
+          <linearGradient id="ptsFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stopColor="#f59e0b" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <line x1="0" y1={VH - PAD_B} x2={VW} y2={VH - PAD_B} stroke="#27272a" strokeWidth="1" />
+        <path d={fillPath} fill="url(#ptsFill)" />
+        <path d={linePath} fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+        {pts.filter(p => p.pts > 0).map((p, i) => (
+          <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="4.5" fill="#f59e0b" style={{ filter: "drop-shadow(0 0 4px #f59e0b80)" }} />
+        ))}
+        {data.map((d, idx) => (
+          <text key={idx} x={pts[idx].x.toFixed(1)} y={VH} textAnchor="middle" fontSize="10" fill="#71717a">
+            {d.day.toLocaleDateString("en-US", { weekday: "short" })}
+          </text>
+        ))}
+      </svg>
     </div>
   );
 }
@@ -299,14 +762,44 @@ function CoachSection({ icon, label, color, children }: {
   icon: React.ReactNode; label: string; color: string; children: React.ReactNode
 }) {
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2.5">
-        <div className={cn("flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800/80", color)}>
+    <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/50 p-5 space-y-3">
+      <div className="flex items-center gap-2">
+        <div className={cn("flex h-7 w-7 items-center justify-center rounded-md border border-zinc-700/50 bg-zinc-800/60", color)}>
           {icon}
         </div>
-        <p className="text-base font-medium text-zinc-200">{label}</p>
+        <p className="text-sm font-semibold text-zinc-100">{label}</p>
       </div>
-      <p className="text-sm leading-relaxed text-zinc-300 pl-[38px]">{children}</p>
+      <p className="text-sm leading-relaxed text-zinc-300 pl-9">{children}</p>
+    </div>
+  );
+}
+
+// ─── Best session card ────────────────────────────────────────────────────────
+
+function BestSessionCard({ logs }: { logs: FirebaseUserExceriseLog[] }) {
+  if (!logs.length) return null;
+  const best = [...logs].sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0))[0];
+  const total = best.timeSumary?.sumTime || 0;
+  if (!total) return null;
+
+  return (
+    <div className="flex items-center gap-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-4">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20">
+        <Trophy size={18} className="text-amber-400" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-semibold text-amber-400/70 uppercase tracking-widest mb-0.5">Best session this week</p>
+        <p className="text-sm font-semibold text-zinc-200 truncate">{best.exceriseTitle || "Practice session"}</p>
+        {best.songTitle && (
+          <p className="text-[11px] text-zinc-600 truncate mt-0.5">
+            {best.songArtist ? `${best.songArtist} — ` : ""}{best.songTitle}
+          </p>
+        )}
+      </div>
+      <div className="text-right shrink-0">
+        <p className="text-sm font-semibold text-zinc-300 tabular-nums">{fmtMs(total)}</p>
+        <p className="text-[10px] text-amber-400 font-semibold tabular-nums mt-0.5">+{best.totalPoints} pts</p>
+      </div>
     </div>
   );
 }
@@ -321,8 +814,22 @@ export const SummaryView = () => {
   const [logs, setLogs]               = useState<FirebaseUserExceriseLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(true);
   const [weekly, setWeekly]           = useState<WeeklySummaryResponse | null>(null);
+  const [daily, setDaily]             = useState<DailySummaryResponse | null>(null);
   const [aiLoading, setAiLoading]     = useState(false);
-  const loadedModes                   = useRef<Set<Mode>>(new Set());
+  const [dailyAiLoading, setDailyAiLoading] = useState(false);
+  const [history, setHistory]           = useState<SavedSummary[]>([]);
+  const [dailyHistory, setDailyHistory] = useState<SavedDailySummary[]>([]);
+  const [dailyRatings, setDailyRatings] = useState<Record<string, SessionGrade>>({});
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    d.setHours(0,0,0,0);
+    return d;
+  });
+  const [weekOffset, setWeekOffset] = useState(1); // 1 = last week, 2 = 2 weeks ago, …
+  const loadedModes       = useRef<Set<Mode>>(new Set());
+  const lastDailyDateRef  = useRef<string>("");
+  const lastWeekIdRef     = useRef<string>("");
 
   useEffect(() => {
     if (!userAuth) return;
@@ -330,12 +837,21 @@ export const SummaryView = () => {
       .then(setLogs).finally(() => setLogsLoading(false));
   }, [userAuth]);
 
+  useEffect(() => {
+    if (!userAuth || mode !== "weekly") return;
+    firebaseGetAllSummaries(userAuth).then(setHistory);
+  }, [userAuth, mode]);
+
+  useEffect(() => {
+    if (!userAuth || mode !== "daily") return;
+    firebaseGetAllDailySummaries(userAuth).then(setDailyHistory);
+    firebaseGetAllDailyRatings(userAuth).then(setDailyRatings);
+  }, [userAuth, mode]);
+
   const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
 
   // ── derived daily ──
-  const todayLogs   = logs.filter(l => isSameDay(new Date(l.reportDate.seconds * 1000), yesterday));
+  const todayLogs   = logs.filter(l => isSameDay(new Date(l.reportDate.seconds * 1000), selectedDate));
   const todayTech   = todayLogs.reduce((s,l) => s + (l.timeSumary?.techniqueTime||0), 0);
   const todayTheory = todayLogs.reduce((s,l) => s + (l.timeSumary?.theoryTime||0), 0);
   const todayHear   = todayLogs.reduce((s,l) => s + (l.timeSumary?.hearingTime||0), 0);
@@ -347,7 +863,7 @@ export const SummaryView = () => {
   const last7 = Array.from({length:7}, (_,i) => {
     const d = new Date(today);
     const currentDay = d.getDay();
-    const daysToLastMonday = (currentDay === 0 ? 6 : currentDay - 1) + 7;
+    const daysToLastMonday = (currentDay === 0 ? 6 : currentDay - 1) + weekOffset * 7;
     d.setDate(d.getDate() - daysToLastMonday + i);
     d.setHours(0,0,0,0);
     return d;
@@ -375,23 +891,48 @@ export const SummaryView = () => {
   const weekCreat    = weekDays.reduce((s,d)=>s+d.creativity,0);
   const weekCatTotal = weekTech+weekTheory+weekHear+weekCreat;
 
-  // ── AI generation (weekly only) ──
+  // ── prev week for trend comparison ──
+  const prevWeekLast7 = Array.from({length:7}, (_,i) => {
+    const d = new Date(today);
+    const currentDay = d.getDay();
+    const daysToLastMonday = (currentDay === 0 ? 6 : currentDay - 1) + (weekOffset + 1) * 7;
+    d.setDate(d.getDate() - daysToLastMonday + i);
+    d.setHours(0,0,0,0);
+    return d;
+  });
+  const prevWeekDays = prevWeekLast7.map(dayStart => {
+    const dl = logs.filter(l => isSameDay(new Date(l.reportDate.seconds*1000), dayStart));
+    return {
+      totalMinutes: Math.round(dl.reduce((s,l) => s+(l.timeSumary?.sumTime||0), 0)/60000),
+      totalPoints:  dl.reduce((s,l)=>s+(l.totalPoints||0),0),
+    };
+  });
+  const prevWeekTotalMin = prevWeekDays.reduce((s,d)=>s+d.totalMinutes,0);
+  const prevWeekTotalPts = prevWeekDays.reduce((s,d)=>s+d.totalPoints,0);
+  const prevWeekActive   = prevWeekDays.filter(d=>d.totalMinutes>0).length;
+
+  const mkTrend = (curr: number, prev: number, fmt: (n: number) => string) => {
+    if (prev === 0 && curr === 0) return undefined;
+    const diff = curr - prev;
+    if (diff === 0) return { diff: "same as prev", positive: null as null };
+    const sign = diff > 0 ? "+" : "−";
+    return { diff: `${sign}${fmt(Math.abs(diff))} vs prev`, positive: diff > 0 };
+  };
+
+  // ── AI generation ──
+  const summaryId      = `weekly-${localDateStr(last7[0])}`;
+  const dailySummaryId = `daily-${localDateStr(selectedDate)}`;
+
   const generateAi = useCallback(async (force = false) => {
     if (!userAuth) return;
 
-    const cacheKey = `cr-ai-weekly-${last7[0].toISOString().split("T")[0]}`;
-
     if (!force) {
-      try {
-        const cached = sessionStorage.getItem(cacheKey);
-        if (cached) {
-          setWeekly(JSON.parse(cached));
-          loadedModes.current.add("weekly");
-          return;
-        }
-      } catch {}
-    } else {
-      try { sessionStorage.removeItem(cacheKey); } catch {}
+      const cached = await firebaseGetSummary(userAuth, summaryId);
+      if (cached) {
+        setWeekly(cached);
+        loadedModes.current.add("weekly");
+        return;
+      }
     }
 
     setAiLoading(true);
@@ -400,7 +941,7 @@ export const SummaryView = () => {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
           days: weekDays.map(d=>({
-            dayName:d.dayName, date:d.date.toISOString().split("T")[0],
+            dayName:d.dayName, date:localDateStr(d.date),
             exercises: d.logs.map(l=>({
               title:l.exceriseTitle||"Practice session", totalTime:l.timeSumary?.sumTime||0,
               techniqueTime:l.timeSumary?.techniqueTime||0, theoryTime:l.timeSumary?.theoryTime||0,
@@ -415,22 +956,79 @@ export const SummaryView = () => {
       if (res.ok) {
         const data = await res.json() as WeeklySummaryResponse;
         setWeekly(data);
-        try { sessionStorage.setItem(cacheKey, JSON.stringify(data)); } catch {}
+        await firebaseSaveSummary(userAuth, summaryId, data);
+        firebaseGetAllSummaries(userAuth).then(setHistory);
       }
       loadedModes.current.add("weekly");
     } finally { setAiLoading(false); }
-  }, [userAuth, weekDays, weekTotalPts, userStats]);
+  }, [userAuth, weekDays, weekTotalPts, userStats, summaryId]);
+
+  const generateDailyAi = useCallback(async (force = false) => {
+    if (!userAuth) return;
+
+    if (!force) {
+      const cached = await firebaseGetDailySummary(userAuth, dailySummaryId);
+      if (cached) {
+        setDaily(cached);
+        loadedModes.current.add("daily");
+        return;
+      }
+    }
+
+    setDailyAiLoading(true);
+    try {
+      const exercises = todayLogs.map(l => ({
+        title: l.exceriseTitle || "Practice session",
+        techniqueTime: l.timeSumary?.techniqueTime || 0,
+        theoryTime: l.timeSumary?.theoryTime || 0,
+        hearingTime: l.timeSumary?.hearingTime || 0,
+        creativityTime: l.timeSumary?.creativityTime || 0,
+        totalTime: l.timeSumary?.sumTime || 0,
+        points: l.totalPoints || 0,
+        songTitle: l.songTitle,
+      }));
+
+      const res = await fetch("/api/generate-daily-summary", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          exercises,
+          totalPoints: todayPts,
+          streak: userStats?.actualDayWithoutBreak || 0,
+          userLevel: userStats?.lvl || 1,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json() as DailySummaryResponse;
+        setDaily(data);
+        await firebaseSaveDailySummary(userAuth, dailySummaryId, data);
+        firebaseGetAllDailySummaries(userAuth).then(setDailyHistory);
+      }
+      loadedModes.current.add("daily");
+    } finally { setDailyAiLoading(false); }
+  }, [userAuth, todayLogs, todayPts, userStats, dailySummaryId]);
 
   useEffect(() => {
     if (logsLoading || !userAuth || mode !== "weekly") return;
-    if (!loadedModes.current.has("weekly")) generateAi();
-  }, [logsLoading, mode, generateAi, userAuth]);
+    if (lastWeekIdRef.current === summaryId) return;
+    lastWeekIdRef.current = summaryId;
+    setWeekly(null);
+    generateAi();
+  }, [logsLoading, mode, userAuth, summaryId, generateAi]);
+
+  useEffect(() => {
+    if (logsLoading || !userAuth || mode !== "daily") return;
+    const dateStr = localDateStr(selectedDate);
+    if (lastDailyDateRef.current === dateStr) return;
+    lastDailyDateRef.current = dateStr;
+    setDaily(null);
+    generateDailyAi();
+  }, [logsLoading, mode, userAuth, selectedDate, generateDailyAi]);
 
   const weekCfg = weekly ? WEEK_CFG[weekly.weekScore] : null;
 
   // ─────────────────────────────────────────────────────────────────────────────
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-4 md:gap-8 md:p-8">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 md:gap-8 md:p-6 lg:p-8">
 
       {/* ── Page header ───────────────────────────────────── */}
       <div className="flex items-center justify-between gap-4">
@@ -442,19 +1040,28 @@ export const SummaryView = () => {
             <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Practice Summary</h1>
           </div>
           <p className="pl-[48px] text-sm text-zinc-500">
-            {yesterday.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"})}
+            {mode === "daily"
+              ? selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"})
+              : today.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"})}
           </p>
         </div>
+        <ModeToggle mode={mode} onChange={setMode}/>
       </div>
-
-      {/* ── Mode toggle ───────────────────────────────────── */}
-      <ModeToggle mode={mode} onChange={setMode}/>
 
       {/* ════════════════════════════════════════════════════
           DAILY MODE
       ════════════════════════════════════════════════════ */}
       {mode === "daily" && (
         <div className="flex flex-col gap-6">
+
+          {/* Activity strip */}
+          <DayActivityStrip
+            logs={logs}
+            today={today}
+            ratings={dailyRatings}
+            selectedDate={selectedDate}
+            onSelectDay={(d) => setSelectedDate(d)}
+          />
 
           {/* Stats */}
           <StatStrip stats={[
@@ -464,13 +1071,17 @@ export const SummaryView = () => {
             { icon:<Star size={15}/>,   value:`Level ${userStats?.lvl??1}`,                    label:"Your level" },
           ]}/>
 
-          {/* Period rating */}
-          {todayTotal > 0 && (
+          {/* Daily Assessment — merged rating + coach feedback */}
+          {todayTotal > 0 ? (
             <div>
-              <SectionHeading icon={<Sparkles size={12}/>}>Yesterday's rating</SectionHeading>
-              <PeriodRatingCard
-                ratingId={`daily-${yesterday.toISOString().split("T")[0]}`}
-                label="Yesterday's full practice"
+              <SectionHeading icon={<Sparkles size={12}/>}>
+                {isSameDay(selectedDate, (() => { const d = new Date(); d.setDate(d.getDate()-1); return d; })())
+                  ? "Yesterday's assessment"
+                  : `${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} assessment`}
+              </SectionHeading>
+              <DailyAssessmentCard
+                ratingId={`daily-${localDateStr(selectedDate)}`}
+                label={`${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} practice`}
                 techniqueTime={todayTech / 1000}
                 theoryTime={todayTheory / 1000}
                 hearingTime={todayHear / 1000}
@@ -479,40 +1090,25 @@ export const SummaryView = () => {
                 points={todayPts}
                 streak={userStats?.actualDayWithoutBreak ?? 0}
                 userLevel={userStats?.lvl ?? 1}
+                daily={daily}
+                dailyLoading={dailyAiLoading}
+                onRatingReady={() => userAuth && firebaseGetAllDailyRatings(userAuth).then(setDailyRatings)}
               />
             </div>
-          )}
-
-          {/* Time split */}
-          {todayTotal > 0 && (
-            <div>
-              <SectionHeading icon={<BarChart2 size={16}/>}>Time split</SectionHeading>
-              <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-5 py-5">
-                <CategoryBars rows={[
-                  { label:"Technique",  value:todayTech,   total:todayTotal, color:"text-cyan-400",    icon:<Zap size={12}/> },
-                  { label:"Theory",     value:todayTheory, total:todayTotal, color:"text-violet-400",  icon:<Brain size={12}/> },
-                  { label:"Ear Train.", value:todayHear,   total:todayTotal, color:"text-emerald-400", icon:<Headphones size={12}/> },
-                  { label:"Creativity", value:todayCreat,  total:todayTotal, color:"text-amber-400",   icon:<Music2 size={12}/> },
-                ]}/>
-              </div>
-            </div>
-          )}
-
-          {/* Sessions list */}
-          {todayLogs.length > 0 && (
-            <div>
-              <SectionHeading icon={<ListMusic size={16}/>} count={todayLogs.length}>Sessions yesterday</SectionHeading>
-              <div className="flex flex-col gap-2">
-                {todayLogs.map((log, i) => <SessionRow key={i} log={log}/>)}
-              </div>
-            </div>
-          )}
-
-          {todayLogs.length === 0 && !logsLoading && (
+          ) : (
             <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-zinc-800 py-16 text-zinc-700">
               <Guitar className="h-10 w-10 opacity-30"/>
-              <p className="text-sm font-medium text-zinc-500">No practice logged yesterday</p>
+              <p className="text-sm font-medium text-zinc-500">No practice logged on this day</p>
               <p className="text-xs text-zinc-600">Start a session to track your progress</p>
+            </div>
+          )}
+
+
+          {/* Day timeline */}
+          {todayLogs.length > 0 && (
+            <div>
+              <SectionHeading icon={<ListMusic size={16}/>} count={todayLogs.length}>Sessions</SectionHeading>
+              <DayTimeline logs={todayLogs} />
             </div>
           )}
         </div>
@@ -524,11 +1120,26 @@ export const SummaryView = () => {
       {mode === "weekly" && (
         <div className="flex flex-col gap-6">
 
-          {/* Stats */}
+          {/* Week activity heatmap */}
+          <ActivityHeatmap
+            logs={logs}
+            today={today}
+            summaries={history}
+            weekOffset={weekOffset}
+            onSelectWeek={setWeekOffset}
+          />
+
+          {/* Points chart */}
+          <PointsChart logs={logs} today={last7[6]} />
+
+          {/* Stats row — full width */}
           <StatStrip stats={[
-            { icon:<Clock size={15}/>,       value:fmtMinAsTime(weekTotalMin),                label:"Last week" },
-            { icon:<Zap size={15}/>,         value:`${weekTotalPts}`,                         label:"Points earned" },
-            { icon:<CalendarDays size={15}/>,value:`${weekActive} / 7 days`,                  label:"Active days" },
+            { icon:<Clock size={15}/>,       value:fmtMinAsTime(weekTotalMin),                label:"Practice time",
+              trend: mkTrend(weekTotalMin, prevWeekTotalMin, fmtMinAsTime) },
+            { icon:<Zap size={15}/>,         value:`${weekTotalPts}`,                         label:"Points earned",
+              trend: mkTrend(weekTotalPts, prevWeekTotalPts, n => `${n}`) },
+            { icon:<CalendarDays size={15}/>,value:`${weekActive} / 7 days`,                  label:"Active days",
+              trend: mkTrend(weekActive, prevWeekActive, n => `${n}d`) },
             { icon:<Flame size={15}/>,       value:`${userStats?.actualDayWithoutBreak??0}d`, label:"Streak" },
           ]}/>
 
@@ -538,7 +1149,7 @@ export const SummaryView = () => {
               <SectionHeading icon={<Sparkles size={16}/>}>Last week's rating</SectionHeading>
               <PeriodRatingCard
                 compact
-                ratingId={`weekly-${last7[0].toISOString().split("T")[0]}`}
+                ratingId={`weekly-${localDateStr(last7[0])}`}
                 label="Last week's practice"
                 techniqueTime={weekTech / 1000}
                 theoryTime={weekTheory / 1000}
@@ -551,9 +1162,6 @@ export const SummaryView = () => {
               />
             </div>
           )}
-
-          {/* Points — last week */}
-          <PointsChart logs={logs} today={last7[6]} />
 
           {/* AI weekly report */}
           <div>
@@ -576,9 +1184,6 @@ export const SummaryView = () => {
                 {/* header */}
                 <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-zinc-800/60 flex-wrap bg-zinc-900/40">
                   <div className="flex items-center gap-3">
-                    <span className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold shadow-sm", weekCfg.chip)}>
-                      <CalendarDays size={13}/>{weekCfg.label}
-                    </span>
                     <span className="text-xs text-zinc-500 font-medium">
                       {last7[0].toLocaleDateString("en-US",{month:"short",day:"numeric"})} – {last7[6].toLocaleDateString("en-US",{month:"short",day:"numeric"})}
                     </span>
@@ -592,7 +1197,7 @@ export const SummaryView = () => {
 
                 {/* key insight */}
                 {weekly.highlight && (
-                  <div className="px-6 py-5 border-b border-zinc-800/60 bg-zinc-900/30">
+                  <div className="px-5 py-4 border-b border-zinc-800/60">
                     <div className="flex items-start gap-3 rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3">
                       <Lightbulb size={16} className="text-amber-400 mt-0.5 shrink-0"/>
                       <p className="text-sm font-medium text-zinc-200">{weekly.highlight}</p>
@@ -600,8 +1205,8 @@ export const SummaryView = () => {
                   </div>
                 )}
 
-                {/* 4 sections */}
-                <div className="grid gap-8 px-6 py-6 sm:grid-cols-2 bg-gradient-to-b from-transparent to-black/10">
+                {/* 4 sections in 2x2 grid */}
+                <div className="grid gap-3 p-4 sm:grid-cols-2">
                   <CoachSection icon={<Brain size={14}/>} label="Week overview" color="text-cyan-400">
                     {weekly.overview}
                   </CoachSection>
@@ -625,46 +1230,6 @@ export const SummaryView = () => {
             )}
           </div>
 
-          {/* Time split */}
-          {weekCatTotal > 0 && (
-            <div>
-              <SectionHeading icon={<BarChart2 size={16}/>}>Time split last week</SectionHeading>
-              <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 px-5 py-5">
-                <CategoryBars rows={[
-                  { label:"Technique",  value:weekTech,   total:weekCatTotal, color:"text-cyan-400",    icon:<Zap size={12}/> },
-                  { label:"Theory",     value:weekTheory, total:weekCatTotal, color:"text-violet-400",  icon:<Brain size={12}/> },
-                  { label:"Ear Train.", value:weekHear,   total:weekCatTotal, color:"text-emerald-400", icon:<Headphones size={12}/> },
-                  { label:"Creativity", value:weekCreat,  total:weekCatTotal, color:"text-amber-400",   icon:<Music2 size={12}/> },
-                ]}/>
-              </div>
-            </div>
-          )}
-
-          {/* Sessions by day */}
-          {weekActive > 0 && (
-            <div>
-              <SectionHeading icon={<ListMusic size={16}/>}>Sessions by day</SectionHeading>
-              <div className="flex flex-col gap-5">
-                {weekDays
-                  .filter(d => d.logs.length > 0)
-                  .map((d, i) => (
-                    <div key={i}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className={cn("text-sm font-semibold", "text-zinc-300")}>
-                          {d.dayName}
-                        </span>
-                        <span className="text-[11px] text-zinc-600 tabular-nums">{fmtMinAsTime(d.totalMinutes)}</span>
-                        <span className="text-[10px] text-amber-400/70 font-semibold tabular-nums">+{d.totalPoints} pts</span>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        {d.logs.map((log,j) => <SessionRow key={j} log={log}/>)}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-
           {weekActive === 0 && !logsLoading && (
             <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-zinc-800 py-16 text-zinc-700">
               <CalendarDays className="h-10 w-10 opacity-30"/>
@@ -674,6 +1239,9 @@ export const SummaryView = () => {
           )}
         </div>
       )}
+
+      {/* DEV ONLY — remove after testing */}
+      {userAuth && <SeedSummariesButton userId={userAuth} />}
     </div>
   );
 };

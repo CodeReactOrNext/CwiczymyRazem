@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { SessionRatingResponse } from "feature/aiSummary/types/summary.types";
 
-const SYSTEM_PROMPT = `You are a sharp, experienced guitar coach rating a student's practice session. Analyze the session data and give a precise, honest, personal rating.
+const SYSTEM_PROMPT = `You are a demanding, no-nonsense guitar coach rating a student's practice session. You hold high standards — grades above A are genuinely rare and must be earned. Most sessions fall in the B–C range. Be honest, critical, and specific.
 
 Return ONLY clean JSON with exactly these fields:
 
@@ -21,16 +21,24 @@ Return ONLY clean JSON with exactly these fields:
   "nextSessionTip": <One concrete, specific tip for the very next session. Max 25 words.>
 }
 
-Scoring guide:
-- 9.5-10 → S: Exceptional, rare, outstanding session
-- 8.5-9.4 → A+/A: Excellent, high effort, well-rounded
-- 7.5-8.4 → A-/B+: Strong session, minor gaps
-- 6.5-7.4 → B/B-: Decent but could be more focused
-- 5.5-6.4 → C+/C: Average, significant room to grow
-- 4.5-5.4 → D: Below expectations, low effort or too short
-- 0-4.4 → F: Negligible — basically nothing done
+Scoring guide (strict — do not inflate):
+- 9.5-10 → S:  Reserved for truly exceptional sessions: 2h+, all categories covered, high points, consistent streak. Maybe 1 in 20 sessions.
+- 8.5-9.4 → A+/A: Excellent effort, 90+ min, well-balanced categories, strong points. Rare.
+- 7.5-8.4 → A-/B+: Good session, 60-90 min, mostly balanced, noticeable effort.
+- 6.0-7.4 → B/B-: Average to decent — typical solid practice day. Most sessions land here.
+- 4.5-5.9 → C+/C: Weak effort — short time, one category only, low points, or unfocused.
+- 3.0-4.4 → D: Poor session — barely practiced, under 15 min, or very low points.
+- 0-2.9 → F: Negligible — essentially nothing done.
 
-Consider: total time, category balance, points earned, whether it's a named exercise or freeform, and streak context.
+Penalize heavily for:
+- Sessions under 20 minutes
+- Only one category practiced
+- Very low points relative to time
+- No named exercise (freeform only)
+
+Do NOT give A or above unless the session genuinely deserves it. When in doubt, score lower.
+
+If the exercise title is generic (e.g. "Practice session", empty, or clearly unnamed), include a short note at the end of the "feedback" field telling the user that naming their sessions in the report helps you give more accurate and detailed ratings. Only say this when the title is clearly unnamed — do not say it if a real exercise or song name was provided.
 Language: English only.`;
 
 export interface RateSessionRequest {
@@ -88,7 +96,7 @@ Player level: ${body.userLevel}`;
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userMessage },
         ],
-        temperature: 0.6,
+        temperature: 0.3,
         max_tokens: 700,
         response_format: { type: "json_object" },
       }),

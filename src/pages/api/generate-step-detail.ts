@@ -1,5 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+const ALLOWED_LEVELS = ["Absolute Beginner", "Beginner", "Intermediate", "Advanced"] as const;
+const MAX_GOAL_LENGTH = 500;
+const MAX_TITLE_LENGTH = 100;
+
 interface StepDetailRequest {
   goal: string;
   level: string;
@@ -99,6 +103,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!body.stepTitle || !body.goal) {
     return res.status(400).json({ message: "Missing required parameters." });
+  }
+
+  if (body.goal.length > MAX_GOAL_LENGTH) {
+    return res.status(400).json({ message: `Goal must be at most ${MAX_GOAL_LENGTH} characters.` });
+  }
+
+  if (body.stepTitle.length > MAX_TITLE_LENGTH || (body.phaseName && body.phaseName.length > MAX_TITLE_LENGTH)) {
+    return res.status(400).json({ message: "Step or phase title too long." });
+  }
+
+  if (body.level && !ALLOWED_LEVELS.includes(body.level as (typeof ALLOWED_LEVELS)[number])) {
+    return res.status(400).json({ message: "Invalid skill level." });
   }
 
   const userPrompt = buildUserPrompt(body);

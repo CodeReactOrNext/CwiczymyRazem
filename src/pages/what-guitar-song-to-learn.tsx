@@ -1,8 +1,7 @@
 import Head from "next/head";
-import { SongRecommender } from "feature/songs/components/SongRecommender/SongRecommender";
 import { Footer } from "feature/landing/components/Footer";
 import { useTranslation } from "hooks/useTranslation";
-import { Sparkles, ArrowLeft } from "lucide-react";
+import { Sparkles, ArrowLeft, Guitar } from "lucide-react";
 import Link from "next/link";
 import { Button } from "assets/components/ui/button";
 
@@ -55,12 +54,25 @@ const WhatSongPage = () => {
             </div>
 
             <div className="flex justify-center animate-in fade-in zoom-in-95 duration-1000 delay-300">
-              <div className="w-full max-w-xl p-8 md:p-12 rounded-[2rem] bg-zinc-900/40 border border-white/10 backdrop-blur-xl shadow-2xl relative group">
+              <div className="w-full max-w-xl p-8 md:p-12 rounded-[2rem] bg-zinc-900/40 border border-white/10 backdrop-blur-xl shadow-2xl relative group flex flex-col items-center text-center">
                 {/* Decorative Elements */}
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-cyan-500/20 rounded-full blur-2xl group-hover:bg-cyan-500/30 transition-colors" />
                 <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl group-hover:bg-purple-500/30 transition-colors" />
                 
-                <SongRecommender variant="inline" />
+                <div className="relative z-10 space-y-6">
+                  <div className="mx-auto w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+                    <Guitar className="w-8 h-8 text-cyan-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Ready to discover your next riff?</h3>
+                    <p className="text-zinc-400">Our recommendation engine is being upgraded to provide even better matches for your style.</p>
+                  </div>
+                  <Link href="/dashboard" className="w-full">
+                    <Button size="lg" className="w-full sm:w-auto px-8 bg-white hover:bg-zinc-200 text-black font-bold h-14 rounded-xl shadow-lg shadow-white/5">
+                      Explore All Songs
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
 

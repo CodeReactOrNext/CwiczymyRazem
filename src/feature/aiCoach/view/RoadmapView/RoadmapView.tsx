@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronRight, Dumbbell, Map, Sparkles, Target, X, Zap } from "lucide-react";
+import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
@@ -42,7 +42,7 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
           <span className="absolute h-12 w-12 animate-pulse rounded-full bg-emerald-500/15" />
           {/* Icon */}
           <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/40">
-            <Map className="h-5 w-5 text-emerald-400" />
+            <MapIcon className="h-5 w-5 text-emerald-400" />
           </div>
         </div>
 
@@ -81,7 +81,7 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
       </div>
 
       {/* Shimmer skeleton */}
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-4">
         {[92, 100, 78, 95, 65, 88].map((w, i) => (
           <div
             key={i}
@@ -156,6 +156,15 @@ const PATH_COLOR: Record<StepStatus, string> = {
   "in-progress": "#78350f",
   done: "#14532d",
 };
+
+const PHASE_COLORS = [
+  { badge: "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/30", border: "border-violet-500/30" },
+  { badge: "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/30", border: "border-sky-500/30" },
+  { badge: "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30", border: "border-amber-500/30" },
+  { badge: "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/30", border: "border-rose-500/30" },
+  { badge: "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30", border: "border-emerald-500/30" },
+  { badge: "bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30", border: "border-orange-500/30" },
+];
 
 interface SvgPath {
   d: string;
@@ -239,17 +248,19 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
 
         let d: string;
         if (stepsRight) {
-          // Phase RIGHT → Step LEFT, curving outward
           const x0 = pRX;
           const x3 = sRect.left - cRect.left;
-          const cpX = x0 + (x3 - x0) * 0.55;
-          d = `M ${x0} ${pCY} C ${cpX} ${pCY} ${cpX} ${sCY} ${x3} ${sCY}`;
+          const span = x3 - x0;
+          const cp1X = x0 + span * 0.75;
+          const cp2X = x0 + span * 0.25;
+          d = `M ${x0} ${pCY} C ${cp1X} ${pCY} ${cp2X} ${sCY} ${x3} ${sCY}`;
         } else {
-          // Phase LEFT → Step RIGHT, curving outward
           const x0 = pLX;
           const x3 = sRect.right - cRect.left;
-          const cpX = x0 - (x0 - x3) * 0.55;
-          d = `M ${x0} ${pCY} C ${cpX} ${pCY} ${cpX} ${sCY} ${x3} ${sCY}`;
+          const span = x0 - x3;
+          const cp1X = x0 - span * 0.75;
+          const cp2X = x0 - span * 0.25;
+          d = `M ${x0} ${pCY} C ${cp1X} ${pCY} ${cp2X} ${sCY} ${x3} ${sCY}`;
         }
 
         newPaths.push({ d, key: `${phase.id}-${step.id}`, status });
@@ -465,32 +476,35 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
           {/* SVG overlay with bezier arrows */}
           {svgDims.w > 0 && (
             <svg
-              className="pointer-events-none absolute left-0 top-0 overflow-visible"
+              className="pointer-events-none absolute left-0 top-0 hidden overflow-visible sm:block"
               width={svgDims.w}
               height={svgDims.h}
               style={{ zIndex: 0 }}
             >
               <defs>
-                <marker
-                  id={markerId}
-                  markerWidth="5"
-                  markerHeight="4"
-                  refX="5"
-                  refY="2"
-                  orient="auto"
-                >
-                  <polygon points="0 0, 5 2, 0 4" />
-                </marker>
+                {(["not-started", "in-progress", "done"] as StepStatus[]).map((s) => (
+                  <marker
+                    key={s}
+                    id={`${markerId}-${s}`}
+                    markerWidth="5"
+                    markerHeight="4"
+                    refX="5"
+                    refY="2"
+                    orient="auto"
+                  >
+                    <polygon points="0 0, 5 2, 0 4" fill={PATH_COLOR[s]} />
+                  </marker>
+                ))}
               </defs>
               {svgPaths.map((path) => (
                 <path
                   key={path.key}
                   d={path.d}
                   stroke={PATH_COLOR[path.status]}
-                  strokeWidth="1.5"
+                  strokeWidth="2"
                   fill="none"
                   strokeDasharray="5 3"
-                  markerEnd={`url(#${markerId})`}
+                  markerEnd={`url(#${markerId}-${path.status})`}
                   opacity="0.8"
                 />
               ))}
@@ -500,124 +514,169 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
           {/* Nodes */}
           <div className="relative flex flex-col items-center" style={{ zIndex: 1 }}>
             {/* Root node */}
-            <div className="rounded-xl border border-zinc-600 bg-zinc-800 px-7 py-3 text-center text-sm font-bold text-zinc-100 shadow-md">
+            <div className="max-w-sm rounded-2xl border border-zinc-600/80 bg-zinc-800/90 px-8 py-4 text-center text-sm font-bold text-zinc-100 shadow-lg shadow-black/30 ring-1 ring-zinc-600/20">
               {roadmap.goal}
             </div>
 
-            {phases.map((phase, phaseIdx) => {
-              const stepsRight = phaseIdx % 2 === 0;
+            {/* Phases wrapper — continuous spine lives here */}
+            <div className="relative w-full">
+              {/* Background track — desktop only */}
+              <div className="absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-zinc-800 sm:block" />
+              {/* Progress fill — desktop only */}
+              <div
+                className="absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-emerald-600/50 transition-all duration-700 sm:block"
+                style={{ height: `${progress}%` }}
+              />
 
-              return (
-                <div key={phase.id} className="flex w-full flex-col items-center">
-                  {/* Spine segment */}
-                  <div className="h-8 w-px bg-zinc-800" />
+              {phases.map((phase, phaseIdx) => {
+                const stepsRight = phaseIdx % 2 === 0;
+                const phaseColor = PHASE_COLORS[phaseIdx % PHASE_COLORS.length];
+                const phaseAllDone = phase.steps.every((s) => getStatus(s) === "done");
 
-                  {/* 3-column row: [left steps] [phase node] [right steps] */}
-                  <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-x-6">
-                    {/* LEFT column */}
-                    <div className="flex flex-col items-end gap-1.5">
-                      {!stepsRight &&
-                        phase.steps.map((step, stepIdx) => {
+                return (
+                  <div key={phase.id} className="flex w-full flex-col py-6 sm:items-center sm:py-10">
+
+                    {/* ── MOBILE layout (< sm) ── */}
+                    <div className="flex w-full flex-col gap-3 sm:hidden">
+                      {/* Phase header */}
+                      <div className="flex items-center gap-2.5">
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40" : phaseColor.badge}`}>
+                          {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
+                        </span>
+                        <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
+                      </div>
+                      {/* Steps — indented */}
+                      <div className="ml-4 flex flex-col gap-3 border-l-2 border-zinc-800 pl-4">
+                        {phase.steps.map((step, stepIdx) => {
                           const status = getStatus(step);
                           const isActive = drawerStepId === step.id;
                           const isLoading = loadingDetailId === step.id;
                           return (
                             <button
                               key={step.id}
-                              ref={(el) => {
-                                if (el) stepBtnRefs.current.set(step.id, el);
-                                else stepBtnRefs.current.delete(step.id);
-                              }}
                               onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
                               className={`
-                                flex max-w-[220px] items-center gap-2 rounded-md border
-                                px-2.5 py-1.5 text-[11px] font-medium transition-all
-                                duration-150 text-right
-                                ${STEP_CLS[status]}
-                                ${isActive ? "ring-1 ring-emerald-500/40 ring-offset-1 ring-offset-zinc-950" : ""}
-                              `}
-                            >
-                              {isLoading && (
-                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-zinc-500" />
-                              )}
-                              {!isLoading && (
-                                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
-                              )}
-                              <span>{step.title}</span>
-                            </button>
-                          );
-                        })}
-                    </div>
-
-                    {/* CENTER — phase node */}
-                    <div
-                      ref={(el) => {
-                        if (el) phaseNodeRefs.current.set(phase.id, el);
-                        else phaseNodeRefs.current.delete(phase.id);
-                      }}
-                      className="flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-xl border border-zinc-500 bg-zinc-800 px-4 py-3 shadow-md"
-                    >
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[10px] font-bold text-zinc-300">
-                        {phaseIdx + 1}
-                      </span>
-                      <span className="h-3.5 w-px bg-zinc-600" />
-                      <span className="text-sm font-semibold text-zinc-100">
-                        {phase.title}
-                      </span>
-                    </div>
-
-                    {/* RIGHT column */}
-                    <div className="flex flex-col items-start gap-1.5">
-                      {stepsRight &&
-                        phase.steps.map((step, stepIdx) => {
-                          const status = getStatus(step);
-                          const isActive = drawerStepId === step.id;
-                          const isLoading = loadingDetailId === step.id;
-                          return (
-                            <button
-                              key={step.id}
-                              ref={(el) => {
-                                if (el) stepBtnRefs.current.set(step.id, el);
-                                else stepBtnRefs.current.delete(step.id);
-                              }}
-                              onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
-                              className={`
-                                flex max-w-[220px] items-center gap-2 rounded-md border
-                                px-2.5 py-1.5 text-[11px] font-medium transition-all
+                                flex w-full items-center gap-2.5 rounded-xl border
+                                px-3 py-2.5 text-xs font-medium transition-all
                                 duration-150 text-left
                                 ${STEP_CLS[status]}
-                                ${isActive ? "ring-1 ring-emerald-500/40 ring-offset-1 ring-offset-zinc-950" : ""}
+                                ${isActive ? "ring-1 ring-emerald-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
                               `}
                             >
                               {isLoading ? (
-                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-zinc-500" />
+                                <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-zinc-500" />
                               ) : (
-                                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
+                                <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
                               )}
                               <span>{step.title}</span>
                             </button>
                           );
                         })}
+                      </div>
+                    </div>
+
+                    {/* ── DESKTOP layout (sm+) ── */}
+                    <div className="hidden w-full sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-x-24 md:gap-x-40">
+                      {/* LEFT column */}
+                      <div className="flex flex-col items-end gap-5">
+                        {!stepsRight &&
+                          phase.steps.map((step, stepIdx) => {
+                            const status = getStatus(step);
+                            const isActive = drawerStepId === step.id;
+                            const isLoading = loadingDetailId === step.id;
+                            return (
+                              <button
+                                key={step.id}
+                                ref={(el) => {
+                                  if (el) stepBtnRefs.current.set(step.id, el);
+                                  else stepBtnRefs.current.delete(step.id);
+                                }}
+                                onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
+                                className={`
+                                  flex max-w-[260px] items-center gap-2.5 rounded-xl border
+                                  px-3 py-2.5 text-xs font-medium transition-all
+                                  duration-150 text-right
+                                  ${STEP_CLS[status]}
+                                  ${isActive ? "ring-1 ring-emerald-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
+                                `}
+                              >
+                                {isLoading ? (
+                                  <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-zinc-500" />
+                                ) : (
+                                  <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
+                                )}
+                                <span>{step.title}</span>
+                              </button>
+                            );
+                          })}
+                      </div>
+
+                      {/* CENTER — phase milestone */}
+                      <div
+                        ref={(el) => {
+                          if (el) phaseNodeRefs.current.set(phase.id, el);
+                          else phaseNodeRefs.current.delete(phase.id);
+                        }}
+                        className="relative z-10 flex shrink-0 items-center gap-2.5 whitespace-nowrap bg-zinc-950 py-1 pl-1 pr-3"
+                      >
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40" : phaseColor.badge}`}>
+                          {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
+                        </span>
+                        <span className="text-sm font-semibold text-zinc-200">
+                          {phase.title}
+                        </span>
+                      </div>
+
+                      {/* RIGHT column */}
+                      <div className="flex flex-col items-start gap-5">
+                        {stepsRight &&
+                          phase.steps.map((step, stepIdx) => {
+                            const status = getStatus(step);
+                            const isActive = drawerStepId === step.id;
+                            const isLoading = loadingDetailId === step.id;
+                            return (
+                              <button
+                                key={step.id}
+                                ref={(el) => {
+                                  if (el) stepBtnRefs.current.set(step.id, el);
+                                  else stepBtnRefs.current.delete(step.id);
+                                }}
+                                onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
+                                className={`
+                                  flex max-w-[260px] items-center gap-2.5 rounded-xl border
+                                  px-3 py-2.5 text-xs font-medium transition-all
+                                  duration-150 text-left
+                                  ${STEP_CLS[status]}
+                                  ${isActive ? "ring-1 ring-emerald-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
+                                `}
+                              >
+                                {isLoading ? (
+                                  <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-zinc-500" />
+                                ) : (
+                                  <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
+                                )}
+                                <span>{step.title}</span>
+                              </button>
+                            );
+                          })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
 
             {/* Finish node */}
             {phases.length > 0 && (
-              <>
-                <div className="h-8 w-px bg-zinc-800" />
-                <div
-                  className={`rounded-xl border px-7 py-3 text-center text-sm font-semibold transition-all duration-700 ${
-                    progress === 100
-                      ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-400"
-                      : "border-zinc-800 bg-zinc-900/30 text-zinc-600 opacity-40"
-                  }`}
-                >
-                  {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
-                </div>
-              </>
+              <div
+                className={`rounded-2xl border px-8 py-4 text-center text-sm font-semibold transition-all duration-700 ${
+                  progress === 100
+                    ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-400 shadow-lg shadow-emerald-950/30"
+                    : "border-zinc-800 bg-zinc-900/30 text-zinc-600 opacity-40"
+                }`}
+              >
+                {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
+              </div>
             )}
           </div>
         </div>
