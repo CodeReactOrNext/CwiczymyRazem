@@ -126,6 +126,7 @@ export const PracticeModeSelector = ({
   ] as const;
 
   return (
+    <>
     <div className='mb-6 w-full'>
       <div className='font-openSans container mx-auto max-w-6xl px-3 py-4 sm:px-6 sm:py-8'>
         <div className='space-y-4 sm:space-y-8'>
@@ -222,5 +223,6 @@ export const PracticeModeSelector = ({
       </div>
     </div>
     <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+    </>
   );
 };
