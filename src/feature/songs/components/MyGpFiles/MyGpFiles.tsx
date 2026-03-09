@@ -64,7 +64,7 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
   const handleLoad = async (file: UserGpFile) => {
     setLoadingFileId(file.id);
     try {
-      const f = await fetchGpFileAsFile(file.storagePath, file.name);
+      const f = await fetchGpFileAsFile(file.downloadUrl, file.name);
       const parsed = await parseGpFile(f);
       const backingTracks = buildBackingTracks(parsed.tracks, 0);
       onLoad(
