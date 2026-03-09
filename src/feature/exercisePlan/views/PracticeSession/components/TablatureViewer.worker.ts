@@ -2,18 +2,18 @@
 
 // ── Layout constants ──────────────────────────────────────────────────────────
 const STRING_SPACING = 32;
-const BLOCK_H        = 22;   // pill height (same as old NOTE_RADIUS*2)
-const BLOCK_CORNER   = 5;    // rounded corner radius
-const BLOCK_GAP      = 4;    // gap between consecutive block right edges and next beat
-const BLOCK_PAD      = 4;    // left padding from beat start
-const NOTE_RADIUS    = BLOCK_H / 2; // kept for badge connector math
-const STAFF_TOP      = 85;
-const STEM_TOP_Y     = 12;
-const RHY_HEAD_Y     = STAFF_TOP - 36;
-const RHY_HEAD_R     = 3.5;
-const BEAM_H         = 3;
-const BEAM_GAP       = 4.5;
-const RHYTHM_COLOR   = "rgba(255,255,255,0.4)";
+const BLOCK_H = 22;   // pill height (same as old NOTE_RADIUS*2)
+const BLOCK_CORNER = 5;    // rounded corner radius
+const BLOCK_GAP = 4;    // gap between consecutive block right edges and next beat
+const BLOCK_PAD = 4;    // left padding from beat start
+const NOTE_RADIUS = BLOCK_H / 2; // kept for badge connector math
+const STAFF_TOP = 85;
+const STEM_TOP_Y = 12;
+const RHY_HEAD_Y = STAFF_TOP - 36;
+const RHY_HEAD_R = 3.5;
+const BEAM_H = 3;
+const BEAM_GAP = 4.5;
+const RHYTHM_COLOR = "rgba(255,255,255,0.4)";
 
 const STRING_COLORS = [
   "#f87171", "#fb923c", "#facc15", "#4ade80", "#60a5fa", "#c084fc",
@@ -68,8 +68,8 @@ interface BeatRD {
 }
 
 interface TimeSigMarker { x: number; sig: [number, number]; }
-interface TupletGroup   { x1: number; x2: number; num: number; }
-interface TempoPoint    { beatPos: number; ratio: number; }
+interface TupletGroup { x1: number; x2: number; num: number; }
+interface TempoPoint { beatPos: number; ratio: number; }
 
 // ── Worker state ──────────────────────────────────────────────────────────────
 let canvas: OffscreenCanvas | null = null;
@@ -104,7 +104,7 @@ let hideNotes = false;
 
 // Scrub/pause position (writable by SCROLL message when paused)
 let pausedCursorPos = 0;
-let pausedScrollX   = 0;
+let pausedScrollX = 0;
 
 // ── Bend badge ────────────────────────────────────────────────────────────────
 function drawBendBadge(
@@ -158,7 +158,7 @@ function drawPill(x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.moveTo(x + cr, y);
   ctx.lineTo(x + w - cr, y);
-  ctx.arcTo(x + w, y,     x + w, y + cr,     cr);
+  ctx.arcTo(x + w, y, x + w, y + cr, cr);
   ctx.lineTo(x + w, y + h - cr);
   ctx.arcTo(x + w, y + h, x + w - cr, y + h, cr);
   ctx.lineTo(x + cr, y + h);
@@ -179,9 +179,9 @@ function recomputeLoopSeconds(): void {
   }
   let total = 0;
   for (let i = 0; i < tempoMap.length; i++) {
-    const segStart   = tempoMap[i].beatPos;
-    const segEnd     = i + 1 < tempoMap.length ? tempoMap[i + 1].beatPos : totalBeats;
-    const effectBpm  = tempoMap[i].ratio * bpm;
+    const segStart = tempoMap[i].beatPos;
+    const segEnd = i + 1 < tempoMap.length ? tempoMap[i + 1].beatPos : totalBeats;
+    const effectBpm = tempoMap[i].ratio * bpm;
     if (effectBpm > 0) total += (segEnd - segStart) / (effectBpm / 60);
   }
   cachedLoopSeconds = total;
@@ -193,21 +193,21 @@ function computeBeatsElapsed(elapsed: number): number {
   if (cachedLoopSeconds <= 0) return 0;
 
   const loops = Math.floor(elapsed / cachedLoopSeconds);
-  let t        = elapsed - loops * cachedLoopSeconds; // time within current loop
+  let t = elapsed - loops * cachedLoopSeconds; // time within current loop
 
   let beatPos = 0;
   for (let i = 0; i < tempoMap.length; i++) {
-    const segStart  = tempoMap[i].beatPos;
-    const segEnd    = i + 1 < tempoMap.length ? tempoMap[i + 1].beatPos : totalBeats;
+    const segStart = tempoMap[i].beatPos;
+    const segEnd = i + 1 < tempoMap.length ? tempoMap[i + 1].beatPos : totalBeats;
     const effectBpm = tempoMap[i].ratio * bpm;
     if (effectBpm <= 0) continue;
-    const segBeats   = segEnd - segStart;
+    const segBeats = segEnd - segStart;
     const segSeconds = segBeats / (effectBpm / 60);
     if (t <= segSeconds + 1e-9) {
       beatPos = segStart + t * (effectBpm / 60);
       break;
     }
-    t      -= segSeconds;
+    t -= segSeconds;
     beatPos = segEnd;
   }
   return loops * totalBeats + beatPos;
@@ -217,13 +217,13 @@ function computeBeatsElapsed(elapsed: number): number {
 function drawRestSymbol(x: number, dur: number) {
   if (!ctx) return;
   ctx.strokeStyle = RHYTHM_COLOR;
-  ctx.fillStyle   = RHYTHM_COLOR;
-  ctx.lineWidth   = 1.5;
+  ctx.fillStyle = RHYTHM_COLOR;
+  ctx.lineWidth = 1.5;
 
   if (dur >= 4.0) {
     // Whole rest: filled rectangle hanging below a ledger line
     const rw = 10, rh = 5;
-    const ry  = RHY_HEAD_Y - rh - 1;
+    const ry = RHY_HEAD_Y - rh - 1;
     ctx.fillRect(x - rw / 2, ry, rw, rh);
     ctx.beginPath();
     ctx.moveTo(x - rw / 2 - 2, ry);
@@ -232,7 +232,7 @@ function drawRestSymbol(x: number, dur: number) {
   } else if (dur >= 2.0) {
     // Half rest: filled rectangle sitting on a ledger line
     const rw = 10, rh = 5;
-    const ry  = RHY_HEAD_Y;
+    const ry = RHY_HEAD_Y;
     ctx.fillRect(x - rw / 2, ry, rw, rh);
     ctx.beginPath();
     ctx.moveTo(x - rw / 2 - 2, ry + rh);
@@ -242,10 +242,10 @@ function drawRestSymbol(x: number, dur: number) {
     // Quarter rest: simplified zigzag
     const y0 = STEM_TOP_Y + 2;
     ctx.beginPath();
-    ctx.moveTo(x + 2,  y0);
-    ctx.lineTo(x - 2,  y0 + 5);
-    ctx.lineTo(x + 3,  y0 + 10);
-    ctx.lineTo(x - 1,  y0 + 15);
+    ctx.moveTo(x + 2, y0);
+    ctx.lineTo(x - 2, y0 + 5);
+    ctx.lineTo(x + 3, y0 + 10);
+    ctx.lineTo(x - 1, y0 + 15);
     ctx.bezierCurveTo(x + 5, y0 + 18, x + 4, y0 + 22, x - 2, y0 + 26);
     ctx.stroke();
   } else {
@@ -271,23 +271,23 @@ function render() {
 
   const dynBW = Math.max(120, Math.min(200, W / 4));
   let cursorPos = pausedCursorPos;
-  let scrollX   = pausedScrollX;
+  let scrollX = pausedScrollX;
   let beatsElapsed = 0;
 
   if (isPlaying && startWallMs !== null && countInRemaining === 0) {
     const elapsed = (Date.now() - startWallMs) / 1000;
-    beatsElapsed  = computeBeatsElapsed(elapsed);
-    const looped  = totalBeats > 0 ? beatsElapsed % totalBeats : 0;
-    cursorPos     = looped * dynBW;
-    scrollX       = Math.max(0, cursorPos - W / 4);
+    beatsElapsed = computeBeatsElapsed(elapsed);
+    const looped = totalBeats > 0 ? beatsElapsed % totalBeats : 0;
+    cursorPos = looped * dynBW;
+    scrollX = Math.max(0, cursorPos - W / 4);
     // Update paused pos so dragging starts from current position
     pausedCursorPos = cursorPos;
-    pausedScrollX   = scrollX;
+    pausedScrollX = scrollX;
   }
 
   const totalW = totalBeats * dynBW;
-  const visL   = scrollX - 50;
-  const visR   = scrollX + W + 50;
+  const visL = scrollX - 50;
+  const visR = scrollX + W + 50;
 
   // ── Clear & translate ────────────────────────────────────────────────────
   ctx.clearRect(0, 0, W, H);
@@ -312,7 +312,7 @@ function render() {
 
   // ── Measure lines — single batched path ─────────────────────────────────
   ctx.strokeStyle = "rgba(255,255,255,0.25)";
-  ctx.lineWidth   = 1;
+  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(0, STAFF_TOP); ctx.lineTo(0, STAFF_TOP + 5 * STRING_SPACING);
   for (const mx of measureEndXs) {
@@ -327,21 +327,21 @@ function render() {
 
   // ── Beat loop ────────────────────────────────────────────────────────────
   for (const beat of renderBeats) {
-    const beatPx    = beat.offsetX * dynBW;
+    const beatPx = beat.offsetX * dynBW;
     const beatEndPx = beatPx + beat.duration * dynBW;
-    const beatL     = beatPx + 10;
+    const beatL = beatPx + 10;
 
     if (beatL > visR) break;
     if (beatEndPx < visL) continue;
 
-    const inView  = beatEndPx >= visL && beatPx <= visR;
+    const inView = beatEndPx >= visL && beatPx <= visR;
     const isActive = isPlaying && startWallMs !== null && cursorPos >= beatPx && cursorPos < beatEndPx;
 
     // Rhythm notation
     if (inView) {
       const dur = beat.duration;
       ctx.strokeStyle = RHYTHM_COLOR;
-      ctx.fillStyle   = RHYTHM_COLOR;
+      ctx.fillStyle = RHYTHM_COLOR;
 
       if (beat.isRest) {
         drawRestSymbol(beatL, dur);
@@ -368,16 +368,16 @@ function render() {
 
           const flags = dur < 0.25 ? 3 : dur < 0.5 ? 2 : dur < 1.0 ? 1 : 0;
           for (let f = 0; f < flags; f++) {
-            const beamY    = STEM_TOP_Y + f * (BEAM_H + BEAM_GAP);
-            const drawRight = f === 0 ? beat.beamRight  : beat.beamRight2;
-            const leftBeam  = f === 0 ? beat.prevBeamRight : beat.prevBeamRight2;
+            const beamY = STEM_TOP_Y + f * (BEAM_H + BEAM_GAP);
+            const drawRight = f === 0 ? beat.beamRight : beat.beamRight2;
+            const leftBeam = f === 0 ? beat.prevBeamRight : beat.prevBeamRight2;
 
             if (drawRight) {
               ctx.fillStyle = RHYTHM_COLOR;
               ctx.fillRect(beatL, beamY, beat.duration * dynBW, BEAM_H);
             } else if (!leftBeam) {
               ctx.strokeStyle = RHYTHM_COLOR;
-              ctx.lineWidth   = 1.5;
+              ctx.lineWidth = 1.5;
               ctx.beginPath();
               ctx.moveTo(beatL, beamY);
               ctx.bezierCurveTo(beatL + 10, beamY + 3, beatL + 8, beamY + 8, beatL + 2, beamY + 12);
@@ -391,37 +391,37 @@ function render() {
     // Notes
     if (inView && !hideNotes) {
       // Block coordinates — same for all notes in this beat
-      const blockX  = beatPx + BLOCK_PAD;
-      const rawW    = beat.duration * dynBW - BLOCK_PAD - BLOCK_GAP;
-      const blockW  = Math.max(BLOCK_H, rawW); // min size = square pill for tiny notes
+      const blockX = beatPx + BLOCK_PAD;
+      const rawW = beat.duration * dynBW - BLOCK_PAD - BLOCK_GAP;
+      const blockW = Math.max(BLOCK_H, rawW); // min size = square pill for tiny notes
       const blockRX = blockX + blockW;         // right edge (for slide tracking)
 
       // Badge Y: above the topmost block in this beat
       const bendBadgeY = beat.topNoteY - BLOCK_H / 2 - 28;
 
       for (const note of beat.notes) {
-        const isHit      = !!hitNotes[note.noteKey];
-        const isDead     = note.isDead;
-        const isHarm     = !!(note.harmonicType && note.harmonicType > 0);
-        const dyn        = hasDynamics && note.dynamics !== undefined ? note.dynamics : 1.0;
-        const ghostAlpha = note.isGhost ? 0.40 : 1.0;
-        const accentDim  = hasAccentedNotes && !note.isAccented ? 0.25 : 1.0;
-        const dynAlpha   = hasDynamics && note.dynamics !== undefined ? 0.3 + 0.7 * dyn : 1.0;
-        const baseAlpha  = dynAlpha * accentDim * ghostAlpha;
+        const isHit = !!hitNotes[note.noteKey];
+        const isDead = note.isDead;
+        const isHarm = !!(note.harmonicType && note.harmonicType > 0);
+        const dyn = hasDynamics && note.dynamics !== undefined ? note.dynamics : 1.0;
+        const ghostAlpha = 1.0; // Disabled transparency for ghost notes
+        const accentDim = hasAccentedNotes && !note.isAccented ? 0.25 : 1.0;
+        const dynAlpha = hasDynamics && note.dynamics !== undefined ? 0.3 + 0.7 * dyn : 1.0;
+        const baseAlpha = dynAlpha * accentDim * ghostAlpha;
 
-        const blockY  = note.noteY - BLOCK_H / 2;
+        const blockY = note.noteY - BLOCK_H / 2;
         // Label sits in the "head" — left portion of block, capped at block center for narrow blocks
-        const labelX  = blockX + Math.min(blockW / 2, BLOCK_H * 0.65);
+        const labelX = blockX + Math.min(blockW / 2, BLOCK_H * 0.65);
 
         // ── Slide-in line ────────────────────────────────────────────────
         if (note.slideIn && note.slideIn > 0) {
           const fromY = note.slideIn === 1 ? note.noteY + 20 : note.noteY - 20;
           ctx.strokeStyle = note.color;
           ctx.globalAlpha = ghostAlpha * 0.7;
-          ctx.lineWidth   = 2;
+          ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(blockX - 16, fromY);
-          ctx.lineTo(blockX - 2,  note.noteY);
+          ctx.lineTo(blockX - 2, note.noteY);
           ctx.stroke();
           ctx.globalAlpha = 1;
         }
@@ -431,28 +431,28 @@ function render() {
         if (prev && prev.slideOut > 0) {
           ctx.strokeStyle = STRING_COLORS[Math.round((note.noteY - STAFF_TOP) / STRING_SPACING)] ?? "#fff";
           ctx.globalAlpha = 0.7;
-          ctx.lineWidth   = 2;
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.moveTo(prev.x + 2,  prev.y);
-          ctx.lineTo(blockX - 2,  note.noteY);
+          ctx.moveTo(prev.x + 2, prev.y);
+          ctx.lineTo(blockX - 2, note.noteY);
           ctx.stroke();
           ctx.globalAlpha = 1;
         }
 
         // ── Choose fill color ────────────────────────────────────────────
         let fillColor = note.color;
-        if      (isHit)            fillColor = "#10b981";
-        else if (note.isPalmMute)  fillColor = "#78716c";
-        else if (isDead)           fillColor = "#374151";
+        if (isHit) fillColor = "#10b981";
+        else if (note.isPalmMute) fillColor = "#78716c";
+        else if (isDead) fillColor = "#374151";
 
         // ── Active glow — translucent ring behind block ───────────────────
         if (isActive && !isHit) {
-          ctx.fillStyle   = note.color;
+          ctx.fillStyle = note.color;
           ctx.globalAlpha = ghostAlpha * 0.12;
           drawPill(blockX - 6, blockY - 6, blockW + 12, BLOCK_H + 12, BLOCK_CORNER + 5);
           ctx.fill();
           ctx.globalAlpha = ghostAlpha * 0.22;
-          drawPill(blockX - 3, blockY - 3, blockW + 6,  BLOCK_H + 6,  BLOCK_CORNER + 2);
+          drawPill(blockX - 3, blockY - 3, blockW + 6, BLOCK_H + 6, BLOCK_CORNER + 2);
           ctx.fill();
           ctx.globalAlpha = 1;
         }
@@ -463,20 +463,30 @@ function render() {
           const col = note.harmonicType === 1 ? note.color : "#e879f9";
           ctx.globalAlpha = ghostAlpha * accentDim;
           ctx.strokeStyle = isHit ? "#10b981" : col;
-          ctx.lineWidth   = 2;
-          ctx.fillStyle   = (isHit ? "#10b981" : col) + "22";
+          ctx.lineWidth = 2;
+          ctx.fillStyle = (isHit ? "#10b981" : col) + "22";
           drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
           ctx.fill();
           ctx.stroke();
           ctx.globalAlpha = 1;
         } else {
           ctx.globalAlpha = isHit ? 1.0 : baseAlpha;
-          ctx.fillStyle   = fillColor;
+          ctx.fillStyle = fillColor;
+
+          ctx.shadowColor = "rgba(0,0,0,0.5)";
+          ctx.shadowBlur = 4;
+          ctx.shadowOffsetY = 2;
+
           drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
           ctx.fill();
+
+          ctx.shadowColor = "transparent";
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetY = 0;
+
           // Subtle inner highlight (lighter strip on top half)
           if (!isHit && !isDead) {
-            ctx.fillStyle   = "rgba(255,255,255,0.14)";
+            ctx.fillStyle = "rgba(255,255,255,0.14)";
             drawPill(blockX + 1, blockY + 1, blockW - 2, BLOCK_H / 2 - 1, BLOCK_CORNER);
             ctx.fill();
           }
@@ -485,7 +495,7 @@ function render() {
           // Dead note X over the pill
           if (isDead) {
             ctx.strokeStyle = isActive ? "#94a3b8" : "#6b7280";
-            ctx.lineWidth   = 2.5;
+            ctx.lineWidth = 2.5;
             const xr = 6, cx = labelX;
             ctx.beginPath();
             ctx.moveTo(cx - xr, note.noteY - xr); ctx.lineTo(cx + xr, note.noteY + xr);
@@ -497,17 +507,26 @@ function render() {
         // ── Fret label ────────────────────────────────────────────────────
         if (!isDead) {
           const fs = hasDynamics ? Math.max(9, Math.round(13 * (0.75 + 0.25 * dyn))) : 13;
-          ctx.fillStyle    = isActive || isHit ? "#ffffff" : "#000000";
-          ctx.font         = `bold ${fs}px Inter, sans-serif`;
-          ctx.textAlign    = "center";
+          ctx.fillStyle = isActive || isHit ? "#ffffff" : "#000000";
+          ctx.font = `bold ${fs}px Inter, sans-serif`;
+          ctx.textAlign = "center";
           ctx.textBaseline = "middle";
+
+          ctx.shadowColor = isActive || isHit ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.4)";
+          ctx.shadowBlur = 2;
+          ctx.shadowOffsetY = 1;
+
           let text = note.fret.toString();
           if (note.isGhost) text = `(${text})`;
           ctx.fillText(text, labelX, note.noteY);
+
+          ctx.shadowColor = "transparent";
+          ctx.shadowBlur = 0;
+          ctx.shadowOffsetY = 0;
         }
 
         // ── Technique labels ──────────────────────────────────────────────
-        ctx.textAlign    = "center";
+        ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = "bold 9px Inter";
         if (note.isAccented) {
@@ -529,16 +548,16 @@ function render() {
 
         // Harmonic badge
         if (isHarm) {
-          ctx.font      = "bold 8px Inter";
+          ctx.font = "bold 8px Inter";
           ctx.fillStyle = note.harmonicType === 1 ? "#a3e635" : "#f0abfc";
-          const hLabel  = note.harmonicType === 1 ? "N.H." : note.harmonicType === 2 ? "A.H."
-                        : note.harmonicType === 3 ? "T.H." : note.harmonicType === 4 ? "P.H." : "S.H.";
+          const hLabel = note.harmonicType === 1 ? "N.H." : note.harmonicType === 2 ? "A.H."
+            : note.harmonicType === 3 ? "T.H." : note.harmonicType === 4 ? "P.H." : "S.H.";
           ctx.fillText(hLabel, labelX, note.noteY);
         }
 
         // Palm mute label below block
         if (note.isPalmMute) {
-          ctx.font      = "bold 7px Inter";
+          ctx.font = "bold 7px Inter";
           ctx.fillStyle = "#a8a29e";
           ctx.textAlign = "left";
           ctx.fillText("PM", blockX + 3, blockY + BLOCK_H + 8);
@@ -555,9 +574,9 @@ function render() {
         // Let ring: dashed line extending past block right edge
         if (note.isLetRing) {
           const trailEnd = Math.min(blockRX + 60, blockRX + beat.duration * dynBW * 1.5);
-          ctx.strokeStyle  = note.color;
-          ctx.globalAlpha  = 0.35;
-          ctx.lineWidth    = 1.5;
+          ctx.strokeStyle = note.color;
+          ctx.globalAlpha = 0.35;
+          ctx.lineWidth = 1.5;
           ctx.setLineDash([4, 4]);
           ctx.beginPath();
           ctx.moveTo(blockRX + 2, note.noteY);
@@ -574,12 +593,12 @@ function render() {
               : note.bendSemitones ? `${note.bendSemitones / 2}` : "")
             : note.isPreBend ? "PB" : "R";
           const bIcon = note.isRelease ? "\u2193" : "\u2191";
-          const bgCol = note.isBend    ? (isHit ? "#064e3b" : "#7e22ce")
-                      : note.isPreBend ? (isHit ? "#064e3b" : "#4c1d95")
-                      :                  (isHit ? "#064e3b" : "#312e81");
-          const txCol = note.isBend    ? (isHit ? "#34d399" : "#f0abfc")
-                      : note.isPreBend ? (isHit ? "#34d399" : "#ddd6fe")
-                      :                  (isHit ? "#34d399" : "#c7d2fe");
+          const bgCol = note.isBend ? (isHit ? "#064e3b" : "#7e22ce")
+            : note.isPreBend ? (isHit ? "#064e3b" : "#4c1d95")
+              : (isHit ? "#064e3b" : "#312e81");
+          const txCol = note.isBend ? (isHit ? "#34d399" : "#f0abfc")
+            : note.isPreBend ? (isHit ? "#34d399" : "#ddd6fe")
+              : (isHit ? "#34d399" : "#c7d2fe");
           // Pass blockY (top edge) so connector line ends at block top
           drawBendBadge(bLabel, bIcon, bgCol, txCol, labelX, bendBadgeY, blockY);
         }
@@ -587,10 +606,10 @@ function render() {
         // Vibrato wave inside block body (to the right of the head)
         if (note.isVibrato && blockW > BLOCK_H * 1.8) {
           ctx.strokeStyle = isHit ? "rgba(6,78,59,0.7)" : "rgba(167,139,250,0.8)";
-          ctx.lineWidth   = 1.5;
+          ctx.lineWidth = 1.5;
           ctx.beginPath();
-          const waveX0  = blockX + BLOCK_H * 1.1;
-          const waveX1  = blockRX - 5;
+          const waveX0 = blockX + BLOCK_H * 1.1;
+          const waveX1 = blockRX - 5;
           const waveLen = waveX1 - waveX0;
           if (waveLen > 8) {
             for (let wx = 0; wx <= waveLen; wx += 2) {
@@ -607,9 +626,9 @@ function render() {
     }
 
     if (beat.chordName && inView) {
-      ctx.fillStyle    = "#22d3ee";
-      ctx.font         = "black 22px Inter, system-ui, sans-serif";
-      ctx.textAlign    = "center";
+      ctx.fillStyle = "#22d3ee";
+      ctx.font = "black 22px Inter, system-ui, sans-serif";
+      ctx.textAlign = "center";
       ctx.fillText(beat.chordName, beatL, STAFF_TOP - 58);
     }
   }
@@ -617,9 +636,9 @@ function render() {
   // ── Time signature markers ───────────────────────────────────────────────
   if (timeSigMarkers.length > 0) {
     const sigMidY = STAFF_TOP + STRING_SPACING * 2.5;
-    ctx.fillStyle    = "rgba(255,255,255,0.45)";
-    ctx.font         = "bold 14px Inter, sans-serif";
-    ctx.textAlign    = "center";
+    ctx.fillStyle = "rgba(255,255,255,0.45)";
+    ctx.font = "bold 14px Inter, sans-serif";
+    ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     for (const marker of timeSigMarkers) {
       const mx = marker.x * dynBW + 10;
@@ -632,20 +651,20 @@ function render() {
   // ── Tuplet brackets ──────────────────────────────────────────────────────
   if (tupletGroups.length > 0) {
     const bracketY = STEM_TOP_Y - 7;
-    const tickH    = 5;
-    ctx.strokeStyle  = RHYTHM_COLOR;
-    ctx.fillStyle    = RHYTHM_COLOR;
-    ctx.lineWidth    = 1.2;
-    ctx.font         = "bold 8px Inter, sans-serif";
-    ctx.textAlign    = "center";
+    const tickH = 5;
+    ctx.strokeStyle = RHYTHM_COLOR;
+    ctx.fillStyle = RHYTHM_COLOR;
+    ctx.lineWidth = 1.2;
+    ctx.font = "bold 8px Inter, sans-serif";
+    ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     for (const group of tupletGroups) {
-      const x1  = group.x1 * dynBW + 8;
-      const x2  = group.x2 * dynBW - 8;
+      const x1 = group.x1 * dynBW + 8;
+      const x2 = group.x2 * dynBW - 8;
       if (x2 < visL || x1 > visR) continue;
-      const midX  = (x1 + x2) / 2;
+      const midX = (x1 + x2) / 2;
       const label = group.num.toString();
-      const lw    = ctx.measureText(label).width + 6;
+      const lw = ctx.measureText(label).width + 6;
       // Left arm
       ctx.beginPath();
       ctx.moveTo(x1, bracketY + tickH);
@@ -665,12 +684,12 @@ function render() {
 
   // ── Dynamics lane ────────────────────────────────────────────────────────
   if (hasDynamics) {
-    const DYN_BASE  = STAFF_TOP + 5 * STRING_SPACING + 36;
+    const DYN_BASE = STAFF_TOP + 5 * STRING_SPACING + 36;
     const DYN_MAX_H = 24;
-    const BAR_W     = 6;
+    const BAR_W = 6;
 
     ctx.strokeStyle = "rgba(255,255,255,0.06)";
-    ctx.lineWidth   = 1;
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(Math.max(0, scrollX), DYN_BASE);
     ctx.lineTo(Math.min(totalW, scrollX + W), DYN_BASE);
@@ -682,7 +701,7 @@ function render() {
       if (x < visL) continue;
       for (const note of beat.notes) {
         if (note.dynamics !== undefined && note.dynamics > 0) {
-          const barH  = Math.max(2, note.dynamics * DYN_MAX_H);
+          const barH = Math.max(2, note.dynamics * DYN_MAX_H);
           const alpha = 0.2 + note.dynamics * 0.8;
           ctx.fillStyle = `rgba(6,182,212,${alpha})`;
           ctx.fillRect(x - BAR_W / 2, DYN_BASE - barH, BAR_W, barH);
@@ -700,7 +719,7 @@ function render() {
   // ── Cursor line + beat pulse ─────────────────────────────────────────────
   if (cursorPos > 0 || isPlaying) {
     ctx.strokeStyle = isPlaying ? "#06b6d4" : "#ef4444";
-    ctx.lineWidth   = 3;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(cursorPos, 0); ctx.lineTo(cursorPos, H);
     ctx.stroke();
@@ -708,10 +727,10 @@ function render() {
     if (isPlaying && beatsElapsed > 0) {
       const bp = beatsElapsed % 1;
       if (bp < 0.3) {
-        const ripple  = bp * 100;
+        const ripple = bp * 100;
         const opacity = 1 - bp / 0.3;
         ctx.strokeStyle = `rgba(6,182,212,${opacity})`;
-        ctx.lineWidth   = 2;
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(cursorPos, H / 2, ripple, 0, Math.PI * 2);
         ctx.stroke();
@@ -724,15 +743,15 @@ function render() {
 
 // ── Message handler ───────────────────────────────────────────────────────────
 self.onmessage = (e: MessageEvent) => {
-  const msg = e.data as { type: string; [k: string]: any };
+  const msg = e.data as { type: string;[k: string]: any };
 
   switch (msg.type) {
     case 'INIT': {
       canvas = msg.canvas as OffscreenCanvas;
-      dpr    = msg.dpr ?? 1;
-      W      = msg.width  ?? 0;
-      H      = msg.height ?? 256;
-      canvas.width  = W * dpr;
+      dpr = msg.dpr ?? 1;
+      W = msg.width ?? 0;
+      H = msg.height ?? 256;
+      canvas.width = W * dpr;
       canvas.height = H * dpr;
       ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -742,10 +761,10 @@ self.onmessage = (e: MessageEvent) => {
     }
     case 'RESIZE': {
       dpr = msg.dpr ?? dpr;
-      W   = msg.width;
-      H   = msg.height;
+      W = msg.width;
+      H = msg.height;
       if (canvas) {
-        canvas.width  = W * dpr;
+        canvas.width = W * dpr;
         canvas.height = H * dpr;
         ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -753,23 +772,23 @@ self.onmessage = (e: MessageEvent) => {
       break;
     }
     case 'DATA': {
-      renderBeats      = msg.renderBeats;
-      measureEndXs     = msg.measureEndXs;
-      totalBeats       = msg.totalBeats;
+      renderBeats = msg.renderBeats;
+      measureEndXs = msg.measureEndXs;
+      totalBeats = msg.totalBeats;
       hasAccentedNotes = msg.hasAccentedNotes;
-      hasDynamics      = msg.hasDynamics;
-      timeSigMarkers   = msg.timeSigMarkers  ?? [];
-      tupletGroups     = msg.tupletGroups    ?? [];
-      tempoMap         = msg.tempoMap        ?? [];
-      pausedCursorPos  = 0;
-      pausedScrollX    = 0;
+      hasDynamics = msg.hasDynamics;
+      timeSigMarkers = msg.timeSigMarkers ?? [];
+      tupletGroups = msg.tupletGroups ?? [];
+      tempoMap = msg.tempoMap ?? [];
+      pausedCursorPos = 0;
+      pausedScrollX = 0;
       recomputeLoopSeconds();
       break;
     }
     case 'PLAYBACK': {
-      isPlaying        = msg.isPlaying;
-      startWallMs      = msg.startWallMs;
-      bpm              = msg.bpm;
+      isPlaying = msg.isPlaying;
+      startWallMs = msg.startWallMs;
+      bpm = msg.bpm;
       countInRemaining = msg.countInRemaining;
       recomputeLoopSeconds();
       break;
@@ -783,12 +802,12 @@ self.onmessage = (e: MessageEvent) => {
       break;
     }
     case 'SCROLL': {
-      pausedScrollX   = msg.scrollX;
+      pausedScrollX = msg.scrollX;
       pausedCursorPos = msg.cursorPos;
       break;
     }
     case 'RESET': {
-      pausedScrollX   = 0;
+      pausedScrollX = 0;
       pausedCursorPos = 0;
       break;
     }

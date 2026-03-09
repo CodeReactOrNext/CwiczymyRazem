@@ -21,19 +21,10 @@ import {
   SlidersHorizontal,
   X, 
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "assets/components/ui/dialog";
-import { SongRecommender } from "feature/songs/components/SongRecommender/SongRecommender";
-import { Sparkles } from "lucide-react";
+
 
 const SongsView = () => {
   const { t } = useTranslation("songs");
@@ -70,7 +61,6 @@ const SongsView = () => {
   } = useSongs();
   const [availableGenres, setAvailableGenres] = useState<string[]>([]);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-  const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -111,25 +101,6 @@ const SongsView = () => {
                   
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               
-                    <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
-                      <DialogTrigger asChild>
-                        <Button 
-                          variant="outline"
-                          size="sm"
-                          className="flex-1 sm:flex-initial border-cyan-500/30 bg-cyan-500/5 text-cyan-400 hover:bg-cyan-500/10"
-                          onClick={() => posthog.capture("song_wizard_opened")}
-                        >
-                          <Sparkles className="mr-2 h-4 w-4" />
-                          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Song Wizard</span>
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md bg-zinc-950 border-white/10 p-4 pt-12">
-                         <SongRecommender onSuccess={() => {
-                            refreshSongs();
-                            setIsWizardOpen(false);
-                         }} />
-                      </DialogContent>
-                    </Dialog>
                     <Button 
                       onClick={() => {
                         posthog.capture("song_management_action", { action: "add_song_transition" });

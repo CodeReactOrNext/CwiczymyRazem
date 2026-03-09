@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronRight, Dumbbell, Sparkles, Target, X, Zap } from "lucide-react";
+import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, Youtube, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
 import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
+import { firebaseGetLessonsByIds } from "../../services/youtubeLesson.service";
+import YouTubeLessonCard from "./components/YouTubeLessonCard";
 
 // ─── AI Generating Loader ───────────────────────────────────────────────────
 
@@ -42,13 +45,13 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
           <span className="absolute h-12 w-12 animate-pulse rounded-full bg-emerald-500/15" />
           {/* Icon */}
           <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/40">
-            <Sparkles className="h-5 w-5 text-emerald-400" />
+            <MapIcon className="h-5 w-5 text-emerald-400" />
           </div>
         </div>
 
         <div className="flex flex-col items-center gap-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-500/70">
-            AI Coach is thinking
+            Roadmap is thinking
           </p>
           <p
             className="text-sm text-zinc-400 transition-opacity duration-300"
@@ -81,7 +84,7 @@ const AiGeneratingLoader: React.FC<{ stepTitle: string }> = ({ stepTitle }) => {
       </div>
 
       {/* Shimmer skeleton */}
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-4">
         {[92, 100, 78, 95, 65, 88].map((w, i) => (
           <div
             key={i}
@@ -157,6 +160,15 @@ const PATH_COLOR: Record<StepStatus, string> = {
   done: "#14532d",
 };
 
+const PHASE_COLORS = [
+  { badge: "bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/30", border: "border-violet-500/30" },
+  { badge: "bg-sky-500/20 text-sky-300 ring-1 ring-sky-500/30", border: "border-sky-500/30" },
+  { badge: "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30", border: "border-amber-500/30" },
+  { badge: "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/30", border: "border-rose-500/30" },
+  { badge: "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30", border: "border-emerald-500/30" },
+  { badge: "bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30", border: "border-orange-500/30" },
+];
+
 interface SvgPath {
   d: string;
   key: string;
@@ -175,6 +187,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
   const [drawerStepId, setDrawerStepId] = useState<string | null>(null);
   const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
   const [loadingExerciseId, setLoadingExerciseId] = useState<string | null>(null);
+  const [lessonsCache, setLessonsCache] = useState<Record<string, YouTubeLessonResult[]>>({});
+  const [loadingLessonsId, setLoadingLessonsId] = useState<string | null>(null);
 
   // SVG overlay refs
   const containerRef = useRef<HTMLDivElement>(null);
@@ -239,17 +253,19 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
 
         let d: string;
         if (stepsRight) {
-          // Phase RIGHT → Step LEFT, curving outward
           const x0 = pRX;
           const x3 = sRect.left - cRect.left;
-          const cpX = x0 + (x3 - x0) * 0.55;
-          d = `M ${x0} ${pCY} C ${cpX} ${pCY} ${cpX} ${sCY} ${x3} ${sCY}`;
+          const span = x3 - x0;
+          const cp1X = x0 + span * 0.75;
+          const cp2X = x0 + span * 0.25;
+          d = `M ${x0} ${pCY} C ${cp1X} ${pCY} ${cp2X} ${sCY} ${x3} ${sCY}`;
         } else {
-          // Phase LEFT → Step RIGHT, curving outward
           const x0 = pLX;
           const x3 = sRect.right - cRect.left;
-          const cpX = x0 - (x0 - x3) * 0.55;
-          d = `M ${x0} ${pCY} C ${cpX} ${pCY} ${cpX} ${sCY} ${x3} ${sCY}`;
+          const span = x0 - x3;
+          const cp1X = x0 - span * 0.75;
+          const cp2X = x0 - span * 0.25;
+          d = `M ${x0} ${pCY} C ${cp1X} ${pCY} ${cp2X} ${sCY} ${x3} ${sCY}`;
         }
 
         newPaths.push({ d, key: `${phase.id}-${step.id}`, status });
@@ -291,6 +307,66 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
     phaseIdx: number
   ) => {
     setDrawerStepId(step.id);
+
+    // Fetch YouTube lessons independently (cached per step)
+    if (!lessonsCache[step.id] && !loadingLessonsId) {
+      setLoadingLessonsId(step.id);
+
+      const fetchLessons = async () => {
+        // If already saved in Firebase – load from Firestore, skip Upstash
+        if (step.suggestedLessonIds?.length) {
+          const firestoreLessons = await firebaseGetLessonsByIds(step.suggestedLessonIds);
+          return firestoreLessons.map((l) => ({
+            videoId: l.videoId,
+            title: l.title,
+            channelName: l.channelName,
+            thumbnailUrl: l.thumbnailUrl,
+            duration: l.duration,
+            level: l.level,
+            topics: l.topics,
+            score: l.qualityScore ?? 0,
+          })) as YouTubeLessonResult[];
+        }
+
+        // First time – search Upstash, then save IDs to Firebase
+        const res = await fetch("/api/search-youtube-lessons", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            stepTitle: step.title,
+            stepDescription: step.description || "",
+            roadmapGoal: roadmap.goal,
+            roadmapLevel: roadmap.level,
+          }),
+        });
+        const data = await res.json();
+        const lessons: YouTubeLessonResult[] = data.lessons ?? [];
+
+        if (lessons.length > 0) {
+          const lessonIds = lessons.map((l) => l.videoId);
+          const newPhases = phases.map((p) =>
+            p.id !== phase.id
+              ? p
+              : {
+                  ...p,
+                  steps: p.steps.map((s) =>
+                    s.id !== step.id ? s : { ...s, suggestedLessonIds: lessonIds }
+                  ),
+                }
+          );
+          setPhases(newPhases);
+          firebaseUpdateRoadmap(roadmap.id, { phases: newPhases });
+        }
+
+        return lessons;
+      };
+
+      fetchLessons()
+        .then((lessons) => setLessonsCache((prev) => ({ ...prev, [step.id]: lessons })))
+        .catch(() => setLessonsCache((prev) => ({ ...prev, [step.id]: [] })))
+        .finally(() => setLoadingLessonsId(null));
+    }
+
     if (step.description || loadingDetailId) return;
 
     setLoadingDetailId(step.id);
@@ -374,6 +450,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
     } finally {
       setLoadingExerciseId(null);
     }
+
   };
 
   const setStepStatus = async (phaseId: string, stepId: string, status: StepStatus) => {
@@ -465,32 +542,35 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
           {/* SVG overlay with bezier arrows */}
           {svgDims.w > 0 && (
             <svg
-              className="pointer-events-none absolute left-0 top-0 overflow-visible"
+              className="pointer-events-none absolute left-0 top-0 hidden overflow-visible sm:block"
               width={svgDims.w}
               height={svgDims.h}
               style={{ zIndex: 0 }}
             >
               <defs>
-                <marker
-                  id={markerId}
-                  markerWidth="5"
-                  markerHeight="4"
-                  refX="5"
-                  refY="2"
-                  orient="auto"
-                >
-                  <polygon points="0 0, 5 2, 0 4" />
-                </marker>
+                {(["not-started", "in-progress", "done"] as StepStatus[]).map((s) => (
+                  <marker
+                    key={s}
+                    id={`${markerId}-${s}`}
+                    markerWidth="5"
+                    markerHeight="4"
+                    refX="5"
+                    refY="2"
+                    orient="auto"
+                  >
+                    <polygon points="0 0, 5 2, 0 4" fill={PATH_COLOR[s]} />
+                  </marker>
+                ))}
               </defs>
               {svgPaths.map((path) => (
                 <path
                   key={path.key}
                   d={path.d}
                   stroke={PATH_COLOR[path.status]}
-                  strokeWidth="1.5"
+                  strokeWidth="2"
                   fill="none"
                   strokeDasharray="5 3"
-                  markerEnd={`url(#${markerId})`}
+                  markerEnd={`url(#${markerId}-${path.status})`}
                   opacity="0.8"
                 />
               ))}
@@ -500,124 +580,169 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
           {/* Nodes */}
           <div className="relative flex flex-col items-center" style={{ zIndex: 1 }}>
             {/* Root node */}
-            <div className="rounded-xl border border-zinc-600 bg-zinc-800 px-7 py-3 text-center text-sm font-bold text-zinc-100 shadow-md">
+            <div className="max-w-sm rounded-2xl border border-zinc-600/80 bg-zinc-800/90 px-8 py-4 text-center text-sm font-bold text-zinc-100 shadow-lg shadow-black/30 ring-1 ring-zinc-600/20">
               {roadmap.goal}
             </div>
 
-            {phases.map((phase, phaseIdx) => {
-              const stepsRight = phaseIdx % 2 === 0;
+            {/* Phases wrapper — continuous spine lives here */}
+            <div className="relative w-full">
+              {/* Background track — desktop only */}
+              <div className="absolute bottom-0 left-1/2 top-0 hidden w-px -translate-x-1/2 bg-zinc-800 sm:block" />
+              {/* Progress fill — desktop only */}
+              <div
+                className="absolute left-1/2 top-0 hidden w-px -translate-x-1/2 bg-emerald-600/50 transition-all duration-700 sm:block"
+                style={{ height: `${progress}%` }}
+              />
 
-              return (
-                <div key={phase.id} className="flex w-full flex-col items-center">
-                  {/* Spine segment */}
-                  <div className="h-8 w-px bg-zinc-800" />
+              {phases.map((phase, phaseIdx) => {
+                const stepsRight = phaseIdx % 2 === 0;
+                const phaseColor = PHASE_COLORS[phaseIdx % PHASE_COLORS.length];
+                const phaseAllDone = phase.steps.every((s) => getStatus(s) === "done");
 
-                  {/* 3-column row: [left steps] [phase node] [right steps] */}
-                  <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-x-6">
-                    {/* LEFT column */}
-                    <div className="flex flex-col items-end gap-1.5">
-                      {!stepsRight &&
-                        phase.steps.map((step, stepIdx) => {
+                return (
+                  <div key={phase.id} className="flex w-full flex-col py-6 sm:items-center sm:py-10">
+
+                    {/* ── MOBILE layout (< sm) ── */}
+                    <div className="flex w-full flex-col gap-3 sm:hidden">
+                      {/* Phase header */}
+                      <div className="flex items-center gap-2.5">
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40" : phaseColor.badge}`}>
+                          {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
+                        </span>
+                        <span className="text-sm font-semibold text-zinc-200">{phase.title}</span>
+                      </div>
+                      {/* Steps — indented */}
+                      <div className="ml-4 flex flex-col gap-3 border-l-2 border-zinc-800 pl-4">
+                        {phase.steps.map((step, stepIdx) => {
                           const status = getStatus(step);
                           const isActive = drawerStepId === step.id;
                           const isLoading = loadingDetailId === step.id;
                           return (
                             <button
                               key={step.id}
-                              ref={(el) => {
-                                if (el) stepBtnRefs.current.set(step.id, el);
-                                else stepBtnRefs.current.delete(step.id);
-                              }}
                               onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
                               className={`
-                                flex max-w-[220px] items-center gap-2 rounded-md border
-                                px-2.5 py-1.5 text-[11px] font-medium transition-all
-                                duration-150 text-right
-                                ${STEP_CLS[status]}
-                                ${isActive ? "ring-1 ring-emerald-500/40 ring-offset-1 ring-offset-zinc-950" : ""}
-                              `}
-                            >
-                              {isLoading && (
-                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-zinc-500" />
-                              )}
-                              {!isLoading && (
-                                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
-                              )}
-                              <span>{step.title}</span>
-                            </button>
-                          );
-                        })}
-                    </div>
-
-                    {/* CENTER — phase node */}
-                    <div
-                      ref={(el) => {
-                        if (el) phaseNodeRefs.current.set(phase.id, el);
-                        else phaseNodeRefs.current.delete(phase.id);
-                      }}
-                      className="flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-xl border border-zinc-500 bg-zinc-800 px-4 py-3 shadow-md"
-                    >
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[10px] font-bold text-zinc-300">
-                        {phaseIdx + 1}
-                      </span>
-                      <span className="h-3.5 w-px bg-zinc-600" />
-                      <span className="text-sm font-semibold text-zinc-100">
-                        {phase.title}
-                      </span>
-                    </div>
-
-                    {/* RIGHT column */}
-                    <div className="flex flex-col items-start gap-1.5">
-                      {stepsRight &&
-                        phase.steps.map((step, stepIdx) => {
-                          const status = getStatus(step);
-                          const isActive = drawerStepId === step.id;
-                          const isLoading = loadingDetailId === step.id;
-                          return (
-                            <button
-                              key={step.id}
-                              ref={(el) => {
-                                if (el) stepBtnRefs.current.set(step.id, el);
-                                else stepBtnRefs.current.delete(step.id);
-                              }}
-                              onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
-                              className={`
-                                flex max-w-[220px] items-center gap-2 rounded-md border
-                                px-2.5 py-1.5 text-[11px] font-medium transition-all
+                                flex w-full items-center gap-2.5 rounded-xl border
+                                px-3 py-2.5 text-xs font-medium transition-all
                                 duration-150 text-left
                                 ${STEP_CLS[status]}
-                                ${isActive ? "ring-1 ring-emerald-500/40 ring-offset-1 ring-offset-zinc-950" : ""}
+                                ${isActive ? "ring-1 ring-emerald-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
                               `}
                             >
                               {isLoading ? (
-                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-zinc-500" />
+                                <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-zinc-500" />
                               ) : (
-                                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
+                                <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
                               )}
                               <span>{step.title}</span>
                             </button>
                           );
                         })}
+                      </div>
+                    </div>
+
+                    {/* ── DESKTOP layout (sm+) ── */}
+                    <div className="hidden w-full sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-x-24 md:gap-x-40">
+                      {/* LEFT column */}
+                      <div className="flex flex-col items-end gap-5">
+                        {!stepsRight &&
+                          phase.steps.map((step, stepIdx) => {
+                            const status = getStatus(step);
+                            const isActive = drawerStepId === step.id;
+                            const isLoading = loadingDetailId === step.id;
+                            return (
+                              <button
+                                key={step.id}
+                                ref={(el) => {
+                                  if (el) stepBtnRefs.current.set(step.id, el);
+                                  else stepBtnRefs.current.delete(step.id);
+                                }}
+                                onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
+                                className={`
+                                  flex max-w-[260px] items-center gap-2.5 rounded-xl border
+                                  px-3 py-2.5 text-xs font-medium transition-all
+                                  duration-150 text-right
+                                  ${STEP_CLS[status]}
+                                  ${isActive ? "ring-1 ring-emerald-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
+                                `}
+                              >
+                                {isLoading ? (
+                                  <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-zinc-500" />
+                                ) : (
+                                  <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
+                                )}
+                                <span>{step.title}</span>
+                              </button>
+                            );
+                          })}
+                      </div>
+
+                      {/* CENTER — phase milestone */}
+                      <div
+                        ref={(el) => {
+                          if (el) phaseNodeRefs.current.set(phase.id, el);
+                          else phaseNodeRefs.current.delete(phase.id);
+                        }}
+                        className="relative z-10 flex shrink-0 items-center gap-2.5 whitespace-nowrap bg-zinc-950 py-1 pl-1 pr-3"
+                      >
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-300 ${phaseAllDone ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/40" : phaseColor.badge}`}>
+                          {phaseAllDone ? <Check className="h-4 w-4" /> : phaseIdx + 1}
+                        </span>
+                        <span className="text-sm font-semibold text-zinc-200">
+                          {phase.title}
+                        </span>
+                      </div>
+
+                      {/* RIGHT column */}
+                      <div className="flex flex-col items-start gap-5">
+                        {stepsRight &&
+                          phase.steps.map((step, stepIdx) => {
+                            const status = getStatus(step);
+                            const isActive = drawerStepId === step.id;
+                            const isLoading = loadingDetailId === step.id;
+                            return (
+                              <button
+                                key={step.id}
+                                ref={(el) => {
+                                  if (el) stepBtnRefs.current.set(step.id, el);
+                                  else stepBtnRefs.current.delete(step.id);
+                                }}
+                                onClick={() => openDrawer(step, phase, stepIdx, phaseIdx)}
+                                className={`
+                                  flex max-w-[260px] items-center gap-2.5 rounded-xl border
+                                  px-3 py-2.5 text-xs font-medium transition-all
+                                  duration-150 text-left
+                                  ${STEP_CLS[status]}
+                                  ${isActive ? "ring-1 ring-emerald-500/50 ring-offset-1 ring-offset-zinc-950" : ""}
+                                `}
+                              >
+                                {isLoading ? (
+                                  <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-zinc-500" />
+                                ) : (
+                                  <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_DOT[status]}`} />
+                                )}
+                                <span>{step.title}</span>
+                              </button>
+                            );
+                          })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
 
             {/* Finish node */}
             {phases.length > 0 && (
-              <>
-                <div className="h-8 w-px bg-zinc-800" />
-                <div
-                  className={`rounded-xl border px-7 py-3 text-center text-sm font-semibold transition-all duration-700 ${
-                    progress === 100
-                      ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-400"
-                      : "border-zinc-800 bg-zinc-900/30 text-zinc-600 opacity-40"
-                  }`}
-                >
-                  {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
-                </div>
-              </>
+              <div
+                className={`rounded-2xl border px-8 py-4 text-center text-sm font-semibold transition-all duration-700 ${
+                  progress === 100
+                    ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-400 shadow-lg shadow-emerald-950/30"
+                    : "border-zinc-800 bg-zinc-900/30 text-zinc-600 opacity-40"
+                }`}
+              >
+                {progress === 100 ? "🏆 Goal achieved!" : "🏆 Finish"}
+              </div>
             )}
           </div>
         </div>
@@ -713,9 +838,28 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                 <AiGeneratingLoader stepTitle={drawerInfo.step.title} />
               ) : drawerInfo.step.description ? (
                 <>
-                  <p className="text-sm leading-relaxed text-zinc-300">
-                    {drawerInfo.step.description}
-                  </p>
+                  <div className="space-y-3 text-sm leading-relaxed text-zinc-300">
+                    {drawerInfo.step.description.split("\n").map((line, i) => {
+                      const sectionMatch = line.match(/^\[(.+)\]$/);
+                      if (sectionMatch) {
+                        return (
+                          <p key={i} className="mt-4 text-[10px] font-semibold uppercase tracking-widest text-zinc-500 first:mt-0">
+                            {sectionMatch[1]}
+                          </p>
+                        );
+                      }
+                      if (line.startsWith("- ")) {
+                        return (
+                          <div key={i} className="flex items-start gap-2">
+                            <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-zinc-500" />
+                            <span>{line.slice(2)}</span>
+                          </div>
+                        );
+                      }
+                      if (line.trim() === "") return null;
+                      return <p key={i}>{line}</p>;
+                    })}
+                  </div>
                   {drawerInfo.step.successCriteria && (
                     <div className="mt-5 flex items-start gap-3 rounded-xl border border-emerald-900/40 bg-emerald-950/20 px-4 py-3">
                       <Target className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
@@ -727,6 +871,39 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                           {drawerInfo.step.successCriteria}
                         </p>
                       </div>
+                    </div>
+                  )}
+
+                  {/* ─── Suggested YouTube Lessons ─── */}
+                  {(loadingLessonsId === drawerInfo.step.id ||
+                    (lessonsCache[drawerInfo.step.id] && lessonsCache[drawerInfo.step.id].length > 0)) && (
+                    <div className="mt-5">
+                      <p className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+                        <Youtube className="h-3 w-3 text-red-500" />
+                        YouTube Lessons
+                      </p>
+                      {loadingLessonsId === drawerInfo.step.id ? (
+                        <div className="space-y-2">
+                          {[0, 1, 2].map((i) => (
+                            <div
+                              key={i}
+                              className="flex h-[61px] animate-pulse items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-3"
+                            >
+                              <div className="h-[45px] w-[80px] shrink-0 rounded-lg bg-zinc-800" />
+                              <div className="flex-1 space-y-2">
+                                <div className="h-3 w-3/4 rounded bg-zinc-800" />
+                                <div className="h-2.5 w-1/2 rounded bg-zinc-800" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {lessonsCache[drawerInfo.step.id].map((lesson) => (
+                            <YouTubeLessonCard key={lesson.videoId} lesson={lesson} />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 

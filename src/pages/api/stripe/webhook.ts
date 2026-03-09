@@ -8,7 +8,7 @@ import { firestore } from "utils/firebase/api/firebase.config";
 export const config = { api: { bodyParser: false } };
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-01-27.acacia",
+  apiVersion: "2026-02-25.clover",
 });
 
 /** Read the raw request body as a Buffer */
@@ -147,10 +147,11 @@ export default async function handler(
       // ── Invoice paid → extend premiumUntil ────────────────────────────────────
       case "invoice.payment_succeeded": {
         const invoice = event.data.object as Stripe.Invoice;
-        if (!invoice.subscription) break;
+        const invoiceSubId = invoice.parent?.subscription_details?.subscription;
+        if (!invoiceSubId) break;
 
         const sub = await stripe.subscriptions.retrieve(
-          invoice.subscription as string
+          invoiceSubId as string
         );
         const userId =
           sub.metadata?.userId ||
@@ -171,10 +172,11 @@ export default async function handler(
       // ── Invoice payment failed ────────────────────────────────────────────────
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
-        if (!invoice.subscription) break;
+        const invoiceSubId = invoice.parent?.subscription_details?.subscription;
+        if (!invoiceSubId) break;
 
         const sub = await stripe.subscriptions.retrieve(
-          invoice.subscription as string
+          invoiceSubId as string
         );
         const userId =
           sub.metadata?.userId ||

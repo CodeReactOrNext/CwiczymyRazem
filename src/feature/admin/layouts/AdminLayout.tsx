@@ -9,7 +9,8 @@ import {
   Music,
   SearchCheck,
   ShieldCheck,
-  Users} from "lucide-react";
+  Users,
+  Youtube} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactNode} from "react";
@@ -29,6 +30,7 @@ const AdminLayout = ({ children, onLogout }: AdminLayoutProps) => {
     { name: "Users",     href: "/admin/users",    icon: Users        },
     { name: "Premium",   href: "/admin/premium",  icon: Crown        },
     { name: "Discovery", href: "/admin/discovery",icon: SearchCheck  },
+    { name: "YT Scraper", href: "/admin/youtube-scraper", icon: Youtube },
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

@@ -1,5 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+const ALLOWED_LEVELS = ["Absolute Beginner", "Beginner", "Intermediate", "Advanced"] as const;
+const MAX_GOAL_LENGTH = 500;
+
 const GUITAR_SYSTEM_PROMPT = `You are an experienced guitar teacher with 20 years of teaching. You create structured multi-month learning plans tailored to the student's level and goal.
 
 GUARD: If the user's goal is NOT related to playing or learning guitar, return ONLY:
@@ -96,6 +99,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!goal || typeof goal !== "string" || goal.trim().length < 5) {
     return res.status(400).json({ message: "Please enter a guitar-related goal (minimum 5 characters)." });
+  }
+
+  if (goal.length > MAX_GOAL_LENGTH) {
+    return res.status(400).json({ message: `Goal must be at most ${MAX_GOAL_LENGTH} characters.` });
+  }
+
+  if (level && !ALLOWED_LEVELS.includes(level as (typeof ALLOWED_LEVELS)[number])) {
+    return res.status(400).json({ message: "Invalid skill level." });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;

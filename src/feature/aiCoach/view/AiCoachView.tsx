@@ -48,7 +48,7 @@ const PlanGeneratingOverlay: React.FC<{ goal: string }> = ({ goal }) => {
 
       <div className="flex flex-col items-center gap-1.5 text-center">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-500/70">
-          AI Coach is building your plan
+          Roadmap is building your plan
         </p>
         <p
           className="text-sm text-zinc-400 transition-opacity duration-300"
@@ -81,6 +81,9 @@ const PlanGeneratingOverlay: React.FC<{ goal: string }> = ({ goal }) => {
     </div>
   );
 };
+
+const MAX_ROADMAPS = 5;
+const MAX_DAILY_GENERATIONS = 5;
 
 const LEVELS = ["Absolute Beginner", "Beginner", "Intermediate", "Advanced"] as const;
 type Level = typeof LEVELS[number];
@@ -124,6 +127,11 @@ const AiCoachView = () => {
     }
   };
 
+  const today = new Date().toDateString();
+  const generatedToday = roadmaps.filter((r) => new Date(r.createdAt).toDateString() === today).length;
+  const atRoadmapLimit = roadmaps.length >= MAX_ROADMAPS;
+  const atDailyLimit = generatedToday >= MAX_DAILY_GENERATIONS;
+
   const handleGenerate = async () => {
     if (!goal.trim()) {
       toast.error("Enter your guitar goal.");
@@ -131,6 +139,14 @@ const AiCoachView = () => {
     }
     if (!userAuth) {
       toast.error("You must be logged in.");
+      return;
+    }
+    if (atRoadmapLimit) {
+      toast.error(`You can have at most ${MAX_ROADMAPS} active roadmaps. Delete one to create a new plan.`);
+      return;
+    }
+    if (atDailyLimit) {
+      toast.error(`You've reached the daily limit of ${MAX_DAILY_GENERATIONS} generated plans. Try again tomorrow.`);
       return;
     }
 
@@ -211,20 +227,33 @@ const AiCoachView = () => {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/30">
               <Sparkles className="h-5 w-5 text-emerald-500" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-100">AI Coach</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Roadmap</h1>
           </div>
           <p className="pl-[46px] text-sm text-zinc-500">
             Your personalized guitar learning plans.
           </p>
         </div>
 
-        <button
-          onClick={() => setShowForm((v) => !v)}
-          className="flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500"
-        >
-          <Plus className="h-4 w-4" />
-          New plan
-        </button>
+        <div className="flex flex-col items-end gap-1">
+          <button
+            onClick={() => setShowForm((v) => !v)}
+            disabled={atRoadmapLimit || atDailyLimit}
+            title={
+              atRoadmapLimit
+                ? `Max ${MAX_ROADMAPS} active roadmaps — delete one first`
+                : atDailyLimit
+                ? `Daily limit of ${MAX_DAILY_GENERATIONS} reached — try again tomorrow`
+                : undefined
+            }
+            className="flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <Plus className="h-4 w-4" />
+            New plan
+          </button>
+          <p className="text-[11px] text-zinc-600">
+            {roadmaps.length}/{MAX_ROADMAPS} plans · {generatedToday}/{MAX_DAILY_GENERATIONS} today
+          </p>
+        </div>
       </div>
 
       {/* Generate form */}
@@ -239,11 +268,15 @@ const AiCoachView = () => {
                 <textarea
                   className="w-full resize-none rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                   rows={3}
+                  maxLength={500}
                   placeholder="E.g. I want to learn blues improvisation, play solos like SRV..."
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
                   autoFocus
                 />
+                <p className={`self-end text-xs ${goal.length >= 480 ? "text-amber-400" : "text-zinc-600"}`}>
+                  {goal.length}/500
+                </p>
               </div>
 
               <div className="flex flex-col gap-1.5">

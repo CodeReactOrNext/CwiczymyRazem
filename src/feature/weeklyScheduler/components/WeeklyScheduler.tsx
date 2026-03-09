@@ -259,22 +259,22 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
   }
 
   return (
-    <div className="w-full mb-4 space-y-6">
-      <div className="flex items-start justify-between gap-4 flex-wrap mb-2">
-        <div className="flex items-center gap-3">
-          <h3 className="text-lg font-bold text-white tracking-wide">
-            Your Week
-          </h3>
-          <span className="text-[10px] sm:text-xs font-bold text-zinc-400 flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-800/40 ">
-            <Calendar size={12} className="opacity-80" />
-            {formatWeekRange(weekStartDate)}
-          </span>
+    <div className="w-full mb-8">
+      {/* Header aligned like reference image */}
+      <div className="flex items-center gap-3 mb-8">
+        <div className="bg-white/5 rounded-lg p-1.5 ring-1 ring-white/5 shadow-2xl">
+           <div className="bg-main h-4 w-4 rounded-sm shadow-[0_0_10px_hsl(var(--main))]" />
+        </div>
+        <h3 className="text-3xl font-black text-white tracking-tight uppercase font-teko">
+          Your Week
+        </h3>
+        <div className="ml-2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-bold text-zinc-500">
+          <Calendar size={12} />
+          {formatWeekRange(weekStartDate)}
         </div>
       </div>
 
-
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
         {weekDays.map((date, index) => {
           const dayKey = getDayOfWeekKey(date);
           const daySchedule = schedule?.days[dayKey] || { completed: false };

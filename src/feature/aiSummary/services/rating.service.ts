@@ -1,6 +1,6 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import type { SessionRatingResponse } from "../types/summary.types";
+import type { SessionGrade, SessionRatingResponse } from "../types/summary.types";
 
 const ratingDocRef = (userId: string, ratingId: string) =>
   doc(db, "users", userId, "aiRatings", ratingId);
@@ -15,6 +15,24 @@ export async function firebaseGetRating(
     return snap.data().rating as SessionRatingResponse;
   } catch {
     return null;
+  }
+}
+
+export async function firebaseGetAllDailyRatings(userId: string): Promise<Record<string, SessionGrade>> {
+  try {
+    const col = collection(db, "users", userId, "aiRatings");
+    const snap = await getDocs(col);
+    const result: Record<string, SessionGrade> = {};
+    snap.docs
+      .filter(d => d.id.startsWith("daily-"))
+      .forEach(d => {
+        const date = d.id.replace("daily-", "");
+        const rating = d.data().rating as SessionRatingResponse;
+        if (rating?.grade) result[date] = rating.grade;
+      });
+    return result;
+  } catch {
+    return {};
   }
 }
 

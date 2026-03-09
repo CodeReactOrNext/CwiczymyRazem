@@ -22,7 +22,17 @@ export const reportUpdateUserStats = ({
   inputData,
   currentUserSongLists
 }: updateUserStatsProps) => {
-  const clientToday = inputData.clientTodayISO ? new Date(inputData.clientTodayISO) : new Date();
+  // Parse client's local date as UTC midnight to avoid timezone drift.
+  // New format: "YYYY-MM-DD" (local date string from client).
+  // Old format: full ISO timestamp (backward compat — normalize to UTC midnight).
+  const parseClientDate = (iso: string): Date => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+      return new Date(iso + "T00:00:00Z");
+    }
+    const d = new Date(iso);
+    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  };
+  const clientToday = inputData.clientTodayISO ? parseClientDate(inputData.clientTodayISO) : new Date();
   const {
     time = { technique: 0, theory: 0, hearing: 0, creativity: 0, longestSession: 0 },
     habitsCount = 0,
@@ -71,9 +81,9 @@ export const reportUpdateUserStats = ({
     dayBeforeStreak.setDate(dayBeforeStreak.getDate() - 1);
 
     const isSameDay = (d1: Date, d2: Date) =>
-      d1.getDate() === d2.getDate() &&
-      d1.getMonth() === d2.getMonth() &&
-      d1.getFullYear() === d2.getFullYear();
+      d1.getUTCDate() === d2.getUTCDate() &&
+      d1.getUTCMonth() === d2.getUTCMonth() &&
+      d1.getUTCFullYear() === d2.getUTCFullYear();
 
     const dayAfterLastReport = new Date(lastReport);
     dayAfterLastReport.setDate(dayAfterLastReport.getDate() + 1);
