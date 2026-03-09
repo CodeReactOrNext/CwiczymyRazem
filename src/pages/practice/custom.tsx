@@ -92,10 +92,10 @@ export default function CustomPracticePage() {
       await uploadUserGpFile(userId, staged.rawFile, ({ progress }) => {
         // Could show a progress bar here if desired
       });
-      toast.success("Plik zapisano w bibliotece!");
+      toast.success("File saved to library!");
       setLastImportedFile(null);
     } catch {
-      toast.error("Nie udało się zapisać pliku");
+      toast.error("Failed to save file");
     } finally {
       setIsSaving(false);
     }
@@ -134,8 +134,8 @@ export default function CustomPracticePage() {
   }
 
   const tabs: { id: Tab; label: string; icon: typeof Upload }[] = [
-    { id: "import", label: "Importuj nowy", icon: Upload },
-    { id: "library", label: "Moje pliki", icon: FolderOpen },
+    { id: "import", label: "Import new", icon: Upload },
+    { id: "library", label: "My files", icon: FolderOpen },
   ];
 
   return (
@@ -211,12 +211,12 @@ export default function CustomPracticePage() {
                         {isSaving ? (
                           <>
                             <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
-                            Zapisywanie...
+                            Saving...
                           </>
                         ) : (
                           <>
                             <Save className="h-3.5 w-3.5 mr-2" />
-                            Zapisz w bibliotece
+                            Save to library
                           </>
                         )}
                       </Button>
