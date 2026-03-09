@@ -57,14 +57,14 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
   useEffect(() => {
     getUserGpFiles(userId)
       .then(setFiles)
-      .catch(() => toast.error("Nie udało się załadować listy plików"))
+      .catch(() => toast.error("Failed to load file list"))
       .finally(() => setIsLoading(false));
   }, [userId]);
 
   const handleLoad = async (file: UserGpFile) => {
     setLoadingFileId(file.id);
     try {
-      const f = await fetchGpFileAsFile(file.downloadUrl, file.name);
+      const f = await fetchGpFileAsFile(file.storagePath, file.name);
       const parsed = await parseGpFile(f);
       const backingTracks = buildBackingTracks(parsed.tracks, 0);
       onLoad(
@@ -74,9 +74,9 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
         parsed.tracks[0].name,
         backingTracks
       );
-      toast.success(`"${file.name}" wczytano!`);
+      toast.success(`"${file.name}" loaded!`);
     } catch {
-      toast.error("Nie udało się wczytać pliku. Może być uszkodzony.");
+      toast.error("Failed to load file. It may be corrupted.");
     } finally {
       setLoadingFileId(null);
     }
@@ -87,9 +87,9 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
     try {
       await deleteUserGpFile(userId, file.id, file.storagePath);
       setFiles((prev) => prev.filter((f) => f.id !== file.id));
-      toast.success(`"${file.name}" usunięto`);
+      toast.success(`"${file.name}" deleted`);
     } catch {
-      toast.error("Nie udało się usunąć pliku");
+      toast.error("Failed to delete file");
     } finally {
       setDeletingFileId(null);
     }
@@ -99,7 +99,7 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-16 text-zinc-600">
         <Loader2 className="h-6 w-6 animate-spin" />
-        <span className="text-xs font-bold uppercase tracking-widest">Ładowanie biblioteki...</span>
+        <span className="text-xs font-bold uppercase tracking-widest">Loading library...</span>
       </div>
     );
   }
@@ -109,8 +109,8 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
       <div className="flex flex-col items-center justify-center gap-4 py-16 rounded-2xl border border-white/5 bg-white/[0.02] text-zinc-600">
         <FolderOpen className="h-10 w-10 opacity-40" />
         <div className="text-center space-y-1">
-          <p className="text-sm font-bold uppercase tracking-widest">Brak zapisanych plików</p>
-          <p className="text-xs text-zinc-700">Wgraj plik GP, aby zapisać go w bibliotece</p>
+          <p className="text-sm font-bold uppercase tracking-widest">No saved files</p>
+          <p className="text-xs text-zinc-700">Upload a GP file to save it to your library</p>
         </div>
       </div>
     );
@@ -157,7 +157,7 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
                 ) : (
                   <>
                     <Play className="h-3 w-3 mr-1 fill-current" />
-                    Załaduj
+                    Load
                   </>
                 )}
               </Button>
