@@ -146,7 +146,7 @@ export default function CustomPracticePage() {
 
       <div className="container mx-auto px-4 py-20 max-w-2xl">
         <Link
-          href="/exercises"
+          href="/timer"
           className="inline-flex items-center gap-2 text-zinc-500 hover:text-white transition-colors mb-12"
         >
           <ArrowLeft className="h-4 w-4" />
