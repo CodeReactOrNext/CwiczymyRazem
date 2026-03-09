@@ -217,7 +217,7 @@ export function UpgradeContent() {
             <div className="mt-1 flex items-baseline gap-1">
               {plan === "yearly" ? (
                 <>
-                  <span className="text-4xl font-black tracking-tight text-zinc-100">€89.91</span>
+                  <span className="text-4xl font-black tracking-tight text-zinc-100">€89.99</span>
                   <span className="text-sm font-medium text-zinc-500">/ year</span>
                   <span className="ml-2 text-xs text-zinc-600 line-through">€119.88</span>
                 </>
