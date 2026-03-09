@@ -16,8 +16,13 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken } = req.body as { idToken: string };
+  const { idToken, plan } = req.body as { idToken: string; plan?: "monthly" | "yearly" };
   if (!idToken) return res.status(400).json({ error: "Missing idToken" });
+
+  const priceId =
+    plan === "yearly"
+      ? process.env.STRIPE_PREMIUM_PRICE_ID_YEARLY!
+      : process.env.STRIPE_PREMIUM_PRICE_ID!;
 
   // Verify Firebase identity
   let userId: string;
@@ -36,7 +41,7 @@ export default async function handler(
       payment_method_types: ["card"],
       line_items: [
         {
-          price: process.env.STRIPE_PREMIUM_PRICE_ID!,
+          price: priceId,
           quantity: 1,
         },
       ],

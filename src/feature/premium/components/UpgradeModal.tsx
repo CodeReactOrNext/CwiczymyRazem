@@ -81,6 +81,7 @@ const BULLETS = [
 
 export function UpgradeContent() {
   const [isLoading, setIsLoading] = useState(false);
+  const [plan, setPlan] = useState<"monthly" | "yearly">("yearly");
 
   const handleUpgrade = async () => {
     const user = auth.currentUser;
@@ -95,7 +96,7 @@ export function UpgradeContent() {
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ idToken, plan }),
       });
 
       if (!res.ok) {
@@ -176,16 +177,60 @@ export function UpgradeContent() {
         ))}
       </div>
 
+      {/* Plan toggle */}
+      <div className="flex items-center justify-center rounded-xl bg-zinc-900 p-1 gap-1">
+        <button
+          onClick={() => setPlan("monthly")}
+          className={cn(
+            "flex-1 rounded-lg px-4 py-2 text-xs font-semibold transition-all",
+            plan === "monthly"
+              ? "bg-zinc-700 text-zinc-100 shadow"
+              : "text-zinc-500 hover:text-zinc-300"
+          )}
+        >
+          Monthly
+        </button>
+        <button
+          onClick={() => setPlan("yearly")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition-all",
+            plan === "yearly"
+              ? "bg-zinc-700 text-zinc-100 shadow"
+              : "text-zinc-500 hover:text-zinc-300"
+          )}
+        >
+          Yearly
+          <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+            Save 25%
+          </span>
+        </button>
+      </div>
+
       {/* Pricing */}
       <div className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 transition-all hover:bg-emerald-500/10">
         <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-emerald-500/10 blur-2xl transition-all group-hover:bg-emerald-500/20" />
         <div className="relative flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Monthly plan</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">
+              {plan === "yearly" ? "Yearly plan" : "Monthly plan"}
+            </p>
             <div className="mt-1 flex items-baseline gap-1">
-              <span className="text-4xl font-black tracking-tight text-zinc-100">€9.99</span>
-              <span className="text-sm font-medium text-zinc-500">/ month</span>
+              {plan === "yearly" ? (
+                <>
+                  <span className="text-4xl font-black tracking-tight text-zinc-100">€89.91</span>
+                  <span className="text-sm font-medium text-zinc-500">/ year</span>
+                  <span className="ml-2 text-xs text-zinc-600 line-through">€119.88</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-4xl font-black tracking-tight text-zinc-100">€9.99</span>
+                  <span className="text-sm font-medium text-zinc-500">/ month</span>
+                </>
+              )}
             </div>
+            {plan === "yearly" && (
+              <p className="mt-1 text-[11px] text-emerald-400">≈ €7.49 / month</p>
+            )}
           </div>
           <div className="flex flex-col items-end gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400 ring-1 ring-emerald-500/20">
