@@ -1,8 +1,10 @@
 import { Button } from "assets/components/ui/button";
 import { selectUserInfo } from "feature/user/store/userSlice";
+import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { useTranslation } from "hooks/useTranslation";
 import { ChevronRight, HelpCircle, Brain, Lock } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { FaClock, FaGuitar, FaList, FaRandom } from "react-icons/fa";
 
@@ -18,6 +20,7 @@ export const PracticeModeSelector = ({
   const { t } = useTranslation(["common", "timer"]);
   const userInfo = useAppSelector(selectUserInfo);
   const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const colorClasses = {
     indigo: {
@@ -145,11 +148,11 @@ export const PracticeModeSelector = ({
               <div
                 key={mode.id}
                 className={`${isLocked ? "opacity-75 cursor-default" : mode.colors.ring} font-openSans relative flex h-24 transform cursor-pointer overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-second-500 via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-300 hover:shadow-xl ${!isLocked ? "hover:ring-2" : ""} sm:h-full sm:p-6`}
-                onClick={() => isLocked ? window.location.href = "/premium" : onSelectMode(mode.id)}
+                onClick={() => isLocked ? setShowUpgradeModal(true) : onSelectMode(mode.id)}
                 tabIndex={0}
                 role='button'
                 aria-label={mode.title}
-                onKeyDown={(e) => e.key === "Enter" && (isLocked ? window.location.href = "/premium" : onSelectMode(mode.id))}>
+                onKeyDown={(e) => e.key === "Enter" && (isLocked ? setShowUpgradeModal(true) : onSelectMode(mode.id))}>
                 <div
                   className={`${mode.colors.blur} absolute right-0 top-0 -mr-6 -mt-6 h-20 w-20 rounded-full blur-2xl sm:h-32 sm:w-32`}></div>
                 <div
@@ -218,5 +221,6 @@ export const PracticeModeSelector = ({
         </div>
       </div>
     </div>
+    <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
   );
 };
