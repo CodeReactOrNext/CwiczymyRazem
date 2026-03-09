@@ -1,5 +1,6 @@
-import { SongRecommender } from "feature/songs/components/SongRecommender/SongRecommender";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Guitar, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { Button } from "assets/components/ui/button";
 
 export const SongRecommenderSection = () => {
   return (
@@ -17,19 +18,34 @@ export const SongRecommenderSection = () => {
             What guitar song should <span className="text-cyan-500">I learn next?</span>
           </h2>
           <p className="max-w-2xl text-zinc-400 text-lg">
-            Don't waste time scrolling through thousands of tabs. Answer 3 quick questions and let our algorithm pick the perfect guitar track for your current skill level and vibe.
+            Don't waste time scrolling through thousands of tabs. Let our algorithm focus your practice on the tracks that matter most for your progress.
           </p>
-          {/* SEO Text */}
-          <div className="sr-only">
-            Find the best guitar songs for beginners, intermediate players and advanced shredders. 
-            Our guitar song recommender helps you choose which guitar song to learn based on genre, 
-            difficulty and popularity. Whether you like rock, metal, pop or blues, we find the 
-            perfect track for your guitar practice.
-          </div>
         </div>
 
         <div className="flex justify-center">
-          <SongRecommender variant="inline" />
+          <div className="w-full max-w-xl p-8 md:p-10 rounded-[2rem] bg-zinc-900/40 border border-white/10 backdrop-blur-xl shadow-2xl relative group flex flex-col items-center text-center">
+            {/* Decorative Elements */}
+            <div className="absolute -top-4 -right-4 w-20 h-20 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-colors" />
+            
+            <div className="relative z-10 space-y-6">
+              <div className="mx-auto w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+                <Guitar className="w-8 h-8 text-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.4)]" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-2">Smart Recommendations Coming Soon</h3>
+                <p className="text-zinc-400 text-sm">
+                  We are upgrading our recommendation engine to provide even better matches for your style and skill level. 
+                  In the meantime, browse our full library.
+                </p>
+              </div>
+              <Link href="/dashboard" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto px-8 bg-white hover:bg-zinc-200 text-black font-extrabold h-12 rounded-xl group transition-all duration-300">
+                  Browse All Songs
+                  <ChevronRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
         
         <div className="mt-16 flex flex-wrap justify-center gap-8 opacity-40 grayscale pointer-events-none select-none">

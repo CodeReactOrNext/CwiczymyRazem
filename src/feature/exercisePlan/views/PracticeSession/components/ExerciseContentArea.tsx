@@ -188,6 +188,7 @@ export const ExerciseContentArea = ({
               audioContext={audioContext}
               audioStartTime={audioStartTime}
               resetKey={tabResetKey}
+              hideDynamicsLane={!!rawGpFile}
             />
           )}
         </div>

@@ -33,6 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   process.env.OPENAI_API_KEY = apiKey;
 
+  const ALLOWED_LEVELS = ["Absolute Beginner", "Beginner", "Intermediate", "Advanced"];
+
   const { stepTitle, description, goal, level } = req.body as {
     stepTitle: string;
     description: string;
@@ -44,7 +46,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Missing stepTitle" });
   }
 
-  const query = `Roadmap step: "${stepTitle}". Student goal: "${goal}". Level: ${level}. Description: ${description}. Find the best matching guitar exercise.`;
+  if (typeof stepTitle !== "string" || stepTitle.length > 100) {
+    return res.status(400).json({ error: "Invalid stepTitle." });
+  }
+
+  if (goal && typeof goal !== "string") {
+    return res.status(400).json({ error: "Invalid goal." });
+  }
+
+  if (description && typeof description !== "string") {
+    return res.status(400).json({ error: "Invalid description." });
+  }
+
+  const truncatedGoal = goal?.slice(0, 500);
+  const truncatedDescription = description?.slice(0, 1000);
+
+  if (level && !ALLOWED_LEVELS.includes(level)) {
+    return res.status(400).json({ error: "Invalid skill level." });
+  }
+
+  const query = `Roadmap step: "${stepTitle}". Student goal: "${truncatedGoal}". Level: ${level}. Description: ${truncatedDescription}. Find the best matching guitar exercise.`;
 
   try {
     const result = await withTrace("exercise_search", async () => {

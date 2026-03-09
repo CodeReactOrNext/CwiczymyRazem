@@ -158,10 +158,11 @@ const FirebaseLogsSongItem = ({
         </p>
         
         {log.id && (
-          <LogReaction 
-            logId={log.id} 
-            reactions={log.reactions} 
-            currentUserId={currentUserId} 
+          <LogReaction
+            logId={log.id}
+            reactions={log.reactions}
+            currentUserId={currentUserId}
+            disabled={log.uid === currentUserId}
           />
         )}
       </div>
@@ -226,10 +227,11 @@ const FirebaseLogsRecordingItem = ({
         </p>
         
         {log.id && (
-          <LogReaction 
-            logId={log.id} 
-            reactions={log.reactions} 
-            currentUserId={currentUserId} 
+          <LogReaction
+            logId={log.id}
+            reactions={log.reactions}
+            currentUserId={currentUserId}
+            disabled={log.uid === currentUserId}
           />
         )}
       </div>
@@ -346,10 +348,11 @@ const FirebaseLogsItem = ({
         )}
         
         {log.id && (
-          <LogReaction 
-            logId={log.id} 
-            reactions={log.reactions} 
-            currentUserId={currentUserId} 
+          <LogReaction
+            logId={log.id}
+            reactions={log.reactions}
+            currentUserId={currentUserId}
+            disabled={log.uid === currentUserId}
           />
         )}
       </div>
@@ -610,10 +613,11 @@ const FirebaseLogsDailyQuestItem = ({
         </div>
         
         {log.id && (
-          <LogReaction 
-            logId={log.id} 
-            reactions={log.reactions} 
-            currentUserId={currentUserId} 
+          <LogReaction
+            logId={log.id}
+            reactions={log.reactions}
+            currentUserId={currentUserId}
+            disabled={log.uid === currentUserId}
           />
         )}
       </div>

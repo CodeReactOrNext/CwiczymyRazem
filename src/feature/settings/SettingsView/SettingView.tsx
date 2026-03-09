@@ -54,15 +54,6 @@ const SettingsView = () => {
                   <span className="font-bold">Profile</span>
                 </TabsTrigger>
                 <TabsTrigger 
-                  value="customization" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
-                >
-                  <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-purple-500/10 group-data-[state=active]:text-purple-500 transition-colors">
-                    <Palette className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold">Profile Appearance</span>
-                </TabsTrigger>
-                <TabsTrigger 
                   value="socials" 
                   className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
                 >
@@ -70,15 +61,6 @@ const SettingsView = () => {
                     <Share2 className="h-4 w-4" />
                   </div>
                   <span className="font-bold">Social Media</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="preferences" 
-                  className="w-full justify-start gap-3.5 px-5 py-4 rounded-2xl transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 border border-transparent data-[state=active]:border-zinc-800 group text-muted-foreground data-[state=active]:text-foreground hover:bg-zinc-900/50"
-                >
-                  <div className="p-2 rounded-xl bg-zinc-900/50 group-data-[state=active]:bg-amber-500/10 group-data-[state=active]:text-amber-500 transition-colors">
-                    <SettingsIcon className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold">Preferences</span>
                 </TabsTrigger>
                 <TabsTrigger 
                   value="security" 
@@ -118,20 +100,14 @@ const SettingsView = () => {
 
           {/* Content Area */}
           <div className="flex-1 min-w-0 pb-20">
-            <TabsContent value="profile" className="mt-0">
+            <TabsContent value="profile" className="mt-0 space-y-8">
               <ProfileBasics />
-            </TabsContent>
-
-            <TabsContent value="customization" className="mt-0">
               <ProfileCustomization />
+              <GuitarStartDate />
             </TabsContent>
 
             <TabsContent value="socials" className="mt-0">
               <MediaLinks />
-            </TabsContent>
-
-            <TabsContent value="preferences" className="mt-0">
-               <GuitarStartDate />
             </TabsContent>
 
             <TabsContent value="security" className="mt-0 space-y-6">

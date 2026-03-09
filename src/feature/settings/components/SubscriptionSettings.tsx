@@ -57,7 +57,7 @@ const SubscriptionSettings = () => {
               </p>
             )}
             {!isPremium && (
-              <p className="text-xs text-zinc-500">Upgrade to unlock AI Coach and practice summaries.</p>
+              <p className="text-xs text-zinc-500">Upgrade to unlock Roadmap and practice summaries.</p>
             )}
           </div>
           <div className="ml-auto">
