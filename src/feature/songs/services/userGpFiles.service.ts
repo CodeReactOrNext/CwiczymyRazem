@@ -8,8 +8,10 @@ import {
   query,
   serverTimestamp,
 } from "firebase/firestore";
-import { deleteObject, getBlob, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { db, storage } from "utils/firebase/client/firebase.utils";
+import { getIdToken } from "firebase/auth";
+import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { db, storage, auth } from "utils/firebase/client/firebase.utils";
+
 
 export interface UserGpFile {
   id: string;
@@ -83,11 +85,22 @@ export const deleteUserGpFile = async (
   }
 };
 
-/** Fetch a stored GP file as a File object for parsing. */
+/** Fetch a stored GP file via server-side proxy to avoid CORS. */
 export const fetchGpFileAsFile = async (
-  storagePath: string,
+  downloadUrl: string,
   fileName: string
 ): Promise<File> => {
-  const blob = await getBlob(ref(storage, storagePath));
+  const user = auth.currentUser;
+  if (!user) throw new Error("Not authenticated");
+  const idToken = await getIdToken(user);
+
+  const response = await fetch("/api/get-gp-file", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ downloadUrl, idToken }),
+  });
+
+  if (!response.ok) throw new Error("Failed to download GP file");
+  const blob = await response.blob();
   return new File([blob], fileName, { type: "application/octet-stream" });
 };
