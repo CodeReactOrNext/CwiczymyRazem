@@ -7,6 +7,7 @@ export interface RoadmapStep {
   sessionsCompleted: number;
   order: number;
   suggestedExerciseId?: string;
+  suggestedLessonIds?: string[];
 }
 
 export interface RoadmapPhase {

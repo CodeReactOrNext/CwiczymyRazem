@@ -50,19 +50,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid stepTitle." });
   }
 
-  if (goal && (typeof goal !== "string" || goal.length > 500)) {
-    return res.status(400).json({ error: "Goal too long." });
+  if (goal && typeof goal !== "string") {
+    return res.status(400).json({ error: "Invalid goal." });
   }
 
-  if (description && (typeof description !== "string" || description.length > 1000)) {
-    return res.status(400).json({ error: "Description too long." });
+  if (description && typeof description !== "string") {
+    return res.status(400).json({ error: "Invalid description." });
   }
+
+  const truncatedGoal = goal?.slice(0, 500);
+  const truncatedDescription = description?.slice(0, 1000);
 
   if (level && !ALLOWED_LEVELS.includes(level)) {
     return res.status(400).json({ error: "Invalid skill level." });
   }
 
-  const query = `Roadmap step: "${stepTitle}". Student goal: "${goal}". Level: ${level}. Description: ${description}. Find the best matching guitar exercise.`;
+  const query = `Roadmap step: "${stepTitle}". Student goal: "${truncatedGoal}". Level: ${level}. Description: ${truncatedDescription}. Find the best matching guitar exercise.`;
 
   try {
     const result = await withTrace("exercise_search", async () => {
