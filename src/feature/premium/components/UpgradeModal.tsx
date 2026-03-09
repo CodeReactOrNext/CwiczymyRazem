@@ -229,14 +229,10 @@ export function UpgradeContent() {
               )}
             </div>
             {plan === "yearly" && (
-              <p className="mt-1 text-[11px] text-emerald-400">≈ €7.49 / month</p>
+              <p className="mt-1 text-[11px] text-emerald-400">25% off</p>
             )}
           </div>
           <div className="flex flex-col items-end gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400 ring-1 ring-emerald-500/20">
-              <Check size={10} />
-              Cancel anytime
-            </span>
           </div>
         </div>
       </div>

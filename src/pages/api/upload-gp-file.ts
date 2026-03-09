@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import * as admin from "firebase-admin";
+import { randomUUID } from "crypto";
 import { firestore, auth } from "utils/firebase/api/firebase.config";
 
 // Increase body size limit for GP5 files (up to 20MB)
@@ -48,15 +49,18 @@ export default async function handler(
 
     const fileBuffer = Buffer.from(fileBase64, "base64");
 
+    const downloadToken = randomUUID();
     const file = bucket.file(storagePath);
     await file.save(fileBuffer, {
-      metadata: { contentType: "application/octet-stream" },
+      metadata: {
+        contentType: "application/octet-stream",
+        metadata: { firebaseStorageDownloadTokens: downloadToken },
+      },
     });
 
-    // Make the file publicly readable so client can download it via GCS URL
-    await file.makePublic();
-    const encodedPath = storagePath.split("/").map(encodeURIComponent).join("/");
-    const downloadUrl = `https://storage.googleapis.com/${bucket.name}/${encodedPath}`;
+    // Use Firebase Storage CDN URL with download token — works with uniform bucket-level access
+    const encodedPath = encodeURIComponent(storagePath);
+    const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodedPath}?alt=media&token=${downloadToken}`;
 
     // Save metadata in Firestore
     const docRef = await firestore
