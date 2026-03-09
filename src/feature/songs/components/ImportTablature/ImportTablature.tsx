@@ -14,9 +14,9 @@ interface ImportTablatureProps {
 }
 
 const TRACK_TYPE_LABELS: Record<string, string> = {
-  guitar: 'Gitara',
-  bass: 'Bas',
-  drums: 'Perkusja',
+  guitar: 'Guitar',
+  bass: 'Bass',
+  drums: 'Drums',
 };
 
 function TrackTypeIcon({ type }: { type: string }) {
@@ -55,7 +55,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
     if (!selectedFile) return;
 
     if (!isGpFile(selectedFile.name)) {
-      toast.error(`Nieobsługiwany format. Obsługiwane: ${GP_EXTENSIONS.join(', ')}`);
+      toast.error(`Unsupported format. Supported: ${GP_EXTENSIONS.join(', ')}`);
       return;
     }
 
@@ -70,10 +70,10 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
       const tracks = buildBackingTracks(data, 0);
       onImported(data.tracks[0].measures, selectedFile.name, data.tempo, data.tracks[0].name, tracks, selectedFile);
 
-      toast.success(`"${selectedFile.name}" zaimportowano pomyślnie!`);
+      toast.success(`"${selectedFile.name}" imported successfully!`);
     } catch (error) {
       console.error("Failed to parse Guitar Pro file:", error);
-      toast.error("Błąd podczas odczytu pliku Guitar Pro. Upewnij się, że plik nie jest uszkodzony.");
+      toast.error("Error reading Guitar Pro file. Make sure the file is not corrupted.");
       setFile(null);
       setParsedData(null);
     } finally {
@@ -112,7 +112,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500">
               <FileMusic className="h-3 w-3 text-cyan-400" />
-              Podgląd tabulatury (Tempo: {parsedData.tempo} BPM)
+              Tablature preview (Tempo: {parsedData.tempo} BPM)
             </div>
             <Button
               variant="ghost"
@@ -120,14 +120,14 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
               onClick={removeFile}
               className="h-7 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-red-400 hover:bg-red-400/10"
             >
-              Usuń plik
+              Remove file
             </Button>
           </div>
 
           {/* Track Selection */}
           <div className="space-y-2">
             <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.2em] px-1">
-              Słuchasz wszystkich ścieżek, ale wybierz tę, którą będziesz ćwiczyć:
+              You hear all tracks, but choose the one you'll practice:
             </div>
             <div className="flex flex-wrap gap-2">
               {parsedData.tracks.map((track, idx) => (
@@ -164,14 +164,14 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
               <div className="absolute top-4 right-4 px-2 py-1 rounded bg-black/60 border border-white/10 backdrop-blur-md text-[10px] font-medium text-zinc-400 flex items-center gap-2 text-center">
                 <div className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
-                Wszystkie ścieżki aktywne w tle
+                All tracks active in background
               </div>
             </div>
           ) : selectedTrack?.trackType === 'drums' ? (
             <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/5 bg-white/[0.02] py-10 text-zinc-500">
               <Drum className="h-8 w-8 opacity-40" />
-              <p className="text-xs font-bold uppercase tracking-widest">Ścieżka perkusji — brak notacji tabulatury</p>
-              <p className="text-[10px] text-zinc-600">Perkusja będzie odtwarzana automatycznie podczas sesji</p>
+              <p className="text-xs font-bold uppercase tracking-widest">Drum track — no tab notation</p>
+              <p className="text-[10px] text-zinc-600">Drums will play automatically during the session</p>
             </div>
           ) : null}
         </div>
@@ -208,7 +208,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
                 {!parsedData && <div className="text-xs text-zinc-500">Przetwarzanie...</div>}
                 {parsedData && (
                   <div className="flex items-center gap-2 text-[10px] text-zinc-500 justify-center uppercase tracking-widest font-bold">
-                    <Zap className="h-3 w-3 text-yellow-500" /> {parsedData.tracks.length} ścieżek wykryto
+                    <Zap className="h-3 w-3 text-yellow-500" /> {parsedData.tracks.length} tracks detected
                   </div>
                 )}
               </div>
@@ -228,16 +228,16 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
 
               <div className="space-y-1">
                 <div className="font-bold text-white uppercase tracking-wider text-xs">
-                  {isDragActive ? "Upuść plik tutaj" : "Importuj Tablaturę"}
+                  {isDragActive ? "Drop file here" : "Import Tablature"}
                 </div>
                 <div className="text-sm text-zinc-500">
-                  {isParsing ? "Analizowanie ścieżek i tempa..." : "Wgraj plik GP3 / GP4 / GP5 / GPX / GP"}
+                  {isParsing ? "Analyzing tracks and tempo..." : "Upload GP3 / GP4 / GP5 / GPX / GP file"}
                 </div>
               </div>
 
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-cyan-500/50 bg-cyan-500/5 px-3 py-1 rounded-full border border-cyan-500/10">
                 <AlertCircle className="h-3 w-3" />
-                Obsługa Guitar Pro (Multi-Track)
+                Guitar Pro (Multi-Track) support
               </div>
             </>
           )}
