@@ -47,6 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     excludedChannels,
   } = config;
 
+  try {
   const lowerExcluded = excludedChannels.map((c) => c.toLowerCase());
   const lessonsRef = collection(db, LESSONS_COLLECTION);
 
@@ -159,4 +160,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     skipped: totalSkipped,
     logs,
   });
+  } catch (err: any) {
+    console.error("scrape-youtube error:", err);
+    return res.status(500).json({ error: err?.message || "Internal server error" });
+  }
 }
