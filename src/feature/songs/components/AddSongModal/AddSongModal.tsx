@@ -218,8 +218,8 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                   Guitar Pro Tablature (Optional)
                   <span className="text-[10px] font-bold text-cyan-500 uppercase tracking-wider bg-cyan-500/10 px-2 py-0.5 rounded-full">New</span>
                 </Label>
-                <ImportTablature 
-                  onImported={(measures, filename, tempo, trackName) => setImportedTab(measures)}
+                <ImportTablature
+                  onImported={(measures) => setImportedTab(measures)}
                   className="animate-in fade-in slide-in-from-top-4 duration-500"
                 />
               </div>
