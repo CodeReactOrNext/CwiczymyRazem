@@ -13,7 +13,7 @@ export const TrackSelector = ({ tracks, selectedIdx, onSelect }: TrackSelectorPr
 
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-[10px] text-zinc-500 shrink-0">Ścieżka:</span>
+      <span className="text-[10px] text-zinc-500 shrink-0">Track:</span>
       {tracks.map((track) => (
         <button
           key={track.idx}

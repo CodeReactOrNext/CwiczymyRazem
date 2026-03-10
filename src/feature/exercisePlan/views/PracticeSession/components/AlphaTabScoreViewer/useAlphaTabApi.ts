@@ -93,7 +93,7 @@ export function useAlphaTabApi({
       if (Array.isArray(score?.tracks) && score.tracks.length > 0) {
         setTracks(
           score.tracks.map((t: any, i: number) => ({
-            name: t.name?.trim() || `Ścieżka ${i + 1}`,
+            name: t.name?.trim() || `Track ${i + 1}`,
             idx:  i,
           })),
         );

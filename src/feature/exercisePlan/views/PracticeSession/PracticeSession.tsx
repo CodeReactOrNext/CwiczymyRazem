@@ -13,7 +13,7 @@ import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
-import { Timer } from "lucide-react";
+import { Drum, Music, Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -52,6 +52,9 @@ import { useAlphaTabPlayer } from "../../hooks/useAlphaTabPlayer";
 import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
 import { getNoteFromFrequency } from "utils/audio/noteUtils";
 import { useCalibration } from "./hooks/useCalibration";
+import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
+import { parseGpFile } from "feature/songs/services/gp5Parser.service";
+import type { BackingTrack } from "../../types/exercise.types";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -150,7 +153,9 @@ export const PracticeSession = ({
 
   const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
 
-  if (rawGpFile && !isPremium) {
+  const planHasGpFile = !!rawGpFile || plan.exercises.some(ex => !!ex.gpFileUrl);
+
+  if (planHasGpFile && !isPremium) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6">
         <div className="w-full max-w-lg animate-in fade-in zoom-in duration-500">
@@ -167,6 +172,42 @@ export const PracticeSession = ({
   }
 
   const { bpmStages, completedBpms, isLoading: isBpmLoading, handleToggleBpm } = useBpmProgress(currentExercise);
+
+  // ── Fetch GP file for exercises created from GP ────────────────────────────
+
+  const [fetchedGpFile, setFetchedGpFile] = useState<File | null>(null);
+  const [isFetchingGpFile, setIsFetchingGpFile] = useState(false);
+
+  useEffect(() => {
+    if (!currentExercise.gpFileUrl) {
+      setFetchedGpFile(null);
+      return;
+    }
+    const fileName = currentExercise.title.replace(/[^a-zA-Z0-9._-]/g, "_") + ".gp5";
+    setIsFetchingGpFile(true);
+    fetchGpFileAsFile(currentExercise.gpFileUrl, fileName)
+      .then(file => { setFetchedGpFile(file); setIsFetchingGpFile(false); })
+      .catch(() => { setFetchedGpFile(null); setIsFetchingGpFile(false); });
+  }, [currentExercise.gpFileUrl]);
+
+  const effectiveRawGpFile = rawGpFile ?? fetchedGpFile ?? undefined;
+
+  // ── Parse GP file to get all tracks ───────────────────────────────────────
+
+  const [parsedGpTracks, setParsedGpTracks] = useState<BackingTrack[] | null>(null);
+
+  useEffect(() => {
+    if (!effectiveRawGpFile) { setParsedGpTracks(null); return; }
+    parseGpFile(effectiveRawGpFile).then(data => {
+      setParsedGpTracks(data.tracks.map((t, idx) => ({
+        id: `track-${idx}`,
+        name: t.name,
+        measures: t.measures,
+        trackType: t.trackType as BackingTrack["trackType"],
+        pan: t.pan,
+      })));
+    }).catch(() => setParsedGpTracks(null));
+  }, [effectiveRawGpFile]);
 
   // Track session start once
   useEffect(() => {
@@ -233,6 +274,10 @@ export const PracticeSession = ({
     setBpm:         metronome.setBpm,
   });
 
+  // ── GP track selection (in-session) ───────────────────────────────────────
+
+  const [selectedGpTrackIdx, setSelectedGpTrackIdx] = useState(0);
+
   // Reset per-exercise UI flags alongside ear training
   useEffect(() => {
     const pref = loadGuitarPlaybackPreference();
@@ -246,9 +291,21 @@ export const PracticeSession = ({
     }
     setIsMetronomeMuted(false);
     setIsHalfSpeed(false);
+    setSelectedGpTrackIdx(0);
   }, [currentExercise.id]);
 
-  const activeTablature = riddleMeasures || activeExercise.tablature;
+  const allGpTracks = parsedGpTracks;
+
+  const activeTablature = riddleMeasures
+    || (allGpTracks ? allGpTracks[selectedGpTrackIdx]?.measures : undefined)
+    || activeExercise.tablature;
+
+  const dynamicBackingTracks = useMemo(() => {
+    if (allGpTracks && allGpTracks.length > 1) {
+      return allGpTracks.filter((_, idx) => idx !== selectedGpTrackIdx);
+    }
+    return activeExercise.backingTracks;
+  }, [allGpTracks, selectedGpTrackIdx, activeExercise.backingTracks]);
 
   // ── Audio playback ────────────────────────────────────────────────────────
 
@@ -258,13 +315,14 @@ export const PracticeSession = ({
     const configs: Record<string, { volume: number; isMuted: boolean }> = {
       main: { volume: 1.0, isMuted: isAudioMuted },
     };
-    if (activeExercise.backingTracks) {
-      activeExercise.backingTracks.forEach(track => {
+    if (dynamicBackingTracks) {
+      dynamicBackingTracks.forEach(track => {
         configs[track.id] = { volume: 0.8, isMuted: false };
       });
     }
     setTrackConfigs(configs);
-  }, [activeExercise.id, activeExercise.backingTracks]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeExercise.id, selectedGpTrackIdx]);
 
   // Keep main track mute in sync with global toggle
   useEffect(() => {
@@ -284,8 +342,8 @@ export const PracticeSession = ({
       trackType: "guitar",
       pan: 0,
     }];
-    if (activeExercise.backingTracks) {
-      activeExercise.backingTracks.forEach(track => {
+    if (dynamicBackingTracks) {
+      dynamicBackingTracks.forEach(track => {
         tracks.push({
           id:        track.id,
           name:      track.name,
@@ -298,7 +356,7 @@ export const PracticeSession = ({
       });
     }
     return tracks;
-  }, [activeTablature, activeExercise.backingTracks, trackConfigs, isAudioMuted]);
+  }, [activeTablature, dynamicBackingTracks, trackConfigs, isAudioMuted]);
 
   const isAudioPlaying = metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime;
 
@@ -307,14 +365,14 @@ export const PracticeSession = ({
   [trackConfigs]);
 
   const alphaTabBackingTrackIds = useMemo(() =>
-    (activeExercise.backingTracks ?? []).map(t => t.id),
-  [activeExercise.backingTracks]);
+    (dynamicBackingTracks ?? []).map(t => t.id),
+  [dynamicBackingTracks]);
 
   // AlphaTab synthesizer (GP files) — disabled while notation view is active
   useAlphaTabPlayer({
-    rawGpFile:      rawGpFile ?? null,
+    rawGpFile:      effectiveRawGpFile ?? null,
     bpm:            effectiveBpm,
-    isPlaying:      !!rawGpFile && isAudioPlaying && !showAlphaTabScore,
+    isPlaying:      !!effectiveRawGpFile && isAudioPlaying && !showAlphaTabScore,
     startTime:      metronome.startTime,
     onLoopComplete: () => setHasPlayedRiddleOnce(true),
     trackConfigs:   alphaTabTrackConfigs,
@@ -325,12 +383,12 @@ export const PracticeSession = ({
   const { soundfontsReady } = useTablatureAudio({
     tracks:         audioTracks,
     bpm:            effectiveBpm,
-    isPlaying:      !rawGpFile && isAudioPlaying,
+    isPlaying:      !effectiveRawGpFile && isAudioPlaying,
     startTime:      metronome.startTime,
     onLoopComplete: () => setHasPlayedRiddleOnce(true),
     audioContext:   metronome.audioContext,
     audioStartTime: metronome.audioStartTime,
-    disabled:       !!rawGpFile,
+    disabled:       !!effectiveRawGpFile,
   });
 
   // ── Image handling ────────────────────────────────────────────────────────
@@ -546,6 +604,16 @@ export const PracticeSession = ({
             activityData={activityDataToUse}
             onRestart={restartFullSession}
           />
+        </div>
+      )}
+
+      {/* GP file loading overlay */}
+      {isFetchingGpFile && (
+        <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center gap-4 bg-zinc-950/90 backdrop-blur-sm">
+          <div className="h-10 w-10 rounded-full border-4 border-cyan-500/30 border-t-cyan-500 animate-spin" />
+          <p className="text-sm font-bold uppercase tracking-widest text-zinc-400">
+            Loading track…
+          </p>
         </div>
       )}
 
@@ -789,12 +857,34 @@ export const PracticeSession = ({
                       />
                     )}
 
+                    {/* GP track selector */}
+                    {allGpTracks && allGpTracks.length > 1 && !showAlphaTabScore && (
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Track:</span>
+                        {allGpTracks.map((track, idx) => (
+                          <button
+                            key={track.id}
+                            onClick={() => setSelectedGpTrackIdx(idx)}
+                            className={cn(
+                              "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all",
+                              selectedGpTrackIdx === idx
+                                ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
+                                : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                            )}
+                          >
+                            {track.trackType === "drums" ? <Drum className="h-3 w-3" /> : <Music className="h-3 w-3" />}
+                            {track.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
                     {/* 3. Content area (tab / notation / video / image) */}
                     <ExerciseContentArea
                       activeTablature={activeTablature}
                       currentExercise={currentExercise}
                       activeExercise={activeExercise}
-                      rawGpFile={rawGpFile}
+                      rawGpFile={effectiveRawGpFile}
                       showAlphaTabScore={showAlphaTabScore}
                       onToggleAlphaTabScore={handleToggleAlphaTabScore}
                       isAudioPlaying={isAudioPlaying}
