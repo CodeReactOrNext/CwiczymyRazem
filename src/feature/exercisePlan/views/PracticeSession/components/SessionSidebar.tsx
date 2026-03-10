@@ -116,8 +116,8 @@ export const SessionSidebar = ({
                 <GiGuitar className="text-base" />
                 {isAudioMuted ? <FaVolumeMute className="h-4 w-4" /> : <FaVolumeUp className="h-4 w-4" />}
                 {isAudioMuted
-                  ? "Gitarowy Podkład wyłączony"
-                  : soundfontsReady ? "Gitarowy Podkład włączony" : "Ładowanie sampli…"}
+                  ? "Guitar Backing Track off"
+                  : soundfontsReady ? "Guitar Backing Track on" : "Loading samples..."}
               </Button>
 
               <div className="flex gap-2">
@@ -196,7 +196,7 @@ export const SessionSidebar = ({
               <div key={track.id} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-zinc-300 truncate max-w-[150px]">
-                    {track.id === "main" ? "Główny Instrument" : track.name}
+                    {track.id === "main" ? "Main Instrument" : track.name}
                   </span>
                   <button
                     onClick={() => setTrackConfigs(prev => ({

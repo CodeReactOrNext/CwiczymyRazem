@@ -58,7 +58,7 @@ export const ScoreControls = ({
         </span>
 
         {!uiReady && (
-          <span className="text-[10px] text-zinc-500 animate-pulse">Ładowanie…</span>
+          <span className="text-[10px] text-zinc-500 animate-pulse">Loading…</span>
         )}
         {uiReady && uiPlaying && (
           <span className="text-[10px] text-blue-400">▶</span>
@@ -67,7 +67,7 @@ export const ScoreControls = ({
 
       {/* Extra controls */}
       <div className="flex items-center gap-2">
-        <span className="text-[10px] text-zinc-500 shrink-0">Notacja:</span>
+        <span className="text-[10px] text-zinc-500 shrink-0">Notation:</span>
 
         {/* Loop */}
         <button
