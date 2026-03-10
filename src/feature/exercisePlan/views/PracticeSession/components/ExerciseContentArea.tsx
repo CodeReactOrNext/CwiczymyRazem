@@ -157,9 +157,9 @@ export const ExerciseContentArea = ({
             <button
               onClick={onToggleAlphaTabScore}
               className="absolute top-2 right-2 z-10 flex items-center gap-1.5 rounded-md bg-black/50 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
-              title={showAlphaTabScore ? "Przełącz na tabulaturę" : "Przełącz na notację"}
+              title={showAlphaTabScore ? "Switch to tablature" : "Switch to notation"}
             >
-              {showAlphaTabScore ? "TAB" : "♩ Notacja"}
+              {showAlphaTabScore ? "TAB" : "♩ Notation"}
             </button>
           )}
           {showAlphaTabScore && rawGpFile ? (
