@@ -140,6 +140,7 @@ export const PracticeSession = ({
     jumpToExercise,
     canSkipExercise,
     completedExercises,
+    restartFullSession,
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, skillRewardSkillId, skillRewardAmount });
 
   const userAuth   = useAppSelector(selectUserAuth);
@@ -543,6 +544,7 @@ export const PracticeSession = ({
             previousUserStats={previousUserStats}
             onClick={() => router.push("/dashboard")}
             activityData={activityDataToUse}
+            onRestart={restartFullSession}
           />
         </div>
       )}
@@ -692,6 +694,7 @@ export const PracticeSession = ({
                     onClick={() => router.push("/dashboard")}
                     activityData={activityDataToUse}
                     hideWrapper={true}
+                    onRestart={restartFullSession}
                   />
                 </div>
               ) : (

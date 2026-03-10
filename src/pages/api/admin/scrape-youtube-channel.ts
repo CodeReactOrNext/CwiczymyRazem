@@ -5,8 +5,6 @@ import type { ScraperConfig, YouTubeLesson } from "feature/aiCoach/types/youtube
 import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
 
 const LESSONS_COLLECTION = "youtubeLessons";
-const ADMIN_CONFIG_COLLECTION = "adminConfig";
-const SCRAPER_CONFIG_DOC = "youtubeScraper";
 
 function parseDurationToSeconds(iso: string): number {
   const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
@@ -81,14 +79,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const youtubeApiKey = process.env.YOUTUBE_API_KEY;
   if (!youtubeApiKey) return res.status(500).json({ error: "YOUTUBE_API_KEY not configured" });
 
-  const { channelInput, maxVideos = 200 } = req.body as { channelInput: string; maxVideos?: number };
+  const { channelInput, maxVideos = 200, config: bodyConfig } = req.body as {
+    channelInput: string;
+    maxVideos?: number;
+    config?: Partial<ScraperConfig>;
+  };
   if (!channelInput?.trim()) return res.status(400).json({ error: "channelInput is required" });
 
-  // Load scraper config for filters
-  const configRef = doc(db, ADMIN_CONFIG_COLLECTION, SCRAPER_CONFIG_DOC);
-  const configSnap = await getDoc(configRef);
-  const config: ScraperConfig = configSnap.exists()
-    ? (configSnap.data() as ScraperConfig)
+  const config: ScraperConfig = bodyConfig
+    ? { ...DEFAULT_SCRAPER_CONFIG, ...bodyConfig }
     : DEFAULT_SCRAPER_CONFIG;
 
   const { minViewCount, minDurationSeconds, maxDurationSeconds, excludedChannels } = config;
