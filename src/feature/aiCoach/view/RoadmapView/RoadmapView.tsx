@@ -308,14 +308,62 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
   ) => {
     setDrawerStepId(step.id);
 
-    // Fetch YouTube lessons independently (cached per step)
+    // Generate description first if missing, so YouTube search has it available
+    let enrichedStep = step;
+    if (!step.description && !loadingDetailId) {
+      setLoadingDetailId(step.id);
+      try {
+        const res = await fetch("/api/generate-step-detail", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            goal: roadmap.goal,
+            level: roadmap.level,
+            phaseIndex: phaseIdx,
+            phaseName: phase.title,
+            totalPhases: phases.length,
+            stepTitle: step.title,
+            prevSteps: phase.steps.slice(0, stepIdx).map((s) => s.title),
+            nextSteps: phase.steps.slice(stepIdx + 1).map((s) => s.title),
+            allPhases: phases.map((p) => ({
+              title: p.title,
+              steps: p.steps.map((s) => s.title),
+            })),
+          }),
+        });
+        const data = await res.json();
+
+        enrichedStep = {
+          ...step,
+          description: data.description || "",
+          successCriteria: data.successCriteria || "",
+          sessionsRequired: Number(data.sessionsRequired) || 8,
+        };
+
+        const newPhases = phases.map((p) =>
+          p.id !== phase.id
+            ? p
+            : { ...p, steps: p.steps.map((s) => (s.id !== step.id ? s : enrichedStep)) }
+        );
+
+        setPhases(newPhases);
+        onUpdate?.({ ...roadmap, phases: newPhases, updatedAt: new Date().toISOString() });
+        await firebaseUpdateRoadmap(roadmap.id, { phases: newPhases });
+      } catch (err) {
+        console.warn("Failed to fetch step detail:", err);
+      } finally {
+        setLoadingDetailId(null);
+      }
+    }
+
+    // Fetch YouTube lessons after description is available (cached per step)
     if (!lessonsCache[step.id] && !loadingLessonsId) {
       setLoadingLessonsId(step.id);
 
       const fetchLessons = async () => {
         // If already saved in Firebase – load from Firestore, skip Upstash
-        if (step.suggestedLessonIds?.length) {
-          const firestoreLessons = await firebaseGetLessonsByIds(step.suggestedLessonIds);
+        if (enrichedStep.suggestedLessonIds?.length) {
+          const firestoreLessons = await firebaseGetLessonsByIds(enrichedStep.suggestedLessonIds);
           return firestoreLessons.map((l) => ({
             videoId: l.videoId,
             title: l.title,
@@ -328,13 +376,13 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
           })) as YouTubeLessonResult[];
         }
 
-        // First time – search Upstash, then save IDs to Firebase
+        // First time – search Upstash with full description, then save IDs to Firebase
         const res = await fetch("/api/search-youtube-lessons", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            stepTitle: step.title,
-            stepDescription: step.description || "",
+            stepTitle: enrichedStep.title,
+            stepDescription: enrichedStep.description || "",
             roadmapGoal: roadmap.goal,
             roadmapLevel: roadmap.level,
           }),
@@ -365,53 +413,6 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
         .then((lessons) => setLessonsCache((prev) => ({ ...prev, [step.id]: lessons })))
         .catch(() => setLessonsCache((prev) => ({ ...prev, [step.id]: [] })))
         .finally(() => setLoadingLessonsId(null));
-    }
-
-    if (step.description || loadingDetailId) return;
-
-    setLoadingDetailId(step.id);
-    let enrichedStep = step;
-    try {
-      const res = await fetch("/api/generate-step-detail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          goal: roadmap.goal,
-          level: roadmap.level,
-          phaseIndex: phaseIdx,
-          phaseName: phase.title,
-          totalPhases: phases.length,
-          stepTitle: step.title,
-          prevSteps: phase.steps.slice(0, stepIdx).map((s) => s.title),
-          nextSteps: phase.steps.slice(stepIdx + 1).map((s) => s.title),
-          allPhases: phases.map((p) => ({
-            title: p.title,
-            steps: p.steps.map((s) => s.title),
-          })),
-        }),
-      });
-      const data = await res.json();
-
-      enrichedStep = {
-        ...step,
-        description: data.description || "",
-        successCriteria: data.successCriteria || "",
-        sessionsRequired: Number(data.sessionsRequired) || 8,
-      };
-
-      const newPhases = phases.map((p) =>
-        p.id !== phase.id
-          ? p
-          : { ...p, steps: p.steps.map((s) => (s.id !== step.id ? s : enrichedStep)) }
-      );
-
-      setPhases(newPhases);
-      onUpdate?.({ ...roadmap, phases: newPhases, updatedAt: new Date().toISOString() });
-      await firebaseUpdateRoadmap(roadmap.id, { phases: newPhases });
-    } catch (err) {
-      console.warn("Failed to fetch step detail:", err);
-    } finally {
-      setLoadingDetailId(null);
     }
 
     if (enrichedStep.suggestedExerciseId || step.suggestedExerciseId) return;
