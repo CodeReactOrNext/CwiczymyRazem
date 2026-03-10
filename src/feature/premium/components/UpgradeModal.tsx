@@ -1,22 +1,14 @@
 import { cn } from "assets/lib/utils";
-import { auth } from "utils/firebase/client/firebase.utils";
-import { getIdToken } from "firebase/auth";
 import {
   BookOpen,
   CalendarDays,
-  Check,
-  ExternalLink,
   FileMusic,
-  Loader2,
   Map,
-  Shield,
   Sparkles,
   Star,
   X,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 // ─── Feature list ─────────────────────────────────────────────────────────────
 
@@ -80,67 +72,31 @@ const BULLETS = [
 // ─── Shared content ───────────────────────────────────────────────────────────
 
 export function UpgradeContent() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [plan, setPlan] = useState<"monthly" | "yearly">("yearly");
-
-  const handleUpgrade = async () => {
-    const user = auth.currentUser;
-    if (!user) {
-      toast.error("You need to be logged in");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const idToken = await getIdToken(user);
-      const res = await fetch("/api/stripe/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken, plan }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error ?? "Failed to create checkout session");
-      }
-
-      const { url } = await res.json();
-      window.location.href = url;
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong");
-      setIsLoading(false);
-    }
-  };
-
-
-
   return (
-    <div className="flex flex-col gap-6 p-6 sm:p-8">
-      {/* Header */}
-      <div className="flex flex-col items-center gap-3 text-center">
-        <div className="relative flex items-center justify-center">
-          <span className="absolute h-16 w-16 animate-ping rounded-full bg-emerald-500/5" />
-          <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-violet-500/20 ring-1 ring-white/10">
-            <Sparkles className="h-6 w-6 text-emerald-400" />
-          </div>
-        </div>
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-zinc-100">
-            Upgrade to Premium
-          </h2>
-          <p className="mx-auto mt-1 max-w-xs text-sm text-zinc-500">
-            Unlock the full toolkit and accelerate your guitar journey.
-          </p>
+    <div className="flex flex-col items-center gap-4 p-8 sm:p-12 text-center">
+      <div className="relative flex items-center justify-center">
+        <span className="absolute h-16 w-16 animate-ping rounded-full bg-emerald-500/5" />
+        <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-violet-500/20 ring-1 ring-white/10">
+          <Sparkles className="h-6 w-6 text-emerald-400" />
         </div>
       </div>
 
+      <div>
+        <h2 className="text-xl font-bold tracking-tight text-zinc-100">
+          Premium — Coming Soon
+        </h2>
+        <p className="mx-auto mt-2 max-w-xs text-sm text-zinc-500">
+          We&apos;re working on premium plans. Stay tuned for updates!
+        </p>
+      </div>
+
       {/* Feature list */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mt-2">
         {FEATURES.map((f, i) => (
           <div
             key={i}
             className={cn(
-              "flex items-start gap-3 rounded-xl border bg-zinc-900/60 p-3.5 transition-colors",
+              "flex items-start gap-3 rounded-xl border bg-zinc-900/60 p-3.5",
               f.accent
             )}
           >
@@ -153,7 +109,7 @@ export function UpgradeContent() {
             >
               {f.icon}
             </div>
-            <div>
+            <div className="text-left">
               <p className="text-sm font-semibold leading-tight text-zinc-200">
                 {f.title}
               </p>
@@ -163,107 +119,6 @@ export function UpgradeContent() {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Trust bullets */}
-      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1.5 px-2">
-        {BULLETS.map((b, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
-              <Check size={10} className="text-emerald-400" />
-            </div>
-            <span className="text-[11px] font-medium text-zinc-500">{b}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Plan toggle */}
-      <div className="flex items-center justify-center rounded-xl bg-zinc-900 p-1 gap-1">
-        <button
-          onClick={() => setPlan("monthly")}
-          className={cn(
-            "flex-1 rounded-lg px-4 py-2 text-xs font-semibold transition-all",
-            plan === "monthly"
-              ? "bg-zinc-700 text-zinc-100 shadow"
-              : "text-zinc-500 hover:text-zinc-300"
-          )}
-        >
-          Monthly
-        </button>
-        <button
-          onClick={() => setPlan("yearly")}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition-all",
-            plan === "yearly"
-              ? "bg-zinc-700 text-zinc-100 shadow"
-              : "text-zinc-500 hover:text-zinc-300"
-          )}
-        >
-          Yearly
-          <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
-            Save 25%
-          </span>
-        </button>
-      </div>
-
-      {/* Pricing */}
-      <div className="group relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 transition-all hover:bg-emerald-500/10">
-        <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-emerald-500/10 blur-2xl transition-all group-hover:bg-emerald-500/20" />
-        <div className="relative flex items-center justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500">
-              {plan === "yearly" ? "Yearly plan" : "Monthly plan"}
-            </p>
-            <div className="mt-1 flex items-baseline gap-1">
-              {plan === "yearly" ? (
-                <>
-                  <span className="text-4xl font-black tracking-tight text-zinc-100">€89.99</span>
-                  <span className="text-sm font-medium text-zinc-500">/ year</span>
-                  <span className="ml-2 text-xs text-zinc-600 line-through">€119.88</span>
-                </>
-              ) : (
-                <>
-                  <span className="text-4xl font-black tracking-tight text-zinc-100">€9.99</span>
-                  <span className="text-sm font-medium text-zinc-500">/ month</span>
-                </>
-              )}
-            </div>
-            {plan === "yearly" && (
-              <p className="mt-1 text-[11px] text-emerald-400">25% off</p>
-            )}
-          </div>
-          <div className="flex flex-col items-end gap-2">
-          </div>
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div className="flex flex-col gap-2">
-        <button
-          onClick={handleUpgrade}
-          disabled={isLoading}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 size={14} className="animate-spin" />
-              Redirecting to checkout...
-            </>
-          ) : (
-            <>
-              <Zap size={14} />
-              Get Premium
-              <ExternalLink size={12} className="opacity-60" />
-            </>
-          )}
-        </button>
-
-        <div className="flex items-center justify-center gap-1.5 pt-1">
-          <Shield size={11} className="text-zinc-600" />
-          <p className="text-center text-xs text-zinc-600">
-            Secure payment · Cancel anytime
-          </p>
-        </div>
       </div>
     </div>
   );
