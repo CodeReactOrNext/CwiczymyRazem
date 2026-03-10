@@ -10,8 +10,6 @@ import type { ScraperConfig, YouTubeLesson } from "feature/aiCoach/types/youtube
 import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
 
 const LESSONS_COLLECTION = "youtubeLessons";
-const ADMIN_CONFIG_COLLECTION = "adminConfig";
-const SCRAPER_CONFIG_DOC = "youtubeScraper";
 
 function parseDurationToSeconds(iso: string): number {
   const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
@@ -37,11 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: "YOUTUBE_API_KEY not configured" });
   }
 
-  // Load config
-  const configRef = doc(db, ADMIN_CONFIG_COLLECTION, SCRAPER_CONFIG_DOC);
-  const configSnap = await getDoc(configRef);
-  const config: ScraperConfig = configSnap.exists()
-    ? (configSnap.data() as ScraperConfig)
+  const config: ScraperConfig = req.body?.config
+    ? { ...DEFAULT_SCRAPER_CONFIG, ...req.body.config }
     : DEFAULT_SCRAPER_CONFIG;
 
   const {

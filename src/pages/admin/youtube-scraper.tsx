@@ -10,12 +10,26 @@ import { db } from "utils/firebase/client/firebase.utils";
 import type { ScraperConfig, YouTubeLesson, YouTubeLessonStatus } from "feature/aiCoach/types/youtubeLesson.types";
 import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
 import {
-  firebaseGetScraperConfig,
-  firebaseSaveScraperConfig,
   firebaseGetLessonsByStatus,
   firebaseUpdateLesson,
   firebaseGetLessonStats,
 } from "feature/aiCoach/services/youtubeLesson.service";
+
+const SCRAPER_CONFIG_KEY = "yt_scraper_config";
+
+function loadConfigFromStorage(): ScraperConfig {
+  try {
+    const raw = localStorage.getItem(SCRAPER_CONFIG_KEY);
+    if (!raw) return DEFAULT_SCRAPER_CONFIG;
+    return { ...DEFAULT_SCRAPER_CONFIG, ...JSON.parse(raw) };
+  } catch {
+    return DEFAULT_SCRAPER_CONFIG;
+  }
+}
+
+function saveConfigToStorage(config: ScraperConfig) {
+  localStorage.setItem(SCRAPER_CONFIG_KEY, JSON.stringify(config));
+}
 import { authOptions } from "../api/auth/[...nextauth]";
 import { Youtube, Settings, Play, RefreshCw, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, ListVideo } from "lucide-react";
 import { Button } from "assets/components/ui/button";
@@ -47,7 +61,6 @@ const YouTubeScraper = () => {
   const PAGE_SIZE = 20;
   const [isScraping, setIsScraping] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isSavingConfig, setIsSavingConfig] = useState(false);
   const [processLogs, setProcessLogs] = useState<any[]>([]);
   const [scrapeLogs, setScrapeLogs] = useState<any[]>([]);
   const [queryInput, setQueryInput] = useState("");
@@ -59,11 +72,8 @@ const YouTubeScraper = () => {
 
   const loadData = useCallback(async (pass: string) => {
     try {
-      const [cfg, sts] = await Promise.all([
-        firebaseGetScraperConfig(),
-        firebaseGetLessonStats(),
-      ]);
-      setConfig(cfg);
+      setConfig(loadConfigFromStorage());
+      const sts = await firebaseGetLessonStats();
       setStats(sts);
       loadLessons("all");
     } catch (err) {
@@ -96,16 +106,9 @@ const YouTubeScraper = () => {
     if (isAuth) { loadLessons(filter); setPage(0); }
   }, [filter, isAuth]);
 
-  const handleSaveConfig = async () => {
-    setIsSavingConfig(true);
-    try {
-      await firebaseSaveScraperConfig(config);
-      toast.success("Config saved");
-    } catch {
-      toast.error("Failed to save config");
-    } finally {
-      setIsSavingConfig(false);
-    }
+  const handleSaveConfig = () => {
+    saveConfigToStorage(config);
+    toast.success("Konfiguracja zapisana w przeglądarce");
   };
 
   const handleScrape = async () => {
@@ -115,7 +118,7 @@ const YouTubeScraper = () => {
       const res = await fetch("/api/admin/scrape-youtube", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-admin-password": password },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ config }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -139,7 +142,7 @@ const YouTubeScraper = () => {
       const res = await fetch("/api/admin/scrape-youtube-channel", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-admin-password": password },
-        body: JSON.stringify({ channelInput: channelScrapeInput.trim(), maxVideos: channelMaxVideos }),
+        body: JSON.stringify({ channelInput: channelScrapeInput.trim(), maxVideos: channelMaxVideos, config }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -534,12 +537,10 @@ const YouTubeScraper = () => {
 
           <Button
             onClick={handleSaveConfig}
-            disabled={isSavingConfig}
             size="sm"
             className="bg-zinc-700 hover:bg-zinc-600 text-white"
           >
-            {isSavingConfig ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-            Save Config
+            Zapisz konfigurację
           </Button>
         </div>
 
