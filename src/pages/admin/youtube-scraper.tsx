@@ -17,7 +17,7 @@ import {
   firebaseGetLessonStats,
 } from "feature/aiCoach/services/youtubeLesson.service";
 import { authOptions } from "../api/auth/[...nextauth]";
-import { Youtube, Settings, Play, RefreshCw, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Youtube, Settings, Play, RefreshCw, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, ListVideo } from "lucide-react";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 
@@ -52,6 +52,10 @@ const YouTubeScraper = () => {
   const [scrapeLogs, setScrapeLogs] = useState<any[]>([]);
   const [queryInput, setQueryInput] = useState("");
   const [channelInput, setChannelInput] = useState("");
+  const [channelScrapeInput, setChannelScrapeInput] = useState("");
+  const [channelMaxVideos, setChannelMaxVideos] = useState(200);
+  const [isScrapingChannel, setIsScrapingChannel] = useState(false);
+  const [channelScrapeLogs, setChannelScrapeLogs] = useState<any[]>([]);
 
   const loadData = useCallback(async (pass: string) => {
     try {
@@ -124,6 +128,30 @@ const YouTubeScraper = () => {
       toast.error(err.message || "Scraping failed");
     } finally {
       setIsScraping(false);
+    }
+  };
+
+  const handleScrapeChannel = async () => {
+    if (!channelScrapeInput.trim()) return;
+    setIsScrapingChannel(true);
+    setChannelScrapeLogs([]);
+    try {
+      const res = await fetch("/api/admin/scrape-youtube-channel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ channelInput: channelScrapeInput.trim(), maxVideos: channelMaxVideos }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setChannelScrapeLogs(data.logs ?? []);
+      toast.success(`Kanał "${data.channelName}": ${data.newLessons} nowych, ${data.skipped} pominiętych`);
+      const sts = await firebaseGetLessonStats();
+      setStats(sts);
+      await loadLessons(filter);
+    } catch (err: any) {
+      toast.error(err.message || "Błąd podczas scrapowania kanału");
+    } finally {
+      setIsScrapingChannel(false);
     }
   };
 
@@ -251,6 +279,85 @@ const YouTubeScraper = () => {
             {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             {isProcessing ? "Processing..." : `Process & Index (${stats.raw} raw)`}
           </Button>
+        </div>
+
+        {/* Channel Scraper */}
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <ListVideo className="h-4 w-4 text-zinc-500" />
+            <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400">Dodaj kanał twórcy</h3>
+          </div>
+          <p className="text-xs text-zinc-500">
+            Wpisz link do kanału, uchwyt (@nazwa) lub ID kanału. Wszystkie filmy kanału zostaną dodane do bazy.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+                URL / @uchwyt / ID kanału
+              </label>
+              <Input
+                value={channelScrapeInput}
+                onChange={(e) => setChannelScrapeInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !isScrapingChannel && handleScrapeChannel()}
+                placeholder="https://www.youtube.com/@JustinGuitar lub @JustinGuitar"
+                className="h-9 border-zinc-700 bg-zinc-800 text-zinc-100 text-sm"
+              />
+            </div>
+            <div className="w-32">
+              <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
+                Max filmów
+              </label>
+              <Input
+                type="number"
+                value={channelMaxVideos}
+                onChange={(e) => setChannelMaxVideos(parseInt(e.target.value) || 200)}
+                className="h-9 border-zinc-700 bg-zinc-800 text-zinc-100 text-sm"
+                min={1}
+                max={500}
+              />
+            </div>
+            <Button
+              onClick={handleScrapeChannel}
+              disabled={isScrapingChannel || isScraping || isProcessing || !channelScrapeInput.trim()}
+              className="gap-2 bg-violet-600 hover:bg-violet-500 text-white font-bold shrink-0"
+            >
+              {isScrapingChannel ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListVideo className="h-4 w-4" />}
+              {isScrapingChannel ? "Scrapuję..." : "Pobierz kanał"}
+            </Button>
+          </div>
+
+          {channelScrapeLogs.length > 0 && (
+            <div className="rounded-xl border border-zinc-800 overflow-hidden">
+              <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                  Wyniki kanału ({channelScrapeLogs.filter((l) => l.result === "saved").length} nowych ·{" "}
+                  {channelScrapeLogs.filter((l) => l.result === "skipped").length} pominiętych)
+                </span>
+                <button onClick={() => setChannelScrapeLogs([])} className="text-[10px] text-zinc-600 hover:text-zinc-400 transition">
+                  Wyczyść
+                </button>
+              </div>
+              <div className="max-h-64 overflow-y-auto divide-y divide-zinc-800/40">
+                {channelScrapeLogs.map((log, i) => (
+                  <div key={i} className="flex items-center gap-3 px-4 py-2">
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
+                      log.result === "saved" ? "bg-emerald-400/10 text-emerald-400" : "bg-zinc-800 text-zinc-500"
+                    }`}>
+                      {log.result === "saved" ? "✓ nowy" : "pomiń"}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-medium text-zinc-300">{log.title}</p>
+                      <p className="mt-0.5 truncate text-[10px] text-zinc-600">
+                        {log.viewCount ? `${(log.viewCount / 1000).toFixed(0)}k wyśw.` : ""}
+                        {log.duration ? ` · ${Math.floor(log.duration / 60)}m` : ""}
+                        {log.skipReason ? ` · ${log.skipReason}` : ""}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Scrape Logs */}
