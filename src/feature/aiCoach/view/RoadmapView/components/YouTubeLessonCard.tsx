@@ -1,5 +1,5 @@
 import type { YouTubeLessonResult } from "feature/aiCoach/types/youtubeLesson.types";
-import { Youtube } from "lucide-react";
+import { Clock, Youtube } from "lucide-react";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -12,6 +12,13 @@ function formatDuration(seconds: number): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+const LEVEL_STYLES: Record<string, string> = {
+  beginner: "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30",
+  intermediate: "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30",
+  advanced: "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/30",
+  all: "bg-zinc-700/60 text-zinc-300 ring-1 ring-zinc-600/40",
+};
+
 interface YouTubeLessonCardProps {
   lesson: YouTubeLessonResult;
 }
@@ -21,34 +28,50 @@ const YouTubeLessonCard = ({ lesson }: YouTubeLessonCardProps) => {
     window.open(`https://www.youtube.com/watch?v=${lesson.videoId}`, "_blank", "noopener,noreferrer");
   };
 
+  const levelKey = lesson.level?.toLowerCase() ?? "";
+  const levelStyle = LEVEL_STYLES[levelKey] ?? "bg-zinc-700/60 text-zinc-300 ring-1 ring-zinc-600/40";
+
   return (
     <button
       onClick={handleClick}
-      className="group flex w-full items-center gap-3 rounded-xl border border-zinc-700/60 bg-zinc-900 px-3 py-2.5 text-left transition hover:border-red-500/40 hover:bg-red-950/10"
+      className="group flex w-full items-start gap-4 rounded-2xl border border-zinc-700/60 bg-zinc-900/80 p-3 text-left transition hover:border-red-500/40 hover:bg-red-950/10"
     >
       {/* Thumbnail */}
-      <div className="relative h-[45px] w-[80px] shrink-0 overflow-hidden rounded-lg bg-zinc-800">
+      <div className="relative h-[68px] w-[120px] shrink-0 overflow-hidden rounded-xl bg-zinc-800">
         <img
           src={lesson.thumbnailUrl}
           alt={lesson.title}
           className="h-full w-full object-cover"
           loading="lazy"
         />
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100">
-          <Youtube className="h-5 w-5 text-red-500" />
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-600/90">
+            <Youtube className="h-5 w-5 text-white" />
+          </div>
         </div>
       </div>
 
       {/* Info */}
-      <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 text-xs font-semibold leading-tight text-zinc-100">
+      <div className="min-w-0 flex-1 py-0.5">
+        <p className="line-clamp-2 text-sm font-semibold leading-snug text-zinc-100 group-hover:text-white">
           {lesson.title}
         </p>
-        <p className="mt-0.5 truncate text-[10px] text-zinc-500">
+        <p className="mt-1 truncate text-xs text-zinc-500">
           {lesson.channelName}
-          {lesson.level ? ` · ${lesson.level}` : ""}
-          {lesson.duration ? ` · ${formatDuration(lesson.duration)}` : ""}
         </p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {lesson.level && (
+            <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold capitalize ${levelStyle}`}>
+              {lesson.level}
+            </span>
+          )}
+          {lesson.duration && (
+            <span className="flex items-center gap-1 text-[11px] text-zinc-500">
+              <Clock className="h-3 w-3" />
+              {formatDuration(lesson.duration)}
+            </span>
+          )}
+        </div>
       </div>
     </button>
   );

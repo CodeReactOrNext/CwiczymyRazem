@@ -50,21 +50,20 @@ const ExerciseControls = ({
       {!hidePlayButton && !isFinished && (
         <div className={cn("relative", variant !== "centered" && "flex-1")}>
           <Button
-            size={size === "lg" ? "lg" : "default"}
             onClick={toggleTimer}
             className={cn(
               variant === "centered" ? (size === "lg" ? "h-14 px-8 w-auto" : "h-12 px-6 w-auto") : "w-full",
-              "radius-premium transition-background click-behavior font-black text-[10px] tracking-[0.2em] uppercase relative",
+              "radius-premium font-black transition-background click-behavior   relative",
               isPlaying 
-                ? "bg-white text-black hover:bg-zinc-200 shadow-2xl shadow-white/20" 
-                : "bg-cyan-500 hover:bg-cyan-400 text-black shadow-2xl shadow-cyan-500/30 animate-pulse"
+                ? "bg-white  hover:bg-zinc-200 shadow-2xl shadow-white/20" 
+                : "bg-cyan-500 hover:bg-cyan-400 shadow-2xl shadow-cyan-500/30 animate-pulse"
             )}>
             {!isPlaying && (
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 whitespace-nowrap z-[60] pointer-events-none">
                 <div className="animate-bounce flex flex-col items-center">
-                  <div className="bg-white text-black px-4 py-1.5 rounded-lg font-black text-[11px] uppercase tracking-wider shadow-2xl shadow-white/20 flex items-center gap-1.5">
+                  <div className="bg-white  px-4 py-1.5 rounded-lg  text-[13px]  tracking-wider shadow-2xl shadow-white/20 flex items-center gap-1.5">
                     <FaPlay className="h-2.5 w-2.5" /> 
-                    <span>Press PLAY to Start</span>
+                    <span>Press Start to play</span>
                   </div>
                   <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-t-[6px] border-transparent border-t-white -mt-[1px]"></div>
                 </div>
