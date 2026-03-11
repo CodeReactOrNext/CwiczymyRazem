@@ -19,9 +19,9 @@ interface StepDetailRequest {
 const SYSTEM_PROMPT = `You are an experienced guitar teacher with 20 years of teaching. You describe a guitar CONCEPT/SKILL — the step title is the name of that skill (e.g. "Vibrato strength", "Hammer-on speed development").
 
 DESCRIPTION FORMAT:
-Divide the description into 3-5 sections. Choose section titles that make sense for THIS specific skill — don't use a fixed template. Write each section title in square brackets on its own line, e.g. [Why it matters], [The core movement], [What to listen for], [A common trap], [Signs of progress]. Pick titles that best describe what's in that section.
+Divide the description into 2-3 sections. Choose section titles that make sense for THIS specific skill. Write each section title in square brackets on its own line, e.g. [Why it matters], [How to practice], [A common trap]. Pick 2-3 titles that best describe what's in that section.
 
-Each section: 1-3 sentences of prose OR a short bullet list (using "- " prefix), whichever fits better. No markdown bold, no extra headers outside the square brackets.
+Each section: 1-2 sentences of prose OR a short bullet list (max 3 items, using "- " prefix), whichever fits better. Keep it concise. No markdown bold, no extra headers outside the square brackets.
 
 DO NOT include:
 - Specific BPM numbers (no "60 BPM", "120 BPM", or any tempo values)
@@ -124,13 +124,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-5-mini",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.25,
-        max_tokens: 1200,
+
+        max_completion_tokens: 2000,
         response_format: { type: "json_object" },
       }),
     });
@@ -142,13 +142,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const data = await openaiRes.json();
-    const content = data.choices?.[0]?.message?.content;
+    const choice = data.choices?.[0];
+    const content = choice?.message?.content;
+    const finishReason = choice?.finish_reason;
+
+    if (finishReason === "length") {
+      console.warn("step-detail truncated (finish_reason=length), content:", content);
+    }
 
     let parsed: any;
     try {
       parsed = JSON.parse(content);
     } catch {
-      console.warn("Failed to parse step-detail response:", content);
+      console.warn("Failed to parse step-detail response (finish_reason:", finishReason, "):", content);
       return res.status(200).json({ description: "", successCriteria: "", sessionsRequired: 8 });
     }
 

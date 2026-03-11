@@ -288,6 +288,7 @@ const SessionModal = ({
                           onEnd={handleNextExerciseClick}
                           onReady={(duration: number) => setVideoDuration(duration)}
                           onSeek={(time: number) => setTimerTime(time * 1000)}
+                          onProgressUpdate={(currentTime: number) => setTimerTime(currentTime * 1000)}
                           onStateChange={(state: number) => {
                             if (state === 1) startTimer();
                             if (state === 2) stopTimer();
