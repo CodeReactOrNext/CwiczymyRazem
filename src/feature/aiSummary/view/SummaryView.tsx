@@ -1079,6 +1079,7 @@ export const SummaryView = () => {
                   : `${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} assessment`}
               </SectionHeading>
               <DailyAssessmentCard
+                key={`daily-${localDateStr(selectedDate)}`}
                 ratingId={`daily-${localDateStr(selectedDate)}`}
                 label={`${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} practice`}
                 techniqueTime={todayTech / 1000}
