@@ -16,7 +16,7 @@ import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import { Drum, Music, Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaInfoCircle, FaLightbulb } from "react-icons/fa";
 
 import { useBpmProgress } from "../../hooks/useBpmProgress";
@@ -227,6 +227,7 @@ export const PracticeSession = ({
   const [isMetronomeMuted,  setIsMetronomeMuted]  = useState(false);
   const [isHalfSpeed,       setIsHalfSpeed]       = useState(false);
   const [showAlphaTabScore, setShowAlphaTabScore] = useState(false);
+  const [tabRestartKey,     setTabRestartKey]     = useState(0);
 
   const handleToggleAlphaTabScore = () => {
     setShowAlphaTabScore(prev => {
@@ -455,6 +456,7 @@ export const PracticeSession = ({
     stopTimer();
     metronome.restartMetronome();
     resetTimer();
+    setTabRestartKey(prev => prev + 1);
     setTimeout(() => {
       startTimer();
       if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
@@ -462,6 +464,11 @@ export const PracticeSession = ({
       }
     }, 100);
   };
+
+  const handleRestartFullSession = useCallback(() => {
+    restartFullSession();
+    setTabRestartKey(prev => prev + 1);
+  }, [restartFullSession]);
 
   // ── Score saving ──────────────────────────────────────────────────────────
 
@@ -604,7 +611,7 @@ export const PracticeSession = ({
             previousUserStats={previousUserStats}
             onClick={() => router.push("/dashboard")}
             activityData={activityDataToUse}
-            onRestart={restartFullSession}
+            onRestart={handleRestartFullSession}
           />
         </div>
       )}
@@ -624,6 +631,7 @@ export const PracticeSession = ({
         <ExerciseSuccessView
           planTitle={planTitleString}
           onFinish={async () => {
+            metronome.stopMetronome();
             await saveCurrentScores();
             autoSubmitReport(
               exerciseRecordsRef.current,
@@ -631,7 +639,14 @@ export const PracticeSession = ({
               currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null
             );
           }}
-          onRestart={() => { resetSuccessView(); resetTimer(); startTimer(); }}
+          onRestart={() => {
+            resetSuccessView();
+            resetTimer();
+            startTimer();
+            if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
+              metronome.startMetronome();
+            }
+          }}
           isLoading={isFinishing || isSubmittingReport}
         />
       )}
@@ -649,6 +664,7 @@ export const PracticeSession = ({
             isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult}
             onClose={onClose || (() => router.push("/report"))}
             onFinish={isLastExercise ? async () => {
+              metronome.stopMetronome();
               await saveCurrentScores();
               autoSubmitReport(
                 exerciseRecordsRef.current,
@@ -766,7 +782,7 @@ export const PracticeSession = ({
                     onClick={() => router.push("/dashboard")}
                     activityData={activityDataToUse}
                     hideWrapper={true}
-                    onRestart={restartFullSession}
+                    onRestart={handleRestartFullSession}
                   />
                 </div>
               ) : (
@@ -778,7 +794,8 @@ export const PracticeSession = ({
                       currentExerciseIndex={currentExerciseIndex}
                       completedExercises={completedExercises}
                       onExerciseSelect={(idx) => {
-                        if (metronome.isPlaying) metronome.toggleMetronome();
+                        stopTimer();
+                        metronome.stopMetronome();
                         jumpToExercise(idx);
                       }}
                     />
@@ -904,7 +921,7 @@ export const PracticeSession = ({
                       currentBeatsElapsed={currentBeatsElapsed}
                       audioContext={metronome.audioContext}
                       audioStartTime={metronome.audioStartTime}
-                      tabResetKey={tabResetKey}
+                      tabResetKey={tabResetKey + tabRestartKey}
                       isRiddleRevealed={isRiddleRevealed}
                       isRiddleGuessed={isRiddleGuessed}
                       hasPlayedRiddleOnce={hasPlayedRiddleOnce}
@@ -1047,12 +1064,14 @@ export const PracticeSession = ({
                       timeLeft={timeLeft}
                       currentExerciseIndex={currentExerciseIndex}
                       onGoToPreviousExercise={() => {
-                        if (metronome.isPlaying) metronome.toggleMetronome();
+                        stopTimer();
+                        metronome.stopMetronome();
                         jumpToExercise(currentExerciseIndex - 1);
                       }}
                       isFinishing={isFinishing}
                       isSubmittingReport={isSubmittingReport}
                       onFinishSession={async () => {
+                        metronome.stopMetronome();
                         await saveCurrentScores();
                         autoSubmitReport(exerciseRecordsRef.current);
                       }}

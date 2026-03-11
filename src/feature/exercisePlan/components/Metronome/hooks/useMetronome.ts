@@ -160,10 +160,10 @@ export const useMetronome = ({
   }, []);
 
   const restartMetronome = useCallback(() => {
+    stopMetronome();
     pausedElapsedTimeRef.current = 0;
     pausedAudioElapsedRef.current = 0;
     beatCounterRef.current = 0;
-    stopMetronome();
   }, [stopMetronome]);
 
   const toggleMetronome = useCallback(() => {
