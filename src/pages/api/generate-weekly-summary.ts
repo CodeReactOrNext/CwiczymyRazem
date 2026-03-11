@@ -108,13 +108,12 @@ Current streak: ${streak} days. Player level: ${userLevel}.`;
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-5-mini",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userMessage },
         ],
-        temperature: 0.7,
-        max_tokens: 1800,
+        max_completion_tokens: 2000,
         response_format: { type: "json_object" },
       }),
     });
