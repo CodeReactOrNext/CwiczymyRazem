@@ -139,15 +139,15 @@ export const WeeklyHorizontalTimeline = ({ userAuth }: WeeklyHorizontalTimelineP
   };
 
   return (
-    <div className="w-full relative mb-8 bg-second-600 border border-second-400/10 rounded-[2rem] p-6 lg:p-8">
+    <div className="w-full relative mb-8 bg-zinc-800/40 rounded-xl p-4 lg:p-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 relative z-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 shrink-0 rounded-2xl bg-second-400/10 flex items-center justify-center border border-second-400/10">
+          <div className="h-10 w-10 shrink-0 rounded-sm bg-second-400/10 flex items-center justify-center ">
             <Calendar className="text-zinc-400" size={18} />
           </div>
           <div>
-            <h3 className="text-2xl font-semibold text-white tracking-tight font-teko leading-none">
+            <h3 className="text-sm font-bold text-zinc-200 tracking-wider">
               Your Week
             </h3>
             <span className="text-[10px] font-bold text-zinc-500 tracking-[0.2em] uppercase">
@@ -176,22 +176,22 @@ export const WeeklyHorizontalTimeline = ({ userAuth }: WeeklyHorizontalTimelineP
               const allDone = items.length > 0 && items.every((i: any) => i.completed);
 
               return (
-                <div key={dayKey} className={`flex flex-col items-center relative group/day rounded-2xl transition-all duration-300 border ${
+                <div key={dayKey} className={`flex flex-col items-center relative group/day rounded-2xl transition-all duration-300  ${
                   allDone
-                    ? 'bg-emerald-500/[0.04] border-emerald-500/20'
+                    ? 'bg-emerald-500/[0.04]'
                     : active
-                      ? 'bg-main/[0.05] border-main/20'
+                      ? 'bg-main/[0.05] '
                       : 'border-transparent hover:bg-white/[0.02]'
                 }`}>
 
                   {/* Top Label (Day & Date) */}
                   <div className="flex flex-col items-center justify-end pb-4 pt-4 w-full">
-                    <span className={`text-[10px] font-black uppercase tracking-[0.2em] mb-1 ${
+                    <span className={`text-[10px] font-black tracking-[0.2em] mb-1 ${
                       active ? 'text-main' : 'text-zinc-400'
                     }`}>
                       {format(date, 'EEE')}
                     </span>
-                    <span className={`font-teko font-black leading-none transition-all ${
+                    <span className={` leading-none transition-all ${
                        active ? 'text-4xl text-white' : 'text-3xl text-zinc-400 group-hover/day:text-zinc-200'
                     }`}>
                       {format(date, 'dd')}
@@ -220,9 +220,9 @@ export const WeeklyHorizontalTimeline = ({ userAuth }: WeeklyHorizontalTimelineP
                         className="w-full"
                       >
                         <div className={`
-                          group/card relative flex flex-col p-3 rounded-xl transition-all duration-200 cursor-default
+                          group/card relative flex flex-col p-2 rounded-sm transition-all duration-100 cursor-default
                           ${item.completed
-                            ? 'bg-emerald-500/10 border border-emerald-500/20 opacity-70'
+                            ? 'bg-emerald-500/10 opacity-70'
                             : active
                               ? 'bg-zinc-800/60 ring-1 ring-white/10 hover:bg-zinc-800/80'
                               : 'bg-zinc-900/60 ring-1 ring-white/[0.06] hover:bg-zinc-800/50 hover:ring-white/10'
@@ -248,7 +248,7 @@ export const WeeklyHorizontalTimeline = ({ userAuth }: WeeklyHorizontalTimelineP
                              </p>
                            </div>
 
-                           <div className="absolute top-1/2 -translate-y-1/2 right-1.5 flex flex-row items-center gap-0.5 opacity-0 group-hover/card:opacity-100 transition-all z-20 bg-zinc-900 p-0.5 rounded-lg border border-white/5 shadow-lg">
+                           <div className="absolute top-1/2 -translate-y-1/2 right-1.5 flex flex-row items-center gap-0.5 opacity-0 group-hover/card:opacity-100 transition-all z-20 bg-zinc-900 p-0.5 rounded-lg  shadow-lg">
                              {!item.completed && (
                                <button
                                  onClick={(e) => { e.stopPropagation(); handlePlayTask(item); }}
@@ -279,15 +279,15 @@ export const WeeklyHorizontalTimeline = ({ userAuth }: WeeklyHorizontalTimelineP
                     <button
                       onClick={() => { setSelectedDayToAdd(dayKey); setIsSelectorOpen(true); }}
                       className={`
-                        w-full h-9 mt-1 rounded-xl border border-dashed flex items-center justify-center gap-1.5 transition-all group/add
+                        w-full h-9 mt-1 rounded-sm  flex items-center justify-center gap-1.5 transition-all group/add border
                         ${active
-                          ? 'border-main/25 text-zinc-400 hover:border-main/40 hover:text-white hover:bg-main/5'
+                          ? ' text-zinc-400 hover:border-main/40 hover:text-white hover:bg-main/5'
                           : 'border-white/[0.06] text-zinc-600 hover:border-white/15 hover:text-zinc-400 hover:bg-white/[0.02]'
                         }
                       `}
                     >
                       <Plus size={12} className="transition-transform group-hover/add:scale-110" />
-                      <span className="text-[9px] font-black uppercase tracking-[0.18em]">Add</span>
+                      <span className="text-[12px] tracking-[0.18em]">Add</span>
                     </button>
                   </div>
 

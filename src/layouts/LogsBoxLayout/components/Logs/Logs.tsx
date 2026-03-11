@@ -606,7 +606,7 @@ const FirebaseLogsDailyQuestItem = ({
             <p className='text-secondText'>
                 completed all <span className="text-yellow-400 font-bold italic tracking-tighter">Daily Quests!</span>
             </p>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-black uppercase">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-black ">
                <FaTrophy className="h-2.5 w-2.5" />
                Claimed +{points} PKT
             </span>
