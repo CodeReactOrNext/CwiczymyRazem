@@ -323,7 +323,7 @@ function render() {
   ctx.stroke();
 
   // Track last rendered note pos per string for slide lines: string# → { x, y, slideOut }
-  const stringLastPos = new Map<number, { x: number; y: number; slideOut: number }>();
+  const stringLastPos = new Map<number, { x: number; cx: number; y: number; slideOut: number }>();
 
   // ── Beat loop ────────────────────────────────────────────────────────────
   for (const beat of renderBeats) {
@@ -533,13 +533,48 @@ function render() {
           ctx.fillStyle = "rgba(255,255,255,0.75)";
           ctx.fillText(">", labelX, blockY - 6);
         }
-        if (note.isHammerOn) {
-          ctx.fillStyle = isHit ? "#064e3b" : "#fbbf24";
-          ctx.fillText("H", blockRX - 7, blockY - 6);
-        }
-        if (note.isPullOff) {
-          ctx.fillStyle = isHit ? "#7f1d1d" : "#f87171";
-          ctx.fillText("P", blockRX - 7, blockY - 6);
+        if (note.isHammerOn || note.isPullOff) {
+          const isHP = note.isHammerOn;
+          const hpColor = isHit ? "#34d399" : note.color;
+          const label = isHP ? "H" : "P";
+
+          if (prev && blockX - prev.x > 4) {
+            // Draw slur arc from centre of previous block to centre of this block
+            const x0 = prev.cx;
+            const x1 = blockX + blockW / 2;
+            const midX = (x0 + x1) / 2;
+            const slurY = note.noteY - BLOCK_H / 2 + 1;
+            const arcH = Math.min(28, Math.max(16, (x1 - x0) * 0.4));
+
+            // Shadow for visibility
+            ctx.shadowColor = "rgba(0,0,0,0.7)";
+            ctx.shadowBlur = 5;
+
+            ctx.strokeStyle = hpColor;
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(x0, slurY);
+            ctx.quadraticCurveTo(midX, slurY - arcH, x1, slurY);
+            ctx.stroke();
+
+            ctx.shadowColor = "transparent";
+            ctx.shadowBlur = 0;
+
+            // Label at apex of arc
+            ctx.fillStyle = hpColor;
+            ctx.font = "bold 12px Inter";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(label, midX, slurY - arcH - 3);
+          } else {
+            // No previous note visible – fallback to label above block
+            ctx.fillStyle = hpColor;
+            ctx.font = "bold 12px Inter";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(label, blockX + blockW / 2, blockY - 3);
+          }
         }
         if (note.isTap) {
           ctx.fillStyle = isHit ? "#064e3b" : "#34d399";
@@ -603,25 +638,47 @@ function render() {
           drawBendBadge(bLabel, bIcon, bgCol, txCol, labelX, bendBadgeY, blockY);
         }
 
-        // Vibrato wave inside block body (to the right of the head)
-        if (note.isVibrato && blockW > BLOCK_H * 1.8) {
-          ctx.strokeStyle = isHit ? "rgba(6,78,59,0.7)" : "rgba(167,139,250,0.8)";
-          ctx.lineWidth = 1.5;
+        // Vibrato – wavy coloured outline over the block
+        if (note.isVibrato) {
+          const vibratoColor = isHit ? "#34d399" : note.color;
+          const cr = Math.min(BLOCK_CORNER, BLOCK_H / 2, blockW / 2);
+          const innerW = blockW - 2 * cr;
+          const cycles = Math.max(2, Math.round(innerW / 7));
+          const amp = 2.5;
+
+          ctx.strokeStyle = vibratoColor;
+          ctx.lineWidth = 2.5;
+          ctx.lineJoin = "round";
+          ctx.lineCap = "round";
           ctx.beginPath();
-          const waveX0 = blockX + BLOCK_H * 1.1;
-          const waveX1 = blockRX - 5;
-          const waveLen = waveX1 - waveX0;
-          if (waveLen > 8) {
-            for (let wx = 0; wx <= waveLen; wx += 2) {
-              const wy = note.noteY + Math.sin((wx / waveLen) * Math.PI * 5) * 3;
-              if (wx === 0) ctx.moveTo(waveX0 + wx, wy); else ctx.lineTo(waveX0 + wx, wy);
-            }
-            ctx.stroke();
+
+          // Top-left arc → top edge
+          ctx.moveTo(blockX + cr, blockY);
+          for (let i = 1; i <= innerW; i++) {
+            ctx.lineTo(blockX + cr + i, blockY + Math.sin((i / innerW) * Math.PI * cycles) * amp);
           }
+          // Top-right corner
+          ctx.arcTo(blockX + blockW, blockY, blockX + blockW, blockY + cr, cr);
+          // Right edge
+          ctx.lineTo(blockX + blockW, blockY + BLOCK_H - cr);
+          // Bottom-right corner
+          ctx.arcTo(blockX + blockW, blockY + BLOCK_H, blockX + blockW - cr, blockY + BLOCK_H, cr);
+          // Bottom edge (wavy, right → left, phase-inverted for ripple effect)
+          for (let i = innerW - 1; i >= 0; i--) {
+            ctx.lineTo(blockX + cr + i, blockY + BLOCK_H - Math.sin((i / innerW) * Math.PI * cycles) * amp);
+          }
+          // Bottom-left corner
+          ctx.arcTo(blockX, blockY + BLOCK_H, blockX, blockY + BLOCK_H - cr, cr);
+          // Left edge
+          ctx.lineTo(blockX, blockY + cr);
+          // Back to start
+          ctx.arcTo(blockX, blockY, blockX + cr, blockY, cr);
+          ctx.closePath();
+          ctx.stroke();
         }
 
         // ── Update slide tracking (right edge of block) ───────────────────
-        stringLastPos.set(note.noteY, { x: blockRX, y: note.noteY, slideOut: note.slideOut ?? 0 });
+        stringLastPos.set(note.noteY, { x: blockRX, cx: blockX + blockW / 2, y: note.noteY, slideOut: note.slideOut ?? 0 });
       }
     }
 

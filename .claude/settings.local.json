@@ -25,7 +25,8 @@
       "Bash(sed 's/[,\\)\"\"].*//')",
       "Bash(sed 's/doc\\(db, //')",
       "Bash(sed 's/\"\"$//')",
-      "Bash(sed 's/collection\\(db, //')"
+      "Bash(sed 's/collection\\(db, //')",
+      "Bash(tr ';' '\\\\n')"
     ]
   }
 }
