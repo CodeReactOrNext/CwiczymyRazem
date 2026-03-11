@@ -976,8 +976,12 @@ export const useTablatureAudio = ({
       if (node) {
         activeNodesRef.current.set(noteKey, node);
 
+        // soundfont-player returns a wrapper; the real AudioBufferSourceNode is at node.source
+        const sourceNode = (node as any).source as AudioBufferSourceNode | undefined;
+        const detuneParam: AudioParam | undefined = sourceNode?.detune;
+
         // ── Vibrato: LFO on detune, swells in after attack ─────────────────
-        if (note.isVibrato && node.detune) {
+        if (note.isVibrato && detuneParam) {
           const lfo  = ctx.createOscillator();
           lfo.type   = 'sine';
           lfo.frequency.value = 5.5;
@@ -985,22 +989,29 @@ export const useTablatureAudio = ({
           lfoG.gain.setValueAtTime(0, t + 0.08);
           lfoG.gain.linearRampToValueAtTime(28, t + 0.26); // ±28 cents depth
           lfo.connect(lfoG);
-          lfoG.connect(node.detune);
+          lfoG.connect(detuneParam);
           lfo.start(t + 0.08);
           lfo.stop(t + sfDuration);
           lfo.onended = () => { lfoG.disconnect(); };
         }
 
         // ── Bend: follow full bend curve point-by-point ────────────────────
-        if (note.isBend && note.bendCurve && node.detune) {
-          const curve = note.bendCurve;
-          // Small offset so the note attack plays before pitch starts moving
+        if (note.isBend && detuneParam) {
           const bendOffset = 0.02;
-          // First point — set immediately (handles pre-bends starting at full pitch)
-          node.detune.setValueAtTime(curve[0].cents, t + bendOffset);
-          for (let i = 1; i < curve.length; i++) {
-            const ptTime = t + bendOffset + curve[i].position * sfDuration;
-            node.detune.linearRampToValueAtTime(curve[i].cents, ptTime);
+          if (note.bendCurve && note.bendCurve.length > 0) {
+            const curve = note.bendCurve;
+            // Small offset so the note attack plays before pitch starts moving
+            // First point — set immediately (handles pre-bends starting at full pitch)
+            detuneParam.setValueAtTime(curve[0].cents, t + bendOffset);
+            for (let i = 1; i < curve.length; i++) {
+              const ptTime = t + bendOffset + curve[i].position * sfDuration;
+              detuneParam.linearRampToValueAtTime(curve[i].cents, ptTime);
+            }
+          } else if (note.bendSemitones) {
+            // Fallback: simple linear glide to target pitch
+            const targetCents = note.bendSemitones * 100;
+            detuneParam.setValueAtTime(0, t + bendOffset);
+            detuneParam.linearRampToValueAtTime(targetCents, t + bendOffset + 0.20);
           }
         }
       }

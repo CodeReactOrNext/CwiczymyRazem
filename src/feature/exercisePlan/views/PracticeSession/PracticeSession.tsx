@@ -429,7 +429,7 @@ export const PracticeSession = ({
       if (e.key === "ArrowRight" && !isLastExercise) handleNextExerciseClick();
       if (e.key === "ArrowLeft" && currentExerciseIndex > 0) {
         stopTimer();
-        metronome.stopMetronome();
+        metronome.restartMetronome();
         jumpToExercise(currentExerciseIndex - 1);
       }
     };
@@ -506,7 +506,7 @@ export const PracticeSession = ({
   const handleNextExerciseClick = async () => {
     await saveCurrentScores();
     stopTimer();
-    metronome.stopMetronome();
+    metronome.restartMetronome();
     handleNextExercise(resetTimer);
   };
 
@@ -683,7 +683,11 @@ export const PracticeSession = ({
             formattedTimeLeft={formattedTimeLeft}
             toggleTimer={handleToggleTimer}
             handleNextExercise={handleNextExerciseClick}
-            handleBackExercise={() => jumpToExercise(currentExerciseIndex - 1)}
+            handleBackExercise={() => {
+              stopTimer();
+              metronome.restartMetronome();
+              jumpToExercise(currentExerciseIndex - 1);
+            }}
             sessionTimerData={sessionTimerData}
             exerciseTimeSpent={exerciseTimeSpent}
             setVideoDuration={setVideoDuration}
@@ -793,7 +797,7 @@ export const PracticeSession = ({
                       completedExercises={completedExercises}
                       onExerciseSelect={(idx) => {
                         stopTimer();
-                        metronome.stopMetronome();
+                        metronome.restartMetronome();
                         jumpToExercise(idx);
                       }}
                     />
@@ -1063,7 +1067,7 @@ export const PracticeSession = ({
                       currentExerciseIndex={currentExerciseIndex}
                       onGoToPreviousExercise={() => {
                         stopTimer();
-                        metronome.stopMetronome();
+                        metronome.restartMetronome();
                         jumpToExercise(currentExerciseIndex - 1);
                       }}
                       isFinishing={isFinishing}
