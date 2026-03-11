@@ -142,6 +142,8 @@ export const PracticeSession = ({
     activityDataToUse,
     jumpToExercise,
     canSkipExercise,
+    canFinishSession,
+    isSkillExercise,
     completedExercises,
     restartFullSession,
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, skillRewardSkillId, skillRewardAmount });
@@ -675,6 +677,8 @@ export const PracticeSession = ({
             isFinishing={isFinishing}
             isSubmittingReport={isSubmittingReport}
             canSkipExercise={canSkipExercise}
+            canFinishSession={canFinishSession}
+            isSkillExercise={isSkillExercise}
             metronome={metronome}
             effectiveBpm={effectiveBpm}
             isMicEnabled={isMicEnabled}
@@ -1038,6 +1042,8 @@ export const PracticeSession = ({
                       sessionTimerData={sessionTimerData}
                       exerciseTimeSpent={exerciseTimeSpent}
                       canSkipExercise={canSkipExercise}
+                      canFinishSession={canFinishSession}
+                      isSkillExercise={isSkillExercise}
                       timeLeft={timeLeft}
                       currentExerciseIndex={currentExerciseIndex}
                       onGoToPreviousExercise={() => {

@@ -90,7 +90,9 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
   const formattedTimeLeft = `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`;
   const timerProgressValue = Math.min(100, (timer.time / (effectiveTotalSeconds * 1000)) * 100);
 
-  const canSkipExercise = !isLastExercise || (timeLeft <= 0) || (exerciseTimeSpent >= 20000 && !forceFullDuration);
+  const isSkillExercise = !!skillRewardSkillId || !!forceFullDuration;
+  const canSkipExercise = true;
+  const canFinishSession = isSkillExercise ? timeLeft <= 0 : completedExercises.length > 0;
 
   const checkForSuccess = useCallback(() => {
     if (isLastExercise && timeLeft <= 0) {
@@ -334,6 +336,8 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
     setVideoDuration,
     autoSubmitReport,
     canSkipExercise,
+    canFinishSession,
+    isSkillExercise,
     isSubmittingReport,
     completedExercises,
     reportResult,
