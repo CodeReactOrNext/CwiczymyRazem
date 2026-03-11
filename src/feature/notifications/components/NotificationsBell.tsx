@@ -1,4 +1,4 @@
-import { Bell, MessageSquare, Heart, CheckCircle2, Clock, Zap } from "lucide-react";
+import { Bell, MessageSquare, Heart, Clock, Zap } from "lucide-react";
 import { useState } from "react";
 import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
 import { selectUserAuth } from "feature/user/store/userSlice";
@@ -9,106 +9,173 @@ import { formatDistanceToNow } from "date-fns";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
 
+const typeConfig = {
+  like: {
+    icon: <Heart className="h-3 w-3 text-white fill-current" />,
+    bg: "bg-red-500",
+    label: "liked your recording",
+  },
+  comment: {
+    icon: <MessageSquare className="h-3 w-3 text-white fill-current" />,
+    bg: "bg-cyan-500",
+    label: "commented on your recording",
+  },
+  reaction: {
+    icon: <Zap className="h-3 w-3 text-white fill-current" />,
+    bg: "bg-yellow-500",
+    label: "reacted to your post",
+  },
+} as const;
+
 export const NotificationsBell = () => {
-    const userId = useAppSelector(selectUserAuth);
-    const { notifications, unreadCount, markAsRead, markAllAsRead, isLoading } = useAppNotifications(userId);
-    const [isOpen, setIsOpen] = useState(false);
+  const userId = useAppSelector(selectUserAuth);
+  const { notifications, unreadCount, markAsRead, markAllAsRead, isLoading } =
+    useAppNotifications(userId);
+  const [isOpen, setIsOpen] = useState(false);
 
-    const handleNotificationClick = (id: string) => {
-        markAsRead(id);
-    };
+  return (
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger asChild>
+        <button className="relative p-2 rounded-full hover:bg-white/10 transition-colors group">
+          <Bell
+            className={cn(
+              "h-5 w-5 text-zinc-400 group-hover:text-white transition-colors",
+              unreadCount > 0 && "text-cyan-400"
+            )}
+          />
+          {unreadCount > 0 && (
+            <span className="absolute top-0.5 right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-cyan-500 px-1 text-[10px] font-bold text-white ring-2 ring-zinc-900">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-96 bg-zinc-900/95 backdrop-blur-xl border-white/10 text-white p-0 overflow-hidden shadow-2xl shadow-black/50"
+        align="end"
+        sideOffset={8}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+          <div>
+            <h3 className="text-sm font-bold text-white">Notifications</h3>
+            {unreadCount > 0 && (
+              <p className="text-xs text-zinc-500 mt-0.5">
+                {unreadCount} unread
+              </p>
+            )}
+          </div>
+          {unreadCount > 0 && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                markAllAsRead();
+              }}
+              className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-cyan-500/10">
+              Mark all as read
+            </button>
+          )}
+        </div>
 
-    return (
-        <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-            <DropdownMenuTrigger asChild>
-                <button className="relative p-2 rounded-full hover:bg-white/10 transition-colors group">
-                    <Bell className={cn("h-5 w-5 text-zinc-400 group-hover:text-white transition-colors", unreadCount > 0 && "text-cyan-400")} />
-                    {unreadCount > 0 && (
-                        <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-zinc-900 group-hover:ring-zinc-800">
-                            {unreadCount}
+        {/* List */}
+        <div className="max-h-[420px] overflow-y-auto">
+          {isLoading ? (
+            <div className="flex flex-col gap-3 p-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex gap-3 items-start animate-pulse">
+                  <div className="h-10 w-10 rounded-full bg-zinc-800 shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-zinc-800 rounded w-3/4" />
+                    <div className="h-3 bg-zinc-800 rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="py-16 text-center flex flex-col items-center gap-4">
+              <div className="p-4 rounded-full bg-zinc-800/60 text-zinc-600">
+                <Bell className="h-7 w-7" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-zinc-400">
+                  No notifications yet
+                </p>
+                <p className="text-xs text-zinc-600 mt-1">
+                  Activity from friends will appear here
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div>
+              {notifications.map((n) => {
+                const config = typeConfig[n.type as keyof typeof typeConfig] ?? typeConfig.reaction;
+                return (
+                  <button
+                    key={n.id}
+                    className={cn(
+                      "w-full flex gap-4 items-start px-5 py-4 text-left transition-colors border-b border-white/5 last:border-0",
+                      n.isRead
+                        ? "hover:bg-white/5"
+                        : "bg-cyan-500/5 hover:bg-cyan-500/8"
+                    )}
+                    onClick={() => markAsRead(n.id)}>
+                    {/* Avatar + type badge */}
+                    <div className="relative w-10 h-10 shrink-0 mt-0.5">
+                      <div className="absolute inset-0">
+                        <Avatar
+                          name={n.senderName}
+                          avatarURL={n.senderAvatarUrl || undefined}
+                          lvl={n.senderFrame}
+                          size="sm"
+                        />
+                      </div>
+                      <div
+                        className={cn(
+                          "absolute -bottom-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center ring-2 ring-zinc-900/95 z-10",
+                          config.bg
+                        )}>
+                        {config.icon}
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-zinc-300 leading-snug">
+                        <span className="font-semibold text-white">
+                          {n.senderName}
+                        </span>{" "}
+                        {config.label}
+                      </p>
+                      {n.recordingTitle && n.type !== "reaction" && (
+                        <p className="text-xs text-zinc-500 truncate mt-1 italic">
+                          &ldquo;{n.recordingTitle}&rdquo;
+                        </p>
+                      )}
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <Clock className="h-3 w-3 text-zinc-600" />
+                        <span className="text-xs text-zinc-600">
+                          {n.timestamp?.toDate
+                            ? formatDistanceToNow(n.timestamp.toDate(), {
+                                addSuffix: true,
+                              })
+                            : "just now"}
                         </span>
+                      </div>
+                    </div>
+
+                    {/* Unread indicator */}
+                    {!n.isRead && (
+                      <div className="h-2 w-2 rounded-full bg-cyan-400 shrink-0 mt-2" />
                     )}
-                </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-80 bg-zinc-950 border-white/10 text-white p-0 overflow-hidden shadow-2xl" align="end" sideOffset={8}>
-                <div className="flex items-center justify-between p-4 bg-zinc-900/50">
-                    <DropdownMenuLabel className="p-0 font-bold">Notifications</DropdownMenuLabel>
-                    {unreadCount > 0 && (
-                        <button 
-                            onClick={(e) => { e.preventDefault(); markAllAsRead(); }}
-                            className="text-[10px] font-black uppercase tracking-widest text-cyan-400 hover:text-cyan-300 transition-colors"
-                        >
-                            Mark all as read
-                        </button>
-                    )}
-                </div>
-                <DropdownMenuSeparator className="bg-white/5 m-0" />
-                <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-                    {isLoading ? (
-                        <div className="p-8 text-center text-zinc-500 text-sm">Loading...</div>
-                    ) : notifications.length === 0 ? (
-                        <div className="p-12 text-center flex flex-col items-center gap-3">
-                            <div className="p-3 rounded-full bg-zinc-900 text-zinc-700">
-                                <Bell className="h-6 w-6" />
-                            </div>
-                            <p className="text-sm text-zinc-500 italic">No notifications yet</p>
-                        </div>
-                    ) : (
-                        notifications.map((n) => (
-                            <DropdownMenuItem 
-                                key={n.id} 
-                                className={cn(
-                                    "p-4 flex gap-3 cursor-pointer outline-none focus:bg-white/5 transition-colors border-b border-white/5 last:border-0",
-                                    !n.isRead && "bg-cyan-500/5 hover:bg-cyan-500/10"
-                                )}
-                                onClick={() => handleNotificationClick(n.id)}
-                            >
-                                <div className="relative shrink-0">
-                                    <div className="transform scale-[0.85] origin-top-left">
-                                        <Avatar 
-                                            name={n.senderName} 
-                                            avatarURL={n.senderAvatarUrl || undefined} 
-                                            lvl={n.senderFrame}
-                                            size="sm"
-                                        />
-                                    </div>
-                                    <div className={cn(
-                                        "absolute -bottom-1 -right-1 h-4 w-4 rounded-full flex items-center justify-center",
-                                        n.type === "like" ? "bg-red-500" : n.type === "comment" ? "bg-cyan-500" : "bg-yellow-500"
-                                    )}>
-                                        {n.type === "like" ? <Heart className="h-2 w-2 text-white fill-current" /> : n.type === "comment" ? <MessageSquare className="h-2 w-2 text-white fill-current" /> : <Zap className="h-2 w-2 text-white fill-current" />}
-                                    </div>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-xs text-zinc-300 leading-normal">
-                                        <span className="font-bold text-white">{n.senderName}</span>
-                                        {" "}
-                                        {n.type === "like" ? "liked your recording" : n.type === "comment" ? "commented on your recording" : "reacted to your activity on logs"}
-                                    </p>
-                                    {n.recordingTitle && n.type !== "reaction" && (
-                                        <p className="text-[10px] italic text-zinc-500 truncate mt-0.5">
-                                            "{n.recordingTitle}"
-                                        </p>
-                                    )}
-                                    <div className="flex items-center gap-1 mt-1">
-                                        <Clock className="h-2 w-2 text-zinc-600" />
-                                        <span className="text-[10px] text-zinc-600">
-                                            {n.timestamp?.toDate ? formatDistanceToNow(n.timestamp.toDate(), { addSuffix: true }) : "just now"}
-                                        </span>
-                                    </div>
-                                </div>
-                                {!n.isRead && <div className="h-2 w-2 rounded-full bg-cyan-500 shrink-0" />}
-                            </DropdownMenuItem>
-                        ))
-                    )}
-                </div>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    );
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };

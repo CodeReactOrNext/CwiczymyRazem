@@ -262,11 +262,11 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
     <div className="w-full mb-8">
       {/* Header aligned like reference image */}
       <div className="flex items-center gap-3 mb-8">
-        <div className="bg-white/5 rounded-lg p-1.5 ring-1 ring-white/5 shadow-2xl">
+        <div className="bg-white/5 rounded-lg p-1.5">
            <div className="bg-main h-4 w-4 rounded-sm shadow-[0_0_10px_hsl(var(--main))]" />
         </div>
-        <h3 className="text-3xl font-black text-white tracking-tight uppercase font-teko">
-          Your Week
+        <h3 className="text-2xl text-white">
+          Your Week 
         </h3>
         <div className="ml-2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-bold text-zinc-500">
           <Calendar size={12} />
