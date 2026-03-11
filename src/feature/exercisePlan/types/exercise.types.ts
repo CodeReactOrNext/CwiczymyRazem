@@ -114,6 +114,7 @@ export interface Exercise {
   }[];
   tablature?: TablatureMeasure[];
   backingTracks?: BackingTrack[];
+  gpFileUrl?: string;
   hideTablatureNotes?: boolean;
   customGoal?: string;
   customGoalDescription?: string;

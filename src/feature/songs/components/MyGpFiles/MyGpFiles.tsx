@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileMusic, Trash2, Play, Loader2, FolderOpen } from "lucide-react";
+import { FileMusic, Trash2, Play, Loader2, FolderOpen, ChevronLeft, Drum, Music as MusicIcon } from "lucide-react";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import {
@@ -8,19 +8,12 @@ import {
   fetchGpFileAsFile,
   UserGpFile,
 } from "../../services/userGpFiles.service";
-import { parseGpFile, GP_EXTENSIONS } from "../../services/gp5Parser.service";
-import { TablatureMeasure, BackingTrack } from "feature/exercisePlan/types/exercise.types";
+import { parseGpFile, ParsedGp, GP_EXTENSIONS } from "../../services/gp5Parser.service";
 import { toast } from "sonner";
 
 interface MyGpFilesProps {
   userId: string;
-  onLoad: (
-    measures: TablatureMeasure[],
-    fileName: string,
-    tempo: number,
-    trackName: string,
-    allTracks: BackingTrack[]
-  ) => void;
+  onLoad: (fileName: string, tempo: number, trackName: string, rawFile: File) => void;
 }
 
 function formatSize(bytes: number): string {
@@ -33,19 +26,17 @@ function formatDate(date: Date): string {
   return date.toLocaleDateString("pl-PL", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function buildBackingTracks(
-  tracks: Array<{ name: string; measures: TablatureMeasure[]; trackType: string; pan: number }>,
-  selectedIdx: number
-): BackingTrack[] {
-  return tracks
-    .map((t, idx) => ({
-      id: `track-${idx}`,
-      name: t.name,
-      measures: t.measures,
-      trackType: t.trackType as BackingTrack["trackType"],
-      pan: t.pan,
-    }))
-    .filter((_, idx) => idx !== selectedIdx);
+function TrackTypeIcon({ type }: { type: string }) {
+  if (type === "drums") return <Drum className="h-3 w-3" />;
+  if (type === "bass") return <span className="text-[10px] font-black">𝄢</span>;
+  return <MusicIcon className="h-3 w-3" />;
+}
+
+interface ParsedState {
+  gpFile: UserGpFile;
+  rawFile: File;
+  parsed: ParsedGp;
+  selectedTrackIndex: number;
 }
 
 export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
@@ -53,6 +44,7 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingFileId, setLoadingFileId] = useState<string | null>(null);
   const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
+  const [parsedState, setParsedState] = useState<ParsedState | null>(null);
 
   useEffect(() => {
     getUserGpFiles(userId)
@@ -64,16 +56,10 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
   const handleLoad = async (file: UserGpFile) => {
     setLoadingFileId(file.id);
     try {
-      const f = await fetchGpFileAsFile(file.downloadUrl, file.name);
-      const parsed = await parseGpFile(f);
-      const backingTracks = buildBackingTracks(parsed.tracks, 0);
-      onLoad(
-        parsed.tracks[0].measures,
-        file.name,
-        parsed.tempo,
-        parsed.tracks[0].name,
-        backingTracks
-      );
+      const rawFile = await fetchGpFileAsFile(file.downloadUrl, file.name);
+      const parsed = await parseGpFile(rawFile);
+      setParsedState({ gpFile: file, rawFile, parsed, selectedTrackIndex: 0 });
+      onLoad(file.name, parsed.tempo, parsed.tracks[0].name, rawFile);
       toast.success(`"${file.name}" loaded!`);
     } catch {
       toast.error("Failed to load file. It may be corrupted.");
@@ -82,11 +68,19 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
     }
   };
 
+  const handleTrackSelect = (index: number) => {
+    if (!parsedState) return;
+    const { parsed, gpFile, rawFile } = parsedState;
+    setParsedState({ ...parsedState, selectedTrackIndex: index });
+    onLoad(gpFile.name, parsed.tempo, parsed.tracks[index].name, rawFile);
+  };
+
   const handleDelete = async (file: UserGpFile) => {
     setDeletingFileId(file.id);
     try {
       await deleteUserGpFile(userId, file.id, file.storagePath);
       setFiles((prev) => prev.filter((f) => f.id !== file.id));
+      if (parsedState?.gpFile.id === file.id) setParsedState(null);
       toast.success(`"${file.name}" deleted`);
     } catch {
       toast.error("Failed to delete file");
@@ -111,6 +105,50 @@ export function MyGpFiles({ userId, onLoad }: MyGpFilesProps) {
         <div className="text-center space-y-1">
           <p className="text-sm font-bold uppercase tracking-widest">No saved files</p>
           <p className="text-xs text-zinc-700">Upload a GP file to save it to your library</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Track selector shown after a file is loaded
+  if (parsedState) {
+    const { parsed, gpFile, selectedTrackIndex } = parsedState;
+    return (
+      <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+        <button
+          onClick={() => setParsedState(null)}
+          className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors"
+        >
+          <ChevronLeft className="h-3 w-3" />
+          Back to library
+        </button>
+
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500 px-1">
+          <FileMusic className="h-3 w-3 text-cyan-400" />
+          {gpFile.name} · {parsed.tempo} BPM
+        </div>
+
+        <div className="space-y-2">
+          <div className="text-[10px] font-bold text-zinc-600 uppercase tracking-[0.2em] px-1">
+            Choose the track you'll practice:
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {parsed.tracks.map((track, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleTrackSelect(idx)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all",
+                  selectedTrackIndex === idx
+                    ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
+                    : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
+                )}
+              >
+                <TrackTypeIcon type={track.trackType} />
+                {track.name}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     );

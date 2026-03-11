@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import { MyGpFiles } from "feature/songs/components/MyGpFiles/MyGpFiles";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
-import { TablatureMeasure, Exercise, ExercisePlan, BackingTrack } from "feature/exercisePlan/types/exercise.types";
+import { Exercise, ExercisePlan, TablatureMeasure, BackingTrack } from "feature/exercisePlan/types/exercise.types";
 import { Button } from "assets/components/ui/button";
 import { ArrowLeft, Music, Zap, Upload, FolderOpen, Save, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -35,13 +35,7 @@ export default function CustomPracticePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
 
-  const buildExercise = (
-    measures: TablatureMeasure[],
-    fileName: string,
-    tempo: number,
-    trackName: string,
-    allTracks: BackingTrack[]
-  ): Exercise => ({
+  const buildExercise = (fileName: string, tempo: number, trackName: string): Exercise => ({
     id: `custom-${Date.now()}`,
     title: trackName ? `${fileName.replace(/\.gp\w*$/i, "")} - ${trackName}` : fileName.replace(/\.gp\w*$/i, ""),
     description: `Custom practice session imported at ${tempo} BPM`,
@@ -51,36 +45,21 @@ export default function CustomPracticePage() {
     instructions: ["Practice this imported tablature at your own pace."],
     tips: ["Slow down if you make mistakes.", "Focus on clean notes."],
     metronomeSpeed: { min: 40, max: 240, recommended: tempo },
-    tablature: measures,
-    backingTracks: allTracks,
     relatedSkills: [],
   });
 
-  const handleImported = (
-    measures: TablatureMeasure[],
-    fileName: string,
-    tempo: number,
-    trackName: string,
-    allTracks: BackingTrack[],
-    rawFile?: File
-  ) => {
+  const handleImported = (_measures: TablatureMeasure[], fileName: string, tempo: number, trackName: string, _backingTracks: BackingTrack[], rawFile: File) => {
     setStaged({
-      exercise: buildExercise(measures, fileName, tempo, trackName, allTracks),
-      rawFile: rawFile ?? null,
+      exercise: buildExercise(fileName, tempo, trackName),
+      rawFile,
       tempo,
     });
   };
 
-  const handleLibraryLoad = (
-    measures: TablatureMeasure[],
-    fileName: string,
-    tempo: number,
-    trackName: string,
-    allTracks: BackingTrack[]
-  ) => {
+  const handleLibraryLoad = (fileName: string, tempo: number, trackName: string, rawFile: File) => {
     setStaged({
-      exercise: buildExercise(measures, fileName, tempo, trackName, allTracks),
-      rawFile: null,
+      exercise: buildExercise(fileName, tempo, trackName),
+      rawFile,
       tempo,
     });
   };
@@ -192,11 +171,7 @@ export default function CustomPracticePage() {
           <div className="relative z-10 space-y-6">
             {activeTab === "import" && (
               <>
-                <ImportTablature
-                  onImported={(measures, fileName, tempo, trackName, allTracks, rawFile) =>
-                    handleImported(measures, fileName, tempo, trackName, allTracks, rawFile)
-                  }
-                />
+                <ImportTablature onImported={handleImported} />
 
                 {staged && (
                   <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -260,12 +235,7 @@ export default function CustomPracticePage() {
 
             {activeTab === "library" && userId && (
               <>
-                <MyGpFiles
-                  userId={userId}
-                  onLoad={(measures, fileName, tempo, trackName, allTracks) =>
-                    handleLibraryLoad(measures, fileName, tempo, trackName, allTracks)
-                  }
-                />
+                <MyGpFiles userId={userId} onLoad={handleLibraryLoad} />
 
                 {staged && (
                   <div className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-500">

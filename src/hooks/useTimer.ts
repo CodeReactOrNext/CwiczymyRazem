@@ -15,15 +15,18 @@ const useTimer = () => {
 
   const startTimeRef = useRef<number | null>(null);
   const initialTimeRef = useRef(0);
+  const timerEnabledRef = useRef(false);
 
   const startTimer = useCallback(() => {
-    if (timerEnabled) return;
+    if (timerEnabledRef.current) return;
+    timerEnabledRef.current = true;
     startTimeRef.current = Date.now();
     setTimerEnabled(true);
-  }, [timerEnabled]);
+  }, []);
 
   const stopTimer = useCallback(() => {
-    if (!timerEnabled) return;
+    if (!timerEnabledRef.current) return;
+    timerEnabledRef.current = false;
 
     if (startTimeRef.current !== null) {
       const sessionDuration = Date.now() - startTimeRef.current;
@@ -33,9 +36,10 @@ const useTimer = () => {
 
     setTimerEnabled(false);
     setTime(initialTimeRef.current);
-  }, [timerEnabled]);
+  }, []);
 
   const restartTime = useCallback(() => {
+    timerEnabledRef.current = false;
     initialTimeRef.current = 0;
     startTimeRef.current = null;
     setTime(0);
@@ -44,9 +48,9 @@ const useTimer = () => {
 
   const setInitialStartTime = useCallback((startTime: number) => {
     initialTimeRef.current = startTime;
-    startTimeRef.current = timerEnabled ? Date.now() : null;
+    startTimeRef.current = timerEnabledRef.current ? Date.now() : null;
     setTime(startTime);
-  }, [timerEnabled]);
+  }, []);
 
   useEffect(() => {
     if (!timerEnabled) return;

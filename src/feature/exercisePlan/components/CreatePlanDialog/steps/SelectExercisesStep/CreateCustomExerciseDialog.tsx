@@ -20,13 +20,19 @@ import {
 } from "assets/components/ui/sheet";
 import { Textarea } from "assets/components/ui/textarea";
 import type {
+    BackingTrack,
     DifficultyLevel,
     Exercise,
-    ExerciseCategory
+    ExerciseCategory,
+    TablatureMeasure,
 } from "feature/exercisePlan/types/exercise.types";
+import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
+import { uploadUserGpFile } from "feature/songs/services/userGpFiles.service";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { AlignLeft, Clock, Dumbbell, HelpCircle, Image as ImageIcon,List, Plus, Tag, Trash2, Youtube } from "lucide-react";
+import { AlignLeft, Clock, Dumbbell, FileMusic, HelpCircle, Image as ImageIcon, List, Loader2, Plus, Tag, Trash2, X, Youtube } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAppSelector } from "store/hooks";
 import { toast } from "sonner";
 
 interface CreateCustomExerciseDialogProps {
@@ -45,15 +51,16 @@ export const CreateCustomExerciseDialog = ({
   mode = "create",
 }: CreateCustomExerciseDialogProps) => {
   const { t } = useTranslation(["exercises", "common"]);
+  const userId = useAppSelector(selectUserAuth);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [duration, setDuration] = useState("5");
   const [category, setCategory] = useState<ExerciseCategory>("technique");
   const [difficulty, setDifficulty] = useState<DifficultyLevel>("medium");
-  
+
   const [instructions, setInstructions] = useState<string[]>([]);
   const [currentInstruction, setCurrentInstruction] = useState("");
-  
+
   const [tips, setTips] = useState<string[]>([]);
   const [currentTip, setCurrentTip] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
@@ -64,6 +71,13 @@ export const CreateCustomExerciseDialog = ({
   const [minBpm, setMinBpm] = useState("60");
   const [maxBpm, setMaxBpm] = useState("180");
   const [recommendedBpm, setRecommendedBpm] = useState("80");
+
+  // GP file state
+  const [gpTablature, setGpTablature] = useState<TablatureMeasure[] | null>(null);
+  const [gpBackingTracks, setGpBackingTracks] = useState<BackingTrack[] | null>(null);
+  const [gpFileName, setGpFileName] = useState<string | null>(null);
+  const [gpRawFile, setGpRawFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Effect to reset/initialize when open status changes
   useEffect(() => {
@@ -78,7 +92,7 @@ export const CreateCustomExerciseDialog = ({
         setTips(initialData.tips);
         setVideoUrl(initialData.videoUrl || "");
         setImageUrl(initialData.imageUrl || "");
-        
+
         if (initialData.metronomeSpeed) {
           setUseMetronome(true);
           setMinBpm(initialData.metronomeSpeed.min.toString());
@@ -87,11 +101,53 @@ export const CreateCustomExerciseDialog = ({
         } else {
           setUseMetronome(false);
         }
+
+        if (initialData.gpFileUrl) {
+          setGpFileName("(uploaded GP file)");
+        } else if (initialData.tablature && initialData.tablature.length > 0) {
+          setGpTablature(initialData.tablature);
+          setGpBackingTracks(initialData.backingTracks ?? null);
+          setGpFileName("(existing GP data)");
+        }
       } else if (mode === "create") {
           resetForm();
       }
     }
   }, [open, initialData, mode]);
+
+  const handleGpImported = (
+    measures: TablatureMeasure[],
+    fileName: string,
+    tempo: number,
+    trackName: string,
+    backingTracks: BackingTrack[],
+    rawFile: File
+  ) => {
+    setGpTablature(measures);
+    setGpBackingTracks(backingTracks);
+    setGpFileName(fileName);
+    setGpRawFile(rawFile);
+
+    // Auto-fill title if still empty
+    if (!title.trim()) {
+      const base = fileName.replace(/\.gp\w*$/i, "");
+      setTitle(trackName ? `${base} - ${trackName}` : base);
+    }
+
+    // Auto-set metronome from file tempo
+    setUseMetronome(true);
+    const bpm = tempo.toString();
+    setRecommendedBpm(bpm);
+    setMinBpm(Math.max(40, Math.round(tempo * 0.5)).toString());
+    setMaxBpm(Math.min(300, Math.round(tempo * 1.5)).toString());
+  };
+
+  const clearGpFile = () => {
+    setGpTablature(null);
+    setGpBackingTracks(null);
+    setGpFileName(null);
+    setGpRawFile(null);
+  };
 
   const handleAddInstruction = () => {
       if (currentInstruction.trim()) {
@@ -114,14 +170,32 @@ export const CreateCustomExerciseDialog = ({
   const handleRemoveTip = (index: number) => {
       setTips(tips.filter((_, i) => i !== index));
   };
-  
-  const handleSubmit = (e?: React.FormEvent) => {
+
+  const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
 
     if (!title.trim()) {
         toast.error(t("exercises:custom_exercise.title_required"));
         return;
     }
+
+    let gpFileUrl: string | undefined;
+    if (gpRawFile && userId) {
+      setIsUploading(true);
+      try {
+        const uploaded = await uploadUserGpFile(userId, gpRawFile);
+        gpFileUrl = uploaded.downloadUrl;
+      } catch {
+        toast.error("Failed to upload GP file");
+        setIsUploading(false);
+        return;
+      }
+      setIsUploading(false);
+    }
+
+    // Preserve existing gpFileUrl in edit mode when no new file was uploaded
+    const effectiveGpFileUrl = gpFileUrl ?? (mode === "edit" ? initialData?.gpFileUrl : undefined);
+    const hasGpFile = !!effectiveGpFileUrl;
 
     const newExercise: Exercise = {
       id: mode === "edit" ? (initialData?.id || `custom-${Date.now()}`) : `custom-${Date.now()}`,
@@ -138,13 +212,17 @@ export const CreateCustomExerciseDialog = ({
         recommended: parseInt(recommendedBpm) || 80,
       } : null,
       relatedSkills: [],
-      videoUrl: videoUrl.trim() || null,
-      imageUrl: imageUrl.trim() || null,
+      videoUrl: (gpTablature || hasGpFile) ? null : (videoUrl.trim() || null),
+      imageUrl: (gpTablature || hasGpFile) ? null : (imageUrl.trim() || null),
+      // Only store inline tablature when there is no GP file URL — avoids Firestore 1MB limit
+      ...(!hasGpFile && gpTablature && { tablature: gpTablature }),
+      ...(!hasGpFile && gpBackingTracks && gpBackingTracks.length > 0 && { backingTracks: gpBackingTracks }),
+      ...(effectiveGpFileUrl && { gpFileUrl: effectiveGpFileUrl }),
     };
 
     onExerciseCreate(newExercise);
     onOpenChange(false);
-    
+
     if (mode === "edit") {
         toast.success(t("exercises:custom_exercise.edit_success"));
     } else if (mode === "clone") {
@@ -152,7 +230,7 @@ export const CreateCustomExerciseDialog = ({
     } else {
         toast.success(t("exercises:custom_exercise.created_success"));
     }
-    
+
     resetForm();
   };
 
@@ -173,6 +251,10 @@ export const CreateCustomExerciseDialog = ({
       setMinBpm("60");
       setMaxBpm("180");
       setRecommendedBpm("80");
+      setGpTablature(null);
+      setGpBackingTracks(null);
+      setGpFileName(null);
+      setGpRawFile(null);
   };
 
   return (
@@ -188,10 +270,39 @@ export const CreateCustomExerciseDialog = ({
                 </SheetDescription>
             </SheetHeader>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto px-6 py-6 custom-scrollbar">
             <form id="create-exercise-form" onSubmit={handleSubmit} className="flex flex-col gap-8">
-            
+
+            {/* GP File Upload */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-zinc-300 font-medium">
+                <FileMusic className="h-4 w-4 text-cyan-500" />
+                <span>Guitar Pro File <span className="text-zinc-600 font-normal text-xs">(optional)</span></span>
+              </div>
+
+              {gpFileName ? (
+                <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-cyan-500/30 bg-cyan-500/5">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <FileMusic className="h-4 w-4 text-cyan-400 shrink-0" />
+                    <span className="text-sm text-cyan-300 font-medium truncate">{gpFileName}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={clearGpFile}
+                    className="text-zinc-500 hover:text-red-400 transition-colors shrink-0"
+                    title="Remove GP file"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <ImportTablature
+                  onImported={handleGpImported}
+                />
+              )}
+            </div>
+
             {/* Title and Description Group */}
             <div className="space-y-4">
                 <div className="space-y-2">
@@ -219,52 +330,58 @@ export const CreateCustomExerciseDialog = ({
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <Label htmlFor="videoUrl" className="flex items-center gap-2 text-zinc-300 font-medium">
-                        <Youtube className="h-4 w-4 text-red-500" />
-                        {t("exercises:custom_exercise.video_url", { defaultValue: "YouTube Link" })}
-                    </Label>
-                    <Input
-                        id="videoUrl"
-                        value={videoUrl}
-                        onChange={(e) => setVideoUrl(e.target.value)}
-                        placeholder="https://www.youtube.com/watch?v=..."
-                        className="bg-zinc-900 border-zinc-800 focus:ring-red-500/50 h-10"
-                    />
-                </div>
+                {/* Video URL — hidden when GP file loaded */}
+                {!gpTablature && (
+                  <div className="space-y-2">
+                      <Label htmlFor="videoUrl" className="flex items-center gap-2 text-zinc-300 font-medium">
+                          <Youtube className="h-4 w-4 text-red-500" />
+                          {t("exercises:custom_exercise.video_url", { defaultValue: "YouTube Link" })}
+                      </Label>
+                      <Input
+                          id="videoUrl"
+                          value={videoUrl}
+                          onChange={(e) => setVideoUrl(e.target.value)}
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          className="bg-zinc-900 border-zinc-800 focus:ring-red-500/50 h-10"
+                      />
+                  </div>
+                )}
 
-                <div className="space-y-2">
-                    <Label htmlFor="imageUrl" className="flex items-center gap-2 text-zinc-300 font-medium">
-                        <ImageIcon className="h-4 w-4 text-emerald-500" />
-                        {t("exercises:custom_exercise.image_url", { defaultValue: "Image URL (Tab/Score)" })}
-                    </Label>
-                    <Input
-                        id="imageUrl"
-                        value={imageUrl}
-                        onChange={(e) => {
-                            setImageUrl(e.target.value);
-                            setIsImageValid(true);
-                        }}
-                        placeholder="https://example.com/image.png"
-                        className="bg-zinc-900 border-zinc-800 focus:ring-emerald-500/50 h-10"
-                    />
-                    {imageUrl && (
-                        <div className="mt-2 relative aspect-[3.5/1] w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
-                            <img 
-                                src={imageUrl} 
-                                alt="Preview" 
-                                className="h-full w-full object-contain"
-                                onError={() => setIsImageValid(false)}
-                                onLoad={() => setIsImageValid(true)}
-                            />
-                            {!isImageValid && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/80 text-rose-500 text-xs font-medium">
-                                    {t("exercises:custom_exercise.invalid_image", { defaultValue: "Invalid image URL" })}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
+                {/* Image URL — hidden when GP file loaded */}
+                {!gpTablature && (
+                  <div className="space-y-2">
+                      <Label htmlFor="imageUrl" className="flex items-center gap-2 text-zinc-300 font-medium">
+                          <ImageIcon className="h-4 w-4 text-emerald-500" />
+                          {t("exercises:custom_exercise.image_url", { defaultValue: "Image URL (Tab/Score)" })}
+                      </Label>
+                      <Input
+                          id="imageUrl"
+                          value={imageUrl}
+                          onChange={(e) => {
+                              setImageUrl(e.target.value);
+                              setIsImageValid(true);
+                          }}
+                          placeholder="https://example.com/image.png"
+                          className="bg-zinc-900 border-zinc-800 focus:ring-emerald-500/50 h-10"
+                      />
+                      {imageUrl && (
+                          <div className="mt-2 relative aspect-[3.5/1] w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50">
+                              <img
+                                  src={imageUrl}
+                                  alt="Preview"
+                                  className="h-full w-full object-contain"
+                                  onError={() => setIsImageValid(false)}
+                                  onLoad={() => setIsImageValid(true)}
+                              />
+                              {!isImageValid && (
+                                  <div className="absolute inset-0 flex items-center justify-center bg-zinc-950/80 text-rose-500 text-xs font-medium">
+                                      {t("exercises:custom_exercise.invalid_image", { defaultValue: "Invalid image URL" })}
+                                  </div>
+                              )}
+                          </div>
+                      )}
+                  </div>
+                )}
             </div>
 
             {/* Properties Grid */}
@@ -329,9 +446,9 @@ export const CreateCustomExerciseDialog = ({
                         <Clock className="h-4 w-4 text-cyan-500" />
                         {t("exercises:custom_exercise.use_metronome", { defaultValue: "Use Metronome" })}
                     </Label>
-                    <Checkbox 
-                        id="metronome" 
-                        checked={useMetronome} 
+                    <Checkbox
+                        id="metronome"
+                        checked={useMetronome}
                         onCheckedChange={(checked) => setUseMetronome(!!checked)}
                         className="border-zinc-700 data-[state=checked]:bg-cyan-500 data-[state=checked]:border-cyan-500"
                     />
@@ -380,7 +497,7 @@ export const CreateCustomExerciseDialog = ({
                     {t("exercises:custom_exercise.instructions")}
                 </Label>
                 <div className="flex gap-2">
-                    <Input 
+                    <Input
                         value={currentInstruction}
                         onChange={(e) => setCurrentInstruction(e.target.value)}
                         placeholder={t("exercises:custom_exercise.add_instruction_placeholder")}
@@ -399,8 +516,8 @@ export const CreateCustomExerciseDialog = ({
                                     {index + 1}
                                 </span>
                                 <span className="text-zinc-300 break-words flex-1 leading-relaxed">{inst}</span>
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     onClick={() => handleRemoveInstruction(index)}
                                     className="text-zinc-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                                 >
@@ -423,7 +540,7 @@ export const CreateCustomExerciseDialog = ({
                     {t("exercises:custom_exercise.tips")}
                 </Label>
                 <div className="flex gap-2">
-                    <Input 
+                    <Input
                         value={currentTip}
                         onChange={(e) => setCurrentTip(e.target.value)}
                         placeholder={t("exercises:custom_exercise.add_tip_placeholder")}
@@ -442,8 +559,8 @@ export const CreateCustomExerciseDialog = ({
                                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                                 </div>
                                 <span className="text-zinc-300 break-words flex-1 leading-relaxed">{tip}</span>
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     onClick={() => handleRemoveTip(index)}
                                     className="text-zinc-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                                 >
@@ -466,8 +583,10 @@ export const CreateCustomExerciseDialog = ({
                 <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto mt-2 sm:mt-0 border-zinc-700 hover:bg-zinc-800">
                     {t("common:cancel" as any)}
                 </Button>
-                <Button type="submit" form="create-exercise-form" className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200">
-                    {mode === "edit" ? t("exercises:custom_exercise.save_button") : t("common:create" as any)}
+                <Button type="submit" form="create-exercise-form" disabled={isUploading} className="w-full sm:w-auto bg-white text-black hover:bg-zinc-200">
+                    {isUploading ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Uploading GP file...</>
+                    ) : mode === "edit" ? t("exercises:custom_exercise.save_button") : t("common:create" as any)}
                 </Button>
             </SheetFooter>
         </div>
