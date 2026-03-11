@@ -124,13 +124,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-5-mini",
         messages: [
           { role: "system", content: GUITAR_SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.2,
-        max_tokens: 2000,
+        max_completion_tokens: 2000,
         response_format: { type: "json_object" },
       }),
     });

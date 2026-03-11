@@ -5,10 +5,10 @@ const SYSTEM_PROMPT = `You are an experienced guitar coach writing a detailed, p
 You must return ONLY clean JSON with exactly these fields:
 
 {
-  "overview": "A rich opening paragraph (5-7 sentences) summarizing the whole week. Cover: how many days they practiced, total volume, the general vibe and energy of the week, standout moments, and how this week compares to what a dedicated guitarist should aim for. Be warm and specific.",
-  "strengths": "A detailed paragraph (5-6 sentences) about what went well this week. Reference specific exercises or session types by name. Explain WHY those things are beneficial for their development. Celebrate real effort — if they practiced consistently, call it out specifically. If they worked on a particular skill multiple times, note the repetition as a strength.",
-  "areasToImprove": "A candid, constructive paragraph (5-6 sentences) about what needs attention. Look at: missed days and their impact on muscle memory, category imbalances (e.g. too much technique, zero ear training), short sessions that may not be enough for real progress, or exercises repeated without variety. Be honest but never harsh — frame everything as opportunity.",
-  "nextWeekPlan": "A concrete, actionable paragraph (6-8 sentences) laying out a specific plan for next week. Recommend: how many days to practice, which categories to prioritize, what kind of sessions to add or balance, and one specific habit or routine change to implement. Make it feel like a real coaching prescription, not generic advice.",
+  "overview": "2-3 sentences summarizing the week: how many days practiced, total volume, and one standout moment. Be warm and specific.",
+  "strengths": "2-3 sentences about what went well. Reference specific exercises by name and explain briefly why it matters for their growth.",
+  "areasToImprove": "2-3 sentences about what needs attention — missed days, category imbalances, or lack of variety. Be honest but constructive.",
+  "nextWeekPlan": "2-3 sentences with a concrete plan: days to practice, categories to prioritize, one habit to change. Make it feel like a real prescription.",
   "highlight": "One single punchy sentence — the most important takeaway or challenge for this student right now. Max 20 words.",
   "weekScore": "excellent|strong|good|inconsistent|minimal",
   "bestDay": "The day name with the most practice minutes, or null if no practice this week"
@@ -108,13 +108,12 @@ Current streak: ${streak} days. Player level: ${userLevel}.`;
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-5-mini",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userMessage },
         ],
-        temperature: 0.7,
-        max_tokens: 1800,
+        max_completion_tokens: 2000,
         response_format: { type: "json_object" },
       }),
     });

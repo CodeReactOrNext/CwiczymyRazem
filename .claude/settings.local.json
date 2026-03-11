@@ -26,7 +26,9 @@
       "Bash(sed 's/doc\\(db, //')",
       "Bash(sed 's/\"\"$//')",
       "Bash(sed 's/collection\\(db, //')",
-      "Bash(tr ';' '\\\\n')"
+      "Bash(tr ';' '\\\\n')",
+      "Bash(/tmp/pause_button_analysis.txt:*)",
+      "Read(//tmp/**)"
     ]
   }
 }

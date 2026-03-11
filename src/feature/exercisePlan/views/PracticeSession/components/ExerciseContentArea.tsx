@@ -200,6 +200,7 @@ export const ExerciseContentArea = ({
             onEnd={onVideoEnd}
             onReady={(duration) => setVideoDuration(duration)}
             onSeek={(time) => setTimerTime(time * 1000)}
+            onProgressUpdate={(currentTime) => setTimerTime(currentTime * 1000)}
             onStateChange={(state) => {
               if (state === 1) startTimer();
               if (state === 2) stopTimer();

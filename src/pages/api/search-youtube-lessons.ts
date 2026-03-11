@@ -8,7 +8,7 @@ import type { YouTubeLesson, YouTubeLessonResult } from "feature/aiCoach/types/y
 const LESSONS_COLLECTION = "youtubeLessons";
 const TOP_K = 8;
 const RESULTS = 5;
-const MIN_SIMILARITY = 0.35;
+const MIN_SIMILARITY = 0.7;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -68,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .filter((r) => {
         if (r.score < MIN_SIMILARITY) return false;
         const meta = r.metadata as any;
-        return !meta || meta.qualityScore == null || meta.qualityScore >= 6;
+        return !meta || meta.qualityScore == null || meta.qualityScore >= 7;
       })
       .slice(0, RESULTS);
 

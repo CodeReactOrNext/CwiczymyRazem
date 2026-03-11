@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, Youtube, Zap } from "lucide-react";
+import { createPortal } from "react-dom";
+import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, YoutubeIcon, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
@@ -185,8 +186,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
   const router = useRouter();
   const [phases, setPhases] = useState<RoadmapPhase[]>(roadmap.phases ?? []);
   const [drawerStepId, setDrawerStepId] = useState<string | null>(null);
-  const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
-  const [loadingExerciseId, setLoadingExerciseId] = useState<string | null>(null);
+  const [loadingDetailIds, setLoadingDetailIds] = useState<Set<string>>(new Set());
+  const [loadingExerciseIds, setLoadingExerciseIds] = useState<Set<string>>(new Set());
   const [lessonsCache, setLessonsCache] = useState<Record<string, YouTubeLessonResult[]>>({});
   const [loadingLessonsId, setLoadingLessonsId] = useState<string | null>(null);
 
@@ -310,8 +311,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
 
     // Generate description first if missing, so YouTube search has it available
     let enrichedStep = step;
-    if (!step.description && !loadingDetailId) {
-      setLoadingDetailId(step.id);
+    if (!step.description && !loadingDetailIds.has(step.id)) {
+      setLoadingDetailIds((prev) => new Set(prev).add(step.id));
       try {
         const res = await fetch("/api/generate-step-detail", {
           method: "POST",
@@ -340,19 +341,22 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
           sessionsRequired: Number(data.sessionsRequired) || 8,
         };
 
-        const newPhases = phases.map((p) =>
-          p.id !== phase.id
-            ? p
-            : { ...p, steps: p.steps.map((s) => (s.id !== step.id ? s : enrichedStep)) }
-        );
-
-        setPhases(newPhases);
-        onUpdate?.({ ...roadmap, phases: newPhases, updatedAt: new Date().toISOString() });
-        await firebaseUpdateRoadmap(roadmap.id, { phases: newPhases });
+        const finalEnriched = enrichedStep;
+        let savedPhases: RoadmapPhase[] = [];
+        setPhases((prev) => {
+          savedPhases = prev.map((p) =>
+            p.id !== phase.id
+              ? p
+              : { ...p, steps: p.steps.map((s) => (s.id !== step.id ? s : finalEnriched)) }
+          );
+          return savedPhases;
+        });
+        onUpdate?.({ ...roadmap, phases: savedPhases, updatedAt: new Date().toISOString() });
+        await firebaseUpdateRoadmap(roadmap.id, { phases: savedPhases });
       } catch (err) {
         console.warn("Failed to fetch step detail:", err);
       } finally {
-        setLoadingDetailId(null);
+        setLoadingDetailIds((prev) => { const s = new Set(prev); s.delete(step.id); return s; });
       }
     }
 
@@ -392,18 +396,20 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
 
         if (lessons.length > 0) {
           const lessonIds = lessons.map((l) => l.videoId);
-          const newPhases = phases.map((p) =>
-            p.id !== phase.id
-              ? p
-              : {
-                  ...p,
-                  steps: p.steps.map((s) =>
-                    s.id !== step.id ? s : { ...s, suggestedLessonIds: lessonIds }
-                  ),
-                }
-          );
-          setPhases(newPhases);
-          firebaseUpdateRoadmap(roadmap.id, { phases: newPhases });
+          setPhases((prev) => {
+            const newPhases = prev.map((p) =>
+              p.id !== phase.id
+                ? p
+                : {
+                    ...p,
+                    steps: p.steps.map((s) =>
+                      s.id !== step.id ? s : { ...s, suggestedLessonIds: lessonIds }
+                    ),
+                  }
+            );
+            firebaseUpdateRoadmap(roadmap.id, { phases: newPhases });
+            return newPhases;
+          });
         }
 
         return lessons;
@@ -416,7 +422,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
     }
 
     if (enrichedStep.suggestedExerciseId || step.suggestedExerciseId) return;
-    setLoadingExerciseId(step.id);
+    setLoadingExerciseIds((prev) => new Set(prev).add(step.id));
     try {
       const exRes = await fetch("/api/search-exercise", {
         method: "POST",
@@ -449,7 +455,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
     } catch (err) {
       console.warn("Failed to search exercise:", err);
     } finally {
-      setLoadingExerciseId(null);
+      setLoadingExerciseIds((prev) => { const s = new Set(prev); s.delete(step.id); return s; });
     }
 
   };
@@ -479,6 +485,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
       toast.error("Failed to save.");
     }
   };
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   const markerId = `arr-${roadmap.id.slice(0, 8)}`;
 
@@ -617,7 +626,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                         {phase.steps.map((step, stepIdx) => {
                           const status = getStatus(step);
                           const isActive = drawerStepId === step.id;
-                          const isLoading = loadingDetailId === step.id;
+                          const isLoading = loadingDetailIds.has(step.id);
                           return (
                             <button
                               key={step.id}
@@ -650,7 +659,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                           phase.steps.map((step, stepIdx) => {
                             const status = getStatus(step);
                             const isActive = drawerStepId === step.id;
-                            const isLoading = loadingDetailId === step.id;
+                            const isLoading = loadingDetailIds.has(step.id);
                             return (
                               <button
                                 key={step.id}
@@ -700,7 +709,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                           phase.steps.map((step, stepIdx) => {
                             const status = getStatus(step);
                             const isActive = drawerStepId === step.id;
-                            const isLoading = loadingDetailId === step.id;
+                            const isLoading = loadingDetailIds.has(step.id);
                             return (
                               <button
                                 key={step.id}
@@ -749,138 +758,186 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
         </div>
       </div>
 
-      {/* ─── Drawer overlay ─── */}
-      <div
-        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
-          drawerInfo ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-        onClick={() => setDrawerStepId(null)}
-      />
+      {mounted && createPortal(
+        <>
+          {/* ─── Drawer overlay ─── */}
+          <div
+            className={`fixed inset-0 z-[800] bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
+              drawerInfo ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
+            onClick={() => setDrawerStepId(null)}
+          />
 
-      {/* ─── Drawer panel ─── */}
-      <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col border-l border-zinc-800 bg-zinc-950 shadow-2xl transition-transform duration-300 ${
-          drawerInfo ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
+          {/* ─── Drawer panel ─── */}
+          <div
+            className={`fixed right-0 top-0 z-[900] flex h-full w-full max-w-lg flex-col bg-zinc-950 shadow-2xl shadow-black/60 transition-transform duration-300 ${
+              drawerInfo ? "translate-x-0" : "translate-x-full"
+            }`}
+          >
         {drawerInfo && (
           <>
-            {/* Header */}
-            <div className="flex items-start justify-between gap-4 border-b border-zinc-800 p-6">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-zinc-800 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                    Phase {drawerInfo.phaseIdx + 1}
-                  </span>
-                  <span className="text-[10px] text-zinc-600">
-                    · step {drawerInfo.stepIdx + 1}
-                  </span>
+            {/* ── Sticky header ── */}
+            <div className="shrink-0 border-b border-zinc-800/80 bg-zinc-950/95 backdrop-blur-md">
+              {/* Phase / step breadcrumb + close */}
+              <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-zinc-800/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                      Phase {drawerInfo.phaseIdx + 1}
+                    </span>
+                    <span className="text-[10px] text-zinc-700">·</span>
+                    <span className="text-[10px] text-zinc-600">
+                      step {drawerInfo.stepIdx + 1}
+                    </span>
+                  </div>
+                  <h2 className="text-lg font-bold leading-snug text-zinc-100">
+                    {drawerInfo.step.title}
+                  </h2>
                 </div>
-                <h2 className="text-base font-bold leading-snug text-zinc-100">
-                  {drawerInfo.step.title}
-                </h2>
-                <span
-                  className={`inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-                    getStatus(drawerInfo.step) === "done"
-                      ? "bg-emerald-900/40 text-emerald-400"
-                      : getStatus(drawerInfo.step) === "in-progress"
-                        ? "bg-amber-500/15 text-amber-300"
-                        : "bg-zinc-800 text-zinc-500"
-                  }`}
+                <button
+                  onClick={() => setDrawerStepId(null)}
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                 >
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[getStatus(drawerInfo.step)]}`}
-                  />
-                  {STATUS_LABEL[getStatus(drawerInfo.step)]}
-                </span>
+                  <X className="h-4 w-4" />
+                </button>
               </div>
+
+              {/* Status buttons */}
+              <div className="px-6 pb-4">
+                <div className="grid grid-cols-3 gap-2">
+                  {STATUS_BTNS.map(({ status: s, label }) => {
+                    const isActive = getStatus(drawerInfo.step) === s;
+                    return (
+                      <button
+                        key={s}
+                        onClick={() =>
+                          setStepStatus(drawerInfo.phase.id, drawerInfo.step.id, s)
+                        }
+                        className={`rounded-lg border py-2 text-xs font-semibold transition-all ${
+                          isActive
+                            ? s === "not-started"
+                              ? "border-zinc-500 bg-zinc-700 text-zinc-100"
+                              : s === "in-progress"
+                                ? "border-amber-500/60 bg-amber-500/15 text-amber-300"
+                                : "border-emerald-600/50 bg-emerald-900/40 text-emerald-400"
+                            : "border-zinc-800 bg-zinc-900/60 text-zinc-600 hover:border-zinc-600 hover:text-zinc-300"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* ── Mobile close bar ── */}
+            <div className="flex shrink-0 items-center justify-center border-b border-zinc-800/60 py-2 sm:hidden">
               <button
                 onClick={() => setDrawerStepId(null)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+                className="flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-medium text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 active:bg-zinc-700"
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5" />
+                Close
               </button>
             </div>
 
-            {/* Status buttons */}
-            <div className="border-b border-zinc-800 px-6 py-4">
-              <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
-                Change status
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {STATUS_BTNS.map(({ status: s, label }) => {
-                  const isActive = getStatus(drawerInfo.step) === s;
-                  return (
-                    <button
-                      key={s}
-                      onClick={() =>
-                        setStepStatus(drawerInfo.phase.id, drawerInfo.step.id, s)
-                      }
-                      className={`rounded-lg border py-2 text-xs font-medium transition-all ${
-                        isActive
-                          ? s === "not-started"
-                            ? "border-zinc-500 bg-zinc-700 text-zinc-200"
-                            : s === "in-progress"
-                              ? "border-amber-500/50 bg-amber-500/15 text-amber-300"
-                              : "border-emerald-700/50 bg-emerald-900/30 text-emerald-400"
-                          : "border-zinc-800 bg-zinc-900 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              {loadingDetailId === drawerInfo.step.id ? (
-                <AiGeneratingLoader stepTitle={drawerInfo.step.title} />
+            {/* ── Scrollable content ── */}
+            <div className="flex-1 overflow-y-auto">
+              {loadingDetailIds.has(drawerInfo.step.id) ? (
+                <div className="p-6">
+                  <AiGeneratingLoader stepTitle={drawerInfo.step.title} />
+                </div>
               ) : drawerInfo.step.description ? (
-                <>
-                  <div className="space-y-3 text-sm leading-relaxed text-zinc-300">
-                    {drawerInfo.step.description.split("\n").map((line, i) => {
-                      const sectionMatch = line.match(/^\[(.+)\]$/);
-                      if (sectionMatch) {
+                <div className="flex flex-col gap-0">
+
+                  {/* ── Recommended exercise (prominent CTA) ── */}
+                  {(loadingExerciseIds.has(drawerInfo.step.id) || drawerInfo.step.suggestedExerciseId) && (
+                    <div className="border-b border-zinc-800/60 px-6 py-5">
+                      {loadingExerciseIds.has(drawerInfo.step.id) ? (
+                        <div className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-emerald-500" />
+                          <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
+                        </div>
+                      ) : (() => {
+                        const ex = exercisesAgregat.find(e => e.id === drawerInfo.step.suggestedExerciseId);
+                        if (!ex) return null;
                         return (
-                          <p key={i} className="mt-4 text-[10px] font-semibold uppercase tracking-widest text-zinc-500 first:mt-0">
-                            {sectionMatch[1]}
-                          </p>
+                          <>
+                            <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                              <Dumbbell className="h-3 w-3 text-emerald-500" />
+                              Recommended exercise
+                            </p>
+                            <button
+                              onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}`)}
+                              className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-emerald-800/40 bg-emerald-950/30 px-4 py-4 text-left transition-all hover:border-emerald-600/50 hover:bg-emerald-950/50"
+                            >
+                              {/* glow */}
+                              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-500/5 via-transparent to-transparent" />
+                              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 ring-1 ring-emerald-500/30 transition group-hover:bg-emerald-500/25 group-hover:ring-emerald-500/50">
+                                <Dumbbell className="h-5 w-5 text-emerald-400" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-bold text-zinc-100">{ex.title}</p>
+                                {ex.difficulty && (
+                                  <p className="mt-0.5 text-[11px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>
+                                )}
+                              </div>
+                              <ChevronRight className="h-4 w-4 shrink-0 text-emerald-600 transition group-hover:translate-x-0.5 group-hover:text-emerald-400" />
+                            </button>
+                          </>
                         );
-                      }
-                      if (line.startsWith("- ")) {
-                        return (
-                          <div key={i} className="flex items-start gap-2">
-                            <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-zinc-500" />
-                            <span>{line.slice(2)}</span>
-                          </div>
-                        );
-                      }
-                      if (line.trim() === "") return null;
-                      return <p key={i}>{line}</p>;
-                    })}
+                      })()}
+                    </div>
+                  )}
+
+                  {/* ── Description ── */}
+                  <div className="border-b border-zinc-800/60 px-6 py-5">
+                    <div className="space-y-3 text-sm leading-relaxed text-zinc-400">
+                      {drawerInfo.step.description.split("\n").map((line, i) => {
+                        const sectionMatch = line.match(/^\[(.+)\]$/);
+                        if (sectionMatch) {
+                          return (
+                            <p key={i} className="mt-4 text-[10px] font-semibold uppercase tracking-widest text-zinc-600 first:mt-0">
+                              {sectionMatch[1]}
+                            </p>
+                          );
+                        }
+                        if (line.startsWith("- ")) {
+                          return (
+                            <div key={i} className="flex items-start gap-2.5">
+                              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-700" />
+                              <span className="text-zinc-300">{line.slice(2)}</span>
+                            </div>
+                          );
+                        }
+                        if (line.trim() === "") return null;
+                        return <p key={i} className="text-zinc-300">{line}</p>;
+                      })}
+                    </div>
                   </div>
+
+                  {/* ── Success criteria ── */}
                   {drawerInfo.step.successCriteria && (
-                    <div className="mt-5 flex items-start gap-3 rounded-xl border border-emerald-900/40 bg-emerald-950/20 px-4 py-3">
-                      <Target className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                      <div>
-                        <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-emerald-500/70">
-                          Success criteria
-                        </p>
-                        <p className="text-sm text-zinc-200">
+                    <div className="border-b border-zinc-800/60 px-6 py-5">
+                      <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                        <Target className="h-3 w-3 text-emerald-500" />
+                        Success criteria
+                      </p>
+                      <div className="rounded-xl border border-emerald-900/50 bg-emerald-950/25 px-4 py-3.5">
+                        <p className="text-sm leading-relaxed text-zinc-200">
                           {drawerInfo.step.successCriteria}
                         </p>
                       </div>
                     </div>
                   )}
 
-                  {/* ─── Suggested YouTube Lessons ─── */}
+                  {/* ── YouTube lessons ── */}
                   {(loadingLessonsId === drawerInfo.step.id ||
                     (lessonsCache[drawerInfo.step.id] && lessonsCache[drawerInfo.step.id].length > 0)) && (
-                    <div className="mt-5">
-                      <p className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
-                        <Youtube className="h-3 w-3 text-red-500" />
+                    <div className="px-6 py-5">
+                      <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+                        <YoutubeIcon className="h-3 w-3 text-red-500" />
                         YouTube Lessons
                       </p>
                       {loadingLessonsId === drawerInfo.step.id ? (
@@ -888,7 +945,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                           {[0, 1, 2].map((i) => (
                             <div
                               key={i}
-                              className="flex h-[61px] animate-pulse items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 px-3"
+                              className="flex h-[61px] animate-pulse items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/60 px-3"
                             >
                               <div className="h-[45px] w-[80px] shrink-0 rounded-lg bg-zinc-800" />
                               <div className="flex-1 space-y-2">
@@ -907,42 +964,9 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                       )}
                     </div>
                   )}
-
-                  {/* ─── Suggested Exercise ─── */}
-                  {loadingExerciseId === drawerInfo.step.id ? (
-                    <div className="mt-5 flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-700 border-t-emerald-500" />
-                      <p className="text-xs text-zinc-500">Finding best exercise for this step...</p>
-                    </div>
-                  ) : drawerInfo.step.suggestedExerciseId ? (() => {
-                    const ex = exercisesAgregat.find(e => e.id === drawerInfo.step.suggestedExerciseId);
-                    if (!ex) return null;
-                    return (
-                      <div className="mt-5">
-                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-600">
-                          Recommended exercise
-                        </p>
-                        <button
-                          onClick={() => router.push(`/profile/skills?exerciseId=${ex.id}`)}
-                          className="group flex w-full items-center gap-3 rounded-xl border border-zinc-700/60 bg-zinc-900 px-4 py-3 text-left transition hover:border-emerald-500/40 hover:bg-emerald-950/20"
-                        >
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 ring-1 ring-emerald-500/20 transition group-hover:bg-emerald-500/20">
-                            <Dumbbell className="h-4 w-4 text-emerald-400" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-semibold text-zinc-100">{ex.title}</p>
-                            {ex.difficulty && (
-                              <p className="mt-0.5 text-[10px] capitalize text-zinc-500">{ex.difficulty} · {ex.category}</p>
-                            )}
-                          </div>
-                          <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600 transition group-hover:text-emerald-400" />
-                        </button>
-                      </div>
-                    );
-                  })() : null}
-                </>
+                </div>
               ) : (
-                <div className="flex flex-col items-center gap-3 py-8 text-center">
+                <div className="flex flex-col items-center gap-3 py-12 text-center">
                   <p className="text-sm text-zinc-500">
                     Detailed description will be generated.
                   </p>
@@ -954,7 +978,10 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
             </div>
           </>
         )}
-      </div>
+          </div>
+        </>,
+        document.body
+      )}
     </>
   );
 };
