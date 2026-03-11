@@ -1,15 +1,25 @@
 import { useState, useCallback, useMemo } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, FileMusic, X, CheckCircle2, AlertCircle, Music as MusicIcon, ChevronRight, Zap, Drum } from "lucide-react";
+import { Upload, FileMusic, CheckCircle2, AlertCircle, Music as MusicIcon, Zap, Drum } from "lucide-react";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { parseGpFile, ParsedGp, isGpFile, GP_EXTENSIONS } from "../../services/gp5Parser.service";
-import { TablatureMeasure, TablatureBeat, BackingTrack } from "feature/exercisePlan/types/exercise.types";
+import { TablatureMeasure, BackingTrack } from "feature/exercisePlan/types/exercise.types";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
 import { toast } from "sonner";
 
 interface ImportTablatureProps {
-  onImported: (measures: TablatureMeasure[], fileName: string, tempo: number, trackName: string, allTracks: BackingTrack[], rawFile?: File) => void;
+  /** Called when a file is imported or the selected track changes.
+   *  `measures` / `backingTracks` are provided for callers that need to persist them (e.g. CreateCustomExerciseDialog).
+   *  For PracticeSession-based callers (custom.tsx) these can be ignored — the session parses the GP file itself. */
+  onImported: (
+    measures: TablatureMeasure[],
+    fileName: string,
+    tempo: number,
+    trackName: string,
+    backingTracks: BackingTrack[],
+    rawFile: File
+  ) => void;
   className?: string;
 }
 
@@ -25,6 +35,18 @@ function TrackTypeIcon({ type }: { type: string }) {
   return <MusicIcon className="h-3 w-3" />;
 }
 
+function buildBackingTracks(data: ParsedGp, selectedIdx: number): BackingTrack[] {
+  return data.tracks
+    .map((t, idx) => ({
+      id: `track-${idx}`,
+      name: t.name,
+      measures: t.measures,
+      trackType: t.trackType as BackingTrack["trackType"],
+      pan: t.pan,
+    }))
+    .filter((_, idx) => idx !== selectedIdx);
+}
+
 export const ImportTablature = ({ onImported, className }: ImportTablatureProps) => {
   const [isParsing, setIsParsing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -34,21 +56,10 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
   const selectedTrack = parsedData?.tracks[selectedTrackIndex] ?? null;
   const showTabPreview = selectedTrack?.trackType !== 'drums';
 
-  const previewMeasures = useMemo(() => {
+  const previewMeasures = useMemo((): TablatureMeasure[] | null => {
     if (!parsedData || !parsedData.tracks[selectedTrackIndex]) return null;
     return parsedData.tracks[selectedTrackIndex].measures;
   }, [parsedData, selectedTrackIndex]);
-
-  const buildBackingTracks = (data: ParsedGp, selectedIdx: number): BackingTrack[] =>
-    data.tracks
-      .map((t, idx) => ({
-        id: `track-${idx}`,
-        name: t.name,
-        measures: t.measures,
-        trackType: t.trackType,
-        pan: t.pan,
-      }))
-      .filter((_, idx) => idx !== selectedIdx);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const selectedFile = acceptedFiles[0];
@@ -66,10 +77,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
       const data = await parseGpFile(selectedFile);
       setParsedData(data);
       setSelectedTrackIndex(0);
-
-      const tracks = buildBackingTracks(data, 0);
-      onImported(data.tracks[0].measures, selectedFile.name, data.tempo, data.tracks[0].name, tracks, selectedFile);
-
+      onImported(data.tracks[0].measures, selectedFile.name, data.tempo, data.tracks[0].name, buildBackingTracks(data, 0), selectedFile);
       toast.success(`"${selectedFile.name}" imported successfully!`);
     } catch (error) {
       console.error("Failed to parse Guitar Pro file:", error);
@@ -84,8 +92,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
   const handleTrackSelect = (index: number) => {
     setSelectedTrackIndex(index);
     if (parsedData && file) {
-      const tracks = buildBackingTracks(parsedData, index);
-      onImported(parsedData.tracks[index].measures, file.name, parsedData.tempo, parsedData.tracks[index].name, tracks, file);
+      onImported(parsedData.tracks[index].measures, file.name, parsedData.tempo, parsedData.tracks[index].name, buildBackingTracks(parsedData, index), file);
     }
   };
 
@@ -202,7 +209,7 @@ export const ImportTablature = ({ onImported, className }: ImportTablatureProps)
               )}
               <div className="space-y-1">
                 <div className="font-bold text-white flex items-center gap-2 justify-center">
-                  <CheckCircle2 className="h-4 w-4 text-green-400" />
+                  <FileMusic className="h-4 w-4 text-green-400" />
                   {file.name}
                 </div>
                 {!parsedData && <div className="text-xs text-zinc-500">Przetwarzanie...</div>}

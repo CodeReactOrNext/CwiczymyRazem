@@ -19,6 +19,8 @@ interface SessionBottomBarProps {
   sessionTimerData: any;
   exerciseTimeSpent: number;
   canSkipExercise: boolean;
+  canFinishSession: boolean;
+  isSkillExercise: boolean;
   timeLeft: number;
   currentExerciseIndex: number;
   onGoToPreviousExercise: () => void;
@@ -44,6 +46,8 @@ export const SessionBottomBar = ({
   sessionTimerData,
   exerciseTimeSpent,
   canSkipExercise,
+  canFinishSession,
+  isSkillExercise,
   timeLeft,
   currentExerciseIndex,
   onGoToPreviousExercise,
@@ -102,28 +106,35 @@ export const SessionBottomBar = ({
               <FaStepBackward /> {t("common:back") || "Back"}
             </Button>
           )}
-          <Button
-            size="sm"
-            variant="ghost"
-            loading={isFinishing || isSubmittingReport}
-            className={cn(
-              "radius-premium font-bold text-[11px] tracking-wide transition-all click-behavior",
-              isLastExercise
-                ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black"
-                : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
-              !canSkipExercise && "opacity-50 cursor-not-allowed"
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              size="sm"
+              variant="ghost"
+              loading={isFinishing || isSubmittingReport}
+              className={cn(
+                "radius-premium font-bold text-[11px] tracking-wide transition-all click-behavior",
+                isLastExercise
+                  ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black"
+                  : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
+                isLastExercise && !canFinishSession && "opacity-50 cursor-not-allowed"
+              )}
+              onClick={isLastExercise ? onFinishSession : handleNextExerciseClick}
+              disabled={isLastExercise ? !canFinishSession : false}
+            >
+              {(isFinishing || isSubmittingReport) ? (
+                <span>Saving...</span>
+              ) : isLastExercise ? (
+                <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
+              ) : (
+                <span className="flex items-center gap-2">{t("common:skip")} <FaStepForward /></span>
+              )}
+            </Button>
+            {isLastExercise && !canFinishSession && (
+              <span className="text-[11px] text-zinc-500 tracking-wide">
+                {isSkillExercise ? "Complete the full exercise to finish" : "Practice at least 20s to finish"}
+              </span>
             )}
-            onClick={isLastExercise ? onFinishSession : handleNextExerciseClick}
-            disabled={!canSkipExercise}
-          >
-            {(isFinishing || isSubmittingReport) ? (
-              <span>Saving...</span>
-            ) : isLastExercise ? (
-              <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
-            ) : (
-              <span className="flex items-center gap-2">{t("common:skip")} <FaStepForward /></span>
-            )}
-          </Button>
+          </div>
         </div>
 
       </div>

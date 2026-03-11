@@ -47,7 +47,7 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled }: 
           ? "cursor-pointer border-amber-500/50 bg-amber-500/15 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.2)] active:scale-90"
           : "cursor-pointer border-zinc-600 bg-zinc-800 text-zinc-400 shadow-sm hover:border-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 active:scale-90"
       )}
-      title={disabled ? undefined : isReacted ? "Cofnij reakcję" : "Daj ognia!"}
+      title={disabled ? undefined : isReacted ? "Remove reaction" : "Give fire!"}
     >
       <AnimatePresence>
         {isAnimating && (
