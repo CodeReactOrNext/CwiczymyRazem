@@ -145,12 +145,12 @@ Totals: ${totalHours}h, ${weekTotalPoints}pts, ${activeDays.length}/7 days activ
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-5-mini",
+        model: "gpt-5-nano",
         messages: [
           { role: "system", content: buildSystemPrompt(safeStyle, safeGoal) },
           { role: "user", content: userMessage },
         ],
-        max_completion_tokens: 2000,
+        max_completion_tokens: 8000,
         response_format: { type: "json_object" },
       }),
     });
