@@ -1,4 +1,40 @@
 import { alternatePickingCrossStringExercise } from "feature/exercisePlan/data/exerises/alternatePickingCrossString/alternatePickingCrossString";
+import { strummingBasicExercise } from "feature/exercisePlan/data/exerises/strummingBasic/strummingBasic";
+import { strummingDownUpExercise } from "feature/exercisePlan/data/exerises/strummingDownUp/strummingDownUp";
+import { strummingRockExercise } from "feature/exercisePlan/data/exerises/strummingRock/strummingRock";
+import { strummingFunkExercise } from "feature/exercisePlan/data/exerises/strummingFunk/strummingFunk";
+import {
+  strummingPattern2,
+  strummingPattern3,
+  strummingPattern4,
+  strummingPattern5,
+  strummingPattern6,
+  strummingPattern7,
+  strummingPattern8,
+  strummingPattern9,
+  strummingPattern10,
+  strummingPattern11,
+  strummingPattern12,
+  strummingPattern13,
+  strummingPattern14,
+  strummingPattern15,
+  strummingPattern16,
+  strummingPattern18,
+  strummingPattern19,
+  strummingPattern20,
+  strummingPattern21,
+  strummingPattern22,
+  strummingPattern23,
+  strummingPattern24,
+  strummingPattern25,
+  strummingPattern26,
+  strummingPattern27,
+  strummingPattern28,
+  strummingPattern29,
+  strummingPattern30,
+  strummingPattern31,
+  strummingPattern32,
+} from "feature/exercisePlan/data/exerises/strummingPatterns/strummingPatterns";
 
 import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
 import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
@@ -106,6 +142,8 @@ import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordP
 import { improvPromptEasy, improvPromptMedium, improvPromptHard } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
 import { compositionChallengeExercise } from "feature/exercisePlan/data/exerises/compositionChallenge/compositionChallenge";
 import { rhythmTrainingEasy, rhythmTrainingMedium, rhythmTrainingHard } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
+import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGallop/metalGallop";
+import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
 
 
 export const exercisesAgregat: Exercise[] = [
@@ -220,5 +258,41 @@ export const exercisesAgregat: Exercise[] = [
   rhythmTrainingMedium,
   rhythmTrainingHard,
   chordPracticeExercise,
-  compositionChallengeExercise
+  compositionChallengeExercise,
+  metalGallopExercise,
+  metalTremoloPickingExercise,
+  strummingBasicExercise,
+  strummingDownUpExercise,
+  strummingRockExercise,
+  strummingFunkExercise,
+  strummingPattern2,
+  strummingPattern3,
+  strummingPattern4,
+  strummingPattern5,
+  strummingPattern6,
+  strummingPattern7,
+  strummingPattern8,
+  strummingPattern9,
+  strummingPattern10,
+  strummingPattern11,
+  strummingPattern12,
+  strummingPattern13,
+  strummingPattern14,
+  strummingPattern15,
+  strummingPattern16,
+  strummingPattern18,
+  strummingPattern19,
+  strummingPattern20,
+  strummingPattern21,
+  strummingPattern22,
+  strummingPattern23,
+  strummingPattern24,
+  strummingPattern25,
+  strummingPattern26,
+  strummingPattern27,
+  strummingPattern28,
+  strummingPattern29,
+  strummingPattern30,
+  strummingPattern31,
+  strummingPattern32,
 ];

@@ -8,19 +8,29 @@ import {
   usePracticeSummary,
   type SummaryMode,
 } from "../hooks/usePracticeSummary";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Brain,
   Calendar,
   CalendarDays,
   Flame,
   RefreshCw,
+  Settings,
   Sparkles,
   Star,
   TrendingUp,
+  X,
   Zap,
 } from "lucide-react";
-import type { DailySummaryResponse, WeeklySummaryResponse } from "../types/summary.types";
+import type { DailySummaryResponse, PromptConfig, WeeklySummaryResponse } from "../types/summary.types";
+
+const PROMPT_CONFIG_KEY = "practice-summary-prompt-config";
+const GOAL_MAX_LENGTH = 150;
+
+const DEFAULT_CONFIG: PromptConfig = {
+  practiceStyle: "hobby",
+  goal: "",
+};
 
 // ─── Mood / Score config ───────────────────────────────────────────────────
 
@@ -311,12 +321,123 @@ function WeeklyContent({
   );
 }
 
+// ─── Config panel ─────────────────────────────────────────────────────────
+
+function ConfigPanel({
+  config,
+  onSave,
+  onClose,
+}: {
+  config: PromptConfig;
+  onSave: (c: PromptConfig) => void;
+  onClose: () => void;
+}) {
+  const [style, setStyle] = useState(config.practiceStyle);
+  const [goal, setGoal] = useState(config.goal);
+
+  const handleSave = () => {
+    onSave({ practiceStyle: style, goal: goal.slice(0, GOAL_MAX_LENGTH) });
+    onClose();
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-semibold text-zinc-200">AI Coach Settings</span>
+        <button
+          onClick={onClose}
+          className="p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/60 transition-colors"
+        >
+          <X size={14} />
+        </button>
+      </div>
+
+      {/* Practice style */}
+      <div className="space-y-2">
+        <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Practice style</span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setStyle("hobby")}
+            className={cn(
+              "flex-1 py-2 px-3 rounded-lg text-xs font-semibold border transition-all",
+              style === "hobby"
+                ? "bg-violet-500/15 border-violet-500/40 text-violet-300"
+                : "bg-zinc-800/40 border-white/5 text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            Hobby
+          </button>
+          <button
+            onClick={() => setStyle("professional")}
+            className={cn(
+              "flex-1 py-2 px-3 rounded-lg text-xs font-semibold border transition-all",
+              style === "professional"
+                ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
+                : "bg-zinc-800/40 border-white/5 text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            Professional
+          </button>
+        </div>
+        <p className="text-[10px] text-zinc-600 leading-snug">
+          {style === "professional"
+            ? "Coach will be direct, technically precise, and hold you to a high standard."
+            : "Coach will be warm, encouraging, and focused on fun and consistency."}
+        </p>
+      </div>
+
+      {/* Goal */}
+      <div className="space-y-1.5">
+        <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Your goal</span>
+        <textarea
+          value={goal}
+          onChange={(e) => setGoal(e.target.value.slice(0, GOAL_MAX_LENGTH))}
+          placeholder="e.g. I want to learn fingerpicking and play folk songs"
+          className="w-full bg-zinc-800/60 border border-white/[0.06] rounded-lg px-3 py-2 text-xs text-zinc-300 placeholder-zinc-600 resize-none outline-none focus:border-violet-500/40 transition-colors"
+          rows={2}
+        />
+        <div className="flex justify-between">
+          <p className="text-[10px] text-zinc-600">AI won&apos;t criticize areas outside your goal.</p>
+          <span className="text-[10px] text-zinc-600 tabular-nums">{goal.length}/{GOAL_MAX_LENGTH}</span>
+        </div>
+      </div>
+
+      <button
+        onClick={handleSave}
+        className="w-full py-2 rounded-lg text-xs font-bold bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30 transition-colors"
+      >
+        Save & regenerate
+      </button>
+    </div>
+  );
+}
+
 // ─── Main widget ──────────────────────────────────────────────────────────
 
 export const PracticeSummaryWidget = () => {
   const [mode, setMode] = useState<SummaryMode>("daily");
+  const [showConfig, setShowConfig] = useState(false);
+  const [promptConfig, setPromptConfig] = useState<PromptConfig>(DEFAULT_CONFIG);
   const userAuth = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(PROMPT_CONFIG_KEY);
+      if (stored) setPromptConfig(JSON.parse(stored) as PromptConfig);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleSaveConfig = (newConfig: PromptConfig) => {
+    setPromptConfig(newConfig);
+    try {
+      localStorage.setItem(PROMPT_CONFIG_KEY, JSON.stringify(newConfig));
+    } catch {
+      // ignore
+    }
+  };
 
   const { dailySummary, weeklySummary, isLoading, error, regenerate } =
     usePracticeSummary({
@@ -324,6 +445,7 @@ export const PracticeSummaryWidget = () => {
       userLevel: userStats?.lvl ?? 1,
       streak: userStats?.actualDayWithoutBreak ?? 0,
       mode,
+      promptConfig,
     });
 
   const activeSummary = mode === "daily" ? dailySummary : weeklySummary;
@@ -362,68 +484,101 @@ export const PracticeSummaryWidget = () => {
           </div>
         </div>
 
-        {/* Mode toggle */}
-        <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-zinc-800/60 border border-white/5">
+        <div className="flex items-center gap-1.5">
+          {/* Config button */}
           <button
-            onClick={() => setMode("daily")}
+            onClick={() => setShowConfig((v) => !v)}
             className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all",
-              mode === "daily"
-                ? "bg-zinc-700 text-zinc-100 shadow-sm"
-                : "text-zinc-500 hover:text-zinc-300"
+              "p-1.5 rounded-md transition-colors",
+              showConfig
+                ? "bg-violet-500/20 text-violet-400"
+                : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/60"
             )}
+            title="AI Coach settings"
           >
-            <Calendar size={12} />
-            Yday
+            <Settings size={13} />
           </button>
-          <button
-            onClick={() => setMode("weekly")}
-            className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all",
-              mode === "weekly"
-                ? "bg-zinc-700 text-zinc-100 shadow-sm"
-                : "text-zinc-500 hover:text-zinc-300"
-            )}
-          >
-            <CalendarDays size={12} />
-            Week
-          </button>
+
+          {/* Mode toggle */}
+          {!showConfig && (
+            <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-zinc-800/60 border border-white/5">
+              <button
+                onClick={() => setMode("daily")}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all",
+                  mode === "daily"
+                    ? "bg-zinc-700 text-zinc-100 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-300"
+                )}
+              >
+                <Calendar size={12} />
+                Yday
+              </button>
+              <button
+                onClick={() => setMode("weekly")}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all",
+                  mode === "weekly"
+                    ? "bg-zinc-700 text-zinc-100 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-300"
+                )}
+              >
+                <CalendarDays size={12} />
+                Week
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Config panel */}
+      {showConfig && (
+        <ConfigPanel
+          config={promptConfig}
+          onSave={(newConfig) => {
+            handleSaveConfig(newConfig);
+            setShowConfig(false);
+            regenerate();
+          }}
+          onClose={() => setShowConfig(false)}
+        />
+      )}
+
       {/* Content */}
-      <div className="min-h-[120px]">
-        {isLoading && <SummarySkeleton />}
+      {!showConfig && (
+        <div className="min-h-[120px]">
+          {isLoading && <SummarySkeleton />}
 
-        {!isLoading && error && (
-          <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
-            <p className="text-xs text-zinc-500">{error}</p>
-            <button
-              onClick={regenerate}
-              className="text-xs font-bold text-zinc-400 hover:text-zinc-200 transition-colors underline underline-offset-2"
-            >
-              Try again
-            </button>
-          </div>
-        )}
+          {!isLoading && error && (
+            <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
+              <p className="text-xs text-zinc-500">{error}</p>
+              <button
+                onClick={regenerate}
+                className="text-xs font-bold text-zinc-400 hover:text-zinc-200 transition-colors underline underline-offset-2"
+              >
+                Try again
+              </button>
+            </div>
+          )}
 
-        {!isLoading && !error && (
-          <>
-            {mode === "daily" &&
-              (dailySummary ? (
-                <DailyContent summary={dailySummary} />
-              ) : null)}
+          {!isLoading && !error && (
+            <>
+              {mode === "daily" &&
+                (dailySummary ? (
+                  <DailyContent summary={dailySummary} />
+                ) : null)}
 
-            {mode === "weekly" &&
-              (weeklySummary ? (
-                <WeeklyContent summary={weeklySummary} />
-              ) : null)}
-          </>
-        )}
-      </div>
+              {mode === "weekly" &&
+                (weeklySummary ? (
+                  <WeeklyContent summary={weeklySummary} />
+                ) : null)}
+            </>
+          )}
+        </div>
+      )}
 
       {/* Footer: stats row + regenerate */}
-      {activeSummary && !isLoading && (
+      {!showConfig && activeSummary && !isLoading && (
         <div className="mt-4 pt-3 border-t border-white/[0.05] flex items-center justify-between">
           <div className="flex items-center gap-3">
             {userStats && (

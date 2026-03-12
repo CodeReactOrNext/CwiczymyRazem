@@ -1,6 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const SYSTEM_PROMPT = `You are an experienced guitar coach writing a detailed, personal weekly review for your student. You have access to their full week of practice logs. Write like a real coach who knows the student — be direct, specific, encouraging but honest.
+const GOAL_MAX_LENGTH = 150;
+const MAX_EXERCISES_PER_DAY = 5;
+const MAX_TITLE_LENGTH = 40;
+
+function buildSystemPrompt(practiceStyle: "professional" | "hobby", goal: string): string {
+  const styleNote =
+    practiceStyle === "professional"
+      ? "This student is a serious, dedicated musician aiming for the highest level. Be direct, technically precise, and hold them to a high standard. Push them when needed."
+      : "This student plays as a hobby and for enjoyment. Keep the tone warm, encouraging, and relaxed. Focus on fun and consistency, not perfection.";
+
+  const goalNote = goal.trim()
+    ? `The student's personal goal: "${goal.trim()}". Focus your review around this goal — do not criticize areas they haven't mentioned as priorities.`
+    : "Focus feedback on the areas they actually worked on this week.";
+
+  return `You are an experienced guitar coach writing a detailed, personal weekly review for your student. You have access to their full week of practice logs. Write like a real coach who knows the student — be direct, specific, encouraging but honest.
+
+${styleNote}
+${goalNote}
 
 You must return ONLY clean JSON with exactly these fields:
 
@@ -22,6 +39,7 @@ weekScore rules:
 - "minimal": very little or no practice at all
 
 Language: English only. Do NOT invent specific BPM numbers or fret positions. Keep each field as a single flowing paragraph — no bullet points inside the fields.`;
+}
 
 interface DayData {
   dayName: string;
@@ -45,6 +63,8 @@ interface WeeklySummaryRequest {
   streak: number;
   userLevel: number;
   weekTotalPoints: number;
+  practiceStyle?: "professional" | "hobby";
+  goal?: string;
 }
 
 interface WeeklySummaryResponse {
@@ -65,8 +85,11 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { days, streak, userLevel, weekTotalPoints } =
+  const { days, streak, userLevel, weekTotalPoints, practiceStyle, goal } =
     req.body as WeeklySummaryRequest;
+
+  const safeStyle = practiceStyle === "professional" ? "professional" : "hobby";
+  const safeGoal = typeof goal === "string" ? goal.slice(0, GOAL_MAX_LENGTH) : "";
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -83,10 +106,25 @@ export default async function handler(
     const dayLines = days
       .map((day) => {
         if (day.totalMinutes === 0) {
-          return `${day.dayName}: rest`;
+          return `${day.dayName.slice(0, 3)}: rest`;
         }
-        const exerciseNames = day.exercises.map((e) => `"${e.title}"`).join(", ");
-        return `${day.dayName}: ${day.totalMinutes} min — ${exerciseNames} (${day.totalPoints} pts)`;
+
+        // Sort by time desc, take top exercises
+        const sorted = [...day.exercises].sort((a, b) => (b.totalTime || 0) - (a.totalTime || 0));
+        const top = sorted.slice(0, MAX_EXERCISES_PER_DAY);
+        const restCount = sorted.length - top.length;
+
+        const names = top.map((e) => e.title.slice(0, MAX_TITLE_LENGTH)).join(", ");
+        const moreStr = restCount > 0 ? `, +${restCount} more` : "";
+
+        // Day-level category totals
+        const tech  = Math.round(day.exercises.reduce((s, e) => s + (e.techniqueTime || 0), 0) / 60000);
+        const theory= Math.round(day.exercises.reduce((s, e) => s + (e.theoryTime || 0), 0) / 60000);
+        const hear  = Math.round(day.exercises.reduce((s, e) => s + (e.hearingTime || 0), 0) / 60000);
+        const creat = Math.round(day.exercises.reduce((s, e) => s + (e.creativityTime || 0), 0) / 60000);
+        const cats = [tech && `tech:${tech}m`, theory && `theory:${theory}m`, hear && `hear:${hear}m`, creat && `creat:${creat}m`].filter(Boolean).join(" ");
+
+        return `${day.dayName.slice(0, 3)}: ${day.totalMinutes}m [${names}${moreStr}] ${cats} (${day.totalPoints}pts)`;
       })
       .join("\n");
 
@@ -96,8 +134,7 @@ export default async function handler(
     userMessage = `This week's practice log:
 ${dayLines}
 
-Weekly totals: ${totalHours} hours practice, ${weekTotalPoints} points, ${activeDays.length}/7 days active.
-Current streak: ${streak} days. Player level: ${userLevel}.`;
+Totals: ${totalHours}h, ${weekTotalPoints}pts, ${activeDays.length}/7 days active. Streak: ${streak}d. Level: ${userLevel}.`;
   }
 
   try {
@@ -110,7 +147,7 @@ Current streak: ${streak} days. Player level: ${userLevel}.`;
       body: JSON.stringify({
         model: "gpt-5-mini",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: buildSystemPrompt(safeStyle, safeGoal) },
           { role: "user", content: userMessage },
         ],
         max_completion_tokens: 2000,

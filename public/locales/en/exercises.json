@@ -12,7 +12,8 @@
       "technique": "Technique",
       "theory": "Theory",
       "creativity": "Creativity",
-      "hearing": "Hearing"
+      "hearing": "Hearing",
+      "mixed": "Mixed"
     }
   },
   "library": {
@@ -95,7 +96,8 @@
     "technique": "Technique",
     "theory": "Theory",
     "creativity": "Creativity",
-    "hearing": "Hearing"
+    "hearing": "Hearing",
+    "mixed": "Mixed"
   },
   "difficulty": {
     "easy": "Easy",

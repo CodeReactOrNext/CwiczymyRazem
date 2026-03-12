@@ -770,7 +770,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
 
           {/* ─── Drawer panel ─── */}
           <div
-            className={`fixed right-0 top-0 z-[900] flex h-full w-full max-w-lg flex-col bg-zinc-950 shadow-2xl shadow-black/60 transition-transform duration-300 ${
+            className={`fixed right-0 top-0 z-[900] flex h-full w-full max-w-xl flex-col bg-zinc-950 shadow-2xl shadow-black/60 transition-transform duration-300 ${
               drawerInfo ? "translate-x-0" : "translate-x-full"
             }`}
           >
@@ -790,7 +790,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                       step {drawerInfo.stepIdx + 1}
                     </span>
                   </div>
-                  <h2 className="text-lg font-bold leading-snug text-zinc-100">
+                  <h2 className="text-base font-bold leading-snug text-zinc-100">
                     {drawerInfo.step.title}
                   </h2>
                 </div>
@@ -920,8 +920,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                   {/* ── Success criteria ── */}
                   {drawerInfo.step.successCriteria && (
                     <div className="border-b border-zinc-800/60 px-6 py-5">
-                      <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                        <Target className="h-3 w-3 text-emerald-500" />
+                      <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                        <Target className="h-3.5 w-3.5 text-emerald-500" />
                         Success criteria
                       </p>
                       <div className="rounded-xl border border-emerald-900/50 bg-emerald-950/25 px-4 py-3.5">
@@ -936,8 +936,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                   {(loadingLessonsId === drawerInfo.step.id ||
                     (lessonsCache[drawerInfo.step.id] && lessonsCache[drawerInfo.step.id].length > 0)) && (
                     <div className="px-6 py-5">
-                      <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                        <YoutubeIcon className="h-3 w-3 text-red-500" />
+                      <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">
+                        <YoutubeIcon className="h-3.5 w-3.5 text-red-500" />
                         YouTube Lessons
                       </p>
                       {loadingLessonsId === drawerInfo.step.id ? (

@@ -34,9 +34,10 @@ import { determinePlanCategory } from "feature/exercisePlan/utils/deteminePlanCa
 
 interface MyPlansProps {
   onPlanSelect: (plan: ExercisePlan) => void;
+  hideTabs?: Array<"routines" | "playalongs" | "my_plans">;
 }
 
-export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
+export const MyPlans = ({ onPlanSelect, hideTabs = [] }: MyPlansProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const [plans, setPlans] = useState<ExercisePlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +45,9 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
   const [editingPlan, setEditingPlan] = useState<ExercisePlan | null>(null);
   const userAuth = useAppSelector(selectUserAuth);
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("routines");
+  const [activeTab, setActiveTab] = useState(
+    hideTabs.includes("routines") ? "my_plans" : "routines"
+  );
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -223,31 +226,37 @@ export const MyPlans = ({ onPlanSelect }: MyPlansProps) => {
     <ExerciseLayout title={t("exercises:tabs.my_plans")}>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         {/* Navigation Switcher */}
-        <div className="mb-10 md:mb-12 sticky top-4 z-40 md:static">
+        {(["routines", "playalongs", "my_plans"] as const).filter(t => !hideTabs.includes(t)).length > 1 && <div className="mb-10 md:mb-12 sticky top-4 z-40 md:static">
           <TabsList className="bg-zinc-900/80 backdrop-blur-md border border-white/5 p-1 rounded-2xl h-auto md:bg-transparent md:border-none md:p-0 md:rounded-none md:justify-start md:space-x-12 md:w-full overflow-hidden shadow-2xl md:shadow-none w-full flex">
-            <TabsTrigger 
-              value="routines" 
-              className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold uppercase tracking-widest text-[9px] md:text-[13px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
-            >
-              <Music size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
-              <span>Routines</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="playalongs" 
-              className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold uppercase tracking-widest text-[9px] md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
-            >
-              <Zap size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
-              <span>Playalongs</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="my_plans" 
-              className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold uppercase tracking-widest text-[9px] md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
-            >
-              <Flame size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
-              <span>My Plans</span>
-            </TabsTrigger>
+            {!hideTabs.includes("routines") && (
+              <TabsTrigger
+                value="routines"
+                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold uppercase tracking-widest text-[9px] md:text-[13px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
+              >
+                <Music size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
+                <span>Routines</span>
+              </TabsTrigger>
+            )}
+            {!hideTabs.includes("playalongs") && (
+              <TabsTrigger
+                value="playalongs"
+                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold uppercase tracking-widest text-[9px] md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
+              >
+                <Zap size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
+                <span>Playalongs</span>
+              </TabsTrigger>
+            )}
+            {!hideTabs.includes("my_plans") && (
+              <TabsTrigger
+                value="my_plans"
+                className="group flex-1 md:flex-none rounded-xl md:rounded-none data-[state=active]:bg-white md:data-[state=active]:bg-transparent data-[state=active]:after:hidden md:data-[state=active]:after:block data-[state=active]:text-black md:data-[state=active]:text-white text-zinc-400 md:text-zinc-500 font-bold uppercase tracking-widest text-[9px] md:text-[12px] py-2.5 md:py-5 px-3 md:px-1 transition-all flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 relative md:after:absolute md:after:bottom-0 md:after:left-0 md:after:right-0 md:after:h-0.5 md:after:bg-cyan-500 md:after:scale-x-0 data-[state=active]:after:scale-x-100 after:transition-transform"
+              >
+                <Flame size={14} className="md:w-5 md:h-5 group-data-[state=active]:text-black md:group-data-[state=active]:text-cyan-400 group-hover:text-white transition-colors" />
+                <span>My Plans</span>
+              </TabsTrigger>
+            )}
           </TabsList>
-        </div>
+        </div>}
 
         <TabsContent value="routines" className="mt-0 focus-visible:outline-none space-y-12">
           <div className='mb-8 flex flex-col items-end text-right md:items-start md:text-left'>

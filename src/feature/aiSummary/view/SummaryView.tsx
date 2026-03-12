@@ -5,7 +5,7 @@ import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userS
 import {
   BarChart2, Brain, Calendar, CalendarDays, CheckCircle2, ChevronDown, Clock,
   Flame, Guitar, Headphones, Lightbulb, ListMusic, Music2,
-  Sparkles, Star, Target, TrendingDown, TrendingUp, TriangleAlert, Trophy, Zap,
+  Settings, Sparkles, Star, Target, TrendingDown, TrendingUp, TriangleAlert, Trophy, X, Zap,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -14,7 +14,11 @@ import { DailyAssessmentCard, PeriodRatingCard } from "../components/SessionRati
 import { firebaseGetAllDailySummaries, firebaseGetAllSummaries, firebaseGetDailySummary, firebaseGetSummary, firebaseSaveDailySummary, firebaseSaveSummary } from "../services/summary.service";
 import { firebaseGetAllDailyRatings } from "../services/rating.service";
 import type { SavedDailySummary, SavedSummary } from "../services/summary.service";
-import type { DailySummaryResponse, SessionGrade } from "../types/summary.types";
+import type { DailySummaryResponse, PromptConfig, SessionGrade } from "../types/summary.types";
+
+const PROMPT_CONFIG_KEY = "practice-summary-prompt-config";
+const GOAL_MAX_LENGTH = 150;
+const DEFAULT_PROMPT_CONFIG: PromptConfig = { practiceStyle: "hobby", goal: "" };
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -157,15 +161,15 @@ function DayActivityStrip({
           return (
             <div
               key={i}
-              className={cn("flex flex-col items-center gap-1.5 flex-1 min-w-[48px]", !isToday && "cursor-pointer group/dot")}
-              onClick={() => !isToday && onSelectDay(day)}
+              className={cn("flex flex-col items-center gap-1.5 flex-1 min-w-[48px] cursor-pointer group/dot")}
+              onClick={() => onSelectDay(day)}
             >
               <span className={cn("text-[9px] font-semibold uppercase tracking-wide transition-colors", isSelected ? "text-zinc-200" : "text-zinc-600 group-hover/dot:text-zinc-400")}>
                 {shortName}
               </span>
 
               {/* Ring */}
-              <div className={cn("relative flex items-center justify-center w-12 h-12 shrink-0 transition-opacity", isToday && "opacity-40")}>
+              <div className={cn("relative flex items-center justify-center w-12 h-12 shrink-0 transition-opacity")}>
                 <svg viewBox="0 0 48 48" className="absolute inset-0 w-full h-full -rotate-90" overflow="visible">
                   {/* Selection outer glow */}
                   {isSelected && (
@@ -807,6 +811,8 @@ function BestSessionCard({ logs }: { logs: FirebaseUserExceriseLog[] }) {
 
 export const SummaryView = () => {
   const [mode, setMode] = useState<Mode>("daily");
+  const [showConfig, setShowConfig] = useState(false);
+  const [promptConfig, setPromptConfig] = useState<PromptConfig>(DEFAULT_PROMPT_CONFIG);
   const userAuth  = useAppSelector(selectUserAuth);
   const userStats = useAppSelector(selectCurrentUserStats);
 
@@ -829,6 +835,13 @@ export const SummaryView = () => {
   const loadedModes       = useRef<Set<Mode>>(new Set());
   const lastDailyDateRef  = useRef<string>("");
   const lastWeekIdRef     = useRef<string>("");
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(PROMPT_CONFIG_KEY);
+      if (stored) setPromptConfig(JSON.parse(stored) as PromptConfig);
+    } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
     if (!userAuth) return;
@@ -950,6 +963,7 @@ export const SummaryView = () => {
             totalMinutes:d.totalMinutes, totalPoints:d.totalPoints,
           })),
           streak:userStats?.actualDayWithoutBreak||0, userLevel:userStats?.lvl||1, weekTotalPoints:weekTotalPts,
+          practiceStyle: promptConfig.practiceStyle, goal: promptConfig.goal,
         }),
       });
       if (res.ok) {
@@ -960,7 +974,7 @@ export const SummaryView = () => {
       }
       loadedModes.current.add("weekly");
     } finally { setAiLoading(false); }
-  }, [userAuth, weekDays, weekTotalPts, userStats, summaryId]);
+  }, [userAuth, weekDays, weekTotalPts, userStats, summaryId, promptConfig]);
 
   const generateDailyAi = useCallback(async (force = false) => {
     if (!userAuth) return;
@@ -994,6 +1008,8 @@ export const SummaryView = () => {
           totalPoints: todayPts,
           streak: userStats?.actualDayWithoutBreak || 0,
           userLevel: userStats?.lvl || 1,
+          practiceStyle: promptConfig.practiceStyle,
+          goal: promptConfig.goal,
         }),
       });
       if (res.ok) {
@@ -1004,7 +1020,7 @@ export const SummaryView = () => {
       }
       loadedModes.current.add("daily");
     } finally { setDailyAiLoading(false); }
-  }, [userAuth, todayLogs, todayPts, userStats, dailySummaryId]);
+  }, [userAuth, todayLogs, todayPts, userStats, dailySummaryId, promptConfig]);
 
   useEffect(() => {
     if (logsLoading || !userAuth || mode !== "weekly") return;
@@ -1016,12 +1032,13 @@ export const SummaryView = () => {
 
   useEffect(() => {
     if (logsLoading || !userAuth || mode !== "daily") return;
+    if (isSameDay(selectedDate, today)) return; // today's summary not available yet
     const dateStr = localDateStr(selectedDate);
     if (lastDailyDateRef.current === dateStr) return;
     lastDailyDateRef.current = dateStr;
     setDaily(null);
     generateDailyAi();
-  }, [logsLoading, mode, userAuth, selectedDate, generateDailyAi]);
+  }, [logsLoading, mode, userAuth, selectedDate, generateDailyAi, today]);
 
   const weekCfg = weekly ? WEEK_CFG[weekly.weekScore] : null;
 
@@ -1044,8 +1061,100 @@ export const SummaryView = () => {
               : today.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"})}
           </p>
         </div>
-        <ModeToggle mode={mode} onChange={setMode}/>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowConfig(v => !v)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all",
+              showConfig
+                ? "bg-violet-500/20 border-violet-500/40 text-violet-300"
+                : "bg-zinc-800/60 border-white/5 text-zinc-400 hover:text-zinc-200 hover:border-white/10"
+            )}
+          >
+            <Settings size={13} />
+            AI Coach
+          </button>
+          <ModeToggle mode={mode} onChange={setMode}/>
+        </div>
       </div>
+
+      {/* ── AI Coach config panel ──────────────────────────── */}
+      {showConfig && (
+        <div className="rounded-2xl border border-violet-500/20 bg-zinc-900/80 p-5 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-zinc-200">AI Coach Settings</span>
+            <button
+              onClick={() => setShowConfig(false)}
+              className="p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/60 transition-colors"
+            >
+              <X size={14} />
+            </button>
+          </div>
+
+          {/* Practice style */}
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Practice style</span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPromptConfig(c => ({ ...c, practiceStyle: "hobby" }))}
+                className={cn(
+                  "flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold border transition-all",
+                  promptConfig.practiceStyle === "hobby"
+                    ? "bg-violet-500/15 border-violet-500/40 text-violet-300"
+                    : "bg-zinc-800/40 border-white/5 text-zinc-500 hover:text-zinc-300"
+                )}
+              >
+                Hobby
+              </button>
+              <button
+                onClick={() => setPromptConfig(c => ({ ...c, practiceStyle: "professional" }))}
+                className={cn(
+                  "flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold border transition-all",
+                  promptConfig.practiceStyle === "professional"
+                    ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
+                    : "bg-zinc-800/40 border-white/5 text-zinc-500 hover:text-zinc-300"
+                )}
+              >
+                Professional
+              </button>
+            </div>
+            <p className="text-xs text-zinc-600">
+              {promptConfig.practiceStyle === "professional"
+                ? "Coach will be direct, technically precise, and hold you to a high standard."
+                : "Coach will be warm, encouraging, and focused on fun and consistency."}
+            </p>
+          </div>
+
+          {/* Goal */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Your goal</span>
+            <textarea
+              value={promptConfig.goal}
+              onChange={(e) => setPromptConfig(c => ({ ...c, goal: e.target.value.slice(0, GOAL_MAX_LENGTH) }))}
+              placeholder="e.g. I want to learn fingerpicking and play folk songs"
+              className="w-full bg-zinc-800/60 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-zinc-300 placeholder-zinc-600 resize-none outline-none focus:border-violet-500/40 transition-colors"
+              rows={2}
+            />
+            <div className="flex justify-between">
+              <p className="text-xs text-zinc-600">AI won&apos;t criticize areas outside your goal.</p>
+              <span className="text-xs text-zinc-600 tabular-nums">{promptConfig.goal.length}/{GOAL_MAX_LENGTH}</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              try { localStorage.setItem(PROMPT_CONFIG_KEY, JSON.stringify(promptConfig)); } catch { /* ignore */ }
+              setShowConfig(false);
+              loadedModes.current.clear();
+              if (mode === "weekly") { setWeekly(null); generateAi(true); }
+              else { setDaily(null); generateDailyAi(true); }
+            }}
+            className="self-end px-5 py-2 rounded-xl text-sm font-bold bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30 transition-colors"
+          >
+            Save &amp; regenerate
+          </button>
+        </div>
+      )}
 
       {/* ════════════════════════════════════════════════════
           DAILY MODE
@@ -1070,46 +1179,65 @@ export const SummaryView = () => {
             { icon:<Star size={15}/>,   value:`Level ${userStats?.lvl??1}`,                    label:"Your level" },
           ]}/>
 
-          {/* Daily Assessment — merged rating + coach feedback */}
-          {todayTotal > 0 ? (
-            <div>
-              <SectionHeading icon={<Sparkles size={12}/>}>
-                {isSameDay(selectedDate, (() => { const d = new Date(); d.setDate(d.getDate()-1); return d; })())
-                  ? "Yesterday's assessment"
-                  : `${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} assessment`}
-              </SectionHeading>
-              <DailyAssessmentCard
-                key={`daily-${localDateStr(selectedDate)}`}
-                ratingId={`daily-${localDateStr(selectedDate)}`}
-                label={`${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} practice`}
-                techniqueTime={todayTech / 1000}
-                theoryTime={todayTheory / 1000}
-                hearingTime={todayHear / 1000}
-                creativityTime={todayCreat / 1000}
-                totalTime={todayTotal / 1000}
-                points={todayPts}
-                streak={userStats?.actualDayWithoutBreak ?? 0}
-                userLevel={userStats?.lvl ?? 1}
-                daily={daily}
-                dailyLoading={dailyAiLoading}
-                onRatingReady={() => userAuth && firebaseGetAllDailyRatings(userAuth).then(setDailyRatings)}
-              />
+          {/* Today — summary not available yet */}
+          {isSameDay(selectedDate, today) ? (
+            <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-zinc-800 py-16 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-500/10 ring-1 ring-violet-500/20">
+                <Sparkles className="h-6 w-6 text-violet-400 opacity-60" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-semibold text-zinc-300">Today&apos;s summary isn&apos;t ready yet</p>
+                <p className="text-xs text-zinc-500">Come back tomorrow — your coach will have a full assessment waiting for you.</p>
+              </div>
+              {todayTotal > 0 && (
+                <p className="text-xs text-zinc-600">
+                  {Math.round(todayTotal / 60000)} min practiced today — great work, keep going!
+                </p>
+              )}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-zinc-800 py-16 text-zinc-700">
-              <Guitar className="h-10 w-10 opacity-30"/>
-              <p className="text-sm font-medium text-zinc-500">No practice logged on this day</p>
-              <p className="text-xs text-zinc-600">Start a session to track your progress</p>
-            </div>
-          )}
+            <>
+              {/* Daily Assessment — merged rating + coach feedback */}
+              {todayTotal > 0 ? (
+                <div>
+                  <SectionHeading icon={<Sparkles size={12}/>}>
+                    {isSameDay(selectedDate, (() => { const d = new Date(); d.setDate(d.getDate()-1); return d; })())
+                      ? "Yesterday's assessment"
+                      : `${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} assessment`}
+                  </SectionHeading>
+                  <DailyAssessmentCard
+                    key={`daily-${localDateStr(selectedDate)}`}
+                    ratingId={`daily-${localDateStr(selectedDate)}`}
+                    label={`${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} practice`}
+                    techniqueTime={todayTech / 1000}
+                    theoryTime={todayTheory / 1000}
+                    hearingTime={todayHear / 1000}
+                    creativityTime={todayCreat / 1000}
+                    totalTime={todayTotal / 1000}
+                    points={todayPts}
+                    streak={userStats?.actualDayWithoutBreak ?? 0}
+                    userLevel={userStats?.lvl ?? 1}
+                    daily={daily}
+                    dailyLoading={dailyAiLoading}
+                    onRatingReady={() => userAuth && firebaseGetAllDailyRatings(userAuth).then(setDailyRatings)}
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-zinc-800 py-16 text-zinc-700">
+                  <Guitar className="h-10 w-10 opacity-30"/>
+                  <p className="text-sm font-medium text-zinc-500">No practice logged on this day</p>
+                  <p className="text-xs text-zinc-600">Start a session to track your progress</p>
+                </div>
+              )}
 
-
-          {/* Day timeline */}
-          {todayLogs.length > 0 && (
-            <div>
-              <SectionHeading icon={<ListMusic size={16}/>} count={todayLogs.length}>Sessions</SectionHeading>
-              <DayTimeline logs={todayLogs} />
-            </div>
+              {/* Day timeline */}
+              {todayLogs.length > 0 && (
+                <div>
+                  <SectionHeading icon={<ListMusic size={16}/>} count={todayLogs.length}>Sessions</SectionHeading>
+                  <DayTimeline logs={todayLogs} />
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

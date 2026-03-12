@@ -1,0 +1,71 @@
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+
+export const strummingRockExercise: Exercise = {
+  id: "strumming_rock",
+  title: "Rock Strumming Patterns",
+  description: "Classic rock rhythm patterns with skips, accents and muted chucks.",
+  difficulty: "easy",
+  category: "technique",
+  timeInMinutes: 8,
+  instructions: [
+    "These patterns use gaps (skipped strums) to create rhythmic groove — your arm never stops moving, but some strums don't hit the strings.",
+    "Pattern A is the most common rock pattern. Pay attention to the accented beats 2 and 4.",
+    "Pattern B introduces a muted chuck (×) — lightly rest your fretting hand on the strings and strum; it creates a percussive 'chk' sound.",
+    "Repeat each pattern for 2–4 bars before switching.",
+    "Apply to power chords: E5, A5, D5, G5.",
+  ],
+  tips: [
+    "The muted chuck is a rhythm tool — use it to fill gaps and add groove.",
+    "Accents on beat 2 and 4 give rock its backbeat feel. Dig in a little harder on those strums.",
+    "A common beginner mistake: stopping the arm on skips. Keep the pendulum going!",
+  ],
+  metronomeSpeed: { min: 60, max: 140, recommended: 90 },
+  relatedSkills: ["rhythm"],
+  strummingPatterns: [
+    {
+      name: "Pattern A: Classic Rock",
+      timeSignature: [4, 4],
+      subdivisions: 2,
+      strums: [
+        { direction: "down", accented: true },
+        { direction: "miss" },
+        { direction: "down", accented: true },
+        { direction: "up" },
+        { direction: "miss" },
+        { direction: "up" },
+        { direction: "down", accented: true },
+        { direction: "up" },
+      ],
+    },
+    {
+      name: "Pattern B: Chuck Groove",
+      timeSignature: [4, 4],
+      subdivisions: 2,
+      strums: [
+        { direction: "down", accented: true },
+        { direction: "up" },
+        { direction: "down", muted: true },
+        { direction: "up" },
+        { direction: "down", accented: true },
+        { direction: "up" },
+        { direction: "down", muted: true },
+        { direction: "miss" },
+      ],
+    },
+    {
+      name: "Pattern C: Syncopated Push",
+      timeSignature: [4, 4],
+      subdivisions: 2,
+      strums: [
+        { direction: "down", accented: true },
+        { direction: "miss" },
+        { direction: "miss" },
+        { direction: "up" },
+        { direction: "down", accented: true },
+        { direction: "miss" },
+        { direction: "miss" },
+        { direction: "up" },
+      ],
+    },
+  ],
+};

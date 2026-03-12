@@ -133,7 +133,8 @@
       "technique": "Technique",
       "theory": "Theory",
       "hearing": "Hearing",
-      "creativity": "Creativity"
+      "creativity": "Creativity",
+      "mixed": "Mixed"
     }
   },
   "duration": "{minutes} min",
@@ -181,7 +182,8 @@
     "technique": "Technique",
     "theory": "Theory",
     "creativity": "Creativity",
-    "hearing": "Hearing"
+    "hearing": "Hearing",
+    "mixed": "Mixed"
   },
   "minutes": "minutes",
   "cancel": "Cancel",
@@ -191,9 +193,9 @@
     "active": "Active",
     "paused": "Paused"
   },
-  "finish_session": "FINISH SESSION",
-  "next_step": "NEXT STEP",
-  "skip": "SKIP",
+  "finish_session": "Finish Session",
+  "next_step": "Next Step",
+  "skip": "Skip",
   "seo": {
     "title": "Riff Quest - See Your Guitar Progress",
     "description": "The free guitar practice tracker that turns random sessions into visible progress. Track songs, skills, and streaks without the stress.",

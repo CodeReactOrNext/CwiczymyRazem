@@ -64,9 +64,7 @@ export const SessionBottomBar = ({
         {/* Left: Exit */}
         <div className="flex-1 hidden xl:flex items-center justify-start gap-4">
           <Button
-            size="sm"
             variant="ghost"
-            className="radius-premium font-bold text-[10px] tracking-wide transition-all click-behavior text-zinc-500 hover:text-white"
             onClick={onClose}
           >
             {t("common:practice.exit")}
@@ -108,7 +106,6 @@ export const SessionBottomBar = ({
           )}
           <div className="flex flex-col items-end gap-1">
             <Button
-              size="sm"
               variant="ghost"
               loading={isFinishing || isSubmittingReport}
               className={cn(
