@@ -73,6 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     searchUrl.searchParams.set("type", "video");
     searchUrl.searchParams.set("videoCategoryId", "10");
     searchUrl.searchParams.set("relevanceLanguage", "en");
+    searchUrl.searchParams.set("videoDuration", "medium");
     searchUrl.searchParams.set("maxResults", "50");
     searchUrl.searchParams.set("key", youtubeApiKey);
 
