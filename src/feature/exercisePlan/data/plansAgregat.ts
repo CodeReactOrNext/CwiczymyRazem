@@ -36,6 +36,9 @@ import { earRhythmFundamentalsPlan } from "feature/exercisePlan/data/plans/earRh
 import { handHealthStrengthPlan } from "feature/exercisePlan/data/plans/handHealthStrength/handHealthStrength";
 import { dailyDexterityStarterPlan } from "feature/exercisePlan/data/plans/dailyDexterityStarter/dailyDexterityStarter";
 import { soloingExplorerPlan } from "feature/exercisePlan/data/plans/soloingExplorer/soloingExplorer";
+import { speedBuildingProgressivePlan } from "feature/exercisePlan/data/plans/speedBuildingProgressive/speedBuildingProgressive";
+import { legatoMasterPlan } from "feature/exercisePlan/data/plans/legatoMasterPlan/legatoMasterPlan";
+import { completeDailyPracticePlan } from "feature/exercisePlan/data/plans/completeDailyPractice/completeDailyPractice";
 
 import type { ExercisePlan } from "../types/exercise.types";
 
@@ -64,6 +67,9 @@ export const defaultPlans: ExercisePlan[] = [
   handHealthStrengthPlan,
   dailyDexterityStarterPlan,
   soloingExplorerPlan,
+  speedBuildingProgressivePlan,
+  legatoMasterPlan,
+  completeDailyPracticePlan,
   // metalGuitarExercisesPlan,
   musicianFitnessLvl1S1Plan,
   musicianFitnessLvl1S2Plan,

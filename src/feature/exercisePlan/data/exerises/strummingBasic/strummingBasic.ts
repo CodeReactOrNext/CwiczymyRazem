@@ -20,13 +20,12 @@ export const strummingBasicExercise: Exercise = {
     "Listen for even spacing between strums — use the metronome as a guide.",
   ],
   metronomeSpeed: { min: 50, max: 120, recommended: 70 },
-  relatedSkills: ["chords", "rhythm"],
+  relatedSkills: ["rhythm"],
   strummingPatterns: [
     {
       name: "Pattern: All Downs",
       timeSignature: [4, 4],
       subdivisions: 2,
-      chord: "Em",
       strums: [
         { direction: "down" },
         { direction: "miss" },

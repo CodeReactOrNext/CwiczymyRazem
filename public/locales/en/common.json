@@ -133,7 +133,8 @@
       "technique": "Technique",
       "theory": "Theory",
       "hearing": "Hearing",
-      "creativity": "Creativity"
+      "creativity": "Creativity",
+      "mixed": "Mixed"
     }
   },
   "duration": "{minutes} min",
@@ -181,7 +182,8 @@
     "technique": "Technique",
     "theory": "Theory",
     "creativity": "Creativity",
-    "hearing": "Hearing"
+    "hearing": "Hearing",
+    "mixed": "Mixed"
   },
   "minutes": "minutes",
   "cancel": "Cancel",

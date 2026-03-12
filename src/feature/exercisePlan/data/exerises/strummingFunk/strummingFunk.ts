@@ -4,7 +4,7 @@ export const strummingFunkExercise: Exercise = {
   id: "strumming_funk",
   title: "Funk Rhythm Guitar",
   description: "16th-note funk strumming with heavy use of muted chucks and syncopation.",
-  difficulty: "hard",
+  difficulty: "easy",
   category: "technique",
   timeInMinutes: 10,
   instructions: [
@@ -20,13 +20,12 @@ export const strummingFunkExercise: Exercise = {
     "Record yourself and listen back. Funk rhythm is unforgiving — you'll hear if you're rushing.",
   ],
   metronomeSpeed: { min: 70, max: 115, recommended: 90 },
-  relatedSkills: ["chords", "rhythm"],
+  relatedSkills: ["rhythm"],
   strummingPatterns: [
     {
       name: "Pattern A: Classic Funk",
       timeSignature: [4, 4],
       subdivisions: 4,
-      chord: "E9",
       strums: [
         { direction: "down", accented: true },   // 1
         { direction: "miss" },                    // e
@@ -50,7 +49,6 @@ export const strummingFunkExercise: Exercise = {
       name: "Pattern B: Percussive 16ths",
       timeSignature: [4, 4],
       subdivisions: 4,
-      chord: "Am7",
       strums: [
         { direction: "down", accented: true },   // 1
         { direction: "miss" },
