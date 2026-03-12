@@ -20,13 +20,12 @@ export const strummingDownUpExercise: Exercise = {
     "If you're rushing, focus your ears on the metronome click — let it be your anchor.",
   ],
   metronomeSpeed: { min: 50, max: 110, recommended: 65 },
-  relatedSkills: ["chords", "rhythm"],
+  relatedSkills: ["rhythm"],
   strummingPatterns: [
     {
       name: "Pattern: All 8ths",
       timeSignature: [4, 4],
       subdivisions: 2,
-      chord: "Em",
       strums: [
         { direction: "down" },
         { direction: "up" },
@@ -42,7 +41,6 @@ export const strummingDownUpExercise: Exercise = {
       name: "Variation: Skip beat 3 upstroke",
       timeSignature: [4, 4],
       subdivisions: 2,
-      chord: "Am",
       strums: [
         { direction: "down" },
         { direction: "up" },

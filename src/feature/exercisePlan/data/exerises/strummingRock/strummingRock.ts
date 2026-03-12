@@ -4,7 +4,7 @@ export const strummingRockExercise: Exercise = {
   id: "strumming_rock",
   title: "Rock Strumming Patterns",
   description: "Classic rock rhythm patterns with skips, accents and muted chucks.",
-  difficulty: "medium",
+  difficulty: "easy",
   category: "technique",
   timeInMinutes: 8,
   instructions: [
@@ -20,13 +20,12 @@ export const strummingRockExercise: Exercise = {
     "A common beginner mistake: stopping the arm on skips. Keep the pendulum going!",
   ],
   metronomeSpeed: { min: 60, max: 140, recommended: 90 },
-  relatedSkills: ["chords", "rhythm"],
+  relatedSkills: ["rhythm"],
   strummingPatterns: [
     {
       name: "Pattern A: Classic Rock",
       timeSignature: [4, 4],
       subdivisions: 2,
-      chord: "E5",
       strums: [
         { direction: "down", accented: true },
         { direction: "miss" },
@@ -42,7 +41,6 @@ export const strummingRockExercise: Exercise = {
       name: "Pattern B: Chuck Groove",
       timeSignature: [4, 4],
       subdivisions: 2,
-      chord: "A5",
       strums: [
         { direction: "down", accented: true },
         { direction: "up" },
@@ -58,7 +56,6 @@ export const strummingRockExercise: Exercise = {
       name: "Pattern C: Syncopated Push",
       timeSignature: [4, 4],
       subdivisions: 2,
-      chord: "G5",
       strums: [
         { direction: "down", accented: true },
         { direction: "miss" },

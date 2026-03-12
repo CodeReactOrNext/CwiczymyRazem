@@ -142,6 +142,8 @@ import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordP
 import { improvPromptEasy, improvPromptMedium, improvPromptHard } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
 import { compositionChallengeExercise } from "feature/exercisePlan/data/exerises/compositionChallenge/compositionChallenge";
 import { rhythmTrainingEasy, rhythmTrainingMedium, rhythmTrainingHard } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
+import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGallop/metalGallop";
+import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
 
 
 export const exercisesAgregat: Exercise[] = [
@@ -257,6 +259,8 @@ export const exercisesAgregat: Exercise[] = [
   rhythmTrainingHard,
   chordPracticeExercise,
   compositionChallengeExercise,
+  metalGallopExercise,
+  metalTremoloPickingExercise,
   strummingBasicExercise,
   strummingDownUpExercise,
   strummingRockExercise,
