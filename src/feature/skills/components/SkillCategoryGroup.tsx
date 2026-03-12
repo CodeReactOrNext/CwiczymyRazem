@@ -47,7 +47,7 @@ export const SkillCategoryGroup = ({
          <div className="w-full xl:w-[540px] flex-shrink-0 sticky top-28">
              <div className="relative bg-zinc-950/50 rounded-lg p-5 border border-zinc-800/30 overflow-hidden">
                  <div className="flex items-center justify-between mb-4">
-                     <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest leading-none">Category Analysis</span>
+                     <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest leading-none">Category Analysis</span>
                  </div>
                  <SkillRadarChart 
                      category={category}

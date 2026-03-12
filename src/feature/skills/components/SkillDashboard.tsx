@@ -160,7 +160,7 @@ export const SkillDashboard = ({
 
   if (selectedChallenge) {
     return (
-      <div className="w-full min-h-[600px] bg-black rounded-3xl overflow-hidden border border-zinc-900 shadow-2xl relative">
+      <div className="w-full min-h-[600px] bg-second-800 rounded-3xl overflow-hidden border border-zinc-900 shadow-2xl relative">
         <div className="absolute top-6 left-6 z-[100]">
            <Button 
             variant="ghost" 
@@ -296,10 +296,10 @@ export const SkillDashboard = ({
                                      </div>
 
                                      {hasBpmProgress && (
-                                       <div className="bg-cyan-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-cyan-500/20">
-                                         <FaCheck className="h-2.5 w-2.5 text-cyan-400" />
-                                          <span className="text-[9px] font-semibold text-cyan-500 tracking-wider">BPM</span>
-                                          <span className="text-xs font-bold text-cyan-400">{completedBpms.length}/{bpmStages.length}</span>
+                                       <div className="bg-main-900/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-main/20">
+                                         <FaCheck className="h-2.5 w-2.5 text-main-300" />
+                                          <span className="text-[9px] font-semibold text-main tracking-wider">BPM</span>
+                                          <span className="text-xs font-bold text-main-300">{completedBpms.length}/{bpmStages.length}</span>
                                        </div>
                                      )}
 
@@ -315,10 +315,10 @@ export const SkillDashboard = ({
                                      )}
 
                                      {earTrainingHighScore != null && earTrainingHighScore > 0 && (
-                                       <div className="bg-purple-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-purple-500/20">
-                                         <Ear className="h-2.5 w-2.5 text-purple-400" />
-                                          <span className="text-[9px] font-semibold text-purple-500 tracking-wider">Ear Record</span>
-                                          <span className="text-xs font-bold text-purple-400">{earTrainingHighScore}</span>
+                                       <div className="bg-link/10 px-3 py-2 rounded-xl flex items-center gap-2 border border-link/20">
+                                         <Ear className="h-2.5 w-2.5 text-link" />
+                                          <span className="text-[9px] font-semibold text-link/70 tracking-wider">Ear Record</span>
+                                          <span className="text-xs font-bold text-link">{earTrainingHighScore}</span>
                                        </div>
                                      )}
 

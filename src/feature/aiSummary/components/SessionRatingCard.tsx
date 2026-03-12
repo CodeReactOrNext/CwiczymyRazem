@@ -20,7 +20,7 @@ import type { DailySummaryResponse, SessionGrade, SessionRatingResponse } from "
 const MOOD_CHIP: Record<DailySummaryResponse["mood"], string> = {
   excellent: "bg-orange-500/10 text-orange-400 border-orange-500/25",
   good:      "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
-  solid:     "bg-cyan-500/10 text-cyan-400 border-cyan-500/25",
+  solid:     "bg-main/10 text-main border-main/25",
   light:     "bg-yellow-500/10 text-yellow-400 border-yellow-500/25",
   rest:      "bg-zinc-800 text-zinc-500 border-zinc-700",
 };
@@ -39,10 +39,10 @@ const GRADE_COLOR: Record<SessionGrade, { ring: string; text: string; bg: string
   S:   { ring: "#f59e0b", text: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/25" },
   "A+":{ ring: "#10b981", text: "text-emerald-400",  bg: "bg-emerald-500/10", border: "border-emerald-500/25" },
   A:   { ring: "#10b981", text: "text-emerald-400",  bg: "bg-emerald-500/10", border: "border-emerald-500/25" },
-  "A-":{ ring: "#34d399", text: "text-emerald-300",  bg: "bg-emerald-500/8",  border: "border-emerald-500/20" },
-  "B+":{ ring: "#22d3ee", text: "text-cyan-400",     bg: "bg-cyan-500/10",    border: "border-cyan-500/25" },
-  B:   { ring: "#22d3ee", text: "text-cyan-400",     bg: "bg-cyan-500/10",    border: "border-cyan-500/25" },
-  "B-":{ ring: "#67e8f9", text: "text-cyan-300",     bg: "bg-cyan-500/8",     border: "border-cyan-500/20" },
+  "A-":{ ring: "#34d399", text: "text-emerald-300",  bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+  "B+":{ ring: "#0891B2", text: "text-main",         bg: "bg-main/10",        border: "border-main/25" },
+  B:   { ring: "#0891B2", text: "text-main",         bg: "bg-main/10",        border: "border-main/25" },
+  "B-":{ ring: "#67e8f9", text: "text-main-300",     bg: "bg-main/10",        border: "border-main/20" },
   "C+":{ ring: "#fbbf24", text: "text-yellow-400",   bg: "bg-yellow-500/10",  border: "border-yellow-500/25" },
   C:   { ring: "#fbbf24", text: "text-yellow-400",   bg: "bg-yellow-500/10",  border: "border-yellow-500/25" },
   D:   { ring: "#f97316", text: "text-orange-400",   bg: "bg-orange-500/10",  border: "border-orange-500/25" },
@@ -70,7 +70,7 @@ function ScoreRing({ score, grade, animated }: { score: number; grade: SessionGr
           strokeLinecap="round"
           strokeDasharray={circ}
           strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 1.2s cubic-bezier(0.34,1.56,0.64,1)", filter: `drop-shadow(0 0 6px ${cfg.ring}80)` }}
+          style={{ transition: "stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1)", filter: `drop-shadow(0 0 6px ${cfg.ring}80)` }}
         />
       </svg>
       {/* Center text */}
@@ -103,6 +103,22 @@ function RatingSkeleton() {
         <div className="h-3 w-2/3 rounded-full bg-zinc-800" />
       </div>
     </div>
+  );
+}
+
+// ─── Shared list renderer ─────────────────────────────────────────────────────
+
+function ItemList({ items, markerColor }: { items: string[]; color: string; markerColor: string }) {
+  if (!items.length) return null;
+  return (
+    <ul className="space-y-2.5">
+      {items.map((s, i) => (
+        <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-200 leading-snug">
+          <span className={cn("mt-[5px] shrink-0 text-[8px]", markerColor)}>▸</span>
+          <span>{s}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -139,14 +155,7 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
               <CheckCircle2 size={15} className="text-emerald-400" />
               <h4 className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Strengths</h4>
             </div>
-            <ul className="space-y-2.5">
-              {rating.strengths.map((s, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-200 leading-snug">
-                  <span className="text-emerald-500/60 mt-[5px] shrink-0 text-[8px]">▸</span>
-                  <span>{s}</span>
-                </li>
-              ))}
-            </ul>
+            <ItemList items={rating.strengths} color="text-zinc-200" markerColor="text-emerald-500/60" />
           </div>
         )}
         {rating.improvements.length > 0 && (
@@ -155,14 +164,7 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
               <TriangleAlert size={15} className="text-yellow-400" />
               <h4 className="text-sm font-semibold text-yellow-400 uppercase tracking-wide">To Improve</h4>
             </div>
-            <ul className="space-y-2.5">
-              {rating.improvements.map((item, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-200 leading-snug">
-                  <span className="text-yellow-500/60 mt-[5px] shrink-0 text-[8px]">▸</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            <ItemList items={rating.improvements} color="text-zinc-200" markerColor="text-yellow-500/60" />
           </div>
         )}
       </div>
@@ -396,14 +398,7 @@ export function DailyAssessmentCard({
                   <CheckCircle2 size={15} className="text-emerald-400" />
                   <h4 className="text-sm font-semibold text-emerald-400 uppercase tracking-wide">Strengths</h4>
                 </div>
-                <ul className="space-y-2.5">
-                  {rating.strengths.map((s, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-200 leading-snug">
-                      <span className="text-emerald-500/60 mt-[5px] shrink-0 text-[8px]">▸</span>
-                      <span>{s}</span>
-                    </li>
-                  ))}
-                </ul>
+                <ItemList items={rating.strengths} color="text-zinc-200" markerColor="text-emerald-500/60" />
               </div>
             )}
             {rating.improvements.length > 0 && (
@@ -412,14 +407,7 @@ export function DailyAssessmentCard({
                   <TriangleAlert size={15} className="text-yellow-400" />
                   <h4 className="text-sm font-semibold text-yellow-400 uppercase tracking-wide">To Improve</h4>
                 </div>
-                <ul className="space-y-2.5">
-                  {rating.improvements.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-200 leading-snug">
-                      <span className="text-yellow-500/60 mt-[5px] shrink-0 text-[8px]">▸</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+                <ItemList items={rating.improvements} color="text-zinc-200" markerColor="text-yellow-500/60" />
               </div>
             )}
           </div>
