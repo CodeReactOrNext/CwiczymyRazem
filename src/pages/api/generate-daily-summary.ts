@@ -127,12 +127,12 @@ Total: ${totalMinutes} min, ${totalPoints} pts. Streak: ${streak}d. Level: ${use
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-5-mini",
+        model: "gpt-5-nano",
         messages: [
           { role: "system", content: buildSystemPrompt(safeStyle, safeGoal) },
           { role: "user", content: userMessage },
         ],
-        max_completion_tokens: 1000,
+        max_completion_tokens: 8000,
         response_format: { type: "json_object" },
       }),
     });
