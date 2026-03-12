@@ -79,6 +79,37 @@ export interface ImprovPromptRiddleConfig {
 
 export type ExerciseRiddleConfig = SequenceRepeatRiddleConfig | ImprovPromptRiddleConfig;
 
+// ─── Strumming Pattern Types ─────────────────────────────────────────────────
+
+export type StrumDirection = 'down' | 'up' | 'miss';
+
+export interface StrumBeat {
+  /** Which direction to strum, or 'miss' for silence/gap */
+  direction: StrumDirection;
+  /** Muted / chuck strum — shown with an X */
+  muted?: boolean;
+  /** Accented — louder emphasis */
+  accented?: boolean;
+}
+
+/**
+ * One repeating strum pattern (e.g. one bar of 4/4 with 8th-note subdivisions).
+ * `strums` length must equal `timeSignature[0] * subdivisions`.
+ */
+export interface StrumPattern {
+  name?: string;
+  timeSignature: [number, number];
+  /** Subdivisions per beat: 2 = 8th notes, 4 = 16th notes */
+  subdivisions: number;
+  strums: StrumBeat[];
+  /** Optional chord label displayed above this pattern (single chord) */
+  chord?: string;
+  /** Optional chord progression — one chord name per loop/bar, cycles automatically */
+  chords?: string[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export interface BackingTrack {
   id: string;
   name: string;
@@ -119,6 +150,7 @@ export interface Exercise {
   customGoal?: string;
   customGoalDescription?: string;
   riddleConfig?: ExerciseRiddleConfig;
+  strummingPatterns?: StrumPattern[];
 }
 
 export interface ExercisePlan {
