@@ -8,7 +8,7 @@ import type { YouTubeLesson, YouTubeLessonResult } from "feature/aiCoach/types/y
 const LESSONS_COLLECTION = "youtubeLessons";
 const TOP_K = 8;
 const RESULTS = 5;
-const MIN_SIMILARITY = 0.85;
+const MIN_SIMILARITY = 0.8;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
