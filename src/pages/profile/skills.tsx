@@ -7,6 +7,7 @@ import {
 } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
+import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
@@ -28,7 +29,11 @@ const ProfileSkillsPage: NextPageWithLayout = () => {
     <div className="bg-second-600 radius-default overflow-hidden flex flex-col border-none shadow-sm min-h-screen">
       {userSkills ? (
         <SkillDashboard userSkills={userSkills as UserSkills} />
-      ) : null}
+      ) : (
+        <div className="flex flex-1 items-center justify-center py-24">
+          <PageLoadingLayout />
+        </div>
+      )}
     </div>
   );
 };

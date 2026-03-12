@@ -25,8 +25,8 @@ const MOOD_CONFIG: Record<
 > = {
   excellent: { label: "On fire",      color: "text-orange-400", bg: "bg-orange-500/10", icon: Flame },
   good:      { label: "Great session",color: "text-emerald-400",bg: "bg-emerald-500/10",icon: TrendingUp },
-  solid:     { label: "Solid work",   color: "text-cyan-400",   bg: "bg-cyan-500/10",   icon: Star },
-  light:     { label: "Light day",    color: "text-violet-400", bg: "bg-violet-500/10", icon: Zap },
+  solid:     { label: "Solid work",   color: "text-main",       bg: "bg-main/10",       icon: Star },
+  light:     { label: "Light day",    color: "text-yellow-400", bg: "bg-yellow-500/10", icon: Zap },
   rest:      { label: "Rest day",     color: "text-zinc-400",   bg: "bg-zinc-700/30",   icon: Brain },
 };
 
@@ -36,7 +36,7 @@ const WEEK_CONFIG: Record<
 > = {
   excellent:    { label: "Exceptional week", color: "text-orange-400",  bg: "bg-orange-500/10" },
   strong:       { label: "Strong week",      color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  good:         { label: "Good progress",    color: "text-cyan-400",    bg: "bg-cyan-500/10" },
+  good:         { label: "Good progress",    color: "text-main",        bg: "bg-main/10" },
   inconsistent: { label: "Inconsistent",     color: "text-yellow-400",  bg: "bg-yellow-500/10" },
   minimal:      { label: "Minimal practice", color: "text-zinc-400",    bg: "bg-zinc-700/30" },
 };
@@ -80,8 +80,8 @@ export const SidebarSummaryCard = () => {
             Summary
           </span>
           <div className="flex items-center gap-0.5 opacity-80">
-            <Sparkles size={10} className="text-violet-400" />
-            <span className="text-[10px] font-medium text-violet-400 leading-none">AI</span>
+            <Sparkles size={10} className="text-link" />
+            <span className="text-[10px] font-medium text-link leading-none">AI</span>
           </div>
         </div>
 
@@ -107,7 +107,7 @@ export const SidebarSummaryCard = () => {
           )}
         >
           <Calendar size={12} />
-          Yday
+          Yesterday
         </button>
         <button
           onClick={() => setMode("weekly")}
@@ -142,7 +142,7 @@ export const SidebarSummaryCard = () => {
             </div>
 
             {/* Summary text - truncated to 2 lines */}
-            <p className="text-[11px] leading-relaxed text-zinc-400 line-clamp-3">
+            <p className="text-xs leading-relaxed text-zinc-400 line-clamp-3">
               {daily.summary}
             </p>
 
@@ -169,7 +169,7 @@ export const SidebarSummaryCard = () => {
             </div>
 
             {/* Summary text */}
-            <p className="text-[11px] leading-relaxed text-zinc-400 line-clamp-3">
+            <p className="text-xs leading-relaxed text-zinc-400 line-clamp-3">
               {weekly.overview}
             </p>
 
