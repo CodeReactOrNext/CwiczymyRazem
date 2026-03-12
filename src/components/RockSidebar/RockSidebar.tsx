@@ -19,6 +19,7 @@ import {
   Dumbbell,
   FileText,
   LayoutGrid,
+  ListChecks,
   Music,
   Settings,
   Timer,
@@ -91,6 +92,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/leaderboard")) return "leaderboard";
     if (pathname.startsWith("/seasons")) return "seasons";
     if (pathname.startsWith("/settings")) return "settings";
+    if (pathname.startsWith("/plans")) return "my-plans";
     return null;
   };
 
@@ -155,6 +157,12 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
       name: "Plans",
       href: "/profile/exercises",
       icon: <Dumbbell size={16} />,
+    },
+    {
+      id: "my-plans" as NavPagesTypes,
+      name: "My Plans",
+      href: "/plans",
+      icon: <ListChecks size={16} />,
     },
     {
       id: "skills",

@@ -1,6 +1,23 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-const SYSTEM_PROMPT = `You are an enthusiastic, sharp guitar coach. The user gives you their practice data for today. Write a short, personal, motivating summary (2-3 sentences). Be specific: mention what they actually practiced. Be real — if they practiced little, acknowledge it warmly. No generic "Great job!" openings.
+const GOAL_MAX_LENGTH = 150;
+const MAX_EXERCISES = 10;
+const MAX_TITLE_LENGTH = 40;
+
+function buildSystemPrompt(practiceStyle: "professional" | "hobby", goal: string): string {
+  const styleNote =
+    practiceStyle === "professional"
+      ? "This student is a serious, dedicated musician aiming for the highest level. Be direct, technically precise, and hold them to a high standard. Push them when needed."
+      : "This student plays as a hobby and for enjoyment. Keep the tone warm, encouraging, and relaxed. Focus on fun and progress, not perfection.";
+
+  const goalNote = goal.trim()
+    ? `The student's personal goal: "${goal.trim()}". Focus feedback around this goal — do not criticize areas they haven't mentioned as priorities.`
+    : "Focus feedback on the areas they actually practiced today.";
+
+  return `You are an enthusiastic, sharp guitar coach. The user gives you their practice data for today. Write a short, personal, motivating summary (2-3 sentences). Be specific: mention what they actually practiced. Be real — if they practiced little, acknowledge it warmly. No generic "Great job!" openings.
+
+${styleNote}
+${goalNote}
 
 Return ONLY clean JSON, nothing else:
 {
@@ -17,6 +34,7 @@ Mood rules (based on total practice minutes):
 - "rest": 0 min (no practice today)
 
 Language: English. Do NOT mention BPM or specific fret positions.`;
+}
 
 interface ExerciseEntry {
   title: string;
@@ -34,6 +52,8 @@ interface DailySummaryRequest {
   totalPoints: number;
   streak: number;
   userLevel: number;
+  practiceStyle?: "professional" | "hobby";
+  goal?: string;
 }
 
 interface DailySummaryResponse {
@@ -50,8 +70,11 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { exercises, totalPoints, streak, userLevel } =
+  const { exercises, totalPoints, streak, userLevel, practiceStyle, goal } =
     req.body as DailySummaryRequest;
+
+  const safeStyle = practiceStyle === "professional" ? "professional" : "hobby";
+  const safeGoal = typeof goal === "string" ? goal.slice(0, GOAL_MAX_LENGTH) : "";
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -67,29 +90,33 @@ export default async function handler(
   if (!exercises || exercises.length === 0) {
     userMessage = `The user did not practice today. Streak: ${streak} days. Level: ${userLevel}.`;
   } else {
-    const exerciseLines = exercises
+    // Sort by time desc, take top exercises, aggregate the rest
+    const sorted = [...exercises].sort((a, b) => (b.totalTime || 0) - (a.totalTime || 0));
+    const top = sorted.slice(0, MAX_EXERCISES);
+    const rest = sorted.slice(MAX_EXERCISES);
+    const restMinutes = Math.round(rest.reduce((s, e) => s + (e.totalTime || 0), 0) / 60000);
+
+    const exerciseLines = top
       .map((e) => {
-        const parts = [`"${e.title}"`];
-        if (e.totalTime > 0)
-          parts.push(`${Math.round(e.totalTime / 60000)} min`);
-        if (e.techniqueTime > 0)
-          parts.push(`technique: ${Math.round(e.techniqueTime / 60000)}min`);
-        if (e.theoryTime > 0)
-          parts.push(`theory: ${Math.round(e.theoryTime / 60000)}min`);
-        if (e.hearingTime > 0)
-          parts.push(`hearing: ${Math.round(e.hearingTime / 60000)}min`);
-        if (e.creativityTime > 0)
-          parts.push(`creativity: ${Math.round(e.creativityTime / 60000)}min`);
-        if (e.songTitle) parts.push(`song: "${e.songTitle}"`);
-        return parts.join(", ");
+        const title = e.title.slice(0, MAX_TITLE_LENGTH);
+        const mins = Math.round(e.totalTime / 60000);
+        const cats: string[] = [];
+        if (e.techniqueTime > 0) cats.push(`tech:${Math.round(e.techniqueTime / 60000)}m`);
+        if (e.theoryTime > 0)    cats.push(`theory:${Math.round(e.theoryTime / 60000)}m`);
+        if (e.hearingTime > 0)   cats.push(`hear:${Math.round(e.hearingTime / 60000)}m`);
+        if (e.creativityTime > 0) cats.push(`creat:${Math.round(e.creativityTime / 60000)}m`);
+        const catStr = cats.length > 0 ? ` (${cats.join(", ")})` : "";
+        const songStr = e.songTitle ? ` — "${e.songTitle.slice(0, 30)}"` : "";
+        return `${title}: ${mins}m${catStr}${songStr}`;
       })
       .join("\n");
 
-    userMessage = `Today's practice:
-${exerciseLines}
+    const restLine = rest.length > 0 ? `\n+${rest.length} more exercises (${restMinutes}m total)` : "";
 
-Total: ${totalMinutes} minutes, ${totalPoints} points earned.
-Current streak: ${streak} days. Player level: ${userLevel}.`;
+    userMessage = `Today's practice:
+${exerciseLines}${restLine}
+
+Total: ${totalMinutes} min, ${totalPoints} pts. Streak: ${streak}d. Level: ${userLevel}.`;
   }
 
   try {
@@ -102,7 +129,7 @@ Current streak: ${streak} days. Player level: ${userLevel}.`;
       body: JSON.stringify({
         model: "gpt-5-mini",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: buildSystemPrompt(safeStyle, safeGoal) },
           { role: "user", content: userMessage },
         ],
         max_completion_tokens: 1000,

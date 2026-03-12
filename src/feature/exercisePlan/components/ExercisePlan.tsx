@@ -92,7 +92,7 @@ export const ExercisePlan = () => {
             onClose={handleClose}
           />
         ) : (
-          <MyPlans onPlanSelect={handlePlanSelect} />
+          <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["my_plans"]} />
         )}
       </div>
     </div>

@@ -25,7 +25,7 @@ const typeConfig = {
   },
   reaction: {
     icon: <Zap className="h-3 w-3 text-white fill-current" />,
-    bg: "bg-yellow-500",
+    bg: "bg-blue-500",
     label: "reacted to your post",
   },
 } as const;
