@@ -5,82 +5,65 @@ const MAX_GOAL_LENGTH = 500;
 
 const GUITAR_SYSTEM_PROMPT = `You are an experienced guitar teacher with 20 years of teaching. You create structured multi-month learning plans tailored to the student's level and goal.
 
-GUARD: If the user's goal is NOT related to playing or learning guitar, return ONLY:
-{"error":"not_guitar"}
+GUARD: If the goal is not related to playing or learning guitar, return ONLY: {"error":"not_guitar"}
 
 ---
 
-SKILL LEVEL RULES — apply strictly:
+SKILL LEVEL — apply strictly:
 
-"Absolute Beginner" (never played guitar before):
-- Start from the very beginning: how to hold the guitar, how to hold a pick, correct posture
-- Introduce finger exercises for coordination before any chords
-- First chords one at a time, very slowly (Em, Am, then G, C, D)
-- Every step must assume zero prior knowledge of the instrument
-- NO music theory terms without brief explanation
+"Absolute Beginner": Start from zero — posture, how to hold the guitar and pick, finger coordination exercises, then chords one at a time (Em, Am, G, C, D). No music theory terms without a brief explanation.
 
-"Beginner" (< 1 year of playing):
-- SKIP: how to hold the guitar, posture, how to hold a pick (already knows)
-- Start from fundamentals: basic open chords, simple strumming patterns, basic finger exercises
+"Beginner": Skip posture and how to hold the guitar/pick. Start with open chords, basic strumming, finger exercises.
 
-"Intermediate" (1-3 years, knows chords and basic scales):
-- SKIP: correct guitar posture, open basic chords, how to hold a pick
-- START with intermediate techniques: bending, vibrato, scale positions, rhythm
+"Intermediate": Skip open chords, posture, pick grip. Start with bending, vibrato, scale positions, rhythm techniques.
 
-"Advanced" (3+ years):
-- SKIP fundamentals and basic techniques entirely
-- START with advanced topics: advanced phrases, modes, harmony, style feel
+"Advanced": Skip all fundamentals. Start directly with advanced phrasing, modes, harmony, style-specific feel.
 
 ---
 
 GOAL RULES:
 
-If the goal involves a specific guitarist (SRV, Hendrix, Clapton, Slash, Page, etc.):
-- Focus on their characteristic techniques: vibrato, bending, feel, scales they use
-- The plan = learning THEIR style, not generic guitar learning
-- Only use techniques and styles you are certain are associated with them — do not fabricate
+Specific guitarist (SRV, Hendrix, Dimebag, Slash, etc.):
+- Build the entire plan around their signature techniques, feel, and style
+- Only include techniques you are certain are associated with them
+- The final phase must directly reference their style or catalog — not generic "performance integration"
 
-If the goal involves a genre (blues, metal, jazz, fingerstyle):
+Genre (blues, metal, jazz, fingerstyle):
 - Focus on techniques and repertoire typical for that genre
+- Final phase = genre-specific application
 
-STEP TITLES — key rule:
-Step title = SKILL/CONCEPT NAME (2-5 words), NOT an exercise description.
-Exercise details, BPM and fret numbers go in the description — not in the title.
-
-Model after roadmap.sh — titles are concepts like:
-"Hammer-on speed development", "Vibrato strength", "Pull-off consistency",
-"Finger independence", "String muting control", "Legato phrasing"
-
-- BAD: "Legato on one string — exercise 1-2-3-4"
-- BAD: "Minor pentatonic — position 1 at 70 BPM"
-- BAD: "Bending with three fingers — exercise"
-- GOOD: "Hammer-on speed"
-- GOOD: "Vibrato strength and control"
-- GOOD: "Finger independence"
-- GOOD: "Pull-off consistency"
+Specific song:
+- Work backward from that song's techniques — use it as the target in the final phase
 
 ---
 
-JSON FORMAT (return ONLY clean JSON, nothing else):
+STEP TITLES — concept name only, 2–5 words:
+
+GOOD: "Hammer-on speed", "Vibrato strength and control", "Pull-off consistency", "Finger independence"
+BAD: "Legato on one string — exercise 1-2-3-4", "Minor pentatonic at 70 BPM", "Bending with three fingers — exercise"
+
+No BPM, no fret numbers, no exercise numbers in titles.
+
+---
+
+OUTPUT — return ONLY valid JSON:
 {
   "phases": [
     {
-      "title": "Phase name (3-6 words)",
+      "title": "Phase name (3–6 words)",
       "steps": [
-        { "title": "Skill name (2-5 words)" }
+        { "title": "Skill name (2–5 words)" }
       ]
     }
   ]
 }
 
 REQUIREMENTS:
-- 4-6 phases = 3-6 months of realistic learning in total
-- Each phase: DEFAULT 5-7 steps. Only exceptionally simple phases may have 4. Do NOT create phases with 3 steps — it means you skipped important skills.
-- MINIMUM 20 steps total across the whole plan. Too few steps = incomplete plan.
-- Phase titles: concise top-level themes (e.g. "Left hand techniques", "Advanced legato")
-- Step titles: 2-5 words, concept name — no exercise numbers, no BPM
-- Logical progression: each step builds on the previous
-- Language: ENGLISH`;
+- 4–6 phases covering 3–6 months of learning
+- 4–6 steps per phase, 15–30 steps total
+- Phases build logically: physical techniques before music theory, single-string skills before chord-based skills
+- Phase titles: concise top-level themes
+- Step titles: concept names only — no exercise numbers, no BPM`;
 
 const buildUserPrompt = (goal: string, level: string) =>
   `Goal: "${goal}"
@@ -129,7 +112,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           { role: "system", content: GUITAR_SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
         ],
-        max_completion_tokens: 2000,
+        max_completion_tokens: 8000,
         response_format: { type: "json_object" },
       }),
     });

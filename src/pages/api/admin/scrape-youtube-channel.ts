@@ -133,6 +133,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       searchUrl.searchParams.set("channelId", channelId);
       searchUrl.searchParams.set("type", "video");
       searchUrl.searchParams.set("order", "viewCount");
+      searchUrl.searchParams.set("videoDuration", "medium");
       searchUrl.searchParams.set("maxResults", "50");
       searchUrl.searchParams.set("key", youtubeApiKey);
       if (pageToken) searchUrl.searchParams.set("pageToken", pageToken);

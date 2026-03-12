@@ -7,7 +7,7 @@ export const metalTremoloPickingExercise: Exercise = {
     "Pure tremolo picking on the low E string using the E Phrygian scale (E F G A B C D). 16th notes, palm mute, no chords — pure mechanical aggression. The b2 interval (E→F, one half-step) is the sound of danger in thrash and death metal. Each measure is a loop. Inspired by Slayer, Kreator, Sepultura.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 12,
+  timeInMinutes: 4,
   instructions: [
     "Measure 1: Pure tremolo on open E (fret 0). 16 identical 16th notes, palm mute. Nothing else. Set the metronome and lock in the time — this is the foundation.",
     "Measure 2: E × 8, then F (fret 1) × 4, then E × 4. A half-step up and back. This is the b2 interval of Phrygian — sounds aggressive and unsettling.",

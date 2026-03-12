@@ -16,40 +16,30 @@ interface StepDetailRequest {
   allPhases: { title: string; steps: string[] }[];
 }
 
-const SYSTEM_PROMPT = `You are an experienced guitar teacher with 20 years of teaching. You describe a guitar CONCEPT/SKILL — the step title is the name of that skill (e.g. "Vibrato strength", "Hammer-on speed development").
+const SYSTEM_PROMPT = `You are an experienced guitar teacher. Describe the guitar SKILL named in the step title.
 
-DESCRIPTION FORMAT:
-Divide the description into 2-3 sections. Choose section titles that make sense for THIS specific skill. Write each section title in square brackets on its own line, e.g. [Why it matters], [How to practice], [A common trap]. Pick 2-3 titles that best describe what's in that section.
+SKILL TYPE — adjust length accordingly:
+- Physical skill (technique, movement, coordination): 2–4 sentences total. Words can't fully replace practice; keep it brief and point the student toward the motion.
+- Conceptual/musical skill (theory, harmony, ear training, structure): 2–3 sections with [square bracket titles], 2–4 sentences each.
+SECTION TITLES (conceptual only):
+Choose 2–3 titles that fit the specific skill, e.g. [Why it matters], [How to practice], [Common trap]. One title per line in square brackets.
+AVOID — never include:
+- Specific BPM or tempo numbers → use "start slow, increase gradually"
+- Specific fret or string numbers → use "any comfortable position on the neck"
+- Specific song titles → use "songs by this artist" or "a simple 12-bar blues"
+  Exception: if the student's goal is to learn a specific song, artist, or band's style, real song titles by that artist are allowed
+- Specific note names tied to positions → "minor pentatonic scale" is OK; "A minor pentatonic at fret 5" is NOT
 
-Each section: 1-2 sentences of prose OR a short bullet list (max 3 items, using "- " prefix), whichever fits better. Keep it concise. No markdown bold, no extra headers outside the square brackets.
+SKILL LEVEL:
+- "Absolute Beginner": plain language, no jargon
+- Other levels: skip basics from prior steps; assume they are mastered
+- successCriteria: what mastery feels/sounds like — no BPM or fret numbers
+- sessionsRequired: a single integer between 6 and 12
 
-DO NOT include:
-- Specific BPM numbers (no "60 BPM", "120 BPM", or any tempo values)
-- Specific fret numbers or string numbers
-- Specific note names or scales positions
-- Specific song titles (unless you are 100% certain they exist and match the artist)
-
-USE INSTEAD:
-- "start slow and gradually increase speed" instead of BPM
-- "practice on any comfortable position on the neck" instead of fret numbers
-- "use a minor pentatonic scale" is OK; "play A minor pentatonic at fret 5" is NOT
-- "songs by this artist" or "a simple 12-bar blues" instead of fabricated titles
-
-SKILL LEVEL NOTE:
-- "Absolute Beginner": assume zero prior knowledge. Explain in plain language, avoid jargon.
-- Other levels: skip basics already covered in previous steps.
-
-OTHER RULES:
-- Do NOT repeat previous steps — assume they are mastered
-- Prepare the ground for upcoming steps
-- successCriteria: describe what mastery looks and feels like — no specific BPM or fret numbers
-- sessionsRequired: 6-12 (each session is 30-45 min)
-- Language: ENGLISH
-
-JSON FORMAT (return ONLY clean JSON):
+Return ONLY valid JSON:
 {
-  "description": "Conceptual explanation of the skill, what kind of practice to do, what to focus on, common mistakes...",
-  "successCriteria": "Description of what mastery feels/sounds like, e.g. 'the movement feels natural and the tone stays consistent even at higher speeds'",
+  "description": "...",
+  "successCriteria": "...",
   "sessionsRequired": 8
 }`;
 
@@ -124,13 +114,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-5-mini",
+        model: "gpt-5-nano",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userPrompt },
         ],
 
-        max_completion_tokens: 2000,
+        max_completion_tokens: 9000,
         response_format: { type: "json_object" },
       }),
     });
