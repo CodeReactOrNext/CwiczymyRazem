@@ -6,6 +6,7 @@ import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
 import { TablatureViewer } from "./TablatureViewer";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
+import { StrummingPatternViewer } from "./StrummingPatternViewer";
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 
 interface ExerciseContentAreaProps {
@@ -232,6 +233,14 @@ export const ExerciseContentArea = ({
             );
           })()}
         </div>
+      ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
+        <StrummingPatternViewer
+          patterns={currentExercise.strummingPatterns}
+          bpm={effectiveBpm}
+          isPlaying={isMetronomePlaying}
+          startTime={startTime}
+          countInRemaining={countInRemaining}
+        />
       ) : (
         <ExerciseImage
           image={currentExercise.imageUrl || currentExercise.image || ""}

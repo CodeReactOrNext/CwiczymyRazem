@@ -1,6 +1,6 @@
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { DailySummaryResponse, WeeklySummaryResponse } from "../types/summary.types";
+import type { DailySummaryResponse, PromptConfig, WeeklySummaryResponse } from "../types/summary.types";
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -25,6 +25,7 @@ interface UsePracticeSummaryProps {
   userLevel: number;
   streak: number;
   mode: SummaryMode;
+  promptConfig?: PromptConfig;
 }
 
 interface SummaryState {
@@ -39,6 +40,7 @@ export const usePracticeSummary = ({
   userLevel,
   streak,
   mode,
+  promptConfig,
 }: UsePracticeSummaryProps) => {
   const [state, setState] = useState<SummaryState>({
     daily: null,
@@ -85,7 +87,14 @@ export const usePracticeSummary = ({
           const res = await fetch("/api/generate-daily-summary", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ exercises, totalPoints, streak, userLevel }),
+            body: JSON.stringify({
+              exercises,
+              totalPoints,
+              streak,
+              userLevel,
+              practiceStyle: promptConfig?.practiceStyle,
+              goal: promptConfig?.goal,
+            }),
           });
 
           if (!res.ok) throw new Error("Failed to generate daily summary");
@@ -145,6 +154,8 @@ export const usePracticeSummary = ({
               streak,
               userLevel,
               weekTotalPoints,
+              practiceStyle: promptConfig?.practiceStyle,
+              goal: promptConfig?.goal,
             }),
           });
 
@@ -164,7 +175,7 @@ export const usePracticeSummary = ({
         }));
       }
     },
-    [userAuth, streak, userLevel]
+    [userAuth, streak, userLevel, promptConfig]
   );
 
   useEffect(() => {

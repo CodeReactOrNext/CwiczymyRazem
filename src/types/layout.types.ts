@@ -17,4 +17,5 @@ export type NavPagesTypes =
   | "exercises"
   | "ai-coach"
   | "summary"
+  | "my-plans"
   | null;
