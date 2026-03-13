@@ -4,19 +4,57 @@ const GOAL_MAX_LENGTH = 150;
 const MAX_EXERCISES = 10;
 const MAX_TITLE_LENGTH = 40;
 
-function buildSystemPrompt(practiceStyle: "professional" | "hobby", goal: string): string {
-  const styleNote =
-    practiceStyle === "professional"
-      ? "This student is a serious, dedicated musician aiming for the highest level. Be direct, technically precise, and hold them to a high standard. Push them when needed."
-      : "This student plays as a hobby and for enjoyment. Keep the tone warm, encouraging, and relaxed. Focus on fun and progress, not perfection.";
+function streakContext(streak: number): string {
+  if (streak === 0) return "0 days";
+  if (streak === 1) return "1 day — fresh start!";
+  if (streak === 2) return "2 days — building momentum!";
+  const milestones: [number, string][] = [
+    [7, "one full week!"], [14, "two weeks!"], [21, "three weeks!"],
+    [30, "one month!"], [60, "two months!"], [100, "100 days!"], [365, "one year!"],
+  ];
+  const hit = milestones.find(([n]) => streak === n);
+  return hit ? `${streak} days — ${hit[1]}` : `${streak} days`;
+}
 
+function buildSystemPrompt(practiceStyle: "professional" | "hobby", goal: string): string {
   const goalNote = goal.trim()
-    ? `The student's personal goal: "${goal.trim()}". Focus feedback around this goal — do not criticize areas they haven't mentioned as priorities.`
+    ? `The student's stated goal: "${goal.trim()}". This goal is the CENTRAL lens for your entire response — you MUST explicitly mention it by name in the summary, explain directly whether today's session moved them closer to or further from it, and make the highlight field a concrete next step toward this specific goal. Do not give generic feedback that could apply to anyone. Every sentence should be written with this goal in mind.`
     : "Focus feedback on the areas they actually practiced today.";
 
-  return `You are an enthusiastic, sharp guitar coach. The user gives you their practice data for today. Write a short, personal, motivating summary (2-3 sentences). Be specific: mention what they actually practiced. Be real — if they practiced little, acknowledge it warmly. No generic "Great job!" openings.
+  if (practiceStyle === "hobby") {
+    return `You are a supportive friend who also plays guitar — not a professional instructor. The user shares their practice data with you. Write a short, warm, personal reaction (2-3 sentences). Mention what they actually played. Celebrate showing up, not the amount of time.
 
-${styleNote}
+Hobby player rules — follow these strictly:
+- 15 minutes of practice is a real win. 20 minutes is great. 25–30 is impressive. Never imply more time is required.
+- NEVER use phrases like "you need to", "at least X minutes", "you should", "it's important that you", or "try to practice more".
+- Consistency beats duration — if they showed up, that matters most.
+- If they practiced less than 15 minutes, be genuinely warm about it — even 10 minutes of guitar is better than none.
+- Suggestions in the highlight field must be optional and framed as "you could" or "next time you might", never as requirements.
+- Do NOT push them to practice more. Do NOT set expectations. Do NOT critique their session length.
+- Focus on what was fun or interesting about what they played, not on what they missed.
+
+${goalNote}
+
+Return ONLY clean JSON, nothing else:
+{
+  "summary": "2-3 sentence warm, friendly reaction to today's practice",
+  "highlight": "One gentle, optional suggestion or fun observation (max 12 words)",
+  "mood": "excellent|good|solid|light|rest"
+}
+
+Mood rules for hobby players (based on total practice minutes):
+- "excellent": 30+ min — they went above and beyond
+- "good": 15–29 min — solid, consistent practice
+- "solid": 8–14 min — showed up and that counts
+- "light": 1–7 min — touched the guitar, still worth celebrating
+- "rest": 0 min — rest day
+
+Language: English. Do NOT mention BPM or specific fret positions.`;
+  }
+
+  return `You are an experienced, sharp guitar coach. The user gives you their practice data for today. Write a short, personal, motivating summary (2-3 sentences). Be specific: mention what they actually practiced. Be real — if they practiced little, acknowledge it directly. No generic "Great job!" openings.
+
+This student is a serious, dedicated musician aiming for the highest level. Be direct, technically precise, and hold them to a high standard. Push them when needed.
 ${goalNote}
 
 Return ONLY clean JSON, nothing else:
@@ -116,7 +154,7 @@ export default async function handler(
     userMessage = `Today's practice:
 ${exerciseLines}${restLine}
 
-Total: ${totalMinutes} min, ${totalPoints} pts. Streak: ${streak}d. Level: ${userLevel}.`;
+Total: ${totalMinutes} min, ${totalPoints} pts. Streak: ${streakContext(streak)}. Level: ${userLevel}.`;
   }
 
   try {

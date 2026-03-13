@@ -20,7 +20,6 @@ export interface SessionRatingResponse {
   };
   strengths: string[];
   improvements: string[];
-  nextSessionTip: string;
 }
 
 export interface DailySummaryResponse {

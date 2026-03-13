@@ -5,7 +5,6 @@ import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
 
 import { SkillCard } from "./SkillCard";
-import { SkillRadarChart } from "./SkillRadarChart";
 
 interface SkillCategoryGroupProps {
   category: CategoryKeys;
@@ -33,29 +32,15 @@ export const SkillCategoryGroup = ({
          <div className="flex-1 h-px bg-zinc-800/50" />
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-8 items-start">
-         <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
-             {skills.map((skill, index) => (
-                 <SkillCard 
-                    key={skill.id}
-                    skill={skill}
-                    currentPoints={userSkills.unlockedSkills[skill.id] || 0}
-                    onSkillClick={() => onSkillClick(skill.id)}
-                 />
-             ))}
-         </div>
-         <div className="w-full xl:w-[540px] flex-shrink-0 sticky top-28">
-             <div className="relative bg-zinc-950/50 rounded-lg p-5 border border-zinc-800/30 overflow-hidden">
-                 <div className="flex items-center justify-between mb-4">
-                     <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest leading-none">Category Analysis</span>
-                 </div>
-                 <SkillRadarChart 
-                     category={category}
-                     skills={skills}
-                     userSkills={userSkills}
-                 />
-             </div>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full">
+          {skills.map((skill) => (
+              <SkillCard
+                 key={skill.id}
+                 skill={skill}
+                 currentPoints={userSkills.unlockedSkills[skill.id] || 0}
+                 onSkillClick={() => onSkillClick(skill.id)}
+              />
+          ))}
       </div>
     </div>
   );

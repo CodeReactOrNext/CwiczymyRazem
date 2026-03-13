@@ -11,12 +11,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { WeeklySummaryResponse } from "../types/summary.types";
 import { DailyAssessmentCard, PeriodRatingCard } from "../components/SessionRatingCard";
-import { firebaseGetAllDailySummaries, firebaseGetAllSummaries, firebaseGetDailySummary, firebaseGetSummary, firebaseSaveDailySummary, firebaseSaveSummary } from "../services/summary.service";
+import { firebaseGetAllDailySummaries, firebaseGetAllSummaries, firebaseGetDailySummary, firebaseGetPromptConfig, firebaseGetSummary, firebaseSaveDailySummary, firebaseSavePromptConfig, firebaseSaveSummary } from "../services/summary.service";
 import { firebaseGetAllDailyRatings } from "../services/rating.service";
 import type { SavedDailySummary, SavedSummary } from "../services/summary.service";
 import type { DailySummaryResponse, PromptConfig, SessionGrade } from "../types/summary.types";
 
-const PROMPT_CONFIG_KEY = "practice-summary-prompt-config";
 const GOAL_MAX_LENGTH = 150;
 const DEFAULT_PROMPT_CONFIG: PromptConfig = { practiceStyle: "hobby", goal: "" };
 
@@ -253,7 +252,7 @@ function ActivityHeatmap({
     });
 
     const weekId = `weekly-${localDateStr(monday)}`;
-    const saved = summaries.find(s => s.id === weekId);
+    const saved = summaries.find(s => s.id.startsWith(weekId));
     const monthLabel = monday.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
     return { offset, monday, days, saved, monthLabel };
@@ -823,11 +822,11 @@ export const SummaryView = () => {
   const lastWeekIdRef     = useRef<string>("");
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(PROMPT_CONFIG_KEY);
-      if (stored) setPromptConfig(JSON.parse(stored) as PromptConfig);
-    } catch { /* ignore */ }
-  }, []);
+    if (!userAuth) return;
+    firebaseGetPromptConfig(userAuth).then((config) => {
+      if (config) setPromptConfig(config);
+    });
+  }, [userAuth]);
 
   useEffect(() => {
     if (!userAuth) return;
@@ -918,8 +917,8 @@ export const SummaryView = () => {
   };
 
   // ── AI generation ──
-  const summaryId      = `weekly-${localDateStr(last7[0])}`;
-  const dailySummaryId = `daily-${localDateStr(selectedDate)}`;
+  const summaryId      = `weekly-${localDateStr(last7[0])}-${promptConfig.practiceStyle}`;
+  const dailySummaryId = `daily-${localDateStr(selectedDate)}-${promptConfig.practiceStyle}`;
 
   const generateAi = useCallback(async (force = false) => {
     if (!userAuth) return;
@@ -1132,7 +1131,7 @@ export const SummaryView = () => {
 
           <button
             onClick={() => {
-              try { localStorage.setItem(PROMPT_CONFIG_KEY, JSON.stringify(promptConfig)); } catch { /* ignore */ }
+              if (userAuth) void firebaseSavePromptConfig(userAuth, promptConfig);
               setShowConfig(false);
               loadedModes.current.clear();
               if (mode === "weekly") { setWeekly(null); generateAi(true); }
@@ -1209,6 +1208,8 @@ export const SummaryView = () => {
                     daily={daily}
                     dailyLoading={dailyAiLoading}
                     onRatingReady={() => userAuth && firebaseGetAllDailyRatings(userAuth).then(setDailyRatings)}
+                    practiceStyle={promptConfig.practiceStyle}
+                    goal={promptConfig.goal}
                   />
                 </div>
               ) : (
@@ -1278,6 +1279,8 @@ export const SummaryView = () => {
                 points={weekTotalPts}
                 streak={userStats?.actualDayWithoutBreak ?? 0}
                 userLevel={userStats?.lvl ?? 1}
+                practiceStyle={promptConfig.practiceStyle}
+                goal={promptConfig.goal}
               />
             </div>
           )}
@@ -1334,7 +1337,11 @@ export const SummaryView = () => {
                   <CoachSection icon={<CheckCircle2 size={14}/>} label="What went well" color="text-emerald-400">
                     {weekly.strengths}
                   </CoachSection>
-                  <CoachSection icon={<TriangleAlert size={14}/>} label="Areas to improve" color="text-yellow-400">
+                  <CoachSection
+                    icon={promptConfig.practiceStyle === "hobby" ? <Lightbulb size={14}/> : <TriangleAlert size={14}/>}
+                    label={promptConfig.practiceStyle === "hobby" ? "Make it even better" : "Areas to improve"}
+                    color={promptConfig.practiceStyle === "hobby" ? "text-emerald-400" : "text-yellow-400"}
+                  >
                     {weekly.areasToImprove}
                   </CoachSection>
                   <CoachSection icon={<Target size={14}/>} label="Plan for this week" color="text-link">
