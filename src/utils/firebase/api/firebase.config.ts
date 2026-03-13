@@ -56,8 +56,15 @@ const getAuth = () => {
   }
 };
 
+const getMessaging = () => {
+  try {
+    return admin.messaging();
+  } catch {
+    return {} as any;
+  }
+};
+
 const firestore = getFirestore();
 const auth = getAuth();
-
-const messaging = admin.messaging();
+const messaging = getMessaging();
 export { auth, firestore, messaging };
