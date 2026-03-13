@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
+import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Button } from "assets/components/ui/button";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { getAllBpmProgress, type BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
@@ -6,11 +6,12 @@ import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages"
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { Brain, ChevronRight, Ear, Guitar, Target, Zap, Lock, Star, ChevronLeft, Mic, Trophy } from "lucide-react";
+import { ChevronRight, Ear, Star, ChevronLeft, Mic, Trophy } from "lucide-react";
 
 import { useRouter } from "next/router";
 import { FaCheck } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
+import { useTranslation } from "hooks/useTranslation";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { SkillCategoryGroup } from "./SkillCategoryGroup";
 import { useState, useMemo, useCallback, useEffect } from "react";
@@ -52,8 +53,10 @@ export const SkillDashboard = ({
   const [isFinishing, setIsFinishing] = useState(false);
   const [leaderboardExercise, setLeaderboardExercise] = useState<{ id: string; title: string } | null>(null);
 
+  const { t } = useTranslation("skills");
   const userAuth = useAppSelector(selectUserAuth);
   const [progressMap, setProgressMap] = useState<Map<string, BpmProgressData>>(new Map());
+  const [activeDifficulty, setActiveDifficulty] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userAuth) return;
@@ -144,9 +147,19 @@ export const SkillDashboard = ({
     return { filteredTree: tree, uniqueDifficulties: difficulties };
   }, [selectedSkillId, exercisesByCategory]);
 
-  const selectedSkillName = useMemo(() => {
-    return guitarSkills.find(s => s.id === selectedSkillId)?.name || "Skill";
+  const currentDifficulty = activeDifficulty && uniqueDifficulties.includes(activeDifficulty)
+    ? activeDifficulty
+    : uniqueDifficulties[0] ?? null;
+
+  useEffect(() => {
+    setActiveDifficulty(null);
   }, [selectedSkillId]);
+
+  const selectedSkillName = useMemo(() => {
+    const skill = guitarSkills.find(s => s.id === selectedSkillId);
+    if (!skill) return "Skill";
+    return skill.name || t(`skills.${skill.id}.name` as any);
+  }, [selectedSkillId, t]);
 
   const handleStartChallenge = useCallback((challenge: DashboardExercise) => {
     setSelectedSkillId(null);
@@ -160,7 +173,7 @@ export const SkillDashboard = ({
 
   if (selectedChallenge) {
     return (
-      <div className="w-full min-h-[600px] bg-black rounded-3xl overflow-hidden border border-zinc-900 shadow-2xl relative">
+      <div className="w-full min-h-[600px] bg-second-800 rounded-3xl overflow-hidden border border-zinc-900 shadow-2xl relative">
         <div className="absolute top-6 left-6 z-[100]">
            <Button 
             variant="ghost" 
@@ -223,150 +236,161 @@ export const SkillDashboard = ({
             </div>
         </div>
 
-        <Dialog open={!!selectedSkillId} onOpenChange={(open) => !open && setSelectedSkillId(null)}>
-            <DialogContent className="max-w-[100dvw] sm:max-w-[700px] h-[100dvh] sm:h-auto sm:max-h-[85vh] overflow-y-auto bg-[#0a0a0a] border-zinc-900 p-0 sm:rounded-xl shadow-2xl">
-            <div className="p-6 md:p-10">
-              <DialogHeader className="mb-10 text-left">
-                <div className="flex flex-col gap-2">
-                   <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-1 bg-white/20 rounded-full" />
-                       <span className="text-[10px] font-semibold text-zinc-500 tracking-wide">Mastery Progress</span>
-                   </div>
-                   <DialogTitle className="text-2xl md:text-3xl font-bold text-white tracking-tight text-left">
-                      {selectedSkillName}
-                   </DialogTitle>
-                </div>
-              </DialogHeader>
-              
-              <div className="flex flex-col gap-12">
-                {uniqueDifficulties.length > 0 ? uniqueDifficulties.map((difficulty) => {
-                  const category = Object.keys(filteredTree)[0];
-                  const levelChallenges = filteredTree[category]?.[selectedSkillId!]?.filter(c => c.difficulty === difficulty) || [];
-                  if (levelChallenges.length === 0) return null;
-
-                  return (
-                    <div key={difficulty} className="flex flex-col gap-5">
-                      <div className="flex items-center gap-4">
-                         <div className={cn(
-                           "px-3 py-1 rounded-md border text-[10px] font-semibold tracking-wider",
-                          difficulty === 'easy' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" :
-                          difficulty === 'medium' ? "bg-amber-500/10 border-amber-500/20 text-amber-400" :
-                          "bg-rose-500/10 border-rose-500/20 text-rose-400"
-                        )}>
-                           {difficulty}
-                        </div>
-                        <div className="flex-1 h-px bg-zinc-900" />
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        {levelChallenges.map((challenge) => {
-                          const isAvailable = true;
-                          const exerciseDef = exercisesAgregat.find(e => e.id === challenge.id);
-                          const progress = progressMap.get(challenge.id);
-                          const bpmStages = exerciseDef?.metronomeSpeed ? generateBpmStages(exerciseDef.metronomeSpeed) : [];
-                          const completedBpms = progress?.completedBpms || [];
-                          const hasBpmProgress = bpmStages.length > 0 && completedBpms.length > 0;
-                          const micHighScore = progress?.micHighScore;
-                          const micAccuracy = progress?.micHighScoreAccuracy;
-                          const earTrainingHighScore = progress?.earTrainingHighScore;
-
-                          return (
-                            <div
-                              key={challenge.id}
-                              className={cn(
-                                "group relative p-5 rounded-xl border transition-all duration-300",
-                                isAvailable
-                                    ? "bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/80"
-                                    : "bg-zinc-950 border-zinc-900 opacity-60 grayscale"
-                              )}
-                            >
-                              <div className="flex items-start justify-between gap-6">
-                                <div className="flex flex-col gap-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-1 text-left">
-                                     <h5 className="font-bold text-white text-lg tracking-tight truncate">{challenge.title}</h5>
-                                  </div>
-                                  <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed font-medium mb-4 text-left">
-                                    {challenge.description}
-                                  </p>
-
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                     <div className="bg-emerald-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-emerald-500/20">
-                                         <span className="text-[9px] font-semibold text-emerald-500 tracking-wider">Skill Points</span>
-                                         <span className="text-xs font-bold text-emerald-400">+{challenge.difficulty === 'easy' ? 1 : challenge.difficulty === 'medium' ? 2 : 3}</span>
-                                     </div>
-
-                                     {hasBpmProgress && (
-                                       <div className="bg-cyan-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-cyan-500/20">
-                                         <FaCheck className="h-2.5 w-2.5 text-cyan-400" />
-                                          <span className="text-[9px] font-semibold text-cyan-500 tracking-wider">BPM</span>
-                                          <span className="text-xs font-bold text-cyan-400">{completedBpms.length}/{bpmStages.length}</span>
-                                       </div>
-                                     )}
-
-                                     {micHighScore != null && micHighScore > 0 && (
-                                       <div className="bg-amber-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-amber-500/20">
-                                         <Mic className="h-2.5 w-2.5 text-amber-400" />
-                                          <span className="text-[9px] font-semibold text-amber-500 tracking-wider">Record</span>
-                                          <span className="text-xs font-bold text-amber-400">{micHighScore.toLocaleString()}</span>
-                                         {micAccuracy != null && (
-                                           <span className="text-[9px] font-bold text-amber-600">({micAccuracy}%)</span>
-                                         )}
-                                       </div>
-                                     )}
-
-                                     {earTrainingHighScore != null && earTrainingHighScore > 0 && (
-                                       <div className="bg-purple-950/30 px-3 py-2 rounded-xl flex items-center gap-2 border border-purple-500/20">
-                                         <Ear className="h-2.5 w-2.5 text-purple-400" />
-                                          <span className="text-[9px] font-semibold text-purple-500 tracking-wider">Ear Record</span>
-                                          <span className="text-xs font-bold text-purple-400">{earTrainingHighScore}</span>
-                                       </div>
-                                     )}
-
-                                     {(bpmStages.length > 0 || !!exerciseDef?.riddleConfig || (exerciseDef?.tablature && exerciseDef.tablature.length > 0)) && (
-                                       <button
-                                         onClick={() => setLeaderboardExercise({ id: challenge.id, title: challenge.title as string })}
-                                         className="bg-zinc-800/60 px-3 py-2 rounded-xl flex items-center gap-1.5 border border-white/5 hover:border-white/15 hover:bg-zinc-800 transition-colors"
-                                       >
-                                         <Trophy className="h-2.5 w-2.5 text-zinc-500" />
-                                          <span className="text-[9px] font-semibold text-zinc-400 tracking-wider">Records</span>
-                                       </button>
-                                     )}
-                                  </div>
-                                </div>
-
-                                {isAvailable ? (
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleStartChallenge(challenge)}
-                                    className={cn(
-                                       "w-12 h-12 rounded-xl transition-all flex-shrink-0 flex items-center justify-center",
-                                      "bg-white hover:bg-zinc-200 text-black border-none shadow-[0_10px_20px_rgba(255,255,255,0.1)]"
-                                    )}
-                                  >
-                                    <ChevronRight size={20} strokeWidth={3} />
-                                  </Button>
-                                ) : (
-                                   <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-zinc-950 border border-zinc-900/50 text-zinc-800 flex-shrink-0">
-                                    <Lock size={18} />
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                }) : (
-                  <div className="flex flex-col items-center justify-center py-24 text-zinc-600">
-                    <Star size={32} className="mb-4 opacity-10" />
-                     <p className="text-sm font-semibold text-zinc-500">Growth in progress</p>
-                  </div>
-                )}
-              </div>
+        <Sheet open={!!selectedSkillId} onOpenChange={(open) => !open && setSelectedSkillId(null)}>
+          <SheetContent
+            side="right"
+            className="w-full sm:max-w-xl p-0 bg-[#0a0a0a] border-zinc-900 flex flex-col"
+          >
+            {/* Header */}
+            <div className="flex-shrink-0 px-6 pt-8 pb-5 border-b border-zinc-900">
+              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Exercises</span>
+              <SheetTitle className="text-3xl font-bold text-white tracking-tight mt-1">
+                {selectedSkillName}
+              </SheetTitle>
+              {uniqueDifficulties.length > 0 && (
+                <p className="mt-1 text-sm text-zinc-500">
+                  {Object.values(filteredTree)[0]?.[selectedSkillId!]?.length ?? 0} exercises available
+                </p>
+              )}
             </div>
-          </DialogContent>
-        </Dialog>
+
+            {uniqueDifficulties.length > 0 ? (
+              <>
+                {/* Difficulty tab buttons */}
+                <div className="flex-shrink-0 px-6 pt-4 pb-0">
+                  <div className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded-lg p-1">
+                    {uniqueDifficulties.map((d) => {
+                      const isActive = currentDifficulty === d;
+                      const label = d === 'easy' ? 'Easy' : d === 'medium' ? 'Medium' : 'Hard';
+                      const count = filteredTree[Object.keys(filteredTree)[0]]?.[selectedSkillId!]?.filter(c => c.difficulty === d).length ?? 0;
+                      const activeClass = d === 'easy'
+                        ? 'bg-emerald-500/15 text-emerald-400'
+                        : d === 'medium'
+                        ? 'bg-amber-500/15 text-amber-400'
+                        : 'bg-rose-500/15 text-rose-400';
+                      return (
+                        <button
+                          key={d}
+                          onClick={() => setActiveDifficulty(d)}
+                          className={cn(
+                            "flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors",
+                            isActive ? activeClass : "text-zinc-400 hover:text-zinc-200"
+                          )}
+                        >
+                          {label}
+                          <span className="text-xs opacity-50 font-normal">{count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Scrollable exercise list */}
+                <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500">
+                  {(filteredTree[Object.keys(filteredTree)[0]]?.[selectedSkillId!]?.filter(c => c.difficulty === currentDifficulty) ?? []).map((challenge) => {
+                    const exerciseDef = exercisesAgregat.find(e => e.id === challenge.id);
+                    const progress = progressMap.get(challenge.id);
+                    const bpmStages = exerciseDef?.metronomeSpeed ? generateBpmStages(exerciseDef.metronomeSpeed) : [];
+                    const completedBpms = progress?.completedBpms || [];
+                    const hasBpmProgress = bpmStages.length > 0 && completedBpms.length > 0;
+                    const micHighScore = progress?.micHighScore;
+                    const micAccuracy = progress?.micHighScoreAccuracy;
+                    const earTrainingHighScore = progress?.earTrainingHighScore;
+                    const hasLeaderboard = bpmStages.length > 0 || !!exerciseDef?.riddleConfig || (exerciseDef?.tablature && exerciseDef.tablature.length > 0);
+                    const sp = currentDifficulty === 'easy' ? 1 : currentDifficulty === 'medium' ? 2 : 3;
+                    const hasBeenAttempted = !!progress && (
+                      completedBpms.length > 0 ||
+                      (micHighScore != null && micHighScore > 0) ||
+                      (earTrainingHighScore != null && earTrainingHighScore > 0)
+                    );
+                    const diffColor = currentDifficulty === 'easy'
+                      ? { bar: "bg-emerald-500", badge: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" }
+                      : currentDifficulty === 'medium'
+                      ? { bar: "bg-amber-500", badge: "bg-amber-500/10 border-amber-500/20 text-amber-400" }
+                      : { bar: "bg-rose-500", badge: "bg-rose-500/10 border-rose-500/20 text-rose-400" };
+
+                    return (
+                      <div
+                        key={challenge.id}
+                        className={cn(
+                          "flex rounded-xl border overflow-hidden transition-all duration-200",
+                          hasBeenAttempted
+                            ? "border-zinc-700 bg-zinc-900/70 hover:bg-zinc-900"
+                            : "border-zinc-800/60 bg-zinc-900/30 hover:bg-zinc-900/60 hover:border-zinc-700"
+                        )}
+                      >
+                        <div className={cn("w-1 flex-shrink-0", diffColor.bar)} />
+                        <div className="flex-1 min-w-0 px-4 py-3 flex flex-col gap-2">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-white leading-snug">{challenge.title}</p>
+                              {hasBeenAttempted && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 mt-1">
+                                  <FaCheck className="h-2 w-2" />
+                                  Practiced
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => handleStartChallenge(challenge)}
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white hover:bg-zinc-200 text-black text-xs font-bold transition-colors flex-shrink-0"
+                            >
+                              Start
+                              <ChevronRight size={12} strokeWidth={3} />
+                            </button>
+                          </div>
+
+                          {challenge.description && (
+                            <p className="text-xs text-zinc-500 leading-relaxed line-clamp-2">{challenge.description}</p>
+                          )}
+
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className={cn("inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-md border", diffColor.badge)}>
+                              +{sp} skill {sp === 1 ? 'point' : 'points'}
+                            </span>
+                            {hasBpmProgress && (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-zinc-800/80 border border-zinc-700/60 text-zinc-300">
+                                <FaCheck className="h-2.5 w-2.5 text-main-300" />
+                                {completedBpms.length}/{bpmStages.length} BPM
+                              </span>
+                            )}
+                            {micHighScore != null && micHighScore > 0 && (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-300">
+                                <Mic className="h-2.5 w-2.5" />
+                                {micHighScore.toLocaleString()} pts
+                                {micAccuracy != null && <span className="text-amber-500 font-normal ml-0.5">({micAccuracy}%)</span>}
+                              </span>
+                            )}
+                            {earTrainingHighScore != null && earTrainingHighScore > 0 && (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-link/10 border border-link/20 text-link">
+                                <Ear className="h-2.5 w-2.5" />
+                                {earTrainingHighScore} pts
+                              </span>
+                            )}
+                            {hasLeaderboard && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setLeaderboardExercise({ id: challenge.id, title: challenge.title as string }); }}
+                                className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md text-zinc-500 border border-zinc-800 hover:border-zinc-700 hover:text-zinc-300 bg-transparent hover:bg-zinc-800/50 transition-colors"
+                              >
+                                <Trophy className="h-2.5 w-2.5" />
+                                Leaderboard
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-zinc-600">
+                <Star size={32} className="mb-4 opacity-10" />
+                <p className="text-sm font-semibold text-zinc-500">No exercises for this skill</p>
+              </div>
+            )}
+          </SheetContent>
+        </Sheet>
 
         {leaderboardExercise && (
           <EarTrainingLeaderboardDialog

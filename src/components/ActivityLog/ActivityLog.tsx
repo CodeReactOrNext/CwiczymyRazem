@@ -102,7 +102,7 @@ export const ActivityLogView = ({
                 className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                   year === yearValue
                     ? "bg-white/20 text-white"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
+                    : "text-white/60 hover:bg-white/15 hover:text-white"
                 }`}>
                 {yearValue}
               </button>
@@ -162,7 +162,7 @@ export const ActivityLogView = ({
             </div>
           </div>
 
-          <div className='flex items-center gap-2 text-[10px] font-medium text-zinc-500'>
+          <div className='flex items-center gap-2 text-[10px] font-medium text-zinc-400'>
             <span>Less</span>
             <div className='flex gap-[4px]'>
               <div className='h-3.5 w-3.5 rounded-[3px] bg-[#3f3f46]' />

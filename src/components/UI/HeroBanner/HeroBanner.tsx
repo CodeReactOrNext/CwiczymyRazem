@@ -37,9 +37,9 @@ export const HeroBanner = ({
       {/* Content */}
       <div className="relative z-10 flex w-full flex-col md:flex-row items-start md:items-center justify-between gap-8 p-8 md:p-8 lg:px-10 lg:py-12">
         <div className="space-y-2 max-w-2xl w-full md:w-auto text-center md:text-left">
-          <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-widest drop-shadow-lg">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-widest drop-shadow-lg">
             {title}
-          </h3>
+          </h1>
           {subtitle && (
             <p className="text-zinc-200 text-sm md:text-base lg:text-lg font-medium drop-shadow-md">
               {subtitle}

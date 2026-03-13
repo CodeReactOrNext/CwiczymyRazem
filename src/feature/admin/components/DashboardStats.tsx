@@ -35,8 +35,8 @@ export const DashboardStats = ({ totalSongs, missingCovers, unverifiedCount, noR
       label: "No Rating",
       value: noRatingCount,
       icon: AlertTriangle,
-      color: "text-purple-500",
-      bgColor: "bg-purple-500/10",
+      color: "text-main",
+      bgColor: "bg-main/10",
     },
   ];
 

@@ -180,19 +180,19 @@ export const WeeklyHorizontalTimeline = ({ userAuth }: WeeklyHorizontalTimelineP
                   allDone
                     ? 'bg-emerald-500/[0.04]'
                     : active
-                      ? 'bg-main/[0.05] '
+                      ? ''
                       : 'border-transparent hover:bg-white/[0.02]'
                 }`}>
 
                   {/* Top Label (Day & Date) */}
                   <div className="flex flex-col items-center justify-end pb-4 pt-4 w-full">
-                    <span className={`text-[10px] font-black tracking-[0.2em] mb-1 ${
+                    <span className={` text-[10px] font-black tracking-[0.2em] mb-1 ${
                       active ? 'text-main' : 'text-zinc-400'
                     }`}>
                       {format(date, 'EEE')}
                     </span>
                     <span className={` leading-none transition-all ${
-                       active ? 'text-4xl text-white' : 'text-3xl text-zinc-400 group-hover/day:text-zinc-200'
+                       active ? 'text-4xl text-white' : 'text-3xl text-zinc-400 group-hover/day:text-zinc-300'
                     }`}>
                       {format(date, 'dd')}
                     </span>
@@ -282,7 +282,7 @@ export const WeeklyHorizontalTimeline = ({ userAuth }: WeeklyHorizontalTimelineP
                         w-full h-9 mt-1 rounded-sm  flex items-center justify-center gap-1.5 transition-all group/add border
                         ${active
                           ? ' text-zinc-400 hover:border-main/40 hover:text-white hover:bg-main/5'
-                          : 'border-white/[0.06] text-zinc-600 hover:border-white/15 hover:text-zinc-400 hover:bg-white/[0.02]'
+                          : 'border-white/[0.06] text-zinc-500 hover:border-white/15 hover:text-zinc-300 hover:bg-white/[0.02]'
                         }
                       `}
                     >

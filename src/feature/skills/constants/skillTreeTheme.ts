@@ -19,12 +19,12 @@ export const SKILL_CATEGORY_THEMES: Record<CategoryKeys, SkillColorTheme> = {
     line: "#ef4444", // red-500
   },
   theory: {
-    primary: "text-blue-400",
-    bg: "bg-blue-900/20",
-    border: "border-blue-500",
-    shadow: "shadow-blue-500/20",
-    glow: "bg-blue-500",
-    line: "#3b82f6", // blue-500
+    primary: "text-main",
+    bg: "bg-main-900/20",
+    border: "border-main",
+    shadow: "shadow-main/20",
+    glow: "bg-main",
+    line: "#0891B2", // main (brand teal)
   },
   hearing: {
     primary: "text-emerald-400",
@@ -35,12 +35,12 @@ export const SKILL_CATEGORY_THEMES: Record<CategoryKeys, SkillColorTheme> = {
     line: "#10b981", // emerald-500
   },
   creativity: {
-    primary: "text-purple-400",
-    bg: "bg-purple-900/20",
-    border: "border-purple-500",
-    shadow: "shadow-purple-500/20",
-    glow: "bg-purple-500",
-    line: "#a855f7", // purple-500
+    primary: "text-amber-400",
+    bg: "bg-amber-900/20",
+    border: "border-amber-500",
+    shadow: "shadow-amber-500/20",
+    glow: "bg-amber-500",
+    line: "#f59e0b", // amber-500
   },
 };
 
