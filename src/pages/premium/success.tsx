@@ -38,7 +38,7 @@ export default function PremiumSuccessPage() {
   return (
     <>
       <Head>
-        <title>Premium aktywny | Riff Quest</title>
+        <title>Premium activated | Riff Quest</title>
       </Head>
 
       <div className="min-h-screen bg-[#020202] flex items-center justify-center px-4">
@@ -61,14 +61,14 @@ export default function PremiumSuccessPage() {
           <div className="space-y-3">
             <h1 className="text-3xl font-black tracking-tight text-white italic">
               {confirmed
-                ? <>Witaj w <span className="text-emerald-400">Premium!</span></>
-                : <span className="text-zinc-300">Aktywowanie konta...</span>
+                ? <>Welcome to <span className="text-emerald-400">Premium!</span></>
+                : <span className="text-zinc-300">Activating your account...</span>
               }
             </h1>
             <p className="text-zinc-400">
               {confirmed
-                ? "Twoja płatność została zaakceptowana. Wszystkie funkcje AI są już odblokowane."
-                : "Poczekaj chwilę — potwierdzamy Twoją płatność."
+                ? "Your payment was confirmed. All AI features are now unlocked."
+                : "Just a moment — we're confirming your payment."
               }
             </p>
           </div>
@@ -79,13 +79,13 @@ export default function PremiumSuccessPage() {
               <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-6 text-left space-y-3">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-400">
                   <Sparkles className="h-3.5 w-3.5" />
-                  Odblokowane funkcje
+                  Unlocked features
                 </div>
                 {[
-                  "AI Practice Summary (codzienny i tygodniowy)",
-                  "Roadmap — Twój spersonalizowany plan nauki",
-                  "Ocena sesji ćwiczeń przez AI",
-                  "Szczegółowe wskazówki do każdego etapu nauki",
+                  "AI Practice Summary (daily & weekly)",
+                  "Roadmap — your personalized learning plan",
+                  "AI session rating after every practice",
+                  "Detailed tips for each learning step",
                 ].map((f) => (
                   <div key={f} className="flex items-start gap-2 text-sm text-zinc-300">
                     <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
@@ -98,14 +98,14 @@ export default function PremiumSuccessPage() {
                 href="/dashboard"
                 className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-bold text-white hover:bg-emerald-500 transition-colors"
               >
-                Przejdź do dashboardu
+                Go to dashboard
                 <ArrowRight className="h-4 w-4" />
               </Link>
 
               <p className="text-xs text-zinc-600">
-                Możesz zarządzać subskrypcją w{" "}
+                You can manage your subscription in{" "}
                 <Link href="/settings" className="text-zinc-400 hover:text-white underline">
-                  ustawieniach
+                  settings
                 </Link>
                 .
               </p>
