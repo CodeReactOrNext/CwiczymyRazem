@@ -52,7 +52,7 @@ export const NavigationCard = ({
   return (
     <div
       className={cn(
-        "font-openSans group relative flex h-full transform cursor-pointer flex-col justify-between overflow-hidden rounded-xl border border-second-400/10 bg-gradient-to-br from-card via-second-500/95 to-second-600 p-3 shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2 sm:p-4",
+        "font-openSans group relative flex h-full transform cursor-pointer flex-col justify-between overflow-hidden rounded-xl border border-second-400/10 bg-zinc-900/50 p-3 shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2 sm:p-4 hover:bg-zinc-800/80",
         colors.ring
       )}
       onClick={onClick}
@@ -66,7 +66,7 @@ export const NavigationCard = ({
       )}
       
       <div
-        className={cn(colors.blur, "absolute right-0 top-0 -mr-10 -mt-10 h-32 w-32 rounded-full blur-2xl")}></div>
+        className={cn(colors.blur, "absolute right-0 top-0 -mr-10 -mt-10 h-32 w-32 rounded-full blur-[32px] opacity-40 transition-opacity group-hover:opacity-60")}></div>
 
       <div className="relative z-10 flex items-start justify-between gap-4">
         <div className="space-y-1">
