@@ -5,12 +5,11 @@ import { DashboardSection } from "components/Layout";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
 import { useRouter } from "next/router";
+import { selectUserInfo } from "feature/user/store/userSlice";
+import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
 
 // ActiveChallengeWidget removed
-import { ChevronRight } from "lucide-react";
-import { GiMetronome } from "react-icons/gi";
-
 import { WeeklyHorizontalTimeline } from "feature/weeklyScheduler/components/WeeklyHorizontalTimeline";
 import { HeroBanner } from "components/UI/HeroBanner";
 
@@ -26,6 +25,7 @@ const ProfileLandingLayout = ({
   featSlot,
 }: LandingLayoutProps) => {
   const router = useRouter();
+  const userInfo = useAppSelector(selectUserInfo);
   const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
 
   const todayStr = new Date().toDateString();
@@ -63,8 +63,6 @@ const ProfileLandingLayout = ({
       <div className="md:mt-6 space-y-6 p-4 md:p-6">
         <div className="relative z-10">
           <div className="space-y-6">
-            <WeeklyHorizontalTimeline userAuth={userAuth as string} />
-
             <NavigationCards />
           </div>
 
@@ -75,6 +73,12 @@ const ProfileLandingLayout = ({
               </div>
             </DashboardSection>
           </div>
+
+          {(userInfo?.role === "premium" || userInfo?.role === "admin") && (
+            <div className="mt-6">
+              <WeeklyHorizontalTimeline userAuth={userAuth as string} />
+            </div>
+          )}
 
           <div className="mt-8">
             <ActivityLogView
