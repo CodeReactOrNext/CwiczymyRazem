@@ -1,43 +1,40 @@
 import * as admin from "firebase-admin";
 
-const projectId = process.env.NEXT_PUBLIC_FIREBASE_CONFIG_PROJECTID;
-const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-const privateKey = (process.env.FIREBASE_PRIVATEKEY || "")
-  .replace(/\\n/g, "\n")
-  .replace(/^"|"$/g, "");
+function initializeFirebaseAdmin() {
+  if (admin.apps.length) return;
 
-const isConfigValid = !!(projectId && clientEmail && privateKey && privateKey.includes("BEGIN PRIVATE KEY"));
+  const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 
-if (!admin.apps.length) {
-  try {
-    if (isConfigValid) {
+  if (serviceAccountJson) {
+    try {
+      const serviceAccount = JSON.parse(serviceAccountJson);
       admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId: projectId!,
-          clientEmail: clientEmail!,
-          privateKey: privateKey!,
-        }),
+        credential: admin.credential.cert(serviceAccount),
         databaseURL: process.env.NEXT_PUBLIC_DATABASE_URL,
       });
-    } else {
-      // Initialize with dummy values for build time if config is missing
-      // This prevents "default app does not exist" but might fail on actual calls
-      // which is fine during SSG/Pre-rendering if those pages don't actually fetch
-      admin.initializeApp({
-        credential: admin.credential.cert({
-          projectId: "dummy-project-id",
-          clientEmail: "dummy@example.com",
-          privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC7Uz9X9X9X9X9X\n9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X\n9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X\n9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X\n9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X\n9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X9X\n-----END PRIVATE KEY-----\n",
-        }),
-        databaseURL: "https://dummy.firebaseio.com",
-      });
+      console.log("[Firebase Admin] Initialized with service account JSON");
+      return;
+    } catch (e) {
+      console.error("[Firebase Admin] Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON:", e);
     }
-  } catch (e) {
-    console.warn("Firebase Admin Initialization warning:", e);
   }
+
+  // Fallback: dummy init for build time
+  console.warn("[Firebase Admin] No FIREBASE_SERVICE_ACCOUNT_JSON — using dummy credentials (calls will fail)");
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: "dummy-project-id",
+        clientEmail: "dummy@example.com",
+        privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC7Uz9X9X9X9X9X\n-----END PRIVATE KEY-----\n",
+      }),
+      databaseURL: "https://dummy.firebaseio.com",
+    });
+  } catch {}
 }
 
-// Ensure we don't crash even if initializeApp somehow failed
+initializeFirebaseAdmin();
+
 const getFirestore = () => {
   try {
     return admin.firestore();
