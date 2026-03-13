@@ -1,6 +1,27 @@
 import { collection, doc, getDoc, getDocs, orderBy, query, setDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import type { DailySummaryResponse, WeeklySummaryResponse } from "../types/summary.types";
+import type { DailySummaryResponse, PromptConfig, WeeklySummaryResponse } from "../types/summary.types";
+
+const promptConfigDocRef = (userId: string) =>
+  doc(db, "users", userId, "settings", "promptConfig");
+
+export async function firebaseGetPromptConfig(userId: string): Promise<PromptConfig | null> {
+  try {
+    const snap = await getDoc(promptConfigDocRef(userId));
+    if (!snap.exists()) return null;
+    return snap.data() as PromptConfig;
+  } catch {
+    return null;
+  }
+}
+
+export async function firebaseSavePromptConfig(userId: string, config: PromptConfig): Promise<void> {
+  try {
+    await setDoc(promptConfigDocRef(userId), config);
+  } catch (err) {
+    console.error("Failed to save promptConfig to Firebase:", err);
+  }
+}
 
 export interface SavedSummary {
   id: string;

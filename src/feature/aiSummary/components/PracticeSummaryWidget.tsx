@@ -8,6 +8,7 @@ import {
   usePracticeSummary,
   type SummaryMode,
 } from "../hooks/usePracticeSummary";
+import { firebaseGetPromptConfig, firebaseSavePromptConfig } from "../services/summary.service";
 import { useEffect, useState } from "react";
 import {
   Brain,
@@ -24,7 +25,6 @@ import {
 } from "lucide-react";
 import type { DailySummaryResponse, PromptConfig, WeeklySummaryResponse } from "../types/summary.types";
 
-const PROMPT_CONFIG_KEY = "practice-summary-prompt-config";
 const GOAL_MAX_LENGTH = 150;
 
 const DEFAULT_CONFIG: PromptConfig = {
@@ -303,21 +303,15 @@ export const PracticeSummaryWidget = () => {
   const userStats = useAppSelector(selectCurrentUserStats);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(PROMPT_CONFIG_KEY);
-      if (stored) setPromptConfig(JSON.parse(stored) as PromptConfig);
-    } catch {
-      // ignore
-    }
-  }, []);
+    if (!userAuth) return;
+    firebaseGetPromptConfig(userAuth).then((config) => {
+      if (config) setPromptConfig(config);
+    });
+  }, [userAuth]);
 
   const handleSaveConfig = (newConfig: PromptConfig) => {
     setPromptConfig(newConfig);
-    try {
-      localStorage.setItem(PROMPT_CONFIG_KEY, JSON.stringify(newConfig));
-    } catch {
-      // ignore
-    }
+    if (userAuth) void firebaseSavePromptConfig(userAuth, newConfig);
   };
 
   const { dailySummary, weeklySummary, isLoading, error, regenerate } =

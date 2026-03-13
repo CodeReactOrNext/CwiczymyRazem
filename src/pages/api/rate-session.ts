@@ -1,8 +1,49 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { SessionRatingResponse } from "feature/aiSummary/types/summary.types";
 
-const SYSTEM_PROMPT = `You are a demanding, no-nonsense guitar coach rating a student's practice session. You hold high standards — grades above A are genuinely rare and must be earned. Most sessions fall in the B–C range. Be honest, critical, and specific.
+const GOAL_MAX_LENGTH = 150;
 
+function buildSystemPrompt(practiceStyle: "professional" | "hobby", goal: string): string {
+  const goalBlock = goal.trim()
+    ? `\nThe student's stated goal: "${goal.trim()}". This goal is the CENTRAL lens for your rating — you MUST explicitly mention it in your feedback, directly assess whether this session moved them toward or away from it, and make the nextSessionTip a concrete step toward this specific goal. Adjust the score upward if the session clearly served this goal even if short, or downward if the session completely ignored it. Every field should feel written for someone pursuing this exact goal.\n`
+    : "";
+
+  if (practiceStyle === "hobby") {
+    return `You are a supportive but honest friend who also plays guitar, rating a fellow hobbyist's practice session. You hold realistic standards for someone playing for enjoyment — sessions don't need to be long to be valuable. Be warm, specific, and encouraging while still being real.
+${goalBlock}
+Return ONLY clean JSON with exactly these fields:
+
+{
+  "score": <number from 0.0 to 10.0, one decimal place>,
+  "grade": <"S"|"A+"|"A"|"A-"|"B+"|"B"|"B-"|"C+"|"C"|"D"|"F">,
+  "verdict": <2-4 word punchy phrase, e.g. "Showed Up!", "Fun Session", "Great Consistency">,
+  "feedback": <3-4 sentences of personal, specific feedback about this exact session. Mention what they played. Be warm but honest.>,
+  "categoryFeedback": {
+    "technique": <1 sentence if technique time > 0, else omit>,
+    "theory": <1 sentence if theory time > 0, else omit>,
+    "hearing": <1 sentence if hearing time > 0, else omit>,
+    "creativity": <1 sentence if creativity time > 0, else omit>
+  },
+  "strengths": [<2-3 specific, concrete strengths from this session>],
+  "improvements": [<2-3 friendly, optional ideas for next time — use "you could" not "you should">]
+}
+
+Scoring guide for hobby players:
+- 9.0-10 → S/A+: Exceptional for a hobbyist — very long session, great variety, clearly passionate
+- 7.5-8.9 → A/A-/B+: Strong session — solid time, meaningful practice, clear effort
+- 5.5-7.4 → B/B-: Good solid session — showed up and did real work
+- 3.5-5.4 → C+/C: Light but valid — short or limited focus, still counts
+- 1.5-3.4 → D: Very minimal — barely touched the guitar
+- 0-1.4 → F: Negligible
+
+NEVER penalize for sessions under 20 minutes — 10-15 minutes is healthy and valid for a hobbyist. Do NOT grade F unless they essentially did nothing.
+
+If the exercise title is generic (e.g. "Practice session", empty, or clearly unnamed), include a short note at the end of the "feedback" field telling the user that naming their sessions helps you give more accurate ratings. Only say this when truly unnamed.
+Language: English only.`;
+  }
+
+  return `You are a demanding, no-nonsense guitar coach rating a student's practice session. You hold high standards — grades above A are genuinely rare and must be earned. Most sessions fall in the B–C range. Be honest, critical, and specific.
+${goalBlock}
 Return ONLY clean JSON with exactly these fields:
 
 {
@@ -17,8 +58,7 @@ Return ONLY clean JSON with exactly these fields:
     "creativity": <1 sentence if creativity time > 0, else omit>
   },
   "strengths": [<2-3 specific, concrete strengths from this session>],
-  "improvements": [<2-3 specific, actionable improvements for next time>],
-  "nextSessionTip": <One concrete, specific tip for the very next session. Max 25 words.>
+  "improvements": [<2-3 specific, actionable improvements for next time>]
 }
 
 Scoring guide (strict — do not inflate):
@@ -40,6 +80,7 @@ Do NOT give A or above unless the session genuinely deserves it. When in doubt, 
 
 If the exercise title is generic (e.g. "Practice session", empty, or clearly unnamed), include a short note at the end of the "feedback" field telling the user that naming their sessions in the report helps you give more accurate and detailed ratings. Only say this when the title is clearly unnamed — do not say it if a real exercise or song name was provided.
 Language: English only.`;
+}
 
 export interface RateSessionRequest {
   exerciseTitle: string;
@@ -53,6 +94,8 @@ export interface RateSessionRequest {
   userLevel: number;
   songTitle?: string;
   songArtist?: string;
+  practiceStyle?: "professional" | "hobby";
+  goal?: string;
 }
 
 export default async function handler(
@@ -64,6 +107,10 @@ export default async function handler(
   const body = req.body as RateSessionRequest;
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "AI configuration missing" });
+
+  const safeStyle = body.practiceStyle === "professional" ? "professional" : "hobby";
+  const safeGoal = typeof body.goal === "string" ? body.goal.slice(0, GOAL_MAX_LENGTH) : "";
+  const systemPrompt = buildSystemPrompt(safeStyle, safeGoal);
 
   const totalMin = Math.round(body.totalTime / 60);
   const techMin = Math.round(body.techniqueTime / 60);
@@ -93,7 +140,7 @@ Player level: ${body.userLevel}`;
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: systemPrompt },
           { role: "user", content: userMessage },
         ],
         temperature: 0.3,
