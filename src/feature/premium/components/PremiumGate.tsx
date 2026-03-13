@@ -19,7 +19,7 @@ const FEATURE_META: Record<
     desc: "Get AI-powered analysis of your daily and weekly practice sessions.",
   },
   "ai-coach": {
-    icon: <Map size={18} className="text-violet-400" />,
+    icon: <Map size={18} className="text-link" />,
     name: "Roadmap",
     desc: "Generate a personalized guitar learning roadmap tailored to your goals.",
   },
@@ -76,7 +76,7 @@ export function PremiumGate({ feature, children }: PremiumGateProps) {
     <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-6 px-4 pt-20 pb-16 sm:pt-28">
       {/* Feature badge */}
       <div className="flex items-center gap-2 rounded-full border border-zinc-700/60 bg-zinc-900 px-3.5 py-1.5">
-        <Lock size={11} className="text-zinc-500" />
+        <Lock size={14} className="text-zinc-500" />
         <span className="text-xs font-medium text-zinc-400">
           {meta.name} · Premium
         </span>

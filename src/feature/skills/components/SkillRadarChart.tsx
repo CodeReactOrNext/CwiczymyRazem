@@ -8,7 +8,7 @@ import {
 import type { CategoryKeys } from "components/Charts/ActivityChart"
 import { getSkillTheme } from "feature/skills/constants/skillTreeTheme"
 import { useTranslation } from "hooks/useTranslation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
 
 import type { GuitarSkill, UserSkills } from "../skills.types"
@@ -24,39 +24,40 @@ export function SkillRadarChart({ category, skills, userSkills }: SkillRadarChar
   const theme = getSkillTheme(category)
   const [isMobile, setIsMobile] = useState(false)
   const [chartRadius, setChartRadius] = useState("65%")
-  const [fontSize, setFontSize] = useState(11)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setChartRadius("65%") // Increased from 55% since icons are compact
-        setFontSize(9)
-        setIsMobile(true)
-      } else {
-        setChartRadius("75%")
-        setFontSize(11)
-        setIsMobile(false)
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width
+        if (width < 400) {
+          setChartRadius("65%")
+          setIsMobile(true)
+        } else {
+          setChartRadius("75%")
+          setIsMobile(false)
+        }
       }
+    })
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
     }
 
-    // Initial check
-    handleResize()
-
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
+    return () => observer.disconnect()
   }, [])
 
   const chartData = skills.map((skill) => ({
     subject: skill.name || t(`skills.${skill.id}.name` as any),
     points: userSkills.unlockedSkills[skill.id] || 0,
-    fullMark: 50, 
+    fullMark: 50,
     icon: skill.icon
   }))
 
   const chartConfig = {
     points: {
       label: "Points",
-      color: theme.line, 
+      color: theme.line,
     },
   } satisfies ChartConfig
 
@@ -83,7 +84,7 @@ export function SkillRadarChart({ category, skills, userSkills }: SkillRadarChar
             y={y}
             textAnchor={textAnchor}
             fill="#a1a1aa"
-            fontSize={fontSize}
+            fontSize={11}
         >
             <tspan dy="0.3em">{payload.value}</tspan>
         </text>
@@ -91,12 +92,7 @@ export function SkillRadarChart({ category, skills, userSkills }: SkillRadarChar
   }
 
   return (
-    <div className="flex justify-center items-center w-full h-full min-h-[250px] relative">
-       {/* Background Glow */}
-       <div
-        className="absolute inset-0  pointer-events-none "
-      />
-      
+    <div ref={containerRef} className="flex justify-center items-center w-full h-full min-h-[250px] relative">
       <ChartContainer
         config={chartConfig}
         className="mx-auto aspect-square max-h-[300px] w-full bg-transparent"
@@ -104,8 +100,8 @@ export function SkillRadarChart({ category, skills, userSkills }: SkillRadarChar
         <RadarChart data={chartData} outerRadius={chartRadius} margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
           <PolarGrid className="stroke-zinc-800" />
-          <PolarAngleAxis 
-             dataKey="subject" 
+          <PolarAngleAxis
+             dataKey="subject"
              tick={(props) => <CustomTick {...props} />}
           />
           <Radar

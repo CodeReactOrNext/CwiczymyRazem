@@ -3,45 +3,35 @@ import { getSkillTheme } from "feature/skills/constants/skillTreeTheme";
 import type { GuitarSkill } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
 import { ChevronRight } from "lucide-react";
-import { useRouter } from "next/router";
-
-interface SkillCardProps {
-  skill: GuitarSkill;
-  currentPoints: number;
-}
-
-const COLOR_CLASSES: Record<string, { iconBg: string; iconText: string; blur: string; ring: string }> = {
-  technique: {
-    iconBg: "bg-red-500/20",
-    iconText: "text-red-400",
-    blur: "bg-red-500/25",
-    ring: "hover:ring-red-500/40",
-  },
-  theory: {
-    iconBg: "bg-blue-500/20",
-    iconText: "text-blue-400",
-    blur: "bg-blue-500/25",
-    ring: "hover:ring-blue-500/40",
-  },
-  hearing: {
-    iconBg: "bg-emerald-500/20",
-    iconText: "text-emerald-400",
-    blur: "bg-emerald-500/25",
-    ring: "hover:ring-emerald-500/40",
-  },
-  creativity: {
-    iconBg: "bg-purple-500/20",
-    iconText: "text-purple-400",
-    blur: "bg-purple-500/25",
-    ring: "hover:ring-purple-500/40",
-  },
-};
 
 interface SkillCardProps {
   skill: GuitarSkill;
   currentPoints: number;
   onSkillClick: () => void;
 }
+
+const COLOR_CLASSES: Record<string, { iconBg: string; iconText: string; ring: string }> = {
+  technique: {
+    iconBg: "bg-red-500/20",
+    iconText: "text-red-400",
+    ring: "hover:ring-red-500/40",
+  },
+  theory: {
+    iconBg: "bg-main/20",
+    iconText: "text-main-300",
+    ring: "hover:ring-main/40",
+  },
+  hearing: {
+    iconBg: "bg-emerald-500/20",
+    iconText: "text-emerald-400",
+    ring: "hover:ring-emerald-500/40",
+  },
+  creativity: {
+    iconBg: "bg-amber-500/20",
+    iconText: "text-amber-400",
+    ring: "hover:ring-amber-500/40",
+  },
+};
 
 export const SkillCard = ({
   skill,
@@ -52,7 +42,6 @@ export const SkillCard = ({
   const theme = getSkillTheme(skill.category);
   const colors = COLOR_CLASSES[skill.category] || COLOR_CLASSES.technique;
   const Icon = skill.icon;
-  const router = useRouter();
 
   return (
     <div
@@ -64,8 +53,6 @@ export const SkillCard = ({
         colors.ring
       )}
     >
-      <div className={cn(colors.blur, "absolute right-0 top-0 -mr-10 -mt-10 h-32 w-32 rounded-full blur-2xl")} />
-
       <div className="relative z-10 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4 flex-1">
            <div className={cn(
@@ -84,7 +71,7 @@ export const SkillCard = ({
                 <span className={cn("text-2xl font-black tabular-nums leading-none tracking-tight", colors.iconText)}>
                     {currentPoints}
                 </span>
-                <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">XP</span>
+                <span className="text-zinc-500 text-xs font-bold uppercase tracking-wider">XP</span>
              </div>
            </div>
         </div>

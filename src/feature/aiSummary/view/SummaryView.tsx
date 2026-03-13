@@ -57,7 +57,7 @@ function weekStartDate(date: Date): string {
 const MOOD_CFG: Record<DailySummaryResponse["mood"], { label: string; chip: string; accent: string }> = {
   excellent: { label: "Excellent session",   chip: "bg-orange-500/10 text-orange-400 border-orange-500/25",   accent: "border-orange-500/40" },
   good:      { label: "Good practice",       chip: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25", accent: "border-emerald-500/40" },
-  solid:     { label: "Solid session",       chip: "bg-cyan-500/10 text-cyan-400 border-cyan-500/25",          accent: "border-cyan-500/40" },
+  solid:     { label: "Solid session",       chip: "bg-main/10 text-main border-main/25",                       accent: "border-main/40" },
   light:     { label: "Light practice",      chip: "bg-yellow-500/10 text-yellow-400 border-yellow-500/25",    accent: "border-yellow-500/40" },
   rest:      { label: "Rest day",            chip: "bg-zinc-800 text-zinc-500 border-zinc-700",                accent: "border-zinc-700/60" },
 };
@@ -67,7 +67,7 @@ const MOOD_CFG: Record<DailySummaryResponse["mood"], { label: string; chip: stri
 const WEEK_CFG = {
   excellent:    { label:"Exceptional week", chip:"bg-orange-500/10 text-orange-400 border-orange-500/25",   accent:"border-l-orange-500" },
   strong:       { label:"Strong week",      chip:"bg-emerald-500/10 text-emerald-400 border-emerald-500/25",accent:"border-l-emerald-500" },
-  good:         { label:"Good progress",    chip:"bg-cyan-500/10 text-cyan-400 border-cyan-500/25",         accent:"border-l-cyan-500" },
+  good:         { label:"Good progress",    chip:"bg-main/10 text-main border-main/25",                      accent:"border-l-main" },
   inconsistent: { label:"Inconsistent",     chip:"bg-yellow-500/10 text-yellow-400 border-yellow-500/25",   accent:"border-l-yellow-500" },
   minimal:      { label:"Minimal practice", chip:"bg-zinc-800 text-zinc-500 border-zinc-700",               accent:"border-l-zinc-700" },
 } satisfies Record<WeeklySummaryResponse["weekScore"], { label:string; chip:string; accent:string }>;
@@ -78,7 +78,7 @@ function dayDotClass(minutes: number): string {
   if (minutes === 0)          return "bg-zinc-800 border border-zinc-700";
   if (minutes < 15)           return "bg-yellow-500/40 border border-yellow-500/30";
   if (minutes < 30)           return "bg-yellow-500/70 border border-yellow-500/50";
-  if (minutes < 60)           return "bg-cyan-500/60 border border-cyan-500/40";
+  if (minutes < 60)           return "bg-main/60 border border-main/40";
   if (minutes < 120)          return "bg-emerald-500/70 border border-emerald-500/50";
   return "bg-orange-500/80 border border-orange-500/60";
 }
@@ -89,15 +89,15 @@ const DAY_SHORT = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
 const GRADE_DOT_TEXT: Record<SessionGrade, string> = {
   S: "text-amber-300", "A+": "text-emerald-300", A: "text-emerald-400",
-  "A-": "text-emerald-400", "B+": "text-cyan-300", B: "text-cyan-400",
-  "B-": "text-cyan-400", "C+": "text-yellow-300", C: "text-yellow-400",
+  "A-": "text-emerald-400", "B+": "text-main-300", B: "text-main",
+  "B-": "text-main", "C+": "text-yellow-300", C: "text-yellow-400",
   D: "text-orange-400", F: "text-red-400",
 };
 
 const GRADE_RING_COLOR: Record<SessionGrade, string> = {
   S:   "#f59e0b",
   "A+":"#10b981", A: "#10b981", "A-":"#34d399",
-  "B+":"#22d3ee", B: "#22d3ee", "B-":"#67e8f9",
+  "B+":"#0891B2", B: "#0891B2", "B-":"#67e8f9",
   "C+":"#fbbf24", C: "#fbbf24",
   D:   "#f97316",
   F:   "#ef4444",
@@ -116,7 +116,7 @@ function minutesRingColor(minutes: number): string {
   if (minutes === 0)   return "#3f3f46";
   if (minutes < 15)    return "#eab308";
   if (minutes < 30)    return "#eab308";
-  if (minutes < 60)    return "#06b6d4";
+  if (minutes < 60)    return "#0891B2";
   if (minutes < 120)   return "#10b981";
   return "#f97316";
 }
@@ -164,7 +164,7 @@ function DayActivityStrip({
               className={cn("flex flex-col items-center gap-1.5 flex-1 min-w-[48px] cursor-pointer group/dot")}
               onClick={() => onSelectDay(day)}
             >
-              <span className={cn("text-[9px] font-semibold uppercase tracking-wide transition-colors", isSelected ? "text-zinc-200" : "text-zinc-600 group-hover/dot:text-zinc-400")}>
+              <span className={cn("text-[10px] font-semibold uppercase tracking-wide transition-colors", isSelected ? "text-zinc-200" : "text-zinc-600 group-hover/dot:text-zinc-400")}>
                 {shortName}
               </span>
 
@@ -204,7 +204,7 @@ function DayActivityStrip({
                 </div>
               </div>
 
-              <span className={cn("text-[9px] tabular-nums transition-colors", isSelected ? "text-zinc-300" : "text-zinc-600 group-hover/dot:text-zinc-500")}>
+              <span className={cn("text-[10px] tabular-nums transition-colors", isSelected ? "text-zinc-300" : "text-zinc-600 group-hover/dot:text-zinc-500")}>
                 {dayNum}
               </span>
             </div>
@@ -220,7 +220,7 @@ function DayActivityStrip({
 const WEEK_DOT_TEXT: Record<WeeklySummaryResponse["weekScore"], string> = {
   excellent:    "text-orange-400",
   strong:       "text-emerald-400",
-  good:         "text-cyan-400",
+  good:         "text-main",
   inconsistent: "text-yellow-400",
   minimal:      "text-zinc-500",
 };
@@ -266,7 +266,7 @@ function ActivityHeatmap({
         <div className="flex flex-col gap-1 shrink-0">
           {DAY_ABBR.map(d => (
             <div key={d} className="h-5 flex items-center">
-              <span className="text-[9px] text-zinc-600 font-medium w-5">{d}</span>
+              <span className="text-[10px] text-zinc-600 font-medium w-5">{d}</span>
             </div>
           ))}
         </div>
@@ -296,7 +296,7 @@ function ActivityHeatmap({
                   />
                 ))}
                 <span className={cn(
-                  "text-[8px] tabular-nums font-medium text-center mt-0.5 truncate transition-colors block",
+                  "text-[10px] tabular-nums font-medium text-center mt-0.5 truncate transition-colors block",
                   isSelected ? "text-zinc-300" : scoreKey ? WEEK_DOT_TEXT[scoreKey] : "text-zinc-700"
                 )}>
                   {w.monthLabel}
@@ -324,18 +324,18 @@ function WeekDayGrid({ weekDays }: { weekDays: { date: Date; dayName: string; to
 
         return (
           <div key={i} className="flex flex-col items-center gap-1">
-            <span className="text-[9px] font-medium text-zinc-500 uppercase tracking-wide">{DAY_ABBR[i]}</span>
+            <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">{DAY_ABBR[i]}</span>
             <div className="flex items-end w-full justify-center h-16">
               <div
                 className={cn("w-full rounded-lg transition-all", dotCls)}
                 style={{ height: `${barH}px`, maxHeight: "64px" }}
               />
             </div>
-            <span className="text-[9px] text-zinc-500 tabular-nums font-medium">
+            <span className="text-[10px] text-zinc-500 tabular-nums font-medium">
               {d.totalMinutes > 0 ? fmtMinAsTime(d.totalMinutes) : "–"}
             </span>
             {d.totalPoints > 0 && (
-              <span className="text-[9px] text-amber-400/80 tabular-nums font-semibold">+{d.totalPoints}</span>
+              <span className="text-[10px] text-amber-400/80 tabular-nums font-semibold">+{d.totalPoints}</span>
             )}
           </div>
         );
@@ -397,10 +397,10 @@ function SectionHeading({ children, count, icon }: { children: React.ReactNode; 
 // ─── Category bars ────────────────────────────────────────────────────────────
 
 const CAT_COLORS: Record<string, { bar: string; text: string }> = {
-  "text-cyan-400":    { bar:"bg-cyan-500",    text:"text-cyan-400" },
-  "text-violet-400":  { bar:"bg-violet-500",  text:"text-violet-400" },
-  "text-emerald-400": { bar:"bg-emerald-500", text:"text-emerald-400" },
-  "text-amber-400":   { bar:"bg-amber-500",   text:"text-amber-400" },
+  "text-red-400":     { bar: "bg-red-500",    text: "text-red-400" },
+  "text-main":        { bar: "bg-main",        text: "text-main" },
+  "text-emerald-400": { bar: "bg-emerald-500", text: "text-emerald-400" },
+  "text-amber-400":   { bar: "bg-amber-500",   text: "text-amber-400" },
 };
 
 function CategoryBars({ rows }: {
@@ -433,7 +433,7 @@ function CategoryBars({ rows }: {
 
 // ─── Day timeline ─────────────────────────────────────────────────────────────
 
-const SESSION_PALETTE = ["#10b981", "#22d3ee", "#a78bfa", "#f59e0b", "#f97316", "#ec4899"];
+const SESSION_PALETTE = ["#10b981", "#0891B2", "#e5626b", "#f59e0b", "#f97316", "#ec4899"];
 
 function DayTimeline({ logs }: { logs: FirebaseUserExceriseLog[] }) {
   if (!logs.length) return null;
@@ -450,8 +450,8 @@ function DayTimeline({ logs }: { logs: FirebaseUserExceriseLog[] }) {
     const hearing = log.timeSumary?.hearingTime    || 0;
     const creat   = log.timeSumary?.creativityTime || 0;
     const chips = [
-      tech    && { label:"Tech",       val:tech,    cls:"text-cyan-400 bg-cyan-500/10" },
-      theory  && { label:"Theory",     val:theory,  cls:"text-violet-400 bg-violet-500/10" },
+      tech    && { label:"Tech",       val:tech,    cls:"text-red-400 bg-red-500/10" },
+      theory  && { label:"Theory",     val:theory,  cls:"text-main bg-main/10" },
       hearing && { label:"Ear",        val:hearing, cls:"text-emerald-400 bg-emerald-500/10" },
       creat   && { label:"Creativity", val:creat,   cls:"text-amber-400 bg-amber-500/10" },
     ].filter(Boolean) as { label:string; val:number; cls:string }[];
@@ -594,8 +594,8 @@ function SessionRow({ log }: { log: FirebaseUserExceriseLog }) {
   const creat   = log.timeSumary?.creativityTime || 0;
 
   const chips = [
-    tech    && { label:"Tech",       val:tech,    cls:"text-cyan-400 bg-cyan-500/10" },
-    theory  && { label:"Theory",     val:theory,  cls:"text-violet-400 bg-violet-500/10" },
+    tech    && { label:"Tech",       val:tech,    cls:"text-red-400 bg-red-500/10" },
+    theory  && { label:"Theory",     val:theory,  cls:"text-main bg-main/10" },
     hearing && { label:"Ear",        val:hearing, cls:"text-emerald-400 bg-emerald-500/10" },
     creat   && { label:"Creativity", val:creat,   cls:"text-amber-400 bg-amber-500/10" },
   ].filter(Boolean) as { label:string; val:number; cls:string }[];
@@ -613,7 +613,7 @@ function SessionRow({ log }: { log: FirebaseUserExceriseLog }) {
           {log.exceriseTitle || "Practice session"}
         </p>
         {log.songTitle && (
-          <p className="text-[11px] text-zinc-600 truncate mt-0.5">
+          <p className="text-xs text-zinc-600 truncate mt-0.5">
             {log.songArtist ? `${log.songArtist} — ` : ""}{log.songTitle}
           </p>
         )}
@@ -672,7 +672,7 @@ function PointsChart({ logs, today }: { logs: FirebaseUserExceriseLog[]; today: 
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
           <TrendingUp size={14} className="text-zinc-500"/>
-          Points — last week
+          Points — last 7 days
         </p>
         <div className="text-sm text-zinc-400">
           <span className="text-amber-400 font-semibold">{totalPts} pts</span>
@@ -711,24 +711,10 @@ function AiSkeleton({ lines = 3 }: { lines?: number }) {
       {Array.from({length: lines}).map((_, i) => (
         <div
           key={i}
-          className={cn("h-3 rounded-full overflow-hidden bg-zinc-800", i === lines-1 ? "w-2/3" : "w-full")}
-        >
-          <div
-            className="h-full w-full"
-            style={{
-              background: "linear-gradient(90deg, transparent 0%, rgba(16,185,129,0.08) 50%, transparent 100%)",
-              backgroundSize: "200% 100%",
-              animation: `shimmer 1.8s ease-in-out ${i * 0.15}s infinite`,
-            }}
-          />
-        </div>
+          className={cn("h-3 rounded-full bg-zinc-800 animate-pulse", i === lines-1 ? "w-2/3" : "w-full")}
+          style={{ animationDelay: `${i * 0.15}s` }}
+        />
       ))}
-      <style jsx>{`
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -752,7 +738,7 @@ function ModeToggle({ mode, onChange }: { mode: Mode; onChange: (m: Mode) => voi
           )}
         >
           {m === "daily" ? <Calendar size={14}/> : <CalendarDays size={14}/>}
-          {m === "daily" ? "Yesterday" : "Last Week"}
+          {m === "daily" ? "Daily" : "Weekly"}
         </button>
       ))}
     </div>
@@ -794,7 +780,7 @@ function BestSessionCard({ logs }: { logs: FirebaseUserExceriseLog[] }) {
         <p className="text-[10px] font-semibold text-amber-400/70 uppercase tracking-widest mb-0.5">Best session this week</p>
         <p className="text-sm font-semibold text-zinc-200 truncate">{best.exceriseTitle || "Practice session"}</p>
         {best.songTitle && (
-          <p className="text-[11px] text-zinc-600 truncate mt-0.5">
+          <p className="text-xs text-zinc-600 truncate mt-0.5">
             {best.songArtist ? `${best.songArtist} — ` : ""}{best.songTitle}
           </p>
         )}
@@ -1064,10 +1050,12 @@ export const SummaryView = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowConfig(v => !v)}
+            aria-label="AI Coach settings"
+            aria-expanded={showConfig}
             className={cn(
               "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all",
               showConfig
-                ? "bg-violet-500/20 border-violet-500/40 text-violet-300"
+                ? "bg-link/20 border-link/40 text-link"
                 : "bg-zinc-800/60 border-white/5 text-zinc-400 hover:text-zinc-200 hover:border-white/10"
             )}
           >
@@ -1080,11 +1068,12 @@ export const SummaryView = () => {
 
       {/* ── AI Coach config panel ──────────────────────────── */}
       {showConfig && (
-        <div className="rounded-2xl border border-violet-500/20 bg-zinc-900/80 p-5 flex flex-col gap-4">
+        <div className="rounded-2xl border border-link/20 bg-zinc-900/80 p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-zinc-200">AI Coach Settings</span>
             <button
               onClick={() => setShowConfig(false)}
+              aria-label="Close AI Coach settings"
               className="p-1 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/60 transition-colors"
             >
               <X size={14} />
@@ -1100,7 +1089,7 @@ export const SummaryView = () => {
                 className={cn(
                   "flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold border transition-all",
                   promptConfig.practiceStyle === "hobby"
-                    ? "bg-violet-500/15 border-violet-500/40 text-violet-300"
+                    ? "bg-link/15 border-link/40 text-link"
                     : "bg-zinc-800/40 border-white/5 text-zinc-500 hover:text-zinc-300"
                 )}
               >
@@ -1132,7 +1121,7 @@ export const SummaryView = () => {
               value={promptConfig.goal}
               onChange={(e) => setPromptConfig(c => ({ ...c, goal: e.target.value.slice(0, GOAL_MAX_LENGTH) }))}
               placeholder="e.g. I want to learn fingerpicking and play folk songs"
-              className="w-full bg-zinc-800/60 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-zinc-300 placeholder-zinc-600 resize-none outline-none focus:border-violet-500/40 transition-colors"
+              className="w-full bg-zinc-800/60 border border-white/[0.06] rounded-xl px-4 py-3 text-sm text-zinc-300 placeholder-zinc-600 resize-none outline-none focus:border-link/40 transition-colors"
               rows={2}
             />
             <div className="flex justify-between">
@@ -1149,7 +1138,7 @@ export const SummaryView = () => {
               if (mode === "weekly") { setWeekly(null); generateAi(true); }
               else { setDaily(null); generateDailyAi(true); }
             }}
-            className="self-end px-5 py-2 rounded-xl text-sm font-bold bg-violet-500/20 border border-violet-500/30 text-violet-300 hover:bg-violet-500/30 transition-colors"
+            className="self-end px-5 py-2 rounded-xl text-sm font-bold bg-link/20 border border-link/30 text-link hover:bg-link/30 transition-colors"
           >
             Save &amp; regenerate
           </button>
@@ -1182,8 +1171,8 @@ export const SummaryView = () => {
           {/* Today — summary not available yet */}
           {isSameDay(selectedDate, today) ? (
             <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-zinc-800 py-16 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-500/10 ring-1 ring-violet-500/20">
-                <Sparkles className="h-6 w-6 text-violet-400 opacity-60" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-link/10 ring-1 ring-link/20">
+                <Sparkles className="h-6 w-6 text-link opacity-60" />
               </div>
               <div className="flex flex-col gap-1">
                 <p className="text-sm font-semibold text-zinc-300">Today&apos;s summary isn&apos;t ready yet</p>
@@ -1274,7 +1263,9 @@ export const SummaryView = () => {
           {/* Period rating */}
           {weekTotalMin > 0 && (
             <div>
-              <SectionHeading icon={<Sparkles size={16}/>}>Last week's rating</SectionHeading>
+              <SectionHeading icon={<Sparkles size={16}/>}>
+                {weekOffset === 1 ? "Last week's rating" : `${last7[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })} week rating`}
+              </SectionHeading>
               <PeriodRatingCard
                 compact
                 ratingId={`weekly-${localDateStr(last7[0])}`}
@@ -1293,7 +1284,9 @@ export const SummaryView = () => {
 
           {/* AI weekly report */}
           <div>
-            <SectionHeading icon={<Sparkles size={16}/>}>Coach's weekly report</SectionHeading>
+            <SectionHeading icon={<Sparkles size={16}/>}>
+              {weekOffset === 1 ? "Coach's weekly report" : `Coach's report — ${last7[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })}`}
+            </SectionHeading>
 
             {aiLoading && (
               <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 p-6 flex flex-col gap-8">
@@ -1335,7 +1328,7 @@ export const SummaryView = () => {
 
                 {/* 4 sections in 2x2 grid */}
                 <div className="grid gap-3 p-4 sm:grid-cols-2">
-                  <CoachSection icon={<Brain size={14}/>} label="Week overview" color="text-cyan-400">
+                  <CoachSection icon={<Brain size={14}/>} label="Week overview" color="text-main">
                     {weekly.overview}
                   </CoachSection>
                   <CoachSection icon={<CheckCircle2 size={14}/>} label="What went well" color="text-emerald-400">
@@ -1344,7 +1337,7 @@ export const SummaryView = () => {
                   <CoachSection icon={<TriangleAlert size={14}/>} label="Areas to improve" color="text-yellow-400">
                     {weekly.areasToImprove}
                   </CoachSection>
-                  <CoachSection icon={<Target size={14}/>} label="Plan for this week" color="text-violet-400">
+                  <CoachSection icon={<Target size={14}/>} label="Plan for this week" color="text-link">
                     {weekly.nextWeekPlan}
                   </CoachSection>
                 </div>
