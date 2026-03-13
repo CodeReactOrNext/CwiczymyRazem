@@ -7,7 +7,6 @@ import {
 import { firebaseGetRating, firebaseSaveRating } from "../services/rating.service";
 import {
   CheckCircle2,
-  Lightbulb,
   Sparkles,
   TriangleAlert,
 } from "lucide-react";
@@ -169,17 +168,6 @@ function RatingBody({ rating, ringAnimated, cfg, compact = false }: {
         )}
       </div>
 
-      {!compact && (
-        <div className="mt-4 pt-4 border-t border-zinc-800/50">
-          <div className="flex items-start gap-3 rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3">
-            <Lightbulb size={16} className="text-amber-400 mt-0.5 shrink-0" />
-            <div>
-              <span className="text-sm font-medium text-amber-500 mr-2">Next session tip:</span>
-              <span className="text-sm text-zinc-300">{rating.nextSessionTip}</span>
-            </div>
-          </div>
-        </div>
-      )}
 
     </>
   );
@@ -294,6 +282,8 @@ export interface PeriodRatingCardProps {
   streak?: number;
   userLevel?: number;
   compact?: boolean;
+  practiceStyle?: "professional" | "hobby";
+  goal?: string;
 }
 
 // ─── Daily assessment card (merged: rating + coach summary) ───────────────────
@@ -302,12 +292,13 @@ export interface DailyAssessmentCardProps extends PeriodRatingCardProps {
   daily: DailySummaryResponse | null;
   dailyLoading: boolean;
   onRatingReady?: () => void;
+  // practiceStyle and goal inherited from PeriodRatingCardProps
 }
 
 export function DailyAssessmentCard({
   ratingId, label, techniqueTime, theoryTime, hearingTime, creativityTime,
   totalTime, points, streak = 0, userLevel = 1,
-  daily, dailyLoading, onRatingReady,
+  daily, dailyLoading, onRatingReady, practiceStyle, goal,
 }: DailyAssessmentCardProps) {
   const userAuth = useAppSelector(selectUserAuth) as string | null;
   const [rating, setRating] = useState<SessionRatingResponse | null>(null);
@@ -334,7 +325,7 @@ export function DailyAssessmentCard({
       const res = await fetch("/api/rate-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exerciseTitle: label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak, userLevel }),
+        body: JSON.stringify({ exerciseTitle: label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak, userLevel, practiceStyle, goal }),
       });
       if (!res.ok) throw new Error("Failed");
       const data = await res.json() as SessionRatingResponse;
@@ -412,20 +403,6 @@ export function DailyAssessmentCard({
             )}
           </div>
 
-          {/* Tip: daily highlight OR rating nextSessionTip */}
-          <div className="pt-3 border-t border-zinc-800/50">
-            <div className="flex items-start gap-3 rounded-xl border border-amber-500/10 bg-amber-500/5 px-4 py-3">
-              <Lightbulb size={15} className="text-amber-400 mt-0.5 shrink-0" />
-              <div>
-                <span className="text-sm font-medium text-amber-500 mr-2">
-                  {daily?.highlight ? "Today's tip:" : "Next session tip:"}
-                </span>
-                <span className="text-sm text-zinc-300">
-                  {daily?.highlight ?? rating.nextSessionTip}
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </div>
@@ -435,7 +412,7 @@ export function DailyAssessmentCard({
 // ─── Period rating card (whole day / whole week) ───────────────────────────────
 
 export function PeriodRatingCard({
-  ratingId, label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak = 0, userLevel = 1, compact = false,
+  ratingId, label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak = 0, userLevel = 1, compact = false, practiceStyle, goal,
 }: PeriodRatingCardProps) {
   const userAuth = useAppSelector(selectUserAuth) as string | null;
   const [rating, setRating] = useState<SessionRatingResponse | null>(null);
@@ -464,7 +441,7 @@ export function PeriodRatingCard({
       const res = await fetch("/api/rate-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exerciseTitle: label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak, userLevel }),
+        body: JSON.stringify({ exerciseTitle: label, techniqueTime, theoryTime, hearingTime, creativityTime, totalTime, points, streak, userLevel, practiceStyle, goal }),
       });
       if (!res.ok) throw new Error("Failed");
       const data = await res.json() as SessionRatingResponse;
