@@ -421,7 +421,7 @@ const ReportView = () => {
                     </div>
                     <div className='mt-8 pt-8 border-t border-white/5'>
                       <div className="flex flex-col items-center md:items-end gap-4">
-                        <div className='flex items-center rounded-2xl border border-white/10 bg-zinc-900/60 p-1 px-4 py-2 shadow-2xl backdrop-blur-md'>
+                        <div className='flex items-center rounded-xl  bg-zinc-900/60 p-1 px-6 py-4 shadow-2xl backdrop-blur-md'>
                           <div className="flex flex-col items-start mr-6">
                             <span className='text-[9px] font-semibold tracking-wide text-zinc-600 mb-0.5'>
                               {t("total_time")}
@@ -435,7 +435,7 @@ const ReportView = () => {
                             <Button
                               type='submit'
                               loading={isFetching}
-                              className="h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs tracking-wide shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all animate-in zoom-in-95 duration-300"
+                              className=" bg-emerald-600 hover:bg-emerald-500 text-white "
                             >
                               <Check className="mr-2 h-4 w-4" />
                               Save Now
@@ -583,7 +583,6 @@ const ReportView = () => {
                                     variant={isSelected ? "default" : "outline"}
                                     onClick={() => setFieldValue("countBackDays", days)}
                                     className={cn(
-                                      "relative rounded-full border px-6 transition-all",
                                       isSelected
                                         ? "border-transparent bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.3)] font-bold"
                                         : "border-white/10 bg-zinc-900/50 text-zinc-400 hover:text-white"
@@ -607,7 +606,7 @@ const ReportView = () => {
                               type='submit'
                               loading={isFetching}
                               disabled={Object.keys(errors).length !== 0 || !isStep1Done}
-                              className='h-14 min-w-[280px] rounded-xl bg-white text-black font-bold text-lg transition-all hover:scale-[1.02] active:scale-95 shadow-xl disabled:opacity-50'>
+                             >
                               <div className="flex items-center gap-2">
                                 <Check className='h-6 w-6 text-emerald-600' />
                                 <span>{isFetching ? "Saving..." : "Finish & Save Practice"}</span>

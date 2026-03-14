@@ -12,7 +12,7 @@ export function TableSkeleton({ rows = 5, className }: TableSkeletonProps) {
       {Array.from({ length: rows }).map((_, i) => (
         <div 
           key={i} 
-          className="relative overflow-hidden radius-premium glass-card p-4 sm:p-6"
+          className="relative overflow-hidden rounded-2xl glass-card p-4 sm:p-6"
         >
           <div className="flex items-center gap-4 sm:gap-6">
             {/* Rank Skeleton */}

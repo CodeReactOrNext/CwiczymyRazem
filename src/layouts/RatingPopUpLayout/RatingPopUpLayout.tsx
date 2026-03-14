@@ -130,7 +130,7 @@ const RatingPopUpLayout = ({
   if (hideWrapper) return content;
 
   return (
-    <MainContainer title="Practice Summary">
+    <MainContainer noBorder>
       {content}
     </MainContainer>
   );

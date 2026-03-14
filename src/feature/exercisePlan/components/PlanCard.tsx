@@ -31,47 +31,53 @@ interface PlanCardProps {
 
 const categoryStyles = {
   technique: {
-    gradient: "from-blue-500/10 via-zinc-950/50 to-zinc-950",
-    border: "border-blue-500/20",
+    gradient: "from-blue-500/15 via-zinc-900/60 to-zinc-950",
+    border: "border-blue-500/25",
+    accent: "from-blue-400 to-blue-600",
     icon: FaGuitar,
-    text: "text-blue-500",
-    badge: "bg-blue-500/10 text-blue-200 border-blue-500/20",
+    text: "text-blue-400",
+    badge: "bg-blue-500/15 text-blue-200 border-blue-500/25",
   },
   theory: {
-    gradient: "from-emerald-500/10 via-zinc-950/50 to-zinc-950",
-    border: "border-emerald-500/20",
+    gradient: "from-emerald-500/15 via-zinc-900/60 to-zinc-950",
+    border: "border-emerald-500/25",
+    accent: "from-emerald-400 to-emerald-600",
     icon: FaBrain,
-    text: "text-emerald-500",
-    badge: "bg-emerald-500/10 text-emerald-200 border-emerald-500/20",
+    text: "text-emerald-400",
+    badge: "bg-emerald-500/15 text-emerald-200 border-emerald-500/25",
   },
   creativity: {
-    gradient: "from-purple-500/10 via-zinc-950/50 to-zinc-950",
-    border: "border-purple-500/20",
+    gradient: "from-purple-500/15 via-zinc-900/60 to-zinc-950",
+    border: "border-purple-500/25",
+    accent: "from-purple-400 to-purple-600",
     icon: FaMusic,
-    text: "text-purple-500",
-    badge: "bg-purple-500/10 text-purple-200 border-purple-500/20",
+    text: "text-purple-400",
+    badge: "bg-purple-500/15 text-purple-200 border-purple-500/25",
   },
   hearing: {
-    gradient: "from-amber-500/10 via-zinc-950/50 to-zinc-950",
-    border: "border-amber-500/20",
+    gradient: "from-amber-500/15 via-zinc-900/60 to-zinc-950",
+    border: "border-amber-500/25",
+    accent: "from-amber-400 to-amber-600",
     icon: FaMusic,
-    text: "text-amber-500",
-    badge: "bg-amber-500/10 text-amber-200 border-amber-500/20",
+    text: "text-amber-400",
+    badge: "bg-amber-500/15 text-amber-200 border-amber-500/25",
   },
   mixed: {
-    gradient: "from-red-500/10 via-zinc-950/50 to-zinc-950",
-    border: "border-red-500/20",
+    gradient: "from-red-500/15 via-zinc-900/60 to-zinc-950",
+    border: "border-red-500/25",
+    accent: "from-red-400 to-red-600",
     icon: FaLayerGroup,
-    text: "text-red-500",
-    badge: "bg-red-500/10 text-red-200 border-red-500/20",
+    text: "text-red-400",
+    badge: "bg-red-500/15 text-red-200 border-red-500/25",
   },
   playalong: {
-    gradient: "from-red-500/10 via-zinc-950/50 to-zinc-950",
+    gradient: "from-red-500/15 via-zinc-900/60 to-zinc-950",
     border: "border-red-500/40",
+    accent: "from-red-500 to-red-700",
     icon: FaYoutube,
-    text: "text-red-500",
+    text: "text-red-400",
     badge: "bg-red-600 text-white border-red-500/30 font-bold",
-  }
+  },
 };
 
 export const PlanCard = ({
@@ -112,14 +118,17 @@ export const PlanCard = ({
   return (
     <Card
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-xl p-4 glass-card radius-premium click-behavior",
+        "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5 p-4 glass-card rounded-2xl click-behavior",
         style.border,
         style.gradient,
         hasPlayalong && "border-red-500/30",
         isLoading && "opacity-80 pointer-events-none"
       )}
       onClick={onSelect}>
-      
+
+      {/* Top accent line */}
+      <div className={cn("absolute left-0 right-0 top-0 h-[2px] bg-gradient-to-r opacity-70", style.accent)} />
+
       {/* Header: Category Icon & Badges */}
       <div className="mb-3 flex items-start justify-between">
         <div className="flex flex-wrap items-center gap-2">

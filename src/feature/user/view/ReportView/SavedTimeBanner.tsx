@@ -33,7 +33,7 @@ const SavedTimeBanner = ({ timerData, onApply, onDismiss }: SavedTimeBannerProps
   ];
 
   return (
-    <div className="mb-6 rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4 backdrop-blur-sm animate-in fade-in slide-in-from-top-3 duration-500">
+    <div className="mb-6 rounded-xl  bg-cyan-500/5 p-4 backdrop-blur-sm animate-in fade-in slide-in-from-top-3 duration-500">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1">
           <p className="text-sm font-bold text-cyan-400 mb-1.5">
@@ -59,17 +59,13 @@ const SavedTimeBanner = ({ timerData, onApply, onDismiss }: SavedTimeBannerProps
         </div>
         <div className="flex gap-2">
           <Button
-            type="button"
             variant="outline"
             onClick={onDismiss}
-            className="h-9 rounded-xl border-white/10 bg-transparent text-xs font-bold text-zinc-400 hover:text-white"
           >
             Dismiss
           </Button>
           <Button
-            type="button"
             onClick={onApply}
-            className="h-9 rounded-xl bg-cyan-500 text-xs font-black text-black hover:bg-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]"
           >
             Apply Time
           </Button>

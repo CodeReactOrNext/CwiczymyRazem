@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { HeroBanner } from "components/UI/HeroBanner";
 import MainContainer from "components/MainContainer";
 import { AddRecordingModal } from "feature/recordings/components/AddRecordingModal";
 import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
@@ -43,55 +44,52 @@ const RecordingsView = () => {
   }, [view, userId, setFilterByUserId]);
 
   return (
-    <MainContainer title="Recordings">
-      <div className="flex flex-col gap-6 p-4 lg:p-8 min-h-screen font-openSans">
-        
-        {/* Header Actions */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-           <div className="flex flex-col gap-4">
-              <p className="text-sm text-zinc-400 max-w-2xl leading-relaxed">
-                  Share your progress, covers, and practice sessions with the community.
-              </p>
-              
-              {/* Tabs */}
-              <div className="flex items-center gap-2 p-1 bg-zinc-900 rounded-lg w-fit border border-white/5">
-                  <button
-                      onClick={() => setView("all")}
-                      className={cn(
-                          "px-4 py-2 rounded-md text-sm font-bold flex items-center gap-2 transition-all",
-                          view === "all" 
-                              ? "bg-zinc-800 text-white shadow-sm" 
-                              : "text-zinc-500 hover:text-zinc-300"
-                      )}
-                  >
-                      <LayoutGrid className="h-4 w-4" />
-                      All Recordings
-                  </button>
-                  <button
-                      onClick={() => setView("mine")}
-                      disabled={!userId}
-                      className={cn(
-                          "px-4 py-2 rounded-md text-sm font-bold flex items-center gap-2 transition-all",
-                          view === "mine" 
-                              ? "bg-zinc-800 text-white shadow-sm" 
-                              : "text-zinc-500 hover:text-zinc-300",
-                          !userId && "opacity-50 cursor-not-allowed"
-                      )}
-                  >
-                      <User className="h-4 w-4" />
-                      My Recordings
-                  </button>
-              </div>
-           </div>
-           
-           <Button 
-                onClick={() => setIsAddModalOpen(true)}
-                className="h-11 bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-[0_0_20px_rgba(8,145,178,0.3)] border-none px-6"
-           >
-                <Plus className="mr-2 h-5 w-5" />
-                Add Recording
-           </Button>
+    <MainContainer>
+      <HeroBanner
+        title="Recordings"
+        subtitle="Listen back and share your practice sessions"
+        eyebrow="Recordings"
+        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+        rightContent={
+          <Button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="h-11 bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-[0_0_20px_rgba(8,145,178,0.3)] border-none px-6"
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            Add Recording
+          </Button>
+        }
+      >
+        <div className="flex items-center gap-2 p-1 bg-zinc-900 rounded-lg w-fit border border-white/5 mt-4">
+          <button
+            onClick={() => setView("all")}
+            className={cn(
+              "px-4 py-2 rounded-md text-sm font-bold flex items-center gap-2 transition-all",
+              view === "all" 
+                ? "bg-zinc-800 text-white shadow-sm" 
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            <LayoutGrid className="h-4 w-4" />
+            All Recordings
+          </button>
+          <button
+            onClick={() => setView("mine")}
+            disabled={!userId}
+            className={cn(
+              "px-4 py-2 rounded-md text-sm font-bold flex items-center gap-2 transition-all",
+              view === "mine" 
+                ? "bg-zinc-800 text-white shadow-sm" 
+                : "text-zinc-500 hover:text-zinc-300",
+              !userId && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            <User className="h-4 w-4" />
+            My Recordings
+          </button>
         </div>
+      </HeroBanner>
+      <div className="flex flex-col gap-6 p-4 lg:p-8 min-h-screen font-openSans">
 
         {/* Grid */}
         <div className="flex-1">

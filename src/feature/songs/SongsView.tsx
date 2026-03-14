@@ -1,7 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 import { cn } from "assets/lib/utils";
-import MainContainer from "components/MainContainer";
+import { HeroBanner } from "components/UI/HeroBanner";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
 import FilterSheet from "feature/songs/components/FilterSheet/FilterSheet";
 import { SongLearningSection } from "feature/songs/components/SongLearningSection/SongLearningSection";
@@ -77,10 +77,37 @@ const SongsView = () => {
   }, [activeTab]);
 
 
-  return (
-    <MainContainer title={t("songs")}>
-      <div className='font-openSans flex flex-col gap-6 p-4 lg:p-8 min-h-screen'>
+  const isLibrary = activeTab === "library" || activeTab === "table";
 
+  return (
+    <>
+      <HeroBanner
+        title={isLibrary ? "Library" : "Song Board"}
+        subtitle={isLibrary ? "Discover songs to learn and master" : "Track and manage your guitar repertoire"}
+        eyebrow={isLibrary ? "Song Library" : "My Songs"}
+        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+        rightContent={
+          activeTab === "management" ? (
+            <Button 
+              onClick={() => {
+                posthog.capture("song_management_action", { action: "add_song_transition" });
+                router.push("/songs?view=library");
+              }}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add a song to learn
+            </Button>
+          ) : (
+            <Button 
+              onClick={() => setIsModalOpen(true)}
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              {t("add_new_song")}
+            </Button>
+          )
+        }
+      />
+      <div className="mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12 font-openSans min-h-screen">
         {/* Content Area */}
         <div className="flex-1">
           <div className="h-full w-full">
@@ -88,34 +115,7 @@ const SongsView = () => {
             {/* MANAGEMENT SECTION */}
             {activeTab === "management" && (
               <div className="space-y-10 animate-in fade-in-50 duration-500">
-                {/* 1. Primary Header Row */}
-                <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-white/5 pb-8">
-                  <div className="space-y-1">
-                    <h2 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
-                      My Song Board
-                    </h2>
-                    <p className="text-zinc-500 font-medium">
-                      Track and manage your guitar repertoire progress
-                    </p>
-                  </div>
-                  
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              
-                    <Button 
-                      onClick={() => {
-                        posthog.capture("song_management_action", { action: "add_song_transition" });
-                        router.push("/songs?view=library");
-                      }}
-                      className="w-full sm:w-auto"
-                      size="sm"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add a song to learn
-                    </Button>
-                  </div>
-                </div>
-
-                {/* 2. Global Strategy/Stats Dashboard */}
+                {/* 1. Global Strategy/Stats Dashboard */}
                 <div className="rounded-xl bg-zinc-900/40 p-2 backdrop-blur-sm -mt-4">
                   <SongLearningStats userSongs={userSongs} />
                 </div>
@@ -138,18 +138,9 @@ const SongsView = () => {
               
                 {/* Tier Selection Grid - New Requirement */}
                 <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex flex-col gap-1">
-                      <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-500/80">Skill Level Filters</h3>
-                      <p className="text-[11px] text-zinc-500 font-medium">Filter library by player tier</p>
-                    </div>
-                    <Button 
-                      onClick={() => setIsModalOpen(true)}
-                     
-                    >
-                      <Plus className="mr-2 h-5 w-5" />
-                      {t("add_new_song")}
-                    </Button>
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-500/80">Skill Level Filters</h3>
+                    <p className="text-[11px] text-zinc-500 font-medium">Filter library by player tier</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {getAllTiers().map((tier) => {
@@ -186,7 +177,7 @@ const SongsView = () => {
                 </div>
 
                 {/* Enhanced Search & Filter Bar */}
-                <div className="relative z-30 -mx-4 px-4 py-4 md:mx-0 md:p-0">
+                <div className="relative z-30 py-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center">
                     
                     {/* Artist Input */}
@@ -310,7 +301,7 @@ const SongsView = () => {
           onSuccess={handleStatusUpdate}
         />
       </div>
-    </MainContainer>
+    </>
   );
 };
 

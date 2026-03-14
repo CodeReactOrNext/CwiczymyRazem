@@ -8,7 +8,7 @@ interface ReportFormLayoutProps {
 
 const ReportFormLayout = ({ children }: ReportFormLayoutProps) => {
   return (
-    <MainContainer title={"Report"}>
+    <MainContainer noBorder>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

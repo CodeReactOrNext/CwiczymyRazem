@@ -14,7 +14,7 @@ const GoogleButton = ({ onClick, children }: GoogleButtonProps) => {
     <button
       onClick={onClick}
       type='button'
-      className='active:click-behavio flex flex-row gap-3 bg-white p-3 font-medium tracking-wide text-googleButtonText radius-default'
+      className='active:click-behavior flex flex-row gap-3 bg-white p-3 font-medium tracking-wide text-gray-700 rounded-xl'
       disabled={isFetching ? true : false}>
       {isFetching ? (
         <Loader2 className='animate-spin' />
