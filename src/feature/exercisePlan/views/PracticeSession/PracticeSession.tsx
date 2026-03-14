@@ -9,7 +9,6 @@ import {
 } from "assets/components/ui/accordion";
 import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
-import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
@@ -764,11 +763,7 @@ export const PracticeSession = ({
         )}
 
         <TooltipProvider>
-          <ExerciseLayout
-            title={reportResult ? "Practice Summary" : plan.title}
-            showBreadcrumbs={false}
-            className="border-b border-white/5 bg-zinc-950/20 backdrop-blur-md sticky top-0 z-50"
-          >
+          <div>
             <div className={cn(
               "mx-auto max-w-8xl px-6 pb-64 pt-4 relative z-10",
               reportResult && "max-w-7xl px-4 pt-8"
@@ -968,7 +963,7 @@ export const PracticeSession = ({
                         className="w-full space-y-4"
                       >
                         {activeExercise.instructions && activeExercise.instructions.length > 0 && (
-                          <AccordionItem value="instructions" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                          <AccordionItem value="instructions" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
                             <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
@@ -991,7 +986,7 @@ export const PracticeSession = ({
                         )}
 
                         {activeExercise.tips && activeExercise.tips.length > 0 && (
-                          <AccordionItem value="tips" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                          <AccordionItem value="tips" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
                             <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
@@ -1082,7 +1077,7 @@ export const PracticeSession = ({
                 </>
               )}
             </div>
-          </ExerciseLayout>
+          </div>
         </TooltipProvider>
       </div>
 

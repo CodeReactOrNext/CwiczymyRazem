@@ -91,7 +91,7 @@ export const ExerciseSuccessView = ({
         isVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }
       }
       className='fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm'>
-      <Card className='relative w-full max-w-md overflow-hidden radius-premium glass-card shadow-xl'>
+      <Card className='relative w-full max-w-md overflow-hidden rounded-2xl glass-card shadow-xl'>
         <div className='absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent' />
 
         <div className='relative flex flex-col items-center space-y-6 p-6 text-center'>
@@ -108,7 +108,7 @@ export const ExerciseSuccessView = ({
           </div>
 
           <div className='flex w-full flex-col justify-center gap-3 pt-4 sm:flex-row'>
-            <Button onClick={onFinish} disabled={isLoading} className='flex items-center gap-2 radius-default bg-cyan-500 hover:bg-cyan-600 text-black font-bold'>
+            <Button onClick={onFinish} disabled={isLoading} className='flex items-center gap-2 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-black font-bold'>
                {isLoading ? (
                   <>
                      <span className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />

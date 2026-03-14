@@ -27,7 +27,7 @@ export const LandingSongCard = ({
     <motion.div 
       whileHover={{ y: -2 }}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden radius-premium glass-card p-4 transition-background cursor-pointer h-full",
+        "group relative flex flex-col justify-between overflow-hidden rounded-2xl glass-card p-4 transition-background cursor-pointer h-full",
         "hover:glass-card-hover hover:shadow-xl hover:shadow-black/40"
       )}
     >

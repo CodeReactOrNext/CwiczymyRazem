@@ -59,7 +59,7 @@ const LogsBoxLayout = ({ logs, userAchievements, currentUserId, className = "" }
     <Card
       className={`relative m-auto flex ${
         showedCategory !== "achievements" && !className.includes("h-") ? "h-[600px]" : ""
-      } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} text-xs leading-5 radius-default xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
+      } font-openSans flex-col p-1 ${className.includes("border-none") ? "pb-24" : "pb-3"} text-xs leading-5 rounded-xl xs:p-5 xs:pb-0 md:mt-0 lg:text-sm xl:w-[100%] ${className}`}>
       <div className=' left-0 top-0 flex flex-row  justify-around gap-4 mb-2  font-bold'>
         <LogsBoxButton
           title="Activity"

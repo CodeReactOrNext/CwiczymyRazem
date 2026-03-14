@@ -10,7 +10,7 @@ export const DashboardContainer = ({
   className = "",
 }: DashboardContainerProps) => {
   return (
-    <div className={`bg-second-600 radius-default ${className}`}>
+    <div className={`bg-second-600 rounded-xl ${className}`}>
       <div className='md:mt-6 space-y-6 p-4 md:p-6'>
           <div
             className='relative z-10'>

@@ -3,11 +3,13 @@ import { Area, AreaChart, ResponsiveContainer } from "recharts";
 interface MiniTrendChartProps {
   data: number[];
   color?: string;
+  className?: string;
 }
 
 export const MiniTrendChart = ({
   data,
   color = "rgb(99, 102, 241)",
+  className = "h-12",
 }: MiniTrendChartProps) => {
   if (!data.length) return null;
 
@@ -17,7 +19,7 @@ export const MiniTrendChart = ({
   }));
 
   return (
-    <div className='h-12 w-full'>
+    <div className={`w-full ${className}`}>
       <ResponsiveContainer width='100%' height='100%'>
         <AreaChart data={chartData}>
           <defs>

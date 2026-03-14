@@ -51,12 +51,13 @@ export const LeadboardLayout = ({
 
   return (
     <div className='min-h-screen flex flex-col'>
-      {isSeasonalView && (
+      {isSeasonalView ? (
         <HeroBanner
           title={currentSeason?.name ?? "Season"}
           subtitle={currentSeason ? `Current season started on ${formatDate(currentSeason.startDate)} and ends on ${formatDate(currentSeason.endDate)}.` : "Practice to climb the leaderboard."}
-          backgroundImage="/headers/seasons.png"
-          className="w-full !rounded-none !shadow-none"
+          characterImage="/images/3d/seasons.png"
+          eyebrow="Seasonal ranking"
+          className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
           rightContent={
             <div className='flex items-center gap-4 bg-black/20 backdrop-blur-md rounded-xl px-6 py-4 border border-white/5'>
               <UserStats
@@ -66,6 +67,14 @@ export const LeadboardLayout = ({
               />
             </div>
           }
+        />
+      ) : (
+        <HeroBanner
+          title="Leaderboard"
+          subtitle="See how you rank against other players"
+          eyebrow="All-time ranking"
+          characterImage="/images/3d/leaderboard.png"
+          className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
         />
       )}
 

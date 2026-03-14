@@ -7,7 +7,11 @@ import { withAuth } from "utils/auth/serverAuth";
 
 const SongsPage: NextPageWithLayout = () => {
 
-  return <SongsView />;
+  return (
+    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+      <SongsView />
+    </div>
+  );
 };
 
 SongsPage.getLayout = function getLayout(page: ReactElement) {

@@ -117,7 +117,7 @@ const LogItem = ({
   children: React.ReactNode;
 }) => (
   <div
-    className={`my-4 flex flex-row flex-nowrap items-center bg-main-opposed-bg p-4 transition-all duration-300 radius-default ${
+    className={`my-4 flex flex-row flex-nowrap items-center bg-main-opposed-bg p-4 transition-all duration-300 rounded-xl ${
       isNew ? "border border-white/30" : ""
     }`}>
     {children}
@@ -565,7 +565,7 @@ const FirebaseLogsTopPlayersItem = ({
 
   return (
     <div
-      className={`my-6 flex flex-col overflow-hidden bg-gradient-to-br from-main-opposed-bg/95 via-main-opposed-bg/90 to-second-600/10 shadow-lg transition-all duration-300 radius-default ${
+      className={`my-6 flex flex-col overflow-hidden bg-gradient-to-br from-main-opposed-bg/95 via-main-opposed-bg/90 to-second-600/10 shadow-lg transition-all duration-300 rounded-xl ${
         isNew ? "border border-white/30 shadow-xl" : ""
       }`}>
       <SeasonHeader

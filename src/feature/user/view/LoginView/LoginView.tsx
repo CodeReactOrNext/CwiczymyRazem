@@ -119,7 +119,7 @@ const LoginView = () => {
           </div>
 
           {/* Card */}
-          <div className="radius-premium glass-card overflow-hidden shadow-xl border border-white/5 bg-zinc-900/40 backdrop-blur-md">
+          <div className="rounded-2xl glass-card overflow-hidden shadow-xl border border-white/5 bg-zinc-900/40 backdrop-blur-md">
             {/* Tab Switcher */}
             <div className="flex border-b border-white/10">
               <Link 

@@ -48,7 +48,7 @@ export const CreatePlan = ({ initialPlan, onSubmit, onUpdate }: CreatePlanProps)
   const currentStepIndex = steps.findIndex((s) => s.id === step);
 
   return (
-    <div className='container mx-auto py-8'>
+    <div className='w-full'>
       {/* Stepper */}
       <div className="mb-8 flex items-center justify-center">
         {steps.map((s, index) => {

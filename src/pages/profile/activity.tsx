@@ -4,6 +4,7 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { ActivityChart } from "components/Charts/ActivityChart";
 import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
+import { HeroBanner } from "components/UI/HeroBanner";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
 import { StatsSection } from "feature/profile/components/StatsSection";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
@@ -33,7 +34,14 @@ const ProfileActivityPage = () => {
   const statsField = userStats ? getUserStatsField(userStats) as StatsFieldProps[] : [];
 
   return (
-    <MainContainer title={"Activity"}>
+    <MainContainer noBorder>
+      <HeroBanner
+        title="Your Activity"
+        subtitle="Track your practice history and progress over time"
+        eyebrow="Practice stats"
+        characterImage="/images/3d/activity.png"
+        className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
+      />
       <div className='p-4'>
         <div className='font-openSans flex flex-col gap-6'>
 

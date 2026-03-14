@@ -18,12 +18,12 @@ const LeaderBoardPage: NextPageWithLayout = () => {
   const siteUrl = "https://riff.quest/leaderboard";
 
   return (
-    <>
+    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
       <Head>
         <link rel='canonical' href={siteUrl} />
       </Head>
       {isLoggedIn ? <LeadboardView /> : <PageLoadingLayout />}
-    </>
+    </div>
   );
 };
 
