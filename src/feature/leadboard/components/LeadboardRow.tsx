@@ -51,7 +51,7 @@ export const LeadboardRow = ({
     <li className='w-full'>
       <div
         className={cn(
-          "relative overflow-hidden radius-premium glass-card transition-background",
+          "relative overflow-hidden rounded-2xl glass-card transition-background",
           profileId === currentUserId
             ? " bg-gradient-to-r from-cyan-900/20 via-zinc-900/60 to-cyan-900/20 "
             : " hover:glass-card-hover"

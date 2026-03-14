@@ -98,7 +98,7 @@ export const SessionBottomBar = ({
             <Button
               size="sm"
               variant="ghost"
-              className="radius-premium font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
+              className="rounded-2xl font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
               onClick={onGoToPreviousExercise}
             >
               <FaStepBackward /> {t("common:back") || "Back"}
@@ -109,7 +109,7 @@ export const SessionBottomBar = ({
               variant="ghost"
               loading={isFinishing || isSubmittingReport}
               className={cn(
-                "radius-premium font-bold text-[11px] tracking-wide transition-all click-behavior",
+                "rounded-2xl font-bold text-[11px] tracking-wide transition-all click-behavior",
                 isLastExercise
                   ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black"
                   : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",

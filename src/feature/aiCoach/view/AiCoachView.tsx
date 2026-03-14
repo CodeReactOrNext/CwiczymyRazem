@@ -1,3 +1,4 @@
+import { HeroBanner } from "components/UI/HeroBanner";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { ArrowLeft, Loader2, Map, Plus, Sparkles } from "lucide-react";
 import posthog from "posthog-js";
@@ -11,6 +12,7 @@ import { firebaseDeleteRoadmap, firebaseGetUserRoadmaps, firebaseSaveRoadmap } f
 import type { Roadmap } from "../types/roadmap.types";
 import RoadmapCard from "./RoadmapCard/RoadmapCard";
 import RoadmapView from "./RoadmapView/RoadmapView";
+import { Button } from "assets/components/ui/button";
 
 const PLAN_GEN_MESSAGES = [
   "Planning your learning journey...",
@@ -197,64 +199,66 @@ const AiCoachView = () => {
   // ─── Detail view ───
   if (selectedRoadmap) {
     return (
-      <div className="mx-auto flex w-full flex-col gap-6 p-4 pt-16 sm:p-6 sm:pt-20 md:gap-8 md:p-10 md:pt-24 lg:p-12 lg:pt-28">
-        <button
-          onClick={() => setSelectedId(null)}
-          className="flex w-fit items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to all plans
-        </button>
-
-        <RoadmapView
-          roadmap={selectedRoadmap}
-          onDelete={() => handleDelete(selectedRoadmap.id)}
-          onUpdate={(updated) =>
-            setRoadmaps((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))
+      <div className="flex w-full flex-col">
+        <HeroBanner
+          title={selectedRoadmap.title}
+          subtitle={`Goal: ${selectedRoadmap.goal}`}
+          eyebrow="Roadmap"
+          className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+          rightContent={
+            <button
+              onClick={() => setSelectedId(null)}
+              className="flex w-fit items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2 text-sm text-zinc-400 transition hover:border-zinc-700 hover:text-zinc-200"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
           }
         />
+        <div className="mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12">
+          <RoadmapView
+            roadmap={selectedRoadmap}
+            onDelete={() => handleDelete(selectedRoadmap.id)}
+            onUpdate={(updated) =>
+              setRoadmaps((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))
+            }
+          />
+        </div>
       </div>
     );
   }
 
   // ─── List view ───
   return (
-    <div className="mx-auto flex w-full flex-col gap-6 p-4 pt-16 sm:p-6 sm:pt-20 md:gap-8 md:p-10 md:pt-24 lg:p-12 lg:pt-28">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/30">
-              <Sparkles className="h-5 w-5 text-emerald-500" />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Roadmap</h1>
+    <div className="flex w-full flex-col">
+      <HeroBanner
+        title="Roadmap"
+        subtitle="Your personalized guitar learning plans."
+        eyebrow="AI Coach"
+        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+        rightContent={
+          <div className="flex flex-col items-start md:items-end gap-1.5 md:gap-1">
+            <Button
+              onClick={() => setShowForm((v) => !v)}
+              disabled={atRoadmapLimit || atDailyLimit}
+              title={
+                atRoadmapLimit
+                  ? `Max ${MAX_ROADMAPS} active roadmaps — delete one first`
+                  : atDailyLimit
+                  ? `Daily limit of ${MAX_DAILY_GENERATIONS} reached — try again tomorrow`
+                  : undefined
+              }
+            >
+              <Plus className="h-4 w-4" />
+              New Roadmap
+            </Button>
+            <p className="text-[12px] mt-2 font-semibold md:font-normal text-zinc-300 uppercase md:normal-case tracking-wider md:tracking-normal">
+              {roadmaps.length}/{MAX_ROADMAPS} plans · {generatedToday}/{MAX_DAILY_GENERATIONS} today
+            </p>
           </div>
-          <p className="pl-[46px] text-sm text-zinc-500">
-            Your personalized guitar learning plans.
-          </p>
-        </div>
-
-        <div className="flex flex-col items-end gap-1">
-          <button
-            onClick={() => setShowForm((v) => !v)}
-            disabled={atRoadmapLimit || atDailyLimit}
-            title={
-              atRoadmapLimit
-                ? `Max ${MAX_ROADMAPS} active roadmaps — delete one first`
-                : atDailyLimit
-                ? `Daily limit of ${MAX_DAILY_GENERATIONS} reached — try again tomorrow`
-                : undefined
-            }
-            className="flex shrink-0 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <Plus className="h-4 w-4" />
-            New plan
-          </button>
-          <p className="text-[11px] text-zinc-600">
-            {roadmaps.length}/{MAX_ROADMAPS} plans · {generatedToday}/{MAX_DAILY_GENERATIONS} today
-          </p>
-        </div>
-      </div>
+        }
+      />
+      <div className="mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12">
 
       {/* Generate form */}
       {showForm && (
@@ -352,6 +356,7 @@ const AiCoachView = () => {
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 };

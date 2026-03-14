@@ -91,10 +91,8 @@ const glassEffects = plugin(function ({ addUtilities }) {
   addUtilities({
     ".glass-card": {
       "background-color": "rgba(24, 24, 27, 0.4)",
-      "border": "1px solid rgba(255, 255, 255, 0.05)",
     },
     ".glass-card-hover": {
-      "border-color": "rgba(255, 255, 255, 0.1)",
       "background-color": "rgba(24, 24, 27, 0.5)",
     },
     ".blur-premium": {
@@ -121,8 +119,11 @@ module.exports = {
     "src/feature/**/*.{js,ts,jsx,tsx}",
     "src/components/**/*.{js,ts,jsx,tsx}",
     "src/layouts/**/*.{js,ts,jsx,tsx}",
+    "src/design-system/**/*.{js,ts,jsx,tsx}",
     './src/**/*.{ts,tsx}',
   ],
+
+  darkMode: 'class',
 
   theme: {
     screens: {
@@ -140,7 +141,15 @@ module.exports = {
       },
       boxShadow: {
         'inset-cool': 'inset 0 -3px 8px -3px rgba(88, 96, 132,0.7)',
-        'outside-cool': '0px 4px 4px 0px rgb(0 0 0 / 8%);'
+        'outside-cool': '0px 4px 4px 0px rgb(0 0 0 / 8%);',
+        // Design system shadows
+        'dark-xs': '0 1px 2px 0 rgb(0 0 0 / 0.4)',
+        'dark-sm': '0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5)',
+        'dark-md': '0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5)',
+        'dark-lg': '0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5)',
+        'dark-xl': '0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5)',
+        'accent-primary': '0 0 20px rgb(34 211 238 / 0.3)',
+        'accent-secondary': '0 0 20px rgb(16 185 129 / 0.3)',
       },
       gridTemplateRows: {
         '7': 'repeat(7, minmax(0, 1fr))'
@@ -193,7 +202,60 @@ module.exports = {
           '3': 'hsl(var(--chart-3))',
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))'
-        }
+        },
+
+        // ── Design System Semantic Colors ─────────────────────────────────
+        // Slate-based dark scale (replaces old zinc-* raw values)
+        dark: {
+          50:  '#F8FAFC',
+          100: '#F1F5F9',
+          200: '#E2E8F0',
+          300: '#CBD5E1',
+          400: '#94A3B8',
+          500: '#64748B',
+          600: '#475569',
+          700: '#334155',
+          800: '#1E293B',
+          900: '#0F172A',
+          950: '#020617',
+        },
+
+        // Surface colors — use instead of raw bg-zinc-800/40 etc.
+        surface: {
+          base:     '#1E293B',  // bg-surface-base
+          elevated: '#334155',  // bg-surface-elevated (hover states)
+          pressed:  '#475569',  // bg-surface-pressed (active states)
+          disabled: '#64748B',  // bg-surface-disabled
+        },
+
+        // State colors — success/warning/error/info
+        state: {
+          success: '#10B981',
+          warning: '#F59E0B',
+          error:   '#EF4444',
+          info:    '#22D3EE',
+        },
+
+        // Cyan accent (same hue as old `main` but clean scale)
+        cyan: {
+          50:  '#ECFEFF',
+          100: '#CFFAFE',
+          200: '#A5F3FC',
+          300: '#67E8F9',
+          400: '#22D3EE',  // primary accent
+          500: '#06B6D4',
+          600: '#0891B2',
+          700: '#0E7490',
+          800: '#155E75',
+          900: '#164E63',
+        },
+
+        // Emerald accent (success/secondary)
+        emerald: {
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],

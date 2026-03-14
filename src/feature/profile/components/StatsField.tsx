@@ -2,10 +2,12 @@ import { Card } from "assets/components/ui/card";
 import { MiniTrendChart } from "feature/profile/components/MiniTrendChart";
 import { calculateTrend } from "feature/profile/utils/calculateTrend";
 import type { LucideIcon } from "lucide-react";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react";
+import type { ComponentType } from "react";
+import Link from "next/link";
 
 export interface StatsFieldProps {
-  Icon?: LucideIcon;
+  Icon?: LucideIcon | ComponentType<{ className?: string }>;
   description: string;
   value: string | number;
   trendData?: number[];
@@ -13,6 +15,8 @@ export interface StatsFieldProps {
   subtitle?: string;
   key?: string;
   id?: string;
+  className?: string;
+  footerLink?: { href: string; label: string };
 }
 
 export const StatsField = ({
@@ -20,6 +24,8 @@ export const StatsField = ({
   description,
   value,
   trendData,
+  className,
+  footerLink,
 }: StatsFieldProps) => {
   const shouldShowTrend = !description.toLowerCase().includes("rekord");
   const trend = shouldShowTrend && trendData ? calculateTrend(trendData) : null;
@@ -37,7 +43,7 @@ export const StatsField = ({
     trend?.direction === "up" ? "rgb(34, 197, 94)" : "rgb(239, 68, 68)";
 
   return (
-    <Card>
+    <Card className={`flex flex-col ${className ?? ""}`}>
       <div className='flex items-start justify-between'>
         <div className='space-y-2'>
           <div className='flex items-center gap-2'>
@@ -61,9 +67,18 @@ export const StatsField = ({
         )}
       </div>
       {shouldShowChart && trendData && trendData.length > 0 && (
-        <div className='mt-3'>
-          <MiniTrendChart data={trendData} color={chartColor} />
+        <div className='mt-3 flex-1 min-h-0'>
+          <MiniTrendChart data={trendData} color={chartColor} className="h-full min-h-[80px]" />
         </div>
+      )}
+      {footerLink && (
+        <Link
+          href={footerLink.href}
+          className="group/link mt-3 flex items-center gap-2 text-xs font-bold text-zinc-300 transition-all duration-300 hover:text-white hover:gap-3 w-fit"
+        >
+          {footerLink.label}
+          <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
+        </Link>
       )}
     </Card>
   );

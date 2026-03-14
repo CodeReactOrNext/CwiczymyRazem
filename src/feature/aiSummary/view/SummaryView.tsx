@@ -1,3 +1,4 @@
+import { HeroBanner } from "components/UI/HeroBanner";
 import { cn } from "assets/lib/utils";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
@@ -1029,41 +1030,37 @@ export const SummaryView = () => {
 
   // ─────────────────────────────────────────────────────────────────────────────
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 md:gap-8 md:p-6 lg:p-8">
-
+    <div className="flex w-full flex-col">
       {/* ── Page header ───────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 ring-1 ring-emerald-500/30">
-              <Sparkles className="h-5 w-5 text-emerald-500" />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Practice Summary</h1>
+      <HeroBanner
+        title="Practice Summary"
+        subtitle={mode === "daily"
+          ? selectedDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
+          : today.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+        eyebrow="Session"
+        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+        rightContent={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowConfig(v => !v)}
+              aria-label="AI Coach settings"
+              aria-expanded={showConfig}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all",
+                showConfig
+                  ? "bg-link/20 border-link/40 text-link"
+                  : "bg-zinc-800/60 border-white/5 text-zinc-400 hover:text-zinc-200 hover:border-white/10"
+              )}
+            >
+              <Settings size={13} />
+              AI Coach
+            </button>
+            <ModeToggle mode={mode} onChange={setMode}/>
           </div>
-          <p className="pl-[48px] text-sm text-zinc-500">
-            {mode === "daily"
-              ? selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"})
-              : today.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"})}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowConfig(v => !v)}
-            aria-label="AI Coach settings"
-            aria-expanded={showConfig}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all",
-              showConfig
-                ? "bg-link/20 border-link/40 text-link"
-                : "bg-zinc-800/60 border-white/5 text-zinc-400 hover:text-zinc-200 hover:border-white/10"
-            )}
-          >
-            <Settings size={13} />
-            AI Coach
-          </button>
-          <ModeToggle mode={mode} onChange={setMode}/>
-        </div>
-      </div>
+        }
+      />
+
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 md:gap-8 md:p-6 lg:p-8">
 
       {/* ── AI Coach config panel ──────────────────────────── */}
       {showConfig && (
@@ -1368,6 +1365,7 @@ export const SummaryView = () => {
         </div>
       )}
 
+      </div>
     </div>
   );
 };

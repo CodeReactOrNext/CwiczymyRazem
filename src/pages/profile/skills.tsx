@@ -1,11 +1,8 @@
+import { HeroBanner } from "components/UI/HeroBanner";
 import { SkillDashboard } from "feature/skills/components/SkillDashboard";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
-import {
-  selectCurrentUserStats,
-  selectUserAuth,
-} from "feature/user/store/userSlice";
-import { useTranslation } from "hooks/useTranslation";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import type { ReactElement } from "react";
@@ -26,7 +23,14 @@ const ProfileSkillsPage: NextPageWithLayout = () => {
   }, [userAuth]);
 
   return (
-    <div className="bg-second-600 radius-default overflow-hidden flex flex-col border-none shadow-sm min-h-screen">
+    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+      <HeroBanner
+        title="Skills"
+        subtitle="Track and develop your guitar playing skills"
+        eyebrow="Skill Tree"
+        characterImage="/images/3d/skills.png"
+        className="w-full !rounded-none !shadow-none min-h-[160px] md:min-h-[140px] lg:min-h-[180px]"
+      />
       {userSkills ? (
         <SkillDashboard userSkills={userSkills as UserSkills} />
       ) : (

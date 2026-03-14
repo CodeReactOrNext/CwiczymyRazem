@@ -98,7 +98,7 @@ const SingupView = () => {
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="relative z-10 w-full max-w-md radius-premium glass-card p-8 text-center border border-white/10 shadow-2xl"
+          className="relative z-10 w-full max-w-md rounded-2xl glass-card p-8 text-center border border-white/10 shadow-2xl"
         >
           <div className="flex justify-center mb-6">
             <div className="h-20 w-20 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
@@ -175,7 +175,7 @@ const SingupView = () => {
           </div>
 
           {/* Card */}
-          <div className="radius-premium glass-card overflow-hidden shadow-xl border border-white/5 bg-zinc-900/40 backdrop-blur-md">
+          <div className="rounded-2xl glass-card overflow-hidden shadow-xl border border-white/5 bg-zinc-900/40 backdrop-blur-md">
             {/* Tab Switcher */}
             <div className="flex border-b border-white/10">
               <Link 

@@ -127,7 +127,7 @@ export const MainTimerSection = ({
 
         {/* Timer Card - Always render when showExerciseInfo is false */}
         {!showExerciseInfo && (
-          <Card className='radius-premium glass-card border-white/5 relative overflow-hidden'>
+          <Card className='rounded-2xl glass-card border-white/5 relative overflow-hidden'>
             {/* Playalong Progress Bar (Top) */}
             {currentExercise.isPlayalong && (
                <div className="absolute top-0 left-0 w-full h-1.5 bg-zinc-800">

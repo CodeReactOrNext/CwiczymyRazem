@@ -42,7 +42,7 @@ export const SongCard = ({
     <div 
       onClick={onOpenDetails}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden radius-premium glass-card p-5 transition-background click-behavior cursor-pointer",
+        "group relative flex flex-col justify-between overflow-hidden rounded-2xl glass-card p-5 transition-background click-behavior cursor-pointer",
         "hover:glass-card-hover hover:shadow-xl hover:shadow-black/40"
       )}
     >
@@ -186,7 +186,7 @@ export const SongCard = ({
               onOpenDetails();
             }}
             variant="outline"
-            className="h-8 w-full group/btn justify-between radius-default border-white/5 bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-background hover:bg-white/10 hover:text-white"
+            className="h-8 w-full group/btn justify-between rounded-xl border-white/5 bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-background hover:bg-white/10 hover:text-white"
           >
             <span>Open details</span>
             <Settings2 className="h-3.5 w-3.5 opacity-40 transition-transform group-hover/btn:rotate-90" />
