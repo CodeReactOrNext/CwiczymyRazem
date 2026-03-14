@@ -53,7 +53,7 @@ const ExerciseControls = ({
             onClick={toggleTimer}
             className={cn(
               variant === "centered" ? (size === "lg" ? "h-14 px-8 w-auto" : "h-12 px-6 w-auto") : "w-full",
-              "radius-premium font-black transition-background click-behavior   relative",
+              "rounded-2xl font-black transition-background click-behavior   relative",
               isPlaying 
                 ? "bg-white  hover:bg-zinc-200 shadow-2xl shadow-white/20" 
                 : "bg-cyan-500 hover:bg-cyan-400 shadow-2xl shadow-cyan-500/30 animate-pulse"
@@ -91,7 +91,7 @@ const ExerciseControls = ({
            onClick={handleRestart}
            className={cn(
              btnSizes[size],
-             "radius-premium transition-all click-behavior text-zinc-400 hover:text-white hover:bg-white/5 border border-white/5"
+             "rounded-2xl transition-all click-behavior text-zinc-400 hover:text-white hover:bg-white/5 border border-white/5"
            )}
            title="Restart Exercise"
          >
@@ -118,7 +118,7 @@ const ExerciseControls = ({
           onClick={handleNextExercise}
           disabled={!canSkipExercise}
           className={cn(
-            "flex-1 radius-premium transition-background click-behavior",
+            "flex-1 rounded-2xl transition-background click-behavior",
             !canSkipExercise && "opacity-50 cursor-not-allowed hover:bg-transparent"
           )}>
           <FaStepForward className={iconSizes[size]} />

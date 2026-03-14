@@ -4,10 +4,14 @@ import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DashboardSection } from "components/Layout";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
 import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
+import { StatsField } from "feature/profile/components/StatsField";
+import { getTrendData } from "feature/profile/utils/getTrendData";
 import { useRouter } from "next/router";
 import { selectUserInfo } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
+import { convertMsToHM } from "utils/converter";
+import { FaClock } from "react-icons/fa";
 
 // ActiveChallengeWidget removed
 import { WeeklyHorizontalTimeline } from "feature/weeklyScheduler/components/WeeklyHorizontalTimeline";
@@ -32,28 +36,34 @@ const ProfileLandingLayout = ({
   const lastReportDate = userStats?.lastReportDate ? new Date(userStats.lastReportDate).toDateString() : null;
   const isTodayCompleted = lastReportDate === todayStr || datasWithReports.some(d => d.date.toDateString() === todayStr && d.report);
 
+  const totalTimeValue = userStats ? convertMsToHM(
+    userStats.time.technique + userStats.time.theory + userStats.time.creativity + userStats.time.hearing
+  ) : "0:00";
+  const timeTrendData = getTrendData(datasWithReports, "time");
+
   return (
-    <div className="bg-second-600 radius-default overflow-hidden flex flex-col shadow-sm border-none">
+    <div className="bg-second-600 rounded-xl flex flex-col shadow-sm border-none lg:mt-16">
       {!isTodayCompleted && (
         <HeroBanner
           title="Start today's practice"
-          backgroundImage="/headers/practice.png"
-          className="w-full !rounded-none !shadow-none min-h-[280px] md:min-h-[240px] lg:min-h-[300px]"
-          rightContent={
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-end sm:items-center mt-auto sm:mt-0">
-              <button 
+          characterImage="/images/3d/guitarist.png"
+          secondaryImage="/images/3d/metronom.png"
+          className="w-full !rounded-none !shadow-none min-h-[220px] md:min-h-[200px] lg:min-h-[240px]"
+          leftContent={
+            <div className="flex flex-row flex-wrap gap-3 items-center">
+              <button
                 onClick={() => router.push("/profile/exercises?view=create")}
-                className="group/btn rounded-xl bg-zinc-900/40 backdrop-blur-md border border-white/10 text-white px-8 py-3.5 text-base font-bold shadow-2xl transition-all duration-300 flex items-center justify-center gap-2 hover:bg-zinc-900/60 active:scale-95 whitespace-nowrap w-fit sm:w-auto min-w-[160px]"
+                className="group/btn rounded-none md:rounded-md bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 hover:bg-zinc-700/80 active:scale-95"
               >
                 Create plan
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
               </button>
-              <button 
+              <button
                 onClick={() => router.push("/timer")}
-                className="group/btn rounded-xl bg-white text-zinc-950 px-8 py-3.5 text-base font-bold shadow-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap w-fit sm:w-auto min-w-[160px]"
+                className="group/btn rounded-none md:rounded-md bg-white text-zinc-950 px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 active:scale-95"
               >
                 Choose mode
-                <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover/btn:translate-x-1" />
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
               </button>
             </div>
           }
@@ -68,8 +78,16 @@ const ProfileLandingLayout = ({
 
           <div className="mt-6">
             <DashboardSection compact>
-              <div className="grid grid-cols-1 gap-4 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                 <DailyQuestWidget />
+                <StatsField
+                  Icon={FaClock}
+                  description="Total Time"
+                  value={totalTimeValue}
+                  trendData={timeTrendData}
+                  className="h-full"
+                  footerLink={{ href: "/profile/activity", label: "View activity" }}
+                />
               </div>
             </DashboardSection>
           </div>

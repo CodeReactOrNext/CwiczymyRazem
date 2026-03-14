@@ -8,7 +8,7 @@ interface NavLinkProps {
 const NavLink = ({ url, title, external }: NavLinkProps) => {
   return (
     <Link href={url} target={external ? "_blank" : undefined} rel='noreferrer'>
-      <li className='min-w-[6rem] cursor-pointer p-2 px-4 text-center transition-background radius-default hover:bg-white hover:bg-opacity-10 hover:shadow-sm active:click-behavior'>
+      <li className='min-w-[6rem] cursor-pointer p-2 px-4 text-center transition-background rounded-xl hover:bg-white hover:bg-opacity-10 hover:shadow-sm active:click-behavior'>
         {title}
       </li>
     </Link>

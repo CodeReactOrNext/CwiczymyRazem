@@ -281,7 +281,7 @@ const SessionModal = ({
                     resetKey={tabResetKey}
                   />
                 ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
-                   <div className="w-full radius-premium overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
+                   <div className="w-full rounded-2xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10">
                       <YouTubePlayalong
                           videoId={currentExercise.youtubeVideoId}
                           isPlaying={isPlaying}
@@ -535,7 +535,7 @@ const SessionModal = ({
                 )}
 
                 <Accordion type="single" collapsible defaultValue="instructions" className="w-full space-y-3">
-                    <AccordionItem value="instructions" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                    <AccordionItem value="instructions" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
                         <AccordionTrigger className="px-4 py-3 hover:bg-white/5 transition-colors group">
                             <div className="flex items-center gap-3">
                                 <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
@@ -557,7 +557,7 @@ const SessionModal = ({
                         </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="tips" className="border-none radius-premium overflow-hidden bg-zinc-900/40 border border-white/5">
+                    <AccordionItem value="tips" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
                         <AccordionTrigger className="px-4 py-3 hover:bg-white/5 transition-colors group">
                             <div className="flex items-center gap-3">
                                 <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
@@ -582,7 +582,7 @@ const SessionModal = ({
 
 
                 {currentExercise.links && currentExercise.links.length > 0 && (
-                     <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-5 backdrop-blur-sm space-y-4 mb-20">
+                     <div className="rounded-2xl bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-5 backdrop-blur-sm space-y-4 mb-20">
                          <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
                              <FaHeart className="animate-pulse" />
                              <span>Support Author</span>

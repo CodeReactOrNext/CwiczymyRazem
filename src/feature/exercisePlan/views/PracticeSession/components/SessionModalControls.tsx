@@ -75,7 +75,7 @@ export const SessionModalControls = ({
           <Button
             onClick={toggleTimer}
             className={cn(
-              "h-12 px-8 radius-premium font-black text-[10px] tracking-[0.2em] transition-all uppercase click-behavior",
+              "h-12 px-8 rounded-2xl font-black text-[10px] tracking-[0.2em] transition-all uppercase click-behavior",
               isPlaying 
                 ? "bg-white text-black shadow-lg shadow-white/10" 
                 : "bg-cyan-500 text-black shadow-lg shadow-cyan-500/20"

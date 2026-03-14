@@ -27,7 +27,7 @@ const MainNavigation = ({ variant }: MainNavigationProps) => {
           ? "lg:!w-1/2 xl:!w-[55%]"
           : "lg:w-[76%] xl:w-[85%]"
       }  ${
-        variant === "secondary" ? "lg:bg-main-opposed-500" : "lg:bg-second-500"
+        variant === "secondary" ? "lg:bg-surface-elevated" : "lg:bg-dark-900"
       }  lg:pl-16`}>
       <ul className='mr-11 hidden w-full items-center justify-evenly text-3xl lg:flex'>
       <NavLink url='/songs' title={t("nav.songs")} />

@@ -83,7 +83,7 @@ export const SessionSidebar = ({
 
       {/* Metronome + Audio Controls */}
       {currentExercise.metronomeSpeed && (
-        <div className="radius-premium bg-zinc-900/40 p-6 backdrop-blur-sm">
+        <div className="rounded-2xl bg-zinc-900/40 p-6 backdrop-blur-sm">
           <Metronome
             metronome={metronome}
             showStartStop={!currentExercise.tablature || currentExercise.tablature.length === 0}
@@ -186,7 +186,7 @@ export const SessionSidebar = ({
 
       {/* Audio Mixer */}
       {activeExercise.backingTracks && activeExercise.backingTracks.length > 0 && (
-        <div className="radius-premium bg-zinc-900/40 p-6 backdrop-blur-sm space-y-4">
+        <div className="rounded-2xl bg-zinc-900/40 p-6 backdrop-blur-sm space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <GiGuitar className="text-cyan-400" />
             <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Audio Mixer</h4>
@@ -234,7 +234,7 @@ export const SessionSidebar = ({
 
       {/* BPM Progress Grid */}
       {currentExercise.metronomeSpeed && bpmStages.length > 0 && (
-        <div className="radius-premium bg-zinc-900/40 p-6 backdrop-blur-sm">
+        <div className="rounded-2xl bg-zinc-900/40 p-6 backdrop-blur-sm">
           <BpmProgressGrid
             bpmStages={bpmStages}
             completedBpms={completedBpms}
@@ -247,7 +247,7 @@ export const SessionSidebar = ({
 
       {/* Support Author Links */}
       {currentExercise.links && currentExercise.links.length > 0 && (
-        <div className="radius-premium bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-6 backdrop-blur-sm space-y-4">
+        <div className="rounded-2xl bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-6 backdrop-blur-sm space-y-4">
           <div className="flex items-center gap-2 text-red-400 font-bold text-xs tracking-wide">
             <FaHeart className="animate-pulse" />
             <span>Support Author</span>

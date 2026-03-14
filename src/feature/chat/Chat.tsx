@@ -32,7 +32,7 @@ export const Chat = () => {
   }, [messages]);
 
   return (
-    <div className='flex h-full flex-col overflow-hidden radius-premium  bg-zinc-950/40 '>
+    <div className='flex h-full flex-col overflow-hidden rounded-2xl  bg-zinc-950/40 '>
       {/* Header for Chat if needed, otherwise just the list */}
       <ScrollArea ref={scrollRef} className='flex-1 p-2 sm:p-4 '>
         <div className='flex flex-col gap-1 px-2'>
@@ -104,7 +104,7 @@ export const Chat = () => {
               value={newMessage}
               placeholder={t("send_placeholder")}
               autoComplete="off"
-              className='h-12 border-white/10 bg-zinc-950/50 pr-12 transition-all focus-visible:ring-cyan-500/50 radius-default'
+              className='h-12 border-white/10 bg-zinc-950/50 pr-12 transition-all focus-visible:ring-cyan-500/50 rounded-xl'
               onChange={(e) => setNewMessage(e.target.value)}
             />
           </div>

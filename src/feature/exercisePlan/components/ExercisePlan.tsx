@@ -1,4 +1,5 @@
 import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
 import { HelpCircle } from "lucide-react";
 import Link from "next/link";
@@ -15,7 +16,7 @@ import { getUserExercisePlans } from "../services/getUserExercisePlans";
 import { useAppSelector } from "store/hooks";
 import { selectUserAuth } from "feature/user/store/userSlice";
 
-export const ExercisePlan = () => {
+export const ExercisePlan = ({ hideLayout, onSessionChange, controlledTab, onTabChange }: { hideLayout?: boolean; onSessionChange?: (active: boolean) => void; controlledTab?: string; onTabChange?: (tab: string) => void }) => {
   const { t } = useTranslation("exercises");
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<ExercisePlanType | null>(
@@ -27,6 +28,7 @@ export const ExercisePlan = () => {
   const handlePlanSelect = (plan: ExercisePlanType) => {
     setSelectedPlan(plan);
     setActiveTab("practice");
+    onSessionChange?.(true);
   };
 
   useEffect(() => {
@@ -78,10 +80,11 @@ export const ExercisePlan = () => {
   const handleClose = () => {
     setSelectedPlan(null);
     setActiveTab("my_plans");
+    onSessionChange?.(false);
   };
 
   return (
-    <div className='container mx-auto md:py-8 font-openSans'>
+    <div className={cn('container mx-auto font-openSans', !selectedPlan && 'md:py-8')}>
 
 
       <div className='mt-4 sm:mt-6'>
@@ -92,7 +95,7 @@ export const ExercisePlan = () => {
             onClose={handleClose}
           />
         ) : (
-          <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["my_plans"]} />
+          <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["my_plans"]} hideLayout={hideLayout} controlledTab={controlledTab} onTabChange={onTabChange} />
         )}
       </div>
     </div>

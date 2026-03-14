@@ -23,12 +23,12 @@ export const MainHeroLayout = ({
 }: MainLayoutProps) => {
   return (
     <main
-      className={`h-screen bg-tertiary-bg  font-sans  lg:min-h-[920px] 2xl:p-4
+      className={`h-screen bg-dark-950 font-sans lg:min-h-[920px] 2xl:p-4
       ${minHeightLimit ? "min-h-[820px] sm:min-h-[1000px]" : ""}`}>
       <div className='relative flex h-full w-full items-center justify-center '>
         <div
-          className={`relative  flex h-full max-h-[calc(1200px_-_4rem)] w-full max-w-[2200px] flex-col overflow-x-hidden scrollbar-hide ${
-            variant === "secondary" ? "bg-second-500" : "bg-main-opposed-500"
+          className={`relative flex h-full max-h-[calc(1200px_-_4rem)] w-full max-w-[2200px] flex-col overflow-x-hidden scrollbar-hide ${
+            variant === "secondary" ? "bg-dark-900" : "bg-surface-elevated"
           }`}>
           <Header variant={variant} />
           <SubtitleBar variant={variant}>{subtitle}</SubtitleBar>

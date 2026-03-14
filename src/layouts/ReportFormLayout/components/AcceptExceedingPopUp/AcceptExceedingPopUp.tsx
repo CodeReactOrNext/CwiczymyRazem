@@ -26,7 +26,7 @@ const AcceptExceedingPopUp = ({
   };
 
   return (
-    <div className=' m-auto mx-2 flex h-1/4 min-h-[300px] flex-col items-center justify-center gap-4 border-2 border-second-400 bg-second p-6 radius-default'>
+    <div className=' m-auto mx-2 flex h-1/4 min-h-[300px] flex-col items-center justify-center gap-4 border-2 border-second-400 bg-second p-6 rounded-xl'>
       <p className='font-openSans text-base'>
         {t("toast.exceeding_time") + convertMsToHM(exceedingTime)}
       </p>

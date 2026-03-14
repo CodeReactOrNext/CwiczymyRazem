@@ -16,7 +16,7 @@ export const IconBox = ({ Icon, small, medium }: IconBoxProps) => {
           ? "m-1.5 h-6 w-6 sm:h-8 sm:w-8 sm:text-base"
           : "m-2 h-7 w-7 sm:h-10 sm:w-10 sm:text-lg"
       }
-       flex shrink-0 items-center justify-center   text-mainText radius-default `}>
+       flex shrink-0 items-center justify-center   text-mainText rounded-xl `}>
       <Icon />
     </div>
   );

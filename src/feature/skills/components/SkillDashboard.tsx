@@ -18,7 +18,6 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { cn } from "assets/lib/utils";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
-import { HeroBanner } from "components/UI/HeroBanner";
 
 interface DashboardExercise {
   id: string;
@@ -198,22 +197,6 @@ export const SkillDashboard = ({
 
   return (
     <div className="w-full pb-24 flex flex-col">
-      <HeroBanner
-        title="Skills & Progress"
-        subtitle="Practice exercises to earn XP and level up your skills."
-        backgroundImage="/headers/skills.png"
-        className="w-full !rounded-none !shadow-none"
-        rightContent={
-          <div className="flex flex-col items-end mr-2">
-            <span className="text-white text-3xl md:text-4xl font-black tabular-nums leading-none">
-              {totalXP}
-            </span>
-            <span className="text-zinc-400 text-[10px] font-bold mt-2 uppercase tracking-[0.2em]">
-              XP total
-            </span>
-          </div>
-        }
-      />
       
       <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-12">
         <div className="space-y-4">

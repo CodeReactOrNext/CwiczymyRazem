@@ -1,4 +1,5 @@
 // eslint-disable-next-line simple-import-sort/imports
+import React from "react";
 import { Button } from "assets/components/ui/button";
 import {
   Tabs,
@@ -10,7 +11,7 @@ import { ExerciseLayout } from "feature/exercisePlan/components/ExerciseLayout";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
-import { Flame, Music, Zap } from "lucide-react";
+import { BookOpen, Flame, Music, Zap } from "lucide-react";
 
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
@@ -32,12 +33,35 @@ import { logger } from "feature/logger/Logger";
 import { determinePlanDifficulty } from "feature/exercisePlan/utils/determinePlanDifficulty";
 import { determinePlanCategory } from "feature/exercisePlan/utils/deteminePlanCategory";
 
+interface SectionHeaderProps {
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+}
+
+const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) => (
+  <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex items-center gap-3">
+      <div className="h-8 w-[3px] rounded-full bg-gradient-to-b from-cyan-400 to-cyan-400/0" />
+      <div>
+        <h2 className="text-base font-black uppercase tracking-widest text-white">{title}</h2>
+        {subtitle && <p className="mt-0.5 text-[11px] text-zinc-500">{subtitle}</p>}
+      </div>
+    </div>
+    {action && <div className="shrink-0">{action}</div>}
+  </div>
+);
+
 interface MyPlansProps {
   onPlanSelect: (plan: ExercisePlan) => void;
   hideTabs?: Array<"routines" | "playalongs" | "my_plans">;
+  hideLayout?: boolean;
+  controlledTab?: string;
+  onTabChange?: (tab: string) => void;
+  hideSectionHeader?: boolean;
 }
 
-export const MyPlans = ({ onPlanSelect, hideTabs = [] }: MyPlansProps) => {
+export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab, onTabChange, hideSectionHeader }: MyPlansProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const [plans, setPlans] = useState<ExercisePlan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,9 +69,14 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [] }: MyPlansProps) => {
   const [editingPlan, setEditingPlan] = useState<ExercisePlan | null>(null);
   const userAuth = useAppSelector(selectUserAuth);
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState(
+  const [internalTab, setInternalTab] = useState(
     hideTabs.includes("routines") ? "my_plans" : "routines"
   );
+  const activeTab = controlledTab ?? internalTab;
+  const setActiveTab = (tab: string) => {
+    setInternalTab(tab);
+    onTabChange?.(tab);
+  };
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -162,7 +191,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [] }: MyPlansProps) => {
 
   if (isCreating) {
     return (
-      <div className='container mx-auto'>
+      <div className='container mx-auto px-4 lg:px-8 py-8 md:py-12'>
         <div className='mb-4 px-4'>
           <Button variant='ghost' onClick={() => setIsCreating(false)}>
             {t("common:back")}
@@ -175,7 +204,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [] }: MyPlansProps) => {
 
   if (editingPlan) {
     return (
-      <div className='container mx-auto'>
+      <div className='container mx-auto px-4 lg:px-8 py-8 md:py-12'>
         <div className='mb-4 px-4'>
           <Button variant='ghost' onClick={() => setEditingPlan(null)}>
             {t("common:back")}
@@ -222,11 +251,10 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [] }: MyPlansProps) => {
     });
   };
 
-  return (
-    <ExerciseLayout title={t("exercises:tabs.my_plans")}>
+  const content = (
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         {/* Navigation Switcher */}
-        {(["routines", "playalongs", "my_plans"] as const).filter(t => !hideTabs.includes(t)).length > 1 && <div className="mb-10 md:mb-12 sticky top-4 z-40 md:static">
+        {!controlledTab && (["routines", "playalongs", "my_plans"] as const).filter(t => !hideTabs.includes(t)).length > 1 && <div className="mb-10 md:mb-12 sticky top-4 z-40 md:static">
           <TabsList className="bg-zinc-900/80 backdrop-blur-md border border-white/5 p-1 rounded-2xl h-auto md:bg-transparent md:border-none md:p-0 md:rounded-none md:justify-start md:space-x-12 md:w-full overflow-hidden shadow-2xl md:shadow-none w-full flex">
             {!hideTabs.includes("routines") && (
               <TabsTrigger
@@ -259,62 +287,41 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [] }: MyPlansProps) => {
         </div>}
 
         <TabsContent value="routines" className="mt-0 focus-visible:outline-none space-y-12">
-          <div className='mb-8 flex flex-col items-end text-right md:items-start md:text-left'>
-            <h2 className='text-2xl font-bold text-white uppercase tracking-tight'>
-              Routine Library
-            </h2>
-            <p className='mt-1 text-xs text-zinc-500'>
-              Selection of curated routines for various techniques
-            </p>
-          </div>
           {renderDifficultyGroups(routinePlans)}
         </TabsContent>
 
         <TabsContent value="playalongs" className="mt-0 focus-visible:outline-none space-y-12">
-          <div className='mb-8 flex flex-col items-end text-right md:items-start md:text-left'>
-            <h2 className='text-2xl font-bold text-white uppercase tracking-tight'>
-              Playalong Library
-            </h2>
-            <p className='mt-1 text-xs text-zinc-500'>
-              Interactive video sessions to play along with
-            </p>
-          </div>
           {renderDifficultyGroups(playalongPlans)}
         </TabsContent>
 
         <TabsContent value="my_plans" className="mt-0 focus-visible:outline-none">
-          <div className='mb-8 flex flex-col items-end justify-between gap-6 md:flex-row md:items-center'>
-            <div className="text-right md:text-left">
-              <h2 className='text-2xl font-bold text-white uppercase tracking-tight'>
-                Your Custom Plans
-              </h2>
-              <p className='mt-1 text-xs text-zinc-500'>
-                {t("exercises:my_plans.custom_plans_description")}
-              </p>
-            </div>
-            <Button 
-                onClick={() => setIsCreating(true)}
-                className="bg-white hover:bg-zinc-200 text-black font-bold uppercase tracking-widest text-[11px] h-10 px-6 rounded-lg transition-all"
-            >
-              <FaPlus className='mr-2 h-3.5 w-3.5' />
-              {t("exercises:my_plans.create_plan")}
-            </Button>
-          </div>
+          {!hideSectionHeader && (
+            <SectionHeader
+              title="Your Custom Plans"
+              subtitle={t("exercises:my_plans.custom_plans_description") as string}
+              action={
+                <Button
+                  onClick={() => setIsCreating(true)}
+                  className="bg-white hover:bg-zinc-100 text-black font-bold uppercase tracking-widest text-[11px] h-9 px-5 rounded-lg transition-all"
+                >
+                  <FaPlus className="mr-2 h-3 w-3" />
+                  {t("exercises:my_plans.create_plan")}
+                </Button>
+              }
+            />
+          )}
           {plans.length === 0 ? (
-            <div className='rounded-2xl border border-dashed border-white/5 p-12 text-center bg-zinc-900/10'>
-              <p className='text-zinc-500 text-sm'>
-                {t("exercises:my_plans.no_custom_plans")}
-              </p>
-              <Button 
-                  onClick={() => setIsCreating(true)} 
-                  variant="outline"
-                  className='mt-6 border-white/10 text-white font-bold uppercase tracking-widest text-[10px] h-9 px-6 rounded-lg'
+            <div className="rounded-2xl border border-dashed border-white/[0.08] bg-zinc-900/20 p-12 text-center">
+              <p className="text-zinc-500 text-sm">{t("exercises:my_plans.no_custom_plans")}</p>
+              <Button
+                onClick={() => setIsCreating(true)}
+                className="mt-6"
               >
                 {t("exercises:my_plans.create_first")}
               </Button>
             </div>
           ) : (
-            <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {plans.map((plan) => (
                 <PlanCard
                   key={plan.id}
@@ -329,6 +336,19 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [] }: MyPlansProps) => {
           )}
         </TabsContent>
       </Tabs>
+  );
+
+  if (hideLayout) {
+    return <div className="px-3 md:px-6">{content}</div>;
+  }
+
+  return (
+    <ExerciseLayout
+      title={t("exercises:tabs.my_plans")}
+      subtitle="Browse routines, playalongs and your custom plans"
+      icon={<BookOpen size={18} />}
+    >
+      {content}
     </ExerciseLayout>
   );
 };
