@@ -226,6 +226,8 @@ export const PracticeSession = ({
   const [isMetronomeMuted,  setIsMetronomeMuted]  = useState(false);
   const [isHalfSpeed,       setIsHalfSpeed]       = useState(false);
   const [showAlphaTabScore, setShowAlphaTabScore] = useState(false);
+  const isPlayingRef = useRef(isPlaying);
+  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   const [tabRestartKey,     setTabRestartKey]     = useState(0);
 
   const handleToggleAlphaTabScore = () => {
@@ -456,6 +458,8 @@ export const PracticeSession = ({
     metronome.restartMetronome();
     resetTimer();
     setTabRestartKey(prev => prev + 1);
+    setEarTrainingScore(0);
+    resetGame();
     setTimeout(() => {
       startTimer();
       if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
@@ -468,6 +472,27 @@ export const PracticeSession = ({
     restartFullSession();
     setTabRestartKey(prev => prev + 1);
   }, [restartFullSession]);
+
+  const handleHalfSpeedToggle = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
+    setIsHalfSpeed(prev => {
+      const next = typeof value === 'function' ? value(prev) : value;
+      if (next !== prev) {
+        // Restart audio and tablature from beginning when toggling speed (timer keeps running)
+        const wasMetronomePlaying = metronome.isPlaying;
+        metronome.restartMetronome();
+        setTabRestartKey(k => k + 1);
+        if (wasMetronomePlaying) {
+          setTimeout(() => {
+            if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
+              metronome.startMetronome();
+            }
+          }, 100);
+        }
+      }
+      return next;
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stopTimer, resetTimer, startTimer, metronome, currentExercise]);
 
   // ── Score saving ──────────────────────────────────────────────────────────
 
@@ -542,7 +567,7 @@ export const PracticeSession = ({
 
   // ── Note matching (RAF game loop) ─────────────────────────────────────────
 
-  const { hitNotes, sessionAccuracy, gameState, maxPossibleScore, currentBeatsElapsed } = useNoteMatching({
+  const { hitNotes, sessionAccuracy, gameState, maxPossibleScore, currentBeatsElapsed, resetGame } = useNoteMatching({
     isPlaying,
     startTime:          metronome.startTime,
     effectiveBpm,
@@ -699,7 +724,7 @@ export const PracticeSession = ({
             metronome={metronome}
             effectiveBpm={effectiveBpm}
             isMicEnabled={isMicEnabled}
-            toggleMic={async () => { if (isListening) closeAudio(); else await initAudio(); }}
+            toggleMic={async () => { if (isListening) { closeAudio(); updateMicPersistence(false); } else { await initAudio(); updateMicPersistence(true); } }}
             gameState={gameState}
             maxPossibleScore={maxPossibleScore}
             sessionAccuracy={sessionAccuracy}
@@ -712,7 +737,7 @@ export const PracticeSession = ({
             isMetronomeMuted={isMetronomeMuted}
             setIsMetronomeMuted={setIsMetronomeMuted}
             isHalfSpeed={isHalfSpeed}
-            onHalfSpeedToggle={setIsHalfSpeed}
+            onHalfSpeedToggle={handleHalfSpeedToggle}
             activeTablature={activeTablature}
             isRiddleRevealed={isRiddleRevealed}
             isRiddleGuessed={isRiddleGuessed}
@@ -1018,17 +1043,13 @@ export const PracticeSession = ({
                       isMetronomeMuted={isMetronomeMuted}
                       setIsMetronomeMuted={setIsMetronomeMuted}
                       isHalfSpeed={isHalfSpeed}
-                      setIsHalfSpeed={setIsHalfSpeed}
+                      setIsHalfSpeed={handleHalfSpeedToggle}
                       isAudioMuted={isAudioMuted}
                       setIsAudioMuted={setIsAudioMuted}
                       saveGuitarPlaybackPreference={saveGuitarPlaybackPreference}
                       soundfontsReady={soundfontsReady}
                       isMicEnabled={isMicEnabled}
                       updateMicPersistence={updateMicPersistence}
-                      isListening={isListening}
-                      volume={volume}
-                      sessionAccuracy={sessionAccuracy}
-                      detectedNoteData={detectedNoteData}
                       setSessionPhase={setSessionPhase}
                       audioTracks={audioTracks}
                       trackConfigs={trackConfigs}
