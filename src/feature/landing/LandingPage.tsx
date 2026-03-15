@@ -7,7 +7,6 @@ import { FaqSection } from "feature/landing/components/FaqSection";
 import { FeaturesSection } from "feature/landing/components/FeaturesSection";
 import { Footer } from "feature/landing/components/Footer";
 import { HeroSection } from "feature/landing/components/HeroSection";
-import { PricingSection } from "feature/landing/components/PricingSection";
 import { WhySection } from "feature/landing/components/WhySection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
 import { FinalCTASection } from "feature/landing/components/FinalCTASection";
@@ -73,7 +72,6 @@ const LandingPage = ({ blogs }: LandingPageProps) => {
         <ProductDemo />
         <WhySection />
         <FeaturesSection />
-        <PricingSection />
         <FaqSection questions={faqQuestions} />
         <BlogSection blogs={blogs} />
         <FinalCTASection />
