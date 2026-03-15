@@ -129,7 +129,7 @@ export function useNoteMatching({
 
   // ── Reset on exercise change ─────────────────────────────────────────────────
 
-  useEffect(() => {
+  const resetGame = () => {
     setHitNotes({});
     hitNotesRef.current = {};
     setSessionAccuracy(100);
@@ -140,6 +140,10 @@ export function useNoteMatching({
     needsFlushRef.current = false;
     lastLoopedBeatsRef.current = 0;
     processedNotesRef.current.clear();
+  };
+
+  useEffect(() => {
+    resetGame();
     onReset?.();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentExerciseIndex]);
@@ -305,5 +309,6 @@ export function useNoteMatching({
     gameState,
     maxPossibleScore,
     currentBeatsElapsed,
+    resetGame,
   };
 }

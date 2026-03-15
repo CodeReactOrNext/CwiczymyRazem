@@ -102,6 +102,10 @@ let countInRemaining = 0;
 let hitNotes: Record<string, boolean> = {};
 let hideNotes = false;
 
+// Hit animation timestamps — noteKey → wall-clock ms when note was first hit
+const HIT_ANIM_MS = 480;
+let hitTimestamps: Record<string, number> = {};
+
 // Scrub/pause position (writable by SCROLL message when paused)
 let pausedCursorPos = 0;
 let pausedScrollX = 0;
@@ -504,6 +508,47 @@ function render() {
           }
         }
 
+        // ── Hit animation (expanding rings + flash) ───────────────────────
+        const hitTs = hitTimestamps[note.noteKey];
+        if (isHit && hitTs !== undefined) {
+          const age = Math.min(1, (Date.now() - hitTs) / HIT_ANIM_MS);
+          const cx = labelX;
+          const cy = note.noteY;
+
+          // White flash over pill — fades over first 30% of animation
+          if (age < 0.3) {
+            const flashA = (1 - age / 0.3) * 0.4;
+            ctx.globalAlpha = flashA;
+            ctx.fillStyle = "#ffffff";
+            drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+
+          // Ring 1 — immediate, expands from pill radius outward
+          const r1 = BLOCK_H / 2 + age * 22;
+          const a1 = (1 - age) * 0.7;
+          ctx.strokeStyle = `rgba(52,211,153,${a1})`;
+          ctx.lineWidth = Math.max(0.5, 2.5 * (1 - age));
+          ctx.beginPath();
+          ctx.arc(cx, cy, r1, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Ring 2 — delayed by 20%, smaller
+          if (age > 0.2) {
+            const age2 = (age - 0.2) / 0.8;
+            const r2 = BLOCK_H / 2 + age2 * 16;
+            const a2 = (1 - age2) * 0.4;
+            ctx.strokeStyle = `rgba(16,185,129,${a2})`;
+            ctx.lineWidth = Math.max(0.5, 1.5 * (1 - age2));
+            ctx.beginPath();
+            ctx.arc(cx, cy, r2, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          if (age >= 1) delete hitTimestamps[note.noteKey];
+        }
+
         // ── Fret label ────────────────────────────────────────────────────
         if (!isDead) {
           const fs = hasDynamics ? Math.max(9, Math.round(13 * (0.75 + 0.25 * dyn))) : 13;
@@ -851,7 +896,19 @@ self.onmessage = (e: MessageEvent) => {
       break;
     }
     case 'HIT_NOTES': {
-      hitNotes = msg.hitNotes;
+      const newHits = msg.hitNotes as Record<string, boolean>;
+      const now = Date.now();
+      // Record timestamp for notes that are newly hit this frame
+      for (const key of Object.keys(newHits)) {
+        if (newHits[key] && !hitNotes[key]) {
+          hitTimestamps[key] = now;
+        }
+      }
+      // Clear timestamps for notes that got reset (loop restart)
+      for (const key of Object.keys(hitTimestamps)) {
+        if (!newHits[key]) delete hitTimestamps[key];
+      }
+      hitNotes = newHits;
       break;
     }
     case 'HIDE_NOTES': {

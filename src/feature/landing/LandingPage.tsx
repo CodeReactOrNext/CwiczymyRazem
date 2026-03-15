@@ -19,11 +19,7 @@ interface LandingPageProps {
 
 const LandingPage = ({ blogs }: LandingPageProps) => {
   const faqQuestions: faqQuestionInterface[] = [
-    {
-      title: "Is Riff Quest really free?",
-      message:
-        "Yes, Riff Quest is 100% free. There are no subscriptions, no hidden fees, and no locked features. Everything we build is available to every guitarist from day one.",
-    },
+  
     {
       title: "Who is this app for?",
       message:
