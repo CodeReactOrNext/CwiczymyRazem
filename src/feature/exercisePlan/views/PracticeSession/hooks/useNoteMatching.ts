@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useMemo, startTransition } from "react";
-import confetti from "canvas-confetti";
 import { getFrequencyFromTab, getCentsDistance } from "utils/audio/noteUtils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import type { TablatureMeasure } from "../../../types/exercise.types";
@@ -158,20 +157,6 @@ export function useNoteMatching({
       return () => clearTimeout(timer);
     }
   }, [gameState.feedbackId]);
-
-  // ── Combo milestone confetti ─────────────────────────────────────────────────
-
-  useEffect(() => {
-    if (gameState.combo === 25 || gameState.combo === 50) {
-      confetti({
-        particleCount: gameState.combo === 50 ? 50 : 30,
-        spread: 60,
-        origin: { y: 0.7 },
-        colors: ["#22d3ee", "#a78bfa", "#fbbf24", "#34d399"],
-        zIndex: 99999999,
-      });
-    }
-  }, [gameState.combo]);
 
   // ── RAF note-matching loop ───────────────────────────────────────────────────
 
