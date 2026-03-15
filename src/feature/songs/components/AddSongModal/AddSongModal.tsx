@@ -213,17 +213,7 @@ const AddSongModal = ({ isOpen, onClose, onSuccess }: AddSongModalProps) => {
                 </div>
               </div>
 
-              <div className="space-y-4 pt-2">
-                <Label className="text-zinc-400 font-bold ml-1 flex items-center gap-2">
-                  Guitar Pro Tablature (Optional)
-                  <span className="text-[10px] font-bold text-cyan-500 uppercase tracking-wider bg-cyan-500/10 px-2 py-0.5 rounded-full">New</span>
-                </Label>
-                <ImportTablature
-                  onImported={(measures) => setImportedTab(measures)}
-                  className="animate-in fade-in slide-in-from-top-4 duration-500"
-                />
-              </div>
-
+  
               {currentMatch?.spotifyId && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
                   <Label className="text-xs font-bold uppercase tracking-widest text-cyan-500 ml-1">

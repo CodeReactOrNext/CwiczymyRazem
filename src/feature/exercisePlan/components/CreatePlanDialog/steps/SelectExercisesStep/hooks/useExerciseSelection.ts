@@ -1,4 +1,5 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import type { GuitarSkillId } from "feature/skills/skills.types";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { useMemo, useState } from "react";
 
@@ -12,12 +13,15 @@ interface UseExerciseSelectionReturn {
   searchQuery: string;
   selectedCategory: string;
   selectedDifficulty: string;
+  selectedSkill: string;
+  availableSkills: GuitarSkillId[];
   groupedExercises: Record<string, Exercise[]>;
   filteredExercises: Exercise[];
   handleExerciseToggle: (exercise: Exercise) => void;
   setSearchQuery: (query: string) => void;
   setSelectedCategory: (category: string) => void;
   setSelectedDifficulty: (difficulty: string) => void;
+  setSelectedSkill: (skill: string) => void;
 }
 
 export const useExerciseSelection = ({
@@ -27,6 +31,7 @@ export const useExerciseSelection = ({
 }: UseExerciseSelectionProps): UseExerciseSelectionReturn => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
+  const [selectedSkill, setSelectedSkill] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filter out the configurable templates - they have dedicated buttons in the creator
@@ -54,31 +59,60 @@ export const useExerciseSelection = ({
     }
   };
 
-  const filteredExercises = useMemo(() => {
+  // Exercises matching category + difficulty (before skill filter) — used to derive available skills
+  const preSkillFilteredExercises = useMemo(() => {
     return exercises.filter((exercise) => {
+      const matchesCategory =
+        selectedCategory === "all" || exercise.category === selectedCategory;
+      const matchesDifficulty =
+        selectedDifficulty === "all" || exercise.difficulty === selectedDifficulty;
+      return matchesCategory && matchesDifficulty;
+    });
+  }, [exercises, selectedCategory, selectedDifficulty]);
+
+  const availableSkills = useMemo(() => {
+    const skillSet = new Set<GuitarSkillId>();
+    preSkillFilteredExercises.forEach((ex) => {
+      ex.relatedSkills.forEach((skill) => skillSet.add(skill));
+    });
+    return Array.from(skillSet).sort();
+  }, [preSkillFilteredExercises]);
+
+  const filteredExercises = useMemo(() => {
+    return preSkillFilteredExercises.filter((exercise) => {
       const matchesSearch = exercise.title
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
 
-      const matchesCategory =
-        selectedCategory === "all" || exercise.category === selectedCategory;
+      const matchesSkill =
+        selectedSkill === "all" || exercise.relatedSkills.includes(selectedSkill as GuitarSkillId);
 
-      const matchesDifficulty =
-        selectedDifficulty === "all" || exercise.difficulty === selectedDifficulty;
-
-      return matchesSearch && matchesCategory && matchesDifficulty;
+      return matchesSearch && matchesSkill;
     });
-  }, [exercises, searchQuery, selectedCategory, selectedDifficulty]);
+  }, [preSkillFilteredExercises, searchQuery, selectedSkill]);
+
+  const handleSetSelectedCategory = (category: string) => {
+    setSelectedCategory(category);
+    setSelectedSkill("all");
+  };
+
+  const handleSetSelectedDifficulty = (difficulty: string) => {
+    setSelectedDifficulty(difficulty);
+    setSelectedSkill("all");
+  };
 
   return {
     searchQuery,
     selectedCategory,
     selectedDifficulty,
+    selectedSkill,
+    availableSkills,
     groupedExercises,
     filteredExercises,
     handleExerciseToggle,
     setSearchQuery,
-    setSelectedCategory,
-    setSelectedDifficulty,
+    setSelectedCategory: handleSetSelectedCategory,
+    setSelectedDifficulty: handleSetSelectedDifficulty,
+    setSelectedSkill,
   };
 };

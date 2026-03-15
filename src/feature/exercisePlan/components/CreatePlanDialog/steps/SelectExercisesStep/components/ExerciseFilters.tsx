@@ -1,5 +1,6 @@
 import { Input } from "assets/components/ui/input";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import type { GuitarSkillId } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
 import { FaSearch, FaFilter } from "react-icons/fa";
 import { cn } from "assets/lib/utils";
@@ -11,6 +12,9 @@ interface ExerciseFiltersProps {
   onCategoryChange: (category: string) => void;
   selectedDifficulty: string;
   onDifficultyChange: (difficulty: string) => void;
+  selectedSkill: string;
+  onSkillChange: (skill: string) => void;
+  availableSkills: GuitarSkillId[];
   groupedExercises: Record<string, Exercise[]>;
 }
 
@@ -21,9 +25,12 @@ export const ExerciseFilters = ({
   onCategoryChange,
   selectedDifficulty,
   onDifficultyChange,
+  selectedSkill,
+  onSkillChange,
+  availableSkills,
   groupedExercises,
 }: ExerciseFiltersProps) => {
-  const { t } = useTranslation(["common", "exercises"]);
+  const { t } = useTranslation(["common", "exercises", "skills"]);
 
   const difficulties = ["all", "easy", "medium", "hard"];
 
@@ -101,6 +108,42 @@ export const ExerciseFilters = ({
                 ))}
             </div>
         </div>
+
+        {/* Skill Pills — only shown when multiple skills are available */}
+        {availableSkills.length > 1 && (
+          <div className="flex flex-col gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+                  Skill
+              </span>
+              <div className="flex flex-wrap gap-2">
+                  <button
+                      onClick={() => onSkillChange("all")}
+                      className={cn(
+                          "px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border",
+                          selectedSkill === "all"
+                              ? "bg-violet-500/10 border-violet-500/50 text-violet-400"
+                              : "bg-zinc-950/50 border-white/5 text-zinc-500 hover:border-white/10 hover:text-zinc-400"
+                      )}
+                  >
+                      {t("common:filters.all")}
+                  </button>
+                  {availableSkills.map((skill) => (
+                      <button
+                          key={skill}
+                          onClick={() => onSkillChange(skill)}
+                          className={cn(
+                              "px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border",
+                              selectedSkill === skill
+                                  ? "bg-violet-500/10 border-violet-500/50 text-violet-400"
+                                  : "bg-zinc-950/50 border-white/5 text-zinc-500 hover:border-white/10 hover:text-zinc-400"
+                          )}
+                      >
+                          {t(`skills:skills.${skill}.name` as any)}
+                      </button>
+                  ))}
+              </div>
+          </div>
+        )}
       </div>
     </div>
   );
