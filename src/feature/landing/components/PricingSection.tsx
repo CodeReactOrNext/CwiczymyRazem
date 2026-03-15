@@ -1,56 +1,129 @@
 "use client";
 
-import { Button } from "assets/components/ui/button";
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
+import { Check, Minus } from "lucide-react";
+
+const FEATURES: { label: string; pro: boolean; master: boolean }[] = [
+  { label: "Real-time Note Detection",   pro: true,  master: true  },
+  { label: "Practice Plan Creator",      pro: true,  master: true  },
+  { label: "Practice Calendar",          pro: true,  master: true  },
+  { label: "Guitar Pro File Support",    pro: true,  master: true  },
+  { label: "Full Exercise Library",      pro: true,  master: true  },
+  { label: "Special Ranks",             pro: true,  master: true  },
+  { label: "Skill Roadmaps",            pro: false, master: true  },
+  { label: "Daily Practice Insights",   pro: false, master: true  },
+  { label: "Weekly Progress Summary",   pro: false, master: true  },
+  { label: "Goal-based Analytics",      pro: false, master: true  },
+];
 
 export const PricingSection = () => {
-
-
   return (
     <section className="py-32 bg-zinc-950 relative overflow-hidden">
-      {/* Background Ambience */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-teal-500/[0.12] blur-[150px] rounded-full pointer-events-none"></div>
+      {/* Subtle grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:72px_72px] pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-700/50 to-transparent" />
 
-      <div className='mx-auto max-w-7xl px-6 lg:px-8 text-center relative z-10'>
-        <div className='max-w-4xl mx-auto'>
-            <h2 className='text-4xl sm:text-5xl font-bold tracking-tighter text-white leading-tight mb-8 font-display'>
-              Professional tracking, <br />
-              <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">at zero cost.</span>
-            </h2>
-            
-            <p className='text-xl sm:text-2xl text-zinc-400 font-medium leading-relaxed mb-20 max-w-2xl mx-auto'>
-              We believe great tools should be accessible. Riff Quest is 100% free with no hidden subscriptions or locked features.
-            </p>
+      <div className="mx-auto max-w-5xl px-6 lg:px-8 relative z-10">
 
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12 text-left mb-24 max-w-3xl mx-auto'>
-              {[
-                'Intelligent Practice Timer',
-                'Visual Consistency Tracker',
-                'Skill-specific Analytics',
-                'Song Library Access',
-                'Achievement System',
-                'Zero Subscription Costs'
-              ].map((feature, i) => (
-                <div key={i} className="flex items-center gap-4 group">
-                  <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 group-hover:scale-150 transition-transform duration-300"></div>
-                  <span className="text-zinc-300 font-bold tracking-tight text-lg">{feature}</span>
-                </div>
-              ))}
-            </div>
-
-            <div>
-              <Link href='/signup'>
-                <Button className='h-16 sm:h-20 w-full sm:w-auto px-8 sm:px-16 bg-white text-black hover:bg-zinc-100 font-bold text-xl sm:text-2xl transition-all rounded-lg shadow-[0_0_40px_-5px_rgba(255,255,255,0.3)]'>
-                  Launch Your Journey
-                </Button>
-              </Link>
-            </div>
-            
-            <p className="mt-12 text-zinc-600 text-sm font-bold uppercase tracking-widest">
-                No Credit Card Required • Join 600+ Guitarists
-            </p>
+        {/* Header */}
+        <div className="text-center mb-16">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">Pricing</p>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4">
+            Simple, transparent pricing.
+          </h2>
+          <p className="text-zinc-400 text-lg max-w-md mx-auto">
+            No hidden fees. Cancel anytime.
+          </p>
         </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-zinc-800 rounded-2xl overflow-hidden mb-6 shadow-2xl">
+
+          {/* Practice Pro */}
+          <div className="bg-zinc-900 p-8 flex flex-col">
+            <div className="mb-8">
+              <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">🎸 Practice Pro</p>
+              <div className="flex items-end gap-2 mb-3">
+                <span className="text-5xl font-bold text-white tracking-tight">$2.99</span>
+                <span className="text-zinc-500 mb-1.5">/ month</span>
+              </div>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                Essential tools to organize and improve your daily guitar practice.
+              </p>
+            </div>
+
+            <ul className="flex flex-col gap-3 flex-1 mb-8">
+              {FEATURES.filter(f => f.pro).map((f, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  <Check size={14} className="text-zinc-400 shrink-0" />
+                  <span className="text-sm text-zinc-300">{f.label}</span>
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/signup"
+              className="block text-center rounded-lg border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 text-sm font-semibold text-zinc-200 transition-colors"
+            >
+              Get started →
+            </Link>
+          </div>
+
+          {/* Practice Master */}
+          <div className="bg-zinc-900 p-8 flex flex-col relative">
+            {/* Top accent line */}
+            <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">🏆 Practice Master</p>
+                <span className="text-[10px] font-bold uppercase tracking-widest border border-white/20 text-white/70 rounded px-2 py-0.5">
+                  Most Popular
+                </span>
+              </div>
+              <div className="flex items-end gap-2 mb-3">
+                <span className="text-5xl font-bold text-white tracking-tight">$4.99</span>
+                <span className="text-zinc-500 mb-1.5">/ month</span>
+              </div>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                Everything in Practice Pro, plus advanced tools to track your progress and reach your goals faster.
+              </p>
+            </div>
+
+            <ul className="flex flex-col gap-3 flex-1 mb-8">
+              {FEATURES.map((f, i) => (
+                <li key={i} className="flex items-center gap-3">
+                  {f.master ? (
+                    <Check size={14} className={`shrink-0 ${f.pro ? "text-zinc-400" : "text-white"}`} />
+                  ) : (
+                    <Minus size={14} className="text-zinc-700 shrink-0" />
+                  )}
+                  <span className={`text-sm ${f.master && !f.pro ? "text-white font-medium" : "text-zinc-300"}`}>
+                    {f.label}
+                  </span>
+                  {!f.pro && f.master && (
+                    <span className="ml-auto text-[10px] font-semibold uppercase tracking-wide text-zinc-500 border border-zinc-700 rounded px-1.5 py-0.5">
+                      Master
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/signup"
+              className="block text-center rounded-lg bg-white hover:bg-zinc-100 px-6 py-3 text-sm font-bold text-black transition-colors"
+            >
+              Get started →
+            </Link>
+          </div>
+        </div>
+
+        {/* Trust line */}
+        <p className="text-center text-xs text-zinc-600 uppercase tracking-widest font-semibold">
+          Cancel Anytime &nbsp;·&nbsp; Secure Payment via Stripe &nbsp;·&nbsp; Instant Access
+        </p>
+
       </div>
     </section>
   );
