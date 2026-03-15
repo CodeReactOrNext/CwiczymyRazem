@@ -1,7 +1,6 @@
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import { Slider } from "assets/components/ui/slider";
-import { motion } from "framer-motion";
 import {
   FaExternalLinkAlt, FaFacebook, FaHeart, FaInstagram, FaMicrophone,
   FaSync, FaTwitter, FaVolumeMute, FaVolumeUp,
@@ -11,10 +10,6 @@ import { BpmProgressGrid } from "../../../components/BpmProgressGrid";
 import { Metronome } from "../../../components/Metronome/Metronome";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { Exercise } from "../../../types/exercise.types";
-import { CENTS_TOLERANCE } from "../hooks/useNoteMatching";
-
-interface NoteData { note: string; octave: number; cents: number; }
-
 interface SessionSidebarProps {
   currentExercise: Exercise;
   activeExercise: Exercise;
@@ -33,10 +28,6 @@ interface SessionSidebarProps {
   // Mic controls
   isMicEnabled: boolean;
   updateMicPersistence: (v: boolean) => void;
-  isListening: boolean;
-  volume: number;
-  sessionAccuracy: number;
-  detectedNoteData: NoteData | null;
   setSessionPhase: (phase: any) => void;
   // Audio mixer
   audioTracks: AudioTrackConfig[];
@@ -66,10 +57,6 @@ export const SessionSidebar = ({
   soundfontsReady,
   isMicEnabled,
   updateMicPersistence,
-  isListening,
-  volume,
-  sessionAccuracy,
-  detectedNoteData,
   setSessionPhase,
   audioTracks,
   trackConfigs,
@@ -150,37 +137,6 @@ export const SessionSidebar = ({
             </div>
           )}
 
-          {/* Mic live feedback */}
-          {isMicEnabled && isListening && (
-            <div className="mt-4 flex flex-col items-end gap-1">
-              <div className="flex items-center gap-1.5 mb-1">
-                <div className="w-12 h-1 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
-                  <motion.div
-                    className={cn(
-                      "h-full transition-all duration-150",
-                      volume > 0.1 ? "bg-emerald-400 shadow-[0_0_8px_#34d399]" : "bg-zinc-600"
-                    )}
-                    animate={{ width: `${Math.min(100, volume * 300)}%` }}
-                  />
-                </div>
-                <span className="text-[8px] font-bold text-zinc-500 tracking-tight">Level</span>
-              </div>
-              <span className="text-[10px] font-bold text-emerald-400 leading-none">
-                {sessionAccuracy}% Accuracy
-              </span>
-              {detectedNoteData && volume > 0.05 && (
-                <span className={cn(
-                  "text-[8px] font-mono px-1 py-0 mt-1 rounded border",
-                  Math.abs(detectedNoteData.cents) <= CENTS_TOLERANCE
-                    ? "text-emerald-400 border-emerald-500/20 bg-emerald-500/10"
-                    : "text-amber-400 border-amber-500/20 bg-amber-500/10"
-                )}>
-                  {detectedNoteData.note}{detectedNoteData.octave}{" "}
-                  {detectedNoteData.cents > 0 ? "+" : ""}{detectedNoteData.cents}c
-                </span>
-              )}
-            </div>
-          )}
         </div>
       )}
 
