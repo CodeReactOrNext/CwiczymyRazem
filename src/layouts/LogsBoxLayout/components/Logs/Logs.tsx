@@ -249,8 +249,8 @@ const FirebaseLogsItem = ({
   currentUserId: string;
 }) => {
   const { t, i18n } = useTranslation(["common", "exercises"]);
-  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame } = log;
-  const date = new Date(data);
+  const { userName, points, data, uid, newLevel, newAchievements, avatarUrl, planId, songTitle, songArtist, exerciseTitle, micPerformance, earTrainingPerformance, userAvatarFrame, timestamp } = log;
+  const date = new Date(timestamp as string);
 
   const plan: any = planId ? defaultPlans.find(p => p.id === planId) : null;
 
