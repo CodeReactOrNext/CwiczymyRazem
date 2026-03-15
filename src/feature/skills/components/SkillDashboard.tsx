@@ -269,7 +269,7 @@ export const SkillDashboard = ({
                 </div>
 
                 {/* Scrollable exercise list */}
-                <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500">
+                <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y px-6 py-4 space-y-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500">
                   {(filteredTree[Object.keys(filteredTree)[0]]?.[selectedSkillId!]?.filter(c => c.difficulty === currentDifficulty) ?? []).map((challenge) => {
                     const exerciseDef = exercisesAgregat.find(e => e.id === challenge.id);
                     const progress = progressMap.get(challenge.id);
