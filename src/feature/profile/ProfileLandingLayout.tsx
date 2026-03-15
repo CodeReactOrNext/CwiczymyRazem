@@ -43,32 +43,30 @@ const ProfileLandingLayout = ({
 
   return (
     <div className="bg-second-600 rounded-xl flex flex-col shadow-sm border-none lg:mt-16">
-      {!isTodayCompleted && (
-        <HeroBanner
-          title="Start today's practice"
-          characterImage="/images/3d/guitarist.png"
-          secondaryImage="/images/3d/metronom.png"
-          className="w-full !rounded-none !shadow-none min-h-[220px] md:min-h-[200px] lg:min-h-[240px]"
-          leftContent={
-            <div className="flex flex-row flex-wrap gap-3 items-center">
-              <button
-                onClick={() => router.push("/profile/exercises?view=create")}
-                className="group/btn rounded-none md:rounded-md bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 hover:bg-zinc-700/80 active:scale-95"
-              >
-                Create plan
-                <Plus className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => router.push("/timer")}
-                className="group/btn rounded-none md:rounded-md bg-white text-zinc-950 px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 active:scale-95"
-              >
-                Choose mode
-                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
-              </button>
-            </div>
-          }
-        />
-      )}
+      <HeroBanner
+        title={isTodayCompleted ? "Great job today!" : "Start today's practice"}
+        characterImage="/images/3d/guitarist.png"
+        secondaryImage="/images/3d/metronom.png"
+        className="w-full !rounded-none !shadow-none min-h-[220px] md:min-h-[200px] lg:min-h-[240px]"
+        leftContent={
+          <div className="flex flex-row flex-wrap gap-3 items-center">
+            <button
+              onClick={() => router.push("/profile/exercises?view=create")}
+              className="group/btn rounded-none md:rounded-md bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 hover:bg-zinc-700/80 active:scale-95"
+            >
+              Create plan
+              <Plus className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => router.push("/timer")}
+              className="group/btn rounded-none md:rounded-md bg-white text-zinc-950 px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 active:scale-95"
+            >
+              Choose mode
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
+            </button>
+          </div>
+        }
+      />
       
       <div className="md:mt-6 space-y-6 p-4 md:p-6">
         <div className="relative z-10">

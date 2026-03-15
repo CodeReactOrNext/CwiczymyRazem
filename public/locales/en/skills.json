@@ -83,6 +83,10 @@
       "name": "Tapping",
       "description": "Advanced technique using both hands on the fretboard"
     },
+    "string_skipping": {
+      "name": "String Skipping",
+      "description": "Develop accuracy and coordination when skipping strings"
+    },
     "improvisation": {
       "name": "Improvisation",
       "description": "Create spontaneous musical ideas and solos"
