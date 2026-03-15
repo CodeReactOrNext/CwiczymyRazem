@@ -35,12 +35,15 @@ export const SelectExercisesStep = ({
     searchQuery,
     selectedCategory,
     selectedDifficulty,
+    selectedSkill,
+    availableSkills,
     groupedExercises,
     filteredExercises,
     handleExerciseToggle,
     setSearchQuery,
     setSelectedCategory,
     setSelectedDifficulty,
+    setSelectedSkill,
   } = useExerciseSelection({
     selectedExercises,
     onExercisesSelect,
@@ -148,6 +151,9 @@ export const SelectExercisesStep = ({
             onCategoryChange={setSelectedCategory}
             selectedDifficulty={selectedDifficulty}
             onDifficultyChange={setSelectedDifficulty}
+            selectedSkill={selectedSkill}
+            onSkillChange={setSelectedSkill}
+            availableSkills={availableSkills}
             groupedExercises={groupedExercises}
           />
 
