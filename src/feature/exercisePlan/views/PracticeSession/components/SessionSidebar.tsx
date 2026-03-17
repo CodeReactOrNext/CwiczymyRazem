@@ -27,7 +27,8 @@ interface SessionSidebarProps {
   soundfontsReady: boolean;
   // Mic controls
   isMicEnabled: boolean;
-  updateMicPersistence: (v: boolean) => void;
+  showMicControls: boolean;
+  toggleMic: () => Promise<void>;
   setSessionPhase: (phase: any) => void;
   // Audio mixer
   audioTracks: AudioTrackConfig[];
@@ -56,7 +57,8 @@ export const SessionSidebar = ({
   saveGuitarPlaybackPreference,
   soundfontsReady,
   isMicEnabled,
-  updateMicPersistence,
+  showMicControls,
+  toggleMic,
   setSessionPhase,
   audioTracks,
   trackConfigs,
@@ -81,7 +83,7 @@ export const SessionSidebar = ({
             onHalfSpeedToggle={setIsHalfSpeed}
           />
 
-          {currentExercise.tablature && currentExercise.tablature.length > 0 && (
+          {((currentExercise.tablature && currentExercise.tablature.length > 0) || showMicControls) && (
             <div className="mt-4 flex flex-col gap-2">
               <Button
                 variant="ghost"
@@ -117,7 +119,7 @@ export const SessionSidebar = ({
                       ? "text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20"
                       : "text-zinc-500 hover:text-zinc-400"
                   )}
-                  onClick={() => updateMicPersistence(!isMicEnabled)}
+                  onClick={toggleMic}
                 >
                   <FaMicrophone className="text-xs" />
                   {isMicEnabled ? "Mic On" : "Mic Off"}

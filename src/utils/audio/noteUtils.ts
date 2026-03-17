@@ -65,6 +65,43 @@ export const getCentsDistance = (freqA: number, freqB: number): number => {
  * @param fret - Fret number.
  * @returns Frequency in Hz.
  */
+/**
+ * Maps a frequency in Hz to a pitch class index 0–11 (C=0, C#=1, …, B=11).
+ */
+export function freqToPitchClass(freq: number): number {
+  const semitones = 12 * Math.log2(freq / A4); // relative to A4 (= 9 semitones above C)
+  return ((Math.round(semitones) % 12) + 12 + 9) % 12;
+}
+
+/**
+ * Computes a 12-element chromagram from a Web Audio AnalyserNode.
+ * Returns a Float32Array[12] with values 0–1 (normalized to the max bin energy).
+ * Returns null when the analyser has no data or the signal is silent.
+ */
+export function computeChromagram(analyser: AnalyserNode): Float32Array | null {
+  const fftSize = analyser.fftSize;
+  const buf = new Float32Array(fftSize / 2);
+  analyser.getFloatFrequencyData(buf); // dB values (typically -100 to 0)
+
+  const sampleRate = analyser.context.sampleRate;
+  const binHz = sampleRate / fftSize;
+  const chroma = new Float32Array(12);
+
+  for (let i = 1; i < buf.length; i++) {
+    const freq = i * binHz;
+    if (freq < 60 || freq > 1400) continue; // guitar fundamental range
+    const amplitude = Math.pow(10, buf[i] / 20); // dB → linear
+    chroma[freqToPitchClass(freq)] += amplitude;
+  }
+
+  let max = 0;
+  for (let i = 0; i < 12; i++) if (chroma[i] > max) max = chroma[i];
+  if (max < 1e-6) return null; // silence
+
+  for (let i = 0; i < 12; i++) chroma[i] /= max;
+  return chroma;
+}
+
 export const getFrequencyFromTab = (string: number, fret: number): number => {
   // Standard Tuning Open String MIDI notes
   // 1: E4 (64)

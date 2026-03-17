@@ -15,6 +15,16 @@ export interface UseAlphaTabPlayerProps {
   /** startTime changes on each new play session — used to restart AlphaTab */
   startTime: number | null;
   onLoopComplete?: () => void;
+  /** Called immediately after api.play() on each loop restart — use to re-anchor the cursor. */
+  onLoopRestart?: () => void;
+  /** Called once when AlphaTab's internal AudioContext becomes available (after playerReady). */
+  onAudioContextReady?: (ctx: AudioContext) => void;
+  /**
+   * Volume for AlphaTab's built-in metronome click track (0 = off, 1 = normal).
+   * Set to 0 when the user has muted the metronome, > 0 otherwise.
+   * Our custom metronome should be muted during GP playback so AlphaTab's click is the only source.
+   */
+  metronomeVolume?: number;
   /** Per-track mute/volume — MUST be memoized by the caller to avoid effect loops */
   trackConfigs?: Record<string, AlphaTabTrackConfig>;
   /** MUST be memoized by the caller */
@@ -26,28 +36,43 @@ export interface UseAlphaTabPlayerProps {
  * AlphaTabApi is created only when rawGpFile is first provided — never for regular exercises.
  * display:none prevents score rendering (no canvas OOM).
  */
+export interface AlphaTabPlayerHandle {
+  /** Call directly (without React render) to start playback — e.g. from metronome onPlayStart. */
+  play: () => void;
+}
+
 export const useAlphaTabPlayer = ({
   rawGpFile,
   bpm,
   isPlaying,
   startTime,
   onLoopComplete,
+  onLoopRestart,
+  onAudioContextReady,
+  metronomeVolume = 1,
   trackConfigs = {},
   backingTrackIds = [],
 }: UseAlphaTabPlayerProps) => {
-  const apiRef            = useRef<any>(null);
-  const scoreRef          = useRef<any>(null);
-  const originalBpmRef    = useRef<number>(120);
-  const isReadyRef        = useRef(false);
-  const pendingPlayRef    = useRef(false);
-  const currentFileRef    = useRef<File | null>(null);
-  const isPlayingRef      = useRef(isPlaying);
-  const bpmRef            = useRef(bpm);
-  const onLoopCompleteRef = useRef(onLoopComplete);
+  const apiRef             = useRef<any>(null);
+  const playRef            = useRef<AlphaTabPlayerHandle['play'] | null>(null);
+  const scoreRef           = useRef<any>(null);
+  const originalBpmRef     = useRef<number>(120);
+  const isReadyRef         = useRef(false);
+  const pendingPlayRef     = useRef(false);
+  const currentFileRef     = useRef<File | null>(null);
+  const isPlayingRef       = useRef(isPlaying);
+  const bpmRef             = useRef(bpm);
+  const onLoopCompleteRef       = useRef(onLoopComplete);
+  const onLoopRestartRef        = useRef(onLoopRestart);
+  const onAudioContextReadyRef  = useRef(onAudioContextReady);
+  // Guards api.stop() — must not be called before api.play() has run at least once.
+  const hasStartedRef           = useRef(false);
 
-  useEffect(() => { isPlayingRef.current      = isPlaying;       }, [isPlaying]);
-  useEffect(() => { bpmRef.current            = bpm;             }, [bpm]);
-  useEffect(() => { onLoopCompleteRef.current = onLoopComplete;  }, [onLoopComplete]);
+  useEffect(() => { isPlayingRef.current             = isPlaying;            }, [isPlaying]);
+  useEffect(() => { bpmRef.current                   = bpm;                  }, [bpm]);
+  useEffect(() => { onLoopCompleteRef.current        = onLoopComplete;       }, [onLoopComplete]);
+  useEffect(() => { onLoopRestartRef.current         = onLoopRestart;        }, [onLoopRestart]);
+  useEffect(() => { onAudioContextReadyRef.current   = onAudioContextReady;  }, [onAudioContextReady]);
 
   // ── Create AlphaTabApi — only when rawGpFile first arrives ────────────────
   // Guard: apiRef.current !== null prevents re-creation if rawGpFile object changes
@@ -92,10 +117,19 @@ export const useAlphaTabPlayer = ({
 
     api.playerReady.on(() => {
       isReadyRef.current = true;
+      // Expose AlphaTab's AudioContext — accessed via the (non-hard-private) output.context field.
+      const atCtx = (api.player as any)?.output?.context as AudioContext | undefined;
+      if (atCtx) onAudioContextReadyRef.current?.(atCtx);
+      // Expose imperative play handle — usable without React render cycle
+      playRef.current = () => {
+        api.playbackSpeed = bpmRef.current / (originalBpmRef.current || 120);
+        if (hasStartedRef.current) api.stop();
+        api.play();
+        hasStartedRef.current = true;
+      };
       if (pendingPlayRef.current) {
         pendingPlayRef.current = false;
-        api.playbackSpeed = bpmRef.current / (originalBpmRef.current || 120);
-        api.play();
+        playRef.current();
       }
     });
 
@@ -104,16 +138,22 @@ export const useAlphaTabPlayer = ({
       if (isPlayingRef.current) {
         api.stop();
         api.play();
+        // Notify caller immediately after play() so it can re-anchor the cursor clock.
+        // Each loop restart introduces a small scheduling offset; re-anchoring prevents
+        // that offset from accumulating across loops.
+        onLoopRestartRef.current?.();
       }
     });
 
     return () => {
-      try { api.stop();    } catch { /* ignore */ }
+      if (hasStartedRef.current) { try { api.stop(); } catch { /* ignore */ } }
       try { api.destroy(); } catch { /* ignore */ }
       isReadyRef.current     = false;
       pendingPlayRef.current = false;
+      hasStartedRef.current  = false;
       currentFileRef.current = null;
       div.remove();
+      playRef.current  = null;
       apiRef.current   = null;
       scoreRef.current = null;
     };
@@ -130,11 +170,28 @@ export const useAlphaTabPlayer = ({
     currentFileRef.current = rawGpFile;
     isReadyRef.current     = false;
     pendingPlayRef.current = false;
+    hasStartedRef.current  = false;
 
     rawGpFile.arrayBuffer().then(buf => {
       if (apiRef.current === api) api.load(new Uint8Array(buf));
     });
   }, [rawGpFile]);
+
+  // ── BPM update — just adjust speed, never restart ────────────────────────
+  // Separated from play/stop so a metronome slider change does not trigger
+  // api.stop() → api.play() (which would cause "stop without start" in the worklet).
+  useEffect(() => {
+    const api = apiRef.current;
+    if (api) api.playbackSpeed = bpm / (originalBpmRef.current || 120);
+  }, [bpm]);
+
+  // ── AlphaTab built-in metronome volume ────────────────────────────────────
+  // countInVolume stays 0 — our metronome handles the count-in clicks.
+  // metronomeVolume is driven by the caller (0 when user mutes, 1 otherwise).
+  useEffect(() => {
+    const api = apiRef.current;
+    if (api) api.metronomeVolume = metronomeVolume;
+  }, [metronomeVolume]);
 
   // ── Playback control ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -142,19 +199,20 @@ export const useAlphaTabPlayer = ({
     if (!api) return;
 
     if (isPlaying) {
-      api.playbackSpeed = bpm / (originalBpmRef.current || 120);
+      api.playbackSpeed = bpmRef.current / (originalBpmRef.current || 120);
       if (isReadyRef.current) {
-        api.stop();
+        if (hasStartedRef.current) api.stop();
         api.play();
+        hasStartedRef.current = true;
       } else {
         pendingPlayRef.current = true;
       }
     } else {
       pendingPlayRef.current = false;
-      try { api.stop(); } catch { /* ignore */ }
+      if (hasStartedRef.current) { try { api.stop(); } catch { /* ignore */ } }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, startTime, bpm]);
+  }, [isPlaying, startTime]);
 
   // ── Per-track mute / volume ───────────────────────────────────────────────
   // trackConfigs and backingTrackIds MUST be memoized by the caller.
@@ -183,4 +241,6 @@ export const useAlphaTabPlayer = ({
       }
     });
   }, [trackConfigs, backingTrackIds]);
+
+  return { playRef };
 };

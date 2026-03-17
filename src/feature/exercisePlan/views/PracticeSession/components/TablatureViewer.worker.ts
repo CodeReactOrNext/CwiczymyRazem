@@ -98,6 +98,10 @@ let startWallMs: number | null = null;
 let bpm = 120;
 let countInRemaining = 0;
 
+// Audio-clock sync (AudioContext.currentTime sent from main thread each rAF)
+let audioStartSec: number | null = null;
+let audioCurrentSec: number | null = null;
+
 // Visual state
 let hitNotes: Record<string, boolean> = {};
 let hideNotes = false;
@@ -105,6 +109,18 @@ let hideNotes = false;
 // Hit animation timestamps — noteKey → wall-clock ms when note was first hit
 const HIT_ANIM_MS = 480;
 let hitTimestamps: Record<string, number> = {};
+
+// ── Performance: module-level reuse ──────────────────────────────────────────
+// Reused each frame instead of allocating a new Map on every rAF tick
+const stringLastPos = new Map<number, { x: number; cx: number; y: number; slideOut: number }>();
+// Dirty flag — skip rAF paint when nothing changed (paused, no animations)
+let needsRedraw = true;
+// Counter for active hit animations — avoids Object.keys() in the hot render path
+let hitTimestampsCount = 0;
+// Cache for bend badge text widths — ctx.measureText is expensive, text never changes
+const bendTextWidthCache = new Map<string, number>();
+// Wall-clock time (ms) at which the last TICK was received — used for interpolation
+let audioCurrentReceivedAt: number | null = null;
 
 // Scrub/pause position (writable by SCROLL message when paused)
 let pausedCursorPos = 0;
@@ -119,7 +135,8 @@ function drawBendBadge(
   if (!ctx) return;
   ctx.font = "bold 16px Inter, sans-serif";
   const fullText = `${icon} ${label}`;
-  const tw = ctx.measureText(fullText).width;
+  let tw = bendTextWidthCache.get(fullText);
+  if (tw === undefined) { tw = ctx.measureText(fullText).width; bendTextWidthCache.set(fullText, tw); }
   const padX = 8, bw = tw + padX * 2, bh = 24, r = 6;
 
   ctx.fillStyle = bgColor;
@@ -273,13 +290,23 @@ function render() {
   rafId = requestAnimationFrame(render);
   if (!ctx || W === 0) return;
 
+  // Skip paint when paused and nothing animating
+  if (!isPlaying && !needsRedraw && hitTimestampsCount === 0) return;
+  needsRedraw = false;
+
   const dynBW = Math.max(120, Math.min(200, W / 4));
   let cursorPos = pausedCursorPos;
   let scrollX = pausedScrollX;
   let beatsElapsed = 0;
 
-  if (isPlaying && startWallMs !== null && countInRemaining === 0) {
-    const elapsed = (Date.now() - startWallMs) / 1000;
+  if (isPlaying && countInRemaining === 0) {
+    // Interpolate audio time between infrequent TICK messages using wall clock
+    const audioNow = (audioCurrentSec !== null && audioCurrentReceivedAt !== null)
+      ? audioCurrentSec + (Date.now() - audioCurrentReceivedAt) / 1000
+      : null;
+    const elapsed = (audioStartSec !== null && audioNow !== null)
+      ? (audioNow - audioStartSec)
+      : startWallMs !== null ? (Date.now() - startWallMs) / 1000 : 0;
     beatsElapsed = computeBeatsElapsed(elapsed);
     const looped = totalBeats > 0 ? beatsElapsed % totalBeats : 0;
     cursorPos = looped * dynBW;
@@ -319,15 +346,23 @@ function render() {
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(0, STAFF_TOP); ctx.lineTo(0, STAFF_TOP + 5 * STRING_SPACING);
-  for (const mx of measureEndXs) {
-    const x = mx * dynBW;
-    if (x < visL || x > visR) continue;
-    ctx.moveTo(x, STAFF_TOP); ctx.lineTo(x, STAFF_TOP + 5 * STRING_SPACING);
+  // Binary search for first visible measure bar, then scan forward
+  if (measureEndXs.length > 0) {
+    let lo = 0, hi = measureEndXs.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (measureEndXs[mid] * dynBW < visL) lo = mid + 1; else hi = mid;
+    }
+    for (let mi = lo; mi < measureEndXs.length; mi++) {
+      const x = measureEndXs[mi] * dynBW;
+      if (x > visR) break;
+      ctx.moveTo(x, STAFF_TOP); ctx.lineTo(x, STAFF_TOP + 5 * STRING_SPACING);
+    }
   }
   ctx.stroke();
 
   // Track last rendered note pos per string for slide lines: string# → { x, y, slideOut }
-  const stringLastPos = new Map<number, { x: number; cx: number; y: number; slideOut: number }>();
+  stringLastPos.clear();
 
   // ── Beat loop ────────────────────────────────────────────────────────────
   for (const beat of renderBeats) {
@@ -477,16 +512,8 @@ function render() {
           ctx.globalAlpha = isHit ? 1.0 : baseAlpha;
           ctx.fillStyle = fillColor;
 
-          ctx.shadowColor = "rgba(0,0,0,0.5)";
-          ctx.shadowBlur = 4;
-          ctx.shadowOffsetY = 2;
-
           drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
           ctx.fill();
-
-          ctx.shadowColor = "transparent";
-          ctx.shadowBlur = 0;
-          ctx.shadowOffsetY = 0;
 
           // Subtle inner highlight (lighter strip on top half)
           if (!isHit && !isDead) {
@@ -546,7 +573,7 @@ function render() {
             ctx.stroke();
           }
 
-          if (age >= 1) delete hitTimestamps[note.noteKey];
+          if (age >= 1) { delete hitTimestamps[note.noteKey]; hitTimestampsCount--; }
         }
 
         // ── Fret label ────────────────────────────────────────────────────
@@ -557,17 +584,9 @@ function render() {
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
 
-          ctx.shadowColor = isActive || isHit ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.4)";
-          ctx.shadowBlur = 2;
-          ctx.shadowOffsetY = 1;
-
           let text = note.fret.toString();
           if (note.isGhost) text = `(${text})`;
           ctx.fillText(text, labelX, note.noteY);
-
-          ctx.shadowColor = "transparent";
-          ctx.shadowBlur = 0;
-          ctx.shadowOffsetY = 0;
         }
 
         // ── Technique labels ──────────────────────────────────────────────
@@ -591,10 +610,6 @@ function render() {
             const slurY = note.noteY - BLOCK_H / 2 + 1;
             const arcH = Math.min(28, Math.max(16, (x1 - x0) * 0.4));
 
-            // Shadow for visibility
-            ctx.shadowColor = "rgba(0,0,0,0.7)";
-            ctx.shadowBlur = 5;
-
             ctx.strokeStyle = hpColor;
             ctx.lineWidth = 3;
             ctx.lineCap = "round";
@@ -602,9 +617,6 @@ function render() {
             ctx.moveTo(x0, slurY);
             ctx.quadraticCurveTo(midX, slurY - arcH, x1, slurY);
             ctx.stroke();
-
-            ctx.shadowColor = "transparent";
-            ctx.shadowBlur = 0;
 
             // Label at apex of arc
             ctx.fillStyle = hpColor;
@@ -690,6 +702,7 @@ function render() {
           const innerW = blockW - 2 * cr;
           const cycles = Math.max(2, Math.round(innerW / 7));
           const amp = 2.5;
+          const vstep = 6; // sample every 6px instead of 1px — ~6× fewer path points
 
           ctx.strokeStyle = vibratoColor;
           ctx.lineWidth = 2.5;
@@ -699,9 +712,10 @@ function render() {
 
           // Top-left arc → top edge
           ctx.moveTo(blockX + cr, blockY);
-          for (let i = 1; i <= innerW; i++) {
+          for (let i = vstep; i < innerW; i += vstep) {
             ctx.lineTo(blockX + cr + i, blockY + Math.sin((i / innerW) * Math.PI * cycles) * amp);
           }
+          ctx.lineTo(blockX + cr + innerW, blockY + Math.sin(Math.PI * cycles) * amp);
           // Top-right corner
           ctx.arcTo(blockX + blockW, blockY, blockX + blockW, blockY + cr, cr);
           // Right edge
@@ -709,9 +723,10 @@ function render() {
           // Bottom-right corner
           ctx.arcTo(blockX + blockW, blockY + BLOCK_H, blockX + blockW - cr, blockY + BLOCK_H, cr);
           // Bottom edge (wavy, right → left, phase-inverted for ripple effect)
-          for (let i = innerW - 1; i >= 0; i--) {
+          for (let i = innerW - vstep; i > 0; i -= vstep) {
             ctx.lineTo(blockX + cr + i, blockY + BLOCK_H - Math.sin((i / innerW) * Math.PI * cycles) * amp);
           }
+          ctx.lineTo(blockX + cr, blockY + BLOCK_H);
           // Bottom-left corner
           ctx.arcTo(blockX, blockY + BLOCK_H, blockX, blockY + BLOCK_H - cr, cr);
           // Left edge
@@ -846,6 +861,7 @@ function render() {
 // ── Message handler ───────────────────────────────────────────────────────────
 self.onmessage = (e: MessageEvent) => {
   const msg = e.data as { type: string;[k: string]: any };
+  needsRedraw = true; // any incoming message requires at least one repaint
 
   switch (msg.type) {
     case 'INIT': {
@@ -892,7 +908,14 @@ self.onmessage = (e: MessageEvent) => {
       startWallMs = msg.startWallMs;
       bpm = msg.bpm;
       countInRemaining = msg.countInRemaining;
+      audioStartSec = msg.audioStartSec ?? null;
+      if (!isPlaying) { audioCurrentSec = null; audioCurrentReceivedAt = null; }
       recomputeLoopSeconds();
+      break;
+    }
+    case 'TICK': {
+      audioCurrentSec = msg.audioCurrentSec;
+      audioCurrentReceivedAt = Date.now();
       break;
     }
     case 'HIT_NOTES': {
@@ -901,12 +924,13 @@ self.onmessage = (e: MessageEvent) => {
       // Record timestamp for notes that are newly hit this frame
       for (const key of Object.keys(newHits)) {
         if (newHits[key] && !hitNotes[key]) {
+          if (!hitTimestamps[key]) hitTimestampsCount++;
           hitTimestamps[key] = now;
         }
       }
       // Clear timestamps for notes that got reset (loop restart)
       for (const key of Object.keys(hitTimestamps)) {
-        if (!newHits[key]) delete hitTimestamps[key];
+        if (!newHits[key]) { delete hitTimestamps[key]; hitTimestampsCount--; }
       }
       hitNotes = newHits;
       break;
