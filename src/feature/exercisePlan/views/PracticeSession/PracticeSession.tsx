@@ -792,7 +792,7 @@ export const PracticeSession = ({
             metronome={metronome}
             effectiveBpm={effectiveBpm}
             isMicEnabled={isMicEnabled}
-            toggleMic={async () => { if (isListening) { closeAudio(); updateMicPersistence(false); } else { await initAudio(); updateMicPersistence(true); } }}
+            toggleMic={async () => { if (isListening) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
             gameState={gameState}
             maxPossibleScore={maxPossibleScore}
             sessionAccuracy={sessionAccuracy}
@@ -1117,7 +1117,8 @@ export const PracticeSession = ({
                       saveGuitarPlaybackPreference={saveGuitarPlaybackPreference}
                       soundfontsReady={soundfontsReady}
                       isMicEnabled={isMicEnabled}
-                      updateMicPersistence={updateMicPersistence}
+                      showMicControls={planHasTablature || planHasGpFile}
+                      toggleMic={async () => { if (isListening) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
                       setSessionPhase={setSessionPhase}
                       audioTracks={audioTracks}
                       trackConfigs={trackConfigs}
