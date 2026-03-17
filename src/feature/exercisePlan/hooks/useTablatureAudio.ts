@@ -86,6 +86,7 @@ export const useTablatureAudio = ({
   startTime,
   onLoopComplete,
   audioContext: externalAudioContext,
+  audioStartTime,
   disabled = false,
 }: UseTablatureAudioProps) => {
   // ── Audio graph refs ──────────────────────────────────────────────────────
@@ -102,8 +103,12 @@ export const useTablatureAudio = ({
   //   + floor(beatIdx / N) * totalLoopDuration   ← loop offset
   //   + offsets[beatIdx % N]                      ← beat offset within loop
   // This eliminates all floating-point accumulation between tracks.
-  const startAudioTimeRef = useRef<number>(0);
-  const trackStatesRef    = useRef<Record<string, { beatIdx: number }>>({});
+  const startAudioTimeRef    = useRef<number | null>(null);
+  const audioStartTimePropRef = useRef<number | null>(null);
+  const trackStatesRef       = useRef<Record<string, { beatIdx: number }>>({});
+
+  // Synchronous ref update — no useEffect needed, always has the latest value before any scheduler tick
+  audioStartTimePropRef.current = audioStartTime ?? null;
 
   // ── Active soundfont nodes for note-off (key = `${trackId}-${string}`) ──
   const activeNodesRef = useRef<Map<string, any>>(new Map());
@@ -116,8 +121,15 @@ export const useTablatureAudio = ({
   const [soundfontsReady, setSoundfontsReady] = useState(false);
 
   // ── isPlaying ref for use inside scheduler closure ────────────────────────
-  const isPlayingRef = useRef(isPlaying);
+  const isPlayingRef    = useRef(isPlaying);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
+
+  /**
+   * Stable ref the caller can call on every external tick (e.g. metronome worklet ~25ms).
+   * Points to the active scheduler when playing, null otherwise.
+   * Exposed so PracticeSession can wire up: onTick → schedulerTickRef.current?.()
+   */
+  const schedulerTickRef = useRef<(() => void) | null>(null);
 
   // ── Track data ────────────────────────────────────────────────────────────
   const activeTracks = useMemo(() => {
@@ -1056,8 +1068,26 @@ export const useTablatureAudio = ({
   // beatIdx grows monotonically; the modulo maps it back to the loop.
   // All tracks reference the same startAudioTime so they cannot drift apart.
   const scheduler = useCallback(() => {
+    // Clear any pending fallback timeout first — prevents accumulation when called by external tick.
+    if (timeoutRef.current) { window.clearTimeout(timeoutRef.current); timeoutRef.current = null; }
+
     const ctx = audioContextRef.current;
     if (!ctx || !isPlayingRef.current) return;
+
+    // Self-initialize from the synchronous prop ref — no useEffect async delay
+    if (startAudioTimeRef.current === null) {
+      const anchor = audioStartTimePropRef.current;
+      if (anchor == null) {
+        // Metronome count-in not finished yet — poll again shortly
+        timeoutRef.current = window.setTimeout(scheduler, 10);
+        return;
+      }
+      startAudioTimeRef.current = anchor;
+      const newStates: Record<string, { beatIdx: number }> = {};
+      activeTracksRef.current.forEach(track => { newStates[track.id] = { beatIdx: 0 }; });
+      trackStatesRef.current = newStates;
+      activeNodesRef.current.clear();
+    }
 
     const lookaheadTime  = ctx.currentTime + 0.25;
     const secondsPerBeat = 60 / (bpmRef.current || 120);
@@ -1104,29 +1134,25 @@ export const useTablatureAudio = ({
       }
     });
 
-    timeoutRef.current = window.setTimeout(scheduler, 50);
+    // Primary driver is the external worklet tick (every ~25ms).
+    // This setTimeout is a fallback in case the tick is not wired up.
+    timeoutRef.current = window.setTimeout(scheduler, 200);
   }, [playNote]);
 
   // ── Start / stop playback ─────────────────────────────────────────────────
   useEffect(() => {
     if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
 
-    if (isPlaying && startTime) {
+    if (isPlaying) {
       if (audioContextRef.current?.state === 'suspended') audioContextRef.current.resume();
-      const ctx = audioContextRef.current;
-      if (ctx) {
-        // Anchor all tracks to the same audio time — the only source of truth
-        startAudioTimeRef.current = ctx.currentTime;
-        const newStates: Record<string, { beatIdx: number }> = {};
-        activeTracksRef.current.forEach(track => {
-          newStates[track.id] = { beatIdx: 0 };
-        });
-        trackStatesRef.current = newStates;
-        activeNodesRef.current.clear();
-        scheduler();
-      }
+      // Reset anchor — scheduler will self-initialize once audioStartTimePropRef is non-null
+      startAudioTimeRef.current = null;
+      schedulerTickRef.current  = scheduler;
+      scheduler();
     } else {
+      schedulerTickRef.current  = null;
       // Stop all lingering soundfont nodes
+      startAudioTimeRef.current = null;
       activeNodesRef.current.forEach(node => {
         try { node.stop(); } catch { /* already ended */ }
       });
@@ -1135,7 +1161,7 @@ export const useTablatureAudio = ({
     }
 
     return () => { if (timeoutRef.current) window.clearTimeout(timeoutRef.current); };
-  }, [isPlaying, startTime, scheduler]);
+  }, [isPlaying, scheduler]);
 
-  return { soundfontsReady };
+  return { soundfontsReady, schedulerTickRef };
 };

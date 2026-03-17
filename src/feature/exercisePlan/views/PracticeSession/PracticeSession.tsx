@@ -249,16 +249,45 @@ export const PracticeSession = ({
 
   // ── Ear training / riddle ─────────────────────────────────────────────────
 
+  // Bridge ref: filled after useAlphaTabPlayer runs, read by metronome's onPlayStart.
+  // This avoids a React render cycle between count-in end and AlphaTab start.
+  const alphaTabPlayRef = useRef<(() => void) | null>(null);
+  // Bridge ref: filled after useTablatureAudio runs, driven by metronome's onTick.
+  // Shares the ~25ms AudioWorklet tick so tablature audio stays locked to the metronome clock.
+  const tabTickBridgeRef = useRef<(() => void) | null>(null);
+
+  // AlphaTab's internal AudioContext — captured via api.player.output.context after playerReady.
+  // Passed to the metronome so metronome clicks and GP audio share the same audio graph and clock.
+  // Reset to null when the GP file changes so a new context is captured on the next playerReady.
+  const [alphaTabAudioContext, setAlphaTabAudioContext] = useState<AudioContext | null>(null);
+  useEffect(() => { setAlphaTabAudioContext(null); }, [effectiveRawGpFile]);
+
+  // Tracks whether GP audio is actively playing (post count-in). Updated one render after
+  // isAudioPlaying to break the circular dependency with useDeviceMetronome's isMuted prop.
+  // Used to silence our custom metronome clicks once AlphaTab's built-in metronome takes over.
+  const [gpAudioActive, setGpAudioActive] = useState(false);
+
   const metronome = useDeviceMetronome({
     initialBpm:     activeExercise.metronomeSpeed?.recommended || 60,
     minBpm:         activeExercise.metronomeSpeed?.min,
     maxBpm:         activeExercise.metronomeSpeed?.max,
     recommendedBpm: activeExercise.metronomeSpeed?.recommended,
-    isMuted:        isMetronomeMuted,
+    // During GP playback AlphaTab's built-in metronome handles clicks — silence ours.
+    // During count-in (gpAudioActive=false) our metronome still clicks normally.
+    isMuted:        isMetronomeMuted || gpAudioActive,
     speedMultiplier: isHalfSpeed ? 0.5 : 1,
+    onPlayStart:    useCallback(() => { alphaTabPlayRef.current?.(); }, []),
+    onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
+    // GP file: share AlphaTab's AudioContext so metronome clicks and GP audio are in the same graph.
+    // Non-GP: undefined → metronome creates its own context (already shared with useTablatureAudio).
+    externalAudioContext: effectiveRawGpFile ? alphaTabAudioContext : undefined,
   });
 
   const effectiveBpm = isHalfSpeed ? metronome.bpm / 2 : metronome.bpm;
+
+  // Re-anchors the TablatureViewer cursor to the metronome audio clock on every
+  // AlphaTab loop restart, preventing cumulative drift between cursor and GP audio.
+  const [alphaTabLoopAnchor, setAlphaTabLoopAnchor] = useState<number | null>(null);
 
   const {
     riddleMeasures,
@@ -271,9 +300,8 @@ export const PracticeSession = ({
   } = useEarTraining({
     currentExercise,
     userAuth,
-    isMetronomeRunning: metronome.isPlaying,
-    stopMetronome:  metronome.stopMetronome,
-    startMetronome: metronome.startMetronome,
+    restartMetronome: metronome.restartMetronome,
+    startMetronome:   metronome.startMetronome,
     currentBpm:     metronome.bpm,
     setBpm:         metronome.setBpm,
   });
@@ -364,6 +392,22 @@ export const PracticeSession = ({
 
   const isAudioPlaying = metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime;
 
+  // Keep gpAudioActive in sync. This drives the isMuted prop on useDeviceMetronome above:
+  // true  → our click sounds are silenced; AlphaTab's built-in metronome plays instead.
+  // false → our metronome plays click sounds (count-in phase or non-GP exercise).
+  useEffect(() => {
+    setGpAudioActive(!!effectiveRawGpFile && isAudioPlaying);
+  }, [effectiveRawGpFile, isAudioPlaying]);
+
+  // Reset loop anchor when playback stops so the next session starts clean.
+  useEffect(() => {
+    if (!isAudioPlaying) setAlphaTabLoopAnchor(null);
+  }, [isAudioPlaying]);
+
+  // Prefer the loop anchor (re-set on each AlphaTab loop restart) over the fixed
+  // metronome start time so cursor re-syncs to beat 0 every loop without drift.
+  const effectiveAudioStartTime = alphaTabLoopAnchor ?? metronome.audioStartTime;
+
   const alphaTabTrackConfigs = useMemo(() =>
     Object.fromEntries(Object.entries(trackConfigs).map(([k, v]) => [k, { isMuted: v.isMuted, volume: v.volume }])),
   [trackConfigs]);
@@ -373,27 +417,50 @@ export const PracticeSession = ({
   [dynamicBackingTracks]);
 
   // AlphaTab synthesizer (GP files) — disabled while notation view is active
-  useAlphaTabPlayer({
+  const { playRef: atPlayRef } = useAlphaTabPlayer({
     rawGpFile:      effectiveRawGpFile ?? null,
     bpm:            effectiveBpm,
     isPlaying:      !!effectiveRawGpFile && isAudioPlaying && !showAlphaTabScore,
     startTime:      metronome.startTime,
     onLoopComplete: () => setHasPlayedRiddleOnce(true),
+    onLoopRestart:  useCallback(() => {
+      // Re-anchor cursor to the current metronome audio clock on each AlphaTab loop
+      // restart. Without this, the small scheduling delay of each api.stop()/api.play()
+      // call accumulates across loops causing visible drift.
+      if (metronome.audioContext) setAlphaTabLoopAnchor(metronome.audioContext.currentTime);
+    }, [metronome.audioContext]),
+    onAudioContextReady: useCallback((ctx: AudioContext) => {
+      // Capture AlphaTab's AudioContext so the metronome can be re-initialised on it,
+      // placing metronome clicks and GP audio in the same audio graph and clock domain.
+      setAlphaTabAudioContext(ctx);
+    }, []),
+    // Relay user mute preference to AlphaTab's built-in metronome click track.
+    metronomeVolume: isMetronomeMuted ? 0 : 1,
     trackConfigs:   alphaTabTrackConfigs,
     backingTrackIds: alphaTabBackingTrackIds,
   });
+  // AlphaTab is driven solely by the isPlaying prop / playback control effect.
+  // Do NOT wire alphaTabPlayRef → atPlayRef here: onPlayStart fires before the React
+  // render cycle, causing api.play() to be called twice (once imperatively, once from
+  // the effect) which triggers api.stop() on an unstarted AlphaTab worklet node.
+  alphaTabPlayRef.current = null;
 
   // Custom synthesis fallback — used when no GP file is present
-  const { soundfontsReady } = useTablatureAudio({
+  const { soundfontsReady, schedulerTickRef: tabSchedulerTickRef } = useTablatureAudio({
     tracks:         audioTracks,
     bpm:            effectiveBpm,
     isPlaying:      !effectiveRawGpFile && isAudioPlaying,
     startTime:      metronome.startTime,
     onLoopComplete: () => setHasPlayedRiddleOnce(true),
     audioContext:   metronome.audioContext,
-    audioStartTime: metronome.audioStartTime,
+    audioStartTime: effectiveAudioStartTime,
     disabled:       !!effectiveRawGpFile,
   });
+  // Sync bridge — keeps tabTickBridgeRef pointing at the live tablature scheduler.
+  // The metronome's onTick calls tabTickBridgeRef, which calls tabSchedulerTickRef.current,
+  // so useTablatureAudio is driven by the AudioWorklet clock instead of window.setTimeout.
+  // Always point at the latest tabSchedulerTickRef value (ref is stable; .current is set by effect).
+  tabTickBridgeRef.current = () => tabSchedulerTickRef.current?.();
 
   // ── Image handling ────────────────────────────────────────────────────────
 
@@ -666,6 +733,7 @@ export const PracticeSession = ({
           onRestart={() => {
             resetSuccessView();
             resetTimer();
+            metronome.restartMetronome();
             startTimer();
             if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
               metronome.startMetronome();
@@ -942,7 +1010,7 @@ export const PracticeSession = ({
                       hitNotes={hitNotes}
                       currentBeatsElapsed={currentBeatsElapsed}
                       audioContext={metronome.audioContext}
-                      audioStartTime={metronome.audioStartTime}
+                      audioStartTime={effectiveAudioStartTime}
                       tabResetKey={tabResetKey + tabRestartKey}
                       isRiddleRevealed={isRiddleRevealed}
                       isRiddleGuessed={isRiddleGuessed}

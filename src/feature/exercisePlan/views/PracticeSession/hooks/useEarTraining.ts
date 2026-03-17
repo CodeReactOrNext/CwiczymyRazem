@@ -6,8 +6,7 @@ import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 interface UseEarTrainingOptions {
   currentExercise: Exercise;
   userAuth: string | null | undefined;
-  isMetronomeRunning: boolean;
-  stopMetronome: () => void;
+  restartMetronome: () => void;
   startMetronome: () => void;
   currentBpm: number;
   setBpm: (bpm: number) => void;
@@ -16,8 +15,7 @@ interface UseEarTrainingOptions {
 export function useEarTraining({
   currentExercise,
   userAuth,
-  isMetronomeRunning,
-  stopMetronome,
+  restartMetronome,
   startMetronome,
   currentBpm,
   setBpm,
@@ -60,7 +58,7 @@ export function useEarTraining({
     setIsRiddleRevealed(false);
     setIsRiddleGuessed(false);
     setHasPlayedRiddleOnce(false);
-    if (isMetronomeRunning) stopMetronome();
+    restartMetronome();
     setTimeout(() => { startMetronome(); }, 100);
   };
 
