@@ -446,7 +446,7 @@ export const claimQuestRewardAction = createAsyncThunk(
         const userRef = doc(db, "users", userId);
 
         // Update seasonal points
-        await updateSeasonalPoints(userId, 100);
+        await updateSeasonalPoints(userId, 30);
 
         // Update user document
         await updateDoc(userRef, {
