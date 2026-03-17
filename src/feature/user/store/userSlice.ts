@@ -211,7 +211,7 @@ export const userSlice = createSlice({
       const allCompleted = quest.tasks.every(t => t.isCompleted);
       if (allCompleted && !quest.isRewardClaimed) {
         quest.isRewardClaimed = true;
-        const newPoints = (state.currentUserStats.points || 0) + 100;
+        const newPoints = (state.currentUserStats.points || 0) + 30;
         state.currentUserStats.points = newPoints;
 
         const newLvl = levelUpUser(state.currentUserStats.lvl || 1, newPoints);
