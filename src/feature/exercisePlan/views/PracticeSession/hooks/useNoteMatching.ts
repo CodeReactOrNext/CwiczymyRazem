@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, useMemo, startTransition } from "react";
-import { getFrequencyFromTab, getCentsDistance } from "utils/audio/noteUtils";
+import { getFrequencyFromTab, getCentsDistance, freqToPitchClass, computeChromagram } from "utils/audio/noteUtils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import type { TablatureMeasure } from "../../../types/exercise.types";
 
 // ── Constants shared with MicHud ─────────────────────────────────────────────
-
+ 
 export const CENTS_TOLERANCE = 60;
+export const CHORD_CHROMA_THRESHOLD = 0.75;
 
 export const feedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
   "NICE!":          { color: "text-emerald-400", dropShadow: "drop-shadow-[0_0_20px_rgba(52,211,153,0.8)]",  scale: 1.35 },
@@ -182,6 +183,16 @@ export function useNoteMatching({
       const currentVolume   = audioRefs.volumeRef.current;
       const lastOnsetTime   = audioRefs.lastOnsetTimeRef.current;
 
+      // Lazy chromagram — computed at most once per tick, only for chord beats
+      let chromagram: Float32Array | null | undefined = undefined;
+      const getChromagram = (): Float32Array | null => {
+        if (chromagram === undefined) {
+          const analyser = audioRefs.analyserRef.current;
+          chromagram = analyser ? computeChromagram(analyser) : null;
+        }
+        return chromagram;
+      };
+
       const beatsPerSec    = bpm / 60;
       const beatDurationMs = 60000 / bpm;
       const onsetRecencyMs = Math.min(800, Math.max(200, beatDurationMs * 0.8));
@@ -226,12 +237,26 @@ export function useNoteMatching({
 
             const requiresOnset = !note.isHammerOn && !note.isPullOff;
 
-            if (isWithinWindow && currentFreq > 50 && (hasRecentOnset || !requiresOnset)) {
+            if (isWithinWindow && currentVolume > 0.02 && (hasRecentOnset || !requiresOnset)) {
               const baseTargetFreq = getFrequencyFromTab(note.string, note.fret);
               const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
-              const centsOff       = Math.abs(getCentsDistance(currentFreq, targetFreq));
 
-              if (centsOff <= CENTS_TOLERANCE && currentVolume > 0.02) {
+              let isHit = false;
+              if (beat.notes.length > 1) {
+                // Chord / dyad / interval — prefer the onset snapshot (cleaner signal).
+                // For legato notes (no onset required) fall back to the live chromagram.
+                const chroma = requiresOnset
+                  ? audioRefs.onsetChromaRef.current
+                  : getChromagram();
+                if (chroma) {
+                  isHit = chroma[freqToPitchClass(targetFreq)] >= CHORD_CHROMA_THRESHOLD;
+                }
+              } else {
+                // Single note — use existing monophonic YIN path
+                isHit = currentFreq > 50 && Math.abs(getCentsDistance(currentFreq, targetFreq)) <= CENTS_TOLERANCE;
+              }
+
+              if (isHit) {
                 processedNotesRef.current.add(noteKey);
                 hitNotesRef.current[noteKey] = true;
                 needsFlushRef.current = true;

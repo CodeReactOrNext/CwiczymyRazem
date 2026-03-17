@@ -1,5 +1,32 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+// AudioWorklet processor — runs on the audio thread, fires ticks every ~25ms.
+// Using an inline Blob URL avoids the need to serve a separate .js file.
+const WORKLET_CODE = `
+class MetronomeProcessor extends AudioWorkletProcessor {
+  constructor(options) {
+    super(options);
+    this._intervalSec = 0.025;
+    this._nextTick    = -1;
+    this._running     = false;
+    this.port.onmessage = ({ data }) => {
+      if (data.type === 'start') { this._running = true;  this._nextTick = -1; }
+      if (data.type === 'stop')  { this._running = false; }
+    };
+  }
+  process() {
+    if (!this._running) return true;
+    if (this._nextTick < 0) this._nextTick = currentTime;
+    if (currentTime >= this._nextTick) {
+      this.port.postMessage({ type: 'tick' });
+      this._nextTick += this._intervalSec;
+    }
+    return true;
+  }
+}
+registerProcessor('metronome-processor', MetronomeProcessor);
+`;
+
 interface UseMetronomeProps {
   initialBpm?: number;
   minBpm?: number;
@@ -7,6 +34,16 @@ interface UseMetronomeProps {
   recommendedBpm?: number;
   isMuted?: boolean;
   speedMultiplier?: number;
+  enabled?: boolean;
+  onPlayStart?: () => void;
+  /** Called on every ~25ms worklet tick — use to drive external schedulers */
+  onTick?: () => void;
+  /**
+   * When provided the metronome schedules its sounds on this context instead of
+   * creating an internal one.  Pass AlphaTab's AudioContext when a GP file is active
+   * so that metronome clicks and GP audio share the same audio graph / clock.
+   */
+  externalAudioContext?: AudioContext | null;
 }
 
 export const useMetronome = ({
@@ -16,46 +53,86 @@ export const useMetronome = ({
   recommendedBpm = 60,
   isMuted = false,
   speedMultiplier = 1,
+  enabled = true,
+  onPlayStart,
+  onTick,
+  externalAudioContext,
 }: UseMetronomeProps) => {
   const [bpm, setBpm] = useState(initialBpm);
   const [isPlaying, setIsPlaying] = useState(false);
   const [countInRemaining, setCountInRemaining] = useState<number>(0);
 
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const nextNoteTimeRef = useRef<number>(0);
-  const timerIDRef = useRef<number | null>(null);
-  const countInTargetRef = useRef<number>(0);
-  const startTimeRef = useRef<number | null>(null);
-  const audioStartTimeRef = useRef<number | null>(null);
-  const beatCounterRef = useRef<number>(0);
-  const isMutedRef = useRef(isMuted);
+  const audioContextRef      = useRef<AudioContext | null>(null);
+  const nextNoteTimeRef      = useRef<number>(0);
+  const workletNodeRef       = useRef<AudioWorkletNode | null>(null);
+  const workletReadyRef      = useRef(false);
+  const countInTargetRef     = useRef<number>(0);
+  const startTimeRef         = useRef<number | null>(null);
+  const audioStartTimeRef    = useRef<number | null>(null);
+  const beatCounterRef       = useRef<number>(0);
+  const isMutedRef           = useRef(isMuted);
   const pausedElapsedTimeRef = useRef<number>(0);
-  const pausedAudioElapsedRef = useRef<number>(0);
+  const pausedAudioElapsedRef= useRef<number>(0);
+
+  // Keep schedulerRef current so the worklet message handler never captures a stale closure.
+  const schedulerRef    = useRef<(() => void) | null>(null);
+  const onPlayStartRef  = useRef(onPlayStart);
+  const onTickRef       = useRef(onTick);
+  useEffect(() => { onPlayStartRef.current = onPlayStart; }, [onPlayStart]);
+  useEffect(() => { onTickRef.current = onTick; },         [onTick]);
 
   useEffect(() => {
     isMutedRef.current = isMuted;
   }, [isMuted]);
 
+  // ── AudioContext + AudioWorklet setup ───────────────────────────────────────
+  // When externalAudioContext is provided (e.g. AlphaTab's context for GP files),
+  // we skip creating our own and add the worklet module to the shared context instead.
+  // This ensures metronome clicks and GP/guitar audio share the same audio graph and clock.
   useEffect(() => {
-    audioContextRef.current = new (window.AudioContext ||
-      (window as any).webkitAudioContext)();
+    if (!enabled) return;
+
+    const ownsContext = !externalAudioContext;
+    const ctx: AudioContext = externalAudioContext
+      ?? new (window.AudioContext || (window as any).webkitAudioContext)();
+
+    audioContextRef.current = ctx;
+    workletNodeRef.current?.disconnect();
+    workletNodeRef.current  = null;
+    workletReadyRef.current = false;
+
+    const blob    = new Blob([WORKLET_CODE], { type: 'application/javascript' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    ctx.audioWorklet.addModule(blobUrl).then(() => {
+      URL.revokeObjectURL(blobUrl);
+      workletReadyRef.current = true;
+    }).catch((err) => {
+      console.error('[useMetronome] AudioWorklet failed to load:', err);
+      URL.revokeObjectURL(blobUrl);
+    });
 
     return () => {
-      if (timerIDRef.current) {
-        window.clearTimeout(timerIDRef.current);
-      }
-      audioContextRef.current?.close();
+      workletNodeRef.current?.port.postMessage({ type: 'stop' });
+      workletNodeRef.current?.disconnect();
+      workletNodeRef.current  = null;
+      workletReadyRef.current = false;
+      // Only close the context if we created it — never close an external context.
+      if (ownsContext) ctx.close();
     };
-  }, []);
+  // externalAudioContext intentionally included: when AlphaTab's context becomes
+  // available we reinitialise the worklet on that context (happens before first play).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, externalAudioContext]);
 
   const playSound = useCallback((time: number, isAccent: boolean = false) => {
     if (!audioContextRef.current || isMutedRef.current) return;
 
-    const context = audioContextRef.current;
+    const context    = audioContextRef.current;
     const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
+    const gainNode   = context.createGain();
 
-    oscillator.type = 'sine';
+    oscillator.type            = 'sine';
     oscillator.frequency.value = isAccent ? 1200 : 800;
 
     gainNode.gain.setValueAtTime(0, time);
@@ -69,46 +146,31 @@ export const useMetronome = ({
     oscillator.stop(time + 0.1);
   }, []);
 
+  // ── Scheduler — called on every worklet tick (~25ms, audio thread) ─────────
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;
 
-    // While there are notes that will need to play before the next interval, 
-    // schedule them and advance the pointer.
-    const lookahead = 0.1; // 100ms
+    const lookahead      = 0.1; // 100ms
     const secondsPerBeat = 60.0 / (bpm * speedMultiplier);
-    const ctx = audioContextRef.current;
+    const ctx            = audioContextRef.current;
 
     while (nextNoteTimeRef.current < ctx.currentTime + lookahead) {
-      // Determine what to play (Count-in or Beat)
       if (countInTargetRef.current > 0) {
-        // Count-in logic
-        // 4, 3, 2, 1
-        // We update state for UI, but we must be careful with state updates in loop.
-        // Actually, we can just fire the sound. State update might lag slightly but that's UI.
-        // To prevent React state update throttling issues, we can check roughly where we are.
-        // But for simple count-in:
+        playSound(nextNoteTimeRef.current, countInTargetRef.current === 4);
 
-        // Note: State updates in 'scheduler' (runs often) is bad.
-        // But we only update when countInTargetRef changes integer value?
-        // Let's just update `countInRemaining` when we schedule it.
-        // Since lookahead is small, it's roughly "now".
-
-        playSound(nextNoteTimeRef.current, countInTargetRef.current === 4); // Accent on 4 (start)? Or 1? Usually high-low-low-low
-
-        // We need to capture the value for the closure or just use ref
         const currentCount = countInTargetRef.current;
-        // Updating state in timeout to not block scheduler
         setTimeout(() => setCountInRemaining(currentCount), 0);
 
         countInTargetRef.current -= 1;
       } else {
-        // Main Metronome
         if (startTimeRef.current === null) {
-          startTimeRef.current = Date.now() - pausedElapsedTimeRef.current;
+          const msUntilBeat = Math.max(0, (nextNoteTimeRef.current - ctx.currentTime) * 1000);
+          startTimeRef.current = Date.now() + msUntilBeat - pausedElapsedTimeRef.current;
           if (audioContextRef.current) {
-            audioStartTimeRef.current = audioContextRef.current.currentTime - (pausedAudioElapsedRef.current / 1000);
+            audioStartTimeRef.current = nextNoteTimeRef.current - (pausedAudioElapsedRef.current / 1000);
           }
           beatCounterRef.current = 0;
+          onPlayStartRef.current?.();
           setTimeout(() => setCountInRemaining(0), 0);
         }
         playSound(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0);
@@ -117,53 +179,80 @@ export const useMetronome = ({
 
       nextNoteTimeRef.current += secondsPerBeat;
     }
-
-    timerIDRef.current = window.setTimeout(scheduler, 25);
   }, [bpm, speedMultiplier, playSound]);
 
-  const startMetronome = useCallback(() => {
-    if (audioContextRef.current?.state === 'suspended') {
-      audioContextRef.current.resume();
+  // Keep schedulerRef in sync with the latest scheduler closure.
+  useEffect(() => {
+    schedulerRef.current = scheduler;
+  }, [scheduler]);
+
+  // ── Worklet node lifecycle ─────────────────────────────────────────────────
+  const ensureWorkletNode = useCallback(() => {
+    const ctx = audioContextRef.current;
+    if (!ctx || !workletReadyRef.current) return null;
+
+    if (!workletNodeRef.current) {
+      const node = new AudioWorkletNode(ctx, 'metronome-processor');
+      node.port.onmessage = ({ data }) => {
+        if (data.type === 'tick') {
+          schedulerRef.current?.();
+          onTickRef.current?.();
+        }
+      };
+      // Must be connected to the audio graph for process() to run.
+      node.connect(ctx.destination);
+      workletNodeRef.current = node;
     }
 
-    if (timerIDRef.current) window.clearTimeout(timerIDRef.current);
+    return workletNodeRef.current;
+  }, []);
 
-    if (audioContextRef.current) {
-      nextNoteTimeRef.current = audioContextRef.current.currentTime;
-      countInTargetRef.current = 4;
-      startTimeRef.current = null;
-      audioStartTimeRef.current = null;
-      beatCounterRef.current = 0;
-      setCountInRemaining(4);
+  const startMetronome = useCallback(() => {
+    const ctx = audioContextRef.current;
+    if (!ctx) return;
+
+    if (ctx.state === 'suspended') ctx.resume();
+
+    nextNoteTimeRef.current  = ctx.currentTime;
+    countInTargetRef.current = 4;
+    startTimeRef.current     = null;
+    audioStartTimeRef.current= null;
+    beatCounterRef.current   = 0;
+    setCountInRemaining(4);
+
+    const node = ensureWorkletNode();
+    if (node) {
+      node.port.postMessage({ type: 'start' });
+    } else {
+      // Worklet not yet ready — run the first tick immediately so there's no silent gap.
       scheduler();
     }
 
     setIsPlaying(true);
-  }, [scheduler]);
+  }, [scheduler, ensureWorkletNode]);
 
   const stopMetronome = useCallback(() => {
-    if (timerIDRef.current) {
-      window.clearTimeout(timerIDRef.current);
-      timerIDRef.current = null;
-    }
+    workletNodeRef.current?.port.postMessage({ type: 'stop' });
+
     if (startTimeRef.current !== null) {
       pausedElapsedTimeRef.current = Date.now() - startTimeRef.current;
     }
     if (audioStartTimeRef.current !== null && audioContextRef.current) {
-      pausedAudioElapsedRef.current = (audioContextRef.current.currentTime - audioStartTimeRef.current) * 1000;
+      pausedAudioElapsedRef.current =
+        (audioContextRef.current.currentTime - audioStartTimeRef.current) * 1000;
     }
-    startTimeRef.current = null;
+    startTimeRef.current      = null;
     audioStartTimeRef.current = null;
-    countInTargetRef.current = 0;
+    countInTargetRef.current  = 0;
     setCountInRemaining(0);
     setIsPlaying(false);
   }, []);
 
   const restartMetronome = useCallback(() => {
     stopMetronome();
-    pausedElapsedTimeRef.current = 0;
+    pausedElapsedTimeRef.current  = 0;
     pausedAudioElapsedRef.current = 0;
-    beatCounterRef.current = 0;
+    beatCounterRef.current        = 0;
   }, [stopMetronome]);
 
   const toggleMetronome = useCallback(() => {
@@ -176,7 +265,6 @@ export const useMetronome = ({
 
   useEffect(() => {
     if (isPlaying && countInRemaining === 0 && startTimeRef.current) {
-      // Just restart if BPM changes, simple
       startMetronome();
     }
   }, [bpm]); // Intentionally not including others to avoid restarts on other prop changes
@@ -202,4 +290,4 @@ export const useMetronome = ({
     audioContext: audioContextRef.current,
     audioStartTime: audioStartTimeRef.current,
   };
-}; 
+};

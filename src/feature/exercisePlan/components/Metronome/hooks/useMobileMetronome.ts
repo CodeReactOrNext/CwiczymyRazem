@@ -9,6 +9,16 @@ interface UseMobileMetronomeProps {
   recommendedBpm?: number;
   isMuted?: boolean;
   speedMultiplier?: number;
+  enabled?: boolean;
+  onPlayStart?: () => void;
+  /** Called on every ~25ms scheduler tick — use to drive external schedulers */
+  onTick?: () => void;
+  /**
+   * When provided the metronome schedules its sounds on this context instead of
+   * creating an internal one.  Pass AlphaTab's AudioContext when a GP file is active
+   * so that metronome clicks and GP audio share the same audio graph / clock.
+   */
+  externalAudioContext?: AudioContext | null;
 }
 
 export const useMobileMetronome = ({
@@ -18,13 +28,18 @@ export const useMobileMetronome = ({
   recommendedBpm = 60,
   isMuted = false,
   speedMultiplier = 1,
+  enabled = true,
+  onPlayStart,
+  onTick,
+  externalAudioContext,
 }: UseMobileMetronomeProps) => {
   const [bpm, setBpm] = useState(initialBpm);
   const [isPlaying, setIsPlaying] = useState(false);
   const [countInRemaining, setCountInRemaining] = useState<number>(0);
   const [audioInitialized, setAudioInitialized] = useState(false);
 
-  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioContextRef    = useRef<AudioContext | null>(null);
+  const ownsAudioContextRef= useRef(true);
   const gainNodeRef = useRef<GainNode | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
   const timeoutRef = useRef<number | null>(null);
@@ -35,6 +50,10 @@ export const useMobileMetronome = ({
   const beatCounterRef = useRef<number>(0);
   const isIOS = isIOSDevice();
   const isMutedRef = useRef(isMuted);
+  const onPlayStartRef = useRef(onPlayStart);
+  const onTickRef      = useRef(onTick);
+  useEffect(() => { onPlayStartRef.current = onPlayStart; }, [onPlayStart]);
+  useEffect(() => { onTickRef.current = onTick; },         [onTick]);
   const pausedElapsedTimeRef = useRef<number>(0);
   const pausedAudioElapsedRef = useRef<number>(0);
 
@@ -47,11 +66,34 @@ export const useMobileMetronome = ({
     }
   }, [isMuted]);
 
+  // When the external context changes, adopt it (replacing the internal one if any).
+  useEffect(() => {
+    if (!externalAudioContext || !enabled) return;
+    // Close the previously self-created context if we owned it.
+    if (ownsAudioContextRef.current && audioContextRef.current) {
+      audioContextRef.current.close();
+    }
+    ownsAudioContextRef.current = false;
+    audioContextRef.current = externalAudioContext;
+    // Recreate the gain node on the new context.
+    gainNodeRef.current = externalAudioContext.createGain();
+    gainNodeRef.current.gain.value = isMutedRef.current ? 0 : 1;
+    gainNodeRef.current.connect(externalAudioContext.destination);
+    setAudioInitialized(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [externalAudioContext, enabled]);
+
   // Initialize audio (must be called on user gesture)
   const initializeAudio = useCallback(() => {
-    if (audioInitialized) return true;
+    if (!enabled || audioInitialized) return true;
+    // If an external context was already adopted, no further init needed.
+    if (externalAudioContext) {
+      setAudioInitialized(true);
+      return true;
+    }
 
     try {
+      ownsAudioContextRef.current = true;
       audioContextRef.current = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
 
@@ -106,6 +148,8 @@ export const useMobileMetronome = ({
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;
 
+    onTickRef.current?.();
+
     const context = audioContextRef.current;
     const currentTime = context.currentTime;
     const secondsPerBeat = 60.0 / (bpm * speedMultiplier);
@@ -118,11 +162,15 @@ export const useMobileMetronome = ({
         countInTargetRef.current -= 1;
       } else {
         if (startTimeRef.current === null) {
-          startTimeRef.current = Date.now() - pausedElapsedTimeRef.current;
+          // Account for lookahead: startTime should reflect when the beat will actually play,
+          // not when it is scheduled. This prevents the cursor from being ~100ms ahead.
+          const msUntilBeat = Math.max(0, (nextNoteTimeRef.current - context.currentTime) * 1000);
+          startTimeRef.current = Date.now() + msUntilBeat - pausedElapsedTimeRef.current;
           if (audioContextRef.current) {
-            audioStartTimeRef.current = audioContextRef.current.currentTime - (pausedAudioElapsedRef.current / 1000);
+            audioStartTimeRef.current = nextNoteTimeRef.current - (pausedAudioElapsedRef.current / 1000);
           }
           beatCounterRef.current = 0;
+          onPlayStartRef.current?.();
           setCountInRemaining(0);
         }
         scheduleNote(nextNoteTimeRef.current, beatCounterRef.current % 4 === 0);
@@ -175,12 +223,6 @@ export const useMobileMetronome = ({
       timeoutRef.current = null;
     }
 
-    // Silence any ongoing sound
-    if (gainNodeRef.current && audioContextRef.current) {
-      gainNodeRef.current.gain.cancelScheduledValues(audioContextRef.current.currentTime);
-      gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current.currentTime);
-    }
-
     if (startTimeRef.current !== null) {
       pausedElapsedTimeRef.current = Date.now() - startTimeRef.current;
     }
@@ -196,10 +238,11 @@ export const useMobileMetronome = ({
   }, []);
 
   const restartMetronome = useCallback(() => {
+    stopMetronome();
+    // Reset AFTER stopMetronome so it doesn't save paused elapsed on stop
     pausedElapsedTimeRef.current = 0;
     pausedAudioElapsedRef.current = 0;
     beatCounterRef.current = 0;
-    stopMetronome();
   }, [stopMetronome]);
 
   const toggleMetronome = useCallback(() => {
@@ -239,7 +282,7 @@ export const useMobileMetronome = ({
         oscillatorRef.current.disconnect();
       }
 
-      audioContextRef.current?.close();
+      if (ownsAudioContextRef.current) audioContextRef.current?.close();
     };
   }, []);
 
