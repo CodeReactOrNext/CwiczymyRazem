@@ -5,7 +5,8 @@
       "Bash(for f in \"c:/cw/CwiczymyRazem/src/feature/recordings/components/RecordingsView.tsx\" \"c:/cw/CwiczymyRazem/src/feature/songs/SongsView.tsx\" \"c:/cw/CwiczymyRazem/src/pages/ai-coach.tsx\" \"c:/cw/CwiczymyRazem/src/pages/plans/index.tsx\" \"c:/cw/CwiczymyRazem/src/pages/profile/exercises.tsx\" \"c:/cw/CwiczymyRazem/src/pages/profile/skills.tsx\" \"c:/cw/CwiczymyRazem/src/pages/report/index.tsx\" \"c:/cw/CwiczymyRazem/src/pages/summary.tsx\")",
       "Bash(do)",
       "Bash(sed -i 's/min-h-\\\\[200px\\\\] md:min-h-\\\\[180px\\\\] lg:min-h-\\\\[220px\\\\]/min-h-[100px] md:min-h-[90px] lg:min-h-[100px]/g' \"$f\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Read(//c/Users/Krokon/.claude/projects/c--cw-CwiczymyRazem/bdab00ad-dfa9-44e5-a6c4-2b3337f1b00b/tool-results/**)"
     ]
   }
 }

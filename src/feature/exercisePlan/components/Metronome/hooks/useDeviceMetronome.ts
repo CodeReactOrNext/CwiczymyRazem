@@ -11,6 +11,10 @@ interface UseDeviceMetronomeProps {
   recommendedBpm?: number;
   isMuted?: boolean;
   speedMultiplier?: number;
+  onPlayStart?: () => void;
+  onTick?: () => void;
+  /** Shared AudioContext — forwarded to the underlying metronome hook (e.g. AlphaTab's context). */
+  externalAudioContext?: AudioContext | null;
 }
 
 export const useDeviceMetronome = (props: UseDeviceMetronomeProps) => {
@@ -18,8 +22,8 @@ export const useDeviceMetronome = (props: UseDeviceMetronomeProps) => {
   const [isMobile] = useState(() => isMobileDevice());
 
   // Use the appropriate hook based on device type
-  const mobileMetronome = useMobileMetronome(props);
-  const desktopMetronome = useMetronome(props);
+  const mobileMetronome = useMobileMetronome({ ...props, enabled: isMobile });
+  const desktopMetronome = useMetronome({ ...props, enabled: !isMobile });
 
   // On mobile, we need to initialize audio on the first user interaction
   useEffect(() => {

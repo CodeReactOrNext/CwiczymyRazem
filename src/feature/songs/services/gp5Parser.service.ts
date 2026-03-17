@@ -132,22 +132,38 @@ export const parseGpFile = async (file: File): Promise<ParsedGp> => {
           if (typeof altBeat.graceType === 'number' && altBeat.graceType !== 0) return;
 
           // ── Duration in quarter notes ─────────────────────────────────────
-          // altBeat.duration is AlphaTab Duration enum: Whole=1, Half=2, Quarter=4, …
-          // Guard against 0 / undefined to prevent Infinity/NaN poisoning offsets.
-          const rawDurEnum = typeof altBeat.duration === 'number' && altBeat.duration > 0
-            ? altBeat.duration : 4; // fallback = quarter note
-          let durationInQuarterNotes = 4 / rawDurEnum;
+          // AlphaTab's Beat.displayDuration is in MIDI ticks where 960 = 1 quarter note.
+          // It already includes dots, tuplets and all edge cases (DoubleWhole etc.),
+          // so using it directly guarantees our cursor grid matches AlphaTab's playback grid.
+          // Fallback: reconstruct from Duration enum + dots + tuplets (legacy path).
+          const TICKS_PER_QUARTER = 960;
+          let durationInQuarterNotes: number;
 
-          // Handle tuplets (e.g. triplets) — only when both fields are valid integers ≠ 1
-          const tupN = altBeat.tupletNumerator;
-          const tupD = altBeat.tupletDenominator;
-          if (typeof tupN === 'number' && typeof tupD === 'number' && tupN > 1 && tupD > 1) {
-            durationInQuarterNotes *= (tupD / tupN);
+          if (typeof altBeat.displayDuration === 'number' && altBeat.displayDuration > 0) {
+            // Primary: AlphaTab's own display grid — exact match with what it plays.
+            durationInQuarterNotes = altBeat.displayDuration / TICKS_PER_QUARTER;
+          } else {
+            // Fallback: reconstruct from Duration enum + dots + tuplets.
+            // Duration enum:  Whole=1, Half=2, Quarter=4, Eighth=8, …
+            //   positive n → quarter_notes = 4 / n
+            // Negative values are extended notes:
+            //   DoubleWhole=-2 → 8 QN,  QuadrupleWhole=-4 → 16 QN
+            //   formula: quarter_notes = 4 * |n|
+            const durEnum = altBeat.duration;
+            if (typeof durEnum === 'number' && durEnum < 0) {
+              durationInQuarterNotes = 4 * Math.abs(durEnum);
+            } else {
+              const rawDurEnum = typeof durEnum === 'number' && durEnum > 0 ? durEnum : 4;
+              durationInQuarterNotes = 4 / rawDurEnum;
+            }
+            const tupN = altBeat.tupletNumerator;
+            const tupD = altBeat.tupletDenominator;
+            if (typeof tupN === 'number' && typeof tupD === 'number' && tupN > 1 && tupD > 1) {
+              durationInQuarterNotes *= (tupD / tupN);
+            }
+            if (altBeat.dots === 1) durationInQuarterNotes *= 1.5;
+            else if (altBeat.dots === 2) durationInQuarterNotes *= 1.75;
           }
-
-          // Handle dots
-          if (altBeat.dots === 1) durationInQuarterNotes *= 1.5;
-          else if (altBeat.dots === 2) durationInQuarterNotes *= 1.75;
 
           // ── Skip tied-note destinations — they extend the previous note,
           //    not create a new one.  The beat itself still occupies time (below).

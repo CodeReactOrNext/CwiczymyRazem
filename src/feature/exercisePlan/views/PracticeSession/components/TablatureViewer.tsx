@@ -83,8 +83,8 @@ const TablatureViewerInner = ({
   hitNotes = {},
   currentBeatsElapsed: _currentBeatsElapsed,
   hideNotes = false,
-  audioContext: _audioContext,
-  audioStartTime: _audioStartTime,
+  audioContext,
+  audioStartTime,
   resetKey,
   hideDynamicsLane = false,
 }: TablatureViewerProps) => {
@@ -282,12 +282,29 @@ const TablatureViewerInner = ({
     workerRef.current?.postMessage({
       type: 'PLAYBACK',
       isPlaying,
-      // startTime is Date.now() when play started; worker uses Date.now() too
       startWallMs: isPlaying ? startTime : null,
+      audioStartSec: isPlaying ? (audioStartTime ?? null) : null,
       bpm,
       countInRemaining,
     });
-  }, [isPlaying, startTime, bpm, countInRemaining]);
+  }, [isPlaying, startTime, audioStartTime, bpm, countInRemaining]);
+
+  // ── Audio-clock TICK: send AudioContext.currentTime at ~10fps so the worker
+  //    can interpolate smooth position without flooding the message channel. ──
+  useEffect(() => {
+    if (!isPlaying || !audioContext || countInRemaining > 0) return;
+    let rafId: number;
+    let lastTick = 0;
+    const tick = (ts: number) => {
+      if (ts - lastTick >= 100) { // ~10fps — worker interpolates between ticks
+        workerRef.current?.postMessage({ type: 'TICK', audioCurrentSec: audioContext.currentTime });
+        lastTick = ts;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [isPlaying, audioContext, countInRemaining]);
 
   // ── Hit notes ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -356,14 +373,16 @@ const TablatureViewerInner = ({
   );
 };
 
-// Memo comparator — same as before.
+// Memo comparator — re-render when any prop that drives a useEffect or render changes.
 // hitNotes IS included to keep the worker in sync via useEffect.
+// audioStartTime IS included so the worker gets the updated anchor on each AlphaTab loop restart.
 // currentBeatsElapsed, detectedNote, isListening excluded (unused here).
 export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   Object.is(prev.measures,     next.measures)      &&
   prev.bpm              === next.bpm               &&
   prev.isPlaying        === next.isPlaying          &&
   prev.startTime        === next.startTime          &&
+  prev.audioStartTime   === next.audioStartTime     &&
   prev.countInRemaining === next.countInRemaining   &&
   prev.hideNotes        === next.hideNotes          &&
   prev.resetKey         === next.resetKey           &&

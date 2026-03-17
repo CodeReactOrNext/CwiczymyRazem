@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { computeChromagram } from "utils/audio/noteUtils";
 
 interface AudioAnalyzerState {
   frequency: number;
@@ -16,6 +17,9 @@ export interface AudioRefs {
   volumeRef: React.MutableRefObject<number>;
   lastOnsetTimeRef: React.MutableRefObject<number>;
   confidenceRef: React.MutableRefObject<number>;
+  analyserRef: React.MutableRefObject<AnalyserNode | null>;
+  /** Chromagram snapshot taken at the most recent onset — cleaner than live FFT */
+  onsetChromaRef: React.MutableRefObject<Float32Array | null>;
 }
 
 const GAIN_STORAGE_KEY = "audio_input_gain";
@@ -45,6 +49,8 @@ export const useAudioAnalyzer = () => {
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
+  const analyserNodeRef = useRef<AnalyserNode | null>(null);
+  const onsetChromaRef = useRef<Float32Array | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const inputGainRef = useRef<number>(loadPersistedGain());
   const pitchDetectorRef = useRef<any>(null);
@@ -77,6 +83,12 @@ export const useAudioAnalyzer = () => {
 
       const source = audioContext.createMediaStreamSource(stream);
       sourceRef.current = source;
+
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 8192;
+      analyser.smoothingTimeConstant = 0.1; // fast decay → cleaner onset snapshots
+      source.connect(analyser);
+      analyserNodeRef.current = analyser;
 
       // ScriptProcessor is deprecated but still widely supported for this use case.
       // Ideally we would use AudioWorklet but for simplicity and aubiojs compatibility we use ScriptProcessor.
@@ -172,6 +184,11 @@ export const useAudioAnalyzer = () => {
 
         if (isOnset || isSoftOnset) {
           lastOnsetTimeRef.current = Date.now();
+          // Snapshot the chromagram right at onset — with smoothingTimeConstant=0.1
+          // this frame already reflects ~90% of the new attack, giving a much
+          // cleaner pitch-class profile than reading the live FFT mid-sustain.
+          const snap = computeChromagram(analyser);
+          if (snap) onsetChromaRef.current = snap;
         }
 
         // Throttle React state updates to ~10Hz (every ~100ms)
@@ -207,6 +224,10 @@ export const useAudioAnalyzer = () => {
       scriptProcessorRef.current.onaudioprocess = null;
       scriptProcessorRef.current = null;
     }
+    if (analyserNodeRef.current) {
+      analyserNodeRef.current.disconnect();
+      analyserNodeRef.current = null;
+    }
     if (sourceRef.current) {
       sourceRef.current.disconnect();
       sourceRef.current = null;
@@ -223,6 +244,7 @@ export const useAudioAnalyzer = () => {
     pitchDetectorRef.current = null;
     onsetDetectorRef.current = null;
     lastFrequenciesRef.current = [];
+    onsetChromaRef.current = null;
     frequencyRef.current = 0;
     volumeRef.current = 0;
     confidenceRef.current = 0;
@@ -255,7 +277,7 @@ export const useAudioAnalyzer = () => {
     return baseLatency + outputLatency + bufferLatency + 30; // +30ms for processing overhead
   }, []);
 
-  const audioRefs: AudioRefs = { frequencyRef, volumeRef, lastOnsetTimeRef, confidenceRef };
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, lastOnsetTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef };
 
   return {
     ...state,
