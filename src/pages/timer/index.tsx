@@ -29,7 +29,7 @@ const Timer: NextPageWithLayout = () => {
         router.push("/profile/skills");
         break;
       case "gp":
-        router.push("/practice/custom");
+        router.push("/gp-tabs");
         break;
       default:
         setLoadingMode(null);

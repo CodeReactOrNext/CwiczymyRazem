@@ -6,7 +6,7 @@ export const legatoContinuousFlowExercise: Exercise = {
   description: "Non-stop 3nps legato runs across the full fretboard. Pick only the first note of each string — everything else is hammer-ons and pull-offs. Builds extreme left-hand endurance and seamless string transitions.",
   difficulty: "hard",
   category: "technique",
-  timeInMinutes: 15,
+  timeInMinutes: 8,
   instructions: [
     "Pick ONLY the first note on each new string. All other notes are pure legato (hammer-ons ascending, pull-offs descending).",
     "Measures 1-2: Full ascending and descending A natural minor run across all 6 strings at 5th position.",

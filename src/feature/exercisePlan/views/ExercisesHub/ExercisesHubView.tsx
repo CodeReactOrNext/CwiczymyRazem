@@ -77,7 +77,7 @@ export const ExercisesHubView = () => {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
              <Link 
-                href="/practice/custom" 
+                href="/gp-tabs"
                 className="group relative flex h-12 items-center justify-center gap-3 overflow-hidden rounded-xl bg-cyan-500 px-8 text-sm font-bold text-black transition-all hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]"
              >
                 <div className="absolute inset-x-0 -top-full h-full bg-gradient-to-b from-white/20 to-transparent transition-all group-hover:top-0" />

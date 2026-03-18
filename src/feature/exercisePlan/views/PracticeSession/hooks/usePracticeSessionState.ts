@@ -17,11 +17,12 @@ interface UsePracticeSessionStateProps {
   onFinish?: () => void;
   autoReport?: boolean;
   forceFullDuration?: boolean;
+  freeMode?: boolean;
   skillRewardSkillId?: string;
   skillRewardAmount?: number;
 }
 
-export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, skillRewardSkillId, skillRewardAmount }: UsePracticeSessionStateProps) => {
+export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount }: UsePracticeSessionStateProps) => {
   const dispatch = useAppDispatch();
   const timerData = useAppSelector(selectTimerData);
   const avatar = useAppSelector(selectUserAvatar);
@@ -82,23 +83,29 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, ski
     }
   }
 
-  const effectiveTotalSeconds = (currentExercise.isPlayalong && videoDuration)
-    ? videoDuration
-    : currentExercise.timeInMinutes * 60;
+  const effectiveTotalSeconds = freeMode
+    ? Number.MAX_SAFE_INTEGER
+    : (currentExercise.isPlayalong && videoDuration)
+      ? videoDuration
+      : currentExercise.timeInMinutes * 60;
 
   const timeLeft = Math.max(0, Math.floor((effectiveTotalSeconds * 1000 - timer.time) / 1000));
-  const formattedTimeLeft = `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`;
-  const timerProgressValue = Math.min(100, (timer.time / (effectiveTotalSeconds * 1000)) * 100);
+  // In free mode show elapsed time (counting up) instead of remaining time (counting down)
+  const elapsedSeconds = Math.floor(timer.time / 1000);
+  const formattedTimeLeft = freeMode
+    ? `${Math.floor(elapsedSeconds / 60)}:${String(elapsedSeconds % 60).padStart(2, "0")}`
+    : `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`;
+  const timerProgressValue = freeMode ? 0 : Math.min(100, (timer.time / (effectiveTotalSeconds * 1000)) * 100);
 
   const isSkillExercise = !!skillRewardSkillId || !!forceFullDuration;
   const canSkipExercise = true;
-  const canFinishSession = isSkillExercise ? timeLeft <= 0 : completedExercises.length > 0;
+  const canFinishSession = freeMode ? completedExercises.length > 0 : isSkillExercise ? timeLeft <= 0 : completedExercises.length > 0;
 
   const checkForSuccess = useCallback(() => {
-    if (isLastExercise && timeLeft <= 0) {
+    if (!freeMode && isLastExercise && timeLeft <= 0) {
       setShowSuccessView(true);
     }
-  }, [isLastExercise, timeLeft]);
+  }, [freeMode, isLastExercise, timeLeft]);
 
   useEffect(() => {
     checkForSuccess();
