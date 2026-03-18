@@ -18,4 +18,5 @@ export type NavPagesTypes =
   | "ai-coach"
   | "summary"
   | "my-plans"
+  | "gp-tabs"
   | null;

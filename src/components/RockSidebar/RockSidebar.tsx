@@ -17,6 +17,7 @@ import {
   Calendar,
   Coffee,
   Dumbbell,
+  FileMusic,
   FileText,
   LayoutGrid,
   ListChecks,
@@ -93,6 +94,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/seasons")) return "seasons";
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/plans")) return "my-plans";
+    if (pathname.startsWith("/gp-tabs")) return "gp-tabs";
     return null;
   };
 
@@ -202,6 +204,12 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
       name: "My Songs",
       href: "/songs?view=management",
       icon: <LayoutGrid size={16} />,
+    },
+    {
+      id: "gp-tabs" as NavPagesTypes,
+      name: "GP Tabs",
+      href: "/gp-tabs",
+      icon: <FileMusic size={16} />,
     },
     {
       id: "recordings" as NavPagesTypes,
@@ -318,10 +326,10 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                   <Link
                     key={id}
                     href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
                       isActive
-                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                        ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                        : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                     }`}>
                     <span
                       className={isActive ? "text-cyan-400" : "text-zinc-500"}>
@@ -351,10 +359,10 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                   <Link
                     key={id}
                     href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
                       isActive
-                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                        ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                        : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                     }`}>
                     <span
                       className={isActive ? "text-cyan-400" : "text-zinc-500"}>
@@ -385,10 +393,10 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                   <Link
                     key={id}
                     href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
                       isActive
-                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                        ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                        : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                     }`}>
                     <span
                       className={
@@ -420,10 +428,10 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                   <Link
                     key={id}
                     href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
                       isActive
-                        ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                        : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                        ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                        : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                     }`}>
                     <span
                       className={isActive ? "text-cyan-400" : "text-zinc-500"}>
@@ -451,7 +459,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                 href='https://buymeacoffee.com/riffquest'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                className='flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
                 <span className='text-amber-500'>
                   <Coffee size={16} />
                 </span>
@@ -461,7 +469,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                 href='https://discord.gg/6yJmsZW2Ne'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                className='flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
                 <span className='text-zinc-500'>
                   <FaDiscord size={16} />
                 </span>
@@ -469,7 +477,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
               </a>
               <button
                 onClick={() => setIsCommunityModalOpen(true)}
-                className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                className='flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
                 <span className='text-rose-500'>
                   <Heart size={16} fill="currentColor" />
                 </span>
@@ -611,10 +619,10 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                           key={id}
                           href={href}
                           onClick={handleLinkClick}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
                             isActive
-                              ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                           }`}>
                           <span
                             className={
@@ -648,10 +656,10 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                           key={id}
                           href={href}
                           onClick={handleLinkClick}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
                             isActive
-                              ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                           }`}>
                           <span
                             className={
@@ -687,10 +695,10 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                           key={id}
                           href={href}
                           onClick={handleLinkClick}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
                             isActive
-                              ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                           }`}>
                           <span
                             className={
@@ -725,10 +733,10 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                           key={id}
                           href={href}
                           onClick={handleLinkClick}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
                             isActive
-                              ? "border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+                              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+                              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
                           }`}>
                           <span
                             className={
@@ -759,7 +767,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                       target='_blank'
                       rel='noopener noreferrer'
                       onClick={handleLinkClick}
-                      className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                      className='flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
                       <span className='text-amber-500'>
                         <Coffee size={16} />
                       </span>
@@ -770,7 +778,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                       target='_blank'
                       rel='noopener noreferrer'
                       onClick={handleLinkClick}
-                      className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                      className='flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
                       <span className='text-zinc-500'>
                         <FaDiscord size={16} />
                       </span>
@@ -781,7 +789,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                         handleLinkClick();
                         setIsCommunityModalOpen(true);
                       }}
-                      className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
+                      className='flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
                       <span className='text-rose-500'>
                         <Heart size={16} fill="currentColor" />
                       </span>

@@ -8,28 +8,43 @@ import { SongLearningSection } from "feature/songs/components/SongLearningSectio
 import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { SongCardSkeleton } from "feature/songs/components/SongsGrid/SongCardSkeleton";
 import { SongsGrid } from "feature/songs/components/SongsGrid/SongsGrid";
+import { SongPracticePickerModal } from "feature/songs/components/SongPracticePickerModal/SongPracticePickerModal";
+import type { Song } from "feature/songs/types/songs.type";
 import { useSongs } from "feature/songs/hooks/useSongs";
+import { useUserSongProgress } from "feature/songs/hooks/useUserSongProgress";
 import { getGlobalGenres } from "feature/songs/services/getGlobalMetadata";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import {  
-  HelpCircle,
-  LoaderCircle, 
+import {
+  LoaderCircle,
   Music,
-  Plus, 
+  Plus,
   Search,
   SlidersHorizontal,
-  X, 
+  X,
 } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useEffect, useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 
 const SongsView = () => {
   const { t } = useTranslation("songs");
   const router = useRouter();
   const activeTab = (router.query.view as string) || "management";
+
+  const userAuth = useAppSelector(selectUserAuth);
+  const userInfo = useAppSelector(selectUserInfo);
+  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
+
+  const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
+
+  const { progressMap, attachGpFile, detachGpFile } = useUserSongProgress(
+    userAuth ?? null,
+    isPremium
+  );
   const {
     page,
     isLoading,
@@ -127,6 +142,9 @@ const SongsView = () => {
                     userSongs={userSongs}
                     onChange={updateUserSongsCache}
                     onStatusChange={refreshSongs}
+                    progressMap={progressMap}
+                    isPremium={isPremium}
+                    onPracticeWithGp={(song) => setPracticeTarget(song)}
                   />
                 </div>
               </div>
@@ -301,6 +319,18 @@ const SongsView = () => {
           onSuccess={handleStatusUpdate}
         />
       </div>
+
+      {practiceTarget && userAuth && (
+        <SongPracticePickerModal
+          song={practiceTarget}
+          userId={userAuth}
+          isPremium={isPremium}
+          progress={progressMap[practiceTarget.id] ?? null}
+          onAttachGpFile={attachGpFile}
+          onDetachGpFile={detachGpFile}
+          onClose={() => setPracticeTarget(null)}
+        />
+      )}
     </>
   );
 };
