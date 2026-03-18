@@ -9,7 +9,7 @@ export const legatoSextuplets457Exercise: Exercise = {
     "Legato exercise based on 4-5-7 fingerings played in sextuplets, combining hammer-ons and pull-offs to develop left-hand strength, control, and rhythmic precision.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 6,
+  timeInMinutes: 4,
   instructions: [
     "Use hammer-ons for ascending notes (4–5–7).",
     "Use pull-offs for descending notes (7–5).",

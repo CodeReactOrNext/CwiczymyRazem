@@ -7,7 +7,7 @@ export const metalGallopExercise: Exercise = {
     "Pure gallop rhythm (16th–16th–8th) on the low E string with palm mute. Each measure is a looping single-note pattern with fret shifts — E, A, G. Clean, mechanical picking with no chords. Think Metallica 'Battery', Iron Maiden 'The Trooper'.",
   difficulty: "medium",
   category: "technique",
-  timeInMinutes: 10,
+  timeInMinutes: 6,
   instructions: [
     "The gallop cell = [16th PM] [16th PM] [8th PM]. Three strokes, one quarter note. Repeated endlessly.",
     "Measure 1: Pure E (fret 0), 4 identical gallop cells. Pure hand synchronization — nothing else.",

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Button } from "assets/components/ui/button";
 
 import { SortableSongItem } from "./SortableSongItem";
+import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 
 interface SongStatusCardProps {
   title: string;
@@ -20,6 +21,9 @@ interface SongStatusCardProps {
   isMobile: boolean;
   isDropTarget?: boolean;
   hideHeaderOnMobile?: boolean;
+  progressMap?: Record<string, UserSongProgress>;
+  isPremium?: boolean;
+  onPracticeWithGp?: (song: Song) => void;
 }
 
 export const SongStatusCard = ({
@@ -31,6 +35,9 @@ export const SongStatusCard = ({
   isMobile,
   isDropTarget,
   hideHeaderOnMobile,
+  progressMap = {},
+  isPremium = false,
+  onPracticeWithGp,
 }: SongStatusCardProps) => {
   const { t } = useTranslation("songs");
   const config = STATUS_CONFIG[droppableId as keyof typeof STATUS_CONFIG];
@@ -136,6 +143,9 @@ export const SongStatusCard = ({
                 getPrimaryActionText={getPrimaryActionText}
                 onStatusChange={onStatusChange}
                 onSongRemove={onSongRemove}
+                progress={progressMap[song.id] ?? null}
+                isPremium={isPremium}
+                onPracticeWithGp={onPracticeWithGp}
               />
             ))
           )}

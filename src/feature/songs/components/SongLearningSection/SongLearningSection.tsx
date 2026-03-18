@@ -26,6 +26,7 @@ import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
@@ -56,6 +57,9 @@ interface SongLearningSectionProps {
     learned: Song[];
   }) => void;
   onStatusChange?: () => void;
+  progressMap?: Record<string, UserSongProgress>;
+  isPremium?: boolean;
+  onPracticeWithGp?: (song: Song) => void;
 }
 
 const FilterBar = ({ 
@@ -176,6 +180,9 @@ export const SongLearningSection = ({
   onChange,
   isLanding,
   onStatusChange,
+  progressMap = {},
+  isPremium = false,
+  onPracticeWithGp,
 }: SongLearningSectionProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -425,6 +432,9 @@ export const SongLearningSection = ({
                 onSongRemove={handleSongRemoval}
                 isMobile={true}
                 hideHeaderOnMobile={true}
+                progressMap={progressMap}
+                isPremium={isPremium}
+                onPracticeWithGp={onPracticeWithGp}
               />
             </TabsContent>
           ))}
@@ -444,6 +454,9 @@ export const SongLearningSection = ({
             onSongRemove={handleSongRemoval}
             isMobile={false}
             isDropTarget={activeOverContainer === status}
+            progressMap={progressMap}
+            isPremium={isPremium}
+            onPracticeWithGp={onPracticeWithGp}
           />
         ))}
       </div>
