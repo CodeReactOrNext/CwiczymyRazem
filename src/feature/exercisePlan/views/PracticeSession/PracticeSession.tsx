@@ -82,6 +82,8 @@ interface PracticeSessionProps {
   isFinishing?: boolean;
   autoReport?: boolean;
   forceFullDuration?: boolean;
+  /** Free mode: no countdown, elapsed time shown, session never auto-completes */
+  freeMode?: boolean;
   skillRewardSkillId?: string;
   skillRewardAmount?: number;
 }
@@ -96,6 +98,7 @@ export const PracticeSession = ({
   isFinishing,
   autoReport,
   forceFullDuration,
+  freeMode,
   skillRewardSkillId,
   skillRewardAmount,
 }: PracticeSessionProps) => {
@@ -145,7 +148,7 @@ export const PracticeSession = ({
     isSkillExercise,
     completedExercises,
     restartFullSession,
-  } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, skillRewardSkillId, skillRewardAmount });
+  } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
 
   const userAuth   = useAppSelector(selectUserAuth);
   const userName   = useAppSelector(selectUserName);

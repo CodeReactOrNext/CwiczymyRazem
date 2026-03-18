@@ -6,8 +6,9 @@ import { cn } from "assets/lib/utils";
 import { TierBadge } from "feature/songs/components/SongsGrid/TierBadge";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
+import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronRight, GripVertical, MoreVertical, Play, Trash2 } from "lucide-react";
+import { ChevronRight, Clock, FileMusic, GripVertical, MoreVertical, Play, Target, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -20,6 +21,18 @@ interface SortableSongItemProps {
   onStatusChange: (id: string, status: SongStatus, title: string, artist: string) => void;
   onSongRemove: (id: string) => void;
   droppableId: string;
+  progress?: UserSongProgress | null;
+  isPremium?: boolean;
+  onPracticeWithGp?: (song: Song) => void; // kept for API compatibility
+}
+
+function formatPracticeMs(ms: number): string {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m`;
+  return `${totalSec}s`;
 }
 
 const SongCover = ({ song, config, size = "sm" }: { song: Song; config: any; size?: "sm" | "md" }) => {
@@ -43,31 +56,102 @@ const SongCover = ({ song, config, size = "sm" }: { song: Song; config: any; siz
   );
 };
 
-const PracticeButton = ({ songId, isMobile }: { songId: string; isMobile: boolean }) => (
-  <Link 
-    href={`/timer/song/${songId}`} 
-    className={isMobile ? "flex-1" : ""} 
-    onClick={(e) => e.stopPropagation()}
-    onPointerDown={(e) => e.stopPropagation()}
-  >
-    {isMobile ? (
-      <Button
-        size="sm"
-        className="h-8 w-full bg-cyan-600 text-[11px] font-bold text-white hover:bg-cyan-500 active:scale-95 transition-all shadow-lg shadow-cyan-500/10"
+const GpPracticeButton = ({
+  songId,
+  song,
+  isMobile,
+  isPremium,
+  onPracticeWithGp,
+}: {
+  songId: string;
+  song: Song;
+  isMobile: boolean;
+  isPremium: boolean;
+  onPracticeWithGp?: (song: Song) => void;
+}) => {
+  if (onPracticeWithGp) {
+    return (
+      <button
+        className={isMobile ? "flex-1" : ""}
+        onClick={(e) => { e.stopPropagation(); onPracticeWithGp(song); }}
+        onPointerDown={(e) => e.stopPropagation()}
       >
-        <Play className="mr-1.5 h-3 w-3 fill-current" />
-        Practice
-      </Button>
-    ) : (
-      <Button
-        size="icon"
-        className="h-8 w-8 rounded-lg bg-cyan-600/10 text-cyan-500 hover:bg-cyan-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"
-      >
-        <Play className="h-4 w-4 fill-current" />
-      </Button>
-    )}
-  </Link>
-);
+        {isMobile ? (
+          <Button
+            size="sm"
+            className="h-8 w-full bg-cyan-600 text-[11px] font-bold text-white hover:bg-cyan-500 active:scale-95 transition-all shadow-lg shadow-cyan-500/10"
+          >
+            <Play className="mr-1.5 h-3 w-3 fill-current" />
+            Practice
+          </Button>
+        ) : (
+          <Button
+            size="icon"
+            className="h-7 w-7 rounded-lg bg-cyan-500/15 text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all"
+          >
+            <Play className="h-3.5 w-3.5 fill-current" />
+          </Button>
+        )}
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      href={`/timer/song/${songId}`}
+      className={isMobile ? "flex-1" : ""}
+      onClick={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
+      {isMobile ? (
+        <Button
+          size="sm"
+          className="h-8 w-full bg-cyan-600 text-[11px] font-bold text-white hover:bg-cyan-500 active:scale-95 transition-all shadow-lg shadow-cyan-500/10"
+        >
+          <Play className="mr-1.5 h-3 w-3 fill-current" />
+          Practice
+        </Button>
+      ) : (
+        <Button
+          size="icon"
+          className="h-8 w-8 rounded-lg bg-cyan-600/10 text-cyan-500 hover:bg-cyan-600 hover:text-white transition-all"
+        >
+          <Play className="h-4 w-4 fill-current" />
+        </Button>
+      )}
+    </Link>
+  );
+};
+
+const GpProgressBadge = ({ progress }: { progress: UserSongProgress | null | undefined }) => {
+  if (!progress) return null;
+  const hasTime = progress.totalPracticeMs > 0;
+  const hasAccuracy = progress.bestAccuracy !== null;
+  if (!hasTime && !hasAccuracy && !progress.gpFileName) return null;
+
+  return (
+    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+      {progress.gpFileName && (
+        <span className="flex items-center gap-1 rounded-md border border-cyan-500/15 bg-cyan-500/8 px-1.5 py-0.5 text-[10px] font-bold text-cyan-400/80 max-w-[120px]">
+          <FileMusic className="h-2.5 w-2.5 shrink-0" />
+          <span className="truncate">{progress.gpFileName.length > 16 ? progress.gpFileName.slice(0, 14) + "…" : progress.gpFileName}</span>
+        </span>
+      )}
+      {hasTime && (
+        <span className="flex items-center gap-1 rounded-md border border-white/8 bg-white/4 px-1.5 py-0.5 text-[10px] font-bold text-zinc-400">
+          <Clock className="h-2.5 w-2.5" />
+          {formatPracticeMs(progress.totalPracticeMs)}
+        </span>
+      )}
+      {hasAccuracy && (
+        <span className="flex items-center gap-1 rounded-md border border-emerald-500/20 bg-emerald-500/8 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400/80">
+          <Target className="h-2.5 w-2.5" />
+          {progress.bestAccuracy}%
+        </span>
+      )}
+    </div>
+  );
+};
 
 export const SortableSongItem = ({
   song,
@@ -78,6 +162,9 @@ export const SortableSongItem = ({
   onStatusChange,
   onSongRemove,
   droppableId,
+  progress,
+  isPremium = false,
+  onPracticeWithGp,
 }: SortableSongItemProps) => {
   const { t } = useTranslation("songs");
   const router = useRouter();
@@ -90,8 +177,8 @@ export const SortableSongItem = ({
     transform,
     transition: sortableTransition,
     isDragging,
-  } = useSortable({ 
-    id: song.id, 
+  } = useSortable({
+    id: song.id,
     data: { song, index: 0, containerId: droppableId },
     disabled: isMobile
   });
@@ -110,16 +197,16 @@ export const SortableSongItem = ({
       {...(isMobile ? {} : attributes)}
       {...(isMobile ? {} : listeners)}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-[#0d0d0c] p-3 shadow-sm click-behavior", 
+        "group relative flex flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-[#0d0d0c] p-3 shadow-sm click-behavior",
         !isMobile ? "transition-all duration-300 touch-none hover:border-white/20 hover:bg-[#121211] hover:shadow-xl hover:shadow-black/40" : "select-none [WebkitTapHighlightColor:transparent]",
-        isDragging && "shadow-2xl ring-2 ring-white/20 bg-[#161615] z-[9999] opacity-100 scale-105 rotate-1" 
+        isDragging && "shadow-2xl ring-2 ring-white/20 bg-[#161615] z-[9999] opacity-100 scale-105 rotate-1"
       )}
     >
       {/* Dynamic Background Blur */}
       {song.coverUrl ? (
-        <div 
+        <div
           className="absolute inset-0 -z-10 opacity-[0.12] blur-3xl saturate-200"
-          style={{ 
+          style={{
             backgroundImage: `url(${song.coverUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
@@ -143,9 +230,10 @@ export const SortableSongItem = ({
               <div className="min-w-0 flex-1">
                   <p className="truncate text-[15px] font-bold text-white tracking-tight leading-none mb-1">{song.title}</p>
                   <p className="truncate text-xs font-medium text-zinc-400">{song.artist}</p>
+                  {isPremium && <GpProgressBadge progress={progress} />}
               </div>
             </div>
-            
+
             <div className="flex items-center gap-1 shrink-0">
                <TierBadge song={song} />
                <DropdownMenu>
@@ -160,18 +248,16 @@ export const SortableSongItem = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-zinc-900/95 border-white/10 backdrop-blur-xl p-1.5 shadow-2xl">
-                  {droppableId !== "learned" && (
-                    <DropdownMenuItem
-                      onClick={() => router.push(`/timer/song/${song.id}`)}
-                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-cyan-400 focus:bg-cyan-500/10 focus:text-cyan-300 cursor-pointer rounded-lg mb-1"
-                    >
-                      <Play className="h-4 w-4 fill-current" />
-                      Practice Song
-                    </DropdownMenuItem>
-                  )}
-                  
+                  <DropdownMenuItem
+                    onClick={() => onPracticeWithGp ? onPracticeWithGp(song) : router.push(`/timer/song/${song.id}`)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-cyan-400 focus:bg-cyan-500/10 focus:text-cyan-300 cursor-pointer rounded-lg mb-1"
+                  >
+                    <Play className="h-4 w-4 fill-current" />
+                    Practice Song
+                  </DropdownMenuItem>
+
                   <div className="h-px bg-white/5 my-1" />
-                  
+
                   {(["wantToLearn", "learning", "learned"] as const).map((status) => {
                     const statusConfig = STATUS_CONFIG[status];
                     const Icon = statusConfig.icon;
@@ -209,8 +295,16 @@ export const SortableSongItem = ({
           </div>
 
           <div className="flex gap-2">
-            {droppableId !== "learned" && <PracticeButton songId={song.id} isMobile={true} />}
-            
+            {droppableId !== "learned" && (
+              <GpPracticeButton
+                songId={song.id}
+                song={song}
+                isMobile={true}
+                isPremium={isPremium}
+                onPracticeWithGp={onPracticeWithGp}
+              />
+            )}
+
             {nextStatus && (
                 <Button
                     size="sm"
@@ -228,46 +322,53 @@ export const SortableSongItem = ({
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-4"> 
+        <div className="flex items-center gap-4">
           <div className="hidden sm:flex text-zinc-600 opacity-60 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity">
                <GripVertical className="h-4 w-4" />
           </div>
 
-          <SongCover song={song} config={config} />
+          <SongCover song={song} config={config} size="md" />
 
           <div className="min-w-0 flex-1">
             <p className="truncate text-[15px] font-bold text-zinc-100 leading-tight group-hover:text-white transition-colors">{song.title}</p>
             <p className="truncate text-xs font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors">{song.artist}</p>
+            {isPremium && <GpProgressBadge progress={progress} />}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <TierBadge song={song} />
-            
+
+            <GpPracticeButton
+              songId={song.id}
+              song={song}
+              isMobile={false}
+              isPremium={isPremium}
+              onPracticeWithGp={onPracticeWithGp}
+            />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-10 w-10 rounded-xl hover:bg-white/10 text-zinc-400 hover:text-white transition-all active:scale-90"
+                  className="h-7 w-7 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-all active:scale-90"
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => e.stopPropagation()}
                 >
-                  <MoreVertical className="h-6 w-6" />
+                  <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-zinc-900/95 border-white/10 backdrop-blur-xl p-1.5 shadow-2xl">
-                {droppableId !== "learned" && (
-                  <DropdownMenuItem
-                    onClick={() => router.push(`/timer/song/${song.id}`)}
-                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-cyan-400 focus:bg-cyan-500/10 focus:text-cyan-300 cursor-pointer rounded-lg mb-1"
-                  >
-                    <Play className="h-4 w-4 fill-current" />
-                    Practice Song
-                  </DropdownMenuItem>
-                )}
-                
+                <DropdownMenuItem
+                  onClick={() => onPracticeWithGp ? onPracticeWithGp(song) : router.push(`/timer/song/${song.id}`)}
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-cyan-400 focus:bg-cyan-500/10 focus:text-cyan-300 cursor-pointer rounded-lg mb-1"
+                >
+                  <Play className="h-4 w-4 fill-current" />
+                  Practice Song
+                </DropdownMenuItem>
+
                 <div className="h-px bg-white/5 my-1" />
-                
+
                 {(["wantToLearn", "learning", "learned"] as const).map((status) => {
                   const statusConfig = STATUS_CONFIG[status];
                   const Icon = statusConfig.icon;
