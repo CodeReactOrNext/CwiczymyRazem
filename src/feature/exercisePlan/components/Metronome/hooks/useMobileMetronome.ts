@@ -290,6 +290,9 @@ export const useMobileMetronome = ({
   useEffect(() => {
     if (isPlaying && countInRemaining === 0 && startTimeRef.current) {
       stopMetronome();
+      // Reset position so BPM change always restarts from the beginning (beat 0)
+      pausedElapsedTimeRef.current  = 0;
+      pausedAudioElapsedRef.current = 0;
       startMetronome();
     }
   }, [bpm]);

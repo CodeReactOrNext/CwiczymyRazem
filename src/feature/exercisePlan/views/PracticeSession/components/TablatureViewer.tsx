@@ -88,10 +88,11 @@ const TablatureViewerInner = ({
   resetKey,
   hideDynamicsLane = false,
 }: TablatureViewerProps) => {
-  const canvasRef      = useRef<HTMLCanvasElement>(null);
-  const containerRef   = useRef<HTMLDivElement>(null);
-  const workerRef      = useRef<Worker | null>(null);
-  const transferredRef = useRef(false);
+  const canvasRef        = useRef<HTMLCanvasElement>(null);
+  const containerRef     = useRef<HTMLDivElement>(null);
+  const workerRef        = useRef<Worker | null>(null);
+  const transferredRef   = useRef(false);
+  const prevStartTimeRef = useRef<number | null>(startTime);
 
   const [containerSize, setContainerSize] = useState({ width: 0, height: 256 });
 
@@ -321,6 +322,18 @@ const TablatureViewerInner = ({
     workerRef.current?.postMessage({ type: 'RESET' });
     pausedScrollRef.current = { scrollX: 0, cursorPos: 0 };
   }, [measures, resetKey]);
+
+  // ── Immediate reset when a restart is triggered during playback ───────────
+  // startTime going null while playing = count-in restart (e.g. BPM change).
+  // Reset cursor to 0 right away so it doesn't stay frozen at the old position.
+  useEffect(() => {
+    const prev = prevStartTimeRef.current;
+    prevStartTimeRef.current = startTime;
+    if (prev !== null && startTime === null && isPlaying) {
+      workerRef.current?.postMessage({ type: 'RESET' });
+      pausedScrollRef.current = { scrollX: 0, cursorPos: 0 };
+    }
+  }, [startTime, isPlaying]);
 
   // ── Container size ────────────────────────────────────────────────────────
   useEffect(() => {

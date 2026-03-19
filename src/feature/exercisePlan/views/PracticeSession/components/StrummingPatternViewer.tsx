@@ -1,15 +1,16 @@
-import { useEffect, useRef, useCallback, memo, useState } from "react";
+import { useEffect, useRef, useCallback, memo } from "react";
 import { cn } from "assets/lib/utils";
 import type { StrumPattern, StrumBeat } from "feature/exercisePlan/types/exercise.types";
+import type { SlotResult } from "../hooks/useStrummingMatcher";
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
 
-const SLOT_W       = 64;
+const SLOT_W       = 64;  // used only for timing calculations (must match useStrummingMatcher)
 const ARROW_AREA_H = 88;
 const LABEL_H      = 26;
 const HEADER_H     = 36;
 const PAD          = 16;
-const RAMP_STEP    = 5; // BPM increase per completed loop
+const DOTS_H       = 22;  // height reserved for rep-progress dots
 
 const CURSOR_COLOR = "rgba(250,204,21,0.90)";
 const BG_COLOR     = "#0a0a0a";
@@ -141,19 +142,26 @@ function barPixelWidth(p: StrumPattern) {
 
 // ─── Arrow drawing ────────────────────────────────────────────────────────────
 
-function drawDownArrow(ctx: CanvasRenderingContext2D, cx: number, arrowTop: number, h: number, color: string, thick: boolean, muted: boolean) {
-  const cy      = arrowTop + h / 2;
+function drawDownArrow(
+  ctx: CanvasRenderingContext2D,
+  cx: number, arrowTop: number, h: number,
+  color: string, thick: boolean, muted: boolean,
+  glowColor?: string,
+) {
   const stemTop = arrowTop + h * 0.08;
   const stemBot = arrowTop + h * 0.72;
+  const cy      = arrowTop + h / 2;
   const hw      = thick ? 11 : 8;
   const lw      = thick ? 3 : 2;
   ctx.save();
+  if (glowColor) { ctx.shadowColor = glowColor; ctx.shadowBlur = 14; }
   ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = "round"; ctx.lineJoin = "round";
   ctx.beginPath(); ctx.moveTo(cx, stemTop); ctx.lineTo(cx, stemBot); ctx.stroke();
   ctx.beginPath();
   ctx.moveTo(cx - hw, stemBot - hw * 1.0); ctx.lineTo(cx, stemBot + 3); ctx.lineTo(cx + hw, stemBot - hw * 1.0);
   ctx.stroke();
   if (muted) {
+    ctx.shadowBlur = 0;
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(cx - 8, cy - 8); ctx.lineTo(cx + 8, cy + 8);
     ctx.moveTo(cx + 8, cy - 8); ctx.lineTo(cx - 8, cy + 8); ctx.stroke();
@@ -161,19 +169,26 @@ function drawDownArrow(ctx: CanvasRenderingContext2D, cx: number, arrowTop: numb
   ctx.restore();
 }
 
-function drawUpArrow(ctx: CanvasRenderingContext2D, cx: number, arrowTop: number, h: number, color: string, thick: boolean, muted: boolean) {
+function drawUpArrow(
+  ctx: CanvasRenderingContext2D,
+  cx: number, arrowTop: number, h: number,
+  color: string, thick: boolean, muted: boolean,
+  glowColor?: string,
+) {
   const cy      = arrowTop + h / 2;
   const stemBot = arrowTop + h * 0.92;
   const stemTop = arrowTop + h * 0.28;
   const hw      = thick ? 11 : 8;
   const lw      = thick ? 3 : 2;
   ctx.save();
+  if (glowColor) { ctx.shadowColor = glowColor; ctx.shadowBlur = 14; }
   ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = "round"; ctx.lineJoin = "round";
   ctx.beginPath(); ctx.moveTo(cx, stemBot); ctx.lineTo(cx, stemTop); ctx.stroke();
   ctx.beginPath();
   ctx.moveTo(cx - hw, stemTop + hw * 1.0); ctx.lineTo(cx, stemTop - 3); ctx.lineTo(cx + hw, stemTop + hw * 1.0);
   ctx.stroke();
   if (muted) {
+    ctx.shadowBlur = 0;
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.moveTo(cx - 8, cy - 8); ctx.lineTo(cx + 8, cy + 8);
     ctx.moveTo(cx + 8, cy - 8); ctx.lineTo(cx - 8, cy + 8); ctx.stroke();
@@ -189,9 +204,16 @@ function drawFrame(
   canvasW: number,
   canvasH: number,
   pattern: StrumPattern,
-  cursorScreenX: number,
-  scrollX: number,
+  cursorScreenX: number,   // pixel position of cursor; -1 when hidden
   chordIdx: number,
+  slotFeedback: Map<number, SlotResult>,
+  prevSlotFeedback: Map<number, SlotResult>,
+  transitionAlpha: number, // 0..1 — alpha for prevSlotFeedback overlay
+  micEnabled: boolean,
+  idleCursor: boolean,
+  currentRep: number,      // 0-indexed within set (0..maxReps-1)
+  maxReps: number,
+  drawSlotW: number,       // scaled slot width to fit canvas
 ) {
   ctx.save();
   ctx.scale(dpr, dpr);
@@ -201,33 +223,33 @@ function drawFrame(
   ctx.fillStyle = BG_COLOR;
   ctx.fillRect(0, 0, W, H);
 
-  const bpw        = barPixelWidth(pattern);
-  const totalSlots = pattern.timeSignature[0] * pattern.subdivisions;
-  const labels     = makeLabels(pattern.timeSignature[0], pattern.subdivisions);
-  const arrowTop   = PAD + HEADER_H;
-  const isPlaying  = cursorScreenX >= 0;
+  const totalSlots   = pattern.timeSignature[0] * pattern.subdivisions;
+  const labels       = makeLabels(pattern.timeSignature[0], pattern.subdivisions);
+  const arrowTop     = PAD + HEADER_H;
+  const patternLeft  = PAD;
+  const patternWidth = totalSlots * drawSlotW;
+  const isActive     = cursorScreenX >= 0 && !idleCursor;
 
   // ── Chord display (fixed, non-scrolling) ─────────────────────────────────
   const hasProgression = pattern.chords && pattern.chords.length > 0;
   if (hasProgression) {
-    // Chord progression pills — all shown, current highlighted
     ctx.save();
     ctx.font = `bold 13px ui-sans-serif, system-ui, sans-serif`;
     let cx = PAD;
     const py = PAD + 5;
     const ph = 24;
     pattern.chords!.forEach((ch, i) => {
-      const isActive = i === chordIdx;
+      const isSelected = i === chordIdx;
       const tw = ctx.measureText(ch).width;
       const pw = tw + 16;
-      ctx.fillStyle = isActive ? "rgba(96,165,250,0.28)" : "rgba(96,165,250,0.07)";
+      ctx.fillStyle = isSelected ? "rgba(96,165,250,0.28)" : "rgba(96,165,250,0.07)";
       ctx.beginPath();
       (ctx as any).roundRect(cx, py, pw, ph, 6);
       ctx.fill();
-      ctx.strokeStyle = isActive ? "rgba(96,165,250,0.75)" : "rgba(96,165,250,0.18)";
-      ctx.lineWidth   = isActive ? 1.5 : 1;
+      ctx.strokeStyle = isSelected ? "rgba(96,165,250,0.75)" : "rgba(96,165,250,0.18)";
+      ctx.lineWidth   = isSelected ? 1.5 : 1;
       ctx.stroke();
-      ctx.fillStyle   = isActive ? "#93c5fd" : "rgba(147,197,253,0.38)";
+      ctx.fillStyle   = isSelected ? "#93c5fd" : "rgba(147,197,253,0.38)";
       ctx.textBaseline = "middle";
       ctx.fillText(ch, cx + 8, py + ph / 2);
       ctx.textBaseline = "alphabetic";
@@ -235,7 +257,6 @@ function drawFrame(
     });
     ctx.restore();
   } else if (pattern.chord) {
-    // Single chord — large prominent badge
     ctx.save();
     ctx.font = `bold 28px ui-sans-serif, system-ui, sans-serif`;
     const textW = ctx.measureText(pattern.chord).width;
@@ -260,7 +281,6 @@ function drawFrame(
     ctx.font = `12px ui-sans-serif, system-ui, sans-serif`;
     let nameX = PAD;
     if (hasProgression && pattern.chords) {
-      // measure total width of pills
       ctx.font = `bold 13px ui-sans-serif, system-ui, sans-serif`;
       let pw = 0;
       pattern.chords.forEach(ch => { pw += ctx.measureText(ch).width + 16 + 6; });
@@ -276,107 +296,203 @@ function drawFrame(
     ctx.restore();
   }
 
-  // ── Repeating bars ───────────────────────────────────────────────────────
-  const startBar = Math.floor(scrollX / bpw) - 1;
-  const endBar   = startBar + Math.ceil(W / bpw) + 3;
+  // ── Rep counter (top-right) ───────────────────────────────────────────────
+  ctx.save();
+  ctx.font      = `bold 12px ui-sans-serif, system-ui, sans-serif`;
+  ctx.fillStyle = "rgba(255,255,255,0.38)";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  ctx.fillText(`Rep ${currentRep + 1} / ${maxReps}`, W - PAD, PAD + HEADER_H / 2);
+  ctx.textAlign    = "left";
+  ctx.textBaseline = "alphabetic";
+  ctx.restore();
 
-  for (let bar = startBar; bar <= endBar; bar++) {
-    const barLeft = bar * bpw - scrollX;
+  // ── Left and right bar-line borders ──────────────────────────────────────
+  ctx.strokeStyle = BAR_LINE;
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(patternLeft, arrowTop);
+  ctx.lineTo(patternLeft, arrowTop + ARROW_AREA_H);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(patternLeft + patternWidth, arrowTop);
+  ctx.lineTo(patternLeft + patternWidth, arrowTop + ARROW_AREA_H);
+  ctx.stroke();
 
-    ctx.strokeStyle = BAR_LINE;
-    ctx.lineWidth   = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(barLeft, arrowTop);
-    ctx.lineTo(barLeft, arrowTop + ARROW_AREA_H);
-    ctx.stroke();
+  // ── Slots ─────────────────────────────────────────────────────────────────
+  for (let si = 0; si < totalSlots; si++) {
+    const slotLeft = patternLeft + si * drawSlotW;
+    const slotCX   = slotLeft + drawSlotW / 2;
 
-    for (let si = 0; si < totalSlots; si++) {
-      const slotLeft = barLeft + si * SLOT_W;
-      const slotCX   = slotLeft + SLOT_W / 2;
+    if (si > 0) {
+      ctx.strokeStyle = si % pattern.subdivisions === 0 ? BAR_LINE : BEAT_LINE;
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.moveTo(slotLeft, arrowTop + 4);
+      ctx.lineTo(slotLeft, arrowTop + ARROW_AREA_H - 4);
+      ctx.stroke();
+    }
 
-      if (si > 0) {
-        ctx.strokeStyle = si % pattern.subdivisions === 0 ? BAR_LINE : BEAT_LINE;
-        ctx.lineWidth   = 1;
-        ctx.beginPath();
-        ctx.moveTo(slotLeft, arrowTop + 4);
-        ctx.lineTo(slotLeft, arrowTop + ARROW_AREA_H - 4);
-        ctx.stroke();
-      }
+    const beat: StrumBeat = pattern.strums[si]!;
+    if (!beat) continue;
 
-      const beat: StrumBeat = pattern.strums[si % totalSlots]!;
-      if (!beat) continue;
-
-      const isActive = isPlaying &&
-        slotCX >= cursorScreenX - SLOT_W / 2 &&
-        slotCX <  cursorScreenX + SLOT_W / 2;
-
-      const baseColor =
-        beat.muted               ? MUTED_COLOR :
-        beat.direction === "down" ? DOWN_COLOR  :
-        beat.direction === "up"   ? UP_COLOR    :
-                                    MISS_COLOR;
-
-      const activeColor =
-        beat.muted               ? "#fde68a" :
-        beat.direction === "down" ? "#bfdbfe" :
-        beat.direction === "up"   ? "#e9d5ff" :
-                                    MISS_COLOR;
-
-      const color = (isActive && beat.direction !== "miss") ? activeColor : baseColor;
-      const thick = isActive && beat.direction !== "miss";
-
-      if (isActive && beat.direction !== "miss") {
+    // ── Previous-rep feedback overlay (fading out) ─────────────────────────
+    if (micEnabled && transitionAlpha > 0) {
+      const prevFb = prevSlotFeedback.get(si);
+      if (prevFb) {
         ctx.save();
-        ctx.fillStyle = beat.direction === "down"
-          ? "rgba(96,165,250,0.13)"
-          : "rgba(192,132,252,0.13)";
+        ctx.globalAlpha = transitionAlpha;
+        ctx.fillStyle =
+          prevFb === "hit"   ? "rgba(74,222,128,0.22)" :
+          prevFb === "wrong" ? "rgba(234,88,12,0.26)"  :
+                               "rgba(239,68,68,0.14)";
         ctx.beginPath();
-        (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, SLOT_W - 4, ARROW_AREA_H - 4, 6);
+        (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6);
         ctx.fill();
         ctx.restore();
       }
+    }
 
-      if (beat.direction === "down") {
-        drawDownArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted);
-      } else if (beat.direction === "up") {
-        drawUpArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted);
-      } else {
-        ctx.fillStyle = MISS_COLOR;
-        ctx.beginPath();
-        ctx.arc(slotCX, arrowTop + ARROW_AREA_H / 2, 3.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
+    // ── Current-rep feedback overlay ───────────────────────────────────────
+    const feedback = micEnabled ? slotFeedback.get(si) : undefined;
+    if (feedback === "hit") {
+      ctx.save();
+      ctx.fillStyle = "rgba(74,222,128,0.18)";
+      ctx.beginPath();
+      (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6);
+      ctx.fill();
+      ctx.restore();
+    } else if (feedback === "wrong") {
+      ctx.save();
+      ctx.fillStyle = "rgba(234,88,12,0.22)";
+      ctx.beginPath();
+      (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6);
+      ctx.fill();
+      ctx.restore();
+    } else if (feedback === "miss") {
+      ctx.save();
+      ctx.fillStyle = "rgba(239,68,68,0.12)";
+      ctx.beginPath();
+      (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6);
+      ctx.fill();
+      ctx.restore();
+    }
 
-      if (beat.accented && beat.direction !== "miss") {
-        ctx.fillStyle = ACCENT_DOT;
-        ctx.beginPath();
-        ctx.arc(slotLeft + SLOT_W - 10, arrowTop + 10, 4, 0, Math.PI * 2);
-        ctx.fill();
-      }
+    const isSlotActive = isActive &&
+      slotCX >= cursorScreenX - drawSlotW / 2 &&
+      slotCX <  cursorScreenX + drawSlotW / 2;
 
-      const label  = labels[si % totalSlots] ?? "";
-      const isBeat = si % pattern.subdivisions === 0;
-      ctx.fillStyle = isBeat ? LABEL_BEAT : LABEL_SUB;
-      ctx.font      = isBeat
-        ? `bold 12px ui-sans-serif, system-ui, sans-serif`
-        : `11px ui-sans-serif, system-ui, sans-serif`;
-      ctx.textAlign = "center";
-      ctx.fillText(label, slotCX, arrowTop + ARROW_AREA_H + LABEL_H - 6);
-      ctx.textAlign = "left";
+    const dimmed = feedback === "miss";
+
+    const baseColor =
+      dimmed                    ? "rgba(255,255,255,0.12)" :
+      beat.muted                ? MUTED_COLOR :
+      beat.direction === "down" ? DOWN_COLOR  :
+      beat.direction === "up"   ? UP_COLOR    :
+                                  MISS_COLOR;
+
+    const activeColor =
+      beat.muted               ? "#fde68a" :
+      beat.direction === "down" ? "#bfdbfe" :
+      beat.direction === "up"   ? "#e9d5ff" :
+                                  MISS_COLOR;
+
+    const color     = (isSlotActive && beat.direction !== "miss") ? activeColor : baseColor;
+    const thick     = isSlotActive && beat.direction !== "miss";
+    const glowColor = feedback === "hit" ? "rgba(74,222,128,0.9)" : undefined;
+
+    if (isSlotActive && beat.direction !== "miss") {
+      ctx.save();
+      ctx.fillStyle = beat.direction === "down"
+        ? "rgba(96,165,250,0.13)"
+        : "rgba(192,132,252,0.13)";
+      ctx.beginPath();
+      (ctx as any).roundRect(slotLeft + 2, arrowTop + 2, drawSlotW - 4, ARROW_AREA_H - 4, 6);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    if (beat.direction === "down") {
+      drawDownArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted, glowColor);
+    } else if (beat.direction === "up") {
+      drawUpArrow(ctx, slotCX, arrowTop, ARROW_AREA_H, color, thick, !!beat.muted, glowColor);
+    } else {
+      ctx.fillStyle = MISS_COLOR;
+      ctx.beginPath();
+      ctx.arc(slotCX, arrowTop + ARROW_AREA_H / 2, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    if (beat.accented && beat.direction !== "miss") {
+      ctx.fillStyle = ACCENT_DOT;
+      ctx.beginPath();
+      ctx.arc(slotLeft + drawSlotW - 10, arrowTop + 10, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const label  = labels[si] ?? "";
+    const isBeat = si % pattern.subdivisions === 0;
+    ctx.fillStyle = isBeat ? LABEL_BEAT : LABEL_SUB;
+    ctx.font      = isBeat
+      ? `bold 12px ui-sans-serif, system-ui, sans-serif`
+      : `11px ui-sans-serif, system-ui, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillText(label, slotCX, arrowTop + ARROW_AREA_H + LABEL_H - 6);
+    ctx.textAlign = "left";
+  }
+
+  // ── Progress dots (rep tracker) ───────────────────────────────────────────
+  const dotR      = 4;
+  const dotStride = 14;  // center-to-center spacing
+  const dotsW     = (maxReps - 1) * dotStride + dotR * 2;
+  const dotsStartX = Math.max(PAD, (W - dotsW) / 2);
+  const dotsY     = arrowTop + ARROW_AREA_H + LABEL_H + 3;
+
+  for (let i = 0; i < maxReps; i++) {
+    const cx = dotsStartX + i * dotStride + dotR;
+    const cy = dotsY + dotR;
+    ctx.beginPath();
+    ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
+    if (i < currentRep) {
+      ctx.fillStyle = "rgba(96,165,250,0.55)";
+      ctx.fill();
+    } else if (i === currentRep) {
+      ctx.fillStyle = "rgba(250,204,21,0.85)";
+      ctx.fill();
+    } else {
+      ctx.strokeStyle = "rgba(255,255,255,0.15)";
+      ctx.lineWidth   = 1;
+      ctx.stroke();
     }
   }
 
   // ── Cursor ───────────────────────────────────────────────────────────────
-  if (isPlaying) {
+  if (cursorScreenX >= PAD - 2) {
     ctx.save();
-    ctx.strokeStyle = CURSOR_COLOR;
-    ctx.lineWidth   = 2;
-    ctx.shadowColor = CURSOR_COLOR;
-    ctx.shadowBlur  = 12;
-    ctx.beginPath();
-    ctx.moveTo(cursorScreenX, arrowTop - 2);
-    ctx.lineTo(cursorScreenX, arrowTop + ARROW_AREA_H + 2);
-    ctx.stroke();
+    if (idleCursor) {
+      ctx.strokeStyle = "rgba(255,255,255,0.22)";
+      ctx.lineWidth   = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(cursorScreenX, arrowTop - 2);
+      ctx.lineTo(cursorScreenX, arrowTop + ARROW_AREA_H + 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(255,255,255,0.30)";
+      ctx.font      = `bold 10px ui-sans-serif, system-ui, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillText("▶ PLAY", cursorScreenX + 20, arrowTop - 8);
+      ctx.textAlign = "left";
+    } else {
+      ctx.strokeStyle = CURSOR_COLOR;
+      ctx.lineWidth   = 2;
+      ctx.shadowColor = CURSOR_COLOR;
+      ctx.shadowBlur  = 12;
+      ctx.beginPath();
+      ctx.moveTo(cursorScreenX, arrowTop - 2);
+      ctx.lineTo(cursorScreenX, arrowTop + ARROW_AREA_H + 2);
+      ctx.stroke();
+    }
     ctx.restore();
   }
 
@@ -392,6 +508,12 @@ interface StrummingPatternViewerProps {
   startTime: number | null;
   countInRemaining?: number;
   className?: string;
+  /** Slot feedback map from useStrummingMatcher — renders hit/miss/wrong colors */
+  slotFeedback?: Map<number, SlotResult>;
+  /** Whether mic is enabled (controls whether overlays are painted) */
+  isMicEnabled?: boolean;
+  /** Number of reps per set before cycling (default 10) */
+  maxReps?: number;
 }
 
 function StrummingPatternViewerInner({
@@ -401,6 +523,9 @@ function StrummingPatternViewerInner({
   startTime,
   countInRemaining = 0,
   className,
+  slotFeedback,
+  isMicEnabled,
+  maxReps = 10,
 }: StrummingPatternViewerProps) {
   const canvasRef        = useRef<HTMLCanvasElement>(null);
   const containerRef     = useRef<HTMLDivElement>(null);
@@ -410,30 +535,23 @@ function StrummingPatternViewerInner({
   const lastSlotRef      = useRef<number>(-1);
   const lastStartTimeRef = useRef<number | null>(null);
 
-  // ── Speed ramp ──────────────────────────────────────────────────────────
-  const [rampEnabled, setRampEnabled] = useState(false);
-  const rampStartBpm = Math.max(40, Math.round(bpm * 0.6));
-  const [rampDisplayBpm, setRampDisplayBpm] = useState(rampStartBpm);
-  const rampBpmRef       = useRef<number>(rampStartBpm);
-  const pixelPosRef      = useRef<number>(0);
-  const loopCountRef     = useRef<number>(0);
-  const lastFrameTimeRef = useRef<number | null>(null);
+  // ── Transition (prev-rep fade) refs ─────────────────────────────────────
+  const prevFeedbackRef      = useRef<Map<number, SlotResult>>(new Map());
+  const transitionStartRef   = useRef<number | null>(null);
+  const viewerLoopCountRef   = useRef<number>(0);
 
   const pattern = patterns[0];
-  const canvasH = PAD + HEADER_H + ARROW_AREA_H + LABEL_H + PAD;
+  const canvasH = PAD + HEADER_H + ARROW_AREA_H + LABEL_H + DOTS_H + PAD;
 
-  // Reset ramp when playback stops
+  // Reset on stop
   useEffect(() => {
     if (!isPlaying) {
-      pixelPosRef.current    = 0;
-      loopCountRef.current   = 0;
-      lastFrameTimeRef.current = null;
-      lastSlotRef.current    = -1;
-      const startBpm = Math.max(40, Math.round(bpm * 0.6));
-      rampBpmRef.current = startBpm;
-      setRampDisplayBpm(startBpm);
+      lastSlotRef.current        = -1;
+      viewerLoopCountRef.current = 0;
+      prevFeedbackRef.current    = new Map();
+      transitionStartRef.current = null;
     }
-  }, [isPlaying, bpm]);
+  }, [isPlaying]);
 
   // ── AudioContext ─────────────────────────────────────────────────────────
   function getAudioCtx() {
@@ -473,62 +591,51 @@ function StrummingPatternViewerInner({
     const totalSlots = pattern.timeSignature[0] * pattern.subdivisions;
     const bpw        = barPixelWidth(pattern);
 
-    let cursorScreenX = -1;
-    let scrollX       = 0;
-    let totalPixels   = 0;
-    let chordIdx      = 0;
+    // Dynamic slot width — scale to fit the canvas width
+    const drawSlotW  = Math.max(28, (w - 2 * PAD) / totalSlots);
+    const drawBpw    = totalSlots * drawSlotW;
+
+    let cursorScreenX  = -1;
+    let totalPixels    = 0;
+    let chordIdx       = 0;
+    let currentRep     = 0;
 
     const active = isPlaying && startTime !== null && countInRemaining === 0;
 
     if (active) {
-      // Reset slot tracker on playback restart
+      // Reset on playback restart
       if (startTime !== lastStartTimeRef.current) {
-        lastStartTimeRef.current  = startTime;
-        lastSlotRef.current       = -1;
-        pixelPosRef.current       = 0;
-        loopCountRef.current      = 0;
-        lastFrameTimeRef.current  = null;
-        const startBpm = Math.max(40, Math.round(bpm * 0.6));
-        rampBpmRef.current = startBpm;
+        lastStartTimeRef.current   = startTime;
+        lastSlotRef.current        = -1;
+        viewerLoopCountRef.current = 0;
+        prevFeedbackRef.current    = new Map();
+        transitionStartRef.current = null;
       }
 
-      if (rampEnabled) {
-        // ── Delta-time accumulation (ramp mode) ─────────────────────────
-        const now = performance.now();
-        if (lastFrameTimeRef.current !== null) {
-          const dt     = Math.min((now - lastFrameTimeRef.current) / 1000, 0.1);
-          const bpsDelta    = rampBpmRef.current / 60;
-          const barDurDelta = pattern.timeSignature[0] / bpsDelta;
-          pixelPosRef.current += dt * (bpw / barDurDelta);
-        }
-        lastFrameTimeRef.current = now;
-        totalPixels = pixelPosRef.current;
+      // ── Wall-clock based position ─────────────────────────────────────
+      const elapsedMs  = Date.now() - startTime;
+      const elapsedSec = Math.max(0, elapsedMs / 1000);
+      const bps        = bpm / 60;
+      const barDurSec  = pattern.timeSignature[0] / bps;
+      totalPixels = (elapsedSec / barDurSec) * bpw;
 
-        // Loop completion → bump BPM
-        const newLoopCount = Math.floor(totalPixels / bpw);
-        if (newLoopCount > loopCountRef.current) {
-          loopCountRef.current = newLoopCount;
-          const next = Math.min(bpm, rampBpmRef.current + RAMP_STEP);
-          rampBpmRef.current = next;
-          setRampDisplayBpm(next);
-        }
-      } else {
-        // ── Wall-clock based (normal mode) ───────────────────────────────
-        const elapsedMs  = Date.now() - startTime;
-        const elapsedSec = Math.max(0, elapsedMs / 1000);
-        const bps        = bpm / 60;
-        const barDurSec  = pattern.timeSignature[0] / bps;
-        totalPixels = (elapsedSec / barDurSec) * bpw;
-      }
-
-      cursorScreenX = w * 0.25;
-      scrollX       = totalPixels - cursorScreenX + SLOT_W / 2;
-
-      // Current bar → chord index
-      const barsDone = Math.floor(totalPixels / bpw);
+      // Current bar → chord index and rep counter
+      const barsDone  = Math.floor(totalPixels / bpw);
       const chordList = pattern.chords && pattern.chords.length > 0 ? pattern.chords : null;
-      chordIdx = chordList ? barsDone % chordList.length : 0;
+      chordIdx        = chordList ? barsDone % chordList.length : 0;
+      currentRep      = barsDone % maxReps;
       const currentChord = chordList ? chordList[chordIdx] : pattern.chord;
+
+      // ── Detect loop restart → capture snapshot for fade transition ───
+      if (barsDone > viewerLoopCountRef.current) {
+        viewerLoopCountRef.current = barsDone;
+        prevFeedbackRef.current    = new Map(slotFeedback ?? new Map());
+        transitionStartRef.current = performance.now();
+      }
+
+      // ── Cursor: sweep left→right across the pattern ─────────────────
+      const repProgress = (totalPixels % bpw) / bpw;   // 0..1 within current rep
+      cursorScreenX = PAD + repProgress * drawBpw;
 
       // ── Sound trigger ──────────────────────────────────────────────────
       const totalSlotsElapsed = Math.floor(totalPixels / SLOT_W);
@@ -544,9 +651,31 @@ function StrummingPatternViewerInner({
       }
     }
 
-    drawFrame(ctx, dpr, canvas.width, canvas.height, pattern, cursorScreenX, scrollX, chordIdx);
+    // ── Transition alpha for previous-rep overlay ─────────────────────────
+    const transitionAlpha = (transitionStartRef.current !== null)
+      ? Math.max(0, 1 - (performance.now() - transitionStartRef.current) / 400)
+      : 0;
+
+    // When stopped, park the cursor at the start so the user sees where to begin
+    const idleCursor = !active && countInRemaining === 0;
+    if (idleCursor) {
+      cursorScreenX = PAD;  // left edge of pattern
+    }
+
+    drawFrame(
+      ctx, dpr, canvas.width, canvas.height, pattern,
+      cursorScreenX, chordIdx,
+      slotFeedback ?? new Map(),
+      prevFeedbackRef.current,
+      transitionAlpha,
+      !!(isMicEnabled && active),
+      idleCursor,
+      currentRep,
+      maxReps,
+      drawSlotW,
+    );
     rafRef.current = requestAnimationFrame(tick);
-  }, [pattern, bpm, isPlaying, startTime, countInRemaining, rampEnabled]);
+  }, [pattern, bpm, isPlaying, startTime, countInRemaining, slotFeedback, isMicEnabled, maxReps]);
 
   useEffect(() => {
     rafRef.current = requestAnimationFrame(tick);
@@ -609,35 +738,6 @@ function StrummingPatternViewerInner({
         {/* Spacer */}
         <span className="flex-1" />
 
-        {/* Speed Ramp toggle */}
-        <button
-          onClick={() => setRampEnabled(v => !v)}
-          className={cn(
-            "flex items-center gap-1.5 px-2 py-0.5 rounded text-xs border transition-colors",
-            rampEnabled
-              ? "border-yellow-500/60 text-yellow-300 bg-yellow-500/10"
-              : "border-white/10 text-zinc-500 hover:text-zinc-300 hover:border-white/20",
-          )}
-        >
-          <svg width={10} height={10} viewBox="0 0 10 10" className={rampEnabled ? "text-yellow-400" : "text-zinc-500"}>
-            <path d="M1 8 L5 2 L9 8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Speed Ramp
-        </button>
-
-        {/* Ramp BPM display */}
-        {rampEnabled && (
-          <span className="text-yellow-400/80 font-mono text-[11px]">
-            {rampDisplayBpm}
-            {rampDisplayBpm < bpm && (
-              <span className="text-zinc-500"> → {bpm} BPM</span>
-            )}
-            {rampDisplayBpm >= bpm && (
-              <span className="text-green-400"> ✓ target</span>
-            )}
-          </span>
-        )}
-
         {/* Chord progression indicator label */}
         {hasChords && (
           <span className="text-zinc-500">
@@ -655,5 +755,8 @@ export const StrummingPatternViewer = memo(StrummingPatternViewerInner, (prev, n
   prev.isPlaying        === next.isPlaying           &&
   prev.startTime        === next.startTime           &&
   prev.countInRemaining === next.countInRemaining    &&
-  prev.className        === next.className
+  prev.className        === next.className           &&
+  prev.isMicEnabled     === next.isMicEnabled        &&
+  prev.maxReps          === next.maxReps             &&
+  Object.is(prev.slotFeedback, next.slotFeedback)
 );

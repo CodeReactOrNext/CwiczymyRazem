@@ -25,7 +25,7 @@ export function getPerformanceGrade(accuracy: number) {
   return                      { letter: "D", color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/30",     glow: "" };
 }
 
-function getFeedbackForCombo(combo: number): { text: string } | null {
+export function getFeedbackForCombo(combo: number): { text: string } | null {
   if (combo >= 25 && combo % 5 === 0) return { text: "UNSTOPPABLE!" };
   if (combo === 20) return { text: "ON FIRE!" };
   if (combo === 15) return { text: "AMAZING!" };
