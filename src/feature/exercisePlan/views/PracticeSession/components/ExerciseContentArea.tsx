@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
 import type { NoteData } from "utils/audio/noteUtils";
+import type { SlotResult } from "../hooks/useStrummingMatcher";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
@@ -53,6 +54,10 @@ interface ExerciseContentAreaProps {
   handleZoomIn: () => void;
   handleZoomOut: () => void;
   resetImagePosition: () => void;
+
+  // Rhythm detection (strumming)
+  isMicEnabled?: boolean;
+  strumSlotFeedback?: Map<number, SlotResult>;
 
   // Video / playalong
   startTimer: () => void;
@@ -111,6 +116,8 @@ export const ExerciseContentArea = ({
   setTimerTime,
   onVideoEnd,
   isPlaying,
+  isMicEnabled,
+  strumSlotFeedback,
 }: ExerciseContentAreaProps) => {
   const hasTablature =
     activeTablature &&
@@ -240,6 +247,8 @@ export const ExerciseContentArea = ({
           isPlaying={isMetronomePlaying}
           startTime={startTime}
           countInRemaining={countInRemaining}
+          isMicEnabled={isMicEnabled}
+          slotFeedback={strumSlotFeedback}
         />
       ) : (
         <ExerciseImage
