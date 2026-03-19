@@ -471,7 +471,7 @@ const SessionModal = ({
                       )}
 
                       {/* BPM Progress */}
-                      {currentExercise.metronomeSpeed && bpmStages && bpmStages.length > 0 && onBpmToggle && (
+                      {currentExercise.metronomeSpeed && bpmStages && bpmStages.length > 0 && onBpmToggle && !currentExercise.gpFileUrl && (
                         <div className="px-2 py-2 border-b border-white/5">
                           <BpmProgressGrid
                             bpmStages={bpmStages}
@@ -779,7 +779,7 @@ const SessionModal = ({
                   </div>
                 )}
 
-                {currentExercise.metronomeSpeed && bpmStages && bpmStages.length > 0 && onBpmToggle && (
+                {currentExercise.metronomeSpeed && bpmStages && bpmStages.length > 0 && onBpmToggle && !currentExercise.gpFileUrl && (
                   <div className="mb-6">
                     <BpmProgressGrid
                       bpmStages={bpmStages}

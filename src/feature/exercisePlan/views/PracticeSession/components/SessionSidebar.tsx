@@ -191,7 +191,7 @@ export const SessionSidebar = ({
       )}
 
       {/* BPM Progress Grid */}
-      {currentExercise.metronomeSpeed && bpmStages.length > 0 && (
+      {currentExercise.metronomeSpeed && bpmStages.length > 0 && !currentExercise.gpFileUrl && (
         <div className="rounded-2xl bg-zinc-900/40 p-6 backdrop-blur-sm">
           <BpmProgressGrid
             bpmStages={bpmStages}

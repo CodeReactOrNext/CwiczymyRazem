@@ -37,6 +37,7 @@ import { SessionSidebar } from "./components/SessionSidebar";
 import { useImageHandling } from "./hooks/useImageHandling";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
 import { useNoteMatching } from "./hooks/useNoteMatching";
+import { useStrummingMatcher } from "./hooks/useStrummingMatcher";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
 import ImageModal from "./modals/ImageModal";
@@ -479,6 +480,11 @@ export const PracticeSession = ({
     [plan.exercises]
   );
 
+  const planHasStrumming = useMemo(
+    () => plan.exercises.some(ex => ex.strummingPatterns && ex.strummingPatterns.length > 0),
+    [plan.exercises]
+  );
+
   // ── Keyboard shortcuts ────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -637,7 +643,7 @@ export const PracticeSession = ({
 
   // ── Note matching (RAF game loop) ─────────────────────────────────────────
 
-  const { hitNotes, sessionAccuracy, gameState, maxPossibleScore, currentBeatsElapsed, resetGame } = useNoteMatching({
+  const { hitNotes, sessionAccuracy: tabAccuracy, gameState: tabGameState, maxPossibleScore, currentBeatsElapsed, resetGame } = useNoteMatching({
     isPlaying,
     startTime:          metronome.startTime,
     effectiveBpm,
@@ -651,6 +657,29 @@ export const PracticeSession = ({
     getAdjustedTargetFreq,
     onReset: () => setEarTrainingScore(0),
   });
+
+  // ── Strumming rhythm matcher ──────────────────────────────────────────────
+
+  const activeStrumPattern = currentExercise.strummingPatterns?.[0];
+  const {
+    slotFeedback: strumSlotFeedback,
+    gameState:    strumGameState,
+    sessionAccuracy: strumAccuracy,
+  } = useStrummingMatcher({
+    isPlaying,
+    startTime:  metronome.startTime,
+    bpm:        effectiveBpm,
+    pattern:    activeStrumPattern,
+    isMicEnabled,
+    audioRefs,
+    getLatencyMs,
+    currentExerciseIndex,
+  });
+
+  // Pick the active game state depending on exercise type
+  const isStrummingExercise = !!activeStrumPattern;
+  const gameState     = isStrummingExercise ? strumGameState  : tabGameState;
+  const sessionAccuracy = isStrummingExercise ? strumAccuracy : tabAccuracy;
 
   // ── Completion notification ───────────────────────────────────────────────
 
@@ -1042,6 +1071,8 @@ export const PracticeSession = ({
                       setTimerTime={setTimerTime}
                       onVideoEnd={handleNextExerciseClick}
                       isPlaying={isPlaying}
+                      isMicEnabled={isMicEnabled}
+                      strumSlotFeedback={strumSlotFeedback}
                     />
                   </div>
 
@@ -1120,7 +1151,7 @@ export const PracticeSession = ({
                       saveGuitarPlaybackPreference={saveGuitarPlaybackPreference}
                       soundfontsReady={soundfontsReady}
                       isMicEnabled={isMicEnabled}
-                      showMicControls={planHasTablature || planHasGpFile}
+                      showMicControls={planHasTablature || planHasGpFile || planHasStrumming}
                       toggleMic={async () => { if (isListening) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
                       setSessionPhase={setSessionPhase}
                       audioTracks={audioTracks}
