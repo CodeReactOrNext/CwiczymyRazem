@@ -58,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: userData.stripeCustomerId,
-      return_url: `${getAppUrl(req)}/premium/success`,
+      return_url: `${getAppUrl(req)}/premium`,
       flow_data: {
         type: "subscription_update_confirm",
         subscription_update_confirm: {
