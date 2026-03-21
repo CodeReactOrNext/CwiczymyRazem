@@ -6,6 +6,7 @@ export interface PremiumUser {
   id: string;
   displayName: string;
   avatar: string | null;
+  role: "pro" | "master";
   premiumUntil: string | null; // ISO date or null = forever
 }
 
@@ -32,14 +33,14 @@ export const useAdminPremium = (password: string) => {
     [password]
   );
 
-  const grantPremium = async (userId: string, premiumUntil?: string) => {
+  const grantPremium = async (userId: string, plan: "pro" | "master", premiumUntil?: string) => {
     try {
       await axios.post(
         "/api/admin/premium",
-        { userId, premiumUntil: premiumUntil || null },
+        { userId, plan, premiumUntil: premiumUntil || null },
         { headers: { "x-admin-password": password } }
       );
-      toast.success("Premium granted");
+      toast.success(`${plan === "master" ? "Master" : "Pro"} plan granted`);
       await fetchPremiumUsers();
     } catch {
       toast.error("Failed to grant premium");
