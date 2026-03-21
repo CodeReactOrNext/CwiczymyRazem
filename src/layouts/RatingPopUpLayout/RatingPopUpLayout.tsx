@@ -63,8 +63,8 @@ const RatingPopUpLayout = ({
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
       className={cn(
-        "mx-auto max-w-7xl p-4 sm:p-5 space-y-8",
-        !hideWrapper && "pb-32 pt-16 sm:pb-10 sm:pt-10"
+        "mx-auto max-w-[1100px] p-4 sm:p-5 space-y-6",
+        !hideWrapper && "pb-32 pt-16 sm:pb-10 sm:pt-6"
       )}>
       
       <div ref={topRef} />
@@ -79,51 +79,45 @@ const RatingPopUpLayout = ({
         skillRewardAmount={ratingData.skillRewardAmount}
         skillPointsGained={ratingData.skillPointsGained}
         onRestart={onRestart}
+        onContinue={() => {
+          if (onClick) {
+            onClick(false);
+          } else {
+            Router.push("/dashboard");
+          }
+        }}
       />
 
-      {/* Core Insights Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-5 h-full">
-              <SessionStats
-                  time={ratingData.bonusPoints.time}
-                  todayTotalTime={activityData.filter(d => new Date(d.date).toDateString() === new Date().toDateString()).reduce((acc, d) => acc + d.techniqueTime + d.theoryTime + d.hearingTime + d.creativityTime, 0)}
-                  averageWeeklyTime={avgTime}
-                  breakdown={sessionBreakdown}
-              />
-          </div>
-
-          <div className="lg:col-span-7 space-y-6">
-              <WeeklyInsight activityData={activityData} />
+      {/* Modern Dashboard Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 lg:gap-6">
+          {/* Left Column: Stats & Streak */}
+          <div className="md:col-span-5 lg:col-span-4 flex flex-col gap-4 lg:gap-6">
+              <div className="h-full">
+                  <SessionStats
+                      time={ratingData.bonusPoints.time}
+                      todayTotalTime={activityData.filter(d => new Date(d.date).toDateString() === new Date().toDateString()).reduce((acc, d) => acc + d.techniqueTime + d.theoryTime + d.hearingTime + d.creativityTime, 0)}
+                      averageWeeklyTime={avgTime}
+                      breakdown={sessionBreakdown}
+                  />
+              </div>
               <NextMilestone currentUserStats={currentUserStats} />
           </div>
-      </div>
 
-      <div className={`grid gap-6 grid-cols-1 ${newAchievements.length > 0 ? 'lg:grid-cols-3' : ''}`}>
-         <div className={newAchievements.length > 0 ? "lg:col-span-2" : ""}>
-              <SkillBalance activityData={activityData} />
-         </div>
-
-         {newAchievements.length > 0 && (
-              <div className="h-full">
-                  <AchievementsDisplay achievements={newAchievements} />
+          {/* Right Column: Charts & Balance */}
+          <div className="md:col-span-7 lg:col-span-8 flex flex-col gap-4 lg:gap-6">
+              <WeeklyInsight activityData={activityData} />
+              
+              <div className={`grid gap-4 lg:gap-6 grid-cols-1 ${newAchievements.length > 0 ? 'lg:grid-cols-2' : ''}`}>
+                 <SkillBalance activityData={activityData} />
+                 
+                 {newAchievements.length > 0 && (
+                      <AchievementsDisplay achievements={newAchievements} />
+                 )}
               </div>
-         )}
+          </div>
       </div>
 
-      <div className='flex justify-center pt-10'>
-        <Button
-          onClick={() => {
-            if (onClick) {
-              onClick(false);
-            } else {
-              Router.push("/dashboard");
-            }
-          }}
-          size='lg'
-          className='bg-white text-zinc-950 hover:bg-white/90 px-16 h-14 rounded-lg text-xs font-bold tracking-wide shadow-2xl transition-all active:scale-95'>
-          Continue
-        </Button>
-      </div>
+
     </motion.div>
   );
 

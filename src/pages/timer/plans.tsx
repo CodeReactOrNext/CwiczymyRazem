@@ -70,7 +70,7 @@ const TimerPlans: NextPageWithLayout = () => {
 
   return selectedPlan ? (
     <MainContainer>
-      <PracticeSession plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} autoReport={true} />
+      <PracticeSession plan={selectedPlan} onClose={handleBack} onFinish={handlePlanFinish} isFinishing={isFinishing} autoReport={true} />
     </MainContainer>
   ) : (
     <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />

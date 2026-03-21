@@ -7,6 +7,8 @@ export interface ProfileInterface {
   soundCloudLink?: string;
   youTubeLink?: string;
   band?: string;
+  selectedFrame?: number;
+  selectedGuitar?: number | string;
   userAuth: string;
   statistics: StatisticsDataInterface;
   createdAt: Timestamp;

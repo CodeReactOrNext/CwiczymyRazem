@@ -48,28 +48,28 @@ export function WeeklyInsight({ activityData }: WeeklyInsightProps) {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.4 }}>
-      <Card className='border-none bg-zinc-900/40 backdrop-blur-xl h-full overflow-hidden rounded-lg'>
+      <Card className='bg-zinc-900 border border-white/5 h-full overflow-hidden rounded-2xl shadow-none'>
         <div className='p-6'>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-8">
               <div className="space-y-1">
-                  <h3 className='text-sm font-semibold text-zinc-400'>
+                  <h3 className='text-[11px] font-semibold text-zinc-500 uppercase tracking-widest mb-1'>
                     {completedDaysCount}/7 Days
                   </h3>
-                  <span className="text-2xl font-bold text-white">{convertMsToHM(totalWeekTime)}</span>
+                  <span className="text-3xl font-bold text-white tracking-tight">{convertMsToHM(totalWeekTime)}</span>
               </div>
           </div>
 
           <ChartContainer
             config={{ totalTime: { label: "Time spent", color: "rgb(6, 182, 212)" } }}
-            className='aspect-auto h-[100px] w-full'>
+            className='aspect-auto h-[120px] w-full'>
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
               <defs>
                 <linearGradient id='fillTotal' x1='0' y1='0' x2='0' y2='1'>
-                  <stop offset='5%' stopColor='rgb(6, 182, 212)' stopOpacity={0.4} />
+                  <stop offset='5%' stopColor='rgb(6, 182, 212)' stopOpacity={0.5} />
                   <stop offset='95%' stopColor='rgb(6, 182, 212)' stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray='4 4' stroke='rgba(255,255,255,0.02)' vertical={false} />
+              <CartesianGrid strokeDasharray='4 4' stroke='rgba(255,255,255,0.03)' vertical={false} />
               <XAxis 
                 dataKey='date' 
                 tickLine={false} 

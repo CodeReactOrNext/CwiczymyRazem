@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import { useTranslation } from "hooks/useTranslation";
-import { FaCheck, FaStepBackward, FaStepForward } from "react-icons/fa";
+import { FaCheck, FaStepBackward, FaStepForward, FaSignOutAlt } from "react-icons/fa";
 import { MainTimerSection } from "./MainTimerSection";
 import type { Exercise } from "../../../types/exercise.types";
 
@@ -58,7 +58,7 @@ export const SessionBottomBar = ({
   const { t } = useTranslation(["common"]);
 
   return (
-    <div className="fixed bottom-0 left-0 lg:left-64 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
       <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
 
         {/* Left: Exit */}
@@ -66,7 +66,9 @@ export const SessionBottomBar = ({
           <Button
             variant="ghost"
             onClick={onClose}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 font-bold text-sm tracking-wide transition-all border border-white/10 hover:border-red-500/30"
           >
+            <FaSignOutAlt />
             {t("common:practice.exit")}
           </Button>
         </div>
