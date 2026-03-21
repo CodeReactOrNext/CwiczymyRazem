@@ -68,17 +68,15 @@ export const SessionSidebar = ({
   isBpmLoading,
   onBpmToggle,
 }: SessionSidebarProps) => (
-    <div className="lg:col-span-4 space-y-6">
-
-      {/* Metronome + Audio Controls */}
+    <>
       {currentExercise.metronomeSpeed && (
+        <div className="space-y-6 flex flex-col w-full lg:col-span-5">
+        {/* Metronome + Audio Controls */}
         <div className="rounded-2xl bg-zinc-900/40 p-6 backdrop-blur-sm">
           <Metronome
             metronome={metronome}
-            showStartStop={!currentExercise.tablature || currentExercise.tablature.length === 0}
             isMuted={isMetronomeMuted}
             onMuteToggle={setIsMetronomeMuted}
-            recommendedBpm={currentExercise.metronomeSpeed.recommended}
             isHalfSpeed={isHalfSpeed}
             onHalfSpeedToggle={setIsHalfSpeed}
           />
@@ -87,9 +85,8 @@ export const SessionSidebar = ({
             <div className="mt-4 flex flex-col gap-2">
               <Button
                 variant="ghost"
-                size="sm"
                 className={cn(
-                  "w-full gap-2 text-xs font-bold tracking-wide transition-all",
+                  "w-full h-12 gap-2 text-sm font-bold tracking-wide transition-all",
                   isAudioMuted
                     ? "text-zinc-500 hover:text-zinc-400"
                     : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10",
@@ -102,8 +99,8 @@ export const SessionSidebar = ({
                   saveGuitarPlaybackPreference(!newMuted);
                 }}
               >
-                <GiGuitar className="text-base" />
-                {isAudioMuted ? <FaVolumeMute className="h-4 w-4" /> : <FaVolumeUp className="h-4 w-4" />}
+                <GiGuitar className="text-lg" />
+                {isAudioMuted ? <FaVolumeMute className="h-5 w-5" /> : <FaVolumeUp className="h-5 w-5" />}
                 {isAudioMuted
                   ? "Guitar Backing Track off"
                   : soundfontsReady ? "Guitar Backing Track on" : "Loading samples..."}
@@ -112,26 +109,24 @@ export const SessionSidebar = ({
               <div className="flex gap-2">
                 <Button
                   variant="ghost"
-                  size="sm"
                   className={cn(
-                    "flex-1 gap-2 text-[10px] font-bold tracking-wide transition-all",
+                    "flex-1 h-10 gap-2 text-xs font-bold tracking-wide transition-all",
                     isMicEnabled
                       ? "text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20"
                       : "text-zinc-500 hover:text-zinc-400"
                   )}
                   onClick={toggleMic}
                 >
-                  <FaMicrophone className="text-xs" />
+                  <FaMicrophone className="text-sm" />
                   {isMicEnabled ? "Mic On" : "Mic Off"}
                 </Button>
                 {isMicEnabled && (
                   <Button
                     variant="ghost"
-                    size="sm"
-                    className="gap-2 text-[10px] font-bold tracking-wide text-zinc-500 hover:text-zinc-300"
+                    className="h-10 gap-2 text-xs font-bold tracking-wide text-zinc-500 hover:text-zinc-300"
                     onClick={() => setSessionPhase("calibrating")}
                   >
-                    <FaSync className="text-xs" />
+                    <FaSync className="text-sm" />
                     Recalibrate
                   </Button>
                 )}
@@ -140,56 +135,58 @@ export const SessionSidebar = ({
           )}
 
         </div>
-      )}
 
-      {/* Audio Mixer */}
-      {activeExercise.backingTracks && activeExercise.backingTracks.length > 0 && (
-        <div className="rounded-2xl bg-zinc-900/40 p-6 backdrop-blur-sm space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <GiGuitar className="text-cyan-400" />
-            <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Audio Mixer</h4>
-          </div>
-          <div className="space-y-6">
-            {audioTracks.map((track) => (
-              <div key={track.id} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-zinc-300 truncate max-w-[150px]">
-                    {track.id === "main" ? "Main Instrument" : track.name}
-                  </span>
-                  <button
-                    onClick={() => setTrackConfigs(prev => ({
-                      ...prev,
-                      [track.id]: { ...prev[track.id], isMuted: !prev[track.id]?.isMuted },
-                    }))}
-                    className={cn(
-                      "p-1.5 rounded transition-colors",
-                      track.isMuted ? "text-red-500 bg-red-500/10" : "text-zinc-500 hover:text-white"
-                    )}
-                  >
-                    {track.isMuted ? <FaVolumeMute size={12} /> : <FaVolumeUp size={12} />}
-                  </button>
+        {/* Audio Mixer */}
+        {activeExercise.backingTracks && activeExercise.backingTracks.length > 0 && (
+          <div className="rounded-2xl bg-zinc-900/40 p-6 backdrop-blur-sm space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+              <GiGuitar className="text-cyan-400" />
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Audio Mixer</h4>
+            </div>
+            <div className="space-y-6">
+              {audioTracks.map((track) => (
+                <div key={track.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-zinc-300 truncate max-w-[150px]">
+                      {track.id === "main" ? "Main Instrument" : track.name}
+                    </span>
+                    <button
+                      onClick={() => setTrackConfigs(prev => ({
+                        ...prev,
+                        [track.id]: { ...prev[track.id], isMuted: !prev[track.id]?.isMuted },
+                      }))}
+                      className={cn(
+                        "p-1.5 rounded transition-colors",
+                        track.isMuted ? "text-red-500 bg-red-500/10" : "text-zinc-500 hover:text-white"
+                      )}
+                    >
+                      {track.isMuted ? <FaVolumeMute size={12} /> : <FaVolumeUp size={12} />}
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Slider
+                      value={[track.isMuted ? 0 : track.volume * 100]}
+                      max={100}
+                      step={1}
+                      className="flex-1"
+                      onValueChange={([val]) => setTrackConfigs(prev => ({
+                        ...prev,
+                        [track.id]: { ...prev[track.id], volume: val / 100, isMuted: val === 0 },
+                      }))}
+                    />
+                    <span className="text-[9px] font-mono text-zinc-600 w-6 text-right">
+                      {Math.round(track.volume * 100)}%
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Slider
-                    value={[track.isMuted ? 0 : track.volume * 100]}
-                    max={100}
-                    step={1}
-                    className="flex-1"
-                    onValueChange={([val]) => setTrackConfigs(prev => ({
-                      ...prev,
-                      [track.id]: { ...prev[track.id], volume: val / 100, isMuted: val === 0 },
-                    }))}
-                  />
-                  <span className="text-[9px] font-mono text-zinc-600 w-6 text-right">
-                    {Math.round(track.volume * 100)}%
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+        )}
         </div>
       )}
 
+      <div className="space-y-6 flex flex-col w-full lg:col-span-3">
       {/* BPM Progress Grid */}
       {currentExercise.metronomeSpeed && bpmStages.length > 0 && !currentExercise.gpFileUrl && (
         <div className="rounded-2xl bg-zinc-900/40 p-6 backdrop-blur-sm">
@@ -239,5 +236,6 @@ export const SessionSidebar = ({
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
 );

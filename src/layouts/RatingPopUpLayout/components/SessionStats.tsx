@@ -54,29 +54,30 @@ export const SessionStats = ({
     <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}>
-      <Card className='border-none bg-zinc-900/60 backdrop-blur-2xl h-full overflow-hidden rounded-lg shadow-2xl relative'>
-        <div className="absolute top-0 right-0 p-6">
-             <div className="h-12 w-12 rounded-lg bg-cyan-500/10 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.1)]">
-                  <Clock className="h-6 w-6 text-cyan-400" />
+      transition={{ duration: 0.5 }}
+      className="h-full">
+      <Card className='bg-zinc-900 border border-white/5 h-full rounded-2xl relative shadow-none'>
+        <div className="absolute top-0 right-0 p-5">
+             <div className="h-10 w-10 flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-zinc-500" />
              </div>
         </div>
 
-        <div className='p-8'>
-          <div className="mb-10">
-              <h3 className='text-sm font-semibold text-zinc-400 mb-2'>{t("timer:practice_session")}</h3>
-              <div className="flex items-baseline gap-4">
-                <span className="text-5xl font-bold text-white tracking-tighter drop-shadow-2xl">{convertMsToHM(time)}</span>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5" title="vs. weekly average">
-                    {performanceDiff > 5 ? <TrendingUp className="h-3.5 w-3.5 text-emerald-400" /> : performanceDiff < -5 ? <TrendingDown className="h-3.5 w-3.5 text-orange-400" /> : <Minus className="h-3.5 w-3.5 text-zinc-500" />}
-                    <span className={`text-[11px] font-bold ${performanceDiff > 5 ? 'text-emerald-400' : performanceDiff < -5 ? 'text-orange-400' : 'text-zinc-500'}`}>
+        <div className='p-6'>
+          <div className="mb-8">
+              <h3 className='text-[11px] uppercase tracking-widest font-semibold text-zinc-500 mb-2'>{t("timer:practice_session")}</h3>
+              <div className="flex items-baseline gap-3">
+                <span className="text-4xl font-bold text-white tracking-tight">{convertMsToHM(time)}</span>
+                <div className="flex items-center gap-1" title="vs. weekly average">
+                    {performanceDiff > 5 ? <TrendingUp className="h-3 w-3 text-emerald-500" /> : performanceDiff < -5 ? <TrendingDown className="h-3 w-3 text-orange-500" /> : <Minus className="h-3 w-3 text-zinc-600" />}
+                    <span className={`text-[10px] font-bold ${performanceDiff > 5 ? 'text-emerald-500' : performanceDiff < -5 ? 'text-orange-500' : 'text-zinc-600'}`}>
                         {Math.abs(performanceDiff).toFixed(0)}% vs avg
                     </span>
                 </div>
               </div>
           </div>
 
-          <div className="grid gap-6">
+          <div className="grid gap-4">
              {practiceCategories.map((cat, index) => (
                 <motion.div
                     key={cat.key}
@@ -85,15 +86,15 @@ export const SessionStats = ({
                     transition={{ delay: 0.5 + (index * 0.1) }}
                     className="group"
                 >
-                    <div className="flex items-center justify-between px-1">
-                        <div className="flex items-center gap-4">
-                            <div className={`h-10 w-10 rounded-lg ${cat.bg} flex items-center justify-center border-none group-hover:scale-110 transition-transform duration-300`}>
-                                <cat.icon className={`${cat.color}`} size="large" />
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className={`h-8 w-8 rounded-lg ${cat.bg} flex items-center justify-center border-none`}>
+                                <cat.icon className={`${cat.color}`} size="small" />
                             </div>
-                            <span className="text-sm font-bold text-zinc-200 tracking-tight">{cat.label}</span>
+                            <span className="text-[13px] font-medium text-zinc-300">{cat.label}</span>
                         </div>
                         <div className="text-right">
-                            <span className="text-base font-bold text-white">{formatMs(cat.value)}</span>
+                            <span className="text-[15px] font-bold text-white">{formatMs(cat.value)}</span>
                         </div>
                     </div>
                 </motion.div>
@@ -101,9 +102,8 @@ export const SessionStats = ({
           </div>
 
           {practiceCategories.length === 0 && (
-             <div className="py-12 text-center bg-white/5 rounded-lg border-none mt-6">
-                <Sparkles className="h-8 w-8 text-zinc-800 mx-auto mb-4" />
-                <p className="text-[11px] text-zinc-600 font-semibold tracking-wide">Data unavailable</p>
+             <div className="py-8 text-center bg-[#1c1c1c] rounded-xl mt-4 border border-white/5">
+                <p className="text-xs text-zinc-500 font-medium">Data unavailable</p>
              </div>
           )}
         </div>

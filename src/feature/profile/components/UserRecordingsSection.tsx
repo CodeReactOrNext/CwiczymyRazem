@@ -20,7 +20,7 @@ export const UserRecordingsSection = ({ userId }: UserRecordingsSectionProps) =>
   } = useRecordings(userId);
 
   return (
-    <div className="rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm border border-white/5">
+    <div className="rounded-2xl bg-zinc-900/30 p-6 backdrop-blur-sm">
       <div className="flex items-center gap-3 mb-8">
         <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
           <Video className="h-6 w-6 text-cyan-400" />

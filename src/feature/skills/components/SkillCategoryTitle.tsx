@@ -12,17 +12,10 @@ export const SkillCategoryTitle = ({
 }: SkillCategoryTitleProps) => (
   <h3
     className={cn(
-      "mb-6 text-center text-lg font-bold uppercase tracking-wide",
-      SKILL_CATEGORY_TEXT_COLORS[
-        category as keyof typeof SKILL_CATEGORY_TEXT_COLORS
-      ]
+      "mb-6 text-center text-lg font-bold uppercase tracking-widest text-white"
     )}>
     <span className='relative'>
       {title}
-      <span
-        className='absolute -bottom-2 left-0 h-0.5 w-full opacity-70'
-        style={{ backgroundColor: `var(--${category}-color)` }}
-      />
     </span>
   </h3>
 );

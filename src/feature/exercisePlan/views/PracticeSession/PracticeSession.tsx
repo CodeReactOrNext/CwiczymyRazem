@@ -621,7 +621,7 @@ export const PracticeSession = ({
 
   const {
     sessionPhase,
-    isMicEnabled,
+    isMicEnabled: _isMicEnabled,
     handleEnableMic, handleSkipMic,
     handleReuseCalibration, handleRecalibrate,
     handleCalibrationComplete, handleCalibrationCancel,
@@ -630,6 +630,8 @@ export const PracticeSession = ({
     setIsMicEnabled: updateMicPersistence,
     setSessionPhase,
   } = useCalibration(planHasTablature);
+
+  const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong;
 
   // Auto-init audio when mic enabled
   useEffect(() => {
@@ -700,6 +702,16 @@ export const PracticeSession = ({
     if (isPlaying) stopTimer();
     if (metronome.isPlaying) metronome.toggleMetronome();
   }, [timeLeft, isPlaying, metronome.isPlaying, stopTimer]);
+
+  // ── Hide site header during session ───────────────────────────────────────
+
+  useEffect(() => {
+    const header = document.querySelector("header.sticky") as HTMLElement | null;
+    if (header) header.style.display = "none";
+    return () => {
+      if (header) header.style.display = "";
+    };
+  }, []);
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
@@ -824,7 +836,7 @@ export const PracticeSession = ({
             metronome={metronome}
             effectiveBpm={effectiveBpm}
             isMicEnabled={isMicEnabled}
-            toggleMic={async () => { if (isListening) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
+            toggleMic={async () => { if (isMicEnabled) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
             gameState={gameState}
             maxPossibleScore={maxPossibleScore}
             sessionAccuracy={sessionAccuracy}
@@ -862,7 +874,7 @@ export const PracticeSession = ({
       )}
 
       {/* ── Desktop view ──────────────────────────────────────────────────── */}
-      <div className={cn("font-openSans min-h-screen bg-zinc-950 relative overflow-hidden", isMobileView && "hidden")}>
+      <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", reportResult ? "overflow-y-auto" : "overflow-hidden", isMobileView && "hidden")}>
 
         {/* Background ambiance glows */}
         {!reportResult && (
@@ -890,7 +902,7 @@ export const PracticeSession = ({
         <TooltipProvider>
           <div>
             <div className={cn(
-              "mx-auto max-w-8xl px-6 pb-64 pt-4 relative z-10",
+              "mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10",
               reportResult && "max-w-7xl px-4 pt-8"
             )}>
 
@@ -1076,93 +1088,110 @@ export const PracticeSession = ({
                     />
                   </div>
 
-                  {/* 4. Instructions / Tips + Sidebar */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
-                    <div className="lg:col-span-8 space-y-8">
-                      <Accordion
-                        type="single"
-                        collapsible
-                        defaultValue={
-                          activeExercise.instructions?.length > 0 ? "instructions"
-                          : activeExercise.tips?.length > 0 ? "tips"
-                          : undefined
-                        }
-                        className="w-full space-y-4"
-                      >
-                        {activeExercise.instructions && activeExercise.instructions.length > 0 && (
-                          <AccordionItem value="instructions" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
-                            <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
-                              <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
-                                  <FaInfoCircle />
-                                </div>
-                                <span className="font-bold tracking-wide">{t("exercises:instructions")}</span>
+                  {/* 4. Controls & Instructions */}
+                  {/* 4. Controls & Instructions */}
+                  {/* 4. Controls & Instructions */}
+                  {(() => {
+                    const instructionsNode = activeExercise.instructions && activeExercise.instructions.length > 0 && (
+                      <Accordion type="single" collapsible defaultValue="instructions" className="w-full">
+                        <AccordionItem value="instructions" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
+                          <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
+                                <FaInfoCircle />
                               </div>
-                            </AccordionTrigger>
-                            <AccordionContent className="px-6 pb-6 pt-2">
-                              <div className={cn(
-                                "prose prose-invert max-w-none",
-                                currentExercise.isPlayalong && "text-sm leading-relaxed opacity-70"
-                              )}>
-                                {activeExercise.instructions.map((instruction, idx) => (
-                                  <p key={idx} className="mb-4 last:mb-0">{instruction}</p>
-                                ))}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        )}
-
-                        {activeExercise.tips && activeExercise.tips.length > 0 && (
-                          <AccordionItem value="tips" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
-                            <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
-                              <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
-                                  <FaLightbulb />
-                                </div>
-                                <span className="font-bold tracking-wide">{t("exercises:hints")}</span>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent className="px-6 pb-6 pt-2">
-                              <ul className={cn(
-                                "list-inside list-disc",
-                                currentExercise.isPlayalong ? "space-y-1 text-sm" : "space-y-2"
-                              )}>
-                                {activeExercise.tips.map((tip, idx) => (
-                                  <li key={idx} className="marker:text-amber-500/50">{tip}</li>
-                                ))}
-                              </ul>
-                            </AccordionContent>
-                          </AccordionItem>
-                        )}
+                              <span className="font-bold tracking-wide">{t("exercises:instructions")}</span>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-6 pb-6 pt-2">
+                            <div className={cn(
+                              "prose prose-invert max-w-none",
+                              currentExercise.isPlayalong && "text-sm leading-relaxed opacity-70"
+                            )}>
+                              {activeExercise.instructions.map((instruction, idx) => (
+                                <p key={idx} className="mb-4 last:mb-0">{instruction}</p>
+                              ))}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
                       </Accordion>
-                    </div>
+                    );
 
-                    <SessionSidebar
-                      currentExercise={currentExercise}
-                      activeExercise={activeExercise}
-                      metronome={metronome}
-                      effectiveBpm={effectiveBpm}
-                      isMetronomeMuted={isMetronomeMuted}
-                      setIsMetronomeMuted={setIsMetronomeMuted}
-                      isHalfSpeed={isHalfSpeed}
-                      setIsHalfSpeed={handleHalfSpeedToggle}
-                      isAudioMuted={isAudioMuted}
-                      setIsAudioMuted={setIsAudioMuted}
-                      saveGuitarPlaybackPreference={saveGuitarPlaybackPreference}
-                      soundfontsReady={soundfontsReady}
-                      isMicEnabled={isMicEnabled}
-                      showMicControls={planHasTablature || planHasGpFile || planHasStrumming}
-                      toggleMic={async () => { if (isListening) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
-                      setSessionPhase={setSessionPhase}
-                      audioTracks={audioTracks}
-                      trackConfigs={trackConfigs}
-                      setTrackConfigs={setTrackConfigs}
-                      bpmStages={bpmStages}
-                      completedBpms={completedBpms}
-                      isBpmLoading={isBpmLoading}
-                      onBpmToggle={handleToggleBpm}
-                    />
-                  </div>
+                    const tipsNode = activeExercise.tips && activeExercise.tips.length > 0 && (
+                      <Accordion type="single" collapsible defaultValue="tips" className="w-full">
+                        <AccordionItem value="tips" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
+                          <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
+                                <FaLightbulb />
+                              </div>
+                              <span className="font-bold tracking-wide">{t("exercises:hints")}</span>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-6 pb-6 pt-2">
+                            <ul className={cn(
+                              "list-inside list-disc",
+                              currentExercise.isPlayalong ? "space-y-1 text-sm" : "space-y-2"
+                            )}>
+                              {activeExercise.tips.map((tip, idx) => (
+                                <li key={idx} className="marker:text-amber-500/50">{tip}</li>
+                              ))}
+                            </ul>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    );
+
+                    return (
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12 w-full max-w-[1800px] mx-auto items-start">
+                        {currentExercise.metronomeSpeed ? (
+                          <div className="w-full flex flex-col gap-6 lg:col-span-4">
+                            {instructionsNode}
+                            {tipsNode}
+                          </div>
+                        ) : (
+                          <>
+                            {instructionsNode && (
+                              <div className={cn("w-full flex flex-col", !activeExercise.tips?.length ? "lg:col-span-9" : "lg:col-span-5")}>
+                                {instructionsNode}
+                              </div>
+                            )}
+                            {tipsNode && (
+                              <div className={cn("w-full flex flex-col", !activeExercise.instructions?.length ? "lg:col-span-9" : "lg:col-span-4")}>
+                                {tipsNode}
+                              </div>
+                            )}
+                          </>
+                        )}
+
+                        <SessionSidebar
+                          currentExercise={currentExercise}
+                          activeExercise={activeExercise}
+                          metronome={metronome}
+                          effectiveBpm={effectiveBpm}
+                          isMetronomeMuted={isMetronomeMuted}
+                          setIsMetronomeMuted={setIsMetronomeMuted}
+                          isHalfSpeed={isHalfSpeed}
+                          setIsHalfSpeed={handleHalfSpeedToggle}
+                          isAudioMuted={isAudioMuted}
+                          setIsAudioMuted={setIsAudioMuted}
+                          saveGuitarPlaybackPreference={saveGuitarPlaybackPreference}
+                          soundfontsReady={soundfontsReady}
+                          isMicEnabled={isMicEnabled}
+                          showMicControls={planHasTablature || planHasGpFile || planHasStrumming}
+                          toggleMic={async () => { if (isMicEnabled) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
+                          setSessionPhase={setSessionPhase}
+                          audioTracks={audioTracks}
+                          trackConfigs={trackConfigs}
+                          setTrackConfigs={setTrackConfigs}
+                          bpmStages={bpmStages}
+                          completedBpms={completedBpms}
+                          isBpmLoading={isBpmLoading}
+                          onBpmToggle={handleToggleBpm}
+                        />
+                      </div>
+                    );
+                  })()}
 
                   {/* 5. Bottom bar */}
                   {!reportResult && (

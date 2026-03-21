@@ -44,24 +44,24 @@ export const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
   const colors = getSkillColor(title);
 
   return (
-    <div className='flex items-center justify-between rounded-lg border border-second-400/25 bg-second-500/25 p-5 font-openSans transition-all duration-200 hover:border-second-400/40 hover:bg-second-500/40'>
+    <div className='flex items-center justify-between rounded-xl bg-zinc-900/40 p-4 font-openSans transition-all duration-200'>
       <div className='flex items-center gap-3'>
-        <div className={`h-3 w-3 rounded-full ${colors.dot} shadow-sm`}></div>
+        <div className={`h-2 w-2 rounded-full ${colors.dot} shadow-[0_0_8px_currentColor] opacity-80`}></div>
         <div>
-          <p className='text-sm font-semibold text-white'>{title}</p>
-          <p className={`text-xs font-medium ${colors.text}`}>{value}</p>
+          <p className='text-[11px] font-semibold uppercase tracking-widest text-zinc-300'>{title}</p>
+          <p className={`text-xs font-semibold tabular-nums ${colors.text}`}>{value}</p>
         </div>
       </div>
 
       <div className='ml-4 flex items-center gap-4'>
-        <div className='h-2.5 w-56 overflow-hidden rounded-full bg-second-400/30'>
+        <div className='h-1.5 w-48 overflow-hidden rounded-full bg-zinc-800'>
           <div
             className={`h-full ${colors.accent} rounded-full shadow-sm transition-all duration-500 ease-out`}
             style={{ width: percentValue + "%" }}
           />
         </div>
         <span
-          className={`text-base font-bold text-white min-w-[3.5rem] text-right`}>
+          className={`min-w-[3.5rem] text-right text-sm font-bold tabular-nums text-white`}>
           {percentValue}%
         </span>
       </div>
