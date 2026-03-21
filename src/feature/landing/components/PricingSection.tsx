@@ -9,7 +9,6 @@ const FEATURES: { label: string; pro: boolean; master: boolean }[] = [
   { label: "Practice Calendar",          pro: true,  master: true  },
   { label: "Guitar Pro File Support",    pro: true,  master: true  },
   { label: "Full Exercise Library",      pro: true,  master: true  },
-  { label: "Special Ranks",             pro: true,  master: true  },
   { label: "Skill Roadmaps",            pro: false, master: true  },
   { label: "Daily Practice Insights",   pro: false, master: true  },
   { label: "Weekly Progress Summary",   pro: false, master: true  },
@@ -42,7 +41,7 @@ export const PricingSection = () => {
             <div className="mb-8">
               <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">🎸 Practice Pro</p>
               <div className="flex items-end gap-2 mb-3">
-                <span className="text-5xl font-bold text-white tracking-tight">€4.99</span>
+                <span className="text-5xl font-bold text-white tracking-tight">€3.99</span>
                 <span className="text-zinc-500 mb-1.5">/ month</span>
               </div>
               <p className="text-sm text-zinc-500 leading-relaxed">
@@ -80,7 +79,7 @@ export const PricingSection = () => {
                 </span>
               </div>
               <div className="flex items-end gap-2 mb-3">
-                <span className="text-5xl font-bold text-white tracking-tight">€7.99</span>
+                <span className="text-5xl font-bold text-white tracking-tight">€6.99</span>
                 <span className="text-zinc-500 mb-1.5">/ month</span>
               </div>
               <p className="text-sm text-zinc-500 leading-relaxed">
