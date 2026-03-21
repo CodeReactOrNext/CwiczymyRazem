@@ -16,7 +16,7 @@ export const ExerciseProgress = ({
   onExerciseSelect,
 }: ExerciseProgressProps) => {
   return (
-    <div className='w-full max-w-4xl mx-auto py-4 px-1'>
+    <div className='w-full max-w-none py-4 px-1'>
       <div className="flex items-center justify-between mb-2 px-1">
           <span className="text-[12px] font-bold text-white tracking-wide">
             Session Progress

@@ -55,15 +55,15 @@ export function SkillBalance({ activityData = [] }: SkillBalanceProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 1.0 }}>
-      <Card className='border-none bg-zinc-900/50 backdrop-blur-xl rounded-lg h-full'>
-        <div className='p-8'>
-          <h3 className='mb-6 text-sm font-semibold text-zinc-400'>
-            Skill Balance — Last 7 Days
+      <Card className='bg-zinc-900 border border-white/5 rounded-2xl h-full shadow-none'>
+        <div className='p-6'>
+          <h3 className='mb-4 text-[11px] font-semibold text-zinc-500 uppercase tracking-widest'>
+            Skill Balance
           </h3>
           <div className="flex items-center justify-center">
             <ChartContainer
               config={chartConfig}
-              className="mx-auto aspect-square max-h-[220px] w-full"
+              className="mx-auto aspect-square max-h-[190px] w-full"
             >
               <RadarChart data={chartData}>
                 <ChartTooltip
@@ -87,15 +87,15 @@ export function SkillBalance({ activityData = [] }: SkillBalanceProps) {
                      return null;
                   }}
                 />
-                <PolarGrid stroke="rgba(255,255,255,0.05)" />
+                <PolarGrid stroke="rgba(255,255,255,0.15)" />
                 <PolarAngleAxis
                   dataKey="skill"
-                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700 }}
+                  tick={{ fill: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 600 }}
                 />
                 <Radar
                   dataKey="time"
                   fill="rgb(6, 182, 212)"
-                  fillOpacity={0.3}
+                  fillOpacity={0.4}
                   stroke="rgb(6, 182, 212)"
                   strokeWidth={2}
                 />

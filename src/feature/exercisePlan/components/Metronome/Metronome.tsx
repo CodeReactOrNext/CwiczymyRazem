@@ -2,149 +2,164 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
-import { Minus, Plus, Volume2, VolumeX } from "lucide-react";
-import { useState } from "react";
-import { FaPause, FaPlay } from "react-icons/fa";
-
-
+import { Gauge, Minus, Plus, Volume2, VolumeX } from "lucide-react";
+import { useRef, useState } from "react";
 
 interface MetronomeProps {
-  metronome: any; // The object from useDeviceMetronome
-  showStartStop?: boolean;
+  metronome: any;
   isMuted?: boolean;
   onMuteToggle?: (muted: boolean) => void;
-  // Fallbacks for specific values if needed, though metronome should have them
-  recommendedBpm?: number;
   isHalfSpeed?: boolean;
   onHalfSpeedToggle?: (value: boolean) => void;
 }
 
+const getTempoColor = (bpm: number) => {
+  if (bpm < 80)  return "text-emerald-400";
+  if (bpm < 120) return "text-amber-400";
+  return "text-red-400";
+};
+
+const getSliderTrackColor = (bpm: number) => {
+  if (bpm < 80)  return "[&_[data-slot=slider-range]]:bg-emerald-500";
+  if (bpm < 120) return "[&_[data-slot=slider-range]]:bg-amber-500";
+  return "[&_[data-slot=slider-range]]:bg-red-500";
+};
+
 export const Metronome = ({
   metronome,
-  showStartStop = true,
   isMuted = false,
   onMuteToggle,
-  recommendedBpm: propsRecommendedBpm,
   isHalfSpeed = false,
   onHalfSpeedToggle
 }: MetronomeProps) => {
   const bpm = metronome.bpm;
-  const isPlaying = metronome.isPlaying;
   const setBpm = metronome.setBpm;
-  const toggleMetronome = metronome.toggleMetronome;
-  const recommendedBpm = propsRecommendedBpm || metronome.recommendedBpm;
   const minBpm = metronome.minBpm;
   const maxBpm = metronome.maxBpm;
-  const handleSetRecommendedBpm = metronome.handleSetRecommendedBpm;
 
-  const effectiveIsMuted = isMuted;
+  const [isEditingBpm, setIsEditingBpm] = useState(false);
+  const [bpmInput, setBpmInput] = useState("");
+  const bpmInputRef = useRef<HTMLInputElement>(null);
 
-  const handleMuteToggle = () => {
-    if (onMuteToggle) {
-      onMuteToggle(!effectiveIsMuted);
-    }
+  const handleBpmClick = () => {
+    setBpmInput(String(bpm));
+    setIsEditingBpm(true);
+    setTimeout(() => bpmInputRef.current?.select(), 0);
   };
 
+  const commitBpmInput = () => {
+    const parsed = parseInt(bpmInput, 10);
+    if (!isNaN(parsed)) {
+      setBpm(Math.min(maxBpm, Math.max(minBpm, parsed)));
+    }
+    setIsEditingBpm(false);
+  };
+
+  const tempoColor = getTempoColor(bpm);
+
   return (
-    <Card className='overflow-hidden rounded-xl border bg-card/80 p-4 shadow-md'>
-      <div className='mb-6 flex items-center justify-between'>
-        <h3 className='text-sm font-medium'>Metronom</h3>
-        <div className='text-sm font-semibold'>
-          {bpm} BPM{isHalfSpeed && <span className="text-xs text-cyan-400 ml-1">(effective: {Math.round(bpm / 2)})</span>}
+    <Card className="relative overflow-hidden rounded-xl border-0 bg-card/80 p-4 shadow-xl backdrop-blur-sm">
+      {onHalfSpeedToggle && (
+        <div className="absolute left-3 top-3">
+          <button
+            onClick={() => onHalfSpeedToggle(!isHalfSpeed)}
+            className={cn(
+              "flex items-center gap-1.5 rounded-sm px-2 py-1.5 transition-all",
+              isHalfSpeed
+                ? "bg-cyan-400 text-black shadow-[0_0_15px_rgba(34,211,238,0.8)]"
+                : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+            )}
+            title="Half Speed"
+          >
+            <Gauge className="h-4 w-4 shrink-0" strokeWidth={2.5} />
+            <span className="text-[11px] font-bold tracking-wider">0.5x</span>
+          </button>
         </div>
+      )}
+
+      <div className="absolute right-3 top-3">
+        <button
+          onClick={() => onMuteToggle?.(!isMuted)}
+          className={cn(
+            "rounded-sm p-2 transition-colors",
+            isMuted 
+              ? "text-zinc-400 hover:text-zinc-200 bg-zinc-800/50 hover:bg-zinc-800"
+              : "text-cyan-400 hover:text-cyan-200 bg-cyan-500/10 hover:bg-cyan-500/20"
+          )}
+          title={isMuted ? "Unmute" : "Mute"}
+        >
+          {isMuted ? <VolumeX className="h-5 w-5" strokeWidth={2.5} /> : <Volume2 className="h-5 w-5" strokeWidth={2.5} />}
+        </button>
       </div>
 
-      <div className='mb-4'>
-        <div className='flex items-center gap-3 mb-3'>
+      <div className="flex flex-col items-center justify-center py-4 mt-2">
+        {isEditingBpm ? (
+          <input
+            ref={bpmInputRef}
+            type="number"
+            value={bpmInput}
+            min={minBpm}
+            max={maxBpm}
+            onChange={(e) => setBpmInput(e.target.value)}
+            onBlur={commitBpmInput}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commitBpmInput();
+              if (e.key === "Escape") setIsEditingBpm(false);
+            }}
+            className="w-28 bg-zinc-900/50 rounded-sm px-2 py-1 text-center text-5xl font-black text-cyan-400 outline-none ring-2 ring-cyan-500 tabular-nums"
+          />
+        ) : (
+          <button
+            onClick={handleBpmClick}
+            className={cn("text-5xl font-black tabular-nums transition-transform hover:scale-105 active:scale-95 cursor-pointer select-none underline decoration-dashed underline-offset-4 decoration-white/20 hover:decoration-white/50", tempoColor)}
+            title="Click to edit BPM"
+          >
+            {bpm}
+          </button>
+        )}
+        <span className="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 select-none">
+          {isEditingBpm ? "↵ to confirm" : "BPM · click to edit"}
+        </span>
+      </div>
+
+      <div className="mt-2 flex flex-col gap-2">
+        <div className="flex items-center gap-3">
           <Button
-            variant="outline"
-            size="sm"
-            className="h-8 w-8 p-0 shrink-0"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0 rounded-sm bg-zinc-800/40 hover:bg-zinc-700/80 text-zinc-100 hover:text-white transition-colors"
             onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
             disabled={bpm <= minBpm}
           >
-            <Minus className="h-3.5 w-3.5" />
+            <Minus className="h-5 w-5" strokeWidth={2.5} />
           </Button>
-          <Slider
-            value={[bpm]}
-            min={minBpm}
-            max={maxBpm}
-            step={1}
-            onValueChange={(value) => setBpm(value[0])}
-            className='py-2'
-          />
+
+          <div className="flex-1 flex flex-col gap-1">
+            <Slider
+              value={[bpm]}
+              min={minBpm}
+              max={maxBpm}
+              step={1}
+              onValueChange={(value) => setBpm(value[0])}
+              className={cn("py-2 cursor-pointer", getSliderTrackColor(bpm))}
+            />
+            <div className="flex items-center justify-between px-1 text-[10px] font-bold text-zinc-600 select-none">
+              <span>{minBpm}</span>
+              <span>{maxBpm}</span>
+            </div>
+          </div>
+
           <Button
-            variant="outline"
-            size="sm"
-            className="h-8 w-8 p-0 shrink-0"
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0 rounded-sm bg-zinc-800/40 hover:bg-zinc-700/80 text-zinc-100 hover:text-white transition-colors"
             onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
             disabled={bpm >= maxBpm}
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-5 w-5" strokeWidth={2.5} />
           </Button>
-        </div>
-        <div className='flex items-center justify-between text-xs text-muted-foreground'>
-          <span>{minBpm}</span>
-          <span>{maxBpm}</span>
         </div>
       </div>
-
-      <div className='flex justify-between items-center'>
-        <div className="flex items-center gap-2">
-          {showStartStop && (
-            <Button
-              variant={isPlaying ? "destructive" : "default"}
-              size='sm'
-              onClick={toggleMetronome}
-              className="gap-2"
-            >
-              {isPlaying ? <FaPause /> : <FaPlay />}
-              {isPlaying ? "Stop" : "Start"}
-            </Button>
-          )}
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleMuteToggle}
-            className={cn(
-               "w-9 px-0",
-               effectiveIsMuted ? "text-zinc-500" : "text-cyan-400"
-            )}
-          >
-            {effectiveIsMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-          </Button>
-        </div>
-
-        {recommendedBpm !== bpm && (
-          <Button
-            variant='ghost'
-            size='sm'
-            onClick={handleSetRecommendedBpm}
-            aria-label={`Set recommended tempo (${recommendedBpm} BPM)`}
-            tabIndex={0}>
-            Recommended ({recommendedBpm})
-          </Button>
-        )}
-      </div>
-
-      {onHalfSpeedToggle && (
-        <div className="mt-3 pt-3 border-t border-white/5">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "w-full gap-2 text-xs font-bold uppercase tracking-widest transition-all",
-              isHalfSpeed
-                ? "text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 hover:text-cyan-300"
-                : "text-zinc-500 hover:text-zinc-400"
-            )}
-            onClick={() => onHalfSpeedToggle(!isHalfSpeed)}
-          >
-            1/2x Half Speed
-          </Button>
-        </div>
-      )}
     </Card>
   );
 };

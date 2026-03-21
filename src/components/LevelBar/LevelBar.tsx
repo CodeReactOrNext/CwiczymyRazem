@@ -80,44 +80,16 @@ export const LevelBar = ({
           </div>
         )}
 
-        {/* Segments Container */}
-        <div className={cn("flex items-center justify-between gap-1", !isMini && "sm:gap-1.5")}>
-          {Array.from({ length: totalSegments }, (_, index) => {
-            let segmentFill = 0;
-
-            if (index < filledSegments) {
-              segmentFill = 100; // Fully filled
-            } else if (index === filledSegments && partialSegment > 0) {
-              segmentFill = partialSegment * 100; // Partially filled
-            }
-
-            const isFilled = segmentFill > 0;
-
-            return (
-              <div
-                key={index}
-                className={cn(
-                  "relative h-2.5 flex-1 overflow-hidden rounded-md border transition-all duration-500 shadow-inner sm:h-3.5",
-                  isFilled ? "border-cyan-400/30 bg-zinc-900/40" : "border-white/5 bg-zinc-900/60"
-                )}>
-                {/* Segment fill with glow and premium gradient */}
-                <div
-                  className={cn(
-                    'h-full bg-gradient-to-r from-cyan-600 via-cyan-400 to-cyan-500 transition-all duration-700 ease-out relative',
-                    isFilled && "shadow-[0_0_15px_rgba(34,211,238,0.3)]"
-                  )}
-                  style={{ width: `${segmentFill}%` }}>
-                  {/* Glossy overlay */}
-                  <div className='absolute inset-0 bg-gradient-to-b from-white/20 to-transparent'></div>
-                  
-                  {/* Active segment edge highlight */}
-                  {segmentFill > 0 && segmentFill < 100 && (
-                    <div className='absolute right-0 top-0 bottom-0 w-px bg-white/40 blur-[1px]'></div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        {/* Continuous Progress Bar */}
+        <div className={cn("relative overflow-hidden rounded-md border border-white/5 bg-zinc-900/60 shadow-inner", isMini ? "h-1.5" : "h-2")}>
+          <div
+            className='absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-600 via-cyan-400 to-cyan-500 transition-all duration-700 ease-out shadow-[0_0_15px_rgba(34,211,238,0.5)]'
+            style={{ width: `${progressPercent}%` }}>
+            <div className='absolute inset-0 bg-gradient-to-b from-white/20 to-transparent'></div>
+            {progressPercent > 0 && progressPercent < 100 && (
+              <div className='absolute right-0 top-0 bottom-0 w-px bg-white/40 blur-[1px]'></div>
+            )}
+          </div>
         </div>
 
         {/* Stats - Hidden on mobile if redundant */}

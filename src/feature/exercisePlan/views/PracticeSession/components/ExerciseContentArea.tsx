@@ -202,18 +202,20 @@ export const ExerciseContentArea = ({
         </div>
       ) : currentExercise.isPlayalong && currentExercise.youtubeVideoId ? (
         !isMobileView && (
-          <YouTubePlayalong
-            videoId={currentExercise.youtubeVideoId}
-            isPlaying={isPlaying}
-            onEnd={onVideoEnd}
-            onReady={(duration) => setVideoDuration(duration)}
-            onSeek={(time) => setTimerTime(time * 1000)}
-            onProgressUpdate={(currentTime) => setTimerTime(currentTime * 1000)}
-            onStateChange={(state) => {
-              if (state === 1) startTimer();
-              if (state === 2) stopTimer();
-            }}
-          />
+          <div className="w-full max-w-6xl mx-auto">
+            <YouTubePlayalong
+              videoId={currentExercise.youtubeVideoId}
+              isPlaying={isPlaying}
+              onEnd={onVideoEnd}
+              onReady={(duration) => setVideoDuration(duration)}
+              onSeek={(time) => setTimerTime(time * 1000)}
+              onProgressUpdate={(currentTime) => setTimerTime(currentTime * 1000)}
+              onStateChange={(state) => {
+                if (state === 1) startTimer();
+                if (state === 2) stopTimer();
+              }}
+            />
+          </div>
         )
       ) : currentExercise.videoUrl ? (
         <div className="aspect-video w-full">

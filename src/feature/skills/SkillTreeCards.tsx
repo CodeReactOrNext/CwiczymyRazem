@@ -71,14 +71,14 @@ export const SkillTreeCards = ({
   };
   return (
     <div className='mb-12 font-openSans'>
-      <div className='mb-4 flex items-center justify-between'>
-        <h2 className='text-lg font-semibold text-white'>
-          {t("skill_categories")}
-        </h2>
-        {!isUserProfile && (
+      {!isUserProfile && (
+        <div className='mb-4 flex items-center justify-between'>
+          <h2 className='text-lg font-semibold text-white'>
+            {t("skill_categories")}
+          </h2>
           <p className='text-xs text-gray-400'>{t("categories_description")}</p>
-        )}
-      </div>
+        </div>
+      )}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

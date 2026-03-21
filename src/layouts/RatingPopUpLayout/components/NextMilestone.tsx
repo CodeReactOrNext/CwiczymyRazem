@@ -16,25 +16,24 @@ export function NextMilestone({ currentUserStats }: NextMilestoneProps) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.7 }}>
-      <Card className='border-none bg-zinc-900/40 backdrop-blur-xl rounded-lg h-full'>
+      transition={{ duration: 0.5, delay: 0.7 }}
+      className="h-full">
+      <Card className='bg-zinc-900 border border-white/5 rounded-2xl h-full shadow-none'>
         <div className='p-6 flex flex-col justify-center h-full'>
-          <div className='mb-4 flex items-center gap-3'>
-            <div className="h-8 w-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                <Flame className='h-4 w-4 text-amber-500' />
-            </div>
-            <h3 className='text-sm font-semibold text-zinc-400'>Streak</h3>
+          <div className='mb-4 flex items-center gap-2'>
+            <Flame className='h-4 w-4 text-orange-500' />
+            <h3 className='text-[11px] font-semibold text-zinc-500 uppercase tracking-widest'>Streak</h3>
           </div>
 
           <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-4xl font-bold text-white">{currentStreakCount}</span>
-            <span className="text-xs font-bold text-zinc-500 tracking-tight">days</span>
+            <span className="text-4xl font-bold text-white tracking-tight">{currentStreakCount}</span>
+            <span className="text-[11px] font-semibold text-zinc-500 tracking-widest uppercase">days</span>
           </div>
 
           {multiplier > 0 && (
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs font-bold text-amber-400">+{Math.round(multiplier * 100)}% XP</span>
-              <span className="text-[10px] font-bold text-zinc-600">bonus</span>
+              <span className="text-[11px] font-bold text-orange-400">+{Math.round(multiplier * 100)}% XP</span>
+              <span className="text-[10px] font-bold text-zinc-600 uppercase">bonus</span>
             </div>
           )}
         </div>
