@@ -1,7 +1,5 @@
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
-import { SkillCategoryTitle } from "feature/skills/components/SkillCategoryTitle";
-import { SkillsList } from "feature/skills/components/SkillsList";
 import { SKILL_CATEGORY_ICONS } from "feature/skills/constants/skillIcons";
 import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import { motion } from "framer-motion";
@@ -25,130 +23,74 @@ export const SkillCategoryCard = ({
   skills,
   userSkills,
   index,
-  totalLevels,
-  progressColorClass,
-  onSkillUpgrade,
 }: SkillCategoryCardProps) => {
   const { t } = useTranslation();
-  const POINTS_PER_LEVEL = 10;
 
-  const CategoryIcon =
-    SKILL_CATEGORY_ICONS[category as keyof typeof SKILL_CATEGORY_ICONS];
-
-  const calculatedTotalPoints = skills.reduce(
-    (sum, skill) => sum + (userSkills.unlockedSkills[skill.id] || 0),
-    0
+  const CategoryIcon = SKILL_CATEGORY_ICONS[category as keyof typeof SKILL_CATEGORY_ICONS];
+  
+  // Only get unlocked skills
+  const unlockedSkills = skills.filter(
+    (skill) => (userSkills.unlockedSkills[skill.id] || 0) > 0
   );
-  const displayTotalLevels = totalLevels ?? calculatedTotalPoints;
-
-  const categoryLevel = Math.floor(displayTotalLevels / POINTS_PER_LEVEL);
 
   const getCategoryColors = () => {
     switch (category) {
-      case "technique":
-        return {
-          border: "border-red-500/20",
-          iconBg: "bg-red-500/10",
-          iconText: "text-red-400",
-          progress: "bg-red-500",
-          glow: "from-red-500/5",
-        };
-      case "theory":
-        return {
-          border: "border-blue-500/20",
-          iconBg: "bg-blue-500/10",
-          iconText: "text-blue-400",
-          progress: "bg-blue-500",
-          glow: "from-blue-500/5",
-        };
-      case "hearing":
-        return {
-          border: "border-emerald-500/20",
-          iconBg: "bg-emerald-500/10",
-          iconText: "text-emerald-400",
-          progress: "bg-emerald-500",
-          glow: "from-emerald-500/5",
-        };
-      case "creativity":
-        return {
-          border: "border-purple-500/20",
-          iconBg: "bg-purple-500/10",
-          iconText: "text-purple-400",
-          progress: "bg-purple-500",
-          glow: "from-purple-500/5",
-        };
-      default:
-        return {
-          border: "border-zinc-500/20",
-          iconBg: "bg-zinc-500/10",
-          iconText: "text-zinc-400",
-          progress: "bg-zinc-500",
-          glow: "from-zinc-500/5",
-        };
+      case "technique": return "text-red-400 bg-red-400/10 shadow-[0_0_10px_rgba(248,113,113,0.1)] border border-red-500/10";
+      case "theory": return "text-blue-400 bg-blue-400/10 shadow-[0_0_10px_rgba(96,165,250,0.1)] border border-blue-500/10";
+      case "hearing": return "text-emerald-400 bg-emerald-400/10 shadow-[0_0_10px_rgba(52,211,153,0.1)] border border-emerald-500/10";
+      case "creativity": return "text-purple-400 bg-purple-400/10 shadow-[0_0_10px_rgba(192,132,252,0.1)] border border-purple-500/10";
+      default: return "text-zinc-400 bg-zinc-400/10 shadow-[0_0_10px_rgba(161,161,170,0.1)] border border-zinc-500/10";
     }
   };
-
-  const colors = getCategoryColors();
-  const progressColor = progressColorClass || colors.progress;
 
   return (
     <motion.div
       initial={{ y: 10, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: index * 0.1 }}
-      className={cn(
-        "relative rounded-2xl border bg-zinc-900/40 p-6 backdrop-blur-sm transition-all duration-300",
-        "hover:border-white/10",
-        colors.border
-      )}>
-      <div className={cn("absolute inset-0 rounded-2xl bg-gradient-to-br opacity-50", colors.glow, "to-transparent")}></div>
-
-      <div className="relative z-10 space-y-4">
-        <div className="flex items-start justify-between">
-          <div className={cn("rounded-xl p-3", colors.iconBg)}>
-            <CategoryIcon className={cn("h-6 w-6", colors.iconText)} />
+      className="relative rounded-2xl border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-sm transition-all duration-300 hover:border-white/10 hover:bg-zinc-900/60"
+    >
+      <div className="flex flex-col h-full gap-6">
+        {/* Header */}
+        <div className="flex items-center gap-4 border-b border-white/5 pb-5">
+          <div className={cn("rounded-xl p-2.5 flex items-center justify-center", getCategoryColors())}>
+            <CategoryIcon className="h-5 w-5" />
           </div>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-100">
+            {t(`skills:categories.${category}` as any)}
+          </h3>
+        </div>
 
-          <div className="flex items-center gap-2">
-       
-            <div className={cn("rounded-lg border px-3 py-1", colors.border, colors.iconBg)}>
-              <span className={cn("text-sm font-bold", colors.iconText)}>
-                {categoryLevel}
-              </span>
+        {/* Minimal Unlocked Skills List */}
+        <div className="flex-1">
+          {unlockedSkills.length > 0 ? (
+            <div className="flex flex-col gap-2">
+              {unlockedSkills.map((skill) => {
+                const level = userSkills.unlockedSkills[skill.id] || 0;
+                return (
+                  <div
+                    key={skill.id}
+                    className="flex w-full items-center justify-between gap-2 px-3 py-2 rounded-lg bg-zinc-800/40 border border-white/5 transition-colors hover:border-white/10 group"
+                  >
+                    <div className="flex items-center gap-2">
+                      {skill.icon && <skill.icon className="h-3.5 w-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors" />}
+                      <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-400 group-hover:text-zinc-300 transition-colors">
+                        {t(`skills:skills.${skill.id}.name` as any)}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-zinc-500 tabular-nums bg-white/5 px-2 py-0.5 rounded-sm shrink-0">
+                      LVL {level}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-          </div>
+          ) : (
+            <p className="text-[11px] text-zinc-600 font-semibold tracking-wide flex items-center h-full">
+              No skills unlocked yet.
+            </p>
+          )}
         </div>
-
-        <SkillCategoryTitle
-          category={category}
-          title={t(`skills:categories.${category}` as any)}
-        />
-
-        <div className="space-y-2">
-          <div className="flex justify-between text-xs">
-            <span className="text-zinc-400">{t("skills:progress" as any)}</span>
-            <span className="font-medium text-white">
-              {displayTotalLevels % POINTS_PER_LEVEL} / {POINTS_PER_LEVEL}
-            </span>
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-black/40">
-            <div
-              className={cn("h-full rounded-full transition-all duration-500", progressColor)}
-              style={{
-                width: `${
-                  (displayTotalLevels % POINTS_PER_LEVEL) *
-                  (100 / POINTS_PER_LEVEL)
-                }%`,
-              }}></div>
-          </div>
-        </div>
-
-        <SkillsList
-          skills={skills}
-          userSkills={userSkills}
-          category={category}
-          onSkillUpgrade={onSkillUpgrade || (() => {})}
-        />
       </div>
     </motion.div>
   );

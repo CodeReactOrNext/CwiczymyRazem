@@ -739,10 +739,8 @@ const SessionModal = ({
                   <div className='mb-6'>
                     <Metronome
                       metronome={metronome}
-                      showStartStop={!currentExercise.tablature || currentExercise.tablature.length === 0}
                       isMuted={isMetronomeMuted}
                       onMuteToggle={setIsMetronomeMuted}
-                      recommendedBpm={currentExercise.metronomeSpeed.recommended}
                       isHalfSpeed={isHalfSpeed}
                       onHalfSpeedToggle={onHalfSpeedToggle}
                     />

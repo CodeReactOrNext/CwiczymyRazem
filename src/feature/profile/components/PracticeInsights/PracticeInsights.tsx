@@ -12,7 +12,7 @@ export const PracticeInsights = ({ statistics }: PracticeInsightsProps) => {
 
   if (!statistics) {
     return (
-      <div className='rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-6 backdrop-blur-sm'>
+      <div className='rounded-xl bg-zinc-900/30 p-6 backdrop-blur-sm'>
         <h3 className='mb-2 text-xl font-bold text-white'>
           {t("practice_insights")}
         </h3>
