@@ -82,8 +82,8 @@ export function UpgradeContent() {
         body: JSON.stringify({ idToken, billing }),
       });
       const data = await res.json();
-      if (data.success) {
-        window.location.href = "/premium/success";
+      if (data.url) {
+        window.location.href = data.url;
       } else {
         setError(data.error ?? "Something went wrong. Please try again.");
         setLoading(null);
