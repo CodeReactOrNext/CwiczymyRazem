@@ -221,7 +221,7 @@ export const userSlice = createSlice({
     setActivity: (state, { payload }: PayloadAction<userSliceInitialState["currentActivity"]>) => {
       state.currentActivity = payload;
     },
-    setUserRole: (state, { payload }: PayloadAction<"admin" | "premium" | "user">) => {
+    setUserRole: (state, { payload }: PayloadAction<"admin" | "pro" | "master" | "user">) => {
       if (state.userInfo) {
         state.userInfo.role = payload;
       }

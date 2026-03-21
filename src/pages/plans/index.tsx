@@ -1,6 +1,7 @@
 import { HeroBanner } from "components/UI/HeroBanner";
 import { MyPlans } from "feature/exercisePlan/components/MyPlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
+import { PremiumGate } from "feature/premium/components/PremiumGate";
 import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
@@ -14,17 +15,19 @@ const MyPlansPage: NextPageWithLayout = () => {
   };
 
   return (
-    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
-      <HeroBanner
-        title="My Plans"
-        subtitle="Your custom practice routines"
-        eyebrow="Practice Plans"
-        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
-        buttonText="Create Plan"
-        onClick={() => router.push('/plans?view=create')}
-      />
-      <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["routines", "playalongs"]} hideLayout hideSectionHeader />
-    </div>
+    <PremiumGate feature="plans">
+      <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+        <HeroBanner
+          title="My Plans"
+          subtitle="Your custom practice routines"
+          eyebrow="Practice Plans"
+          className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
+          buttonText="Create Plan"
+          onClick={() => router.push('/plans?view=create')}
+        />
+        <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["routines", "playalongs"]} hideLayout hideSectionHeader />
+      </div>
+    </PremiumGate>
   );
 };
 

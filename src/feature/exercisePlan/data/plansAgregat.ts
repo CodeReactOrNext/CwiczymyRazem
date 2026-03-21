@@ -48,6 +48,15 @@ const difficultyOrder: Record<string, number> = {
   hard: 3,
 };
 
+// Plans available for free — all others require Pro
+const FREE_PLAN_IDS = new Set([
+  "mega_beginner_first_steps",
+  "ear_rhythm_fundamentals",
+  "daily_dexterity_starter",
+  "warm_up_15_minutes",
+  "musician_fitness_lvl1_s1",
+]);
+
 export const defaultPlans: ExercisePlan[] = [
   spiderMasterPlan,
   spiderPermutationPlan,
@@ -91,7 +100,9 @@ export const defaultPlans: ExercisePlan[] = [
   musicianFitnessLvl2S18Plan,
   musicianFitnessLvl2S19Plan,
   musicianFitnessLvl2S20Plan,
-].sort((a, b) => (difficultyOrder[a.difficulty] || 0) - (difficultyOrder[b.difficulty] || 0));
+]
+  .sort((a, b) => (difficultyOrder[a.difficulty] || 0) - (difficultyOrder[b.difficulty] || 0))
+  .map(plan => ({ ...plan, premium: !FREE_PLAN_IDS.has(plan.id) }));
 
 
 

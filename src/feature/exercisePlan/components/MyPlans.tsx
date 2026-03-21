@@ -13,7 +13,8 @@ import { useTranslation } from "hooks/useTranslation";
 import { FaPlus } from "react-icons/fa";
 import { BookOpen, Flame, Music, Zap } from "lucide-react";
 
-import { selectUserAuth } from "feature/user/store/userSlice";
+import { UpgradeModal } from "feature/premium/components/UpgradeModal";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { useRouter } from "next/router";
@@ -67,7 +68,10 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [editingPlan, setEditingPlan] = useState<ExercisePlan | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
+  const userInfo = useAppSelector(selectUserInfo);
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const router = useRouter();
   const [internalTab, setInternalTab] = useState(
     hideTabs.includes("routines") ? "my_plans" : "routines"
@@ -237,14 +241,19 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
           </div>
           
           <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-            {difficultyPlans.map((plan) => (
-              <PlanCard
-                key={plan.id}
-                plan={plan}
-                onSelect={() => onPlanSelect(plan)}
-                onStart={() => onPlanSelect(plan)}
-              />
-            ))}
+            {difficultyPlans.map((plan) => {
+              const locked = !!plan.premium && !isPremium;
+              return (
+                <PlanCard
+                  key={plan.id}
+                  plan={plan}
+                  isLocked={locked}
+                  onSelect={locked ? undefined : () => onPlanSelect(plan)}
+                  onStart={locked ? undefined : () => onPlanSelect(plan)}
+                  onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
+                />
+              );
+            })}
           </div>
         </div>
       );
@@ -338,17 +347,22 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
       </Tabs>
   );
 
+  const modal = <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />;
+
   if (hideLayout) {
-    return <div className="px-3 md:px-6">{content}</div>;
+    return <>{<div className="px-3 md:px-6">{content}</div>}{modal}</>;
   }
 
   return (
-    <ExerciseLayout
-      title={t("exercises:tabs.my_plans")}
-      subtitle="Browse routines, playalongs and your custom plans"
-      icon={<BookOpen size={18} />}
-    >
-      {content}
-    </ExerciseLayout>
+    <>
+      <ExerciseLayout
+        title={t("exercises:tabs.my_plans")}
+        subtitle="Browse routines, playalongs and your custom plans"
+        icon={<BookOpen size={18} />}
+      >
+        {content}
+      </ExerciseLayout>
+      {modal}
+    </>
   );
 };

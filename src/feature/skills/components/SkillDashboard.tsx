@@ -5,8 +5,9 @@ import { getAllBpmProgress, type BpmProgressData } from "feature/exercisePlan/se
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { UserSkills } from "feature/skills/skills.types";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { ChevronRight, Ear, Star, ChevronLeft, Mic, Trophy } from "lucide-react";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
+import { ChevronRight, Ear, Star, ChevronLeft, Mic, Trophy, Lock } from "lucide-react";
+import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 
 import { useRouter } from "next/router";
 import { FaCheck } from "react-icons/fa";
@@ -54,6 +55,9 @@ export const SkillDashboard = ({
 
   const { t } = useTranslation("skills");
   const userAuth = useAppSelector(selectUserAuth);
+  const userInfo = useAppSelector(selectUserInfo);
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [progressMap, setProgressMap] = useState<Map<string, BpmProgressData>>(new Map());
   const [activeDifficulty, setActiveDifficulty] = useState<string | null>(null);
 
@@ -272,6 +276,7 @@ export const SkillDashboard = ({
                 <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y px-6 py-4 space-y-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500">
                   {(filteredTree[Object.keys(filteredTree)[0]]?.[selectedSkillId!]?.filter(c => c.difficulty === currentDifficulty) ?? []).map((challenge) => {
                     const exerciseDef = exercisesAgregat.find(e => e.id === challenge.id);
+                    const isLocked = !!exerciseDef?.premium && !isPremium;
                     const progress = progressMap.get(challenge.id);
                     const bpmStages = exerciseDef?.metronomeSpeed ? generateBpmStages(exerciseDef.metronomeSpeed) : [];
                     const completedBpms = progress?.completedBpms || [];
@@ -291,6 +296,30 @@ export const SkillDashboard = ({
                       : currentDifficulty === 'medium'
                       ? { bar: "bg-amber-500", badge: "bg-amber-500/10 border-amber-500/20 text-amber-400" }
                       : { bar: "bg-rose-500", badge: "bg-rose-500/10 border-rose-500/20 text-rose-400" };
+
+                    if (isLocked) {
+                      return (
+                        <div
+                          key={challenge.id}
+                          onClick={() => setShowUpgradeModal(true)}
+                          className="flex rounded-xl border overflow-hidden transition-all duration-200 cursor-pointer border-amber-500/20 bg-zinc-900/20 hover:border-amber-500/35 hover:bg-zinc-900/40"
+                        >
+                          <div className="w-1 flex-shrink-0 bg-amber-500/30" />
+                          <div className="flex-1 min-w-0 px-4 py-3 flex flex-col gap-2">
+                            <div className="flex items-start justify-between gap-3">
+                              <p className="text-sm font-bold text-zinc-600 leading-snug flex-1">{challenge.title}</p>
+                              <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/25 flex-shrink-0">
+                                <Lock className="h-3 w-3 text-amber-500" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500">Pro</span>
+                              </div>
+                            </div>
+                            {challenge.description && (
+                              <p className="text-xs text-zinc-700 leading-relaxed line-clamp-2">{challenge.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
 
                     return (
                       <div
@@ -383,6 +412,8 @@ export const SkillDashboard = ({
             exerciseTitle={leaderboardExercise.title}
           />
         )}
+
+        <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </div>
   );
 };

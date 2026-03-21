@@ -156,7 +156,7 @@ export const PracticeSession = ({
   const userAvatar = useAppSelector(selectUserAvatar);
   const userInfo   = useAppSelector(selectUserInfo);
 
-  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const planHasGpFile = !!rawGpFile || plan.exercises.some(ex => !!ex.gpFileUrl);
 

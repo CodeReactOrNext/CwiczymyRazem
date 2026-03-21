@@ -1,6 +1,7 @@
 import { getUserExercisePlan } from "feature/exercisePlan/services/getUserExercisePlan";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { useRouter } from "next/router";
@@ -46,14 +47,16 @@ export default function PracticePage() {
   const [isFinishing, setIsFinishing] = useState(false);
 
   return (
-    <PracticeSession 
-      plan={plan} 
-      onClose={() => router.push("/exercises")}
-      onFinish={() => {
-        setIsFinishing(true);
-        router.push("/report");
-      }} 
-      isFinishing={isFinishing}
-    />
+    <PremiumGate feature="practice" requiredPlan="master">
+      <PracticeSession
+        plan={plan}
+        onClose={() => router.push("/exercises")}
+        onFinish={() => {
+          setIsFinishing(true);
+          router.push("/report");
+        }}
+        isFinishing={isFinishing}
+      />
+    </PremiumGate>
   );
 }

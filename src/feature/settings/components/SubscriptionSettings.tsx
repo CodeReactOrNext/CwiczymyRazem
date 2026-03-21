@@ -9,7 +9,8 @@ const SubscriptionSettings = () => {
   const userInfo = useAppSelector(selectUserInfo);
   const [loading, setLoading] = useState(false);
 
-  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
+  const planName = userInfo?.role === "master" ? "Practice Master" : userInfo?.role === "pro" ? "Practice Pro" : null;
 
   const handleManageSubscription = async () => {
     setLoading(true);
@@ -49,7 +50,7 @@ const SubscriptionSettings = () => {
           </div>
           <div>
             <p className="text-sm font-semibold text-zinc-100">
-              {isPremium ? "Premium" : "Free plan"}
+              {planName ?? (isPremium ? "Premium" : "Free plan")}
             </p>
             {isPremium && userInfo?.premiumUntil && (
               <p className="text-xs text-zinc-500">
