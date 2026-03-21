@@ -8,6 +8,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 const APP_URL = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
+const PRICE_IDS = {
+  pro: {
+    monthly: process.env.STRIPE_PRO_PRICE_ID_MONTHLY!,
+    yearly: process.env.STRIPE_PRO_PRICE_ID_YEARLY!,
+  },
+  master: {
+    monthly: process.env.STRIPE_MASTER_PRICE_ID_MONTHLY!,
+    yearly: process.env.STRIPE_MASTER_PRICE_ID_YEARLY!,
+  },
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -16,13 +27,21 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { idToken, plan } = req.body as { idToken: string; plan?: "monthly" | "yearly" };
+  const { idToken, plan, billing } = req.body as {
+    idToken: string;
+    plan?: "pro" | "master";
+    billing?: "monthly" | "yearly";
+  };
+
   if (!idToken) return res.status(400).json({ error: "Missing idToken" });
 
-  const priceId =
-    plan === "yearly"
-      ? process.env.STRIPE_PREMIUM_PRICE_ID_YEARLY!
-      : process.env.STRIPE_PREMIUM_PRICE_ID!;
+  const selectedPlan = plan ?? "pro";
+  const selectedBilling = billing ?? "monthly";
+  const priceId = PRICE_IDS[selectedPlan][selectedBilling];
+
+  if (!priceId) {
+    return res.status(400).json({ error: `Missing price ID for ${selectedPlan}/${selectedBilling}` });
+  }
 
   // Verify Firebase identity
   let userId: string;
@@ -45,10 +64,9 @@ export default async function handler(
           quantity: 1,
         },
       ],
-      // Embed userId in both session and subscription metadata
       metadata: { userId },
       subscription_data: {
-        metadata: { userId },
+        metadata: { userId, plan: selectedPlan },
       },
       customer_email: userEmail,
       success_url: `${APP_URL}/premium/success?session_id={CHECKOUT_SESSION_ID}`,

@@ -103,6 +103,23 @@ import { pentatonicPlayalongExercise } from "feature/exercisePlan/data/exerises/
 import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
+// Exercises available for free — all others require Pro
+const FREE_EXERCISE_IDS = new Set([
+  "spider_basic",
+  "spider_one_string",
+  "spider_permutation_1234",
+  "spider_legato_basic",
+  "strumming_basic",
+  "strumming_down_up",
+  "earTrainingEasy",
+  "rhythm_training_easy",
+  "open_g_repetition",
+  "all_strings_open_repetition",
+  "improv_prompt_easy",
+  "natural_notes_map",
+  "metronome_gap_test",
+]);
+
 import { spiderOneStringExercise } from "./exerises/spiderOneString/spiderOneString";
 import { spiderPermutation1243Exercise } from "./exerises/spiderPermutation1243/spiderPermutation1243";
 import { spiderPermutation1324Exercise } from "./exerises/spiderPermutation1324/spiderPermutation1324";
@@ -146,7 +163,7 @@ import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGal
 import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
 
 
-export const exercisesAgregat: Exercise[] = [
+const rawExercises: Exercise[] = [
   spiderOneStringExercise,
   spiderStairsHardExercise,
   SpiderStringSkippingExercise,
@@ -296,3 +313,8 @@ export const exercisesAgregat: Exercise[] = [
   strummingPattern31,
   strummingPattern32,
 ];
+
+export const exercisesAgregat: Exercise[] = rawExercises.map(ex => ({
+  ...ex,
+  premium: !FREE_EXERCISE_IDS.has(ex.id),
+}));

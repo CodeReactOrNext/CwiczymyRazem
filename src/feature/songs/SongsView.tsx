@@ -37,7 +37,7 @@ const SongsView = () => {
 
   const userAuth = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
-  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const [practiceTarget, setPracticeTarget] = useState<Song | null>(null);
 

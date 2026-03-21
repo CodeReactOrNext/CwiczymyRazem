@@ -139,7 +139,7 @@ export interface userSliceInitialState {
     band?: string;
     selectedFrame?: number;
     selectedGuitar?: number | string;
-    role?: "admin" | "premium" | "user";
+    role?: "admin" | "pro" | "master" | "user";
     premiumUntil?: string | null; // ISO date string, null = no expiry (forever)
   } | null;
   timer: TimerInterface;

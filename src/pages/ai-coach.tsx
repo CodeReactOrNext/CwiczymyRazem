@@ -10,15 +10,15 @@ import { withAuth } from "utils/auth/serverAuth";
 
 const AiCoachPage: NextPageWithLayout = () => {
   const userInfo = useAppSelector(selectUserInfo);
-  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   return (
     <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
       {!isPremium && userInfo !== null && (
         <HeroBanner
-          title="AI Coach"
+          title="Roadmap"
           subtitle="Get personalized guidance for your practice"
-          eyebrow="AI Coach"
+          eyebrow="Generate your path"
           className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
         />
       )}
