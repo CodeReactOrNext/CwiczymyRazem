@@ -2,6 +2,7 @@ import MainContainer from "components/MainContainer";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { AutoPlanGenerator } from "feature/practice/views/AutoPlanGenerator/AutoPlanGenerator";
+import { PremiumGate } from "feature/premium/components/PremiumGate";
 import AppLayout from "layouts/AppLayout";
 import posthog from "posthog-js";
 import { useRouter } from "next/router";
@@ -42,16 +43,20 @@ const TimerAuto: NextPageWithLayout = () => {
     router.push("/report");
   };
 
-  return selectedPlan ? (
-    <MainContainer>
-      <PracticeSession onClose={handleBack} plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
-    </MainContainer>
-  ) : (
-    <AutoPlanGenerator
-      onBack={handleBack}
-      onSelectPlan={handleAutoPlanSelect}
-      isStarting={isStarting}
-    />
+  return (
+    <PremiumGate feature="timer-auto" requiredPlan="master">
+      {selectedPlan ? (
+        <MainContainer>
+          <PracticeSession onClose={handleBack} plan={selectedPlan} onFinish={handlePlanFinish} isFinishing={isFinishing} />
+        </MainContainer>
+      ) : (
+        <AutoPlanGenerator
+          onBack={handleBack}
+          onSelectPlan={handleAutoPlanSelect}
+          isStarting={isStarting}
+        />
+      )}
+    </PremiumGate>
   );
 };
 

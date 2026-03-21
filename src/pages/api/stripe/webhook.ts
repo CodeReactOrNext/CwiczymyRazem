@@ -25,10 +25,11 @@ async function grantPremium(
   userId: string,
   stripeCustomerId: string | null,
   stripeSubscriptionId: string | null,
-  premiumUntil: string | null
+  premiumUntil: string | null,
+  plan: "pro" | "master" = "pro"
 ) {
   await firestore.collection("users").doc(userId).update({
-    role: "premium",
+    role: plan,
     premiumUntil,
     stripeCustomerId,
     stripeSubscriptionId,
@@ -92,19 +93,22 @@ export default async function handler(
         if (!userId) break;
 
         let premiumUntil: string | null = null;
+        let plan: "pro" | "master" = "pro";
         if (session.subscription) {
           const sub = await stripe.subscriptions.retrieve(
             session.subscription as string
           );
           const periodEnd = getPeriodEnd(sub);
           premiumUntil = periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
+          if (sub.metadata?.plan === "master") plan = "master";
         }
 
         await grantPremium(
           userId,
           session.customer as string | null,
           session.subscription as string | null,
-          premiumUntil
+          premiumUntil,
+          plan
         );
         break;
       }
@@ -119,13 +123,15 @@ export default async function handler(
 
         const periodEnd = getPeriodEnd(sub);
         const premiumUntil = periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
+        const plan: "pro" | "master" = sub.metadata?.plan === "master" ? "master" : "pro";
 
         if (sub.status === "active" || sub.status === "trialing") {
           await grantPremium(
             userId,
             sub.customer as string,
             sub.id,
-            premiumUntil
+            premiumUntil,
+            plan
           );
         } else {
           await revokePremium(userId);
@@ -160,11 +166,13 @@ export default async function handler(
 
         const periodEnd2 = getPeriodEnd(sub);
         const premiumUntil = periodEnd2 ? new Date(periodEnd2 * 1000).toISOString() : null;
+        const plan2: "pro" | "master" = sub.metadata?.plan === "master" ? "master" : "pro";
         await grantPremium(
           userId,
           sub.customer as string,
           sub.id,
-          premiumUntil
+          premiumUntil,
+          plan2
         );
         break;
       }

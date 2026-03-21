@@ -90,7 +90,7 @@ const ProfileLandingLayout = ({
             </DashboardSection>
           </div>
 
-          {(userInfo?.role === "premium" || userInfo?.role === "admin") && (
+          {(userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin") && (
             <div className="mt-6">
               <WeeklyHorizontalTimeline userAuth={userAuth as string} />
             </div>

@@ -8,15 +8,21 @@ import {
 } from "assets/components/ui/select";
 import { ExerciseCard } from "feature/exercisePlan/components/ExerciseCard";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { UpgradeModal } from "feature/premium/components/UpgradeModal";
+import { selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 export const ExerciseLibrary = () => {
   const { t } = useTranslation("exercises");
-
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  const userInfo = useAppSelector(selectUserInfo);
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const filteredExercises = exercisesAgregat.filter((exercise) => {
     if (!exercise || !exercise.title) return false;
@@ -34,56 +40,68 @@ export const ExerciseLibrary = () => {
   });
 
   return (
-    <div className='space-y-6'>
-      <div className='flex items-center justify-between'>
-        <h2 className='text-2xl font-bold'>{t("library.title")}</h2>
+    <>
+      <div className='space-y-6'>
+        <div className='flex items-center justify-between'>
+          <h2 className='text-2xl font-bold'>{t("library.title")}</h2>
+        </div>
+
+        <div className='flex flex-col gap-4 sm:flex-row'>
+          <Input
+            placeholder={t("library.search_placeholder")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className='sm:w-[200px]'
+          />
+
+          <Select
+            value={selectedDifficulty}
+            onValueChange={setSelectedDifficulty}>
+            <SelectTrigger className='sm:w-[180px]'>
+              <SelectValue placeholder={t("filters.difficulty")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>{t("filters.all")}</SelectItem>
+              <SelectItem value='easy'>{t("difficulty.easy")}</SelectItem>
+              <SelectItem value='medium'>{t("difficulty.medium")}</SelectItem>
+              <SelectItem value='hard'>{t("difficulty.hard")}</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className='sm:w-[180px]'>
+              <SelectValue placeholder={t("filters.category")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>{t("filters.all")}</SelectItem>
+              <SelectItem value='technique'>
+                {t("categories.technique")}
+              </SelectItem>
+              <SelectItem value='theory'>{t("categories.theory")}</SelectItem>
+              <SelectItem value='creativity'>
+                {t("categories.creativity")}
+              </SelectItem>
+              <SelectItem value='hearing'>{t("categories.hearing")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+          {filteredExercises.map((exercise) => {
+            const locked = !!exercise.premium && !isPremium;
+            return (
+              <ExerciseCard
+                key={exercise.id}
+                exercise={exercise}
+                isLocked={locked}
+                onUpgrade={locked ? () => setShowUpgradeModal(true) : undefined}
+              />
+            );
+          })}
+        </div>
       </div>
 
-      <div className='flex flex-col gap-4 sm:flex-row'>
-        <Input
-          placeholder={t("library.search_placeholder")}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className='sm:w-[200px]'
-        />
-
-        <Select
-          value={selectedDifficulty}
-          onValueChange={setSelectedDifficulty}>
-          <SelectTrigger className='sm:w-[180px]'>
-            <SelectValue placeholder={t("filters.difficulty")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>{t("filters.all")}</SelectItem>
-            <SelectItem value='easy'>{t("difficulty.easy")}</SelectItem>
-            <SelectItem value='medium'>{t("difficulty.medium")}</SelectItem>
-            <SelectItem value='hard'>{t("difficulty.hard")}</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className='sm:w-[180px]'>
-            <SelectValue placeholder={t("filters.category")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='all'>{t("filters.all")}</SelectItem>
-            <SelectItem value='technique'>
-              {t("categories.technique")}
-            </SelectItem>
-            <SelectItem value='theory'>{t("categories.theory")}</SelectItem>
-            <SelectItem value='creativity'>
-              {t("categories.creativity")}
-            </SelectItem>
-            <SelectItem value='hearing'>{t("categories.hearing")}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-        {filteredExercises.map((exercise) => (
-          <ExerciseCard key={exercise.id} exercise={exercise} />
-        ))}
-      </div>
-    </div>
+      <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+    </>
   );
 };

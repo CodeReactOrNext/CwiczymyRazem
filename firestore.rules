@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Users ────────────────────────────────────────────────────────────────
+    match /users/{userId} {
+
+      // User can read their own document
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // User can write their own document, but cannot change role or stripe fields
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && !("role"                 in request.resource.data.diff(resource.data).affectedKeys())
+        && !("stripeCustomerId"     in request.resource.data.diff(resource.data).affectedKeys())
+        && !("stripeSubscriptionId" in request.resource.data.diff(resource.data).affectedKeys())
+        && !("premiumUntil"         in request.resource.data.diff(resource.data).affectedKeys());
+
+      // role / stripe fields are written only by the backend (Firebase Admin SDK)
+      // Admin SDK bypasses these rules entirely — no extra rule needed
+    }
+
+    // ─── Exercise plans ───────────────────────────────────────────────────────
+    match /exercisePlans/{planId} {
+      allow read:   if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // ─── Practice sessions ────────────────────────────────────────────────────
+    match /practiceSessions/{sessionId} {
+      allow read:   if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // ─── Daily quests ─────────────────────────────────────────────────────────
+    match /dailyQuests/{questId} {
+      allow read:   if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // ─── Default: deny everything else ────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

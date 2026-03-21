@@ -3,18 +3,22 @@ import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Clock, Video, Youtube } from "lucide-react";
+import { Check, Clock, Lock, Video, Youtube } from "lucide-react";
 
 interface ExerciseCardProps {
   exercise: Exercise;
   isSelected: boolean;
   onToggle: (exercise: Exercise) => void;
+  isLocked?: boolean;
+  onUpgrade?: () => void;
 }
 
 export const ExerciseCard = ({
   exercise,
   isSelected,
   onToggle,
+  isLocked = false,
+  onUpgrade,
 }: ExerciseCardProps) => {
   const { t } = useTranslation(["common", "exercises"]);
 
@@ -22,38 +26,53 @@ export const ExerciseCard = ({
     .map((skillId) => guitarSkills.find((s) => s.id === skillId))
     .filter(Boolean);
 
-  const handleClick = () => onToggle(exercise);
+  const handleClick = () => {
+    if (isLocked) { onUpgrade?.(); return; }
+    onToggle(exercise);
+  };
 
   return (
     <div
       onClick={handleClick}
       className={cn(
-        "group relative flex cursor-pointer flex-col justify-between rounded-xl border p-5 transition-all duration-200 ease-in-out hover:shadow-md",
-        isSelected
-          ? "border-cyan-500/50 bg-cyan-950/10 shadow-cyan-900/20"
-          : "border-white/5 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-900/80"
+        "group relative flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 ease-in-out hover:shadow-md",
+        isLocked
+          ? "cursor-pointer border-amber-500/20 bg-zinc-900/30 hover:border-amber-500/35 hover:bg-zinc-900/50"
+          : isSelected
+            ? "cursor-pointer border-cyan-500/50 bg-cyan-950/10 shadow-cyan-900/20"
+            : "cursor-pointer border-white/5 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-900/80"
       )}
     >
-      {/* Selection Checkbox */}
-      <div className={cn(
-        "absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full border transition-all duration-200",
-        isSelected
-            ? "border-cyan-500 bg-cyan-500 text-white"
-            : "border-zinc-700 bg-zinc-950/50 text-transparent opacity-50 group-hover:block group-hover:opacity-100"
-      )}>
-        <Check className="h-3.5 w-3.5" strokeWidth={3} />
-      </div>
+      {/* Lock badge or Selection Checkbox */}
+      {isLocked ? (
+        <div className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/25">
+          <Lock className="h-3 w-3 text-amber-500" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500">Pro</span>
+        </div>
+      ) : (
+        <div className={cn(
+          "absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full border transition-all duration-200",
+          isSelected
+              ? "border-cyan-500 bg-cyan-500 text-white"
+              : "border-zinc-700 bg-zinc-950/50 text-transparent opacity-50 group-hover:block group-hover:opacity-100"
+        )}>
+          <Check className="h-3.5 w-3.5" strokeWidth={3} />
+        </div>
+      )}
 
       <div className="space-y-3">
         {/* Header */}
         <div>
           <h3 className={cn(
-            "pr-8 font-semibold leading-tight tracking-tight transition-colors",
-            isSelected ? "text-cyan-400" : "text-zinc-100 group-hover:text-white"
+            "pr-16 font-semibold leading-tight tracking-tight transition-colors",
+            isLocked ? "text-zinc-500" : isSelected ? "text-cyan-400" : "text-zinc-100 group-hover:text-white"
           )}>
             {exercise.title}
           </h3>
-          <p className="mt-1.5 line-clamp-2 text-xs text-zinc-400 group-hover:text-zinc-300">
+          <p className={cn(
+            "mt-1.5 line-clamp-2 text-xs",
+            isLocked ? "text-zinc-600" : "text-zinc-400 group-hover:text-zinc-300"
+          )}>
             {exercise.description}
           </p>
         </div>

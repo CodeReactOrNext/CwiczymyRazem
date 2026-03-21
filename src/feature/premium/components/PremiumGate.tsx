@@ -7,40 +7,42 @@ import { db } from "utils/firebase/client/firebase.utils";
 import { UpgradeContent } from "./UpgradeModal";
 
 interface PremiumGateProps {
-  feature: "summary" | "ai-coach" | string;
+  feature: string;
+  requiredPlan?: "master";
   children: ReactNode;
 }
 
-export function PremiumGate({ feature, children }: PremiumGateProps) {
+export function PremiumGate({ requiredPlan, children }: PremiumGateProps) {
   const dispatch = useAppDispatch();
   const userInfo = useAppSelector(selectUserInfo);
   const userAuth = useAppSelector(selectUserAuth);
 
-  const isPremium =
-    userInfo?.role === "premium" || userInfo?.role === "admin";
+  const role = userInfo?.role;
+  const isAdmin = role === "admin";
+  const isPremium = role === "pro" || role === "master" || isAdmin;
+  const hasSufficientPlan = requiredPlan === "master"
+    ? role === "master" || isAdmin
+    : isPremium;
 
-  // When gate is visible (not premium), listen for role changes in Firestore.
-  // This handles the case where the user completes Stripe checkout and the
-  // webhook updates their role — the gate unlocks automatically.
+  // Listen for role changes in Firestore when gate is visible.
+  // Unlocks automatically after Stripe webhook updates the role.
   useEffect(() => {
-    if (isPremium || !userAuth) return;
+    if (hasSufficientPlan || !userAuth) return;
 
     const unsub = onSnapshot(doc(db, "users", userAuth as string), (snap) => {
-      const role = snap.data()?.role as "admin" | "premium" | "user" | undefined;
-      if (role === "premium" || role === "admin") {
-        dispatch(setUserRole(role));
+      const r = snap.data()?.role as "admin" | "pro" | "master" | "user" | undefined;
+      if (r === "pro" || r === "master" || r === "admin") {
+        dispatch(setUserRole(r));
       }
     });
 
     return () => unsub();
-  }, [isPremium, userAuth, dispatch]);
+  }, [hasSufficientPlan, userAuth, dispatch]);
 
   // Still loading user data — don't flash gate or content
   if (userInfo === null) return null;
 
-  if (isPremium) return <>{children}</>;
-
-
+  if (hasSufficientPlan) return <>{children}</>;
 
   return (
     <div className="mx-auto flex w-full flex-col items-center px-4 py-16">

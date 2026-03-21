@@ -27,7 +27,7 @@ export default function SongPracticePage() {
   const { songId } = router.query;
   const userId = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
-  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const [pageState, setPageState] = useState<PageState>({ status: "loading" });
   const [isFinishing, setIsFinishing] = useState(false);

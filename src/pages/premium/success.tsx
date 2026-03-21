@@ -7,11 +7,30 @@ import { db } from "utils/firebase/client/firebase.utils";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
 
+const PLAN_FEATURES: Record<"pro" | "master", string[]> = {
+  pro: [
+    "Real-time Note Detection",
+    "Practice Plan Creator",
+    "Practice Calendar & history",
+    "Guitar Pro File Support",
+    "Full Exercise Library",
+    "Special Ranks",
+  ],
+  master: [
+    "Everything in Practice Pro",
+    "Skill Roadmaps",
+    "Daily Practice Insights",
+    "Weekly Progress Summary",
+    "Goal-based Analytics",
+  ],
+};
+
 export default function PremiumSuccessPage() {
   const userId = useAppSelector(selectUserAuth);
   const [confirmed, setConfirmed] = useState(false);
+  const [plan, setPlan] = useState<"pro" | "master">("pro");
 
-  // Poll Firestore until role === "premium" (webhook may be slightly delayed)
+  // Poll Firestore until role is pro or master (webhook may be slightly delayed)
   useEffect(() => {
     if (!userId) return;
 
@@ -21,7 +40,9 @@ export default function PremiumSuccessPage() {
     const poll = async () => {
       try {
         const snap = await getDoc(doc(db, "users", userId));
-        if (snap.data()?.role === "premium") {
+        const role = snap.data()?.role;
+        if (role === "pro" || role === "master") {
+          setPlan(role);
           setConfirmed(true);
           return;
         }
@@ -61,13 +82,13 @@ export default function PremiumSuccessPage() {
           <div className="space-y-3">
             <h1 className="text-3xl font-black tracking-tight text-white italic">
               {confirmed
-                ? <>Welcome to <span className="text-emerald-400">Premium!</span></>
+                ? <>Welcome to <span className="text-emerald-400">{plan === "master" ? "Practice Master!" : "Practice Pro!"}</span></>
                 : <span className="text-zinc-300">Activating your account...</span>
               }
             </h1>
             <p className="text-zinc-400">
               {confirmed
-                ? "Your payment was confirmed. All AI features are now unlocked."
+                ? "Your payment was confirmed. Your features are now unlocked."
                 : "Just a moment — we're confirming your payment."
               }
             </p>
@@ -81,12 +102,7 @@ export default function PremiumSuccessPage() {
                   <Sparkles className="h-3.5 w-3.5" />
                   Unlocked features
                 </div>
-                {[
-                  "AI Practice Summary (daily & weekly)",
-                  "Roadmap — your personalized learning plan",
-                  "AI session rating after every practice",
-                  "Detailed tips for each learning step",
-                ].map((f) => (
+                {PLAN_FEATURES[plan].map((f) => (
                   <div key={f} className="flex items-start gap-2 text-sm text-zinc-300">
                     <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
                     {f}
