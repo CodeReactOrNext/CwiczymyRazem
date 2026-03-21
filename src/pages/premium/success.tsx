@@ -14,7 +14,6 @@ const PLAN_FEATURES: Record<"pro" | "master", string[]> = {
     "Practice Calendar & history",
     "Guitar Pro File Support",
     "Full Exercise Library",
-    "Special Ranks",
   ],
   master: [
     "Everything in Practice Pro",
