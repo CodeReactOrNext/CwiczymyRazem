@@ -6,7 +6,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-02-25.clover",
 });
 
-const APP_URL = process.env.NEXTAUTH_URL || "http://localhost:3000";
+function getAppUrl(req: NextApiRequest) {
+  if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
+  const proto = (req.headers["x-forwarded-proto"] as string) || "http";
+  const host = req.headers["x-forwarded-host"] as string || req.headers["host"] as string;
+  return `${proto}://${host}`;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -37,7 +42,7 @@ export default async function handler(
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
-      return_url: `${APP_URL}/settings`,
+      return_url: `${getAppUrl(req)}/settings`,
     });
 
     return res.status(200).json({ url: portalSession.url });

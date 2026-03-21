@@ -22,7 +22,7 @@ const AiCoachPage: NextPageWithLayout = () => {
           className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
         />
       )}
-      <PremiumGate feature="ai-coach">
+      <PremiumGate feature="ai-coach" requiredPlan="master">
         <AiCoachView />
       </PremiumGate>
     </div>
