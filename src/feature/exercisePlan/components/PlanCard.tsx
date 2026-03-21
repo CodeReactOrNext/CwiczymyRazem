@@ -3,16 +3,17 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
+import { Lock } from "lucide-react";
 import Image from "next/image";
-import { 
-  FaBrain, 
-  FaClock, 
+import {
+  FaBrain,
+  FaClock,
   FaEdit,
-  FaGuitar, 
+  FaGuitar,
   FaLayerGroup,
-  FaListUl, 
-  FaMusic, 
-  FaPlay, 
+  FaListUl,
+  FaMusic,
+  FaPlay,
   FaTrashAlt,
   FaVideo,
   FaYoutube} from "react-icons/fa";
@@ -25,8 +26,10 @@ interface PlanCardProps {
   onStart?: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
+  onUpgrade?: () => void;
   startButtonText?: string;
   isLoading?: boolean;
+  isLocked?: boolean;
 }
 
 const categoryStyles = {
@@ -86,8 +89,10 @@ export const PlanCard = ({
   onStart,
   onDelete,
   onEdit,
+  onUpgrade,
   startButtonText,
-  isLoading
+  isLoading,
+  isLocked = false,
 }: PlanCardProps) => {
   const { t } = useTranslation(["exercises", "common"]);
 
@@ -108,7 +113,7 @@ export const PlanCard = ({
   const difficulty = ((plan as any).difficulty || "beginner") as
     | DifficultyLevel
     | "beginner";
-  
+
   const hasPlayalong = plan.exercises.some(ex => ex.isPlayalong || ex.youtubeVideoId);
   const hasVideo = plan.exercises.some(ex => ex.videoUrl && !ex.youtubeVideoId);
 
@@ -118,34 +123,58 @@ export const PlanCard = ({
   return (
     <Card
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5 p-4 glass-card rounded-2xl click-behavior",
+        "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 p-4 glass-card rounded-2xl",
         style.border,
         style.gradient,
         hasPlayalong && "border-red-500/30",
-        isLoading && "opacity-80 pointer-events-none"
+        isLoading && "opacity-80 pointer-events-none",
+        isLocked
+          ? "border-amber-500/20 cursor-pointer hover:border-amber-500/40 hover:shadow-[0_0_20px_rgba(245,158,11,0.08)]"
+          : "click-behavior hover:shadow-2xl hover:-translate-y-0.5"
       )}
-      onClick={onSelect}>
+      onClick={isLocked ? onUpgrade : onSelect}>
 
       {/* Top accent line */}
-      <div className={cn("absolute left-0 right-0 top-0 h-[2px] bg-gradient-to-r opacity-70", style.accent)} />
+      <div className={cn(
+        "absolute left-0 right-0 top-0 h-[2px] bg-gradient-to-r",
+        isLocked ? "from-amber-500/30 via-amber-400/60 to-amber-500/30" : cn("opacity-70", style.accent)
+      )} />
+
+      {/* Locked overlay with centered lock icon */}
+      {isLocked && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-zinc-950/40 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-2xl">
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/20 ring-1 ring-amber-500/40">
+              <Lock className="h-5 w-5 text-amber-400" />
+            </div>
+            <span className="text-xs font-bold uppercase tracking-widest text-amber-400">Unlock with Pro</span>
+          </div>
+        </div>
+      )}
 
       {/* Header: Category Icon & Badges */}
       <div className="mb-3 flex items-start justify-between">
         <div className="flex flex-wrap items-center gap-2">
-            <div className={`flex h-7 w-7 items-center justify-center rounded-lg border bg-zinc-950/50 shadow-sm ${style.border}`}>
-                <Icon className={`h-3.5 w-3.5 ${style.text}`} />
+            <div className={cn(
+              "flex h-7 w-7 items-center justify-center rounded-lg border bg-zinc-950/50 shadow-sm",
+              isLocked ? "border-amber-500/20" : style.border
+            )}>
+                <Icon className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-500" : style.text)} />
             </div>
-            <Badge variant="secondary" className={`capitalize tracking-wide px-2 py-0.5 text-[10px] ${style.badge}`}>
+            <Badge variant="secondary" className={cn(
+              "capitalize tracking-wide px-2 py-0.5 text-[10px]",
+              isLocked ? "bg-zinc-800/60 text-zinc-500 border-zinc-700/50" : style.badge
+            )}>
                 {t(`exercises:categories.${plan.category}` as any)}
             </Badge>
-            
-            {hasPlayalong && (
+
+            {hasPlayalong && !isLocked && (
                 <Badge className="bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30 text-[9px] h-5 px-2 font-bold uppercase tracking-wider">
                     <FaYoutube className="mr-1.5 h-2.5 w-2.5" />
                     Playalong
                 </Badge>
             )}
-            {hasVideo && (
+            {hasVideo && !isLocked && (
                 <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/30 text-[9px] h-5 px-2 font-bold uppercase tracking-wider">
                     <FaVideo className="mr-1.5 h-2.5 w-2.5" />
                     Video
@@ -156,9 +185,9 @@ export const PlanCard = ({
             {(onEdit || onDelete) && (
                 <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 mr-2">
                     {onEdit && (
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
+                        <Button
+                            variant="ghost"
+                            size="icon"
                             className="h-7 w-7 text-zinc-400 hover:text-white hover:bg-white/10"
                             onClick={(e) => { e.stopPropagation(); onEdit(); }}
                         >
@@ -166,9 +195,9 @@ export const PlanCard = ({
                         </Button>
                     )}
                     {onDelete && (
-                        <Button 
-                            variant="ghost" 
-                            size="icon" 
+                        <Button
+                            variant="ghost"
+                            size="icon"
                             className="h-7 w-7 text-zinc-400 hover:text-red-400 hover:bg-red-500/10"
                             onClick={(e) => { e.stopPropagation(); onDelete(); }}
                         >
@@ -177,34 +206,53 @@ export const PlanCard = ({
                     )}
                 </div>
             )}
-            <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-[10px] h-5 px-2 font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
-                {t(`exercises:difficulty.${difficulty}` as any)}
-            </Badge>
+            {isLocked ? (
+              <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/25">
+                <Lock className="h-3 w-3 text-amber-500" />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500">Pro</span>
+              </div>
+            ) : (
+              <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-[10px] h-5 px-2 font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                  {t(`exercises:difficulty.${difficulty}` as any)}
+              </Badge>
+            )}
         </div>
       </div>
 
       {/* Main Content with Avatar */}
       <div className="flex gap-4">
         {plan.author && (
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-white/10 shadow-inner">
-                <Image 
-                    src={plan.author.avatar} 
-                    alt={plan.author.name} 
-                    fill 
+            <div className={cn(
+              "relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border shadow-inner",
+              isLocked ? "border-white/5 grayscale opacity-50" : "border-white/10"
+            )}>
+                <Image
+                    src={plan.author.avatar}
+                    alt={plan.author.name}
+                    fill
                     className="object-cover"
                 />
             </div>
         )}
         <div className="flex-1 space-y-1">
             {plan.author && (
-                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80 leading-none">
+                <span className={cn(
+                  "text-[10px] font-bold uppercase tracking-widest leading-none",
+                  isLocked ? "text-zinc-600" : "text-primary/80"
+                )}>
                     {plan.author.name}
                 </span>
             )}
-            <h3 className="text-base font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+            <h3 className={cn(
+              "text-base font-bold leading-tight transition-colors",
+              isLocked ? "text-zinc-400" : "text-foreground group-hover:text-primary"
+            )}>
                 {title}
             </h3>
-            <p className="line-clamp-2 text-[11px] leading-relaxed text-muted-foreground/80">
+            <p className={cn(
+              "line-clamp-2 text-[11px] leading-relaxed",
+              isLocked ? "text-zinc-600" : "text-muted-foreground/80"
+            )}>
                 {description}
             </p>
         </div>
@@ -213,19 +261,29 @@ export const PlanCard = ({
       {/* Footer: Stats & Action */}
       <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <div className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-muted-foreground")}>
                 <FaClock className="h-3.5 w-3.5" />
                 <span>{totalDuration} min</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <div className={cn("flex items-center gap-1.5 text-xs font-medium", isLocked ? "text-zinc-600" : "text-muted-foreground")}>
                 <FaListUl className="h-3.5 w-3.5" />
                 <span>{plan.exercises.length}</span>
             </div>
         </div>
 
-        {onStart && (
-           <Button 
-            size="sm" 
+        {isLocked ? (
+          <Button
+            size="sm"
+            className="h-8 px-3 text-xs font-bold uppercase tracking-wider shadow-sm gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/25 hover:bg-amber-500/20 hover:text-amber-300 hover:border-amber-500/40"
+            variant="outline"
+            onClick={(e) => { e.stopPropagation(); onUpgrade?.(); }}
+          >
+            <Lock className="h-3 w-3" />
+            Upgrade
+          </Button>
+        ) : onStart && (
+           <Button
+            size="sm"
             className="h-8 px-3 text-xs font-semibold shadow-sm transition-all hover:scale-105"
             onClick={(e) => {
                 e.stopPropagation();
@@ -240,7 +298,7 @@ export const PlanCard = ({
                 </div>
             ) : (
                 <>
-                    {startButtonText || t("common:start")} 
+                    {startButtonText || t("common:start")}
                     <FaPlay className="ml-2 h-2 w-2" />
                 </>
             )}

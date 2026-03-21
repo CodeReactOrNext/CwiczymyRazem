@@ -31,9 +31,7 @@ export const PricingSection = () => {
           <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-4">
             Simple, transparent pricing.
           </h2>
-          <p className="text-zinc-400 text-lg max-w-md mx-auto">
-            No hidden fees. Cancel anytime.
-          </p>
+
         </div>
 
         {/* Cards */}
@@ -44,7 +42,7 @@ export const PricingSection = () => {
             <div className="mb-8">
               <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">🎸 Practice Pro</p>
               <div className="flex items-end gap-2 mb-3">
-                <span className="text-5xl font-bold text-white tracking-tight">$2.99</span>
+                <span className="text-5xl font-bold text-white tracking-tight">€4.99</span>
                 <span className="text-zinc-500 mb-1.5">/ month</span>
               </div>
               <p className="text-sm text-zinc-500 leading-relaxed">
@@ -62,7 +60,7 @@ export const PricingSection = () => {
             </ul>
 
             <Link
-              href="/signup"
+              href="/premium"
               className="block text-center rounded-lg border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 px-6 py-3 text-sm font-semibold text-zinc-200 transition-colors"
             >
               Get started →
@@ -82,7 +80,7 @@ export const PricingSection = () => {
                 </span>
               </div>
               <div className="flex items-end gap-2 mb-3">
-                <span className="text-5xl font-bold text-white tracking-tight">$4.99</span>
+                <span className="text-5xl font-bold text-white tracking-tight">€7.99</span>
                 <span className="text-zinc-500 mb-1.5">/ month</span>
               </div>
               <p className="text-sm text-zinc-500 leading-relaxed">
@@ -111,7 +109,7 @@ export const PricingSection = () => {
             </ul>
 
             <Link
-              href="/signup"
+              href="/premium"
               className="block text-center rounded-lg bg-white hover:bg-zinc-100 px-6 py-3 text-sm font-bold text-black transition-colors"
             >
               Get started →
@@ -119,10 +117,7 @@ export const PricingSection = () => {
           </div>
         </div>
 
-        {/* Trust line */}
-        <p className="text-center text-xs text-zinc-600 uppercase tracking-widest font-semibold">
-          Cancel Anytime &nbsp;·&nbsp; Secure Payment via Stripe &nbsp;·&nbsp; Instant Access
-        </p>
+     
 
       </div>
     </section>

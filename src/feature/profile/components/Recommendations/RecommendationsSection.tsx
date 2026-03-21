@@ -5,7 +5,9 @@ import { DailyRecommendation } from "feature/songs/components/DailyRecommendatio
 import { RecommendationSkeleton } from "feature/songs/components/DailyRecommendation/RecommendationSkeleton";
 import { getDailyRecommendation } from "feature/songs/services/getRecommendation";
 import type { Song } from "feature/songs/types/songs.type";
+import { selectUserInfo } from "feature/user/store/userSlice";
 import { useEffect,useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 interface RecommendationsSectionProps {
   userSongs: {
@@ -34,6 +36,8 @@ export const RecommendationsSection = ({
   const [dailyPick, setDailyPick] = useState<Song | null>(null);
   const [dailyExercisePick, setDailyExercisePick] = useState<ExercisePlan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const userInfo = useAppSelector(selectUserInfo);
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const fetchRecommendations = async () => {
     if (!isOwnProfile) return;
@@ -114,7 +118,7 @@ export const RecommendationsSection = ({
             }));
         }
       } else if (type === "exercise") {
-        const exPick = getDailyExerciseRecommendation();
+        const exPick = getDailyExerciseRecommendation(isPremium);
         setDailyExercisePick(exPick);
         
          // Cache exercise

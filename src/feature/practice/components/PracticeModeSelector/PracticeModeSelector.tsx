@@ -19,7 +19,8 @@ export const PracticeModeSelector = ({
 }: PracticeModeSelectorProps) => {
   const { t } = useTranslation(["common", "timer"]);
   const userInfo = useAppSelector(selectUserInfo);
-  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
+  const isMaster = userInfo?.role === "master" || userInfo?.role === "admin";
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const colorClasses = {
@@ -100,6 +101,7 @@ export const PracticeModeSelector = ({
       title: "Auto Plan",
       description: "Get a practice plan generated for you.",
       colors: colorClasses.rose,
+      master: true,
     },
     {
       id: "song" as const,
@@ -144,7 +146,9 @@ export const PracticeModeSelector = ({
 
           <div className='flex flex-col gap-3 sm:gap-6 md:grid md:grid-cols-2 lg:grid-cols-3'>
             {modes.map((mode) => {
-              const isLocked = "premium" in mode && mode.premium && !isPremium;
+              const isLocked =
+                ("master" in mode && mode.master && !isMaster) ||
+                ("premium" in mode && mode.premium && !isPremium);
               return (
               <div
                 key={mode.id}

@@ -120,6 +120,7 @@ export interface BackingTrack {
 
 export interface Exercise {
   id: string;
+  premium?: boolean;
   title: LocalizedContent;
   description: LocalizedContent;
   difficulty: DifficultyLevel;
@@ -164,6 +165,7 @@ export interface ExercisePlan {
   exercises: Exercise[];
   userId: string;
   image: StaticImageData | null;
+  premium?: boolean;
   author?: {
     name: string;
     avatar: StaticImageData;

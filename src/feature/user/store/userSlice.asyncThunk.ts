@@ -408,12 +408,20 @@ export const updateQuestProgress = createAsyncThunk(
 
 export const initializeDailyQuestAction = createAsyncThunk(
   "user/initializeDailyQuest",
-  async (_, { dispatch }) => {
+  async (_, { dispatch, getState }) => {
     const { generateDailyQuest } = await import("./userSlice");
     const { exercisesAgregat } = await import("../../exercisePlan/data/exercisesAgregat");
 
-    // Select random exercise
-    const randomExercise = exercisesAgregat[Math.floor(Math.random() * exercisesAgregat.length)];
+    // Filter exercises based on user plan
+    const state = getState() as RootState;
+    const role = state.user.userInfo?.role;
+    const isPremium = role === "pro" || role === "master" || role === "admin";
+    const availableExercises = isPremium
+      ? exercisesAgregat
+      : exercisesAgregat.filter((e) => !e.premium);
+
+    // Select random exercise from available pool
+    const randomExercise = availableExercises[Math.floor(Math.random() * availableExercises.length)];
 
     dispatch(generateDailyQuest({
       randomExercise: {

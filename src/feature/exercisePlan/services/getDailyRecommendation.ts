@@ -1,8 +1,9 @@
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 
-export const getDailyExerciseRecommendation = (): ExercisePlan | null => {
-  if (!defaultPlans || defaultPlans.length === 0) return null;
+export const getDailyExerciseRecommendation = (isPremium = false): ExercisePlan | null => {
+  const pool = isPremium ? defaultPlans : defaultPlans.filter((p) => !p.premium);
+  if (!pool || pool.length === 0) return null;
 
   // Generate a deterministic index based on the current date
   const today = new Date();
@@ -16,6 +17,6 @@ export const getDailyExerciseRecommendation = (): ExercisePlan | null => {
     hash = hash & hash; // Convert to 32bit integer
   }
 
-  const index = Math.abs(hash) % defaultPlans.length;
-  return defaultPlans[index];
+  const index = Math.abs(hash) % pool.length;
+  return pool[index];
 };

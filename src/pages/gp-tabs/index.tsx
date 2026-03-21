@@ -111,7 +111,7 @@ function buildExercise(fileName: string, tempo: number, trackName: string): Exer
 const GpTabsPage: NextPageWithLayout = () => {
   const userId = useAppSelector(selectUserAuth);
   const userInfo = useAppSelector(selectUserInfo);
-  const isPremium = userInfo?.role === "premium" || userInfo?.role === "admin";
+  const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
