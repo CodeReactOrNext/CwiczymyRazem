@@ -15,7 +15,6 @@ const FEATURES: { label: string; pro: boolean; master: boolean }[] = [
   { label: "Guitar Pro File Support",                               pro: true,  master: true  },
   { label: `${exercisesAgregat.length}+ Exercises to Practice`,    pro: true,  master: true  },
   { label: `${defaultPlans.length} Ready-made Practice Plans`,     pro: true,  master: true  },
-  { label: "Special Ranks",                                         pro: true,  master: true  },
   { label: "Auto Practice Generator",                               pro: false, master: true  },
   { label: "AI-guided Practice Sessions",                           pro: false, master: true  },
   { label: "Skill Roadmaps",                                        pro: false, master: true  },
@@ -25,8 +24,8 @@ const FEATURES: { label: string; pro: boolean; master: boolean }[] = [
 ];
 
 const PRICING = {
-  pro:    { monthly: "€4.99", yearly: "€41.99" },
-  master: { monthly: "€7.99", yearly: "€67.99" },
+  pro:    { monthly: "€3.99", yearly: "€33.99" },
+  master: { monthly: "€6.99", yearly: "€58.99" },
 };
 
 // ─── Shared content ────────────────────────────────────────────────────────────
