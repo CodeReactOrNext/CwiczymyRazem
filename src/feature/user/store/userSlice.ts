@@ -123,6 +123,14 @@ export const userSlice = createSlice({
         state.currentUserStats.points = (state.currentUserStats.points || 0) + payload;
       }
     },
+    deductFame: (state, { payload }: PayloadAction<number>) => {
+      if (state.currentUserStats) {
+        state.currentUserStats.fame = Math.max(
+          0,
+          (state.currentUserStats.fame || 0) - payload
+        );
+      }
+    },
     // Challenges removed
     generateDailyQuest: (state, action: PayloadAction<{ randomExercise?: { id: string; title: string } } | undefined>) => {
       if (!state.currentUserStats) return;
@@ -429,6 +437,7 @@ export const {
   claimQuestReward,
   setActivity,
   setUserRole,
+  deductFame,
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;
