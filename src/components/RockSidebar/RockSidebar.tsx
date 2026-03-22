@@ -23,6 +23,7 @@ import {
   ListChecks,
   Music,
   Settings,
+  Swords,
   Timer,
   Trophy,
   User,
@@ -95,6 +96,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/settings")) return "settings";
     if (pathname.startsWith("/plans")) return "my-plans";
     if (pathname.startsWith("/gp-tabs")) return "gp-tabs";
+    if (pathname.startsWith("/arsenal")) return "arsenal";
     return null;
   };
 
@@ -220,6 +222,12 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
   ];
 
   const otherSections = [
+    {
+      id: "arsenal" as NavPagesTypes,
+      name: "Guitar Arsenal",
+      href: "/arsenal",
+      icon: <Swords size={16} />,
+    },
     {
       id: "settings" as NavPagesTypes,
       name: "Settings",

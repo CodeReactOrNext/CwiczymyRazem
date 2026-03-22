@@ -1,0 +1,55 @@
+import type { CaseDefinition } from "../types/arsenal.types";
+
+export const CASE_DEFINITIONS: Record<string, CaseDefinition> = {
+  standard: {
+    id: "standard",
+    name: "Standard Case",
+    description: "A classic case for every aspiring rocker.",
+    fameCost: 30,
+    yearFrom: 2020,
+    yearTo: 2023,
+    country: "China",
+    probabilities: {
+      Common: 0.70,
+      Uncommon: 0.20,
+      Rare: 0.07,
+      Epic: 0.025,
+      Legendary: 0.004,
+      Mythic: 0.001,
+    },
+  },
+  premium: {
+    id: "premium",
+    name: "Premium Case",
+    description: "Higher odds for the rare and sought-after.",
+    fameCost: 120,
+    yearFrom: 2018,
+    yearTo: 2023,
+    country: "Korea",
+    probabilities: {
+      Common: 0.50,
+      Uncommon: 0.30,
+      Rare: 0.14,
+      Epic: 0.05,
+      Legendary: 0.008,
+      Mythic: 0.002,
+    },
+  },
+  elite: {
+    id: "elite",
+    name: "Elite Case",
+    description: "Reserved for the most dedicated players.",
+    fameCost: 300,
+    yearFrom: 2020,
+    yearTo: 2023,
+    country: "USA",
+    probabilities: {
+      Common: 0.30,
+      Uncommon: 0.35,
+      Rare: 0.22,
+      Epic: 0.10,
+      Legendary: 0.025,
+      Mythic: 0.005,
+    },
+  },
+};
