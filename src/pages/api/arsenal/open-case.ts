@@ -9,6 +9,7 @@ import type {
 } from "feature/arsenal/types/arsenal.types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
+import type { Transaction } from "firebase-admin/firestore";
 
 // 60% guitar, 40% effect
 const GUITAR_CHANCE = 0.6;
@@ -51,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const userRef = firestore.collection("users").doc(userId);
     let capturedUserData: any = null;
 
-    const result = await firestore.runTransaction(async (t) => {
+    const result = await firestore.runTransaction(async (t: Transaction) => {
       const userDoc = await t.get(userRef);
       if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
 
