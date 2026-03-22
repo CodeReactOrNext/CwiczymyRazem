@@ -153,3 +153,22 @@ export interface FirebaseLogsDailyQuestInterface {
   id?: string;
   reactions?: string[];
 }
+
+export interface FirebaseLogsCaseOpenInterface {
+  type: "case_open";
+  uid: string;
+  userName: string;
+  avatarUrl: string | null;
+  userAvatarFrame?: number;
+  timestamp: string | number | Date;
+  data: string;
+  caseType: string;
+  caseName: string;
+  itemType: "guitar" | "effect";
+  itemName: string;
+  itemBrand: string;
+  itemRarity: string;
+  itemImageId: number | string;
+  id?: string;
+  reactions?: string[];
+}

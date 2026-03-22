@@ -17,6 +17,7 @@ import type { ProfileInterface } from "types/ProfileInterface";
 import { getYearsOfPlaying } from "utils/converter";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
+import { ProfileArsenal } from "./components/ProfileArsenal";
 import { SongSkillShowcase } from "./components/SongSkillShowcase";
 import { StatsSection } from "./components/StatsSection";
 import { UserRecordingsSection } from "./components/UserRecordingsSection";
@@ -180,6 +181,9 @@ const ProfileLayout = ({
             <SkillTreeCards isUserProfile userSkills={userSkills} />
           </div>
         )}
+
+        {/* Arsenal Section */}
+        <ProfileArsenal userAuth={userAuth} />
 
         {/* Recordings Section */}
         <UserRecordingsSection userId={userAuth} />
