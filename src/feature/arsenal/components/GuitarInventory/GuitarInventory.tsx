@@ -1,4 +1,3 @@
-import { ScrollArea } from "assets/components/ui/scroll-area";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
 import { clearNewFlags } from "feature/arsenal/services/arsenal.service";
 import { useQueryClient } from "@tanstack/react-query";
@@ -35,44 +34,19 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
     );
   }
 
-  // Group by guitarId to show count per guitar, but keep the latest item for display
-  const groupedMap = new Map<
-    number | string,
-    { item: typeof data.inventory[0]; count: number }
-  >();
-  for (const item of data.inventory) {
-    const existing = groupedMap.get(item.guitarId);
-    if (!existing || item.acquiredAt > existing.item.acquiredAt) {
-      groupedMap.set(item.guitarId, {
-        item,
-        count: (existing?.count || 0) + 1,
-      });
-    } else {
-      groupedMap.set(item.guitarId, {
-        item: existing.item,
-        count: existing.count + 1,
-      });
-    }
-  }
-
-  const grouped = Array.from(groupedMap.values()).sort(
-    (a, b) => b.item.acquiredAt - a.item.acquiredAt
-  );
+  const sorted = [...data.inventory].sort((a, b) => b.acquiredAt - a.acquiredAt);
 
   return (
-    <ScrollArea className="h-[600px] w-full">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-1">
-        {grouped.map(({ item, count }) => (
-          <GuitarCard
-            key={item.guitarId}
-            item={item}
-            count={count}
-            isEquipped={data.equippedGuitarId === item.guitarId}
-            onEquip={equip}
-            isEquipping={isEquipping}
-          />
-        ))}
-      </div>
-    </ScrollArea>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {sorted.map((item) => (
+        <GuitarCard
+          key={item.id}
+          item={item}
+          isEquipped={data.equippedGuitarId === item.guitarId}
+          onEquip={equip}
+          isEquipping={isEquipping}
+        />
+      ))}
+    </div>
   );
 };

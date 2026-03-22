@@ -1,4 +1,5 @@
-import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
+import type { ArsenalUserData, EffectInventoryItem } from "feature/arsenal/types/arsenal.types";
+import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
 
@@ -33,14 +34,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const arsenal: ArsenalUserData = {
         inventory: [],
         equippedGuitarId,
+        rig: DEFAULT_RIG,
+        effectInventory: [],
       };
       await userRef.update({ arsenal });
       return res.status(200).json({ ...arsenal, fame });
     }
 
+    const storedRig = data.arsenal.rig;
     const arsenal: ArsenalUserData = {
       inventory: data.arsenal.inventory || [],
       equippedGuitarId: data.arsenal.equippedGuitarId ?? null,
+      rig: {
+        guitarSlots: storedRig?.guitarSlots ?? DEFAULT_RIG.guitarSlots,
+        pedalboardItems: Array.isArray(storedRig?.pedalboardItems)
+          ? storedRig.pedalboardItems
+          : DEFAULT_RIG.pedalboardItems,
+        ampHeadId: storedRig?.ampHeadId ?? null,
+        ampId: storedRig?.ampId ?? null,
+      },
+      effectInventory: data.arsenal.effectInventory || [],
     };
 
     return res.status(200).json({ ...arsenal, fame });

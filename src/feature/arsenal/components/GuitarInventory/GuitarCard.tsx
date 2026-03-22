@@ -1,18 +1,17 @@
 import { cn } from "assets/lib/utils";
 import { Check } from "lucide-react";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { RarityBadge, RARITY_STYLES, RARITY_GLOW_CLASS } from "../RarityBadge";
+import { RARITY_STYLES } from "../RarityBadge";
 import type { InventoryItem } from "../../types/arsenal.types";
 
 interface GuitarCardProps {
   item: InventoryItem;
-  count: number;
   isEquipped: boolean;
   onEquip: (guitarId: number | string) => void;
   isEquipping: boolean;
 }
 
-export const GuitarCard = ({ item, count, isEquipped, onEquip, isEquipping }: GuitarCardProps) => {
+export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCardProps) => {
   const guitar = GUITARS_BY_ID.get(item.guitarId);
   if (!guitar) return null;
 
@@ -21,78 +20,110 @@ export const GuitarCard = ({ item, count, isEquipped, onEquip, isEquipping }: Gu
   return (
     <div
       className={cn(
-        "group relative flex flex-col items-center rounded-lg overflow-hidden transition-all duration-300 hover:scale-[1.04] hover:-translate-y-1 hover:z-10",
-        isEquipped
-          ? "ring-2 ring-amber-400/70 shadow-[0_0_20px_rgba(251,191,36,0.3)]"
-          : RARITY_GLOW_CLASS[guitar.rarity]
+        "group relative flex flex-col h-full overflow-hidden cursor-default",
+        isEquipped && "ring-2 ring-amber-400/60"
       )}
       style={{
-        background: `linear-gradient(180deg, ${rs.baseColor}12 0%, #09090b 50%, ${rs.baseColor}08 100%)`,
+        borderRadius: 6,
+        background: `linear-gradient(175deg, ${rs.baseColor}18 0%, #0c0c10 35%, #0c0c10 100%)`,
+        border: `1px solid ${rs.baseColor}28`,
         borderBottom: `3px solid ${rs.baseColor}`,
+        boxShadow: isEquipped
+          ? `0 0 24px rgba(251,191,36,0.25), inset 0 0 0 1px rgba(251,191,36,0.1)`
+          : `0 8px 32px rgba(0,0,0,0.6), 0 0 0 0 transparent`,
       }}
     >
-      {item.isNew && (
-        <div
-          className="absolute top-1 right-1 z-20 rounded-sm px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-white"
-          style={{
-            backgroundColor: rs.baseColor,
-            boxShadow: `0 0 10px ${rs.baseColor}80`,
-          }}
-        >
-          NEW
-        </div>
-      )}
-      {count > 1 && (
-        <div className="absolute top-1 left-1 z-20 rounded-sm bg-zinc-800/90 border border-zinc-600 px-1.5 py-0.5 text-[9px] font-black text-zinc-300">
-          x{count}
-        </div>
-      )}
+      {/* Rarity stripe top */}
+      <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, transparent, ${rs.baseColor}90, transparent)` }} />
 
+      {/* Header */}
+      <div className="px-3 pt-2 pb-1.5 flex flex-col gap-0">
+        <p className="text-[9px] font-semibold tracking-wide leading-none truncate" style={{ color: rs.baseColor }}>
+          {guitar.brand}
+        </p>
+        <p className="text-[15px] font-bold text-white leading-tight truncate mt-0.5">
+          {guitar.name}
+        </p>
+        <p className="text-[8px] font-medium tracking-[0.2em] mt-0.5 uppercase" style={{ color: `${rs.baseColor}80` }}>
+          {guitar.rarity}
+        </p>
+      </div>
+
+      {/* Image */}
       <div
-        className="relative flex h-52 w-full items-center justify-center overflow-hidden"
+        className="relative flex items-center justify-center overflow-hidden flex-1"
         style={{
-          background: `radial-gradient(ellipse at center, ${rs.baseColor}15 0%, transparent 70%)`,
+          minHeight: 220,
+          background: `radial-gradient(ellipse at 50% 60%, ${rs.baseColor}28 0%, ${rs.baseColor}06 50%, transparent 75%)`,
         }}
       >
+        {/* Scan line */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-px"
-          style={{ backgroundColor: `${rs.baseColor}30` }}
+          className="absolute inset-x-0 bottom-0 h-16 pointer-events-none"
+          style={{ background: `linear-gradient(to top, ${rs.baseColor}14, transparent)` }}
         />
+
         <img
           src={`/static/images/rank/${guitar.imageId}.png`}
           alt={guitar.name}
-          className="relative z-10 h-36 w-36 -rotate-45 object-contain transition-transform duration-500 group-hover:scale-130 group-hover:-rotate-[30deg]"
+          className="relative z-10 object-contain -rotate-90"
           style={{
-            filter: `drop-shadow(0 0 16px ${rs.baseColor}40)`,
+            height: 240,
+            width: 240,
+            WebkitMaskImage: "radial-gradient(ellipse 55% 88% at 50% 50%, black 55%, transparent 100%)",
+            maskImage: "radial-gradient(ellipse 55% 88% at 50% 50%, black 55%, transparent 100%)",
           }}
         />
+
+        {/* Badges */}
+        {item.isNew && (
+          <div
+            className="absolute top-2 right-2 z-20 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-black"
+            style={{ backgroundColor: rs.baseColor, borderRadius: 3, boxShadow: `0 0 12px ${rs.baseColor}90` }}
+          >
+            NEW
+          </div>
+        )}
+        {/* Equip indicator dot */}
+        {isEquipped && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-400" style={{ boxShadow: "0 0 6px rgba(251,191,36,0.9)" }} />
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-col items-center gap-1.5 w-full px-3 py-3">
-        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-[0.2em] leading-none">
-          {guitar.brand}
-        </span>
-        <span className="text-center text-sm font-black tracking-wide text-white uppercase leading-tight min-h-[32px] flex items-center">
-          {guitar.name}
-        </span>
-        <div className="mt-1">
-          <RarityBadge rarity={guitar.rarity} size="sm" />
-        </div>
+      {/* Meta row */}
+      <div className="flex items-stretch border-t" style={{ borderColor: `${rs.baseColor}20` }}>
+        {item.year && (
+          <div className="flex-1 flex items-center justify-center py-1.5 border-r" style={{ borderColor: `${rs.baseColor}20` }}>
+            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{item.year}</span>
+          </div>
+        )}
+        {item.country && (
+          <div className="flex-1 flex items-center justify-center py-1.5">
+            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest truncate px-1">{item.country}</span>
+          </div>
+        )}
       </div>
 
+      {/* Equip button */}
       <button
         onClick={() => onEquip(guitar.id)}
         disabled={isEquipped || isEquipping}
         className={cn(
-          "w-full px-2 py-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 border-t",
+          "w-full py-2 text-[10px] font-black uppercase tracking-widest transition-all duration-200 border-t flex items-center justify-center gap-1.5",
           isEquipped
-            ? "bg-amber-500/15 text-amber-400 border-amber-500/30 cursor-default flex items-center justify-center gap-1.5"
-            : "bg-zinc-900/50 text-zinc-500 hover:bg-zinc-800 hover:text-white border-zinc-800/50 disabled:opacity-50"
+            ? "text-amber-400 cursor-default"
+            : "text-zinc-600 hover:text-white disabled:opacity-40"
         )}
+        style={{
+          borderColor: isEquipped ? `rgba(251,191,36,0.25)` : `${rs.baseColor}18`,
+          background: isEquipped ? `rgba(251,191,36,0.08)` : "transparent",
+        }}
       >
         {isEquipped ? (
           <>
-            <Check size={11} strokeWidth={3} />
+            <Check size={10} strokeWidth={3} />
             Equipped
           </>
         ) : (

@@ -8,9 +8,11 @@ import { useOpenCase } from "./hooks/useOpenCase";
 import { useAppSelector } from "store/hooks";
 import { useState } from "react";
 import { FaGem } from "react-icons/fa";
-import { PackageOpen, Swords } from "lucide-react";
+import { PackageOpen, Swords, Guitar } from "lucide-react";
 import { CaseShop } from "./components/CaseShop/CaseShop";
 import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
+import { EffectCollection } from "./components/GuitarInventory/EffectCollection";
+import { RigView } from "./components/Rig/RigView";
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
 import type { CaseType, OpenCaseResult } from "./types/arsenal.types";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
@@ -39,8 +41,6 @@ export const ArsenalView = () => {
         title="Guitar Arsenal"
         subtitle="Spend your Fame Points to unlock rare guitars"
         eyebrow="Collect & equip"
-        characterImage="/images/3d/guitarist.png"
-        secondaryImage="/images/3d/metronom.png"
         className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
         rightContent={
           <div className="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
@@ -66,6 +66,10 @@ export const ArsenalView = () => {
                   <span className="ml-1 h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
                 )}
               </TabsTrigger>
+              <TabsTrigger value="rig" className="gap-2 px-6 py-2.5 rounded-lg font-black uppercase tracking-widest text-xs data-[state=active]:bg-zinc-800 data-[state=active]:text-white">
+                <Guitar size={16} />
+                Rig
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="cases" className="mt-6">
@@ -85,8 +89,15 @@ export const ArsenalView = () => {
                   ))}
                 </div>
               ) : data ? (
-                <GuitarInventory data={data} />
+                <>
+                  <GuitarInventory data={data} />
+                  <EffectCollection data={data} />
+                </>
               ) : null}
+            </TabsContent>
+
+            <TabsContent value="rig" className="mt-4">
+              {data ? <RigView data={data} /> : null}
             </TabsContent>
           </Tabs>
         </div>
