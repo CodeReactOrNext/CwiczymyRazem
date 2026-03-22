@@ -48,16 +48,6 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
     >
       <div className="flex flex-col gap-1 items-center text-center">
         <h3 className="text-lg font-black tracking-wide text-white uppercase drop-shadow-md">{caseDef.name}</h3>
-        <p className="text-xs font-medium text-zinc-400">{caseDef.description}</p>
-        <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-            {caseDef.yearFrom === caseDef.yearTo ? caseDef.yearFrom : `${caseDef.yearFrom}–${caseDef.yearTo}`}
-          </span>
-          <span className="text-zinc-600 text-[10px]">·</span>
-          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-            {caseDef.country}
-          </span>
-        </div>
       </div>
 
       {/* Package image */}
