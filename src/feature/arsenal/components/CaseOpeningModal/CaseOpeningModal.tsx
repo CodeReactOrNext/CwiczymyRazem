@@ -4,23 +4,27 @@ import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
+import { GUITARS_BY_ID, GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
+import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
 import { RarityBadge, RARITY_STYLES, RARITY_GLOW_CLASS } from "../RarityBadge";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
-import type { OpenCaseResult, CaseDefinition, GuitarDefinition, GuitarRarity } from "../../types/arsenal.types";
+import type { OpenCaseResult, CaseDefinition, GuitarDefinition, EffectDefinition, GuitarRarity } from "../../types/arsenal.types";
 
 const ITEM_WIDTH = 180;
 const VISIBLE_ITEMS = 60;
 const WIN_INDEX = 45;
 
-function buildRouletteStrip(caseDef: CaseDefinition, winGuitar: GuitarDefinition): GuitarDefinition[] {
+type StripItem =
+  | { kind: "guitar"; def: GuitarDefinition }
+  | { kind: "effect"; def: EffectDefinition };
+
+function buildRouletteStrip(caseDef: CaseDefinition, winItem: StripItem): StripItem[] {
   const rarities = Object.entries(caseDef.probabilities) as [GuitarRarity, number][];
-  const strip: GuitarDefinition[] = [];
+  const strip: StripItem[] = [];
 
   for (let i = 0; i < VISIBLE_ITEMS; i++) {
     if (i === WIN_INDEX) {
-      strip.push(winGuitar);
+      strip.push(winItem);
       continue;
     }
 
@@ -28,17 +32,23 @@ function buildRouletteStrip(caseDef: CaseDefinition, winGuitar: GuitarDefinition
     let chosen: GuitarRarity = "Common";
     for (const [rarity, prob] of rarities) {
       roll -= prob;
-      if (roll <= 0) {
-        chosen = rarity;
-        break;
-      }
+      if (roll <= 0) { chosen = rarity; break; }
     }
 
-    const pool = GUITARS_BY_RARITY[chosen];
-    if (pool && pool.length > 0) {
-      strip.push(pool[Math.floor(Math.random() * pool.length)]);
+    if (Math.random() < 0.6) {
+      const pool = GUITARS_BY_RARITY[chosen];
+      if (pool && pool.length > 0) {
+        strip.push({ kind: "guitar", def: pool[Math.floor(Math.random() * pool.length)] });
+      } else {
+        strip.push(winItem);
+      }
     } else {
-      strip.push(winGuitar);
+      const pool = EFFECTS_BY_RARITY[chosen] || EFFECTS_BY_RARITY["Common"] || [];
+      if (pool.length > 0) {
+        strip.push({ kind: "effect", def: pool[Math.floor(Math.random() * pool.length)] });
+      } else {
+        strip.push(winItem);
+      }
     }
   }
 
@@ -55,43 +65,36 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
   const [phase, setPhase] = useState<"idle" | "spinning" | "reveal" | "done">("idle");
   const { mutate: equip, isPending: isEquipping } = useEquipGuitar();
   const isOpen = result !== null;
-  const stripRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
 
-  const guitar = result ? GUITARS_BY_ID.get(result.guitar.id) : null;
-  const rarityStyles = guitar ? RARITY_STYLES[guitar.rarity] : null;
+  const guitar = result?.type === "guitar" && result.guitar ? GUITARS_BY_ID.get(result.guitar.id) ?? null : null;
+  const effect = result?.type === "effect" && result.effect ? EFFECTS_BY_ID.get(result.effect.id) ?? null : null;
+
+  const winDef: StripItem | null = guitar
+    ? { kind: "guitar", def: guitar }
+    : effect
+    ? { kind: "effect", def: effect }
+    : null;
+
+  const revealRarity = guitar?.rarity ?? effect?.rarity ?? null;
+  const rarityStyles = revealRarity ? RARITY_STYLES[revealRarity] : null;
 
   const strip = useMemo(() => {
-    if (!result || !caseDef || !guitar) return [];
-    return buildRouletteStrip(caseDef, guitar);
-  }, [result, caseDef, guitar]);
+    if (!result || !caseDef || !winDef) return [];
+    return buildRouletteStrip(caseDef, winDef);
+  }, [result, caseDef]);
 
   useEffect(() => {
-    if (!isOpen || !guitar || !caseDef) {
+    if (!isOpen || !winDef || !caseDef) {
       setPhase("idle");
       return;
     }
-
     setPhase("spinning");
-
-    const spinTimer = setTimeout(() => {
-      setPhase("reveal");
-    }, 5500);
-
-    const doneTimer = setTimeout(() => {
-      setPhase("done");
-    }, 7000);
-
-    return () => {
-      clearTimeout(spinTimer);
-      clearTimeout(doneTimer);
-    };
+    const t1 = setTimeout(() => setPhase("reveal"), 5500);
+    const t2 = setTimeout(() => setPhase("done"), 7000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [isOpen, result]);
-
-  const handleEquip = () => {
-    if (!guitar) return;
-    equip(guitar.id, { onSuccess: onClose });
-  };
 
   const containerWidth = containerRef.current?.offsetWidth ?? 600;
   const centerOffset = containerWidth / 2 - ITEM_WIDTH / 2;
@@ -111,19 +114,15 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
             onClick={phase === "done" ? onClose : undefined}
           />
 
-          {phase === "reveal" || phase === "done" ? (
-            rarityStyles && (
-              <motion.div
-                className="absolute inset-0 pointer-events-none"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                style={{
-                  background: `radial-gradient(circle at center, ${rarityStyles.baseColor}15 0%, transparent 70%)`,
-                }}
-              />
-            )
-          ) : null}
+          {(phase === "reveal" || phase === "done") && rarityStyles && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              style={{ background: `radial-gradient(circle at center, ${rarityStyles.baseColor}15 0%, transparent 70%)` }}
+            />
+          )}
 
           <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-4xl px-4">
             <motion.h2
@@ -134,40 +133,25 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
               {caseDef?.name ?? "Opening Case"}
             </motion.h2>
 
-            {/* Roulette Container */}
+            {/* Roulette */}
             <div
               ref={containerRef}
               className="relative w-full overflow-hidden rounded-xl border-2 border-zinc-700/80 bg-zinc-950/90 shadow-[inset_0_0_60px_rgba(0,0,0,0.9)]"
               style={{ height: 220 }}
             >
-              {/* Center indicator line */}
               <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 z-30 w-[4px] bg-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.9)]" />
-
-              {/* Left/Right fade */}
               <div className="absolute inset-y-0 left-0 w-40 z-20 bg-gradient-to-r from-zinc-950 to-transparent pointer-events-none" />
               <div className="absolute inset-y-0 right-0 w-40 z-20 bg-gradient-to-l from-zinc-950 to-transparent pointer-events-none" />
 
-              {/* Scrolling strip */}
               <motion.div
                 ref={stripRef}
                 className="flex items-center h-full"
                 initial={{ x: 0 }}
-                animate={
-                  phase !== "idle"
-                    ? { x: -targetOffset + (Math.random() * 20 - 10) }
-                    : { x: 0 }
-                }
-                transition={
-                  phase !== "idle"
-                    ? {
-                        duration: 5,
-                        ease: [0.15, 0.0, 0.07, 1.0],
-                      }
-                    : undefined
-                }
+                animate={phase !== "idle" ? { x: -targetOffset + (Math.random() * 20 - 10) } : { x: 0 }}
+                transition={phase !== "idle" ? { duration: 5, ease: [0.15, 0.0, 0.07, 1.0] } : undefined}
               >
-                {strip.map((g, i) => {
-                  const rs = RARITY_STYLES[g.rarity];
+                {strip.map((item, i) => {
+                  const rs = RARITY_STYLES[item.def.rarity];
                   const isWinner = i === WIN_INDEX && (phase === "reveal" || phase === "done");
                   return (
                     <div
@@ -178,9 +162,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       <div
                         className={cn(
                           "relative flex items-center justify-center rounded-xl w-[160px] h-[120px] border-b-[5px] transition-all duration-500 overflow-hidden",
-                          isWinner
-                            ? "bg-zinc-800 scale-110"
-                            : "bg-zinc-900/80"
+                          isWinner ? "bg-zinc-800 scale-110" : "bg-zinc-900/80"
                         )}
                         style={{
                           borderBottomColor: rs.baseColor,
@@ -189,30 +171,27 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                             : `inset 0 0 15px ${rs.baseColor}10`,
                         }}
                       >
-                        <div
-                          className="absolute inset-0 opacity-20"
-                          style={{
-                            background: `linear-gradient(180deg, ${rs.baseColor}25 0%, transparent 60%)`,
-                          }}
-                        />
-                        <img
-                          src={`/static/images/rank/${g.imageId}.png`}
-                          alt={g.name}
-                          className="relative z-10 h-24 w-24 -rotate-45 object-contain drop-shadow-2xl"
-                        />
+                        <div className="absolute inset-0 opacity-20" style={{ background: `linear-gradient(180deg, ${rs.baseColor}25 0%, transparent 60%)` }} />
+                        {item.kind === "guitar" ? (
+                          <img
+                            src={`/static/images/rank/${item.def.imageId}.png`}
+                            alt={item.def.name}
+                            className="relative z-10 h-24 w-24 -rotate-45 object-contain drop-shadow-2xl"
+                          />
+                        ) : (
+                          <img
+                            src={`/static/images/effects/${item.def.imageId}.png`}
+                            alt={item.def.name}
+                            className="relative z-10 h-20 w-20 object-contain drop-shadow-2xl"
+                          />
+                        )}
                       </div>
                       <div className="flex flex-col items-center">
-                        <span
-                          className="text-[8px] font-black uppercase tracking-[0.2em] text-center leading-none truncate w-full opacity-60 mb-0.5"
-                          style={{ color: rs.baseColor }}
-                        >
-                          {g.brand}
+                        <span className="text-[8px] font-black uppercase tracking-[0.2em] opacity-60 mb-0.5" style={{ color: rs.baseColor }}>
+                          {item.kind === "guitar" ? item.def.brand : item.def.type}
                         </span>
-                        <span
-                          className="text-[11px] font-black uppercase tracking-wider text-center leading-tight truncate w-full"
-                          style={{ color: rs.baseColor }}
-                        >
-                          {g.name}
+                        <span className="text-[11px] font-black uppercase tracking-wider text-center leading-tight truncate w-full" style={{ color: rs.baseColor }}>
+                          {item.def.name}
                         </span>
                       </div>
                     </div>
@@ -221,9 +200,9 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
               </motion.div>
             </div>
 
-            {/* Reveal section */}
+            {/* Reveal */}
             <AnimatePresence>
-              {(phase === "reveal" || phase === "done") && guitar && rarityStyles && (
+              {(phase === "reveal" || phase === "done") && winDef && rarityStyles && (
                 <motion.div
                   initial={{ opacity: 0, y: 30, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -241,7 +220,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     <motion.div
                       className={cn(
                         "relative flex h-80 w-80 items-center justify-center rounded-3xl bg-zinc-950/90 border-b-8",
-                        RARITY_GLOW_CLASS[guitar.rarity]
+                        RARITY_GLOW_CLASS[winDef.def.rarity]
                       )}
                       style={{ borderBottomColor: rarityStyles.baseColor }}
                       animate={{
@@ -253,17 +232,20 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                       }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <div
-                        className="absolute inset-0 rounded-3xl opacity-30"
-                        style={{
-                          background: `radial-gradient(circle at center, ${rarityStyles.baseColor}30 0%, transparent 70%)`,
-                        }}
-                      />
-                      <img
-                        src={`/static/images/rank/${guitar.imageId}.png`}
-                        alt={guitar.name}
-                        className="relative z-10 h-64 w-64 -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
-                      />
+                      <div className="absolute inset-0 rounded-3xl opacity-30" style={{ background: `radial-gradient(circle at center, ${rarityStyles.baseColor}30 0%, transparent 70%)` }} />
+                      {winDef.kind === "guitar" ? (
+                        <img
+                          src={`/static/images/rank/${winDef.def.imageId}.png`}
+                          alt={winDef.def.name}
+                          className="relative z-10 h-64 w-64 -rotate-[35deg] object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
+                        />
+                      ) : (
+                        <img
+                          src={`/static/images/effects/${winDef.def.imageId}.png`}
+                          alt={winDef.def.name}
+                          className="relative z-10 h-60 w-60 object-contain filter drop-shadow-[0_0_30px_rgba(0,0,0,0.9)]"
+                        />
+                      )}
                     </motion.div>
                   </div>
 
@@ -273,41 +255,50 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                     transition={{ delay: 0.4 }}
                     className="flex flex-col items-center gap-2"
                   >
-                    <RarityBadge rarity={guitar.rarity} size="lg" />
+                    <RarityBadge rarity={winDef.def.rarity} size="lg" />
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-sm font-bold text-zinc-400 uppercase tracking-[0.3em] leading-none">
-                        {guitar.brand}
+                        {winDef.kind === "guitar" ? winDef.def.brand : winDef.def.type}
                       </span>
                       <h3 className="text-4xl md:text-5xl font-black uppercase tracking-wider text-white drop-shadow-lg text-center leading-tight">
-                        {guitar.name}
+                        {winDef.def.name}
                       </h3>
+                      {winDef.kind === "guitar" && result?.newItem?.year && result?.newItem?.country && (
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{result.newItem.year}</span>
+                          <span className="text-zinc-600 text-xs">·</span>
+                          <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{result.newItem.country}</span>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Action buttons */}
+            {/* Buttons */}
             <AnimatePresence>
-              {phase === "done" && guitar && (
+              {phase === "done" && winDef && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex w-full gap-4"
                 >
-                  <Button
-                    onClick={handleEquip}
-                    disabled={isEquipping}
-                    className="w-full bg-cyan-500 hover:bg-cyan-400 text-cyan-950 font-black uppercase tracking-widest h-12 text-sm"
-                  >
-                    Equip Now
-                  </Button>
+                  {winDef.kind === "guitar" && guitar && (
+                    <Button
+                      onClick={() => equip(guitar.id, { onSuccess: onClose })}
+                      disabled={isEquipping}
+                      className="w-full bg-cyan-500 hover:bg-cyan-400 text-cyan-950 font-black uppercase tracking-widest h-12 text-sm"
+                    >
+                      Equip Now
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     onClick={onClose}
                     className="w-full border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-white font-bold uppercase tracking-widest h-12 text-sm"
                   >
-                    Keep in Arsenal
+                    {winDef.kind === "guitar" ? "Keep in Arsenal" : "Add to Collection"}
                   </Button>
                 </motion.div>
               )}

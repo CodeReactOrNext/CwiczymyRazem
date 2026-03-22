@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
+import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -39,9 +40,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ error: "Guitar not in inventory" });
     }
 
+    const guitarDef = GUITARS_BY_ID.get(guitarId);
+    const imageId = guitarDef?.imageId ?? guitarId;
+
     await userRef.update({
       "arsenal.equippedGuitarId": guitarId,
-      selectedGuitar: guitarId,
+      selectedGuitar: imageId,
     });
 
     return res.status(200).json({ success: true });

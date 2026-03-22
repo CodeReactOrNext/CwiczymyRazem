@@ -234,6 +234,11 @@ export const userSlice = createSlice({
         state.userInfo.role = payload;
       }
     },
+    setSelectedGuitar: (state, { payload }: PayloadAction<string | number | null>) => {
+      if (state.userInfo) {
+        state.userInfo.selectedGuitar = payload ?? undefined;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -315,6 +320,11 @@ export const userSlice = createSlice({
         }
 
         state.raitingData = payload.raitingData;
+
+        // Add earned fame to Redux state (Firestore was already updated via increment)
+        if (payload.raitingData?.fameEarned && state.currentUserStats) {
+          state.currentUserStats.fame = (state.currentUserStats.fame || 0) + payload.raitingData.fameEarned;
+        }
         state.isFetching = null;
       })
       .addCase(restartUserStats.fulfilled, (state) => {
@@ -438,6 +448,7 @@ export const {
   setActivity,
   setUserRole,
   deductFame,
+  setSelectedGuitar,
 } = userSlice.actions;
 
 export const selectUserAuth = (state: RootState) => state.user.userAuth;

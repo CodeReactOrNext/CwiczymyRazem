@@ -1,3 +1,9 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 import Avatar from "components/UI/Avatar";
@@ -7,14 +13,18 @@ import AchievementIcon from "feature/achievements/components/AchievementIcon";
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
+import { EFFECT_DEFINITIONS } from "feature/arsenal/data/effectDefinitions";
+import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { LogReaction } from "feature/logs/components/LogReaction";
 import type {
   FirebaseLogsInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
   FirebaseLogsRecordingsInterface,
-  FirebaseLogsDailyQuestInterface
+  FirebaseLogsDailyQuestInterface,
+  FirebaseLogsCaseOpenInterface,
 } from "feature/logs/types/logs.type";
+import { FaGem, FaCalendarAlt, FaGlobe, FaTag } from "react-icons/fa";
 import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
@@ -55,6 +65,175 @@ const isFirebaseLogsDailyQuest = (
   return (log as FirebaseLogsDailyQuestInterface).type === "daily_quest_completed";
 };
 
+const isFirebaseLogsCaseOpen = (
+  log: any
+): log is FirebaseLogsCaseOpenInterface => {
+  return (log as FirebaseLogsCaseOpenInterface).type === "case_open";
+};
+
+const RARITY_COLORS: Record<string, string> = {
+  Common: "#9ca3af",
+  Uncommon: "#4ade80",
+  Rare: "#60a5fa",
+  Epic: "#c084fc",
+  Legendary: "#fb923c",
+  Mythic: "#f43f5e",
+};
+
+const ItemTooltipCard = ({
+  itemType,
+  itemName,
+  itemBrand,
+  itemRarity,
+  itemImageId,
+}: {
+  itemType: "guitar" | "effect";
+  itemName: string;
+  itemBrand: string;
+  itemRarity: string;
+  itemImageId: number | string;
+}) => {
+  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
+  const imgSrc = itemType === "guitar"
+    ? `/static/images/rank/${itemImageId}.png`
+    : `/static/images/effects/${itemImageId}.png`;
+
+  const guitarDef = itemType === "guitar"
+    ? GUITAR_DEFINITIONS.find((g) => g.imageId === itemImageId)
+    : null;
+  const effectDef = itemType === "effect"
+    ? EFFECT_DEFINITIONS.find((e) => e.imageId === itemImageId)
+    : null;
+
+  return (
+    <div
+      className="flex flex-col w-44 overflow-hidden rounded-xl"
+      style={{ border: `1px solid ${color}50`, background: "#111" }}
+    >
+      {/* Header */}
+      <div className="px-3 pt-3 pb-1">
+        <p className="text-[10px] font-medium uppercase tracking-widest" style={{ color: `${color}cc` }}>{itemBrand}</p>
+        <p className="text-sm font-bold text-white leading-tight">{itemName}</p>
+        <span
+          className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"
+          style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}
+        >
+          <FaGem size={7} />
+          {itemRarity}
+        </span>
+      </div>
+
+      {/* Image */}
+      <div
+        className="flex items-end justify-center px-3 py-4 mx-2 my-2 rounded-lg"
+        style={{ background: `radial-gradient(ellipse at center, ${color}18 0%, transparent 70%)` }}
+      >
+        <img
+          src={imgSrc}
+          alt={itemName}
+          className={`object-contain drop-shadow-xl ${itemType === "guitar" ? "h-36 w-auto -rotate-90" : "h-24 w-24"}`}
+        />
+      </div>
+
+      {/* Footer */}
+      {(guitarDef || effectDef) && (
+        <div
+          className="flex items-center justify-between px-3 py-2 text-[10px] text-gray-400"
+          style={{ borderTop: `1px solid ${color}20`, background: `${color}08` }}
+        >
+          {guitarDef && (
+            <>
+              <span className="font-semibold text-gray-300">{guitarDef.yearFrom}</span>
+              <span className="text-gray-500 uppercase tracking-widest text-[9px]">
+                {guitarDef.countries[0]}
+              </span>
+            </>
+          )}
+          {effectDef && (
+            <>
+              <span className="font-semibold text-gray-300">{effectDef.type}</span>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const FirebaseLogsCaseOpenItem = ({
+  log,
+  isNew,
+  currentUserId,
+}: {
+  log: FirebaseLogsCaseOpenInterface;
+  isNew: boolean;
+  currentUserId: string;
+}) => {
+  const { timestamp, userName, uid, avatarUrl, userAvatarFrame, caseName, itemType, itemName, itemBrand, itemRarity, itemImageId } = log;
+  const date = new Date(timestamp);
+  const color = RARITY_COLORS[itemRarity] || RARITY_COLORS.Common;
+  const imgSrc = itemType === "guitar"
+    ? `/static/images/rank/${itemImageId}.png`
+    : `/static/images/effects/${itemImageId}.png`;
+
+  return (
+    <LogItem isNew={isNew}>
+      <TimeStamp date={date} />
+      <div className="flex w-full flex-wrap items-center gap-1 sm:w-[80%]">
+        <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
+          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+        </span>
+        <span className="text-secondText">opened</span>
+        <span className="text-white font-bold">{caseName}</span>
+        <span className="text-secondText">and got</span>
+        <TooltipProvider>
+          <Tooltip delayDuration={150}>
+            <TooltipTrigger asChild>
+              <span className="inline-flex cursor-default items-center gap-1.5">
+                <span
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest"
+                  style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
+                >
+                  <FaGem size={8} />
+                  {itemRarity}
+                </span>
+                <span className="font-bold" style={{ color }}>
+                  {itemBrand} {itemName}
+                </span>
+                <img
+                  src={imgSrc}
+                  alt={itemName}
+                  className={`h-7 w-7 object-contain opacity-80 ${itemType === "guitar" ? "-rotate-45" : ""}`}
+                />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent
+              className="p-0 border-0 bg-transparent shadow-2xl"
+              side="top"
+            >
+              <ItemTooltipCard
+                itemType={itemType}
+                itemName={itemName}
+                itemBrand={itemBrand}
+                itemRarity={itemRarity}
+                itemImageId={itemImageId}
+              />
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        {log.id && (
+          <LogReaction
+            logId={log.id}
+            reactions={log.reactions}
+            currentUserId={currentUserId}
+            disabled={log.uid === currentUserId}
+          />
+        )}
+      </div>
+    </LogItem>
+  );
+};
+
 interface LogsBoxLayoutProps {
   logs: (
     | FirebaseLogsSongsInterface
@@ -62,6 +241,7 @@ interface LogsBoxLayoutProps {
     | FirebaseLogsTopPlayersInterface
     | FirebaseLogsRecordingsInterface
     | FirebaseLogsDailyQuestInterface
+    | FirebaseLogsCaseOpenInterface
   )[];
   marksLogsAsRead: () => void;
   currentUserId: string;
@@ -686,6 +866,12 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
              />
           ) : isFirebaseLogsDailyQuest(log) ? (
             <FirebaseLogsDailyQuestItem
+              log={log}
+              isNew={isNewMessage((log as any).data || (log as any).timestamp)}
+              currentUserId={currentUserId}
+            />
+          ) : isFirebaseLogsCaseOpen(log) ? (
+            <FirebaseLogsCaseOpenItem
               log={log}
               isNew={isNewMessage((log as any).data || (log as any).timestamp)}
               currentUserId={currentUserId}

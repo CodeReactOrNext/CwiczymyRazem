@@ -1,12 +1,17 @@
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
 import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
+import { EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
 import type {
   CaseType,
   GuitarRarity,
   InventoryItem,
+  EffectInventoryItem,
 } from "feature/arsenal/types/arsenal.types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
+
+// 60% guitar, 40% effect
+const GUITAR_CHANCE = 0.6;
 
 function drawRarity(probabilities: Record<GuitarRarity, number>): GuitarRarity {
   const roll = Math.random();
@@ -44,42 +49,93 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const userRef = firestore.collection("users").doc(userId);
+    let capturedUserData: any = null;
 
     const result = await firestore.runTransaction(async (t) => {
       const userDoc = await t.get(userRef);
       if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
 
       const data = userDoc.data()!;
+      capturedUserData = data;
       const currentFame: number = data.statistics?.fame || 0;
 
       if (currentFame < caseDef.fameCost) throw new Error("INSUFFICIENT_FAME");
 
-      // Draw rarity then pick random guitar of that rarity
-      const rarity = drawRarity(caseDef.probabilities);
-      const pool = GUITARS_BY_RARITY[rarity] || GUITARS_BY_RARITY["Common"];
-      const guitar = pool[Math.floor(Math.random() * pool.length)];
-
-      const newItem: InventoryItem = {
-        id: generateId(),
-        guitarId: guitar.id,
-        acquiredAt: Date.now(),
-        isNew: true,
-      };
-
-      const currentInventory: InventoryItem[] = data.arsenal?.inventory || [];
-      const newInventory = [...currentInventory, newItem];
-
-      // Starter migration: if first time opening, set equippedGuitarId from selectedGuitar
       const existingEquipped = data.arsenal?.equippedGuitarId ?? data.selectedGuitar ?? null;
+      const newFame = currentFame - caseDef.fameCost;
 
-      t.update(userRef, {
-        "statistics.fame": currentFame - caseDef.fameCost,
-        "arsenal.inventory": newInventory,
-        "arsenal.equippedGuitarId": existingEquipped,
-      });
+      if (Math.random() < GUITAR_CHANCE) {
+        // Draw guitar
+        const rarity = drawRarity(caseDef.probabilities);
+        const pool = GUITARS_BY_RARITY[rarity] || GUITARS_BY_RARITY["Common"];
+        const guitar = pool[Math.floor(Math.random() * pool.length)];
+        const year = Math.floor(Math.random() * (guitar.yearTo - guitar.yearFrom + 1)) + guitar.yearFrom;
+        const country = guitar.countries[Math.floor(Math.random() * guitar.countries.length)];
 
-      return { guitar, newItem, newInventory, newFame: currentFame - caseDef.fameCost };
+        const newItem: InventoryItem = {
+          id: generateId(),
+          guitarId: guitar.id,
+          acquiredAt: Date.now(),
+          isNew: true,
+          year,
+          country,
+        };
+
+        const newInventory = [...(data.arsenal?.inventory || []), newItem];
+
+        t.update(userRef, {
+          "statistics.fame": newFame,
+          "arsenal.inventory": newInventory,
+          "arsenal.equippedGuitarId": existingEquipped,
+        });
+
+        return { type: "guitar", guitar, newItem, newInventory, newFame };
+      } else {
+        // Draw effect
+        const rarity = drawRarity(caseDef.probabilities);
+        const pool = EFFECTS_BY_RARITY[rarity] || EFFECTS_BY_RARITY["Common"] || [];
+        const effect = pool[Math.floor(Math.random() * pool.length)];
+
+        const effectItem: EffectInventoryItem = {
+          id: generateId(),
+          effectId: effect.id,
+          acquiredAt: Date.now(),
+          isNew: true,
+        };
+
+        const newEffectInventory = [...(data.arsenal?.effectInventory || []), effectItem];
+
+        t.update(userRef, {
+          "statistics.fame": newFame,
+          "arsenal.effectInventory": newEffectInventory,
+        });
+
+        return { type: "effect", effect, effectItem, newFame };
+      }
     });
+
+    // Write activity log (panel only, no Discord)
+    try {
+      const item = result.type === "guitar" ? result.guitar : result.effect;
+      await firestore.collection("logs").add({
+        type: "case_open",
+        uid: userId,
+        userName: capturedUserData?.displayName || "Unknown",
+        avatarUrl: capturedUserData?.avatarUrl || null,
+        userAvatarFrame: capturedUserData?.selectedFrame ?? capturedUserData?.statistics?.lvl ?? 0,
+        timestamp: new Date().toISOString(),
+        data: new Date().toISOString(),
+        caseType,
+        caseName: caseDef.name,
+        itemType: result.type,
+        itemName: item.name,
+        itemBrand: item.brand,
+        itemRarity: item.rarity,
+        itemImageId: item.imageId,
+      });
+    } catch (logError) {
+      console.error("[open-case] log write failed:", logError);
+    }
 
     return res.status(200).json(result);
   } catch (error: any) {

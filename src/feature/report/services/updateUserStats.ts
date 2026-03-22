@@ -1,5 +1,5 @@
 import { updateSeasonalStats } from "feature/report/services/updateSeasonalStats";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, increment, updateDoc } from "firebase/firestore";
 import type { StatisticsDataInterface } from "types/api.types";
 import { db } from "utils/firebase/client/firebase.utils";
 
@@ -14,7 +14,8 @@ export const firebaseUpdateUserStats = async (
     creativityTime: number;
     sumTime: number;
   },
-  pointsGained: number
+  pointsGained: number,
+  fameEarned: number = 0
 ) => {
   const userDocRef = doc(db, "users", userAuth);
 
@@ -34,6 +35,7 @@ export const firebaseUpdateUserStats = async (
     "statistics.achievements": statistics.achievements,
     "statistics.lastReportDate": statistics.lastReportDate,
     "skills": statistics.skills,
+    ...(fameEarned > 0 && { "statistics.fame": increment(fameEarned) }),
   };
 
   await Promise.all([

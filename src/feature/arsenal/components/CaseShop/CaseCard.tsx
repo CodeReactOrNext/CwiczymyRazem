@@ -1,9 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { FaGem } from "react-icons/fa";
 import { RARITY_STYLES } from "../RarityBadge";
-import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
-import type { CaseDefinition, GuitarRarity, GuitarDefinition } from "../../types/arsenal.types";
-import { useMemo } from "react";
+import type { CaseDefinition, GuitarRarity } from "../../types/arsenal.types";
 
 const CASE_ACCENT: Record<string, { border: string; glow: string; button: string; bg: string }> = {
   standard: {
@@ -39,21 +37,6 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
 
   const probs = Object.entries(caseDef.probabilities) as [GuitarRarity, number][];
 
-  const previewGuitars = useMemo(() => {
-    const items: GuitarDefinition[] = [];
-    const rarities: GuitarRarity[] = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic"];
-    for (const rarity of rarities) {
-      const pool = GUITARS_BY_RARITY[rarity];
-      if (pool && pool.length > 0) {
-        items.push(pool[0]);
-        if (pool.length > 1) {
-          items.push(pool[1]);
-        }
-      }
-    }
-    return items.slice(0, 8);
-  }, []);
-
   return (
     <div
       className={cn(
@@ -66,35 +49,24 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
       <div className="flex flex-col gap-1 items-center text-center">
         <h3 className="text-lg font-black tracking-wide text-white uppercase drop-shadow-md">{caseDef.name}</h3>
         <p className="text-xs font-medium text-zinc-400">{caseDef.description}</p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+            {caseDef.yearFrom === caseDef.yearTo ? caseDef.yearFrom : `${caseDef.yearFrom}–${caseDef.yearTo}`}
+          </span>
+          <span className="text-zinc-600 text-[10px]">·</span>
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+            {caseDef.country}
+          </span>
+        </div>
       </div>
 
-      {/* Case contents preview — CS:GO style grid */}
-      <div className="grid grid-cols-4 gap-1.5 bg-zinc-950/60 rounded-lg p-2 border border-zinc-800/50">
-        {previewGuitars.map((g) => {
-          const rs = RARITY_STYLES[g.rarity];
-          return (
-            <div
-              key={g.id}
-              className="flex flex-col items-center gap-0.5 rounded-md py-1.5 relative overflow-hidden group/item"
-              style={{
-                borderBottom: `2px solid ${rs.baseColor}`,
-                background: `linear-gradient(180deg, ${rs.baseColor}10 0%, transparent 80%)`,
-              }}
-            >
-              <img
-                src={`/static/images/rank/${g.imageId}.png`}
-                alt={g.name}
-                className="h-8 w-8 -rotate-45 object-contain drop-shadow-md"
-              />
-              <span
-                className="text-[7px] font-bold uppercase tracking-wide truncate w-full text-center leading-tight px-0.5"
-                style={{ color: rs.baseColor }}
-              >
-                {g.name}
-              </span>
-            </div>
-          );
-        })}
+      {/* Package image */}
+      <div className="flex items-center justify-center py-2">
+        <img
+          src={`/static/images/package/${caseDef.id}.png`}
+          alt={caseDef.name}
+          className="h-36 object-contain drop-shadow-2xl transition-transform duration-300 group-hover:scale-105"
+        />
       </div>
 
       {/* Probabilities */}
