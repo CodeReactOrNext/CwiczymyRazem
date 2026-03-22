@@ -9,7 +9,7 @@ import type {
 } from "feature/arsenal/types/arsenal.types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
-import type { Transaction } from "firebase-admin/firestore";
+import type { Transaction, DocumentReference } from "firebase-admin/firestore";
 
 // 60% guitar, 40% effect
 const GUITAR_CHANCE = 0.6;
@@ -49,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const userRef = firestore.collection("users").doc(userId);
+    const userRef = firestore.collection("users").doc(userId) as DocumentReference;
     let capturedUserData: any = null;
 
     const result = await firestore.runTransaction(async (t: Transaction) => {
