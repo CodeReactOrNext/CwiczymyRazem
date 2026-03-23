@@ -1,5 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
+import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { FaGem } from "react-icons/fa";
+
+const RARITY_COLORS: Record<string, string> = {
+  Common: "#9ca3af",
+  Uncommon: "#4ade80",
+  Rare: "#60a5fa",
+  Epic: "#c084fc",
+  Legendary: "#fb923c",
+  Mythic: "#f43f5e",
+};
 
 interface AvatarProps {
   name: string;
@@ -95,11 +107,19 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
   if (size === "sm") innerRoundedClass = "rounded-full";
   if (size === "2xl") innerRoundedClass = "rounded-[14px]";
 
-  const badgePosition = size === "2xl" 
-    ? { bottom: "28px", left: "58px" } 
+  const badgePosition = size === "2xl"
+    ? { bottom: "28px", left: "58px" }
     : { bottom: "18px", left: "35px" };
 
   const showEffects = size === "2xl";
+
+  const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
+  const specialGuitarDef = isSpecialGuitar ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath) : null;
+  const specialGuitarColor = specialGuitarDef ? (RARITY_COLORS[specialGuitarDef.rarity] ?? RARITY_COLORS.Common) : RARITY_COLORS.Common;
+  const guitarGlow = `drop-shadow(0 0 4px ${specialGuitarColor}40) drop-shadow(0 8px 20px rgba(0,0,0,0.95))`;
+  const specialGuitarImgStyle = size === "2xl"
+    ? { bottom: "-40px", right: "-40px", width: 160, height: 160, transform: "rotate(-90deg)", filter: guitarGlow }
+    : { bottom: "-28px", right: "-28px", width: 110, height: 110, transform: "rotate(-90deg)", filter: guitarGlow };
 
   return (
     <div className={`relative inline-block ${className || ""}`}>
@@ -187,13 +207,39 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
           )}
         </div>
       </div>
-      {imgPath !== 0 && (
-        <img
-          className='absolute -rotate-90 z-20'
-          style={size === "sm" ? { display: "none" } : { ...badgePosition }}
-          src={`/static/images/rank/${imgPath}.png`}
-          alt={`gutiar rank image for level ${lvl ?? 0}`}
-        />
+      {imgPath !== 0 && isSpecialGuitar && size !== "sm" && !specialGuitarDef && (
+        <img className='absolute z-20 object-contain' style={specialGuitarImgStyle} src={`/static/images/rank/${imgPath}.png`} alt='equipped guitar' />
+      )}
+      {imgPath !== 0 && isSpecialGuitar && size !== "sm" && specialGuitarDef && (
+        <TooltipProvider>
+          <Tooltip delayDuration={200}>
+            <TooltipTrigger asChild>
+              <img className='absolute z-20 object-contain cursor-pointer' style={specialGuitarImgStyle} src={`/static/images/rank/${imgPath}.png`} alt='equipped guitar' />
+            </TooltipTrigger>
+            <TooltipContent className="p-0 border-0 bg-transparent shadow-2xl" side="top">
+              <div className="flex flex-col w-44 overflow-hidden rounded-xl" style={{ border: `1px solid ${specialGuitarColor}50`, background: "#111" }}>
+                <div className="px-3 pt-3 pb-1">
+                  <p className="text-[10px] font-medium uppercase tracking-widest" style={{ color: `${specialGuitarColor}cc` }}>{specialGuitarDef.brand}</p>
+                  <p className="text-sm font-bold text-white leading-tight">{specialGuitarDef.name}</p>
+                  <span className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest" style={{ backgroundColor: `${specialGuitarColor}20`, color: specialGuitarColor, border: `1px solid ${specialGuitarColor}40` }}>
+                    <FaGem size={7} />
+                    {specialGuitarDef.rarity}
+                  </span>
+                </div>
+                <div className="flex items-end justify-center px-3 py-4 mx-2 my-2 rounded-lg" style={{ background: `radial-gradient(ellipse at center, ${specialGuitarColor}18 0%, transparent 70%)` }}>
+                  <img src={`/static/images/rank/${imgPath}.png`} alt={specialGuitarDef.name} className="object-contain drop-shadow-xl h-52 w-auto -rotate-90" />
+                </div>
+                <div className="flex items-center justify-between px-3 py-2 text-[10px] text-gray-400" style={{ borderTop: `1px solid ${specialGuitarColor}20`, background: `${specialGuitarColor}08` }}>
+                  <span className="font-semibold text-gray-300">{specialGuitarDef.yearFrom}–{specialGuitarDef.yearTo}</span>
+                  <span className="text-gray-500 uppercase tracking-widest text-[9px]">{specialGuitarDef.countries[0]}</span>
+                </div>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
+      {imgPath !== 0 && !isSpecialGuitar && (
+        <img className='absolute -rotate-90 z-20' style={size === "sm" ? { display: "none" } : { ...badgePosition }} src={`/static/images/rank/${imgPath}.png`} alt={`guitar rank image for level ${lvl ?? 0}`} />
       )}
     </div>
   );

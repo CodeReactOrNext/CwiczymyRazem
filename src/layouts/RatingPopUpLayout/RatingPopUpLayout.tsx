@@ -70,8 +70,9 @@ const RatingPopUpLayout = ({
       <div ref={topRef} />
       {isGetNewLevel && <LevelUpBanner />}
 
-      <SuccessRewardCard 
+      <SuccessRewardCard
         displayedPoints={displayedPoints}
+        fameEarned={ratingData.fameEarned}
         currentLevel={currentLevel}
         prevProgressPercent={prevProgressPercent}
         currProgressPercent={currProgressPercent}

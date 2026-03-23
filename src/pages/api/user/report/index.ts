@@ -83,7 +83,8 @@ export default async function handler(
 
 
     // Calculate points gained in this session - use the points from current report only
-    const pointsGained = report.raitingData.totalPoints || 0; // Use points from current session only
+    const pointsGained = report.raitingData.totalPoints || 0;
+    const fameEarned = Math.round(pointsGained);
 
     const writePromises = [];
 
@@ -91,7 +92,8 @@ export default async function handler(
       userUid,
       report.currentUserStats,
       report.timeSummary,
-      pointsGained
+      pointsGained,
+      fameEarned
     ));
 
     writePromises.push(firebaseSetUserExerciseRaprot(
@@ -142,6 +144,7 @@ export default async function handler(
 
     res.status(200).json({
       ...report,
+      raitingData: { ...report.raitingData, fameEarned },
     });
   }
   res.status(400);
