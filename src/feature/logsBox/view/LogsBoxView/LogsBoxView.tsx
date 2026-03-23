@@ -11,8 +11,8 @@ import { useAppSelector } from "store/hooks";
 
 const LogsBoxView = ({ className }: { className?: string }) => {
   const [logs, setLogs] = useState<
-    (FirebaseLogsSongsInterface | FirebaseLogsInterface | FirebaseLogsTopPlayersInterface)[]
-  >([]);
+    (FirebaseLogsSongsInterface | FirebaseLogsInterface | FirebaseLogsTopPlayersInterface)[] | null
+  >(null);
 
   const userStats = useAppSelector(selectCurrentUserStats);
   const currentUserId = useAppSelector(selectUserAuth);
@@ -26,7 +26,7 @@ const LogsBoxView = ({ className }: { className?: string }) => {
     return () => unsubscribe();
   }, []);
 
-  if (!currentUserId) return null;
+  if (!currentUserId || logs === null) return null;
 
   return (
     <LogsBoxLayout
