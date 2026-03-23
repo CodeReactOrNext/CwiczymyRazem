@@ -84,13 +84,17 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
 
   useEffect(() => {
     if (!router.isReady) return;
-    
+
     const { view } = router.query;
     if (view === "create") {
-      setIsCreating(true);
-      setActiveTab("my_plans");
+      if (isPremium) {
+        setIsCreating(true);
+        setActiveTab("my_plans");
+      } else {
+        setShowUpgradeModal(true);
+      }
     }
-  }, [router.isReady, router.query]);
+  }, [router.isReady, router.query, isPremium]);
 
   useEffect(() => {
     const loadPlans = async () => {
@@ -310,7 +314,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
               subtitle={t("exercises:my_plans.custom_plans_description") as string}
               action={
                 <Button
-                  onClick={() => setIsCreating(true)}
+                  onClick={() => isPremium ? setIsCreating(true) : setShowUpgradeModal(true)}
                   className="bg-white hover:bg-zinc-100 text-black font-bold uppercase tracking-widest text-[11px] h-9 px-5 rounded-lg transition-all"
                 >
                   <FaPlus className="mr-2 h-3 w-3" />
@@ -323,7 +327,7 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
             <div className="rounded-2xl border border-dashed border-white/[0.08] bg-zinc-900/20 p-12 text-center">
               <p className="text-zinc-500 text-sm">{t("exercises:my_plans.no_custom_plans")}</p>
               <Button
-                onClick={() => setIsCreating(true)}
+                onClick={() => isPremium ? setIsCreating(true) : setShowUpgradeModal(true)}
                 className="mt-6"
               >
                 {t("exercises:my_plans.create_first")}

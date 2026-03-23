@@ -19,4 +19,5 @@ export type NavPagesTypes =
   | "summary"
   | "my-plans"
   | "gp-tabs"
+  | "arsenal"
   | null;

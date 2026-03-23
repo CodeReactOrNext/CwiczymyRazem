@@ -13,7 +13,7 @@ export interface FirebaseUserDataInterface {
   band?: string;
   guitarStartDate?: Timestamp;
   selectedFrame?: number;
-  selectedGuitar?: number;
+  selectedGuitar?: number | string;
   statistics: StatisticsDataInterface;
   songLists: UserSongLists;
   fcmData?: {

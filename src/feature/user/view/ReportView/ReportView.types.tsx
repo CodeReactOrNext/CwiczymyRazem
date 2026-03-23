@@ -35,6 +35,7 @@ export interface ReportFormikInterface {
 export interface ReportDataInterface {
   reportDate: Date;
   totalPoints: number;
+  fameEarned?: number;
   bonusPoints: {
     multiplier: number;
     habitsCount: number;
