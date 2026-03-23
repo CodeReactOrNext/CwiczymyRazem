@@ -40,11 +40,11 @@ const useAuthSync = () => {
       isSyncing.current = true;
 
       try {
-        const currentUser = await firebaseGetCurrentUser(10000);
+        const currentUser = await firebaseGetCurrentUser(30000);
 
         if (currentUser) {
           retryCount.current++;
-          dispatch(autoLogIn(currentUser));
+          await dispatch(autoLogIn(currentUser));
         } else {
           console.warn("Session authenticated but Firebase User null. Logging out to sync.");
           await signOut({ redirect: false });
