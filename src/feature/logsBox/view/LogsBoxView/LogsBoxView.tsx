@@ -28,9 +28,9 @@ const LogsBoxView = ({ className }: { className?: string }) => {
   }, []);
 
   return logs && userAchievement && currentUserId ? (
-    <LogsBoxLayout 
-      logs={logs} 
-      userAchievements={userAchievement} 
+    <LogsBoxLayout
+      logs={logs}
+      userAchievements={userAchievement}
       currentUserId={currentUserId}
       className={className}
     />
