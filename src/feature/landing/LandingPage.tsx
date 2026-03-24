@@ -4,7 +4,12 @@ import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { BlogSection } from "feature/landing/components/BlogSection";
 import { CookieBanner } from "feature/landing/components/CookieBanner";
 import { FaqSection } from "feature/landing/components/FaqSection";
-import { FeaturesSection } from "feature/landing/components/FeaturesSection";
+import { InteractiveExercisesSection } from "feature/landing/components/InteractiveExercisesSection";
+import { StatisticsSection } from "feature/landing/components/StatisticsSection";
+import { SongsLibrarySection } from "feature/landing/components/SongsLibrarySection";
+import { PracticePlansSection } from "feature/landing/components/PracticePlansSection";
+import { RoadmapSection } from "feature/landing/components/RoadmapSection";
+import { SessionSummarySection } from "feature/landing/components/SessionSummarySection";
 import { Footer } from "feature/landing/components/Footer";
 import { HeroSection } from "feature/landing/components/HeroSection";
 import { WhySection } from "feature/landing/components/WhySection";
@@ -67,7 +72,12 @@ const LandingPage = ({ blogs }: LandingPageProps) => {
         <HeroSection />
         <ProductDemo />
         <WhySection />
-        <FeaturesSection />
+        <InteractiveExercisesSection />
+        <StatisticsSection />
+        <SongsLibrarySection />
+        <PracticePlansSection />
+        <RoadmapSection />
+        <SessionSummarySection />
         <FaqSection questions={faqQuestions} />
         <BlogSection blogs={blogs} />
         <FinalCTASection />
