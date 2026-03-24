@@ -96,7 +96,7 @@ const getBorderStyles = (lvl: number) => {
 
 const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selectedGuitar }: AvatarProps) => {
   const effectiveLvl = selectedFrame !== undefined ? selectedFrame : (lvl ?? 0);
-  const imgPath = selectedGuitar !== undefined ? selectedGuitar : getRankImgPath(lvl ?? 0);
+  const imgPath = selectedGuitar ?? getRankImgPath(lvl ?? 0);
   const borderStyles = getBorderStyles(effectiveLvl);
 
   let containerSizeClass = "h-20 w-20 rounded-xl";
