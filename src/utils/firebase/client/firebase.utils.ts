@@ -58,7 +58,7 @@ export const db =
   typeof window !== "undefined"
     ? initializeFirestore(firebaseApp, {
         localCache: persistentLocalCache({
-          tabManager: persistentSingleTabManager(null),
+          tabManager: persistentSingleTabManager(undefined),
         }),
       })
     : initializeFirestore(firebaseApp, {});
