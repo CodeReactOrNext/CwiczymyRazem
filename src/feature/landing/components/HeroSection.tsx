@@ -82,7 +82,7 @@ export const HeroSection = () => {
             repeatType: "mirror",
             ease: "easeInOut"
           }}
-          className="absolute -bottom-[15%] -right-[10%] w-[80%] h-[70%] bg-teal-500/20 blur-[130px] rounded-full"
+          className="absolute -bottom-[15%] -right-[10%] w-[80%] h-[70%] bg-orange-500/25 blur-[130px] rounded-full"
         />
       </div>
 
@@ -95,13 +95,13 @@ export const HeroSection = () => {
         <div className='max-w-4xl mx-auto flex flex-col items-center pt-20'>
           {/* Header - Reduced Size */}
           <h1 className='text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-[1.1] mb-8 font-display'>
-            Stop guessing. <br />
-            <span className='bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent'>Start seeing it.</span>
+            The guitar practice tracker <br />
+            <span className='bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent'>built for real progress.</span>
           </h1>
 
           <p className='max-w-2xl text-xl sm:text-2xl text-zinc-400 font-medium leading-relaxed mb-12 tracking-tight'>
-            Riff Quest turns your practice sessions into visible growth. <br className="hidden sm:block"/>
-            Built for guitarists who want to practice smarter.
+            Log sessions, discover song difficulty ratings, and follow a <br className="hidden sm:block"/>
+            structured routine — from beginner to advanced.
           </p>
 
           {/* Action Group */}
