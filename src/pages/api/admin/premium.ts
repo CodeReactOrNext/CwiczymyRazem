@@ -20,16 +20,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // ── GET  – list all premium users ──────────────────────────────────────────
+  // ── GET  – list all premium users (pro + master) ────────────────────────────
   if (req.method === "GET") {
     try {
-      const snap = await getDocs(
-        query(collection(db, "users"), where("role", "==", "premium"))
-      );
-      const users = snap.docs.map((d) => ({
+      const [proSnap, masterSnap] = await Promise.all([
+        getDocs(query(collection(db, "users"), where("role", "==", "pro"))),
+        getDocs(query(collection(db, "users"), where("role", "==", "master"))),
+      ]);
+      const users = [...proSnap.docs, ...masterSnap.docs].map((d) => ({
         id: d.id,
         displayName: d.data().displayName ?? "Unknown",
         avatar: d.data().avatar ?? null,
+        role: d.data().role as "pro" | "master",
         premiumUntil: d.data().premiumUntil ?? null,
       }));
       return res.status(200).json({ users });
@@ -38,17 +40,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
-  // ── POST – grant premium ────────────────────────────────────────────────────
+  // ── POST – grant premium (pro or master) ────────────────────────────────────
   if (req.method === "POST") {
-    const { userId, premiumUntil } = req.body as {
+    const { userId, premiumUntil, plan } = req.body as {
       userId?: string;
       premiumUntil?: string | null;
+      plan?: "pro" | "master";
     };
     if (!userId) return res.status(400).json({ error: "userId required" });
+    if (!plan || !["pro", "master"].includes(plan)) {
+      return res.status(400).json({ error: "plan must be 'pro' or 'master'" });
+    }
 
     try {
       await updateDoc(doc(db, "users", userId), {
-        role: "premium",
+        role: plan,
         premiumUntil: premiumUntil || deleteField(),
       });
       return res.status(200).json({ success: true });
