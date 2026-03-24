@@ -11,20 +11,38 @@ export const useActivityLogReports = (userAuth: string, year: number) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchUserReports = async () => {
       if (!userAuth) return;
 
       setIsLoading(true);
       try {
-        const response = await firebaseGetUserRaprotsLogs(userAuth, year);
-        const processedReports = processRawReports(response);
-        setReportList(processedReports);
+        const timeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Activity logs fetch timeout")), 15000)
+        );
+        const response = await Promise.race([
+          firebaseGetUserRaprotsLogs(userAuth, year),
+          timeout,
+        ]);
+        if (!cancelled) {
+          const processedReports = processRawReports(response);
+          setReportList(processedReports);
+        }
+      } catch (error) {
+        console.error("Failed to load activity logs:", error);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchUserReports();
+
+    return () => {
+      cancelled = true;
+    };
   }, [userAuth, year]);
 
   return { reportList, isLoading };
