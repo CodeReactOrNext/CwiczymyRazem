@@ -15,10 +15,11 @@ import {
 import {
   collection,
   doc,
-  enableIndexedDbPersistence,
   getDoc,
   getDocs,
-  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
   limit,
   orderBy,
   query,
@@ -53,19 +54,14 @@ export const firebaseSignInWithGooglePopup = () =>
 export const firebaseSignInWithCredential = (credential: any) =>
   signInWithCredential(auth, credential);
 
-export const db = getFirestore(firebaseApp);
-
-if (typeof window !== 'undefined') {
-  enableIndexedDbPersistence(db, { forceOwnership: true }).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn("Firestore persistence failed: multiple tabs open or quota exceeded.");
-    } else if (err.code === 'unimplemented') {
-      console.warn("Firestore persistence not supported in this browser.");
-    } else {
-      console.warn("Firestore persistence failed:", err);
-    }
-  });
-}
+export const db =
+  typeof window !== "undefined"
+    ? initializeFirestore(firebaseApp, {
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager(),
+        }),
+      })
+    : initializeFirestore(firebaseApp, {});
 
 export const storage = getStorage(firebaseApp);
 
