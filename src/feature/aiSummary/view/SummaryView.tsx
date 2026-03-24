@@ -1216,15 +1216,15 @@ export const SummaryView = () => {
                   <p className="text-xs text-zinc-600">Start a session to track your progress</p>
                 </div>
               )}
-
-              {/* Day timeline */}
-              {todayLogs.length > 0 && (
-                <div>
-                  <SectionHeading icon={<ListMusic size={16}/>} count={todayLogs.length}>Sessions</SectionHeading>
-                  <DayTimeline logs={todayLogs} />
-                </div>
-              )}
             </>
+          )}
+
+          {/* Day timeline — shown for any day that has sessions */}
+          {todayLogs.length > 0 && (
+            <div>
+              <SectionHeading icon={<ListMusic size={16}/>} count={todayLogs.length}>Sessions</SectionHeading>
+              <DayTimeline logs={todayLogs} />
+            </div>
           )}
         </div>
       )}

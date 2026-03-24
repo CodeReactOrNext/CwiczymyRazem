@@ -874,7 +874,7 @@ export const PracticeSession = ({
       )}
 
       {/* ── Desktop view ──────────────────────────────────────────────────── */}
-      <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", reportResult ? "overflow-y-auto" : "overflow-hidden", isMobileView && "hidden")}>
+      <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobileView && "hidden")}>
 
         {/* Background ambiance glows */}
         {!reportResult && (

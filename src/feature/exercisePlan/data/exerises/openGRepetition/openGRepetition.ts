@@ -49,6 +49,32 @@ export const openGRepetitionExercise: Exercise = {
         { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
         { duration: 0.5, notes: [{ string: 3, fret: 0 }] }
       ]
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] }
+      ]
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] },
+        { duration: 0.5, notes: [{ string: 3, fret: 0 }] }
+      ]
     }
   ]
 };
