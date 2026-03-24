@@ -19,7 +19,7 @@ import {
   getDocs,
   initializeFirestore,
   persistentLocalCache,
-  persistentMultipleTabManager,
+  persistentSingleTabManager,
   limit,
   orderBy,
   query,
@@ -58,7 +58,7 @@ export const db =
   typeof window !== "undefined"
     ? initializeFirestore(firebaseApp, {
         localCache: persistentLocalCache({
-          tabManager: persistentMultipleTabManager(),
+          tabManager: persistentSingleTabManager(undefined),
         }),
       })
     : initializeFirestore(firebaseApp, {});
