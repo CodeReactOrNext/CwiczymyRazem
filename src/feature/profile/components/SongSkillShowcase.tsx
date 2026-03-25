@@ -72,18 +72,17 @@ export const SongSkillShowcase = ({
 
         {playerTier && (
           <div className='flex shrink-0 flex-col items-center gap-1.5'>
+            <span className='text-[10px] font-semibold uppercase tracking-widest text-zinc-400'>Song tier</span>
             <div
-              className='flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-black shadow-lg'
+              className='flex h-14 w-14 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg'
               style={{
                 color: playerTier.color,
-                backgroundColor: `${playerTier.color}15`,
-                boxShadow: `0 0 24px ${playerTier.color}25`,
+                backgroundColor: 'rgba(10,10,10,0.9)',
+                borderColor: `${playerTier.color}40`,
               }}>
               {playerTier.tier}
             </div>
-            <span
-              className='text-[10px] font-black uppercase tracking-widest'
-              style={{ color: playerTier.color }}>
+            <span className='text-[11px] font-medium' style={{ color: playerTier.color }}>
               {playerTier.label}
             </span>
           </div>

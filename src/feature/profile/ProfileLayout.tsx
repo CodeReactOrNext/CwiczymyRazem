@@ -14,7 +14,9 @@ import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
 import { FaSoundcloud, FaYoutube } from "react-icons/fa";
 import type { ProfileInterface } from "types/ProfileInterface";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { getYearsOfPlaying } from "utils/converter";
+import { getPointsToLvlUp } from "utils/gameLogic";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
 import { ProfileArsenal } from "./components/ProfileArsenal";
@@ -59,6 +61,24 @@ const ProfileLayout = ({
     ? getYearsOfPlaying(guitarStartDate.toDate())
     : null;
 
+  const lvlXpStart = getPointsToLvlUp(statistics.lvl - 1);
+  const lvlXpEnd = getPointsToLvlUp(statistics.lvl);
+  let effectivePts = statistics.points;
+  if (statistics.points < lvlXpStart && statistics.lvl > 1) effectivePts += lvlXpStart;
+  const ptsInLevel = Math.max(0, effectivePts - lvlXpStart);
+  const lvlRange = Math.max(1, lvlXpEnd - lvlXpStart);
+  const xpPercent = Math.min(Math.max((ptsInLevel / lvlRange) * 100, 0), 100);
+  const arcR = 38;
+  const arcC = 2 * Math.PI * arcR;
+  const arcOffset = arcC * (1 - xpPercent / 100);
+
+  const tierOrder: Record<string, number> = { S: 5, A: 4, B: 3, C: 2, D: 1, '?': 0 };
+  const bestTierKey = songs?.learned?.reduce<string>((best, song) => {
+    const t = song.tier ?? '?';
+    return (tierOrder[t] ?? 0) > (tierOrder[best] ?? 0) ? t : best;
+  }, '?') ?? '?';
+  const songTier = getSongTier(bestTierKey);
+
   useEffect(() => {
     getUserSongs(userAuth).then((songs) => setSongs(songs));
   }, []);
@@ -74,6 +94,60 @@ const ProfileLayout = ({
         title={displayName}
         subtitle={`${statistics.points.toLocaleString()} ${t("points")}${band ? ` · ${band}` : ""}`}
         className='w-full !rounded-none !shadow-none'
+        rightContent={
+          <div className='relative flex select-none items-center gap-4 pr-2'>
+            <div className='absolute inset-0 rounded-full bg-cyan-400/10 blur-3xl' />
+
+            {/* Song tier badge */}
+            <div className='relative flex flex-col items-center gap-1.5'>
+              <span className='text-[10px] font-semibold uppercase tracking-widest text-zinc-400'>Song tier</span>
+              <div
+                className='flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg'
+                style={{ color: songTier.color, backgroundColor: 'rgba(10,10,10,0.9)', borderColor: `${songTier.color}40` }}
+              >
+                {songTier.tier}
+              </div>
+              <span className='text-[11px] font-medium' style={{ color: songTier.color }}>{songTier.label}</span>
+            </div>
+
+            {/* Level ring */}
+            <div className='relative flex flex-col items-center gap-1'>
+              <svg width='120' height='120' viewBox='0 0 100 100' className='relative shrink-0'>
+                <defs>
+                  <linearGradient id='lvlArcGrad' x1='0%' y1='0%' x2='100%' y2='100%'>
+                    <stop offset='0%' stopColor='#a5f3fc' />
+                    <stop offset='100%' stopColor='#0891b2' />
+                  </linearGradient>
+                  <filter id='lvlGlow' x='-30%' y='-30%' width='160%' height='160%'>
+                    <feGaussianBlur stdDeviation='2.5' result='blur' />
+                    <feMerge><feMergeNode in='blur' /><feMergeNode in='SourceGraphic' /></feMerge>
+                  </filter>
+                </defs>
+                <circle cx='50' cy='50' r='46' fill='rgba(0,0,0,0.45)' />
+                <circle cx='50' cy='50' r={arcR} fill='none' stroke='rgba(255,255,255,0.1)' strokeWidth='6' />
+                <circle
+                  cx='50' cy='50' r={arcR}
+                  fill='none'
+                  stroke='url(#lvlArcGrad)'
+                  strokeWidth='6'
+                  strokeLinecap='round'
+                  strokeDasharray={arcC}
+                  strokeDashoffset={arcOffset}
+                  transform='rotate(-90 50 50)'
+                  filter='url(#lvlGlow)'
+                />
+                <text x='50' y='54' textAnchor='middle' fill='white' fontSize='24' fontWeight='900' style={{ fontFamily: 'system-ui, sans-serif' }}>
+                  {statistics.lvl}
+                </text>
+                <text x='50' y='67' textAnchor='middle' fill='#67e8f9' fontSize='9' fontWeight='700' letterSpacing='3' style={{ fontFamily: 'system-ui, sans-serif' }}>
+                  LVL
+                </text>
+              </svg>
+              <span className='text-[10px] font-semibold uppercase tracking-widest text-zinc-400'>Level progress</span>
+              <span className='text-[11px] tabular-nums text-zinc-500'>{ptsInLevel.toLocaleString()} / {lvlRange.toLocaleString()} XP</span>
+            </div>
+          </div>
+        }
         leftContent={
           <div className='flex items-center gap-5'>
             {/* Avatar with level badge */}
@@ -130,21 +204,9 @@ const ProfileLayout = ({
       />
 
       <div className='space-y-8 p-4 md:p-6'>
-        {/* Level + Practice Insights */}
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
-          <div className='rounded-xl bg-zinc-800/20 p-4 sm:p-6 backdrop-blur-sm'>
-            <h3 className='mb-4 text-[11px] font-semibold uppercase tracking-widest text-zinc-500'>
-              Level Progress
-            </h3>
-            <LevelBar
-              points={statistics.points}
-              lvl={statistics.lvl}
-              currentLevelMaxPoints={statistics.currentLevelMaxPoints}
-            />
-          </div>
-          <div className='font-openSans lg:col-span-2'>
-            <PracticeInsights statistics={statistics} />
-          </div>
+        {/* Practice Insights */}
+        <div className='font-openSans'>
+          <PracticeInsights statistics={statistics} />
         </div>
 
         {/* Activity Heatmap */}
