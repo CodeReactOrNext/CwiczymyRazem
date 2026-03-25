@@ -645,7 +645,7 @@ export const PracticeSession = ({
 
   // ── Note matching (RAF game loop) ─────────────────────────────────────────
 
-  const { hitNotes, sessionAccuracy: tabAccuracy, gameState: tabGameState, maxPossibleScore, currentBeatsElapsed, resetGame } = useNoteMatching({
+  const { hitNotes, missedNotes, sessionAccuracy: tabAccuracy, gameState: tabGameState, maxPossibleScore, currentBeatsElapsed, resetGame } = useNoteMatching({
     isPlaying,
     startTime:          metronome.startTime,
     effectiveBpm,
@@ -843,6 +843,7 @@ export const PracticeSession = ({
             detectedNoteData={detectedNoteData}
             isListening={isListening}
             hitNotes={hitNotes}
+            missedNotes={missedNotes}
             currentBeatsElapsed={currentBeatsElapsed}
             isAudioMuted={isAudioMuted}
             setIsAudioMuted={setIsAudioMuted}
@@ -1052,6 +1053,7 @@ export const PracticeSession = ({
                       detectedNoteData={detectedNoteData}
                       isListening={isListening}
                       hitNotes={hitNotes}
+                      missedNotes={missedNotes}
                       currentBeatsElapsed={currentBeatsElapsed}
                       audioContext={metronome.audioContext}
                       audioStartTime={effectiveAudioStartTime}
