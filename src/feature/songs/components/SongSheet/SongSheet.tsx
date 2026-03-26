@@ -177,12 +177,12 @@ const SongSheet = ({
             
             <div className="absolute bottom-6 left-6 right-6">
                 <div className="flex items-center gap-2 mb-1">
-                  <h2 className="text-2xl font-black tracking-tight text-white leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
+                  <h2 translate="no" className="text-2xl font-black tracking-tight text-white leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.8)]">
                     {song.title}
                   </h2>
                  
                 </div>
-                <p className="text-lg font-bold text-zinc-300 [text-shadow:0_2px_8px_rgba(0,0,0,0.8)]">{song.artist}</p>
+                <p translate="no" className="text-lg font-bold text-zinc-300 [text-shadow:0_2px_8px_rgba(0,0,0,0.8)]">{song.artist}</p>
                 
                 {/* Genres List */}
                 {song.genres && song.genres.length > 0 && (

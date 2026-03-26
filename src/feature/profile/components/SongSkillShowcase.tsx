@@ -135,10 +135,10 @@ export const SongSkillShowcase = ({
                     </div>
                   )}
                   <div className='min-w-0 flex-1'>
-                    <p className='truncate text-sm font-semibold text-white'>
+                    <p translate="no" className='truncate text-sm font-semibold text-white'>
                       {song.title}
                     </p>
-                    <p className='truncate text-xs text-zinc-400'>
+                    <p translate="no" className='truncate text-xs text-zinc-400'>
                       {song.artist}
                     </p>
                   </div>

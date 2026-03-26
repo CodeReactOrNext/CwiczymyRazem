@@ -67,6 +67,7 @@ interface SessionModalProps {
   detectedNoteData: any;
   isListening: boolean;
   hitNotes: Record<string, boolean>;
+  missedNotes: Record<string, boolean>;
   currentBeatsElapsed: number;
   isAudioMuted: boolean;
   setIsAudioMuted: (bool: boolean) => void;
@@ -128,6 +129,7 @@ const SessionModal = ({
   detectedNoteData,
   isListening,
   hitNotes,
+  missedNotes,
   currentBeatsElapsed,
   isAudioMuted,
   setIsAudioMuted,
@@ -258,6 +260,7 @@ const SessionModal = ({
           detectedNote={detectedNoteData}
           isListening={isListening}
           hitNotes={hitNotes}
+          missedNotes={missedNotes}
           currentBeatsElapsed={currentBeatsElapsed}
           resetKey={tabResetKey}
         />

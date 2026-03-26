@@ -250,6 +250,7 @@ const AnimatedTimerDisplay = ({
         <div className='absolute inset-0 z-20 flex flex-col items-center justify-center rounded-full text-white'>
           <div className='text-center'>
             <p
+              translate="no"
               className='font-sans text-5xl font-semibold tracking-wider'
               style={{
                 textShadow: activeSkill
@@ -380,7 +381,7 @@ const TimerLayout = ({
                 </span>
                 <div className='flex items-center gap-2'>
                   <BlinkingDot isActive={timerEnabled} />
-                  <span className=' font-medium text-white sm:text-base'>
+                  <span translate="no" className=' font-medium text-white sm:text-base'>
                     {chosenSkill ? getSkillName(chosenSkill) : "Not selected"}
                   </span>
                 </div>
@@ -392,7 +393,7 @@ const TimerLayout = ({
                 </span>
                 <div className='flex items-center'>
                   <IconBox Icon={MdAccessTime} small />
-                  <span className='ml-1  text-base font-medium text-white sm:text-lg'>
+                  <span translate="no" className='ml-1  text-base font-medium text-white sm:text-lg'>
                     {convertMsToHMS(sumTime)}
                   </span>
                 </div>
@@ -445,15 +446,15 @@ const TimerLayout = ({
               disabled={isFinishing}
             >
               {isFinishing ? (
-                  <div className="flex items-center gap-2">
+                  <div translate="no" className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       <span>Saving...</span>
                   </div>
               ) : (
-                  <>
+                  <span translate="no" className="flex items-center gap-2">
                     {t("end_button")}
                     <ArrowRight />
-                  </>
+                  </span>
               )}
             </Button>
           </div>

@@ -30,13 +30,13 @@ const SeasonSelect = ({
       value={selectedSeason}
       onValueChange={setSelectedSeason}
       disabled={isLoading}>
-      <SelectTrigger>
+      <SelectTrigger translate="no">
         <SelectValue placeholder='Select a season' />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent translate="no">
         {seasons.map((season) => (
-          <SelectItem key={season.seasonId} value={season.seasonId}>
-            {`${new Date(season.startDate).toLocaleDateString()} - 
+          <SelectItem key={season.seasonId} value={season.seasonId} translate="no">
+            {`${new Date(season.startDate).toLocaleDateString()} -
                ${new Date(season.endDate).toLocaleDateString()}`}
             {isCurrentSeason(season) && ` (${t("current_season")})`}
           </SelectItem>
