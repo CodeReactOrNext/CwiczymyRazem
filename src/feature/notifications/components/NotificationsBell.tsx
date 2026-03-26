@@ -150,7 +150,7 @@ export const NotificationsBell = () => {
                         <>
                           <div className="absolute inset-0">
                             <Avatar
-                              name={n.senderName}
+                              name={n.senderName ?? ""}
                               avatarURL={n.senderAvatarUrl || undefined}
                               lvl={n.senderFrame}
                               size="sm"
