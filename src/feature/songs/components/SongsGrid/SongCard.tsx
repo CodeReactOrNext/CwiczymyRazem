@@ -131,12 +131,12 @@ export const SongCard = ({
         
         <div className="min-w-0 flex-1 pt-1">
             <div className="flex items-center justify-between gap-1.5">
-              <h3 className="line-clamp-1 text-base font-bold text-white transition-colors group-hover:text-white/90">
+              <h3 translate="no" className="line-clamp-1 text-base font-bold text-white transition-colors group-hover:text-white/90">
                 {song.title}
               </h3>
             </div>
             
-            <p className="truncate text-sm font-medium text-zinc-400">
+            <p translate="no" className="truncate text-sm font-medium text-zinc-400">
               {song.artist}
             </p>
             

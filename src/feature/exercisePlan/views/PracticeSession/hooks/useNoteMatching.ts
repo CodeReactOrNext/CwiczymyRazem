@@ -78,6 +78,7 @@ export function useNoteMatching({
   onReset,
 }: UseNoteMatchingOptions) {
   const [hitNotes,       setHitNotes]       = useState<Record<string, boolean>>({});
+  const [missedNotes,    setMissedNotes]    = useState<Record<string, boolean>>({});
   const [sessionAccuracy,setSessionAccuracy] = useState(100);
   const [sessionStats,   setSessionStats]   = useState({ hits: 0, misses: 0 });
   const [gameState,      setGameState]      = useState<GameState>({
@@ -87,11 +88,13 @@ export function useNoteMatching({
   const lastLoopedBeatsRef  = useRef(0);
   const processedNotesRef   = useRef<Set<string>>(new Set());
   const hitNotesRef         = useRef<Record<string, boolean>>({});
+  const missedNotesRef      = useRef<Record<string, boolean>>({});
   const rafIdRef            = useRef<number>(0);
   const gameStateRef        = useRef<GameState>({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
   const statsRef            = useRef({ hits: 0, misses: 0 });
   const lastFlushRef        = useRef(0);
   const needsFlushRef       = useRef(false);
+  const consecutiveMissesRef = useRef(0);
 
   // ── Derived ─────────────────────────────────────────────────────────────────
 
@@ -132,6 +135,8 @@ export function useNoteMatching({
   const resetGame = () => {
     setHitNotes({});
     hitNotesRef.current = {};
+    setMissedNotes({});
+    missedNotesRef.current = {};
     setSessionAccuracy(100);
     setSessionStats({ hits: 0, misses: 0 });
     setGameState({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
@@ -139,6 +144,7 @@ export function useNoteMatching({
     statsRef.current = { hits: 0, misses: 0 };
     needsFlushRef.current = false;
     lastLoopedBeatsRef.current = 0;
+    consecutiveMissesRef.current = 0;
     processedNotesRef.current.clear();
   };
 
@@ -196,8 +202,10 @@ export function useNoteMatching({
       const beatsPerSec    = bpm / 60;
       const beatDurationMs = 60000 / bpm;
       const onsetRecencyMs = Math.min(800, Math.max(200, beatDurationMs * 0.8));
-      const windowMs       = Math.min(500, Math.max(150, beatDurationMs * 0.35));
-      const windowBeats    = (windowMs / 1000) * beatsPerSec;
+      const windowMs         = Math.min(500, Math.max(150, beatDurationMs * 0.35));
+      const windowBeats      = (windowMs / 1000) * beatsPerSec;
+      const earlyWindowMs    = Math.max(16, Math.min(50, beatDurationMs * 0.05));
+      const earlyWindowBeats = (earlyWindowMs / 1000) * beatsPerSec;
 
       const elapsedSec       = (compensatedNow - startTime) / 1000;
       const totalBeatsElapsed = elapsedSec * beatsPerSec;
@@ -207,6 +215,7 @@ export function useNoteMatching({
       const hasLooped = loopedBeatsElapsed < lastLoopedBeatsRef.current - 0.1;
       if (hasLooped) {
         hitNotesRef.current = {};
+        missedNotesRef.current = {};
         processedNotesRef.current.clear();
         needsFlushRef.current = true;
       }
@@ -227,8 +236,8 @@ export function useNoteMatching({
           const beatEnd   = currentBeatTotal + beat.duration;
 
           const isWithinWindow =
-            (loopedBeatsElapsed >= beatStart - windowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
-            (loopedBeatsElapsed < windowBeats && beatEnd + windowBeats >= totalExBeats);
+            (loopedBeatsElapsed >= beatStart - earlyWindowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
+            (loopedBeatsElapsed < earlyWindowBeats && beatEnd + windowBeats >= totalExBeats);
           const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
 
           beat.notes.forEach((note, nIdx) => {
@@ -261,6 +270,7 @@ export function useNoteMatching({
                 hitNotesRef.current[noteKey] = true;
                 needsFlushRef.current = true;
                 s.hits++;
+                consecutiveMissesRef.current = 0;
 
                 const newCombo      = gs.combo + 1;
                 const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
@@ -276,10 +286,15 @@ export function useNoteMatching({
               }
             } else if (isPassed && !hitNotesRef.current[noteKey]) {
               processedNotesRef.current.add(noteKey);
+              missedNotesRef.current[noteKey] = true;
               needsFlushRef.current = true;
               s.misses++;
-              gs.combo      = 0;
-              gs.multiplier = 1;
+              consecutiveMissesRef.current++;
+              gs.combo = 0;
+              // Reset multiplier only after 3 consecutive misses
+              if (consecutiveMissesRef.current >= 3) {
+                gs.multiplier = 1;
+              }
             }
           });
 
@@ -287,17 +302,21 @@ export function useNoteMatching({
         }
       }
 
-      // Throttled flush to React (~10Hz), detection stays at 60fps
-      if (needsFlushRef.current && now - lastFlushRef.current >= 100) {
+      // Throttled flush to React: immediate after long pause (first note of phrase), 50ms throttle during active play
+      const timeSinceFlush = now - lastFlushRef.current;
+      const flushThreshold = timeSinceFlush > 200 ? 0 : 50;
+      if (needsFlushRef.current && timeSinceFlush >= flushThreshold) {
         lastFlushRef.current  = now;
         needsFlushRef.current = false;
-        const hitNotesCopy = { ...hitNotesRef.current };
-        const statsCopy    = { hits: s.hits, misses: s.misses };
-        const total        = s.hits + s.misses;
-        const accuracy     = total > 0 ? Math.round((s.hits / total) * 100) : 100;
-        const gsCopy       = { ...gs };
+        const hitNotesCopy    = { ...hitNotesRef.current };
+        const missedNotesCopy = { ...missedNotesRef.current };
+        const statsCopy       = { hits: s.hits, misses: s.misses };
+        const total           = s.hits + s.misses;
+        const accuracy        = total > 0 ? Math.round((s.hits / total) * 100) : 100;
+        const gsCopy          = { ...gs };
         startTransition(() => {
           setHitNotes(hitNotesCopy);
+          setMissedNotes(missedNotesCopy);
           setSessionStats(statsCopy);
           setSessionAccuracy(accuracy);
           setGameState(gsCopy);
@@ -314,6 +333,7 @@ export function useNoteMatching({
 
   return {
     hitNotes,
+    missedNotes,
     sessionAccuracy,
     sessionStats,
     gameState,

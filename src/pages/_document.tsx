@@ -3,7 +3,7 @@ import Document, { Head, Html, Main, NextScript } from "next/document";
 class MyDocument extends Document {
   render(): React.JSX.Element {
     return (
-      <Html lang='en' className='dark'>
+      <Html lang='pl' className='dark'>
         <Head>
           {/* Google Fonts - Inter for professional typography */}
           <link rel='preconnect' href='https://fonts.googleapis.com' />

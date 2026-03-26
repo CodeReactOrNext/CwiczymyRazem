@@ -104,10 +104,11 @@ let audioCurrentSec: number | null = null;
 
 // Visual state
 let hitNotes: Record<string, boolean> = {};
+let missedNotes: Record<string, boolean> = {};
 let hideNotes = false;
 
 // Hit animation timestamps — noteKey → wall-clock ms when note was first hit
-const HIT_ANIM_MS = 480;
+const HIT_ANIM_MS = 240;
 let hitTimestamps: Record<string, number> = {};
 
 // ── Performance: module-level reuse ──────────────────────────────────────────
@@ -446,7 +447,8 @@ function render() {
         const ghostAlpha = 1.0; // Disabled transparency for ghost notes
         const accentDim = hasAccentedNotes && !note.isAccented ? 0.25 : 1.0;
         const dynAlpha = hasDynamics && note.dynamics !== undefined ? 0.3 + 0.7 * dyn : 1.0;
-        const baseAlpha = dynAlpha * accentDim * ghostAlpha;
+        const missedDim = !hitNotes[note.noteKey] && missedNotes[note.noteKey] ? 0.2 : 1.0;
+        const baseAlpha = dynAlpha * accentDim * ghostAlpha * missedDim;
 
         const blockY = note.noteY - BLOCK_H / 2;
         // Label sits in the "head" — left portion of block, capped at block center for narrow blocks
@@ -512,8 +514,19 @@ function render() {
           ctx.globalAlpha = isHit ? 1.0 : baseAlpha;
           ctx.fillStyle = fillColor;
 
+          // Glow behind the pill for fresh hits
+          if (isHit && hitTimestamps[note.noteKey] !== undefined) {
+            const hitAge = Math.min(1, (Date.now() - hitTimestamps[note.noteKey]) / HIT_ANIM_MS);
+            if (hitAge < 0.55) {
+              const glowStr = 1 - hitAge / 0.55;
+              ctx.shadowColor = '#34d399';
+              ctx.shadowBlur = glowStr * 18;
+            }
+          }
+
           drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
           ctx.fill();
+          ctx.shadowBlur = 0;
 
           // Subtle inner highlight (lighter strip on top half)
           if (!isHit && !isDead) {
@@ -521,6 +534,7 @@ function render() {
             drawPill(blockX + 1, blockY + 1, blockW - 2, BLOCK_H / 2 - 1, BLOCK_CORNER);
             ctx.fill();
           }
+
           ctx.globalAlpha = 1;
 
           // Dead note X over the pill
@@ -541,10 +555,24 @@ function render() {
           const age = Math.min(1, (Date.now() - hitTs) / HIT_ANIM_MS);
           const cx = labelX;
           const cy = note.noteY;
+          // Ease-out quad: fast start, smooth finish
+          const eased = 1 - (1 - age) * (1 - age);
 
-          // White flash over pill — fades over first 30% of animation
-          if (age < 0.3) {
-            const flashA = (1 - age / 0.3) * 0.4;
+          // Tight inner ring — brief crisp pop at the very start
+          if (age < 0.25) {
+            const age0 = age / 0.25;
+            const r0 = BLOCK_H / 2 + age0 * 10;
+            const a0 = (1 - age0) * 0.55;
+            ctx.strokeStyle = `rgba(167,243,208,${a0})`;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r0, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          // White flash over pill — sharper and quicker (first 20%)
+          if (age < 0.2) {
+            const flashA = (1 - age / 0.2) * 0.55;
             ctx.globalAlpha = flashA;
             ctx.fillStyle = "#ffffff";
             drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
@@ -552,20 +580,21 @@ function render() {
             ctx.globalAlpha = 1;
           }
 
-          // Ring 1 — immediate, expands from pill radius outward
-          const r1 = BLOCK_H / 2 + age * 22;
-          const a1 = (1 - age) * 0.7;
+          // Ring 1 — main ring, ease-out expansion
+          const r1 = BLOCK_H / 2 + eased * 28;
+          const a1 = (1 - age) * 0.65;
           ctx.strokeStyle = `rgba(52,211,153,${a1})`;
-          ctx.lineWidth = Math.max(0.5, 2.5 * (1 - age));
+          ctx.lineWidth = Math.max(0.5, 3 * (1 - age));
           ctx.beginPath();
           ctx.arc(cx, cy, r1, 0, Math.PI * 2);
           ctx.stroke();
 
-          // Ring 2 — delayed by 20%, smaller
-          if (age > 0.2) {
-            const age2 = (age - 0.2) / 0.8;
-            const r2 = BLOCK_H / 2 + age2 * 16;
-            const a2 = (1 - age2) * 0.4;
+          // Ring 2 — delayed by 15%, ease-out, slower fade
+          if (age > 0.15) {
+            const age2 = (age - 0.15) / 0.85;
+            const eased2 = 1 - (1 - age2) * (1 - age2);
+            const r2 = BLOCK_H / 2 + eased2 * 20;
+            const a2 = (1 - age2) * 0.35;
             ctx.strokeStyle = `rgba(16,185,129,${a2})`;
             ctx.lineWidth = Math.max(0.5, 1.5 * (1 - age2));
             ctx.beginPath();
@@ -935,6 +964,11 @@ self.onmessage = (e: MessageEvent) => {
       hitNotes = newHits;
       break;
     }
+    case 'MISSED_NOTES': {
+      missedNotes = msg.missedNotes as Record<string, boolean>;
+      needsRedraw = true;
+      break;
+    }
     case 'HIDE_NOTES': {
       hideNotes = msg.hideNotes;
       break;
@@ -947,6 +981,7 @@ self.onmessage = (e: MessageEvent) => {
     case 'RESET': {
       pausedScrollX = 0;
       pausedCursorPos = 0;
+      missedNotes = {};
       break;
     }
     case 'STOP': {
