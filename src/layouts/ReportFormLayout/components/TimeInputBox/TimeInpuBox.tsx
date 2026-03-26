@@ -10,7 +10,7 @@ import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportV
 import type { FormikErrors } from "formik";
 import { useFormikContext } from "formik";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons/lib";
 
 export interface TimeInputBoxProps {
@@ -45,6 +45,18 @@ const TimeInputBox = ({
 }: TimeInputBoxProps) => {
   const { values, setFieldValue } = useFormikContext<ReportFormikInterface>();
   const [isHovered, setIsHovered] = useState(false);
+  const timePickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = timePickerRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+    };
+    el.addEventListener("wheel", handler, { passive: false, capture: true });
+    return () => el.removeEventListener("wheel", handler, { capture: true });
+  }, []);
   const error =
     errors.hasOwnProperty(hoursName) || errors.hasOwnProperty(minutesName);
 
@@ -158,7 +170,7 @@ const TimeInputBox = ({
         </div>
 
         <div className='mt-auto flex w-full items-center justify-center gap-3'>
-          <div className='mx-auto flex w-full max-w-[300px] items-center justify-center gap-4'>
+          <div ref={timePickerRef} className='mx-auto flex w-full max-w-[300px] items-center justify-center gap-4'>
             {/* Hours */}
             <div className='flex flex-1 flex-col items-center gap-2'>
               <div className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm">

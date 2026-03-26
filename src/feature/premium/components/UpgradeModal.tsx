@@ -18,6 +18,7 @@ const FEATURES: { label: string; pro: boolean; master: boolean }[] = [
   { label: "Auto Practice Generator",                               pro: false, master: true  },
   { label: "AI-guided Practice Sessions",                           pro: false, master: true  },
   { label: "Skill Roadmaps",                                        pro: false, master: true  },
+  { label: "Practice Finder",                                        pro: false, master: true  },
   { label: "Daily Practice Insights",                               pro: false, master: true  },
   { label: "Weekly Progress Summary",                               pro: false, master: true  },
   { label: "Goal-based Analytics",                                  pro: false, master: true  },

@@ -3,8 +3,11 @@ import { logger } from "feature/logger/Logger";
 import {
   collection,
   doc,
+  increment,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
+import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDoc, trackedGetDocs, trackedSetDoc } from "utils/firebase/client/firestoreTracking";
 
@@ -90,6 +93,28 @@ export const assignSeasonalAchievements = async (
     });
     return 0;
   }
+};
+
+export const awardSeasonFame = async (
+  topPlayers: TopPlayerData[],
+  seasonId: string,
+): Promise<void> => {
+  const topFive = topPlayers.slice(0, 5);
+
+  const updates = topFive
+    .filter((player) => player.uid && !player.uid.startsWith("player-"))
+    .map((player, i) => {
+      const fameAmount = SEASON_FAME_REWARDS[i];
+      const userRef = doc(db, "users", player.uid!);
+      return updateDoc(userRef, { "statistics.fame": increment(fameAmount) });
+    });
+
+  await Promise.all(updates);
+
+  logger.info("Season fame awarded", {
+    context: "seasonalAchievementsService",
+    extra: { seasonId, count: updates.length },
+  });
 };
 
 export const hasSeasonalAchievement = async (userId: string, seasonId: string): Promise<boolean> => {

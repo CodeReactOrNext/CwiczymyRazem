@@ -20,4 +20,5 @@ export type NavPagesTypes =
   | "my-plans"
   | "gp-tabs"
   | "arsenal"
+  | "practice-finder"
   | null;

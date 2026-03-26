@@ -435,7 +435,8 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
         }),
       });
       const exData = await exRes.json();
-      if (!exData.exercise_id) return;
+      const firstExId = exData.exercise_ids?.[0] ?? null;
+      if (!firstExId) return;
 
       setPhases((prev) => {
         const phasesWithEx = prev.map((p) =>
@@ -444,7 +445,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
             : {
                 ...p,
                 steps: p.steps.map((s) =>
-                  s.id !== step.id ? s : { ...s, suggestedExerciseId: exData.exercise_id }
+                  s.id !== step.id ? s : { ...s, suggestedExerciseId: firstExId }
                 ),
               }
         );
@@ -964,6 +965,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                       )}
                     </div>
                   )}
+
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3 py-12 text-center">
