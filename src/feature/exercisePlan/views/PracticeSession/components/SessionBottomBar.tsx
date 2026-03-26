@@ -1,7 +1,16 @@
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "assets/components/ui/dialog";
 import { useTranslation } from "hooks/useTranslation";
 import { FaCheck, FaStepBackward, FaStepForward, FaSignOutAlt } from "react-icons/fa";
+import { useState } from "react";
 import { MainTimerSection } from "./MainTimerSection";
 import type { Exercise } from "../../../types/exercise.types";
 
@@ -56,8 +65,10 @@ export const SessionBottomBar = ({
   onFinishSession,
 }: SessionBottomBarProps) => {
   const { t } = useTranslation(["common"]);
+  const [showExitDialog, setShowExitDialog] = useState(false);
 
   return (
+    <>
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
       <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
 
@@ -65,7 +76,7 @@ export const SessionBottomBar = ({
         <div className="flex-1 hidden xl:flex items-center justify-start gap-4">
           <Button
             variant="ghost"
-            onClick={onClose}
+            onClick={() => setShowExitDialog(true)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 font-bold text-sm tracking-wide transition-all border border-white/10 hover:border-red-500/30"
           >
             <FaSignOutAlt />
@@ -138,5 +149,42 @@ export const SessionBottomBar = ({
 
       </div>
     </div>
+
+    <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+
+      <DialogContent className="max-w-md bg-zinc-900 border border-white/10 text-white">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-bold tracking-tight">Leave the session?</DialogTitle>
+          <DialogDescription className="text-zinc-400 text-sm mt-1">
+            Your progress won't be saved if you exit now. Would you like to finish the session and save your practice time instead?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
+          <Button
+            variant="ghost"
+            className="flex-1 rounded-xl bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 border border-white/10 hover:border-red-500/30 font-semibold text-sm"
+            onClick={() => { setShowExitDialog(false); onClose?.(); }}
+          >
+            <FaSignOutAlt className="mr-2" />
+            Exit without saving
+          </Button>
+          <Button
+            className="flex-1 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-sm shadow-lg shadow-cyan-500/20"
+            loading={isFinishing || isSubmittingReport}
+            disabled={!canFinishSession}
+            onClick={async () => { setShowExitDialog(false); await onFinishSession(); }}
+          >
+            <FaCheck className="mr-2" />
+            Finish &amp; save time
+          </Button>
+        </DialogFooter>
+        {!canFinishSession && (
+          <p className="text-[11px] text-zinc-500 text-center -mt-2">
+            {isSkillExercise ? "Complete the full exercise to save" : "Practice at least 20s to save"}
+          </p>
+        )}
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
