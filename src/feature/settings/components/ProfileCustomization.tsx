@@ -112,7 +112,7 @@ const ProfileCustomization = () => {
                     />
                   </div>
                   <div className="text-center">
-                     <p className="text-base font-bold text-white">@{userInfo?.displayName}</p>
+                     <p translate="no" className="text-base font-bold text-white">@{userInfo?.displayName}</p>
                      <p className="text-xs text-zinc-500 font-medium">Level {currentLevel}</p>
                   </div>
                 </div>

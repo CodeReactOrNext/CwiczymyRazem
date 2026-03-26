@@ -49,7 +49,7 @@ export const UserManagementTable = ({ users, isLoading, searchTerm, setSearchTer
                   </div>
                 </div>
                 <div className="col-span-4">
-                  <p className="text-sm font-bold text-white leading-tight">{user.displayName || "Anonymous"}</p>
+                  <p translate="no" className="text-sm font-bold text-white leading-tight">{user.displayName || "Anonymous"}</p>
                   <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-wider">{user.role || "user"}</p>
                 </div>
                 <div className="col-span-4 flex items-center gap-2">

@@ -79,7 +79,7 @@ export const CommentsModal = ({ isOpen, onClose, recordingId }: CommentsModalPro
                     </div>
                     <div className="bg-zinc-900/50 rounded-xl p-3 flex-1 border border-white/5">
                         <div className="flex justify-between items-baseline mb-1">
-                            <span className="font-bold text-sm text-cyan-400">{comment.userName}</span>
+                            <span translate="no" className="font-bold text-sm text-cyan-400">{comment.userName}</span>
                             <span className="text-[10px] text-zinc-500">
                                 {formattedDate}
                             </span>

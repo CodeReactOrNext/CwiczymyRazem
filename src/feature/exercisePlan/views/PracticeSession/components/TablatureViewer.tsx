@@ -13,6 +13,7 @@ interface TablatureViewerProps {
   detectedNote?: NoteData | null;
   isListening?: boolean;
   hitNotes?: Record<string, boolean>;
+  missedNotes?: Record<string, boolean>;
   currentBeatsElapsed?: number;
   hideNotes?: boolean;
   audioContext?: AudioContext | null;
@@ -81,6 +82,7 @@ const TablatureViewerInner = ({
   detectedNote: _detectedNote,
   isListening: _isListening,
   hitNotes = {},
+  missedNotes = {},
   currentBeatsElapsed: _currentBeatsElapsed,
   hideNotes = false,
   audioContext,
@@ -297,7 +299,7 @@ const TablatureViewerInner = ({
     let rafId: number;
     let lastTick = 0;
     const tick = (ts: number) => {
-      if (ts - lastTick >= 100) { // ~10fps — worker interpolates between ticks
+      if (ts - lastTick >= 33) { // ~30fps — worker interpolates between ticks
         workerRef.current?.postMessage({ type: 'TICK', audioCurrentSec: audioContext.currentTime });
         lastTick = ts;
       }
@@ -311,6 +313,11 @@ const TablatureViewerInner = ({
   useEffect(() => {
     workerRef.current?.postMessage({ type: 'HIT_NOTES', hitNotes });
   }, [hitNotes]);
+
+  // ── Missed notes ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    workerRef.current?.postMessage({ type: 'MISSED_NOTES', missedNotes });
+  }, [missedNotes]);
 
   // ── Hide notes ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -401,5 +408,6 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.resetKey         === next.resetKey           &&
   prev.className        === next.className          &&
   prev.hitNotes         === next.hitNotes           &&
+  prev.missedNotes      === next.missedNotes        &&
   prev.hideDynamicsLane === next.hideDynamicsLane
 );

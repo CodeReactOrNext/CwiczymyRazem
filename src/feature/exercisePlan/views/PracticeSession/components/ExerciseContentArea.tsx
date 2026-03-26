@@ -29,6 +29,7 @@ interface ExerciseContentAreaProps {
   detectedNoteData: NoteData | null;
   isListening: boolean;
   hitNotes: Record<string, boolean>;
+  missedNotes: Record<string, boolean>;
   currentBeatsElapsed: number;
   audioContext?: AudioContext | null;
   audioStartTime?: number | null;
@@ -89,6 +90,7 @@ export const ExerciseContentArea = ({
   detectedNoteData,
   isListening,
   hitNotes,
+  missedNotes,
   currentBeatsElapsed,
   audioContext,
   audioStartTime,
@@ -191,6 +193,7 @@ export const ExerciseContentArea = ({
               detectedNote={detectedNoteData}
               isListening={isListening}
               hitNotes={hitNotes}
+              missedNotes={missedNotes}
               currentBeatsElapsed={currentBeatsElapsed}
               hideNotes={activeExercise.hideTablatureNotes}
               audioContext={audioContext}
