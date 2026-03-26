@@ -89,6 +89,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
     }
     if (pathname === "/timer") return "timer";
     if (pathname === "/ai-coach") return "ai-coach";
+    if (pathname === "/practice-finder") return "practice-finder";
     if (pathname === "/summary") return "summary";
     if (pathname.startsWith("/report")) return "report";
     if (pathname.startsWith("/leaderboard")) return "leaderboard";
@@ -185,6 +186,12 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
       name: "Roadmap",
       href: "/ai-coach",
       icon: <Map size={18} className="text-zinc-500" />,
+    },
+    {
+      id: "practice-finder" as NavPagesTypes,
+      name: "Practice Finder",
+      href: "/practice-finder",
+      icon: <Sparkles size={16} />,
     },
     {
       id: "summary" as NavPagesTypes,
