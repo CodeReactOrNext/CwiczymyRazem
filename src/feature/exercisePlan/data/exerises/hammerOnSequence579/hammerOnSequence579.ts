@@ -40,7 +40,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 4,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },
@@ -73,7 +73,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 3,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },
@@ -106,7 +106,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 4,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },
@@ -139,7 +139,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 3,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },
@@ -172,7 +172,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 4,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },
@@ -205,7 +205,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 3,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         }
@@ -246,7 +246,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 4,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },
@@ -279,7 +279,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 3,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },
@@ -312,7 +312,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 4,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },
@@ -344,7 +344,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 3,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },
@@ -377,7 +377,7 @@ export const hammerOnSequence579Exercise: Exercise = {
               "string": 4,
               "fret": 5,
               "isAccented": false,
-              "isHammerOn": true
+              "isHammerOn": false
             }
           ]
         },

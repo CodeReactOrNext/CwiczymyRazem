@@ -15,7 +15,6 @@ import {
   Activity,
   Brain,
   Calendar,
-  Coffee,
   Dumbbell,
   FileMusic,
   FileText,
@@ -471,16 +470,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
             </div>
             <div className='space-y-1'>
               <a
-                href='https://buymeacoffee.com/riffquest'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
-                <span className='text-amber-500'>
-                  <Coffee size={16} />
-                </span>
-                <span>Buy Me a Coffee</span>
-              </a>
-              <a
                 href='https://discord.gg/6yJmsZW2Ne'
                 target='_blank'
                 rel='noopener noreferrer'
@@ -777,17 +766,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                     Community
                   </div>
                   <div className='space-y-1'>
-                    <a
-                      href='https://buymeacoffee.com/riffquest'
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      onClick={handleLinkClick}
-                      className='flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
-                      <span className='text-amber-500'>
-                        <Coffee size={16} />
-                      </span>
-                      <span>Buy Me a Coffee</span>
-                    </a>
                     <a
                       href='https://discord.gg/6yJmsZW2Ne'
                       target='_blank'
