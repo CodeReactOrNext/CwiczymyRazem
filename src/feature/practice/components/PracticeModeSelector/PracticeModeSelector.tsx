@@ -197,17 +197,17 @@ export const PracticeModeSelector = ({
                     disabled={!!loadingMode && !isLocked}
                   >
                     {isLocked ? (
-                      <div className="flex items-center justify-center gap-2">
+                      <div translate="no" className="flex items-center justify-center gap-2">
                         <Lock size={14} />
                         Upgrade
                       </div>
                     ) : loadingMode === mode.id ? (
-                        <div className="flex items-center gap-2">
+                        <div translate="no" className="flex items-center gap-2">
                            <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           Loading...
                         </div>
                     ) : (
-                        <div className="flex items-center justify-center gap-2">
+                        <div translate="no" className="flex items-center justify-center gap-2">
                           {t("common:select" as any)}
                           <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
                         </div>

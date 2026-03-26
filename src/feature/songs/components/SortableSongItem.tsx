@@ -228,8 +228,8 @@ export const SortableSongItem = ({
             <div className="flex items-center gap-4 min-w-0 flex-1">
               <SongCover song={song} config={config} size="md" />
               <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] font-bold text-white tracking-tight leading-none mb-1">{song.title}</p>
-                  <p className="truncate text-xs font-medium text-zinc-400">{song.artist}</p>
+                  <p translate="no" className="truncate text-[15px] font-bold text-white tracking-tight leading-none mb-1">{song.title}</p>
+                  <p translate="no" className="truncate text-xs font-medium text-zinc-400">{song.artist}</p>
                   {isPremium && <GpProgressBadge progress={progress} />}
               </div>
             </div>
@@ -330,8 +330,8 @@ export const SortableSongItem = ({
           <SongCover song={song} config={config} size="md" />
 
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[15px] font-bold text-zinc-100 leading-tight group-hover:text-white transition-colors">{song.title}</p>
-            <p className="truncate text-xs font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors">{song.artist}</p>
+            <p translate="no" className="truncate text-[15px] font-bold text-zinc-100 leading-tight group-hover:text-white transition-colors">{song.title}</p>
+            <p translate="no" className="truncate text-xs font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors">{song.artist}</p>
             {isPremium && <GpProgressBadge progress={progress} />}
           </div>
 

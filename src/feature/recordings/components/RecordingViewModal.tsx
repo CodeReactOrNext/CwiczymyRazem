@@ -168,7 +168,7 @@ export const RecordingViewModal = ({ isOpen, onClose, recordingId, initialRecord
                                 </div>
                                 <div className="flex-1 min-w-0 bg-zinc-800/50 rounded-lg p-2.5 border border-white/5">
                                     <div className="flex justify-between items-start mb-1">
-                                        <span className="font-bold text-xs text-cyan-400 truncate pr-2">{comment.userName}</span>
+                                        <span translate="no" className="font-bold text-xs text-cyan-400 truncate pr-2">{comment.userName}</span>
                                         <span className="text-[9px] text-zinc-500 shrink-0 mt-0.5">
                                             {comment.createdAt ? new Date((comment.createdAt as any).toDate ? (comment.createdAt as any).toDate() : comment.createdAt).toLocaleDateString() : ""}
                                         </span>

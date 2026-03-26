@@ -167,7 +167,7 @@ const SongsTable = ({
                     {/* Artist Cell */}
                     <TableCell className='px-6 py-4'>
                       <div className='flex items-center gap-3'>
-                        <p className='font-medium text-zinc-300 transition-colors group-hover:text-white'>
+                        <p translate="no" className='font-medium text-zinc-300 transition-colors group-hover:text-white'>
                           {song.artist}
                         </p>
                       </div>
@@ -175,7 +175,7 @@ const SongsTable = ({
 
                     {/* Title Cell */}
                     <TableCell className='px-6 py-4'>
-                      <p className='font-semibold text-white transition-colors group-hover:text-cyan-300'>
+                      <p translate="no" className='font-semibold text-white transition-colors group-hover:text-cyan-300'>
                         {song.title}
                       </p>
                     </TableCell>
