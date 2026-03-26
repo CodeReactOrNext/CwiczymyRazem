@@ -19,14 +19,36 @@ export default async function handler(
 
   try {
     const usersRef = firestore.collection("users");
-    // Filter users who have notifications enabled
-    // Note: Firestore doesn't support array-contains-any for complex objects easily without index, 
-    // but we can query by "fcmData.notificationsEnabled" == true
     const snapshot = await usersRef.where("fcmData.notificationsEnabled", "==", true).get();
 
     const notifications: Promise<any>[] = [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
+    // Collect all enabled tokens for bulk sends (e.g. season start)
+    const allEnabledTokens: string[] = [];
+    snapshot.docs.forEach((doc: any) => {
+      const tokens = doc.data().fcmData?.tokens || [];
+      allEnabledTokens.push(...tokens);
+    });
+
+    // Season start notification on the 1st of each month
+    if (today.getDate() === 1 && allEnabledTokens.length > 0) {
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const seasonId = `${year}-${month}`;
+
+      notifications.push(
+        messaging.sendMulticast({
+          tokens: allEnabledTokens,
+          notification: {
+            title: "🎸 A new season has started!",
+            body: `Season ${seasonId} is now live. Start practicing and fight for top 5!`,
+          },
+          data: { url: "/seasons" },
+        })
+      );
+    }
 
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -39,25 +61,16 @@ export default async function handler(
       const lastReportDateStr = data.statistics?.lastReportDate;
       if (!lastReportDateStr) return; // User never practiced
 
-      // Parse lastReportDate (assuming YYYY-MM-DD or ISO)
-      // I saw earlier that lastReportDate is a string. Assuming standard format.
       const lastReportDate = new Date(lastReportDateStr);
       lastReportDate.setHours(0, 0, 0, 0);
 
       const diffTime = Math.abs(today.getTime() - lastReportDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-      // Logic:
-      // 1. Streak Warning: Practiced yesterday (diffDays == 1) but not today.
-      // 2. Missed Practice: Practiced 3 days ago (diffDays == 3)
-
       let title = "";
       let body = "";
 
       if (diffDays === 1) {
-        // Warning: Keep your streak alive!
-        // But wait, if they practiced yesterday (diff=1), logic says they haven't practiced TODAY yet (because today is 0 diff).
-        // So if diffDays is 1, they practiced yesterday.
         title = "🔥 Keep your streak alive!";
         body = "You haven't practiced today! Do a quick session to keep your streak.";
       } else if (diffDays === 3) {
@@ -69,13 +82,8 @@ export default async function handler(
         notifications.push(
           messaging.sendMulticast({
             tokens,
-            notification: {
-              title,
-              body,
-            },
-            data: {
-              url: "/timer", // deep link to timer
-            }
+            notification: { title, body },
+            data: { url: "/timer" },
           })
         );
       }
