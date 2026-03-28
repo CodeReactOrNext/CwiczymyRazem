@@ -157,7 +157,7 @@ export const HeroSection = () => {
                 <div className="flex items-center gap-6 text-white text-sm font-bold uppercase tracking-widest">
                   <Link href="/login" className="hover:text-cyan-400 transition-colors">Sign In</Link>
                   <span className="w-1 h-1 rounded-full bg-white/20"></span>
-                  <Link href="#features" className="hover:text-cyan-400 transition-colors">How it works</Link>
+                  <Link href="/how-it-works" className="hover:text-cyan-400 transition-colors">How it works</Link>
                 </div>
               </div>
             )}
