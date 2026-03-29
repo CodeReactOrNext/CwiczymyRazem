@@ -109,7 +109,7 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
                   />
                 ) : (
                   <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-900'>
-                    {userData.displayName[0]}
+                    {userData.displayName?.[0] ?? "?"}
                   </div>
                 )}
                 <div>
