@@ -136,9 +136,9 @@ export const createAccount = createAsyncThunk(
       }
       const { user } = await firebaseCreateAccountWithEmail(email, password);
       const token = await user.getIdToken();
-      await signIn("credentials", { idToken: token, redirect: false });
       const userWithDisplayName = { ...user, displayName: login };
       const userData = await fetchUserData(userWithDisplayName);
+      await signIn("credentials", { idToken: token, redirect: false });
       posthog.identify(user.uid, { email: user.email ?? undefined, name: login });
       posthog.capture("user_signed_up", { method: "email", email: user.email, login });
       signUpSuccess();
