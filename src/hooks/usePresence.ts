@@ -2,7 +2,7 @@ import { selectCurrentActivity, selectUserAuth, selectUserInfo } from "feature/u
 import { getDatabase, onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
 import { useEffect } from "react";
 import { useAppSelector } from "store/hooks";
-import { firebaseApp } from "utils/firebase/client/firebase.config";
+import { firebaseApp, isDatabaseEnabled } from "utils/firebase/client/firebase.config";
 
 export const usePresence = () => {
   const userInfo = useAppSelector(selectUserInfo);
@@ -10,7 +10,7 @@ export const usePresence = () => {
   const currentActivity = useAppSelector(selectCurrentActivity);
 
   useEffect(() => {
-    if (!userAuth || !userInfo) return;
+    if (!userAuth || !userInfo || !isDatabaseEnabled) return;
 
     let db;
     try {

@@ -844,7 +844,7 @@ const Logs = ({ logs, marksLogsAsRead, currentUserId }: LogsBoxLayoutProps) => {
       <div ref={spanRef} className='h-1' />
       {logs.map((log) => (
         <div
-          key={(log as any).data || (log as any).timestamp + (log as any).userName || "topPlayers"}
+          key={(log as any).id || String((log as any).timestamp) + (log as any).uid + (log as any).userName || "topPlayers"}
           className='mr-2'>
           {isFirebaseLogsSongs(log) ? (
             <FirebaseLogsSongItem 

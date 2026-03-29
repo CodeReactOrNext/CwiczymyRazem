@@ -13,6 +13,8 @@ const firebaseConfig = {
 // Safety check for build environment without valid API key
 const isConfigValid = !!firebaseConfig.apiKey;
 
+export const isDatabaseEnabled = !!firebaseConfig.databaseURL;
+
 export const firebaseApp =
   getApps().length > 0
     ? getApp()
