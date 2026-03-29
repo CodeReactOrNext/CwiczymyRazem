@@ -9,6 +9,7 @@ import { ExerciseFilters } from "./components/ExerciseFilters";
 import { ExerciseGrid } from "./components/ExerciseGrid";
 import { SelectedExercisesList } from "./components/SelectedExercisesList";
 import { CreateCustomExerciseDialog } from "./CreateCustomExerciseDialog";
+import { AddExerciseTimeDialog } from "./components/AddExerciseTimeDialog";
 import { useExerciseSelection } from "./hooks/useExerciseSelection";
 import { ScaleSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ScaleSelectionDialog";
 import { ChordSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ChordSelectionDialog";
@@ -30,6 +31,7 @@ export const SelectExercisesStep = ({
   const [customExerciseMode, setCustomExerciseMode] = useState<"create" | "edit" | "clone">("create");
   const [isScaleDialogOpen, setIsScaleDialogOpen] = useState(false);
   const [isChordDialogOpen, setIsChordDialogOpen] = useState(false);
+  const [pendingExercise, setPendingExercise] = useState<Exercise | undefined>(undefined);
 
   const {
     searchQuery,
@@ -48,6 +50,20 @@ export const SelectExercisesStep = ({
     selectedExercises,
     onExercisesSelect,
   });
+
+  const handleExerciseToggleWithTimeModal = (exercise: Exercise) => {
+    const isAlreadySelected = selectedExercises.some((e) => e.id === exercise.id);
+    if (isAlreadySelected) {
+      handleExerciseToggle(exercise);
+    } else {
+      setPendingExercise(exercise);
+    }
+  };
+
+  const handleTimeConfirm = (exercise: Exercise, timeInMinutes: number) => {
+    onExercisesSelect([...selectedExercises, { ...exercise, timeInMinutes }]);
+    setPendingExercise(undefined);
+  };
 
   const handleCustomExerciseCreate = (exercise: Exercise) => {
     if (customExerciseMode === "edit") {
@@ -79,6 +95,10 @@ export const SelectExercisesStep = ({
       // Add the configured scale exercise to selected exercises
       onExercisesSelect([...selectedExercises, generatedExercise]);
       setIsScaleDialogOpen(false);
+  };
+
+  const handleUpdateExerciseTime = (exercise: Exercise, newTime: number) => {
+    onExercisesSelect(selectedExercises.map(e => e.id === exercise.id ? { ...e, timeInMinutes: newTime } : e));
   };
 
   const handleChordGenerated = (generatedExercise: Exercise) => {
@@ -140,6 +160,7 @@ export const SelectExercisesStep = ({
             onToggleExercise={handleExerciseToggle}
             onEditExercise={handleEditExercise}
             onCloneExercise={handleCloneExercise}
+            onUpdateExerciseTime={handleUpdateExerciseTime}
           />
         </div>
 
@@ -160,7 +181,7 @@ export const SelectExercisesStep = ({
           <ExerciseGrid
             exercises={filteredExercises}
             selectedExercises={selectedExercises}
-            onToggleExercise={handleExerciseToggle}
+            onToggleExercise={handleExerciseToggleWithTimeModal}
           />
         </div>
       </div>
@@ -171,6 +192,12 @@ export const SelectExercisesStep = ({
         onExerciseCreate={handleCustomExerciseCreate}
         initialData={editingExercise}
         mode={customExerciseMode}
+      />
+
+      <AddExerciseTimeDialog
+        exercise={pendingExercise ?? null}
+        onConfirm={handleTimeConfirm}
+        onCancel={() => setPendingExercise(undefined)}
       />
 
       <ScaleSelectionDialog
