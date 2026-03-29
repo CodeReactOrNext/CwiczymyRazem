@@ -53,7 +53,7 @@ export const ExerciseDetailView = ({ exercise }: ExerciseDetailViewProps) => {
         <meta property="og:title" content={`${exercise.title} - Free Interactive Guitar Exercise`} />
         <meta property="og:description" content={exercise.description} />
         {exercise.imageUrl && <meta property="og:image" content={exercise.imageUrl} />}
-        <link rel="canonical" href={`https://riff.quest/exercises/${exercise.id.replace(/_/g, "-")}`} />
+        <link rel="canonical" href="https://riff.quest/signup" />
         
         <script
           type="application/ld+json"
@@ -79,7 +79,7 @@ export const ExerciseDetailView = ({ exercise }: ExerciseDetailViewProps) => {
       <div className="relative border-b border-white/5 bg-zinc-950/50 pt-16 pb-12">
         <div className="container mx-auto px-4">
           <Link 
-            href="/exercises" 
+            href="/" 
             className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-zinc-500 transition-colors hover:text-white"
           >
             <FaArrowLeft className="h-3 w-3" /> Back to Hub

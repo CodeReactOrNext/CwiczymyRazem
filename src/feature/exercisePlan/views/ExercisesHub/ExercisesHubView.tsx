@@ -49,7 +49,7 @@ export const ExercisesHubView = () => {
       <Head>
         <title>Interactive Guitar Exercise Library | Riff Quest</title>
         <meta name="description" content="Explore over 60 professional guitar exercises designed to improve your technique, theory, and creativity. Master your craft with interactive tabs and structured practice routines." />
-        <link rel="canonical" href="https://riff.quest/exercises" />
+        <link rel="canonical" href="https://riff.quest/signup" />
       </Head>
 
       {/* Hero Section */}
@@ -85,12 +85,12 @@ export const ExercisesHubView = () => {
                 Quick Practice (GP5)
                 <Badge variant="secondary" className="bg-black/20 text-[10px] text-black">Beta</Badge>
              </Link>
-             <Link 
-                href="/guitar-practice-builder" 
+              <Link 
+                href="/signup" 
                 className="flex h-12 items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 px-8 text-sm font-bold text-white transition-all hover:bg-white/10"
-             >
-                Practice Generator
-             </Link>
+              >
+                Join to Use Generator
+              </Link>
           </div>
         </div>
       </div>
@@ -163,7 +163,7 @@ export const ExercisesHubView = () => {
             {filteredExercises.map((ex) => {
               const slug = ex.id.replace(/_/g, "-");
               return (
-                <Link key={ex.id} href={`/exercises/${slug}`} className="group h-full">
+                <Link key={ex.id} href="/signup" className="group h-full">
                   <div className="h-full transform transition-transform duration-300 hover:-translate-y-2">
                     <ExerciseCard exercise={ex} disableDialog={true} />
                   </div>
