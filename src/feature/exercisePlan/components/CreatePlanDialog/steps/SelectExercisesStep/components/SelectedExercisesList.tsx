@@ -4,12 +4,14 @@ import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { Clock, Edit2, Copy, Trash2, GripVertical } from "lucide-react";
+import { useState, useRef } from "react";
 
 interface SelectedExercisesListProps {
   selectedExercises: Exercise[];
   onToggleExercise: (exercise: Exercise) => void;
   onEditExercise?: (exercise: Exercise) => void;
   onCloneExercise?: (exercise: Exercise) => void;
+  onUpdateExerciseTime?: (exercise: Exercise, newTime: number) => void;
 }
 
 export const SelectedExercisesList = ({
@@ -17,13 +19,31 @@ export const SelectedExercisesList = ({
   onToggleExercise,
   onEditExercise,
   onCloneExercise,
+  onUpdateExerciseTime,
 }: SelectedExercisesListProps) => {
   const { t } = useTranslation(["exercises", "common"]);
+  const [editingTimeId, setEditingTimeId] = useState<string | null>(null);
+  const [editingTimeValue, setEditingTimeValue] = useState<string>("");
+  const timeInputRef = useRef<HTMLInputElement>(null);
 
   const totalDuration = selectedExercises.reduce(
     (total, exercise) => total + exercise.timeInMinutes,
     0
   );
+
+  const startEditingTime = (exercise: Exercise) => {
+    setEditingTimeId(exercise.id);
+    setEditingTimeValue(String(exercise.timeInMinutes));
+    setTimeout(() => timeInputRef.current?.select(), 0);
+  };
+
+  const commitTimeEdit = (exercise: Exercise) => {
+    const parsed = parseInt(editingTimeValue, 10);
+    if (!isNaN(parsed) && parsed > 0) {
+      onUpdateExerciseTime?.(exercise, parsed);
+    }
+    setEditingTimeId(null);
+  };
 
 
   const container = {
@@ -89,10 +109,36 @@ export const SelectedExercisesList = ({
                             {exercise.title}
                         </h4>
                         <div className='flex items-center gap-3 mt-1 text-[11px] font-medium text-zinc-500 tracking-wide'>
-                            <div className="flex items-center gap-1">
-                            <Clock className='h-3 w-3' />
-                            <span>{exercise.timeInMinutes} min</span>
-                            </div>
+                            {editingTimeId === exercise.id ? (
+                              <div className="flex items-center gap-1">
+                                <Clock className='h-3 w-3 text-cyan-400' />
+                                <input
+                                  ref={timeInputRef}
+                                  type="number"
+                                  min={1}
+                                  value={editingTimeValue}
+                                  onChange={(e) => setEditingTimeValue(e.target.value)}
+                                  onBlur={() => commitTimeEdit(exercise)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') commitTimeEdit(exercise);
+                                    if (e.key === 'Escape') setEditingTimeId(null);
+                                  }}
+                                  className="w-12 bg-zinc-900 border border-cyan-500/50 rounded px-1 text-cyan-300 text-[11px] font-bold outline-none"
+                                />
+                                <span className="text-zinc-500">min</span>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => startEditingTime(exercise)}
+                                className="flex items-center gap-1 hover:text-cyan-400 transition-colors group/time"
+                                title="Kliknij aby zmienić czas"
+                              >
+                                <Clock className='h-3 w-3 group-hover/time:text-cyan-400' />
+                                <span>{exercise.timeInMinutes} min</span>
+                                <Edit2 className="h-2.5 w-2.5 opacity-0 group-hover/time:opacity-100 transition-opacity" />
+                              </button>
+                            )}
                             {isCustom && (
                             <span className="px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400/90 border border-cyan-500/20 text-[9px]">
                                 Custom
