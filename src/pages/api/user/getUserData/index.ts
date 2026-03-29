@@ -59,6 +59,10 @@ export default async function handler(
           selectedFrame: userData?.selectedFrame ?? null,
           selectedGuitar: userData?.selectedGuitar ?? null,
           role: userData?.role ?? null,
+          createdAt: userData?.createdAt ?? null,
+          feedbackAskedAt: userData?.feedbackAskedAt ?? null,
+          feedbackDismissCount: userData?.feedbackDismissCount ?? 0,
+          feedbackLastDismissedAt: userData?.feedbackLastDismissedAt ?? null,
         },
         userAuth: uid,
         currentUserStats: {

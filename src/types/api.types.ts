@@ -141,6 +141,9 @@ export interface userSliceInitialState {
     selectedGuitar?: number | string;
     role?: "admin" | "pro" | "master" | "user";
     premiumUntil?: string | null; // ISO date string, null = no expiry (forever)
+    feedbackAskedAt?: Timestamp | null;
+    feedbackDismissCount?: number;
+    feedbackLastDismissedAt?: Timestamp | null;
   } | null;
   timer: TimerInterface;
   currentActivity: {
