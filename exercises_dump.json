@@ -380,86 +380,6 @@
     "category": "technique"
   },
   {
-    "id": "metal_playalong_basic",
-    "title": "Metal Guitar Playalong",
-    "description": "Practice along with video - metal guitar exercises. Play synchronously with the instructor and develop your technique.",
-    "difficulty": "medium",
-    "category": "technique",
-    "youtubeVideoId": "aHaPgeCbEMQ"
-  },
-  {
-    "id": "musician_fitness_lvl1_s1",
-    "title": "Level #1 Session #1 - Spider Crawls, Strumming, Chords",
-    "description": "Beginner practice session: Spider Crawls, strumming, Power chords, and riffs. Play along with the instructor.",
-    "difficulty": "easy",
-    "category": "technique",
-    "youtubeVideoId": "PiY1uDAGhVM"
-  },
-  {
-    "id": "musician_fitness_lvl1_s2",
-    "title": "Level #1 Session #2 - Speeding Up & Changing Chords",
-    "description": "Level 1 Session 2: Increasing speed and smooth chord transitions.",
-    "difficulty": "easy",
-    "category": "technique",
-    "youtubeVideoId": "QWSfpBlzj20"
-  },
-  {
-    "id": "musician_fitness_lvl1_s3",
-    "title": "Level #1 Session #3 - Open Chords, Powerchords, Strumming",
-    "description": "Level 1 Session 3: Open Chords, Powerchords, strumming, and a full song. Play along with the instructor.",
-    "difficulty": "easy",
-    "category": "technique",
-    "youtubeVideoId": "4e9RvY0ko08"
-  },
-  {
-    "id": "musician_fitness_lvl1_s4",
-    "title": "Level #1 Session #4 - Pinky Control, Smooth Chord Changes",
-    "description": "Level 1 Session 4: Pinky control and smooth chord changes. Play along with the instructor.",
-    "difficulty": "easy",
-    "category": "technique",
-    "youtubeVideoId": "l3TKHRUlK9U"
-  },
-  {
-    "id": "musician_fitness_lvl1_s5",
-    "title": "Level #1 Session #5 - Smoke on the Water",
-    "description": "Level 1 Session 5: Learn Smoke on the Water! Play along with the instructor.",
-    "difficulty": "easy",
-    "category": "technique",
-    "youtubeVideoId": "YnNdHcxiJTY"
-  },
-  {
-    "id": "musician_fitness_lvl1_s6",
-    "title": "Level #1 Session #6 - Riffs, Chords, Spider Crawls",
-    "description": "Level 1 Session 6: Riffs, chord changes, Spider Crawls, and more. Play along with the instructor.",
-    "difficulty": "easy",
-    "category": "technique",
-    "youtubeVideoId": "d1Vtdtx_Xwo"
-  },
-  {
-    "id": "musician_fitness_lvl1_s7",
-    "title": "Level #1 Session #7 - Spider Crawls, Common Chords, Songs",
-    "description": "Level 1 Session 7: Spider Crawls, common chord changes, and easy songs. Play along with the instructor.",
-    "difficulty": "easy",
-    "category": "technique",
-    "youtubeVideoId": "GqorA0S2bj4"
-  },
-  {
-    "id": "musician_fitness_lvl1_s8",
-    "title": "Level #1 Session #8 - Practice Session",
-    "description": "Level 1 Session 8: Comprehensive practice session for beginners. Play along with the instructor.",
-    "difficulty": "easy",
-    "category": "technique",
-    "youtubeVideoId": "DoVmZ1XNBj4"
-  },
-  {
-    "id": "pentatonic_playalong_best_of",
-    "title": "Pentatonic Best Of - Guitar Playalongs",
-    "description": "Practice pentatonic scales along with the video. The best pentatonic exercises in one place.",
-    "difficulty": "medium",
-    "category": "technique",
-    "youtubeVideoId": "nMV64UCrtFw"
-  },
-  {
     "id": "jp_stretching",
     "title": "Petrucci Stretching Exercise",
     "description": "John Petrucci's stretching exercise from Rock Discipline - helps improve finger flexibility and reach.",
@@ -745,5 +665,257 @@
     "description": "Compose a piece in 40 minutes guided by 5 random constraints — style, form, harmony, melody, and rhythm. Every session generates a unique creative brief.",
     "difficulty": "hard",
     "category": "creativity"
+  },
+  {
+    "id": "metal_gallop",
+    "title": "Iron Gallop — Thrash Rhythm Drill",
+    "description": "Pure gallop rhythm (16th–16th–8th) on the low E string with palm mute. Each measure is a looping single-note pattern with fret shifts — E, A, G. Clean, mechanical picking with no chords. Think Metallica 'Battery', Iron Maiden 'The Trooper'.",
+    "difficulty": "medium",
+    "category": "technique"
+  },
+  {
+    "id": "metal_tremolo_picking",
+    "title": "Phrygian Assault — Thrash Tremolo Picking",
+    "description": "Pure tremolo picking on the low E string using the E Phrygian scale (E F G A B C D). 16th notes, palm mute, no chords — pure mechanical aggression. The b2 interval (E→F, one half-step) is the sound of danger in thrash and death metal. Each measure is a loop. Inspired by Slayer, Kreator, Sepultura.",
+    "difficulty": "hard",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_basic",
+    "title": "Basic Down Strumming",
+    "description": "Foundation of rhythm guitar — steady down strums on every beat.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_down_up",
+    "title": "Down-Up Strumming",
+    "description": "Introduces alternating down-up strumming — the foundation of most rhythm guitar patterns.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_rock",
+    "title": "Rock Strumming Patterns",
+    "description": "Classic rock rhythm patterns with skips, accents and muted chucks.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_funk",
+    "title": "Funk Rhythm Guitar",
+    "description": "16th-note funk strumming with heavy use of muted chucks and syncopation.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_2",
+    "title": "Strumming Pattern 2 — Quarter Downs + Final Up",
+    "description": "Four steady downstrokes with a single upstroke on the final '&'. The easiest entry to strumming with rhythm.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_3",
+    "title": "Strumming Pattern 3 — All Eighth Notes",
+    "description": "Constant down-up strumming on every 8th note subdivision. The foundation of all strumming.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_4",
+    "title": "Strumming Pattern 4 — Down-Skip-Down-Up",
+    "description": "Down on 1, skip the '&', Down-Up on 2, repeat. One of the most common pop/rock patterns.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_5",
+    "title": "Strumming Pattern 5 — Down-Up Skip",
+    "description": "Down-Up on beats 1 and 3, skip the '&' before beats 2 and 4. Creates a forward-moving feel.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_6",
+    "title": "Strumming Pattern 6 — Syncopated Upstroke",
+    "description": "Classic syncopated pattern: the '&' of beat 2 continues into beat 3 with two upstrokes.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_7",
+    "title": "Strumming Pattern 7 — Inside Upstrokes",
+    "description": "Downstrokes on 1 and 3, surrounded by upstrokes on all the '&' positions. Flowing and continuous.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_8",
+    "title": "Strumming Pattern 8 — Two Downs then Down-Up",
+    "description": "Steady quarter-note feel on beats 1-2, then eighth-note feel on beats 3-4.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_9",
+    "title": "Strumming Pattern 9 — Skip First &",
+    "description": "Skips only the first '&', then runs all eighth notes for the rest of the bar.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_10",
+    "title": "Strumming Pattern 10 — Syncopated Upstroke Run",
+    "description": "Heavy syncopation: three upstrokes in a row after beat 1. Creates a choppy, modern feel.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_11",
+    "title": "Strumming Pattern 11 — Syncopated Mid-Bar Down",
+    "description": "Starts with down-up, then a series of upstrokes with a surprise downstroke in the middle.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_12",
+    "title": "Strumming Pattern 12 — Starts on Upstroke",
+    "description": "Begins with an upstroke on the '&' of beat 1. Unusual feel that trains coordination.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_13",
+    "title": "Strumming Pattern 13 — Soft Landing",
+    "description": "Down on all 4 beats, with a single upstroke on '&' of beat 2. Gentle and versatile.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_14",
+    "title": "Strumming Pattern 14 — All Upstrokes",
+    "description": "Only upstrokes on every '&'. No downstrokes at all. Develops upstroke technique and tone.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_15",
+    "title": "Strumming Pattern 15 — Upstrokes + One Down",
+    "description": "Upstrokes on '&' positions with a single downstroke sneaked in. Trains rhythmic variety.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_16",
+    "title": "Strumming Pattern 16 — Double Down-Up",
+    "description": "Two down-up pairs buried inside upstroke-only positions. Tricky syncopation challenge.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_18",
+    "title": "Strumming Pattern 18 — Half-Time Feel",
+    "description": "Only downstrokes on beats 1 and 3. Creates a slow, open, spacious feel.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_19",
+    "title": "Strumming Pattern 19 — Down-Up on Beat 1",
+    "description": "Opens with a down-up pair, then straight downstrokes. Creates an energetic opening feel.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_20",
+    "title": "Strumming Pattern 20 — Mixed Syncopation",
+    "description": "A balanced mix of down-up pairings and single downstrokes creating a flowing rhythm.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_21",
+    "title": "Strumming Pattern 21 — Upstroke Ending",
+    "description": "Single downstroke to open, then an upstroke-down-up figure at the end of the bar.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_22",
+    "title": "Strumming Pattern 22 — Mid-Bar Upstroke",
+    "description": "Down, then upstroke-down on beat 2, followed by a lone down on beat 3.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_23",
+    "title": "Strumming Pattern 23 — Full 1-2, Quarter 3-4",
+    "description": "Eighth notes on beats 1-2, quarter notes on beats 3-4. Contrast between sections.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_24",
+    "title": "Strumming Pattern 24 — Opens on Upstroke",
+    "description": "Starts on an '&1' upstroke, then quarter-note downs. Advanced feel with delayed entry.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_25",
+    "title": "Strumming Pattern 25 — Late Upstroke",
+    "description": "Four beats of down-up but skips the '&' of beats 3 and 4, ending with a final upstroke.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_26",
+    "title": "Strumming Pattern 26 — Two Down-Up Groups",
+    "description": "Two isolated down-up pairs, one on beat 1 and one on beat 3. Big open gaps between them.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_27",
+    "title": "Strumming Pattern 27 — Upstroke Lead-In",
+    "description": "Upstroke on '&1' followed by constant eighth notes. Creates a forward, driving feel.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_28",
+    "title": "Strumming Pattern 28 — Upstroke into Downs",
+    "description": "Upstroke on '&1', then downstrokes on beats 2 and 3, finishing with down-up.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_29",
+    "title": "Strumming Pattern 29 — Skip the & of 3",
+    "description": "Constant eighth notes but with a skip on '&' of beat 3. Creates a characteristic 'hiccup'.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_30",
+    "title": "Strumming Pattern 30 — Opens Slow, Ends Fast",
+    "description": "Two quiet quarter-note downs, then a syncopated upstroke and down-up ending.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_31",
+    "title": "Strumming Pattern 31 — All Eighths, Skip Last",
+    "description": "Continuous eighth notes but the very last '&' is skipped. Almost full but not quite.",
+    "difficulty": "easy",
+    "category": "technique"
+  },
+  {
+    "id": "strumming_pattern_32",
+    "title": "Strumming Pattern 32 — Double Upstroke Gaps",
+    "description": "Two up-down pairs on '&' positions, with everything else silent. Very syncopated.",
+    "difficulty": "easy",
+    "category": "technique"
   }
 ]
