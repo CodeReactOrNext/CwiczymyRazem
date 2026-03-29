@@ -14,6 +14,8 @@ export type NavPagesTypes =
   | "recordings"
   | "about"
   | "privacy-policy"
+  | "contact"
+  | "terms-of-service"
   | "ai-coach"
   | "summary"
   | "my-plans"

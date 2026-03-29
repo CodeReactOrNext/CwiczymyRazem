@@ -59,7 +59,9 @@ export const Footer = () => {
                         <h4 className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em]">Social</h4>
                         <ul className="space-y-4">
                             <li><Link href="https://discord.gg/6yJmsZW2Ne" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors">Discord</Link></li>
-                            <li><Link href="/privacy-policy" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors">Legal</Link></li>
+                            <li><Link href="/contact" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Contact <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/privacy-policy" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Privacy Policy <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
+                            <li><Link href="/terms-of-service" className="text-sm font-bold text-zinc-600 hover:text-white transition-colors flex items-center group">Terms of Service <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all ml-1" /></Link></li>
                         </ul>
                       </div>
                   </div>
