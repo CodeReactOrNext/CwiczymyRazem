@@ -20,6 +20,7 @@ import {
   FileText,
   LayoutGrid,
   ListChecks,
+  MessageSquarePlus,
   Music,
   Settings,
   Swords,
@@ -44,6 +45,8 @@ import type { NavPagesTypes } from "types/layout.types";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 
+import { FeedbackModal } from "components/FeedbackBubble";
+import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { CommunityModal } from "./CommunityModal";
 import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 
@@ -63,6 +66,8 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
   const { t } = useTranslation("common");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const { show: showFeedbackPrompt, markAsDismissed, markAsSent } = useFeedbackPrompt();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -469,6 +474,15 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
               Community
             </div>
             <div className='space-y-1'>
+              <button
+                onClick={() => setIsFeedbackOpen(true)}
+                className='flex w-full items-center gap-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2.5 text-sm font-medium transition-all duration-200 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300'>
+                <span className='text-cyan-500'>
+                  <MessageSquarePlus size={16} />
+                </span>
+                <span>Send Feedback</span>
+              </button>
+
               <a
                 href='https://discord.gg/6yJmsZW2Ne'
                 target='_blank'
@@ -487,7 +501,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                 </span>
                 <span>Grow Riff Quest</span>
               </button>
-
             </div>
           </div>
 
@@ -766,6 +779,18 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                     Community
                   </div>
                   <div className='space-y-1'>
+                    <button
+                      onClick={() => {
+                        handleLinkClick();
+                        setIsFeedbackOpen(true);
+                      }}
+                      className='flex w-full items-center gap-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2.5 text-sm font-medium transition-all duration-200 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300'>
+                      <span className='text-cyan-500'>
+                        <MessageSquarePlus size={16} />
+                      </span>
+                      <span>Send Feedback</span>
+                    </button>
+
                     <a
                       href='https://discord.gg/6yJmsZW2Ne'
                       target='_blank'
@@ -811,9 +836,19 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
         )}
       </AnimatePresence>
 
-      <CommunityModal 
-        isOpen={isCommunityModalOpen} 
-        onClose={() => setIsCommunityModalOpen(false)} 
+      <CommunityModal
+        isOpen={isCommunityModalOpen}
+        onClose={() => setIsCommunityModalOpen(false)}
+      />
+      <FeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+      />
+      <FeedbackModal
+        variant="prompt"
+        isOpen={showFeedbackPrompt}
+        onClose={markAsDismissed}
+        onSent={markAsSent}
       />
     </>
   );
