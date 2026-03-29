@@ -175,7 +175,7 @@ const ProfileLayout = ({
                   <div className='h-1.5 w-1.5 rounded-full bg-cyan-400'></div>
                   <span>Joined: <span className='tracking-normal text-zinc-300 tabular-nums'>{createdAt.toDate().toLocaleDateString()}</span></span>
                 </div>
-                {yearsOfPlaying && yearsOfPlaying > 0 && (
+                {yearsOfPlaying != null && yearsOfPlaying > 0 && (
                   <div className='flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-zinc-500'>
                     <div className='h-1.5 w-1.5 rounded-full bg-green-400'></div>
                     <span>Playing for <span className='tracking-normal text-zinc-300 tabular-nums'>{yearsOfPlaying} years</span></span>
