@@ -316,14 +316,15 @@ export const PracticeSession = ({
 
   // Reset per-exercise UI flags alongside ear training
   useEffect(() => {
-    const pref = loadGuitarPlaybackPreference();
-    if (pref !== null) {
-      setIsAudioMuted(!pref);
+    if (currentExercise.riddleConfig?.mode === "sequenceRepeat") {
+      setIsAudioMuted(false);
     } else {
-      setIsAudioMuted(
-        !(currentExercise.riddleConfig?.mode === "sequenceRepeat" ||
-          (currentExercise.tablature && currentExercise.tablature.length > 0))
-      );
+      const pref = loadGuitarPlaybackPreference();
+      if (pref !== null) {
+        setIsAudioMuted(!pref);
+      } else {
+        setIsAudioMuted(!(currentExercise.tablature && currentExercise.tablature.length > 0));
+      }
     }
     setIsMetronomeMuted(false);
     setIsHalfSpeed(false);

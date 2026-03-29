@@ -90,7 +90,7 @@ export const SessionSidebar = ({
                   isAudioMuted
                     ? "text-zinc-500 hover:text-zinc-400"
                     : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10",
-                  currentExercise.riddleConfig?.mode === "sequenceRepeat" && "opacity-50 cursor-not-allowed"
+                  currentExercise.riddleConfig?.mode === "sequenceRepeat" && "cursor-not-allowed"
                 )}
                 disabled={currentExercise.riddleConfig?.mode === "sequenceRepeat"}
                 onClick={() => {
@@ -126,7 +126,7 @@ export const SessionSidebar = ({
                     className="h-10 gap-2 text-xs font-bold tracking-wide text-zinc-500 hover:text-zinc-300"
                     onClick={() => setSessionPhase("calibrating")}
                   >
-                    <FaSync className="text-sm" />
+                    <FaSync className="text-sm mr-1" />
                     Recalibrate
                   </Button>
                 )}
