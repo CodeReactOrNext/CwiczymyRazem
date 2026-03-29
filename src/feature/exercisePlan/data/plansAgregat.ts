@@ -54,6 +54,8 @@ const FREE_PLAN_IDS = new Set([
   "ear_rhythm_fundamentals",
   "daily_dexterity_starter",
   "warm_up_15_minutes",
+  "soloing_explorer",
+  "spider_master_plan",
   // Playalong plans — free
   "pentatonic_playalong_best_of_plan",
   "metal_guitar_exercises",

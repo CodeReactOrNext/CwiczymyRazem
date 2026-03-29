@@ -13,8 +13,23 @@ const MIN_DAYS_SINCE_REGISTRATION = 4;
 const MIN_SESSIONS = 3;
 const MAX_DISMISSALS = 3;
 
-// Cooldown in days after each dismissal (index = dismissCount before this show)
-const DISMISS_COOLDOWNS_DAYS = [0, 3, 7];
+// Cooldown in days after each dismissal (index = dismissCount after dismissal)
+const DISMISS_COOLDOWNS_DAYS = [3, 7, 30];
+
+const LS_KEY = "feedbackDismiss";
+const getLsDismiss = () => {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+const setLsDismiss = (count: number) => {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ count, at: Date.now() }));
+  } catch {}
+};
 
 const toMs = (value: any): number => {
   if (!value) return 0;
@@ -35,7 +50,10 @@ export const useFeedbackPrompt = () => {
     // Sent feedback already → never show
     if (userInfo.feedbackAskedAt) return;
 
-    const dismissCount = userInfo.feedbackDismissCount ?? 0;
+    const firestoreCount = userInfo.feedbackDismissCount ?? 0;
+    const ls = getLsDismiss();
+    // Trust whichever source shows more dismissals (Firestore may lag or fail)
+    const dismissCount = Math.max(firestoreCount, ls?.count ?? 0);
 
     // Dismissed max times → never show
     if (dismissCount >= MAX_DISMISSALS) return;
@@ -49,13 +67,15 @@ export const useFeedbackPrompt = () => {
     if (!meetsLevel || !meetsSessions || !meetsAge) return;
 
     // Cooldown after previous dismissal
-    const cooldownDays = DISMISS_COOLDOWNS_DAYS[dismissCount] ?? 0;
-    const lastDismissedMs = toMs(userInfo.feedbackLastDismissedAt);
-    const daysSinceLastDismiss = lastDismissedMs
-      ? (Date.now() - lastDismissedMs) / 86_400_000
-      : Infinity;
-
-    if (daysSinceLastDismiss < cooldownDays) return;
+    if (dismissCount > 0) {
+      const cooldownDays = DISMISS_COOLDOWNS_DAYS[dismissCount - 1] ?? 30;
+      const lastDismissedMs =
+        toMs(userInfo.feedbackLastDismissedAt) || ls?.at || 0;
+      const daysSinceLastDismiss = lastDismissedMs
+        ? (Date.now() - lastDismissedMs) / 86_400_000
+        : Infinity;
+      if (daysSinceLastDismiss < cooldownDays) return;
+    }
 
     const timer = setTimeout(() => setShow(true), 3000);
     return () => clearTimeout(timer);
@@ -64,13 +84,16 @@ export const useFeedbackPrompt = () => {
   const markAsDismissed = async () => {
     if (!userAuth) return;
     setShow(false);
+    const ls = getLsDismiss();
+    const newCount = Math.max((userInfo?.feedbackDismissCount ?? 0), ls?.count ?? 0) + 1;
+    setLsDismiss(newCount);
     try {
       await updateDoc(doc(db, "users", userAuth), {
         feedbackDismissCount: increment(1),
         feedbackLastDismissedAt: serverTimestamp(),
       });
     } catch {
-      // non-critical
+      // localStorage fallback already saved above
     }
   };
 
