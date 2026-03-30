@@ -10,6 +10,7 @@ interface HeroBannerProps {
   characterImage?: string;
   secondaryImage?: string;
   eyebrow?: string;
+  eyebrowClassName?: string;
   onClick?: () => void;
   className?: string;
   leftContent?: ReactNode;
@@ -25,6 +26,7 @@ export const HeroBanner = ({
   characterImage,
   secondaryImage,
   eyebrow = "Daily practice",
+  eyebrowClassName = "text-orange-400/80",
   onClick,
   className = "",
   leftContent,
@@ -89,7 +91,7 @@ export const HeroBanner = ({
       >
         <div className="space-y-2 max-w-xl w-full">
           {eyebrow && (
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-orange-400/80 md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none">
+            <p className={`text-xs font-semibold tracking-[0.2em] uppercase md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none ${eyebrowClassName}`}>
               {eyebrow}
             </p>
           )}

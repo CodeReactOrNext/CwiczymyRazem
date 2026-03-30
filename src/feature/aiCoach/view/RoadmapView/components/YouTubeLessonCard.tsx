@@ -13,10 +13,10 @@ function formatDuration(seconds: number): string {
 }
 
 const LEVEL_STYLES: Record<string, string> = {
-  beginner: "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30",
-  intermediate: "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30",
-  advanced: "bg-rose-500/20 text-rose-300 ring-1 ring-rose-500/30",
-  all: "bg-zinc-700/60 text-zinc-300 ring-1 ring-zinc-600/40",
+  beginner: "bg-cyan-500/10 text-cyan-400 ring-1 ring-cyan-500/20",
+  intermediate: "bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20",
+  advanced: "bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20",
+  all: "bg-zinc-800/60 text-zinc-400 ring-1 ring-zinc-700/40",
 };
 
 interface YouTubeLessonCardProps {

@@ -13,6 +13,7 @@ const PracticeFinderPage: NextPageWithLayout = () => {
         title="Practice Finder"
         subtitle="Describe what you want to practice and get matching exercises and lessons"
         eyebrow="AI Search"
+        eyebrowClassName="text-cyan-400"
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
       />
       <PremiumGate feature="practice-finder" requiredPlan="master">
