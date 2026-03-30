@@ -33,6 +33,7 @@ export const usePresence = () => {
         last_changed: serverTimestamp(),
         currentActivity: currentActivity || null,
       });
+      fetch("/api/presence/cleanup", { method: "POST" }).catch(() => {});
     };
 
     const setOffline = () => {

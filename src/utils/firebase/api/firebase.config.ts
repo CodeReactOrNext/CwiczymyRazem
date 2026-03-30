@@ -61,7 +61,16 @@ const getMessaging = () => {
   }
 };
 
+const getDatabase = () => {
+  try {
+    return admin.database();
+  } catch {
+    return {} as any;
+  }
+};
+
 const firestore = getFirestore();
 const auth = getAuth();
 const messaging = getMessaging();
-export { auth, firestore, messaging };
+const database = getDatabase();
+export { auth, database, firestore, messaging };
