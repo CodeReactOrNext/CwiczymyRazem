@@ -23,7 +23,7 @@ export interface AudioRefs {
 }
 
 const GAIN_STORAGE_KEY = "audio_input_gain";
-const DEFAULT_GAIN = 1.0;
+const DEFAULT_GAIN = 3.0;
 
 function loadPersistedGain(): number {
   try {
@@ -156,7 +156,7 @@ export const useAudioAnalyzer = () => {
         }
 
         // 4. Threshold & Stabilization
-        const VOLUME_THRESHOLD = 0.008;
+        const VOLUME_THRESHOLD = 0.002;
         let stabilizedFreq = 0;
 
         if (rms > VOLUME_THRESHOLD && frequency > 50) {
@@ -180,7 +180,7 @@ export const useAudioAnalyzer = () => {
         // Track onset timestamps — combine aubio onset with volume-delta detection
         const volumeDelta = volume - prevVolumeRef.current;
         prevVolumeRef.current = volume;
-        const isSoftOnset = volumeDelta > 0.025 && volume > 0.025;
+        const isSoftOnset = volumeDelta > 0.010 && volume > 0.010;
 
         if (isOnset || isSoftOnset) {
           lastOnsetTimeRef.current = Date.now();
