@@ -3,7 +3,8 @@ import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FaCheck, FaMicrophone, FaRedo, FaTimes } from "react-icons/fa";
+import { FaCheck, FaChevronRight, FaMicrophone, FaRedo, FaTimes } from "react-icons/fa";
+import Image from "next/image";
 import { getCentsDistance, getNoteFromFrequency } from "utils/audio/noteUtils";
 
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
@@ -216,7 +217,7 @@ const AudioFeedbackPanel = ({
   );
 };
 
-const STRING_THICKNESSES = [3, 2.5, 2, 1.5, 1, 1]; // px for strings 6→1
+const STRING_THICKNESSES = [4, 3.5, 3, 2, 1.5, 1.5]; // px for strings 6→1
 
 const GuitarNeckDiagram = ({
   currentStringIndex,
@@ -225,28 +226,28 @@ const GuitarNeckDiagram = ({
   currentStringIndex: number;
   offsets: CalibrationOffsets;
 }) => (
-  <div className="w-full max-w-xs mx-auto">
-    <div className="relative rounded-lg bg-zinc-900/60 border border-white/5 px-4 py-3">
+  <div className="w-full max-w-md mx-auto">
+    <div className="relative rounded-xl bg-zinc-900/60 border border-white/5 pl-6 pr-6 py-5">
       {/* Nut bar */}
-      <div className="absolute left-10 top-2 bottom-2 w-1 rounded-full bg-zinc-400/40" />
+      <div className="absolute left-20 top-3 bottom-3 w-1.5 rounded-full bg-zinc-400/40" />
       {/* Fret wires */}
-      {[0.3, 0.55, 0.78].map((pos) => (
+      {[0.28, 0.52, 0.74].map((pos) => (
         <div
           key={pos}
-          className="absolute top-2 bottom-2 w-px bg-zinc-800"
-          style={{ left: `${10 + pos * 80}%` }}
+          className="absolute top-3 bottom-3 w-px bg-zinc-800"
+          style={{ left: `${18 + pos * 74}%` }}
         />
       ))}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-6">
         {CALIBRATION_STRINGS.map((s, idx) => {
           const isDone = offsets[s.string] !== undefined;
           const isCurrent = idx === currentStringIndex;
           const isPending = !isDone && !isCurrent;
           return (
-            <div key={s.string} className="flex items-center gap-3">
+            <div key={s.string} className="flex items-center gap-4">
               <span
                 className={cn(
-                  "text-[10px] font-black w-6 text-right tabular-nums tracking-wide",
+                  "text-sm font-black w-8 text-right tabular-nums tracking-wide",
                   isCurrent && "text-cyan-400",
                   isDone && "text-emerald-400/70",
                   isPending && "text-zinc-700"
@@ -258,20 +259,19 @@ const GuitarNeckDiagram = ({
                 <div
                   className={cn(
                     "w-full rounded-full transition-all duration-300",
-                    isCurrent &&
-                      "bg-cyan-400 shadow-[0_0_8px_#22d3ee]",
+                    isCurrent && "bg-cyan-400 shadow-[0_0_10px_#22d3ee]",
                     isDone && "bg-emerald-500/40",
                     isPending && "bg-zinc-800"
                   )}
                   style={{ height: `${STRING_THICKNESSES[idx]}px` }}
                 />
               </div>
-              <div className="w-5 flex justify-center">
+              <div className="w-6 flex justify-center">
                 {isDone && (
-                  <FaCheck className="h-2.5 w-2.5 text-emerald-400" />
+                  <FaCheck className="h-3.5 w-3.5 text-emerald-400" />
                 )}
                 {isCurrent && (
-                  <div className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_6px_#22d3ee]" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_6px_#22d3ee]" />
                 )}
               </div>
             </div>
@@ -281,6 +281,279 @@ const GuitarNeckDiagram = ({
     </div>
   </div>
 );
+
+const IntroStep = ({
+  onGrant,
+  onCancel,
+  onNext,
+  isLoading,
+  isListening,
+  audioRefs,
+}: {
+  onGrant: () => void;
+  onCancel: () => void;
+  onNext: () => void;
+  isLoading: boolean;
+  isListening: boolean;
+  audioRefs: AudioRefs;
+}) => {
+  const [volume, setVolume] = useState(0);
+  const rafRef = useRef(0);
+  const lastRef = useRef(0);
+
+  useEffect(() => {
+    if (!isListening) { setVolume(0); return; }
+    const tick = () => {
+      const now = Date.now();
+      if (now - lastRef.current >= 60) {
+        lastRef.current = now;
+        setVolume(audioRefs.volumeRef.current);
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [isListening, audioRefs]);
+
+  const fillPct = Math.min(100, volume * 300);
+  const hasSignal = fillPct >= 8;
+  const barColor = !isListening
+    ? "bg-zinc-700"
+    : fillPct < 8
+    ? "bg-zinc-600"
+    : fillPct < 75
+    ? "bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+    : "bg-amber-500";
+
+  return (
+    <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-white">
+      <div className="w-full max-w-md flex flex-col items-center gap-5">
+        <button
+          onClick={onCancel}
+          className="self-end rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors"
+        >
+          <FaTimes className="h-4 w-4" />
+        </button>
+
+        {/* Illustration with styled background */}
+        <div className="relative flex items-center justify-center w-full rounded-2xl overflow-hidden bg-gradient-to-b from-cyan-950/40 to-zinc-900/80 border border-cyan-500/10 py-4">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,211,238,0.08)_0%,transparent_70%)]" />
+          <Image
+            src="/images/ilustration/plugin.png"
+            alt="Guitar interface"
+            width={200}
+            height={200}
+            className="relative w-[200px] h-auto object-contain drop-shadow-[0_0_24px_rgba(34,211,238,0.2)]"
+          />
+        </div>
+
+        <div className="text-center space-y-1.5">
+          <h2 className="text-xl font-bold tracking-tight">Guitar Calibration</h2>
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            Connect your guitar via a <span className="text-zinc-200 font-medium">microphone</span> or{" "}
+            <span className="text-zinc-200 font-medium">audio interface</span>, then grant browser access below.
+            Play a note — you should see the signal bar light up.
+          </p>
+        </div>
+
+        {/* Live signal bar */}
+        <div className="w-full space-y-1.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <FaMicrophone className={cn(
+                "h-3 w-3 transition-colors",
+                isListening && hasSignal ? "text-emerald-400 animate-pulse" : "text-zinc-600"
+              )} />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Signal</span>
+            </div>
+            {isListening && (
+              <span className={cn(
+                "text-[10px] font-bold",
+                hasSignal ? "text-emerald-400" : "text-zinc-600"
+              )}>
+                {hasSignal ? "Signal detected" : "No signal — play a note"}
+              </span>
+            )}
+          </div>
+          <div className="w-full h-3 rounded-full bg-zinc-800 border border-white/5 overflow-hidden">
+            <div
+              className={cn("h-full rounded-full transition-all duration-75", barColor)}
+              style={{ width: `${fillPct}%` }}
+            />
+          </div>
+        </div>
+
+        {!isListening ? (
+          <Button
+            onClick={onGrant}
+            disabled={isLoading}
+            className="w-full bg-cyan-500 text-black hover:bg-cyan-400 font-bold disabled:opacity-60"
+          >
+            <FaMicrophone className="mr-2 h-4 w-4" />
+            {isLoading ? "Requesting access…" : "Grant Mic Access"}
+          </Button>
+        ) : (
+          <Button
+            onClick={onNext}
+            className="w-full bg-cyan-500 text-black hover:bg-cyan-400 font-bold"
+          >
+            Next — adjust sensitivity <FaChevronRight className="ml-1 h-3 w-3" />
+          </Button>
+        )}
+
+        <button
+          onClick={onCancel}
+          className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+        >
+          Skip calibration
+        </button>
+      </div>
+    </div>
+  );
+};
+
+interface SignalLiveState {
+  volume: number;
+  frequency: number;
+  noteName: string;
+}
+
+const SignalCheckStep = ({
+  audioRefs,
+  isListening,
+  inputGain,
+  onInputGainChange,
+  onNext,
+  onCancel,
+}: {
+  audioRefs: AudioRefs;
+  isListening: boolean;
+  inputGain: number;
+  onInputGainChange: (v: number) => void;
+  onNext: () => void;
+  onCancel: () => void;
+}) => {
+  const [live, setLive] = useState<SignalLiveState>({ volume: 0, frequency: 0, noteName: "—" });
+  const rafRef = useRef(0);
+  const lastRef = useRef(0);
+
+  useEffect(() => {
+    const tick = () => {
+      const now = Date.now();
+      if (now - lastRef.current >= 60) {
+        lastRef.current = now;
+        const vol = audioRefs.volumeRef.current;
+        const freq = audioRefs.frequencyRef.current;
+        let noteName = "—";
+        if (freq > 40 && vol > 0.002) {
+          const data = getNoteFromFrequency(freq);
+          if (data) noteName = `${data.note}${data.octave}`;
+        }
+        setLive({ volume: vol, frequency: freq, noteName });
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [audioRefs]);
+
+  const fillPct = Math.min(100, live.volume * 300);
+  const tooQuiet = fillPct < 8;
+  const tooLoud  = fillPct >= 75;
+  const good     = !tooQuiet && !tooLoud;
+
+  const barColor = tooQuiet
+    ? "bg-red-500"
+    : good
+    ? "bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.4)]"
+    : "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]";
+
+  const statusText = tooQuiet ? "Too quiet" : good ? "Good level" : "Too loud";
+  const statusColor = tooQuiet ? "text-red-400" : good ? "text-emerald-400" : "text-amber-400";
+
+  return (
+    <div className="flex h-full flex-col items-center justify-center px-6 py-8 text-white">
+      <div className="mb-6 w-full max-w-md flex items-center justify-between">
+        <h2 className="text-lg font-bold tracking-tight">Check Signal</h2>
+        <button
+          onClick={onCancel}
+          className="rounded-full p-2 text-zinc-500 hover:text-white hover:bg-white/10 transition-colors"
+        >
+          <FaTimes className="h-4 w-4" />
+        </button>
+      </div>
+
+      <div className="w-full max-w-md flex flex-col gap-5">
+        {/* Volume meter */}
+        <div className="rounded-xl border border-white/5 bg-zinc-900/60 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <FaMicrophone className={cn("h-3.5 w-3.5", isListening ? "text-emerald-400 animate-pulse" : "text-zinc-600")} />
+              <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Signal Level</span>
+            </div>
+            {isListening && (
+              <span className={cn("text-xs font-bold", statusColor)}>{statusText}</span>
+            )}
+          </div>
+          <div className="relative w-full h-4 rounded-full bg-zinc-800 border border-white/5 overflow-hidden mb-1">
+            <div className="absolute top-0 bottom-0 left-[8%] w-px bg-zinc-600/40" />
+            <div className="absolute top-0 bottom-0 left-[75%] w-px bg-zinc-600/40" />
+            <div
+              className={cn("h-full rounded-full transition-all duration-75", barColor)}
+              style={{ width: `${isListening ? fillPct : 0}%` }}
+            />
+          </div>
+          <div className="relative w-full text-[9px] font-bold uppercase tracking-widest text-zinc-600 flex justify-between mt-1">
+            <span>Too quiet</span>
+            <span>Good range</span>
+            <span>Too loud</span>
+          </div>
+        </div>
+
+        {/* Gain slider */}
+        <div className="rounded-xl border border-white/5 bg-zinc-900/60 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Sensitivity</span>
+            <span className="text-sm font-mono font-bold text-zinc-300">{inputGain.toFixed(1)}x</span>
+          </div>
+          <Slider
+            min={0.5}
+            max={10.0}
+            step={0.5}
+            value={[inputGain]}
+            onValueChange={([val]) => onInputGainChange(val)}
+          />
+          <p className="mt-3 text-xs text-zinc-400">
+            Play a note — adjust until the bar sits in the green range.
+          </p>
+        </div>
+
+        {/* Detected note */}
+        <div className="rounded-xl border border-white/5 bg-zinc-900/60 p-5">
+          <span className="text-xs font-bold uppercase tracking-widest text-zinc-500 block mb-3">Detected Note</span>
+          <div className="flex items-end gap-4">
+            <span className={cn(
+              "text-4xl font-black tabular-nums transition-colors",
+              live.noteName === "—" ? "text-zinc-700" : "text-white"
+            )}>
+              {live.noteName}
+            </span>
+            {live.frequency > 40 && (
+              <span className="text-xs font-mono text-zinc-500 pb-1">{Math.round(live.frequency)} Hz</span>
+            )}
+          </div>
+        </div>
+
+        <Button
+          onClick={onNext}
+          className="w-full bg-cyan-500 text-black hover:bg-cyan-400 font-bold mt-1"
+        >
+          Next — tune strings <FaChevronRight className="ml-1 h-3 w-3" />
+        </Button>
+      </div>
+    </div>
+  );
+};
 
 export const CalibrationWizard = ({
   isOpen,
@@ -293,6 +566,8 @@ export const CalibrationWizard = ({
   inputGain,
   onInputGainChange,
 }: CalibrationWizardProps) => {
+  const [step, setStep] = useState<"intro" | "signal_check" | "calibrating">("intro");
+  const [isGranting, setIsGranting] = useState(false);
   const [currentStringIndex, setCurrentStringIndex] = useState(0);
   const [stringState, setStringState] = useState<StringState>("listening");
   const [offsets, setOffsets] = useState<CalibrationOffsets>({});
@@ -308,17 +583,23 @@ export const CalibrationWizard = ({
 
   const currentStr = CALIBRATION_STRINGS[currentStringIndex];
 
-  // Auto-init mic on mount
-  useEffect(() => {
-    if (!isOpen) return;
-    if (!isListening) {
-      audioInit().catch(() => setMicError(true));
+  const handleGrant = useCallback(async () => {
+    setIsGranting(true);
+    try {
+      await audioInit();
+      setStep("signal_check");
+    } catch {
+      setMicError(true);
+    } finally {
+      setIsGranting(false);
     }
-  }, [isOpen, isListening, audioInit]);
+  }, [audioInit]);
 
   // Reset state when opened
   useEffect(() => {
     if (isOpen) {
+      setStep("intro");
+      setIsGranting(false);
       setCurrentStringIndex(0);
       setStringState("listening");
       setOffsets({});
@@ -345,7 +626,7 @@ export const CalibrationWizard = ({
       const freq = audioRefs.frequencyRef.current;
       const vol = audioRefs.volumeRef.current;
 
-      if (freq > 40 && vol > 0.02) {
+      if (freq > 40 && vol > 0.005) {
         const cents = Math.abs(getCentsDistance(freq, targetHz));
         if (cents <= ACCEPT_CENTS) {
           samplesRef.current.push(freq);
@@ -422,6 +703,36 @@ export const CalibrationWizard = ({
   }, [stringState, handleNext]);
 
   if (!isOpen) return null;
+
+  if (step === "intro" && !micError) {
+    return (
+      <ModalWrapper zIndex="z-[99999999]">
+        <IntroStep
+          onGrant={handleGrant}
+          onCancel={handleCancel}
+          onNext={() => setStep("signal_check")}
+          isLoading={isGranting}
+          isListening={isListening}
+          audioRefs={audioRefs}
+        />
+      </ModalWrapper>
+    );
+  }
+
+  if (step === "signal_check" && !micError) {
+    return (
+      <ModalWrapper zIndex="z-[99999999]">
+        <SignalCheckStep
+          audioRefs={audioRefs}
+          isListening={isListening}
+          inputGain={inputGain}
+          onInputGainChange={onInputGainChange}
+          onNext={() => setStep("calibrating")}
+          onCancel={handleCancel}
+        />
+      </ModalWrapper>
+    );
+  }
 
   const doneCount = Object.keys(offsets).length;
 

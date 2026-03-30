@@ -246,7 +246,7 @@ export function useNoteMatching({
 
             const requiresOnset = !note.isHammerOn && !note.isPullOff;
 
-            if (isWithinWindow && currentVolume > 0.02 && (hasRecentOnset || !requiresOnset)) {
+            if (isWithinWindow && currentVolume > 0.005 && (hasRecentOnset || !requiresOnset)) {
               const baseTargetFreq = getFrequencyFromTab(note.string, note.fret);
               const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
 
