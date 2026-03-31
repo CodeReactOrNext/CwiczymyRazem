@@ -109,6 +109,8 @@ const ProfileCustomization = () => {
                       size="2xl"
                       lvl={selectedFrame !== undefined ? selectedFrame : currentLevel}
                       selectedGuitar={selectedGuitar}
+                      guitarYear={userInfo?.selectedGuitarYear}
+                      guitarCountry={userInfo?.selectedGuitarCountry}
                     />
                   </div>
                   <div className="text-center">

@@ -10,7 +10,7 @@ const agent = new Agent({
   name: "Exercise search agent",
   instructions:
     "You are a guitar exercise search agent. Search the knowledge base and choose the top 2 best exercises that match the given context. Return ONLY valid JSON: { \"exercise_ids\": [\"<id1>\", \"<id2>\"] }. No explanation. Two IDs only, or one if only one matches well.",
-  model: "gpt-4.1",
+  model: "gpt-5-mini",
   tools: [fileSearchTool([VECTOR_STORE_ID])],
   outputType: ExerciseSchema,
   modelSettings: {

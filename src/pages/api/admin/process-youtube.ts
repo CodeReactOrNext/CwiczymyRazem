@@ -93,7 +93,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       // Step 1: Categorize with gpt-4o-mini
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "gpt-5-nano",
         temperature: 0.1,
         max_tokens: 200,
         messages: [

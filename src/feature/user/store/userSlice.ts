@@ -234,9 +234,11 @@ export const userSlice = createSlice({
         state.userInfo.role = payload;
       }
     },
-    setSelectedGuitar: (state, { payload }: PayloadAction<string | number | null>) => {
+    setSelectedGuitar: (state, { payload }: PayloadAction<{ imageId: string | number | null; year?: number; country?: string }>) => {
       if (state.userInfo) {
-        state.userInfo.selectedGuitar = payload ?? undefined;
+        state.userInfo.selectedGuitar = payload.imageId ?? undefined;
+        state.userInfo.selectedGuitarYear = payload.year;
+        state.userInfo.selectedGuitarCountry = payload.country;
       }
     },
   },

@@ -214,6 +214,8 @@ export interface UserTooltipData {
   band: string;
   selectedFrame?: number;
   selectedGuitar?: number | string;
+  selectedGuitarYear?: number;
+  selectedGuitarCountry?: string;
   statistics: {
     totalPracticeTime: number;
     totalPoints: number;
@@ -254,6 +256,8 @@ export const firebaseGetUserTooltipData = async (
       band: userData.band,
       selectedFrame: userData.selectedFrame,
       selectedGuitar: userData.selectedGuitar,
+      selectedGuitarYear: userData.selectedGuitarYear,
+      selectedGuitarCountry: userData.selectedGuitarCountry,
       statistics: {
         totalPracticeTime:
           userData.statistics.time.creativity +

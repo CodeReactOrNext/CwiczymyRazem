@@ -134,6 +134,8 @@ export const LeadboardLayout = ({
                     currentUserId={currentUserId}
                     selectedFrame={user.selectedFrame}
                     selectedGuitar={user.selectedGuitar}
+                    selectedGuitarYear={user.selectedGuitarYear}
+                    selectedGuitarCountry={user.selectedGuitarCountry}
                   />
                 ))}
               </ul>

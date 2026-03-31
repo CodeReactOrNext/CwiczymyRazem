@@ -7,7 +7,7 @@ import type { InventoryItem } from "../../types/arsenal.types";
 interface GuitarCardProps {
   item: InventoryItem;
   isEquipped: boolean;
-  onEquip: (guitarId: number | string) => void;
+  onEquip: (guitarId: number | string, year?: number, country?: string) => void;
   isEquipping: boolean;
 }
 
@@ -108,7 +108,7 @@ export const GuitarCard = ({ item, isEquipped, onEquip, isEquipping }: GuitarCar
 
       {/* Equip button */}
       <button
-        onClick={() => onEquip(guitar.id)}
+        onClick={() => onEquip(guitar.id, item.year, item.country)}
         disabled={isEquipped || isEquipping}
         className={cn(
           "w-full py-2 text-[10px] font-black uppercase tracking-widest transition-all duration-200 border-t flex items-center justify-center gap-1.5",
