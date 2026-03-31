@@ -35,9 +35,9 @@ export const clearNewFlags = async (): Promise<void> => {
   await axios.post("/api/arsenal/clear-new-flags", { idToken });
 };
 
-export const updateRig = async (rig: RigSetup, selectedGuitar?: string | number | null): Promise<void> => {
+export const updateRig = async (rig: RigSetup, selectedGuitar?: string | number | null, selectedGuitarYear?: number, selectedGuitarCountry?: string): Promise<void> => {
   const idToken = await getIdToken();
-  await axios.post("/api/arsenal/update-rig", { idToken, rig, selectedGuitar });
+  await axios.post("/api/arsenal/update-rig", { idToken, rig, selectedGuitar, selectedGuitarYear, selectedGuitarCountry });
 };
 
 export const openEffectPack = async (): Promise<OpenEffectPackResult> => {

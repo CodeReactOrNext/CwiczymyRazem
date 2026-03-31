@@ -17,6 +17,8 @@ interface LeadboardColumnProps {
   currentUserId: string | null;
   selectedFrame?: number;
   selectedGuitar?: number | string;
+  selectedGuitarYear?: number;
+  selectedGuitarCountry?: string;
 }
 
 export const LeadboardRow = ({
@@ -28,6 +30,8 @@ export const LeadboardRow = ({
   currentUserId,
   selectedFrame,
   selectedGuitar,
+  selectedGuitarYear,
+  selectedGuitarCountry,
 }: LeadboardColumnProps) => {
   const { t } = useTranslation("leadboard");
   const { lvl, time } = statistics;
@@ -78,7 +82,7 @@ export const LeadboardRow = ({
               {/* Avatar & Identity */}
               <div className="flex flex-1 items-center gap-3 overflow-hidden">
                   <Link href={`/user/${profileId}`} className="relative flex-shrink-0">
-                     <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} size="sm" selectedFrame={selectedFrame} selectedGuitar={selectedGuitar} />
+                     <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} size="sm" selectedFrame={selectedFrame} selectedGuitar={selectedGuitar} guitarYear={selectedGuitarYear} guitarCountry={selectedGuitarCountry} />
                   </Link>
 
                  <div className="flex flex-col min-w-0 gap-0.5">
@@ -168,7 +172,7 @@ export const LeadboardRow = ({
           {/* Avatar */}
           <Link href={`/user/${profileId}`} className='flex-shrink-0'>
             <div className='relative transition-transform duration-300 group-hover:scale-105'>
-              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} selectedFrame={selectedFrame} selectedGuitar={selectedGuitar} />
+              <Avatar avatarURL={userAvatar} name={nick} lvl={lvl} selectedFrame={selectedFrame} selectedGuitar={selectedGuitar} guitarYear={selectedGuitarYear} guitarCountry={selectedGuitarCountry} />
             </div>
           </Link>
 

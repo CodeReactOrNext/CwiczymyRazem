@@ -14,6 +14,8 @@ export interface FirebaseUserDataInterface {
   guitarStartDate?: Timestamp;
   selectedFrame?: number;
   selectedGuitar?: number | string;
+  selectedGuitarYear?: number;
+  selectedGuitarCountry?: string;
   statistics: StatisticsDataInterface;
   songLists: UserSongLists;
   fcmData?: {

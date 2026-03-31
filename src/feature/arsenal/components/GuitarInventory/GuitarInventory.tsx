@@ -43,7 +43,7 @@ export const GuitarInventory = ({ data }: GuitarInventoryProps) => {
           key={item.id}
           item={item}
           isEquipped={data.equippedGuitarId === item.guitarId}
-          onEquip={equip}
+          onEquip={(guitarId, year, country) => equip({ guitarId, year, country })}
           isEquipping={isEquipping}
         />
       ))}

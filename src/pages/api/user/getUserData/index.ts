@@ -58,6 +58,8 @@ export default async function handler(
           guitarStartDate: userData?.guitarStartDate ?? null,
           selectedFrame: userData?.selectedFrame ?? null,
           selectedGuitar: userData?.selectedGuitar ?? null,
+          selectedGuitarYear: userData?.selectedGuitarYear ?? null,
+          selectedGuitarCountry: userData?.selectedGuitarCountry ?? null,
           role: userData?.role ?? null,
           createdAt: userData?.createdAt ?? null,
           feedbackAskedAt: userData?.feedbackAskedAt ?? null,

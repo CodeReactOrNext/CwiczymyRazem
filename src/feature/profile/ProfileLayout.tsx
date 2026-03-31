@@ -52,6 +52,8 @@ const ProfileLayout = ({
     guitarStartDate,
     selectedFrame,
     selectedGuitar,
+    selectedGuitarYear,
+    selectedGuitarCountry,
   } = userData;
   const { lastReportDate, achievements } = statistics;
   const [userSkills, setUserSkills] = useState<UserSkills>();
@@ -158,6 +160,8 @@ const ProfileLayout = ({
                 lvl={statistics.lvl}
                 selectedFrame={selectedFrame}
                 selectedGuitar={selectedGuitar}
+                guitarYear={selectedGuitarYear}
+                guitarCountry={selectedGuitarCountry}
               />
               <div className='absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full bg-zinc-900 shadow-xl'>
                 <div className='flex flex-col items-center justify-center leading-none'>

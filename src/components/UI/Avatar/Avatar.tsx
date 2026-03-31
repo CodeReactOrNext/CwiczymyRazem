@@ -21,6 +21,8 @@ interface AvatarProps {
   className?: string;
   selectedFrame?: number;
   selectedGuitar?: number | string;
+  guitarYear?: number;
+  guitarCountry?: string;
 }
 
 const getRankImgPath = (lvl: number) => {
@@ -94,7 +96,7 @@ const getBorderStyles = (lvl: number) => {
   return "bg-gradient-to-br from-zinc-800 via-zinc-900 to-zinc-950 border border-zinc-800 shadow-sm";
 };
 
-const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selectedGuitar }: AvatarProps) => {
+const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selectedGuitar, guitarYear, guitarCountry }: AvatarProps) => {
   const effectiveLvl = selectedFrame !== undefined ? selectedFrame : (lvl ?? 0);
   const imgPath = selectedGuitar ?? getRankImgPath(lvl ?? 0);
   const borderStyles = getBorderStyles(effectiveLvl);
@@ -230,8 +232,8 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
                   <img src={`/static/images/rank/${imgPath}.png`} alt={specialGuitarDef.name} className="object-contain drop-shadow-xl h-52 w-auto -rotate-90" />
                 </div>
                 <div className="flex items-center justify-between px-3 py-2 text-[10px] text-gray-400" style={{ borderTop: `1px solid ${specialGuitarColor}20`, background: `${specialGuitarColor}08` }}>
-                  <span className="font-semibold text-gray-300">{specialGuitarDef.yearFrom}–{specialGuitarDef.yearTo}</span>
-                  <span className="text-gray-500 uppercase tracking-widest text-[9px]">{specialGuitarDef.countries[0]}</span>
+                  <span className="font-semibold text-gray-300">{guitarYear ?? `${specialGuitarDef.yearFrom}–${specialGuitarDef.yearTo}`}</span>
+                  <span className="text-gray-500 uppercase tracking-widest text-[9px]">{guitarCountry ?? specialGuitarDef.countries[0]}</span>
                 </div>
               </div>
             </TooltipContent>

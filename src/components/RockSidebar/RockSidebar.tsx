@@ -295,6 +295,8 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                         lvl={userStats.lvl}
                         selectedFrame={userInfo?.selectedFrame}
                         selectedGuitar={userInfo?.selectedGuitar as number}
+                        guitarYear={userInfo?.selectedGuitarYear}
+                        guitarCountry={userInfo?.selectedGuitarCountry}
                       />
                     </div>
 
@@ -573,6 +575,8 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                           lvl={userStats.lvl}
                           selectedFrame={userInfo?.selectedFrame}
                           selectedGuitar={userInfo?.selectedGuitar}
+                          guitarYear={userInfo?.selectedGuitarYear}
+                          guitarCountry={userInfo?.selectedGuitarCountry}
                         />
                       </div>
 

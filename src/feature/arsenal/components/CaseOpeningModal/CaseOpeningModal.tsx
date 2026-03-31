@@ -286,7 +286,7 @@ export const CaseOpeningModal = ({ result, caseDef, onClose }: CaseOpeningModalP
                 >
                   {winDef.kind === "guitar" && guitar && (
                     <Button
-                      onClick={() => equip(guitar.id, { onSuccess: onClose })}
+                      onClick={() => equip({ guitarId: guitar.id, year: result?.newItem?.year, country: result?.newItem?.country }, { onSuccess: onClose })}
                       disabled={isEquipping}
                       className="w-full bg-cyan-500 hover:bg-cyan-400 text-cyan-950 font-black uppercase tracking-widest h-12 text-sm"
                     >

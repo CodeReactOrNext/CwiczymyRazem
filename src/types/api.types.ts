@@ -45,6 +45,8 @@ export interface UserDataInterface {
     band?: string;
     selectedFrame?: number;
     selectedGuitar?: number | string;
+    selectedGuitarYear?: number;
+    selectedGuitarCountry?: string;
   };
   userAuth: string;
   currentUserStats: StatisticsDataInterface;
@@ -139,6 +141,8 @@ export interface userSliceInitialState {
     band?: string;
     selectedFrame?: number;
     selectedGuitar?: number | string;
+    selectedGuitarYear?: number;
+    selectedGuitarCountry?: string;
     role?: "admin" | "pro" | "master" | "user";
     premiumUntil?: string | null; // ISO date string, null = no expiry (forever)
     feedbackAskedAt?: Timestamp | null;

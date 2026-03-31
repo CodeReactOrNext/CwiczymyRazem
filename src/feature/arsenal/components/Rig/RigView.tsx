@@ -18,26 +18,32 @@ export const RigView = ({ data }: RigViewProps) => {
 
   const rig = data.rig;
 
-  const getSelectedGuitar = (slots: RigSetup["guitarSlots"]) => {
+  const getSelectedGuitarMeta = (slots: RigSetup["guitarSlots"]) => {
     const slot0ItemId = slots[0];
-    if (!slot0ItemId) return null;
+    if (!slot0ItemId) return { imageId: null };
     const inventoryItem = data.inventory.find((item) => item.id === slot0ItemId);
-    if (!inventoryItem) return null;
+    if (!inventoryItem) return { imageId: null };
     const guitarDef = GUITARS_BY_ID.get(inventoryItem.guitarId);
-    return guitarDef?.imageId ?? null;
+    return {
+      imageId: guitarDef?.imageId ?? null,
+      year: inventoryItem.year,
+      country: inventoryItem.country,
+    };
   };
 
   const handleGuitarSelect = (itemId: string | null) => {
     if (pickerSlot === null) return;
     const newSlots = [...rig.guitarSlots] as RigSetup["guitarSlots"];
     newSlots[pickerSlot] = itemId;
-    saveRig({ rig: { ...rig, guitarSlots: newSlots }, selectedGuitar: getSelectedGuitar(newSlots) });
+    const meta = getSelectedGuitarMeta(newSlots);
+    saveRig({ rig: { ...rig, guitarSlots: newSlots }, selectedGuitar: meta.imageId, selectedGuitarYear: meta.year, selectedGuitarCountry: meta.country });
   };
 
   const handleGuitarRemove = (slotIndex: number) => {
     const newSlots = [...rig.guitarSlots] as RigSetup["guitarSlots"];
     newSlots[slotIndex] = null;
-    saveRig({ rig: { ...rig, guitarSlots: newSlots }, selectedGuitar: getSelectedGuitar(newSlots) });
+    const meta = getSelectedGuitarMeta(newSlots);
+    saveRig({ rig: { ...rig, guitarSlots: newSlots }, selectedGuitar: meta.imageId, selectedGuitarYear: meta.year, selectedGuitarCountry: meta.country });
   };
 
   return (
