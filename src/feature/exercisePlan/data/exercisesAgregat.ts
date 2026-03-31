@@ -184,6 +184,8 @@ import { compositionChallengeExercise } from "feature/exercisePlan/data/exerises
 import { rhythmTrainingEasy, rhythmTrainingMedium, rhythmTrainingHard } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
 import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGallop/metalGallop";
 import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
+import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
+import { fingerIndependence1aExercise } from "feature/exercisePlan/data/exerises/fingerIndependence1a/fingerIndependence1a";
 
 
 const rawExercises: Exercise[] = [
@@ -260,6 +262,8 @@ const rawExercises: Exercise[] = [
   jpStretching,
 
   alternatePickingCrossStringExercise,
+  alternatePickingPentatonicAPositionsExercise,
+  fingerIndependence1aExercise,
   mutingDisciplineDrillExercise,
   speedBurstChromaticBlitzExercise,
   legatoHammerPullRunExercise,
