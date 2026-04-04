@@ -34,7 +34,6 @@ const CreatePlanPage: NextPageWithLayout = () => {
         category: determinePlanCategory(exercises),
         difficulty: determinePlanDifficulty(exercises),
         exercises,
-        userId: userAuth,
         createdAt: new Date(),
         updatedAt: new Date(),
         image: null,
