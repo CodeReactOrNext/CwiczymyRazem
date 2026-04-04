@@ -26,7 +26,7 @@ export const spiderOneStringExercise: Exercise = {
   metronomeSpeed: {
     min: 40,
     max: 140,
-    recommended: 70
+    recommended: 50
   },
   tablature: [
     {

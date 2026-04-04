@@ -23,7 +23,7 @@ export const stringSkippingBasicExercise: Exercise = {
     "Listen to Paul Gilbert's string skipping runs for inspiration."
   ],
   metronomeSpeed: { min: 60, max: 120, recommended: 80 },
-  relatedSkills: ["string_skipping"],
+  relatedSkills: ["hybrid_picking"],
   tablature: [
     {
       timeSignature: [4, 4],
