@@ -95,7 +95,8 @@ export function generateChordExercise(config: ChordExerciseConfig): Exercise {
     ],
     metronomeSpeed: tempo,
     relatedSkills: ['chords'],
-    tablature
+    tablature,
+    _generatorConfig: config
   };
 }
 

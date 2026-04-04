@@ -152,6 +152,7 @@ export interface Exercise {
   customGoalDescription?: string;
   riddleConfig?: ExerciseRiddleConfig;
   strummingPatterns?: StrumPattern[];
+  _generatorConfig?: any;
 }
 
 export interface ExercisePlan {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,17 +32,34 @@ interface ChordSelectionDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onExerciseGenerated: (exercise: Exercise) => void;
+  initialExercise?: Exercise;
 }
 
 export function ChordSelectionDialog({
   isOpen,
   onClose,
   onExerciseGenerated,
+  initialExercise,
 }: ChordSelectionDialogProps) {
   const [selectedChords, setSelectedChords] = useState<string[]>(['G', 'C']);
   const [hideNotes, setHideNotes] = useState(false);
   const [changesPerMeasure, setChangesPerMeasure] = useState(1);
   const categorizedChords = getCategorizedChords();
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialExercise && initialExercise._generatorConfig) {
+        const conf = initialExercise._generatorConfig as ChordExerciseConfig;
+        setSelectedChords(conf.chords || []);
+        setHideNotes(initialExercise.hideTablatureNotes ?? false);
+        setChangesPerMeasure(conf.changesPerMeasure || 1);
+      } else {
+        setSelectedChords(['G', 'C']);
+        setHideNotes(false);
+        setChangesPerMeasure(1);
+      }
+    }
+  }, [isOpen, initialExercise]);
 
   const handleAddChord = (chord: string) => {
     if (selectedChords.length < 8) {

@@ -23,7 +23,7 @@ const MyPlansPage: NextPageWithLayout = () => {
           eyebrow="Practice Plans"
           className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
           buttonText="Create Plan"
-          onClick={() => router.push('/plans?view=create')}
+          onClick={() => router.push('/plans/create')}
         />
         <MyPlans onPlanSelect={handlePlanSelect} hideTabs={["routines", "playalongs"]} hideLayout hideSectionHeader />
       </div>

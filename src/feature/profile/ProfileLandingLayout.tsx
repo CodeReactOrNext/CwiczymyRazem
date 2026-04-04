@@ -52,7 +52,7 @@ const ProfileLandingLayout = ({
           <div className="flex flex-col gap-3">
             <div className="flex flex-row flex-wrap gap-3 items-center">
               <button
-                onClick={() => router.push("/profile/exercises?view=create")}
+                onClick={() => router.push("/plans/create")}
                 className="group/btn rounded-none md:rounded-md bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 hover:bg-zinc-700/80 active:scale-95"
               >
                 Create plan
