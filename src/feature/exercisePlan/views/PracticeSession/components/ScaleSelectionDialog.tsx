@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -34,12 +34,14 @@ interface ScaleSelectionDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onExerciseGenerated: (exercise: Exercise) => void;
+  initialExercise?: Exercise;
 }
 
 export function ScaleSelectionDialog({
   isOpen,
   onClose,
   onExerciseGenerated,
+  initialExercise,
 }: ScaleSelectionDialogProps) {
   const [config, setConfig] = useState<Partial<ScaleExerciseConfig>>({
     rootNote: 'C',
@@ -47,6 +49,21 @@ export function ScaleSelectionDialog({
     patternType: 'ascending',
     position: 1,
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialExercise && initialExercise._generatorConfig) {
+        setConfig(initialExercise._generatorConfig);
+      } else {
+        setConfig({
+          rootNote: 'C',
+          scaleType: 'major',
+          patternType: 'ascending',
+          position: 1,
+        });
+      }
+    }
+  }, [isOpen, initialExercise]);
 
   const rootNotes = getAvailableRootNotes();
   const scales = getAvailableScales();

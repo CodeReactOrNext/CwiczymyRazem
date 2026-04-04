@@ -13,12 +13,14 @@ import { TitleField } from "./TitleField";
 interface PlanDetailsFormProps {
   selectedExercises: Exercise[];
   onSubmit: (data: Omit<ExercisePlan, "id">) => void;
+  onBack: () => void;
   initialData?: ExercisePlan;
 }
 
 export const PlanDetailsForm = ({
   selectedExercises,
   onSubmit,
+  onBack,
   initialData,
 }: PlanDetailsFormProps) => {
   const { t } = useTranslation("exercises");
@@ -35,14 +37,19 @@ export const PlanDetailsForm = ({
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
       onSubmit={handleSubmit}
-      className='space-y-6'>
+      className='space-y-6 pt-4'>
       <div className='space-y-4'>
         <TitleField register={register} />
         <DescriptionField register={register} />
       </div>
 
-      <div className='flex justify-end'>
-        <Button type='submit'>{t("common.next")}</Button>
+      <div className='flex justify-end gap-3 pt-6'>
+        <Button type="button" variant="ghost" onClick={onBack}>
+          Back
+        </Button>
+        <Button type="submit">
+          Create Plan
+        </Button>
       </div>
     </motion.form>
   );

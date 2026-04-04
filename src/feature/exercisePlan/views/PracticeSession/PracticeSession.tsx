@@ -79,7 +79,7 @@ interface PracticeSessionProps {
   /** Raw GP file — when present AlphaTab's built-in synthesizer is used for audio */
   rawGpFile?: File;
   onFinish: () => void;
-  onClose?: () => void;
+  onClose: () => void;
   isFinishing?: boolean;
   autoReport?: boolean;
   forceFullDuration?: boolean;
@@ -799,7 +799,7 @@ export const PracticeSession = ({
           />
           <SessionModal
             isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult}
-            onClose={onClose || (() => router.push("/report"))}
+            onClose={onClose }
             onFinish={isLastExercise ? async () => {
               metronome.stopMetronome();
               await saveCurrentScores();

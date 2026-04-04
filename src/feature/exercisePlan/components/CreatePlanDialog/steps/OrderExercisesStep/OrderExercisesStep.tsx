@@ -50,11 +50,11 @@ export const OrderExercisesStep = ({
         onMoveDown={handleMoveDown}
       />
 
-      <div className='flex gap-4'>
-        <Button variant='outline' onClick={onBack}>
+      <div className='flex justify-end gap-3 pt-4'>
+        <Button variant='ghost' onClick={onBack}>
           {t("common:back")}
         </Button>
-        <Button className='flex-1' onClick={onNext}>
+        <Button onClick={onNext}>
           {t("common:next")}
         </Button>
       </div>

@@ -18,6 +18,7 @@ import { SkillCategoryGroup } from "./SkillCategoryGroup";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { cn } from "assets/lib/utils";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 
 interface DashboardExercise {
@@ -35,6 +36,7 @@ interface DashboardExercise {
   shortGoal: string;
   accentColor: string;
   difficulty: string;
+  tablature?: import("feature/exercisePlan/types/exercise.types").TablatureMeasure[];
 }
 
 interface SkillDashboardProps {
@@ -91,7 +93,8 @@ export const SkillDashboard = ({
             intensity: "medium",
             shortGoal: "",
             accentColor: "#ffffff",
-            difficulty: exercise.difficulty
+            difficulty: exercise.difficulty,
+            tablature: exercise.tablature,
         };
         setSelectedChallenge(challengeLike);
       }
@@ -124,9 +127,10 @@ export const SkillDashboard = ({
           intensity: "medium",
           shortGoal: "",
           accentColor: "#ffffff",
-          difficulty: exercise.difficulty
+          difficulty: exercise.difficulty,
+          tablature: exercise.tablature,
       };
-      
+
       acc[category][skillId].push(challengeLike);
       return acc;
     }, {} as Record<string, Record<string, DashboardExercise[]>>);
@@ -354,6 +358,12 @@ export const SkillDashboard = ({
 
                           {challenge.description && (
                             <p className="text-xs text-zinc-500 leading-relaxed line-clamp-2">{challenge.description}</p>
+                          )}
+
+                          {challenge.tablature && challenge.tablature.length > 0 && (
+                            <div className="pt-1">
+                              <TablaturePreview measures={challenge.tablature} />
+                            </div>
                           )}
 
                           <div className="flex flex-wrap items-center gap-1.5">

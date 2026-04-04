@@ -128,7 +128,8 @@ export function generateScaleExercise(config: ScaleExerciseConfig): Exercise {
       recommended: baseRec
     },
     relatedSkills: ['scales'],
-    tablature
+    tablature,
+    _generatorConfig: config
   };
 }
 
