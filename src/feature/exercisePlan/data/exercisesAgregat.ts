@@ -118,6 +118,30 @@ const FREE_EXERCISE_IDS = new Set([
   "improv_prompt_easy",
   "natural_notes_map",
   "metronome_gap_test",
+  // Exercises added in recent sessions — free
+  "alternate_picking_pentatonic_a_positions",
+  "finger_independence_1a",
+  "bend_and_release",
+  "chord_spotlight_drill",
+  "down_picking_doom_pulse",
+  "first_bend",
+  "first_bend_half_step",
+  "hammer_on_pentatonic_run",
+  "high_register_bends",
+  "mini_arpeggio",
+  "muting_spotlight_drill",
+  "naked_tone_melody",
+  "pull_off_pentatonic_run",
+  "string_skipping_two_notes",
+  "sweep_picking_motion_drill",
+  "sweep_picking_motion_drill_6_string",
+  "tapping_descending_target",
+  "tapping_pull_hammer",
+  "tapping_single_string",
+  "vibrato_finger_isolation",
+  "vibrato_high_position",
+  "vibrato_low_position",
+  "vibrato_sustain_drill",
   // Playalong exercises — free
   "pentatonic_playalong_best_of",
   "metal_playalong_basic",
@@ -154,13 +178,23 @@ import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExten
 import { spiderPermutation1234Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1234/spiderPermutation1234";
 import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
 import { earTrainingEasy, earTrainingMedium, earTrainingHard } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
+import { firstBendExercise } from "feature/exercisePlan/data/exerises/firstBend/firstBend";
+import { firstBendHalfStepExercise } from "feature/exercisePlan/data/exerises/firstBendHalfStep/firstBendHalfStep";
+import { bendAndReleaseExercise } from "feature/exercisePlan/data/exerises/bendAndRelease/bendAndRelease";
+import { highRegisterBendsExercise } from "feature/exercisePlan/data/exerises/highRegisterBends/highRegisterBends";
 import { precisionBendingDrillExercise } from "feature/exercisePlan/data/exerises/precisionBendingDrill/precisionBendingDrill";
 import { vibratoControlDrillExercise } from "feature/exercisePlan/data/exerises/vibratoControlDrill/vibratoControlDrill";
 import { expressiveBendPhrasingExercise } from "feature/exercisePlan/data/exerises/expressiveBendPhrasing/expressiveBendPhrasing";
 import { unisonBendDrillExercise } from "feature/exercisePlan/data/exerises/unisonBendDrill/unisonBendDrill";
+import { tappingSingleStringExercise } from "feature/exercisePlan/data/exerises/tappingSingleString/tappingSingleString";
+import { tappingPullHammerExercise } from "feature/exercisePlan/data/exerises/tappingPullHammer/tappingPullHammer";
+import { tappingDescendingTargetExercise } from "feature/exercisePlan/data/exerises/tappingDescendingTarget/tappingDescendingTarget";
 import { tappingTriadicCascadeExercise } from "feature/exercisePlan/data/exerises/tappingTriadicCascade/tappingTriadicCascade";
 import { tappingMelodicLinesExercise } from "feature/exercisePlan/data/exerises/tappingMelodicLines/tappingMelodicLines";
 import { sweepPicking3StringExercise } from "feature/exercisePlan/data/exerises/sweepPicking3String/sweepPicking3String";
+import { sweepPickingMotionDrillExercise } from "feature/exercisePlan/data/exerises/sweepPickingMotionDrill/sweepPickingMotionDrill";
+import { miniArpeggioExercise } from "feature/exercisePlan/data/exerises/miniArpeggio/miniArpeggio";
+import { sweepPickingMotionDrill6StringExercise } from "feature/exercisePlan/data/exerises/sweepPickingMotionDrill6String/sweepPickingMotionDrill6String";
 import { sweep5StringCascadeExercise } from "feature/exercisePlan/data/exerises/sweep5StringCascade/sweep5StringCascade";
 import { sweepNeoclassicalExercise } from "feature/exercisePlan/data/exerises/sweepNeoclassical/sweepNeoclassical";
 import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
@@ -186,6 +220,17 @@ import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGal
 import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
 import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
 import { fingerIndependence1aExercise } from "feature/exercisePlan/data/exerises/fingerIndependence1a/fingerIndependence1a";
+import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
+import { pullOffPentatonicRunExercise } from "feature/exercisePlan/data/exerises/pullOffPentatonicRun/pullOffPentatonicRun";
+import { downPickingDoomPulseExercise } from "feature/exercisePlan/data/exerises/downPickingDoomPulse/downPickingDoomPulse";
+import { nakedToneMelodyExercise } from "feature/exercisePlan/data/exerises/nakedToneMelody/nakedToneMelody";
+import { mutingSpotlightDrillExercise } from "feature/exercisePlan/data/exerises/mutingSpotlightDrill/mutingSpotlightDrill";
+import { chordSpotlightDrillExercise } from "feature/exercisePlan/data/exerises/chordSpotlightDrill/chordSpotlightDrill";
+import { vibratoSustainDrillExercise } from "feature/exercisePlan/data/exerises/vibratoSustainDrill/vibratoSustainDrill";
+import { vibratoLowPositionExercise } from "feature/exercisePlan/data/exerises/vibratoLowPosition/vibratoLowPosition";
+import { vibratoHighPositionExercise } from "feature/exercisePlan/data/exerises/vibratoHighPosition/vibratoHighPosition";
+import { vibratoFingerIsolationExercise } from "feature/exercisePlan/data/exerises/vibratoFingerIsolation/vibratoFingerIsolation";
+import { stringSkippingTwoNotesExercise } from "feature/exercisePlan/data/exerises/stringSkippingTwoNotes/stringSkippingTwoNotes";
 
 
 const rawExercises: Exercise[] = [
@@ -204,6 +249,8 @@ const rawExercises: Exercise[] = [
 
   economyPickingAngularExercise,
   hammerOnSequence579Exercise,
+  hammerOnPentatonicRunExercise,
+  pullOffPentatonicRunExercise,
   legatoSextuplets457Exercise,
   guideToneVoiceLeadingExercise,
   twoNotesPerBarPhrasingExercise,
@@ -272,13 +319,23 @@ const rawExercises: Exercise[] = [
   earTrainingEasy,
   earTrainingMedium,
   earTrainingHard,
+  firstBendExercise,
+  firstBendHalfStepExercise,
+  bendAndReleaseExercise,
+  highRegisterBendsExercise,
   precisionBendingDrillExercise,
   vibratoControlDrillExercise,
   expressiveBendPhrasingExercise,
   unisonBendDrillExercise,
+  tappingSingleStringExercise,
+  tappingPullHammerExercise,
+  tappingDescendingTargetExercise,
   tappingTriadicCascadeExercise,
   tappingMelodicLinesExercise,
   sweepPicking3StringExercise,
+  sweepPickingMotionDrillExercise,
+  sweepPickingMotionDrill6StringExercise,
+  miniArpeggioExercise,
   sweep5StringCascadeExercise,
   sweepNeoclassicalExercise,
   rhythmicPocketMasteryExercise,
@@ -305,6 +362,15 @@ const rawExercises: Exercise[] = [
   compositionChallengeExercise,
   metalGallopExercise,
   metalTremoloPickingExercise,
+  downPickingDoomPulseExercise,
+  nakedToneMelodyExercise,
+  mutingSpotlightDrillExercise,
+  chordSpotlightDrillExercise,
+  vibratoSustainDrillExercise,
+  vibratoLowPositionExercise,
+  vibratoHighPositionExercise,
+  vibratoFingerIsolationExercise,
+  stringSkippingTwoNotesExercise,
   strummingBasicExercise,
   strummingDownUpExercise,
   strummingRockExercise,
