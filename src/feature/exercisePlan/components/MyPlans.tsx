@@ -131,7 +131,6 @@ export const MyPlans = ({ onPlanSelect, hideTabs = [], hideLayout, controlledTab
       };
 
       setPlans((prevPlans) => [...prevPlans, newPlan]);
-      setIsCreating(false);
 
       toast.success(t("exercises:my_plans.create_success") as string);
     } catch (error) {
