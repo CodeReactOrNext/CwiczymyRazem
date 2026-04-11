@@ -41,7 +41,7 @@ export const pentatonicBox1UpDownExercise: Exercise = {
     "This shape is movable: at fret 7 it's Bm, at fret 12 it's Em. Learn the shape, not the position.",
   ],
   metronomeSpeed: { min: 40, max: 100, recommended: 60 },
-  relatedSkills: ["scales", "alternate_picking", "picking"],
+  relatedSkills: ["scales", "alternate_picking"],
   examBacking: { url: "/static/sounds/exercise/pentatonic_box_1___up_and_down_backing_track.mp3", sourceBpm: 70 },
   tablature: [
     {

@@ -35,7 +35,7 @@ export const pentatonicStringCrossing3Exercise: Exercise = {
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 50 },
   examBacking: { url: "/static/sounds/exercise/pentatonic_string_crossing___3_strings_backing_track.mp3", sourceBpm: 50 },
-  relatedSkills: ["alternate_picking", "picking"],
+  relatedSkills: ["alternate_picking"],
   tablature: [
     // Bar 1: ascend str4 → str3 → str2, turnaround
     // ↓  ↑  ↓  ↑  ↓  ↑  ↓  ↑
@@ -93,7 +93,7 @@ export const pentatonicStringCrossing3Exercise: Exercise = {
         { duration: 0.5, notes: [{ string: 3, fret: 7 }] },
         { duration: 0.5, notes: [{ string: 3, fret: 5 }] },
         { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
-        { duration: 2,   notes: [{ string: 4, fret: 5 }] },
+        { duration: 2, notes: [{ string: 4, fret: 5 }] },
       ],
     },
   ],

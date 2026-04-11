@@ -141,6 +141,8 @@ export default function SongPracticePage() {
     );
   }
 
+  if (pageState.status !== "ready") return null;
+
   return (
     <>
       <Head>

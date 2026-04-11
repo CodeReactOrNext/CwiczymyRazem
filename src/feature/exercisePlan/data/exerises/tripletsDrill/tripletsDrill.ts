@@ -77,7 +77,7 @@ export const tripletsDrillExercise: Exercise = {
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 45 },
   examBacking: { url: "/static/sounds/exercise/triplets_drill_backing_track.mp3", sourceBpm: 50 },
-  relatedSkills: ["rhythm", "picking"],
+  relatedSkills: ["rhythm"],
   tablature: [
     ascBar(),
     descBar(),

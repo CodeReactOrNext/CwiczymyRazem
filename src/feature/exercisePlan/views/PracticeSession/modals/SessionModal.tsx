@@ -66,7 +66,7 @@ interface SessionModalProps {
   sessionAccuracy: number;
   detectedNoteData: any;
   isListening: boolean;
-  hitNotes: Record<string, boolean>;
+  hitNotes: Record<string, boolean | number>;
   missedNotes: Record<string, boolean>;
   currentBeatsElapsed: number;
   isAudioMuted: boolean;
