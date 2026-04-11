@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
-import { Gauge, Minus, Plus, Volume2, VolumeX } from "lucide-react";
+import { Gauge, Lock, Minus, Plus, Volume2, VolumeX } from "lucide-react";
 import { useRef, useState } from "react";
 
 interface MetronomeProps {
@@ -11,6 +11,8 @@ interface MetronomeProps {
   onMuteToggle?: (muted: boolean) => void;
   isHalfSpeed?: boolean;
   onHalfSpeedToggle?: (value: boolean) => void;
+  /** Exam mode — BPM controls are disabled */
+  locked?: boolean;
 }
 
 const getTempoColor = (bpm: number) => {
@@ -30,7 +32,8 @@ export const Metronome = ({
   isMuted = false,
   onMuteToggle,
   isHalfSpeed = false,
-  onHalfSpeedToggle
+  onHalfSpeedToggle,
+  locked = false,
 }: MetronomeProps) => {
   const bpm = metronome.bpm;
   const setBpm = metronome.setBpm;
@@ -93,7 +96,14 @@ export const Metronome = ({
       </div>
 
       <div className="flex flex-col items-center justify-center py-4 mt-2">
-        {isEditingBpm ? (
+        {locked ? (
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2">
+              <Lock size={16} className="text-amber-400" />
+              <span className={cn("text-5xl font-black tabular-nums select-none", tempoColor)}>{bpm}</span>
+            </div>
+          </div>
+        ) : isEditingBpm ? (
           <input
             ref={bpmInputRef}
             type="number"
@@ -118,7 +128,7 @@ export const Metronome = ({
           </button>
         )}
         <span className="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 select-none">
-          {isEditingBpm ? "↵ to confirm" : "BPM · click to edit"}
+          {locked ? "BPM · exam mode" : isEditingBpm ? "↵ to confirm" : "BPM · click to edit"}
         </span>
       </div>
 
@@ -129,7 +139,7 @@ export const Metronome = ({
             size="icon"
             className="h-8 w-8 shrink-0 rounded-sm bg-zinc-800/40 hover:bg-zinc-700/80 text-zinc-100 hover:text-white transition-colors"
             onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
-            disabled={bpm <= minBpm}
+            disabled={locked || bpm <= minBpm}
           >
             <Minus className="h-5 w-5" strokeWidth={2.5} />
           </Button>
@@ -140,8 +150,8 @@ export const Metronome = ({
               min={minBpm}
               max={maxBpm}
               step={1}
-              onValueChange={(value) => setBpm(value[0])}
-              className={cn("py-2 cursor-pointer", getSliderTrackColor(bpm))}
+              onValueChange={(value) => { if (!locked) setBpm(value[0]); }}
+              className={cn("py-2", locked ? "cursor-not-allowed opacity-50" : "cursor-pointer", getSliderTrackColor(bpm))}
             />
             <div className="flex items-center justify-between px-1 text-[10px] font-bold text-zinc-600 select-none">
               <span>{minBpm}</span>
@@ -154,7 +164,7 @@ export const Metronome = ({
             size="icon"
             className="h-8 w-8 shrink-0 rounded-sm bg-zinc-800/40 hover:bg-zinc-700/80 text-zinc-100 hover:text-white transition-colors"
             onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
-            disabled={bpm >= maxBpm}
+            disabled={locked || bpm >= maxBpm}
           >
             <Plus className="h-5 w-5" strokeWidth={2.5} />
           </Button>

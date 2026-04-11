@@ -51,6 +51,10 @@ export interface TablatureBeat {
 export interface TablatureMeasure {
   beats: TablatureBeat[];
   timeSignature: [number, number]; // e.g. [4, 4]
+  /** If true, this measure is played only on the first loop — skipped on all subsequent repeats */
+  firstLoopOnly?: boolean;
+  /** If true, this measure is played only on the last loop — skipped on all preceding repeats */
+  lastLoopOnly?: boolean;
   /** Tempo ratio relative to score.tempo (e.g. 0.869 = 146/168). Present only when the
    *  tempo changes at this measure. The cursor uses it to compute effective BPM so that
    *  playback speed-scaling (bpm / originalBpm) stays in sync with AlphaTabPlayer. */
@@ -153,6 +157,8 @@ export interface Exercise {
   riddleConfig?: ExerciseRiddleConfig;
   strummingPatterns?: StrumPattern[];
   _generatorConfig?: any;
+  /** Audio file played as backing in exam mode. sourceBpm must match the file's recorded tempo. */
+  examBacking?: { url: string; sourceBpm: number };
 }
 
 export interface ExercisePlan {

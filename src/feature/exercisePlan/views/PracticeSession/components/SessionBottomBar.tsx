@@ -1,12 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "assets/components/ui/dialog";
 import { useTranslation } from "hooks/useTranslation";
 import { FaCheck, FaStepBackward, FaStepForward, FaSignOutAlt } from "react-icons/fa";
@@ -16,6 +11,7 @@ import type { Exercise } from "../../../types/exercise.types";
 
 interface SessionBottomBarProps {
   onClose?: () => void;
+  skipExitDialog?: boolean;
   exerciseKey: number;
   currentExercise: Exercise;
   isLastExercise: boolean;
@@ -36,6 +32,7 @@ interface SessionBottomBarProps {
   isFinishing?: boolean;
   isSubmittingReport: boolean;
   onFinishSession: () => Promise<void>;
+  examMode?: boolean;
 }
 
 /**
@@ -63,6 +60,8 @@ export const SessionBottomBar = ({
   isFinishing,
   isSubmittingReport,
   onFinishSession,
+  skipExitDialog = false,
+  examMode = false,
 }: SessionBottomBarProps) => {
   const { t } = useTranslation(["common"]);
   const [showExitDialog, setShowExitDialog] = useState(false);
@@ -73,10 +72,10 @@ export const SessionBottomBar = ({
       <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
 
         {/* Left: Exit */}
-        <div className="flex-1 hidden xl:flex items-center justify-start gap-4">
+        <div className="flex-1 flex items-center justify-start gap-4">
           <Button
             variant="ghost"
-            onClick={() => setShowExitDialog(true)}
+            onClick={skipExitDialog ? onClose : () => setShowExitDialog(true)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 font-bold text-sm tracking-wide transition-all border border-white/10 hover:border-red-500/30"
           >
             <FaSignOutAlt />
@@ -117,41 +116,42 @@ export const SessionBottomBar = ({
               <FaStepBackward /> {t("common:back") || "Back"}
             </Button>
           )}
-          <div className="flex flex-col items-end gap-1">
-            <Button
-              variant="ghost"
-              loading={isFinishing || isSubmittingReport}
-              className={cn(
-                "rounded-2xl font-bold text-[11px] tracking-wide transition-all click-behavior",
-                isLastExercise
-                  ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black"
-                  : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
-                isLastExercise && !canFinishSession && "opacity-50 cursor-not-allowed"
+          {!examMode && (
+            <div className="flex flex-col items-end gap-1">
+              <Button
+                variant="ghost"
+                loading={isFinishing || isSubmittingReport}
+                className={cn(
+                  "rounded-2xl font-bold text-[11px] tracking-wide transition-all click-behavior",
+                  isLastExercise
+                    ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black"
+                    : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
+                  isLastExercise && !canFinishSession && "opacity-50 cursor-not-allowed"
+                )}
+                onClick={isLastExercise ? onFinishSession : handleNextExerciseClick}
+                disabled={isLastExercise ? !canFinishSession : false}
+              >
+                {(isFinishing || isSubmittingReport) ? (
+                  <span>Saving...</span>
+                ) : isLastExercise ? (
+                  <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
+                ) : (
+                  <span className="flex items-center gap-2">{t("common:skip")} <FaStepForward /></span>
+                )}
+              </Button>
+              {isLastExercise && !canFinishSession && (
+                <span className="text-[11px] text-zinc-500 tracking-wide">
+                  {isSkillExercise ? "Complete the full exercise to finish" : "Practice at least 20s to finish"}
+                </span>
               )}
-              onClick={isLastExercise ? onFinishSession : handleNextExerciseClick}
-              disabled={isLastExercise ? !canFinishSession : false}
-            >
-              {(isFinishing || isSubmittingReport) ? (
-                <span>Saving...</span>
-              ) : isLastExercise ? (
-                <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
-              ) : (
-                <span className="flex items-center gap-2">{t("common:skip")} <FaStepForward /></span>
-              )}
-            </Button>
-            {isLastExercise && !canFinishSession && (
-              <span className="text-[11px] text-zinc-500 tracking-wide">
-                {isSkillExercise ? "Complete the full exercise to finish" : "Practice at least 20s to finish"}
-              </span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
       </div>
     </div>
 
     <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
-
       <DialogContent className="max-w-md bg-zinc-900 border border-white/10 text-white">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold tracking-tight">Leave the session?</DialogTitle>
@@ -185,6 +185,7 @@ export const SessionBottomBar = ({
         )}
       </DialogContent>
     </Dialog>
+
     </>
   );
 };

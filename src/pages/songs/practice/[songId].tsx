@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import type { Song } from "feature/songs/types/songs.type";
 import {
@@ -14,7 +15,7 @@ import {
 import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
-import { Loader2, Music } from "lucide-react";
+import { Music } from "lucide-react";
 import { withAuth } from "utils/auth/serverAuth";
 
 type PageState =
@@ -30,6 +31,7 @@ export default function SongPracticePage() {
   const isPremium = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
 
   const [pageState, setPageState] = useState<PageState>({ status: "loading" });
+  const [sessionReady, setSessionReady] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
 
   useEffect(() => {
@@ -110,17 +112,12 @@ export default function SongPracticePage() {
     router.push("/songs?view=management");
   };
 
-  if (pageState.status === "loading") {
+  if (!sessionReady) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#020202]">
-        <Head>
-          <title>Loading Practice... | Riff Quest</title>
-        </Head>
-        <div className="flex flex-col items-center gap-4 text-zinc-500">
-          <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
-          <span className="text-sm font-bold uppercase tracking-widest">Loading practice session…</span>
-        </div>
-      </div>
+      <PracticeLoadingScreen
+        isReady={pageState.status === "ready"}
+        onDone={() => setSessionReady(true)}
+      />
     );
   }
 

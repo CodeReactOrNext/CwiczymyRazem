@@ -22,4 +22,5 @@ export type NavPagesTypes =
   | "gp-tabs"
   | "arsenal"
   | "practice-finder"
+  | "journey"
   | null;

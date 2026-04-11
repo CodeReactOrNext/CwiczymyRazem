@@ -33,6 +33,7 @@ import {
   Sparkles,
   BarChart2,
   Map,
+  Route,
 } from "lucide-react";
 import { Heart, Zap } from "lucide-react";
 import Image from "next/image";
@@ -102,6 +103,7 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/plans")) return "my-plans";
     if (pathname.startsWith("/gp-tabs")) return "gp-tabs";
     if (pathname.startsWith("/arsenal")) return "arsenal";
+    if (pathname.startsWith("/journey")) return "journey";
     return null;
   };
 
@@ -155,6 +157,12 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
   ];
 
   const practiceSections = [
+    {
+      id: "journey" as NavPagesTypes,
+      name: "Journey",
+      href: "/journey",
+      icon: <Route size={16} />,
+    },
     {
       id: "timer" as NavPagesTypes,
       name: "Practice",
