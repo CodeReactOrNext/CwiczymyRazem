@@ -32,7 +32,7 @@ export const quarterNotesDrillExercise: Exercise = {
   ],
   metronomeSpeed: { min: 40, max: 90, recommended: 50 },
   examBacking: { url: "/static/sounds/exercise/quarter_notes_drill_backing_track.mp3", sourceBpm: 50 },
-  relatedSkills: ["rhythm", "picking"],
+  relatedSkills: ["rhythm"],
   tablature: [
     // Phase 1: open A
     // Bar 1: A A — —

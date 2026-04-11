@@ -29,7 +29,7 @@ interface ExerciseContentAreaProps {
   countInRemaining: number;
   detectedNoteData: NoteData | null;
   isListening: boolean;
-  hitNotes: Record<string, boolean>;
+  hitNotes: Record<string, boolean | number>;
   missedNotes: Record<string, boolean>;
   currentBeatsElapsed: number;
   audioContext?: AudioContext | null;
