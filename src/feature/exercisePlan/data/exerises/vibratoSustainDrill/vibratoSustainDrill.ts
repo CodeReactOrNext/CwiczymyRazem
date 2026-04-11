@@ -7,7 +7,7 @@ export const vibratoSustainDrillExercise: Exercise = {
     "Two notes (B on string 2, D on string 3) played as sustained whole notes with vibrato, then repeated with a deliberate quarter-note rest on beat 2. The rest is the point — you must start vibrato, pause completely, then re-enter clean vibrato without resetting your technique. Slow, wide, controlled. No rushing, no wobble.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 56 / 60,
   instructions: [
     "Measure 1 (reference — B, full bar): Strike B (string 2, fret 7). Start vibrato immediately and sustain it evenly for all 4 beats. Width and speed must stay constant from beat 1 to beat 4.",
     "Measure 2 (B with rest on beat 2): Strike B on beat 1 — quarter note, no vibrato yet. Rest on beat 2 — lift cleanly, silence. Beat 3: re-strike B and hold vibrato for a full half note (beats 3 and 4).",
@@ -23,6 +23,7 @@ export const vibratoSustainDrillExercise: Exercise = {
     "Record yourself. Listen back without watching your hands. Is the vibrato even from start to finish? Does the rest sound like silence or like a dead buzz?",
   ],
   metronomeSpeed: { min: 40, max: 80, recommended: 55 },
+  examBacking: { url: "/static/sounds/exercise/vibrato_sustain___hold_it_for_the_whole_bar_backing_track.mp3", sourceBpm: 55 },
   relatedSkills: ["vibrato", "articulation"],
   tablature: [
     // M1: B (str2, f7) whole note vibrato — referencja
@@ -57,11 +58,73 @@ export const vibratoSustainDrillExercise: Exercise = {
         { duration: 2, notes: [{ string: 3, fret: 7, isVibrato: true }] },
       ],
     },
-    // M5: B (str2, f7) whole note vibrato — resolve
+    // M5: B whole note vibrato — drugi cykl
     {
       timeSignature: [4, 4],
       beats: [
         { duration: 4, notes: [{ string: 2, fret: 7, isVibrato: true }] },
+      ],
+    },
+    // M6: B quarter → rest → B half vibrato
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 1, notes: [{ string: 2, fret: 7 }] },
+        { duration: 1, notes: [] },
+        { duration: 2, notes: [{ string: 2, fret: 7, isVibrato: true }] },
+      ],
+    },
+    // M7: D whole note vibrato
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 4, notes: [{ string: 3, fret: 7, isVibrato: true }] },
+      ],
+    },
+    // M8: D quarter → rest → D half vibrato
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 1, notes: [{ string: 3, fret: 7 }] },
+        { duration: 1, notes: [] },
+        { duration: 2, notes: [{ string: 3, fret: 7, isVibrato: true }] },
+      ],
+    },
+    // M9: B whole note vibrato — trzeci cykl
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 4, notes: [{ string: 2, fret: 7, isVibrato: true }] },
+      ],
+    },
+    // M10: B quarter → rest → B half vibrato
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 1, notes: [{ string: 2, fret: 7 }] },
+        { duration: 1, notes: [] },
+        { duration: 2, notes: [{ string: 2, fret: 7, isVibrato: true }] },
+      ],
+    },
+    // M11: D whole note vibrato
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 3, notes: [{ string: 2, fret: 7, isVibrato: true }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    // M12: B (str2, f7) whole note vibrato — resolve
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 4, notes: [{ string: 3, fret: 7, isVibrato: true }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 4, notes: [] },
       ],
     },
   ],

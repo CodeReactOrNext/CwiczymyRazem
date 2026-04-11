@@ -103,13 +103,16 @@ let audioStartSec: number | null = null;
 let audioCurrentSec: number | null = null;
 
 // Visual state
-let hitNotes: Record<string, boolean> = {};
+let hitNotes: Record<string, boolean | number> = {};
 let missedNotes: Record<string, boolean> = {};
 let hideNotes = false;
 
 // Hit animation timestamps — noteKey → wall-clock ms when note was first hit
-const HIT_ANIM_MS = 240;
+const HIT_ANIM_MS = 320;
 let hitTimestamps: Record<string, number> = {};
+
+// Visual cache for progressive fills to prevent backward snapping during latency variance
+const noteVisualFill = new Map<string, number>();
 
 // ── Performance: module-level reuse ──────────────────────────────────────────
 // Reused each frame instead of allocating a new Map on every rAF tick
@@ -126,6 +129,12 @@ let audioCurrentReceivedAt: number | null = null;
 // Scrub/pause position (writable by SCROLL message when paused)
 let pausedCursorPos = 0;
 let pausedScrollX = 0;
+
+// Rest-active state — track changes to avoid flooding main thread
+let lastRestActive = false;
+
+// Whether user is playing sound during a rest (set by main thread)
+let showRestWarning = false;
 
 // ── Bend badge ────────────────────────────────────────────────────────────────
 function drawBendBadge(
@@ -175,8 +184,8 @@ function drawBendBadge(
 
 // ── Rounded rectangle (pill) helper ──────────────────────────────────────────
 function drawPill(x: number, y: number, w: number, h: number, r: number) {
-  if (!ctx) return;
-  const cr = Math.min(r, h / 2, w / 2);
+  if (!ctx || w <= 0 || h <= 0) return;
+  const cr = Math.max(0, Math.min(r, h / 2, w / 2));
   ctx.beginPath();
   ctx.moveTo(x + cr, y);
   ctx.lineTo(x + w - cr, y);
@@ -292,7 +301,13 @@ function render() {
   if (!ctx || W === 0) return;
 
   // Skip paint when paused and nothing animating
-  if (!isPlaying && !needsRedraw && hitTimestampsCount === 0) return;
+  if (!isPlaying && !needsRedraw && hitTimestampsCount === 0) {
+    if (lastRestActive) {
+      lastRestActive = false;
+      self.postMessage({ type: 'REST_ACTIVE', isRest: false });
+    }
+    return;
+  }
   needsRedraw = false;
 
   const dynBW = Math.max(120, Math.min(200, W / 4));
@@ -384,7 +399,27 @@ function render() {
       ctx.fillStyle = RHYTHM_COLOR;
 
       if (beat.isRest) {
+        const warnThisBeat = showRestWarning && isActive;
+        if (warnThisBeat) {
+          // Subtle amber column tint
+          ctx.fillStyle = "rgba(251,191,36,0.07)";
+          ctx.fillRect(beatPx, 0, beat.duration * dynBW, H);
+          // Override rest symbol color to amber
+          ctx.strokeStyle = "rgba(251,191,36,0.9)";
+          ctx.fillStyle = "rgba(251,191,36,0.9)";
+        }
         drawRestSymbol(beatL, dur);
+        if (warnThisBeat) {
+          // Small "!" above the rest symbol
+          ctx.font = "bold 11px Inter, sans-serif";
+          ctx.fillStyle = "#fbbf24";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("!", beatL, STEM_TOP_Y - 8);
+          // Reset colors
+          ctx.strokeStyle = RHYTHM_COLOR;
+          ctx.fillStyle = RHYTHM_COLOR;
+        }
       } else if (dur >= 4.0) {
         ctx.lineWidth = 1.5;
         ctx.beginPath();
@@ -440,7 +475,8 @@ function render() {
       const bendBadgeY = beat.topNoteY - BLOCK_H / 2 - 28;
 
       for (const note of beat.notes) {
-        const isHit = !!hitNotes[note.noteKey];
+        const hitVal = hitNotes[note.noteKey];
+        const isHit = !!hitVal;
         const isDead = note.isDead;
         const isHarm = !!(note.harmonicType && note.harmonicType > 0);
         const dyn = hasDynamics && note.dynamics !== undefined ? note.dynamics : 1.0;
@@ -482,9 +518,11 @@ function render() {
 
         // ── Choose fill color ────────────────────────────────────────────
         let fillColor = note.color;
-        if (isHit) fillColor = "#10b981";
-        else if (note.isPalmMute) fillColor = "#78716c";
-        else if (isDead) fillColor = "#374151";
+        const finalHitColor = "#10b981";
+        const isAnimatingHit = isHit && hitTimestamps[note.noteKey] !== undefined;
+
+        if (!isHit && note.isPalmMute) fillColor = "#78716c";
+        else if (!isHit && isDead) fillColor = "#374151";
 
         // ── Active glow — translucent ring behind block ───────────────────
         if (isActive && !isHit) {
@@ -499,6 +537,33 @@ function render() {
         }
 
         // ── Draw pill block ──────────────────────────────────────────────
+        let hitAge = 0;
+        if (isAnimatingHit) {
+          hitAge = Math.min(1, (Date.now() - hitTimestamps[note.noteKey]) / HIT_ANIM_MS);
+        }
+
+        let fillW = 0;
+        if (isHit) {
+          const currentVisualFill = noteVisualFill.get(note.noteKey) || 0;
+          // ~250ms slack covers typical latency + 50ms React state interval
+          const slackX = (250 / 60000) * (bpm || 120) * dynBW;
+          const limitX = typeof hitVal === 'number' ? hitVal * dynBW : cursorPos;
+          
+          let optimisticTarget = 0;
+          if (cursorPos - limitX <= slackX) {
+            // Optimistic tracking: as long as limitX is close enough to cursor, assume it's still held
+            optimisticTarget = cursorPos - blockX;
+          } else {
+            // Note dropped: cap at actual drop point + slack (preventing backward visual snap)
+            optimisticTarget = limitX - blockX + slackX;
+          }
+          
+          fillW = Math.max(0, Math.min(blockW, Math.max(currentVisualFill, optimisticTarget)));
+          noteVisualFill.set(note.noteKey, fillW);
+        } else {
+          noteVisualFill.delete(note.noteKey);
+        }
+
         if (isHarm) {
           // Harmonic: outlined pill
           const col = note.harmonicType === 1 ? note.color : "#e879f9";
@@ -510,18 +575,26 @@ function render() {
           ctx.fill();
           ctx.stroke();
           ctx.globalAlpha = 1;
+
+          // Progressive fill for harmonic
+          if (fillW > 0) {
+            ctx.save();
+            drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
+            ctx.clip();
+            ctx.fillStyle = "rgba(16, 185, 129, 0.4)";
+            ctx.fillRect(blockX, blockY, fillW, BLOCK_H);
+            ctx.restore();
+          }
+
         } else {
           ctx.globalAlpha = isHit ? 1.0 : baseAlpha;
           ctx.fillStyle = fillColor;
 
           // Glow behind the pill for fresh hits
-          if (isHit && hitTimestamps[note.noteKey] !== undefined) {
-            const hitAge = Math.min(1, (Date.now() - hitTimestamps[note.noteKey]) / HIT_ANIM_MS);
-            if (hitAge < 0.55) {
-              const glowStr = 1 - hitAge / 0.55;
-              ctx.shadowColor = '#34d399';
-              ctx.shadowBlur = glowStr * 18;
-            }
+          if (isAnimatingHit && hitAge < 0.55) {
+            const glowStr = 1 - hitAge / 0.55;
+            ctx.shadowColor = '#34d399';
+            ctx.shadowBlur = glowStr * 20;
           }
 
           drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
@@ -529,10 +602,41 @@ function render() {
           ctx.shadowBlur = 0;
 
           // Subtle inner highlight (lighter strip on top half)
-          if (!isHit && !isDead) {
+          if (!isDead) {
             ctx.fillStyle = "rgba(255,255,255,0.14)";
             drawPill(blockX + 1, blockY + 1, blockW - 2, BLOCK_H / 2 - 1, BLOCK_CORNER);
             ctx.fill();
+          }
+          
+          // Progressive filling with green tied to the playback cursor
+          if (fillW > 0) {
+            ctx.save();
+            drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
+            ctx.clip();
+            
+            // The solid green fill
+            ctx.fillStyle = finalHitColor;
+            ctx.fillRect(blockX, blockY, fillW, BLOCK_H);
+            
+            // White shining leading edge of the fill
+            const sweepW = 12;
+            const sweepX = blockX + fillW - sweepW;
+            if (sweepX > blockX - sweepW && fillW < blockW) {
+              const sweepGrad = ctx.createLinearGradient(sweepX, 0, sweepX + sweepW, 0);
+              sweepGrad.addColorStop(0, "rgba(255,255,255,0)");
+              sweepGrad.addColorStop(1, "rgba(255,255,255,0.85)");
+              ctx.fillStyle = sweepGrad;
+              ctx.fillRect(sweepX, blockY, sweepW, BLOCK_H);
+            }
+            
+            // Inner highlight for the filled green part
+            if (fillW > 2) {
+              ctx.fillStyle = "rgba(255,255,255,0.2)";
+              drawPill(blockX, blockY + 1, fillW - 1, BLOCK_H / 2 - 1, BLOCK_CORNER);
+              ctx.fill();
+            }
+
+            ctx.restore();
           }
 
           ctx.globalAlpha = 1;
@@ -549,30 +653,13 @@ function render() {
           }
         }
 
-        // ── Hit animation (expanding rings + flash) ───────────────────────
-        const hitTs = hitTimestamps[note.noteKey];
-        if (isHit && hitTs !== undefined) {
-          const age = Math.min(1, (Date.now() - hitTs) / HIT_ANIM_MS);
-          const cx = labelX;
-          const cy = note.noteY;
-          // Ease-out quad: fast start, smooth finish
-          const eased = 1 - (1 - age) * (1 - age);
+        // ── Hit animation (Block Shockwave + Sweet Flash) ───────────────────────
+        if (isAnimatingHit) {
+          const eased = 1 - (1 - hitAge) * (1 - hitAge); // Quad ease-out
 
-          // Tight inner ring — brief crisp pop at the very start
-          if (age < 0.25) {
-            const age0 = age / 0.25;
-            const r0 = BLOCK_H / 2 + age0 * 10;
-            const a0 = (1 - age0) * 0.55;
-            ctx.strokeStyle = `rgba(167,243,208,${a0})`;
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.arc(cx, cy, r0, 0, Math.PI * 2);
-            ctx.stroke();
-          }
-
-          // White flash over pill — sharper and quicker (first 20%)
-          if (age < 0.2) {
-            const flashA = (1 - age / 0.2) * 0.55;
+          // White flash over whole pill at start
+          if (hitAge < 0.2) {
+            const flashA = (1 - hitAge / 0.2) * 0.7;
             ctx.globalAlpha = flashA;
             ctx.fillStyle = "#ffffff";
             drawPill(blockX, blockY, blockW, BLOCK_H, BLOCK_CORNER);
@@ -580,29 +667,27 @@ function render() {
             ctx.globalAlpha = 1;
           }
 
-          // Ring 1 — main ring, ease-out expansion
-          const r1 = BLOCK_H / 2 + eased * 28;
-          const a1 = (1 - age) * 0.65;
+          // Shockwave 1 — pill outline expanding outwards
+          const exp1 = eased * 8; // expands by 8px
+          const a1 = (1 - hitAge) * 0.8;
           ctx.strokeStyle = `rgba(52,211,153,${a1})`;
-          ctx.lineWidth = Math.max(0.5, 3 * (1 - age));
-          ctx.beginPath();
-          ctx.arc(cx, cy, r1, 0, Math.PI * 2);
+          ctx.lineWidth = Math.max(0.5, 3 * (1 - hitAge));
+          drawPill(blockX - exp1, blockY - exp1, blockW + exp1 * 2, BLOCK_H + exp1 * 2, BLOCK_CORNER + exp1);
           ctx.stroke();
 
-          // Ring 2 — delayed by 15%, ease-out, slower fade
-          if (age > 0.15) {
-            const age2 = (age - 0.15) / 0.85;
+          // Shockwave 2 — delayed, smaller outline
+          if (hitAge > 0.15) {
+            const age2 = (hitAge - 0.15) / 0.85;
             const eased2 = 1 - (1 - age2) * (1 - age2);
-            const r2 = BLOCK_H / 2 + eased2 * 20;
-            const a2 = (1 - age2) * 0.35;
+            const exp2 = eased2 * 5;
+            const a2 = (1 - age2) * 0.4;
             ctx.strokeStyle = `rgba(16,185,129,${a2})`;
-            ctx.lineWidth = Math.max(0.5, 1.5 * (1 - age2));
-            ctx.beginPath();
-            ctx.arc(cx, cy, r2, 0, Math.PI * 2);
+            ctx.lineWidth = Math.max(0.5, 2 * (1 - age2));
+            drawPill(blockX - exp2, blockY - exp2, blockW + exp2 * 2, BLOCK_H + exp2 * 2, BLOCK_CORNER + exp2);
             ctx.stroke();
           }
 
-          if (age >= 1) { delete hitTimestamps[note.noteKey]; hitTimestampsCount--; }
+          if (hitAge >= 1) { delete hitTimestamps[note.noteKey]; hitTimestampsCount--; }
         }
 
         // ── Fret label ────────────────────────────────────────────────────
@@ -885,6 +970,20 @@ function render() {
   }
 
   ctx.restore();
+
+  // ── Notify main thread when cursor enters/leaves a rest beat ────────────
+  if (isPlaying && countInRemaining === 0) {
+    const restActive = renderBeats.some(b =>
+      b.isRest && cursorPos >= b.offsetX * dynBW && cursorPos < (b.offsetX + b.duration) * dynBW
+    );
+    if (restActive !== lastRestActive) {
+      lastRestActive = restActive;
+      self.postMessage({ type: 'REST_ACTIVE', isRest: restActive });
+    }
+  } else if (lastRestActive) {
+    lastRestActive = false;
+    self.postMessage({ type: 'REST_ACTIVE', isRest: false });
+  }
 }
 
 // ── Message handler ───────────────────────────────────────────────────────────
@@ -978,10 +1077,15 @@ self.onmessage = (e: MessageEvent) => {
       pausedCursorPos = msg.cursorPos;
       break;
     }
+    case 'SHOW_REST_WARNING': {
+      showRestWarning = msg.show;
+      break;
+    }
     case 'RESET': {
       pausedScrollX = 0;
       pausedCursorPos = 0;
       missedNotes = {};
+      showRestWarning = false;
       break;
     }
     case 'STOP': {

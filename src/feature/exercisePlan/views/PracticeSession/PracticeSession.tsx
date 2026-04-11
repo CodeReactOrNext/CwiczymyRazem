@@ -48,6 +48,7 @@ import { useAppSelector } from "store/hooks";
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
 import { AlphaTabScoreViewer } from "./components/AlphaTabScoreViewer";
 import { useTablatureAudio, AudioTrackConfig } from "../../hooks/useTablatureAudio";
+import { useExamBackingAudio } from "../../hooks/useExamBackingAudio";
 import { useAlphaTabPlayer } from "../../hooks/useAlphaTabPlayer";
 import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
 import { getNoteFromFrequency } from "utils/audio/noteUtils";
@@ -87,6 +88,12 @@ interface PracticeSessionProps {
   freeMode?: boolean;
   skillRewardSkillId?: string;
   skillRewardAmount?: number;
+  /** Exam mode — metronome locked at examBpm, score reported on finish */
+  examMode?: boolean;
+  examBpm?: number;
+  onExamComplete?: (accuracy: number) => void;
+  /** Skip exit confirmation dialog — use when navigating back to journey */
+  skipExitDialog?: boolean;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -102,6 +109,10 @@ export const PracticeSession = ({
   freeMode,
   skillRewardSkillId,
   skillRewardAmount,
+  examMode = false,
+  examBpm,
+  onExamComplete,
+  skipExitDialog = false,
 }: PracticeSessionProps) => {
   const { t } = useTranslation(["exercises", "common"]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -230,6 +241,8 @@ export const PracticeSession = ({
   const [isMetronomeMuted,  setIsMetronomeMuted]  = useState(false);
   const [isHalfSpeed,       setIsHalfSpeed]       = useState(false);
   const [showAlphaTabScore, setShowAlphaTabScore] = useState(false);
+  const [tabRepeatCount,    setTabRepeatCount]    = useState(0); // 0 = infinite
+  const loopsCompletedRef = useRef(0);
   const isPlayingRef = useRef(isPlaying);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
   const [tabRestartKey,     setTabRestartKey]     = useState(0);
@@ -272,10 +285,10 @@ export const PracticeSession = ({
   const [gpAudioActive, setGpAudioActive] = useState(false);
 
   const metronome = useDeviceMetronome({
-    initialBpm:     activeExercise.metronomeSpeed?.recommended || 60,
-    minBpm:         activeExercise.metronomeSpeed?.min,
-    maxBpm:         activeExercise.metronomeSpeed?.max,
-    recommendedBpm: activeExercise.metronomeSpeed?.recommended,
+    initialBpm:     examMode && examBpm ? examBpm : (activeExercise.metronomeSpeed?.recommended || 60),
+    minBpm:         examMode && examBpm ? examBpm : activeExercise.metronomeSpeed?.min,
+    maxBpm:         examMode && examBpm ? examBpm : activeExercise.metronomeSpeed?.max,
+    recommendedBpm: examMode && examBpm ? examBpm : activeExercise.metronomeSpeed?.recommended,
     // During GP playback AlphaTab's built-in metronome handles clicks — silence ours.
     // During count-in (gpAudioActive=false) our metronome still clicks normally.
     isMuted:        isMetronomeMuted || gpAudioActive,
@@ -427,7 +440,9 @@ export const PracticeSession = ({
     bpm:            effectiveBpm,
     isPlaying:      !!effectiveRawGpFile && isAudioPlaying && !showAlphaTabScore,
     startTime:      metronome.startTime,
-    onLoopComplete: () => setHasPlayedRiddleOnce(true),
+    onLoopComplete: () => {
+      setHasPlayedRiddleOnce(true);
+    },
     onLoopRestart:  useCallback(() => {
       // Re-anchor cursor to the current metronome audio clock on each AlphaTab loop
       // restart. Without this, the small scheduling delay of each api.stop()/api.play()
@@ -449,6 +464,24 @@ export const PracticeSession = ({
   // render cycle, causing api.play() to be called twice (once imperatively, once from
   // the effect) which triggers api.stop() on an unstarted AlphaTab worklet node.
   alphaTabPlayRef.current = null;
+  // Exam backing track (MP3, exam mode only)
+  useExamBackingAudio({
+    url:       activeExercise.examBacking?.url ?? "",
+    sourceBpm: activeExercise.examBacking?.sourceBpm ?? 60,
+    targetBpm: effectiveBpm,
+    isPlaying: isAudioPlaying,
+    enabled:   !!(examMode && activeExercise.examBacking),
+    onEnded: () => {
+      if (examMode) {
+        stopTimer();
+        // Force timeLeft → 0 to trigger checkForSuccess
+        setTimerTime(999_999_999);
+      }
+    },
+  });
+
+  // Reset loop counter when exercise changes
+  useEffect(() => { loopsCompletedRef.current = 0; }, [currentExercise.id]);
 
   // Custom synthesis fallback — used when no GP file is present
   const { soundfontsReady, schedulerTickRef: tabSchedulerTickRef } = useTablatureAudio({
@@ -456,10 +489,21 @@ export const PracticeSession = ({
     bpm:            effectiveBpm,
     isPlaying:      !effectiveRawGpFile && isAudioPlaying,
     startTime:      metronome.startTime,
-    onLoopComplete: () => setHasPlayedRiddleOnce(true),
+    onLoopComplete: () => {
+      setHasPlayedRiddleOnce(true);
+      if (tabRepeatCount > 0) {
+        loopsCompletedRef.current += 1;
+        if (loopsCompletedRef.current >= tabRepeatCount) {
+          loopsCompletedRef.current = 0;
+          metronome.stopMetronome();
+          stopTimer();
+        }
+      }
+    },
     audioContext:   metronome.audioContext,
     audioStartTime: effectiveAudioStartTime,
     disabled:       !!effectiveRawGpFile,
+    repeatCount:    tabRepeatCount,
   });
   // Sync bridge — keeps tabTickBridgeRef pointing at the live tablature scheduler.
   // The metronome's onTick calls tabTickBridgeRef, which calls tabSchedulerTickRef.current,
@@ -534,6 +578,7 @@ export const PracticeSession = ({
     stopTimer();
     metronome.restartMetronome();
     resetTimer();
+    loopsCompletedRef.current = 0;
     setTabRestartKey(prev => prev + 1);
     setEarTrainingScore(0);
     resetGame();
@@ -646,7 +691,7 @@ export const PracticeSession = ({
 
   // ── Note matching (RAF game loop) ─────────────────────────────────────────
 
-  const { hitNotes, missedNotes, sessionAccuracy: tabAccuracy, gameState: tabGameState, maxPossibleScore, currentBeatsElapsed, resetGame } = useNoteMatching({
+  const { hitNotes, missedNotes, sessionAccuracy: tabAccuracy, gameState: tabGameState, maxCombo, maxPossibleScore, currentBeatsElapsed, resetGame } = useNoteMatching({
     isPlaying,
     startTime:          metronome.startTime,
     effectiveBpm,
@@ -683,6 +728,20 @@ export const PracticeSession = ({
   const isStrummingExercise = !!activeStrumPattern;
   const gameState     = isStrummingExercise ? strumGameState  : tabGameState;
   const sessionAccuracy = isStrummingExercise ? strumAccuracy : tabAccuracy;
+
+  // Build an ordered hit/miss timeline from note-matching results
+  const noteTimeline = useMemo((): ('hit' | 'miss')[] => {
+    const keys = new Set([...Object.keys(hitNotes), ...Object.keys(missedNotes)]);
+    return Array.from(keys)
+      .sort((a, b) => {
+        const [ma, ba, na] = a.split('-').map(Number);
+        const [mb, bb, nb] = b.split('-').map(Number);
+        if (ma !== mb) return ma - mb;
+        if (ba !== bb) return ba - bb;
+        return na - nb;
+      })
+      .map(key => (hitNotes[key] ? 'hit' : 'miss'));
+  }, [hitNotes, missedNotes]);
 
   // ── Completion notification ───────────────────────────────────────────────
 
@@ -766,6 +825,11 @@ export const PracticeSession = ({
       {showSuccessView && !reportResult && (
         <ExerciseSuccessView
           planTitle={planTitleString}
+          examMode={examMode}
+          score={gameState.score}
+          maxScore={maxPossibleScore}
+          stats={{ accuracy: sessionAccuracy, maxStreak: maxCombo }}
+          timeline={noteTimeline}
           onFinish={async () => {
             metronome.stopMetronome();
             await saveCurrentScores();
@@ -774,6 +838,7 @@ export const PracticeSession = ({
               isMicEnabled ? { score: gameState.score, accuracy: sessionAccuracy } : null,
               currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null
             );
+            if (examMode) onExamComplete?.(sessionAccuracy);
           }}
           onRestart={() => {
             resetSuccessView();
@@ -798,7 +863,8 @@ export const PracticeSession = ({
             imageAlt={currentExercise.title}
           />
           <SessionModal
-            isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult}
+            examMode={examMode}
+            isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult && !showSuccessView}
             onClose={onClose }
             onFinish={isLastExercise ? async () => {
               metronome.stopMetronome();
@@ -808,6 +874,7 @@ export const PracticeSession = ({
                 isMicEnabled ? { score: gameState.score, accuracy: sessionAccuracy } : null,
                 currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null
               );
+              if (examMode) onExamComplete?.(sessionAccuracy);
             } : onFinish}
             onImageClick={() => setIsImageModalOpen(true)}
             isMounted={isMounted}
@@ -1088,6 +1155,7 @@ export const PracticeSession = ({
                       isPlaying={isPlaying}
                       isMicEnabled={isMicEnabled}
                       strumSlotFeedback={strumSlotFeedback}
+                      volumeRef={audioRefs.volumeRef}
                     />
                   </div>
 
@@ -1191,6 +1259,10 @@ export const PracticeSession = ({
                           completedBpms={completedBpms}
                           isBpmLoading={isBpmLoading}
                           onBpmToggle={handleToggleBpm}
+                          examMode={examMode}
+                          tabRepeatCount={tabRepeatCount}
+                          setTabRepeatCount={setTabRepeatCount}
+                          onRepeatCountChange={() => { loopsCompletedRef.current = 0; }}
                         />
                       </div>
                     );
@@ -1199,7 +1271,9 @@ export const PracticeSession = ({
                   {/* 5. Bottom bar */}
                   {!reportResult && (
                     <SessionBottomBar
+                      examMode={examMode}
                       onClose={onClose}
+                      skipExitDialog={skipExitDialog}
                       exerciseKey={exerciseKey}
                       currentExercise={currentExercise}
                       isLastExercise={isLastExercise}

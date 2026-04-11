@@ -92,6 +92,7 @@ interface SessionModalProps {
   isBpmLoading?: boolean;
   onBpmToggle?: (bpm: number) => void;
   onRecordsClick?: () => void;
+  examMode?: boolean;
 }
 
 const SessionModal = ({
@@ -151,7 +152,8 @@ const SessionModal = ({
   completedBpms,
   isBpmLoading,
   onBpmToggle,
-  onRecordsClick
+  onRecordsClick,
+  examMode,
 }: SessionModalProps) => {
   if (!isOpen || !isMounted) return null;
 
@@ -570,17 +572,19 @@ const SessionModal = ({
                   </Button>
 
                   {/* Next / Finish */}
-                  <Button
-                    onClick={isLastExercise ? onFinish : handleNextExerciseClick}
-                    disabled={isFinishing || isSubmittingReport || !canSkipExercise}
-                    variant="ghost" size="icon"
-                    className="h-9 w-9 shrink-0 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white"
-                  >
-                    {isFinishing || isSubmittingReport
-                      ? <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-full" />
-                      : isLastExercise ? <FaCheck className="h-4 w-4" /> : <FaStepForward className="h-4 w-4" />
-                    }
-                  </Button>
+                  {!examMode && (
+                    <Button
+                      onClick={isLastExercise ? onFinish : handleNextExerciseClick}
+                      disabled={isFinishing || isSubmittingReport || !canSkipExercise}
+                      variant="ghost" size="icon"
+                      className="h-9 w-9 shrink-0 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white"
+                    >
+                      {isFinishing || isSubmittingReport
+                        ? <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-full" />
+                        : isLastExercise ? <FaCheck className="h-4 w-4" /> : <FaStepForward className="h-4 w-4" />
+                      }
+                    </Button>
+                  )}
                 </div>
               </motion.div>
             </motion.div>
@@ -879,6 +883,7 @@ const SessionModal = ({
             </div>
 
             <SessionModalControls
+              examMode={examMode}
               isPlaying={isPlaying}
               isLastExercise={isLastExercise}
               onClose={onClose}

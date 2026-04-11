@@ -77,17 +77,18 @@ export function useNoteMatching({
   getAdjustedTargetFreq,
   onReset,
 }: UseNoteMatchingOptions) {
-  const [hitNotes,       setHitNotes]       = useState<Record<string, boolean>>({});
+  const [hitNotes,       setHitNotes]       = useState<Record<string, boolean | number>>({});
   const [missedNotes,    setMissedNotes]    = useState<Record<string, boolean>>({});
   const [sessionAccuracy,setSessionAccuracy] = useState(100);
   const [sessionStats,   setSessionStats]   = useState({ hits: 0, misses: 0 });
+  const [maxCombo,       setMaxCombo]       = useState(0);
   const [gameState,      setGameState]      = useState<GameState>({
     score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0,
   });
 
   const lastLoopedBeatsRef  = useRef(0);
   const processedNotesRef   = useRef<Set<string>>(new Set());
-  const hitNotesRef         = useRef<Record<string, boolean>>({});
+  const hitNotesRef         = useRef<Record<string, boolean | number>>({});
   const missedNotesRef      = useRef<Record<string, boolean>>({});
   const rafIdRef            = useRef<number>(0);
   const gameStateRef        = useRef<GameState>({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
@@ -95,6 +96,7 @@ export function useNoteMatching({
   const lastFlushRef        = useRef(0);
   const needsFlushRef       = useRef(false);
   const consecutiveMissesRef = useRef(0);
+  const maxComboRef          = useRef(0);
 
   // ── Derived ─────────────────────────────────────────────────────────────────
 
@@ -139,9 +141,11 @@ export function useNoteMatching({
     missedNotesRef.current = {};
     setSessionAccuracy(100);
     setSessionStats({ hits: 0, misses: 0 });
+    setMaxCombo(0);
     setGameState({ score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 });
     gameStateRef.current = { score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 };
     statsRef.current = { hits: 0, misses: 0 };
+    maxComboRef.current = 0;
     needsFlushRef.current = false;
     lastLoopedBeatsRef.current = 0;
     consecutiveMissesRef.current = 0;
@@ -242,19 +246,23 @@ export function useNoteMatching({
 
           beat.notes.forEach((note, nIdx) => {
             const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
-            if (processedNotesRef.current.has(noteKey)) return;
+            if (processedNotesRef.current.has(noteKey) && !hitNotesRef.current[noteKey]) return;
 
             const requiresOnset = !note.isHammerOn && !note.isPullOff;
+            const alreadyHit = !!hitNotesRef.current[noteKey];
 
-            if (isWithinWindow && currentVolume > 0.005 && (hasRecentOnset || !requiresOnset)) {
-              const baseTargetFreq = getFrequencyFromTab(note.string, note.fret);
+            if (isWithinWindow && currentVolume > 0.005 && (hasRecentOnset || !requiresOnset || alreadyHit)) {
+              const targetFret = (note.isBend || note.isPreBend) && note.bendSemitones
+                ? note.fret + note.bendSemitones
+                : note.fret;
+              const baseTargetFreq = getFrequencyFromTab(note.string, targetFret);
               const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
 
               let isHit = false;
               if (beat.notes.length > 1) {
                 // Chord / dyad / interval — prefer the onset snapshot (cleaner signal).
                 // For legato notes (no onset required) fall back to the live chromagram.
-                const chroma = requiresOnset
+                const chroma = (requiresOnset && !alreadyHit)
                   ? audioRefs.onsetChromaRef.current
                   : getChromagram();
                 if (chroma) {
@@ -266,23 +274,28 @@ export function useNoteMatching({
               }
 
               if (isHit) {
-                processedNotesRef.current.add(noteKey);
-                hitNotesRef.current[noteKey] = true;
-                needsFlushRef.current = true;
-                s.hits++;
-                consecutiveMissesRef.current = 0;
+                if (!processedNotesRef.current.has(noteKey)) {
+                  processedNotesRef.current.add(noteKey);
+                  s.hits++;
+                  consecutiveMissesRef.current = 0;
 
-                const newCombo      = gs.combo + 1;
-                const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
-                if (newMultiplier > gs.multiplier) {
-                  gs.lastFeedback = "MULTIPLIER UP!"; gs.feedbackId++;
-                } else {
-                  const tier = getFeedbackForCombo(newCombo);
-                  if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; }
+                  const newCombo      = gs.combo + 1;
+                  if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
+                  const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
+                  if (newMultiplier > gs.multiplier) {
+                    gs.lastFeedback = "MULTIPLIER UP!"; gs.feedbackId++;
+                  } else {
+                    const tier = getFeedbackForCombo(newCombo);
+                    if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; }
+                  }
+                  gs.score      += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
+                  gs.combo       = newCombo;
+                  gs.multiplier  = newMultiplier;
                 }
-                gs.score      += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
-                gs.combo       = newCombo;
-                gs.multiplier  = newMultiplier;
+                
+                // Track how long the note is sustained
+                hitNotesRef.current[noteKey] = loopedBeatsElapsed;
+                needsFlushRef.current = true;
               }
             } else if (isPassed && !hitNotesRef.current[noteKey]) {
               processedNotesRef.current.add(noteKey);
@@ -320,6 +333,7 @@ export function useNoteMatching({
           setSessionStats(statsCopy);
           setSessionAccuracy(accuracy);
           setGameState(gsCopy);
+          setMaxCombo(maxComboRef.current);
         });
       }
 
@@ -337,6 +351,7 @@ export function useNoteMatching({
     sessionAccuracy,
     sessionStats,
     gameState,
+    maxCombo,
     maxPossibleScore,
     currentBeatsElapsed,
     resetGame,

@@ -11,7 +11,7 @@ export const firstBendExercise: Exercise = {
     "Introduction to whole-step bends across two strings in Am pentatonic position 1. Play the target pitch first so your ear knows where to aim, then bend from the lower fret up to match it. Half-note pacing gives you time to really listen.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.49,
   instructions: [
     "Play the reference note first (fret 9 or 10) — that's the pitch your bend must reach.",
     "Place your ring finger on the bend fret, with middle and index fingers supporting behind it.",
@@ -28,8 +28,8 @@ export const firstBendExercise: Exercise = {
   ],
   metronomeSpeed: { min: 40, max: 72, recommended: 52 },
   relatedSkills: ["bending"],
+  examBacking: { url: "/static/sounds/exercise/bends.mp3", sourceBpm: 60 },
   tablature: [
-    // M1-2: G string — reference then bend, half notes
     {
       timeSignature: [4, 4],
       beats: [
@@ -44,7 +44,6 @@ export const firstBendExercise: Exercise = {
         { duration: 2, notes: [{ string: 3, fret: 7, isBend: true, bendSemitones: 2 }] },
       ],
     },
-    // M3-4: B string — reference then bend
     {
       timeSignature: [4, 4],
       beats: [
@@ -59,7 +58,6 @@ export const firstBendExercise: Exercise = {
         { duration: 2, notes: [{ string: 2, fret: 8, isBend: true, bendSemitones: 2 }] },
       ],
     },
-    // M5-6: G string repeat
     {
       timeSignature: [4, 4],
       beats: [
@@ -74,7 +72,6 @@ export const firstBendExercise: Exercise = {
         { duration: 2, notes: [{ string: 3, fret: 7, isBend: true, bendSemitones: 2 }] },
       ],
     },
-    // M7-8: B string repeat
     {
       timeSignature: [4, 4],
       beats: [
@@ -89,5 +86,102 @@ export const firstBendExercise: Exercise = {
         { duration: 2, notes: [{ string: 2, fret: 8, isBend: true, bendSemitones: 2 }] },
       ],
     },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 3, fret: 9 }] },
+        { duration: 2, notes: [{ string: 3, fret: 7, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 3, fret: 9 }] },
+        { duration: 2, notes: [{ string: 3, fret: 7, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 2, fret: 10 }] },
+        { duration: 2, notes: [{ string: 2, fret: 8, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 2, fret: 10 }] },
+        { duration: 2, notes: [{ string: 2, fret: 8, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 3, fret: 9 }] },
+        { duration: 2, notes: [{ string: 3, fret: 7, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 3, fret: 9 }] },
+        { duration: 2, notes: [{ string: 3, fret: 7, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 2, fret: 10 }] },
+        { duration: 2, notes: [{ string: 2, fret: 8, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 2, fret: 10 }] },
+        { duration: 2, notes: [{ string: 2, fret: 8, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 3, fret: 9 }] },
+        { duration: 2, notes: [{ string: 3, fret: 7, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 3, fret: 9 }] },
+        { duration: 2, notes: [{ string: 3, fret: 7, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 2, fret: 10 }] },
+        { duration: 2, notes: [{ string: 2, fret: 8, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 2, fret: 10 }] },
+        { duration: 2, notes: [{ string: 2, fret: 8, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 2, notes: [{ string: 3, fret: 9 }] },
+        { duration: 2, notes: [{ string: 3, fret: 7, isBend: true, bendSemitones: 2 }] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 4, notes: [] },
+      ],
+    }
   ],
 };

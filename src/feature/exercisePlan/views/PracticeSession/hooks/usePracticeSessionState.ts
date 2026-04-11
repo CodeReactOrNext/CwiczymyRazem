@@ -85,7 +85,7 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, fre
 
   const effectiveTotalSeconds = freeMode
     ? Number.MAX_SAFE_INTEGER
-    : (currentExercise.isPlayalong && videoDuration)
+    : videoDuration !== null
       ? videoDuration
       : currentExercise.timeInMinutes * 60;
 

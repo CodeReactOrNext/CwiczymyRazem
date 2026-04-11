@@ -7,7 +7,7 @@ export const stringSkippingTwoNotesExercise: Exercise = {
     "The simplest possible string skipping pattern: 2 notes on string 6, skip string 5, 2 notes on string 4, skip string 3, 2 notes on string 2 — then reverse back down. All notes are from the A minor pentatonic box 1 (frets 5 and 7). One measure up, one measure down. The skipped string is always in between — your pick must arc cleanly over it every single time.",
   difficulty: "easy",
   category: "technique",
-  timeInMinutes: 5,
+  timeInMinutes: 1.36,
   instructions: [
     "Measure 1 (ascending): str6 fret 5 → str6 fret 7 → SKIP str5 → str4 fret 5 → str4 fret 7 → SKIP str3 → str2 fret 5 → str2 fret 8. Two notes on each string, one string skipped between each pair.",
     "Measure 2 (descending): reverse — str2 fret 8 → str2 fret 5 → SKIP str3 → str4 fret 7 → str4 fret 5 → SKIP str5 → str6 fret 7 → str6 fret 5. Same pattern, same skips, going back down.",
@@ -22,9 +22,8 @@ export const stringSkippingTwoNotesExercise: Exercise = {
   ],
   metronomeSpeed: { min: 50, max: 110, recommended: 70 },
   relatedSkills: ["hybrid_picking", "alternate_picking"],
+  examBacking: { url: "/static/sounds/exercise/string_skipping___2_notes_per_string_backing_track.mp3", sourceBpm: 50 },
   tablature: [
-    // M1: Ascending — 2 notes per string, skipping str5 and str3
-    // str6: A(f5) E(f7) | skip str5 | str4: D(f5) A(f7) | skip str3 | str2: E(f5) C(f8)
     {
       timeSignature: [4, 4],
       beats: [
@@ -37,7 +36,6 @@ export const stringSkippingTwoNotesExercise: Exercise = {
         { duration: 1, notes: [] },
       ],
     },
-    // M2: Descending — same skips in reverse
     {
       timeSignature: [4, 4],
       beats: [
@@ -50,5 +48,179 @@ export const stringSkippingTwoNotesExercise: Exercise = {
         { duration: 1, notes: [] },
       ],
     },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 0.5, notes: [{ string: 2, fret: 8 }] },
+        { duration: 0.5, notes: [{ string: 2, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 4, fret: 5 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 7 }] },
+        { duration: 0.5, notes: [{ string: 6, fret: 5 }] },
+        { duration: 1, notes: [] },
+      ],
+    },
+    {
+      timeSignature: [4, 4],
+      beats: [
+        { duration: 4, notes: [] },
+      ],
+    }
   ],
 };

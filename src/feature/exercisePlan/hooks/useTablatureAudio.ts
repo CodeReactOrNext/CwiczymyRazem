@@ -24,6 +24,8 @@ interface UseTablatureAudioProps {
   audioStartTime?: number | null;
   /** Skip soundfont loading entirely — use when AlphaTab handles audio */
   disabled?: boolean;
+  /** Number of times to play the loop (0 = infinite). Required for lastLoopOnly measures. */
+  repeatCount?: number;
 }
 
 // ── Open-string MIDI note numbers ─────────────────────────────────────────────
@@ -88,6 +90,7 @@ export const useTablatureAudio = ({
   audioContext: externalAudioContext,
   audioStartTime,
   disabled = false,
+  repeatCount = 0,
 }: UseTablatureAudioProps) => {
   // ── Audio graph refs ──────────────────────────────────────────────────────
   const ownAudioContextRef  = useRef<AudioContext | null>(null);
@@ -105,7 +108,10 @@ export const useTablatureAudio = ({
   // This eliminates all floating-point accumulation between tracks.
   const startAudioTimeRef    = useRef<number | null>(null);
   const audioStartTimePropRef = useRef<number | null>(null);
+  const repeatCountRef       = useRef(repeatCount);
+  useEffect(() => { repeatCountRef.current = repeatCount; }, [repeatCount]);
   const trackStatesRef       = useRef<Record<string, { beatIdx: number }>>({});
+  const pendingLoopCompleteTimeoutsRef = useRef<Set<number>>(new Set());
 
   // Synchronous ref update — no useEffect needed, always has the latest value before any scheduler tick
   audioStartTimePropRef.current = audioStartTime ?? null;
@@ -149,7 +155,12 @@ export const useTablatureAudio = ({
   const trackDataRef = useRef<Record<string, {
     flattened:     any[];
     offsets:       number[]; // beat-unit start time of each beat within one loop
-    totalDuration: number;   // total loop length in beat-units
+    totalDuration: number;   // total loop length in beat-units (first loop, includes firstLoopOnly)
+    loopStartIdx:  number;   // first beat index that repeats (0 if no firstLoopOnly measures)
+    loopStartOff:  number;   // beat-unit offset of loopStartIdx
+    loopDuration:  number;   // repeating section duration in beat-units
+    loopEndIdx:    number;   // first beat index of lastLoopOnly measures (= N if none)
+    loopEndOff:    number;   // beat-unit offset of loopEndIdx
   }>>({});
 
   useEffect(() => {
@@ -162,7 +173,28 @@ export const useTablatureAudio = ({
         offsets.push(cursor);
         cursor += beat.duration;
       }
-      trackDataRef.current[track.id] = { flattened, offsets, totalDuration: cursor };
+      // Find first beat that is NOT part of a firstLoopOnly measure
+      let loopStartIdx = 0;
+      let loopStartOff = 0;
+      for (const m of track.measures) {
+        if (!m.firstLoopOnly) break;
+        loopStartIdx += m.beats.length;
+        loopStartOff += m.beats.reduce((s, b) => s + b.duration, 0);
+      }
+      // Find first beat of trailing lastLoopOnly measures
+      let loopEndIdx = flattened.length;
+      let loopEndOff = cursor;
+      for (let i = track.measures.length - 1; i >= 0; i--) {
+        if (!track.measures[i].lastLoopOnly) break;
+        loopEndIdx -= track.measures[i].beats.length;
+        loopEndOff -= track.measures[i].beats.reduce((s, b) => s + b.duration, 0);
+      }
+      const loopDuration = loopEndOff - loopStartOff;
+      trackDataRef.current[track.id] = {
+        flattened, offsets, totalDuration: cursor,
+        loopStartIdx, loopStartOff, loopDuration,
+        loopEndIdx, loopEndOff,
+      };
     });
   }, [activeTracks]);
 
@@ -326,7 +358,7 @@ export const useTablatureAudio = ({
 
     // ── Attack noise transient ────────────────────────────────────────────
     const ns = ctx.createBufferSource(); ns.buffer = getCachedNoiseBuffer(ctx, 10);
-    const ng = ctx.createGain(); ng.gain.value = isPalmMute ? 0.40 : 0.18;
+    const ng = ctx.createGain(); ng.gain.value = (isPalmMute ? 0.40 : 0.18) * gainScale;
 
     // ── Tonal filter ──────────────────────────────────────────────────────
     const filter = ctx.createBiquadFilter(); filter.type = 'lowpass';
@@ -436,7 +468,7 @@ export const useTablatureAudio = ({
 
     // ── Attack noise transient ────────────────────────────────────────────
     const ns = ctx.createBufferSource(); ns.buffer = getCachedNoiseBuffer(ctx, 8);
-    const ng = ctx.createGain(); ng.gain.value = 0.18;
+    const ng = ctx.createGain(); ng.gain.value = 0.18 * gainScale;
 
     // ── Filter ────────────────────────────────────────────────────────────
     const filter = ctx.createBiquadFilter(); filter.type = 'lowpass';
@@ -934,7 +966,7 @@ export const useTablatureAudio = ({
     if (!isFinite(freq) || freq <= 0 || midiNote < 0 || midiNote > 127) return;
 
     // ── Gain scale: dynamics + ghost note + accent ─────────────────────────
-    const dynScale    = note.dynamics !== undefined ? Math.max(0.3, note.dynamics) : 1.0;
+    const dynScale    = note.dynamics !== undefined ? Math.max(0.05, note.dynamics) : 1.0;
     const ghostScale  = note.isGhost    ? 0.28 : 1.0;
     const accentScale = note.isAccented ? 1.25 : 1.0;
     const gainScale   = dynScale * ghostScale * accentScale;
@@ -989,8 +1021,10 @@ export const useTablatureAudio = ({
         activeNodesRef.current.set(noteKey, node);
 
         // soundfont-player returns a wrapper; the real AudioBufferSourceNode is at node.source
-        const sourceNode = (node as any).source as AudioBufferSourceNode | undefined;
+        // (older versions used .bufferSource — try both)
+        const sourceNode = ((node as any).source ?? (node as any).bufferSource) as AudioBufferSourceNode | undefined;
         const detuneParam: AudioParam | undefined = sourceNode?.detune;
+        const rateParam: AudioParam | undefined = sourceNode?.playbackRate;
 
         // ── Vibrato: LFO on detune, swells in after attack ─────────────────
         if (note.isVibrato && detuneParam) {
@@ -1008,22 +1042,35 @@ export const useTablatureAudio = ({
         }
 
         // ── Bend: follow full bend curve point-by-point ────────────────────
-        if (note.isBend && detuneParam) {
+        if (note.isBend && (detuneParam || rateParam)) {
           const bendOffset = 0.02;
-          if (note.bendCurve && note.bendCurve.length > 0) {
-            const curve = note.bendCurve;
-            // Small offset so the note attack plays before pitch starts moving
-            // First point — set immediately (handles pre-bends starting at full pitch)
-            detuneParam.setValueAtTime(curve[0].cents, t + bendOffset);
-            for (let i = 1; i < curve.length; i++) {
-              const ptTime = t + bendOffset + curve[i].position * sfDuration;
-              detuneParam.linearRampToValueAtTime(curve[i].cents, ptTime);
+          if (detuneParam) {
+            // Preferred: detune param (cents)
+            if (note.bendCurve && note.bendCurve.length > 0) {
+              const curve = note.bendCurve;
+              detuneParam.setValueAtTime(curve[0].cents, t + bendOffset);
+              for (let i = 1; i < curve.length; i++) {
+                const ptTime = t + bendOffset + curve[i].position * sfDuration;
+                detuneParam.linearRampToValueAtTime(curve[i].cents, ptTime);
+              }
+            } else if (note.bendSemitones) {
+              const targetCents = note.bendSemitones * 100;
+              detuneParam.setValueAtTime(0, t + bendOffset);
+              detuneParam.linearRampToValueAtTime(targetCents, t + bendOffset + 0.20);
             }
-          } else if (note.bendSemitones) {
-            // Fallback: simple linear glide to target pitch
-            const targetCents = note.bendSemitones * 100;
-            detuneParam.setValueAtTime(0, t + bendOffset);
-            detuneParam.linearRampToValueAtTime(targetCents, t + bendOffset + 0.20);
+          } else if (rateParam) {
+            // Fallback: playbackRate (ratio = 2^(semitones/12))
+            if (note.bendCurve && note.bendCurve.length > 0) {
+              const curve = note.bendCurve;
+              rateParam.setValueAtTime(Math.pow(2, curve[0].cents / 1200), t + bendOffset);
+              for (let i = 1; i < curve.length; i++) {
+                const ptTime = t + bendOffset + curve[i].position * sfDuration;
+                rateParam.linearRampToValueAtTime(Math.pow(2, curve[i].cents / 1200), ptTime);
+              }
+            } else if (note.bendSemitones) {
+              rateParam.setValueAtTime(1, t + bendOffset);
+              rateParam.linearRampToValueAtTime(Math.pow(2, note.bendSemitones / 12), t + bendOffset + 0.20);
+            }
           }
         }
       }
@@ -1101,22 +1148,78 @@ export const useTablatureAudio = ({
       if (!data || data.flattened.length === 0 || !state) return;
 
       const N             = data.flattened.length;
-      const loopDurSec    = data.totalDuration * secondsPerBeat;
+      const { loopStartIdx, loopStartOff, loopDuration, totalDuration, loopEndIdx, loopEndOff } = data;
+      const rc            = repeatCountRef.current; // 0 = infinite
+      // Core = repeating section (between firstLoopOnly prefix and lastLoopOnly suffix)
+      const N_core        = loopEndIdx - loopStartIdx;
+      // First loop plays prefix+core (no lastLoopOnly unless rc===1)
+      const firstLoopBeats = loopEndIdx; // = loopStartIdx + N_core
+      const firstLoopSec   = loopEndOff * secondsPerBeat;
+      const loopDurSec     = (loopDuration > 0 ? loopDuration : totalDuration) * secondsPerBeat;
 
       while (true) {
-        const localIdx   = state.beatIdx % N;
-        const loopCount  = Math.floor(state.beatIdx / N);
+        // Map ever-incrementing beatIdx → (loopCount, localIdx)
+        // accounting for firstLoopOnly prefix and lastLoopOnly suffix.
+        let loopCount: number;
+        let localIdx: number;
 
-        // Exact absolute audio time — no accumulation
-        const beatAudioTime = startAudio
-          + loopCount  * loopDurSec
-          + data.offsets[localIdx] * secondsPerBeat;
+        if (rc === 0 || rc === 1) {
+          // Infinite (rc=0): lastLoopOnly never plays; loop over core only.
+          // Single play (rc=1): everything plays once linearly.
+          if (rc === 1) {
+            loopCount = 0;
+            localIdx  = state.beatIdx < N ? state.beatIdx : N - 1;
+          } else if (state.beatIdx < firstLoopBeats || loopStartIdx === 0 && loopEndIdx === N) {
+            loopCount = Math.floor(state.beatIdx / firstLoopBeats || 1);
+            // Infinite: loop over core only (no lastLoopOnly)
+            if (state.beatIdx < firstLoopBeats) {
+              loopCount = 0; localIdx = state.beatIdx;
+            } else {
+              const afterFirst = state.beatIdx - firstLoopBeats;
+              loopCount = 1 + Math.floor(afterFirst / N_core);
+              localIdx  = loopStartIdx + (afterFirst % N_core);
+            }
+          } else {
+            const afterFirst = state.beatIdx - firstLoopBeats;
+            loopCount = 1 + Math.floor(afterFirst / N_core);
+            localIdx  = loopStartIdx + (afterFirst % N_core);
+          }
+        } else {
+          // Finite loops: first=prefix+core, middle=core, last=core+lastLoopOnly
+          if (state.beatIdx < firstLoopBeats) {
+            loopCount = 0;
+            localIdx  = state.beatIdx;
+          } else {
+            const afterFirst     = state.beatIdx - firstLoopBeats;
+            const middleLoops    = rc - 2; // loops 1..rc-2 (0 if rc===2)
+            const totalMiddle    = middleLoops * N_core;
+            if (afterFirst < totalMiddle) {
+              loopCount = 1 + Math.floor(afterFirst / N_core);
+              localIdx  = loopStartIdx + (afterFirst % N_core);
+            } else {
+              // Last loop — includes lastLoopOnly suffix
+              loopCount = rc - 1;
+              localIdx  = loopStartIdx + (afterFirst - totalMiddle);
+            }
+          }
+        }
+
+        // Absolute audio time of this beat
+        let beatAudioTime: number;
+        if (loopCount === 0) {
+          beatAudioTime = startAudio + data.offsets[localIdx] * secondsPerBeat;
+        } else {
+          const relOff = (data.offsets[localIdx] - loopStartOff) * secondsPerBeat;
+          beatAudioTime = startAudio + firstLoopSec + (loopCount - 1) * loopDurSec + relOff;
+        }
 
         if (beatAudioTime >= lookaheadTime) break;
 
+        // Guard against out-of-range localIdx (e.g. last loop overrun)
+        if (localIdx >= N) { state.beatIdx++; continue; }
+
         const beat         = data.flattened[localIdx];
         const beatDuration = Math.max(0.05, beat.duration * secondsPerBeat);
-        // Never schedule in the past (e.g. if scheduler fires very late)
         const t = Math.max(ctx.currentTime + 0.001, beatAudioTime);
 
         if (!track.isMuted) {
@@ -1125,9 +1228,20 @@ export const useTablatureAudio = ({
           });
         }
 
-        // Fire loop-complete callback at the boundary of the reference track
-        if (localIdx === N - 1 && track.id === refTrackId) {
-          onLoopCompleteRef.current?.();
+        // Boundary for loopComplete:
+        // - last finite loop: fire at N-1 (after lastLoopOnly suffix)
+        // - all other loops (including infinite): fire at loopEndIdx-1 (end of core)
+        const isLastLoop   = rc > 0 && loopCount === rc - 1;
+        const loopBoundary = isLastLoop ? N - 1 : loopEndIdx - 1;
+        if (localIdx === loopBoundary && track.id === refTrackId) {
+          // The last note is scheduled at beatAudioTime, and lasts beatDuration.
+          // Wait until it has fully sounded, plus a small 500ms safety tail, before firing completion.
+          const delayMs = (beatAudioTime + beatDuration - ctx.currentTime) * 1000;
+          const tid = window.setTimeout(() => {
+            pendingLoopCompleteTimeoutsRef.current.delete(tid);
+            onLoopCompleteRef.current?.();
+          }, Math.max(0, delayMs + 500));
+          pendingLoopCompleteTimeoutsRef.current.add(tid);
         }
 
         state.beatIdx++;
@@ -1158,9 +1272,14 @@ export const useTablatureAudio = ({
       });
       activeNodesRef.current.clear();
       trackStatesRef.current = {};
+      pendingLoopCompleteTimeoutsRef.current.forEach(id => window.clearTimeout(id));
+      pendingLoopCompleteTimeoutsRef.current.clear();
     }
 
-    return () => { if (timeoutRef.current) window.clearTimeout(timeoutRef.current); };
+    return () => { 
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current); 
+      pendingLoopCompleteTimeoutsRef.current.forEach(id => window.clearTimeout(id));
+    };
   }, [isPlaying, scheduler]);
 
   return { soundfontsReady, schedulerTickRef };

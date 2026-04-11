@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, useMemo, memo } from "react";
+import React from "react";
 import { cn } from "assets/lib/utils";
 import { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
-import { NoteData } from "utils/audio/noteUtils";
+import { NoteData, NOTES } from "utils/audio/noteUtils";
+
+const REST_VOLUME_THRESHOLD = 0.05;
 
 interface TablatureViewerProps {
   measures?: TablatureMeasure[];
@@ -12,7 +15,7 @@ interface TablatureViewerProps {
   className?: string;
   detectedNote?: NoteData | null;
   isListening?: boolean;
-  hitNotes?: Record<string, boolean>;
+  hitNotes?: Record<string, boolean | number>;
   missedNotes?: Record<string, boolean>;
   currentBeatsElapsed?: number;
   hideNotes?: boolean;
@@ -20,6 +23,7 @@ interface TablatureViewerProps {
   audioStartTime?: number | null;
   resetKey?: number;
   hideDynamicsLane?: boolean;
+  volumeRef?: React.MutableRefObject<number>;
 }
 
 // ── Pre-computed per-beat types (shared with worker via postMessage) ──────────
@@ -89,12 +93,23 @@ const TablatureViewerInner = ({
   audioStartTime,
   resetKey,
   hideDynamicsLane = false,
+  volumeRef,
 }: TablatureViewerProps) => {
   const canvasRef        = useRef<HTMLCanvasElement>(null);
   const containerRef     = useRef<HTMLDivElement>(null);
   const workerRef        = useRef<Worker | null>(null);
   const transferredRef   = useRef(false);
   const prevStartTimeRef = useRef<number | null>(startTime);
+  const ambientGlowRef   = useRef<HTMLDivElement>(null);
+  const detectedNoteRef  = useRef<NoteData | null | undefined>(null);
+  
+  // Track latest detected note without re-triggering the RAF loop
+  useEffect(() => {
+    detectedNoteRef.current = _detectedNote;
+  }, [_detectedNote]);
+
+  const [isRestActive, setIsRestActive] = useState(false);
+  const [showRestWarning, setShowRestWarning] = useState(false);
 
   const [containerSize, setContainerSize] = useState({ width: 0, height: 256 });
 
@@ -239,6 +254,11 @@ const TablatureViewerInner = ({
     const worker = new Worker(new URL('./TablatureViewer.worker.ts', import.meta.url));
     workerRef.current    = worker;
     transferredRef.current = false;
+    worker.onmessage = (e: MessageEvent) => {
+      if (e.data?.type === 'REST_ACTIVE') {
+        setIsRestActive(e.data.isRest);
+      }
+    };
     return () => {
       worker.postMessage({ type: 'STOP' });
       worker.terminate();
@@ -309,6 +329,28 @@ const TablatureViewerInner = ({
     return () => cancelAnimationFrame(rafId);
   }, [isPlaying, audioContext, countInRemaining]);
 
+  // ── Reset rest indicator when playback stops ──────────────────────────────
+  useEffect(() => {
+    if (!isPlaying) { setIsRestActive(false); setShowRestWarning(false); }
+  }, [isPlaying]);
+
+  // ── Poll volume while on a rest to decide whether to show warning ─────────
+  useEffect(() => {
+    if (!isRestActive || !isPlaying || !volumeRef) {
+      setShowRestWarning(false);
+      return;
+    }
+    const id = setInterval(() => {
+      setShowRestWarning((volumeRef.current ?? 0) > REST_VOLUME_THRESHOLD);
+    }, 50);
+    return () => clearInterval(id);
+  }, [isRestActive, isPlaying, volumeRef]);
+
+  // ── Sync rest warning to worker for canvas rendering ─────────────────────
+  useEffect(() => {
+    workerRef.current?.postMessage({ type: 'SHOW_REST_WARNING', show: showRestWarning });
+  }, [showRestWarning]);
+
   // ── Hit notes ─────────────────────────────────────────────────────────────
   useEffect(() => {
     workerRef.current?.postMessage({ type: 'HIT_NOTES', hitNotes });
@@ -341,6 +383,65 @@ const TablatureViewerInner = ({
       pausedScrollRef.current = { scrollX: 0, cursorPos: 0 };
     }
   }, [startTime, isPlaying]);
+
+  // ── Ambient Mic Volume & Pitch Glow ───────────────────────────────────────
+  useEffect(() => {
+    if (!volumeRef) return;
+    let rafId: number;
+    let smoothedVolume = 0;
+    let currentHue = 150; // Start at Emerald
+    let targetHue = 150;
+    
+    // Smooth circle wrap for Hue interpolation
+    const interpolateHue = (curr: number, target: number, step: number) => {
+      let diff = target - curr;
+      // Normalize difference to -180..180
+      while (diff < -180) diff += 360;
+      while (diff > 180) diff -= 360;
+      return curr + diff * step;
+    };
+    
+    const updateGlow = () => {
+      const targetVol = volumeRef.current || 0;
+      // Exponential moving average for smooth visual transitions
+      smoothedVolume += (targetVol - smoothedVolume) * 0.15;
+      
+      if (ambientGlowRef.current) {
+        // Map volume to intensity for opacity and scale
+        const intensity = Math.min(smoothedVolume * 8, 1);
+        
+        // Use detected pitch to drive Hue
+        if (detectedNoteRef.current) {
+          const noteIndex = NOTES.indexOf(detectedNoteRef.current.note);
+          if (noteIndex !== -1) {
+            // Map 12 notes around the 360 degrees color wheel:
+            // C = 0 (Red), C# = 30 (Orange), D = 60 (Yellow) ...
+            // If you want standard "Emerald" for natural notes, you can offset this, but standard color wheel is great!
+            targetHue = (noteIndex * 30 + 120) % 360; // offset by 120 so C starts as Green
+          }
+        }
+        
+        // Very smooth color interpolation so it never flickers, correctly handling max Hue wrap
+        currentHue = interpolateHue(currentHue, targetHue, 0.05);
+        if (currentHue < 0) currentHue += 360;
+        
+        // Only update if visible changes to save DOM mutations
+        if (intensity > 0.01 || ambientGlowRef.current.style.opacity !== "0") {
+           ambientGlowRef.current.style.opacity = (intensity * 0.7).toFixed(3);
+           const scale = 1 + intensity * 0.1;
+           ambientGlowRef.current.style.transform = `scaleY(${scale.toFixed(3)}) translateZ(0)`;
+           
+           // Update gradient with dynamic hue based on Pitch
+           const color1 = `hsla(${currentHue}, 85%, 55%, 0.18)`;
+           const color2 = `hsla(${currentHue}, 85%, 55%, 0.05)`;
+           ambientGlowRef.current.style.background = `radial-gradient(circle at 50% 100%, ${color1} 0%, ${color2} 50%, transparent 80%)`;
+        }
+      }
+      rafId = requestAnimationFrame(updateGlow);
+    };
+    rafId = requestAnimationFrame(updateGlow);
+    return () => cancelAnimationFrame(rafId);
+  }, [volumeRef]);
 
   // ── Container size ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -375,7 +476,22 @@ const TablatureViewerInner = ({
       onTouchEnd={handleDragEnd}
     >
       {/* Canvas is owned by the worker after INIT — no React drawing here */}
-      <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block" }} />
+      <canvas ref={canvasRef} style={{ width: "100%", height: "100%", display: "block", position: "relative", zIndex: 10 }} />
+
+      {/* Delicate Ambient Mic Glow */}
+      {volumeRef && (
+        <div
+          ref={ambientGlowRef}
+          className="absolute inset-x-0 bottom-0 pointer-events-none mix-blend-screen opacity-0"
+          style={{
+            height: '150%', // Allow vertical scaling
+            background: 'radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 50%, transparent 80%)',
+            transformOrigin: 'bottom',
+            zIndex: 1, // Behind canvas content
+            transition: 'opacity 50ms linear, transform 50ms linear', // Smooth out the micro-jitters
+          }}
+        />
+      )}
 
       {countInRemaining > 0 && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-20 animate-in fade-in zoom-in duration-300">
@@ -389,6 +505,15 @@ const TablatureViewerInner = ({
           </div>
         </div>
       )}
+
+      {showRestWarning && countInRemaining === 0 && (
+        <div className="absolute top-2 right-3 pointer-events-none z-10">
+          <div className="flex items-center gap-1.5 bg-white/8 border border-white/15 text-white/50 text-xs px-3 py-1 rounded-full backdrop-blur-sm">
+            <span className="leading-none">𝄽</span>
+            <span className="tracking-wider">pauza</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -396,7 +521,7 @@ const TablatureViewerInner = ({
 // Memo comparator — re-render when any prop that drives a useEffect or render changes.
 // hitNotes IS included to keep the worker in sync via useEffect.
 // audioStartTime IS included so the worker gets the updated anchor on each AlphaTab loop restart.
-// currentBeatsElapsed, detectedNote, isListening excluded (unused here).
+// currentBeatsElapsed, isListening excluded (unused here).
 export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   Object.is(prev.measures,     next.measures)      &&
   prev.bpm              === next.bpm               &&
@@ -409,5 +534,6 @@ export const TablatureViewer = memo(TablatureViewerInner, (prev, next) =>
   prev.className        === next.className          &&
   prev.hitNotes         === next.hitNotes           &&
   prev.missedNotes      === next.missedNotes        &&
-  prev.hideDynamicsLane === next.hideDynamicsLane
+  prev.hideDynamicsLane === next.hideDynamicsLane   &&
+  prev.detectedNote     === next.detectedNote
 );

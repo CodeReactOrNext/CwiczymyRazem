@@ -17,6 +17,7 @@ interface SessionModalControlsProps {
   isSubmittingReport?: boolean;
   canSkipExercise?: boolean;
   onRestart?: () => void;
+  examMode?: boolean;
 }
 
 export const SessionModalControls = ({
@@ -32,6 +33,7 @@ export const SessionModalControls = ({
   handleBackExercise,
   currentExerciseIndex,
   onRestart,
+  examMode,
 }: SessionModalControlsProps) => {
   const { t } = useTranslation(["common", "exercises"]);
 
@@ -87,24 +89,26 @@ export const SessionModalControls = ({
             )}
           </Button>
 
-          <Button
-            onClick={isLastExercise ? onFinish : handleNextExercise}
-            disabled={isFinishing || isSubmittingReport || !canSkipExercise}
-            variant="ghost"
-            size="icon"
-             className={cn(
-              "h-12 w-12 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-all",
-              !canSkipExercise && "opacity-50 cursor-not-allowed"
-            )}
-          >
-            {isFinishing || isSubmittingReport ? (
-              <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-full" />
-            ) : isLastExercise ? (
-              <FaCheck className="h-5 w-5" />
-            ) : (
-              <FaStepForward className="h-5 w-5" />
-            )}
-          </Button>
+          {!examMode && (
+            <Button
+              onClick={isLastExercise ? onFinish : handleNextExercise}
+              disabled={isFinishing || isSubmittingReport || !canSkipExercise}
+              variant="ghost"
+              size="icon"
+               className={cn(
+                "h-12 w-12 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-all",
+                !canSkipExercise && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              {isFinishing || isSubmittingReport ? (
+                <div className="h-3 w-3 border-2 border-zinc-500/20 border-t-zinc-500 animate-spin rounded-full" />
+              ) : isLastExercise ? (
+                <FaCheck className="h-5 w-5" />
+              ) : (
+                <FaStepForward className="h-5 w-5" />
+              )}
+            </Button>
+          )}
         </div>
       </div>
     </motion.div>

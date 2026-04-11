@@ -1,3 +1,4 @@
+import React from "react";
 import { cn } from "assets/lib/utils";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
 import type { NoteData } from "utils/audio/noteUtils";
@@ -59,6 +60,7 @@ interface ExerciseContentAreaProps {
   // Rhythm detection (strumming)
   isMicEnabled?: boolean;
   strumSlotFeedback?: Map<number, SlotResult>;
+  volumeRef?: React.MutableRefObject<number>;
 
   // Video / playalong
   startTimer: () => void;
@@ -120,6 +122,7 @@ export const ExerciseContentArea = ({
   isPlaying,
   isMicEnabled,
   strumSlotFeedback,
+  volumeRef,
 }: ExerciseContentAreaProps) => {
   const hasTablature =
     activeTablature &&
@@ -200,6 +203,7 @@ export const ExerciseContentArea = ({
               audioStartTime={audioStartTime}
               resetKey={tabResetKey}
               hideDynamicsLane={!!rawGpFile}
+              volumeRef={volumeRef}
             />
           )}
         </div>

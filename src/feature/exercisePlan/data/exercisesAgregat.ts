@@ -124,6 +124,10 @@ const FREE_EXERCISE_IDS = new Set([
   "bend_and_release",
   "chord_spotlight_drill",
   "down_picking_doom_pulse",
+  "first_melody",
+  "quarter_notes_drill",
+  "pentatonic_string_crossing_3",
+  "rhythm_triole",
   "first_bend",
   "first_bend_half_step",
   "hammer_on_pentatonic_run",
@@ -142,6 +146,7 @@ const FREE_EXERCISE_IDS = new Set([
   "vibrato_high_position",
   "vibrato_low_position",
   "vibrato_sustain_drill",
+  "pentatonic_box1_up_down",
   // Playalong exercises — free
   "pentatonic_playalong_best_of",
   "metal_playalong_basic",
@@ -231,6 +236,11 @@ import { vibratoLowPositionExercise } from "feature/exercisePlan/data/exerises/v
 import { vibratoHighPositionExercise } from "feature/exercisePlan/data/exerises/vibratoHighPosition/vibratoHighPosition";
 import { vibratoFingerIsolationExercise } from "feature/exercisePlan/data/exerises/vibratoFingerIsolation/vibratoFingerIsolation";
 import { stringSkippingTwoNotesExercise } from "feature/exercisePlan/data/exerises/stringSkippingTwoNotes/stringSkippingTwoNotes";
+import { firstMelodyExercise } from "feature/exercisePlan/data/exerises/firstMelody/firstMelody";
+import { quarterNotesDrillExercise } from "feature/exercisePlan/data/exerises/quarterNotesDrill/quarterNotesDrill";
+import { pentatonicStringCrossing3Exercise } from "feature/exercisePlan/data/exerises/pentatonicStringCrossing3/pentatonicStringCrossing3";
+import { tripletsDrillExercise } from "feature/exercisePlan/data/exerises/tripletsDrill/tripletsDrill";
+import { pentatonicBox1UpDownExercise } from "feature/exercisePlan/data/exerises/pentatonicBox1UpDown/pentatonicBox1UpDown";
 
 
 const rawExercises: Exercise[] = [
@@ -371,6 +381,11 @@ const rawExercises: Exercise[] = [
   vibratoHighPositionExercise,
   vibratoFingerIsolationExercise,
   stringSkippingTwoNotesExercise,
+  firstMelodyExercise,
+  quarterNotesDrillExercise,
+  pentatonicStringCrossing3Exercise,
+  tripletsDrillExercise,
+  pentatonicBox1UpDownExercise,
   strummingBasicExercise,
   strummingDownUpExercise,
   strummingRockExercise,
