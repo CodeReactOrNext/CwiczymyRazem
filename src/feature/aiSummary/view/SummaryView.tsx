@@ -11,7 +11,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import type { WeeklySummaryResponse } from "../types/summary.types";
-import { DailyAssessmentCard, PeriodRatingCard } from "../components/SessionRatingCard";
+import { PeriodRatingCard, DailyAssessmentCard, ScoreRing, GRADE_COLOR, RatingSkeleton, WEEKLY_LOADING_MESSAGES } from "../components/SessionRatingCard";
 import { firebaseGetAllDailySummaries, firebaseGetAllSummaries, firebaseGetDailySummary, firebaseGetPromptConfig, firebaseGetSummary, firebaseSaveDailySummary, firebaseSavePromptConfig, firebaseSaveSummary } from "../services/summary.service";
 import { firebaseGetAllDailyRatings } from "../services/rating.service";
 import type { SavedDailySummary, SavedSummary } from "../services/summary.service";
@@ -856,6 +856,24 @@ export const SummaryView = () => {
   const todayCreat  = todayLogs.reduce((s,l) => s + (l.timeSumary?.creativityTime||0), 0);
   const todayTotal  = todayLogs.reduce((s,l) => s + (l.timeSumary?.sumTime||0), 0);
   const todayPts    = todayLogs.reduce((s,l) => s + (l.totalPoints||0), 0);
+  const todayStreak = todayLogs.length > 0 ? Math.max(...todayLogs.map(l => l.bonusPoints?.streak ?? 0)) : 0;
+  const recentSessions = (() => {
+    const dayMap = new Map<string, number>();
+    for (const log of logs) {
+      const logDate = new Date(log.reportDate.seconds * 1000);
+      if (isSameDay(logDate, selectedDate) || logDate > selectedDate) continue;
+      const dateStr = localDateStr(logDate);
+      dayMap.set(dateStr, (dayMap.get(dateStr) ?? 0) + (log.timeSumary?.sumTime ?? 0));
+    }
+    return Array.from(dayMap.entries())
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .slice(0, 3)
+      .map(([dateStr, totalMs]) => {
+        const date = new Date(dateStr + "T00:00:00");
+        const daysAgo = Math.round((selectedDate.getTime() - date.getTime()) / 86400000);
+        return { daysAgo, totalMinutes: Math.round(totalMs / 60000) };
+      });
+  })();
 
   // ── derived weekly ──
   const last7 = Array.from({length:7}, (_,i) => {
@@ -919,7 +937,7 @@ export const SummaryView = () => {
 
   // ── AI generation ──
   const summaryId      = `weekly-${localDateStr(last7[0])}-${promptConfig.practiceStyle}`;
-  const dailySummaryId = `daily-${localDateStr(selectedDate)}-${promptConfig.practiceStyle}`;
+  const dailySummaryId = `daily-v2-${localDateStr(selectedDate)}-${promptConfig.practiceStyle}`;
 
   const generateAi = useCallback(async (force = false) => {
     if (!userAuth) return;
@@ -948,8 +966,10 @@ export const SummaryView = () => {
             })),
             totalMinutes:d.totalMinutes, totalPoints:d.totalPoints,
           })),
-          streak:userStats?.actualDayWithoutBreak||0, userLevel:userStats?.lvl||1, weekTotalPoints:weekTotalPts,
+          userLevel:userStats?.lvl||1, weekTotalPoints:weekTotalPts,
           practiceStyle: promptConfig.practiceStyle, goal: promptConfig.goal,
+          totalLoggedHours: userStats?.time ? Math.round((userStats.time.technique + userStats.time.theory + userStats.time.hearing + userStats.time.creativity) / 3600000) : undefined,
+          yearsPlaying: userStats?.guitarStartDate != null ? Math.max(0, Math.floor((Date.now() - (userStats.guitarStartDate as any).seconds * 1000) / (365.25 * 24 * 3600 * 1000))) : undefined,
         }),
       });
       if (res.ok) {
@@ -992,7 +1012,7 @@ export const SummaryView = () => {
         body: JSON.stringify({
           exercises,
           totalPoints: todayPts,
-          streak: userStats?.actualDayWithoutBreak || 0,
+          streak: todayStreak,
           userLevel: userStats?.lvl || 1,
           practiceStyle: promptConfig.practiceStyle,
           goal: promptConfig.goal,
@@ -1061,6 +1081,20 @@ export const SummaryView = () => {
       />
 
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 md:gap-8 md:p-6 lg:p-8">
+        {!promptConfig.goal.trim() && (
+          <div 
+            onClick={() => setShowConfig(true)}
+            className="group flex cursor-pointer items-center gap-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 px-5 py-4 transition-colors hover:bg-amber-500/20"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 border border-amber-500/30 group-hover:border-amber-500/50 transition-colors">
+              <Target size={18} className="text-amber-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-zinc-200">No practice goal defined</p>
+              <p className="text-xs text-zinc-400">Configure your goal in <span className="text-link font-medium">AI Coach settings</span> to get personalized feedback focused on what matters to you.</p>
+            </div>
+          </div>
+        )}
 
       {/* ── AI Coach config panel ──────────────────────────── */}
       {showConfig && (
@@ -1126,18 +1160,21 @@ export const SummaryView = () => {
             </div>
           </div>
 
-          <button
-            onClick={() => {
-              if (userAuth) void firebaseSavePromptConfig(userAuth, promptConfig);
-              setShowConfig(false);
-              loadedModes.current.clear();
-              if (mode === "weekly") { setWeekly(null); generateAi(true); }
-              else { setDaily(null); generateDailyAi(true); }
-            }}
-            className="self-end px-5 py-2 rounded-xl text-sm font-bold bg-link/20 border border-link/30 text-link hover:bg-link/30 transition-colors"
-          >
-            Save &amp; regenerate
-          </button>
+          <div className="flex items-center justify-end gap-3 mt-2">
+            <button
+              onClick={() => {
+                if (userAuth) void firebaseSavePromptConfig(userAuth, promptConfig);
+                setShowConfig(false);
+                // Always regenerate to reflect new settings/goals
+                loadedModes.current.clear();
+                if (mode === "weekly") { setWeekly(null); generateAi(true); }
+                else { setDaily(null); generateDailyAi(true); }
+              }}
+              className="px-6 py-2.5 rounded-xl text-sm font-bold bg-link/20 border border-link/30 text-link hover:bg-link/30 transition-colors"
+            >
+              Save settings
+            </button>
+          </div>
         </div>
       )}
 
@@ -1191,22 +1228,24 @@ export const SummaryView = () => {
                       : `${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} assessment`}
                   </SectionHeading>
                   <DailyAssessmentCard
-                    key={`daily-${localDateStr(selectedDate)}`}
-                    ratingId={`daily-${localDateStr(selectedDate)}`}
+                    key={`daily-v2-${localDateStr(selectedDate)}`}
+                    ratingId={`daily-v2-${localDateStr(selectedDate)}`}
                     label={`${selectedDate.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"})} practice`}
+                    sessionTitles={todayLogs.map(l => l.exceriseTitle).filter((t): t is string => Boolean(t))}
                     techniqueTime={todayTech / 1000}
                     theoryTime={todayTheory / 1000}
                     hearingTime={todayHear / 1000}
                     creativityTime={todayCreat / 1000}
                     totalTime={todayTotal / 1000}
                     points={todayPts}
-                    streak={userStats?.actualDayWithoutBreak ?? 0}
+                    streak={todayStreak}
                     userLevel={userStats?.lvl ?? 1}
                     daily={daily}
                     dailyLoading={dailyAiLoading}
                     onRatingReady={() => userAuth && firebaseGetAllDailyRatings(userAuth).then(setDailyRatings)}
                     practiceStyle={promptConfig.practiceStyle}
                     goal={promptConfig.goal}
+                    recentSessions={recentSessions}
                   />
                 </div>
               ) : (
@@ -1258,29 +1297,7 @@ export const SummaryView = () => {
             { icon:<Flame size={15}/>,       value:`${userStats?.actualDayWithoutBreak??0}d`, label:"Streak" },
           ]}/>
 
-          {/* Period rating */}
-          {weekTotalMin > 0 && (
-            <div>
-              <SectionHeading icon={<Sparkles size={16}/>}>
-                {weekOffset === 1 ? "Last week's rating" : `${last7[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })} week rating`}
-              </SectionHeading>
-              <PeriodRatingCard
-                compact
-                ratingId={`weekly-${localDateStr(last7[0])}`}
-                label="Last week's practice"
-                techniqueTime={weekTech / 1000}
-                theoryTime={weekTheory / 1000}
-                hearingTime={weekHear / 1000}
-                creativityTime={weekCreat / 1000}
-                totalTime={weekTotalMin * 60}
-                points={weekTotalPts}
-                streak={userStats?.actualDayWithoutBreak ?? 0}
-                userLevel={userStats?.lvl ?? 1}
-                practiceStyle={promptConfig.practiceStyle}
-                goal={promptConfig.goal}
-              />
-            </div>
-          )}
+
 
           {/* AI weekly report */}
           <div>
@@ -1289,14 +1306,8 @@ export const SummaryView = () => {
             </SectionHeading>
 
             {aiLoading && (
-              <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 p-6 flex flex-col gap-8">
-                <AiSkeleton lines={2} />
-                <div className="grid gap-8 sm:grid-cols-2">
-                  <AiSkeleton lines={4}/>
-                  <AiSkeleton lines={4}/>
-                  <AiSkeleton lines={4}/>
-                  <AiSkeleton lines={4}/>
-                </div>
+              <div className="rounded-2xl border border-zinc-800/60 bg-zinc-900/50 p-8 flex flex-col items-center justify-center min-h-[400px]">
+                <RatingSkeleton messages={WEEKLY_LOADING_MESSAGES} />
               </div>
             )}
 
@@ -1316,6 +1327,27 @@ export const SummaryView = () => {
                   )}
                 </div>
 
+                {/* score & overview merger */}
+                <div className="p-5 flex flex-col sm:flex-row gap-6 border-b border-zinc-800/60">
+                   {weekly.grade && (
+                     <div className="flex flex-col items-center gap-4">
+                        <ScoreRing score={weekly.score ?? 0} grade={weekly.grade} animated={!aiLoading} />
+                        <span className={cn("text-xs font-bold uppercase tracking-widest text-center", GRADE_COLOR[weekly.grade]?.text)}>
+                          {weekly.verdict}
+                        </span>
+                     </div>
+                   )}
+                   <div className="flex-1 space-y-3">
+                      <div className="flex items-center gap-2">
+                         <Brain size={14} className="text-main" />
+                         <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500">Week Overview</h4>
+                      </div>
+                      <p className="text-sm leading-relaxed text-zinc-300">
+                        {weekly.overview}
+                      </p>
+                   </div>
+                </div>
+
                 {/* key insight */}
                 {weekly.highlight && (
                   <div className="px-5 py-4 border-b border-zinc-800/60">
@@ -1326,11 +1358,8 @@ export const SummaryView = () => {
                   </div>
                 )}
 
-                {/* 4 sections in 2x2 grid */}
-                <div className="grid gap-3 p-4 sm:grid-cols-2">
-                  <CoachSection icon={<Brain size={14}/>} label="Week overview" color="text-main">
-                    {weekly.overview}
-                  </CoachSection>
+                {/* 3 remaining sections in grid */}
+                <div className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
                   <CoachSection icon={<CheckCircle2 size={14}/>} label="What went well" color="text-emerald-400">
                     {weekly.strengths}
                   </CoachSection>
