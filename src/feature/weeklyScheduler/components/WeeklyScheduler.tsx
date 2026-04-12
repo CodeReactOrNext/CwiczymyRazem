@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { Calendar } from "lucide-react";
 import { DayBlock } from "./DayBlock";
 import { ScheduleItemSelector } from "./ScheduleItemSelector";
 import { getCurrentWeekStart, getWeekDays, formatDayName, isToday, getDayOfWeekKey, formatWeekRange } from "../utils/dateUtils";
@@ -269,7 +268,6 @@ export const WeeklyScheduler = ({ userAuth }: WeeklySchedulerProps) => {
           Your Week 
         </h3>
         <div className="ml-2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 text-[10px] font-bold text-zinc-500">
-          <Calendar size={12} />
           {formatWeekRange(weekStartDate)}
         </div>
       </div>

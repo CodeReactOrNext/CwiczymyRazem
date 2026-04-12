@@ -1,6 +1,6 @@
 "use client";
 
-import { Brain, CalendarCheck, Sparkles, TrendingUp } from "lucide-react";
+import { Brain, Sparkles, TrendingUp } from "lucide-react";
 import Image from "next/image";
 
 const features = [
@@ -18,11 +18,6 @@ const features = [
     icon: <TrendingUp className="w-4 h-4" />,
     label: "Points & level progression",
     desc: "Earn XP for each session and watch your level climb in real time",
-  },
-  {
-    icon: <CalendarCheck className="w-4 h-4" />,
-    label: "Weekly calendar view",
-    desc: "See your session grades across the week at a glance — spot gaps before they become habits",
   },
 ];
 
