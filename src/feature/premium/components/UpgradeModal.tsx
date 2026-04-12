@@ -11,7 +11,6 @@ import { auth } from "utils/firebase/client/firebase.utils";
 const FEATURES: { label: string; pro: boolean; master: boolean }[] = [
   { label: "Real-time Note Detection",                              pro: true,  master: true  },
   { label: "Practice Plan Creator",                                 pro: true,  master: true  },
-  { label: "Practice Calendar",                                     pro: true,  master: true  },
   { label: "Guitar Pro File Support",                               pro: true,  master: true  },
   { label: `${exercisesAgregat.length}+ Exercises to Practice`,    pro: true,  master: true  },
   { label: `${defaultPlans.length} Ready-made Practice Plans`,     pro: true,  master: true  },

@@ -7,14 +7,11 @@ import { NavigationCards } from "feature/profile/components/NavigationCards/Navi
 import { StatsField } from "feature/profile/components/StatsField";
 import { getTrendData } from "feature/profile/utils/getTrendData";
 import { useRouter } from "next/router";
-import { selectUserInfo } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
 import { FaClock } from "react-icons/fa";
 
 // ActiveChallengeWidget removed
-import { WeeklyHorizontalTimeline } from "feature/weeklyScheduler/components/WeeklyHorizontalTimeline";
 import { HeroBanner } from "components/UI/HeroBanner";
 
 interface LandingLayoutProps {
@@ -29,7 +26,6 @@ const ProfileLandingLayout = ({
   featSlot,
 }: LandingLayoutProps) => {
   const router = useRouter();
-  const userInfo = useAppSelector(selectUserInfo);
   const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
 
   const todayStr = new Date().toDateString();
@@ -111,12 +107,6 @@ const ProfileLandingLayout = ({
               </div>
             </DashboardSection>
           </div>
-
-          {(userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin") && (
-            <div className="mt-6">
-              <WeeklyHorizontalTimeline userAuth={userAuth as string} />
-            </div>
-          )}
 
           <div className="mt-8">
             <ActivityLogView

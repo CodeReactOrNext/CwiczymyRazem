@@ -6,7 +6,6 @@ import { Check, Minus } from "lucide-react";
 const FEATURES: { label: string; pro: boolean; master: boolean }[] = [
   { label: "Real-time Note Detection",   pro: true,  master: true  },
   { label: "Practice Plan Creator",      pro: true,  master: true  },
-  { label: "Practice Calendar",          pro: true,  master: true  },
   { label: "Guitar Pro File Support",    pro: true,  master: true  },
   { label: "Full Exercise Library",      pro: true,  master: true  },
   { label: "Skill Roadmaps",            pro: false, master: true  },
