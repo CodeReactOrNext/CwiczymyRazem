@@ -329,7 +329,9 @@ export const PracticeSession = ({
 
   // Reset per-exercise UI flags alongside ear training
   useEffect(() => {
-    if (currentExercise.riddleConfig?.mode === "sequenceRepeat") {
+    if (examMode) {
+      setIsAudioMuted(true);
+    } else if (currentExercise.riddleConfig?.mode === "sequenceRepeat") {
       setIsAudioMuted(false);
     } else {
       const pref = loadGuitarPlaybackPreference();
@@ -678,6 +680,12 @@ export const PracticeSession = ({
   } = useCalibration(planHasTablature);
 
   const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong;
+
+  // In exam mode, force the mic prompt at session start if mic isn't already configured
+  useEffect(() => {
+    if (examMode && !_isMicEnabled) setSessionPhase("mic_prompt");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auto-init audio when mic enabled
   useEffect(() => {
@@ -1321,6 +1329,7 @@ export const PracticeSession = ({
         resetTimer={resetTimer}
         startTimer={startTimer}
         sessionPhase={sessionPhase}
+        examMode={examMode}
         handleEnableMic={handleEnableMic}
         handleSkipMic={handleSkipMic}
         existingCalibrationTimestamp={existingCalibrationTimestamp}
