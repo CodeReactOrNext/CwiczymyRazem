@@ -18,6 +18,7 @@ interface SessionDialogsProps {
 
   // Mic / Calibration
   sessionPhase: string;
+  examMode?: boolean;
   handleEnableMic: () => void;
   handleSkipMic: () => void;
   existingCalibrationTimestamp: number | null;
@@ -53,6 +54,7 @@ export const SessionDialogs = ({
   resetTimer,
   startTimer,
   sessionPhase,
+  examMode,
   handleEnableMic,
   handleSkipMic,
   existingCalibrationTimestamp,
@@ -82,6 +84,7 @@ export const SessionDialogs = ({
 
     <MicModeDialog
       isOpen={sessionPhase === "mic_prompt"}
+      examMode={examMode}
       onEnableMic={handleEnableMic}
       onSkipMic={handleSkipMic}
     />
