@@ -6,9 +6,16 @@ import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget"
 import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
 import { StatsField } from "feature/profile/components/StatsField";
 import { getTrendData } from "feature/profile/utils/getTrendData";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
+import type { Song } from "feature/songs/types/songs.type";
+import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
 import { convertMsToHM } from "utils/converter";
+import { getPointsToLvlUp } from "utils/gameLogic";
 import { FaClock } from "react-icons/fa";
 
 // ActiveChallengeWidget removed
@@ -27,6 +34,11 @@ const ProfileLandingLayout = ({
 }: LandingLayoutProps) => {
   const router = useRouter();
   const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
+  const [songs, setSongs] = useState<{ wantToLearn: Song[]; learning: Song[]; learned: Song[] }>();
+
+  useEffect(() => {
+    getUserSongs(userAuth).then((s) => setSongs(s));
+  }, [userAuth]);
 
   const todayStr = new Date().toDateString();
   const lastReportDate = userStats?.lastReportDate ? new Date(userStats.lastReportDate).toDateString() : null;
@@ -37,26 +49,101 @@ const ProfileLandingLayout = ({
   ) : "0:00";
   const timeTrendData = getTrendData(datasWithReports, "time");
 
+  const lvlXpStart = getPointsToLvlUp((userStats?.lvl ?? 1) - 1);
+  const lvlXpEnd = getPointsToLvlUp(userStats?.lvl ?? 1);
+  let effectivePts = userStats?.points ?? 0;
+  if ((userStats?.points ?? 0) < lvlXpStart && (userStats?.lvl ?? 1) > 1) effectivePts += lvlXpStart;
+  const ptsInLevel = Math.max(0, effectivePts - lvlXpStart);
+  const lvlRange = Math.max(1, lvlXpEnd - lvlXpStart);
+  const xpPercent = Math.min(Math.max((ptsInLevel / lvlRange) * 100, 0), 100);
+  const arcR = 38;
+  const arcC = 2 * Math.PI * arcR;
+  const arcOffset = arcC * (1 - xpPercent / 100);
+
+  const skillPower = songs?.learned ? calculateSkillPower(songs.learned) : 0;
+  const songTier = getSongTier(skillPower > 0 ? skillPower : '?');
+
   return (
     <div className="bg-second-600 rounded-xl flex flex-col shadow-sm border-none lg:mt-16">
       <HeroBanner
         title={isTodayCompleted ? "Great job today!" : "Start today's practice"}
-        characterImage="/images/3d/guitarist.png"
-        secondaryImage="/images/3d/metronom.png"
         className="w-full !rounded-none !shadow-none min-h-[220px] md:min-h-[200px] lg:min-h-[240px]"
+        rightContent={
+          <div className="relative hidden md:flex select-none items-center gap-4 pr-2">
+            <div className="absolute inset-0 rounded-full bg-cyan-400/10 blur-3xl" />
+
+            {/* Song tier badge */}
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="relative flex flex-col items-center gap-1.5 cursor-default">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">Song tier</span>
+                    <div
+                      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg"
+                      style={{ color: songTier.color, backgroundColor: 'rgba(10,10,10,0.9)', borderColor: `${songTier.color}40` }}
+                    >
+                      {songTier.tier}
+                    </div>
+                    <span className="text-[11px] font-medium" style={{ color: songTier.color }}>{songTier.label}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-[220px] text-center text-zinc-800 leading-relaxed">
+                  Your skill tier based on the difficulty of songs you've mastered. Ranges from D (beginner) to S (master).
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
+            {/* Level ring */}
+            <div className="relative flex flex-col items-center gap-1">
+              <svg width="120" height="120" viewBox="0 0 100 100" className="relative shrink-0">
+                <defs>
+                  <linearGradient id="lvlArcGradDash" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#a5f3fc" />
+                    <stop offset="100%" stopColor="#0891b2" />
+                  </linearGradient>
+                  <filter id="lvlGlowDash" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                  </filter>
+                </defs>
+                <circle cx="50" cy="50" r="46" fill="rgba(0,0,0,0.45)" />
+                <circle cx="50" cy="50" r={arcR} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
+                <circle
+                  cx="50" cy="50" r={arcR}
+                  fill="none"
+                  stroke="url(#lvlArcGradDash)"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  strokeDasharray={arcC}
+                  strokeDashoffset={arcOffset}
+                  transform="rotate(-90 50 50)"
+                  filter="url(#lvlGlowDash)"
+                />
+                <text x="50" y="54" textAnchor="middle" fill="white" fontSize="24" fontWeight="900" style={{ fontFamily: 'system-ui, sans-serif' }}>
+                  {userStats?.lvl ?? 1}
+                </text>
+                <text x="50" y="67" textAnchor="middle" fill="#67e8f9" fontSize="9" fontWeight="700" letterSpacing="3" style={{ fontFamily: 'system-ui, sans-serif' }}>
+                  LVL
+                </text>
+              </svg>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">Level progress</span>
+              <span className="text-[11px] tabular-nums text-zinc-500">{ptsInLevel.toLocaleString()} / {lvlRange.toLocaleString()} XP</span>
+            </div>
+          </div>
+        }
         leftContent={
           <div className="flex flex-col gap-3">
             <div className="flex flex-row flex-wrap gap-3 items-center">
               <button
                 onClick={() => router.push("/plans/create")}
-                className="group/btn rounded-none md:rounded-md bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 hover:bg-zinc-700/80 active:scale-95"
+                className="group/btn rounded-[8px] bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 hover:bg-zinc-700/80 active:scale-95"
               >
                 Create plan
                 <Plus className="h-4 w-4" />
               </button>
               <button
                 onClick={() => router.push("/timer")}
-                className="group/btn rounded-none md:rounded-md bg-white text-zinc-950 px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 active:scale-95"
+                className="group/btn rounded-[8px] bg-white text-zinc-950 px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 active:scale-95"
               >
                 Choose mode
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
@@ -65,7 +152,7 @@ const ProfileLandingLayout = ({
             {(userStats?.fame ?? 0) >= 30 && (
               <button
                 onClick={() => router.push("/arsenal")}
-                className="group/fame flex items-center gap-2 w-fit rounded-none md:rounded-md bg-zinc-800/80 backdrop-blur-md border border-orange-500/30 hover:border-orange-400/60 hover:bg-zinc-700/80 text-white px-4 py-2 text-sm font-semibold transition-all duration-300 active:scale-95"
+                className="group/fame flex items-center gap-2 w-fit rounded-[8px] bg-zinc-800/80 backdrop-blur-md border border-orange-500/30 hover:border-orange-400/60 hover:bg-zinc-700/80 text-white px-4 py-2 text-sm font-semibold transition-all duration-300 active:scale-95"
               >
                 <Gem className="h-3.5 w-3.5 text-orange-400 shrink-0" />
                 {/* Mobile: compact */}

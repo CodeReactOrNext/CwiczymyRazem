@@ -70,7 +70,7 @@ export const SuccessRewardCard = ({
           stiffness: 100,
           delay: 0.1 
        }}
-       className='relative flex flex-col items-center justify-center bg-zinc-900 border border-white/5 p-8 sm:p-10 rounded-2xl shadow-xl overflow-visible mb-4 group mt-16 md:mt-20'
+       className='relative flex flex-col items-center justify-center bg-zinc-900 border border-white/5 p-8 sm:p-10 rounded-2xl shadow-xl overflow-visible mb-4 group'
     >
         <div className="flex flex-col md:flex-row items-center justify-center w-full relative z-10 gap-6 md:gap-12 mb-8 md:mb-10">
            
@@ -106,27 +106,6 @@ export const SuccessRewardCard = ({
               )}
            </div>
 
-           {/* Character Visual - Sticking out from the top */}
-           <div className="relative md:absolute md:-top-28 md:right-8 group/char">
-              {/* Subtle Character Glow Effect - Soft radial gradient */}
-              <div 
-                 className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.1),transparent_60%)] scale-150 pointer-events-none" 
-              />
-              
-              <motion.img 
-                 initial={{ opacity: 0, y: 100, scale: 0.8 }}
-                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                 transition={{ 
-                   delay: 0.4, 
-                   type: "spring", 
-                   stiffness: 80, 
-                   damping: 15 
-                 }}
-                 src="/images/3d/summary.png" 
-                 alt="Summary Character" 
-                 className="relative h-[220px] sm:h-[260px] w-auto object-contain pointer-events-none select-none z-10"
-              />
-           </div>
         </div>
 
         <div className="flex flex-col items-center relative z-10 text-center mb-10 w-full">

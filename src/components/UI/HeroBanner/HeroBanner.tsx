@@ -15,6 +15,7 @@ interface HeroBannerProps {
   className?: string;
   leftContent?: ReactNode;
   children?: ReactNode;
+  compact?: boolean;
 }
 
 export const HeroBanner = ({
@@ -31,10 +32,11 @@ export const HeroBanner = ({
   className = "",
   leftContent,
   children,
+  compact = false,
 }: HeroBannerProps) => {
   return (
     <div
-      className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible min-h-[220px] md:min-h-[160px] lg:min-h-[180px] ${className}`}
+      className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible ${compact ? '' : 'min-h-[220px] md:min-h-[160px] lg:min-h-[180px]'} ${className}`}
     >
       {/* Base background — matches page bg so it bleeds in */}
       <div className="absolute inset-0 bg-background" />
@@ -84,8 +86,10 @@ export const HeroBanner = ({
       )}
 
       {/* Content */}
-      <div 
-        className={`relative z-10 flex flex-col md:flex-row w-full items-start md:items-end justify-between p-6 md:p-8 lg:px-10 lg:py-8 gap-6 md:gap-8 ${
+      <div
+        className={`relative z-10 flex flex-col md:flex-row w-full items-start md:items-end justify-between gap-6 md:gap-8 ${
+          compact ? 'p-4 md:p-5 lg:px-6 lg:py-4' : 'p-6 md:p-8 lg:px-10 lg:py-8'
+        } ${
           characterImage ? "pr-[120px] xs:pr-[160px] md:pr-8 lg:pr-10" : ""
         }`}
       >

@@ -313,28 +313,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                   <span className='truncate text-[15px] font-bold text-white tracking-wide'>
                     {userName}
                   </span>
-                  <div className="mt-1 flex items-center gap-1.5">
-                    <span className="text-[12px] font-bold text-zinc-400">LVL {userStats.lvl}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Enhanced XP Bar */}
-              <div className="mt-4 space-y-1.5">
-                <div className="flex items-center justify-between px-0.5">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-sm font-bold text-cyan-400 drop-shadow-sm">{Math.floor(pointsInCurrentLvl)}</span>
-                    <span className="text-[11px] font-semibold text-zinc-300">/ {pointsNeededForNextLvl} XP</span>
-                  </div>
-                </div>
-
-                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 1, ease: "easeOut", delay: 0.1 }}
-                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6)]"
-                  />
                 </div>
               </div>
             </div>
@@ -592,9 +570,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                         <span className='truncate text-[15px] font-bold text-white tracking-wide'>
                           {userName}
                         </span>
-                        <div className="mt-1 flex items-center gap-1.5">
-                          <span className="text-[12px] font-bold text-zinc-400">LVL {userStats.lvl}</span>
-                        </div>
                         <div className='mt-2 flex items-center gap-2'>
                           <Link 
                             href="/settings" 
@@ -611,24 +586,6 @@ export const RockSidebar = ({  pageId }: RockSidebarProps) => {
                       </div>
                     </div>
 
-                    {/* Progress Bar - Mobile */}
-                    <div className="mt-4 space-y-1.5 px-0.5">
-                      <div className="flex items-center justify-between px-0.5">
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-sm font-bold text-cyan-400 drop-shadow-sm">{Math.floor(pointsInCurrentLvl)}</span>
-                          <span className="text-[11px] font-semibold text-zinc-300">/ {pointsNeededForNextLvl} XP</span>
-                        </div>
-                      </div>
-                      
-                      <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${progress}%` }}
-                          transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
-                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6)]"
-                        />
-                      </div>
-                    </div>
                   </div>
                 );
               })()}

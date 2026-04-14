@@ -10,6 +10,7 @@ import type { ReportFormikInterface } from "feature/user/view/ReportView/ReportV
 import type { FormikErrors } from "formik";
 import { useFormikContext } from "formik";
 import { motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons/lib";
 
@@ -45,6 +46,7 @@ const TimeInputBox = ({
 }: TimeInputBoxProps) => {
   const { values, setFieldValue } = useFormikContext<ReportFormikInterface>();
   const [isHovered, setIsHovered] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const timePickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -130,46 +132,65 @@ const TimeInputBox = ({
           />
         )}
 
-        <div className='relative mb-5 flex items-center gap-4'>
-          <motion.div
-            animate={{ scale: isHovered ? 1.05 : 1 }}
-            transition={{ duration: 0.3 }}
-            className={`flex h-12 w-12 items-center justify-center rounded-full opacity-90 ${
-              hasValue ? "" : "opacity-60"
-            }`}
-            style={{
-              background: hasValue
-                ? `linear-gradient(135deg, ${skillColor}20, ${skillColor}10)`
-                : "linear-gradient(135deg, #33333320, #22222210)",
-              border: hasValue
-                ? `1px solid ${skillColor}30`
-                : "1px solid #33333330",
-              boxShadow:
-                isHovered && hasValue ? `0 0 15px ${skillColor}30` : "none",
-            }}>
-            <Icon
-              className='text-2xl'
-              style={{ color: hasValue ? skillColor : "#666666" }}
-            />
-          </motion.div>
-          <div className='flex items-center gap-1.5'>
-            <span
-              className={`md:text-md font-openSans text-sm ${
-                hasValue ? "text-white" : "text-gray-400"
-              }`}>
-              {title}
-            </span>
-            <div
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
+        <div
+          className={`relative flex items-center justify-between gap-4 cursor-pointer sm:cursor-default ${isOpen ? 'mb-5' : 'mb-0 sm:mb-5'}`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className='flex items-center gap-4'>
+            <motion.div
+              animate={{ scale: isHovered ? 1.05 : 1 }}
+              transition={{ duration: 0.3 }}
+              className={`flex h-12 w-12 items-center justify-center rounded-full opacity-90 ${
+                hasValue ? "" : "opacity-60"
+              }`}
+              style={{
+                background: hasValue
+                  ? `linear-gradient(135deg, ${skillColor}20, ${skillColor}10)`
+                  : "linear-gradient(135deg, #33333320, #22222210)",
+                border: hasValue
+                  ? `1px solid ${skillColor}30`
+                  : "1px solid #33333330",
+                boxShadow:
+                  isHovered && hasValue ? `0 0 15px ${skillColor}30` : "none",
               }}>
-              <QuestionMark description={questionMarkProps.description} />
+              <Icon
+                className='text-2xl'
+                style={{ color: hasValue ? skillColor : "#666666" }}
+              />
+            </motion.div>
+            <div className='flex items-center gap-1.5'>
+              <span
+                className={`md:text-md font-openSans text-sm ${
+                  hasValue ? "text-white" : "text-gray-400"
+                }`}>
+                {title}
+              </span>
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}>
+                <QuestionMark description={questionMarkProps.description} />
+              </div>
             </div>
+          </div>
+
+          {/* Mobile: time preview + expand chevron */}
+          <div className='flex items-center gap-2 sm:hidden'>
+            {hasValue && (
+              <span
+                className='font-mono text-sm font-bold'
+                style={{ color: skillColor }}>
+                {String(hoursValue).padStart(2, '0')}:{String(minutesValue).padStart(2, '0')}
+              </span>
+            )}
+            <ChevronDown
+              className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+            />
           </div>
         </div>
 
-        <div className='mt-auto flex w-full items-center justify-center gap-3'>
+        <div className={`${isOpen ? 'flex' : 'hidden sm:flex'} mt-auto w-full items-center justify-center gap-3`}>
           <div ref={timePickerRef} className='mx-auto flex w-full max-w-[300px] items-center justify-center gap-4'>
             {/* Hours */}
             <div className='flex flex-1 flex-col items-center gap-2'>

@@ -13,7 +13,8 @@ const ReportPage: NextPageWithLayout = () => {
         title="Log Session"
         subtitle="Record and review your practice session"
         eyebrow="Practice Log"
-        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+        compact
+        className="w-full !rounded-none !shadow-none"
       />
       <ReportView />
     </div>

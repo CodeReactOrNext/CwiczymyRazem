@@ -513,7 +513,23 @@ const ReportView = () => {
                                   { label: "Song Writing", icon: "✍️", cat: "creative" },
                                   { label: "Speed Building", icon: "🏎️", cat: "basic" },
                                   { label: "Jamming", icon: "🔊", cat: "creative" },
-                                  { label: "Night practice", icon: "🌙", cat: "basic" }
+                                  { label: "Night practice", icon: "🌙", cat: "basic" },
+                                  { label: "Sight Reading", icon: "👁️", cat: "theory" },
+                                  { label: "Arpeggios", icon: "🎼", cat: "basic" },
+                                  { label: "Scales", icon: "🎹", cat: "basic" },
+                                  { label: "Chords", icon: "🔗", cat: "theory" },
+                                  { label: "Fingerpicking", icon: "🖐️", cat: "basic" },
+                                  { label: "Rhythm Training", icon: "🥁", cat: "theory" },
+                                  { label: "Vibrato", icon: "〰️", cat: "basic" },
+                                  { label: "Bends", icon: "🎯", cat: "basic" },
+                                  { label: "Cover Song", icon: "🎤", cat: "creative" },
+                                  { label: "Performance Prep", icon: "🎭", cat: "creative" },
+                                  { label: "Transcribing", icon: "🎧", cat: "theory" },
+                                  { label: "Morning session", icon: "☀️", cat: "basic" },
+                                  { label: "Legato", icon: "🌊", cat: "basic" },
+                                  { label: "Composition", icon: "🖊️", cat: "creative" },
+                                  { label: "Sweep Picking", icon: "🌪️", cat: "basic" },
+                                  { label: "Backing Track", icon: "🎙️", cat: "creative" },
                                 ].map((tag) => (
                                   <button
                                     key={tag.label}

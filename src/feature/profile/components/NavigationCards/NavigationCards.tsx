@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { ArrowRight, Bot, ClipboardCheck, ClipboardList, Loader2, Music, Sparkles, Wand2 } from "lucide-react";
+import { ArrowRight, Bot, ClipboardCheck, ClipboardList, Guitar, Loader2, Music, Sparkles, Wand2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -114,12 +114,12 @@ export const NavigationCards = () => {
   
 
       <NavigationCard
-        title="Play Songs"
-        icon={<Music className='h-5 w-5' />}
-        onClick={() => handleNavigation("/timer/song-select", "songs")}
-        colorAccent='purple'
+        title="Guitar Journey"
+        icon={<Guitar className='h-5 w-5' />}
+        onClick={() => handleNavigation("/journey", "songs")}
+        colorAccent='amber'
         isLoading={loadingCard === "songs"}
-        actionLabel="Choose Song"
+        actionLabel="Continue Learning"
       />
 
       <NavigationCard
