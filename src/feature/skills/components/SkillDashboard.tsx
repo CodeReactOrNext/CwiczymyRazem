@@ -233,16 +233,10 @@ export const SkillDashboard = ({
             className="w-full sm:max-w-xl p-0 bg-[#0a0a0a] border-zinc-900 flex flex-col"
           >
             {/* Header */}
-            <div className="flex-shrink-0 px-6 pt-8 pb-5 border-b border-zinc-900">
-              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Exercises</span>
-              <SheetTitle className="text-3xl font-bold text-white tracking-tight mt-1">
+            <div className="flex-shrink-0 px-6 pt-5 pb-3 border-b border-zinc-900">
+              <SheetTitle className="text-2xl font-bold text-white tracking-tight">
                 {selectedSkillName}
               </SheetTitle>
-              {uniqueDifficulties.length > 0 && (
-                <p className="mt-1 text-sm text-zinc-500">
-                  {Object.values(filteredTree)[0]?.[selectedSkillId!]?.length ?? 0} exercises available
-                </p>
-              )}
             </div>
 
             {uniqueDifficulties.length > 0 ? (
@@ -277,7 +271,7 @@ export const SkillDashboard = ({
                 </div>
 
                 {/* Scrollable exercise list */}
-                <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y px-6 py-4 space-y-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500">
+                <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y px-6 py-6 pb-16 space-y-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-zinc-700 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500">
                   {(filteredTree[Object.keys(filteredTree)[0]]?.[selectedSkillId!]?.filter(c => c.difficulty === currentDifficulty) ?? []).map((challenge) => {
                     const exerciseDef = exercisesAgregat.find(e => e.id === challenge.id);
                     const isLocked = !!exerciseDef?.premium && !isPremium;
@@ -296,29 +290,28 @@ export const SkillDashboard = ({
                       (earTrainingHighScore != null && earTrainingHighScore > 0)
                     );
                     const diffColor = currentDifficulty === 'easy'
-                      ? { bar: "bg-emerald-500", badge: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" }
+                      ? { bar: "bg-emerald-500", text: "text-emerald-400", badge: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" }
                       : currentDifficulty === 'medium'
-                      ? { bar: "bg-amber-500", badge: "bg-amber-500/10 border-amber-500/20 text-amber-400" }
-                      : { bar: "bg-rose-500", badge: "bg-rose-500/10 border-rose-500/20 text-rose-400" };
+                      ? { bar: "bg-amber-500", text: "text-amber-400", badge: "bg-amber-500/10 border-amber-500/20 text-amber-400" }
+                      : { bar: "bg-rose-500", text: "text-rose-400", badge: "bg-rose-500/10 border-rose-500/20 text-rose-400" };
 
                     if (isLocked) {
                       return (
                         <div
                           key={challenge.id}
                           onClick={() => setShowUpgradeModal(true)}
-                          className="flex rounded-xl border overflow-hidden transition-all duration-200 cursor-pointer border-amber-500/20 bg-zinc-900/20 hover:border-amber-500/35 hover:bg-zinc-900/40"
+                          className="group flex rounded-2xl border border-amber-500/20 bg-zinc-900/30 overflow-hidden transition-all duration-300 cursor-pointer hover:border-amber-500/50 hover:bg-zinc-900/60 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] relative"
                         >
-                          <div className="w-1 flex-shrink-0 bg-amber-500/30" />
-                          <div className="flex-1 min-w-0 px-4 py-3 flex flex-col gap-2">
+                          <div className="flex-1 min-w-0 px-5 py-4 flex flex-col gap-2.5">
                             <div className="flex items-start justify-between gap-3">
-                              <p className="text-sm font-bold text-zinc-600 leading-snug flex-1">{challenge.title}</p>
-                              <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/25 flex-shrink-0">
+                              <p className="text-[15px] font-bold text-zinc-500 group-hover:text-zinc-400 leading-snug flex-1 transition-colors">{challenge.title}</p>
+                              <div className="flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-0.5 ring-1 ring-amber-500/25 flex-shrink-0">
                                 <Lock className="h-3 w-3 text-amber-500" />
                                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500">Pro</span>
                               </div>
                             </div>
                             {challenge.description && (
-                              <p className="text-xs text-zinc-700 leading-relaxed line-clamp-2">{challenge.description}</p>
+                              <p className="text-[13px] text-zinc-600 leading-relaxed line-clamp-2">{challenge.description}</p>
                             )}
                           </div>
                         </div>
@@ -326,79 +319,82 @@ export const SkillDashboard = ({
                     }
 
                     return (
-                      <div
-                        key={challenge.id}
-                        className={cn(
-                          "flex rounded-xl border overflow-hidden transition-all duration-200",
-                          hasBeenAttempted
-                            ? "border-zinc-700 bg-zinc-900/70 hover:bg-zinc-900"
-                            : "border-zinc-800/60 bg-zinc-900/30 hover:bg-zinc-900/60 hover:border-zinc-700"
-                        )}
-                      >
-                        <div className={cn("w-1 flex-shrink-0", diffColor.bar)} />
-                        <div className="flex-1 min-w-0 px-4 py-3 flex flex-col gap-2">
+                        <div
+                          key={challenge.id}
+                          className={cn(
+                            "group flex rounded-2xl border overflow-hidden transition-all duration-300 relative",
+                            hasBeenAttempted
+                              ? "border-zinc-700 bg-zinc-900/80 hover:bg-zinc-800 hover:border-zinc-500 shadow-md shadow-black/40"
+                              : "border-zinc-800/80 bg-zinc-900/40 hover:bg-zinc-900/70 hover:border-zinc-700 shadow-sm shadow-black/20"
+                          )}
+                        >
+                          <div className="flex-1 min-w-0 px-5 py-4 flex flex-col gap-2.5 relative z-10">
                           <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-bold text-white leading-snug">{challenge.title}</p>
+                            <div className="flex-1 min-w-0 flex items-center gap-2.5 flex-wrap">
+                              <p className={cn("text-[16px] font-bold leading-snug transition-colors", hasBeenAttempted ? "text-white" : "text-zinc-300 group-hover:text-zinc-100")}>{challenge.title}</p>
                               {hasBeenAttempted && (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 mt-1">
-                                  <FaCheck className="h-2 w-2" />
-                                  Practiced
-                                </span>
+                                <div className="flex items-center justify-center flex-shrink-0 bg-emerald-500/10 rounded-full h-5 w-5 border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.15)]" title="Practiced">
+                                  <FaCheck className="h-2.5 w-2.5 text-emerald-400" />
+                                </div>
                               )}
                             </div>
                             <button
                               onClick={() => handleStartChallenge(challenge)}
-                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white hover:bg-zinc-200 text-black text-xs font-bold transition-colors flex-shrink-0"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-all flex-shrink-0 scale-95 group-hover:scale-100"
                             >
+                              <ChevronRight size={14} strokeWidth={2.5} />
                               Start
-                              <ChevronRight size={12} strokeWidth={3} />
                             </button>
                           </div>
 
                           {challenge.description && (
-                            <p className="text-xs text-zinc-500 leading-relaxed line-clamp-2">{challenge.description}</p>
+                            <p className="text-[13px] text-zinc-500 leading-relaxed line-clamp-2">{challenge.description}</p>
                           )}
 
                           {challenge.tablature && challenge.tablature.length > 0 && (
-                            <div className="pt-1">
+                            <div className="pt-1 overflow-hidden opacity-90 group-hover:opacity-100 transition-opacity">
                               <TablaturePreview measures={challenge.tablature} />
                             </div>
                           )}
 
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span className={cn("inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-md border", diffColor.badge)}>
-                              +{sp} skill {sp === 1 ? 'point' : 'points'}
-                            </span>
-                            {hasBpmProgress && (
-                              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-zinc-800/80 border border-zinc-700/60 text-zinc-300">
-                                <FaCheck className="h-2.5 w-2.5 text-main-300" />
-                                {completedBpms.length}/{bpmStages.length} BPM
-                              </span>
-                            )}
-                            {micHighScore != null && micHighScore > 0 && (
-                              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-300">
-                                <Mic className="h-2.5 w-2.5" />
-                                {micHighScore.toLocaleString()} pts
-                                {micAccuracy != null && <span className="text-amber-500 font-normal ml-0.5">({micAccuracy}%)</span>}
-                              </span>
-                            )}
-                            {earTrainingHighScore != null && earTrainingHighScore > 0 && (
-                              <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-link/10 border border-link/20 text-link">
-                                <Ear className="h-2.5 w-2.5" />
-                                {earTrainingHighScore} pts
-                              </span>
-                            )}
-                            {hasLeaderboard && (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setLeaderboardExercise({ id: challenge.id, title: challenge.title as string }); }}
-                                className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md text-zinc-500 border border-zinc-800 hover:border-zinc-700 hover:text-zinc-300 bg-transparent hover:bg-zinc-800/50 transition-colors"
-                              >
-                                <Trophy className="h-2.5 w-2.5" />
-                                Leaderboard
-                              </button>
-                            )}
-                          </div>
+                          {/* Metrics row */}
+                          {(hasBpmProgress || (micHighScore != null && micHighScore > 0) || (earTrainingHighScore != null && earTrainingHighScore > 0) || hasLeaderboard) && (
+                            <div className="flex flex-wrap items-center gap-5 pt-3.5 mt-3 border-t border-zinc-800/40">
+                              {hasBpmProgress && (
+                                <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-zinc-300">
+                                  <FaCheck className="h-3.5 w-3.5 text-main-400" />
+                                  {completedBpms.length}/{bpmStages.length} BPM
+                                </div>
+                              )}
+                              
+                              {micHighScore != null && micHighScore > 0 && (
+                                <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-amber-400">
+                                  <Mic className="h-4 w-4 text-amber-500/80" />
+                                  <span>{micHighScore.toLocaleString()} PTS</span>
+                                  {micAccuracy != null && <span className="text-amber-500/60 font-medium">({micAccuracy}%)</span>}
+                                </div>
+                              )}
+
+                              {earTrainingHighScore != null && earTrainingHighScore > 0 && (
+                                <div className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-cyan-400">
+                                  <Ear className="h-4 w-4 text-cyan-400/80" />
+                                  <span>{earTrainingHighScore} PTS</span>
+                                </div>
+                              )}
+
+                              {hasLeaderboard && (
+                                <div className="flex-1 flex justify-end">
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); setLeaderboardExercise({ id: challenge.id, title: challenge.title as string }); }}
+                                    className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-zinc-700/60 bg-zinc-800/40 text-zinc-400 hover:text-white hover:border-zinc-600 hover:bg-zinc-700/80 transition-all shadow-sm"
+                                  >
+                                    <Trophy className="h-4 w-4" />
+                                    <span className={cn(hasBeenAttempted ? "" : "opacity-0 invisible w-0")}>Leaderboard</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
