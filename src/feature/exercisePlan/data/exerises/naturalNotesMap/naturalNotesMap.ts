@@ -25,6 +25,10 @@ export const naturalNotesMapExercise: Exercise = {
     "Try one pass without looking at the fretboard to test your internal map.",
     "Recording a short fragment can reveal where your rhythm breaks during harder areas."
   ],
-  metronomeSpeed: null,
+  metronomeSpeed: {
+    min: 40,
+    max: 150,
+    recommended: 50,
+  },
   relatedSkills: ["music_theory"],
 };

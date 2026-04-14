@@ -46,5 +46,5 @@ export const specialAchievements = [
   achivFactor("short", FaShieldAlt, "veryRare", (ctx) => ctx.statistics.actualDayWithoutBreak >= 10 && ctx.sessionResults.totalPoints <= 15),
   achivFactor("event", FaTrophy, "veryRare", () => false),
   achivFactor("batteryHearth", GiHeartBattery, "epic", AchievementRequirement.statThreshold("habitsCount", 2000), AchievementRequirement.getProgressFor.statThreshold("habitsCount", 2000, "habits")),
-  achivFactor("bomb", GiRollingBomb, "veryRare", (ctx) => ctx.statistics.actualDayWithoutBreak >= 2 && ctx.inputData.countBackDays !== undefined),
+  achivFactor("bomb", GiRollingBomb, "veryRare", (ctx) => ctx.statistics.actualDayWithoutBreak >= 2 && ctx.inputData.countBackDays > 0),
 ];
