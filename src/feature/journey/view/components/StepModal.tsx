@@ -327,7 +327,7 @@ const [checklistState, setChecklistState] = useState<boolean[]>(
           className="relative flex w-full max-w-4xl max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative h-60 flex-shrink-0 overflow-hidden">
+          <div className="relative h-32 md:h-60 flex-shrink-0 overflow-hidden">
             <Image
               src={step.image}
               alt={step.title}
@@ -340,28 +340,35 @@ const [checklistState, setChecklistState] = useState<boolean[]>(
               className="absolute inset-0"
               style={{ background: `radial-gradient(ellipse at 25% 70%, ${hero.tint} 0%, transparent 65%)` }}
             />
-            <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-zinc-950 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-20 md:h-36 bg-gradient-to-t from-zinc-950 to-transparent" />
             <button
               onClick={onClose}
               className="absolute right-4 top-4 z-10 rounded-xl bg-black/50 p-2 text-zinc-400 backdrop-blur-sm transition hover:bg-black/70 hover:text-white"
             >
               <X size={18} />
             </button>
-            <div className="absolute inset-x-0 bottom-0 flex items-end gap-4 px-7 pb-6">
+            <div className="absolute inset-x-0 bottom-0 flex items-end gap-3 md:gap-4 px-4 md:px-7 pb-3 md:pb-6">
               <div
-                className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-black/60 backdrop-blur-md ring-1 ${hero.iconRing} ${hero.iconText}`}
+                className={`flex h-12 w-12 md:h-16 md:w-16 flex-shrink-0 items-center justify-center rounded-xl md:rounded-2xl bg-black/60 backdrop-blur-md ring-1 ${hero.iconRing} ${hero.iconText}`}
                 style={{ boxShadow: `0 0 24px ${hero.glow}` }}
               >
-                {STEP_ICONS[step.stepIcon] ?? <Zap size={30} />}
+                {step.stepIcon && ICON_MAP[step.stepIcon] ? (
+                  <>
+                    <span className="md:hidden">{ICON_MAP[step.stepIcon](24)}</span>
+                    <span className="hidden md:block">{ICON_MAP[step.stepIcon](30)}</span>
+                  </>
+                ) : (
+                  <Zap className="h-6 w-6 md:h-8 md:w-8" />
+                )}
               </div>
               <div className="min-w-0 flex-1 pb-1">
-                <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                <div className="mb-1 flex flex-wrap items-center gap-2">
                   <span className={`rounded-[8px] px-2.5 py-0.5 text-[10px] font-bold tracking-wider ring-1 ${status.cls}`}>
                     {status.label}
                   </span>
                   <span className="text-[10px] text-zinc-600">Step {step.order}</span>
                 </div>
-                <h2 className="text-2xl font-black leading-tight text-white drop-shadow-lg">
+                <h2 className="text-lg md:text-2xl font-black leading-tight text-white drop-shadow-lg">
                   {step.title}
                 </h2>
               </div>
