@@ -116,7 +116,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             creativityMinutes: "0",
             habbits: [],
             countBackDays: 0,
-            reportTitle: `${t("timer:currently_exercising")} ${song.artist} - ${song.title}`,
+            reportTitle: `Song: ${song.artist} - ${song.title}`,
             avatarUrl: userAvatar ?? null,
             songId: song.id,
             songTitle: song.title,
