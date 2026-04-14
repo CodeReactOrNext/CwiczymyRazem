@@ -22,6 +22,9 @@ function buildSystemPrompt(practiceStyle: "professional" | "hobby", goal: string
     : `\n=== PLAYER GOAL ===\nNone provided. Suggest defining a goal in the "highlight" section to help prioritize practice.\n`;
 
   const shared = `
+=== ASSUMPTIONS RULE ===
+Only state what directly follows from the provided data. Do NOT assume anything not explicitly present — e.g. whether the user used a metronome, whether a technique was applied to a specific song, whether they struggled with or mastered something unless the data makes it clear. Stick to what you know for certain; omit everything else.
+
 === CORE RULE ===
 The player already sees what they practiced in the app UI. Do NOT summarize it back at them. DON'T LIST DOWN ALL EXERCISES NAMES
 Wrong: "You practiced First Melody — One String for 10 minutes." or "You worked through the Quarter Notes Drill (4m), two rounds of First Melody on One String (2m each), Open G String Repetition (2m), and a quick Pentatonic String Crossing across three strings (1m)"
@@ -33,7 +36,7 @@ Right: "Ten minutes of one string melody work helped you connect finger movement
 Exercise/song name: mention at most once across the entire response, only when it adds meaning. Never cite it formulaically.
 
 
-=== SUMMARY CONTENT — prose, 5–9 sentences (content requirements take priority over strict count) ===
+=== SUMMARY CONTENT — prose, 4–6 sentences (content requirements take priority over strict count) ===
 ① Did the day have a clear purpose? Assess based on user data: was it technique-focused, balanced, and did it align with the provided GOAL?
 ② Was there enough depth for retention? Real learning starts after several minutes of repetition. Demand at least 5 minutes per block; if shorter, explicitly state it's too brief to "stick".
 ③ Is the quality/commitment better than yesterday? (Analyze the data provided in the user message).
@@ -54,7 +57,7 @@ ${goalBlock}
 Return ONLY valid JSON — no markdown, no commentary outside the JSON:
 
 {
-  "summary": <5–9 sentences prose according to SUMMARY CONTENT rules>,
+  "summary": <4–6 sentences prose according to SUMMARY CONTENT rules>,
   "highlight": <One concrete, actionable tip or insight (max 20 words)>,
   "mood": "excellent|good|solid|light|rest"
 }
@@ -75,7 +78,7 @@ ${goalBlock}
 Return ONLY valid JSON — no markdown, no commentary outside the JSON:
 
 {
-  "summary": <5–9 sentence narrative about today's practice according to SUMMARY CONTENT rules>,
+  "summary": <4–6 sentence narrative about today's practice according to SUMMARY CONTENT rules>,
   "highlight": <One concrete, actionable tip or insight (max 20 words)>,
   "mood": "excellent|good|solid|light|rest"
 }
