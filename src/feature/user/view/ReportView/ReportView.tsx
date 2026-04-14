@@ -58,6 +58,7 @@ const ReportView = () => {
   const [acceptExceedingTime, setAcceptExceedingTime] = useState(false);
   const [submittedValues, setSubmittedValues] = useState<ReportFormikInterface | null>(null);
   const [savedTimeApplied, setSavedTimeApplied] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const autoApplyTimer = applyTimer === "true";
   const { t } = useTranslation("report");
 
@@ -492,7 +493,7 @@ const ReportView = () => {
                               placeholder='e.g. Practicing major scales'
                               className={`h-11 border-white/10 bg-zinc-900/40 text-sm shadow-sm focus:border-cyan-500/30 ${errors.reportTitle ? 'border-red-500/50 ring-1 ring-red-500/20' : ''}`}
                               value={values.reportTitle}
-                              onChange={(e) => setFieldValue("reportTitle", e.target.value)}
+                              onChange={(e) => { setSelectedTags([]); setFieldValue("reportTitle", e.target.value); }}
                             />
                             {errors.reportTitle && (
                               <p className="mt-1.5 text-[10px] font-semibold tracking-wide text-red-500">
@@ -529,18 +530,39 @@ const ReportView = () => {
                                   { label: "Legato", icon: "🌊", cat: "basic" },
                                   { label: "Composition", icon: "🖊️", cat: "creative" },
                                   { label: "Sweep Picking", icon: "🌪️", cat: "basic" },
-                                  { label: "Backing Track", icon: "🎙️", cat: "creative" },
-                                ].map((tag) => (
-                                  <button
-                                    key={tag.label}
-                                    type="button"
-                                    onClick={() => setFieldValue("reportTitle", tag.label)}
-                                    className="group flex items-center gap-1.5 rounded-lg border border-white/5 bg-zinc-900 px-3 py-1.5 text-[10px] font-bold tracking-wide text-zinc-500 transition-all hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
-                                  >
-                                    <span className="opacity-70 group-hover:opacity-100">{tag.icon}</span>
-                                    {tag.label}
-                                  </button>
-                                ))}
+                                  { label: "Alt Picking", icon: "🔄", cat: "basic" },
+                                  { label: "Tapping", icon: "👆", cat: "basic" },
+                                  { label: "String Skipping", icon: "⏩", cat: "basic" },
+                                  { label: "Hybrid Picking", icon: "🤏", cat: "basic" },
+                                  { label: "Soloing", icon: "🌟", cat: "creative" },
+                                  { label: "Down Picking", icon: "⬇️", cat: "basic" },
+                                ].map((tag) => {
+                                  const isActive = selectedTags.includes(tag.label);
+                                  return (
+                                    <button
+                                      key={tag.label}
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedTags(prev => {
+                                          const newTags = prev.includes(tag.label)
+                                            ? prev.filter(t => t !== tag.label)
+                                            : [...prev, tag.label];
+                                          setFieldValue("reportTitle", newTags.join(" + "));
+                                          return newTags;
+                                        });
+                                      }}
+                                      className={cn(
+                                        "group flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[10px] font-bold tracking-wide transition-all",
+                                        isActive
+                                          ? "border-cyan-500/50 bg-cyan-500/20 text-cyan-300"
+                                          : "border-white/5 bg-zinc-900 text-zinc-500 hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
+                                      )}
+                                    >
+                                      <span className={cn("transition-opacity", isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100")}>{tag.icon}</span>
+                                      {tag.label}
+                                    </button>
+                                  );
+                                })}
                               </div>
                             </div>
                           </div>
