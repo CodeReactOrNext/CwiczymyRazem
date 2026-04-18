@@ -9,11 +9,8 @@ import {
 } from "assets/components/ui/card";
 import {
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
 } from "assets/components/ui/chart";
-import { Checkbox } from "assets/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -23,7 +20,7 @@ import {
 } from "assets/components/ui/select";
 import { useTranslation } from "hooks/useTranslation";
 import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { addZeroToTime, convertMsToHMObject } from "utils/converter";
 
 interface ActivityChartProps {
@@ -36,75 +33,61 @@ interface ActivityChartProps {
   }[];
 }
 
-export type CategoryKeys = "technique" | "theory" | "hearing" | "creativity";
-
 export function ActivityChart({ data }: ActivityChartProps) {
   const { t } = useTranslation();
   const [timeRange, setTimeRange] = React.useState("all");
-  const [visibleCategories, setVisibleCategories] = React.useState({
-    technique: true,
-    theory: true,
-    hearing: true,
-    creativity: true,
-  });
 
   const chartConfig = {
-    activity: {
+    totalTime: {
       label: "Activity",
     },
-    technique: {
-      label: t("chart.categories.technique"),
-      color: "hsl(var(--chart-1))",
-    },
-    theory: {
-      label: t("chart.categories.theory"),
-      color: "hsl(var(--chart-2))",
-    },
-    hearing: {
-      label: t("chart.categories.hearing"),
-      color: "hsl(var(--chart-3))",
-    },
-    creativity: {
-      label: t("chart.categories.creativity"),
-      color: "hsl(var(--chart-4))",
-    },
   };
 
-  const processedData =
-    data?.map((report) => {
-      const d = new Date(report.date);
-      const dateStr = `${d.getFullYear()}-${(d.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
-      return {
-        date: dateStr,
-        technique: report.techniqueTime,
-        theory: report.theoryTime,
-        hearing: report.hearingTime,
-        creativity: report.creativityTime,
-      };
-    }) || [];
+  const processedData = React.useMemo(() => {
+    return (data || [])
+      .map((report) => {
+        const d = new Date(report.date);
+        const dateStr = `${d.getFullYear()}-${(d.getMonth() + 1)
+          .toString()
+          .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
+        return {
+          date: dateStr,
+          totalTime:
+            report.techniqueTime +
+            report.theoryTime +
+            report.hearingTime +
+            report.creativityTime,
+        };
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [data]);
 
-  const filteredData = processedData.filter((item) => {
-    if (timeRange === "all") return true;
+  const filteredData = React.useMemo(() => {
+    return processedData.filter((item) => {
+      if (timeRange === "all") return true;
 
-    const date = new Date(item.date);
-    const referenceDate = new Date();
-    let daysToSubtract = 90;
-    if (timeRange === "30d") daysToSubtract = 30;
-    if (timeRange === "7d") daysToSubtract = 7;
+      const date = new Date(item.date);
+      const referenceDate = new Date();
+      referenceDate.setHours(0, 0, 0, 0);
 
-    const startDate = new Date(referenceDate);
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+      let daysToSubtract = 90;
+      if (timeRange === "30d") daysToSubtract = 30;
+      if (timeRange === "7d") daysToSubtract = 7;
 
-  const toggleCategory = (category: keyof typeof visibleCategories) => {
-    setVisibleCategories((prev) => ({
-      ...prev,
-      [category]: !prev[category],
-    }));
-  };
+      const startDate = new Date(referenceDate);
+      startDate.setDate(startDate.getDate() - daysToSubtract);
+      return date >= startDate;
+    });
+  }, [processedData, timeRange]);
+
+  const isNegative = React.useMemo(() => {
+    if (filteredData.length < 2) return false;
+    const first = filteredData[0].totalTime;
+    const last = filteredData[filteredData.length - 1].totalTime;
+    return last < first;
+  }, [filteredData]);
+
+  const chartColor = isNegative ? "#f43f5e" : "#10b981";
 
   return (
     <Card>
@@ -117,26 +100,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
             {t("chart.showing_activity")}
           </CardDescription>
         </div>
-        <div className='flex flex-wrap items-center gap-4'>
-          <div className='flex flex-wrap gap-3'>
-            {Object.entries(visibleCategories).map(([category, isVisible]) => (
-              <div key={category} className='flex items-center space-x-2'>
-                <Checkbox
-                  id={category}
-                  checked={isVisible}
-                  onCheckedChange={() =>
-                    toggleCategory(category as keyof typeof visibleCategories)
-                  }
-                  className='border-white/30 data-[state=checked]:bg-white data-[state=checked]:text-black'
-                />
-                <label
-                  htmlFor={category}
-                  className='text-xs capitalize text-white/70'>
-                  {t(`chart.categories.${category as CategoryKeys}`)}
-                </label>
-              </div>
-            ))}
-          </div>
+        <div className='flex items-center'>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
               className='w-[160px] rounded-lg border-white/10 bg-white/5 text-white sm:ml-auto'
@@ -171,66 +135,27 @@ export function ActivityChart({ data }: ActivityChartProps) {
       <CardContent className='px-2 pt-4 sm:px-6 sm:pt-6'>
         <ChartContainer
           config={chartConfig}
-          className='aspect-auto h-[250px] w-full'>
+          className='aspect-auto h-[250px] w-full text-white'>
           <AreaChart data={filteredData}>
             <defs>
-              <linearGradient id='fillTechnique' x1='0' y1='0' x2='0' y2='1'>
-                <stop
-                  offset='5%'
-                  stopColor='var(--color-technique)'
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset='95%'
-                  stopColor='var(--color-technique)'
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id='fillTheory' x1='0' y1='0' x2='0' y2='1'>
-                <stop
-                  offset='5%'
-                  stopColor='var(--color-theory)'
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset='95%'
-                  stopColor='var(--color-theory)'
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id='fillHearing' x1='0' y1='0' x2='0' y2='1'>
-                <stop
-                  offset='5%'
-                  stopColor='var(--color-hearing)'
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset='95%'
-                  stopColor='var(--color-hearing)'
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id='fillCreativity' x1='0' y1='0' x2='0' y2='1'>
-                <stop
-                  offset='5%'
-                  stopColor='var(--color-creativity)'
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset='95%'
-                  stopColor='var(--color-creativity)'
-                  stopOpacity={0.1}
-                />
+              <linearGradient id='fillPrice' x1='0' y1='0' x2='0' y2='1'>
+                <stop offset='5%' stopColor={chartColor} stopOpacity={0.4} />
+                <stop offset='95%' stopColor={chartColor} stopOpacity={0.0} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid
+              vertical={false}
+              strokeDasharray='3 3'
+              stroke='rgba(255,255,255,0.1)'
+            />
             <XAxis
               dataKey='date'
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
+              tickMargin={12}
               minTickGap={32}
-              className='font-openSans'
+              stroke='rgba(255,255,255,0.5)'
+              className='font-openSans text-xs font-bold'
               tickFormatter={(value) => {
                 const date = new Date(value);
                 return date.toLocaleDateString("pl", {
@@ -239,40 +164,47 @@ export function ActivityChart({ data }: ActivityChartProps) {
                 });
               }}
             />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={12}
+              width={50}
+              stroke='rgba(255,255,255,0.5)'
+              className='font-openSans text-xs font-bold'
+              tickFormatter={(value) => {
+                if (value === 0) return "0";
+                const { hours, minutes } = convertMsToHMObject(value);
+                if (hours > 0 && minutes === 0) return `${hours}h`;
+                if (hours > 0) return `${hours}h ${minutes}m`;
+                return `${minutes}m`;
+              }}
+            />
             <ChartTooltip
-              cursor={false}
+              cursor={{
+                stroke: "rgba(255,255,255,0.2)",
+                strokeWidth: 1,
+                strokeDasharray: "3 3",
+              }}
               content={(props) => {
                 const { active, payload, label } = props;
                 if (active && payload && payload.length) {
+                  const entry = payload[0];
+                  const hm = convertMsToHMObject(Number(entry.value) ?? 0);
                   return (
-                    <div className='rounded-lg border border-white/10 bg-zinc-900/90 p-2 text-white shadow-sm backdrop-blur-xl'>
-                      <div className='grid grid-cols-2 gap-2'>
-                        <div className='flex flex-col'>
-                          <span className='text-[0.70rem] uppercase'>
-                            {new Date(label).toLocaleDateString("pl", {
-                              month: "short",
-                              day: "numeric",
-                            })}
+                    <div className='rounded-lg border border-white/10 bg-zinc-950/90 p-4 text-white shadow-2xl backdrop-blur-xl'>
+                      <div className='flex flex-col gap-1'>
+                        <span className='text-[0.70rem] uppercase font-bold text-zinc-500 tracking-wider'>
+                          {new Date(label).toLocaleDateString("pl", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
+                        <div className="flex items-baseline gap-2">
+                           <span className={`font-black text-2xl tracking-tighter ${isNegative ? "text-rose-500" : "text-emerald-400"}`}>
+                            {hm.hours > 0 && `${hm.hours}h `}
+                            {addZeroToTime(Number(hm.minutes))}m
                           </span>
-                          {payload.map((entry) => (
-                            <span key={entry.name} className='font-bold'>
-                              {t(
-                                `chart.categories.${entry.name as CategoryKeys}`
-                              )}
-                              :{" "}
-                              {
-                                convertMsToHMObject(Number(entry.value) ?? 0)
-                                  .hours
-                              }
-                              :
-                              {addZeroToTime(
-                                Number(
-                                  convertMsToHMObject(Number(entry.value) ?? 0)
-                                    .minutes
-                                )
-                              )}
-                            </span>
-                          ))}
                         </div>
                       </div>
                     </div>
@@ -281,46 +213,18 @@ export function ActivityChart({ data }: ActivityChartProps) {
                 return null;
               }}
             />
-            {visibleCategories.technique && (
-              <Area
-                dataKey='technique'
-                type='linear'
-                fill='url(#fillTechnique)'
-                stroke='var(--color-technique)'
-                stackId='1'
-              />
-            )}
-            {visibleCategories.theory && (
-              <Area
-                dataKey='theory'
-                type='linear'
-                fill='url(#fillTheory)'
-                stroke='var(--color-theory)'
-                stackId='2'
-              />
-            )}
-            {visibleCategories.hearing && (
-              <Area
-                dataKey='hearing'
-                type='linear'
-                fill='url(#fillHearing)'
-                stroke='var(--color-hearing)'
-                stackId='3'
-              />
-            )}
-            {visibleCategories.creativity && (
-              <Area
-                dataKey='creativity'
-                type='linear'
-                fill='url(#fillCreativity)'
-                stroke='var(--color-creativity)'
-                stackId='4'
-              />
-            )}
-            <ChartLegend content={<ChartLegendContent />} />
+            <Area
+              dataKey='totalTime'
+              type='monotone'
+              fill='url(#fillPrice)'
+              stroke={chartColor}
+              strokeWidth={4}
+              animationDuration={1500}
+            />
           </AreaChart>
         </ChartContainer>
       </CardContent>
     </Card>
+
   );
 }
