@@ -96,15 +96,15 @@ export const SessionSidebar = ({
               />
 
               {((currentExercise.tablature && currentExercise.tablature.length > 0) || showMicControls) && (
-                <div className="mt-4 flex flex-col gap-2">
+                <div className="mt-5 grid grid-cols-2 gap-3 border-t border-white/5 pt-5">
                   <Button
                     variant="ghost"
                     className={cn(
-                      "w-full h-12 gap-2 text-sm font-bold tracking-wide transition-all",
+                      "h-11 gap-2 text-xs font-bold tracking-wide transition-all",
                       isAudioMuted
-                        ? "text-zinc-500 hover:text-zinc-400"
-                        : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10",
-                      currentExercise.riddleConfig?.mode === "sequenceRepeat" && "cursor-not-allowed"
+                        ? "bg-zinc-900/50 text-zinc-500 hover:text-zinc-300 border border-white/5"
+                        : "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20",
+                      currentExercise.riddleConfig?.mode === "sequenceRepeat" && "cursor-not-allowed opacity-50"
                     )}
                     disabled={currentExercise.riddleConfig?.mode === "sequenceRepeat"}
                     onClick={() => {
@@ -113,35 +113,36 @@ export const SessionSidebar = ({
                       saveGuitarPlaybackPreference(!newMuted);
                     }}
                   >
-                    <GiGuitar className="text-lg" />
-                    {isAudioMuted ? <FaVolumeMute className="h-5 w-5" /> : <FaVolumeUp className="h-5 w-5" />}
-                    {isAudioMuted
-                      ? "Guitar Backing Track off"
-                      : soundfontsReady ? "Guitar Backing Track on" : "Loading samples..."}
+                    <GiGuitar className="text-lg shrink-0" />
+                    <span className="truncate">
+                      {isAudioMuted
+                        ? "Track Off"
+                        : soundfontsReady ? "Track On" : "Loading..."}
+                    </span>
                   </Button>
 
                   <div className="flex gap-2">
                     <Button
                       variant="ghost"
                       className={cn(
-                        "flex-1 h-10 gap-2 text-xs font-bold tracking-wide transition-all",
+                        "flex-1 h-11 gap-2 text-xs font-bold tracking-wide transition-all",
                         isMicEnabled
-                          ? "text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20"
-                          : "text-zinc-500 hover:text-zinc-400"
+                          ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20"
+                          : "bg-zinc-900/50 text-zinc-500 hover:text-zinc-300 border border-white/5"
                       )}
                       onClick={toggleMic}
                     >
-                      <FaMicrophone className="text-sm" />
-                      {isMicEnabled ? "Mic On" : "Mic Off"}
+                      <FaMicrophone className="shrink-0" />
+                      <span className="truncate">{isMicEnabled ? "Mic On" : "Mic Off"}</span>
                     </Button>
                     {isMicEnabled && (
                       <Button
                         variant="ghost"
-                        className="h-10 gap-2 text-xs font-bold tracking-wide text-zinc-500 hover:text-zinc-300"
+                        className="h-11 w-11 shrink-0 p-0 bg-zinc-900/50 text-zinc-400 hover:text-white border border-white/5 transition-all"
                         onClick={() => setSessionPhase("calibrating")}
+                        title="Recalibrate"
                       >
-                        <FaSync className="text-sm mr-1" />
-                        Recalibrate
+                        <FaSync />
                       </Button>
                     )}
                   </div>

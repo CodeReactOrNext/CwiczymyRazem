@@ -16,6 +16,9 @@ export interface AudioRefs {
   frequencyRef: React.MutableRefObject<number>;
   volumeRef: React.MutableRefObject<number>;
   lastOnsetTimeRef: React.MutableRefObject<number>;
+  /** Timestamp of the most recent *percussive* onset (muted/dead-note friendly:
+   *  fires on broadband transients like tick/thud even when pitch is absent). */
+  lastTickTimeRef: React.MutableRefObject<number>;
   confidenceRef: React.MutableRefObject<number>;
   analyserRef: React.MutableRefObject<AnalyserNode | null>;
   /** Chromagram snapshot taken at the most recent onset — cleaner than live FFT */
@@ -55,6 +58,7 @@ export const useAudioAnalyzer = () => {
   const inputGainRef = useRef<number>(loadPersistedGain());
   const pitchDetectorRef = useRef<any>(null);
   const onsetDetectorRef = useRef<any>(null);
+  const tickDetectorRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const lastFrequenciesRef = useRef<number[]>([]);
 
@@ -63,8 +67,11 @@ export const useAudioAnalyzer = () => {
   const volumeRef = useRef<number>(0);
   const confidenceRef = useRef<number>(0);
   const lastOnsetTimeRef = useRef<number>(0);
+  const lastTickTimeRef = useRef<number>(0);
   const lastStateUpdateRef = useRef<number>(0);
   const prevVolumeRef = useRef<number>(0);
+  const prevTickRmsRef = useRef<number>(0);
+  const lastTickFireRef = useRef<number>(0);
 
   const init = useCallback(async () => {
     try {
@@ -116,6 +123,19 @@ export const useAudioAnalyzer = () => {
       onsetDetector.setThreshold(0.3);
       onsetDetectorRef.current = onsetDetector;
 
+      // Second onset detector tuned for percussive / muted attacks (dead notes, palm
+      // mutes, body taps). "specflux" reacts to broadband spectral change, so it fires
+      // on tonal-less transients that "hfc" often misses. Lower threshold because muted
+      // hits have smaller spectral magnitude than a plucked string.
+      const tickDetector = new (aubio.Onset as any)(
+        "specflux",
+        2048,
+        512,
+        audioContext.sampleRate
+      );
+      tickDetector.setThreshold(0.15);
+      tickDetectorRef.current = tickDetector;
+
       const normalizedBuf = new Float32Array(2048);
 
       scriptProcessor.onaudioprocess = (event) => {
@@ -145,12 +165,14 @@ export const useAudioAnalyzer = () => {
         // 3. Detect Onset & Pitch — process in hop-size chunks (512)
         //    aubio expects do() to be called with hopSize samples, not bufferSize.
         let isOnset = false;
+        let isTick = false;
         let frequency = 0;
         let pitchConfidence = 0;
         const HOP = 512;
         for (let offset = 0; offset < 2048; offset += HOP) {
           const chunk = normalizedBuf.subarray(offset, offset + HOP);
           if (onsetDetector.do(chunk)) isOnset = true;
+          if (tickDetector.do(chunk)) isTick = true;
           frequency = pitchDetector.do(chunk);
           pitchConfidence = (pitchDetector as any).getConfidence();
         }
@@ -182,13 +204,27 @@ export const useAudioAnalyzer = () => {
         prevVolumeRef.current = volume;
         const isSoftOnset = volumeDelta > 0.010 && volume > 0.010;
 
+        const nowMs = Date.now();
+
         if (isOnset || isSoftOnset) {
-          lastOnsetTimeRef.current = Date.now();
+          lastOnsetTimeRef.current = nowMs;
           // Snapshot the chromagram right at onset — with smoothingTimeConstant=0.1
           // this frame already reflects ~90% of the new attack, giving a much
           // cleaner pitch-class profile than reading the live FFT mid-sustain.
           const snap = computeChromagram(analyser);
           if (snap) onsetChromaRef.current = snap;
+        }
+
+        // Percussive-tick detection (for muted / dead notes — any attack counts).
+        // Fires on either aubio onset/specflux OR a sharp RMS rise. Refractory
+        // period (60ms) blocks double-triggers within a single attack envelope.
+        const rmsDelta = rms - prevTickRmsRef.current;
+        prevTickRmsRef.current = rms;
+        const isRmsTransient = rmsDelta > 0.006 && rms > 0.004;
+        const tickCandidate = isTick || isOnset || isSoftOnset || isRmsTransient;
+        if (tickCandidate && nowMs - lastTickFireRef.current > 60) {
+          lastTickFireRef.current = nowMs;
+          lastTickTimeRef.current = nowMs;
         }
 
         // Throttle React state updates to ~10Hz (every ~100ms)
@@ -243,12 +279,16 @@ export const useAudioAnalyzer = () => {
 
     pitchDetectorRef.current = null;
     onsetDetectorRef.current = null;
+    tickDetectorRef.current = null;
     lastFrequenciesRef.current = [];
     onsetChromaRef.current = null;
     frequencyRef.current = 0;
     volumeRef.current = 0;
     confidenceRef.current = 0;
     lastOnsetTimeRef.current = 0;
+    lastTickTimeRef.current = 0;
+    prevTickRmsRef.current = 0;
+    lastTickFireRef.current = 0;
 
     setState(prev => ({ ...prev, isListening: false, frequency: 0, volume: 0, isOnset: false }));
   }, []);
@@ -277,7 +317,7 @@ export const useAudioAnalyzer = () => {
     return baseLatency + outputLatency + bufferLatency + 30; // +30ms for processing overhead
   }, []);
 
-  const audioRefs: AudioRefs = { frequencyRef, volumeRef, lastOnsetTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef };
+  const audioRefs: AudioRefs = { frequencyRef, volumeRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef };
 
   return {
     ...state,

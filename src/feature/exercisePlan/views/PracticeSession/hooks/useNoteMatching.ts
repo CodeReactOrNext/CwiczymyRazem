@@ -192,6 +192,7 @@ export function useNoteMatching({
       const currentFreq     = audioRefs.frequencyRef.current;
       const currentVolume   = audioRefs.volumeRef.current;
       const lastOnsetTime   = audioRefs.lastOnsetTimeRef.current;
+      const lastTickTime    = audioRefs.lastTickTimeRef.current;
 
       // Lazy chromagram — computed at most once per tick, only for chord beats
       let chromagram: Float32Array | null | undefined = undefined;
@@ -227,6 +228,8 @@ export function useNoteMatching({
 
       const timeSinceOnset = now - lastOnsetTime;
       const hasRecentOnset = timeSinceOnset < onsetRecencyMs;
+      const timeSinceTick  = now - lastTickTime;
+      const hasRecentTick  = timeSinceTick < onsetRecencyMs;
 
       let currentBeatTotal = 0;
       const gs = gameStateRef.current;
@@ -251,26 +254,33 @@ export function useNoteMatching({
             const requiresOnset = !note.isHammerOn && !note.isPullOff;
             const alreadyHit = !!hitNotesRef.current[noteKey];
 
-            if (isWithinWindow && currentVolume > 0.005 && (hasRecentOnset || !requiresOnset || alreadyHit)) {
-              const targetFret = (note.isBend || note.isPreBend) && note.bendSemitones
-                ? note.fret + note.bendSemitones
-                : note.fret;
-              const baseTargetFreq = getFrequencyFromTab(note.string, targetFret);
-              const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
-
+            if (isWithinWindow && currentVolume > 0.005 && (hasRecentOnset || hasRecentTick || !requiresOnset || alreadyHit)) {
               let isHit = false;
-              if (beat.notes.length > 1) {
-                // Chord / dyad / interval — prefer the onset snapshot (cleaner signal).
-                // For legato notes (no onset required) fall back to the live chromagram.
-                const chroma = (requiresOnset && !alreadyHit)
-                  ? audioRefs.onsetChromaRef.current
-                  : getChromagram();
-                if (chroma) {
-                  isHit = chroma[freqToPitchClass(targetFreq)] >= CHORD_CHROMA_THRESHOLD;
-                }
+
+              if (note.isDead) {
+                // Muted/dead note (X): any percussive attack in the window counts.
+                // Skip pitch entirely — muted strings have no defined fundamental.
+                isHit = hasRecentTick || hasRecentOnset;
               } else {
-                // Single note — use existing monophonic YIN path
-                isHit = currentFreq > 50 && Math.abs(getCentsDistance(currentFreq, targetFreq)) <= CENTS_TOLERANCE;
+                const targetFret = (note.isBend || note.isPreBend) && note.bendSemitones
+                  ? note.fret + note.bendSemitones
+                  : note.fret;
+                const baseTargetFreq = getFrequencyFromTab(note.string, targetFret);
+                const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
+
+                if (beat.notes.length > 1) {
+                  // Chord / dyad / interval — prefer the onset snapshot (cleaner signal).
+                  // For legato notes (no onset required) fall back to the live chromagram.
+                  const chroma = (requiresOnset && !alreadyHit)
+                    ? audioRefs.onsetChromaRef.current
+                    : getChromagram();
+                  if (chroma) {
+                    isHit = chroma[freqToPitchClass(targetFreq)] >= CHORD_CHROMA_THRESHOLD;
+                  }
+                } else {
+                  // Single note — use existing monophonic YIN path
+                  isHit = currentFreq > 50 && Math.abs(getCentsDistance(currentFreq, targetFreq)) <= CENTS_TOLERANCE;
+                }
               }
 
               if (isHit) {
