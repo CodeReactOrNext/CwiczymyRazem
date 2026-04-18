@@ -133,33 +133,36 @@ export const HeroSection = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center gap-6">
-                <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <Link href='/signup'>
-                    <div className="relative p-[1px] overflow-hidden rounded-lg group">
-                        {/* Vibrant Rotating Border Beam - Updated for White Button */}
-                        <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
-                        
-                        <Button className='relative h-14 px-10 bg-white hover:bg-zinc-100 text-black border-none font-bold text-lg transition-all rounded-[7px] shadow-2xl overflow-hidden'>
-                            <span className="relative z-10">Start Free</span>
-                        </Button>
+                <div className="flex flex-col items-center gap-6">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                      <Link href='/signup'>
+                        <div className="relative p-[1px] overflow-hidden rounded-lg group">
+                            {/* Vibrant Rotating Border Beam - Updated for White Button */}
+                            <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
+                            
+                            <Button className='relative h-14 px-8 bg-white hover:bg-zinc-100 text-black border-none font-bold text-base transition-all rounded-[7px] shadow-2xl overflow-hidden'>
+                                <span className="relative z-10 whitespace-nowrap">Start My Guitar Progress</span>
+                            </Button>
+                        </div>
+                      </Link>
+                      <Button
+                        onClick={handleGoogleLogin}
+                        disabled={isGoogleFetching}
+                        className="h-14 px-8 bg-black text-white hover:bg-zinc-900 border border-white/10 font-semibold text-base transition-all rounded-lg flex items-center gap-3 shadow-lg"
+                      >
+                        <FcGoogle className="h-5 w-5 mr-2" /> Continue with Google
+                      </Button>
                     </div>
-                  </Link>
-                  <Button
-                    onClick={handleGoogleLogin}
-                    disabled={isGoogleFetching}
-                    className="h-14 px-8 bg-black text-white hover:bg-zinc-900 border border-white/10 font-semibold text-base transition-all rounded-lg flex items-center gap-3 shadow-lg"
-                  >
-                    <FcGoogle className="h-5 w-5" /> Continue with Google
-                  </Button>
+                    <span className="text-xs text-zinc-400 font-medium whitespace-nowrap text-center mt-1">Free forever for tracking progress</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-6 text-white text-sm font-bold uppercase tracking-widest mt-2">
+                    <Link href="/login" className="hover:text-cyan-400 transition-colors">Sign In</Link>
+                    <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                    <Link href="/how-it-works" className="hover:text-cyan-400 transition-colors">How it works</Link>
+                  </div>
                 </div>
-                
-                <div className="flex items-center gap-6 text-white text-sm font-bold uppercase tracking-widest">
-                  <Link href="/login" className="hover:text-cyan-400 transition-colors">Sign In</Link>
-                  <span className="w-1 h-1 rounded-full bg-white/20"></span>
-                  <Link href="/how-it-works" className="hover:text-cyan-400 transition-colors">How it works</Link>
-                </div>
-              </div>
             )}
           </div>
         </div>
