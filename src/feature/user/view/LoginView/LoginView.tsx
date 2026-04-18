@@ -10,7 +10,6 @@ import { loginSchema } from "feature/user/view/LoginView/Login.schemas";
 import { Form, Formik } from "formik";
 import { useTranslation } from "hooks/useTranslation";
 import {
-  ArrowLeft,
   ChevronRight,
   Eye,
   EyeOff,
@@ -19,13 +18,13 @@ import {
   Loader2,
   Lock,
   Mail,
-  Mic2,
   Music,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
+import { TbGuitarPick } from "react-icons/tb";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import { firebaseSendPasswordResetEmail } from "utils/firebase/client/firebase.utils";
@@ -89,7 +88,7 @@ const LoginView = () => {
                  <Music size={28} className="text-white" strokeWidth={1.5} />
               </g>
               <g transform="translate(40, 100) scale(1)">
-                 <Mic2 size={30} className="text-white" strokeWidth={1.5} />
+                 <TbGuitarPick size={30} className="text-white" strokeWidth={1.5} />
               </g>
               <g transform="translate(110, 110) scale(1)">
                  <Headphones size={32} className="text-white" strokeWidth={1.5} />
@@ -100,32 +99,23 @@ const LoginView = () => {
         </svg>
       </div>
 
-      <div className='relative z-10 w-full max-w-md p-6'>
-        <div className='mb-6'>
-           <Link
-             href='/'
-             className='group inline-flex items-center gap-2 text-sm text-zinc-400 transition-all duration-300 hover:text-cyan-400'>
-             <ArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-             {t("common:back")}
-           </Link>
-        </div>
-
-        <div className="flex flex-col gap-6">
+      <div className='relative z-10 w-full max-w-md p-4 sm:p-6 mt-4 sm:mt-0'>
+        <div className="flex flex-col gap-4 sm:gap-6">
           {/* Header Section */}
           <div className="text-center">
-             <div className="flex justify-center mb-6">
+             <div className="flex justify-center mb-2 sm:mb-6">
                 <Image
                   src='/images/logolight.svg'
                   alt='Logo'
                   width={56}
                   height={56}
-                  className='h-14 w-14' priority
+                  className='h-10 w-10 sm:h-14 sm:w-14' priority
                 />
              </div>
-             <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-1 sm:mb-2">
                {t("login:title")}
              </h1>
-             <p className="text-zinc-400 text-sm">
+             <p className="text-zinc-400 text-xs sm:text-sm">
                {t("login:subtitle")}
              </p>
           </div>
@@ -155,7 +145,7 @@ const LoginView = () => {
               validationSchema={loginSchema}
               onSubmit={onSubmit}>
               {({ values, errors, touched, handleChange, handleBlur }) => (
-                <Form className='space-y-4'>
+                <Form className='space-y-3 sm:space-y-4'>
                   {/* Email Field */}
                     <div className="space-y-2">
                         <Label
@@ -251,7 +241,7 @@ const LoginView = () => {
               )}
             </Formik>
 
-            <div className="relative my-6">
+            <div className="relative my-4 sm:my-6">
                 <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-white/10"></div>
                 </div>
