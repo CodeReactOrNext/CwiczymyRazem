@@ -242,6 +242,14 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, fre
         dispatch(updateQuestProgress({ type: 'practice_any_song' }));
       }
 
+      const totalMin = techMin + theoryMin + hearMin + creatMin;
+      if (totalMin > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMin }));
+      }
+      if (techMin > 0) {
+        dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: techMin }));
+      }
+
     } catch (error) {
       console.error("Auto report failed:", error);
       isSubmittingRef.current = false;
