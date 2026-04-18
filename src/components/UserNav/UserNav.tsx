@@ -68,7 +68,6 @@ const UserNav = ({ flexDirection, showOnlyLogout }: UserNavProps) => {
                      dispatch(logUserOff());
                      setIsLogoutDialogOpen(false);
                   }}
-                  className="bg-red-500 hover:bg-red-600 border-none"
                >
                   Sign out
                </Button>
