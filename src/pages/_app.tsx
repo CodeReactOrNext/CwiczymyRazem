@@ -99,7 +99,9 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                  <ResponsiveInitializer />
                  <TooltipProvider>
                     <div className={`${teko.variable} ${inter.variable} min-h-screen bg-zinc-950 text-foreground`}>
-                       <Toaster theme='dark' position='top-right' />
+                       <Toaster position='top-right' toastOptions={{
+                           className: "bg-zinc-200 text-zinc-950 border border-zinc-300 shadow-xl font-medium"
+                       }} />
                        <NextTopLoader color='#06b6d4' />
                        <div id='overlays'></div>
                        {getLayout(<Component {...pageProps} />)}
