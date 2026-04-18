@@ -137,12 +137,15 @@ export const HeroSection = () => {
                   <div className="flex flex-col items-center gap-2">
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                       <Link href='/signup'>
-                        <div className="relative p-[1px] overflow-hidden rounded-lg group">
-                            {/* Vibrant Rotating Border Beam - Updated for White Button */}
+                        <div className="relative p-[1px] overflow-hidden rounded-lg group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                            {/* Vibrant Rotating Border Beam - Restored and Working */}
                             <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
                             
-                            <Button className='relative h-14 px-8 bg-white hover:bg-zinc-100 text-black border-none font-bold text-base transition-all rounded-[7px] shadow-2xl overflow-hidden group/btn'>
-                                <span className="relative z-10 flex items-center gap-3 whitespace-nowrap">Start My Guitar Progress <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1.5 transition-transform" /></span>
+                            <Button className='relative h-14 px-8 bg-white hover:bg-zinc-50 text-black border-none font-bold text-base transition-all rounded-[7px] shadow-2xl overflow-hidden group/btn'>
+                                <span className="relative z-10 flex items-center gap-3 whitespace-nowrap">
+                                  Start My Guitar Progress 
+                                  <ArrowRight className="w-5 h-5 text-orange-500 group-hover/btn:translate-x-1.5 transition-transform duration-300" />
+                                </span>
                             </Button>
                         </div>
                       </Link>

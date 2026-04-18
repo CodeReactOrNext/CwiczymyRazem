@@ -68,13 +68,14 @@ export const FinalCTASection = () => {
 
                 <div className="flex flex-col items-center">
                   <Link href="/signup">
-                      <div className="relative p-[1px] overflow-hidden rounded-lg group">
-                          {/* Vibrant Rotating Border Beam */}
+                      <div className="relative p-[1px] overflow-hidden rounded-lg group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                          {/* Vibrant Rotating Border Beam - Restored and Working */}
                           <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
                           
-                          <Button className="relative h-14 sm:h-14 w-full sm:w-auto px-10 bg-zinc-950 text-white hover:bg-zinc-900 border-none font-bold text-base transition-all rounded-[7px] shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)] overflow-hidden">
+                          <Button className="relative h-14 sm:h-14 w-full sm:w-auto px-10 bg-zinc-950 text-white hover:bg-zinc-900 border-none font-bold text-base transition-all rounded-[7px] shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)] overflow-hidden group/btn">
                               <span className="relative z-10 flex items-center gap-3">
-                                  Start My Guitar Progress <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                                  Start My Guitar Progress 
+                                  <ArrowRight className="w-5 h-5 text-orange-500 group-hover/btn:translate-x-2 transition-transform duration-300" />
                               </span>
                           </Button>
                       </div>

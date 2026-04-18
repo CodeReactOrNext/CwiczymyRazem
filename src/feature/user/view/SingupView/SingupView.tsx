@@ -97,7 +97,7 @@ const SingupView = () => {
           <div className='absolute -right-[10%] -bottom-[10%] h-[40vh] w-[40vh] rounded-full bg-cyan-800/20 blur-[120px]' />
         </div>
         
-        <div className="relative z-10 w-full max-w-md rounded-lg glass-card p-8 text-center border border-white/10 shadow-2xl">
+        <div className="relative z-10 w-full max-w-md rounded-lg p-8 text-center border border-white/10 shadow-2xl">
           <div className="flex justify-center mb-6">
             <div className="h-20 w-20 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
               <CheckCircle className="h-10 w-10" />
@@ -171,7 +171,7 @@ const SingupView = () => {
           </div>
 
           {/* Card */}
-          <div className="rounded-lg glass-card overflow-hidden shadow-2xl border border-white/5 bg-zinc-900/40 backdrop-blur-xl">
+          <div className="rounded-lg  overflow-hidden shadow-2xl border border-white/5 bg-zinc-900/80">
             <div className="p-2">
               {/* Tab Switcher */}
               <div className="flex p-1 bg-zinc-900/50 border border-white/5 rounded-lg mb-4">
@@ -215,7 +215,7 @@ const SingupView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder={t("signup:username_placeholder")}
-                            className='pl-10 h-11 bg-zinc-900/80 border-white/5 rounded-lg focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all duration-200 text-white placeholder:text-zinc-600'
+                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                           />
                         </div>
                         {errors.login && touched.login && (
@@ -243,7 +243,7 @@ const SingupView = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             placeholder='name@example.com'
-                            className='pl-10 h-11 bg-zinc-900/80 border-white/5 rounded-lg focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all duration-200 text-white placeholder:text-zinc-600'
+                            className='pl-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                           />
                         </div>
                         {errors.email && touched.email && (
@@ -271,7 +271,7 @@ const SingupView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='••••••••'
-                        className='pl-10 pr-10 h-11 bg-zinc-900/80 border-white/5 rounded-lg focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all duration-200 text-white placeholder:text-zinc-600'
+                        className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                       />
                       <button
                         type='button'
@@ -335,7 +335,7 @@ const SingupView = () => {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder='••••••••'
-                        className='pl-10 pr-10 h-11 bg-zinc-900/80 border-white/5 rounded-lg focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all duration-200 text-white placeholder:text-zinc-600'
+                        className='pl-10 pr-10 h-11 bg-black/40 border-white/10 rounded-lg focus:border-cyan-500/50 focus:ring-4 focus:ring-cyan-500/10 transition-all duration-300 text-white placeholder:text-zinc-500'
                       />
                       <button
                         type='button'
