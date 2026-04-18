@@ -72,13 +72,14 @@ export const FinalCTASection = () => {
                           {/* Vibrant Rotating Border Beam */}
                           <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
                           
-                          <Button className="relative h-16 sm:h-16 w-full sm:w-auto px-12 bg-zinc-950 text-white hover:bg-zinc-900 border-none font-bold text-xl transition-all rounded-[7px] shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)] overflow-hidden">
+                          <Button className="relative h-14 sm:h-14 w-full sm:w-auto px-10 bg-zinc-950 text-white hover:bg-zinc-900 border-none font-bold text-base transition-all rounded-[7px] shadow-[0_0_30px_-5px_rgba(34,211,238,0.3)] overflow-hidden">
                               <span className="relative z-10 flex items-center gap-3">
-                                  Start Free <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                                  Start My Guitar Progress <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
                               </span>
                           </Button>
                       </div>
                   </Link>
+                  <span className="mt-3 text-xs text-zinc-400 font-medium whitespace-nowrap">Free forever for tracking progress</span>
                 </div>
             </div>
         </div>
