@@ -27,7 +27,6 @@ import { FcGoogle } from "react-icons/fc";
 import { TbGuitarPick } from "react-icons/tb";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { firebaseSendPasswordResetEmail } from "utils/firebase/client/firebase.utils";
 
 
 export interface logInCredentials {
@@ -50,21 +49,6 @@ const LoginView = () => {
   function onSubmit(credentials: logInCredentials) {
     dispatch(logInViaEmail(credentials));
   }
-
-  const handleForgotPassword = async (email: string) => {
-    if (!email) {
-      toast.error(t("login:enter_email_error"));
-      return;
-    }
-
-    try {
-      await firebaseSendPasswordResetEmail(email);
-      toast.success(t("login:reset_password_success"));
-    } catch  {
-      toast.error(t("login:reset_password_error"));
-    }
-  };
-
 
   const formikInitialValues = {
     email: "",
@@ -181,13 +165,12 @@ const LoginView = () => {
                           className='text-xs font-semibold text-zinc-400'>
                           {t("login:password_label")}
                         </Label>
-                        <button
-                          type="button"
-                          onClick={() => handleForgotPassword(values.email)}
+                        <Link
+                          href="/forgot-password"
                           className="text-[10px] text-cyan-500 hover:text-cyan-400 font-bold transition-colors"
                         >
                           {t("login:forgot_password")}
-                        </button>
+                        </Link>
                     </div>
 
                     <div className='relative group'>
