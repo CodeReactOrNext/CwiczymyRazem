@@ -24,10 +24,13 @@ export const invalidateActivityLogsCache = (userAuth: string, year?: number) => 
 
 export const firebaseGetUserRaprotsLogs = async (
   userAuth: string,
-  year?: number
+  year?: number | "all"
 ) => {
-  const targetYear = year ?? new Date().getFullYear();
-  const cacheKey = getActivityLogsCacheKey(userAuth, targetYear);
+  const isAllTime = year === "all";
+  const targetYear = !isAllTime ? (year ?? new Date().getFullYear()) : null;
+  const cacheKey = isAllTime 
+    ? `activityLogs:${userAuth}:all` 
+    : getActivityLogsCacheKey(userAuth, targetYear!);
 
   const cached = memoryCache.get(cacheKey);
   if (cached) {
@@ -37,16 +40,22 @@ export const firebaseGetUserRaprotsLogs = async (
   const userDocRef = doc(db, "users", userAuth);
   const exerciseDataRef = collection(userDocRef, "exerciseData");
 
-  const startOfYear = new Date(targetYear, 0, 1).toISOString();
-  const endOfYear = new Date(targetYear, 11, 31, 23, 59, 59, 999).toISOString();
+  let reportsQuery;
+  if (isAllTime) {
+    // Fetch all logs without filtering by year
+    reportsQuery = query(exerciseDataRef);
+  } else {
+    const startOfYear = new Date(targetYear!, 0, 1).toISOString();
+    const endOfYear = new Date(targetYear!, 11, 31, 23, 59, 59, 999).toISOString();
 
-  const yearQuery = query(
-    exerciseDataRef,
-    where("__name__", ">=", startOfYear),
-    where("__name__", "<=", endOfYear)
-  );
+    reportsQuery = query(
+      exerciseDataRef,
+      where("__name__", ">=", startOfYear),
+      where("__name__", "<=", endOfYear)
+    );
+  }
 
-  const exerciseDocRef = await getDocs(yearQuery);
+  const exerciseDocRef = await getDocs(reportsQuery);
 
   const exerciseArr: FirebaseUserExceriseLog[] = [];
 

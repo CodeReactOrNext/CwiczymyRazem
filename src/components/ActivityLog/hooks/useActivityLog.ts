@@ -5,7 +5,7 @@ import { useActivityLogYear } from "./useActivityLogYear";
 
 export const useActivityLog = (userAuth: string) => {
   const { year, setYear } = useActivityLogYear();
-  const { reportList, isLoading } = useActivityLogReports(userAuth, year);
+  const { reportList, isLoading } = useActivityLogReports(userAuth, "all");
   const { activityData } = useActivityLogData(reportList, year);
   const { formattedReports } = useActivityLogFormatted(reportList);
 

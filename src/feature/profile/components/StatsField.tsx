@@ -43,12 +43,12 @@ export const StatsField = ({
     trend?.direction === "up" ? "rgb(34, 197, 94)" : "rgb(239, 68, 68)";
 
   return (
-    <Card className={`flex flex-col border-0 bg-zinc-900/40 p-5 shadow-sm backdrop-blur-sm ${className ?? ""}`}>
+    <Card className={`flex flex-col border-0 bg-zinc-800/40 p-5 shadow-sm backdrop-blur-sm ${className ?? ""}`}>
       <div className='flex items-start justify-between'>
         <div className='space-y-1.5'>
           <div className='flex items-center gap-2'>
             {Icon && <Icon className='h-4 w-4 text-zinc-500' />}
-            <span className='text-[11px] font-semibold uppercase tracking-widest text-zinc-500'>{description}</span>
+            <span className='text-[11px] font-semibold tracking-widest text-zinc-500'>{description}</span>
           </div>
           <p className='text-2xl font-bold tabular-nums text-white'>{value}</p>
         </div>

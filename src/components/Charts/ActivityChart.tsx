@@ -44,48 +44,61 @@ export function ActivityChart({ data }: ActivityChartProps) {
   };
 
   const processedData = React.useMemo(() => {
-    return (data || [])
-      .map((report) => {
-        const d = new Date(report.date);
-        const dateStr = `${d.getFullYear()}-${(d.getMonth() + 1)
-          .toString()
-          .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
-        return {
-          date: dateStr,
-          totalTime:
-            report.techniqueTime +
-            report.theoryTime +
-            report.hearingTime +
-            report.creativityTime,
-        };
-      })
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  }, [data]);
+    if (!data || data.length === 0) return [];
 
-  const filteredData = React.useMemo(() => {
-    return processedData.filter((item) => {
-      if (timeRange === "all") return true;
-
-      const date = new Date(item.date);
-      const referenceDate = new Date();
-      referenceDate.setHours(0, 0, 0, 0);
-
-      let daysToSubtract = 90;
-      if (timeRange === "30d") daysToSubtract = 30;
-      if (timeRange === "7d") daysToSubtract = 7;
-
-      const startDate = new Date(referenceDate);
-      startDate.setDate(startDate.getDate() - daysToSubtract);
-      return date >= startDate;
+    // 1. Map existing reports by date key for fast lookup
+    const reportMap = new Map<string, number>();
+    data.forEach((report) => {
+      const d = new Date(report.date);
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      reportMap.set(key, 
+        report.techniqueTime + 
+        report.theoryTime + 
+        report.hearingTime + 
+        report.creativityTime
+      );
     });
-  }, [processedData, timeRange]);
+
+    // 2. Determine time range
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const endDate = now;
+
+    let startDate = new Date(now);
+    if (timeRange === "7d") startDate.setDate(now.getDate() - 7);
+    else if (timeRange === "30d") startDate.setDate(now.getDate() - 30);
+    else if (timeRange === "90d") startDate.setDate(now.getDate() - 90);
+    else {
+      // "all" - start from first available report
+      const sortedDates = data
+        .map(r => new Date(r.date).getTime())
+        .sort((a, b) => a - b);
+      startDate = new Date(sortedDates[0]);
+      startDate.setHours(0, 0, 0, 0);
+    }
+
+    // 3. Fill every day in range
+    const result = [];
+    const current = new Date(startDate);
+    
+    while (current <= endDate) {
+      const key = `${current.getFullYear()}-${current.getMonth()}-${current.getDate()}`;
+      result.push({
+        date: current.toISOString(),
+        totalTime: reportMap.get(key) || 0,
+      });
+      current.setDate(current.getDate() + 1);
+    }
+
+    return result;
+  }, [data, timeRange]);
 
   const isNegative = React.useMemo(() => {
-    if (filteredData.length < 2) return false;
-    const first = filteredData[0].totalTime;
-    const last = filteredData[filteredData.length - 1].totalTime;
+    if (processedData.length < 2) return false;
+    const first = processedData[0].totalTime;
+    const last = processedData[processedData.length - 1].totalTime;
     return last < first;
-  }, [filteredData]);
+  }, [processedData]);
 
   const chartColor = isNegative ? "#f43f5e" : "#10b981";
 
@@ -96,9 +109,6 @@ export function ActivityChart({ data }: ActivityChartProps) {
           <CardTitle className='text-lg font-bold text-white'>
             {t("chart.activity_overview")}
           </CardTitle>
-          <CardDescription className='text-white/70'>
-            {t("chart.showing_activity")}
-          </CardDescription>
         </div>
         <div className='flex items-center'>
           <Select value={timeRange} onValueChange={setTimeRange}>
@@ -136,7 +146,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
         <ChartContainer
           config={chartConfig}
           className='aspect-auto h-[250px] w-full text-white'>
-          <AreaChart data={filteredData}>
+          <AreaChart data={processedData}>
             <defs>
               <linearGradient id='fillPrice' x1='0' y1='0' x2='0' y2='1'>
                 <stop offset='5%' stopColor={chartColor} stopOpacity={0.4} />
@@ -168,15 +178,18 @@ export function ActivityChart({ data }: ActivityChartProps) {
               tickLine={false}
               axisLine={false}
               tickMargin={12}
-              width={50}
+              width={40}
               stroke='rgba(255,255,255,0.5)'
               className='font-openSans text-xs font-bold'
+              tickCount={5}
+              domain={[0, (dataMax: number) => {
+                const hours = Math.ceil(dataMax / 3600000);
+                return hours * 3600000;
+              }]}
               tickFormatter={(value) => {
                 if (value === 0) return "0";
-                const { hours, minutes } = convertMsToHMObject(value);
-                if (hours > 0 && minutes === 0) return `${hours}h`;
-                if (hours > 0) return `${hours}h ${minutes}m`;
-                return `${minutes}m`;
+                const hours = value / 3600000;
+                return `${Math.round(hours)}h`;
               }}
             />
             <ChartTooltip
@@ -201,9 +214,9 @@ export function ActivityChart({ data }: ActivityChartProps) {
                           })}
                         </span>
                         <div className="flex items-baseline gap-2">
-                           <span className={`font-black text-2xl tracking-tighter ${isNegative ? "text-rose-500" : "text-emerald-400"}`}>
-                            {hm.hours > 0 && `${hm.hours}h `}
-                            {addZeroToTime(Number(hm.minutes))}m
+                           <span className={`font-bold text-xl tracking-tight ${isNegative ? "text-rose-500" : "text-emerald-400"}`}>
+                            {Number(hm.hours) > 0 && `${Number(hm.hours)}h `}
+                            {Number(hm.minutes)}m
                           </span>
                         </div>
                       </div>
@@ -215,10 +228,30 @@ export function ActivityChart({ data }: ActivityChartProps) {
             />
             <Area
               dataKey='totalTime'
-              type='monotone'
+              type='linear'
               fill='url(#fillPrice)'
               stroke={chartColor}
-              strokeWidth={4}
+              strokeWidth={2}
+              dot={(props: any) => {
+                const { cx, cy, payload } = props;
+                if (!payload || payload.totalTime === 0) return <></>;
+                return (
+                  <circle
+                    key={`dot-${payload.date}`}
+                    cx={cx}
+                    cy={cy}
+                    r={3}
+                    fill={chartColor}
+                    strokeWidth={1.5}
+                    stroke='#09090b'
+                    fillOpacity={1}
+                  />
+                );
+              }}
+              activeDot={{
+                r: 5,
+                strokeWidth: 0,
+              }}
               animationDuration={1500}
             />
           </AreaChart>
