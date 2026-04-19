@@ -21,7 +21,9 @@ import {
 import { useTranslation } from "hooks/useTranslation";
 import * as React from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { addZeroToTime, convertMsToHMObject } from "utils/converter";
+import { convertMsToHMObject } from "utils/converter";
+
+export type CategoryKeys = "technique" | "theory" | "hearing" | "creativity";
 
 interface ActivityChartProps {
   data: {
