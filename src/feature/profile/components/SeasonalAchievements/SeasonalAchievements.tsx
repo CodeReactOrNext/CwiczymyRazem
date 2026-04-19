@@ -1,4 +1,5 @@
 import { Card } from "assets/components/ui/card";
+import { Button } from "assets/components/ui/button";
 import type { SeasonalAchievement } from "feature/profile/services/seasonalAchievementsService";
 import { getUserSeasonalAchievements } from "feature/profile/services/seasonalAchievementsService";
 import { useTranslation } from "hooks/useTranslation";
@@ -153,8 +154,8 @@ const SeasonalAchievements = ({
   if (!loading && achievements.length === 0) {
     return (
       <Card className='border-white/5 bg-zinc-800/40 p-6 backdrop-blur-md'>
-        <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
-          <div>
+        <div className='flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
+          <div className='text-left'>
             <h4 className='text-lg font-bold text-white'>
               {String(t("seasonal_achievements.title", "Osiągnięcia Sezonowe"))}
             </h4>
@@ -162,12 +163,15 @@ const SeasonalAchievements = ({
               {String(t("seasonal_achievements.no_achievements", "Brak osiągnięć. Walcz o miejsce w rankingu!"))}
             </p>
           </div>
-          <Link
-            href='/seasons'
-            className='flex items-center gap-2 rounded-sm border border-cyan-500/30 bg-cyan-500/10 px-6 py-2 text-sm font-bold text-cyan-400 transition-all hover:bg-cyan-500/20 hover:border-cyan-500/50'>
-            Check Seasons
-            <FaExternalLinkAlt size={12} />
-          </Link>
+          <Button
+             asChild
+             variant='outline'
+             >
+            <Link href='/seasons' className='flex items-center gap-2'>
+              Check Seasons
+              <FaExternalLinkAlt size={12} />
+            </Link>
+          </Button>
         </div>
       </Card>
     );
@@ -179,7 +183,7 @@ const SeasonalAchievements = ({
         <h4 className='mb-4 text-lg font-bold text-white'>
           {String(t("seasonal_achievements.title", "Osiągnięcia Sezonowe"))}
         </h4>
-        <div className='py-8 text-center text-sm text-white/50'>
+        <div className='py-8 text-left text-sm text-white/50'>
           <span className='tracking-widest uppercase font-bold text-[10px]'>Synchronizing...</span>
         </div>
       </Card>

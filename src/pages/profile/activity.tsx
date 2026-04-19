@@ -8,6 +8,8 @@ import { HeroBanner } from "components/UI/HeroBanner";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
 import { StatsSection } from "feature/profile/components/StatsSection";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
+import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
+import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import {
   selectCurrentUserStats,
@@ -81,6 +83,19 @@ const ProfileActivityPage = () => {
 
           {/* 4. Activity Log calendar */}
           <ActivityLog userAuth={userAuth as string} />
+
+          {/* 5. Achievement Sections */}
+          <div className='space-y-8 mt-4'>
+                <SeasonalAchievements userId={userAuth as string} />
+
+              <div className='flex items-center gap-2 mb-1'>
+               <h3 className='text-xl font-semibold text-white mr-2'>Achievements</h3>
+                <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
+                  {userStats?.achievements?.length || 0}
+                </span>
+              </div>
+              <AchievementWrapper userAchievements={userStats?.achievements ?? []} />
+          </div>
         </div>
       </div>
     </MainContainer>
