@@ -73,14 +73,23 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
          <TierBadge difficulty={skillPower} className="h-10 w-10 text-sm" />
          <div>
             <p className="text-sm font-medium text-zinc-400">{t("your_skill_tier", "Skill Tier")}</p>
-            <div className="flex items-baseline gap-2">
-               <h3 className="text-xl font-bold text-white" style={{ color: playerTier?.color }}>
-                   {playerTier ? playerTier.tier + "-Tier" : "N/A"}
-               </h3>
-               {playerTier && (
-                   <span className="text-xs text-zinc-500">
-                       (Power: {skillPower.toFixed(1)})
-                   </span>
+            <div className="flex flex-col">
+               {playerTier ? (
+                  <div className="flex items-baseline gap-2">
+                     <h3 className="text-xl font-bold text-white" style={{ color: playerTier?.color }}>
+                         {playerTier.tier}-Tier
+                     </h3>
+                     <span className="text-xs text-zinc-500">
+                         (Power: {skillPower.toFixed(1)})
+                     </span>
+                  </div>
+               ) : (
+                  <div className="flex flex-col mt-0.5">
+                     <h3 className="text-lg font-bold text-zinc-500 leading-tight">Unrated</h3>
+                     <p className="text-[10px] leading-tight text-zinc-600 max-w-[140px] mt-0.5">
+                        Add mastered songs to evaluate your skill level.
+                     </p>
+                  </div>
                )}
             </div>
          </div>

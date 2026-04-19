@@ -106,8 +106,8 @@ export function ActivityChart({ data }: ActivityChartProps) {
 
   return (
     <Card>
-      <CardHeader className='flex items-center gap-2 space-y-0 border-b border-white/10 py-5 sm:flex-row'>
-        <div className='grid flex-1 gap-1 text-center sm:text-left'>
+      <CardHeader className='flex p-0 pb-4 flex-col items-start justify-start gap-4 space-y-0 border-b border-white/10 sm:flex-row sm:items-center'>
+        <div className='flex flex-col gap-1 text-left'>
           <CardTitle className='text-lg font-bold text-white'>
             {t("chart.activity_overview")}
           </CardTitle>
@@ -115,7 +115,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
         <div className='flex items-center'>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
-              className='w-[160px] rounded-lg border-white/10 bg-white/5 text-white sm:ml-auto'
+              className='w-[160px] rounded-lg border-white/10 bg-white/5 text-white'
               aria-label={t("chart.time_ranges.all_time")}>
               <SelectValue placeholder={t("chart.time_ranges.all_time")} />
             </SelectTrigger>
