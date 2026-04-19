@@ -23,6 +23,8 @@ import { ProfileArsenal } from "./components/ProfileArsenal";
 import { SongSkillShowcase } from "./components/SongSkillShowcase";
 import { StatsSection } from "./components/StatsSection";
 import { UserRecordingsSection } from "./components/UserRecordingsSection";
+import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
+import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 
 export interface LandingLayoutProps {
   statsField: StatsFieldProps[];
@@ -102,7 +104,7 @@ const ProfileLayout = ({
 
             {/* Song tier badge */}
             <div className='relative flex flex-col items-center gap-1.5'>
-              <span className='text-[10px] font-semibold uppercase tracking-widest text-zinc-400'>Song tier</span>
+              <span className='text-[10px] font-semibold tracking-widest text-zinc-400'>Song tier</span>
               <div
                 className='flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg'
                 style={{ color: songTier.color, backgroundColor: 'rgba(10,10,10,0.9)', borderColor: `${songTier.color}40` }}
@@ -145,7 +147,7 @@ const ProfileLayout = ({
                   LVL
                 </text>
               </svg>
-              <span className='text-[10px] font-semibold uppercase tracking-widest text-zinc-400'>Level progress</span>
+              <span className='text-[10px] font-semibold tracking-widest text-zinc-400'>Level progress</span>
               <span className='text-[11px] tabular-nums text-zinc-500'>{ptsInLevel.toLocaleString()} / {lvlRange.toLocaleString()} XP</span>
             </div>
           </div>
@@ -165,7 +167,7 @@ const ProfileLayout = ({
               />
               <div className='absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full bg-zinc-900 shadow-xl'>
                 <div className='flex flex-col items-center justify-center leading-none'>
-                  <span className='text-[7px] font-black uppercase tracking-tighter text-zinc-500'>LVL</span>
+                  <span className='text-[7px] font-black tracking-tighter text-zinc-500'>LVL</span>
                   <span className='text-sm font-black text-white'>{statistics.lvl}</span>
                 </div>
               </div>
@@ -175,12 +177,12 @@ const ProfileLayout = ({
             <div className='space-y-2'>
               <DaySinceMessage date={new Date(lastReportDate)} />
               <div className='flex flex-wrap gap-x-4 gap-y-1'>
-                <div className='flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-zinc-500'>
+                <div className='flex items-center gap-1.5 text-[11px] font-semibold tracking-widest text-zinc-500'>
                   <div className='h-1.5 w-1.5 rounded-full bg-cyan-400'></div>
                   <span>Joined: <span className='tracking-normal text-zinc-300 tabular-nums'>{createdAt.toDate().toLocaleDateString()}</span></span>
                 </div>
                 {yearsOfPlaying != null && yearsOfPlaying > 0 && (
-                  <div className='flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-zinc-500'>
+                  <div className='flex items-center gap-1.5 text-[11px] font-semibold tracking-widest text-zinc-500'>
                     <div className='h-1.5 w-1.5 rounded-full bg-green-400'></div>
                     <span>Playing for <span className='tracking-normal text-zinc-300 tabular-nums'>{yearsOfPlaying} years</span></span>
                   </div>
@@ -253,6 +255,21 @@ const ProfileLayout = ({
 
         {/* Recordings Section */}
         <UserRecordingsSection userId={userAuth} />
+
+        {/* Achievement Sections */}
+        <div className='space-y-8'>
+          <SeasonalAchievements userId={userAuth} />
+
+          <div className='space-y-4 px-2'>
+            <div className='flex items-center gap-2'>
+              <h2 className='text-xl font-bold text-white uppercase tracking-wider'>Achievements</h2>
+              <span className='rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/70'>
+                {achievements?.length || 0}
+              </span>
+            </div>
+            <AchievementWrapper userAchievements={achievements ?? []} />
+          </div>
+        </div>
       </div>
     </div>
   );

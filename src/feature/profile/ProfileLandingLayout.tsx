@@ -77,7 +77,7 @@ const ProfileLandingLayout = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="relative flex flex-col items-center gap-1.5 cursor-default">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">Song tier</span>
+                    <span className="text-[10px] font-semibold tracking-widest text-zinc-400">Song tier</span>
                     <div
                       className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-2 text-2xl font-black shadow-lg"
                       style={{ color: songTier.color, backgroundColor: 'rgba(10,10,10,0.9)', borderColor: `${songTier.color}40` }}
@@ -126,7 +126,7 @@ const ProfileLandingLayout = ({
                   LVL
                 </text>
               </svg>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">Level progress</span>
+              <span className="text-[10px] font-semibold tracking-widest text-zinc-400">Level progress</span>
               <span className="text-[11px] tabular-nums text-zinc-500">{ptsInLevel.toLocaleString()} / {lvlRange.toLocaleString()} XP</span>
             </div>
           </div>

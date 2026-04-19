@@ -48,7 +48,7 @@ export const StatisticBar = ({ title, value, percent }: StatisticBarProps) => {
       <div className='flex items-center gap-3'>
         <div className={`h-2 w-2 rounded-full ${colors.dot} shadow-[0_0_8px_currentColor] opacity-80`}></div>
         <div>
-          <p className='text-[11px] font-semibold uppercase tracking-widest text-zinc-300'>{title}</p>
+          <p className='text-[11px] font-semibold tracking-widest text-zinc-300'>{title}</p>
           <p className={`text-xs font-semibold tabular-nums ${colors.text}`}>{value}</p>
         </div>
       </div>

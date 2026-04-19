@@ -152,7 +152,7 @@ const SeasonalAchievements = ({
 
   if (!loading && achievements.length === 0) {
     return (
-      <Card className='border-white/5 bg-zinc-900/60 p-6 backdrop-blur-md'>
+      <Card className='border-white/5 bg-zinc-800/40 p-6 backdrop-blur-md'>
         <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
           <div>
             <h4 className='text-lg font-bold text-white'>
@@ -175,7 +175,7 @@ const SeasonalAchievements = ({
 
   if (loading) {
     return (
-      <Card className='relative overflow-hidden border-white/10 bg-zinc-900/60 p-6 backdrop-blur-xl'>
+      <Card className='relative overflow-hidden border-white/10 bg-zinc-800/40 p-6 backdrop-blur-xl'>
         <h4 className='mb-4 text-lg font-bold text-white'>
           {String(t("seasonal_achievements.title", "Osiągnięcia Sezonowe"))}
         </h4>
@@ -187,7 +187,7 @@ const SeasonalAchievements = ({
   }
 
   return (
-    <Card className='relative overflow-hidden border-white/10 bg-zinc-900/60 p-6 backdrop-blur-xl'>
+    <Card className='relative overflow-hidden border-white/10 bg-zinc-800/40 p-6 backdrop-blur-xl'>
       {/* Background decoration */}
       <div className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent)]' />
 

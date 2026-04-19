@@ -226,19 +226,7 @@ export const StatsSection = ({
 
 
 
-      <div className='space-y-2'>
-        <SeasonalAchievements userId={userAuth} />
-      </div>
 
-      <div className='space-y-4'>
-        <div className='flex items-center gap-2'>
-          <h3 className='text-lg font-semibold text-white'>Achievements</h3>
-          <span className='rounded-full bg-white/10 px-2 py-1 text-xs font-medium text-white/70'>
-            {achievements?.length || 0}
-          </span>
-        </div>
-        <AchievementWrapper userAchievements={achievements ?? []} />
-      </div>
 
       <SongSheet
         song={selectedSong}

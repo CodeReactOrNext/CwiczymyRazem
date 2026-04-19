@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { ReportListInterfaceWithTimeSumary } from "../activityLog.types";
 import { processRawReports } from "../activityLog.utils";
 
-export const useActivityLogReports = (userAuth: string, year: number) => {
+export const useActivityLogReports = (userAuth: string, year: number | "all") => {
   const [reportList, setReportList] = useState<
     ReportListInterfaceWithTimeSumary[] | null
   >(null);
