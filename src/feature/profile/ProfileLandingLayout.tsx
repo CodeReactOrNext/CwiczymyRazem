@@ -20,17 +20,22 @@ import { FaClock } from "react-icons/fa";
 
 // ActiveChallengeWidget removed
 import { HeroBanner } from "components/UI/HeroBanner";
+import { IMG_RANKS_NUMBER } from "constants/gameSettings";
+import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import type { ProfileInterface } from "types/ProfileInterface";
 
 interface LandingLayoutProps {
   userStats: StatisticsDataInterface;
   featSlot: React.ReactNode;
   userAuth: string;
+  userInfo?: Partial<ProfileInterface> | any | null;
 }
 
 const ProfileLandingLayout = ({
   userStats,
   userAuth,
   featSlot,
+  userInfo,
 }: LandingLayoutProps) => {
   const router = useRouter();
   const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
@@ -63,11 +68,44 @@ const ProfileLandingLayout = ({
   const skillPower = songs?.learned ? calculateSkillPower(songs.learned) : 0;
   const songTier = getSongTier(skillPower > 0 ? skillPower : '?');
 
+  const imgPath = userInfo?.selectedGuitar ?? (userStats?.lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : userStats?.lvl);
+  const isSpecialGuitar = typeof imgPath === "string" && imgPath.includes("special/");
+  const specialGuitarDef = isSpecialGuitar ? GUITAR_DEFINITIONS.find((g) => g.imageId === imgPath) : null;
+  const RARITY_COLORS: Record<string, string> = {
+    Common: "#9ca3af",
+    Uncommon: "#4ade80",
+    Rare: "#60a5fa",
+    Epic: "#c084fc",
+    Legendary: "#fb923c",
+    Mythic: "#f43f5e",
+  };
+  const glowColor = specialGuitarDef ? (RARITY_COLORS[specialGuitarDef.rarity] ?? "#0891b2") : "#0891b2";
+
   return (
     <div className="bg-second-600 rounded-xl flex flex-col shadow-sm border-none lg:mt-16">
       <HeroBanner
         title={isTodayCompleted ? "Great job today!" : "Start today's practice"}
         className="w-full !rounded-none !shadow-none min-h-[220px] md:min-h-[200px] lg:min-h-[240px]"
+        backgroundContent={
+          isSpecialGuitar ? (
+            <div className="absolute inset-0 z-0 overflow-hidden rounded-none md:rounded-xl">
+              {/* Glow Blur on the left */}
+              <div className='absolute left-[0%] md:left-[5%] top-[-10%] md:top-[-15%] blur-[80px] opacity-25 md:opacity-30 pointer-events-none' style={{ backgroundColor: glowColor, width: '350px', height: '350px', borderRadius: '50%' }} />
+
+              {/* Guitar with CSS fade on the right side */}
+              <img
+                src={`/static/images/rank/${imgPath}.png`}
+                className="absolute top-[-15%] md:top-[-35%] left-[0%] md:left-[8%] max-w-none h-[300px] md:h-[480px] -rotate-[10deg] md:-rotate-[15deg] opacity-[0.75] pointer-events-none"
+                style={{ 
+                  filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
+                  WebkitMaskImage: 'linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)',
+                  maskImage: 'linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)'
+                }}
+                alt="Background Guitar"
+              />
+            </div>
+          ) : null
+        }
         rightContent={
           <div className="relative hidden md:flex select-none items-center gap-4 pr-2">
             <div className="absolute inset-0 rounded-full bg-cyan-400/10 blur-3xl" />

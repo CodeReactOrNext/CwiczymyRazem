@@ -24,7 +24,8 @@ export const firebaseAddSongsLog = async (
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
   const userSnapshot = await trackedGetDoc(userDocRef);
-  const userData = userSnapshot.data()!;
+  const userData = userSnapshot.data();
+  if (!userData) return;
   const userName = userData.displayName;
   const userAvatarFrame = userData.selectedFrame ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0;
 
@@ -35,7 +36,7 @@ export const firebaseAddSongsLog = async (
     songTitle,
     songArtist,
     status,
-    avatarUrl,
+    avatarUrl: avatarUrl || userData.avatar || null,
     userAvatarFrame,
     timestamp: new Date().toISOString(),
   };

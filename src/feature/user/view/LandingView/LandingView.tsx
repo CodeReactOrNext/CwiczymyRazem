@@ -3,6 +3,7 @@ import ProfileLandingLayout from "feature/profile/ProfileLandingLayout";
 import {
   selectCurrentUserStats,
   selectUserAuth,
+  selectUserInfo,
 } from "feature/user/store/userSlice";
 import PageLoadingLayout from "layouts/PageLoadingLayout";
 import { useAppSelector } from "store/hooks";
@@ -11,6 +12,7 @@ const LandingView = () => {
 
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth = useAppSelector(selectUserAuth);
+  const userInfo = useAppSelector(selectUserInfo);
 
   if (!userStats ) {
     return (
@@ -25,6 +27,7 @@ const LandingView = () => {
       userStats={userStats}
       featSlot={<LogsBoxView />}
       userAuth={userAuth as string}
+      userInfo={userInfo}
     />
   );
 };

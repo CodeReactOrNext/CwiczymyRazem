@@ -48,7 +48,8 @@ export const firebaseAddLogReport = async (
   const logsDocRef = doc(collection(db, "logs"));
   const userDocRef = doc(db, "users", uid);
   const userSnapshot = await trackedGetDoc(userDocRef);
-  const userData = userSnapshot.data()!;
+  const userData = userSnapshot.data();
+  if (!userData) return;
   const userName = userData.displayName;
   const userAvatarFrame = userData.selectedFrame ?? userData.statistics?.lbl ?? userData.statistics?.level ?? userData.statistics?.lvl ?? 0;
 
@@ -62,7 +63,7 @@ export const firebaseAddLogReport = async (
     newLevel,
     timestamp: new Date().toISOString(),
     timeSumary,
-    avatarUrl: avatarUrl ?? null,
+    avatarUrl: avatarUrl || userData.avatar || null,
     planId,
     streak,
     ...(exerciseTitle && { exerciseTitle }),

@@ -7,6 +7,7 @@ interface HeroBannerProps {
   buttonText?: string;
   rightContent?: React.ReactNode;
   backgroundImage?: string;
+  backgroundContent?: ReactNode;
   characterImage?: string;
   secondaryImage?: string;
   eyebrow?: string;
@@ -24,6 +25,7 @@ export const HeroBanner = ({
   buttonText,
   rightContent,
   backgroundImage,
+  backgroundContent,
   characterImage,
   secondaryImage,
   eyebrow = "Daily practice",
@@ -38,25 +40,31 @@ export const HeroBanner = ({
     <div
       className={`relative flex rounded-none md:rounded-xl items-start border-none overflow-hidden md:overflow-visible ${compact ? '' : 'min-h-[220px] md:min-h-[160px] lg:min-h-[180px]'} ${className}`}
     >
-      {/* Base background — matches page bg so it bleeds in */}
-      <div className="absolute inset-0 bg-background" />
+      {/* Backgrounds Container (Clipped) */}
+      <div className="absolute inset-0 rounded-none md:rounded-xl overflow-hidden pointer-events-none z-0">
+        {/* Base background — matches page bg so it bleeds in */}
+        <div className="absolute inset-0 bg-background" />
 
-      {/* Background Image */}
-      {backgroundImage && (
-        <div
-          className="absolute inset-0 bg-no-repeat bg-cover bg-center"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        />
-      )}
+        {/* Background Image */}
+        {backgroundImage && (
+          <div
+            className="absolute inset-0 bg-no-repeat bg-cover bg-center"
+            style={{ backgroundImage: `url(${backgroundImage})` }}
+          />
+        )}
 
-      {/* Warm spot on the right — more prominent orange glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_100%_at_85%_100%,rgba(234,88,12,0.3),transparent_70%)]" />
+        {/* Warm spot on the right — more prominent orange glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_100%_at_85%_100%,rgba(234,88,12,0.3),transparent_70%)]" />
 
-      {/* Left-to-right fade so text stays readable — only rounded on desktop */}
-      <div className="absolute inset-0 bg-gradient-to-r from-second-600 via-second-600/90 via-60% to-transparent md:rounded-tl-2xl" />
+        {/* Left-to-right fade so text stays readable — only rounded on desktop */}
+        <div className="absolute inset-0 bg-gradient-to-r from-second-600 via-second-600/90 via-60% to-transparent md:rounded-tl-2xl" />
 
-      {/* Bottom edge fade — ties the banner into the cards below */}
-      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-second-600/60 to-transparent" />
+        {/* Renders after the fade so custom elements remain highly visible */}
+        {backgroundContent}
+
+        {/* Bottom edge fade — ties the banner into the cards below */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-second-600/60 to-transparent" />
+      </div>
 
       {/* Glow blob behind the figures */}
       {(characterImage || secondaryImage) && (
