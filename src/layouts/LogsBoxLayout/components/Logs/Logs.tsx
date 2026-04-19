@@ -179,56 +179,61 @@ const FirebaseLogsCaseOpenItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex w-full flex-wrap items-center gap-1 sm:w-[80%]">
-        <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
-          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
-        </span>
-        <span className="text-secondText">opened</span>
-        <span className="text-white font-bold">{caseName}</span>
-        <span className="text-secondText">and got</span>
-        <TooltipProvider>
-          <Tooltip delayDuration={150}>
-            <TooltipTrigger asChild>
-              <span className="inline-flex cursor-default items-center gap-1.5">
-                <span
-                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest"
-                  style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
-                >
-                  <FaGem size={8} />
-                  {itemRarity}
+      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+          </span>
+          <span className="text-secondText text-sm">opened</span>
+          <span className="text-white font-bold text-sm">{caseName}</span>
+          <span className="text-secondText text-sm">and got</span>
+        </div>
+        
+        <div className="flex flex-wrap items-center sm:justify-end gap-2 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
+          <TooltipProvider>
+            <Tooltip delayDuration={150}>
+              <TooltipTrigger asChild>
+                <span className="inline-flex cursor-default items-center gap-1.5 bg-white/5 sm:bg-transparent p-1.5 sm:p-0 rounded-lg sm:rounded-none">
+                  <span
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-widest"
+                    style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
+                  >
+                    <FaGem size={8} />
+                    {itemRarity}
+                  </span>
+                  <span className="font-bold text-sm" style={{ color }}>
+                    {itemBrand} {itemName}
+                  </span>
+                  <img
+                    src={imgSrc}
+                    alt={itemName}
+                    className={`h-7 w-7 object-contain opacity-80 ${itemType === "guitar" ? "-rotate-45" : ""}`}
+                  />
                 </span>
-                <span className="font-bold" style={{ color }}>
-                  {itemBrand} {itemName}
-                </span>
-                <img
-                  src={imgSrc}
-                  alt={itemName}
-                  className={`h-7 w-7 object-contain opacity-80 ${itemType === "guitar" ? "-rotate-45" : ""}`}
+              </TooltipTrigger>
+              <TooltipContent
+                className="p-0 border-0 bg-transparent shadow-2xl"
+                side="top"
+              >
+                <ItemTooltipCard
+                  itemType={itemType}
+                  itemName={itemName}
+                  itemBrand={itemBrand}
+                  itemRarity={itemRarity}
+                  itemImageId={itemImageId}
                 />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent
-              className="p-0 border-0 bg-transparent shadow-2xl"
-              side="top"
-            >
-              <ItemTooltipCard
-                itemType={itemType}
-                itemName={itemName}
-                itemBrand={itemBrand}
-                itemRarity={itemRarity}
-                itemImageId={itemImageId}
-              />
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        {log.id && (
-          <LogReaction
-            logId={log.id}
-            reactions={log.reactions}
-            currentUserId={currentUserId}
-            disabled={log.uid === currentUserId}
-          />
-        )}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          {log.id && (
+            <LogReaction
+              logId={log.id}
+              reactions={log.reactions}
+              currentUserId={currentUserId}
+              disabled={log.uid === currentUserId}
+            />
+          )}
+        </div>
       </div>
     </LogItem>
   );
@@ -248,7 +253,7 @@ interface LogsBoxLayoutProps {
 }
 
 const TimeStamp = ({ date }: { date: Date }) => (
-  <p className='hidden sm:block mr-3 w-[23%] max-w-[8rem] border-r-2 border-main-opposed-400 p-1 pr-2 text-[0.55rem] text-secondText lg:text-xs'>
+  <p className='w-full sm:mr-3 sm:w-[23%] sm:max-w-[8rem] sm:border-r-2 border-main-opposed-400 py-1 sm:pr-2 text-[0.6rem] sm:text-[0.55rem] text-secondText lg:text-xs opacity-60 sm:opacity-100 mb-2 sm:mb-0'>
     {date.toLocaleDateString() +
       " " +
       addZeroToTime(date.getHours()) +
@@ -297,7 +302,7 @@ const LogItem = ({
   children: React.ReactNode;
 }) => (
   <div
-    className={`my-4 flex flex-row flex-nowrap items-center bg-main-opposed-bg p-4 transition-all duration-300 rounded-xl ${
+    className={`my-4 flex flex-col sm:flex-row flex-nowrap items-start sm:items-center bg-main-opposed-bg p-3 sm:p-4 transition-all duration-300 rounded-xl ${
       isNew ? "border border-white/30" : ""
     }`}>
     {children}
@@ -325,26 +330,30 @@ const FirebaseLogsSongItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className='flex w-full flex-wrap items-center gap-1 sm:w-[80%]'>
-        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
-        </span>
-        <p className='text-secondText'>
-          {message}{" "}
-          <span className='text-white'>
-            {songArtist} {songTitle}
+      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
           </span>
-          {status !== "difficulty_rate" && "."}
-        </p>
+          <p className='text-secondText text-sm'>
+            {message}{" "}
+            <span className='text-white'>
+              {songArtist} {songTitle}
+            </span>
+            {status !== "difficulty_rate" && "."}
+          </p>
+        </div>
         
-        {log.id && (
-          <LogReaction
-            logId={log.id}
-            reactions={log.reactions}
-            currentUserId={currentUserId}
-            disabled={log.uid === currentUserId}
-          />
-        )}
+        <div className="flex items-center sm:justify-end shrink-0 mt-1 sm:mt-0">
+          {log.id && (
+            <LogReaction
+              logId={log.id}
+              reactions={log.reactions}
+              currentUserId={currentUserId}
+              disabled={log.uid === currentUserId}
+            />
+          )}
+        </div>
       </div>
     </LogItem>
   );
@@ -376,44 +385,48 @@ const FirebaseLogsRecordingItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className='flex w-full flex-wrap items-center gap-1 sm:w-[80%]'>
-        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
-        </span>
-        <p className='text-secondText'>
-          <Video className="mr-1.5 inline-block h-3 w-3 text-cyan-400" />
-          added a new recording:{" "}
-          {recordingId ? (
-            <button 
-                onClick={() => onView(recordingId)}
-                className='font-bold text-white hover:text-cyan-400 hover:underline transition-colors text-left'
-            >
-                {recordingTitle}
-            </button>
-          ) : (
-            <a 
-                href={videoUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className='font-bold text-white hover:text-cyan-400 hover:underline transition-colors'
-            >
-                {recordingTitle}
-            </a>
-          )}
-          {" "}
-          {songTitle && (
-             <span className="text-xs opacity-70">({songArtist} - {songTitle})</span>
-          )}
-        </p>
+      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+          </span>
+          <p className='text-secondText text-sm'>
+            <Video className="mr-1.5 inline-block h-3 w-3 text-cyan-400" />
+            added a new recording:{" "}
+            {recordingId ? (
+              <button 
+                  onClick={() => onView(recordingId)}
+                  className='font-bold text-white hover:text-cyan-400 hover:underline transition-colors text-left'
+              >
+                  {recordingTitle}
+              </button>
+            ) : (
+              <a 
+                  href={videoUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className='font-bold text-white hover:text-cyan-400 hover:underline transition-colors'
+              >
+                  {recordingTitle}
+              </a>
+            )}
+            {" "}
+            {songTitle && (
+               <span className="text-xs opacity-70">({songArtist} - {songTitle})</span>
+            )}
+          </p>
+        </div>
         
-        {log.id && (
-          <LogReaction
-            logId={log.id}
-            reactions={log.reactions}
-            currentUserId={currentUserId}
-            disabled={log.uid === currentUserId}
-          />
-        )}
+        <div className="flex items-center sm:justify-end shrink-0 mt-1 sm:mt-0">
+          {log.id && (
+            <LogReaction
+              logId={log.id}
+              reactions={log.reactions}
+              currentUserId={currentUserId}
+              disabled={log.uid === currentUserId}
+            />
+          )}
+        </div>
       </div>
     </LogItem>
   );
@@ -446,125 +459,106 @@ const FirebaseLogsItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className='flex w-full flex-wrap items-center gap-1 sm:w-[80%]'>
-        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-          <UserLink
-            uid={uid}
-            userName={userName}
-            avatarUrl={avatarUrl ?? undefined}
-            lvl={userAvatarFrame ?? newLevel?.level}
-          />
-        </span>{" "}
-        <span className='text-secondText'>{t("common:logsBox.get")}</span>
-        <span className='mr-1 text-main'>
-          +{points}
-          <span className='text-secondText'> {t("common:logsBox.points")}</span>
-        </span>
-        
-        {planTitle && (
-            <span className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20">
-              <span className="uppercase tracking-widest text-[9px] opacity-70">
-                  PLAN
-              </span>
-              <span className="font-medium">{planTitle}</span>
-            </span>
-        )}
-
-        {exerciseTitle && !exerciseTitle.includes("Practicing: ") && !planTitle && !songTitle && (
-            <span className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20">
-              <span className="uppercase tracking-widest text-[9px] opacity-70">
-                  EXERCISE
-              </span>
-              <span className="font-medium">{exerciseTitle}</span>
-            </span>
-        )}
-
-        {micPerformance && (
-            <span className="ml-2 inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
-               <span className="flex items-center gap-1">
-                  <span className="font-bold text-main">{micPerformance.score}</span>
-                  <span className="text-[9px] uppercase opacity-70 tracking-tighter">pts</span>
-               </span>
-               <span className="w-px h-2.5 bg-blue-500/30" />
-               <span className="flex items-center gap-1 text-[10px] font-bold">
-                  {micPerformance.accuracy}%
-               </span>
-            </span>
-        )}
-
-        {earTrainingPerformance && (
-            <span className="ml-2 inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
-               <span className="text-[9px] uppercase opacity-70 tracking-widest">Score:</span>
-               <span className="font-bold">{earTrainingPerformance.score}</span>
-            </span>
-        )}
-
-        {songTitle && songArtist && (
-            <span className="ml-2 inline-flex items-center gap-1 text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90">
-              <span className="uppercase tracking-widest text-[9px] opacity-70">SONG</span>
-              <span className="font-medium">{songArtist} - {songTitle}</span>
-            </span>
-        )}
-
-        {newLevel?.isNewLevel && (
-          <span className='text-secondText'>
-            {" "}
-            {t("common:logsBox.lvl_up")}
-            <span className='ml-1 text-main'>
-              {newLevel.level}
-              {" lvl"}
-            </span>
+      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
+            <UserLink
+              uid={uid}
+              userName={userName}
+              avatarUrl={avatarUrl ?? undefined}
+              lvl={userAvatarFrame ?? newLevel?.level}
+            />
+          </span>{" "}
+          <span className='text-secondText text-sm'>{t("common:logsBox.get")}</span>
+          <span className='mr-1 text-main text-sm'>
+            +{points}
+            <span className='text-secondText'> {t("common:logsBox.points")}</span>
           </span>
-        )}
-        {newAchievements?.length > 0 && (
-          <span className='inline-flex items-center gap-2'>
-            {t("common:logsBox.achievements")}{" "}
-            {newAchievements.map((achievement, index) => (
-              <span key={index} className='inline-flex items-center gap-2'>
-                <AchievementIcon id={achievement} />
+
+          {newLevel?.isNewLevel && (
+            <span className='text-secondText text-sm'>
+              {" "}
+              {t("common:logsBox.lvl_up")}
+              <span className='ml-1 text-main'>
+                {newLevel.level}
+                {" lvl"}
               </span>
-            ))}
-          </span>
-        )}
-        
-        {log.id && (
-          <LogReaction
-            logId={log.id}
-            reactions={log.reactions}
-            currentUserId={currentUserId}
-            disabled={log.uid === currentUserId}
-          />
-        )}
+            </span>
+          )}
+          {newAchievements?.length > 0 && (
+            <span className='inline-flex items-center gap-2 text-sm'>
+              {t("common:logsBox.achievements")}{" "}
+              {newAchievements.map((achievement, index) => (
+                <span key={index} className='inline-flex items-center gap-2'>
+                  <AchievementIcon id={achievement} />
+                </span>
+              ))}
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center sm:justify-end gap-2 shrink-0 mt-1 sm:mt-0">
+          {planTitle && (
+              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20">
+                <span className="uppercase tracking-widest text-[8px] sm:text-[9px] opacity-70">
+                    PLAN
+                </span>
+                <span className="font-medium">{planTitle}</span>
+              </span>
+          )}
+
+          {exerciseTitle && !exerciseTitle.includes("Practicing: ") && !planTitle && !songTitle && (
+              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20">
+                <span className="uppercase tracking-widest text-[8px] sm:text-[9px] opacity-70">
+                    EXERCISE
+                </span>
+                <span className="font-medium">{exerciseTitle}</span>
+              </span>
+          )}
+
+          {micPerformance && (
+              <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-blue-400 bg-blue-950/30 border-blue-500/20">
+                <span className="flex items-center gap-1">
+                    <span className="font-bold text-main">{micPerformance.score}</span>
+                    <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-tighter">pts</span>
+                </span>
+                <span className="w-px h-2.5 bg-blue-500/30" />
+                <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-bold">
+                    {micPerformance.accuracy}%
+                </span>
+              </span>
+          )}
+
+          {earTrainingPerformance && (
+              <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-amber-400 bg-amber-950/30 border-amber-500/20">
+                <span className="text-[8px] sm:text-[9px] uppercase opacity-70 tracking-widest">Score:</span>
+                <span className="font-bold">{earTrainingPerformance.score}</span>
+              </span>
+          )}
+
+          {songTitle && songArtist && (
+              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90">
+                <span className="uppercase tracking-widest text-[8px] sm:text-[9px] opacity-70">SONG</span>
+                <span className="font-medium">{songArtist} - {songTitle}</span>
+              </span>
+          )}
+
+          {log.id && (
+            <LogReaction
+              logId={log.id}
+              reactions={log.reactions}
+              currentUserId={currentUserId}
+              disabled={log.uid === currentUserId}
+            />
+          )}
+        </div>
       </div>
     </LogItem>
   );
 };
 
 // Podkomponenty dla FirebaseLogsTopPlayersItem
-const PlayerRankBadge = ({ index }: { index: number }) => {
-  const getMedalIcon = (position: number) => {
-    switch (position) {
-      case 0:
-        return (
-          <div className='flex items-center justify-center'>
-            <FaCrown className='animate-pulse text-2xl text-yellow-400' />
-          </div>
-        );
-      case 1:
-        return <FaMedal className='text-xl text-gray-300' />;
-      case 2:
-        return <FaMedal className='text-xl text-amber-600' />;
-      default:
-        return <FaRegStar className='text-lg text-white/70' />;
-    }
-  };
 
-  return (
-    <div className='w-6 flex-shrink-0 text-center sm:w-7'>
-      {getMedalIcon(index)}
-    </div>
-  );
-};
 
 const PlayerAvatar = ({
   player,
@@ -574,7 +568,7 @@ const PlayerAvatar = ({
   isFirst: boolean;
 }) => (
   <div className='relative flex flex-shrink-0 items-center justify-center'>
-    <div className="scale-75 origin-center">
+    <div className="scale-[0.8] origin-center -mx-1">
        <Avatar 
          size="sm" 
          name={player.displayName} 
@@ -582,14 +576,6 @@ const PlayerAvatar = ({
          lvl={(player as any).lvl ?? (player as any).level} 
        />
     </div>
-    {/* isFirst indicator was chevron up, but maybe new avatar border is enough? 
-        The user wants level borders. If player object has level/lvl, it will work. 
-        If not, it will be silver. */}
-    {isFirst && (
-      <div className='absolute -bottom-1 z-10 flex w-full justify-center'>
-        <FaChevronUp className='text-xs text-yellow-400 drop-shadow-md' />
-      </div>
-    )}
   </div>
 );
 
@@ -604,27 +590,27 @@ const SeasonHeader = ({
   date: Date;
   t: (key: string) => string;
 }) => (
-  <div className='flex flex-wrap items-center gap-2 border-b border-second-400/60 bg-gradient-to-r from-second-500/40 to-second-500/20 px-2 py-2 sm:px-4 sm:py-3'>
-    <div className='rounded-full bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 p-1'>
-      <FaTrophy className='text-lg text-yellow-400 sm:text-xl' />
+  <div className='flex flex-wrap items-center gap-3 border-b border-white/5 bg-transparent px-3 py-3 sm:px-5 sm:py-4'>
+    <div className='flex items-center gap-2'>
+      <h3 className='text-sm font-bold text-white tracking-wide sm:text-base'>
+        {t("logsBox.top_players")}
+      </h3>
     </div>
-    <h3 className='text-sm font-bold text-white sm:text-base'>
-      {t("logsBox.top_players")}
-    </h3>
-    <span className='ml-1 rounded-md border border-second-500/50 bg-second-600/40 px-1.5 py-0.5 text-xs font-medium text-tertiary sm:ml-2 sm:px-2'>
+    
+    <span className='text-xs font-semibold text-secondText tracking-wide'>
       {seasonName}
     </span>
 
     {/* Right side with date info - on larger screens */}
-    <div className='ml-auto hidden items-center text-xs text-secondText sm:flex'>
+    <div className='ml-auto hidden items-center gap-3 text-xs text-secondText sm:flex'>
       {daysLeftInSeason !== undefined && (
-        <div className='mr-4 flex items-center rounded-full border border-second-500/50 bg-gradient-to-r from-second-600/80 to-second-600/60 px-2 py-1'>
-          <IoCalendarOutline className='mr-1 text-tertiary' />
-          <span className='font-semibold'>{daysLeftInSeason}</span>{" "}
-          <span className='ml-1'>{t("logsBox.days_left")}</span>
+        <div className='flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 border border-white/5'>
+          <IoCalendarOutline className='text-zinc-400' />
+          <span className='font-semibold text-zinc-300'>{daysLeftInSeason}</span>
+          <span>{t("logsBox.days_left")}</span>
         </div>
       )}
-      <span className='opacity-70'>
+      <span className='opacity-60'>
         {date.toLocaleDateString()} {addZeroToTime(date.getHours())}:
         {addZeroToTime(date.getMinutes())}
       </span>
@@ -632,11 +618,11 @@ const SeasonHeader = ({
 
     {/* Days left - on mobile only */}
     {daysLeftInSeason !== undefined && (
-      <div className='mt-1 flex w-full items-center justify-end text-xs text-secondText sm:hidden'>
-        <div className='flex items-center rounded-full border border-second-500/50 bg-gradient-to-r from-second-600/80 to-second-600/60 px-2 py-1'>
-          <IoCalendarOutline className='mr-1 text-tertiary' />
-          <span className='font-semibold'>{daysLeftInSeason}</span>{" "}
-          <span className='ml-1'>{t("logsBox.days_left")}</span>
+      <div className='mt-2 flex w-full items-center justify-end text-xs text-secondText sm:hidden'>
+        <div className='flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 border border-white/5'>
+          <IoCalendarOutline className='text-zinc-400' />
+          <span className='font-semibold text-zinc-300'>{daysLeftInSeason}</span>
+          <span>{t("logsBox.days_left")}</span>
         </div>
       </div>
     )}
@@ -652,27 +638,11 @@ const PlayerRow = ({
   index: number;
   t: (key: string) => string;
 }) => {
-  const getRowBackground = (position: number) => {
-    switch (position) {
-      case 0:
-        return "bg-gradient-to-r from-yellow-900/30 via-yellow-600/10 to-yellow-900/5";
-      case 1:
-        return "bg-gradient-to-r from-gray-600/20 via-gray-400/5 to-gray-600/0";
-      case 2:
-        return "bg-gradient-to-r from-amber-800/20 via-amber-700/5 to-amber-800/0";
-      default:
-        return "";
-    }
-  };
-
+  const isTop3 = index < 3;
+  
   return (
-    <div
-      className={`flex items-center gap-1 px-2 py-2 transition-all sm:gap-3 sm:px-4 sm:py-3 ${getRowBackground(
-        index
-      )}`}>
-      <PlayerRankBadge index={index} />
-
-      <div className='w-5 flex-shrink-0 text-center text-sm font-bold text-white sm:w-6 sm:text-base'>
+    <div className='flex items-center gap-2 sm:gap-4 px-3 py-2 sm:px-5 sm:py-3'>
+      <div className='w-6 flex-shrink-0 text-center font-bold text-white/50 text-sm'>
         #{index + 1}
       </div>
 
@@ -682,9 +652,9 @@ const PlayerRow = ({
 
         <UserTooltip userId={player.uid}>
           <Link
-            className={`text-sm font-semibold hover:text-main hover:underline sm:text-base ${
-              index === 0 ? "text-yellow-300" : "text-white"
-            }`}
+            className={`text-sm sm:text-base font-bold tracking-wide transition-colors ${
+              index === 0 ? "text-yellow-500/90" : "text-white/90"
+            } hover:text-white`}
             href={`/user/${player.uid}`}>
             {player.displayName}
           </Link>
@@ -692,9 +662,11 @@ const PlayerRow = ({
       </div>
 
       <div className='ml-auto'>
-        <div className='rounded-lg border border-second-500/20 bg-second-600/30 px-2 py-1 text-secondText'>
-          <span className='text-xs'>{t("logsBox.points")}:</span>{" "}
-          <span className='font-bold text-main'>{player.points}</span>
+        <div className='flex items-baseline gap-1.5'>
+          <span className='text-[10px] sm:text-xs font-semibold text-secondText opacity-60'>pt:</span>
+          <span className={`text-sm sm:text-base font-bold ${isTop3 ? 'text-cyan-400' : 'text-cyan-600'}`}>
+            {player.points}
+          </span>
         </div>
       </div>
     </div>
@@ -745,7 +717,7 @@ const FirebaseLogsTopPlayersItem = ({
 
   return (
     <div
-      className={`my-6 flex flex-col overflow-hidden bg-gradient-to-br from-main-opposed-bg/95 via-main-opposed-bg/90 to-second-600/10 shadow-lg transition-all duration-300 rounded-xl ${
+      className={`my-4 flex flex-col overflow-hidden bg-main-opposed-bg transition-all duration-300 rounded-xl ${
         isNew ? "border border-white/30 shadow-xl" : ""
       }`}>
       <SeasonHeader
@@ -755,7 +727,7 @@ const FirebaseLogsTopPlayersItem = ({
         t={t}
       />
 
-      <div className='divide-y divide-second-400/10'>
+      <div className='divide-y divide-white/5'>
         {topPlayers.map((player, index) => (
           <PlayerRow key={player.uid} player={player} index={index} t={t} />
         ))}
@@ -778,28 +750,30 @@ const FirebaseLogsDailyQuestItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className='flex w-full flex-wrap items-center gap-2 sm:w-[80%]'>
-        <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
-          <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
-        </span>
-        <div className='flex items-center gap-2'>
-            <p className='text-secondText'>
-                completed all <span className="text-yellow-400 font-bold italic tracking-tighter">Daily Quests!</span>
-            </p>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-black ">
-               <FaTrophy className="h-2.5 w-2.5" />
-               Claimed +{points} PKT
-            </span>
+      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
+            <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
+          </span>
+          <p className='text-secondText text-sm'>
+            completed all <span className="text-yellow-400 font-bold italic tracking-tighter">Daily Quests!</span>
+          </p>
         </div>
-        
-        {log.id && (
-          <LogReaction
-            logId={log.id}
-            reactions={log.reactions}
-            currentUserId={currentUserId}
-            disabled={log.uid === currentUserId}
-          />
-        )}
+
+        <div className="flex flex-wrap items-center sm:justify-end gap-2 shrink-0 mt-1 sm:mt-0">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-black ">
+             <FaTrophy className="h-2.5 w-2.5" />
+             Claimed +{points} PKT
+          </span>
+          {log.id && (
+            <LogReaction
+              logId={log.id}
+              reactions={log.reactions}
+              currentUserId={currentUserId}
+              disabled={log.uid === currentUserId}
+            />
+          )}
+        </div>
       </div>
     </LogItem>
   );
