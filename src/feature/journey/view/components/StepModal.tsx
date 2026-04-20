@@ -210,7 +210,7 @@ function SongPickerSection({
         <div className="grid grid-cols-3 gap-3 pt-9">
           {loading
             ? [0, 1, 2].map((i) => (
-                <div key={i} className="h-44 rounded-xl border border-zinc-800 bg-zinc-900/40 animate-pulse" />
+                <div key={i} className="h-44 rounded-xl border border-zinc-800 bg-zinc-900/40" />
               ))
             : songs.map((song) => {
                 const isSelected = selectedId === song.id;
@@ -309,21 +309,13 @@ const [checklistState, setChecklistState] = useState<boolean[]>(
   const isCompleted = step.status === "completed";
 
   const modal = (
-    <AnimatePresence>
-      <motion.div
+      <div
         key="backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
         className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm"
         onClick={onClose}
       >
-        <motion.div
+        <div
           key="panel"
-          initial={{ opacity: 0, scale: 0.94, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.94, y: 20 }}
-          transition={{ type: "spring", stiffness: 300, damping: 28 }}
           className="relative flex w-full max-w-4xl max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
@@ -537,9 +529,8 @@ const [checklistState, setChecklistState] = useState<boolean[]>(
               </>
             )}
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </div>
+      </div>
   );
 
   if (!mounted) return null;

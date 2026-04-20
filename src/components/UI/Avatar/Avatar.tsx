@@ -2,6 +2,7 @@
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { useState } from "react";
 import { FaGem } from "react-icons/fa";
 
 const RARITY_COLORS: Record<string, string> = {
@@ -97,6 +98,7 @@ const getBorderStyles = (lvl: number) => {
 };
 
 const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selectedGuitar, guitarYear, guitarCountry }: AvatarProps) => {
+  const [guitarError, setGuitarError] = useState(false);
   const effectiveLvl = selectedFrame !== undefined ? selectedFrame : (lvl ?? 0);
   const imgPath = selectedGuitar ?? getRankImgPath(lvl ?? 0);
   const borderStyles = getBorderStyles(effectiveLvl);
@@ -209,14 +211,26 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
           )}
         </div>
       </div>
-      {imgPath !== 0 && isSpecialGuitar && size !== "sm" && !specialGuitarDef && (
-        <img className='absolute z-20 object-contain' style={specialGuitarImgStyle} src={`/static/images/rank/${imgPath}.png`} alt='equipped guitar' />
+      {imgPath !== 0 && isSpecialGuitar && size !== "sm" && !specialGuitarDef && !guitarError && (
+        <img 
+          className='absolute z-20 object-contain' 
+          style={specialGuitarImgStyle} 
+          src={`/static/images/rank/${imgPath}.png`} 
+          alt='' 
+          onError={() => setGuitarError(true)}
+        />
       )}
-      {imgPath !== 0 && isSpecialGuitar && size !== "sm" && specialGuitarDef && (
+      {imgPath !== 0 && isSpecialGuitar && size !== "sm" && specialGuitarDef && !guitarError && (
         <TooltipProvider>
           <Tooltip delayDuration={200}>
             <TooltipTrigger asChild>
-              <img className='absolute z-20 object-contain cursor-pointer' style={specialGuitarImgStyle} src={`/static/images/rank/${imgPath}.png`} alt='equipped guitar' />
+              <img 
+                className='absolute z-20 object-contain cursor-pointer' 
+                style={specialGuitarImgStyle} 
+                src={`/static/images/rank/${imgPath}.png`} 
+                alt='' 
+                onError={() => setGuitarError(true)}
+              />
             </TooltipTrigger>
             <TooltipContent className="p-0 border-0 bg-transparent shadow-2xl" side="top">
               <div className="flex flex-col w-44 overflow-hidden rounded-xl" style={{ border: `1px solid ${specialGuitarColor}50`, background: "#111" }}>
@@ -240,8 +254,14 @@ const Avatar = ({ name, lvl, avatarURL, size, className, selectedFrame, selected
           </Tooltip>
         </TooltipProvider>
       )}
-      {imgPath !== 0 && !isSpecialGuitar && (
-        <img className='absolute -rotate-90 z-20' style={size === "sm" ? { display: "none" } : { ...badgePosition }} src={`/static/images/rank/${imgPath}.png`} alt={`guitar rank image for level ${lvl ?? 0}`} />
+      {imgPath !== 0 && !isSpecialGuitar && !guitarError && (
+        <img 
+          className='absolute -rotate-90 z-20' 
+          style={size === "sm" ? { display: "none" } : { ...badgePosition }} 
+          src={`/static/images/rank/${imgPath}.png`} 
+          alt='' 
+          onError={() => setGuitarError(true)}
+        />
       )}
     </div>
   );

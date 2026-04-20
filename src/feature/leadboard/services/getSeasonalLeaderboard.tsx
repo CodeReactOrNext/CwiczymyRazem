@@ -56,6 +56,10 @@ export const getSeasonalLeaderboard = async (
         profileId: doc.id,
         displayName: data.displayName || "",
         avatar: data.avatar || "",
+        selectedFrame: data.selectedFrame || 0,
+        selectedGuitar: data.selectedGuitar || "",
+        selectedGuitarYear: data.selectedGuitarYear || 0,
+        selectedGuitarCountry: data.selectedGuitarCountry || "",
         statistics: {
           points: data.points || 0,
           sessionCount: data.sessionCount || 0,

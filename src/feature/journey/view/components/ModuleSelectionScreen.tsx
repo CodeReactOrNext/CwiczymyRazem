@@ -147,38 +147,21 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
     <div className="relative min-h-screen w-full overflow-y-auto overflow-x-hidden bg-zinc-950">
 
 
-      <FloatingParticles />
+
 
       {/* Ambient top glow */}
       <div
         className="pointer-events-none absolute -top-40 left-1/2 h-[500px] w-[700px] -translate-x-1/2 rounded-full opacity-15"
-        style={{ background: `radial-gradient(ellipse, rgba(${cfg.accentRgb},0.7) 0%, transparent 65%)` }}
       />
 
-      <div className="relative mx-auto max-w-5xl px-4 py-16 md:px-8">
-
-        {/* ── Header ────────────────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-14 text-center"
-        >
+      <div className="relative mx-auto max-w-5xl px-4  md:px-8">
 
 
-
-          <h1 className="text-4xl font-black tracking-tight text-white md:text-5xl lg:text-6xl">
-            Choose Your Module
-          </h1>
-          <p className="mt-4 text-base text-zinc-500 md:text-lg">
-            Each module unlocks when the previous one is mastered.
-          </p>
-        </motion.div>
 
         {/* ── Featured (active) module card ─────────────────────────────── */}
-        <motion.div variants={container} initial="hidden" animate="show" className="space-y-4">
-          <motion.div variants={fadeUp}>
-            <motion.div
+        <div className="space-y-4">
+          <div>
+            <div
               className="group relative cursor-pointer overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl transition-all"
               onClick={() => onSelectModule(activeModule.id)}
             >
@@ -199,10 +182,8 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                   {/* Right fade for desktop */}
                   <div className="absolute inset-y-0 right-0 z-10 hidden w-24 bg-gradient-to-l from-zinc-900 to-transparent md:block" />
 
-                  <motion.div
+                  <div
                     className="absolute inset-0"
-                    whileHover={{ scale: 1.06 }}
-                    transition={{ duration: 0.5 }}
                   >
                     <Image
                       src={cfg.image}
@@ -211,7 +192,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                       className="object-cover object-center"
                       priority
                     />
-                  </motion.div>
+                  </div>
 
                   {/* Radial glow behind image */}
                   <div
@@ -266,12 +247,9 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                         </span>
                       </div>
                       <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800">
-                        <motion.div
+                        <div
                           className="h-full rounded-full"
-                          style={{ background: `rgb(${cfg.accentRgb})` }}
-                          initial={{ width: 0 }}
-                          animate={{ width: `${pct}%` }}
-                          transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
+                          style={{ background: `rgb(${cfg.accentRgb})`, width: `${pct}%` }}
                         />
                       </div>
                       <p className="text-[11px] font-medium text-zinc-500">
@@ -293,12 +271,12 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* ── Locked modules grid ────────────────────────────────────── */}
           {placeholders.length > 0 && (
-            <motion.div variants={fadeUp} className={`grid gap-4 ${placeholders.length === 3 ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"}`}>
+            <div className={`grid gap-4 ${placeholders.length === 3 ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"}`}>
               {placeholders.map((mod, idx) => {
                 const lcfg = MODULE_CFG[mod.id] ?? MODULE_CFG.rhythm;
                 return (
@@ -350,12 +328,12 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                   </div>
                 );
               })}
-            </motion.div>
+            </div>
           )}
 
 
 
-        </motion.div>
+        </div>
       </div>
     </div>
   );

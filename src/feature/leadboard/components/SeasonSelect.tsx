@@ -30,7 +30,7 @@ const SeasonSelect = ({
       value={selectedSeason}
       onValueChange={setSelectedSeason}
       disabled={isLoading}>
-      <SelectTrigger translate="no">
+      <SelectTrigger translate="no" className="max-w-md w-full">
         <SelectValue placeholder='Select a season' />
       </SelectTrigger>
       <SelectContent translate="no">
