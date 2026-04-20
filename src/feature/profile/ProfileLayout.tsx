@@ -122,7 +122,7 @@ const ProfileLayout = ({
               {/* Guitar with CSS fade on the right side */}
               <img
                 src={`/static/images/rank/${imgPath}.png`}
-                className="absolute top-[-15%] md:top-[-35%] left-[0%] md:left-[8%] max-w-none h-[300px] md:h-[480px] -rotate-[10deg] md:-rotate-[15deg] opacity-[0.75] pointer-events-none"
+                className="absolute top-[-15%] md:top-[-35%] left-[0%] md:left-[8%] max-w-none h-[300px] md:h-[480px] -rotate-[90deg] md:-rotate-[15deg] opacity-[0.75] pointer-events-none"
                 style={{ 
                   filter: `drop-shadow(0 15px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 20px ${glowColor}30)`,
                   WebkitMaskImage: 'linear-gradient(to right, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 95%)',
