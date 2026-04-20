@@ -40,7 +40,7 @@ export const LogReaction = ({ logId, reactions = [], currentUserId, disabled }: 
     <button
       onClick={handleToggle}
       className={cn(
-        "group relative ml-2 flex min-h-[36px] items-center justify-center gap-1.5 rounded-full border px-3 text-sm font-semibold transition-all duration-150",
+        "group relative flex min-h-[36px] items-center justify-center gap-1.5 rounded-lg border px-3 text-sm font-semibold transition-all duration-150",
         disabled
           ? "cursor-default border-amber-500/50 bg-amber-500/15 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.2)]"
           : isReacted
