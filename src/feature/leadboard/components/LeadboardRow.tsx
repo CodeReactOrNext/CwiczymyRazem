@@ -111,9 +111,9 @@ export const LeadboardRow = ({
                        >
                          LVL {lvl}
                        </div>
-                       <span translate="no" className="truncate">
-                         <DaySinceMessage date={new Date(statistics.lastReportDate)} />
-                       </span>
+                        <div translate="no" className="truncate">
+                          <DaySinceMessage date={new Date(statistics.lastReportDate)} />
+                        </div>
                     </div>
                  </div>
               </div>
@@ -208,7 +208,7 @@ export const LeadboardRow = ({
               </div>
             </div>
 
-            <div translate="no" className='text-xs font-medium text-zinc-500 group-hover:text-zinc-400'>
+            <div translate="no" className='font-medium'>
               <DaySinceMessage date={new Date(statistics.lastReportDate)} />
             </div>
           </div>
@@ -224,7 +224,7 @@ export const LeadboardRow = ({
                 }`}>
                 {statistics.points.toLocaleString()}
               </div>
-              <div className='text-[10px] font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+              <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                 {t("points")}
               </div>
             </div>
@@ -240,7 +240,7 @@ export const LeadboardRow = ({
                   time.creativity + time.hearing + time.technique + time.theory
                 )}
               </div>
-              <div className='text-[10px] font-bold uppercase tracking-wider text-zinc-500 group-hover:text-zinc-400'>
+              <div className='text-[10px] font-bold  tracking-wider text-zinc-500 group-hover:text-zinc-400'>
                 {t("exercise_time")}
               </div>
             </div>

@@ -505,7 +505,7 @@ const FirebaseLogsItem = ({
           <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
           {planTitle && (
               <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
-                <span className="font-bold tracking-wide mr-1.5 opacity-80">
+                <span className="tracking-wide mr-1.5 opacity-80">
                     Plan
                 </span>
                 <span className="font-medium">{planTitle}</span>

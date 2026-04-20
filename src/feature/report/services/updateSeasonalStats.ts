@@ -63,6 +63,10 @@ export const updateSeasonalStats = async (
     lastReportDate: stats.lastReportDate || new Date().toISOString(),
     displayName: userData?.displayName || "Unknown User",
     avatar: userData?.avatar || "",
+    selectedFrame: userData?.selectedFrame || 0,
+    selectedGuitar: userData?.selectedGuitar || "",
+    selectedGuitarYear: userData?.selectedGuitarYear || 0,
+    selectedGuitarCountry: userData?.selectedGuitarCountry || "",
     seasonId: season.seasonId,
   };
 

@@ -147,10 +147,9 @@ function StepNode({ step, onClick, isLast, moduleId }: {
   const rotateYSpring = useSpring(useTransform(mouseX, [-200, 200], [-7, 7]), { damping: 20, stiffness: 150 });
 
   return (
-    <motion.div variants={stepVariants} className="flex w-full max-w-3xl flex-col items-center">
+    <div className="flex w-full max-w-3xl flex-col items-center">
       {/* ── Card ── */}
-      <motion.div
-        whileHover={!isLocked ? { scale: 1.012 } : {}}
+      <div
         className={`
           relative w-full overflow-hidden rounded-2xl border transition-all duration-300 backdrop-blur-md
           ${isCompleted  ? "border-emerald-500/20 bg-zinc-900/40" : ""}
@@ -287,17 +286,15 @@ function StepNode({ step, onClick, isLast, moduleId }: {
 
         {/* Pulse border for available */}
         {isAvailable && (
-          <motion.div
-            className={`pointer-events-none absolute inset-0 rounded-2xl border-2 ${theme.availableBorder}`}
-            animate={{ opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          <div
+            className={`pointer-events-none absolute inset-0 rounded-2xl border-2 ${theme.availableBorder} opacity-60`}
           />
         )}
-      </motion.div>
+      </div>
 
       {/* ── Spacing ── */}
       {!isLast && <div className="h-8 w-full" />}
-    </motion.div>
+    </div>
   );
 }
 
@@ -314,7 +311,7 @@ function BranchNode({ step, onClick }: { step: JourneyStepWithStatus; onClick: (
   }, [step.songPicker]);
 
   return (
-    <motion.div variants={stepVariants} className="flex w-full max-w-3xl flex-col items-center">
+    <div className="flex w-full max-w-3xl flex-col items-center">
       {/* stem down */}
       <div className="h-8 w-px bg-zinc-800" />
 
@@ -393,7 +390,7 @@ function BranchNode({ step, onClick }: { step: JourneyStepWithStatus; onClick: (
       {!isLocked && !isCompleted && (
         <p className="mt-3 text-[11px] text-zinc-600">Click any card to open &amp; choose</p>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -458,12 +455,12 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
           {/* Progress */}
           <div className="mt-5 flex items-center gap-3">
             <div className="h-1.5 w-40 overflow-hidden rounded-full bg-zinc-800">
-              <motion.div
+              <div
                 className="h-full rounded-full bg-cyan-500"
-                initial={{ width: 0 }}
-                animate={{ width: module.totalCount > 0 ? `${(module.completedCount / module.totalCount) * 100}%` : 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                style={{ boxShadow: "0 0 8px rgba(6,182,212,0.6)" }}
+                style={{
+                  width: module.totalCount > 0 ? `${(module.completedCount / module.totalCount) * 100}%` : 0,
+                  boxShadow: "0 0 8px rgba(6,182,212,0.6)"
+                }}
               />
             </div>
             <span className="text-xs text-zinc-500">{module.completedCount}/{module.totalCount} steps</span>
@@ -473,20 +470,20 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
 
       {/* ── Path ── */}
       <div className="px-4 py-10 md:px-10">
-        <motion.div variants={containerVariants} initial="hidden" animate="show" className="flex flex-col items-center">
+        <div className="flex flex-col items-center">
           {module.stages.map((stage, stageIdx) => (
             <div key={stage.id} className="flex w-full max-w-3xl flex-col items-center">
               {stageIdx > 0 && <div className="my-2 h-8 w-px bg-zinc-800" />}
 
               {/* Stage label */}
               {stage.label && (
-                <motion.div variants={stepVariants} className="mb-5 flex w-full items-center gap-3">
+                <div className="mb-5 flex w-full items-center gap-3">
                   <div className="h-px flex-1 bg-zinc-800" />
                   <span className={`whitespace-nowrap rounded-[8px] px-4 py-1.5 text-[11px] font-bold tracking-widest ring-1 ${stage.colorClass}`}>
                     {stage.label}
                   </span>
                   <div className="h-px flex-1 bg-zinc-800" />
-                </motion.div>
+                </div>
               )}
 
               {/* Steps */}
@@ -521,10 +518,7 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
 
           {/* Completion */}
           {module.completedCount === module.totalCount && module.totalCount > 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
+            <div
               className="mt-8 flex w-full max-w-3xl flex-col items-center gap-3 rounded-2xl border border-orange-500/20 bg-orange-500/5 px-8 py-7 text-center"
             >
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-500/15 ring-1 ring-orange-500/30">
@@ -536,9 +530,9 @@ export const JourneyPath: React.FC<JourneyPathProps> = ({ module, onStepClick, o
                   Congratulations — you&apos;ve mastered all guitar fundamentals.
                 </p>
               </div>
-            </motion.div>
+            </div>
           )}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

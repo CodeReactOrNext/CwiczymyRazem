@@ -7,7 +7,7 @@ import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.t
 
 import SeasonSelect from "./SeasonSelect";
 import { SeasonRewards } from "./SeasonRewards";
-import UserStats from "./UserStats";
+
 import { HeroBanner } from "components/UI/HeroBanner";
 
 export type SortByType = "points" | "sessionCount";
@@ -60,13 +60,7 @@ export const LeadboardLayout = ({
           className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
           rightContent={
             <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4'>
-              <div className='bg-black/20 backdrop-blur-md rounded-xl px-6 py-4 border border-white/5'>
-                <UserStats
-                  currentPage={currentPage}
-                  itemsPerPage={itemsPerPage}
-                  totalUsers={totalUsers}
-                />
-              </div>
+
               <SeasonRewards />
             </div>
           }
