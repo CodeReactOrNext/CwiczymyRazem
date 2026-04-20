@@ -40,7 +40,7 @@ export const PricingSection = () => {
             <div className="mb-8">
               <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">🎸 Practice Pro</p>
               <div className="flex items-end gap-2 mb-3">
-                <span className="text-5xl font-bold text-white tracking-tight">€3.99</span>
+                <span className="text-5xl font-bold text-white tracking-tight">€1.99</span>
                 <span className="text-zinc-500 mb-1.5">/ month</span>
               </div>
               <p className="text-sm text-zinc-500 leading-relaxed">
