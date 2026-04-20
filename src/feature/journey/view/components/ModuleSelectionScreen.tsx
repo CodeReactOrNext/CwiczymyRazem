@@ -145,20 +145,11 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
 
   return (
     <div className="relative min-h-screen w-full overflow-y-auto overflow-x-hidden bg-zinc-950">
-
-
-
-
-      {/* Ambient top glow */}
       <div
         className="pointer-events-none absolute -top-40 left-1/2 h-[500px] w-[700px] -translate-x-1/2 rounded-full opacity-15"
       />
 
       <div className="relative mx-auto max-w-5xl px-4  md:px-8">
-
-
-
-        {/* ── Featured (active) module card ─────────────────────────────── */}
         <div className="space-y-4">
           <div>
             <div
