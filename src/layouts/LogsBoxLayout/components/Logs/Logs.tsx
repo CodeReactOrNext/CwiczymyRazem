@@ -112,10 +112,10 @@ const ItemTooltipCard = ({
     >
       {/* Header */}
       <div className="px-3 pt-3 pb-1">
-        <p className="text-[10px] font-medium uppercase tracking-widest" style={{ color: `${color}cc` }}>{itemBrand}</p>
+        <p className="text-[10px] font-bold tracking-wide" style={{ color: `${color}cc` }}>{itemBrand}</p>
         <p className="text-sm font-bold text-white leading-tight">{itemName}</p>
         <span
-          className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest"
+          className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
           style={{ backgroundColor: `${color}20`, color, border: `1px solid ${color}40` }}
         >
           <FaGem size={7} />
@@ -179,7 +179,7 @@ const FirebaseLogsCaseOpenItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+      <div className="flex flex-1 flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
@@ -189,49 +189,53 @@ const FirebaseLogsCaseOpenItem = ({
           <span className="text-secondText text-sm">and got</span>
         </div>
         
-        <div className="flex flex-wrap items-center sm:justify-end gap-2 shrink-0 w-full sm:w-auto mt-1 sm:mt-0">
-          <TooltipProvider>
-            <Tooltip delayDuration={150}>
-              <TooltipTrigger asChild>
-                <span className="inline-flex cursor-default items-center gap-1.5 bg-white/5 sm:bg-transparent p-1.5 sm:p-0 rounded-lg sm:rounded-none">
-                  <span
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-widest"
-                    style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
-                  >
-                    <FaGem size={8} />
-                    {itemRarity}
+        <div className="flex flex-row items-center justify-between md:justify-end gap-3 shrink-0 w-full md:w-auto mt-2 md:mt-0">
+          <div className="flex flex-col items-start gap-2 flex-1 md:flex-row md:flex-wrap md:justify-end md:flex-initial min-w-0">
+            <TooltipProvider>
+              <Tooltip delayDuration={150}>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex cursor-default items-center gap-1.5 bg-white/5 sm:bg-transparent p-1.5 sm:p-0 rounded-lg sm:rounded-none">
+                    <span
+                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide"
+                      style={{ backgroundColor: `${color}18`, color, border: `1px solid ${color}40` }}
+                    >
+                      <FaGem size={8} />
+                      {itemRarity}
+                    </span>
+                    <span className="font-bold text-sm" style={{ color }}>
+                      {itemBrand} {itemName}
+                    </span>
+                    <img
+                      src={imgSrc}
+                      alt={itemName}
+                      className={`h-7 w-7 object-contain opacity-80 ${itemType === "guitar" ? "-rotate-45" : ""}`}
+                    />
                   </span>
-                  <span className="font-bold text-sm" style={{ color }}>
-                    {itemBrand} {itemName}
-                  </span>
-                  <img
-                    src={imgSrc}
-                    alt={itemName}
-                    className={`h-7 w-7 object-contain opacity-80 ${itemType === "guitar" ? "-rotate-45" : ""}`}
+                </TooltipTrigger>
+                <TooltipContent
+                  className="p-0 border-0 bg-transparent shadow-2xl"
+                  side="top"
+                >
+                  <ItemTooltipCard
+                    itemType={itemType}
+                    itemName={itemName}
+                    itemBrand={itemBrand}
+                    itemRarity={itemRarity}
+                    itemImageId={itemImageId}
                   />
-                </span>
-              </TooltipTrigger>
-              <TooltipContent
-                className="p-0 border-0 bg-transparent shadow-2xl"
-                side="top"
-              >
-                <ItemTooltipCard
-                  itemType={itemType}
-                  itemName={itemName}
-                  itemBrand={itemBrand}
-                  itemRarity={itemRarity}
-                  itemImageId={itemImageId}
-                />
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           {log.id && (
-            <LogReaction
-              logId={log.id}
-              reactions={log.reactions}
-              currentUserId={currentUserId}
-              disabled={log.uid === currentUserId}
-            />
+            <div className="shrink-0">
+              <LogReaction
+                logId={log.id}
+                reactions={log.reactions}
+                currentUserId={currentUserId}
+                disabled={log.uid === currentUserId}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -253,7 +257,7 @@ interface LogsBoxLayoutProps {
 }
 
 const TimeStamp = ({ date }: { date: Date }) => (
-  <p className='w-full sm:mr-3 sm:w-[23%] sm:max-w-[8rem] sm:border-r-2 border-main-opposed-400 py-1 sm:pr-2 text-[0.6rem] sm:text-[0.55rem] text-secondText lg:text-xs opacity-60 sm:opacity-100 mb-2 sm:mb-0'>
+  <p className='w-full sm:w-auto lg:mr-4 lg:pr-4 lg:border-r-2 border-main-opposed-400 py-1 text-[0.6rem] sm:text-[0.55rem] text-secondText lg:text-xs opacity-60 sm:opacity-100 mb-2 sm:mb-0 whitespace-nowrap'>
     {date.toLocaleDateString() +
       " " +
       addZeroToTime(date.getHours()) +
@@ -302,7 +306,7 @@ const LogItem = ({
   children: React.ReactNode;
 }) => (
   <div
-    className={`my-4 flex flex-col sm:flex-row flex-nowrap items-start sm:items-center bg-main-opposed-bg p-3 sm:p-4 transition-all duration-300 rounded-xl ${
+    className={`my-4 flex flex-col md:flex-row flex-nowrap items-start md:items-center bg-main-opposed-bg p-3 sm:p-4 transition-all duration-300 rounded-xl ${
       isNew ? "border border-white/30" : ""
     }`}>
     {children}
@@ -330,7 +334,7 @@ const FirebaseLogsSongItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+      <div className="flex flex-1 flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
@@ -344,7 +348,7 @@ const FirebaseLogsSongItem = ({
           </p>
         </div>
         
-        <div className="flex items-center sm:justify-end shrink-0 mt-1 sm:mt-0">
+        <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
           {log.id && (
             <LogReaction
               logId={log.id}
@@ -385,7 +389,7 @@ const FirebaseLogsRecordingItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+      <div className="flex flex-1 flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
@@ -417,7 +421,7 @@ const FirebaseLogsRecordingItem = ({
           </p>
         </div>
         
-        <div className="flex items-center sm:justify-end shrink-0 mt-1 sm:mt-0">
+        <div className="flex items-center justify-end flex-1 sm:shrink-0 mt-1 sm:mt-0">
           {log.id && (
             <LogReaction
               logId={log.id}
@@ -459,7 +463,7 @@ const FirebaseLogsItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+      <div className="flex flex-1 flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
             <UserLink
@@ -497,20 +501,21 @@ const FirebaseLogsItem = ({
           )}
         </div>
 
-        <div className="flex flex-wrap items-center sm:justify-end gap-2 shrink-0 mt-1 sm:mt-0">
+        <div className="flex flex-row items-center justify-between md:justify-end gap-3 shrink-0 mt-2 md:mt-0 w-full md:w-auto">
+          <div className="flex flex-col items-start gap-2 flex-1 md:flex-row md:flex-wrap md:justify-end md:flex-initial min-w-0">
           {planTitle && (
-              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20">
-                <span className="uppercase tracking-widest text-[8px] sm:text-[9px] opacity-70">
-                    PLAN
+              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words">
+                <span className="shrink-0 font-bold tracking-wide text-[9px] sm:text-[10px] opacity-80 uppercase-none">
+                    Plan
                 </span>
                 <span className="font-medium">{planTitle}</span>
               </span>
           )}
 
           {exerciseTitle && !exerciseTitle.includes("Practicing: ") && !planTitle && !songTitle && (
-              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20">
-                <span className="uppercase tracking-widest text-[8px] sm:text-[9px] opacity-70">
-                    EXERCISE
+              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words">
+                <span className="shrink-0 font-bold tracking-wide text-[9px] sm:text-[10px] opacity-80 uppercase-none">
+                    Exercise
                 </span>
                 <span className="font-medium">{exerciseTitle}</span>
               </span>
@@ -537,19 +542,22 @@ const FirebaseLogsItem = ({
           )}
 
           {songTitle && songArtist && (
-              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90">
-                <span className="uppercase tracking-widest text-[8px] sm:text-[9px] opacity-70">SONG</span>
+              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words">
+                <span className="shrink-0 font-bold tracking-wide text-[9px] sm:text-[10px] opacity-80 uppercase-none">Song</span>
                 <span className="font-medium">{songArtist} - {songTitle}</span>
               </span>
           )}
 
+          </div>
           {log.id && (
-            <LogReaction
-              logId={log.id}
-              reactions={log.reactions}
-              currentUserId={currentUserId}
-              disabled={log.uid === currentUserId}
-            />
+            <div className="shrink-0">
+              <LogReaction
+                logId={log.id}
+                reactions={log.reactions}
+                currentUserId={currentUserId}
+                disabled={log.uid === currentUserId}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -760,18 +768,22 @@ const FirebaseLogsDailyQuestItem = ({
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center sm:justify-end gap-2 shrink-0 mt-1 sm:mt-0">
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] font-black ">
-             <FaTrophy className="h-2.5 w-2.5" />
-             Claimed +{points} PKT
-          </span>
+        <div className="flex flex-row items-center justify-between md:justify-end gap-3 shrink-0 mt-2 md:mt-0 w-full md:w-auto">
+          <div className="flex flex-col items-start gap-2 flex-1 md:flex-row md:flex-wrap md:justify-end md:flex-initial min-w-0">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] ">
+              <FaTrophy className="h-2.5 w-2.5" />
+              Claimed +{points} Pt
+            </span>
+          </div>
           {log.id && (
-            <LogReaction
-              logId={log.id}
-              reactions={log.reactions}
-              currentUserId={currentUserId}
-              disabled={log.uid === currentUserId}
-            />
+            <div className="shrink-0">
+              <LogReaction
+                logId={log.id}
+                reactions={log.reactions}
+                currentUserId={currentUserId}
+                disabled={log.uid === currentUserId}
+              />
+            </div>
           )}
         </div>
       </div>

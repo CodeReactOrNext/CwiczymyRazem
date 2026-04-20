@@ -168,10 +168,12 @@ export const UserTooltip = ({ userId, children, currentActivity }: UserTooltipPr
               {(() => {
                 const lvl = userData.statistics.level ?? 0;
                 const imgPath = userData.selectedGuitar ?? (lvl >= IMG_RANKS_NUMBER ? IMG_RANKS_NUMBER : lvl);
-                if (imgPath !== 0) {
+                const isSpecial = typeof imgPath === "string" && imgPath.includes("special/");
+
+                if (isSpecial) {
                   return (
                     <img
-                      className='absolute top-1/2 -right-32 -translate-y-1/2 w-64 h-64 object-contain -rotate-90 drop-shadow-2xl z-20 pointer-events-none'
+                      className='absolute top-1/2 -right-[143px] -translate-y-1/2 w-64 h-64 object-contain -rotate-90 drop-shadow-2xl z-20 pointer-events-none'
                       src={`/static/images/rank/${imgPath}.png`}
                       alt='equipped guitar'
                     />
