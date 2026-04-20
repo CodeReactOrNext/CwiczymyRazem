@@ -24,12 +24,12 @@ const FEATURES: { label: string; pro: boolean; master: boolean }[] = [
 ];
 
 const PRICING = {
-  pro:    { monthly: "€3.99", yearly: "€33.99" },
-  master: { monthly: "€6.99", yearly: "€58.99" },
+  pro:    { monthly: "€1.99", yearly: "€19.99" },
+  master: { monthly: "€3.99", yearly: "€39.99" },
 };
 
 // ─── Shared content ────────────────────────────────────────────────────────────
-
+  
 export function UpgradeContent() {
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   const [loading, setLoading] = useState<"pro" | "master" | null>(null);

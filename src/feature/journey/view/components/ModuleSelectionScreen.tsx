@@ -156,8 +156,6 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
               className="group relative cursor-pointer overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl transition-all"
               onClick={() => onSelectModule(activeModule.id)}
             >
-
-
               <div className="flex flex-col md:flex-row">
                 {/* ── Image panel ── */}
                 <div className="relative h-60 shrink-0 overflow-hidden bg-zinc-800 md:h-auto md:w-80">
