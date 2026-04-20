@@ -179,7 +179,7 @@ const FirebaseLogsCaseOpenItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="inline-flex items-center gap-2 font-semibold text-tertiary">
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
@@ -189,8 +189,8 @@ const FirebaseLogsCaseOpenItem = ({
           <span className="text-secondText text-sm">and got</span>
         </div>
         
-        <div className="flex flex-row items-center justify-between md:justify-end gap-3 shrink-0 w-full md:w-auto mt-2 md:mt-0">
-          <div className="flex flex-col items-start gap-2 flex-1 md:flex-row md:flex-wrap md:justify-end md:flex-initial min-w-0">
+        <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 w-full lg:w-auto mt-2 lg:mt-0 lg:ml-auto">
+          <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
             <TooltipProvider>
               <Tooltip delayDuration={150}>
                 <TooltipTrigger asChild>
@@ -306,7 +306,7 @@ const LogItem = ({
   children: React.ReactNode;
 }) => (
   <div
-    className={`my-4 flex flex-col md:flex-row flex-nowrap items-start md:items-center bg-main-opposed-bg p-3 sm:p-4 transition-all duration-300 rounded-xl ${
+    className={`my-4 flex flex-col lg:flex-row flex-nowrap items-start lg:items-center bg-main-opposed-bg p-3 sm:p-4 transition-all duration-300 rounded-xl ${
       isNew ? "border border-white/30" : ""
     }`}>
     {children}
@@ -334,7 +334,7 @@ const FirebaseLogsSongItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 w-full min-w-0">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
@@ -389,7 +389,7 @@ const FirebaseLogsRecordingItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center justify-between gap-3 lg:gap-4 w-full min-w-0">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
@@ -463,7 +463,7 @@ const FirebaseLogsItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
             <UserLink
@@ -501,11 +501,11 @@ const FirebaseLogsItem = ({
           )}
         </div>
 
-        <div className="flex flex-row items-center justify-between md:justify-end gap-3 shrink-0 mt-2 md:mt-0 w-full md:w-auto">
-          <div className="flex flex-col items-start gap-2 flex-1 md:flex-row md:flex-wrap md:justify-end md:flex-initial min-w-0">
+        <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 mt-2 lg:mt-0 w-full lg:w-auto lg:ml-auto">
+          <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
           {planTitle && (
-              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words">
-                <span className="shrink-0 font-bold tracking-wide text-[9px] sm:text-[10px] opacity-80 uppercase-none">
+              <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-cyan-400 bg-cyan-950/30 border-cyan-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+                <span className="font-bold tracking-wide mr-1.5 opacity-80">
                     Plan
                 </span>
                 <span className="font-medium">{planTitle}</span>
@@ -513,8 +513,8 @@ const FirebaseLogsItem = ({
           )}
 
           {exerciseTitle && !exerciseTitle.includes("Practicing: ") && !planTitle && !songTitle && (
-              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words">
-                <span className="shrink-0 font-bold tracking-wide text-[9px] sm:text-[10px] opacity-80 uppercase-none">
+              <span className="inline-block text-[10px] sm:text-xs px-2 py-0.5 rounded border opacity-90 text-emerald-400 bg-emerald-950/30 border-emerald-500/20 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+                <span className="font-bold tracking-wide mr-1.5 opacity-80">
                     Exercise
                 </span>
                 <span className="font-medium">{exerciseTitle}</span>
@@ -542,8 +542,8 @@ const FirebaseLogsItem = ({
           )}
 
           {songTitle && songArtist && (
-              <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words">
-                <span className="shrink-0 font-bold tracking-wide text-[9px] sm:text-[10px] opacity-80 uppercase-none">Song</span>
+              <span className="inline-block text-[10px] sm:text-xs text-purple-400 bg-purple-950/30 px-2 py-0.5 rounded border border-purple-500/20 opacity-90 max-w-[250px] md:max-w-[200px] lg:max-w-[450px] whitespace-normal break-words align-middle">
+                <span className="font-bold tracking-wide mr-1.5 opacity-80">Song</span>
                 <span className="font-medium">{songArtist} - {songTitle}</span>
               </span>
           )}
@@ -758,7 +758,7 @@ const FirebaseLogsDailyQuestItem = ({
   return (
     <LogItem isNew={isNew}>
       <TimeStamp date={date} />
-      <div className="flex flex-1 flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 w-full">
+      <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:flex-wrap justify-between gap-3 lg:gap-4 w-full min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <span className='inline-flex items-center gap-2 font-semibold text-tertiary'>
             <UserLink uid={uid} userName={userName} avatarUrl={avatarUrl} lvl={userAvatarFrame} />
@@ -768,8 +768,8 @@ const FirebaseLogsDailyQuestItem = ({
           </p>
         </div>
 
-        <div className="flex flex-row items-center justify-between md:justify-end gap-3 shrink-0 mt-2 md:mt-0 w-full md:w-auto">
-          <div className="flex flex-col items-start gap-2 flex-1 md:flex-row md:flex-wrap md:justify-end md:flex-initial min-w-0">
+        <div className="flex flex-row items-center justify-between lg:justify-end gap-3 lg:shrink-0 mt-2 lg:mt-0 w-full lg:w-auto lg:ml-auto">
+          <div className="flex flex-col items-start gap-2 flex-1 lg:flex-row lg:flex-wrap lg:justify-end lg:flex-initial min-w-0">
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[10px] ">
               <FaTrophy className="h-2.5 w-2.5" />
               Claimed +{points} Pt
