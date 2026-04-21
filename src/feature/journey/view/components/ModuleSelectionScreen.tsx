@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import {
-  Lock, CheckCircle2, ChevronRight,
+  CheckCircle2, ChevronRight,
   Guitar, Drum, Music2, Mic2,
 } from "lucide-react";
 import Image from "next/image";
@@ -290,7 +290,9 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                       {/* Lock */}
                       <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800/50 bg-zinc-900/80 backdrop-blur-md">
-                          <Lock size={16} className="text-zinc-700" />
+                        <div className="text-zinc-600">
+                          {lcfg.icon}
+                        </div>
                         </div>
                         <span className="rounded-full bg-zinc-900/60 px-3 py-0.5 text-[9px] font-bold uppercase tracking-widest text-zinc-700 backdrop-blur-sm ring-1 ring-zinc-800/50">
                           Coming Soon
@@ -302,7 +304,7 @@ export const ModuleSelectionScreen: React.FC<ModuleSelectionScreenProps> = ({
                     <div className="p-4 opacity-40 grayscale">
                       <div className="mb-2 flex items-center gap-2">
                         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800/50 text-zinc-700">
-                          <Lock size={14} />
+                          {lcfg.icon}
                         </div>
                         <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-800">
                           Locked Module

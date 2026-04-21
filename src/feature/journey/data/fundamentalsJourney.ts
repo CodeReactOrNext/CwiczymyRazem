@@ -25,16 +25,11 @@ export const fundamentalsModule: JourneyModule = {
           examGoal: "Tick all the boxes below — that confirms you're ready to begin.",
           suggestedExerciseId: "",
           stepIcon: "ClipboardCheck",
-          image: "https://loremflickr.com/800/600/guitar,studio?lock=303",
+          image: "/images/journey/fundametnals/1.png",
           contentBlocks: [
             {
               type: "text",
               body: "Before you start, we want to make sure you have a few skills in place and that you understand how this app works and how to learn here effectively.",
-            },
-            {
-              type: "image",
-              url: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?1wx=800&q=80&fit=crop",
-              caption: "Prepare your space: Metronome, tuner, and your guitar.",
             },
             {
               type: "callout",
@@ -77,7 +72,7 @@ export const fundamentalsModule: JourneyModule = {
           examBpm: 50,
           suggestedExerciseId: "first_melody",
           stepIcon: "Music",
-          image: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=800&q=80&fit=crop",
+          image: "/images/journey/fundametnals/2.jpeg",
           contentBlocks: [
             {
               type: "text",

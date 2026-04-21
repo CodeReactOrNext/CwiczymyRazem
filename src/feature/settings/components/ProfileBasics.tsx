@@ -146,9 +146,6 @@ const ProfileBasics = () => {
                 size="2xl"
                 lvl={userStats?.lvl}
                 selectedFrame={userInfo?.selectedFrame}
-                selectedGuitar={userInfo?.selectedGuitar}
-                guitarYear={userInfo?.selectedGuitarYear}
-                guitarCountry={userInfo?.selectedGuitarCountry}
               />
               <div className="flex flex-col items-center">
                 <Label

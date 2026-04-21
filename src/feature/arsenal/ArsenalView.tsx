@@ -54,19 +54,28 @@ export const ArsenalView = () => {
       <div className="p-4">
         <div className="font-openSans flex flex-col gap-6">
           <Tabs defaultValue="cases" className="w-full">
-            <TabsList className="bg-zinc-950/80 border border-zinc-800/80 p-1.5 rounded-xl shadow-inner w-full sm:w-auto h-auto">
-              <TabsTrigger value="cases" className="gap-2 px-6 py-2.5 rounded-lg font-black uppercase tracking-widest text-xs data-[state=active]:bg-zinc-800 data-[state=active]:text-white">
+            <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit border border-white/5 h-auto">
+              <TabsTrigger 
+                value="cases" 
+                className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+              >
                 <PackageOpen size={16} />
                 Cases
               </TabsTrigger>
-              <TabsTrigger value="collection" className="gap-2 px-6 py-2.5 rounded-lg font-black uppercase tracking-widest text-xs data-[state=active]:bg-zinc-800 data-[state=active]:text-white">
+              <TabsTrigger 
+                value="collection" 
+                className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+              >
                 <Swords size={16} />
                 Collection
                 {data && data.inventory.some((i) => i.isNew) && (
                   <span className="ml-1 h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.8)]" />
                 )}
               </TabsTrigger>
-              <TabsTrigger value="rig" className="gap-2 px-6 py-2.5 rounded-lg font-black uppercase tracking-widest text-xs data-[state=active]:bg-zinc-800 data-[state=active]:text-white">
+              <TabsTrigger 
+                value="rig" 
+                className="gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+              >
                 <Guitar size={16} />
                 Rig
               </TabsTrigger>
