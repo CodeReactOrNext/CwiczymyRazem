@@ -4,8 +4,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "assets/components/ui/tabs";
-import MainContainer from "components/MainContainer";
-import { PageHeader } from "constants/PageHeader";
 import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
@@ -14,12 +12,12 @@ import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { Flame, Music, Zap } from "lucide-react";
+import { Flame, Music, Zap, ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 
 interface PlanSelectorProps {
-  onBack: () => void;
+  onBack?: () => void;
   onSelectPlan?: (planId: string) => void;
   loadingPlanId?: string | null;
 }
@@ -114,24 +112,28 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
 
   return (
     <>
-      <MainContainer>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className='space-y-8 p-8 font-openSans'
-        >
-          <PageHeader
-            title={t("exercises:plans.title")}
-            description={t("exercises:plans.description")}
-            onBack={onBack}
-          />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className='space-y-8 font-openSans px-3 md:px-6 lg:px-8 py-6 md:py-8'
+      >
 
           {isLoading ? (
             <div className='flex h-[400px] items-center justify-center'>
               <div className='h-12 w-12 animate-spin rounded-full border-b-2 border-cyan-500' />
             </div>
           ) : (
-            <Tabs defaultValue="routines" className="w-full">
+            <>
+              {onBack && (
+                <button
+                  onClick={onBack}
+                  className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors mb-4"
+                >
+                  <ArrowLeft size={16} />
+                  <span className="text-sm font-medium">Back</span>
+                </button>
+              )}
+              <Tabs defaultValue="routines" className="w-full">
               <TabsList className="bg-zinc-900 p-1 rounded-lg w-fit border border-white/5 h-auto">
                 <TabsTrigger
                   value="routines"
@@ -198,9 +200,9 @@ export const PlanSelector = ({ onBack, onSelectPlan, loadingPlanId }: PlanSelect
                 )}
               </TabsContent>
             </Tabs>
+            </>
           )}
         </motion.div>
-      </MainContainer>
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
     </>
   );

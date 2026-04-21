@@ -2,7 +2,6 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { Slider } from "assets/components/ui/slider";
 import MainContainer from "components/MainContainer";
-import { PageHeader } from "constants/PageHeader";
 import type { DifficultyLevel, ExerciseCategory } from "feature/exercisePlan/types/exercise.types";
 import { useTranslation } from "hooks/useTranslation";
 
@@ -49,11 +48,6 @@ export const PlanSetup = ({
   return (
     <MainContainer>
       <div className='mx-auto max-w-3xl space-y-8 p-8 font-openSans'>
-        <PageHeader
-          title={t("exercises:auto_plan.title")}
-          description={t("exercises:auto_plan.description")}
-          onBack={onBack}
-        />
 
         <Card className='space-y-8 p-6'>
         {/* Duration Section */}

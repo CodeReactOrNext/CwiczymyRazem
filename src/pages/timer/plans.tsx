@@ -3,6 +3,7 @@ import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { HeroBanner } from "components/UI/HeroBanner";
 import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
@@ -73,7 +74,23 @@ const TimerPlans: NextPageWithLayout = () => {
       <PracticeSession plan={selectedPlan} onClose={handleBack} onFinish={handlePlanFinish} isFinishing={isFinishing} autoReport={true} />
     </MainContainer>
   ) : (
-    <PlanSelector onBack={handleBack} onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />
+    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+      <HeroBanner
+        title="Exercises"
+        subtitle="Build your skills with focused practice exercises"
+        eyebrow="Exercise Hub"
+        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+        rightContent={
+          <button
+            onClick={() => router.push("/timer")}
+            className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors border border-white/10 rounded-lg hover:bg-white/5"
+          >
+            Back
+          </button>
+        }
+      />
+      <PlanSelector onSelectPlan={handlePlanSelect} loadingPlanId={loadingPlanId} />
+    </div>
   );
 };
 
