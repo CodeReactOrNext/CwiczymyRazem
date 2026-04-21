@@ -51,9 +51,6 @@ const FRAMES = [
   { lvl: 100, label: "Divine", class: "bg-[conic-gradient(from_0deg,#6366f1,#a855f7,#ec4899,#a855f7,#6366f1)] text-white shadow-[0_0_45px_rgba(168,85,247,0.9)] ring-2 ring-purple-500/30" },
 ];
 
-const GUITAR_COUNT = 28;
-const SPECIAL_GUITARS = ["special-1"];
-
 const ProfileCustomization = () => {
   const { t } = useTranslation(["settings", "common"]);
   const dispatch = useAppDispatch();
@@ -63,13 +60,12 @@ const ProfileCustomization = () => {
 
   const currentLevel = userStats?.lvl || 0;
   const [selectedFrame, setSelectedFrame] = useState<number | undefined>(userInfo?.selectedFrame);
-  const [selectedGuitar, setSelectedGuitar] = useState<number | string | undefined>(userInfo?.selectedGuitar);
 
   const handleSave = () => {
-    dispatch(updateProfileCustomization({ selectedFrame, selectedGuitar }));
+    dispatch(updateProfileCustomization({ selectedFrame }));
   };
 
-  const isChanged = selectedFrame !== userInfo?.selectedFrame || selectedGuitar !== userInfo?.selectedGuitar;
+  const isChanged = selectedFrame !== userInfo?.selectedFrame;
 
   return (
     <Card className="border-zinc-800/50 bg-zinc-900/20">
@@ -79,7 +75,7 @@ const ProfileCustomization = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold text-foreground">Personalization</h3>
-              <p className="text-sm text-muted-foreground">Customize your profile frame and guitar icon</p>
+              <p className="text-sm text-muted-foreground">Customize your profile frame</p>
             </div>
             <div className="flex items-center gap-3 bg-zinc-900/50 rounded-xl px-4 py-2 border border-zinc-800">
                <Trophy className="h-4 w-4 text-cyan-500" />
@@ -108,9 +104,6 @@ const ProfileCustomization = () => {
                       name={userInfo?.displayName || "User"}
                       size="2xl"
                       lvl={selectedFrame !== undefined ? selectedFrame : currentLevel}
-                      selectedGuitar={selectedGuitar}
-                      guitarYear={userInfo?.selectedGuitarYear}
-                      guitarCountry={userInfo?.selectedGuitarCountry}
                     />
                   </div>
                   <div className="text-center">
@@ -189,81 +182,6 @@ const ProfileCustomization = () => {
                           {!isUnlocked && (
                             <div className="absolute inset-0 z-10 flex items-center justify-center bg-zinc-950/60 rounded-xl backdrop-blur-[1px]">
                                <Lock className="w-5 h-5 text-zinc-500" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {/* Guitars */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-1">
-                  <h4 className="flex items-center gap-2 text-sm font-bold text-zinc-300">
-                    <Zap className="h-4 w-4 text-yellow-500" />
-                    Guitar Icons
-                  </h4>
-                  <span className="text-xs font-medium text-zinc-500">
-                    {Math.min(currentLevel + 1, GUITAR_COUNT + 1)} / {GUITAR_COUNT + 1}
-                  </span>
-                </div>
-
-                <ScrollArea className="h-[280px] w-full rounded-2xl border border-zinc-800/50 bg-zinc-950/30 p-2">
-                  <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-3 p-2">
-                    {[...Array.from({ length: GUITAR_COUNT + 1 }).map((_, i) => i), ...SPECIAL_GUITARS].map((i) => {
-                      const isUnlocked = typeof i === 'number' ? currentLevel >= i : currentLevel >= 1; // Special guitars unlocked at lvl 50
-                      const isSelected = selectedGuitar === i || (selectedGuitar === undefined && typeof i === 'number' && i === (currentLevel > GUITAR_COUNT ? GUITAR_COUNT : currentLevel));
-
-                      return (
-                        <button
-                          key={i}
-                          disabled={!isUnlocked}
-                          onClick={() => setSelectedGuitar(i)}
-                          className={cn(
-                            "group relative flex flex-col items-center gap-2 p-2 rounded-xl transition-all duration-200 outline-none",
-                            isUnlocked 
-                              ? "cursor-pointer hover:bg-zinc-900/80" 
-                              : "opacity-30 cursor-not-allowed grayscale",
-                            isSelected 
-                              ? "bg-zinc-900 border border-cyan-500/30" 
-                              : "hover:border-zinc-700 bg-transparent border border-transparent"
-                          )}
-                        >
-                          <div className={cn(
-                            "relative flex h-14 w-14 items-center justify-center rounded-xl bg-zinc-900/50 border border-zinc-800/50 transition-all",
-                            isSelected && "border-cyan-500 ring-1 ring-cyan-500/30 bg-zinc-900",
-                            isUnlocked && !isSelected && "group-hover:border-zinc-700 group-hover:bg-zinc-800"
-                          )}>
-                            {i === 0 ? (
-                                <div className="flex flex-col items-center opacity-40">
-                                  <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">None</span>
-                                </div>
-                            ) : (
-                                <img
-                                 src={`/static/images/rank/${i}.png`}
-                                 alt={`Guitar ${i}`}
-                                 className={cn(
-                                   "w-10 h-10 object-contain -rotate-90 transition-transform duration-300 drop-shadow-md",
-                                   isUnlocked && "group-hover:scale-110 group-hover:-rotate-[100deg]"
-                                 )}
-                               />
-                            )}
-                          </div>
-                          
-                          <div className="flex flex-col items-center w-full">
-                             <div className={cn(
-                               "text-[10px] font-bold text-center px-2 py-0.5 rounded-full transition-colors",
-                               isSelected ? "bg-cyan-500/10 text-cyan-400" : "text-zinc-600 bg-zinc-900/30"
-                             )}>
-                                {typeof i === 'number' ? `Rank #${i}` : "Special"}
-                             </div>
-                          </div>
-
-                          {!isUnlocked && (
-                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-zinc-950/40 rounded-xl">
-                               <Lock className="w-4 h-4 text-zinc-600" />
                             </div>
                           )}
                         </button>

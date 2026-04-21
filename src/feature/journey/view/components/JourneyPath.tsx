@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
-  Check, Lock, Play, Target, ChevronLeft,
+  Check, Play, Target, ChevronLeft,
   ArrowDown, ArrowUpDown, GitMerge, Timer, Link2,
   MoveHorizontal, Hand, SkipForward, TrendingUp,
   Zap, AudioWaveform, Layers,
@@ -160,8 +160,7 @@ function StepNode({ step, onClick, isLast, moduleId }: {
         style={(!isLocked && (isAvailable || isInProgress)) ? { boxShadow: `0 0 40px -10px rgba(${theme.glow.split(",")[0].split("(")[1]},0.2)` } : {}}
       >
         {/* Background image bleeding from right */}
-        {step.title !== "Before You Begin" && (
-          <div className="pointer-events-none absolute right-0 top-0 h-full w-3/5">
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-3/5">
             <Image
               src={step.image} alt="" fill className="object-cover"
               style={{
@@ -175,7 +174,6 @@ function StepNode({ step, onClick, isLast, moduleId }: {
             {!isLocked && <div className={`absolute inset-0 ${isCompleted ? "bg-emerald-900/20" : theme.imgTint}`} />}
             <div className={`absolute inset-0 bg-gradient-to-r ${isCompleted ? "from-zinc-950 via-zinc-950/70 to-transparent" : theme.cardFade}`} />
           </div>
-        )}
 
         {/* Watermark number */}
         <div
@@ -201,8 +199,6 @@ function StepNode({ step, onClick, isLast, moduleId }: {
           }`}>
             {isCompleted
               ? <Check size={22} strokeWidth={2.5} className="text-emerald-400" />
-              : isLocked
-              ? <Lock size={20} />
               : (STEP_ICONS[step.stepIcon] ?? <Zap size={22} />)
             }
           </div>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useRouter } from "next/router";
 import { useAppSelector } from "store/hooks";
@@ -19,8 +19,9 @@ import {
   firebaseStartJourneyStep,
 } from "../services/journey.service";
 import { JourneyPath } from "./components/JourneyPath";
-import { StepModal } from "./components/StepModal";
+import { StepSidebar } from "./components/StepSidebar";
 import { ModuleSelectionScreen } from "./components/ModuleSelectionScreen";
+import { Drawer, DrawerContent } from "assets/components/ui/drawer";
 
 // ─── Progress merging ─────────────────────────────────────────────────────────
 
@@ -248,7 +249,7 @@ const JourneyView: React.FC = () => {
   }
 
   return (
-    <div className="flex h-full min-h-screen">
+    <div className="relative h-full min-h-screen bg-zinc-950 overflow-x-hidden">
       <JourneyPath
         module={activeModule}
         onStepClick={handleStepClick}
@@ -258,19 +259,26 @@ const JourneyView: React.FC = () => {
         }}
       />
 
-      <AnimatePresence>
-        {isModalOpen && selectedStep && (
-          <StepModal
-            key={selectedStep.id}
-            step={selectedStep}
-            moduleId={selectedModuleId}
-            onClose={handleCloseModal}
-            onComplete={handleCompleteStep}
-            onStart={handleStartStep}
-            isSaving={isSaving}
-          />
-        )}
-      </AnimatePresence>
+      <Drawer 
+        open={!!selectedStep} 
+        onOpenChange={(open) => {
+          if (!open) handleCloseModal();
+        }}
+        direction="right"
+      >
+        <DrawerContent className="fixed inset-y-0 right-0 left-auto mt-0 h-full w-full max-w-xl rounded-none border-l border-white/10 bg-zinc-950 shadow-2xl">
+          {selectedStep && (
+            <StepSidebar
+              step={selectedStep}
+              moduleId={selectedModuleId}
+              onClose={handleCloseModal}
+              onComplete={handleCompleteStep}
+              onStart={handleStartStep}
+              isSaving={isSaving}
+            />
+          )}
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 };
