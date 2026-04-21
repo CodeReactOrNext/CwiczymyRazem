@@ -1,3 +1,4 @@
+import { HeroBanner } from "components/UI/HeroBanner";
 import { selectTimerData, selectUserAvatar, updateLocalTimer, updateTimerTime } from "feature/user/store/userSlice";
 import useTimer from "hooks/useTimer";
 import AppLayout from "layouts/AppLayout";
@@ -62,16 +63,32 @@ const TimerPractice: NextPageWithLayout = () => {
   }, [timer, dispatch]);
 
   return (
-    <TimerLayout
-      timer={timer}
-      timerData={timerData}
-      chosenSkill={chosenSkill}
-      timerSubmitHandler={timerSubmitHandler}
-      choseSkillHandler={choseSkillHandler}
-      onBack={onBack}
-      onResetTimer={resetTimerHandler}
-      isFinishing={isFinishing}
-    />
+    <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
+      <HeroBanner
+        title="Exercises"
+        subtitle="Build your skills with focused practice exercises"
+        eyebrow="Exercise Hub"
+        className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
+        rightContent={
+          <button
+            onClick={onBack}
+            className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors border border-white/10 rounded-lg hover:bg-white/5"
+          >
+            Back
+          </button>
+        }
+      />
+      <TimerLayout
+        timer={timer}
+        timerData={timerData}
+        chosenSkill={chosenSkill}
+        timerSubmitHandler={timerSubmitHandler}
+        choseSkillHandler={choseSkillHandler}
+        onBack={onBack}
+        onResetTimer={resetTimerHandler}
+        isFinishing={isFinishing}
+      />
+    </div>
   );
 };
 

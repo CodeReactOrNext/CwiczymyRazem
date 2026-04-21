@@ -15,7 +15,6 @@ import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { IconBox } from "components/IconBox/IconBox";
 import MainContainer from "components/MainContainer";
-import { PageHeader } from "constants/PageHeader";
 import { AnimatePresence, motion } from "framer-motion";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
@@ -366,9 +365,6 @@ const TimerLayout = ({
   return (
     <MainContainer>
       <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
-        <div className="pl-14 sm:pl-0">
-          <PageHeader title='Practice' onBack={onBack} />
-        </div>
         <Card>
           <div className='flex flex-col sm:flex-row'>
             <div className='flex justify-center p-4 pb-0 sm:flex-1 sm:py-6'>
