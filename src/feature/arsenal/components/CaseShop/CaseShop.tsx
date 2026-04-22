@@ -11,7 +11,7 @@ interface CaseShopProps {
 
 export const CaseShop = ({ currentFame, onOpenCase, isOpening }: CaseShopProps) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-6xl mx-auto">
       {Object.values(CASE_DEFINITIONS).map((caseDef) => (
         <CaseCard
           key={caseDef.id}
