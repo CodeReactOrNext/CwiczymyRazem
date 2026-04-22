@@ -96,7 +96,7 @@ const SongSelectPage: NextPageWithLayout = () => {
             />
             <div className="container mx-auto max-w-6xl px-4 py-8">
             
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as "all" | SongStatus)} className="w-full">
                 <div className="space-y-6">
                 {/* Search */}
                 <div className="relative w-full md:w-96 group">

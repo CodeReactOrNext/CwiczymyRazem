@@ -35,51 +35,45 @@ interface PlanCardProps {
 const categoryStyles = {
   technique: {
     gradient: "from-blue-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-blue-500/25",
-    accent: "from-blue-400 to-blue-600",
+    border: "border-blue-500/20",
     icon: FaGuitar,
     text: "text-blue-400",
-    badge: "bg-blue-500/15 text-blue-200 border-blue-500/25",
+    badge: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   },
   theory: {
     gradient: "from-emerald-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-emerald-500/25",
-    accent: "from-emerald-400 to-emerald-600",
+    border: "border-emerald-500/20",
     icon: FaBrain,
     text: "text-emerald-400",
-    badge: "bg-emerald-500/15 text-emerald-200 border-emerald-500/25",
+    badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
   },
   creativity: {
     gradient: "from-purple-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-purple-500/25",
-    accent: "from-purple-400 to-purple-600",
+    border: "border-purple-500/20",
     icon: FaMusic,
     text: "text-purple-400",
-    badge: "bg-purple-500/15 text-purple-200 border-purple-500/25",
+    badge: "bg-purple-500/10 text-purple-400 border-purple-500/20",
   },
   hearing: {
     gradient: "from-amber-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-amber-500/25",
-    accent: "from-amber-400 to-amber-600",
+    border: "border-amber-500/20",
     icon: FaMusic,
     text: "text-amber-400",
-    badge: "bg-amber-500/15 text-amber-200 border-amber-500/25",
+    badge: "bg-amber-500/10 text-amber-400 border-amber-500/20",
   },
   mixed: {
     gradient: "from-red-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-red-500/25",
-    accent: "from-red-400 to-red-600",
+    border: "border-red-500/20",
     icon: FaLayerGroup,
     text: "text-red-400",
-    badge: "bg-red-500/15 text-red-200 border-red-500/25",
+    badge: "bg-red-500/10 text-red-400 border-red-500/20",
   },
   playalong: {
     gradient: "from-red-500/15 via-zinc-900/60 to-zinc-950",
-    border: "border-red-500/40",
-    accent: "from-red-500 to-red-700",
+    border: "border-red-500/30",
     icon: FaYoutube,
     text: "text-red-400",
-    badge: "bg-red-600 text-white border-red-500/30 font-bold",
+    badge: "bg-red-500/10 text-red-400 border-red-500/20",
   },
 };
 
@@ -123,34 +117,15 @@ export const PlanCard = ({
   return (
     <Card
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden border bg-gradient-to-br transition-all duration-300 p-4 glass-card rounded-2xl",
-        style.border,
+        "relative flex flex-col justify-between overflow-hidden border p-5 rounded-lg transition-colors bg-gradient-to-br",
         style.gradient,
-        hasPlayalong && "border-red-500/30",
+        style.border,
         isLoading && "opacity-80 pointer-events-none",
         isLocked
-          ? "border-amber-500/20 cursor-pointer hover:border-amber-500/40 hover:shadow-[0_0_20px_rgba(245,158,11,0.08)]"
-          : "click-behavior hover:shadow-2xl hover:-translate-y-0.5"
+          ? "border-amber-500/20 cursor-pointer"
+          : "click-behavior"
       )}
       onClick={isLocked ? onUpgrade : onSelect}>
-
-      {/* Top accent line */}
-      <div className={cn(
-        "absolute left-0 right-0 top-0 h-[2px] bg-gradient-to-r",
-        isLocked ? "from-amber-500/30 via-amber-400/60 to-amber-500/30" : cn("opacity-70", style.accent)
-      )} />
-
-      {/* Locked overlay with centered lock icon */}
-      {isLocked && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-zinc-950/40 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-2xl">
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/20 ring-1 ring-amber-500/40">
-              <Lock className="h-5 w-5 text-amber-400" />
-            </div>
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-400">Unlock with Pro</span>
-          </div>
-        </div>
-      )}
 
       {/* Header: Category Icon & Badges */}
       <div className="mb-3 flex items-start justify-between">
@@ -159,23 +134,23 @@ export const PlanCard = ({
               "flex h-7 w-7 items-center justify-center rounded-lg border bg-zinc-950/50 shadow-sm",
               isLocked ? "border-amber-500/20" : style.border
             )}>
-                <Icon className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-500" : style.text)} />
+                <Icon className={cn("h-3.5 w-3.5", isLocked ? "text-zinc-400" : style.text)} />
             </div>
             <Badge variant="secondary" className={cn(
-              "capitalize tracking-wide px-2 py-0.5 text-[10px]",
-              isLocked ? "bg-zinc-800/60 text-zinc-500 border-zinc-700/50" : style.badge
+              "capitalize tracking-wide px-2 py-0.5 text-[11px] font-medium",
+              isLocked ? "bg-zinc-800/80 text-zinc-300 border-zinc-700/50" : style.badge
             )}>
                 {t(`exercises:categories.${plan.category}` as any)}
             </Badge>
 
             {hasPlayalong && !isLocked && (
-                <Badge className="bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30 text-[9px] h-5 px-2 font-bold uppercase tracking-wider">
+                <Badge className="bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30 text-[11px] h-5 px-2 font-medium">
                     <FaYoutube className="mr-1.5 h-2.5 w-2.5" />
                     Playalong
                 </Badge>
             )}
             {hasVideo && !isLocked && (
-                <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/30 text-[9px] h-5 px-2 font-bold uppercase tracking-wider">
+                <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/30 text-[11px] h-5 px-2 font-medium">
                     <FaVideo className="mr-1.5 h-2.5 w-2.5" />
                     Video
                 </Badge>
@@ -183,12 +158,12 @@ export const PlanCard = ({
         </div>
         <div className="flex items-center gap-2">
             {(onEdit || onDelete) && (
-                <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 mr-2">
+                <div className="flex items-center gap-1 mr-2">
                     {onEdit && (
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-zinc-400 hover:text-white hover:bg-white/10"
+                            className="h-7 w-7 text-zinc-400"
                             onClick={(e) => { e.stopPropagation(); onEdit(); }}
                         >
                             <FaEdit className="h-3 w-3" />
@@ -198,7 +173,7 @@ export const PlanCard = ({
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-zinc-400 hover:text-red-400 hover:bg-red-500/10"
+                            className="h-7 w-7 text-zinc-400"
                             onClick={(e) => { e.stopPropagation(); onDelete(); }}
                         >
                             <FaTrashAlt className="h-3 w-3" />
@@ -209,10 +184,10 @@ export const PlanCard = ({
             {isLocked ? (
               <div className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 ring-1 ring-amber-500/25">
                 <Lock className="h-3 w-3 text-amber-500" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500">Pro</span>
+                <span className="text-[11px] font-medium text-amber-500">Pro</span>
               </div>
             ) : (
-              <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-[10px] h-5 px-2 font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+              <Badge variant="outline" className="border-white/10 bg-zinc-950/30 text-[11px] h-5 px-2 font-medium capitalize text-muted-foreground whitespace-nowrap">
                   {t(`exercises:difficulty.${difficulty}` as any)}
               </Badge>
             )}
@@ -237,21 +212,21 @@ export const PlanCard = ({
         <div className="flex-1 space-y-1">
             {plan.author && (
                 <span className={cn(
-                  "text-[10px] font-bold uppercase tracking-widest leading-none",
-                  isLocked ? "text-zinc-600" : "text-primary/80"
+                  "text-[11px] font-medium leading-none",
+                  isLocked ? "text-zinc-400" : "text-primary/80"
                 )}>
                     {plan.author.name}
                 </span>
             )}
             <h3 className={cn(
-              "text-base font-bold leading-tight transition-colors",
-              isLocked ? "text-zinc-400" : "text-foreground group-hover:text-primary"
+              "text-base font-bold leading-tight",
+              isLocked ? "text-foreground/90" : "text-foreground"
             )}>
                 {title}
             </h3>
             <p className={cn(
-              "line-clamp-2 text-[11px] leading-relaxed",
-              isLocked ? "text-zinc-600" : "text-muted-foreground/80"
+              "line-clamp-2 text-[12px] leading-relaxed",
+              isLocked ? "text-muted-foreground/80" : "text-muted-foreground/80"
             )}>
                 {description}
             </p>
@@ -274,7 +249,7 @@ export const PlanCard = ({
         {isLocked ? (
           <Button
             size="sm"
-            className="h-8 px-3 text-xs font-bold uppercase tracking-wider shadow-sm gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/25 hover:bg-amber-500/20 hover:text-amber-300 hover:border-amber-500/40"
+            className="h-8 px-3 text-xs font-semibold shadow-sm gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/25"
             variant="outline"
             onClick={(e) => { e.stopPropagation(); onUpgrade?.(); }}
           >
@@ -284,7 +259,7 @@ export const PlanCard = ({
         ) : onStart && (
            <Button
             size="sm"
-            className="h-8 px-3 text-xs font-semibold shadow-sm transition-all hover:scale-105"
+            className="h-8 px-3 text-xs font-semibold shadow-sm hover:scale-105 transition-all"
             onClick={(e) => {
                 e.stopPropagation();
                 onStart();
