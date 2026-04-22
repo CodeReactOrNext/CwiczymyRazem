@@ -5,7 +5,8 @@ import AppLayout from "layouts/AppLayout";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { useAppSelector } from "store/hooks";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
-import { PremiumGate } from "feature/premium/components/PremiumGate";
+import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
+import {  Music,  Gauge } from "lucide-react";
 import {
   deleteUserGpFile,
   fetchGpFileAsFile,
@@ -35,7 +36,6 @@ import {
   FolderOpen,
   Infinity,
   Loader2,
-  Music,
   Music2,
   Play,
   Trash2,
@@ -276,6 +276,40 @@ const GpTabsPage: NextPageWithLayout = () => {
     );
   }
 
+  // ── Show premium preview for non-premium users ──────────────────────────────
+  if (!isPremium) {
+    return (
+      <PremiumFeaturePreview
+        eyebrow="Practice Files"
+        title="GP Tabs"
+        description="Upload your own Guitar Pro files and practice them with tempo control, track selection, and real-time note detection. Build custom practice sessions from your favorite songs."
+        features={[
+          {
+            icon: <Upload className="h-5 w-5" />,
+            label: "Upload Your Files",
+            description: "Import any Guitar Pro file (.gp, .gp5) from your collection",
+          },
+          {
+            icon: <Music className="h-5 w-5" />,
+            label: "Track Selection",
+            description: "Choose which instrument track to practice on",
+          },
+          {
+            icon: <Gauge className="h-5 w-5" />,
+            label: "Tempo Control",
+            description: "Practice at any speed with custom tempo settings",
+          },
+          {
+            icon: <Zap className="h-5 w-5" />,
+            label: "Real-time Detection",
+            description: "Get real-time note feedback while practicing",
+          },
+        ]}
+        availableIn="both"
+      />
+    );
+  }
+
   return (
     <div className="bg-second-600 rounded-xl overflow-visible flex flex-col border-none shadow-sm min-h-screen lg:mt-16">
       <HeroBanner
@@ -283,10 +317,8 @@ const GpTabsPage: NextPageWithLayout = () => {
         subtitle="Your Guitar Pro file library"
         eyebrow="Practice Files"
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px] mb-6"
-        {...(isPremium && {
-          buttonText: "Upload File",
-          onClick: () => fileInputRef.current?.click(),
-        })}
+        buttonText="Upload File"
+        onClick={() => fileInputRef.current?.click()}
       />
 
       <input
@@ -297,7 +329,7 @@ const GpTabsPage: NextPageWithLayout = () => {
         onChange={handleFileInput}
       />
 
-      <PremiumGate feature="gp-tabs">
+      <div>
 
       <div className="px-4 md:px-8 pb-8 space-y-4">
         {/* Upload progress */}
@@ -449,10 +481,10 @@ const GpTabsPage: NextPageWithLayout = () => {
         )}
       </div>
 
-      </PremiumGate>
+      </div>
 
       {/* ── Session config modal ─────────────────────────────────────────── */}
-      {isPremium && showConfigModal && staged && (
+      {showConfigModal && staged && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
