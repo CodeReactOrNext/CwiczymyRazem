@@ -363,7 +363,7 @@ const TimerLayout = ({
   };
 
   return (
-    <MainContainer>
+    <MainContainer noBorder>
       <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
         <Card>
           <div className='flex flex-col sm:flex-row'>

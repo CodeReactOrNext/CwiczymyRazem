@@ -12,9 +12,8 @@ import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { motion } from "framer-motion";
 import AppLayout from "layouts/AppLayout";
-import { ArrowRight, Music, Search, X } from "lucide-react";
+import { ArrowRight, Music, Play, Search, X } from "lucide-react";
 import Link from "next/link";
 import type { ReactElement } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -94,7 +93,7 @@ const SongSelectPage: NextPageWithLayout = () => {
                 </button>
               }
             />
-            <div className="container mx-auto max-w-6xl px-4 py-8">
+            <div className="container mx-auto px-4 sm:px-8 py-2">
             
             <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as "all" | SongStatus)} className="w-full">
                 <div className="space-y-6">
@@ -141,18 +140,17 @@ const SongSelectPage: NextPageWithLayout = () => {
                         ) : filteredSongs.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {filteredSongs.map(song => (
-                                    <motion.div
+                                    <div
                                         key={song.id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
                                         onClick={() => handleSongSelect(song)}
                                         className="cursor-pointer"
                                     >
                                         <SongCard
                                             song={song}
                                             onOpenDetails={() => handleSongSelect(song)}
+                                            footerAction={{ label: "Practice", icon: <Play className="h-3.5 w-3.5 fill-current opacity-60" /> }}
                                         />
-                                    </motion.div>
+                                    </div>
                                 ))}
                             </div>
                         ) : (

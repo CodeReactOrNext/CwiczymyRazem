@@ -96,7 +96,7 @@ export const AutoPlanGenerator = ({
     if (avgDifficulty > 2.3) difficulty = "hard";
     else if (avgDifficulty > 1.5) difficulty = "medium";
 
-    const title: LocalizedContent = `Plan ${time} minut`;
+    const title: LocalizedContent = `Plan ${time} minutes`;
 
     const description: LocalizedContent = "Automatically generated practice plan";
 
