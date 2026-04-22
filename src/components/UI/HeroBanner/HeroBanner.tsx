@@ -95,7 +95,7 @@ export const HeroBanner = ({
 
       {/* Content */}
       <div
-        className={`relative z-10 flex flex-col md:flex-row w-full items-start md:items-end justify-between gap-6 md:gap-8 ${
+        className={`relative z-10 flex flex-col md:flex-row w-full items-start md:items-start justify-between gap-6 md:gap-8 ${
           compact ? 'p-4 md:p-5 lg:px-6 lg:py-4' : 'p-6 md:p-8 lg:px-10 lg:py-8'
         } ${
           characterImage ? "pr-[120px] xs:pr-[160px] md:pr-8 lg:pr-10" : ""

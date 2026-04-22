@@ -10,27 +10,30 @@ import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { 
+import {
   Bookmark,
-  Music, 
+  Music,
   Settings2,
   Star,
   TrendingUp,
   Trophy,
   Users,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { useAppSelector } from "store/hooks";
 
 interface SongCardProps {
   song: Song;
   onOpenDetails: () => void;
   userStatus?: SongStatus;
+  footerAction?: { label: string; icon: ReactNode };
 }
 
 export const SongCard = ({
   song,
   onOpenDetails,
   userStatus,
+  footerAction,
 }: SongCardProps) => {
   const userId = useAppSelector(selectUserAuth);
   const avgDifficulty = song.avgDifficulty || 0;
@@ -42,7 +45,7 @@ export const SongCard = ({
     <div 
       onClick={onOpenDetails}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-2xl glass-card p-5 transition-background click-behavior cursor-pointer",
+        "group relative flex flex-col justify-between overflow-hidden rounded-lg glass-card p-5 transition-background click-behavior cursor-pointer",
         "hover:glass-card-hover hover:shadow-xl hover:shadow-black/40"
       )}
     >
@@ -180,7 +183,7 @@ export const SongCard = ({
 
         {/* Minimal Footer Action */}
         <div className="relative z-10 mt-auto">
-          <Button 
+          <Button
             onClick={(e) => {
               e.stopPropagation();
               onOpenDetails();
@@ -188,8 +191,8 @@ export const SongCard = ({
             variant="outline"
             className="h-8 w-full group/btn justify-between rounded-xl border-white/5 bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-background hover:bg-white/10 hover:text-white"
           >
-            <span>Open details</span>
-            <Settings2 className="h-3.5 w-3.5 opacity-40 transition-transform group-hover/btn:rotate-90" />
+            <span>{footerAction?.label ?? "Open details"}</span>
+            {footerAction?.icon ?? <Settings2 className="h-3.5 w-3.5 opacity-40 transition-transform group-hover/btn:rotate-90" />}
           </Button>
         </div>
       </div>

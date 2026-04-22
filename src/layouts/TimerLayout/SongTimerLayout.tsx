@@ -43,7 +43,7 @@ export const SongTimerLayout = ({
   };
 
   return (
-    <MainContainer>
+    <MainContainer noBorder>
       <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
         <div className="pl-14 sm:pl-0">
              <div className="flex items-center gap-2 mb-6">
