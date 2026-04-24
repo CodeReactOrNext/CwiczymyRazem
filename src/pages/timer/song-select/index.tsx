@@ -117,17 +117,19 @@ const SongSelectPage: NextPageWithLayout = () => {
                 </div>
 
                 {/* Tabs */}
-                <TabsList className="bg-zinc-900/80 p-1 rounded-lg w-fit border border-white/5 h-auto">
+                <div className="overflow-x-auto pb-0.5 -mx-1 px-1">
+                <TabsList className="bg-zinc-900/80 p-1 rounded-lg w-max border border-white/5 h-auto">
                     {tabs.map((tab) => (
                         <TabsTrigger
                             key={tab.id}
                             value={tab.id}
-                            className="px-4 py-2 rounded-md text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+                            className="px-3 py-2 sm:px-4 rounded-md text-xs sm:text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300 whitespace-nowrap"
                         >
                             {tab.label}
                         </TabsTrigger>
                     ))}
                 </TabsList>
+                </div>
 
                 {tabs.map((tab) => (
                     <TabsContent key={tab.id} value={tab.id} className="mt-8 focus-visible:outline-none">
