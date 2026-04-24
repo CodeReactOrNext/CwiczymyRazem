@@ -37,62 +37,65 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className='relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-[#000]'>
+    <section className='relative min-h-[90vh] flex flex-col items-center justify-center bg-[#000]'>
       <GoogleOneTap />
-      
-      {/* Hero Image - Lightened */}
-      <div className='absolute inset-0 select-none pointer-events-none opacity-50'>
-        <div className='absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black z-10'></div>
-        <Image
-          src='/images/hero-image.png'
-          alt='Guitarist practicing'
-          fill
-          className='object-cover object-center grayscale'
-          priority
-        />
+
+      {/* Background layers - overflow-hidden scoped here, not on the section */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Hero Image - Lightened */}
+        <div className='absolute inset-0 select-none opacity-50'>
+          <div className='absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black z-10'></div>
+          <Image
+            src='/images/hero-image.png'
+            alt='Guitarist practicing'
+            fill
+            className='object-cover object-center grayscale'
+            priority
+          />
+        </div>
+
+        {/* Floating Glow Animation (Flow) - hidden on mobile, fade-in on desktop */}
+        <div className="absolute inset-0 hidden md:block">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{
+              x: ['-15%', '15%'],
+              y: ['-10%', '10%'],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              repeatType: "mirror",
+              ease: "easeInOut"
+            }}
+            className="absolute -top-[15%] -left-[10%] w-[80%] h-[70%] bg-cyan-500/30 blur-[130px] rounded-full"
+          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{
+              x: ['15%', '-15%'],
+              y: ['10%', '-10%'],
+              opacity: [0.15, 0.35, 0.15]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              repeatType: "mirror",
+              ease: "easeInOut"
+            }}
+            className="absolute -bottom-[15%] -right-[10%] w-[80%] h-[70%] bg-orange-500/25 blur-[130px] rounded-full"
+          />
+        </div>
       </div>
 
-      {/* Floating Glow Animation (Flow) - hidden on mobile, fade-in on desktop */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            x: ['-15%', '15%'],
-            y: ['-10%', '10%'],
-            opacity: [0.2, 0.4, 0.2]
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            repeatType: "mirror",
-            ease: "easeInOut"
-          }}
-          className="absolute -top-[15%] -left-[10%] w-[80%] h-[70%] bg-cyan-500/30 blur-[130px] rounded-full"
-        />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            x: ['15%', '-15%'],
-            y: ['10%', '-10%'],
-            opacity: [0.15, 0.35, 0.15]
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            repeatType: "mirror",
-            ease: "easeInOut"
-          }}
-          className="absolute -bottom-[15%] -right-[10%] w-[80%] h-[70%] bg-orange-500/25 blur-[130px] rounded-full"
-        />
-      </div>
+      {/* Navigation - positioned relative to section */}
+      <nav className='relative z-30 w-full py-8 px-6 lg:px-8 flex justify-center'>
+        <Logo large />
+      </nav>
 
-      <div className='relative z-20 mx-auto max-w-7xl px-6 lg:px-8 w-full text-center'>
-        {/* Navigation - Clean & Floated */}
-        <nav className='absolute top-[-10vh] left-0 right-0 py-8 px-6 lg:px-8 z-30 flex justify-center'>
-           <Logo large />
-        </nav>
-
-        <div className='max-w-4xl mx-auto flex flex-col items-center pt-20'>
+      <div className='relative z-20 mx-auto max-w-7xl px-6 lg:px-8 w-full text-center flex-1 flex items-center justify-center'>
+        <div className='max-w-4xl mx-auto flex flex-col items-center py-8 sm:py-12'>
           {/* Header - Reduced Size */}
           <h1 className='text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-[1.1] mb-8 font-display'>
             The guitar practice tracker <br />
