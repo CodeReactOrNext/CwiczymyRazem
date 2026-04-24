@@ -131,8 +131,8 @@ export const ExerciseContentArea = ({
 
   return (
     <div className={cn(
-      "relative w-full overflow-hidden rounded-2xl bg-zinc-900 shadow-2xl",
-      currentExercise.isPlayalong ? "" : "border border-white/10 glass-card"
+      "relative w-full overflow-hidden rounded-xl bg-[#0a0a0a] shadow-2xl",
+      currentExercise.isPlayalong ? "" : "border border-white/10 "
     )}>
 
       {/* Ear Training */}
@@ -165,7 +165,7 @@ export const ExerciseContentArea = ({
 
       {/* Tablature / Notation / Video / Image */}
       {hasTablature ? (
-        <div className="relative w-full">
+        <div className="relative w-full my-8 bg-[#0a0a0a] rounded-xl">
           {rawGpFile && (
             <button
               onClick={onToggleAlphaTabScore}

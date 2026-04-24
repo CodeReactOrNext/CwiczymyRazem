@@ -68,7 +68,7 @@ export const SessionBottomBar = ({
 
   return (
     <>
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/5 bg-zinc-950/60 backdrop-blur-3xl">
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-zinc-950">
       <div className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between gap-8">
 
         {/* Left: Exit */}
@@ -76,7 +76,7 @@ export const SessionBottomBar = ({
           <Button
             variant="ghost"
             onClick={skipExitDialog ? onClose : () => setShowExitDialog(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 font-bold text-sm tracking-wide transition-all border border-white/10 hover:border-red-500/30"
+            className="rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
           >
             <FaSignOutAlt />
             {t("common:practice.exit")}
@@ -110,7 +110,7 @@ export const SessionBottomBar = ({
             <Button
               size="sm"
               variant="ghost"
-              className="rounded-2xl font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
+              className="rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2 flex items-center gap-2"
               onClick={onGoToPreviousExercise}
             >
               <FaStepBackward /> {t("common:back") || "Back"}
@@ -122,7 +122,7 @@ export const SessionBottomBar = ({
                 variant="ghost"
                 loading={isFinishing || isSubmittingReport}
                 className={cn(
-                  "rounded-2xl font-bold text-[11px] tracking-wide transition-all click-behavior",
+                  "rounded-lg font-bold text-[11px] tracking-wide transition-all click-behavior",
                   isLastExercise
                     ? "h-12 px-6 bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400 hover:text-black"
                     : "text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 px-4 py-2",
@@ -162,14 +162,14 @@ export const SessionBottomBar = ({
         <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4">
           <Button
             variant="ghost"
-            className="flex-1 rounded-xl bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 border border-white/10 hover:border-red-500/30 font-semibold text-sm"
+            className="flex-1 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-zinc-300 border border-white/10 hover:border-red-500/30 font-semibold text-sm"
             onClick={() => { setShowExitDialog(false); onClose?.(); }}
           >
             <FaSignOutAlt className="mr-2" />
             Exit without saving
           </Button>
           <Button
-            className="flex-1 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-sm shadow-lg shadow-cyan-500/20"
+            className="flex-1 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-sm shadow-lg shadow-cyan-500/20"
             loading={isFinishing || isSubmittingReport}
             disabled={!canFinishSession}
             onClick={async () => { setShowExitDialog(false); await onFinishSession(); }}

@@ -61,13 +61,13 @@ export const Metronome = ({
   const tempoColor = getTempoColor(bpm);
 
   return (
-    <Card className="relative overflow-hidden rounded-xl border-0 bg-card/80 p-4 shadow-xl backdrop-blur-sm">
+    <Card className="relative overflow-hidden rounded-lg border-0 bg-card/80 p-4 shadow-xl backdrop-blur-sm">
       {onHalfSpeedToggle && (
         <div className="absolute left-3 top-3">
           <button
             onClick={() => onHalfSpeedToggle(!isHalfSpeed)}
             className={cn(
-              "flex items-center gap-1.5 rounded-sm px-2 py-1.5 transition-all",
+              "flex items-center gap-1.5 rounded-lg px-2 py-1.5 transition-all",
               isHalfSpeed
                 ? "bg-cyan-400 text-black shadow-[0_0_15px_rgba(34,211,238,0.8)]"
                 : "bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
@@ -84,7 +84,7 @@ export const Metronome = ({
         <button
           onClick={() => onMuteToggle?.(!isMuted)}
           className={cn(
-            "rounded-sm p-2 transition-colors",
+            "rounded-lg p-2 transition-colors",
             isMuted 
               ? "text-zinc-400 hover:text-zinc-200 bg-zinc-800/50 hover:bg-zinc-800"
               : "text-cyan-400 hover:text-cyan-200 bg-cyan-500/10 hover:bg-cyan-500/20"
@@ -116,7 +116,7 @@ export const Metronome = ({
               if (e.key === "Enter") commitBpmInput();
               if (e.key === "Escape") setIsEditingBpm(false);
             }}
-            className="w-28 bg-zinc-900/50 rounded-sm px-2 py-1 text-center text-5xl font-black text-cyan-400 outline-none ring-2 ring-cyan-500 tabular-nums"
+            className="w-28 bg-zinc-900/50 rounded-lg px-2 py-1 text-center text-5xl font-black text-cyan-400 outline-none ring-2 ring-cyan-500 tabular-nums"
           />
         ) : (
           <button
@@ -137,7 +137,7 @@ export const Metronome = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 shrink-0 rounded-sm bg-zinc-800/40 hover:bg-zinc-700/80 text-zinc-100 hover:text-white transition-colors"
+            className="h-8 w-8 shrink-0 rounded-lg bg-zinc-800/40 hover:bg-zinc-700/80 text-zinc-100 hover:text-white transition-colors"
             onClick={() => setBpm(Math.max(minBpm, bpm - 1))}
             disabled={locked || bpm <= minBpm}
           >
@@ -162,7 +162,7 @@ export const Metronome = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 shrink-0 rounded-sm bg-zinc-800/40 hover:bg-zinc-700/80 text-zinc-100 hover:text-white transition-colors"
+            className="h-8 w-8 shrink-0 rounded-lg bg-zinc-800/40 hover:bg-zinc-700/80 text-zinc-100 hover:text-white transition-colors"
             onClick={() => setBpm(Math.min(maxBpm, bpm + 1))}
             disabled={locked || bpm >= maxBpm}
           >

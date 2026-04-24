@@ -7,16 +7,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "assets/components/ui/accordion";
-import { TooltipProvider } from "assets/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
-import { Drum, Music, Timer } from "lucide-react";
+import { Drum, Gauge, Music, Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FaInfoCircle, FaLightbulb } from "react-icons/fa";
+import { FaInfoCircle, FaLightbulb, FaMicrophone, FaSync } from "react-icons/fa";
+import { GiGuitar } from "react-icons/gi";
 
 import { useBpmProgress } from "../../hooks/useBpmProgress";
 import { updateMicHighScore, updateEarTrainingHighScore, saveLeaderboardEntry } from "../../services/bpmProgressService";
@@ -1108,6 +1109,96 @@ export const PracticeSession = ({
                             {track.name}
                           </button>
                         ))}
+                      </div>
+                    )}
+
+                    {/* Media controls toolbar */}
+                    {!!(currentExercise.metronomeSpeed || planHasTablature || planHasGpFile || planHasStrumming) && (
+                      <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
+                        {currentExercise.metronomeSpeed && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => handleHalfSpeedToggle(!isHalfSpeed)}
+                                className={cn(
+                                  "flex items-center gap-2 h-12 px-4 rounded-lg transition-all border text-sm font-bold tracking-wide",
+                                  isHalfSpeed
+                                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20"
+                                    : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                                )}
+                              >
+                                <Gauge className="h-4 w-4 shrink-0" />
+                                0.5x
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                                {isHalfSpeed ? "Half speed ON" : "Half speed OFF"}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        {((currentExercise.tablature && currentExercise.tablature.length > 0) || planHasTablature || planHasGpFile || planHasStrumming) && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => {
+                                  const newMuted = !isAudioMuted;
+                                  setIsAudioMuted(newMuted);
+                                  saveGuitarPlaybackPreference(!newMuted);
+                                }}
+                                disabled={currentExercise.riddleConfig?.mode === "sequenceRepeat"}
+                                className={cn(
+                                  "flex items-center justify-center h-12 w-12 rounded-lg transition-all border",
+                                  isAudioMuted
+                                    ? "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                                    : "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20",
+                                  currentExercise.riddleConfig?.mode === "sequenceRepeat" && "opacity-50 cursor-not-allowed"
+                                )}
+                              >
+                                <GiGuitar className="text-lg" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              {isAudioMuted ? "Track Off" : "Track On"}
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        {(planHasTablature || planHasGpFile || planHasStrumming) && (
+                          <>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  onClick={async () => { if (isMicEnabled) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
+                                  className={cn(
+                                    "flex items-center justify-center h-12 w-12 rounded-lg transition-all border",
+                                    isMicEnabled
+                                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+                                      : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                                  )}
+                                >
+                                  <FaMicrophone className="text-base" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                {isMicEnabled ? "Mic On" : "Mic Off"}
+                              </TooltipContent>
+                            </Tooltip>
+                            {isMicEnabled && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    onClick={() => setSessionPhase("calibrating")}
+                                    className="flex items-center justify-center h-12 w-12 rounded-lg transition-all border bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                                  >
+                                    <FaSync className="text-base" />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  Recalibrate mic
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          </>
+                        )}
                       </div>
                     )}
 
