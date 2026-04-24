@@ -31,14 +31,14 @@ const PRICING = {
   
 export function UpgradeContent() {
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
-  const [loading, setLoading] = useState<"pro" | "master" | null>(null);
+  const [loading, setLoading] = useState<"pro" | "master" | "pro-trial" | "master-trial" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const userInfo = useAppSelector(selectUserInfo);
   const isPro = userInfo?.role === "pro";
 
-  async function handleCheckout(plan: "pro" | "master") {
-    setLoading(plan);
+  async function handleCheckout(plan: "pro" | "master", trial = false) {
+    setLoading(trial ? `${plan}-trial` : plan);
     setError(null);
     try {
       const user = auth.currentUser;
@@ -50,13 +50,17 @@ export function UpgradeContent() {
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken, plan, billing }),
+        body: JSON.stringify({ idToken, plan, billing, trial }),
       });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
       } else {
-        setError(data.error ?? "Something went wrong. Please try again.");
+        setError(
+          data.error === "Trial already used"
+            ? "You've already used your free trial."
+            : data.error ?? "Something went wrong. Please try again."
+        );
         setLoading(null);
       }
     } catch {
@@ -244,13 +248,30 @@ export function UpgradeContent() {
             )}
           </ul>
 
-          <button
-            onClick={isPro ? handleUpgrade : () => handleCheckout("master")}
-            disabled={loading !== null}
-            className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-black bg-amber-500 hover:bg-amber-400 py-4 rounded-md transition-all disabled:opacity-50 shadow-xl shadow-amber-500/10 hover:shadow-amber-500/20 relative z-10"
-          >
-            {loading === "master" ? <Loader2 size={18} className="animate-spin" /> : <span className="flex items-center gap-2">{isPro ? "Upgrade to Master" : "Get Master Access"} <Crown size={14} fill="currentColor" /></span>}
-          </button>
+          <div className="flex flex-col gap-3 relative z-10">
+            <button
+              onClick={isPro ? handleUpgrade : () => handleCheckout("master")}
+              disabled={loading !== null}
+              className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-black bg-amber-500 hover:bg-amber-400 py-4 rounded-md transition-all disabled:opacity-50 shadow-xl shadow-amber-500/10 hover:shadow-amber-500/20"
+            >
+              {loading === "master" ? <Loader2 size={18} className="animate-spin" /> : <span className="flex items-center gap-2">{isPro ? "Upgrade to Master" : "Get Master Access"} <Crown size={14} fill="currentColor" /></span>}
+            </button>
+            {!isPro && (
+              <button
+                onClick={() => handleCheckout("master", true)}
+                disabled={loading !== null}
+                className="w-full flex flex-col items-center justify-center gap-0.5 border border-amber-500/20 hover:border-amber-500/50 hover:bg-amber-500/5 py-3.5 rounded-md transition-all disabled:opacity-50 group"
+              >
+                {loading === "master-trial"
+                  ? <Loader2 size={18} className="animate-spin text-amber-400" />
+                  : <>
+                      <span className="text-sm font-semibold text-amber-400 group-hover:text-amber-300 transition-colors">Try free for 7 days</span>
+                      <span className="text-[10px] text-zinc-600 font-normal">Card required · Cancel anytime</span>
+                    </>
+                }
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

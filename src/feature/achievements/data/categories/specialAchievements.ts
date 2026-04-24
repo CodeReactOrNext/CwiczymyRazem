@@ -4,6 +4,7 @@ import {
   FaBalanceScale,
   FaDumbbell,
   FaGrimace,
+  FaGuitar,
   FaHeart,
   FaHotjar,
   FaMedal,
@@ -47,4 +48,8 @@ export const specialAchievements = [
   achivFactor("event", FaTrophy, "veryRare", () => false),
   achivFactor("batteryHearth", GiHeartBattery, "epic", AchievementRequirement.statThreshold("habitsCount", 2000), AchievementRequirement.getProgressFor.statThreshold("habitsCount", 2000, "habits")),
   achivFactor("bomb", GiRollingBomb, "veryRare", (ctx) => ctx.statistics.actualDayWithoutBreak >= 2 && ctx.inputData.countBackDays > 0),
+  achivFactor("performance", FaGuitar, "rare", (ctx) => {
+    const { techniqueTime } = inputTimeConverter(ctx.inputData);
+    return !!ctx.inputData.songId && techniqueTime >= hoursToMilliseconds(1) && ctx.inputData.habbits.includes("recording");
+  }),
 ];

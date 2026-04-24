@@ -47,6 +47,12 @@ const TimeInputBox = ({
   const { values, setFieldValue } = useFormikContext<ReportFormikInterface>();
   const [isHovered, setIsHovered] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [editingHours, setEditingHours] = useState(false);
+  const [editingMinutes, setEditingMinutes] = useState(false);
+  const [editHoursValue, setEditHoursValue] = useState("");
+  const [editMinutesValue, setEditMinutesValue] = useState("");
+  const hoursInputRef = useRef<HTMLInputElement>(null);
+  const minutesInputRef = useRef<HTMLInputElement>(null);
   const timePickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -86,6 +92,30 @@ const TimeInputBox = ({
   };
 
   const skillColor = getSkillColor();
+
+  const startEditHours = () => {
+    setEditHoursValue(String(hoursValue).padStart(2, "0"));
+    setEditingHours(true);
+    setTimeout(() => hoursInputRef.current?.select(), 0);
+  };
+
+  const commitHours = (raw: string) => {
+    const n = parseInt(raw, 10);
+    if (!isNaN(n)) setFieldValue(hoursName, Math.min(23, Math.max(0, n)).toString());
+    setEditingHours(false);
+  };
+
+  const startEditMinutes = () => {
+    setEditMinutesValue(String(minutesValue).padStart(2, "0"));
+    setEditingMinutes(true);
+    setTimeout(() => minutesInputRef.current?.select(), 0);
+  };
+
+  const commitMinutes = (raw: string) => {
+    const n = parseInt(raw, 10);
+    if (!isNaN(n)) setFieldValue(minutesName, Math.min(59, Math.max(0, n)).toString());
+    setEditingMinutes(false);
+  };
 
   const getGradientStyle = () => {
     if (!hasValue) {
@@ -194,19 +224,38 @@ const TimeInputBox = ({
           <div ref={timePickerRef} className='mx-auto flex w-full max-w-[300px] items-center justify-center gap-4'>
             {/* Hours */}
             <div className='flex flex-1 flex-col items-center gap-2'>
-              <div className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm">
-                <WheelPicker
-                  options={hourOptions}
-                  value={parseInt(hoursValue.toString(), 10).toString()}
-                  onValueChange={(value) =>
-                    setFieldValue(hoursName, value)
-                  }
-                  infinite
-                  classNames={{
+              <div
+                className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm"
+                onDoubleClick={startEditHours}
+                title="Double-click to type">
+                {editingHours ? (
+                  <input
+                    ref={hoursInputRef}
+                    type="number"
+                    min={0}
+                    max={23}
+                    value={editHoursValue}
+                    onChange={(e) => setEditHoursValue(e.target.value)}
+                    onBlur={(e) => commitHours(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") commitHours(editHoursValue);
+                      if (e.key === "Escape") setEditingHours(false);
+                    }}
+                    className="w-full bg-transparent text-center text-2xl font-bold text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    autoFocus
+                  />
+                ) : (
+                  <WheelPicker
+                    options={hourOptions}
+                    value={parseInt(hoursValue.toString(), 10).toString()}
+                    onValueChange={(value) => setFieldValue(hoursName, value)}
+                    infinite
+                    classNames={{
                       optionItem: "text-zinc-500 text-lg font-medium cursor-pointer transition-colors",
                       highlightWrapper: "bg-white/5 text-white text-xl font-bold backdrop-blur-md"
-                  }}
-                />
+                    }}
+                  />
+                )}
               </div>
               <span className='text-[10px] font-bold tracking-wider text-slate-500'>
                 HOURS
@@ -219,19 +268,38 @@ const TimeInputBox = ({
 
             {/* Minutes */}
             <div className='flex flex-1 flex-col items-center gap-2'>
-              <div className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm">
-                <WheelPicker
-                  options={minuteOptions}
-                  value={parseInt(minutesValue.toString(), 10).toString()}
-                  onValueChange={(value) =>
-                    setFieldValue(minutesName, value)
-                  }
-                  infinite
+              <div
+                className="relative flex h-[120px] w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-900/40 ring-1 ring-white/10 backdrop-blur-sm"
+                onDoubleClick={startEditMinutes}
+                title="Double-click to type">
+                {editingMinutes ? (
+                  <input
+                    ref={minutesInputRef}
+                    type="number"
+                    min={0}
+                    max={59}
+                    value={editMinutesValue}
+                    onChange={(e) => setEditMinutesValue(e.target.value)}
+                    onBlur={(e) => commitMinutes(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") commitMinutes(editMinutesValue);
+                      if (e.key === "Escape") setEditingMinutes(false);
+                    }}
+                    className="w-full bg-transparent text-center text-2xl font-bold text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    autoFocus
+                  />
+                ) : (
+                  <WheelPicker
+                    options={minuteOptions}
+                    value={parseInt(minutesValue.toString(), 10).toString()}
+                    onValueChange={(value) => setFieldValue(minutesName, value)}
+                    infinite
                     classNames={{
                       optionItem: "text-zinc-500 text-lg font-medium cursor-pointer transition-colors",
                       highlightWrapper: "bg-white/5 text-white text-xl font-bold backdrop-blur-md"
-                  }}
-                />
+                    }}
+                  />
+                )}
               </div>
               <span className='text-[10px] font-bold tracking-wider text-slate-500'>
                 MIN

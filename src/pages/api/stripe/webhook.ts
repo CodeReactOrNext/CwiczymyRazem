@@ -110,6 +110,13 @@ export default async function handler(
           premiumUntil,
           plan
         );
+
+        if (session.subscription) {
+          const sub = await stripe.subscriptions.retrieve(session.subscription as string);
+          if (sub.status === "trialing") {
+            await firestore.collection("users").doc(userId).update({ hadTrial: true });
+          }
+        }
         break;
       }
 

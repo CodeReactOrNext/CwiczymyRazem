@@ -69,7 +69,8 @@ export type AchievementList =
   | "learned20"
   | "learned30"
   | "learned50"
-  | "learned100";
+  | "learned100"
+  | "performance";
 
 export interface AchievementContext {
   statistics: StatisticsDataInterface;
