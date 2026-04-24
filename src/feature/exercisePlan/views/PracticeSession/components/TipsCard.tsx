@@ -6,7 +6,7 @@ interface TipsCardProps {
 
 export const TipsCard = ({ tips }: TipsCardProps) => {
   return (
-    <Card className='border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
+    <Card className='rounded-lg border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
       {/* PRIMARY: Enhanced header with visual hierarchy */}
       <div className='border-b border-zinc-700/30 bg-gradient-to-r from-emerald-500/5 to-transparent p-4'>
         <div className='flex items-center gap-2'>
