@@ -1,7 +1,7 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { selectUserInfo } from "feature/user/store/userSlice";
-import { Check, Loader2, X, Zap, Crown } from "lucide-react";
+import { Check, Crown,Loader2, X, Zap } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { auth } from "utils/firebase/client/firebase.utils";

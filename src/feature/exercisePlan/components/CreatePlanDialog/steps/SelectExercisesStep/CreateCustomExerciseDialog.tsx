@@ -31,10 +31,10 @@ import { uploadUserGpFile } from "feature/songs/services/userGpFiles.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import { AlignLeft, Clock, Dumbbell, FileMusic, HelpCircle, Image as ImageIcon, List, Loader2, Plus, Tag, Trash2, X } from "lucide-react";
-import { FaYoutube } from "react-icons/fa6";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "store/hooks";
+import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
 
 interface CreateCustomExerciseDialogProps {
   open: boolean;

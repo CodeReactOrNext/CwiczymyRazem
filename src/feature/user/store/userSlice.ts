@@ -12,6 +12,7 @@ import type {
   userSliceInitialState,
 } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";
+import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
 import {
   autoLogIn,
@@ -24,14 +25,13 @@ import {
   logUserOff,
   rateSong,
   restartUserStats,
+  updateProfileCustomization,
   updateUserEmail,
   updateUserPassword,
   updateUserStats,
   uploadUserAvatar,
   uploadUserSocialData,
-  updateProfileCustomization,
 } from "./userSlice.asyncThunk";
-import { levelUpUser } from "utils/gameLogic/levelUpUser";
 
 
 

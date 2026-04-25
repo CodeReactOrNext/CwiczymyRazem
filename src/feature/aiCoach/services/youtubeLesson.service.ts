@@ -1,19 +1,20 @@
-import { db } from "utils/firebase/client/firebase.utils";
 import {
   collection,
   doc,
   getDoc,
   getDocs,
+  limit,
+  query,
   setDoc,
   updateDoc,
-  query,
   where,
-  limit,
 } from "firebase/firestore";
+import { db } from "utils/firebase/client/firebase.utils";
+
 import type {
+  ScraperConfig,
   YouTubeLesson,
   YouTubeLessonStatus,
-  ScraperConfig,
 } from "../types/youtubeLesson.types";
 import { DEFAULT_SCRAPER_CONFIG } from "../types/youtubeLesson.types";
 

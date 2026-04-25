@@ -1,6 +1,7 @@
 import { cn } from "assets/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-import { getPerformanceGrade, type GameState } from "../hooks/useNoteMatching";
+import { AnimatePresence,motion } from "framer-motion";
+
+import { type GameState,getPerformanceGrade } from "../hooks/useNoteMatching";
 
 interface MicHudProps {
   gameState: GameState;

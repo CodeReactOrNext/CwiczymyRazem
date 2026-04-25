@@ -9,7 +9,6 @@ import { cn } from "assets/lib/utils";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
-import { useTranslation } from "hooks/useTranslation";
 import {
   Bookmark,
   Music,

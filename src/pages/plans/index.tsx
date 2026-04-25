@@ -1,15 +1,15 @@
 import { HeroBanner } from "components/UI/HeroBanner";
 import { MyPlans } from "feature/exercisePlan/components/MyPlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
+import { PremiumGate } from "feature/premium/components/PremiumGate";
+import { selectUserInfo } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
+import { CheckCircle,Clock, Settings, Zap } from "lucide-react";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import type { NextPageWithLayout } from "types/page";
-import { selectUserInfo } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
-import { Clock, Zap, Settings, CheckCircle } from "lucide-react";
+import type { NextPageWithLayout } from "types/page";
 
 const MyPlansPage: NextPageWithLayout = () => {
   const router = useRouter();

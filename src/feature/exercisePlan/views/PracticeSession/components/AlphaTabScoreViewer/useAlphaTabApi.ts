@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
 import * as alphaTabLib from "@coderline/alphatab";
+import { useEffect, useRef, useState } from "react";
+
 import type { Track } from "./types";
 
 interface UseAlphaTabApiOptions {

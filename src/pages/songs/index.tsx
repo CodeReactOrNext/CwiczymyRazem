@@ -1,5 +1,4 @@
 import SongsView from "feature/songs/SongsView";
-import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";

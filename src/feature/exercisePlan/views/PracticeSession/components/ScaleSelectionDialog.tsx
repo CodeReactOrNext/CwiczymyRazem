@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Button } from 'assets/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from 'assets/components/ui/dialog';
-import { Button } from 'assets/components/ui/button';
+import { Label } from 'assets/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -16,18 +16,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'assets/components/ui/select';
-import { Label } from 'assets/components/ui/label';
+import { type FretPosition,getScalePatternForPosition } from 'feature/exercisePlan/scales/fretboardMapper';
+import { rootNotes as chromaticRootNotes,scaleDefinitions } from 'feature/exercisePlan/scales/scaleDefinitions';
 import {
-  getAvailableRootNotes,
-  getAvailableScales,
+  generateScaleExercise,
   getAvailablePatterns,
   getAvailablePositions,
-  generateScaleExercise,
+  getAvailableRootNotes,
+  getAvailableScales,
   type ScaleExerciseConfig,
 } from 'feature/exercisePlan/scales/scaleExerciseGenerator';
-import { scaleDefinitions, rootNotes as chromaticRootNotes } from 'feature/exercisePlan/scales/scaleDefinitions';
-import { getScalePatternForPosition, type FretPosition } from 'feature/exercisePlan/scales/fretboardMapper';
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
+import { useEffect,useState } from 'react';
+
 import { FretboardPreview } from './FretboardPreview';
 
 interface ScaleSelectionDialogProps {

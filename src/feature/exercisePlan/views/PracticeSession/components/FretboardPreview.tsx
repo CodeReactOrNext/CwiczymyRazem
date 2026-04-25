@@ -1,7 +1,7 @@
 'use client';
 
-import { rootNotes } from 'feature/exercisePlan/scales/scaleDefinitions';
 import type { FretPosition } from 'feature/exercisePlan/scales/fretboardMapper';
+import { rootNotes } from 'feature/exercisePlan/scales/scaleDefinitions';
 
 interface FretboardPreviewProps {
   positions: FretPosition[];

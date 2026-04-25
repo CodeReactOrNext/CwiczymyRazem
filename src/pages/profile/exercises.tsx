@@ -1,6 +1,6 @@
+import { cn } from "assets/lib/utils";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { ExercisePlan } from "feature/exercisePlan/components/ExercisePlan";
-import { cn } from "assets/lib/utils";
 import AppLayout from "layouts/AppLayout";
 import { Music, Zap } from "lucide-react";
 import type { ReactElement } from "react";

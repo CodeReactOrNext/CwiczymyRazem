@@ -1,12 +1,14 @@
+import { ActionCard } from 'components/Blog/ActionCard';
+import { BlogAlert } from 'components/Blog/BlogAlert';
 import { BlogCard } from 'components/Blog/BlogCard';
 import { BlogHeader } from 'components/Blog/BlogHeader';
-import { YouTube } from 'components/Blog/YouTube';
-import { BlogAlert } from 'components/Blog/BlogAlert';
-import { ActionCard } from 'components/Blog/ActionCard';
 import { PracticeTable } from 'components/Blog/PracticeTable';
+import { YouTube } from 'components/Blog/YouTube';
 import { Footer } from 'feature/landing/components/Footer';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import type { BlogFrontmatter} from 'lib/blog';
 import {getAllBlogs, getBlogBySlug } from 'lib/blog';
+import { ChevronRight, List } from 'lucide-react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -15,8 +17,6 @@ import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import { useEffect, useState } from 'react';
-import { motion, useScroll, useSpring } from 'framer-motion';
-import { ChevronRight, List } from 'lucide-react';
 
 
 

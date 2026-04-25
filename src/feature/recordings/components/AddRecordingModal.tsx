@@ -10,13 +10,13 @@ import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { Textarea } from "assets/components/ui/textarea";
 import { useRecordingMutations } from "feature/recordings/hooks/useRecordingMutations";
-import { selectUserAuth } from "feature/user/store/userSlice";
 import { getSongs } from "feature/songs/services/getSongs";
 import type { Song } from "feature/songs/types/songs.type";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import debounce from "lodash/debounce";
-import { ArrowRight, Check, Loader2, Music, Video, X } from "lucide-react";
-import { FaYoutube } from "react-icons/fa6";
+import { Loader2, Music, Video, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { FaYoutube } from "react-icons/fa6";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 

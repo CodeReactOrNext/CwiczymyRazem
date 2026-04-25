@@ -1,12 +1,11 @@
+import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
+import { logger } from "feature/logger/Logger";
 import {
   collection,
   doc,
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDoc, trackedSetDoc } from "utils/firebase/client/firestoreTracking";
-import { formatDiscordMessage } from "feature/discordBot/formatters/formatDiscordMessage";
-import { sendDiscordMessage } from "feature/discordBot/utils/discord.utils";
-import { logger } from "feature/logger/Logger";
 
 export const firebaseAddQuestLog = async (uid: string) => {
   try {

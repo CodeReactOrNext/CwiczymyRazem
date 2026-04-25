@@ -1,6 +1,5 @@
 "use client";
 
-import { Play } from "lucide-react";
 
 export const ProductDemo = () => {
   return (

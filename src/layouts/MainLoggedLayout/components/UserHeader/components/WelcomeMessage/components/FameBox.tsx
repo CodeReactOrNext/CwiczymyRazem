@@ -1,13 +1,13 @@
-import { FaGem } from "react-icons/fa";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
-import { useTranslation } from "hooks/useTranslation";
-import { useAppSelector } from "store/hooks";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
+import { useTranslation } from "hooks/useTranslation";
+import { FaGem } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
 
 export const FameBox = () => {
   const { t } = useTranslation("common");

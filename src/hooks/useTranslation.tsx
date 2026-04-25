@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 // Import all translation files
 import not_found from '../../public/locales/en/404.json';

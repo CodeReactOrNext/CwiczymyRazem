@@ -1,27 +1,27 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
-import { useRouter } from "next/router";
-import { useAppSelector } from "store/hooks";
+import { Drawer, DrawerContent } from "assets/components/ui/drawer";
 import { selectUserAuth } from "feature/user/store/userSlice";
+import { useRouter } from "next/router";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
+
+import { fundamentalsModule, placeholderModules } from "../data/fundamentalsJourney";
+import {
+  firebaseCompleteJourneyStep,
+  firebaseGetJourneyProgress,
+  firebaseInitJourneyProgress,
+  firebaseStartJourneyStep,
+} from "../services/journey.service";
 import type {
   JourneyModuleWithStatus,
   JourneyProgressDocument,
-  JourneyStepProgress,
   JourneyStep,
+  JourneyStepProgress,
   JourneyStepWithStatus,
 } from "../types/journey.types";
-import { fundamentalsModule, placeholderModules } from "../data/fundamentalsJourney";
-import {
-  firebaseGetJourneyProgress,
-  firebaseInitJourneyProgress,
-  firebaseCompleteJourneyStep,
-  firebaseStartJourneyStep,
-} from "../services/journey.service";
 import { JourneyPath } from "./components/JourneyPath";
-import { StepSidebar } from "./components/StepSidebar";
 import { ModuleSelectionScreen } from "./components/ModuleSelectionScreen";
-import { Drawer, DrawerContent } from "assets/components/ui/drawer";
+import { StepSidebar } from "./components/StepSidebar";
 
 // ─── Progress merging ─────────────────────────────────────────────────────────
 

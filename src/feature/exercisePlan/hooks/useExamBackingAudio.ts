@@ -12,7 +12,7 @@ interface UseExamBackingAudioProps {
 
 function getOrCreateCtx(ref: React.MutableRefObject<AudioContext | null>): AudioContext {
   if (!ref.current || ref.current.state === "closed") {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     ref.current = new (window.AudioContext || (window as any).webkitAudioContext)();
   }
   return ref.current;

@@ -1,4 +1,4 @@
-import type { Exercise, TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 export const firstMelodyExercise: Exercise = {
   id: "first_melody",

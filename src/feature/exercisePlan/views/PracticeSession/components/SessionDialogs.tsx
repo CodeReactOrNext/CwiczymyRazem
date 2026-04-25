@@ -1,7 +1,8 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence,motion } from "framer-motion";
 import { FaCheck } from "react-icons/fa";
-import { ExerciseCompleteDialog } from "../../../components/ExerciseCompleteDialog";
+
 import { EarTrainingLeaderboardDialog } from "../../../components/EarTrainingLeaderboardDialog";
+import { ExerciseCompleteDialog } from "../../../components/ExerciseCompleteDialog";
 import { CalibrationChoiceDialog } from "./CalibrationChoiceDialog";
 import { CalibrationWizard } from "./CalibrationWizard";
 import { MicModeDialog } from "./MicModeDialog";

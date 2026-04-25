@@ -1,17 +1,17 @@
+import { Index } from "@upstash/vector";
+import type { YouTubeLesson, YouTubeLessonStatus } from "feature/aiCoach/types/youtubeLesson.types";
 import {
   collection,
   doc,
+  getCountFromServer,
   getDocs,
+  limit,
   query,
   updateDoc,
   where,
-  limit,
-  getCountFromServer,
 } from "firebase/firestore";
-import { Index } from "@upstash/vector";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "utils/firebase/client/firebase.utils";
-import type { YouTubeLesson, YouTubeLessonStatus } from "feature/aiCoach/types/youtubeLesson.types";
 
 const LESSONS_COLLECTION = "youtubeLessons";
 const PAGE_SIZE = 20;

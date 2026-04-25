@@ -1,6 +1,7 @@
-import type { GetStaticProps, NextPage } from "next";
 import LandingPage from "feature/landing/LandingPage";
-import { getAllBlogs, BlogFrontmatter } from "lib/blog";
+import type { BlogFrontmatter} from "lib/blog";
+import {getAllBlogs } from "lib/blog";
+import type { GetStaticProps, NextPage } from "next";
 
 interface HomeProps {
   blogs: BlogFrontmatter[];

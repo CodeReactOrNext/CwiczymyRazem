@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { setSelectedGuitar } from "feature/user/store/userSlice";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { setSelectedGuitar } from "feature/user/store/userSlice";
+
 import { updateRig } from "../services/arsenal.service";
 import type { RigSetup } from "../types/arsenal.types";
 import { ARSENAL_QUERY_KEY } from "./useArsenalData";

@@ -1,5 +1,5 @@
-import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { improvPromptEasy } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
+import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
 import { playByEarExercise } from "feature/exercisePlan/data/exerises/playByEar/playByEar";
 
 import type { ExercisePlan } from "../../../types/exercise.types";

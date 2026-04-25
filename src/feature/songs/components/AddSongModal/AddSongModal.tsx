@@ -9,6 +9,7 @@ import {
 import { Input } from "assets/components/ui/input";
 import { Label } from "assets/components/ui/label";
 import { cn } from "assets/lib/utils";
+import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { addSong } from "feature/songs/services/addSong";
 import { enrichSong } from "feature/songs/services/enrichment.service";
@@ -17,16 +18,14 @@ import { updateSongStatus } from "feature/songs/services/udateSongStatus";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserAvatar } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import posthog from "posthog-js";
 import debounce from "lodash/debounce";
 import { ArrowRight, Check, Music, Search, SkipForward } from "lucide-react";
+import posthog from "posthog-js";
 import { useCallback,useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
 
 import { SpotifyPlayer } from "../SpotifyPlayer";
-import { ImportTablature } from "../ImportTablature/ImportTablature";
-import { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 
 interface AddSongModalProps {
   isOpen: boolean;

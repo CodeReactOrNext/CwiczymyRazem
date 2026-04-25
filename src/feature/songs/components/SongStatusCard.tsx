@@ -1,16 +1,15 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
+import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { useTranslation } from "hooks/useTranslation";
-
 import { ArrowDown } from "lucide-react";
 import Link from "next/link";
-import { Button } from "assets/components/ui/button";
 
 import { SortableSongItem } from "./SortableSongItem";
-import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 
 interface SongStatusCardProps {
   title: string;

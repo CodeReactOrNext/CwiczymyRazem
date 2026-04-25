@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { fetchInventory } from "../services/arsenal.service";
 
 export const ARSENAL_QUERY_KEY = ["arsenal", "inventory"];

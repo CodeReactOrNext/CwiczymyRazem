@@ -6,6 +6,7 @@ import {
 } from "assets/components/ui/tooltip";
 import { IconBox } from "components/IconBox/IconBox";
 import Avatar from "components/UI/Avatar";
+import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { useTranslation } from "hooks/useTranslation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -22,7 +23,6 @@ import {
 import { convertMsToHM } from "utils/converter";
 import type { UserTooltipData } from "utils/firebase/client/firebase.utils";
 import { firebaseGetUserTooltipData } from "utils/firebase/client/firebase.utils";
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 
 const StatsBox = ({
   Icon,

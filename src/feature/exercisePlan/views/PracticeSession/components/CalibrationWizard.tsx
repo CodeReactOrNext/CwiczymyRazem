@@ -1,13 +1,13 @@
 import { Button } from "assets/components/ui/button";
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence,motion } from "framer-motion";
+import type { AudioRefs } from "hooks/useAudioAnalyzer";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FaCheck, FaChevronRight, FaMicrophone, FaRedo, FaTimes } from "react-icons/fa";
-import Image from "next/image";
 import { getCentsDistance, getNoteFromFrequency } from "utils/audio/noteUtils";
 
-import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import type { CalibrationData, CalibrationOffsets } from "../hooks/useCalibration";
 import { ModalWrapper } from "./ModalWrapper";
 

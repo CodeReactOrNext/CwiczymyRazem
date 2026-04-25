@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, startTransition } from "react";
-import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import type { StrumPattern } from "feature/exercisePlan/types/exercise.types";
+import type { AudioRefs } from "hooks/useAudioAnalyzer";
+import { startTransition,useEffect, useRef, useState } from "react";
+
 import type { GameState } from "./useNoteMatching";
 import { getFeedbackForCombo } from "./useNoteMatching";
 
@@ -73,7 +74,7 @@ export function useStrummingMatcher({
     });
   };
 
-  useEffect(() => { resetGame(); }, [currentExerciseIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { resetGame(); }, [currentExerciseIndex]);  
 
   // Clear feedback message after it shows
   useEffect(() => {
@@ -193,7 +194,7 @@ export function useStrummingMatcher({
 
     rafIdRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafIdRef.current);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [isPlaying, startTime, bpm, pattern, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs]);
 
   return { slotFeedback, gameState, sessionAccuracy, sessionStats, resetGame };

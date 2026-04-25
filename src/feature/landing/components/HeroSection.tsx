@@ -1,18 +1,17 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
-import { useSession } from "next-auth/react";
-import { motion } from "framer-motion";
 import { Logo } from "components/Logo/Logo";
 import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
 import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
 import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
-import { Loader2, LayoutDashboard, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight,LayoutDashboard, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { FaFire } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 

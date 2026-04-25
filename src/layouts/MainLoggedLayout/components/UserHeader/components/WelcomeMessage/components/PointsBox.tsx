@@ -1,6 +1,6 @@
+import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import {  Sparkles } from 'lucide-react';
 import { useAppSelector } from "store/hooks";
-import { selectCurrentUserStats } from "feature/user/store/userSlice";
 
 export const PointsBox = () => {
   const userStats = useAppSelector(selectCurrentUserStats);

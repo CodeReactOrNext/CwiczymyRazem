@@ -1,11 +1,11 @@
 import { Separator } from "assets/components/ui/separator";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
 import UserNav from "components/UserNav";
+import { FameBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/FameBox";
+import { PointsBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/PointsBox";
+import { StreakBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/StreakBox";
 import Image from "next/image";
 import type { StatisticsDataInterface } from "types/api.types";
-import { StreakBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/StreakBox";
-import { PointsBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/PointsBox";
-import { FameBox } from "layouts/MainLoggedLayout/components/UserHeader/components/WelcomeMessage/components/FameBox";
 
 interface UserHeaderProps {
   userStats: StatisticsDataInterface;

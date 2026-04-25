@@ -18,6 +18,7 @@ import type { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
 import { useState } from "react";
 import { db } from "utils/firebase/client/firebase.utils";
+
 import { authOptions } from "../api/auth/[...nextauth]";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

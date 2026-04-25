@@ -80,7 +80,7 @@ export const useMobileMetronome = ({
     gainNodeRef.current.gain.value = isMutedRef.current ? 0 : 1;
     gainNodeRef.current.connect(externalAudioContext.destination);
     setAudioInitialized(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [externalAudioContext, enabled]);
 
   // Initialize audio (must be called on user gesture)

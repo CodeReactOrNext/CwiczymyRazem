@@ -1,11 +1,11 @@
 import { Button } from "assets/components/ui/button";
 import { ChartContainer, ChartTooltip } from "assets/components/ui/chart";
-import confetti from "canvas-confetti";
-import { motion, animate } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
-import { useEffect, useState, useMemo } from "react";
-import { FaCheck, FaTrophy, FaStar, FaBullseye, FaFire, FaUnlock } from "react-icons/fa";
 import { cn } from "assets/lib/utils";
+import confetti from "canvas-confetti";
+import { animate,motion } from "framer-motion";
+import { useTranslation } from "hooks/useTranslation";
+import { useEffect, useMemo,useState } from "react";
+import { FaBullseye, FaCheck, FaFire, FaStar, FaTrophy, FaUnlock } from "react-icons/fa";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 
 interface ExerciseStats {

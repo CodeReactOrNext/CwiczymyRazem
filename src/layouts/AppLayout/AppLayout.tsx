@@ -1,4 +1,5 @@
 import { selectAutoLogInFailed, selectCurrentUserStats, selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
+import { usePresence } from "hooks/usePresence";
 import { useTranslation } from "hooks/useTranslation";
 import type { LandingNavObjectInterface } from "layouts/MainLoggedLayout/components/LandingNav";
 import MainLoggedLayout from "layouts/MainLoggedLayout/MainLoggedLayout";
@@ -7,7 +8,6 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import React, { useEffect } from "react";
 import { useAppSelector } from "store/hooks";
-import { usePresence } from "hooks/usePresence";
 import type { NavPagesTypes } from "types/layout.types";
 
 interface AppLayoutProps {

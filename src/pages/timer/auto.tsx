@@ -1,12 +1,12 @@
-import { HeroBanner } from "components/UI/HeroBanner";
 import MainContainer from "components/MainContainer";
+import { HeroBanner } from "components/UI/HeroBanner";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { AutoPlanGenerator } from "feature/practice/views/AutoPlanGenerator/AutoPlanGenerator";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import AppLayout from "layouts/AppLayout";
-import posthog from "posthog-js";
 import { useRouter } from "next/router";
+import posthog from "posthog-js";
 import type { ReactElement } from "react";
 import { useEffect,useState } from "react";
 import type { NextPageWithLayout } from "types/page";

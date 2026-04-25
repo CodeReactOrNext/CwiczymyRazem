@@ -1,7 +1,8 @@
-import { db } from "utils/firebase/client/firebase.utils";
-import { collection, doc, documentId, getDoc, query, setDoc, updateDoc, where } from "firebase/firestore";
-import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
 import type { Song } from "feature/songs/types/songs.type";
+import { collection, doc, documentId, getDoc, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { db } from "utils/firebase/client/firebase.utils";
+import { trackedGetDocs } from "utils/firebase/client/firestoreTracking";
+
 import type { JourneyProgressDocument, JourneyStepProgress } from "../types/journey.types";
 
 const COLLECTION = "journeyProgress";
@@ -38,7 +39,7 @@ export const firebaseCompleteJourneyStep = async (
     completed: true,
     completedAt: new Date().toISOString(),
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   await updateDoc(ref, {
     [`moduleProgress.${moduleId}.steps.${stepId}`]: stepData,
     updatedAt: new Date().toISOString(),
@@ -65,7 +66,7 @@ export const firebaseCompleteJourneyStepWithStars = async (
     completedAt: new Date().toISOString(),
     stars,
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   await updateDoc(ref, {
     [`moduleProgress.${moduleId}.steps.${stepId}`]: stepData,
     updatedAt: new Date().toISOString(),
@@ -90,7 +91,7 @@ export const firebaseStartJourneyStep = async (
     completed: false,
     startedAt: new Date().toISOString(),
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   await updateDoc(ref, {
     [`moduleProgress.${moduleId}.steps.${stepId}`]: stepData,
     updatedAt: new Date().toISOString(),

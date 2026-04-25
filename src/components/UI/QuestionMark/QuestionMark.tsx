@@ -4,8 +4,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
-import { RiQuestionLine } from "react-icons/ri";
 import { cn } from "assets/lib/utils";
+import { RiQuestionLine } from "react-icons/ri";
 
 export interface QuestionMarkProps {
   description?: string;

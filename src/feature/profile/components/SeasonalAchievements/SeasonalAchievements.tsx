@@ -1,5 +1,5 @@
-import { Card } from "assets/components/ui/card";
 import { Button } from "assets/components/ui/button";
+import { Card } from "assets/components/ui/card";
 import type { SeasonalAchievement } from "feature/profile/services/seasonalAchievementsService";
 import { getUserSeasonalAchievements } from "feature/profile/services/seasonalAchievementsService";
 import { useTranslation } from "hooks/useTranslation";

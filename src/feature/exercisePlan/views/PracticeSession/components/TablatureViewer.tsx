@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, useMemo, memo } from "react";
-import React from "react";
 import { cn } from "assets/lib/utils";
-import { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
-import { NoteData, NOTES } from "utils/audio/noteUtils";
+import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
+import { memo,useEffect, useMemo, useRef, useState } from "react";
+import React from "react";
+import type { NoteData} from "utils/audio/noteUtils";
+import { NOTES } from "utils/audio/noteUtils";
 
 const REST_VOLUME_THRESHOLD = 0.05;
 

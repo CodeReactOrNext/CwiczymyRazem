@@ -1,3 +1,5 @@
+import type { ScraperConfig, YouTubeLesson } from "feature/aiCoach/types/youtubeLesson.types";
+import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
 import {
   collection,
   doc,
@@ -6,8 +8,6 @@ import {
 } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "utils/firebase/client/firebase.utils";
-import type { ScraperConfig, YouTubeLesson } from "feature/aiCoach/types/youtubeLesson.types";
-import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
 
 const LESSONS_COLLECTION = "youtubeLessons";
 

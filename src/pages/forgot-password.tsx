@@ -1,5 +1,5 @@
-import Head from "next/head";
 import ForgotPasswordView from "feature/user/view/ForgotPasswordView/ForgotPasswordView";
+import Head from "next/head";
 
 export default function ForgotPassword() {
   return (

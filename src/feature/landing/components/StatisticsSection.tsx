@@ -1,9 +1,9 @@
 "use client";
 
+import { cn } from "assets/lib/utils";
 import { BarChart2, Clock, Star, TrendingUp, Users } from "lucide-react";
 import Image from "next/image";
 import { useMemo } from "react";
-import { cn } from "assets/lib/utils";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 

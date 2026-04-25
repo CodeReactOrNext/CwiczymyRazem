@@ -1,5 +1,5 @@
-import { database } from "utils/firebase/api/firebase.config";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { database } from "utils/firebase/api/firebase.config";
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
 

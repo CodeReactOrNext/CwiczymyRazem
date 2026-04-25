@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { getUserStatsField } from "assets/stats/profileStats";
 import ActivityLog from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
@@ -5,11 +6,11 @@ import { ActivityChart } from "components/Charts/ActivityChart";
 import { DashboardSection } from "components/Layout";
 import MainContainer from "components/MainContainer";
 import { HeroBanner } from "components/UI/HeroBanner";
-import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
-import { StatsSection } from "feature/profile/components/StatsSection";
-import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
+import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
+import type { StatsFieldProps } from "feature/profile/components/StatsField";
+import { StatsSection } from "feature/profile/components/StatsSection";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import {
   selectCurrentUserStats,
@@ -19,8 +20,6 @@ import AppLayout from "layouts/AppLayout";
 import type { ReactElement } from "react";
 import { useAppSelector } from "store/hooks";
 import type { StatisticsDataInterface } from "types/api.types";
-
-import { useQuery } from "@tanstack/react-query";
 
 const ProfileActivityPage = () => {
   const userStats = useAppSelector(selectCurrentUserStats);

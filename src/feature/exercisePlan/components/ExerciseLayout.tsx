@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
-
 import { PageHeader } from "components/PageHeader/PageHeader";
+import type { ReactNode } from "react";
 
 interface ExerciseLayoutProps {
   children: ReactNode;

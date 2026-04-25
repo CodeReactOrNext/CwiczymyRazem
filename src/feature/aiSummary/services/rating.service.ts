@@ -1,5 +1,6 @@
 import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+
 import type { SessionGrade, SessionRatingResponse } from "../types/summary.types";
 
 const ratingDocRef = (userId: string, ratingId: string) =>

@@ -1,7 +1,65 @@
 import { alternatePickingCrossStringExercise } from "feature/exercisePlan/data/exerises/alternatePickingCrossString/alternatePickingCrossString";
+import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
+import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
+import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
+import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
+import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
+import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
+import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
+import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
+import { legatoContinuousFlowExercise } from "feature/exercisePlan/data/exerises/legatoContinuousFlow/legatoContinuousFlow";
+import { legatoHammerPullRunExercise } from "feature/exercisePlan/data/exerises/legatoHammerPullRun/legatoHammerPullRun";
+import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
+import { legatoTrillSprintExercise } from "feature/exercisePlan/data/exerises/legatoTrillSprint/legatoTrillSprint";
+import {
+  metalPlayalongExercise,
+  musicianFitnessLvl1S1Exercise,
+  musicianFitnessLvl1S2Exercise,
+  musicianFitnessLvl1S3Exercise,
+  musicianFitnessLvl1S4Exercise,
+  musicianFitnessLvl1S5Exercise,
+  musicianFitnessLvl1S6Exercise,
+  musicianFitnessLvl1S7Exercise,
+  musicianFitnessLvl1S8Exercise,
+} from "feature/exercisePlan/data/exerises/metalPlayalong/metalPlayalong";
+import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
+import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
+import { mutingDisciplineDrillExercise } from "feature/exercisePlan/data/exerises/mutingDisciplineDrill/mutingDisciplineDrill";
+import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
+import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
+import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
+import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
+import { pentatonicPlayalongExercise } from "feature/exercisePlan/data/exerises/pentatonicPlayalong/pentatonicPlayalong";
+import { playByEarExercise } from "feature/exercisePlan/data/exerises/playByEar/playByEar";
+import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
+import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
+import { speedBurstChromaticBlitzExercise } from "feature/exercisePlan/data/exerises/speedBurstChromaticBlitz/speedBurstChromaticBlitz";
+import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
+import { spiderChromaticsExercise } from "feature/exercisePlan/data/exerises/spiderChromatics/spiderChromatics";
+import { spiderLegatoBasicExercise } from "feature/exercisePlan/data/exerises/spiderLegatoBasic/spiderLegatoBasic";
+import { spiderPermutation1423Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1423/spiderPermutation1423";
+import { spiderPermutation1432Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1432/spiderPermutation1432";
+import { spiderPermutation2134Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2134/spiderPermutation2134";
+import { spiderPermutation2143Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2143/spiderPermutation2143";
+import { spiderPermutation2314Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2314/spiderPermutation2314";
+import { spiderPermutation2341Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2341/spiderPermutation2341";
+import { spiderPermutation2413Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2413/spiderPermutation2413";
+import { spiderPermutation2431Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2431/spiderPermutation2431";
+import { spiderPermutation3124Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3124/spiderPermutation3124";
+import { spiderPermutation3142Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3142/spiderPermutation3142";
+import { spiderPermutation3214Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3214/spiderPermutation3214";
+import { spiderPermutation3241Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3241/spiderPermutation3241";
+import { spiderPermutation3412Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3412/spiderPermutation3412";
+import { spiderPermutation3421Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3421/spiderPermutation3421";
+import { spiderPermutation4123Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4123/spiderPermutation4123";
+import { spiderPermutation4132Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4132/spiderPermutation4132";
+import { spiderPermutation4213Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4213/spiderPermutation4213";
+import { spiderPermutation4231Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4231/spiderPermutation4231";
+import { spiderPermutation4312Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4312/spiderPermutation4312";
+import { spiderPermutation4321Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4321/spiderPermutation4321";
+import { stringRepetitionExercise } from "feature/exercisePlan/data/exerises/stringRepetition/stringRepetition";
 import { strummingBasicExercise } from "feature/exercisePlan/data/exerises/strummingBasic/strummingBasic";
 import { strummingDownUpExercise } from "feature/exercisePlan/data/exerises/strummingDownUp/strummingDownUp";
-import { strummingRockExercise } from "feature/exercisePlan/data/exerises/strummingRock/strummingRock";
 import { strummingFunkExercise } from "feature/exercisePlan/data/exerises/strummingFunk/strummingFunk";
 import {
   strummingPattern2,
@@ -35,72 +93,10 @@ import {
   strummingPattern31,
   strummingPattern32,
 } from "feature/exercisePlan/data/exerises/strummingPatterns/strummingPatterns";
-
-import { callAndResponsePhrasingExercise } from "feature/exercisePlan/data/exerises/callAndResponsePhrasing/callAndResponsePhrasing";
-import { chordToneImprovisationExercise } from "feature/exercisePlan/data/exerises/chordToneImprovisation/chordToneImprovisation";
-import { chromaticAccentsExercise } from "feature/exercisePlan/data/exerises/chromaticAccents/chromaticAccents";
-import { economyPickingAngularExercise } from "feature/exercisePlan/data/exerises/economyPickingAngular/economyPickingAngular";
-import { fretboardMasteryExercise } from "feature/exercisePlan/data/exerises/fretboardMastery/fretboardMastery";
-import { guideToneVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/guideToneVoiceLeading/guideToneVoiceLeading";
-import { hammerOnSequence579Exercise } from "feature/exercisePlan/data/exerises/hammerOnSequence579/hammerOnSequence579";
-
-import { legatoContinuousFlowExercise } from "feature/exercisePlan/data/exerises/legatoContinuousFlow/legatoContinuousFlow";
-import { legatoHammerPullRunExercise } from "feature/exercisePlan/data/exerises/legatoHammerPullRun/legatoHammerPullRun";
-import { legatoTrillSprintExercise } from "feature/exercisePlan/data/exerises/legatoTrillSprint/legatoTrillSprint";
-import { mutingDisciplineDrillExercise } from "feature/exercisePlan/data/exerises/mutingDisciplineDrill/mutingDisciplineDrill";
-import { legatoSextuplets457Exercise } from "feature/exercisePlan/data/exerises/legatoSextuplets457/legatoSextuplets457";
-import { metronomeGapTestExercise } from "feature/exercisePlan/data/exerises/metronomeGapTest/metronomeGapTest";
-import { minimalMotionVoiceLeadingExercise } from "feature/exercisePlan/data/exerises/minimalMotionVoiceLeading/minimalMotionVoiceLeading";
-import { naturalNotesMapExercise } from "feature/exercisePlan/data/exerises/naturalNotesMap/naturalNotesMap";
-import { oneChordImprovExercise } from "feature/exercisePlan/data/exerises/oneChordImprov/oneChordImprov";
-import { oneStringBackingExercise } from "feature/exercisePlan/data/exerises/oneStringBacking/oneStringBacking";
-import { playByEarExercise } from "feature/exercisePlan/data/exerises/playByEar/playByEar";
-
-import { singWhatYouPlayExercise } from "feature/exercisePlan/data/exerises/singWhatYouPlay/singWhatYouPlay";
-import { speedBurstChromaticBlitzExercise } from "feature/exercisePlan/data/exerises/speedBurstChromaticBlitz/speedBurstChromaticBlitz";
-import { smoothChordTransitionsExercise } from "feature/exercisePlan/data/exerises/smoothChordTransitions/smoothChordTransitions";
-import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
-import { spiderLegatoBasicExercise } from "feature/exercisePlan/data/exerises/spiderLegatoBasic/spiderLegatoBasic";
-import { spiderPermutation1423Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1423/spiderPermutation1423";
-import { spiderPermutation1432Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1432/spiderPermutation1432";
-import { spiderPermutation2134Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2134/spiderPermutation2134";
-import { spiderPermutation2143Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2143/spiderPermutation2143";
-import { spiderPermutation2314Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2314/spiderPermutation2314";
-import { spiderPermutation2341Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2341/spiderPermutation2341";
-import { spiderPermutation2413Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2413/spiderPermutation2413";
-import { spiderPermutation2431Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation2431/spiderPermutation2431";
-import { spiderPermutation3124Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3124/spiderPermutation3124";
-import { spiderPermutation3142Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3142/spiderPermutation3142";
-import { spiderPermutation3214Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3214/spiderPermutation3214";
-import { spiderPermutation3241Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3241/spiderPermutation3241";
-import { spiderPermutation3412Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3412/spiderPermutation3412";
-import { spiderPermutation3421Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation3421/spiderPermutation3421";
-import { spiderPermutation4123Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4123/spiderPermutation4123";
-import { spiderPermutation4132Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4132/spiderPermutation4132";
-import { spiderPermutation4213Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4213/spiderPermutation4213";
-import { spiderPermutation4231Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4231/spiderPermutation4231";
-import { spiderPermutation4312Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4312/spiderPermutation4312";
-import { spiderPermutation4321Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation4321/spiderPermutation4321";
-
+import { strummingRockExercise } from "feature/exercisePlan/data/exerises/strummingRock/strummingRock";
 import { triadImprovisationExercise } from "feature/exercisePlan/data/exerises/triadImprovisation/triadImprovisation";
 import { twoNotesPerBarPhrasingExercise } from "feature/exercisePlan/data/exerises/twoNotesPerBarPhrasing/twoNotesPerBarPhrasing";
 import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
-import { openGRepetitionExercise } from "feature/exercisePlan/data/exerises/openGRepetition/openGRepetition";
-import { stringRepetitionExercise } from "feature/exercisePlan/data/exerises/stringRepetition/stringRepetition";
-import { spiderChromaticsExercise } from "feature/exercisePlan/data/exerises/spiderChromatics/spiderChromatics";
-import {
-  metalPlayalongExercise,
-  musicianFitnessLvl1S1Exercise,
-  musicianFitnessLvl1S2Exercise,
-  musicianFitnessLvl1S3Exercise,
-  musicianFitnessLvl1S4Exercise,
-  musicianFitnessLvl1S5Exercise,
-  musicianFitnessLvl1S6Exercise,
-  musicianFitnessLvl1S7Exercise,
-  musicianFitnessLvl1S8Exercise,
-} from "feature/exercisePlan/data/exerises/metalPlayalong/metalPlayalong";
-import { pentatonicPlayalongExercise } from "feature/exercisePlan/data/exerises/pentatonicPlayalong/pentatonicPlayalong";
-import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
 // Exercises available for free — all others require Pro
@@ -172,6 +168,67 @@ const FREE_EXERCISE_IDS = new Set([
   "musician_fitness_lvl2_s20",
 ]);
 
+import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
+import { bendAndReleaseExercise } from "feature/exercisePlan/data/exerises/bendAndRelease/bendAndRelease";
+import { chickenPickinExercise } from "feature/exercisePlan/data/exerises/chickenPickin/chickenPickin";
+import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordPractice/chordPractice";
+import { chordSpotlightDrillExercise } from "feature/exercisePlan/data/exerises/chordSpotlightDrill/chordSpotlightDrill";
+import { chromaticSpiderWalkExercise } from "feature/exercisePlan/data/exerises/chromaticSpiderWalk/chromaticSpiderWalk";
+import { compositionChallengeExercise } from "feature/exercisePlan/data/exerises/compositionChallenge/compositionChallenge";
+import { downPickingDoomPulseExercise } from "feature/exercisePlan/data/exerises/downPickingDoomPulse/downPickingDoomPulse";
+import { dynamicCrescendoExercise } from "feature/exercisePlan/data/exerises/dynamicCrescendo/dynamicCrescendo";
+import { earTrainingEasy, earTrainingHard,earTrainingMedium } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
+import { expressiveBendPhrasingExercise } from "feature/exercisePlan/data/exerises/expressiveBendPhrasing/expressiveBendPhrasing";
+import { fingerIndependence1aExercise } from "feature/exercisePlan/data/exerises/fingerIndependence1a/fingerIndependence1a";
+import { firstBendExercise } from "feature/exercisePlan/data/exerises/firstBend/firstBend";
+import { firstBendHalfStepExercise } from "feature/exercisePlan/data/exerises/firstBendHalfStep/firstBendHalfStep";
+import { firstMelodyExercise } from "feature/exercisePlan/data/exerises/firstMelody/firstMelody";
+import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
+import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
+import { highRegisterBendsExercise } from "feature/exercisePlan/data/exerises/highRegisterBends/highRegisterBends";
+import { hybridPickingIndependenceExercise } from "feature/exercisePlan/data/exerises/hybridPickingIndependence/hybridPickingIndependence";
+import { improvPromptEasy, improvPromptHard,improvPromptMedium } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
+import { jazzChordMelodyExercise } from "feature/exercisePlan/data/exerises/jazzChordMelody/jazzChordMelody";
+import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGallop/metalGallop";
+import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
+import { miniArpeggioExercise } from "feature/exercisePlan/data/exerises/miniArpeggio/miniArpeggio";
+import { mutingSpotlightDrillExercise } from "feature/exercisePlan/data/exerises/mutingSpotlightDrill/mutingSpotlightDrill";
+import { nakedToneMelodyExercise } from "feature/exercisePlan/data/exerises/nakedToneMelody/nakedToneMelody";
+import { pentatonicBox1UpDownExercise } from "feature/exercisePlan/data/exerises/pentatonicBox1UpDown/pentatonicBox1UpDown";
+import { pentatonicStringCrossing3Exercise } from "feature/exercisePlan/data/exerises/pentatonicStringCrossing3/pentatonicStringCrossing3";
+import { pinkyPowerDrillExercise } from "feature/exercisePlan/data/exerises/pinkyPowerDrill/pinkyPowerDrill";
+import { precisionBendingDrillExercise } from "feature/exercisePlan/data/exerises/precisionBendingDrill/precisionBendingDrill";
+import { pullOffPentatonicRunExercise } from "feature/exercisePlan/data/exerises/pullOffPentatonicRun/pullOffPentatonicRun";
+import { quarterNotesDrillExercise } from "feature/exercisePlan/data/exerises/quarterNotesDrill/quarterNotesDrill";
+import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
+import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
+import { rhythmTrainingEasy, rhythmTrainingHard,rhythmTrainingMedium } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
+import { scalePracticeExercise } from "feature/exercisePlan/data/exerises/scalePractice/scalePractice";
+import { spiderPermutation1234Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1234/spiderPermutation1234";
+import { stringSkippingArpeggiosExercise } from "feature/exercisePlan/data/exerises/stringSkippingArpeggios/stringSkippingArpeggios";
+import { stringSkippingBasicExercise } from "feature/exercisePlan/data/exerises/stringSkippingBasic/stringSkippingBasic";
+import { stringSkippingMelodicExercise } from "feature/exercisePlan/data/exerises/stringSkippingMelodic/stringSkippingMelodic";
+import { stringSkippingTwoNotesExercise } from "feature/exercisePlan/data/exerises/stringSkippingTwoNotes/stringSkippingTwoNotes";
+import { sweep5StringCascadeExercise } from "feature/exercisePlan/data/exerises/sweep5StringCascade/sweep5StringCascade";
+import { sweepNeoclassicalExercise } from "feature/exercisePlan/data/exerises/sweepNeoclassical/sweepNeoclassical";
+import { sweepPicking3StringExercise } from "feature/exercisePlan/data/exerises/sweepPicking3String/sweepPicking3String";
+import { sweepPickingMotionDrillExercise } from "feature/exercisePlan/data/exerises/sweepPickingMotionDrill/sweepPickingMotionDrill";
+import { sweepPickingMotionDrill6StringExercise } from "feature/exercisePlan/data/exerises/sweepPickingMotionDrill6String/sweepPickingMotionDrill6String";
+import { tappingDescendingTargetExercise } from "feature/exercisePlan/data/exerises/tappingDescendingTarget/tappingDescendingTarget";
+import { tappingMelodicLinesExercise } from "feature/exercisePlan/data/exerises/tappingMelodicLines/tappingMelodicLines";
+import { tappingPullHammerExercise } from "feature/exercisePlan/data/exerises/tappingPullHammer/tappingPullHammer";
+import { tappingSingleStringExercise } from "feature/exercisePlan/data/exerises/tappingSingleString/tappingSingleString";
+import { tappingTriadicCascadeExercise } from "feature/exercisePlan/data/exerises/tappingTriadicCascade/tappingTriadicCascade";
+import { toneColorExplorationExercise } from "feature/exercisePlan/data/exerises/toneColorExploration/toneColorExploration";
+import { toneMatchingExercise } from "feature/exercisePlan/data/exerises/toneMatching/toneMatching";
+import { tripletsDrillExercise } from "feature/exercisePlan/data/exerises/tripletsDrill/tripletsDrill";
+import { unisonBendDrillExercise } from "feature/exercisePlan/data/exerises/unisonBendDrill/unisonBendDrill";
+import { vibratoControlDrillExercise } from "feature/exercisePlan/data/exerises/vibratoControlDrill/vibratoControlDrill";
+import { vibratoFingerIsolationExercise } from "feature/exercisePlan/data/exerises/vibratoFingerIsolation/vibratoFingerIsolation";
+import { vibratoHighPositionExercise } from "feature/exercisePlan/data/exerises/vibratoHighPosition/vibratoHighPosition";
+import { vibratoLowPositionExercise } from "feature/exercisePlan/data/exerises/vibratoLowPosition/vibratoLowPosition";
+import { vibratoSustainDrillExercise } from "feature/exercisePlan/data/exerises/vibratoSustainDrill/vibratoSustainDrill";
+
 import { spiderOneStringExercise } from "./exerises/spiderOneString/spiderOneString";
 import { spiderPermutation1243Exercise } from "./exerises/spiderPermutation1243/spiderPermutation1243";
 import { spiderPermutation1324Exercise } from "./exerises/spiderPermutation1324/spiderPermutation1324";
@@ -180,67 +237,6 @@ import { spiderStairsHardExercise } from "./exerises/spiderStairsHard/spiderStai
 import { SpiderStringSkippingExercise } from "./exerises/spiderStringSkipping/spiderStringSkipping";
 import { spiderXExercise } from "./exerises/spiderX/spiderX";
 import { spiderXExtendedExercise } from "./exerises/spiderXExtended/spiderXExtended";
-import { spiderPermutation1234Exercise } from "feature/exercisePlan/data/exerises/spiderPermutation1234/spiderPermutation1234";
-import { randomNoteHuntExercise } from "feature/exercisePlan/data/exerises/randomNoteHunt/randomNoteHunt";
-import { earTrainingEasy, earTrainingMedium, earTrainingHard } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
-import { firstBendExercise } from "feature/exercisePlan/data/exerises/firstBend/firstBend";
-import { firstBendHalfStepExercise } from "feature/exercisePlan/data/exerises/firstBendHalfStep/firstBendHalfStep";
-import { bendAndReleaseExercise } from "feature/exercisePlan/data/exerises/bendAndRelease/bendAndRelease";
-import { highRegisterBendsExercise } from "feature/exercisePlan/data/exerises/highRegisterBends/highRegisterBends";
-import { precisionBendingDrillExercise } from "feature/exercisePlan/data/exerises/precisionBendingDrill/precisionBendingDrill";
-import { vibratoControlDrillExercise } from "feature/exercisePlan/data/exerises/vibratoControlDrill/vibratoControlDrill";
-import { expressiveBendPhrasingExercise } from "feature/exercisePlan/data/exerises/expressiveBendPhrasing/expressiveBendPhrasing";
-import { unisonBendDrillExercise } from "feature/exercisePlan/data/exerises/unisonBendDrill/unisonBendDrill";
-import { tappingSingleStringExercise } from "feature/exercisePlan/data/exerises/tappingSingleString/tappingSingleString";
-import { tappingPullHammerExercise } from "feature/exercisePlan/data/exerises/tappingPullHammer/tappingPullHammer";
-import { tappingDescendingTargetExercise } from "feature/exercisePlan/data/exerises/tappingDescendingTarget/tappingDescendingTarget";
-import { tappingTriadicCascadeExercise } from "feature/exercisePlan/data/exerises/tappingTriadicCascade/tappingTriadicCascade";
-import { tappingMelodicLinesExercise } from "feature/exercisePlan/data/exerises/tappingMelodicLines/tappingMelodicLines";
-import { sweepPicking3StringExercise } from "feature/exercisePlan/data/exerises/sweepPicking3String/sweepPicking3String";
-import { sweepPickingMotionDrillExercise } from "feature/exercisePlan/data/exerises/sweepPickingMotionDrill/sweepPickingMotionDrill";
-import { miniArpeggioExercise } from "feature/exercisePlan/data/exerises/miniArpeggio/miniArpeggio";
-import { sweepPickingMotionDrill6StringExercise } from "feature/exercisePlan/data/exerises/sweepPickingMotionDrill6String/sweepPickingMotionDrill6String";
-import { sweep5StringCascadeExercise } from "feature/exercisePlan/data/exerises/sweep5StringCascade/sweep5StringCascade";
-import { sweepNeoclassicalExercise } from "feature/exercisePlan/data/exerises/sweepNeoclassical/sweepNeoclassical";
-import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
-
-import { hybridPickingIndependenceExercise } from "feature/exercisePlan/data/exerises/hybridPickingIndependence/hybridPickingIndependence";
-import { chickenPickinExercise } from "feature/exercisePlan/data/exerises/chickenPickin/chickenPickin";
-import { jazzChordMelodyExercise } from "feature/exercisePlan/data/exerises/jazzChordMelody/jazzChordMelody";
-import { stringSkippingBasicExercise } from "feature/exercisePlan/data/exerises/stringSkippingBasic/stringSkippingBasic";
-import { stringSkippingArpeggiosExercise } from "feature/exercisePlan/data/exerises/stringSkippingArpeggios/stringSkippingArpeggios";
-import { stringSkippingMelodicExercise } from "feature/exercisePlan/data/exerises/stringSkippingMelodic/stringSkippingMelodic";
-import { chromaticSpiderWalkExercise } from "feature/exercisePlan/data/exerises/chromaticSpiderWalk/chromaticSpiderWalk";
-import { pinkyPowerDrillExercise } from "feature/exercisePlan/data/exerises/pinkyPowerDrill/pinkyPowerDrill";
-import { fretStretchDrillExercise } from "feature/exercisePlan/data/exerises/fretStretchDrill/fretStretchDrill";
-import { dynamicCrescendoExercise } from "feature/exercisePlan/data/exerises/dynamicCrescendo/dynamicCrescendo";
-import { toneColorExplorationExercise } from "feature/exercisePlan/data/exerises/toneColorExploration/toneColorExploration";
-import { toneMatchingExercise } from "feature/exercisePlan/data/exerises/toneMatching/toneMatching";
-import { scalePracticeExercise } from "feature/exercisePlan/data/exerises/scalePractice/scalePractice";
-import { chordPracticeExercise } from "feature/exercisePlan/data/exerises/chordPractice/chordPractice";
-import { improvPromptEasy, improvPromptMedium, improvPromptHard } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
-import { compositionChallengeExercise } from "feature/exercisePlan/data/exerises/compositionChallenge/compositionChallenge";
-import { rhythmTrainingEasy, rhythmTrainingMedium, rhythmTrainingHard } from "feature/exercisePlan/data/exerises/rhythmTraining/rhythmTraining";
-import { metalGallopExercise } from "feature/exercisePlan/data/exerises/metalGallop/metalGallop";
-import { metalTremoloPickingExercise } from "feature/exercisePlan/data/exerises/metalTremoloPicking/metalTremoloPicking";
-import { alternatePickingPentatonicAPositionsExercise } from "feature/exercisePlan/data/exerises/alternatePickingPentatonicAPositions/alternatePickingPentatonicAPositions";
-import { fingerIndependence1aExercise } from "feature/exercisePlan/data/exerises/fingerIndependence1a/fingerIndependence1a";
-import { hammerOnPentatonicRunExercise } from "feature/exercisePlan/data/exerises/hammerOnPentatonicRun/hammerOnPentatonicRun";
-import { pullOffPentatonicRunExercise } from "feature/exercisePlan/data/exerises/pullOffPentatonicRun/pullOffPentatonicRun";
-import { downPickingDoomPulseExercise } from "feature/exercisePlan/data/exerises/downPickingDoomPulse/downPickingDoomPulse";
-import { nakedToneMelodyExercise } from "feature/exercisePlan/data/exerises/nakedToneMelody/nakedToneMelody";
-import { mutingSpotlightDrillExercise } from "feature/exercisePlan/data/exerises/mutingSpotlightDrill/mutingSpotlightDrill";
-import { chordSpotlightDrillExercise } from "feature/exercisePlan/data/exerises/chordSpotlightDrill/chordSpotlightDrill";
-import { vibratoSustainDrillExercise } from "feature/exercisePlan/data/exerises/vibratoSustainDrill/vibratoSustainDrill";
-import { vibratoLowPositionExercise } from "feature/exercisePlan/data/exerises/vibratoLowPosition/vibratoLowPosition";
-import { vibratoHighPositionExercise } from "feature/exercisePlan/data/exerises/vibratoHighPosition/vibratoHighPosition";
-import { vibratoFingerIsolationExercise } from "feature/exercisePlan/data/exerises/vibratoFingerIsolation/vibratoFingerIsolation";
-import { stringSkippingTwoNotesExercise } from "feature/exercisePlan/data/exerises/stringSkippingTwoNotes/stringSkippingTwoNotes";
-import { firstMelodyExercise } from "feature/exercisePlan/data/exerises/firstMelody/firstMelody";
-import { quarterNotesDrillExercise } from "feature/exercisePlan/data/exerises/quarterNotesDrill/quarterNotesDrill";
-import { pentatonicStringCrossing3Exercise } from "feature/exercisePlan/data/exerises/pentatonicStringCrossing3/pentatonicStringCrossing3";
-import { tripletsDrillExercise } from "feature/exercisePlan/data/exerises/tripletsDrill/tripletsDrill";
-import { pentatonicBox1UpDownExercise } from "feature/exercisePlan/data/exerises/pentatonicBox1UpDown/pentatonicBox1UpDown";
 
 
 const rawExercises: Exercise[] = [

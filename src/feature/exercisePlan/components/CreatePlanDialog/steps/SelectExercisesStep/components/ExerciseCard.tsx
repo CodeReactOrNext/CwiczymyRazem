@@ -3,8 +3,9 @@ import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Lock, Plus, Video, X, Info } from "lucide-react";
+import { Check, Info,Lock, Plus, Video, X } from "lucide-react";
 import { FaYoutube } from "react-icons/fa6";
+
 import { TablaturePreview } from "./TablaturePreview";
 
 interface ExerciseCardProps {

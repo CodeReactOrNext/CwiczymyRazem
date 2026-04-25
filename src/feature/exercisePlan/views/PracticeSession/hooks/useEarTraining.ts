@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
 import { generateRiddle } from "feature/exercisePlan/logic/riddleGenerator";
+import { useEffect, useState } from "react";
+
 import { getExerciseBpmProgress } from "../../../services/bpmProgressService";
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 

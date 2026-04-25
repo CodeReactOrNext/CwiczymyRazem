@@ -122,7 +122,7 @@ export const useMetronome = ({
     };
   // externalAudioContext intentionally included: when AlphaTab's context becomes
   // available we reinitialise the worklet on that context (happens before first play).
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [enabled, externalAudioContext]);
 
   const playSound = useCallback((time: number, isAccent: boolean = false) => {

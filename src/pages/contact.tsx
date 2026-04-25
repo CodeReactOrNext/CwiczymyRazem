@@ -1,12 +1,12 @@
 import { Footer } from "feature/landing/components/Footer";
 import AppLayout from "layouts/AppLayout";
+import { Mail, MessageCircle, Send } from "lucide-react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import type { ReactElement } from "react";
 import type { NextPageWithLayout } from "types/page";
-import { Mail, MessageCircle, Send } from "lucide-react";
 
 const ContactPage: NextPageWithLayout = () => {
   const { status } = useSession();

@@ -1,9 +1,10 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import { Plus, X } from "lucide-react";
 import { EFFECTS_BY_ID } from "feature/arsenal/data/effectDefinitions";
+import { Plus, X } from "lucide-react";
+import { useCallback, useEffect,useRef, useState } from "react";
+
+import type { ArsenalUserData, PedalboardPlacement } from "../../types/arsenal.types";
 import { RARITY_STYLES } from "../RarityBadge";
 import { EffectPickerModal } from "./EffectPickerModal";
-import type { ArsenalUserData, PedalboardPlacement } from "../../types/arsenal.types";
 
 const PEDAL_W_PCT = 16;
 const PEDAL_H_PCT = 42;

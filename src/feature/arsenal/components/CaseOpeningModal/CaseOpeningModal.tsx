@@ -1,14 +1,15 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { GUITARS_BY_ID, GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
+import { cn } from "assets/lib/utils";
 import { EFFECTS_BY_ID, EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
-import { RarityBadge, RARITY_STYLES, RARITY_GLOW_CLASS } from "../RarityBadge";
+import { GUITARS_BY_ID, GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import { useEquipGuitar } from "feature/arsenal/hooks/useEquipGuitar";
-import type { OpenCaseResult, CaseDefinition, GuitarDefinition, EffectDefinition, GuitarRarity } from "../../types/arsenal.types";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import type { CaseDefinition, EffectDefinition, GuitarDefinition, GuitarRarity,OpenCaseResult } from "../../types/arsenal.types";
+import { RARITY_GLOW_CLASS,RARITY_STYLES, RarityBadge } from "../RarityBadge";
 
 const ITEM_WIDTH = 180;
 const VISIBLE_ITEMS = 60;

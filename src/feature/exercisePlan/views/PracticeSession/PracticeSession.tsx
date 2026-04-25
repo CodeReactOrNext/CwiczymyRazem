@@ -1,5 +1,4 @@
 import "react-circular-progressbar/dist/styles.css";
-import posthog from "posthog-js";
 
 import {
   Accordion,
@@ -9,54 +8,52 @@ import {
 } from "assets/components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
+import { PremiumGate } from "feature/premium/components/PremiumGate";
+import { parseGpFile } from "feature/songs/services/gp5Parser.service";
+import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
+import { selectUserAuth, selectUserAvatar, selectUserInfo,selectUserName } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
+import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import { Drum, Gauge, Music, Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import posthog from "posthog-js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaInfoCircle, FaLightbulb, FaMicrophone, FaSync } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
-
-import { useBpmProgress } from "../../hooks/useBpmProgress";
-import { updateMicHighScore, updateEarTrainingHighScore, saveLeaderboardEntry } from "../../services/bpmProgressService";
+import { useAppSelector } from "store/hooks";
+import { getNoteFromFrequency } from "utils/audio/noteUtils";
 import { playCompletionSound } from "utils/audioUtils";
-import type { ExercisePlan } from "../../types/exercise.types";
 
+import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
+import { useAlphaTabPlayer } from "../../hooks/useAlphaTabPlayer";
+import { useBpmProgress } from "../../hooks/useBpmProgress";
+import { useExamBackingAudio } from "../../hooks/useExamBackingAudio";
+import type { AudioTrackConfig} from "../../hooks/useTablatureAudio";
+import {useTablatureAudio } from "../../hooks/useTablatureAudio";
+import { saveLeaderboardEntry,updateEarTrainingHighScore, updateMicHighScore } from "../../services/bpmProgressService";
+import type { ExercisePlan } from "../../types/exercise.types";
+import type { BackingTrack } from "../../types/exercise.types";
+import { ChordSelectionDialog } from "./components/ChordSelectionDialog";
+import { ExerciseContentArea } from "./components/ExerciseContentArea";
 import { ExerciseProgress } from "./components/ExerciseProgress";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
-import { ExerciseContentArea } from "./components/ExerciseContentArea";
-import { MainTimerSection } from "./components/MainTimerSection";
 import { MicHud } from "./components/MicHud";
 import { ScaleSelectionDialog } from "./components/ScaleSelectionDialog";
-import { ChordSelectionDialog } from "./components/ChordSelectionDialog";
 import { SessionBottomBar } from "./components/SessionBottomBar";
 import { SessionDialogs } from "./components/SessionDialogs";
 import { SessionSidebar } from "./components/SessionSidebar";
-
-import { useImageHandling } from "./hooks/useImageHandling";
-import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
-import { useNoteMatching } from "./hooks/useNoteMatching";
-import { useStrummingMatcher } from "./hooks/useStrummingMatcher";
+import { useCalibration } from "./hooks/useCalibration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
+import { useImageHandling } from "./hooks/useImageHandling";
+import { useNoteMatching } from "./hooks/useNoteMatching";
+import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
+import { useStrummingMatcher } from "./hooks/useStrummingMatcher";
 import ImageModal from "./modals/ImageModal";
 import SessionModal from "./modals/SessionModal";
-import { PremiumGate } from "feature/premium/components/PremiumGate";
-import { selectUserAuth, selectUserName, selectUserAvatar, selectUserInfo } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
-import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
-import { AlphaTabScoreViewer } from "./components/AlphaTabScoreViewer";
-import { useTablatureAudio, AudioTrackConfig } from "../../hooks/useTablatureAudio";
-import { useExamBackingAudio } from "../../hooks/useExamBackingAudio";
-import { useAlphaTabPlayer } from "../../hooks/useAlphaTabPlayer";
-import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
-import { getNoteFromFrequency } from "utils/audio/noteUtils";
-import { useCalibration } from "./hooks/useCalibration";
-import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
-import { parseGpFile } from "feature/songs/services/gp5Parser.service";
-import type { BackingTrack } from "../../types/exercise.types";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

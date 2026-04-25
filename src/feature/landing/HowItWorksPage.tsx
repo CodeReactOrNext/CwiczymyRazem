@@ -1,13 +1,13 @@
 "use client";
 
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { Footer } from "feature/landing/components/Footer";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 
 /* ─────────────────────────────────────────────
    Data

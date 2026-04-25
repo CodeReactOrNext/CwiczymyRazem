@@ -8,11 +8,11 @@ import { PlanCard } from "feature/exercisePlan/components/PlanCard";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
+import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
-import { Flame, Music, Zap, ArrowLeft } from "lucide-react";
+import { ArrowLeft,Flame, Music, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
 

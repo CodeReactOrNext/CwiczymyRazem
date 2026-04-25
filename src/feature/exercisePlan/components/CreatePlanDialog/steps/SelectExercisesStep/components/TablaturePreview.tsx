@@ -1,5 +1,5 @@
-import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { cn } from "assets/lib/utils";
+import type { TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 
 interface TablaturePreviewProps {
   measures: TablatureMeasure[];

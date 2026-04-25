@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
-import { useScroll, useTransform, motion } from "framer-motion";
+import { motion,useScroll, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
 import { useRef } from "react";
 
 export const FinalCTASection = () => {

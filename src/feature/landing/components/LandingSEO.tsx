@@ -1,5 +1,5 @@
-import Head from "next/head";
 import { useTranslation } from "hooks/useTranslation";
+import Head from "next/head";
 
 interface LandingSEOProps {
   faqQuestions: {

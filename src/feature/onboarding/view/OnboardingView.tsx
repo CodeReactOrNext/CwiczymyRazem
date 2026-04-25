@@ -4,8 +4,8 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import posthog from "posthog-js";
+import { useState } from "react";
 
 import { StepPath } from "../components/StepPath";
 import { StepWelcome } from "../components/StepWelcome";

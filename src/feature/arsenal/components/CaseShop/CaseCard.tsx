@@ -1,7 +1,8 @@
 import { cn } from "assets/lib/utils";
 import { FaGem } from "react-icons/fa";
-import { RARITY_STYLES } from "../RarityBadge";
+
 import type { CaseDefinition, GuitarRarity } from "../../types/arsenal.types";
+import { RARITY_STYLES } from "../RarityBadge";
 
 const CASE_ACCENT: Record<string, { cardBg: string; button: string; header: string; iconColor: string }> = {
   standard: {

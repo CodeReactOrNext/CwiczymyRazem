@@ -1,9 +1,9 @@
-import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
-import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
 import { earTrainingMedium } from "feature/exercisePlan/data/exerises/earTraining/earTrainingExercises";
 import { improvPromptMedium } from "feature/exercisePlan/data/exerises/improvPrompt/improvPromptExercises";
-import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
+import { jpStretching } from "feature/exercisePlan/data/exerises/jpStretch/jpStretching";
 import { rhythmicPocketMasteryExercise } from "feature/exercisePlan/data/exerises/rhythmicPocketMastery/rhythmicPocketMastery";
+import { spiderBasicExercise } from "feature/exercisePlan/data/exerises/spiderBasic/spiderBasic";
+import { vibratoMasteryExercise } from "feature/exercisePlan/data/exerises/vibratoMastery/vibratoMastery";
 
 import type { ExercisePlan } from "../../../types/exercise.types";
 

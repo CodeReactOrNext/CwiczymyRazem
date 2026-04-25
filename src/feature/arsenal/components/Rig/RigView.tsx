@@ -1,10 +1,11 @@
 import { useState } from "react";
-import type { ArsenalUserData, RigSetup } from "../../types/arsenal.types";
+
 import { GUITARS_BY_ID } from "../../data/guitarDefinitions";
-import { useUpdateRig } from "../../hooks/useUpdateRig";
 import { useUpdatePedalboard } from "../../hooks/useUpdatePedalboard";
-import { GuitarSlot } from "./GuitarSlot";
+import { useUpdateRig } from "../../hooks/useUpdateRig";
+import type { ArsenalUserData, RigSetup } from "../../types/arsenal.types";
 import { GuitarPickerModal } from "./GuitarPickerModal";
+import { GuitarSlot } from "./GuitarSlot";
 import { PedalboardView } from "./PedalboardView";
 
 interface RigViewProps {

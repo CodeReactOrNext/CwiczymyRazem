@@ -1,7 +1,7 @@
-import { ArrowRight, Dumbbell, Library, Loader2, Map, NotebookPen } from "lucide-react";
-
 import { cn } from "assets/lib/utils";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { ArrowRight, Dumbbell, Library, Loader2, Map, NotebookPen } from "lucide-react";
+
 import type { OnboardingPath } from "../types";
 
 interface Props {

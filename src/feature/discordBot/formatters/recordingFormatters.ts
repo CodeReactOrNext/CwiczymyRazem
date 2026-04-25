@@ -1,4 +1,5 @@
 import type { FirebaseLogsRecordingsInterface } from "feature/logs/types/logs.type";
+
 import { getUserDisplayName } from "../utils/userUtils";
 
 export class RecordingAddedFormatter {

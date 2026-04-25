@@ -1,8 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
-import { cn } from "assets/lib/utils";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import { ArrowRight, ChevronRight, Clock, Dumbbell, Play, Target, Zap } from "lucide-react";
+import { ChevronRight, Clock, Dumbbell, Target, Zap } from "lucide-react";
 import Link from "next/link";
 
 interface DailyPlanRecommendationProps {

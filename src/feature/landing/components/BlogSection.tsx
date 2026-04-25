@@ -1,9 +1,7 @@
-import { Badge } from "assets/components/ui/badge";
-import { Card, CardContent } from "assets/components/ui/card";
-import { ArrowRight, Clock } from "lucide-react";
-import Link from "next/link";
+import type { BlogFrontmatter } from "lib/blog";
+import { ArrowRight } from "lucide-react";
 import NextImage from "next/image";
-import { BlogFrontmatter } from "lib/blog";
+import Link from "next/link";
 
 interface BlogSectionProps {
   blogs: BlogFrontmatter[];

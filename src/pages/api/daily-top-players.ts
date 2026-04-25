@@ -1,3 +1,4 @@
+import {SEASON_FAME_REWARDS } from "constants/seasonRewards";
 import { SeasonService } from "feature/discordBot/services/seasonService";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { logger } from "feature/logger/Logger";
@@ -6,7 +7,6 @@ import {
   awardSeasonFame,
   hasSeasonalAchievement
 } from "feature/profile/services/seasonalAchievementsService";
-import { SEASON_FAME_REWARDS, placeSuffix } from "constants/seasonRewards";
 import {
   addDoc,
   collection,

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Soundfont from "soundfont-player";
-import { TablatureMeasure, TablatureNote, BendPoint } from "../types/exercise.types";
+
+import type { BendPoint,TablatureMeasure, TablatureNote } from "../types/exercise.types";
 
 export interface AudioTrackConfig {
   id: string;

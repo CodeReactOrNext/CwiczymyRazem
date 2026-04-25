@@ -1,15 +1,16 @@
-import React from "react";
 import { cn } from "assets/lib/utils";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
+import React from "react";
 import type { NoteData } from "utils/audio/noteUtils";
+
+import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
 import type { SlotResult } from "../hooks/useStrummingMatcher";
+import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
-import { TablatureViewer } from "./TablatureViewer";
-import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { StrummingPatternViewer } from "./StrummingPatternViewer";
-import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
+import { TablatureViewer } from "./TablatureViewer";
 
 interface ExerciseContentAreaProps {
   activeTablature: TablatureMeasure[] | null | undefined;

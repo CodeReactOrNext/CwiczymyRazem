@@ -1,26 +1,25 @@
-import { Button } from "assets/components/ui/button";
-import { cn } from "assets/lib/utils";
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
-import { useTranslation } from "hooks/useTranslation";
-import { Clock, Edit2, Copy, Trash2, GripVertical, ListPlus } from "lucide-react";
-import { useState, useRef } from "react";
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  type DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  type DragEndEvent,
 } from "@dnd-kit/core";
 import {
+  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-  arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Button } from "assets/components/ui/button";
+import { cn } from "assets/lib/utils";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import { useTranslation } from "hooks/useTranslation";
+import { Clock, Copy, Edit2, GripVertical, ListPlus,Trash2 } from "lucide-react";
 
 interface SelectedExercisesListProps {
   selectedExercises: Exercise[];

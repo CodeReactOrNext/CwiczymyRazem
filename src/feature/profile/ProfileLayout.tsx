@@ -1,32 +1,31 @@
 import { ActivityLogView } from "components/ActivityLog/ActivityLog";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DaySinceMessage } from "components/DaySince/DaySince";
-import { LevelBar } from "components/LevelBar/LevelBar";
 import Avatar from "components/UI/Avatar";
 import { HeroBanner } from "components/UI/HeroBanner";
+import { IMG_RANKS_NUMBER } from "constants/gameSettings";
+import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
+import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { getUserSkills } from "feature/skills/services/getUserSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { SkillTreeCards } from "feature/skills/SkillTreeCards";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
+import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
 import { FaSoundcloud, FaYoutube } from "react-icons/fa";
 import type { ProfileInterface } from "types/ProfileInterface";
-import { getSongTier } from "feature/songs/utils/getSongTier";
 import { getYearsOfPlaying } from "utils/converter";
 import { getPointsToLvlUp } from "utils/gameLogic";
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 
 import { PracticeInsights } from "./components/PracticeInsights/PracticeInsights";
 import { ProfileArsenal } from "./components/ProfileArsenal";
 import { SongSkillShowcase } from "./components/SongSkillShowcase";
 import { StatsSection } from "./components/StatsSection";
 import { UserRecordingsSection } from "./components/UserRecordingsSection";
-import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
-import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 
 interface LandingLayoutProps {
   statsField: StatsFieldProps[];

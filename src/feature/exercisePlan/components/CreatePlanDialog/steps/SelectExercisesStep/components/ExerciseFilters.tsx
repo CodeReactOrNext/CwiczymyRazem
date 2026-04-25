@@ -1,12 +1,12 @@
 import { Input } from "assets/components/ui/input";
+import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { GuitarSkillId } from "feature/skills/skills.types";
 import { useTranslation } from "hooks/useTranslation";
-import { FaSearch, FaFilter } from "react-icons/fa";
-import { cn } from "assets/lib/utils";
-import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { FaFilter,FaSearch } from "react-icons/fa";
 
 interface ExerciseFiltersProps {
   searchQuery: string;

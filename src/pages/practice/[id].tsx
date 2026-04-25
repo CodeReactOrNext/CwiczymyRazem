@@ -1,7 +1,7 @@
 import { getUserExercisePlan } from "feature/exercisePlan/services/getUserExercisePlan";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
+import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";

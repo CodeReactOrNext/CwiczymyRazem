@@ -1,20 +1,20 @@
 import { Button } from "assets/components/ui/button";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import { ChordSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ChordSelectionDialog";
+import { ScaleSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ScaleSelectionDialog";
 import { motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 
+import { AddExerciseTimeDialog } from "./components/AddExerciseTimeDialog";
 import { ExerciseFilters } from "./components/ExerciseFilters";
 import { ExerciseGrid } from "./components/ExerciseGrid";
+import { ExercisePreviewDialog } from "./components/ExercisePreviewDialog";
 import { SelectedExercisesList } from "./components/SelectedExercisesList";
 import { CreateCustomExerciseDialog } from "./CreateCustomExerciseDialog";
-import { AddExerciseTimeDialog } from "./components/AddExerciseTimeDialog";
-import { ExercisePreviewDialog } from "./components/ExercisePreviewDialog";
 import { useExerciseSelection } from "./hooks/useExerciseSelection";
-import { ScaleSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ScaleSelectionDialog";
-import { ChordSelectionDialog } from "feature/exercisePlan/views/PracticeSession/components/ChordSelectionDialog";
 
 interface SelectExercisesStepProps {
   selectedExercises: Exercise[];

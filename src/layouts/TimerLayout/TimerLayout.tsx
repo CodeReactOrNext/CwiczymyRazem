@@ -20,7 +20,7 @@ import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect,useState } from "react";
 import { MdAccessTime } from "react-icons/md";
 import type { TimerInterface } from "types/api.types";
 import type { SkillsType } from "types/skillsTypes";

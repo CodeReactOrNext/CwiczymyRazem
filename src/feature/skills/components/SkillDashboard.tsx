@@ -1,25 +1,25 @@
-import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
 import { Button } from "assets/components/ui/button";
+import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
+import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
-import { getAllBpmProgress, type BpmProgressData } from "feature/exercisePlan/services/bpmProgressService";
+import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
+import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { type BpmProgressData,getAllBpmProgress } from "feature/exercisePlan/services/bpmProgressService";
 import { generateBpmStages } from "feature/exercisePlan/utils/generateBpmStages";
+import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { UpgradeModal } from "feature/premium/components/UpgradeModal";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import type { UserSkills } from "feature/skills/skills.types";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
-import { ChevronRight, Ear, Star, ChevronLeft, Mic, Trophy, Lock } from "lucide-react";
-import { UpgradeModal } from "feature/premium/components/UpgradeModal";
-
+import { useTranslation } from "hooks/useTranslation";
+import { ChevronLeft, ChevronRight, Ear, Lock,Mic, Star, Trophy } from "lucide-react";
 import { useRouter } from "next/router";
+import { useCallback, useEffect,useMemo, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
-import { useTranslation } from "hooks/useTranslation";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+
 import { SkillCategoryGroup } from "./SkillCategoryGroup";
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { cn } from "assets/lib/utils";
-import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
-import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
-import { EarTrainingLeaderboardDialog } from "feature/exercisePlan/components/EarTrainingLeaderboardDialog";
 
 interface DashboardExercise {
   id: string;

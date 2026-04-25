@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
 import { motion } from "framer-motion";
-import {
-  CheckCircle2, ChevronRight,
-  Guitar, Drum, Music2, Mic2,
-} from "lucide-react";
+import { ChevronRight,
+Drum,   Guitar, Mic2,
+Music2, } from "lucide-react";
 import Image from "next/image";
+import React, { useMemo } from "react";
+
 import type { JourneyModuleWithStatus, LockedModulePlaceholder } from "../../types/journey.types";
 
 // ─── Config ───────────────────────────────────────────────────────────────────

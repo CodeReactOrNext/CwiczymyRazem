@@ -4,19 +4,19 @@ import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
 import { BlogSection } from "feature/landing/components/BlogSection";
 import { CookieBanner } from "feature/landing/components/CookieBanner";
 import { FaqSection } from "feature/landing/components/FaqSection";
-import { InteractiveExercisesSection } from "feature/landing/components/InteractiveExercisesSection";
-import { StatisticsSection } from "feature/landing/components/StatisticsSection";
-import { SongsLibrarySection } from "feature/landing/components/SongsLibrarySection";
-import { PracticePlansSection } from "feature/landing/components/PracticePlansSection";
-import { RoadmapSection } from "feature/landing/components/RoadmapSection";
-import { SessionSummarySection } from "feature/landing/components/SessionSummarySection";
+import { FinalCTASection } from "feature/landing/components/FinalCTASection";
 import { Footer } from "feature/landing/components/Footer";
 import { HeroSection } from "feature/landing/components/HeroSection";
-import { WhySection } from "feature/landing/components/WhySection";
+import { InteractiveExercisesSection } from "feature/landing/components/InteractiveExercisesSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
-import { FinalCTASection } from "feature/landing/components/FinalCTASection";
+import { PracticePlansSection } from "feature/landing/components/PracticePlansSection";
 import { ProductDemo } from "feature/landing/components/ProductDemo";
-import { BlogFrontmatter } from "lib/blog";
+import { RoadmapSection } from "feature/landing/components/RoadmapSection";
+import { SessionSummarySection } from "feature/landing/components/SessionSummarySection";
+import { SongsLibrarySection } from "feature/landing/components/SongsLibrarySection";
+import { StatisticsSection } from "feature/landing/components/StatisticsSection";
+import { WhySection } from "feature/landing/components/WhySection";
+import type { BlogFrontmatter } from "lib/blog";
 
 interface LandingPageProps {
   blogs: BlogFrontmatter[];

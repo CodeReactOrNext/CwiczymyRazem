@@ -1,3 +1,4 @@
+import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { logger } from "feature/logger/Logger";
 import {
@@ -7,7 +8,6 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
-import { SEASON_FAME_REWARDS } from "constants/seasonRewards";
 import { db } from "utils/firebase/client/firebase.utils";
 import { trackedGetDoc, trackedGetDocs, trackedSetDoc } from "utils/firebase/client/firestoreTracking";
 
