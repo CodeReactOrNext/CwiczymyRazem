@@ -2,7 +2,7 @@ import { Button } from "assets/components/ui/button";
 import { Card } from "assets/components/ui/card";
 import { cn } from "assets/lib/utils";
 import { selectDailyQuest } from "feature/user/store/userSlice";
-import { claimQuestRewardAction,initializeDailyQuestAction } from "feature/user/store/userSlice.asyncThunk";
+import { claimQuestRewardAction, initializeDailyQuestAction } from "feature/user/store/userSlice.questActions";
 import { useTranslation } from "hooks/useTranslation";
 import { ArrowRight, CheckCircle2, Gift, Swords } from "lucide-react";
 import Router from "next/router";

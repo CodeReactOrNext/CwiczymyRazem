@@ -12,7 +12,8 @@ import {
   selectUserAuth,
   selectUserAvatar,
 } from "feature/user/store/userSlice";
-import { updateQuestProgress, updateUserStats } from "feature/user/store/userSlice.asyncThunk";
+import { updateUserStats } from "feature/user/store/userSlice.asyncThunk";
+import { updateQuestProgress } from "feature/user/store/userSlice.questActions";
 import { Formik } from "formik";
 import { useTranslation } from "hooks/useTranslation";
 import RatingPopUpLayout from "layouts/RatingPopUpLayout";
