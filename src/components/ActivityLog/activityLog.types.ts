@@ -1,6 +1,6 @@
 import type { ReportListInterface } from "types/api.types";
 
-export type PartiallyRequired<T, K extends keyof T> = Omit<T, K> &
+type PartiallyRequired<T, K extends keyof T> = Omit<T, K> &
   Required<Pick<T, K>>;
 
 export type ReportListInterfaceWithTimeSumary = PartiallyRequired<
@@ -10,7 +10,7 @@ export type ReportListInterfaceWithTimeSumary = PartiallyRequired<
   activities?: ActivityDetail[];
 };
 
-export interface ActivityDetail {
+interface ActivityDetail {
   title: string;
   planId?: string;
   points: number;
@@ -24,7 +24,7 @@ export interface ActivityDetail {
   };
 }
 
-export interface ActivityReport {
+interface ActivityReport {
   date: Date;
   techniqueTime: number;
   theoryTime: number;

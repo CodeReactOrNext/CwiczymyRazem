@@ -11,7 +11,7 @@ export interface FretPosition {
 /**
  * Get MIDI note for a given string and fret
  */
-export function getMidiNote(stringNum: number, fret: number): number {
+function getMidiNote(stringNum: number, fret: number): number {
   // stringNum is 1-6, array is 0-indexed
   const openNote = STANDARD_TUNING[stringNum - 1];
   return openNote + fret;
@@ -21,7 +21,7 @@ export function getMidiNote(stringNum: number, fret: number): number {
  * Get all positions on the fretboard for a given MIDI note
  * within a specific fret range
  */
-export function getPositionsForNote(
+function getPositionsForNote(
   midiNote: number,
   minFret: number = 0,
   maxFret: number = 12
@@ -84,7 +84,7 @@ export function getScalePatternForPosition(
 /**
  * Get positions for a single string within a fret range
  */
-export function getScaleOnString(
+function getScaleOnString(
   rootMidi: number,
   scaleIntervals: number[],
   stringNum: number,

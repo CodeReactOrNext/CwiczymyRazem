@@ -24,13 +24,13 @@ export interface DiscordEmbed {
   timestamp?: string;
 }
 
-export interface DiscordField {
+interface DiscordField {
   name: string;
   value?: string;
   inline?: boolean;
 }
 
-export interface RandomMessage {
+interface RandomMessage {
   condition: boolean;
   message: string;
 }

@@ -12,7 +12,7 @@ interface NavigationCardProps {
   actionLabel?: string;
 }
 
-export const NavigationCard = ({
+const NavigationCard = ({
   title,
   icon,
   onClick,

@@ -202,4 +202,4 @@ export const FeedbackModal = ({ isOpen, onClose, onSent, variant = "default" }: 
   );
 };
 
-export default FeedbackModal;
+FeedbackModal;

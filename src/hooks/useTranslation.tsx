@@ -156,16 +156,3 @@ export function useTranslation(
   };
 }
 
-/**
- * Trans component replacement for react-i18next Trans
- * For now, just renders children or the translation key
- */
-export function Trans({ 
-  i18nKey,
-  children,
-}: { 
-  i18nKey?: string;
-  children?: React.ReactNode;
-}) {
-  return <>{children || i18nKey}</>;
-}

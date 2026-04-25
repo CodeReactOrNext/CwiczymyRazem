@@ -96,4 +96,4 @@ export interface AchievementsDataInterface extends AchievementsRarityType {
   getProgress?: (ctx: AchievementContext) => AchievementProgress;
 }
 
-export type AchievementCheckerReturnType = AchievementList | undefined;
+type AchievementCheckerReturnType = AchievementList | undefined;

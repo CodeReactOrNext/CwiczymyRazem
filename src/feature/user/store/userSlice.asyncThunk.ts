@@ -320,7 +320,7 @@ export const uploadUserSocialData = createAsyncThunk(
 
 
 
-export interface RateSongPayload {
+interface RateSongPayload {
   songId: string;
   rating: number;
   title: string;
@@ -368,7 +368,7 @@ export const rateSong = createAsyncThunk(
 
 // resetChallenge removed
 
-export const saveDailyQuestAction = createAsyncThunk(
+const saveDailyQuestAction = createAsyncThunk(
   "user/saveDailyQuest",
   async (_, { getState, rejectWithValue }) => {
     try {

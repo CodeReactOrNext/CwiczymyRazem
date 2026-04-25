@@ -5,7 +5,7 @@ import * as RechartsPrimitive from "recharts";
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
 
-export type ChartConfig = {
+type ChartConfig = {
   [k in string]: {
     label?: React.ReactNode;
     icon?: React.ComponentType;
@@ -347,9 +347,5 @@ function getPayloadConfigFromPayload(
 
 export {
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartStyle,
   ChartTooltip,
-  ChartTooltipContent,
 };

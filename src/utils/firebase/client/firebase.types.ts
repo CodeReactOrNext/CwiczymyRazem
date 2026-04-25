@@ -24,12 +24,12 @@ export interface FirebaseUserDataInterface {
   };
 }
 
-export interface FirebaseEventsInteface {
+interface FirebaseEventsInteface {
   category: SkillsType;
   name: string;
   link: string;
 }
-export interface FirebaseDiscordEventsInteface {
+interface FirebaseDiscordEventsInteface {
   title: string;
   deadline: string;
   description: string;

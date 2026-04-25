@@ -6,7 +6,7 @@ type LogOptions = {
   extra?: Record<string, unknown>;
 };
 
-export class Logger {
+class Logger {
   private static instance: Logger;
   private isDev: boolean;
 

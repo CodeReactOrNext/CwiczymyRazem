@@ -14,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
-export type NotificationType = "like" | "comment" | "reaction" | "season_reward" | "season_start";
+type NotificationType = "like" | "comment" | "reaction" | "season_reward" | "season_start";
 
 export interface AppNotification {
   id: string;
@@ -34,7 +34,7 @@ export interface AppNotification {
   isRead: boolean;
 }
 
-export const addNotification = async (notification: Omit<AppNotification, "id" | "timestamp" | "isRead">) => {
+const addNotification = async (notification: Omit<AppNotification, "id" | "timestamp" | "isRead">) => {
   // Basic avoid self-notification
   if (notification.userId === notification.senderId) return;
 

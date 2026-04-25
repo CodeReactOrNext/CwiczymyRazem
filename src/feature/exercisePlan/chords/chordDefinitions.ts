@@ -71,7 +71,7 @@ export const beginnerChords = ['A', 'Am', 'C', 'D', 'Dm', 'E', 'Em', 'G', 'A7', 
 export const intermediateChords = ['F', 'B', 'Bm', 'Bb', 'D7', 'B7', 'Amaj7', 'Dmaj7', 'Gmaj7', 'Fmaj7', 'Dm7', 'Em7', 'Bm7', 'Asus2', 'Asus4', 'Dsus2', 'Dsus4', 'Esus4', 'Cadd9'];
 export const advancedChords = ['Fm', 'Gm', 'A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'Gadd9'];
 
-export interface ChordShape {
+interface ChordShape {
   name: string;
   intervals: number[];
 }

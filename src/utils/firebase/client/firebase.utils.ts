@@ -84,7 +84,7 @@ export const firebaseSendPasswordResetEmail = (email: string) =>
 
 
 
-export const firebaseGetUserAvatarURL = async () => {
+const firebaseGetUserAvatarURL = async () => {
   const userDocRef = doc(db, "users", auth.currentUser?.uid!);
   const userSnapshot = await getDoc(userDocRef);
   return userSnapshot.data()!.avatar;

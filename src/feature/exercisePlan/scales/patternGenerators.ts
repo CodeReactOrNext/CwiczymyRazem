@@ -10,7 +10,7 @@ export type PatternType =
   | 'intervals_thirds'
   | 'intervals_fourths';
 
-export interface PatternGeneratorOptions {
+interface PatternGeneratorOptions {
   patternType: PatternType;
   positions: FretPosition[];
   noteDuration: number; // 0.25 = 16th, 0.5 = 8th, 1 = quarter

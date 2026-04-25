@@ -29,7 +29,7 @@ import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 
-export interface logInCredentials {
+interface logInCredentials {
   email: string;
   password: string;
 }

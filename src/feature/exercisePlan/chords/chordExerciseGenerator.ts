@@ -100,7 +100,7 @@ export function generateChordExercise(config: ChordExerciseConfig): Exercise {
   };
 }
 
-export function getAvailableChords(): string[] {
+function getAvailableChords(): string[] {
   return Object.keys(commonChords);
 }
 

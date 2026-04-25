@@ -3,7 +3,7 @@ import type { FirebaseLogsInterface, FirebaseLogsSongsInterface } from "feature/
 
 import type { DiscordEmbed } from "./discord.types";
 
-export type SongStatus =
+type SongStatus =
   | "learned"
   | "wantToLearn"
   | "learning"

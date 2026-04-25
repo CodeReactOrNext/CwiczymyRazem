@@ -86,7 +86,7 @@ export function ScoreRing({ score, grade, animated }: { score: number; grade: Se
 
 // ─── Loading animation ────────────────────────────────────────────────────────
 
-export const SESSION_LOADING_MESSAGES = [
+const SESSION_LOADING_MESSAGES = [
   "Reading your session…",
   "Analyzing practice patterns…",
   "Checking technique depth…",
@@ -240,7 +240,7 @@ interface SessionRatingCardProps {
   onClose?: () => void;
 }
 
-export function SessionRatingCard({ log }: SessionRatingCardProps) {
+function SessionRatingCard({ log }: SessionRatingCardProps) {
   const userStats = useAppSelector(selectCurrentUserStats);
   const userAuth  = useAppSelector(selectUserAuth) as string | null;
   const [rating, setRating] = useState<SessionRatingResponse | null>(null);
@@ -331,7 +331,7 @@ export function SessionRatingCard({ log }: SessionRatingCardProps) {
 
 // ─── Period rating card (whole day / whole week) ───────────────────────────────
 
-export interface PeriodRatingCardProps {
+interface PeriodRatingCardProps {
   ratingId: string;
   label: string;
   sessionTitles?: string[];
@@ -351,7 +351,7 @@ export interface PeriodRatingCardProps {
 
 // ─── Daily assessment card (merged: rating + coach summary) ───────────────────
 
-export interface DailyAssessmentCardProps extends PeriodRatingCardProps {
+interface DailyAssessmentCardProps extends PeriodRatingCardProps {
   daily: DailySummaryResponse | null;
   dailyLoading: boolean;
   onRatingReady?: () => void;

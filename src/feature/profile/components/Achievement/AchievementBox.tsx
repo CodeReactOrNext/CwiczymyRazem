@@ -8,7 +8,7 @@ import {
 } from "feature/achievements";
 import { useTranslation } from "hooks/useTranslation";
 
-export interface AchievementBoxProps extends AchievementsRarityType {
+interface AchievementBoxProps extends AchievementsRarityType {
   achievment: AchievementsDataInterface[];
   maxLenght: number;
   context?: AchievementContext | null;

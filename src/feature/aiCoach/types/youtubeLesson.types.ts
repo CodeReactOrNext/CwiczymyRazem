@@ -1,5 +1,5 @@
 export type YouTubeLessonStatus = "raw" | "indexed" | "rejected";
-export type GuitarLevel = "beginner" | "intermediate" | "advanced" | "all";
+type GuitarLevel = "beginner" | "intermediate" | "advanced" | "all";
 
 export interface YouTubeLesson {
   videoId: string;

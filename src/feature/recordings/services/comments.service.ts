@@ -83,7 +83,7 @@ export const getComments = async (recordingId: string) => {
   })) as Comment[];
 };
 
-export const deleteComment = async (recordingId: string, commentId: string, userId: string) => {
+const deleteComment = async (recordingId: string, commentId: string, userId: string) => {
   const recordingRef = doc(db, "recordings", recordingId);
   const commentRef = doc(db, "recordings", recordingId, "comments", commentId);
 
