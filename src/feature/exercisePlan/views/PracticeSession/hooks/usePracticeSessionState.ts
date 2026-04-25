@@ -1,6 +1,7 @@
 import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
 import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAuth, selectUserAvatar } from 'feature/user/store/userSlice';
-import { updateQuestProgress, updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
+import { updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
+import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
 import { setActivity } from 'feature/user/store/userSlice';
 import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
 import useTimer from 'hooks/useTimer';
