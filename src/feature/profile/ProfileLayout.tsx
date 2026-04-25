@@ -14,6 +14,7 @@ import { SkillTreeCards } from "feature/skills/SkillTreeCards";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { getSongTier } from "feature/songs/utils/getSongTier";
+import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import { useTranslation } from "hooks/useTranslation";
 import { useEffect, useState } from "react";
 import { FaSoundcloud, FaYoutube } from "react-icons/fa";
@@ -77,12 +78,8 @@ const ProfileLayout = ({
   const arcC = 2 * Math.PI * arcR;
   const arcOffset = arcC * (1 - xpPercent / 100);
 
-  const tierOrder: Record<string, number> = { S: 5, A: 4, B: 3, C: 2, D: 1, '?': 0 };
-  const bestTierKey = songs?.learned?.reduce<string>((best, song) => {
-    const t = song.tier ?? '?';
-    return (tierOrder[t] ?? 0) > (tierOrder[best] ?? 0) ? t : best;
-  }, '?') ?? '?';
-  const songTier = getSongTier(bestTierKey);
+  const skillPower = songs?.learned ? calculateSkillPower(songs.learned) : 0;
+  const songTier = getSongTier(skillPower);
 
   useEffect(() => {
     getUserSongs(userAuth).then((songs) => setSongs(songs));
