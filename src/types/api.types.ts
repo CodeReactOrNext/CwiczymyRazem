@@ -106,7 +106,7 @@ export interface TimerInterface {
   creativity: number;
 }
 
-export interface ReportTimeData {
+interface ReportTimeData {
   techniqueTime: number;
   theoryTime: number;
   hearingTime: number;
@@ -123,7 +123,7 @@ export interface ReportListInterface {
   planId?: string;
 }
 
-export interface UserSliceProviderData {
+interface UserSliceProviderData {
   providerId: string | null;
   uid: string | null;
   displayName: string | null;
@@ -175,7 +175,7 @@ export interface updateReprotInterface {
   inputData: ReportFormikInterface;
 }
 
-export type MediaType = "youTubeLink" | "soundCloudLink" | "band";
+type MediaType = "youTubeLink" | "soundCloudLink" | "band";
 
 export interface updateSocialInterface {
   value: string;
@@ -195,6 +195,6 @@ export interface SeasonDataInterface {
   };
 }
 
-export interface SeasonalStatsInterface extends StatisticsDataInterface {
+interface SeasonalStatsInterface extends StatisticsDataInterface {
   seasonId: string;
 }

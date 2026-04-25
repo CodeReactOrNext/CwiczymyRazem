@@ -40,7 +40,7 @@ export const updateRig = async (rig: RigSetup, selectedGuitar?: string | number 
   await axios.post("/api/arsenal/update-rig", { idToken, rig, selectedGuitar, selectedGuitarYear, selectedGuitarCountry });
 };
 
-export const openEffectPack = async (): Promise<OpenEffectPackResult> => {
+const openEffectPack = async (): Promise<OpenEffectPackResult> => {
   const idToken = await getIdToken();
   const { data } = await axios.post<OpenEffectPackResult>("/api/arsenal/open-effect-pack", { idToken });
   return data;

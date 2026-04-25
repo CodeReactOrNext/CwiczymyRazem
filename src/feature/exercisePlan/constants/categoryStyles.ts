@@ -20,7 +20,7 @@ export const categoryGradients = {
 } as const; 
 
 
-export const categoryGradientsWithHover = {
+const categoryGradientsWithHover = {
   technique:
     "from-blue-500/5 via-transparent to-indigo-500/5 hover:from-blue-500/15 hover:to-indigo-500/10",
   theory:

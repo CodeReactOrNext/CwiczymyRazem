@@ -1,4 +1,4 @@
-export type EffectType =
+type EffectType =
   | "Overdrive"
   | "Distortion"
   | "Delay"
@@ -38,7 +38,7 @@ export type GuitarRarity =
 
 export type CaseType = "standard" | "premium" | "elite";
 
-export type ProductionCountry =
+type ProductionCountry =
   | "USA"
   | "Japan"
   | "Korea"
@@ -51,7 +51,7 @@ export type ProductionCountry =
   | "Canada"
   | "Sweden";
 
-export const PRODUCTION_COUNTRIES: ProductionCountry[] = [
+const PRODUCTION_COUNTRIES: ProductionCountry[] = [
   "USA", "Japan", "Korea", "China", "Mexico",
   "Indonesia", "Czech Republic", "Germany", "UK", "Canada", "Sweden",
 ];
@@ -67,7 +67,7 @@ export interface GuitarDefinition {
   countries: ProductionCountry[];
 }
 
-export interface ProbabilityTable {
+interface ProbabilityTable {
   Common: number;
   Uncommon: number;
   Rare: number;

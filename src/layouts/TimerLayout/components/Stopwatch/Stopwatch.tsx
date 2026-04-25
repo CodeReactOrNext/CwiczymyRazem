@@ -1,6 +1,6 @@
 import { addZeroToTime, convertMsToHMObject } from "utils/converter";
 
-export interface StopwatchProps {
+interface StopwatchProps {
   time: number;
   timerData: {
     creativity: number;
@@ -109,4 +109,4 @@ const Stopwatch = ({ time, timerData, activeSkill = null }: StopwatchProps) => {
   );
 };
 
-export default Stopwatch;
+Stopwatch;

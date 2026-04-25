@@ -9,7 +9,5 @@ export {
   AcceptExceedingPopUp,
   ErrorBox,
   HealthHabbitsBox,
-  InputTime,
-  ReportCategoryWrapper,
   TimeInputBox,
 };

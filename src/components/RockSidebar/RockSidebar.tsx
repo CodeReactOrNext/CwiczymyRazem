@@ -63,7 +63,7 @@ interface RockSidebarProps {
   pageId: NavPagesTypes;
 }
 
-export const RockSidebar = ({  pageId }: RockSidebarProps) => {
+const RockSidebar = ({  pageId }: RockSidebarProps) => {
   const { t } = useTranslation("common");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);

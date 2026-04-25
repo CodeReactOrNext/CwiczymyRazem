@@ -4,6 +4,7 @@ import { statisticsInitial } from "constants/userStatisticsInitialData";
 import type { RootState } from "store/store";
 import type {
   DailyQuest,
+  DailyQuestTask,
   DailyQuestTaskType,
   StatisticsDataInterface,
   StatisticsTime,
@@ -53,7 +54,7 @@ const initialState: userSliceInitialState = {
   currentActivity: null,
 };
 
-export const userSlice = createSlice({
+const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -157,7 +158,7 @@ export const userSlice = createSlice({
       const selected = shuffled.slice(0, 3);
 
       const tasks = selected.map((t, index) => {
-        const taskObj: import("types/api.types").DailyQuestTask = {
+        const taskObj: DailyQuestTask = {
           id: `quest_${today}_${index}`,
           type: t.type,
           title: t.title,
@@ -438,8 +439,6 @@ export const userSlice = createSlice({
 });
 
 export const {
-  addUserAuth,
-  addUserData,
   updateTimerTime,
   increaseTimerTime,
   updateLocalTimer,

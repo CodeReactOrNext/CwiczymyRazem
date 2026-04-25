@@ -18,7 +18,7 @@ import { useActivityLog } from "./hooks/useActivityLog";
 
 const CALENDAR_HEIGHT = 7 * 19;
 
-export interface ActivityLogViewProps {
+interface ActivityLogViewProps {
   year: number;
   setYear: (year: number) => void;
   datasWithReports: DateWithReport[];

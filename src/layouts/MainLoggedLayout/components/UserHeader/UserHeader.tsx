@@ -13,7 +13,7 @@ interface UserHeaderProps {
   avatar?: string;
 }
 
-export const UserHeader = ({
+const UserHeader = ({
   userStats,
   userName,
 }: UserHeaderProps) => {

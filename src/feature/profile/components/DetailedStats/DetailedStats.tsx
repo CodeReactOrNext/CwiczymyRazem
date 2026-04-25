@@ -115,7 +115,7 @@ interface DetailedStatsProps {
     | undefined;
 }
 
-export const DetailedStats = ({
+const DetailedStats = ({
   statistics,
   userSongs,
 }: DetailedStatsProps) => {

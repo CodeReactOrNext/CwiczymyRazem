@@ -14,7 +14,7 @@ interface UseAlphaTabApiOptions {
   speedMultiplierRef: React.MutableRefObject<number>;
 }
 
-export interface UseAlphaTabApiReturn {
+interface UseAlphaTabApiReturn {
   apiRef: React.MutableRefObject<any>;
   scrollRef: React.MutableRefObject<HTMLDivElement | null>;
   containerRef: React.MutableRefObject<HTMLDivElement | null>;

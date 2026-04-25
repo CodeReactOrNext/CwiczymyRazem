@@ -1,5 +1,5 @@
-export type JourneyStepStatus = "locked" | "available" | "in-progress" | "completed";
-export type JourneyStageId = "stage_1" | "stage_2" | "stage_3";
+type JourneyStepStatus = "locked" | "available" | "in-progress" | "completed";
+type JourneyStageId = "stage_1" | "stage_2" | "stage_3";
 
 export interface StepContentBlock {
   type: "text" | "callout" | "image";
@@ -11,7 +11,7 @@ export interface StepContentBlock {
   caption?: string;
 }
 
-export interface ChecklistItem {
+interface ChecklistItem {
   text: string;
   icon?: string; // Lucide icon name
 }
@@ -23,7 +23,7 @@ export interface JourneyStepProgress {
   stars?: 1 | 2 | 3;
 }
 
-export interface JourneyModuleProgress {
+interface JourneyModuleProgress {
   steps: Record<string, JourneyStepProgress>;
 }
 
@@ -53,7 +53,7 @@ export interface JourneyStep {
   songPicker?: string[];       // song IDs to offer as a pick-one recommendation
 }
 
-export interface JourneyStage {
+interface JourneyStage {
   id: JourneyStageId;
   label?: string;
   order: number;
@@ -75,7 +75,7 @@ export interface JourneyStepWithStatus extends JourneyStep {
   stars?: 1 | 2 | 3;
 }
 
-export interface JourneyStageWithStatus extends Omit<JourneyStage, "steps"> {
+interface JourneyStageWithStatus extends Omit<JourneyStage, "steps"> {
   steps: JourneyStepWithStatus[];
 }
 

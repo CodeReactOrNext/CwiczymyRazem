@@ -1,6 +1,6 @@
 export type SessionGrade = "S" | "A+" | "A" | "A-" | "B+" | "B" | "B-" | "C+" | "C" | "D" | "F";
 
-export type PracticeStyle = "professional" | "hobby";
+type PracticeStyle = "professional" | "hobby";
 
 export interface PromptConfig {
   practiceStyle: PracticeStyle;

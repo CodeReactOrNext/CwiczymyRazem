@@ -1,6 +1,6 @@
 import { getTierFromDifficulty } from "./difficulty.utils";
 
-export interface SongTier {
+interface SongTier {
   tier: 'S' | 'A' | 'B' | 'C' | 'D' | '?';
   label: string;
   color: string;

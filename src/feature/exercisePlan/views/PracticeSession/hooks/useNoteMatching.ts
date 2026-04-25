@@ -5,10 +5,10 @@ import type { TablatureMeasure } from "../../../types/exercise.types";
 
 // ── Constants shared with MicHud ─────────────────────────────────────────────
  
-export const CENTS_TOLERANCE = 60;
-export const CHORD_CHROMA_THRESHOLD = 0.75;
+const CENTS_TOLERANCE = 60;
+const CHORD_CHROMA_THRESHOLD = 0.75;
 
-export const feedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
+const feedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {
   "NICE!":          { color: "text-emerald-400", dropShadow: "drop-shadow-[0_0_20px_rgba(52,211,153,0.8)]",  scale: 1.35 },
   "GREAT!":         { color: "text-cyan-400",    dropShadow: "drop-shadow-[0_0_20px_rgba(34,211,238,0.8)]",  scale: 1.45 },
   "AMAZING!":       { color: "text-purple-400",  dropShadow: "drop-shadow-[0_0_20px_rgba(192,132,252,0.8)]", scale: 1.5  },

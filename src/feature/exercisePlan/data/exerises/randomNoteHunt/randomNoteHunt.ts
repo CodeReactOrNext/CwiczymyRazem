@@ -1,6 +1,6 @@
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 
-export const getRandomNote = () => {
+const getRandomNote = () => {
   const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
   return notes[Math.floor(Math.random() * notes.length)];
 };

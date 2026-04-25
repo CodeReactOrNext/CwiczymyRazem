@@ -12,7 +12,7 @@ import { HeroBanner } from "components/UI/HeroBanner";
 
 export type SortByType = "points" | "sessionCount";
 
-export interface LeaderboardProps {
+interface LeaderboardProps {
   usersData: FirebaseUserDataInterface[];
   currentUserId: string | null;
   isLoading: boolean;

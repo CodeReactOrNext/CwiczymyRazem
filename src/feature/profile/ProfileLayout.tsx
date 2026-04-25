@@ -28,7 +28,7 @@ import { UserRecordingsSection } from "./components/UserRecordingsSection";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 
-export interface LandingLayoutProps {
+interface LandingLayoutProps {
   statsField: StatsFieldProps[];
   userData: ProfileInterface;
   userAuth: string;

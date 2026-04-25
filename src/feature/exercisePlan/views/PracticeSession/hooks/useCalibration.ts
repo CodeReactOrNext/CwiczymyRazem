@@ -9,7 +9,7 @@ export interface CalibrationData {
   timestamp: number;
 }
 
-export type SessionPhase = "mic_prompt" | "calibration_choice" | "calibrating" | "ready";
+type SessionPhase = "mic_prompt" | "calibration_choice" | "calibrating" | "ready";
 
 const STORAGE_KEY = "guitar_calibration_data";
 const MIC_PREFERENCE_KEY = "mic_tracking_enabled";

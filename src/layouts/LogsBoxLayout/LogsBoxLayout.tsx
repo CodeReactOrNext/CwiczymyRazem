@@ -16,7 +16,7 @@ import { IoChatboxEllipses } from "react-icons/io5";
 import Chat from "../../feature/chat/Chat";
 import Logs from "./components/Logs";
 
-export interface LogsBoxLayoutProps {
+interface LogsBoxLayoutProps {
   logs: (
     | FirebaseLogsSongsInterface
     | FirebaseLogsInterface

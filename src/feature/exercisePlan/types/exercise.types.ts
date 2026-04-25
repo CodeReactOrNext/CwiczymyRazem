@@ -81,11 +81,11 @@ export interface ImprovPromptRiddleConfig {
   simultaneousPrompts: number;
 }
 
-export type ExerciseRiddleConfig = SequenceRepeatRiddleConfig | ImprovPromptRiddleConfig;
+type ExerciseRiddleConfig = SequenceRepeatRiddleConfig | ImprovPromptRiddleConfig;
 
 // ─── Strumming Pattern Types ─────────────────────────────────────────────────
 
-export type StrumDirection = 'down' | 'up' | 'miss';
+type StrumDirection = 'down' | 'up' | 'miss';
 
 export interface StrumBeat {
   /** Which direction to strum, or 'miss' for silence/gap */

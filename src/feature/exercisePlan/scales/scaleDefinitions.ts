@@ -14,7 +14,7 @@ export type ScaleType =
   | 'aeolian'
   | 'locrian';
 
-export interface ScaleDefinition {
+interface ScaleDefinition {
   name: string;
   intervals: number[]; // semitones from root
   description: string;
@@ -85,12 +85,12 @@ export const scaleDefinitions: Record<ScaleType, ScaleDefinition> = {
 export const rootNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 // Get note name from MIDI number
-export function getNoteNameFromMidi(midi: number): string {
+function getNoteNameFromMidi(midi: number): string {
   return rootNotes[midi % 12];
 }
 
 // Get MIDI number from note name
-export function getMidiFromNoteName(noteName: string): number {
+function getMidiFromNoteName(noteName: string): number {
   const baseNote = rootNotes.indexOf(noteName);
   if (baseNote === -1) return 0;
   return baseNote;

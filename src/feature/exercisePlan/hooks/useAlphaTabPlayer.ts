@@ -1,12 +1,12 @@
 import { useEffect, useRef } from 'react';
 import * as alphaTabLib from '@coderline/alphatab';
 
-export interface AlphaTabTrackConfig {
+interface AlphaTabTrackConfig {
   isMuted: boolean;
   volume: number;
 }
 
-export interface UseAlphaTabPlayerProps {
+interface UseAlphaTabPlayerProps {
   rawGpFile: File | null;
   /** User-set BPM (from metronome). AlphaTab playbackSpeed = bpm / originalBpm */
   bpm: number;
@@ -36,7 +36,7 @@ export interface UseAlphaTabPlayerProps {
  * AlphaTabApi is created only when rawGpFile is first provided — never for regular exercises.
  * display:none prevents score rendering (no canvas OOM).
  */
-export interface AlphaTabPlayerHandle {
+interface AlphaTabPlayerHandle {
   /** Call directly (without React render) to start playback — e.g. from metronome onPlayStart. */
   play: () => void;
 }
