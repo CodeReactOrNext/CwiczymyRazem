@@ -14,7 +14,7 @@ export const updateCredsSchema = yup.object().shape({
     .oneOf([yup.ref("password"), null], "Passwords must be the same"),
 });
 
-export const mediaSchema = yup.object().shape({
+const mediaSchema = yup.object().shape({
   youtube: yup
     .string()
     .matches(

@@ -1,6 +1,6 @@
 
-export const A4 = 440;
-export const SEMITONE = 69;
+const A4 = 440;
+const SEMITONE = 69;
 export const NOTES = [
   "C",
   "C#",

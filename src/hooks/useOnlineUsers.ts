@@ -2,7 +2,7 @@ import { getDatabase, onValue, ref } from "firebase/database";
 import { useEffect, useState } from "react";
 import { firebaseApp, isDatabaseEnabled } from "utils/firebase/client/firebase.config";
 
-export interface OnlineUser {
+interface OnlineUser {
   uid: string;
   displayName: string;
   avatar: string;
