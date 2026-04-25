@@ -20,7 +20,7 @@ import timer from '../../public/locales/en/timer.json';
 import toast from '../../public/locales/en/toast.json';
 import yup_errors from '../../public/locales/en/yup_errors.json';
 
-type TranslationNamespace = 
+type TranslationNamespace =
   | '404'
   | 'achievements'
   | 'chat'
@@ -66,15 +66,15 @@ const translations: Record<TranslationNamespace, any> = {
 function get(obj: any, path: string): any {
   const keys = path.split('.');
   let result = obj;
-  
+
   for (const key of keys) {
     if (result && typeof result === 'object' && key in result) {
       result = result[key];
     } else {
-      return path; 
+      return path;
     }
   }
-  
+
   return result;
 }
 
@@ -88,11 +88,11 @@ function interpolate(str: string, vars?: Record<string, any>): string {
 /**
  * Global translation function for use outside of React components
  */
-export const t = (key: string, options?: Record<string, any> | string) => {
+const t = (key: string, options?: Record<string, any> | string) => {
   // Try to parse namespace from key, e.g. "profile:stats.spent_time"
   let namespace: TranslationNamespace = 'common';
   let actualKey = key;
-  
+
   if (key.includes(':')) {
     const parts = key.split(':');
     namespace = parts[0] as TranslationNamespace;
@@ -104,11 +104,11 @@ export const t = (key: string, options?: Record<string, any> | string) => {
 
   const value = get(nsData, actualKey);
   const vars = typeof options === 'object' ? options : undefined;
-  
+
   if (value !== actualKey) {
-     return interpolate(typeof value === 'string' ? value : String(value), vars);
+    return interpolate(typeof value === 'string' ? value : String(value), vars);
   }
-  
+
   return actualKey;
 };
 
