@@ -258,6 +258,7 @@ export const ExerciseContentArea = ({
           countInRemaining={countInRemaining}
           isMicEnabled={isMicEnabled}
           slotFeedback={strumSlotFeedback}
+          audioContext={audioContext}
         />
       ) : (
         <ExerciseImage

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, YoutubeIcon, Zap } from "lucide-react";
+import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, Zap } from "lucide-react";
+import { FaYoutube } from "react-icons/fa6";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
@@ -938,7 +939,7 @@ const RoadmapView: React.FC<RoadmapViewProps> = ({ roadmap, onUpdate }) => {
                     (lessonsCache[drawerInfo.step.id] && lessonsCache[drawerInfo.step.id].length > 0)) && (
                     <div className="px-6 py-5">
                       <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-                        <YoutubeIcon className="h-3.5 w-3.5 text-red-500" />
+                        <FaYoutube className="h-3.5 w-3.5 text-red-500" />
                         YouTube Lessons
                       </p>
                       {loadingLessonsId === drawerInfo.step.id ? (
