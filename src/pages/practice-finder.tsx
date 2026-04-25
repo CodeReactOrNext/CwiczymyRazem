@@ -1,14 +1,14 @@
 import { HeroBanner } from "components/UI/HeroBanner";
 import PracticeFinderView from "feature/aiCoach/view/PracticeFinderView/PracticeFinderView";
-import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
+import { PremiumGate } from "feature/premium/components/PremiumGate";
+import { selectUserInfo } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout/AppLayout";
+import { BookOpen, Lightbulb, Search, Zap } from "lucide-react";
 import type { ReactElement } from "react";
+import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
-import { Search, Lightbulb, BookOpen, Zap } from "lucide-react";
-import { selectUserInfo } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
 
 const PracticeFinderPage: NextPageWithLayout = () => {
   const userInfo = useAppSelector(selectUserInfo);

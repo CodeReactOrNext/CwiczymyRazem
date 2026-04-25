@@ -1,4 +1,4 @@
-import type { ArsenalUserData, EffectInventoryItem } from "feature/arsenal/types/arsenal.types";
+import type { ArsenalUserData } from "feature/arsenal/types/arsenal.types";
 import { DEFAULT_RIG } from "feature/arsenal/types/arsenal.types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";

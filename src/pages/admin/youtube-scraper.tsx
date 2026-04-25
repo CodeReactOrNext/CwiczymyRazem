@@ -1,19 +1,18 @@
 import AdminLogin from "feature/admin/components/AdminLogin";
 import { useAdminAuth } from "feature/admin/hooks/useAdminAuth";
 import AdminLayout from "feature/admin/layouts/AdminLayout";
+import {
+  firebaseGetLessonsByStatus,
+  firebaseGetLessonStats,
+} from "feature/aiCoach/services/youtubeLesson.service";
+import type { ScraperConfig, YouTubeLesson, YouTubeLessonStatus } from "feature/aiCoach/types/youtubeLesson.types";
+import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
+import { doc, getDoc } from "firebase/firestore";
 import type { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth/next";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { doc, getDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
-import type { ScraperConfig, YouTubeLesson, YouTubeLessonStatus } from "feature/aiCoach/types/youtubeLesson.types";
-import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
-import {
-  firebaseGetLessonsByStatus,
-  firebaseUpdateLesson,
-  firebaseGetLessonStats,
-} from "feature/aiCoach/services/youtubeLesson.service";
 
 const SCRAPER_CONFIG_KEY = "yt_scraper_config";
 
@@ -30,11 +29,12 @@ function loadConfigFromStorage(): ScraperConfig {
 function saveConfigToStorage(config: ScraperConfig) {
   localStorage.setItem(SCRAPER_CONFIG_KEY, JSON.stringify(config));
 }
-import { authOptions } from "../api/auth/[...nextauth]";
-import { Settings, Play, RefreshCw, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, ListVideo } from "lucide-react";
-import { FaYoutube } from "react-icons/fa6";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
+import { CheckCircle, ChevronLeft, ChevronRight, ListVideo,Loader2, Play, RefreshCw, Settings, XCircle } from "lucide-react";
+import { FaYoutube } from "react-icons/fa6";
+
+import { authOptions } from "../api/auth/[...nextauth]";
 
 type LessonFilter = YouTubeLessonStatus | "all";
 

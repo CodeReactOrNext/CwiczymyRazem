@@ -1,6 +1,5 @@
 import type { Comment } from "feature/recordings/types/types";
 import {
-  addDoc,
   collection,
   doc,
   getDocs,

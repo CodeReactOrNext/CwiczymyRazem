@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { ChevronRight, Dumbbell, Search, Sparkles } from "lucide-react";
-import { FaYoutube } from "react-icons/fa6";
-import { useRouter } from "next/router";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { ChevronRight, Dumbbell, Search, Sparkles } from "lucide-react";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { FaYoutube } from "react-icons/fa6";
+
 import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
 import YouTubeLessonCard from "../RoadmapView/components/YouTubeLessonCard";
 

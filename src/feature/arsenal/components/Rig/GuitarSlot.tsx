@@ -1,7 +1,8 @@
-import { Guitar, Plus, X } from "lucide-react";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { RARITY_STYLES } from "../RarityBadge";
+import { Guitar, Plus, X } from "lucide-react";
+
 import type { InventoryItem } from "../../types/arsenal.types";
+import { RARITY_STYLES } from "../RarityBadge";
 
 interface GuitarSlotProps {
   slotIndex: number;

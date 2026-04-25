@@ -1,14 +1,13 @@
 import { TableSkeleton } from "assets/components/ui/table-skeleton";
+import { HeroBanner } from "components/UI/HeroBanner";
 import { LeadboardRow } from "feature/leadboard/components/LeadboardRow";
 import { Pagination } from "feature/leadboard/components/Pagination";
 import { useTranslation } from "hooks/useTranslation";
 import type { SeasonDataInterface } from "types/api.types";
 import type { FirebaseUserDataInterface } from "utils/firebase/client/firebase.types";
 
-import SeasonSelect from "./SeasonSelect";
 import { SeasonRewards } from "./SeasonRewards";
-
-import { HeroBanner } from "components/UI/HeroBanner";
+import SeasonSelect from "./SeasonSelect";
 
 export type SortByType = "points" | "sessionCount";
 

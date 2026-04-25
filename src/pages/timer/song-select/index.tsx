@@ -7,7 +7,6 @@ import {
   TabsTrigger,
 } from "assets/components/ui/tabs";
 import { HeroBanner } from "components/UI/HeroBanner";
-import { useRouter } from "next/router";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
@@ -15,6 +14,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";
 import { ArrowRight, Music, Play, Search, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import type { ReactElement } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";

@@ -1,6 +1,7 @@
-import { UpgradeContent } from "./UpgradeModal";
+import { Crown,Zap } from "lucide-react";
 import Image from "next/image";
-import { Zap, Crown } from "lucide-react";
+
+import { UpgradeContent } from "./UpgradeModal";
 
 interface FeatureItem {
   icon: React.ReactNode;

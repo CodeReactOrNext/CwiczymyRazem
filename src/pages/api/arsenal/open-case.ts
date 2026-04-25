@@ -1,15 +1,15 @@
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
-import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import { EFFECTS_BY_RARITY } from "feature/arsenal/data/effectDefinitions";
+import { GUITARS_BY_RARITY } from "feature/arsenal/data/guitarDefinitions";
 import type {
   CaseType,
+  EffectInventoryItem,
   GuitarRarity,
   InventoryItem,
-  EffectInventoryItem,
 } from "feature/arsenal/types/arsenal.types";
+import type { DocumentReference,Transaction } from "firebase-admin/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
-import type { Transaction, DocumentReference } from "firebase-admin/firestore";
 
 // 60% guitar, 40% effect
 const GUITAR_CHANCE = 0.6;

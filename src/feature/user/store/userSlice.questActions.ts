@@ -1,10 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
 import { doc, updateDoc } from "firebase/firestore";
 import posthog from "posthog-js";
 import type { RootState } from "store/store";
 import type { DailyQuestTaskType } from "types/api.types";
 import { auth, db } from "utils/firebase/client/firebase.utils";
-import { updateSeasonalPoints } from "feature/report/services/updateSeasonalPoints";
 
 import { claimQuestReward, completeQuestTask, generateDailyQuest } from "./userSlice";
 

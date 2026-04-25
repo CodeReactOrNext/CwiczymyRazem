@@ -1,11 +1,9 @@
 import { cn } from "assets/lib/utils";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
-import type { StatisticsDataInterface } from "types/api.types";
 import {
   selectCurrentUserStats,
   selectUserAuth,
 } from "feature/user/store/userSlice";
-import { firebaseGetRating, firebaseSaveRating } from "../services/rating.service";
 import {
   CheckCircle2,
   Sparkles,
@@ -13,6 +11,9 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
+import type { StatisticsDataInterface } from "types/api.types";
+
+import { firebaseGetRating, firebaseSaveRating } from "../services/rating.service";
 import type { DailySummaryResponse, SessionGrade, SessionRatingResponse } from "../types/summary.types";
 
 // ─── Mood config (used by DailyAssessmentCard) ────────────────────────────────

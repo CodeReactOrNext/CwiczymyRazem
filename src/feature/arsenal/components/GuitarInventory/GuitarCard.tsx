@@ -1,8 +1,9 @@
 import { cn } from "assets/lib/utils";
-import { Check } from "lucide-react";
 import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
-import { RARITY_STYLES } from "../RarityBadge";
+import { Check } from "lucide-react";
+
 import type { InventoryItem } from "../../types/arsenal.types";
+import { RARITY_STYLES } from "../RarityBadge";
 
 interface GuitarCardProps {
   item: InventoryItem;

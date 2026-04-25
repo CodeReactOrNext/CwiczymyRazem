@@ -1,12 +1,14 @@
-import { useState, useCallback, useMemo } from "react";
-import { useDropzone } from "react-dropzone";
-import { Upload, FileMusic, CheckCircle2, AlertCircle, Music as MusicIcon, Zap, Drum } from "lucide-react";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
-import { parseGpFile, ParsedGp, isGpFile, GP_EXTENSIONS } from "../../services/gp5Parser.service";
-import { TablatureMeasure, BackingTrack } from "feature/exercisePlan/types/exercise.types";
+import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { TablatureViewer } from "feature/exercisePlan/views/PracticeSession/components/TablatureViewer";
+import { AlertCircle, Drum,FileMusic, Music as MusicIcon, Upload, Zap } from "lucide-react";
+import { useCallback, useMemo,useState } from "react";
+import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+
+import type { ParsedGp} from "../../services/gp5Parser.service";
+import { GP_EXTENSIONS,isGpFile, parseGpFile } from "../../services/gp5Parser.service";
 
 interface ImportTablatureProps {
   /** Called when a file is imported or the selected track changes.

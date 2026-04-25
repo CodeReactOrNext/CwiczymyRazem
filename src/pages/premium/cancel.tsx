@@ -1,6 +1,6 @@
+import { ArrowLeft, XCircle, Zap } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
-import { XCircle, ArrowLeft, Zap } from "lucide-react";
 
 export default function PremiumCancelPage() {
   return (

@@ -1,9 +1,9 @@
 import MainContainer from "components/MainContainer";
+import { HeroBanner } from "components/UI/HeroBanner";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { getUserExercisePlans } from "feature/exercisePlan/services/getUserExercisePlans";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
 import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
-import { HeroBanner } from "components/UI/HeroBanner";
 import { PlanSelector } from "feature/practice/views/PlanSelector/PlanSelector";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import AppLayout from "layouts/AppLayout";

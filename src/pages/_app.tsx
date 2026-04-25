@@ -26,10 +26,11 @@ const teko = Teko({
   display: "swap",
 });
 
-import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 import Analytics from "components/Analytics/Analytics";
+import { ResponsiveInitializer } from "components/ResponsiveInitializer/ResponsiveInitializer";
 import useAuthSync from "hooks/useAuthSync";
 import type { AppPropsWithLayout } from "types/page";
+
 import { PostHogProvider } from "../providers/PostHogProvider";
 
 const AuthSyncWrapper = ({ children }: { children: React.ReactNode }) => {

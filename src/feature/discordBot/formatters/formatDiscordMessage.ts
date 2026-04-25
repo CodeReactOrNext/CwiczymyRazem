@@ -1,10 +1,10 @@
 
 
-import type { FirebaseLogsInterface, FirebaseLogsSongsInterface, FirebaseLogsRecordingsInterface } from "feature/logs/types/logs.type";
-import { RecordingAddedFormatter } from "./recordingFormatters";
+import type { FirebaseLogsInterface, FirebaseLogsRecordingsInterface,FirebaseLogsSongsInterface } from "feature/logs/types/logs.type";
 
 import type { SongFormatter } from "../types/formatter.types";
 import { ActivityLogFormatter } from "./generalLogFormatter";
+import { RecordingAddedFormatter } from "./recordingFormatters";
 import {
   AddedSongFormatter,
   DifficultyRateSongFormatter,

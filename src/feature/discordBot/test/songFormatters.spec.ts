@@ -1,9 +1,10 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import {
   LearnedSongFormatter,
   WantToLearnSongFormatter,
 } from "../formatters/songFormatters";
 import { getUserDisplayName } from "../utils/userUtils";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../utils/userUtils", () => ({
   getUserDisplayName: vi.fn(),

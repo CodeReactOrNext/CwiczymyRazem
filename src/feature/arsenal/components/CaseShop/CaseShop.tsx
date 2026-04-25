@@ -1,4 +1,5 @@
 import { CASE_DEFINITIONS } from "feature/arsenal/data/caseDefinitions";
+
 import type { CaseType, OpenCaseResult } from "../../types/arsenal.types";
 import { CaseCard } from "./CaseCard";
 

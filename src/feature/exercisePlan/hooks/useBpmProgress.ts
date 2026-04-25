@@ -1,11 +1,12 @@
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { useCallback, useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import type { Exercise } from "../types/exercise.types";
+
 import {
   getExerciseBpmProgress,
   toggleBpmStage,
 } from "../services/bpmProgressService";
+import type { Exercise } from "../types/exercise.types";
 import { generateBpmStages } from "../utils/generateBpmStages";
 
 interface UseBpmProgressReturn {

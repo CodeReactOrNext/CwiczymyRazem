@@ -1,6 +1,7 @@
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
+
 import type { OnboardingResult } from "../types";
 
 export const firebaseSaveOnboarding = async (result: OnboardingResult) => {

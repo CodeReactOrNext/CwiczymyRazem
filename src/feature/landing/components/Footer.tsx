@@ -1,9 +1,8 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
 
 export const Footer = () => {
     return (

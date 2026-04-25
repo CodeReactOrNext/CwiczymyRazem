@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
-import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
+import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { useState } from "react";
 import { FaGem } from "react-icons/fa";

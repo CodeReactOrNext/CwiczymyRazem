@@ -1,20 +1,17 @@
-import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { HelpCircle } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-
-import type { ExercisePlan as ExercisePlanType } from "../types/exercise.types";
-import { PracticeSession } from "../views/PracticeSession/PracticeSession";
-import { MyPlans } from "./MyPlans";
 import { useEffect } from "react";
+import { useAppSelector } from "store/hooks";
+
 import { exercisesAgregat } from "../data/exercisesAgregat";
 import { defaultPlans } from "../data/plansAgregat";
 import { getUserExercisePlans } from "../services/getUserExercisePlans";
-import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import type { ExercisePlan as ExercisePlanType } from "../types/exercise.types";
+import { PracticeSession } from "../views/PracticeSession/PracticeSession";
+import { MyPlans } from "./MyPlans";
 
 export const ExercisePlan = ({ hideLayout, onSessionChange, controlledTab, onTabChange }: { hideLayout?: boolean; onSessionChange?: (active: boolean) => void; controlledTab?: string; onTabChange?: (tab: string) => void }) => {
   const { t } = useTranslation("exercises");

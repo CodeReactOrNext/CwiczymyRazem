@@ -1,7 +1,7 @@
 import type { Exercise } from '../types/exercise.types';
-import { scaleDefinitions, type ScaleType, rootNotes } from './scaleDefinitions';
 import { getScalePatternForPosition } from './fretboardMapper';
-import { generatePattern, type PatternType, getPatternName } from './patternGenerators';
+import { generatePattern, getPatternName,type PatternType } from './patternGenerators';
+import { rootNotes,scaleDefinitions, type ScaleType } from './scaleDefinitions';
 
 export interface ScaleExerciseConfig {
   rootNote: string; // 'C', 'D', 'E', etc.

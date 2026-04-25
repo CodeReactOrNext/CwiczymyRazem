@@ -1,6 +1,7 @@
-import { useEffect, useRef, useCallback, memo } from "react";
 import { cn } from "assets/lib/utils";
-import type { StrumPattern, StrumBeat } from "feature/exercisePlan/types/exercise.types";
+import type { StrumBeat,StrumPattern } from "feature/exercisePlan/types/exercise.types";
+import { memo,useCallback, useEffect, useRef } from "react";
+
 import type { SlotResult } from "../hooks/useStrummingMatcher";
 
 // ─── Layout constants ─────────────────────────────────────────────────────────

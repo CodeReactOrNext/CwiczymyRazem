@@ -3,11 +3,11 @@
 import { Button } from "assets/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "assets/components/ui/dialog";
 import { selectUserAuth, selectUserName } from "feature/user/store/userSlice";
-import { Bug, Lightbulb, HelpCircle } from "lucide-react";
+import { Bug, HelpCircle,Lightbulb } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useAppSelector } from "store/hooks";
 import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
 
 type FeedbackCategory = "bug" | "idea" | "question";
 

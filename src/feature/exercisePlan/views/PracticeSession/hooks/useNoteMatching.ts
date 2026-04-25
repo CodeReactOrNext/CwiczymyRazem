@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, useMemo, startTransition } from "react";
-import { getFrequencyFromTab, getCentsDistance, freqToPitchClass, computeChromagram } from "utils/audio/noteUtils";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
+import { startTransition,useEffect, useMemo, useRef, useState } from "react";
+import { computeChromagram,freqToPitchClass, getCentsDistance, getFrequencyFromTab } from "utils/audio/noteUtils";
+
 import type { TablatureMeasure } from "../../../types/exercise.types";
 
 // ── Constants shared with MicHud ─────────────────────────────────────────────
@@ -352,7 +353,7 @@ export function useNoteMatching({
 
     rafIdRef.current = requestAnimationFrame(tick);
     return () => { cancelAnimationFrame(rafIdRef.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [isPlaying, startTime, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, isHalfSpeed, rawBpm]);
 
   return {

@@ -1,16 +1,14 @@
-import { cn } from "assets/lib/utils";
-import { Button } from "assets/components/ui/button";
 import { Slider } from "assets/components/ui/slider";
+import { cn } from "assets/lib/utils";
 import {
-  FaExternalLinkAlt, FaFacebook, FaHeart, FaInstagram, FaMicrophone,
-  FaSync, FaTwitter, FaVolumeMute, FaVolumeUp,
+  FaExternalLinkAlt, FaFacebook, FaHeart, FaInstagram, FaTwitter, FaVolumeMute, FaVolumeUp,
 } from "react-icons/fa";
 import { GiGuitar } from "react-icons/gi";
+
 import { BpmProgressGrid } from "../../../components/BpmProgressGrid";
 import { Metronome } from "../../../components/Metronome/Metronome";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { Exercise } from "../../../types/exercise.types";
-import { useState } from "react";
 
 interface SessionSidebarProps {
   currentExercise: Exercise;

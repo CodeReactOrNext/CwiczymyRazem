@@ -1,14 +1,15 @@
+import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
+import { Check, ChevronRight, Dumbbell, Map as MapIcon, Target, X, Zap } from "lucide-react";
+import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronRight, Dumbbell, Map as MapIcon, Sparkles, Target, X, Zap } from "lucide-react";
 import { FaYoutube } from "react-icons/fa6";
-import { useRouter } from "next/router";
 import { toast } from "sonner";
-import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
+
 import { firebaseUpdateRoadmap } from "../../services/roadmap.service";
-import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
-import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
 import { firebaseGetLessonsByIds } from "../../services/youtubeLesson.service";
+import type { Roadmap, RoadmapPhase, RoadmapStep } from "../../types/roadmap.types";
+import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
 import YouTubeLessonCard from "./components/YouTubeLessonCard";
 
 // ─── AI Generating Loader ───────────────────────────────────────────────────

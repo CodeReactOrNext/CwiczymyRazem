@@ -1,12 +1,11 @@
 import { Button } from "assets/components/ui/button";
-import { selectUserInfo } from "feature/user/store/userSlice";
 import { UpgradeModal } from "feature/premium/components/UpgradeModal";
+import { selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
-import { ChevronRight, HelpCircle, Brain, Lock } from "lucide-react";
-import Link from "next/link";
+import { Brain, ChevronRight, Lock } from "lucide-react";
 import { useState } from "react";
-import { useAppSelector } from "store/hooks";
 import { FaClock, FaGuitar, FaList, FaRandom } from "react-icons/fa";
+import { useAppSelector } from "store/hooks";
 
 interface PracticeModeSelectorProps {
   onSelectMode: (mode: "timer" | "plan" | "auto" | "song" | "skills" | "gp") => void;

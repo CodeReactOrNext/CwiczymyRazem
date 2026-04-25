@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { setSelectedGuitar } from "feature/user/store/userSlice";
-import { useAppDispatch } from "store/hooks";
 import { toast } from "sonner";
-import { equipGuitar } from "../services/arsenal.service";
+import { useAppDispatch } from "store/hooks";
+
 import { GUITARS_BY_ID } from "../data/guitarDefinitions";
+import { equipGuitar } from "../services/arsenal.service";
 import { ARSENAL_QUERY_KEY } from "./useArsenalData";
 
 interface EquipGuitarPayload {

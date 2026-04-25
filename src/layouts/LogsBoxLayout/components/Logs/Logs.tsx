@@ -4,41 +4,36 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "assets/components/ui/tooltip";
-import { cn } from "assets/lib/utils";
 import { OnlineUsers } from "components/OnlineUsers/OnlineUsers";
 import Avatar from "components/UI/Avatar";
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
 import AchievementIcon from "feature/achievements/components/AchievementIcon";
+import { EFFECT_DEFINITIONS } from "feature/arsenal/data/effectDefinitions";
+import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 // challengesList removed
 import { useUnreadMessages } from "feature/chat/hooks/useUnreadMessages";
 import type { TopPlayerData } from "feature/discordBot/services/topPlayersService";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
-import { EFFECT_DEFINITIONS } from "feature/arsenal/data/effectDefinitions";
-import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { LogReaction } from "feature/logs/components/LogReaction";
 import type {
+  FirebaseLogsCaseOpenInterface,
+  FirebaseLogsDailyQuestInterface,
   FirebaseLogsInterface,
+  FirebaseLogsRecordingsInterface,
   FirebaseLogsSongsInterface,
   FirebaseLogsTopPlayersInterface,
-  FirebaseLogsRecordingsInterface,
-  FirebaseLogsDailyQuestInterface,
-  FirebaseLogsCaseOpenInterface,
 } from "feature/logs/types/logs.type";
-import { FaGem, FaCalendarAlt, FaGlobe, FaTag } from "react-icons/fa";
+import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
 import { useTranslation } from "hooks/useTranslation";
+import { Video } from "lucide-react"; 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
+import { useState } from "react";
+import { FaGem } from "react-icons/fa";
 import {
-  FaChevronUp,
-  FaCrown,
-  FaMedal,
-  FaRegStar,
   FaTrophy,
 } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
-import { Video } from "lucide-react"; 
-import { RecordingViewModal } from "feature/recordings/components/RecordingViewModal";
-import { useState } from "react";
 import { addZeroToTime } from "utils/converter";
 
 const isFirebaseLogsSongs = (

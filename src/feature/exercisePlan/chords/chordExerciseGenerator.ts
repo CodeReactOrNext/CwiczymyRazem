@@ -1,5 +1,5 @@
-import type { Exercise, TablatureMeasure, TablatureBeat, TablatureNote } from '../types/exercise.types';
-import { commonChords, beginnerChords, intermediateChords, advancedChords, type ChordDefinition } from './chordDefinitions';
+import type { Exercise, TablatureBeat, TablatureMeasure, TablatureNote } from '../types/exercise.types';
+import { advancedChords, beginnerChords,commonChords, intermediateChords } from './chordDefinitions';
 
 export interface ChordExerciseConfig {
   chords: string[]; // ['G', 'C', 'D']

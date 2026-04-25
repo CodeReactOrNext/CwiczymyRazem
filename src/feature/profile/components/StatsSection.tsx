@@ -1,7 +1,5 @@
 import type { DateWithReport } from "components/ActivityLog/activityLog.types";
 import { StatsCard } from "components/Cards";
-import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
-import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import SkillsRadarChart from "feature/profile/components/SkillsRadarChart/SkillsRadarChart";
 import {
   StatsField,

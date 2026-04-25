@@ -1,7 +1,7 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
+import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
 import { accuracyToStars, firebaseCompleteJourneyStepWithStars } from "feature/journey/services/journey.service";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useRouter } from "next/router";

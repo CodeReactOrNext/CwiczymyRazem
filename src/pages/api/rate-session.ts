@@ -1,5 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
 import type { SessionRatingResponse } from "feature/aiSummary/types/summary.types";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 const GOAL_MAX_LENGTH = 150;
 

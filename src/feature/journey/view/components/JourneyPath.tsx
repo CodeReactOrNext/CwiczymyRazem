@@ -1,16 +1,17 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import type { Song } from "feature/songs/types/songs.type";
+import { useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
-  Check, Play, Target, ChevronLeft,
-  ArrowDown, ArrowUpDown, GitMerge, Timer, Link2,
-  MoveHorizontal, Hand, SkipForward, TrendingUp,
-  Zap, AudioWaveform, Layers,
-  Music, Hammer, ChevronDown, LayoutGrid, Waves, SlidersHorizontal, Bug, ClipboardCheck, Guitar,
-} from "lucide-react";
-import { FaStar } from "react-icons/fa";
+  ArrowDown, ArrowUpDown, AudioWaveform, Bug,   Check, ChevronDown, ChevronLeft,
+ClipboardCheck, GitMerge, Guitar,
+Hammer, Hand, Layers,
+LayoutGrid, Link2,
+  MoveHorizontal,   Music, Play, SkipForward, SlidersHorizontal, Target, Timer, TrendingUp,
+Waves,   Zap, } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import type { Song } from "feature/songs/types/songs.type";
+import React, { useEffect, useState } from "react";
+import { FaStar } from "react-icons/fa";
+
 import { getSongsByIds } from "../../services/journey.service";
 import type { JourneyModuleWithStatus, JourneyStepWithStatus } from "../../types/journey.types";
 

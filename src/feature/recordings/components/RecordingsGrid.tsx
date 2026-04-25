@@ -1,7 +1,8 @@
-import { RecordingCard } from "./RecordingCard";
+import { Button } from "assets/components/ui/button";
 import type { Recording } from "feature/recordings/types/types";
 import { Loader2 } from "lucide-react";
-import { Button } from "assets/components/ui/button";
+
+import { RecordingCard } from "./RecordingCard";
 
 interface RecordingsGridProps {
   recordings: Recording[];

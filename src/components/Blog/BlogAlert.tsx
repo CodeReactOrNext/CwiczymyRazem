@@ -1,5 +1,5 @@
+import { AlertTriangle, Info, Lightbulb, Zap } from 'lucide-react';
 import React from 'react';
-import { Info, AlertTriangle, Lightbulb, Zap } from 'lucide-react';
 
 type AlertType = 'info' | 'warning' | 'tip' | 'important';
 

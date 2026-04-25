@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Badge } from 'assets/components/ui/badge';
+import { Button } from 'assets/components/ui/button';
+import { Checkbox } from 'assets/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from 'assets/components/ui/dialog';
-import { Button } from 'assets/components/ui/button';
+import { Label } from 'assets/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -16,17 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'assets/components/ui/select';
-import { Label } from 'assets/components/ui/label';
-import { Checkbox } from 'assets/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'assets/components/ui/tabs';
 import {
-  getCategorizedChords,
-  generateChordExercise,
   type ChordExerciseConfig,
+  generateChordExercise,
+  getCategorizedChords,
 } from 'feature/exercisePlan/chords/chordExerciseGenerator';
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
-import { Badge } from 'assets/components/ui/badge';
 import { X } from 'lucide-react';
+import { useEffect,useState } from 'react';
 
 interface ChordSelectionDialogProps {
   isOpen: boolean;

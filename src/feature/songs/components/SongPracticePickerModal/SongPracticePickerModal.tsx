@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { Dialog, DialogContent } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
+import type { BackingTrack,TablatureMeasure } from "feature/exercisePlan/types/exercise.types";
 import { ImportTablature } from "feature/songs/components/ImportTablature/ImportTablature";
 import {
   getUserGpFiles,
@@ -10,7 +9,6 @@ import {
 } from "feature/songs/services/userGpFiles.service";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
 import type { Song } from "feature/songs/types/songs.type";
-import type { TablatureMeasure, BackingTrack } from "feature/exercisePlan/types/exercise.types";
 import {
   ArrowLeft,
   ChevronRight,
@@ -18,14 +16,16 @@ import {
   FileMusic,
   FolderOpen,
   Link2Off,
-  Lock,
   Loader2,
+  Lock,
   Timer,
   Upload,
   Zap,
 } from "lucide-react";
-import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type Phase = "pick" | "attach";
 type AttachTab = "library" | "import";

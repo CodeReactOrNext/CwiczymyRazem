@@ -1,5 +1,5 @@
 import { HeroBanner } from "components/UI/HeroBanner";
-import { selectTimerData, selectUserAvatar, updateLocalTimer, updateTimerTime } from "feature/user/store/userSlice";
+import { selectTimerData, updateLocalTimer, updateTimerTime } from "feature/user/store/userSlice";
 import useTimer from "hooks/useTimer";
 import AppLayout from "layouts/AppLayout";
 import TimerLayout from "layouts/TimerLayout/TimerLayout";

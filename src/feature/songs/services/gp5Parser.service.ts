@@ -1,5 +1,5 @@
 import * as alphaTab from '@coderline/alphatab';
-import { TablatureMeasure, TablatureBeat, TablatureNote, BendPoint } from 'feature/exercisePlan/types/exercise.types';
+import type { BendPoint,TablatureBeat, TablatureMeasure, TablatureNote } from 'feature/exercisePlan/types/exercise.types';
 
 interface GpTrack {
   name: string;

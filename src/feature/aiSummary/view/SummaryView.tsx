@@ -1,20 +1,20 @@
-import { HeroBanner } from "components/UI/HeroBanner";
 import { cn } from "assets/lib/utils";
+import { HeroBanner } from "components/UI/HeroBanner";
 import { firebaseGetUserRaprotsLogs } from "feature/logs/services/getUserRaprotsLogs.service";
 import type { FirebaseUserExceriseLog } from "feature/logs/types/logs.type";
 import { selectCurrentUserStats, selectUserAuth } from "feature/user/store/userSlice";
-import {
-  BarChart2, Brain, Calendar, CalendarDays, CheckCircle2, ChevronDown, Clock,
-  Flame, Guitar, Headphones, Lightbulb, ListMusic, Music2,
+import { Brain, Calendar, CalendarDays, CheckCircle2, Clock,
+  Flame, Guitar, Lightbulb, ListMusic,
   Settings, Sparkles, Star, Target, TrendingDown, TrendingUp, TriangleAlert, Trophy, X, Zap,
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppSelector } from "store/hooks";
-import type { WeeklySummaryResponse } from "../types/summary.types";
-import { PeriodRatingCard, DailyAssessmentCard, ScoreRing, GRADE_COLOR, RatingSkeleton, WEEKLY_LOADING_MESSAGES } from "../components/SessionRatingCard";
-import { firebaseGetAllDailySummaries, firebaseGetAllSummaries, firebaseGetDailySummary, firebaseGetPromptConfig, firebaseGetSummary, firebaseSaveDailySummary, firebaseSavePromptConfig, firebaseSaveSummary } from "../services/summary.service";
+
+import { DailyAssessmentCard, GRADE_COLOR, RatingSkeleton, ScoreRing, WEEKLY_LOADING_MESSAGES } from "../components/SessionRatingCard";
 import { firebaseGetAllDailyRatings } from "../services/rating.service";
 import type { SavedDailySummary, SavedSummary } from "../services/summary.service";
+import { firebaseGetAllDailySummaries, firebaseGetAllSummaries, firebaseGetDailySummary, firebaseGetPromptConfig, firebaseGetSummary, firebaseSaveDailySummary, firebaseSavePromptConfig, firebaseSaveSummary } from "../services/summary.service";
+import type { WeeklySummaryResponse } from "../types/summary.types";
 import type { DailySummaryResponse, PromptConfig, SessionGrade } from "../types/summary.types";
 
 const GOAL_MAX_LENGTH = 150;

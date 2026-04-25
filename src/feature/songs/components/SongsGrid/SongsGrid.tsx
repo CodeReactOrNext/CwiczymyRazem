@@ -1,22 +1,11 @@
 import { Button } from "assets/components/ui/button";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "assets/components/ui/pagination";
 import { SongCard } from "feature/songs/components/SongsGrid/SongCard";
 import SongSheet from "feature/songs/components/SongSheet/SongSheet";
 import { SongsTableEmpty } from "feature/songs/components/SongsTable/components/SongsTableEmpty";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
-import posthog from "posthog-js";
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
-import { selectUserAuth } from "feature/user/store/userSlice";
+import posthog from "posthog-js";
 import { useState } from "react";
-import { useAppSelector } from "store/hooks";
 
 interface SongsGridProps {
   songs: Song[];

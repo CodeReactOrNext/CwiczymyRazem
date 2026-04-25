@@ -1,8 +1,8 @@
-import Head from "next/head";
 import { UpgradeContent } from "feature/premium/components/UpgradeModal";
 import { selectUserInfo } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
+import Head from "next/head";
 import Link from "next/link";
+import { useAppSelector } from "store/hooks";
 
 export default function PremiumPage() {
   const userInfo = useAppSelector(selectUserInfo);

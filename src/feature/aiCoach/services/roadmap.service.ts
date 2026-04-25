@@ -1,15 +1,15 @@
-import { db } from "utils/firebase/client/firebase.utils";
 import {
   collection,
+  deleteDoc,
   doc,
-  getDoc,
+  getDocs,
+  query,
   setDoc,
   updateDoc,
-  deleteDoc,
-  query,
   where,
-  getDocs,
 } from "firebase/firestore";
+import { db } from "utils/firebase/client/firebase.utils";
+
 import type { Roadmap } from "../types/roadmap.types";
 
 const ROADMAPS_COLLECTION = "roadmaps";

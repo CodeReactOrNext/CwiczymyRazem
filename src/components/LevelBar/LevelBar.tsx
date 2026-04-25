@@ -1,5 +1,4 @@
 import { cn } from "assets/lib/utils";
-import { useTranslation } from "hooks/useTranslation";
 import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface LevelInterfaceProps {

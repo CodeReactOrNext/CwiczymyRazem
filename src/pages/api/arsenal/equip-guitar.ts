@@ -1,6 +1,6 @@
+import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { auth, firestore } from "utils/firebase/api/firebase.config";
-import { GUITARS_BY_ID } from "feature/arsenal/data/guitarDefinitions";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {

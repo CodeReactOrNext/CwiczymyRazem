@@ -1,5 +1,5 @@
-import { firestore, messaging } from "utils/firebase/api/firebase.config";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { firestore, messaging } from "utils/firebase/api/firebase.config";
 
 export default async function handler(
   req: NextApiRequest,

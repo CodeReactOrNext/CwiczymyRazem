@@ -1,11 +1,11 @@
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { doc, getDoc } from "firebase/firestore";
+import { ArrowRight, CheckCircle2, Loader2,Sparkles } from "lucide-react";
 import Head from "next/head";
 import Link from "next/link";
-import { CheckCircle2, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
-import { selectUserAuth } from "feature/user/store/userSlice";
 import { useAppSelector } from "store/hooks";
+import { db } from "utils/firebase/client/firebase.utils";
 
 const PLAN_FEATURES: Record<"pro" | "master", string[]> = {
   pro: [

@@ -1,6 +1,7 @@
+import MainContainer from "components/MainContainer";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { useState } from "react";
-import MainContainer from "components/MainContainer";
+
 import type {
   DifficultyLevel,
   Exercise,

@@ -1,17 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { Button } from 'assets/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from 'assets/components/ui/dialog';
-import { Button } from 'assets/components/ui/button';
 import { Input } from 'assets/components/ui/input';
 import { Label } from 'assets/components/ui/label';
-import { Clock } from 'lucide-react';
 import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
+import { Clock } from 'lucide-react';
+import { useEffect, useRef,useState } from 'react';
 
 interface AddExerciseTimeDialogProps {
   exercise: Exercise | null;

@@ -8,7 +8,6 @@ import type { NavPagesTypes } from "types/layout.types";
 import DesktopHeaderWrapper from "./components/DesktopHeaderWrapper";
 import type { LandingNavObjectInterface } from "./components/LandingNav/LandingNav";
 import MainLoggedWrapper from "./components/MainLoggedWrapper";
-
 import UserHeader from "./components/UserHeader/UserHeader";
 
 interface LandingLayoutProps {

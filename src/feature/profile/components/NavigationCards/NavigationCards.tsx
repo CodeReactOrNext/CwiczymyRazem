@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { ArrowRight, Bot, ClipboardCheck, ClipboardList, Guitar, Loader2, Music, Sparkles, Wand2 } from "lucide-react";
+import { ArrowRight, ClipboardCheck, ClipboardList, Guitar, Loader2, Sparkles } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 

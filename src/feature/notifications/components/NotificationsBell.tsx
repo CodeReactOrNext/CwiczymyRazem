@@ -1,16 +1,16 @@
-import { Bell, MessageSquare, Heart, Clock, Gem, Trophy, Zap } from "lucide-react";
-import { useState } from "react";
-import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
-import { cn } from "assets/lib/utils";
-import Avatar from "components/UI/Avatar";
-import { formatDistanceToNow } from "date-fns";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "assets/components/ui/dropdown-menu";
+import { cn } from "assets/lib/utils";
+import Avatar from "components/UI/Avatar";
+import { formatDistanceToNow } from "date-fns";
+import { useAppNotifications } from "feature/notifications/hooks/useAppNotifications";
+import { selectUserAuth } from "feature/user/store/userSlice";
+import { Bell, Clock, Gem, Heart, MessageSquare, Trophy, Zap } from "lucide-react";
+import { useState } from "react";
+import { useAppSelector } from "store/hooks";
 
 const placeSuffix = (place: number) => {
   if (place === 1) return "st";

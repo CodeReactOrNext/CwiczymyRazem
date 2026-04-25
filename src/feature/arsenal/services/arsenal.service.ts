@@ -1,6 +1,7 @@
-import type { CaseType, OpenCaseResult, ArsenalUserData, RigSetup, OpenEffectPackResult, PedalboardPlacement } from "../types/arsenal.types";
-import { auth } from "utils/firebase/client/firebase.utils";
 import axios from "axios";
+import { auth } from "utils/firebase/client/firebase.utils";
+
+import type { ArsenalUserData, CaseType, OpenCaseResult, OpenEffectPackResult, PedalboardPlacement,RigSetup } from "../types/arsenal.types";
 
 async function getIdToken(): Promise<string> {
   const token = await auth.currentUser!.getIdToken();

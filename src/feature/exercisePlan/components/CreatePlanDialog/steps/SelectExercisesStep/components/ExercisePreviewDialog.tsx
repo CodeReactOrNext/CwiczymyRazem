@@ -1,17 +1,17 @@
+import { Badge } from 'assets/components/ui/badge';
+import { Button } from 'assets/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from 'assets/components/ui/dialog';
-import { Badge } from 'assets/components/ui/badge';
-import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
-import { useTranslation } from 'hooks/useTranslation';
-import { guitarSkills } from 'feature/skills/data/guitarSkills';
-import { Clock, Info, CheckCircle2, Lightbulb, Activity, Tag, Play } from 'lucide-react';
-import { TablatureViewer } from 'feature/exercisePlan/views/PracticeSession/components/TablatureViewer';
-import { Button } from 'assets/components/ui/button';
 import { cn } from 'assets/lib/utils';
+import type { Exercise } from 'feature/exercisePlan/types/exercise.types';
+import { TablatureViewer } from 'feature/exercisePlan/views/PracticeSession/components/TablatureViewer';
+import { guitarSkills } from 'feature/skills/data/guitarSkills';
+import { useTranslation } from 'hooks/useTranslation';
+import { Activity, CheckCircle2, Clock, Lightbulb, Play } from 'lucide-react';
 
 interface ExercisePreviewDialogProps {
   exercise: Exercise | null;

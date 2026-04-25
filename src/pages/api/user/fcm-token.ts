@@ -1,6 +1,6 @@
-import { db } from "utils/firebase/client/firebase.utils";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { db } from "utils/firebase/client/firebase.utils";
 
 export default async function handler(
   req: NextApiRequest,

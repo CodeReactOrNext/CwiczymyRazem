@@ -1,9 +1,9 @@
 import { selectUserInfo } from "feature/user/store/userSlice";
-import { auth } from "utils/firebase/client/firebase.utils";
 import { CreditCard, ExternalLink, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useAppSelector } from "store/hooks";
 import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
+import { auth } from "utils/firebase/client/firebase.utils";
 
 const SubscriptionSettings = () => {
   const userInfo = useAppSelector(selectUserInfo);

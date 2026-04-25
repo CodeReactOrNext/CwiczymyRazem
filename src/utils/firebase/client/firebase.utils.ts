@@ -1,5 +1,4 @@
 import type { SortByType } from "feature/leadboard/components/LeadboardLayout";
-import type { GuitarSkill, UserSkills } from "feature/skills/skills.types";
 import {
   createUserWithEmailAndPassword,
   EmailAuthProvider,
@@ -16,12 +15,11 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   initializeFirestore,
-  persistentLocalCache,
-  persistentSingleTabManager,
   limit,
   orderBy,
+  persistentLocalCache,
+  persistentSingleTabManager,
   query,
   startAfter,
   Timestamp,
@@ -57,10 +55,10 @@ export const firebaseSignInWithCredential = (credential: any) =>
 export const db =
   typeof window !== "undefined"
     ? initializeFirestore(firebaseApp, {
-        localCache: persistentLocalCache({
-          tabManager: persistentSingleTabManager(undefined),
-        }),
-      })
+      localCache: persistentLocalCache({
+        tabManager: persistentSingleTabManager(undefined),
+      }),
+    })
     : initializeFirestore(firebaseApp, {});
 
 export const storage = getStorage(firebaseApp);

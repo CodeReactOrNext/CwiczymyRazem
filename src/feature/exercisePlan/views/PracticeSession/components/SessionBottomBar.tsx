@@ -1,13 +1,14 @@
-import { cn } from "assets/lib/utils";
 import { Button } from "assets/components/ui/button";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from "assets/components/ui/dialog";
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+DialogHeader, DialogTitle, } from "assets/components/ui/dialog";
+import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { FaCheck, FaStepBackward, FaStepForward, FaSignOutAlt } from "react-icons/fa";
 import { useState } from "react";
-import { MainTimerSection } from "./MainTimerSection";
+import { FaCheck, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons/fa";
+
 import type { Exercise } from "../../../types/exercise.types";
+import { MainTimerSection } from "./MainTimerSection";
 
 interface SessionBottomBarProps {
   onClose?: () => void;

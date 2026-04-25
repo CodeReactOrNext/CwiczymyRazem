@@ -3,7 +3,6 @@ import {
   collection,
   doc,
   getCountFromServer,
-  getDoc,
   limit,
   orderBy,
   query,

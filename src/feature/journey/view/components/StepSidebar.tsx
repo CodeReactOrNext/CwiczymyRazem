@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { updateSongStatus } from "feature/songs/services/udateSongStatus";
+import type { Song } from "feature/songs/types/songs.type";
+import { selectUserAuth } from "feature/user/store/userSlice";
 import {
-  X, CheckCircle2, Play, Target, Lock,
-  Zap, Music, Star, ChevronRight,
   AlertCircle,
-  Square, SquareCheck,
-} from "lucide-react";
+CheckCircle2, Play,   Square, SquareCheck,
+Star, Target,   X, } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 import { useAppSelector } from "store/hooks";
-import { selectUserAuth } from "feature/user/store/userSlice";
-import type { Song } from "feature/songs/types/songs.type";
+
 import { getSongsByIds } from "../../services/journey.service";
-import { updateSongStatus } from "feature/songs/services/udateSongStatus";
-import type { JourneyStepWithStatus, StepContentBlock } from "../../types/journey.types";
+import type { JourneyStepWithStatus } from "../../types/journey.types";
 
 interface StepSidebarProps {
   step: JourneyStepWithStatus;

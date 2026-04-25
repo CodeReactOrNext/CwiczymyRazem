@@ -1,18 +1,23 @@
 import { Button } from "assets/components/ui/button";
 import { Separator } from "assets/components/ui/separator";
 import { CopyLinkProfile } from "components/CopyLinkProfile/CopyLinkProfile";
+import { FeedbackModal } from "components/FeedbackBubble";
 import { MobileBottomNav } from "components/MobileBottomNav/MobileBottomNav";
 import Avatar from "components/UI/Avatar";
+import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 import {
   selectCurrentUserStats,
   selectUserAvatar,
   selectUserInfo,
   selectUserName,
 } from "feature/user/store/userSlice";
+import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 import { AnimatePresence,motion } from "framer-motion";
+import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
+  BarChart2,
   Brain,
   Calendar,
   Dumbbell,
@@ -20,22 +25,21 @@ import {
   FileText,
   LayoutGrid,
   ListChecks,
+  LogOut,
+  Map,
   MessageSquarePlus,
   Music,
+  Route,
   Settings,
+  Sparkles,
   Swords,
   Timer,
   Trophy,
   User,
-  X,
   Video,
-  LogOut,
-  Sparkles,
-  BarChart2,
-  Map,
-  Route,
+  X,
 } from "lucide-react";
-import { Heart, Zap } from "lucide-react";
+import { Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -44,12 +48,8 @@ import { FaDiscord } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
 import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
-import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
 
-import { FeedbackModal } from "components/FeedbackBubble";
-import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { CommunityModal } from "./CommunityModal";
-import { NotificationsBell } from "feature/notifications/components/NotificationsBell";
 
 export interface SidebarLinkInterface {
   id: NavPagesTypes;

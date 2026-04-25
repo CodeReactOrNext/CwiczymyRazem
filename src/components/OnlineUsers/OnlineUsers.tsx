@@ -1,8 +1,7 @@
 import { UserTooltip } from "components/UserTooltip/UserTooltip";
+import { motion } from "framer-motion";
 import { useOnlineUsers } from "hooks/useOnlineUsers";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Music } from "lucide-react";
 
 export const OnlineUsers = () => {
     const { onlineUsers, isDbEnabled } = useOnlineUsers();

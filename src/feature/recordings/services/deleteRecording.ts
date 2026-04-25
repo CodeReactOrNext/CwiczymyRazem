@@ -1,4 +1,4 @@
-import { deleteDoc, doc, runTransaction } from "firebase/firestore";
+import { doc, runTransaction } from "firebase/firestore";
 import { db } from "utils/firebase/client/firebase.utils";
 
 export const deleteRecording = async (recordingId: string, userId: string) => {

@@ -1,22 +1,21 @@
-import { useEffect, useState } from "react";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "utils/firebase/client/firebase.utils";
-import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
-import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
 import type { Exercise, ExercisePlan } from "feature/exercisePlan/types/exercise.types";
-import type { Song } from "feature/songs/types/songs.type";
+import { PracticeLoadingScreen } from "feature/exercisePlan/views/PracticeSession/components/PracticeLoadingScreen";
+import { PracticeSession } from "feature/exercisePlan/views/PracticeSession/PracticeSession";
+import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
 import {
   getUserSongProgress,
-  recordPracticeSession,
   type UserSongProgress,
 } from "feature/songs/services/userSongProgress.service";
-import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
+import type { Song } from "feature/songs/types/songs.type";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
+import { doc, getDoc } from "firebase/firestore";
 import { Music } from "lucide-react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useAppSelector } from "store/hooks";
 import { withAuth } from "utils/auth/serverAuth";
+import { db } from "utils/firebase/client/firebase.utils";
 
 type PageState =
   | { status: "loading" }

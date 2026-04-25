@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import Head from 'next/head';
-import { TablatureViewer } from 'feature/exercisePlan/views/PracticeSession/components/TablatureViewer';
-import { useTablatureAudio } from 'feature/exercisePlan/hooks/useTablatureAudio';
-import { TablatureMeasure, TablatureBeat, TablatureNote } from 'feature/exercisePlan/types/exercise.types';
-import { motion, AnimatePresence } from 'framer-motion';
-import { LucidePlus, LucideTrash2, LucidePlay, LucideSquare, LucideCopy, LucideEraser, LucideWand2, LucideVolume2, LucideVolumeX } from 'lucide-react';
 import { cn } from 'assets/lib/utils';
+import { useTablatureAudio } from 'feature/exercisePlan/hooks/useTablatureAudio';
+import type { TablatureBeat, TablatureMeasure, TablatureNote } from 'feature/exercisePlan/types/exercise.types';
+import { TablatureViewer } from 'feature/exercisePlan/views/PracticeSession/components/TablatureViewer';
+import { AnimatePresence,motion } from 'framer-motion';
+import { LucideCopy, LucideEraser, LucidePlay, LucidePlus, LucideSquare, LucideTrash2, LucideVolume2, LucideVolumeX,LucideWand2 } from 'lucide-react';
+import Head from 'next/head';
+import React, { useCallback,useEffect, useState } from 'react';
 
 
 export default function TabEditor() {

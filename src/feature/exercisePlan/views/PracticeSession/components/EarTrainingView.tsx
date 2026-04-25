@@ -1,8 +1,7 @@
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Copy, Ear, Eye, EyeOff, HelpCircle, Music, Play, RefreshCw, Trophy, Volume2 } from "lucide-react";
-import { useState } from "react";
+import { Ear, Eye, Music, RefreshCw, Trophy, Volume2 } from "lucide-react";
 import { FaPlay } from "react-icons/fa";
 
 interface EarTrainingViewProps {

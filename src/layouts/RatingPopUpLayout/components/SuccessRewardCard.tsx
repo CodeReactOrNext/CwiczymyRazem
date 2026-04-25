@@ -1,7 +1,7 @@
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
-import { FaSync, FaGem } from "react-icons/fa";
 import React, { useEffect } from "react";
+import { FaGem,FaSync } from "react-icons/fa";
 
 interface SuccessRewardCardProps {
   displayedPoints: number;

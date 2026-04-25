@@ -1,28 +1,27 @@
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
 import { ActivityLogView } from "components/ActivityLog/ActivityLog";
-import { ArrowRight, Plus, Gem } from "lucide-react";
 import { useActivityLog } from "components/ActivityLog/hooks/useActivityLog";
 import { DashboardSection } from "components/Layout";
-import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
-import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
-import { StatsField } from "feature/profile/components/StatsField";
-import { getTrendData } from "feature/profile/utils/getTrendData";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
-import { getUserSongs } from "feature/songs/services/getUserSongs";
-import type { Song } from "feature/songs/types/songs.type";
-import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
-import { getSongTier } from "feature/songs/utils/getSongTier";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import type { StatisticsDataInterface } from "types/api.types";
-import { convertMsToHM } from "utils/converter";
-import { getPointsToLvlUp } from "utils/gameLogic";
-import { FaClock } from "react-icons/fa";
-
 // ActiveChallengeWidget removed
 import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
+import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
+import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
+import { StatsField } from "feature/profile/components/StatsField";
+import { getTrendData } from "feature/profile/utils/getTrendData";
+import { getUserSongs } from "feature/songs/services/getUserSongs";
+import type { Song } from "feature/songs/types/songs.type";
+import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
+import { getSongTier } from "feature/songs/utils/getSongTier";
+import { ArrowRight, Gem,Plus } from "lucide-react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { FaClock } from "react-icons/fa";
+import type { StatisticsDataInterface } from "types/api.types";
 import type { ProfileInterface } from "types/ProfileInterface";
+import { convertMsToHM } from "utils/converter";
+import { getPointsToLvlUp } from "utils/gameLogic";
 
 interface LandingLayoutProps {
   userStats: StatisticsDataInterface;

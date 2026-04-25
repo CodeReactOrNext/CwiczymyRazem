@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
 import * as alphaTabLib from '@coderline/alphatab';
+import { useEffect, useRef } from 'react';
 
 interface AlphaTabTrackConfig {
   isMuted: boolean;
@@ -159,7 +159,7 @@ export const useAlphaTabPlayer = ({
     };
   // rawGpFile in deps: effect re-evaluates when file arrives (null→File transition).
   // The apiRef.current guard prevents double-creation if deps fire again with same state.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [rawGpFile]);
 
   // ── Load file into existing API ───────────────────────────────────────────
@@ -211,7 +211,7 @@ export const useAlphaTabPlayer = ({
       pendingPlayRef.current = false;
       if (hasStartedRef.current) { try { api.stop(); } catch { /* ignore */ } }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [isPlaying, startTime]);
 
   // ── Per-track mute / volume ───────────────────────────────────────────────

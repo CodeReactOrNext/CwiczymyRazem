@@ -11,8 +11,8 @@ import { useTranslation } from "hooks/useTranslation";
 import AppLayout from "layouts/AppLayout";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import { useAppSelector } from "store/hooks";
 import { toast } from "sonner";
+import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 
 const CreatePlanPage: NextPageWithLayout = () => {

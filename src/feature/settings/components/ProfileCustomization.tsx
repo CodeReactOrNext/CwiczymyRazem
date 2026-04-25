@@ -4,6 +4,7 @@ import {
   CardContent,
 } from "assets/components/ui/card";
 import { ScrollArea } from "assets/components/ui/scroll-area";
+import { cn } from "assets/lib/utils";
 import Avatar from "components/UI/Avatar";
 import {
   selectCurrentUserStats,
@@ -12,10 +13,9 @@ import {
 } from "feature/user/store/userSlice";
 import { updateProfileCustomization } from "feature/user/store/userSlice.asyncThunk";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Lock, Loader2, Sparkles, Trophy, Zap } from "lucide-react";
+import { Check, Loader2, Lock, Trophy } from "lucide-react";
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "store/hooks";
-import { cn } from "assets/lib/utils";
 
 const FRAMES = [
   { lvl: 0, label: "Default", class: "bg-zinc-800 text-zinc-400" },

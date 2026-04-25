@@ -1,14 +1,13 @@
-import { HeroBanner } from "components/UI/HeroBanner";
 import AiCoachView from "feature/aiCoach/view/AiCoachView";
-import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { PremiumFeaturePreview } from "feature/premium/components/PremiumFeaturePreview";
+import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { selectUserInfo } from "feature/user/store/userSlice";
-import { useAppSelector } from "store/hooks";
 import AppLayout from "layouts/AppLayout/AppLayout";
+import { Compass, Map, Target, Zap } from "lucide-react";
 import type { ReactElement } from "react";
+import { useAppSelector } from "store/hooks";
 import type { NextPageWithLayout } from "types/page";
 import { withAuth } from "utils/auth/serverAuth";
-import { Map, Target, Compass, Zap } from "lucide-react";
 
 const AiCoachPage: NextPageWithLayout = () => {
   const userInfo = useAppSelector(selectUserInfo);

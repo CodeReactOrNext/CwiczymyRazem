@@ -1,7 +1,6 @@
+import { cn } from "assets/lib/utils";
 import { Crown, Guitar, Play, Trophy, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
-
-import { cn } from "assets/lib/utils";
 
 /* ───────────────────────────────────────
    Animated XP / level loop

@@ -3,8 +3,8 @@ import { MiniTrendChart } from "feature/profile/components/MiniTrendChart";
 import { calculateTrend } from "feature/profile/utils/calculateTrend";
 import type { LucideIcon } from "lucide-react";
 import { ArrowDown, ArrowRight, ArrowUp } from "lucide-react";
-import type { ComponentType } from "react";
 import Link from "next/link";
+import type { ComponentType } from "react";
 
 export interface StatsFieldProps {
   Icon?: LucideIcon | ComponentType<{ className?: string }>;

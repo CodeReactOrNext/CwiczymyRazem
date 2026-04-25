@@ -19,14 +19,13 @@ import {
   TabsTrigger,
 } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
-import { SongLearningStats } from "feature/songs/components/SongLearningStats/SongLearningStats";
 import { SongStatusCard } from "feature/songs/components/SongStatusCard";
 import { STATUS_CONFIG } from "feature/songs/constants/statusConfig";
 import { useSongsStatusChange } from "feature/songs/hooks/useSongsStatusChange";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import { updateUserSongOrder } from "feature/songs/services/updateUserSongOrder";
-import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import type { UserSongProgress } from "feature/songs/services/userSongProgress.service";
+import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { getAllTiers } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";

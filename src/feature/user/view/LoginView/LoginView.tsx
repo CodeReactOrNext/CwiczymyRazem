@@ -25,7 +25,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { TbGuitarPick } from "react-icons/tb";
-import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 
 

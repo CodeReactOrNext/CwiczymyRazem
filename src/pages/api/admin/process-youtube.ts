@@ -1,19 +1,19 @@
+import { Index } from "@upstash/vector";
+import type { ScraperConfig, YouTubeLesson } from "feature/aiCoach/types/youtubeLesson.types";
+import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
 import {
   collection,
   doc,
   getDoc,
   getDocs,
+  limit,
   query,
   updateDoc,
   where,
-  limit,
 } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import OpenAI from "openai";
-import { Index } from "@upstash/vector";
 import { db } from "utils/firebase/client/firebase.utils";
-import type { ScraperConfig, YouTubeLesson } from "feature/aiCoach/types/youtubeLesson.types";
-import { DEFAULT_SCRAPER_CONFIG } from "feature/aiCoach/types/youtubeLesson.types";
 
 const LESSONS_COLLECTION = "youtubeLessons";
 const ADMIN_CONFIG_COLLECTION = "adminConfig";

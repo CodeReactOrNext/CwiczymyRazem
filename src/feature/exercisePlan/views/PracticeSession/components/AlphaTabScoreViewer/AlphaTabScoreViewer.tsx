@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "assets/lib/utils";
-import { useAlphaTabApi } from "./useAlphaTabApi";
-import { TrackSelector } from "./TrackSelector";
+import { useCallback,useEffect, useRef, useState } from "react";
+
 import { ScoreControls, SPEEDS } from "./ScoreControls";
+import { TrackSelector } from "./TrackSelector";
 import type { AlphaTabScoreViewerProps } from "./types";
+import { useAlphaTabApi } from "./useAlphaTabApi";
 
 /**
  * Interactive AlphaTab score/tab viewer.

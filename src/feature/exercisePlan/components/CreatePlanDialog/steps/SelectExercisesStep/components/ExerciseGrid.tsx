@@ -1,11 +1,12 @@
-import { UpgradeModal } from "feature/premium/components/UpgradeModal";
-import type { Exercise } from "feature/exercisePlan/types/exercise.types";
-import { selectUserInfo } from "feature/user/store/userSlice";
-import { useState, useEffect } from "react";
-import { useAppSelector } from "store/hooks";
-import { ExerciseCard } from "./ExerciseCard";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "assets/lib/utils";
+import type { Exercise } from "feature/exercisePlan/types/exercise.types";
+import { UpgradeModal } from "feature/premium/components/UpgradeModal";
+import { selectUserInfo } from "feature/user/store/userSlice";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect,useState } from "react";
+import { useAppSelector } from "store/hooks";
+
+import { ExerciseCard } from "./ExerciseCard";
 
 interface ExerciseGridProps {
   exercises: Exercise[];

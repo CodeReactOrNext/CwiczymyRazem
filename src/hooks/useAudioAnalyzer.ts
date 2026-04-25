@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback,useEffect, useRef, useState } from "react";
 import { computeChromagram } from "utils/audio/noteUtils";
 
 interface AudioAnalyzerState {

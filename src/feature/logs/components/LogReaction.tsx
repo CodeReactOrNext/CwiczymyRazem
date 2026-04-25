@@ -1,8 +1,8 @@
 import { cn } from "assets/lib/utils";
 import { toggleLogReaction } from "feature/logs/services/toggleLogReaction.service";
 import { AnimatePresence, motion } from "framer-motion";
-import { FaGem } from "react-icons/fa";
 import { useState } from "react";
+import { FaGem } from "react-icons/fa";
 
 interface LogReactionProps {
   logId: string;

@@ -1,21 +1,22 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { Skeleton } from "assets/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import MainContainer from "components/MainContainer";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
-import { useArsenalData } from "./hooks/useArsenalData";
-import { useOpenCase } from "./hooks/useOpenCase";
-import { useAppSelector } from "store/hooks";
+import { Guitar,PackageOpen, Swords } from "lucide-react";
 import { useState } from "react";
 import { FaGem } from "react-icons/fa";
-import { PackageOpen, Swords, Guitar } from "lucide-react";
-import { CaseShop } from "./components/CaseShop/CaseShop";
-import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
-import { EffectCollection } from "./components/GuitarInventory/EffectCollection";
-import { RigView } from "./components/Rig/RigView";
+import { useAppSelector } from "store/hooks";
+
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
-import type { CaseType, OpenCaseResult } from "./types/arsenal.types";
+import { CaseShop } from "./components/CaseShop/CaseShop";
+import { EffectCollection } from "./components/GuitarInventory/EffectCollection";
+import { GuitarInventory } from "./components/GuitarInventory/GuitarInventory";
+import { RigView } from "./components/Rig/RigView";
 import { CASE_DEFINITIONS } from "./data/caseDefinitions";
+import { useArsenalData } from "./hooks/useArsenalData";
+import { useOpenCase } from "./hooks/useOpenCase";
+import type { CaseType, OpenCaseResult } from "./types/arsenal.types";
 
 export const ArsenalView = () => {
   const { data, isLoading } = useArsenalData();

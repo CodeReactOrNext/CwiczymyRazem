@@ -1,4 +1,3 @@
-import { useTranslation } from "hooks/useTranslation";
 import Image from "next/image";
 import Link from "next/link";
 
