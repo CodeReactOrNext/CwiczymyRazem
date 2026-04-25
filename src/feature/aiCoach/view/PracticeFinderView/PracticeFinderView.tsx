@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { ChevronRight, Dumbbell, Search, Sparkles, YoutubeIcon } from "lucide-react";
+import { ChevronRight, Dumbbell, Search, Sparkles } from "lucide-react";
+import { FaYoutube } from "react-icons/fa6";
 import { useRouter } from "next/router";
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import type { YouTubeLessonResult } from "../../types/youtubeLesson.types";
@@ -240,7 +241,7 @@ const PracticeFinderView: React.FC = () => {
               {result!.lessons.length > 0 && (
                 <div>
                   <p className="mb-2.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                    <YoutubeIcon className="h-3.5 w-3.5 text-red-500" />
+                    <FaYoutube className="h-3.5 w-3.5 text-red-500" />
                     YouTube Lessons
                   </p>
                   <div className="space-y-2">

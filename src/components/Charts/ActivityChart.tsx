@@ -209,7 +209,7 @@ export function ActivityChart({ data }: ActivityChartProps) {
                     <div className='rounded-lg border border-white/10 bg-zinc-950/90 p-4 text-white shadow-2xl backdrop-blur-xl'>
                       <div className='flex flex-col gap-1'>
                         <span className='text-[0.70rem] uppercase font-bold text-zinc-500 tracking-wider'>
-                          {new Date(label).toLocaleDateString("pl", {
+                          {new Date(label ?? "").toLocaleDateString("pl", {
                             month: "long",
                             day: "numeric",
                             year: "numeric",

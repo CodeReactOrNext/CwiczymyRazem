@@ -31,7 +31,8 @@ function saveConfigToStorage(config: ScraperConfig) {
   localStorage.setItem(SCRAPER_CONFIG_KEY, JSON.stringify(config));
 }
 import { authOptions } from "../api/auth/[...nextauth]";
-import { Youtube, Settings, Play, RefreshCw, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, ListVideo } from "lucide-react";
+import { Settings, Play, RefreshCw, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, ListVideo } from "lucide-react";
+import { FaYoutube } from "react-icons/fa6";
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
 
@@ -241,7 +242,7 @@ const YouTubeScraper = () => {
         {/* Header */}
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10">
-            <Youtube className="h-5 w-5 text-red-500" />
+            <FaYoutube className="h-5 w-5 text-red-500" />
           </div>
           <div>
             <h2 className="text-2xl font-black tracking-tight text-white">YouTube Scraper</h2>

@@ -14,7 +14,8 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { getSongs } from "feature/songs/services/getSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import debounce from "lodash/debounce";
-import { ArrowRight, Check, Loader2, Music, Video, X , Youtube } from "lucide-react";
+import { ArrowRight, Check, Loader2, Music, Video, X } from "lucide-react";
+import { FaYoutube } from "react-icons/fa6";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAppSelector } from "store/hooks";
@@ -24,7 +25,7 @@ interface AddRecordingModalProps {
   onClose: () => void;
 }
 
-const isValidYoutubeUrl = (url: string) => {
+const isValidFaYoutubeUrl = (url: string) => {
   return /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/.test(url);
 };
 
@@ -118,7 +119,7 @@ export const AddRecordingModal = ({ isOpen, onClose }: AddRecordingModalProps) =
       toast.error("You must be logged in.");
       return;
     }
-    if (!isValidYoutubeUrl(videoUrl)) {
+    if (!isValidFaYoutubeUrl(videoUrl)) {
       toast.error("Please enter a valid YouTube URL.");
       return;
     }
@@ -157,7 +158,7 @@ export const AddRecordingModal = ({ isOpen, onClose }: AddRecordingModalProps) =
           <div className="space-y-2">
             <Label htmlFor="videoUrl">YouTube URL *</Label>
             <div className="relative">
-                <Youtube className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                <FaYoutube className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                 <Input
                 id="videoUrl"
                 value={videoUrl}

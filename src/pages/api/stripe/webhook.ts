@@ -8,7 +8,7 @@ import { firestore } from "utils/firebase/api/firebase.config";
 export const config = { api: { bodyParser: false } };
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-02-25.clover",
+  apiVersion: "2026-04-22.dahlia",
 });
 
 /** Read the raw request body as a Buffer */

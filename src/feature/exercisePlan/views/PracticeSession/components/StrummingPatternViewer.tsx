@@ -514,6 +514,8 @@ interface StrummingPatternViewerProps {
   isMicEnabled?: boolean;
   /** Number of reps per set before cycling (default 10) */
   maxReps?: number;
+  /** Shared AudioContext from the session — reused instead of creating a new one */
+  audioContext?: AudioContext | null;
 }
 
 function StrummingPatternViewerInner({
@@ -526,6 +528,7 @@ function StrummingPatternViewerInner({
   slotFeedback,
   isMicEnabled,
   maxReps = 10,
+  audioContext: externalAudioContext,
 }: StrummingPatternViewerProps) {
   const canvasRef        = useRef<HTMLCanvasElement>(null);
   const containerRef     = useRef<HTMLDivElement>(null);
@@ -555,6 +558,10 @@ function StrummingPatternViewerInner({
 
   // ── AudioContext ─────────────────────────────────────────────────────────
   function getAudioCtx() {
+    if (externalAudioContext) {
+      if (externalAudioContext.state === "suspended") externalAudioContext.resume();
+      return externalAudioContext;
+    }
     if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
     if (audioCtxRef.current.state === "suspended") audioCtxRef.current.resume();
     return audioCtxRef.current;

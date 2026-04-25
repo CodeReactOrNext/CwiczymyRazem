@@ -61,8 +61,7 @@ const scrollbarHide = plugin(function ({
           display: "block",
         },
       },
-    },
-    ["responsive"]
+    }
   );
 });
 
@@ -332,7 +331,6 @@ module.exports = {
     }
   },
   plugins: [
-    require("prettier-plugin-tailwindcss"),
     require("tailwindcss-themer")({
       themes: [{
         name: "dark-theme",

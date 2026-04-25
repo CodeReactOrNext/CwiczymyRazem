@@ -3,7 +3,8 @@ import { cn } from "assets/lib/utils";
 import type { Exercise } from "feature/exercisePlan/types/exercise.types";
 import { guitarSkills } from "feature/skills/data/guitarSkills";
 import { useTranslation } from "hooks/useTranslation";
-import { Check, Lock, Plus, Video, Youtube, X, Info } from "lucide-react";
+import { Check, Lock, Plus, Video, X, Info } from "lucide-react";
+import { FaYoutube } from "react-icons/fa6";
 import { TablaturePreview } from "./TablaturePreview";
 
 interface ExerciseCardProps {
@@ -110,7 +111,7 @@ export const ExerciseCard = ({
 
             {exercise.isPlayalong && (
               <Badge className="bg-red-500/10 text-red-500 border-transparent text-[11px] px-2.5 py-0.5 font-medium tracking-wide rounded-[8px] shadow-none">
-                <Youtube className="mr-1 h-3.5 w-3.5" />Playalong
+                <FaYoutube className="mr-1 h-3.5 w-3.5" />Playalong
               </Badge>
             )}
             {exercise.videoUrl && !exercise.isPlayalong && (

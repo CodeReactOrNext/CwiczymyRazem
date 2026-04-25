@@ -1,22 +1,26 @@
-{
-  "extends": [
-    "next/core-web-vitals"
-  ],
-  "overrides": [{
-    "files": ["**/*.ts", "**/*.tsx", "**/*.mts"],
-    "plugins": [
-      "@typescript-eslint",
-      "unused-imports",
-      "simple-import-sort"
-    ],
-    "extends": [
-      "next/core-web-vitals"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "project": "./tsconfig.json"
+const nextConfig = require("eslint-config-next/core-web-vitals");
+const tseslint = require("@typescript-eslint/eslint-plugin");
+const tsparser = require("@typescript-eslint/parser");
+const unusedImports = require("eslint-plugin-unused-imports");
+const simpleImportSort = require("eslint-plugin-simple-import-sort");
+const path = require("path");
+
+module.exports = [
+  ...nextConfig,
+  {
+    files: ["**/*.ts", "**/*.tsx", "**/*.mts"],
+    plugins: {
+      "@typescript-eslint": tseslint,
+      "unused-imports": unusedImports,
+      "simple-import-sort": simpleImportSort,
     },
-    "rules": {
+    languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        project: path.resolve(__dirname, "./tsconfig.json"),
+      },
+    },
+    rules: {
       "import/no-extraneous-dependencies": "warn",
       "no-param-reassign": "error",
       "consistent-return": "warn",
@@ -50,12 +54,12 @@
       "unused-imports/no-unused-vars": [
         "error",
         {
-          "vars": "all",
-          "varsIgnorePattern": "^_",
-          "args": "after-used",
-          "argsIgnorePattern": "^_"
-        }
-      ]
-    }
-  }]
-}
+          vars: "all",
+          varsIgnorePattern: "^_",
+          args: "after-used",
+          argsIgnorePattern: "^_",
+        },
+      ],
+    },
+  },
+];
