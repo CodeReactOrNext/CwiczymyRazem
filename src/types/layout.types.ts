@@ -23,4 +23,5 @@ export type NavPagesTypes =
   | "arsenal"
   | "practice-finder"
   | "journey"
+  | "scale-tree"
   | null;

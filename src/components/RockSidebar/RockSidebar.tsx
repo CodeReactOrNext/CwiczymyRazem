@@ -104,6 +104,7 @@ const RockSidebar = ({  pageId }: RockSidebarProps) => {
     if (pathname.startsWith("/gp-tabs")) return "gp-tabs";
     if (pathname.startsWith("/arsenal")) return "arsenal";
     if (pathname.startsWith("/journey")) return "journey";
+    if (pathname.startsWith("/scale-tree")) return "scale-tree";
     return null;
   };
 

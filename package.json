@@ -50,6 +50,7 @@
     "@sentry/nextjs": "^10.32.1",
     "@tanstack/react-query": "^5.90.12",
     "@upstash/vector": "^1.2.2",
+    "@xyflow/react": "^12.10.2",
     "aubiojs": "^0.2.1",
     "axios": "^1.2.2",
     "canvas-confetti": "^1.9.3",
