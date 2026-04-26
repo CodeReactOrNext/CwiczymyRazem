@@ -432,10 +432,8 @@ const TablatureViewerInner = ({
            const scale = 1 + intensity * 0.1;
            ambientGlowRef.current.style.transform = `scaleY(${scale.toFixed(3)}) translateZ(0)`;
            
-           // Update gradient with dynamic hue based on Pitch
-           const color1 = `hsla(${currentHue}, 85%, 55%, 0.18)`;
-           const color2 = `hsla(${currentHue}, 85%, 55%, 0.05)`;
-           ambientGlowRef.current.style.background = `radial-gradient(circle at 50% 100%, ${color1} 0%, ${color2} 50%, transparent 80%)`;
+           // Rotate hue instead of re-calculating the whole gradient texture
+           ambientGlowRef.current.style.filter = `hue-rotate(${currentHue - 120}deg)`;
         }
       }
       rafId = requestAnimationFrame(updateGlow);
