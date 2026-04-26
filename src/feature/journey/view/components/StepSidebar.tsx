@@ -69,28 +69,29 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
   return (
     <div className="flex h-full w-full flex-col bg-zinc-950">
       {/* Header */}
-      <div className="relative h-48 flex-shrink-0">
+      <div className="relative h-24 sm:h-48 flex-shrink-0">
         <Image src={step.image} alt={step.title} fill className="object-cover opacity-60" />
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full bg-black/60 p-2 text-white backdrop-blur-md transition hover:bg-black/80"
+          data-vaul-no-drag
+          className="absolute right-4 top-4 z-10 rounded-full bg-black/60 p-2 text-white backdrop-blur-md transition hover:bg-black/80"
         >
           <X size={20} />
         </button>
         
-        <div className="absolute bottom-6 left-6 right-6">
-          <div className="mb-2 flex items-center gap-2">
+        <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
+          <div className="mb-1.5 flex items-center gap-2">
             <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${status.cls}`}>
               {status.label}
             </span>
             <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Step {step.order}</span>
           </div>
-          <h2 className="text-2xl font-black text-white">{step.title}</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-white">{step.title}</h2>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 space-y-5 sm:space-y-8">
         {/* Short info */}
         <p className="text-zinc-400 text-sm leading-relaxed">{step.shortDescription}</p>
 
@@ -184,7 +185,7 @@ export const StepSidebar: React.FC<StepSidebarProps> = ({
       </div>
 
       {/* Footer Actions */}
-      <div className="mt-auto border-t border-zinc-800 bg-zinc-950 p-6 space-y-3">
+      <div className="mt-auto border-t border-zinc-800 bg-zinc-950 p-4 sm:p-6 space-y-3">
         {step.modalOnly ? (
           !isCompleted && (
             <button
