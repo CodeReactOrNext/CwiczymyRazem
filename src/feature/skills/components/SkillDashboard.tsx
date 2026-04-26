@@ -1,5 +1,6 @@
 import { Button } from "assets/components/ui/button";
 import { Sheet, SheetContent, SheetTitle } from "assets/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
 import type { CategoryKeys } from "components/Charts/ActivityChart";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
@@ -19,9 +20,10 @@ import { useCallback, useEffect,useMemo, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
+import { ExerciseBrowseTab } from "./ExerciseBrowseTab";
 import { SkillCategoryGroup } from "./SkillCategoryGroup";
 
-interface DashboardExercise {
+export interface DashboardExercise {
   id: string;
   title: string;
   description: string;
@@ -205,29 +207,57 @@ export const SkillDashboard = ({
 
   return (
     <div className="w-full pb-24 flex flex-col">
-      
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-12">
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-12">
-                {CATEGORIES.map((category) => {
-                    const categorySkills = guitarSkills.filter(s => s.category === category);
-                    if (categorySkills.length === 0) return null;
+      <Tabs defaultValue="skill-tree" className="w-full">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-8">
+          <TabsList className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded-lg p-1 w-fit h-auto">
+            <TabsTrigger
+              value="skill-tree"
+              className="px-4 py-1.5 rounded-md text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
+            >
+              Skill Tree
+            </TabsTrigger>
+            <TabsTrigger
+              value="browse"
+              className="px-4 py-1.5 rounded-md text-sm font-semibold transition-colors data-[state=active]:bg-zinc-700 data-[state=active]:text-white data-[state=inactive]:text-zinc-400 data-[state=inactive]:hover:text-zinc-200"
+            >
+              Browse Exercises
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-                    return (
-                        <SkillCategoryGroup 
-                          key={category}
-                          category={category}
-                          skills={categorySkills}
-                          userSkills={userSkills}
-                          onSkillClick={(id) => setSelectedSkillId(id)}
-                        />
-                    );
+        <TabsContent value="skill-tree" className="mt-0">
+          <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-12">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-12">
+                {CATEGORIES.map((category) => {
+                  const categorySkills = guitarSkills.filter(s => s.category === category);
+                  if (categorySkills.length === 0) return null;
+                  return (
+                    <SkillCategoryGroup
+                      key={category}
+                      category={category}
+                      skills={categorySkills}
+                      userSkills={userSkills}
+                      onSkillClick={(id) => setSelectedSkillId(id)}
+                    />
+                  );
                 })}
               </div>
             </div>
-        </div>
+          </div>
+        </TabsContent>
 
-        <Sheet open={!!selectedSkillId} onOpenChange={(open) => !open && setSelectedSkillId(null)}>
+        <TabsContent value="browse" className="mt-0">
+          <ExerciseBrowseTab
+            progressMap={progressMap}
+            isPremium={isPremium}
+            onStartExercise={handleStartChallenge}
+            onShowUpgrade={() => setShowUpgradeModal(true)}
+          />
+        </TabsContent>
+      </Tabs>
+
+      <Sheet open={!!selectedSkillId} onOpenChange={(open) => !open && setSelectedSkillId(null)}>
           <SheetContent
             side="right"
             className="w-full sm:max-w-xl p-0 bg-[#0a0a0a] border-zinc-900 flex flex-col"
