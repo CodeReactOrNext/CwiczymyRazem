@@ -175,11 +175,33 @@ export function useNoteMatching({
   useEffect(() => {
     if (!isPlaying || !startTime || !activeTablature || !isMicEnabled) return;
 
-    const tablature = activeTablature;
-    const totalExBeats = tablature.reduce((acc, m) =>
+    const totalExBeats = activeTablature.reduce((acc, m) =>
       acc + m.beats.reduce((acc2, b) => acc2 + b.duration, 0), 0
     );
     if (totalExBeats === 0) return;
+
+    const flatBeats: { 
+      mIdx: number; bIdx: number; 
+      beat: any; 
+      beatStart: number; beatEnd: number; 
+      notes: { note: any; nIdx: number; noteKey: string }[] 
+    }[] = [];
+    let currentBeatTotal = 0;
+    for (let mIdx = 0; mIdx < activeTablature.length; mIdx++) {
+      const measure = activeTablature[mIdx];
+      for (let bIdx = 0; bIdx < measure.beats.length; bIdx++) {
+        const beat = measure.beats[bIdx];
+        const beatStart = currentBeatTotal;
+        const beatEnd = currentBeatTotal + beat.duration;
+        flatBeats.push({
+          mIdx, bIdx, beat, beatStart, beatEnd,
+          notes: beat.notes.map((note: any, nIdx: number) => ({
+            note, nIdx, noteKey: `${mIdx}-${bIdx}-${nIdx}`
+          }))
+        });
+        currentBeatTotal += beat.duration;
+      }
+    }
 
     const bpm             = effectiveBpm;
     const halfSpeedPenalty = isHalfSpeed ? 0.5 : 1;
@@ -232,98 +254,103 @@ export function useNoteMatching({
       const timeSinceTick  = now - lastTickTime;
       const hasRecentTick  = timeSinceTick < onsetRecencyMs;
 
-      let currentBeatTotal = 0;
       const gs = gameStateRef.current;
       const s  = statsRef.current;
 
-      for (let mIdx = 0; mIdx < tablature.length; mIdx++) {
-        const measure = tablature[mIdx];
-        for (let bIdx = 0; bIdx < measure.beats.length; bIdx++) {
-          const beat      = measure.beats[bIdx];
-          const beatStart = currentBeatTotal;
-          const beatEnd   = currentBeatTotal + beat.duration;
+      // ── Find active range using Binary Search ──────────────────────────────
+      // We search for the first beat that hasn't finished + window yet
+      let low = 0;
+      let high = flatBeats.length - 1;
+      let startIdx = 0;
+      const searchTarget = loopedBeatsElapsed - windowBeats;
+      
+      while (low <= high) {
+        const mid = (low + high) >> 1;
+        if (flatBeats[mid].beatEnd < searchTarget) {
+          startIdx = mid + 1;
+          low = mid + 1;
+        } else {
+          high = mid - 1;
+        }
+      }
 
-          const isWithinWindow =
-            (loopedBeatsElapsed >= beatStart - earlyWindowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
-            (loopedBeatsElapsed < earlyWindowBeats && beatEnd + windowBeats >= totalExBeats);
-          const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
+      // Check only beats in the immediate vicinity (current + window)
+      for (let i = startIdx; i < flatBeats.length; i++) {
+        const { mIdx, bIdx, beat, beatStart, beatEnd, notes } = flatBeats[i];
+        
+        // If we've passed the window where a note can be hit, we can stop searching forward
+        if (beatStart > loopedBeatsElapsed + earlyWindowBeats + 1) break;
 
-          beat.notes.forEach((note, nIdx) => {
-            const noteKey = `${mIdx}-${bIdx}-${nIdx}`;
-            if (processedNotesRef.current.has(noteKey) && !hitNotesRef.current[noteKey]) return;
+        const isWithinWindow =
+          (loopedBeatsElapsed >= beatStart - earlyWindowBeats && loopedBeatsElapsed <= beatEnd + windowBeats) ||
+          (loopedBeatsElapsed < earlyWindowBeats && beatEnd + windowBeats >= totalExBeats);
+        const isPassed = loopedBeatsElapsed > beatEnd + windowBeats;
 
-            const requiresOnset = !note.isHammerOn && !note.isPullOff;
-            const alreadyHit = !!hitNotesRef.current[noteKey];
+        notes.forEach(({ note, nIdx, noteKey }) => {
+          if (processedNotesRef.current.has(noteKey) && !hitNotesRef.current[noteKey]) return;
 
-            if (isWithinWindow && currentVolume > 0.005 && (hasRecentOnset || hasRecentTick || !requiresOnset || alreadyHit)) {
-              let isHit = false;
+          const requiresOnset = !note.isHammerOn && !note.isPullOff;
+          const alreadyHit = !!hitNotesRef.current[noteKey];
 
-              if (note.isDead) {
-                // Muted/dead note (X): any percussive attack in the window counts.
-                // Skip pitch entirely — muted strings have no defined fundamental.
-                isHit = hasRecentTick || hasRecentOnset;
+          if (isWithinWindow && currentVolume > 0.005 && (hasRecentOnset || hasRecentTick || !requiresOnset || alreadyHit)) {
+            let isHit = false;
+
+            if (note.isDead) {
+              isHit = hasRecentTick || hasRecentOnset;
+            } else {
+              const targetFret = (note.isBend || note.isPreBend) && note.bendSemitones
+                ? note.fret + note.bendSemitones
+                : note.fret;
+              const baseTargetFreq = getFrequencyFromTab(note.string, targetFret);
+              const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
+
+              if (beat.notes.length > 1) {
+                const chroma = (requiresOnset && !alreadyHit)
+                  ? audioRefs.onsetChromaRef.current
+                  : getChromagram();
+                if (chroma) {
+                  isHit = chroma[freqToPitchClass(targetFreq)] >= CHORD_CHROMA_THRESHOLD;
+                }
               } else {
-                const targetFret = (note.isBend || note.isPreBend) && note.bendSemitones
-                  ? note.fret + note.bendSemitones
-                  : note.fret;
-                const baseTargetFreq = getFrequencyFromTab(note.string, targetFret);
-                const targetFreq     = getAdjustedTargetFreq(note.string, baseTargetFreq);
-
-                if (beat.notes.length > 1) {
-                  // Chord / dyad / interval — prefer the onset snapshot (cleaner signal).
-                  // For legato notes (no onset required) fall back to the live chromagram.
-                  const chroma = (requiresOnset && !alreadyHit)
-                    ? audioRefs.onsetChromaRef.current
-                    : getChromagram();
-                  if (chroma) {
-                    isHit = chroma[freqToPitchClass(targetFreq)] >= CHORD_CHROMA_THRESHOLD;
-                  }
-                } else {
-                  // Single note — use existing monophonic YIN path
-                  isHit = currentFreq > 50 && Math.abs(getCentsDistance(currentFreq, targetFreq)) <= CENTS_TOLERANCE;
-                }
-              }
-
-              if (isHit) {
-                if (!processedNotesRef.current.has(noteKey)) {
-                  processedNotesRef.current.add(noteKey);
-                  s.hits++;
-                  consecutiveMissesRef.current = 0;
-
-                  const newCombo      = gs.combo + 1;
-                  if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
-                  const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
-                  if (newMultiplier > gs.multiplier) {
-                    gs.lastFeedback = "MULTIPLIER UP!"; gs.feedbackId++;
-                  } else {
-                    const tier = getFeedbackForCombo(newCombo);
-                    if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; }
-                  }
-                  gs.score      += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
-                  gs.combo       = newCombo;
-                  gs.multiplier  = newMultiplier;
-                }
-                
-                // Track how long the note is sustained
-                hitNotesRef.current[noteKey] = loopedBeatsElapsed;
-                needsFlushRef.current = true;
-              }
-            } else if (isPassed && !hitNotesRef.current[noteKey]) {
-              processedNotesRef.current.add(noteKey);
-              missedNotesRef.current[noteKey] = true;
-              needsFlushRef.current = true;
-              s.misses++;
-              consecutiveMissesRef.current++;
-              gs.combo = 0;
-              // Reset multiplier only after 3 consecutive misses
-              if (consecutiveMissesRef.current >= 3) {
-                gs.multiplier = 1;
+                isHit = currentFreq > 50 && Math.abs(getCentsDistance(currentFreq, targetFreq)) <= CENTS_TOLERANCE;
               }
             }
-          });
 
-          currentBeatTotal += beat.duration;
-        }
+            if (isHit) {
+              if (!processedNotesRef.current.has(noteKey)) {
+                processedNotesRef.current.add(noteKey);
+                s.hits++;
+                consecutiveMissesRef.current = 0;
+
+                const newCombo      = gs.combo + 1;
+                if (newCombo > maxComboRef.current) maxComboRef.current = newCombo;
+                const newMultiplier = Math.min(8, Math.floor(newCombo / 5) + 1);
+                if (newMultiplier > gs.multiplier) {
+                  gs.lastFeedback = "MULTIPLIER UP!"; gs.feedbackId++;
+                } else {
+                  const tier = getFeedbackForCombo(newCombo);
+                  if (tier) { gs.lastFeedback = tier.text; gs.feedbackId++; }
+                }
+                gs.score      += Math.round(100 * newMultiplier * halfSpeedPenalty * bpmBonus);
+                gs.combo       = newCombo;
+                gs.multiplier  = newMultiplier;
+              }
+              
+              hitNotesRef.current[noteKey] = loopedBeatsElapsed;
+              needsFlushRef.current = true;
+            }
+          } else if (isPassed && !hitNotesRef.current[noteKey]) {
+            processedNotesRef.current.add(noteKey);
+            missedNotesRef.current[noteKey] = true;
+            needsFlushRef.current = true;
+            s.misses++;
+            consecutiveMissesRef.current++;
+            gs.combo = 0;
+            if (consecutiveMissesRef.current >= 3) {
+              gs.multiplier = 1;
+            }
+          }
+        });
       }
 
       // Throttled flush to React: immediate after long pause (first note of phrase), 50ms throttle during active play

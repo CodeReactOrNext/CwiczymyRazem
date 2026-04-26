@@ -380,14 +380,26 @@ function render() {
   // Track last rendered note pos per string for slide lines: string# → { x, y, slideOut }
   stringLastPos.clear();
 
+  // Binary search for first visible beat, then scan forward
+  let startIdx = 0;
+  if (renderBeats.length > 0) {
+    let lo = 0, hi = renderBeats.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      const beatEndPx = (renderBeats[mid].offsetX + renderBeats[mid].duration) * dynBW;
+      if (beatEndPx < visL) lo = mid + 1; else hi = mid;
+    }
+    startIdx = lo;
+  }
+
   // ── Beat loop ────────────────────────────────────────────────────────────
-  for (const beat of renderBeats) {
+  for (let i = startIdx; i < renderBeats.length; i++) {
+    const beat = renderBeats[i];
     const beatPx = beat.offsetX * dynBW;
     const beatEndPx = beatPx + beat.duration * dynBW;
     const beatL = beatPx + 10;
 
     if (beatL > visR) break;
-    if (beatEndPx < visL) continue;
 
     const inView = beatEndPx >= visL && beatPx <= visR;
     const isActive = isPlaying && startWallMs !== null && cursorPos >= beatPx && cursorPos < beatEndPx;
