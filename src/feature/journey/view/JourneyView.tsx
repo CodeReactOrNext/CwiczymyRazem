@@ -266,7 +266,7 @@ const JourneyView: React.FC = () => {
         }}
         direction="right"
       >
-        <DrawerContent className="fixed inset-y-0 right-0 left-auto mt-0 h-full w-full max-w-xl rounded-none border-l border-white/10 bg-zinc-950 shadow-2xl">
+        <DrawerContent className="fixed top-0 bottom-[100px] sm:bottom-0 right-0 left-auto mt-0 w-full max-w-xl rounded-none border-l border-white/10 bg-zinc-950 shadow-2xl">
           {selectedStep && (
             <StepSidebar
               step={selectedStep}
