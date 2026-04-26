@@ -3,6 +3,7 @@ import { AlertTriangle, Home,RefreshCcw } from "lucide-react";
 import Link from "next/link";
 import type { ErrorInfo, ReactNode } from 'react';
 import React, { Component } from 'react';
+import * as Sentry from "@sentry/nextjs";
 
 interface Props {
   children: ReactNode;
@@ -27,6 +28,11 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
+    Sentry.captureException(error, {
+      contexts: {
+        react: { componentStack: errorInfo.componentStack },
+      },
+    });
     this.setState({ componentStack: errorInfo.componentStack ?? null });
   }
 
