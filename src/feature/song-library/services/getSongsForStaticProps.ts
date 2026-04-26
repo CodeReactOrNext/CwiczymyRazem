@@ -28,7 +28,7 @@ export async function getSongsForStaticProps(limit = 24): Promise<GetSongsResult
       firestore.collection("songs").count().get(),
     ]);
 
-    const songs: LibrarySong[] = snapshot.docs.map((doc) => {
+    const songs: LibrarySong[] = snapshot.docs.map((doc: any) => {
       const data = doc.data();
       return {
         id: doc.id,
