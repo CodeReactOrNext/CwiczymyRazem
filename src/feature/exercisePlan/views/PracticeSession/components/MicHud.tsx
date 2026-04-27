@@ -1,19 +1,16 @@
 import { cn } from "assets/lib/utils";
 import { AnimatePresence,motion } from "framer-motion";
 
-import { type GameState,getPerformanceGrade } from "../hooks/useNoteMatching";
-
-interface MicHudProps {
-  gameState: GameState;
-  maxPossibleScore: number;
-  sessionAccuracy: number;
-}
+import { getPerformanceGrade } from "../hooks/useNoteMatching";
+import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 
 /**
  * The game HUD shown when mic mode is active: score, accuracy grade,
  * combo streak, multiplier, and animated feedback text.
  */
-export const MicHud = ({ gameState, maxPossibleScore, sessionAccuracy }: MicHudProps) => (
+export const MicHud = () => {
+  const { gameState, maxPossibleScore, sessionAccuracy } = useNoteMatchingContext();
+  return (
   <div className="w-full max-w-5xl mb-6 animate-in fade-in slide-in-from-top-6 duration-700">
     <div className="flex items-end justify-between gap-8">
 
@@ -106,4 +103,5 @@ export const MicHud = ({ gameState, maxPossibleScore, sessionAccuracy }: MicHudP
 
     </div>
   </div>
-);
+  );
+};

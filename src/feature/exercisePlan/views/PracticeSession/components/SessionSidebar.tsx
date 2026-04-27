@@ -1,5 +1,6 @@
 import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
+import { memo } from "react";
 import {
   FaExternalLinkAlt, FaFacebook, FaHeart, FaInstagram, FaTwitter, FaVolumeMute, FaVolumeUp,
 } from "react-icons/fa";
@@ -15,22 +16,9 @@ interface SessionSidebarProps {
   activeExercise: Exercise;
   // Metronome
   metronome: any;
-  effectiveBpm: number;
   isMetronomeMuted: boolean;
   setIsMetronomeMuted: (v: boolean) => void;
-  isHalfSpeed: boolean;
-  setIsHalfSpeed: (v: boolean | ((p: boolean) => boolean)) => void;
-  // Audio toggle
-  isAudioMuted: boolean;
-  setIsAudioMuted: (v: boolean) => void;
-  saveGuitarPlaybackPreference: (enabled: boolean) => void;
-  soundfontsReady: boolean;
-  // Mic controls
-  isMicEnabled: boolean;
-  showMicControls: boolean;
-  toggleMic: () => Promise<void>;
-  setSessionPhase: (phase: any) => void;
-  // Audio mixer
+ 
   audioTracks: AudioTrackConfig[];
   trackConfigs: Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs: React.Dispatch<React.SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
@@ -41,44 +29,26 @@ interface SessionSidebarProps {
   onBpmToggle: (bpm: number) => void;
   /** Exam mode — metronome BPM is locked */
   examMode?: boolean;
-  /** Playback repeat count (0 = infinite) */
-  tabRepeatCount: number;
-  setTabRepeatCount: (n: number) => void;
-  onRepeatCountChange?: () => void;
+
 }
 
 /**
  * Right sidebar panel: Metronome, audio controls, mixer, BPM progress, links.
  */
-export const SessionSidebar = ({
+export const SessionSidebar = memo(function SessionSidebar({
   currentExercise,
   activeExercise,
   metronome,
-  effectiveBpm,
   isMetronomeMuted,
   setIsMetronomeMuted,
-  isHalfSpeed,
-  setIsHalfSpeed,
-  isAudioMuted,
-  setIsAudioMuted,
-  saveGuitarPlaybackPreference,
-  soundfontsReady,
-  isMicEnabled,
-  showMicControls,
-  toggleMic,
-  setSessionPhase,
   audioTracks,
-  trackConfigs,
   setTrackConfigs,
   bpmStages,
   completedBpms,
   isBpmLoading,
   onBpmToggle,
   examMode = false,
-  tabRepeatCount,
-  setTabRepeatCount,
-  onRepeatCountChange,
-}: SessionSidebarProps) => {
+}: SessionSidebarProps) {
   return (
     <>
         {currentExercise.metronomeSpeed && (
@@ -193,5 +163,4 @@ export const SessionSidebar = ({
         </div>
     </>
   );
-};
-;
+});

@@ -24,17 +24,73 @@ const NODE_TYPES: NodeTypes = {
   scaleTreeNode: ScaleTreeNodeComponent as NodeTypes[string],
 };
 
+/** Extracts the scale cluster ID from a node ID (e.g. "min_pent_pos5_asc" → "min_pent"). */
+function getScaleId(nodeId: string): string {
+  const m = nodeId.match(/^(.*?)_pos\d+/);
+  return m ? m[1] : nodeId;
+}
+
 function buildStyledEdges(rawEdges: Edge[], nodeStatuses: Record<string, string>): Edge[] {
   return rawEdges.map((edge) => {
-    const sourceStatus = nodeStatuses[edge.source];
-    const isActive = sourceStatus === "completed" || sourceStatus === "in_progress";
+    const sourceStatus   = nodeStatuses[edge.source];
+    const targetStatus   = nodeStatuses[edge.target];
+    const isCompleted    = sourceStatus === "completed" && targetStatus === "completed";
+    const isActive       = sourceStatus === "completed" || sourceStatus === "in_progress";
+    const isSpine        = edge.source.endsWith("_asc") && edge.target.endsWith("_asc");
+    const isCrossCluster = isSpine && getScaleId(edge.source) !== getScaleId(edge.target);
+
+    // ── Branch edges (arm chains within each cluster) ────────────────────────
+    // Thin, dim — show structure without visual chaos.
+    if (!isSpine) {
+      return {
+        ...edge,
+        type: "straight" as const,
+        style: {
+          stroke: isCompleted
+            ? "rgba(34,211,238,0.35)"
+            : isActive
+            ? "rgba(34,211,238,0.18)"
+            : "rgba(90,90,115,0.22)",
+          strokeWidth: 0.7,
+        },
+        animated: false,
+      };
+    }
+
+    // ── Cross-cluster "roads" ────────────────────────────────────────────────
+    if (isCrossCluster) {
+      if (!isActive) {
+        return {
+          ...edge,
+          type: "straight" as const,
+          style: { stroke: "rgba(100,100,140,0.45)", strokeWidth: 1.5, strokeDasharray: "10 6" },
+          animated: false,
+        };
+      }
+      return {
+        ...edge,
+        type: "straight" as const,
+        style: {
+          stroke: isCompleted ? "rgba(34,211,238,0.9)" : "rgba(34,211,238,0.6)",
+          strokeWidth: isCompleted ? 3 : 2.5,
+        },
+        animated: false,
+      };
+    }
+
+    // ── Within-cluster spine ring — bezier for smooth arc look ───────────────
     return {
       ...edge,
+      type: "bezier" as const,
       style: {
-        stroke: isActive ? "rgba(34,211,238,0.35)" : "#27272a",
-        strokeWidth: isActive ? 2 : 1.5,
+        stroke: isCompleted
+          ? "rgba(34,211,238,0.7)"
+          : isActive
+          ? "rgba(34,211,238,0.45)"
+          : "rgba(100,100,130,0.55)",
+        strokeWidth: isCompleted ? 2 : isActive ? 1.8 : 1.4,
       },
-      animated: sourceStatus === "in_progress",
+      animated: false,
     };
   });
 }
@@ -119,9 +175,10 @@ export function ScaleTreeView() {
           router.push(`/practice/scale?type=${data.scaleType}&pos=${req.position}&pattern=${req.patternType}`);
         }}
         fitView
-        fitViewOptions={{ padding: 0.15 }}
-        minZoom={0.15}
-        maxZoom={1.5}
+        fitViewOptions={{ padding: 0.12 }}
+        nodeOrigin={[0.5, 0.5]}
+        minZoom={0.08}
+        maxZoom={2}
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
@@ -130,9 +187,9 @@ export function ScaleTreeView() {
       >
         <Background
           variant={BackgroundVariant.Dots}
-          gap={24}
-          size={1}
-          color="rgba(255,255,255,0.04)"
+          gap={32}
+          size={0.8}
+          color="rgba(255,255,255,0.025)"
         />
         <Controls
           showInteractive={false}

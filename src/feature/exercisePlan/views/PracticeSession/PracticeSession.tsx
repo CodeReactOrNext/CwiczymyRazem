@@ -1,28 +1,17 @@
 import "react-circular-progressbar/dist/styles.css";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "assets/components/ui/accordion";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "assets/components/ui/tooltip";
+import { TooltipProvider } from "assets/components/ui/tooltip";
 import { cn } from "assets/lib/utils";
 import { PremiumGate } from "feature/premium/components/PremiumGate";
 import { parseGpFile } from "feature/songs/services/gp5Parser.service";
 import { fetchGpFileAsFile } from "feature/songs/services/userGpFiles.service";
 import { selectUserAuth, selectUserAvatar, selectUserInfo,selectUserName } from "feature/user/store/userSlice";
-import { motion } from "framer-motion";
 import { useAudioAnalyzer } from "hooks/useAudioAnalyzer";
-import { useTranslation } from "hooks/useTranslation";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
-import { Drum, Gauge, Music, Timer } from "lucide-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FaInfoCircle, FaLightbulb, FaMicrophone, FaSync } from "react-icons/fa";
-import { GiGuitar } from "react-icons/gi";
 import { useAppSelector } from "store/hooks";
 import { getNoteFromFrequency } from "utils/audio/noteUtils";
 import { playCompletionSound } from "utils/audioUtils";
@@ -36,10 +25,16 @@ import {useTablatureAudio } from "../../hooks/useTablatureAudio";
 import { saveLeaderboardEntry,updateEarTrainingHighScore, updateMicHighScore } from "../../services/bpmProgressService";
 import type { ExercisePlan } from "../../types/exercise.types";
 import type { BackingTrack } from "../../types/exercise.types";
+import { BackgroundAmbiance } from "./components/BackgroundAmbiance";
 import { ChordSelectionDialog } from "./components/ChordSelectionDialog";
 import { ExerciseContentArea } from "./components/ExerciseContentArea";
+import { ExerciseHeroHeader } from "./components/ExerciseHeroHeader";
+import { ExerciseInfoGrid } from "./components/ExerciseInfoGrid";
 import { ExerciseProgress } from "./components/ExerciseProgress";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
+import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
+import { GpTrackSelector } from "./components/GpTrackSelector";
+import { MediaControlsToolbar } from "./components/MediaControlsToolbar";
 import { MicHud } from "./components/MicHud";
 import { ScaleSelectionDialog } from "./components/ScaleSelectionDialog";
 import { SessionBottomBar } from "./components/SessionBottomBar";
@@ -49,11 +44,11 @@ import { useCalibration } from "./hooks/useCalibration";
 import { useEarTraining } from "./hooks/useEarTraining";
 import { useGeneratedExercise } from "./hooks/useGeneratedExercise";
 import { useImageHandling } from "./hooks/useImageHandling";
-import { useNoteMatching } from "./hooks/useNoteMatching";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
-import { useStrummingMatcher } from "./hooks/useStrummingMatcher";
 import ImageModal from "./modals/ImageModal";
 import SessionModal from "./modals/SessionModal";
+import type { NoteMatchingHandle, NoteMatchingSnapshot } from "./contexts/NoteMatchingContext";
+import { NoteMatchingProvider } from "./contexts/NoteMatchingContext";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -112,7 +107,6 @@ export const PracticeSession = ({
   onExamComplete,
   skipExitDialog = false,
 }: PracticeSessionProps) => {
-  const { t } = useTranslation(["exercises", "common"]);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -581,7 +575,7 @@ export const PracticeSession = ({
     loopsCompletedRef.current = 0;
     setTabRestartKey(prev => prev + 1);
     setEarTrainingScore(0);
-    resetGame();
+    noteMatchingHandle.current?.resetGame();
     setTimeout(() => {
       startTimer();
       if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
@@ -624,16 +618,17 @@ export const PracticeSession = ({
   }>({});
 
   const saveCurrentScores = async () => {
-    const exId       = activeExercise.id;
-    const exTitle    = activeExercise.title;
+    const snap      = noteMatchingHandle.current?.snapshot();
+    const exId      = activeExercise.id;
+    const exTitle   = activeExercise.title;
     const exCategory = activeExercise.category;
-    if (userAuth && isMicEnabled && gameState.score > 0) {
-      const result = await updateMicHighScore(userAuth, exId, gameState.score, sessionAccuracy, exTitle, exCategory);
-      saveLeaderboardEntry(userAuth, exId, gameState.score, userName || "Anonymous", userAvatar || "");
+    if (userAuth && isMicEnabled && snap && snap.score > 0) {
+      const result = await updateMicHighScore(userAuth, exId, snap.score, snap.accuracy, exTitle, exCategory);
+      saveLeaderboardEntry(userAuth, exId, snap.score, userName || "Anonymous", userAvatar || "");
       if (result.isNewRecord) {
         exerciseRecordsRef.current = {
           ...exerciseRecordsRef.current,
-          micHighScore: { exerciseTitle: exTitle, score: gameState.score, accuracy: sessionAccuracy },
+          micHighScore: { exerciseTitle: exTitle, score: snap.score, accuracy: snap.accuracy },
         };
       }
     }
@@ -695,59 +690,17 @@ export const PracticeSession = ({
     return getNoteFromFrequency(frequency);
   }, [frequency]);
 
-  // ── Note matching (RAF game loop) ─────────────────────────────────────────
-
-  const { hitNotes, missedNotes, sessionAccuracy: tabAccuracy, gameState: tabGameState, maxCombo, maxPossibleScore, currentBeatsElapsed, resetGame } = useNoteMatching({
-    isPlaying,
-    startTime:          metronome.startTime,
-    effectiveBpm,
-    rawBpm:             metronome.bpm,
-    activeTablature,
-    isMicEnabled,
-    currentExerciseIndex,
-    isHalfSpeed,
-    getLatencyMs,
-    audioRefs,
-    getAdjustedTargetFreq,
-    onReset: () => setEarTrainingScore(0),
-  });
-
-  // ── Strumming rhythm matcher ──────────────────────────────────────────────
+  // ── Note matching — moved to NoteMatchingProvider ────────────────────────
+  // PracticeSession reads final values only via noteMatchingHandle.snapshot()
 
   const activeStrumPattern = currentExercise.strummingPatterns?.[0];
-  const {
-    slotFeedback: strumSlotFeedback,
-    gameState:    strumGameState,
-    sessionAccuracy: strumAccuracy,
-  } = useStrummingMatcher({
-    isPlaying,
-    startTime:  metronome.startTime,
-    bpm:        effectiveBpm,
-    pattern:    activeStrumPattern,
-    isMicEnabled,
-    audioRefs,
-    getLatencyMs,
-    currentExerciseIndex,
-  });
+  const noteMatchingHandle = useRef<NoteMatchingHandle | null>(null);
+  const [successSnapshot, setSuccessSnapshot] = useState<NoteMatchingSnapshot | null>(null);
 
-  // Pick the active game state depending on exercise type
-  const isStrummingExercise = !!activeStrumPattern;
-  const gameState     = isStrummingExercise ? strumGameState  : tabGameState;
-  const sessionAccuracy = isStrummingExercise ? strumAccuracy : tabAccuracy;
-
-  // Build an ordered hit/miss timeline from note-matching results
-  const noteTimeline = useMemo((): ('hit' | 'miss')[] => {
-    const keys = new Set([...Object.keys(hitNotes), ...Object.keys(missedNotes)]);
-    return Array.from(keys)
-      .sort((a, b) => {
-        const [ma, ba, na] = a.split('-').map(Number);
-        const [mb, bb, nb] = b.split('-').map(Number);
-        if (ma !== mb) return ma - mb;
-        if (ba !== bb) return ba - bb;
-        return na - nb;
-      })
-      .map(key => (hitNotes[key] ? 'hit' : 'miss'));
-  }, [hitNotes, missedNotes]);
+  // Capture end-of-session snapshot as soon as the success view should appear
+  useEffect(() => {
+    if (showSuccessView) setSuccessSnapshot(noteMatchingHandle.current?.snapshot() ?? null);
+  }, [showSuccessView]);
 
   // ── Completion notification ───────────────────────────────────────────────
 
@@ -783,9 +736,51 @@ export const PracticeSession = ({
 
   const category = currentExercise.category || "mixed";
 
+  const handleMicToggle = useCallback(async () => {
+    if (isMicEnabled) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); }
+  }, [isMicEnabled, closeAudio, updateMicPersistence]);
+
+  const handleAudioToggle = useCallback(() => {
+    const newMuted = !isAudioMuted;
+    setIsAudioMuted(newMuted);
+    saveGuitarPlaybackPreference(!newMuted);
+  }, [isAudioMuted]);
+
+  const handleExerciseSelect = useCallback((idx: number) => {
+    stopTimer();
+    metronome.restartMetronome();
+    jumpToExercise(idx);
+  }, [stopTimer, metronome.restartMetronome, jumpToExercise]);
+
+  const handleEarTrainingGuessed = useCallback(() => {
+    setEarTrainingScore(s => s + 1);
+    setIsRiddleGuessed(true);
+    handleRevealRiddle();
+  }, [handleRevealRiddle]);
+
+  const handleRepeatCountChange = useCallback(() => { loopsCompletedRef.current = 0; }, []);
+
   // ── Render ────────────────────────────────────────────────────────────────
 
+  const handleNoteMatchingReset = useCallback(() => setEarTrainingScore(0), []);
+
   return (
+    <NoteMatchingProvider
+      handleRef={noteMatchingHandle}
+      isPlaying={isPlaying}
+      startTime={metronome.startTime}
+      effectiveBpm={effectiveBpm}
+      rawBpm={metronome.bpm}
+      activeTablature={activeTablature}
+      isMicEnabled={isMicEnabled}
+      currentExerciseIndex={currentExerciseIndex}
+      isHalfSpeed={isHalfSpeed}
+      getLatencyMs={getLatencyMs}
+      audioRefs={audioRefs}
+      getAdjustedTargetFreq={getAdjustedTargetFreq}
+      activeStrumPattern={activeStrumPattern}
+      onReset={handleNoteMatchingReset}
+    >
     <>
       <Head>
         <title>{formattedTimeLeft} | {activeExercise.title}</title>
@@ -818,33 +813,26 @@ export const PracticeSession = ({
       )}
 
       {/* GP file loading overlay */}
-      {isFetchingGpFile && (
-        <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center gap-4 bg-zinc-950/90 backdrop-blur-sm">
-          <div className="h-10 w-10 rounded-full border-4 border-cyan-500/30 border-t-cyan-500 animate-spin" />
-          <p className="text-sm font-bold uppercase tracking-widest text-zinc-400">
-            Loading track…
-          </p>
-        </div>
-      )}
+      <GpLoadingOverlay isLoading={isFetchingGpFile} />
 
       {/* Success view */}
-      {showSuccessView && !reportResult && (
+      {showSuccessView && !reportResult && successSnapshot && (
         <ExerciseSuccessView
           planTitle={planTitleString}
           examMode={examMode}
-          score={gameState.score}
-          maxScore={maxPossibleScore}
-          stats={{ accuracy: sessionAccuracy, maxStreak: maxCombo }}
-          timeline={noteTimeline}
+          score={successSnapshot.score}
+          maxScore={successSnapshot.maxPossibleScore}
+          stats={{ accuracy: successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }}
+          timeline={successSnapshot.noteTimeline}
           onFinish={async () => {
             metronome.stopMetronome();
             await saveCurrentScores();
             autoSubmitReport(
               exerciseRecordsRef.current,
-              isMicEnabled ? { score: gameState.score, accuracy: sessionAccuracy } : null,
+              isMicEnabled ? { score: successSnapshot.score, accuracy: successSnapshot.accuracy } : null,
               currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null
             );
-            if (examMode) onExamComplete?.(sessionAccuracy);
+            if (examMode) onExamComplete?.(successSnapshot.accuracy);
           }}
           onRestart={() => {
             resetSuccessView();
@@ -873,14 +861,15 @@ export const PracticeSession = ({
             isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult && !showSuccessView}
             onClose={onClose }
             onFinish={isLastExercise ? async () => {
+              const snap = noteMatchingHandle.current?.snapshot();
               metronome.stopMetronome();
               await saveCurrentScores();
               autoSubmitReport(
                 exerciseRecordsRef.current,
-                isMicEnabled ? { score: gameState.score, accuracy: sessionAccuracy } : null,
+                isMicEnabled && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
                 currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null
               );
-              if (examMode) onExamComplete?.(sessionAccuracy);
+              if (examMode && snap) onExamComplete?.(snap.accuracy);
             } : onFinish}
             onImageClick={() => setIsImageModalOpen(true)}
             isMounted={isMounted}
@@ -910,15 +899,9 @@ export const PracticeSession = ({
             metronome={metronome}
             effectiveBpm={effectiveBpm}
             isMicEnabled={isMicEnabled}
-            toggleMic={async () => { if (isMicEnabled) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
-            gameState={gameState}
-            maxPossibleScore={maxPossibleScore}
-            sessionAccuracy={sessionAccuracy}
+            toggleMic={handleMicToggle}
             detectedNoteData={detectedNoteData}
             isListening={isListening}
-            hitNotes={hitNotes}
-            missedNotes={missedNotes}
-            currentBeatsElapsed={currentBeatsElapsed}
             isAudioMuted={isAudioMuted}
             setIsAudioMuted={setIsAudioMuted}
             isMetronomeMuted={isMetronomeMuted}
@@ -952,27 +935,11 @@ export const PracticeSession = ({
       <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobileView && "hidden")}>
 
         {/* Background ambiance glows */}
-        {!reportResult && (
-          <>
-            <div className={cn(
-              "absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-20 transition-all duration-1000",
-              category === "technique"  && "bg-blue-500",
-              category === "theory"     && "bg-emerald-500",
-              category === "creativity" && "bg-purple-500",
-              category === "hearing"    && "bg-orange-500",
-              category === "mixed"      && "bg-cyan-500",
-              currentExercise.isPlayalong && "bg-red-600 opacity-30 blur-[150px]"
-            )} />
-            <div className={cn(
-              "absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[120px] opacity-10 transition-all duration-1000",
-              category === "technique"  && "bg-indigo-500",
-              category === "theory"     && "bg-green-500",
-              category === "creativity" && "bg-pink-500",
-              category === "hearing"    && "bg-amber-500",
-              category === "mixed"      && "bg-blue-500"
-            )} />
-          </>
-        )}
+        <BackgroundAmbiance
+          category={category}
+          isPlayalong={currentExercise.isPlayalong}
+          visible={!reportResult}
+        />
 
         <TooltipProvider>
           <div>
@@ -1002,11 +969,7 @@ export const PracticeSession = ({
                       plan={plan}
                       currentExerciseIndex={currentExerciseIndex}
                       completedExercises={completedExercises}
-                      onExerciseSelect={(idx) => {
-                        stopTimer();
-                        metronome.restartMetronome();
-                        jumpToExercise(idx);
-                      }}
+                      onExerciseSelect={handleExerciseSelect}
                     />
                   </div>
 
@@ -1015,189 +978,38 @@ export const PracticeSession = ({
                     "flex flex-col items-center justify-center text-center",
                     currentExercise.isPlayalong ? "mb-6 mt-0" : "mb-12 mt-8"
                   )}>
-                    <h2 className={cn(
-                      "font-bold text-white tracking-tight flex flex-wrap items-center justify-center gap-3 mb-8",
-                      currentExercise.isPlayalong ? "text-2xl sm:text-3xl" : "text-4xl sm:text-5xl"
-                    )}>
-                      {currentExercise.isPlayalong && (
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/20 bg-red-500/10 backdrop-blur-sm">
-                          <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-                          <span className="text-[10px] font-bold tracking-wide text-red-400">Playalong</span>
-                        </div>
-                      )}
-                      {activeExercise.title}
-                    </h2>
-
-                    {activeExercise.customGoal && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        key={currentExercise.customGoal}
-                        className="mb-12 flex flex-col items-center gap-4"
-                      >
-                        <div className="relative group">
-                          <div className="absolute -inset-8 bg-cyan-500/20 blur-[40px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
-                          <div className="relative w-32 h-32 rounded-3xl bg-zinc-900/80 border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-xl overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
-                            <span className="text-6xl font-extrabold text-white tracking-tighter drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">
-                              {currentExercise.customGoal}
-                            </span>
-                          </div>
-                        </div>
-                        {currentExercise.customGoalDescription && (
-                          <p className="text-xs text-zinc-500 font-semibold tracking-wide mt-2">
-                            {currentExercise.customGoalDescription}
-                          </p>
-                        )}
-                      </motion.div>
-                    )}
-
-                    {!!(plan as any).streakDays && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mb-10 w-full max-w-2xl px-6 py-4 rounded-xl bg-main/10 border border-main/20 flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 rounded-lg bg-main text-white"><Timer size={20} /></div>
-                          <div>
-                            <h3 className="text-lg font-bold text-white tracking-tight">
-                              Challenge: {(plan as any).title}
-                            </h3>
-                            <p className="text-sm text-zinc-400 leading-relaxed">{(plan as any).description}</p>
-                            <p className="text-xs text-main font-semibold tracking-wide">
-                              Reward: {(plan as any).rewardDescription}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex gap-1.5">
-                          {Array.from({ length: (plan as any).streakDays }).map((_, i) => (
-                            <div key={i} className="h-1.5 w-6 rounded-full bg-main/20 border border-main/10" />
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
+                    <ExerciseHeroHeader
+                      exercise={currentExercise}
+                      activeExercise={activeExercise}
+                      plan={plan}
+                    />
 
                     {/* Mic game HUD */}
-                    {isMicEnabled && (
-                      <MicHud
-                        gameState={gameState}
-                        maxPossibleScore={maxPossibleScore}
-                        sessionAccuracy={sessionAccuracy}
+                    {isMicEnabled && <MicHud />}
+
+                    {/* GP track selector */}
+                    {allGpTracks && !showAlphaTabScore && (
+                      <GpTrackSelector
+                        tracks={allGpTracks}
+                        selectedIdx={selectedGpTrackIdx}
+                        onChange={setSelectedGpTrackIdx}
                       />
                     )}
 
-                    {/* GP track selector */}
-                    {allGpTracks && allGpTracks.length > 1 && !showAlphaTabScore && (
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Track:</span>
-                        {allGpTracks.map((track, idx) => (
-                          <button
-                            key={track.id}
-                            onClick={() => setSelectedGpTrackIdx(idx)}
-                            className={cn(
-                              "flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all",
-                              selectedGpTrackIdx === idx
-                                ? "bg-cyan-500/10 border-cyan-500/50 text-cyan-400"
-                                : "bg-white/5 border-white/5 text-zinc-500 hover:border-white/20 hover:text-zinc-300"
-                            )}
-                          >
-                            {track.trackType === "drums" ? <Drum className="h-3 w-3" /> : <Music className="h-3 w-3" />}
-                            {track.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
                     {/* Media controls toolbar */}
-                    {!!(currentExercise.metronomeSpeed || planHasTablature || planHasGpFile || planHasStrumming) && (
-                      <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
-                        {currentExercise.metronomeSpeed && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={() => handleHalfSpeedToggle(!isHalfSpeed)}
-                                className={cn(
-                                  "flex items-center gap-2 h-12 px-4 rounded-lg transition-all border text-sm font-bold tracking-wide",
-                                  isHalfSpeed
-                                    ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20"
-                                    : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
-                                )}
-                              >
-                                <Gauge className="h-4 w-4 shrink-0" />
-                                0.5x
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                                {isHalfSpeed ? "Half speed ON" : "Half speed OFF"}
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                        {((currentExercise.tablature && currentExercise.tablature.length > 0) || planHasTablature || planHasGpFile || planHasStrumming) && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={() => {
-                                  const newMuted = !isAudioMuted;
-                                  setIsAudioMuted(newMuted);
-                                  saveGuitarPlaybackPreference(!newMuted);
-                                }}
-                                disabled={currentExercise.riddleConfig?.mode === "sequenceRepeat"}
-                                className={cn(
-                                  "flex items-center justify-center h-12 w-12 rounded-lg transition-all border",
-                                  isAudioMuted
-                                    ? "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
-                                    : "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20",
-                                  currentExercise.riddleConfig?.mode === "sequenceRepeat" && "opacity-50 cursor-not-allowed"
-                                )}
-                              >
-                                <GiGuitar className="text-lg" />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                              {isAudioMuted ? "Track Off" : "Track On"}
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                        {(planHasTablature || planHasGpFile || planHasStrumming) && (
-                          <>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  onClick={async () => { if (isMicEnabled) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
-                                  className={cn(
-                                    "flex items-center justify-center h-12 w-12 rounded-lg transition-all border",
-                                    isMicEnabled
-                                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
-                                      : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
-                                  )}
-                                >
-                                  <FaMicrophone className="text-base" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom">
-                                {isMicEnabled ? "Mic On" : "Mic Off"}
-                              </TooltipContent>
-                            </Tooltip>
-                            {isMicEnabled && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <button
-                                    onClick={() => setSessionPhase("calibrating")}
-                                    className="flex items-center justify-center h-12 w-12 rounded-lg transition-all border bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
-                                  >
-                                    <FaSync className="text-base" />
-                                  </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom">
-                                  Recalibrate mic
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )}
+                    <MediaControlsToolbar
+                      hasMetronome={!!currentExercise.metronomeSpeed}
+                      hasAudioTrack={!!((currentExercise.tablature && currentExercise.tablature.length > 0) || planHasTablature || planHasGpFile || planHasStrumming)}
+                      hasMicControls={planHasTablature || planHasGpFile || planHasStrumming}
+                      isHalfSpeed={isHalfSpeed}
+                      onHalfSpeedToggle={handleHalfSpeedToggle}
+                      isAudioMuted={isAudioMuted}
+                      isRiddleMode={currentExercise.riddleConfig?.mode === "sequenceRepeat"}
+                      onAudioToggle={handleAudioToggle}
+                      isMicEnabled={isMicEnabled}
+                      onMicToggle={handleMicToggle}
+                      onRecalibrate={handleRecalibrate}
+                    />
 
                     {/* 3. Content area (tab / notation / video / image) */}
                     <ExerciseContentArea
@@ -1216,9 +1028,6 @@ export const PracticeSession = ({
                       countInRemaining={(metronome as any).countInRemaining ?? 0}
                       detectedNoteData={detectedNoteData}
                       isListening={isListening}
-                      hitNotes={hitNotes}
-                      missedNotes={missedNotes}
-                      currentBeatsElapsed={currentBeatsElapsed}
                       audioContext={metronome.audioContext}
                       audioStartTime={effectiveAudioStartTime}
                       tabResetKey={tabResetKey + tabRestartKey}
@@ -1230,11 +1039,7 @@ export const PracticeSession = ({
                       onPlayRiddle={handleToggleTimer}
                       onRevealRiddle={handleRevealRiddle}
                       onNextRiddle={handleNextRiddle}
-                      onEarTrainingGuessed={() => {
-                        setEarTrainingScore(s => s + 1);
-                        setIsRiddleGuessed(true);
-                        handleRevealRiddle();
-                      }}
+                      onEarTrainingGuessed={handleEarTrainingGuessed}
                       onLeaderboardClick={() => setLeaderboardOpen(true)}
                       imageScale={imageScale}
                       setImageScale={setImageScale}
@@ -1250,119 +1055,32 @@ export const PracticeSession = ({
                       onVideoEnd={handleNextExerciseClick}
                       isPlaying={isPlaying}
                       isMicEnabled={isMicEnabled}
-                      strumSlotFeedback={strumSlotFeedback}
                       volumeRef={audioRefs.volumeRef}
                     />
                   </div>
 
                   {/* 4. Controls & Instructions */}
-                  {/* 4. Controls & Instructions */}
-                  {/* 4. Controls & Instructions */}
-                  {(() => {
-                    const instructionsNode = activeExercise.instructions && activeExercise.instructions.length > 0 && (
-                      <Accordion type="single" collapsible defaultValue="instructions" className="w-full">
-                        <AccordionItem value="instructions" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
-                          <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
-                                <FaInfoCircle />
-                              </div>
-                              <span className="font-bold tracking-wide">{t("exercises:instructions")}</span>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="px-6 pb-6 pt-2">
-                            <div className={cn(
-                              "prose prose-invert max-w-none",
-                              currentExercise.isPlayalong && "text-sm leading-relaxed opacity-70"
-                            )}>
-                              {activeExercise.instructions.map((instruction, idx) => (
-                                <p key={idx} className="mb-4 last:mb-0">{instruction}</p>
-                              ))}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    );
-
-                    const tipsNode = activeExercise.tips && activeExercise.tips.length > 0 && (
-                      <Accordion type="single" collapsible defaultValue="tips" className="w-full">
-                        <AccordionItem value="tips" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
-                          <AccordionTrigger className="px-6 py-4 hover:bg-white/5 transition-colors group">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
-                                <FaLightbulb />
-                              </div>
-                              <span className="font-bold tracking-wide">{t("exercises:hints")}</span>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="px-6 pb-6 pt-2">
-                            <ul className={cn(
-                              "list-inside list-disc",
-                              currentExercise.isPlayalong ? "space-y-1 text-sm" : "space-y-2"
-                            )}>
-                              {activeExercise.tips.map((tip, idx) => (
-                                <li key={idx} className="marker:text-amber-500/50">{tip}</li>
-                              ))}
-                            </ul>
-                          </AccordionContent>
-                        </AccordionItem>
-                      </Accordion>
-                    );
-
-                    return (
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12 w-full max-w-[1800px] mx-auto items-start">
-                        {currentExercise.metronomeSpeed ? (
-                          <div className="w-full flex flex-col gap-6 lg:col-span-4">
-                            {instructionsNode}
-                            {tipsNode}
-                          </div>
-                        ) : (
-                          <>
-                            {instructionsNode && (
-                              <div className={cn("w-full flex flex-col", !activeExercise.tips?.length ? "lg:col-span-9" : "lg:col-span-5")}>
-                                {instructionsNode}
-                              </div>
-                            )}
-                            {tipsNode && (
-                              <div className={cn("w-full flex flex-col", !activeExercise.instructions?.length ? "lg:col-span-9" : "lg:col-span-4")}>
-                                {tipsNode}
-                              </div>
-                            )}
-                          </>
-                        )}
-
-                        <SessionSidebar
-                          currentExercise={currentExercise}
-                          activeExercise={activeExercise}
-                          metronome={metronome}
-                          effectiveBpm={effectiveBpm}
-                          isMetronomeMuted={isMetronomeMuted}
-                          setIsMetronomeMuted={setIsMetronomeMuted}
-                          isHalfSpeed={isHalfSpeed}
-                          setIsHalfSpeed={handleHalfSpeedToggle}
-                          isAudioMuted={isAudioMuted}
-                          setIsAudioMuted={setIsAudioMuted}
-                          saveGuitarPlaybackPreference={saveGuitarPlaybackPreference}
-                          soundfontsReady={soundfontsReady}
-                          isMicEnabled={isMicEnabled}
-                          showMicControls={planHasTablature || planHasGpFile || planHasStrumming}
-                          toggleMic={async () => { if (isMicEnabled) { closeAudio(); updateMicPersistence(false); } else { updateMicPersistence(true); } }}
-                          setSessionPhase={setSessionPhase}
-                          audioTracks={audioTracks}
-                          trackConfigs={trackConfigs}
-                          setTrackConfigs={setTrackConfigs}
-                          bpmStages={bpmStages}
-                          completedBpms={completedBpms}
-                          isBpmLoading={isBpmLoading}
-                          onBpmToggle={handleToggleBpm}
-                          examMode={examMode}
-                          tabRepeatCount={tabRepeatCount}
-                          setTabRepeatCount={setTabRepeatCount}
-                          onRepeatCountChange={() => { loopsCompletedRef.current = 0; }}
-                        />
-                      </div>
-                    );
-                  })()}
+                  <ExerciseInfoGrid
+                    exercise={activeExercise}
+                    isPlayalong={currentExercise.isPlayalong}
+                    hasMetronome={!!currentExercise.metronomeSpeed}
+                  >
+                    <SessionSidebar
+                      currentExercise={currentExercise}
+                      activeExercise={activeExercise}
+                      metronome={metronome}
+                      isMetronomeMuted={isMetronomeMuted}
+                      setIsMetronomeMuted={setIsMetronomeMuted}
+                      audioTracks={audioTracks}
+                      trackConfigs={trackConfigs}
+                      setTrackConfigs={setTrackConfigs}
+                      bpmStages={bpmStages}
+                      completedBpms={completedBpms}
+                      isBpmLoading={isBpmLoading}
+                      onBpmToggle={handleToggleBpm}
+                      examMode={examMode}
+                    />
+                  </ExerciseInfoGrid>
 
                   {/* 5. Bottom bar */}
                   {!reportResult && (
@@ -1437,5 +1155,6 @@ export const PracticeSession = ({
         showCompletionNotification={showCompletionNotification}
       />
     </>
+    </NoteMatchingProvider>
   );
 };
