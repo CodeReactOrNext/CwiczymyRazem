@@ -1,119 +1,147 @@
-import { cn } from "assets/lib/utils";
 import { motion } from "framer-motion";
-import { Check, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { Handle, Position } from "@xyflow/react";
 import type { Node, NodeProps } from "@xyflow/react";
 import type { ScaleTreeNodeData } from "../types/scaleTree.types";
 
 export type ScaleTreeRFNode = Node<ScaleTreeNodeData, "scaleTreeNode">;
 
-const FAMILY_COLORS = {
-  pentatonic: { dot: "bg-amber-400" },
-  diatonic:   { dot: "bg-cyan-400"  },
-  mode:       { dot: "bg-violet-400"},
+const FAMILY = {
+  pentatonic: { gem: "#f59e0b", glow: "rgba(245,158,11,0.85)" },
+  diatonic:   { gem: "#22d3ee", glow: "rgba(34,211,238,0.85)"  },
+  mode:       { gem: "#a78bfa", glow: "rgba(167,139,250,0.85)" },
 } as const;
 
-const STATUS_STYLES = {
-  locked: {
-    card: "opacity-40 grayscale cursor-not-allowed border-white/5 bg-zinc-900/60",
-    glow: "",
-  },
-  available: {
-    card: "cursor-pointer border-white/10 bg-zinc-900/80 hover:border-cyan-500/30 hover:bg-zinc-800/80 transition-colors duration-200",
-    glow: "",
-  },
-  in_progress: {
-    card: "cursor-pointer border-cyan-500/40 bg-zinc-900/90 hover:border-cyan-400/60",
-    glow: "ring-1 ring-cyan-500/20",
-  },
-  completed: {
-    card: "cursor-pointer border-cyan-400/60 bg-cyan-950/30",
-    glow: "ring-2 ring-cyan-400/40 shadow-[0_0_24px_rgba(34,211,238,0.25)]",
-  },
-} as const;
+type Status = "locked" | "available" | "in_progress" | "completed";
+type FamilyKey = keyof typeof FAMILY;
+
+interface DiamondStyle {
+  bg: string;
+  border: string;
+  shadow: string;
+  opacity: number;
+}
+
+function getDiamondStyle(status: Status, gemGlow: string, isSelected: boolean): DiamondStyle {
+  if (isSelected) return {
+    bg: "rgba(12,28,40,0.95)",
+    border: "rgba(251,191,36,0.95)",
+    shadow: "0 0 0 2px rgba(251,191,36,0.35), 0 0 28px rgba(251,191,36,0.55)",
+    opacity: 1,
+  };
+  switch (status) {
+    case "locked":      return { bg: "#1a1a20", border: "#44444e", shadow: "none", opacity: 0.65 };
+    case "available":   return { bg: "#1e1e28", border: "#5a5a72", shadow: "0 0 3px rgba(90,90,114,0.25)", opacity: 1 };
+    case "in_progress": return {
+      bg: "#08192a",
+      border: "rgba(6,182,212,0.8)",
+      shadow: "0 0 14px rgba(6,182,212,0.5), 0 0 4px rgba(6,182,212,0.3)",
+      opacity: 1,
+    };
+    case "completed": return {
+      bg: "#061616",
+      border: "rgba(34,211,238,0.9)",
+      shadow: `0 0 20px ${gemGlow}, 0 0 8px rgba(34,211,238,0.35)`,
+      opacity: 1,
+    };
+  }
+}
+
+const HANDLE_STYLE = { opacity: 0, width: 1, height: 1, minWidth: 1, minHeight: 1 };
 
 export function ScaleTreeNodeComponent({ data }: NodeProps<ScaleTreeRFNode>) {
-  const { label, subtitle, scaleFamily, status, progress, isSelected, onSelect } = data;
-
-  const familyColor = FAMILY_COLORS[scaleFamily as keyof typeof FAMILY_COLORS] ?? FAMILY_COLORS.diatonic;
-  const statusStyle = STATUS_STYLES[status as keyof typeof STATUS_STYLES] ?? STATUS_STYLES.available;
+  const { label, subtitle, scaleFamily, status, isSelected } = data;
   const isLocked = status === "locked";
 
+  // Spine nodes (ascending pattern) are the "notable" nodes — larger, more prominent
+  const isSpine = data.requiredExercises[0]?.patternType === "ascending";
+  const diamondSize   = isSpine ? 44 : 28;
+  const containerSize = isSpine ? 64 : 40;
+
+  const fam = FAMILY[(scaleFamily as FamilyKey)] ?? FAMILY.diatonic;
+  const ds = getDiamondStyle(status as Status, fam.glow, isSelected as boolean);
+
   return (
-    <>
-      <Handle type="target" position={Position.Top}    style={{ opacity: 0 }} />
+    <div className="flex flex-col items-center select-none" style={{ width: isSpine ? 90 : 60 }}>
+      <Handle type="target" position={Position.Top} style={HANDLE_STYLE} />
 
-      <motion.div
-        whileHover={isLocked ? {} : { scale: 1.03 }}
-        whileTap={isLocked ? {} : { scale: 0.98 }}
-        className={cn(
-          "relative w-[190px] rounded-xl border px-4 py-3 select-none",
-          statusStyle.card,
-          statusStyle.glow,
-          isSelected && !isLocked && "border-cyan-400/80 ring-2 ring-cyan-400/50 bg-cyan-950/40",
-        )}
-      >
-        {/* Status icon */}
-        <div className="absolute top-2.5 right-2.5">
-          {status === "completed" ? (
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]">
-              <Check className="h-3 w-3 text-zinc-950" strokeWidth={3} />
-            </div>
-          ) : status === "locked" ? (
-            <Lock className="h-3.5 w-3.5 text-zinc-600" />
-          ) : null}
-        </div>
-
-        {/* Family color dot + subtitle */}
-        <div className="mb-1 flex items-center gap-1.5">
-          <span className={cn("h-1.5 w-1.5 rounded-full flex-shrink-0", familyColor.dot)} />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-            {subtitle as string}
-          </span>
-        </div>
-
-        {/* Scale name */}
-        <p className={cn(
-          "text-sm font-bold leading-tight",
-          isLocked ? "text-zinc-500" : "text-white",
-        )}>
-          {label as string}
-        </p>
-
-        {/* Progress bar */}
-        {!isLocked && (() => {
-          const prog = progress as { done: number; total: number };
-          return (
-            <div className="mt-2.5 space-y-1">
-              <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(prog.done / prog.total) * 100}%` }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className={cn(
-                    "h-full rounded-full",
-                    status === "completed" ? "bg-cyan-400" : "bg-cyan-600",
-                  )}
-                />
-              </div>
-              <p className="text-[10px] text-zinc-500">
-                {prog.done}/{prog.total} ćwiczeń
-              </p>
-            </div>
-          );
-        })()}
-
-        {/* In-progress pulse ring */}
-        {status === "in_progress" && (
+      {/* Square container keeps layout footprint consistent */}
+      <div style={{ width: containerSize, height: containerSize, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <motion.div
+          whileHover={!isLocked ? { scale: 1.2 } : {}}
+          whileTap={!isLocked ? { scale: 0.9 } : {}}
+          style={{
+            rotate: 45,
+            width: diamondSize,
+            height: diamondSize,
+            background: ds.bg,
+            border: `2px solid ${ds.border}`,
+            boxShadow: ds.shadow,
+            opacity: ds.opacity,
+            cursor: isLocked ? "not-allowed" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
           <motion.div
-            animate={{ opacity: [0.4, 0.8, 0.4] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="pointer-events-none absolute inset-0 rounded-xl border border-cyan-400/30"
-          />
-        )}
-      </motion.div>
+            style={{
+              rotate: -45,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {status === "completed" && (
+              <div style={{
+                width: 16,
+                height: 16,
+                background: fam.gem,
+                transform: "rotate(45deg)",
+                boxShadow: `0 0 10px ${fam.glow}, 0 0 4px ${fam.gem}`,
+              }} />
+            )}
+            {status === "in_progress" && (
+              <motion.div
+                animate={{ opacity: [0.45, 1, 0.45] }}
+                transition={{ repeat: Infinity, duration: 1.8 }}
+                style={{
+                  width: 12,
+                  height: 12,
+                  background: "rgba(6,182,212,0.85)",
+                  transform: "rotate(45deg)",
+                  boxShadow: "0 0 8px rgba(6,182,212,0.9)",
+                }}
+              />
+            )}
+            {status === "available" && (
+              <div style={{
+                width: 10,
+                height: 10,
+                background: "rgba(100,100,130,0.7)",
+                transform: "rotate(45deg)",
+                boxShadow: "0 0 4px rgba(100,100,150,0.4)",
+              }} />
+            )}
+            {status === "locked" && (
+              <Lock size={13} color="rgba(100,100,120,0.7)" />
+            )}
+          </motion.div>
+        </motion.div>
+      </div>
 
-      <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
-    </>
+      {/* Label — only non-locked spine nodes (branch labels would be illegible) */}
+      {!isLocked && isSpine && (
+        <div style={{ width: 90, marginTop: 1 }} className="text-center">
+          <p className="text-[9px] font-bold leading-tight text-zinc-300 truncate px-1">{label as string}</p>
+          <p className="text-[8px] leading-tight text-zinc-600 truncate px-1">{subtitle as string}</p>
+        </div>
+      )}
+
+      <Handle type="source" position={Position.Bottom} style={HANDLE_STYLE} />
+    </div>
   );
 }

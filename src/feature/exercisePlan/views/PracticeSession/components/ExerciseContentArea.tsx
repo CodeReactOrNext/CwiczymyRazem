@@ -4,7 +4,7 @@ import React from "react";
 import type { NoteData } from "utils/audio/noteUtils";
 
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
-import type { SlotResult } from "../hooks/useStrummingMatcher";
+import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
@@ -30,9 +30,6 @@ interface ExerciseContentAreaProps {
   countInRemaining: number;
   detectedNoteData: NoteData | null;
   isListening: boolean;
-  hitNotes: Record<string, boolean | number>;
-  missedNotes: Record<string, boolean>;
-  currentBeatsElapsed: number;
   audioContext?: AudioContext | null;
   audioStartTime?: number | null;
   tabResetKey: number;
@@ -58,9 +55,8 @@ interface ExerciseContentAreaProps {
   handleZoomOut: () => void;
   resetImagePosition: () => void;
 
-  // Rhythm detection (strumming)
+  // Rhythm detection
   isMicEnabled?: boolean;
-  strumSlotFeedback?: Map<number, SlotResult>;
   volumeRef?: React.MutableRefObject<number>;
 
   // Video / playalong
@@ -92,9 +88,6 @@ export const ExerciseContentArea = ({
   countInRemaining,
   detectedNoteData,
   isListening,
-  hitNotes,
-  missedNotes,
-  currentBeatsElapsed,
   audioContext,
   audioStartTime,
   tabResetKey,
@@ -122,9 +115,9 @@ export const ExerciseContentArea = ({
   onVideoEnd,
   isPlaying,
   isMicEnabled,
-  strumSlotFeedback,
   volumeRef,
 }: ExerciseContentAreaProps) => {
+  const { hitNotes, missedNotes, currentBeatsElapsed, strumSlotFeedback } = useNoteMatchingContext();
   const hasTablature =
     activeTablature &&
     activeTablature.length > 0 &&
