@@ -2,9 +2,9 @@ import type { ScaleTreeNodeDef } from "../types/scaleTree.types";
 import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
 
-const INNER_RADIUS = 110;  // distance from cluster centre to spine node (patIdx 0)
-const ARM_STEP     = 75;   // distance between successive pattern nodes along each arm
-// max cluster radius = INNER_RADIUS + 6 × ARM_STEP = 560 px
+const INNER_RADIUS = 180;  // distance from cluster centre to spine node (patIdx 0)
+const ARM_STEP     = 100;  // distance between successive pattern nodes along each arm
+// max cluster radius = INNER_RADIUS + 6 × ARM_STEP = 780 px
 
 type ScaleFamily = "pentatonic" | "diatonic" | "mode";
 
@@ -144,11 +144,11 @@ function buildCluster(
   return nodes;
 }
 
-// ─── Cluster centres (1.7× scaled) + radial parameters ───────────────────────
+// ─── Cluster centres (×1.4 vs original) + radial parameters ─────────────────
 //
-//  Dorian(-3060,0)  NatMinor(-1700,-816)  MinPent(0,0)  MajPent(1700,-816)  Major(3060,0)
-//  Phrygian(-2380,1360)                                  Mixolydian(2380,1360)  Lydian(4080,-1020)
-//                               Locrian(0,3060)
+//  Dorian(-4284,0)  NatMinor(-2380,-1142)  MinPent(0,0)  MajPent(2380,-1142)  Major(4284,0)
+//  Phrygian(-3332,1904)                                   Mixolydian(3332,1904)  Lydian(5712,-1428)
+//                                Locrian(0,4284)
 //
 
 // ─── Minor Pentatonic — root cluster, pentagon ───────────────────────────────
@@ -163,59 +163,80 @@ const minPentNodes = buildCluster(
 // ─── Major Pentatonic — upper right, fan facing -26° (away from origin) ──────
 const majPentNodes = buildCluster(
   "maj_pent", "Major Pentatonic", "major_pentatonic", "pentatonic", "major_pentatonic",
-  PENT_POSITIONS, 1700, -816, spineId("min_pent", 5), 80,
-  "fan", -26, 220,
+  PENT_POSITIONS, 2380, -1142, spineId("min_pent", 5), 80,
+  "fan", -26, 240,
 );
 
 // ─── Natural Minor — upper left, fan facing -154° ─────────────────────────────
 const natMinorNodes = buildCluster(
   "nat_minor", "Natural Minor", "minor", "diatonic", "minor",
-  DIAT_POSITIONS, -1700, -816, spineId("min_pent", 5), 80,
-  "fan", -154, 220,
+  DIAT_POSITIONS, -2380, -1142, spineId("min_pent", 5), 80,
+  "fan", -154, 240,
 );
 
 // ─── Major Scale — right, fan facing 0° ──────────────────────────────────────
 const majorNodes = buildCluster(
   "major", "Major Scale", "major", "diatonic", "major",
-  DIAT_POSITIONS, 3060, 0, spineId("maj_pent", 5), 80,
-  "fan", 0, 180,
+  DIAT_POSITIONS, 4284, 0, spineId("maj_pent", 5), 80,
+  "fan", 0, 240,
 );
 
 // ─── Dorian — far left, fan facing 180° ──────────────────────────────────────
 const dorianNodes = buildCluster(
   "dorian", "Dorian", "dorian", "mode", "dorian",
-  DIAT_POSITIONS, -3060, 0, spineId("nat_minor", 3), 75,
-  "fan", 180, 180,
+  DIAT_POSITIONS, -4284, 0, spineId("nat_minor", 3), 75,
+  "fan", 180, 240,
 );
 
 // ─── Phrygian — lower left, fan facing 150° ──────────────────────────────────
 const phrygianNodes = buildCluster(
   "phrygian", "Phrygian", "phrygian", "mode", "phrygian",
-  DIAT_POSITIONS, -2380, 1360, spineId("nat_minor", 5), 75,
-  "fan", 150, 200,
+  DIAT_POSITIONS, -3332, 1904, spineId("nat_minor", 5), 75,
+  "fan", 150, 240,
 );
 
 // ─── Mixolydian — lower right, fan facing 30° ────────────────────────────────
 const mixolydianNodes = buildCluster(
   "mixolydian", "Mixolydian", "mixolydian", "mode", "mixolydian",
-  DIAT_POSITIONS, 2380, 1360, spineId("major", 3), 75,
-  "fan", 30, 200,
+  DIAT_POSITIONS, 3332, 1904, spineId("major", 3), 75,
+  "fan", 30, 240,
 );
 
 // ─── Lydian — far upper right, fan facing -14° ───────────────────────────────
 const lydianNodes = buildCluster(
   "lydian", "Lydian", "lydian", "mode", "lydian",
-  DIAT_POSITIONS, 4080, -1020, spineId("major", 5), 75,
-  "fan", -14, 160,
+  DIAT_POSITIONS, 5712, -1428, spineId("major", 5), 75,
+  "fan", -14, 200,
 );
 
 // ─── Locrian — bottom centre, fan facing 90° (downward) ──────────────────────
 const locrianNodes = buildCluster(
   "locrian", "Locrian", "locrian", "mode", "locrian",
-  DIAT_POSITIONS, 0, 3060, spineId("phrygian", 5), 70,
-  "fan", 90, 200,
+  DIAT_POSITIONS, 0, 4284, spineId("phrygian", 5), 70,
+  "fan", 90, 240,
 );
 locrianNodes[0].prerequisites = [spineId("phrygian", 5), spineId("mixolydian", 3)];
+
+// ─── Cluster label positions (for orientation overlay) ───────────────────────
+export type ClusterLabelDef = {
+  id: string;
+  label: string;
+  family: ScaleFamily;
+  x: number;
+  y: number;
+};
+
+export const CLUSTER_LABELS: ClusterLabelDef[] = [
+  { id: "lbl_min_pent",   label: "Minor Pentatonic", family: "pentatonic", x: 0,     y: 0      },
+  { id: "lbl_maj_pent",   label: "Major Pentatonic", family: "pentatonic", x: 2380,  y: -1142  },
+  { id: "lbl_nat_minor",  label: "Natural Minor",    family: "diatonic",   x: -2380, y: -1142  },
+  { id: "lbl_major",      label: "Major Scale",      family: "diatonic",   x: 4284,  y: 0      },
+  { id: "lbl_dorian",     label: "Dorian",           family: "mode",       x: -4284, y: 0      },
+  { id: "lbl_phrygian",   label: "Phrygian",         family: "mode",       x: -3332, y: 1904   },
+  { id: "lbl_mixolydian", label: "Mixolydian",       family: "mode",       x: 3332,  y: 1904   },
+  { id: "lbl_lydian",     label: "Lydian",           family: "mode",       x: 5712,  y: -1428  },
+  { id: "lbl_locrian",    label: "Locrian",          family: "mode",       x: 0,     y: 4284   },
+];
 
 // ─── Export ──────────────────────────────────────────────────────────────────
 export const SCALE_TREE_NODES: ScaleTreeNodeDef[] = [

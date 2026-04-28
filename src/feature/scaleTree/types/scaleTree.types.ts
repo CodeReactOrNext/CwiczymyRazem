@@ -28,8 +28,7 @@ export interface ScaleTreeNodeData extends ScaleTreeNodeDef {
   [key: string]: unknown;
   status: NodeStatus;
   progress: { done: number; total: number };
-  isSelected: boolean;
-  onSelect: () => void;
+  currentBpm: number | null;
 }
 
 export type BpmProgressMap = Map<string, number[]>;

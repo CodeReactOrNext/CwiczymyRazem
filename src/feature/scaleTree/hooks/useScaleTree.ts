@@ -37,12 +37,15 @@ export function useScaleTree() {
         return bpms.some((b) => b >= req.requiredBpm);
       }).length;
 
+      const firstReq = node.requiredExercises[0];
+      const bpmsForFirst = firstReq ? (progressMap.get(firstReq.exerciseId) ?? []) : [];
+      const currentBpm = bpmsForFirst.length > 0 ? Math.max(...bpmsForFirst) : null;
+
       const data: ScaleTreeNodeData = {
         ...node,
         status: nodeStatuses[node.id] ?? "locked",
         progress: { done: doneCount, total: node.requiredExercises.length },
-        isSelected: selectedNodeId === node.id,
-        onSelect: () => setSelectedNodeId((prev) => (prev === node.id ? null : node.id)),
+        currentBpm,
       };
 
       return {
@@ -52,7 +55,7 @@ export function useScaleTree() {
         data,
       };
     });
-  }, [nodeStatuses, progressMap, selectedNodeId]);
+  }, [nodeStatuses, progressMap]);
 
   const selectedNode = useMemo(
     () => (selectedNodeId ? SCALE_TREE_NODES.find((n) => n.id === selectedNodeId) ?? null : null),
