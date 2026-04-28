@@ -1,27 +1,68 @@
 import "@xyflow/react/dist/style.css";
 
 import {
-  Background,
-  BackgroundVariant,
   Controls,
   MiniMap,
   ReactFlow,
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
-import type { Edge, NodeTypes } from "@xyflow/react";
+import type { Edge, Node, NodeTypes } from "@xyflow/react";
 import { motion } from "framer-motion";
-import { GitBranch, RefreshCw } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { GitBranch, Guitar, Headphones, Music, RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
+import { TbGuitarPick } from "react-icons/tb";
 
 import { ScaleTreeNodeComponent } from "./ScaleTreeNodeComponent";
 import type { ScaleTreeRFNode } from "./ScaleTreeNodeComponent";
+import { ScaleNodeModal } from "./ScaleNodeModal";
 import { useScaleTree } from "../hooks/useScaleTree";
-import type { ScaleTreeNodeData } from "../types/scaleTree.types";
+import { CLUSTER_LABELS } from "../data/scaleTreeNodes";
+import type { ClusterLabelDef } from "../data/scaleTreeNodes";
+
+const FAMILY_COLOR: Record<ClusterLabelDef["family"], string> = {
+  pentatonic: "rgba(245,158,11,0.55)",
+  diatonic:   "rgba(34,211,238,0.55)",
+  mode:       "rgba(167,139,250,0.55)",
+};
+
+function ClusterLabelNode({ data }: { data: ClusterLabelDef }) {
+  return (
+    <div
+      style={{
+        pointerEvents: "none",
+        userSelect: "none",
+        textAlign: "center",
+        color: FAMILY_COLOR[data.family],
+        fontSize: 28,
+        fontWeight: 800,
+        letterSpacing: "0.04em",
+        textTransform: "uppercase",
+        lineHeight: 1,
+        whiteSpace: "nowrap",
+        textShadow: `0 0 40px ${FAMILY_COLOR[data.family]}`,
+        opacity: 0.6,
+      }}
+    >
+      {data.label}
+    </div>
+  );
+}
+
+const CLUSTER_LABEL_NODES: Node[] = CLUSTER_LABELS.map((lbl) => ({
+  id: lbl.id,
+  type: "clusterLabel",
+  position: { x: lbl.x, y: lbl.y - 60 },
+  data: lbl,
+  selectable: false,
+  draggable: false,
+  focusable: false,
+}));
 
 const NODE_TYPES: NodeTypes = {
   scaleTreeNode: ScaleTreeNodeComponent as NodeTypes[string],
+  clusterLabel:  ClusterLabelNode as NodeTypes[string],
 };
 
 /** Extracts the scale cluster ID from a node ID (e.g. "min_pent_pos5_asc" → "min_pent"). */
@@ -40,7 +81,6 @@ function buildStyledEdges(rawEdges: Edge[], nodeStatuses: Record<string, string>
     const isCrossCluster = isSpine && getScaleId(edge.source) !== getScaleId(edge.target);
 
     // ── Branch edges (arm chains within each cluster) ────────────────────────
-    // Thin, dim — show structure without visual chaos.
     if (!isSpine) {
       return {
         ...edge,
@@ -81,7 +121,7 @@ function buildStyledEdges(rawEdges: Edge[], nodeStatuses: Record<string, string>
     // ── Within-cluster spine ring — bezier for smooth arc look ───────────────
     return {
       ...edge,
-      type: "bezier" as const,
+      type: "default" as const,
       style: {
         stroke: isCompleted
           ? "rgba(34,211,238,0.7)"
@@ -102,13 +142,23 @@ export function ScaleTreeView() {
     rfEdges: rawEdges,
     isLoading,
     refreshProgress,
+    selectedNode,
+    selectedNodeId,
+    selectedNodeStatus,
+    setSelectedNodeId,
   } = useScaleTree();
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<ScaleTreeRFNode>(initialNodes as ScaleTreeRFNode[]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([...CLUSTER_LABEL_NODES, ...(initialNodes as Node[])]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(rawEdges);
 
   useEffect(() => {
-    setNodes(initialNodes as ScaleTreeRFNode[]);
+    setNodes((prev) => {
+      const selectedId = prev.find((n) => n.selected)?.id ?? null;
+      return [
+        ...CLUSTER_LABEL_NODES,
+        ...(initialNodes as Node[]).map((n) => ({ ...n, selected: n.id === selectedId })),
+      ];
+    });
   }, [initialNodes, setNodes]);
 
   const nodeStatuses = useMemo(() => {
@@ -128,8 +178,57 @@ export function ScaleTreeView() {
     [nodeStatuses]
   );
 
+  const handleNodeClick = useCallback((_: unknown, node: Node) => {
+    if (node.type === "clusterLabel") return;
+    setSelectedNodeId((prev) => {
+      const newId = prev === node.id ? null : node.id;
+      setNodes((nds) => nds.map((n) => {
+        if (n.id === prev || n.id === newId) return { ...n, selected: n.id === newId };
+        return n;
+      }));
+      return newId;
+    });
+  }, [setSelectedNodeId, setNodes]);
+
+  const handlePractice = useCallback(() => {
+    if (!selectedNode) return;
+    const req = selectedNode.requiredExercises[0];
+    if (!req) return;
+    router.push(`/practice/scale?type=${selectedNode.scaleType}&pos=${req.position}&pattern=${req.patternType}`);
+  }, [selectedNode, router]);
+
+  const handleCloseModal = useCallback(() => {
+    setSelectedNodeId(null);
+  }, [setSelectedNodeId]);
+
   return (
     <div className="relative h-full w-full overflow-hidden rounded-xl bg-zinc-950">
+      {/* Background — matches sign-in aesthetic */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 h-[60%] w-[80%] bg-cyan-500/5 blur-[120px] rounded-[100%]" />
+        <div className="absolute left-[5%] bottom-[15%] h-[40%] w-[35%] bg-violet-500/4 blur-[100px] rounded-[100%]" />
+        <div className="absolute right-[10%] top-[25%] h-[35%] w-[30%] bg-amber-500/3 blur-[100px] rounded-[100%]" />
+        <svg className="absolute inset-0 w-full h-full opacity-[0.025]">
+          <defs>
+            <pattern id="scale-tree-bg" x="0" y="0" width="160" height="160" patternUnits="userSpaceOnUse" patternTransform="rotate(-15)">
+              <g transform="translate(20, 20)">
+                <Guitar size={32} strokeWidth={1.5} />
+              </g>
+              <g transform="translate(100, 40)">
+                <Music size={28} strokeWidth={1.5} />
+              </g>
+              <g transform="translate(40, 100)">
+                <TbGuitarPick size={30} />
+              </g>
+              <g transform="translate(110, 110)">
+                <Headphones size={32} strokeWidth={1.5} />
+              </g>
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#scale-tree-bg)" />
+        </svg>
+      </div>
+
       {/* Header stats */}
       <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-1.5 backdrop-blur-sm">
         <GitBranch className="h-3.5 w-3.5 text-cyan-400" />
@@ -167,13 +266,7 @@ export function ScaleTreeView() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={NODE_TYPES}
-        onNodeClick={(_, node) => {
-          const data = node.data as ScaleTreeNodeData;
-          if (data.status === "locked") return;
-          const req = data.requiredExercises[0];
-          if (!req) return;
-          router.push(`/practice/scale?type=${data.scaleType}&pos=${req.position}&pattern=${req.patternType}`);
-        }}
+        onNodeClick={handleNodeClick}
         fitView
         fitViewOptions={{ padding: 0.12 }}
         nodeOrigin={[0.5, 0.5]}
@@ -185,12 +278,6 @@ export function ScaleTreeView() {
         proOptions={{ hideAttribution: true }}
         colorMode="dark"
       >
-        <Background
-          variant={BackgroundVariant.Dots}
-          gap={32}
-          size={0.8}
-          color="rgba(255,255,255,0.025)"
-        />
         <Controls
           showInteractive={false}
           className="[&>button]:border-white/10 [&>button]:bg-zinc-900 [&>button]:text-zinc-400 [&>button:hover]:bg-zinc-800"
@@ -208,15 +295,25 @@ export function ScaleTreeView() {
         />
       </ReactFlow>
 
-      {/* Hint */}
-      <motion.p
-        initial={{ opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
-        className="absolute bottom-4 right-4 z-10 text-[10px] text-zinc-600 select-none"
-      >
-        Kliknij węzeł, aby ćwiczyć
-      </motion.p>
+      {/* Node detail modal */}
+      <ScaleNodeModal
+        node={selectedNode}
+        status={selectedNodeStatus}
+        onClose={handleCloseModal}
+        onPractice={handlePractice}
+      />
+
+      {/* Hint — hidden when modal is open */}
+      {!selectedNodeId && (
+        <motion.p
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+          className="absolute bottom-4 right-4 z-10 text-[10px] text-zinc-600 select-none"
+        >
+          Kliknij węzeł, aby ćwiczyć
+        </motion.p>
+      )}
     </div>
   );
 }
