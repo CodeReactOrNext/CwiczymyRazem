@@ -100,8 +100,7 @@ const MainLoggedLayout = ({
 
 
             <div className='z-20 mx-auto w-full max-w-[1490px] px-0 pb-24 md:pt-8 md:pb-8 lg:px-8'>
-                <div
-                  className='relative z-10'>
+                <div className='relative'>
                   {children}
                 </div>
             </div>

@@ -249,7 +249,7 @@ const SessionModal = ({
         onClose={onClose}
       />
 
-      <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5 pb-[76px]'>
+      <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5'>
         <div className='space-y-6 p-4'>
 
           <MobileExerciseContent
