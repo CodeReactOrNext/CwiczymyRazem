@@ -12,6 +12,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
 import { getNoteFromFrequency } from "utils/audio/noteUtils";
 import { playCompletionSound } from "utils/audioUtils";
@@ -847,8 +848,8 @@ export const PracticeSession = ({
         />
       )}
 
-      {/* Mobile modals */}
-      {isMobileView && (
+      {/* Mobile modals — rendered via portal to document.body to escape parent stacking contexts */}
+      {isMobileView && createPortal(
         <>
           <ImageModal
             isOpen={isImageModalOpen}
@@ -928,7 +929,8 @@ export const PracticeSession = ({
             onBpmToggle={handleToggleBpm}
             onRecordsClick={() => setLeaderboardOpen(true)}
           />
-        </>
+        </>,
+        document.body
       )}
 
       {/* ── Desktop view ──────────────────────────────────────────────────── */}
