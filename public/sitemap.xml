@@ -3,7 +3,7 @@
   <!-- Home Page / Landing Page -->
   <url>
     <loc>https://riff.quest/</loc>
-    <lastmod>2026-01-27</lastmod>
+    <lastmod>2026-04-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,7 +11,7 @@
   <!-- Blog Index -->
   <url>
     <loc>https://riff.quest/blog</loc>
-    <lastmod>2026-01-27</lastmod>
+    <lastmod>2026-04-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -96,25 +96,75 @@
 
   <url>
     <loc>https://riff.quest/blog/why-youre-not-improving-at-guitar-8-common-reasons</loc>
-    <lastmod>2026-03-29</lastmod>
+    <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Guide -->
   <url>
-    <loc>https://riff.quest/guide</loc>
-    <lastmod>2026-01-27</lastmod>
+    <loc>https://riff.quest/blog/best-guitar-techniques-for-speed</loc>
+    <lastmod>2026-04-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Legal & Info -->
+  <url>
+    <loc>https://riff.quest/blog/do-analytics-improve-guitar-practice</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/blog/how-song-difficulty-ratings-improve-practice</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/blog/skill-goals-vs-song-goals</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/blog/structured-practice-technical-vs-musical-focus</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/blog/why-practice-logs-improve-guitar-skills</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+
+
+  <!-- Info Pages -->
   <url>
     <loc>https://riff.quest/about</loc>
     <lastmod>2026-01-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/faq</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/how-it-works</loc>
+    <lastmod>2026-04-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <url>
