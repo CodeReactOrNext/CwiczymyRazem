@@ -89,7 +89,7 @@ export const InteractiveExercisesSection = () => {
               {/* Screenshot */}
               <div className="relative overflow-hidden rounded-xl mt-0">
                 <Image
-                  src="/images/feature/tabs.png"
+                  src="/images/feature/tabs.webp"
                   alt="Interactive Guitar Pro tablature with animated playback"
                   width={1400}
                   height={350}

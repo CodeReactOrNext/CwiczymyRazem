@@ -63,7 +63,7 @@ export const PracticePlansSection = () => {
               {/* Screenshot */}
               <div className="relative overflow-hidden rounded-xl">
                 <Image
-                  src="/images/feature/practices-plans.png"
+                  src="/images/feature/practices-plans.webp"
                   alt="Practice plans library with custom and template routines"
                   width={1200}
                   height={800}

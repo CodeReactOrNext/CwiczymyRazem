@@ -129,7 +129,7 @@ export const StatisticsSection = () => {
                 {/* Screenshot */}
                 <div className="relative overflow-hidden rounded-xl">
                   <Image
-                    src="/images/feature/statistics.png"
+                    src="/images/feature/statistics.webp"
                     alt="Detailed practice statistics dashboard with skill breakdowns"
                     width={1100}
                     height={460}

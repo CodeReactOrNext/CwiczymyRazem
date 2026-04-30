@@ -58,7 +58,7 @@ export const SessionSummarySection = () => {
               {/* Screenshot */}
               <div className="relative overflow-hidden rounded-xl">
                 <Image
-                  src="/images/feature/summary.png"
+                  src="/images/feature/summary.webp"
                   alt="AI-powered session summary with grade, strengths and improvement tips"
                   width={1040}
                   height={680}
