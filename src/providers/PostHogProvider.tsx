@@ -8,7 +8,6 @@ if (typeof window !== "undefined") {
     api_host: "/ingest",
     ui_host: "https://eu.posthog.com",
     capture_exceptions: false, // Sentry handles this
-    disable_dead_clicks: true, // not used, Sentry handles replays
     debug: process.env.NODE_ENV === "development",
     person_profiles: "identified_only",
   });
