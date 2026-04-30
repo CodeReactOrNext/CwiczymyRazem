@@ -143,7 +143,12 @@
     <priority>0.8</priority>
   </url>
 
-
+  <url>
+    <loc>https://riff.quest/blog/how-to-track-guitar-practice-progress-effectively</loc>
+    <lastmod>2026-04-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- Info Pages -->
   <url>
