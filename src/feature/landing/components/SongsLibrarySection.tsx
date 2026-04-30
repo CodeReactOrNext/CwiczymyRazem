@@ -100,7 +100,7 @@ export const SongsLibrarySection = () => {
               {/* Screenshot */}
               <div className="relative overflow-hidden rounded-xl">
                 <Image
-                  src="/images/feature/songs.png"
+                  src="/images/feature/songs.webp"
                   alt="Song library with community difficulty ratings and genre filters"
                   width={900}
                   height={700}
