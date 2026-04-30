@@ -15,10 +15,10 @@ const FAMILY = {
 type FamilyKey = keyof typeof FAMILY;
 
 const STATUS_LABEL: Record<NodeStatus, string> = {
-  locked:      "Zablokowany",
-  available:   "Dostępny",
-  in_progress: "W trakcie",
-  completed:   "Ukończony",
+  locked:      "Locked",
+  available:   "Available",
+  in_progress: "In Progress",
+  completed:   "Completed",
 };
 
 const STATUS_COLOR: Record<NodeStatus, string> = {
@@ -29,9 +29,9 @@ const STATUS_COLOR: Record<NodeStatus, string> = {
 };
 
 const FAMILY_LABEL: Record<FamilyKey, string> = {
-  pentatonic: "Pentatonika",
-  diatonic:   "Skala diatoniczna",
-  mode:       "Tryb modalny",
+  pentatonic: "Pentatonic",
+  diatonic:   "Diatonic Scale",
+  mode:       "Modal Mode",
 };
 
 interface DiamondStyle {
@@ -43,24 +43,24 @@ interface DiamondStyle {
 
 function getDiamondStyle(status: NodeStatus, gemGlow: string, selected: boolean): DiamondStyle {
   if (selected) return {
-    bg: "rgba(12,28,40,0.95)",
-    border: "rgba(251,191,36,0.95)",
-    shadow: "0 0 0 2px rgba(251,191,36,0.35), 0 0 28px rgba(251,191,36,0.55)",
+    bg: "#16201a",
+    border: "rgba(251,191,36,1)",
+    shadow: "0 0 0 2px rgba(251,191,36,0.50), 0 0 44px rgba(251,191,36,0.80), 0 0 18px rgba(251,191,36,0.45), inset 0 0 20px rgba(251,191,36,0.10)",
     opacity: 1,
   };
   switch (status) {
-    case "locked":      return { bg: "#1a1a20", border: "#44444e", shadow: "none", opacity: 0.65 };
-    case "available":   return { bg: "#1e1e28", border: "#5a5a72", shadow: "0 0 3px rgba(90,90,114,0.25)", opacity: 1 };
+    case "locked":      return { bg: "#18182a", border: "#484860", shadow: "none", opacity: 0.55 };
+    case "available":   return { bg: "#1e1e32", border: "rgba(150,150,200,0.80)", shadow: "0 0 6px rgba(100,100,160,0.20)", opacity: 1 };
     case "in_progress": return {
-      bg: "#08192a",
-      border: "rgba(6,182,212,0.8)",
-      shadow: "0 0 14px rgba(6,182,212,0.5), 0 0 4px rgba(6,182,212,0.3)",
+      bg: "#0d2038",
+      border: "rgba(6,182,212,1)",
+      shadow: "0 0 24px rgba(6,182,212,0.70), 0 0 10px rgba(6,182,212,0.40), inset 0 0 14px rgba(6,182,212,0.12)",
       opacity: 1,
     };
     case "completed": return {
-      bg: "#061616",
-      border: "rgba(34,211,238,0.9)",
-      shadow: `0 0 20px ${gemGlow}, 0 0 8px rgba(34,211,238,0.35)`,
+      bg: "#0a1e1e",
+      border: "rgba(34,211,238,1)",
+      shadow: `0 0 32px ${gemGlow}, 0 0 14px rgba(34,211,238,0.55), inset 0 0 16px rgba(34,211,238,0.12)`,
       opacity: 1,
     };
   }
@@ -127,11 +127,11 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
       {req && (
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 8, marginBottom: 8 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-            <span style={{ fontSize: 10, color: "#52525b" }}>Wymagane BPM</span>
+            <span style={{ fontSize: 10, color: "#52525b" }}>Required BPM</span>
             <span style={{ fontSize: 10, color: "#e4e4e7" }}>{requiredBpm} BPM</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-            <span style={{ fontSize: 10, color: "#52525b" }}>Twoje najlepsze</span>
+            <span style={{ fontSize: 10, color: "#52525b" }}>Your best</span>
             <span style={{ fontSize: 10, fontWeight: 600, color: bpmColor }}>
               {currentBpm != null ? `${currentBpm} BPM` : "—"}
             </span>
@@ -148,12 +148,12 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
           </div>
           {bpmRatio > 0 && bpmRatio < 1 && (
             <div style={{ fontSize: 9, color: "#52525b", marginTop: 3, textAlign: "right" }}>
-              {Math.round(bpmRatio * 100)}% celu
+              {Math.round(bpmRatio * 100)}% of goal
             </div>
           )}
           {bpmRatio >= 1 && (
             <div style={{ fontSize: 9, color: "#22d3ee", marginTop: 3, textAlign: "right" }}>
-              Cel osiągnięty
+              Goal achieved
             </div>
           )}
         </div>
@@ -163,10 +163,10 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 7 }}>
         <span style={{ fontSize: 9, color: "#52525b" }}>
           {prereqCount === 0
-            ? "Węzeł startowy — brak wymagań"
+            ? "Start node — no requirements"
             : prereqCount === 1
-            ? "Wymaga 1 poprzedniego węzła"
-            : `Wymaga ${prereqCount} poprzednich węzłów`}
+            ? "Requires 1 previous node"
+            : `Requires ${prereqCount} previous nodes`}
         </span>
       </div>
     </div>
@@ -190,8 +190,8 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
   };
 
   const isSpine = data.requiredExercises[0]?.patternType === "ascending";
-  const diamondSize   = isSpine ? 44 : 28;
-  const containerSize = isSpine ? 64 : 40;
+  const diamondSize   = isSpine ? 50 : 30;
+  const containerSize = isSpine ? 70 : 44;
 
   const fam = FAMILY[(scaleFamily as FamilyKey)] ?? FAMILY.diatonic;
   const ds = getDiamondStyle(status as NodeStatus, fam.glow, selected ?? false);
@@ -210,7 +210,6 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
       <div style={{ width: containerSize, height: containerSize, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div
           style={{
-            rotate: "45deg",
             width: diamondSize,
             height: diamondSize,
             background: ds.bg,
@@ -228,7 +227,6 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
         >
           <div
             style={{
-              rotate: "-45deg",
               width: "100%",
               height: "100%",
               display: "flex",
@@ -238,45 +236,42 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
           >
             {status === "completed" && (
               <div style={{
-                width: 16,
-                height: 16,
+                width: isSpine ? 20 : 14,
+                height: isSpine ? 20 : 14,
                 background: fam.gem,
-                transform: "rotate(45deg)",
-                boxShadow: `0 0 10px ${fam.glow}, 0 0 4px ${fam.gem}`,
+                boxShadow: `0 0 16px ${fam.glow}, 0 0 6px ${fam.gem}, 0 0 28px ${fam.glow}`,
               }} />
             )}
             {status === "in_progress" && (
               <div
                 style={{
-                  width: 12,
-                  height: 12,
-                  background: "rgba(6,182,212,0.85)",
-                  transform: "rotate(45deg)",
-                  boxShadow: "0 0 8px rgba(6,182,212,0.9)",
+                  width: isSpine ? 14 : 10,
+                  height: isSpine ? 14 : 10,
+                  background: "rgba(6,182,212,0.90)",
+                  boxShadow: "0 0 14px rgba(6,182,212,0.95), 0 0 6px rgba(6,182,212,0.6)",
                   animation: "pulse 1.8s ease-in-out infinite",
                 }}
               />
             )}
             {status === "available" && (
               <div style={{
-                width: 10,
-                height: 10,
-                background: "rgba(100,100,130,0.7)",
-                transform: "rotate(45deg)",
-                boxShadow: "0 0 4px rgba(100,100,150,0.4)",
+                width: isSpine ? 10 : 7,
+                height: isSpine ? 10 : 7,
+                background: "rgba(80,80,110,0.65)",
+                boxShadow: "0 0 4px rgba(80,80,120,0.35)",
               }} />
             )}
             {status === "locked" && (
-              <Lock size={13} color="rgba(100,100,120,0.7)" />
+              <Lock size={isSpine ? 14 : 10} color="rgba(70,70,90,0.55)" />
             )}
           </div>
         </div>
       </div>
 
       {isSpine && (
-        <div style={{ width: 90, marginTop: 1 }} className="text-center">
-          <p className={`text-[9px] font-bold leading-tight truncate px-1 ${isLocked ? "text-zinc-600" : "text-zinc-300"}`}>{label as string}</p>
-          <p className="text-[8px] leading-tight text-zinc-600 truncate px-1">{subtitle as string}</p>
+        <div style={{ width: 90, marginTop: 2 }} className="text-center">
+          <p className={`text-[9px] font-light tracking-wide leading-tight truncate px-1 ${isLocked ? "text-zinc-500" : "text-zinc-100"}`}>{label as string}</p>
+          <p className={`text-[8px] font-light leading-tight tracking-wide truncate px-1 ${isLocked ? "text-zinc-600" : "text-zinc-500"}`}>{subtitle as string}</p>
         </div>
       )}
 
