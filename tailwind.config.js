@@ -313,6 +313,14 @@ module.exports = {
             "background-position": "100% 50%"
           }
         },
+        "glow-float-1": {
+          "from": { transform: "translate(-15%, -10%)", opacity: "0.2" },
+          "to":   { transform: "translate(15%, 10%)",  opacity: "0.4" }
+        },
+        "glow-float-2": {
+          "from": { transform: "translate(15%, 10%)",  opacity: "0.15" },
+          "to":   { transform: "translate(-15%, -10%)", opacity: "0.35" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -320,6 +328,8 @@ module.exports = {
         "ping-slow": "ping-slow 0.8s ease-out",
         "skill-upgraded": "skill-upgraded 0.5s ease-in-out",
         "gradient": "gradient 6s linear infinite",
+        "glow-float-1": "glow-float-1 8s ease-in-out infinite alternate",
+        "glow-float-2": "glow-float-2 10s ease-in-out infinite alternate",
       },
     },
     fontFamily: {
@@ -427,11 +437,7 @@ module.exports = {
               DEFAULT: "#555555"
             },
           },
-          backgroundImage: {
-            "old-effect": "url('/static/images/old_effect_dark.webp')",
-            "old-effect-hr": "url('/static/images/old_effect_hr_dark.webp')",
-            guitarImage: "url('/static/images/guitar_red.png')",
-          },
+       
         },
       }, ],
     }),

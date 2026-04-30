@@ -7,7 +7,8 @@ if (typeof window !== "undefined") {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
     api_host: "/ingest",
     ui_host: "https://eu.posthog.com",
-    capture_exceptions: true,
+    capture_exceptions: false, // Sentry handles this
+    disable_dead_clicks: true, // not used, Sentry handles replays
     debug: process.env.NODE_ENV === "development",
     person_profiles: "identified_only",
   });

@@ -38,6 +38,7 @@ export const LandingSEO = ({ faqQuestions }: LandingSEOProps) => {
       <meta name='twitter:image' content={ogImageUrl} />
 
       <link rel='canonical' href={siteUrl} />
+      <link rel='preload' as='image' href='/images/hero-image.webp' fetchPriority='high' />
 
       {/* Structured Data */}
       <script
