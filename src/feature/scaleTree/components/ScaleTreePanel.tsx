@@ -21,16 +21,16 @@ interface ScaleTreePanelProps {
 const DEFAULT_METRO = { min: 70, max: 140, recommended: 100 };
 
 const STATUS_LABELS: Record<NodeStatus, { text: string; color: string }> = {
-  locked:      { text: "Zablokowane",  color: "text-zinc-500"   },
-  available:   { text: "Dostępne",     color: "text-zinc-300"   },
-  in_progress: { text: "W trakcie",    color: "text-cyan-400"   },
-  completed:   { text: "Ukończone",    color: "text-emerald-400"},
+  locked:      { text: "Locked",       color: "text-zinc-500"   },
+  available:   { text: "Available",    color: "text-zinc-300"   },
+  in_progress: { text: "In Progress",  color: "text-cyan-400"   },
+  completed:   { text: "Completed",    color: "text-emerald-400"},
 };
 
 const FAMILY_LABELS = {
-  pentatonic: "Pentatonika",
-  diatonic:   "Skala diatoniczna",
-  mode:       "Tryb modalny",
+  pentatonic: "Pentatonic",
+  diatonic:   "Diatonic Scale",
+  mode:       "Modal Mode",
 } as const;
 
 function ExerciseRow({
@@ -73,7 +73,7 @@ function ExerciseRow({
             <CheckCircle2 className="h-3.5 w-3.5 flex-shrink-0 text-emerald-400" />
           )}
           <span className="text-[10px] text-zinc-500">
-            cel: {req.requiredBpm} BPM
+            goal: {req.requiredBpm} BPM
           </span>
         </div>
       </div>
@@ -158,14 +158,14 @@ export function ScaleTreePanel({
 
           {status === "locked" ? (
             <div className="rounded-lg border border-white/5 bg-zinc-900/40 p-3 text-xs text-zinc-500">
-              Ukończ poprzednie węzły, aby odblokować tę skalę.
+              Complete the previous nodes to unlock this scale.
             </div>
           ) : (
             <>
               {/* Required exercises */}
               <div>
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                  Wymagane ćwiczenia
+                  Required exercises
                 </p>
                 <div className="space-y-2">
                   {node.requiredExercises.map((req) => (
@@ -186,14 +186,14 @@ export function ScaleTreePanel({
                 className="flex items-center justify-center gap-2 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-4 py-2.5 text-sm font-medium text-cyan-400 transition-all hover:bg-cyan-500/10 hover:text-cyan-300"
               >
                 <Timer className="h-4 w-4" />
-                Ćwicz w sekcji Timer
+                Practice in the Timer section
                 <ExternalLink className="h-3 w-3 opacity-60" />
               </Link>
 
               <p className="text-[10px] text-zinc-600 leading-relaxed">
-                Przejdź do sekcji Timer → wybierz "Scale Practice (Configurable)" → ustaw{" "}
-                <span className="text-zinc-400">{node.label}</span> w tonacji C.
-                Po ćwiczeniu zaznacz zaliczony BPM w siatce powyżej.
+                Go to the Timer section → select "Scale Practice (Configurable)" → set{" "}
+                <span className="text-zinc-400">{node.label}</span> in the key of C.
+                After practicing, mark the achieved BPM in the grid above.
               </p>
             </>
           )}

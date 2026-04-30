@@ -5,17 +5,6 @@ class MyDocument extends Document {
     return (
       <Html lang='pl' className='dark'>
         <Head>
-          {/* Google Fonts - Inter for professional typography */}
-          <link rel='preconnect' href='https://fonts.googleapis.com' />
-          <link
-            rel='preconnect'
-            href='https://fonts.gstatic.com'
-            crossOrigin='anonymous'
-          />
-          <link
-            href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'
-            rel='stylesheet'
-          />
           <link
             rel='icon'
             type='image/svg+xml'

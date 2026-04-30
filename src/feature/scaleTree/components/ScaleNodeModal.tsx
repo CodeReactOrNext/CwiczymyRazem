@@ -6,19 +6,19 @@ import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDial
 import type { NodeStatus, ScaleTreeNodeDef } from "../types/scaleTree.types";
 
 const PATTERN_LABELS: Record<string, string> = {
-  ascending:            "Wstępujący",
-  descending:           "Zstępujący",
-  ascending_descending: "Wstępujący + Zstępujący",
-  intervals_thirds:     "Tercje",
-  intervals_fourths:    "Kwarty",
-  sequence_3_notes:     "Sekwencja 3",
-  sequence_4_notes:     "Sekwencja 4",
+  ascending:            "Ascending",
+  descending:           "Descending",
+  ascending_descending: "Ascending + Descending",
+  intervals_thirds:     "Thirds",
+  intervals_fourths:    "Fourths",
+  sequence_3_notes:     "Sequence 3",
+  sequence_4_notes:     "Sequence 4",
 };
 
 const FAMILY_LABEL: Record<string, string> = {
-  pentatonic: "Pentatonika",
-  diatonic:   "Skala diatoniczna",
-  mode:       "Tryb modalny",
+  pentatonic: "Pentatonic",
+  diatonic:   "Diatonic Scale",
+  mode:       "Modal Mode",
 };
 
 const FAMILY_COLOR: Record<string, string> = {
@@ -95,7 +95,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
                   {PATTERN_LABELS[req.patternType] ?? req.patternType}
                 </span>
                 <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-300">
-                  Poz. {req.position}
+                  Pos. {req.position}
                 </span>
                 <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-300">
                   {req.requiredBpm} BPM
@@ -115,7 +115,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
               {status === "locked" ? (
                 <div className="flex items-center gap-2 rounded-lg bg-zinc-800/50 px-3 py-2.5 text-xs text-zinc-500">
                   <Lock size={12} className="flex-shrink-0" />
-                  Ukończ wymagane ćwiczenia, aby odblokować
+                  Complete the required exercises to unlock
                 </div>
               ) : (
                 <button
@@ -123,7 +123,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-cyan-500 active:bg-cyan-700"
                 >
                   <Play size={14} />
-                  Ćwicz
+                  Practice
                 </button>
               )}
             </div>

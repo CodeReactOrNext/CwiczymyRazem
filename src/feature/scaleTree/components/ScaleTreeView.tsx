@@ -9,22 +9,20 @@ import {
 } from "@xyflow/react";
 import type { Edge, Node, NodeTypes } from "@xyflow/react";
 import { motion } from "framer-motion";
-import { GitBranch, Guitar, Headphones, Music, RefreshCw } from "lucide-react";
+import { GitBranch, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
-import { TbGuitarPick } from "react-icons/tb";
 
 import { ScaleTreeNodeComponent } from "./ScaleTreeNodeComponent";
-import type { ScaleTreeRFNode } from "./ScaleTreeNodeComponent";
 import { ScaleNodeModal } from "./ScaleNodeModal";
 import { useScaleTree } from "../hooks/useScaleTree";
 import { CLUSTER_LABELS } from "../data/scaleTreeNodes";
 import type { ClusterLabelDef } from "../data/scaleTreeNodes";
 
 const FAMILY_COLOR: Record<ClusterLabelDef["family"], string> = {
-  pentatonic: "rgba(245,158,11,0.55)",
-  diatonic:   "rgba(34,211,238,0.55)",
-  mode:       "rgba(167,139,250,0.55)",
+  pentatonic: "rgba(245,158,11,0.75)",
+  diatonic:   "rgba(34,211,238,0.75)",
+  mode:       "rgba(167,139,250,0.75)",
 };
 
 function ClusterLabelNode({ data }: { data: ClusterLabelDef }) {
@@ -35,14 +33,14 @@ function ClusterLabelNode({ data }: { data: ClusterLabelDef }) {
         userSelect: "none",
         textAlign: "center",
         color: FAMILY_COLOR[data.family],
-        fontSize: 28,
-        fontWeight: 800,
-        letterSpacing: "0.04em",
+        fontSize: 18,
+        fontWeight: 300,
+        letterSpacing: "0.28em",
         textTransform: "uppercase",
         lineHeight: 1,
         whiteSpace: "nowrap",
-        textShadow: `0 0 40px ${FAMILY_COLOR[data.family]}`,
-        opacity: 0.6,
+        textShadow: `0 0 18px ${FAMILY_COLOR[data.family]}, 0 0 50px ${FAMILY_COLOR[data.family]}`,
+        opacity: 0.5,
       }}
     >
       {data.label}
@@ -53,7 +51,7 @@ function ClusterLabelNode({ data }: { data: ClusterLabelDef }) {
 const CLUSTER_LABEL_NODES: Node[] = CLUSTER_LABELS.map((lbl) => ({
   id: lbl.id,
   type: "clusterLabel",
-  position: { x: lbl.x, y: lbl.y - 60 },
+  position: { x: lbl.x, y: lbl.y - 240 },
   data: lbl,
   selectable: false,
   draggable: false,
@@ -87,11 +85,12 @@ function buildStyledEdges(rawEdges: Edge[], nodeStatuses: Record<string, string>
         type: "straight" as const,
         style: {
           stroke: isCompleted
-            ? "rgba(34,211,238,0.35)"
+            ? "rgba(34,211,238,0.50)"
             : isActive
-            ? "rgba(34,211,238,0.18)"
-            : "rgba(90,90,115,0.22)",
-          strokeWidth: 0.7,
+            ? "rgba(34,211,238,0.28)"
+            : "rgba(70,70,100,0.28)",
+          strokeWidth: isCompleted ? 2.5 : 1.5,
+          filter: isCompleted ? "drop-shadow(0 0 4px rgba(34,211,238,0.6))" : "none",
         },
         animated: false,
       };
@@ -103,7 +102,7 @@ function buildStyledEdges(rawEdges: Edge[], nodeStatuses: Record<string, string>
         return {
           ...edge,
           type: "straight" as const,
-          style: { stroke: "rgba(100,100,140,0.45)", strokeWidth: 1.5, strokeDasharray: "10 6" },
+          style: { stroke: "rgba(70,70,100,0.35)", strokeWidth: 3, strokeDasharray: "14 8" },
           animated: false,
         };
       }
@@ -111,8 +110,11 @@ function buildStyledEdges(rawEdges: Edge[], nodeStatuses: Record<string, string>
         ...edge,
         type: "straight" as const,
         style: {
-          stroke: isCompleted ? "rgba(34,211,238,0.9)" : "rgba(34,211,238,0.6)",
-          strokeWidth: isCompleted ? 3 : 2.5,
+          stroke: isCompleted ? "rgba(34,211,238,0.95)" : "rgba(34,211,238,0.70)",
+          strokeWidth: isCompleted ? 6 : 5,
+          filter: isCompleted
+            ? "drop-shadow(0 0 8px rgba(34,211,238,0.95))"
+            : "drop-shadow(0 0 5px rgba(34,211,238,0.60))",
         },
         animated: false,
       };
@@ -121,14 +123,19 @@ function buildStyledEdges(rawEdges: Edge[], nodeStatuses: Record<string, string>
     // ── Within-cluster spine ring — bezier for smooth arc look ───────────────
     return {
       ...edge,
-      type: "default" as const,
+      type: "straight" as const,
       style: {
         stroke: isCompleted
-          ? "rgba(34,211,238,0.7)"
+          ? "rgba(34,211,238,0.80)"
           : isActive
-          ? "rgba(34,211,238,0.45)"
-          : "rgba(100,100,130,0.55)",
-        strokeWidth: isCompleted ? 2 : isActive ? 1.8 : 1.4,
+          ? "rgba(34,211,238,0.50)"
+          : "rgba(70,70,100,0.40)",
+        strokeWidth: isCompleted ? 4.5 : isActive ? 3.5 : 2.5,
+        filter: isCompleted
+          ? "drop-shadow(0 0 5px rgba(34,211,238,0.75))"
+          : isActive
+          ? "drop-shadow(0 0 3px rgba(34,211,238,0.45))"
+          : "none",
       },
       animated: false,
     };
@@ -202,59 +209,70 @@ export function ScaleTreeView() {
   }, [setSelectedNodeId]);
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl bg-zinc-950">
-      {/* Background — matches sign-in aesthetic */}
+    <div className="relative h-full w-full overflow-hidden rounded-xl" style={{ background: "#02020a" }}>
+      {/* Background */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 h-[60%] w-[80%] bg-cyan-500/5 blur-[120px] rounded-[100%]" />
-        <div className="absolute left-[5%] bottom-[15%] h-[40%] w-[35%] bg-violet-500/4 blur-[100px] rounded-[100%]" />
-        <div className="absolute right-[10%] top-[25%] h-[35%] w-[30%] bg-amber-500/3 blur-[100px] rounded-[100%]" />
-        <svg className="absolute inset-0 w-full h-full opacity-[0.025]">
+        {/* Ambient glow orbs */}
+        <div className="absolute left-1/2 top-[-10%] -translate-x-1/2 h-[75%] w-[90%] rounded-[100%]"
+          style={{ background: "radial-gradient(ellipse, rgba(34,211,238,0.07) 0%, transparent 70%)", filter: "blur(60px)" }} />
+        <div className="absolute left-[3%] bottom-[5%] h-[55%] w-[45%] rounded-[100%]"
+          style={{ background: "radial-gradient(ellipse, rgba(167,139,250,0.06) 0%, transparent 70%)", filter: "blur(80px)" }} />
+        <div className="absolute right-[3%] top-[15%] h-[50%] w-[40%] rounded-[100%]"
+          style={{ background: "radial-gradient(ellipse, rgba(245,158,11,0.05) 0%, transparent 70%)", filter: "blur(80px)" }} />
+        {/* Dot grid pattern */}
+        <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.035 }}>
           <defs>
-            <pattern id="scale-tree-bg" x="0" y="0" width="160" height="160" patternUnits="userSpaceOnUse" patternTransform="rotate(-15)">
-              <g transform="translate(20, 20)">
-                <Guitar size={32} strokeWidth={1.5} />
-              </g>
-              <g transform="translate(100, 40)">
-                <Music size={28} strokeWidth={1.5} />
-              </g>
-              <g transform="translate(40, 100)">
-                <TbGuitarPick size={30} />
-              </g>
-              <g transform="translate(110, 110)">
-                <Headphones size={32} strokeWidth={1.5} />
-              </g>
+            <pattern id="scale-tree-dots" x="0" y="0" width="36" height="36" patternUnits="userSpaceOnUse">
+              <circle cx="18" cy="18" r="0.9" fill="rgba(200,220,255,1)" />
             </pattern>
           </defs>
-          <rect x="0" y="0" width="100%" height="100%" fill="url(#scale-tree-bg)" />
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#scale-tree-dots)" />
         </svg>
+        {/* Subtle scanline vignette */}
+        <div className="absolute inset-0" style={{
+          background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,6,0.55) 100%)",
+        }} />
       </div>
 
       {/* Header stats */}
-      <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-1.5 backdrop-blur-sm">
-        <GitBranch className="h-3.5 w-3.5 text-cyan-400" />
-        <span className="text-xs font-medium text-zinc-300">
-          {completedCount}/413 węzłów
+      <div
+        className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-lg px-3 py-1.5 backdrop-blur-md"
+        style={{
+          border: "1px solid rgba(34,211,238,0.18)",
+          background: "rgba(2,2,16,0.75)",
+          boxShadow: "0 0 24px rgba(34,211,238,0.06), inset 0 0 16px rgba(34,211,238,0.03)",
+        }}
+      >
+        <GitBranch className="h-3.5 w-3.5 text-cyan-400" style={{ filter: "drop-shadow(0 0 4px rgba(34,211,238,0.7))" }} />
+        <span className="text-xs font-light tracking-widest text-zinc-300">
+          {completedCount} <span className="text-zinc-600">/</span> 413
         </span>
         <button
           onClick={refreshProgress}
           disabled={isLoading}
-          className="ml-1 flex h-5 w-5 items-center justify-center rounded text-zinc-500 transition-colors hover:text-zinc-300 disabled:opacity-40"
-          title="Odśwież postęp"
+          className="ml-1 flex h-5 w-5 items-center justify-center rounded text-zinc-600 transition-colors hover:text-cyan-400 disabled:opacity-30"
+          title="Refresh progress"
         >
           <RefreshCw className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`} />
         </button>
       </div>
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 z-10 flex flex-col gap-1 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 backdrop-blur-sm">
+      <div
+        className="absolute bottom-4 left-4 z-10 flex flex-col gap-2 rounded-lg px-3 py-2.5 backdrop-blur-md"
+        style={{
+          border: "1px solid rgba(255,255,255,0.07)",
+          background: "rgba(2,2,16,0.75)",
+        }}
+      >
         {[
-          { color: "bg-amber-400",  label: "Pentatonika"       },
-          { color: "bg-cyan-400",   label: "Skala diatoniczna" },
-          { color: "bg-violet-400", label: "Tryb modalny"      },
-        ].map(({ color, label }) => (
+          { hex: "#f59e0b", glow: "rgba(245,158,11,0.65)",  label: "Pentatonic"     },
+          { hex: "#22d3ee", glow: "rgba(34,211,238,0.65)",   label: "Diatonic Scale" },
+          { hex: "#a78bfa", glow: "rgba(167,139,250,0.65)", label: "Modal Mode"      },
+        ].map(({ hex, glow, label }) => (
           <div key={label} className="flex items-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${color}`} />
-            <span className="text-[10px] text-zinc-400">{label}</span>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: hex, boxShadow: `0 0 6px ${glow}`, flexShrink: 0 }} />
+            <span className="text-[10px] font-light tracking-wide text-zinc-500">{label}</span>
           </div>
         ))}
       </div>
@@ -280,18 +298,18 @@ export function ScaleTreeView() {
       >
         <Controls
           showInteractive={false}
-          className="[&>button]:border-white/10 [&>button]:bg-zinc-900 [&>button]:text-zinc-400 [&>button:hover]:bg-zinc-800"
+          className="[&>button]:border-cyan-500/15 [&>button]:bg-black/70 [&>button]:text-zinc-500 [&>button:hover]:bg-black/90 [&>button:hover]:text-cyan-400"
         />
         <MiniMap
           nodeColor={(node) => {
             const s = (node.data as Record<string, unknown>).status as string;
             if (s === "completed") return "#22d3ee";
-            if (s === "in_progress") return "#0891b2";
-            if (s === "available") return "#3f3f46";
-            return "#27272a";
+            if (s === "in_progress") return "#0e7490";
+            if (s === "available") return "#2a2a38";
+            return "#111118";
           }}
-          maskColor="rgba(9,9,11,0.7)"
-          style={{ backgroundColor: "#18181b", border: "1px solid rgba(255,255,255,0.08)" }}
+          maskColor="rgba(2,2,10,0.80)"
+          style={{ backgroundColor: "#06060f", border: "1px solid rgba(34,211,238,0.12)" }}
         />
       </ReactFlow>
 
@@ -309,9 +327,9 @@ export function ScaleTreeView() {
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
-          className="absolute bottom-4 right-4 z-10 text-[10px] text-zinc-600 select-none"
+          className="absolute bottom-4 right-4 z-10 text-[9px] font-light tracking-widest uppercase text-zinc-700 select-none"
         >
-          Kliknij węzeł, aby ćwiczyć
+          Click a node to practice
         </motion.p>
       )}
     </div>

@@ -14,9 +14,9 @@ const ScaleTreePage: NextPageWithLayout = () => {
   return (
     <div className="flex h-[calc(100vh-8rem)] flex-col gap-4 lg:h-[calc(100vh-4rem)]">
       <div className="flex-shrink-0">
-        <h1 className="text-xl font-bold text-white">Drzewko Skali</h1>
+        <h1 className="text-xl font-bold text-white">Scale Tree</h1>
         <p className="text-sm text-zinc-400">
-          Poznaj gamy w tonacji C krok po kroku — od pentatoniki do trybów modalnych.
+          Explore scales in the key of C step by step — from pentatonics to modal modes.
         </p>
       </div>
 
@@ -29,7 +29,7 @@ const ScaleTreePage: NextPageWithLayout = () => {
 
 ScaleTreePage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId="scale-tree" subtitle="Drzewko Skali" variant="secondary">
+    <AppLayout pageId="scale-tree" subtitle="Scale Tree" variant="secondary">
       {page}
     </AppLayout>
   );
