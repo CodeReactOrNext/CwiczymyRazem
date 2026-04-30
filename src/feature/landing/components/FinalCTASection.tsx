@@ -1,8 +1,7 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
-import { m } from "framer-motion/m";
-import { useScroll, useTransform } from "framer-motion";
+import { m, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
