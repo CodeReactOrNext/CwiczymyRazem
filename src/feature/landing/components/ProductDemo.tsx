@@ -16,7 +16,7 @@ export const ProductDemo = () => {
                     muted
                     loop
                     playsInline
-                    preload="metadata"
+                    preload="none"
                 >
                     <source src="/demo.webm" type="video/webm" />
                     Your browser does not support the video tag.

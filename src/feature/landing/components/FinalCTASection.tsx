@@ -1,10 +1,12 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
-import { m, useScroll, useTransform } from "framer-motion";
+import { LazyMotion, m, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
+
+const loadFeatures = () => import("framer-motion").then((res) => res.domAnimation);
 
 export const FinalCTASection = () => {
   const sectionRef = useRef(null);
@@ -19,6 +21,7 @@ export const FinalCTASection = () => {
   const y2 = useTransform(scrollYProgress, [0, 1], [0, 50]);
 
   return (
+    <LazyMotion features={loadFeatures}>
     <section ref={sectionRef} className="relative py-32 bg-black overflow-hidden border-t border-white/5">
       {/* Background decoration - Dynamic Floating Glow */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -86,5 +89,6 @@ export const FinalCTASection = () => {
         </div>
       </div>
     </section>
+    </LazyMotion>
   );
 };
