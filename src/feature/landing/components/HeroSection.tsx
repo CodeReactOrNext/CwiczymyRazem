@@ -54,8 +54,8 @@ export const HeroSection = () => {
 
         {/* Floating Glow Animation (Flow) - hidden on mobile */}
         <div className="absolute inset-0 hidden md:block">
-          <div className="animate-glow-float-1 absolute -top-[15%] -left-[10%] w-[80%] h-[70%] bg-cyan-500/30 blur-[130px] rounded-full" />
-          <div className="animate-glow-float-2 absolute -bottom-[15%] -right-[10%] w-[80%] h-[70%] bg-orange-500/25 blur-[130px] rounded-full" />
+          <div className="animate-glow-float-1 will-change-transform absolute -top-[15%] -left-[10%] w-[80%] h-[70%] bg-cyan-500/30 blur-[100px] rounded-full" />
+          <div className="animate-glow-float-2 will-change-transform absolute -bottom-[15%] -right-[10%] w-[80%] h-[70%] bg-orange-500/25 blur-[100px] rounded-full" />
         </div>
       </div>
 
@@ -69,7 +69,7 @@ export const HeroSection = () => {
           {/* Header - Reduced Size */}
           <h1 className='text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-white leading-[1.1] mb-8 font-display'>
             The guitar practice tracker <br />
-            <span className='bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent'>built for real progress.</span>
+            <span className='bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent'>built for real progress.</span>
           </h1>
 
           <p className='max-w-2xl text-xl sm:text-2xl text-zinc-400 font-medium leading-relaxed mb-12 tracking-tight'>
@@ -87,7 +87,7 @@ export const HeroSection = () => {
               <div className="flex flex-col items-center">
                 <div className="relative p-[1px] overflow-hidden rounded-lg group">
                   {/* Vibrant Rotating Border Beam */}
-                  {!isDashboardLoading && <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)]" />}
+                  {!isDashboardLoading && <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] will-change-transform bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)]" />}
                   
                   <Button
                     onClick={handleGoToDashboard}
@@ -112,7 +112,7 @@ export const HeroSection = () => {
                       <Link href='/signup'>
                         <div className="relative p-[1px] overflow-hidden rounded-lg group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]">
                             {/* Vibrant Rotating Border Beam - Restored and Working */}
-                            <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
+                            <div className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] will-change-transform bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_70%,#22d3ee_100%)] opacity-100" />
                             
                             <Button className='relative h-14 px-8 bg-white hover:bg-zinc-50 text-black border-none font-bold text-base transition-all rounded-[7px] shadow-2xl overflow-hidden group/btn'>
                                 <span className="relative z-10 flex items-center gap-3 whitespace-nowrap">

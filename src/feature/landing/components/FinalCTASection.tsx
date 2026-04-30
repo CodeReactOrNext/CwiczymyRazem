@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "assets/components/ui/button";
-import { motion,useScroll, useTransform } from "framer-motion";
+import { m } from "framer-motion/m";
+import { useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRef } from "react";
@@ -22,7 +23,7 @@ export const FinalCTASection = () => {
     <section ref={sectionRef} className="relative py-32 bg-black overflow-hidden border-t border-white/5">
       {/* Background decoration - Dynamic Floating Glow */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <motion.div 
+        <m.div 
             animate={{ 
                 x: ['-5%', '5%'],
                 y: ['-2%', '8%'],
@@ -36,7 +37,7 @@ export const FinalCTASection = () => {
             }}
             className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-cyan-500 rounded-full blur-[140px] pointer-events-none" 
         />
-        <motion.div 
+        <m.div 
             animate={{ 
                 x: ['5%', '-5%'],
                 y: ['5%', '-5%'],
@@ -58,7 +59,7 @@ export const FinalCTASection = () => {
             <div className="max-w-4xl">
                 <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-8 font-display leading-[0.9] tracking-tighter">
                   Level up your <br />
-                  <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">future self.</span>
+                  <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent">future self.</span>
                 </h2>
 
                 <p className="text-lg sm:text-xl text-zinc-400 mb-12 max-w-2xl mx-auto font-medium leading-relaxed">

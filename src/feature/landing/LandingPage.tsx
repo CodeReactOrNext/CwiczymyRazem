@@ -1,22 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import type { faqQuestionInterface } from "feature/faq/components/FaqLayout";
-import { BlogSection } from "feature/landing/components/BlogSection";
-import { CookieBanner } from "feature/landing/components/CookieBanner";
-import { FaqSection } from "feature/landing/components/FaqSection";
-import { FinalCTASection } from "feature/landing/components/FinalCTASection";
-import { Footer } from "feature/landing/components/Footer";
 import { HeroSection } from "feature/landing/components/HeroSection";
-import { InteractiveExercisesSection } from "feature/landing/components/InteractiveExercisesSection";
 import { LandingSEO } from "feature/landing/components/LandingSEO";
-import { PracticePlansSection } from "feature/landing/components/PracticePlansSection";
 import { ProductDemo } from "feature/landing/components/ProductDemo";
-import { RoadmapSection } from "feature/landing/components/RoadmapSection";
-import { SessionSummarySection } from "feature/landing/components/SessionSummarySection";
-import { SongsLibrarySection } from "feature/landing/components/SongsLibrarySection";
-import { StatisticsSection } from "feature/landing/components/StatisticsSection";
-import { WhySection } from "feature/landing/components/WhySection";
 import type { BlogFrontmatter } from "lib/blog";
+
+const WhySection = dynamic(() => import("feature/landing/components/WhySection").then(m => m.WhySection));
+const InteractiveExercisesSection = dynamic(() => import("feature/landing/components/InteractiveExercisesSection").then(m => m.InteractiveExercisesSection));
+const StatisticsSection = dynamic(() => import("feature/landing/components/StatisticsSection").then(m => m.StatisticsSection));
+const SongsLibrarySection = dynamic(() => import("feature/landing/components/SongsLibrarySection").then(m => m.SongsLibrarySection));
+const PracticePlansSection = dynamic(() => import("feature/landing/components/PracticePlansSection").then(m => m.PracticePlansSection));
+const RoadmapSection = dynamic(() => import("feature/landing/components/RoadmapSection").then(m => m.RoadmapSection));
+const SessionSummarySection = dynamic(() => import("feature/landing/components/SessionSummarySection").then(m => m.SessionSummarySection));
+const FaqSection = dynamic(() => import("feature/landing/components/FaqSection").then(m => m.FaqSection));
+const BlogSection = dynamic(() => import("feature/landing/components/BlogSection").then(m => m.BlogSection));
+const FinalCTASection = dynamic(() => import("feature/landing/components/FinalCTASection").then(m => m.FinalCTASection));
+const Footer = dynamic(() => import("feature/landing/components/Footer").then(m => m.Footer));
+const CookieBanner = dynamic(() => import("feature/landing/components/CookieBanner").then(m => m.CookieBanner), { ssr: false });
 
 interface LandingPageProps {
   blogs: BlogFrontmatter[];

@@ -1,5 +1,6 @@
 import "styles/globals.css";
 
+import { LazyMotion, domAnimation } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TooltipProvider } from "assets/components/ui/tooltip";
@@ -105,7 +106,9 @@ const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppPropsWith
                        }} />
                        <NextTopLoader color='#06b6d4' />
                        <div id='overlays'></div>
-                       {getLayout(<Component {...pageProps} />)}
+                       <LazyMotion features={domAnimation}>
+                         {getLayout(<Component {...pageProps} />)}
+                       </LazyMotion>
                     </div>
                  </TooltipProvider>
               </AuthSyncWrapper>

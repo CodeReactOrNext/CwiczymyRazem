@@ -3,7 +3,8 @@
 import { exercisesAgregat } from "feature/exercisePlan/data/exercisesAgregat";
 import { defaultPlans } from "feature/exercisePlan/data/plansAgregat";
 import { Footer } from "feature/landing/components/Footer";
-import { motion, useInView } from "framer-motion";
+import { m } from "framer-motion/m";
+import { useInView } from "framer-motion";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -82,7 +83,7 @@ function StepSection({
   const isEven = index % 2 === 0;
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial={{ opacity: 0, y: 50 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -149,7 +150,7 @@ function StepSection({
           />
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -193,7 +194,7 @@ export const HowItWorksPage = () => {
       {/* ── Hero ── */}
       <section className="pt-16 pb-16 px-6 lg:px-10 border-b border-white/5">
         <div className="mx-auto max-w-7xl">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -222,7 +223,7 @@ export const HowItWorksPage = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -238,7 +239,7 @@ export const HowItWorksPage = () => {
       {/* ── Final CTA ── */}
       <section className="border-t border-white/5 py-28 px-6 lg:px-10">
         <div className="mx-auto max-w-7xl">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
@@ -271,7 +272,7 @@ export const HowItWorksPage = () => {
                 Start practicing
               </Link>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
