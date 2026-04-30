@@ -5,7 +5,6 @@ import { Logo } from "components/Logo/Logo";
 import { GoogleOneTap } from "feature/user/components/GoogleOneTap/GoogleOneTap";
 import { selectIsFetching, selectUserAuth } from "feature/user/store/userSlice";
 import { logInViaGoogle } from "feature/user/store/userSlice.asyncThunk";
-import { motion } from "framer-motion";
 import { ArrowRight,LayoutDashboard, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,7 +44,7 @@ export const HeroSection = () => {
         <div className='absolute inset-0 select-none opacity-50'>
           <div className='absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black z-10'></div>
           <Image
-            src='/images/hero-image.png'
+            src='/images/hero-image.webp'
             alt='Guitarist practicing'
             fill
             className='object-cover object-center grayscale'
@@ -53,38 +52,10 @@ export const HeroSection = () => {
           />
         </div>
 
-        {/* Floating Glow Animation (Flow) - hidden on mobile, fade-in on desktop */}
+        {/* Floating Glow Animation (Flow) - hidden on mobile */}
         <div className="absolute inset-0 hidden md:block">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{
-              x: ['-15%', '15%'],
-              y: ['-10%', '10%'],
-              opacity: [0.2, 0.4, 0.2]
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              repeatType: "mirror",
-              ease: "easeInOut"
-            }}
-            className="absolute -top-[15%] -left-[10%] w-[80%] h-[70%] bg-cyan-500/30 blur-[130px] rounded-full"
-          />
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{
-              x: ['15%', '-15%'],
-              y: ['10%', '-10%'],
-              opacity: [0.15, 0.35, 0.15]
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              repeatType: "mirror",
-              ease: "easeInOut"
-            }}
-            className="absolute -bottom-[15%] -right-[10%] w-[80%] h-[70%] bg-orange-500/25 blur-[130px] rounded-full"
-          />
+          <div className="animate-glow-float-1 absolute -top-[15%] -left-[10%] w-[80%] h-[70%] bg-cyan-500/30 blur-[130px] rounded-full" />
+          <div className="animate-glow-float-2 absolute -bottom-[15%] -right-[10%] w-[80%] h-[70%] bg-orange-500/25 blur-[130px] rounded-full" />
         </div>
       </div>
 

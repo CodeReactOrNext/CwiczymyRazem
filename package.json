@@ -16,6 +16,21 @@
     "export-exercises": "vitest run scripts/exportExercises.test.ts",
     "knip": "knip"
   },
+  "browserslist": {
+    "production": [
+      "chrome >= 87",
+      "edge >= 88",
+      "firefox >= 78",
+      "safari >= 14",
+      "not dead",
+      "not IE 11"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "browser": {
     "fs": false,
     "path": false,
