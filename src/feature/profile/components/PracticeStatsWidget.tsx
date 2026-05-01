@@ -49,6 +49,15 @@ const formatMin = (ms: number) => {
   return rem > 0 ? `${h}h ${rem}m` : `${h}h`;
 };
 
+const formatBarLabel = (ms: number) => {
+  const m = Math.floor(ms / 60000);
+  if (m === 0) return "";
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60);
+  const rem = m % 60;
+  return rem > 0 ? `${h}h${rem}m` : `${h}h`;
+};
+
 const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
   const data = payload[0]?.payload;
@@ -172,7 +181,7 @@ export const PracticeStatsWidget = ({
         {/* Chart */}
         <div className="flex-1 min-h-[130px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 6, right: 28, bottom: 0, left: 0 }} barCategoryGap="20%">
+            <BarChart data={chartData} margin={{ top: 18, right: 28, bottom: 0, left: 0 }} barCategoryGap="20%">
               <XAxis
                 dataKey="day"
                 axisLine={false}
@@ -276,7 +285,26 @@ export const PracticeStatsWidget = ({
                     fill = "rgba(255,255,255,0.06)";
                   }
 
-                  return <rect x={x} y={y} width={width} height={height} fill={fill} rx={3} ry={3} />;
+                  const labelColor = payload.isGoalMet ? "#4ade80" : "rgb(6,182,212)";
+                  const label = formatBarLabel(payload.totalMs);
+
+                  return (
+                    <g>
+                      <rect x={x} y={y} width={width} height={height} fill={fill} rx={3} ry={3} />
+                      {label && (
+                        <text
+                          x={x + width / 2}
+                          y={y - 5}
+                          textAnchor="middle"
+                          fontSize={8}
+                          fontWeight={700}
+                          fill={labelColor}
+                        >
+                          {label}
+                        </text>
+                      )}
+                    </g>
+                  );
                 }}
               />
             </BarChart>
