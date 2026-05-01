@@ -142,7 +142,7 @@ export const PracticeStatsWidget = ({
 
   return (
     <Card className={cn("flex flex-col border-0 bg-zinc-800/40 shadow-sm backdrop-blur-sm", className)}>
-      <div className="flex flex-col flex-1 p-5 gap-4">
+      <div className="flex flex-col flex-1 gap-4">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -224,8 +224,8 @@ export const PracticeStatsWidget = ({
                       )}
                       {showX && (
                         <g>
-                          <line x1={cx - 3} y1={iconY - 3} x2={cx + 3} y2={iconY + 3} stroke="#52525b" strokeWidth={1.6} strokeLinecap="round" />
-                          <line x1={cx + 3} y1={iconY - 3} x2={cx - 3} y2={iconY + 3} stroke="#52525b" strokeWidth={1.6} strokeLinecap="round" />
+                          <line x1={cx - 3} y1={iconY - 3} x2={cx + 3} y2={iconY + 3} stroke="#ef4444" strokeOpacity={0.6} strokeWidth={1.6} strokeLinecap="round" />
+                          <line x1={cx + 3} y1={iconY - 3} x2={cx - 3} y2={iconY + 3} stroke="#ef4444" strokeOpacity={0.6} strokeWidth={1.6} strokeLinecap="round" />
                         </g>
                       )}
                     </g>
@@ -255,15 +255,27 @@ export const PracticeStatsWidget = ({
                 dataKey="minutes"
                 maxBarSize={36}
                 isAnimationActive={false}
+                background={{ fill: "rgba(255,255,255,0.03)", radius: 3 }}
                 shape={(props: any) => {
                   const { x, y, width, height, payload } = props;
-                  if (!width || !height) return <g />;
-                  const fill =
-                    payload.minutes === 0
-                      ? "rgba(255,255,255,0.06)"
-                      : payload.isGoalMet
-                      ? "rgba(74,222,128,0.75)"
-                      : "rgba(6,182,212,0.6)";
+                  const isUnfulfilled = !payload.isGoalMet && !payload.isFuture && !payload.isToday;
+                  
+                  if (!width || !height) {
+                    if (isUnfulfilled) {
+                      return <rect x={x} y={y - 2} width={width || 36} height={2} fill="rgba(239, 68, 68, 0.3)" rx={1} ry={1} />;
+                    }
+                    return <g />;
+                  }
+
+                  let fill = "rgba(6,182,212,0.6)";
+                  if (payload.isGoalMet) {
+                    fill = "rgba(74,222,128,0.75)";
+                  } else if (isUnfulfilled) {
+                    fill = "rgba(239, 68, 68, 0.4)";
+                  } else if (payload.minutes === 0) {
+                    fill = "rgba(255,255,255,0.06)";
+                  }
+
                   return <rect x={x} y={y} width={width} height={height} fill={fill} rx={3} ry={3} />;
                 }}
               />
