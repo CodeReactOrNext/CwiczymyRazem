@@ -12,30 +12,22 @@ import {
   selectUserName,
 } from "feature/user/store/userSlice";
 import { logUserOff } from "feature/user/store/userSlice.asyncThunk";
-import { AnimatePresence,motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useFeedbackPrompt } from "hooks/useFeedbackPrompt";
 import { useTranslation } from "hooks/useTranslation";
 import {
   Activity,
   BarChart2,
-  Brain,
   Calendar,
-  Dumbbell,
-  FileMusic,
-  FileText,
-  LayoutGrid,
+  Home,
   ListChecks,
   LogOut,
-  Map,
   MessageSquarePlus,
   Music,
-  Route,
   Settings,
-  Sparkles,
   Swords,
   Timer,
   Trophy,
-  User,
   Video,
   X,
 } from "lucide-react";
@@ -47,7 +39,6 @@ import { useState } from "react";
 import { FaDiscord } from "react-icons/fa";
 import { useAppDispatch, useAppSelector } from "store/hooks";
 import type { NavPagesTypes } from "types/layout.types";
-import { getPointsToLvlUp } from "utils/gameLogic/getPointsToLvlUp";
 
 import { CommunityModal } from "./CommunityModal";
 
@@ -63,7 +54,7 @@ interface RockSidebarProps {
   pageId: NavPagesTypes;
 }
 
-const RockSidebar = ({  pageId }: RockSidebarProps) => {
+const RockSidebar = ({ pageId }: RockSidebarProps) => {
   const { t } = useTranslation("common");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
@@ -72,56 +63,35 @@ const RockSidebar = ({  pageId }: RockSidebarProps) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  // User data
   const userStats = useAppSelector(selectCurrentUserStats);
   const userName = useAppSelector(selectUserName);
   const userAvatar = useAppSelector(selectUserAvatar);
   const userInfo = useAppSelector(selectUserInfo);
 
- 
-  // Get current route to determine active profile section
   const getActiveProfileSection = () => {
-    const { pathname, query } = router;
-    if (pathname === "/dashboard" || pathname === "/profile") return "profile";
-    if (pathname.startsWith("/profile/activity")) return "activity";
-    if (pathname.startsWith("/profile/skills")) return "skills";
-    if (pathname.startsWith("/profile/exercises")) return "exercises";
-    if (pathname.startsWith("/songs")) {
-      const view = query.view || "library";
-      if (view === "library") return "library";
-      if (view === "management") return "my_songs";
-      return "library";
-    }
-    if (pathname === "/timer") return "timer";
-    if (pathname === "/ai-coach") return "ai-coach";
-    if (pathname === "/practice-finder") return "practice-finder";
-    if (pathname === "/summary") return "summary";
-    if (pathname.startsWith("/report")) return "report";
-    if (pathname.startsWith("/leaderboard")) return "leaderboard";
+    const { pathname } = router;
+    if (pathname === "/dashboard" || pathname === "/profile") return "home";
+    if (pathname.startsWith("/timer")) return "practice";
+    if (pathname.startsWith("/songs")) return "songs";
+    if (pathname.startsWith("/profile/activity")) return "progress";
     if (pathname.startsWith("/seasons")) return "seasons";
+    
+    // Secondary matches
+    if (pathname === "/summary") return "summary";
+    if (pathname.startsWith("/leaderboard")) return "leaderboard";
     if (pathname.startsWith("/settings")) return "settings";
-    if (pathname.startsWith("/plans")) return "my-plans";
-    if (pathname.startsWith("/gp-tabs")) return "gp-tabs";
+    if (pathname.startsWith("/plans")) return "plans";
     if (pathname.startsWith("/arsenal")) return "arsenal";
-    if (pathname.startsWith("/journey")) return "journey";
-    if (pathname.startsWith("/scale-tree")) return "scale-tree";
+    if (pathname.startsWith("/recordings")) return "recordings";
     return null;
   };
 
   const activeId = getActiveProfileSection();
 
   const isLinkActive = (id: string | null, href: string) => {
-    // 1. If we have a specific active item identified, strictly match it
-    if (activeId) {
-        return activeId === id;
-    }
-    
-    // 2. Fallback to pageId passed from layout (for pages without explicit mapping)
+    if (activeId) return activeId === id;
     if (id === pageId && pageId !== null) return true;
-
-    // 3. Final fallback: simple path check (avoiding root)
     if (href !== "/" && router.pathname === href) return true;
-    
     return false;
   };
 
@@ -129,371 +99,223 @@ const RockSidebar = ({  pageId }: RockSidebarProps) => {
     setIsMobileOpen(false);
   };
 
-  // Main navigation structure
   const mainNavigation = [
-    {
-      id: "profile" as NavPagesTypes,
-      name: "Profile",
-      href: "/dashboard",
-      icon: <User size={18} />,
-    },
-    {
-      id: "activity",
-      name: "Activity",
-      href: "/profile/activity",
-      icon: <Activity size={16} />,
-    },
-    {
-      id: "leaderboard" as NavPagesTypes,
-      name: "Leaderboard",
-      href: "/leaderboard",
-      icon: <Trophy size={16} />,
-    },
-    {
-      id: "seasons" as NavPagesTypes,
-      name: "Seasons",
-      href: "/seasons",
-      icon: <Calendar size={16} />,
-    },
+    { id: "home", name: "Home", href: "/dashboard", icon: <Home size={18} /> },
+    { id: "practice", name: "Practice", href: "/timer", icon: <Timer size={18} /> },
+    { id: "songs", name: "Songs", href: "/songs?view=management", icon: <Music size={18} /> },
+    { id: "progress", name: "Progress", href: "/profile/activity", icon: <Activity size={18} /> },
+    { id: "seasons", name: "Seasons", href: "/seasons", icon: <Calendar size={18} /> },
   ];
 
-  const practiceSections = [
-    {
-      id: "journey" as NavPagesTypes,
-      name: "Journey",
-      href: "/journey",
-      icon: <Route size={16} />,
-    },
-    {
-      id: "timer" as NavPagesTypes,
-      name: "Practice",
-      href: "/timer",
-      icon: <Timer size={18} />,
-    },
-    {
-      id: "exercises",
-      name: "Plans",
-      href: "/profile/exercises",
-      icon: <Dumbbell size={16} />,
-    },
-    {
-      id: "my-plans" as NavPagesTypes,
-      name: "My Plans",
-      href: "/plans",
-      icon: <ListChecks size={16} />,
-    },
-    {
-      id: "skills",
-      name: "Skills",
-      href: "/profile/skills",
-      icon: <Brain size={16} />,
-    },
-    {
-      id: "report" as NavPagesTypes,
-      name: "Reports",
-      href: "/report",
-      icon: <FileText size={18} />,
-    },
-    {
-      id: "ai-coach" as NavPagesTypes,
-      name: "Roadmap",
-      href: "/ai-coach",
-      icon: <Map size={18} className="text-zinc-500" />,
-    },
-    {
-      id: "practice-finder" as NavPagesTypes,
-      name: "Practice Finder",
-      href: "/practice-finder",
-      icon: <Sparkles size={16} />,
-    },
-    {
-      id: "summary" as NavPagesTypes,
-      name: "Summary",
-      href: "/summary",
-      icon: <BarChart2 size={16} />,
-    },
+  const toolsNavigation = [
+    { id: "plans", name: "My Plans", href: "/plans", icon: <ListChecks size={16} /> },
+    { id: "arsenal", name: "Guitar Arsenal", href: "/arsenal", icon: <Swords size={16} /> },
+    { id: "summary", name: "Summary", href: "/summary", icon: <BarChart2 size={16} /> },
   ];
 
-  const songsSections = [
-    {
-      id: "library" as NavPagesTypes,
-      name: "Library",
-      href: "/songs?view=library",
-      icon: <Music size={16} />,
-    },
-    {
-      id: "my_songs" as NavPagesTypes,
-      name: "My Songs",
-      href: "/songs?view=management",
-      icon: <LayoutGrid size={16} />,
-    },
-    {
-      id: "gp-tabs" as NavPagesTypes,
-      name: "GP Tabs",
-      href: "/gp-tabs",
-      icon: <FileMusic size={16} />,
-    },
-    {
-      id: "recordings" as NavPagesTypes,
-      name: "Recordings",
-      href: "/recordings",
-      icon: <Video size={16} />,
-    },
+  const otherNavigation = [
+    { id: "leaderboard", name: "Leaderboard", href: "/leaderboard", icon: <Trophy size={16} /> },
+    { id: "recordings", name: "Recordings", href: "/recordings", icon: <Video size={16} /> },
+    { id: "settings", name: "Settings", href: "/settings", icon: <Settings size={16} /> },
   ];
 
-  const otherSections = [
-    {
-      id: "arsenal" as NavPagesTypes,
-      name: "Guitar Arsenal",
-      href: "/arsenal",
-      icon: <Swords size={16} />,
-    },
-    {
-      id: "settings" as NavPagesTypes,
-      name: "Settings",
-      href: "/settings",
-      icon: <Settings size={16} />,
-    },
-  ];
+  const renderNavLinks = (
+    items: { id: string; name: string; href: string; icon: React.ReactNode }[],
+    onClick?: () => void
+  ) =>
+    items.map(({ id, name, href, icon }) => {
+      const isActive = isLinkActive(id, href);
+      return (
+        <Link
+          key={id}
+          href={href}
+          onClick={onClick}
+          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
+            isActive
+              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
+              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
+          }`}>
+          <span className={isActive ? "text-cyan-400" : "text-zinc-500"}>{icon}</span>
+          <span className="flex-1">{name}</span>
+          {isActive && <div className="h-2 w-2 rounded-full bg-cyan-400" />}
+        </Link>
+      );
+    });
+
+  const renderSectionLabel = (label: string) => (
+    <div className="mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+      {label}
+    </div>
+  );
+
+  const userProfileSection = (mobile?: boolean) => {
+    if (!userStats || !userName) return null;
+
+    if (mobile) {
+      return (
+        <div className="border-b border-white/10 p-4">
+          <div className="flex items-center gap-3">
+            <Avatar
+              avatarURL={userAvatar}
+              name={userName}
+              lvl={userStats.lvl}
+              selectedFrame={userInfo?.selectedFrame}
+              selectedGuitar={userInfo?.selectedGuitar}
+              guitarYear={userInfo?.selectedGuitarYear}
+              guitarCountry={userInfo?.selectedGuitarCountry}
+            />
+            <div className="min-w-0 flex-1">
+              <span className="truncate text-[15px] font-bold text-white tracking-wide">
+                {userName}
+              </span>
+              <div className="mt-2 flex items-center gap-2">
+                <Link
+                  href="/settings"
+                  onClick={handleLinkClick}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
+                  title={t("button.edit")}>
+                  <Settings size={14} />
+                </Link>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white">
+                  <CopyLinkProfile mode="icon" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="p-4">
+        <div className="flex items-center gap-3">
+          <Avatar
+            avatarURL={userAvatar}
+            name={userName}
+            lvl={userStats.lvl}
+            selectedFrame={userInfo?.selectedFrame}
+            selectedGuitar={userInfo?.selectedGuitar as number}
+            guitarYear={userInfo?.selectedGuitarYear}
+            guitarCountry={userInfo?.selectedGuitarCountry}
+          />
+          <div className="min-w-0 flex-1 flex flex-col justify-center">
+            <span className="truncate text-[15px] font-bold text-white tracking-wide">
+              {userName}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const navContent = (mobile?: boolean) => (
+    <nav
+      className={`flex-1 space-y-6 overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent ${
+        mobile ? "pb-20" : ""
+      }`}>
+      <div>
+        {renderSectionLabel("Navigation")}
+        <div className="space-y-1">{renderNavLinks(mainNavigation, mobile ? handleLinkClick : undefined)}</div>
+      </div>
+
+      <Separator className="bg-white/10" />
+
+      <div>
+        {renderSectionLabel("Tools")}
+        <div className="space-y-1">{renderNavLinks(toolsNavigation, mobile ? handleLinkClick : undefined)}</div>
+      </div>
+
+      <Separator className="bg-white/10" />
+
+      <div>
+        {renderSectionLabel("Other")}
+        <div className="space-y-1">{renderNavLinks(otherNavigation, mobile ? handleLinkClick : undefined)}</div>
+      </div>
+
+      <Separator className="bg-white/10" />
+
+      <div>
+        {renderSectionLabel("Community")}
+        <div className="space-y-1">
+          <button
+            onClick={() => {
+              if (mobile) handleLinkClick();
+              setIsFeedbackOpen(true);
+            }}
+            className="flex w-full items-center gap-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2.5 text-sm font-medium transition-all duration-200 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300">
+            <span className="text-cyan-500">
+              <MessageSquarePlus size={16} />
+            </span>
+            <span>Send Feedback</span>
+          </button>
+
+          <a
+            href="https://discord.gg/6yJmsZW2Ne"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={mobile ? handleLinkClick : undefined}
+            className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+            <span className="text-zinc-500">
+              <FaDiscord size={16} />
+            </span>
+            <span>{t("nav.discord")}</span>
+          </a>
+
+          <button
+            onClick={() => {
+              if (mobile) handleLinkClick();
+              setIsCommunityModalOpen(true);
+            }}
+            className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300">
+            <span className="text-rose-500">
+              <Heart size={16} fill="currentColor" />
+            </span>
+            <span>Grow Riff Quest</span>
+          </button>
+        </div>
+      </div>
+
+      {mobile && (
+        <>
+          <Separator className="bg-white/10" />
+          <button
+            onClick={() => {
+              handleLinkClick();
+              dispatch(logUserOff());
+            }}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 mb-12">
+            <span className="text-zinc-500">
+              <LogOut size={16} />
+            </span>
+            <span>Sign Out</span>
+          </button>
+        </>
+      )}
+    </nav>
+  );
 
   return (
     <>
-      {/* Mobile Bottom Navigation */}
       <MobileBottomNav onMenuClick={() => setIsMobileOpen(true)} />
 
       {/* Desktop Sidebar */}
-      <aside className='hidden h-full border-r border-white/10 bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col'>
-        {/* Brand Header */}
-        <div className='border-b border-white/10 p-4'>
-          <div className='flex items-center gap-3'>
-            <div className='flex h-9 w-9 items-center justify-center'>
-              <Image
-                src='/images/logolight.svg'
-                alt='Logo'
-                width={32}
-                height={32}
-                className='h-8 w-8'
-              />
+      <aside className="hidden h-full border-r border-white/10 bg-card backdrop-blur-xl lg:flex lg:w-64 lg:flex-col">
+        <div className="border-b border-white/10 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center">
+              <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
             </div>
             <div>
-              <h2 className='text-sm font-semibold text-white'>
-                Rifff Quest
-              </h2>
+              <h2 className="text-sm font-semibold text-white">Rifff Quest</h2>
             </div>
-            <div className='ml-auto'>
-                <NotificationsBell />
+            <div className="ml-auto">
+              <NotificationsBell />
             </div>
           </div>
         </div>
 
-        {/* User Profile Section */}
-        {userStats && userName && (() => {
-          const currentLvlPoints = getPointsToLvlUp(userStats.lvl - 1);
-          const nextLvlPoints = getPointsToLvlUp(userStats.lvl);
-          const pointsInCurrentLvl = userStats.points - currentLvlPoints;
-          const pointsNeededForNextLvl = nextLvlPoints - currentLvlPoints;
-          const progress = Math.min(Math.max((pointsInCurrentLvl / pointsNeededForNextLvl) * 100, 0), 100);
-
-          return (
-            <div className='p-4'>
-                  <div className='flex items-center gap-3'>
-                    <div className='relative'>
-                      <Avatar
-                        avatarURL={userAvatar}
-                        name={userName}
-                        lvl={userStats.lvl}
-                        selectedFrame={userInfo?.selectedFrame}
-                        selectedGuitar={userInfo?.selectedGuitar as number}
-                        guitarYear={userInfo?.selectedGuitarYear}
-                        guitarCountry={userInfo?.selectedGuitarCountry}
-                      />
-                    </div>
-
-
-                <div className='min-w-0 flex-1 flex flex-col justify-center'>
-                  <span className='truncate text-[15px] font-bold text-white tracking-wide'>
-                    {userName}
-                  </span>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* Navigation */}
-        <nav className='flex-1 space-y-6 overflow-y-auto p-4 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent'>
-          {/* Main Navigation */}
-          <div>
-            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-              Main
-            </div>
-            <div className='space-y-1'>
-              {mainNavigation.map(({ id, name, href, icon }) => {
-                const isActive = isLinkActive(id, href);
-                return (
-                  <Link
-                    key={id}
-                    href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
-                      isActive
-                        ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                        : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                    }`}>
-                    <span
-                      className={isActive ? "text-cyan-400" : "text-zinc-500"}>
-                      {icon}
-                    </span>
-                    <span className="flex-1">{name}</span>
-                    {isActive && (
-                      <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          <Separator className='bg-white/10' />
-
-          {/* Practice Section */}
-          <div>
-            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-              Practice
-            </div>
-            <div className='space-y-1'>
-              {practiceSections.map(({ id, name, href, icon }) => {
-                const isActive = isLinkActive(id, href);
-                return (
-                  <Link
-                    key={id}
-                    href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
-                      isActive
-                        ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                        : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                    }`}>
-                    <span
-                      className={isActive ? "text-cyan-400" : "text-zinc-500"}>
-                      {icon}
-                    </span>
-                    <span className="flex-1">{name}</span>
-                    
-                    {isActive && (
-                      <div className='h-2 w-2 rounded-full bg-cyan-400'></div>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          <Separator className='bg-white/10' />
-
-          {/* Songs Section */}
-          <div>
-            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-              Songs
-            </div>
-            <div className='space-y-1'>
-              {songsSections.map(({ id, name, href, icon }) => {
-                const isActive = isLinkActive(id, href);
-                return (
-                  <Link
-                    key={id}
-                    href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
-                      isActive
-                        ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                        : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                    }`}>
-                    <span
-                      className={
-                        isActive ? "text-cyan-400" : "text-zinc-500"
-                      }>
-                      {icon}
-                    </span>
-                    <span>{name}</span>
-                    {isActive && (
-                      <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          <Separator className='bg-white/10' />
-
-          {/* Other Section */}
-          <div>
-            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-              Other
-            </div>
-            <div className='space-y-1'>
-              {otherSections.map(({ id, name, href, icon }) => {
-                const isActive = isLinkActive(id, href);
-                return (
-                  <Link
-                    key={id}
-                    href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
-                      isActive
-                        ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                        : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                    }`}>
-                    <span
-                      className={isActive ? "text-cyan-400" : "text-zinc-500"}>
-                      {icon}
-                    </span>
-                    <span>{name}</span>
-                    {isActive && (
-                      <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          <Separator className='bg-white/10' />
-
-          {/* Community Section */}
-          <div>
-            <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-              Community
-            </div>
-            <div className='space-y-1'>
-              <button
-                onClick={() => setIsFeedbackOpen(true)}
-                className='flex w-full items-center gap-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2.5 text-sm font-medium transition-all duration-200 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300'>
-                <span className='text-cyan-500'>
-                  <MessageSquarePlus size={16} />
-                </span>
-                <span>Send Feedback</span>
-              </button>
-
-              <a
-                href='https://discord.gg/6yJmsZW2Ne'
-                target='_blank'
-                rel='noopener noreferrer'
-                className='flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
-                <span className='text-zinc-500'>
-                  <FaDiscord size={16} />
-                </span>
-                <span>{t("nav.discord")}</span>
-              </a>
-              <button
-                onClick={() => setIsCommunityModalOpen(true)}
-                className='flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
-                <span className='text-rose-500'>
-                  <Heart size={16} fill="currentColor" />
-                </span>
-                <span>Grow Riff Quest</span>
-              </button>
-            </div>
-          </div>
-
-        </nav>
+        {userProfileSection()}
+        {navContent()}
       </aside>
 
       {/* Mobile Sidebar Overlay */}
@@ -505,7 +327,7 @@ const RockSidebar = ({  pageId }: RockSidebarProps) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileOpen(false)}
-              className='fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden'
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
             />
 
             <motion.aside
@@ -513,307 +335,37 @@ const RockSidebar = ({  pageId }: RockSidebarProps) => {
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className='fixed left-0 top-0 z-50 flex h-[100dvh] w-72 flex-col border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden'>
-              {/* Header */}
-              <div className='flex items-center justify-between border-b border-white/10 p-4'>
-                <div className='flex items-center gap-3'>
-                  <div className='flex h-9 w-9 items-center justify-center'>
-                    <Image
-                      src='/images/logolight.svg'
-                      alt='Logo'
-                      width={32}
-                      height={32}
-                      className='h-8 w-8'
-                    />
+              className="fixed left-0 top-0 z-50 flex h-[100dvh] w-72 flex-col border-r border-white/10 bg-zinc-900/95 backdrop-blur-xl lg:hidden">
+              <div className="flex items-center justify-between border-b border-white/10 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center">
+                    <Image src="/images/logolight.svg" alt="Logo" width={32} height={32} className="h-8 w-8" />
                   </div>
                   <div>
-                    <h2 className='text-sm font-semibold text-white'>
-                      Rifff Quest
-                    </h2>
+                    <h2 className="text-sm font-semibold text-white">Rifff Quest</h2>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <NotificationsBell />
-                    <Button
-                    variant='ghost'
-                    size='icon'
+                  <NotificationsBell />
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setIsMobileOpen(false)}
-                    className='text-zinc-400 hover:bg-white/10 hover:text-white'>
+                    className="text-zinc-400 hover:bg-white/10 hover:text-white">
                     <X size={16} />
-                    </Button>
+                  </Button>
                 </div>
               </div>
 
-              {/* User Profile Section - Mobile */}
-              {userStats && userName && (() => {
-                const currentLvlPoints = getPointsToLvlUp(userStats.lvl - 1);
-                const nextLvlPoints = getPointsToLvlUp(userStats.lvl);
-                const pointsInCurrentLvl = userStats.points - currentLvlPoints;
-                const pointsNeededForNextLvl = nextLvlPoints - currentLvlPoints;
-                const progress = Math.min(Math.max((pointsInCurrentLvl / pointsNeededForNextLvl) * 100, 0), 100);
-
-                return (
-                  <div className='border-b border-white/10 p-4'>
-                    <div className='flex items-center gap-3'>
-                      <div className='relative'>
-                        <Avatar
-                          avatarURL={userAvatar}
-                          name={userName}
-                          lvl={userStats.lvl}
-                          selectedFrame={userInfo?.selectedFrame}
-                          selectedGuitar={userInfo?.selectedGuitar}
-                          guitarYear={userInfo?.selectedGuitarYear}
-                          guitarCountry={userInfo?.selectedGuitarCountry}
-                        />
-                      </div>
-
-                      <div className='min-w-0 flex-1'>
-                        <span className='truncate text-[15px] font-bold text-white tracking-wide'>
-                          {userName}
-                        </span>
-                        <div className='mt-2 flex items-center gap-2'>
-                          <Link 
-                            href="/settings" 
-                            onClick={handleLinkClick}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
-                            title={t("button.edit")}
-                          >
-                            <Settings size={14} />
-                          </Link>
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white">
-                            <CopyLinkProfile mode="icon" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                );
-              })()}
-
-              {/* Navigation - Mobile */}
-              <nav className='flex-1 space-y-6 overflow-y-auto p-4 pb-20 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-800 [&::-webkit-scrollbar-track]:bg-transparent'>
-                {/* Main Navigation */}
-                <div>
-                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-                    Main
-                  </div>
-                  <div className='space-y-1'>
-                    {mainNavigation.map(({ id, name, href, icon }) => {
-                      const isActive = isLinkActive(id, href);
-                      return (
-                        <Link
-                          key={id}
-                          href={href}
-                          onClick={handleLinkClick}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
-                            isActive
-                              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                          }`}>
-                          <span
-                            className={
-                              isActive ? "text-cyan-400" : "text-zinc-500"
-                            }>
-                            {icon}
-                          </span>
-                          <span>{name}</span>
-                          {isActive && (
-                            <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <Separator className='bg-white/10' />
-
-                {/* Practice Section - Mobile */}
-                <div>
-                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-                    Practice
-                  </div>
-                  <div className='space-y-1'>
-                    {practiceSections.map(({ id, name, href, icon }) => {
-                      const isActive = isLinkActive(id, href);
-
-                      return (
-                        <Link
-                          key={id}
-                          href={href}
-                          onClick={handleLinkClick}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
-                            isActive
-                              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                          }`}>
-                          <span
-                            className={
-                              isActive
-                                ? "text-cyan-400"
-                                : "text-zinc-500"
-                            }>
-                            {icon}
-                          </span>
-                          <span className="flex-1">{name}</span>
-                          
-                          {isActive && (
-                            <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <Separator className='bg-white/10' />
-
-                {/* Songs Section - Mobile */}
-                <div>
-                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-                    Songs
-                  </div>
-                  <div className='space-y-1'>
-                    {songsSections.map(({ id, name, href, icon }) => {
-                      const isActive = isLinkActive(id, href);
-                      return (
-                        <Link
-                          key={id}
-                          href={href}
-                          onClick={handleLinkClick}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
-                            isActive
-                              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                          }`}>
-                          <span
-                            className={
-                              isActive
-                                ? "text-cyan-400"
-                                : "text-zinc-500"
-                            }>
-                            {icon}
-                          </span>
-                          <span>{name}</span>
-                          {isActive && (
-                            <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <Separator className='bg-white/10' />
-
-                {/* Other Section */}
-                <div>
-                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-                    Other
-                  </div>
-                  <div className='space-y-1'>
-                    {otherSections.map(({ id, name, href, icon }) => {
-                      const isActive = isLinkActive(id, href);
-                      return (
-                        <Link
-                          key={id}
-                          href={href}
-                          onClick={handleLinkClick}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium border transition-all duration-200 ${
-                            isActive
-                              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-sm"
-                              : "border-transparent text-zinc-400 hover:bg-white/5 hover:text-zinc-300"
-                          }`}>
-                          <span
-                            className={
-                              isActive ? "text-cyan-400" : "text-zinc-500"
-                            }>
-                            {icon}
-                          </span>
-                          <span>{name}</span>
-                          {isActive && (
-                            <div className='ml-auto h-2 w-2 rounded-full bg-cyan-400'></div>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <Separator className='bg-white/10' />
-
-                {/* Community Section - Mobile */}
-                <div>
-                  <div className='mb-3 px-2 text-xs font-medium uppercase tracking-wide text-zinc-500'>
-                    Community
-                  </div>
-                  <div className='space-y-1'>
-                    <button
-                      onClick={() => {
-                        handleLinkClick();
-                        setIsFeedbackOpen(true);
-                      }}
-                      className='flex w-full items-center gap-3 rounded-lg border border-cyan-500/20 bg-cyan-500/5 px-3 py-2.5 text-sm font-medium transition-all duration-200 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300'>
-                      <span className='text-cyan-500'>
-                        <MessageSquarePlus size={16} />
-                      </span>
-                      <span>Send Feedback</span>
-                    </button>
-
-                    <a
-                      href='https://discord.gg/6yJmsZW2Ne'
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      onClick={handleLinkClick}
-                      className='flex items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
-                      <span className='text-zinc-500'>
-                        <FaDiscord size={16} />
-                      </span>
-                      <span>{t("nav.discord")}</span>
-                    </a>
-                    <button
-                      onClick={() => {
-                        handleLinkClick();
-                        setIsCommunityModalOpen(true);
-                      }}
-                      className='flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-white/5 hover:text-zinc-300'>
-                      <span className='text-rose-500'>
-                        <Heart size={16} fill="currentColor" />
-                      </span>
-                      <span>Grow Riff Quest</span>
-                    </button>
-                  </div>
-                </div>
-
-                
-                <Separator className='bg-white/10' />
-                
-                <button
-                    onClick={() => {
-                        handleLinkClick();
-                        dispatch(logUserOff());
-                    }}
-                    className='flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-zinc-400 hover:bg-red-500/10 hover:text-red-500 mb-12'>
-                    <span className='text-zinc-500 group-hover:text-red-500'>
-                        <LogOut size={16} />
-                    </span>
-                    <span>Sign Out</span>
-                </button>
-              </nav>
+              {userProfileSection(true)}
+              {navContent(true)}
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
-      <CommunityModal
-        isOpen={isCommunityModalOpen}
-        onClose={() => setIsCommunityModalOpen(false)}
-      />
-      <FeedbackModal
-        isOpen={isFeedbackOpen}
-        onClose={() => setIsFeedbackOpen(false)}
-      />
+      <CommunityModal isOpen={isCommunityModalOpen} onClose={() => setIsCommunityModalOpen(false)} />
+      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
       <FeedbackModal
         variant="prompt"
         isOpen={showFeedbackPrompt}

@@ -205,9 +205,15 @@ export const SkillDashboard = ({
     );
   }
 
+  const activeTab = (router.query.tab as string) || "skill-tree";
+
   return (
     <div className="w-full pb-24 flex flex-col">
-      <Tabs defaultValue="skill-tree" className="w-full">
+      <Tabs 
+        value={activeTab} 
+        onValueChange={(val) => router.push({ query: { ...router.query, tab: val } }, undefined, { shallow: true })} 
+        className="w-full"
+      >
         <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full pt-8">
           <TabsList className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded-lg p-1 w-fit h-auto">
             <TabsTrigger

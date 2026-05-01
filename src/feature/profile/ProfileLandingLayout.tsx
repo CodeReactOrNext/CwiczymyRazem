@@ -7,17 +7,15 @@ import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
-import { NavigationCards } from "feature/profile/components/NavigationCards/NavigationCards";
-import { StatsField } from "feature/profile/components/StatsField";
+import { PracticeStatsWidget } from "feature/profile/components/PracticeStatsWidget";
 import { getTrendData } from "feature/profile/utils/getTrendData";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { ArrowRight, Gem,Plus } from "lucide-react";
+import { ArrowRight, Gem } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { FaClock } from "react-icons/fa";
 import type { StatisticsDataInterface } from "types/api.types";
 import type { ProfileInterface } from "types/ProfileInterface";
 import { convertMsToHM } from "utils/converter";
@@ -37,7 +35,7 @@ const ProfileLandingLayout = ({
   userInfo,
 }: LandingLayoutProps) => {
   const router = useRouter();
-  const { datasWithReports, year, setYear, isLoading } = useActivityLog(userAuth);
+  const { datasWithReports, year, setYear, isLoading, reportList } = useActivityLog(userAuth);
   const [songs, setSongs] = useState<{ wantToLearn: Song[]; learning: Song[]; learned: Song[] }>();
 
   useEffect(() => {
@@ -172,17 +170,10 @@ const ProfileLandingLayout = ({
           <div className="flex flex-col gap-3">
             <div className="flex flex-row flex-wrap gap-3 items-center">
               <button
-                onClick={() => router.push("/plans/create")}
-                className="group/btn rounded-[8px] bg-zinc-800/80 backdrop-blur-md border border-white/10 text-white px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 hover:bg-zinc-700/80 active:scale-95"
-              >
-                Create plan
-                <Plus className="h-4 w-4" />
-              </button>
-              <button
                 onClick={() => router.push("/timer")}
                 className="group/btn rounded-[8px] bg-white text-zinc-950 px-5 py-2.5 text-sm font-semibold transition-all duration-300 flex items-center gap-2 active:scale-95"
               >
-                Choose mode
+                Start practice
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
               </button>
             </div>
@@ -212,21 +203,16 @@ const ProfileLandingLayout = ({
       
       <div className="md:mt-6 space-y-6 p-4 md:p-6">
         <div className="relative z-10">
-          <div className="space-y-6">
-            <NavigationCards />
-          </div>
-
           <div className="mt-6">
             <DashboardSection compact>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                 <DailyQuestWidget />
-                <StatsField
-                  Icon={FaClock}
-                  description="Total Time"
-                  value={totalTimeValue}
+                <PracticeStatsWidget
+                  userStats={userStats}
+                  totalTimeValue={totalTimeValue}
                   trendData={timeTrendData}
+                  reportList={reportList}
                   className="h-full"
-                  footerLink={{ href: "/profile/activity", label: "View activity" }}
                 />
               </div>
             </DashboardSection>

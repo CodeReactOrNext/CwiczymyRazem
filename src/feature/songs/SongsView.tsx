@@ -1,5 +1,10 @@
 import { Button } from "assets/components/ui/button";
 import { Input } from "assets/components/ui/input";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "assets/components/ui/tabs";
 import { cn } from "assets/lib/utils";
 import { HeroBanner } from "components/UI/HeroBanner";
 import AddSongModal from "feature/songs/components/AddSongModal/AddSongModal";
@@ -17,6 +22,8 @@ import { getAllTiers } from "feature/songs/utils/getSongTier";
 import { selectUserAuth, selectUserInfo } from "feature/user/store/userSlice";
 import { useTranslation } from "hooks/useTranslation";
 import {
+  LayoutDashboard,
+  Library as LibraryIcon,
   LoaderCircle,
   Music,
   Plus,
@@ -102,17 +109,7 @@ const SongsView = () => {
         eyebrow={isLibrary ? "Song Library" : "My Songs"}
         className="w-full !rounded-none !shadow-none min-h-[100px] md:min-h-[90px] lg:min-h-[100px]"
         rightContent={
-          activeTab === "management" ? (
-            <Button 
-              onClick={() => {
-                posthog.capture("song_management_action", { action: "add_song_transition" });
-                router.push("/songs?view=library");
-              }}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add a song to learn
-            </Button>
-          ) : (
+          isLibrary && (
             <Button 
               onClick={() => setIsModalOpen(true)}
             >
@@ -123,6 +120,33 @@ const SongsView = () => {
         }
       />
       <div className="mx-auto flex w-full flex-col gap-6 p-4 sm:p-6 md:gap-8 md:p-10 lg:p-12 font-openSans min-h-screen">
+        
+        {/* Navigation Tabs */}
+        <div className="flex justify-start">
+          <Tabs 
+            value={activeTab === "table" ? "library" : activeTab} 
+            onValueChange={(val) => router.push(`/songs?view=${val}`, undefined, { shallow: true })}
+            className="w-fit"
+          >
+            <TabsList className="bg-zinc-900/80 p-1 rounded-xl h-auto border border-white/5">
+              <TabsTrigger
+                value="management"
+                className="gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+              >
+                <LayoutDashboard size={18} />
+                <span>My Board</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="library"
+                className="gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-zinc-500 hover:text-zinc-300"
+              >
+                <LibraryIcon size={18} />
+                <span>Library</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
         {/* Content Area */}
         <div className="flex-1">
           <div className="h-full w-full">

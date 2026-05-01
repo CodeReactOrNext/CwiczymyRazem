@@ -1,5 +1,5 @@
 import { cn } from "assets/lib/utils";
-import { FileText,Home, LayoutGrid, Menu, Timer } from "lucide-react";
+import { Activity, Home, LayoutGrid, Menu, Timer } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -22,14 +22,14 @@ export const MobileBottomNav = ({ onMenuClick }: MobileBottomNavProps) => {
       icon: Timer,
     },
     {
-      label: "Reports",
-      href: "/report",
-      icon: FileText,
-    },
-    {
-      label: "My Songs",
+      label: "Songs",
       href: "/songs?view=management",
       icon: LayoutGrid,
+    },
+    {
+      label: "Progress",
+      href: "/profile/activity",
+      icon: Activity,
     },
   ];
 
