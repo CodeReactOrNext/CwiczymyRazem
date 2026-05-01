@@ -135,6 +135,12 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: tMins }));
             }
 
+            // Record session for the specific song progress
+            if (userId) {
+                const { recordPracticeSession } = await import("feature/songs/services/userSongProgress.service");
+                await recordPracticeSession(userId, song.id, techniqueTime + hearingTime, null, null);
+            }
+
             await dispatch(updateUserStats({ inputData })).unwrap();
             setIsSplitterOpen(false);
             setShowSuccess(true);
@@ -207,6 +213,8 @@ const SongPracticeTimer: NextPageWithLayout = () => {
                 song={song}
                 timerSubmitHandler={timerSubmitHandler}
                 onBack={handleBack}
+                userId={userId as string}
+                songId={song.id}
             />
             
             <TimeSplitterModal 

@@ -34,6 +34,8 @@ export interface Song {
   artist_lowercase?: string;
   tier?: string;
   spotifyId?: string;
+  masteryProgress?: number;
+  totalSections?: number;
 }
 
 interface UserSongStatus {

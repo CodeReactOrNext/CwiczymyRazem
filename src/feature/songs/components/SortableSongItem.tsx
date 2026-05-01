@@ -130,7 +130,7 @@ const GpProgressBadge = ({ progress }: { progress: UserSongProgress | null | und
   if (!hasTime && !hasAccuracy && !progress.gpFileName) return null;
 
   return (
-    <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
       {progress.gpFileName && (
         <span className="flex items-center gap-1 rounded-md border border-cyan-500/15 bg-cyan-500/8 px-1.5 py-0.5 text-[10px] font-bold text-cyan-400/80 max-w-[120px]">
           <FileMusic className="h-2.5 w-2.5 shrink-0" />
@@ -149,6 +149,25 @@ const GpProgressBadge = ({ progress }: { progress: UserSongProgress | null | und
           {progress.bestAccuracy}%
         </span>
       )}
+    </div>
+  );
+};
+
+const SongMasteryProgress = ({ progress, totalSections }: { progress: number; totalSections?: number }) => {
+  if (totalSections === undefined || totalSections === 0) return null;
+  
+  return (
+    <div className="mt-2.5 space-y-1">
+      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.15em]">
+        <span className="text-zinc-500">Mastery</span>
+        <span className="text-cyan-400 font-black">{progress}%</span>
+      </div>
+      <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800/50">
+        <div
+          className="h-full bg-cyan-500 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+          style={{ width: `${Math.max(2, progress)}%` }}
+        />
+      </div>
     </div>
   );
 };
@@ -231,6 +250,12 @@ export const SortableSongItem = ({
                   <p translate="no" className="truncate text-[15px] font-bold text-white tracking-tight leading-none mb-1">{song.title}</p>
                   <p translate="no" className="truncate text-xs font-medium text-zinc-400">{song.artist}</p>
                   {isPremium && <GpProgressBadge progress={progress} />}
+                  {song.masteryProgress !== undefined && (
+                    <SongMasteryProgress 
+                      progress={song.masteryProgress} 
+                      totalSections={song.totalSections} 
+                    />
+                  )}
               </div>
             </div>
 
@@ -333,6 +358,12 @@ export const SortableSongItem = ({
             <p translate="no" className="truncate text-[15px] font-bold text-zinc-100 leading-tight group-hover:text-white transition-colors">{song.title}</p>
             <p translate="no" className="truncate text-xs font-medium text-zinc-500 group-hover:text-zinc-400 transition-colors">{song.artist}</p>
             {isPremium && <GpProgressBadge progress={progress} />}
+            {song.masteryProgress !== undefined && (
+              <SongMasteryProgress 
+                progress={song.masteryProgress} 
+                totalSections={song.totalSections} 
+              />
+            )}
           </div>
 
           <div className="flex items-center gap-2">

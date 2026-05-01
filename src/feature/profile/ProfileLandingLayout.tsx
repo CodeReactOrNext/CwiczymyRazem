@@ -7,6 +7,7 @@ import { HeroBanner } from "components/UI/HeroBanner";
 import { IMG_RANKS_NUMBER } from "constants/gameSettings";
 import { GUITAR_DEFINITIONS } from "feature/arsenal/data/guitarDefinitions";
 import { DailyQuestWidget } from "feature/dashboard/components/DailyQuestWidget";
+import { LevelProgressCircle } from "feature/profile/components/LevelProgressCircle";
 import { PracticeStatsWidget } from "feature/profile/components/PracticeStatsWidget";
 import { getTrendData } from "feature/profile/utils/getTrendData";
 import { getUserSongs } from "feature/songs/services/getUserSongs";
@@ -51,16 +52,7 @@ const ProfileLandingLayout = ({
   ) : "0:00";
   const timeTrendData = getTrendData(datasWithReports, "time");
 
-  const lvlXpStart = getPointsToLvlUp((userStats?.lvl ?? 1) - 1);
-  const lvlXpEnd = getPointsToLvlUp(userStats?.lvl ?? 1);
-  let effectivePts = userStats?.points ?? 0;
-  if ((userStats?.points ?? 0) < lvlXpStart && (userStats?.lvl ?? 1) > 1) effectivePts += lvlXpStart;
-  const ptsInLevel = Math.max(0, effectivePts - lvlXpStart);
-  const lvlRange = Math.max(1, lvlXpEnd - lvlXpStart);
-  const xpPercent = Math.min(Math.max((ptsInLevel / lvlRange) * 100, 0), 100);
-  const arcR = 38;
-  const arcC = 2 * Math.PI * arcR;
-  const arcOffset = arcC * (1 - xpPercent / 100);
+
 
   const skillPower = songs?.learned ? calculateSkillPower(songs.learned) : 0;
   const songTier = getSongTier(skillPower > 0 ? skillPower : '?');
@@ -82,7 +74,8 @@ const ProfileLandingLayout = ({
     <div className="bg-second-600 rounded-xl flex flex-col shadow-sm border-none lg:mt-16">
       <HeroBanner
         title={isTodayCompleted ? "Great job today!" : "Start today's practice"}
-        className="w-full !rounded-none !shadow-none min-h-[220px] md:min-h-[200px] lg:min-h-[240px]"
+        className="w-full !rounded-none !shadow-none !flex-row !items-center !justify-between min-h-[160px] md:min-h-[200px] lg:min-h-[240px]"
+
         backgroundContent={
           isSpecialGuitar ? (
             <div className="absolute inset-0 z-0 overflow-hidden rounded-none md:rounded-xl">
@@ -104,7 +97,8 @@ const ProfileLandingLayout = ({
           ) : null
         }
         rightContent={
-          <div className="relative hidden md:flex select-none items-center gap-4 pr-2">
+          <div className="relative flex select-none items-center gap-4 pr-2">
+
             <div className="absolute inset-0 rounded-full bg-cyan-400/10 blur-3xl" />
 
             {/* Song tier badge */}
@@ -129,41 +123,11 @@ const ProfileLandingLayout = ({
             </TooltipProvider>
 
             {/* Level ring */}
-            <div className="relative flex flex-col items-center gap-1">
-              <svg width="120" height="120" viewBox="0 0 100 100" className="relative shrink-0">
-                <defs>
-                  <linearGradient id="lvlArcGradDash" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#a5f3fc" />
-                    <stop offset="100%" stopColor="#0891b2" />
-                  </linearGradient>
-                  <filter id="lvlGlowDash" x="-30%" y="-30%" width="160%" height="160%">
-                    <feGaussianBlur stdDeviation="2.5" result="blur" />
-                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                  </filter>
-                </defs>
-                <circle cx="50" cy="50" r="46" fill="rgba(0,0,0,0.45)" />
-                <circle cx="50" cy="50" r={arcR} fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
-                <circle
-                  cx="50" cy="50" r={arcR}
-                  fill="none"
-                  stroke="url(#lvlArcGradDash)"
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  strokeDasharray={arcC}
-                  strokeDashoffset={arcOffset}
-                  transform="rotate(-90 50 50)"
-                  filter="url(#lvlGlowDash)"
-                />
-                <text x="50" y="54" textAnchor="middle" fill="white" fontSize="24" fontWeight="900" style={{ fontFamily: 'system-ui, sans-serif' }}>
-                  {userStats?.lvl ?? 1}
-                </text>
-                <text x="50" y="67" textAnchor="middle" fill="#67e8f9" fontSize="9" fontWeight="700" letterSpacing="3" style={{ fontFamily: 'system-ui, sans-serif' }}>
-                  LVL
-                </text>
-              </svg>
-              <span className="text-[10px] font-semibold tracking-widest text-zinc-400">Level progress</span>
-              <span className="text-[11px] tabular-nums text-zinc-500">{ptsInLevel.toLocaleString()} / {lvlRange.toLocaleString()} XP</span>
-            </div>
+            <LevelProgressCircle 
+              lvl={userStats?.lvl ?? 1} 
+              points={userStats?.points ?? 0}
+            />
+
           </div>
         }
         leftContent={

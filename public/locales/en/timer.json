@@ -42,11 +42,18 @@
   },
   "practice_session": "Practice Session",
   "finish": "Finish",
-  "spotify": {
-    "playback": "Spotify Playback",
-    "open_in_app": "Open in App",
-    "important_login": "Important: Log in via Browser",
-    "login_description": "To listen to full tracks (not just 30s previews), make sure you are logged into <1>Spotify.com</1> with an active Premium account."
+  "youtube": {
+    "add_link": "Paste YouTube link",
+    "change_link": "Change video",
+    "no_link": "No video linked yet"
+  },
+  "sections": {
+    "add": "Add Section",
+    "name_placeholder": "Section name",
+    "mastery_0": "Not learned",
+    "mastery_1": "Bad",
+    "mastery_2": "Medium",
+    "mastery_3": "Mastered"
   },
   "rating_summary": "Practice Summary",
   "reset_button": "Reset",

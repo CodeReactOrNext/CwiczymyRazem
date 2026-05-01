@@ -101,7 +101,7 @@ export const HeroBanner = ({
           characterImage ? "pr-[120px] xs:pr-[160px] md:pr-8 lg:pr-10" : ""
         }`}
       >
-        <div className="space-y-2 max-w-xl w-full">
+        <div className="space-y-2 max-w-xl min-w-0 flex-1">
           {eyebrow && (
             <p className={`text-xs font-semibold tracking-[0.2em] uppercase md:bg-transparent md:backdrop-blur-none md:px-0 md:py-0 md:rounded-none ${eyebrowClassName}`}>
               {eyebrow}
@@ -123,7 +123,7 @@ export const HeroBanner = ({
         </div>
 
         {(buttonText || rightContent || children) && (
-          <div className="flex flex-col items-start md:items-end shrink-0 z-10 w-full md:w-auto gap-4 md:gap-0">
+          <div className="flex flex-col items-start md:items-end shrink-0 z-10 w-auto gap-4 md:gap-0">
             {rightContent && (
               <div className="pt-1">{rightContent}</div>
             )}
