@@ -1,144 +1,43 @@
-import { cn } from "assets/lib/utils";
-import { ArrowRight, ClipboardCheck, ClipboardList, Guitar, Loader2, Sparkles } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useState } from "react";
-
-interface NavigationCardProps {
-  title: string;
-  icon: React.ReactNode;
-  onClick?: () => void;
-  colorAccent?: "cyan" | "purple" | "green" | "amber";
-  isLoading?: boolean;
-  actionLabel?: string;
-}
-
-const NavigationCard = ({
-  title,
-  icon,
-  onClick,
-  colorAccent = "cyan",
-  isLoading = false,
-  actionLabel = "Go to action",
-}: NavigationCardProps) => {
-  const colorClasses = {
-    cyan: {
-      iconBg: "bg-cyan-500/20",
-      iconText: "text-cyan-400",
-      blur: "bg-cyan-500/25",
-      ring: "hover:ring-cyan-500/40",
-    },
-    purple: {
-      iconBg: "bg-purple-500/20",
-      iconText: "text-purple-400",
-      blur: "bg-purple-500/25",
-      ring: "hover:ring-purple-500/40",
-    },
-    green: {
-      iconBg: "bg-emerald-500/20",
-      iconText: "text-emerald-400",
-      blur: "bg-emerald-500/25",
-      ring: "hover:ring-emerald-500/40",
-    },
-    amber: {
-      iconBg: "bg-amber-500/20",
-      iconText: "text-amber-400",
-      blur: "bg-amber-500/25",
-      ring: "hover:ring-amber-500/40",
-    },
-  };
-
-  const colors = colorClasses[colorAccent];
-
-  return (
-    <div
-      className={cn(
-        "font-openSans group relative flex h-full transform cursor-pointer flex-col justify-between overflow-hidden rounded-xl border border-second-400/10 bg-zinc-900/50 p-3 shadow-lg transition-all duration-300 hover:shadow-xl hover:ring-2 sm:p-4 hover:bg-zinc-800/80",
-        colors.ring
-      )}
-      onClick={onClick}
-      tabIndex={0}
-      aria-label={title}
-      onKeyDown={(e) => e.key === "Enter" && onClick?.()}>
-      {isLoading && (
-        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-xl">
-          <Loader2 className={`h-8 w-8 ${colors.iconText} animate-spin`} />
-        </div>
-      )}
-      
-      <div
-        className={cn(colors.blur, "absolute right-0 top-0 -mr-10 -mt-10 h-32 w-32 rounded-full blur-[32px] opacity-40 transition-opacity group-hover:opacity-60")}></div>
-
-      <div className="relative z-10 flex items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h3 className="text-sm font-black font-normal  text-white">
-            {title}
-          </h3>
-        </div>
-        <div className={cn(
-          "rounded-xl p-2 shadow-2xl transition-all duration-500 group-hover:scale-110",
-          colors.iconBg,
-          colors.iconText
-        )}>
-          {icon}
-        </div>
-      </div>
-
-      <div className="relative z-10 mt-3 flex items-center gap-2 text-xs font-bold text-zinc-300 transition-all duration-300 group-hover:text-white group-hover:gap-3">
-        <span>{actionLabel}</span>
-        <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-      </div>
-    </div>
-  );
-};
+import { FaClock } from "react-icons/fa";
 
 export const NavigationCards = () => {
   const router = useRouter();
-  const [loadingCard, setLoadingCard] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleNavigation = async (path: string, cardId: string) => {
-    setLoadingCard(cardId);
-    await router.push(path);
+  const handleClick = async () => {
+    setLoading(true);
+    await router.push("/timer");
   };
 
   return (
-    <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-      <NavigationCard
-        title="Report Practice"
-        icon={<ClipboardCheck className='h-5 w-5' />}
-        onClick={() => handleNavigation("/report", "report")}
-        colorAccent='cyan'
-        isLoading={loadingCard === "report"}
-        actionLabel="Log Now"
-      />
+    <div
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && handleClick()}
+      className="relative cursor-pointer overflow-hidden rounded-xl border border-white/20 bg-white/10 px-6 py-5 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:shadow-xl hover:border-white/30 active:scale-[0.99]">
+      {/* Subtle glow */}
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-white/5 via-white/10 to-white/5 pointer-events-none" />
 
-  
-
-      <NavigationCard
-        title="Guitar Journey"
-        icon={<Guitar className='h-5 w-5' />}
-        onClick={() => handleNavigation("/journey", "songs")}
-        colorAccent='amber'
-        isLoading={loadingCard === "songs"}
-        actionLabel="Continue Learning"
-      />
-
-      <NavigationCard
-        title="Guided Routine"
-        icon={<ClipboardList className='h-5 w-5' />}
-        onClick={() => handleNavigation("/timer/plans", "plans")}
-        colorAccent='green'
-        isLoading={loadingCard === "plans"}
-        actionLabel="Start Plan"
-      />
-
-      <NavigationCard
-        title="Generate Session"
-        icon={<Sparkles className='h-5 w-5' fill="currentColor" />}
-        onClick={() => handleNavigation("/timer/auto", "exercises")}
-        colorAccent='amber'
-        isLoading={loadingCard === "exercises"}
-        actionLabel="Start Auto"
-      />
+      <div className="relative z-10 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-white/20">
+            {loading ? (
+              <Loader2 className="h-5 w-5 text-white animate-spin" />
+            ) : (
+              <FaClock className="h-5 w-5 text-white" />
+            )}
+          </div>
+          <div>
+            <p className="text-base font-bold text-white">Start Practice</p>
+            <p className="text-sm text-white/60">Choose your mode and begin today's session</p>
+          </div>
+        </div>
+        <ArrowRight className="h-5 w-5 flex-shrink-0 text-white/70 transition-transform duration-300 group-hover:translate-x-1" />
+      </div>
     </div>
   );
 };
