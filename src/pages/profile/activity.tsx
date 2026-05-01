@@ -8,6 +8,7 @@ import MainContainer from "components/MainContainer";
 import { HeroBanner } from "components/UI/HeroBanner";
 import { AchievementWrapper } from "feature/profile/components/Achievement/AchievementWrapper";
 import { RecordsList, SongLearningSection } from "feature/profile/components/DetailedStats/DetailedStats";
+import { LevelProgressHero } from "feature/profile/components/LevelProgressHero";
 import SeasonalAchievements from "feature/profile/components/SeasonalAchievements/SeasonalAchievements";
 import type { StatsFieldProps } from "feature/profile/components/StatsField";
 import { StatsSection } from "feature/profile/components/StatsSection";
@@ -40,9 +41,19 @@ const ProfileActivityPage = () => {
         title="Your Activity"
         subtitle="Track your practice history and progress over time"
         eyebrow="Practice stats"
-        characterImage="/images/3d/activity.png"
-        className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
+        rightContent={
+          <div className="w-full h-full flex items-center md:justify-end">
+            <LevelProgressHero 
+              lvl={userStats?.lvl ?? 1} 
+              points={userStats?.points ?? 0}
+            />
+          </div>
+        }
+
+        className="w-full !rounded-none !shadow-none min-h-[220px] md:min-h-[200px] lg:min-h-[260px] !flex-col md:!flex-row"
       />
+
+
       <div className='p-4'>
         <div className='font-openSans flex flex-col gap-6'>
 

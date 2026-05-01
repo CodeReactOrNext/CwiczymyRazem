@@ -1,172 +1,522 @@
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "assets/components/ui/chart";
+import { Pie, PieChart, Cell } from "recharts";
 import { Button } from "assets/components/ui/button";
 import { cn } from "assets/lib/utils";
 import MainContainer from "components/MainContainer";
-import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
+import { SectionList, nextSectionColor } from "feature/songs/components/SongSections/SectionList";
+import { SectionTimeline } from "feature/songs/components/SongSections/SectionTimeline";
+import { YouTubeSongPlayer } from "feature/songs/components/YouTubeSongPlayer";
+import type { YouTubeSongPlayerRef } from "feature/songs/components/YouTubeSongPlayer";
+import { getUserSongMeta, saveUserSongMeta } from "feature/songs/services/songSections.service";
+import type { MasteryLevel, SongSection } from "feature/songs/types/songSection.type";
 import type { Song } from "feature/songs/types/songs.type";
 import type { useTimerInterface } from "hooks/useTimer";
 import { useTranslation } from "hooks/useTranslation";
-import { ArrowLeft, ArrowRight, Music, Pause, Play } from "lucide-react";
+import { ArrowLeft, CheckCircle2, FileText, Keyboard, Music, Pause, Play, Save } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 interface SongTimerLayoutProps {
   timer: useTimerInterface;
   song: Song;
   timerSubmitHandler: () => void;
   onBack: () => void;
+  userId: string;
+  songId: string;
 }
+
+const MASTERY_COLORS: Record<MasteryLevel, string> = {
+  0: "text-zinc-500",
+  1: "text-red-400",
+  2: "text-amber-400",
+  3: "text-green-400",
+  4: "text-zinc-500",
+};
+
+const MASTERY_LABELS_SHORT: Record<MasteryLevel, string> = {
+  0: "Not learned",
+  1: "Bad",
+  2: "Medium",
+  3: "Mastered",
+  4: "Skip",
+};
 
 export const SongTimerLayout = ({
   timer,
   song,
   timerSubmitHandler,
   onBack,
+  userId,
+  songId,
 }: SongTimerLayoutProps) => {
   const { t } = useTranslation("timer");
   const { time, timerEnabled, startTimer, stopTimer } = timer;
+
+  const playerRef = useRef<YouTubeSongPlayerRef>(null);
+  const [youtubeUrl, setYoutubeUrl] = useState<string | null>(null);
+  const [sections, setSections] = useState<SongSection[]>([]);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [loopSectionId, setLoopSectionId] = useState<string | null>(null);
+  const [isLocked, setIsLocked] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    getUserSongMeta(userId, songId).then((meta) => {
+      setYoutubeUrl(meta.youtubeUrl ?? null);
+      setSections(meta.sections ?? []);
+      setNotes(meta.notes ?? "");
+    });
+  }, [userId, songId]);
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const timeout = setTimeout(async () => {
+      setIsSaving(true);
+      try {
+        await saveUserSongMeta(userId, songId, {
+          youtubeUrl: youtubeUrl ?? undefined,
+          sections,
+          notes,
+        });
+      } finally {
+        setIsSaving(false);
+      }
+    }, 1000);
+    return () => clearTimeout(timeout);
+  }, [youtubeUrl, sections, notes, userId, songId]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      switch (e.code) {
+        case "Space":
+          e.preventDefault();
+          playerRef.current?.togglePlay();
+          break;
+        case "KeyM":
+          if (!isLocked) {
+             e.preventDefault();
+             handleAddSection();
+          }
+          break;
+        case "KeyL":
+          e.preventDefault();
+          // Toggle loop for current section if any
+          const currentSection = sections.find(s => 
+            currentTime >= s.startTime && 
+            currentTime < (sections.find(next => next.startTime > s.startTime)?.startTime ?? Infinity)
+          );
+          if (currentSection) handleSectionLoop(currentSection);
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          playerRef.current?.seekTo(Math.max(0, currentTime - 5));
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          playerRef.current?.seekTo(Math.min(duration, currentTime + 5));
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentTime, duration, isLocked, sections]);
+
+  const persistSections = useCallback(
+    (next: SongSection[]) => setSections(next),
+    []
+  );
+
+  const handleUrlSave = (url: string) => setYoutubeUrl(url);
+
+  const handleTimeUpdate = useCallback(
+    (t: number, d: number) => {
+      setCurrentTime(t);
+      if (d > 0 && d !== duration) setDuration(d);
+
+      if (!loopSectionId) return;
+      const sorted = [...sections].sort((a, b) => a.startTime - b.startTime);
+      const idx = sorted.findIndex((s) => s.id === loopSectionId);
+      if (idx === -1) return;
+      const loopSec = sorted[idx];
+      const endTime = sorted[idx + 1]?.startTime ?? loopSec.startTime + 30;
+      if (t >= endTime) {
+        playerRef.current?.seekTo(loopSec.startTime);
+      }
+    },
+    [duration, loopSectionId, sections]
+  );
+
+  const handleSeek = (time: number) => playerRef.current?.seekTo(time);
+
+  const handleSectionPlay = (section: SongSection) => {
+    setLoopSectionId(null);
+    playerRef.current?.seekTo(section.startTime);
+    playerRef.current?.play();
+  };
+
+  const handleSectionLoop = (section: SongSection) => {
+    if (loopSectionId === section.id) {
+      setLoopSectionId(null);
+    } else {
+      setLoopSectionId(section.id);
+      playerRef.current?.seekTo(section.startTime);
+      playerRef.current?.play();
+    }
+  };
+
+  const handleAddSection = () => {
+    const newSection: SongSection = {
+      id: uuidv4(),
+      name: `Section ${sections.length + 1}`,
+      startTime: Math.floor(currentTime),
+      color: nextSectionColor(sections),
+      mastery: 0,
+    };
+    persistSections([...sections, newSection]);
+  };
+
+  const handleRename = (id: string, name: string) =>
+    persistSections(sections.map((s) => (s.id === id ? { ...s, name } : s)));
+
+  const handleTimeChange = (id: string, startTime: number) =>
+    persistSections(sections.map((s) => (s.id === id ? { ...s, startTime } : s)));
+
+  const handleMasteryChange = (id: string, mastery: MasteryLevel) =>
+    persistSections(sections.map((s) => (s.id === id ? { ...s, mastery } : s)));
+
+  const handleDelete = (id: string) => {
+    if (loopSectionId === id) setLoopSectionId(null);
+    persistSections(sections.filter((s) => s.id !== id));
+  };
 
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     const hours = Math.floor(minutes / 60);
     if (hours > 0) {
-        const remMinutes = minutes % 60;
-        return `${hours}:${remMinutes < 10 ? "0" : ""}${remMinutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+      const remMinutes = minutes % 60;
+      return `${hours}:${remMinutes < 10 ? "0" : ""}${remMinutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     }
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
-  const toggleTimer = () => {
-      if (timerEnabled) {
-          stopTimer();
-      } else {
-          startTimer();
-      }
-  };
+  const toggleTimer = () => (timerEnabled ? stopTimer() : startTimer());
+
+  // Mastery summary counts
+  const masteryCounts = ([0, 1, 2, 3, 4] as MasteryLevel[]).map((level) => ({
+    level,
+    count: sections.filter((s) => s.mastery === level).length,
+  })).filter((m) => m.count > 0);
 
   return (
     <MainContainer noBorder>
-      <div className='font-openSans h-full space-y-6 pb-8 sm:space-y-8 sm:pb-12 md:p-8'>
+      <div className="font-openSans h-full space-y-5 pb-8 md:p-8">
         <div className="pl-14 sm:pl-0">
-             <div className="flex items-center gap-2 mb-6">
-                <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full hover:bg-white/10">
-                    <ArrowLeft className="h-5 w-5" />
-                </Button>
-                <h1 className="text-xl font-bold">{t("practice_session")}</h1>
-             </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onBack}
+              className="rounded-full hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-bold">{t("practice_session")}</h1>
+          </div>
         </div>
-        
-        <div className="relative w-full max-w-4xl mx-auto">
-            <div className="absolute inset-0 bg-emerald-500/10 blur-[100px] rounded-full opacity-50 pointer-events-none" />
 
-            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-zinc-900/50 backdrop-blur-xl border border-white/5 p-8 sm:p-12 rounded-3xl overflow-hidden shadow-2xl">
-                
-                <div className="flex flex-col items-center justify-center space-y-6">
-                    <div className="relative group">
-                        <div className={cn(
-                            "absolute -inset-4 bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 rounded-full blur-xl transition-all duration-1000",
-                            timerEnabled ? "opacity-100 scale-110" : "opacity-0 scale-100"
-                        )} />
-                        
-                        <div className={cn(
-                            "relative h-64 w-64 sm:h-80 sm:w-80 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-transform duration-700 ease-in-out",
-                             timerEnabled && "scale-105"
-                        )}>
-                            {song.coverUrl ? (
-                                <img src={song.coverUrl} className="h-full w-full object-cover" alt={song.title} />
-                            ) : (
-                                <div className="h-full w-full bg-zinc-800 flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
-                                    <Music className="h-32 w-32 text-zinc-700" />
-                                </div>
-                            )}
-                            
-                            {!timerEnabled && time > 0 && (
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px]">
-                                    <Pause className="h-16 w-16 text-white/80" />
-                                </div>
-                            )}
-                        </div>
-                    </div>
+        <div className="w-full max-w-4xl mx-auto space-y-8 px-4">
+
+          {/* Compact timer bar */}
+          <div className="flex items-center gap-2 sm:gap-4 bg-white/[0.02] border border-white/5 rounded-2xl p-2.5 sm:px-5 sm:py-3.5">
+            <div className="h-11 w-11 rounded-xl overflow-hidden shrink-0 border border-white/10">
+              {song.coverUrl ? (
+                <img src={song.coverUrl} className="h-full w-full object-cover" alt={song.title} />
+              ) : (
+                <div className="h-full w-full bg-zinc-800 flex items-center justify-center">
+                  <Music className="h-5 w-5 text-zinc-600" />
                 </div>
-
-                <div className="flex flex-col items-center md:items-start space-y-8 text-center md:text-left w-full">
-                    <div className="space-y-2 w-full">
-                        <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight line-clamp-2">
-                            {song.title}
-                        </h2>
-                        <p className="text-xl text-zinc-400 font-medium">{song.artist}</p>
-                    </div>
-
-                    <div className="flex flex-col items-center md:items-start space-y-4 w-full">
-                         <div className={cn(
-                             "text-[6rem] sm:text-[7rem] leading-none font-black font-variant-numeric tabular-nums tracking-tighter transition-colors duration-300",
-                             timerEnabled ? "text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]" : "text-zinc-600"
-                         )}>
-                            {formatTime(time)}
-                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-6 w-full pt-4">
-                        <Button
-                            onClick={toggleTimer}
-                            size="lg"
-                            className={cn(
-                                "h-20 w-20 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center border-4",
-                                timerEnabled 
-                                    ? "bg-zinc-900 text-white border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800" 
-                                    : "bg-white text-black border-white hover:bg-zinc-100"
-                            )}
-                        >
-                            {timerEnabled ? (
-                                <Pause className="h-8 w-8 fill-current" />
-                            ) : (
-                                <Play className="h-8 w-8 fill-current ml-1" />
-                            )}
-                        </Button>
-
-                        <div className="flex-1 border-t border-white/5 mx-4" />
-
-                        <Button
-                            onClick={timerSubmitHandler}
-                            variant="ghost"
-                            className="h-14 px-8 rounded-xl text-zinc-400 hover:text-white hover:bg-white/5 font-bold uppercase tracking-widest text-sm transition-all"
-                        >
-                            {t("finish")}
-                        </Button>
-                    </div>
-                </div>
+              )}
             </div>
-        
-            {song.spotifyId && (
-                <div className="mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                            <div className="h-1 w-8 bg-emerald-500 rounded-full" />
-                            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500">{t("spotify.playback")}</h3>
-                        </div>
-                        <a 
-                            href={`https://open.spotify.com/track/${song.spotifyId}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-[10px] font-bold text-emerald-500 hover:text-emerald-400 flex items-center gap-1 transition-colors"
-                        >
-                            {t("spotify.open_in_app")} <ArrowRight className="h-3 w-3" />
-                        </a>
-                    </div>
-                    
-                    <SpotifyPlayer trackId={song.spotifyId} height={152} className="shadow-2xl hover:border-emerald-500/30 transition-colors duration-500" />
-                    
-                    <div className="mt-4 p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-4 group hover:bg-emerald-500/10 transition-all duration-300">
-                        <div className="h-10 w-10 shrink-0 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
-                            <Music className="h-5 w-5" />
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-sm font-bold text-emerald-400 mb-0.5">{t("spotify.important_login")}</p>
-                            <p className="text-xs text-zinc-400 leading-relaxed">
-                                To listen to full tracks (not just 30s previews), make sure you are logged into <a href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/30 hover:decoration-emerald-500">Spotify.com</a> with an active Premium account.
-                            </p>
-                        </div>
-                    </div>
+
+            <div className="flex-1 min-w-0 hidden xs:block">
+              <p className="text-sm font-semibold text-white truncate">{song.title}</p>
+              <p className="text-xs text-zinc-500 truncate hidden md:block">{song.artist}</p>
+            </div>
+
+            <div
+              className={cn(
+                "text-2xl font-black tabular-nums tracking-tight transition-colors",
+                timerEnabled ? "text-white" : "text-zinc-600"
+              )}
+            >
+              {formatTime(time)}
+            </div>
+
+            <button
+              onClick={toggleTimer}
+              className={cn(
+                "h-10 w-10 rounded-full flex items-center justify-center border-2 transition-all shrink-0",
+                timerEnabled
+                  ? "border-zinc-700 bg-zinc-800 text-white hover:bg-zinc-700"
+                  : "border-white bg-white text-black hover:bg-zinc-100"
+              )}
+            >
+              {timerEnabled ? (
+                <Pause className="h-4 w-4 fill-current" />
+              ) : (
+                <Play className="h-4 w-4 fill-current ml-0.5" />
+              )}
+            </button>
+
+            <div className="h-6 w-px bg-white/10 shrink-0" />
+
+            <Button
+              onClick={async () => {
+                setIsSaving(true);
+                try {
+                  await saveUserSongMeta(userId, songId, {
+                    youtubeUrl: youtubeUrl ?? undefined,
+                    sections,
+                    notes,
+                  });
+                } finally {
+                  setIsSaving(false);
+                  timerSubmitHandler();
+                }
+              }}
+              className="sm:ml-2 gap-2 px-3 sm:px-4"
+            >
+              <span className="hidden sm:inline">{t("finish")}</span>
+              <CheckCircle2 className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Mastery summary */}
+          {sections.length > 0 && (
+            <div className="flex items-center gap-6 w-full">
+                <div className="h-28 w-28 shrink-0">
+                  {(() => {
+                    const sortedSections = [...sections].sort((a, b) => a.startTime - b.startTime);
+                    const weights: Record<MasteryLevel, number> = { 0: 0, 1: 0.2, 2: 0.5, 3: 1, 4: 0 };
+                    const data = ([3, 2, 1, 0, 4] as MasteryLevel[]).map(level => {
+                      const durationInLevel = sortedSections.reduce((acc, s, idx, arr) => {
+                        if (s.mastery !== level) return acc;
+                        const nextStart = arr[idx + 1]?.startTime ?? duration;
+                        return acc + Math.max(0, nextStart - s.startTime);
+                      }, 0);
+                      return {
+                        name: MASTERY_LABELS_SHORT[level],
+                        value: durationInLevel,
+                        level
+                      };
+                    }).filter(d => d.value > 0);
+
+                    const colors: Record<MasteryLevel, string> = {
+                      0: "#3f3f46",
+                      1: "#ef4444",
+                      2: "#f59e0b",
+                      3: "#22c55e",
+                      4: "#52525b",
+                    };
+
+                    const totalWeighted = sortedSections.reduce((acc, s, idx, arr) => {
+                      const nextStart = arr[idx + 1]?.startTime ?? duration;
+                      return acc + Math.max(0, nextStart - s.startTime) * weights[s.mastery];
+                    }, 0);
+                    const progress = duration > 0 ? Math.round((totalWeighted / duration) * 100) : 0;
+
+                    return (
+                      <ChartContainer
+                        config={{
+                          value: { label: "Duration" }
+                        }}
+                        className="h-full w-full aspect-square"
+                      >
+                        <PieChart>
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Pie
+                            data={data}
+                            dataKey="value"
+                            nameKey="name"
+                            innerRadius={40}
+                            outerRadius={54}
+                            stroke="none"
+                            paddingAngle={2}
+                          >
+                            {data.map((entry) => (
+                              <Cell key={entry.name} fill={colors[entry.level as MasteryLevel]} />
+                            ))}
+                          </Pie>
+                          <text
+                            x="50%"
+                            y="50%"
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            className="fill-white text-[18px] font-black"
+                          >
+                            {progress}%
+                          </text>
+                        </PieChart>
+                      </ChartContainer>
+                    );
+                  })()}
                 </div>
+
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
+                      Song Mastery
+                    </span>
+                    <span className="text-[10px] font-bold text-zinc-600 tabular-nums">
+                      {sections.filter(s => s.mastery === 3).length} / {sections.length} Sections
+                    </span>
+                  </div>
+                  <div className="h-3 rounded-[8px] overflow-hidden bg-black/40 border border-white/5 relative">
+                    {/* Background segments for chronological mastery */}
+                    {[...sections]
+                      .sort((a, b) => a.startTime - b.startTime)
+                      .map((s, idx, arr) => {
+                        const nextStart = arr[idx + 1]?.startTime ?? duration;
+                        const secDuration = Math.max(0, nextStart - s.startTime);
+                        const widthPct = duration > 0 ? (secDuration / duration) * 100 : 0;
+                        const leftPct = duration > 0 ? (s.startTime / duration) * 100 : 0;
+                        const bg = {
+                          0: "bg-zinc-800",
+                          1: "bg-red-500",
+                          2: "bg-amber-400",
+                          3: "bg-green-400",
+                          4: "bg-zinc-700",
+                        }[s.mastery];
+
+                        return (
+                          <div
+                            key={s.id}
+                            className={cn("absolute top-0 h-full transition-all", bg)}
+                            style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
+                          />
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
             )}
+        </div>
+
+        {/* YouTube player + sections - WIDER CONTAINER */}
+        <div className="w-full max-w-6xl mx-auto space-y-10 px-4">
+          <div className="space-y-6">
+            <YouTubeSongPlayer
+              ref={playerRef}
+              youtubeUrl={youtubeUrl}
+              onUrlSave={handleUrlSave}
+              onTimeUpdate={handleTimeUpdate}
+              onDurationReady={setDuration}
+              onPlay={startTimer}
+              isLocked={isLocked}
+              onLockToggle={() => setIsLocked(!isLocked)}
+            />
+
+            {youtubeUrl && (
+              <div className="space-y-8 pt-4">
+                <SectionTimeline
+                  sections={sections}
+                  currentTime={currentTime}
+                  duration={duration}
+                  loopSectionId={loopSectionId}
+                  onSeek={handleSeek}
+                  onSectionTimeChange={handleTimeChange}
+                  isLocked={isLocked}
+                />
+
+                <SectionList
+                  sections={sections}
+                  loopSectionId={loopSectionId}
+                  currentTime={currentTime}
+                  onPlay={handleSectionPlay}
+                  onLoop={handleSectionLoop}
+                  onMasteryChange={handleMasteryChange}
+                  onRename={handleRename}
+                  onTimeChange={handleTimeChange}
+                  onDelete={handleDelete}
+                  onAdd={handleAddSection}
+                  isLocked={isLocked}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Shortcuts Legend */}
+          <div className="hidden md:flex items-center gap-6 py-4 px-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+            <div className="flex items-center gap-2 text-zinc-500">
+              <Keyboard className="h-4 w-4" />
+              <span className="text-xs font-bold uppercase tracking-wider">Shortcuts</span>
+            </div>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <div className="flex items-center gap-2">
+                <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">Space</kbd>
+                <span className="text-xs text-zinc-500">Play/Pause</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">M</kbd>
+                <span className="text-xs text-zinc-500">Mark Section</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">L</kbd>
+                <span className="text-xs text-zinc-500">Toggle Loop</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-[10px] font-mono text-white">← →</kbd>
+                <span className="text-xs text-zinc-500">Seek 5s</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Notes Section */}
+          <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.01]">
+              <div className="flex items-center gap-2 text-zinc-400">
+                <FileText className="h-4 w-4" />
+                <span className="text-xs font-bold uppercase tracking-wider">Practice Notes</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {isSaving && (
+                  <span className="text-[10px] text-zinc-500 animate-pulse">Saving...</span>
+                )}
+                <span className={cn(
+                  "text-[10px] font-medium",
+                  notes.split("\n").length > 250 ? "text-amber-500" : "text-zinc-600"
+                )}>
+                  {notes.split("\n").length} / 300 lines
+                </span>
+              </div>
+            </div>
+            <textarea
+              value={notes}
+              onChange={(e) => {
+                const lines = e.target.value.split("\n");
+                if (lines.length <= 300) {
+                  setNotes(e.target.value);
+                }
+              }}
+              placeholder="Add your practice notes here... (e.g. settings, tips for difficult parts, gear used)"
+              className="w-full min-h-[160px] bg-transparent p-5 text-sm text-zinc-300 placeholder:text-zinc-700 focus:outline-none resize-none leading-relaxed"
+            />
+          </div>
         </div>
       </div>
     </MainContainer>
