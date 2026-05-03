@@ -64,7 +64,7 @@ interface NoteMatchingProviderProps {
   activeTablature: TablatureMeasure[] | null | undefined;
   isMicEnabled: boolean;
   currentExerciseIndex: number;
-  isHalfSpeed: boolean;
+  speedMultiplier: number;
   getLatencyMs: () => number;
   audioRefs: AudioRefs;
   getAdjustedTargetFreq: (string: number, baseFreq: number) => number;
@@ -84,7 +84,7 @@ export function NoteMatchingProvider({
   activeTablature,
   isMicEnabled,
   currentExerciseIndex,
-  isHalfSpeed,
+  speedMultiplier,
   getLatencyMs,
   audioRefs,
   getAdjustedTargetFreq,
@@ -108,7 +108,7 @@ export function NoteMatchingProvider({
     activeTablature,
     isMicEnabled,
     currentExerciseIndex,
-    isHalfSpeed,
+    speedMultiplier,
     getLatencyMs,
     audioRefs,
     getAdjustedTargetFreq,

@@ -118,7 +118,6 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
             onGuessed={onEarTrainingGuessed}
             score={earTrainingScore}
             highScore={earTrainingHighScore}
-            exerciseUrl={`/exercises/${activeExercise.id.replace(/_/g, "-")}`}
             canGuess={hasPlayedRiddleOnce}
             onRecordsClick={onLeaderboardClick}
           />

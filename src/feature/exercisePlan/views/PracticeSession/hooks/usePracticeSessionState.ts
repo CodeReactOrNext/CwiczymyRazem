@@ -1,6 +1,6 @@
 import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData } from 'feature/user/store/userSlice';
 import useTimer from 'hooks/useTimer';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from 'store/hooks';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
@@ -124,7 +124,7 @@ export const usePracticeSessionState = ({
   const planTitleString = typeof plan.title === 'string' ? plan.title : plan.title;
 
 
-  return {
+  return useMemo(() => ({
     currentExerciseIndex,
     exerciseKey,
     showCompleteDialog,
@@ -160,5 +160,13 @@ export const usePracticeSessionState = ({
     activityDataToUse,
     jumpToExercise,
     timer,
-  };
+  }), [
+    currentExerciseIndex, exerciseKey, showCompleteDialog, isMobileView,
+    isFullSessionModalOpen, isMounted, currentExercise, isLastExercise,
+    setShowCompleteDialog, handleNextExercise, timer, showSuccessView,
+    restartFullSession, setVideoDuration, videoDuration, handleFinishSession,
+    timerData, canFinishSession, isSkillExercise, isSubmittingReport,
+    completedExercises, reportResult, currentUserStats, previousUserStats,
+    planTitleString, activityDataToUse
+  ]);
 };

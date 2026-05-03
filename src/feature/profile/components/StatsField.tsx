@@ -27,7 +27,7 @@ export const StatsField = ({
   className,
   footerLink,
 }: StatsFieldProps) => {
-  const shouldShowTrend = !description.toLowerCase().includes("rekord");
+  const shouldShowTrend = true;
   const trend = shouldShowTrend && trendData ? calculateTrend(trendData) : null;
   const DATA_LENGTH_FOR_CHART = 7;
 

@@ -1,11 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import type { CalibrationData } from "../../hooks/useCalibration";
-import { ModalWrapper } from "../ModalWrapper";
 import { MicErrorScreen } from "./components/MicErrorScreen";
+import { PermissionStep } from "./components/PermissionStep";
 import { SetupStep } from "./components/SetupStep";
+import { type InputSource, SourceStep } from "./components/SourceStep";
 import { SummaryStep } from "./components/SummaryStep";
 import { TuningStep } from "./components/TuningStep";
 import { useCalibrationCapture } from "./hooks/useCalibrationCapture";
@@ -26,23 +28,27 @@ export const CalibrationWizard = ({
   isOpen, onComplete, onCancel, audioInit, audioRefs,
   isListening, inputGain, onInputGainChange,
 }: CalibrationWizardProps) => {
-  const [step,       setStep]       = useState<"setup" | "tuning" | "summary">("setup");
-  const [isGranting, setIsGranting] = useState(false);
-  const [micError,   setMicError]   = useState(false);
+  const [step,        setStep]        = useState<"source" | "permission" | "setup" | "tuning" | "summary">("source");
+  const [inputSource, setInputSource] = useState<InputSource>("interface");
+  const [isGranting,  setIsGranting]  = useState(false);
+  const [micError,    setMicError]    = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
-    setStep("setup");
+    setStep("source");
     setIsGranting(false);
     setMicError(false);
   }, [isOpen]);
 
-  const { currentStringIndex, currentStr, stringState, offsets, currentOffset, sampleCount, handleRetry, advanceString } =
-    useCalibrationCapture({ step, isOpen, isListening, audioRefs, onAllStringsDone: () => setStep("summary") });
+  const { currentStringIndex, stringState, offsets, currentOffset, sampleCount, handleRetry, advanceString } =
+    useCalibrationCapture({ step: step === "permission" || step === "source" ? "setup" : step, isOpen, isListening, audioRefs, onAllStringsDone: () => setStep("summary") });
 
   const handleGrant = useCallback(async () => {
     setIsGranting(true);
-    try { await audioInit(); }
+    try { 
+      await audioInit(); 
+      setStep("setup");
+    }
     catch { setMicError(true); }
     finally { setIsGranting(false); }
   }, [audioInit]);
@@ -52,50 +58,82 @@ export const CalibrationWizard = ({
 
   if (!isOpen) return null;
 
-  if (micError) {
-    return <MicErrorScreen onRetry={() => { setMicError(false); handleGrant(); }} onCancel={handleCancel} />;
-  }
-
-  return (
-    <ModalWrapper zIndex="z-[99999999]">
-      <AnimatePresence mode="wait">
-        {step === "setup" && (
-          <motion.div key="setup" className="h-full"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <SetupStep
-              isListening={isListening} isLoading={isGranting}
-              audioRefs={audioRefs} inputGain={inputGain}
-              onInputGainChange={onInputGainChange}
-              onGrant={handleGrant}
-              onNext={() => setStep("tuning")}
-              onCancel={handleCancel}
-            />
-          </motion.div>
+  return createPortal(
+    <div className="fixed inset-0 z-[99999999] flex items-center justify-center bg-black/70 backdrop-blur-sm font-openSans">
+      <div className="relative w-full max-w-lg mx-4 bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl overflow-y-auto max-h-[90dvh]">
+        {micError ? (
+          <MicErrorScreen onRetry={() => { setMicError(false); handleGrant(); }} onCancel={handleCancel} />
+        ) : (
+          <AnimatePresence mode="wait">
+            {step === "source" && (
+              <motion.div key="source"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.18 }}
+              >
+                <SourceStep
+                  onSelect={(source) => {
+                    setInputSource(source);
+                    setStep(isListening ? "setup" : "permission");
+                  }}
+                  onCancel={handleCancel}
+                />
+              </motion.div>
+            )}
+            {step === "permission" && (
+              <motion.div key="permission"
+                initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.18 }}
+              >
+                <PermissionStep
+                  isLoading={isGranting}
+                  onGrant={handleGrant}
+                  onBack={() => setStep("source")}
+                  onCancel={handleCancel}
+                />
+              </motion.div>
+            )}
+            {step === "setup" && (
+              <motion.div key="setup"
+                initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.18 }}
+              >
+                <SetupStep
+                  isListening={isListening} isLoading={isGranting}
+                  inputSource={inputSource}
+                  audioRefs={audioRefs} inputGain={inputGain}
+                  onInputGainChange={onInputGainChange}
+                  onGrant={handleGrant}
+                  onNext={() => setStep("tuning")}
+                  onBack={() => setStep(isListening ? "source" : "permission")}
+                  onCancel={handleCancel}
+                />
+              </motion.div>
+            )}
+            {step === "tuning" && (
+              <motion.div key="tuning"
+                initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.22 }}
+              >
+                <TuningStep
+                  currentIndex={currentStringIndex} offsets={offsets}
+                  sampleCount={sampleCount} stringState={stringState}
+                  currentOffset={currentOffset} audioRefs={audioRefs}
+                  onRetry={handleRetry} onAdvance={advanceString} onCancel={handleCancel}
+                />
+              </motion.div>
+            )}
+            {step === "summary" && (
+              <motion.div key="summary"
+                initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
+                transition={{ duration: 0.22 }}
+              >
+                <SummaryStep offsets={offsets} onConfirm={handleConfirm} onCancel={handleCancel} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
-        {step === "tuning" && (
-          <motion.div key="tuning" className="h-full"
-            initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
-            transition={{ duration: 0.22 }}
-          >
-            <TuningStep
-              currentIndex={currentStringIndex} offsets={offsets}
-              sampleCount={sampleCount} stringState={stringState}
-              currentOffset={currentOffset} audioRefs={audioRefs}
-              onRetry={handleRetry} onSkip={advanceString} onCancel={handleCancel}
-            />
-          </motion.div>
-        )}
-        {step === "summary" && (
-          <motion.div key="summary" className="h-full"
-            initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
-            transition={{ duration: 0.22 }}
-          >
-            <SummaryStep offsets={offsets} onConfirm={handleConfirm} onCancel={handleCancel} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </ModalWrapper>
+      </div>
+    </div>,
+    document.body
   );
 };

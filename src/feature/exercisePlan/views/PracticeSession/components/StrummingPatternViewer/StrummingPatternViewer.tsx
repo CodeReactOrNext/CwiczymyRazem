@@ -47,9 +47,9 @@ function StrummingPatternViewerInner({
       </div>
 
       {countInRemaining > 0 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-20 animate-in fade-in duration-300">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-20 animate-in fade-in zoom-in duration-200">
           <div className="flex flex-col items-center">
-            <span className="text-8xl font-black text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)] animate-bounce">
+            <span className="text-8xl font-black text-white drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]">
               {countInRemaining}
             </span>
             <span className="text-xs font-bold uppercase tracking-[0.3em] text-white/50 mt-4">

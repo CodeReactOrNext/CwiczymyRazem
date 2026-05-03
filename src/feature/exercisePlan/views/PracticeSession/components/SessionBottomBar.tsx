@@ -4,7 +4,7 @@ import {
 DialogHeader, DialogTitle, } from "assets/components/ui/dialog";
 import { cn } from "assets/lib/utils";
 import { useTranslation } from "hooks/useTranslation";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { FaCheck, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons/fa";
 
 import type { Exercise } from "../../../types/exercise.types";
@@ -35,7 +35,7 @@ interface SessionBottomBarProps {
 /**
  * Fixed bottom navigation bar: exit button, timer, back/next controls.
  */
-export const SessionBottomBar = ({
+export const SessionBottomBar = memo(({
   onClose,
   exerciseKey,
   currentExercise,
@@ -121,7 +121,7 @@ export const SessionBottomBar = ({
                 ) : isLastExercise ? (
                   <span className="flex items-center gap-2">{t("common:finish_session")} <FaCheck /></span>
                 ) : (
-                  <span className="flex items-center gap-2">{t("common:skip")} <FaStepForward /></span>
+                  <span className="flex items-center gap-2">{t("skip") || "Skip"} <FaStepForward /></span>
                 )}
               </Button>
               {isLastExercise && !canFinishSession && (
@@ -173,4 +173,4 @@ export const SessionBottomBar = ({
 
     </>
   );
-};
+});

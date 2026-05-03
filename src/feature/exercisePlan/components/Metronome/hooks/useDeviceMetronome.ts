@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import { isMobileDevice } from "../utils/deviceDetection";
 import { useMetronome } from "./useMetronome";
@@ -47,7 +47,5 @@ export const useDeviceMetronome = (props: UseDeviceMetronomeProps) => {
     }
   }, [isMobile, mobileMetronome]);
 
-  const metronome = isMobile ? mobileMetronome : desktopMetronome;
-
-  return metronome;
+  return useMemo(() => (isMobile ? mobileMetronome : desktopMetronome), [isMobile, mobileMetronome, desktopMetronome]);
 }; 

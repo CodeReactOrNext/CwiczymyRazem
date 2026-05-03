@@ -27,28 +27,28 @@ export const LevelProgressHero = ({
         <span className="font-teko text-5xl font-medium text-white tracking-tight leading-none">
           Lvl {lvl}
         </span>
-        <div className="h-4 w-[1px] bg-white/10 mx-0.5 self-center hidden md:block" />
-        <span className="font-inter text-xl font-bold text-zinc-600 tracking-tight leading-none">
+        <div className="h-4 w-[1px] bg-white/20 mx-0.5 self-center hidden md:block" />
+        <span className="font-inter text-xl font-bold text-cyan-400 tracking-tight leading-none">
           {Math.round(xpPercent)}%
         </span>
       </div>
 
       <div className="relative h-1.5 w-full bg-zinc-900 rounded-full overflow-hidden border border-white/5">
-        <div 
-          className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)] transition-all duration-1000 ease-out" 
-          style={{ width: `${xpPercent}%` }} 
+        <div
+          className="h-full bg-gradient-to-r from-cyan-600 to-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)] transition-all duration-1000 ease-out"
+          style={{ width: `${xpPercent}%` }}
         />
       </div>
 
       <div className="flex justify-between items-center text-[11px] font-medium text-zinc-500 font-inter">
         <div className="flex items-center gap-1.5">
-          <span className="text-zinc-400">{ptsInLevel.toLocaleString()}</span>
-          <span className="text-zinc-800">/</span>
+          <span className="text-zinc-300">{ptsInLevel.toLocaleString()}</span>
+          <span className="text-zinc-600">/</span>
           <span>{lvlRange.toLocaleString()} xp</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="h-px w-4 bg-zinc-800" />
-          <span className="text-zinc-600">Level {lvl + 1}</span>
+          <span className="h-px w-4 bg-zinc-700" />
+          <span className="text-zinc-400">Level {lvl + 1}</span>
         </div>
       </div>
     </div>

@@ -113,7 +113,7 @@ export const MainTimerSection = ({
         className='space-y-6'>
         {/* Conditionally render Exercise Information Card */}
         {showExerciseInfo && (
-          <Card className='border-zinc-700/50 bg-zinc-900/50 backdrop-blur-sm'>
+          <Card className='border-zinc-700/50 bg-zinc-900'>
             <div className='bg-gradient-to-r from-zinc-800/30 to-zinc-800/10'>
               <ExerciseDescription exercise={currentExercise} />
             </div>
@@ -154,7 +154,7 @@ export const MainTimerSection = ({
                 
                 {/* Time Info (Default) */}
                 <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 w-max">
-                    <div className="flex items-center gap-6 bg-zinc-900/90 backdrop-blur-xl px-6 py-3 rounded-2xl border border-white/10 shadow-2xl">
+                    <div className="flex items-center gap-6 bg-zinc-900 px-6 py-3 rounded-2xl border border-white/10 shadow-2xl">
                         <div className="flex flex-col items-center px-2">
                             <span className="text-[9px] font-black uppercase tracking-[0.2em] text-cyan-500/70 mb-1.5">Session Total</span>
                             <div className="flex items-center gap-2">

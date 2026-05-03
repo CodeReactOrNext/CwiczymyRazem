@@ -11,8 +11,8 @@ import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 export const MicHud = () => {
   const { gameState, maxPossibleScore, sessionAccuracy } = useNoteMatchingContext();
   return (
-  <div className="w-full max-w-5xl mb-6 animate-in fade-in slide-in-from-top-6 duration-700">
-    <div className="flex items-end justify-between gap-8">
+  <div className="w-full max-w-2xl mb-10 animate-in fade-in slide-in-from-top-6 duration-700">
+    <div className="flex items-end justify-between gap-4">
 
       {/* Left: Accuracy */}
       <div className="flex-1 flex items-center gap-3">
@@ -66,7 +66,7 @@ export const MicHud = () => {
       </div>
 
       {/* Right: Streak + Multiplier */}
-      <div className="flex-1 flex justify-end items-center gap-8">
+      <div className="flex-1 flex justify-end items-center gap-4">
         <div className="text-right">
           <span className="block text-[10px] font-semibold tracking-wide text-zinc-500 mb-1">Note Streak</span>
           <div className="flex items-center justify-end gap-3">

@@ -83,7 +83,7 @@ export function useCalibration(planHasTablature: boolean) {
   }, []);
 
   const handleCalibrationCancel = useCallback(() => {
-    setSessionPhase("mic_prompt");
+    setSessionPhase("ready");
   }, []);
 
   const getAdjustedTargetFreq = useCallback(
