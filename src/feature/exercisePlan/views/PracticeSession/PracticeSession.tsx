@@ -12,7 +12,6 @@ import { createPortal } from "react-dom";
 import { useAppSelector } from "store/hooks";
 
 import { useDeviceMetronome } from "../../components/Metronome/hooks/useDeviceMetronome";
-import { useBpmProgress } from "../../hooks/useBpmProgress";
 import type { ExercisePlan } from "../../types/exercise.types";
 import { TimerProvider, useTimerContext } from "./contexts/TimerContext";
 import type { NoteMatchingHandle, NoteMatchingSnapshot } from "./contexts/NoteMatchingContext";
@@ -26,10 +25,13 @@ import { useScoreSaving } from "./hooks/useScoreSaving";
 import { useSessionAudio } from "./hooks/useSessionAudio";
 import { useSessionControls } from "./hooks/useSessionControls";
 import { usePracticeSessionState } from "./hooks/usePracticeSessionState";
+import { usePlaybackReducer } from "./hooks/usePlaybackReducer";
 import { DesktopSessionView } from "./components/DesktopSessionView";
 import { ExerciseSuccessView } from "./components/ExerciseSuccessView";
 import { GpLoadingOverlay } from "./components/GpLoadingOverlay";
 import { GeneratedExerciseDialogs } from "./components/GeneratedExerciseDialogs";
+import { SessionUIProvider } from "./contexts/SessionUIContext";
+import { BpmProgressProvider } from "./contexts/BpmProgressContext";
 import SessionModal from "./modals/SessionModal";
 import { SessionDialogs } from "./components/SessionDialogs";
 
@@ -98,8 +100,6 @@ export const PracticeSession = ({
     );
   }
 
-  const { bpmStages, completedBpms, isLoading: isBpmLoading, handleToggleBpm } = useBpmProgress(currentExercise);
-
   // ── GP file loading ───────────────────────────────────────────────────────
 
   const { effectiveRawGpFile, isFetchingGpFile, parsedGpTracks } = useGpFileLoader({
@@ -111,20 +111,15 @@ export const PracticeSession = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── UI state ──────────────────────────────────────────────────────────────
+  // ── Playback settings (Reducer) ──────────────────────────────────────────
 
-  const [isAudioMuted,       setIsAudioMuted]       = useState(true);
-  const [showLeaderboard,    setShowLeaderboard]     = useState(false);
-  const [isMetronomeMuted,   setIsMetronomeMuted]    = useState(false);
-  const [isHalfSpeed,        setIsHalfSpeed]         = useState(false);
-  const [showAlphaTabScore,  setShowAlphaTabScore]   = useState(false);
-  const [tabRepeatCount]                             = useState(0);
-  const [selectedGpTrackIdx, setSelectedGpTrackIdx] = useState(0);
+  const {
+    isAudioMuted, isMetronomeMuted, isHalfSpeed, showAlphaTabScore, selectedGpTrackIdx,
+    setIsAudioMuted, setIsMetronomeMuted, setIsHalfSpeed, setSelectedGpTrackIdx,
+    toggleAlphaTabScore, resetForExercise
+  } = usePlaybackReducer();
+  const [tabRepeatCount] = useState(0);
   const loopsCompletedRef = useRef(0);
-
-  const handleToggleAlphaTabScore = () => {
-    setShowAlphaTabScore(prev => { const next = !prev; if (next) setIsAudioMuted(false); return next; });
-  };
 
   // ── Generated exercise ────────────────────────────────────────────────────
 
@@ -163,13 +158,17 @@ export const PracticeSession = ({
   } = useEarTraining({ currentExercise, userAuth, restartMetronome: metronome.restartMetronome, startMetronome: metronome.startMetronome, currentBpm: metronome.bpm, setBpm: metronome.setBpm });
 
   useEffect(() => {
-    if (examMode) { setIsAudioMuted(true); }
-    else if (currentExercise.riddleConfig?.mode === "sequenceRepeat") { setIsAudioMuted(false); }
-    else {
+    let nextAudioMuted = true;
+    if (examMode) {
+      nextAudioMuted = true;
+    } else if (currentExercise.riddleConfig?.mode === "sequenceRepeat") {
+      nextAudioMuted = false;
+    } else {
       const pref = loadGuitarPlaybackPreference();
-      setIsAudioMuted(pref !== null ? !pref : !(currentExercise.tablature && currentExercise.tablature.length > 0));
+      nextAudioMuted = pref !== null ? !pref : !(currentExercise.tablature && currentExercise.tablature.length > 0);
     }
-    setIsMetronomeMuted(false); setIsHalfSpeed(false); setSelectedGpTrackIdx(0);
+
+    resetForExercise({ isAudioMuted: nextAudioMuted });
   }, [currentExercise.id]);
 
   const activeTablature = riddleMeasures
@@ -278,6 +277,8 @@ export const PracticeSession = ({
       onReset={handleNoteMatchingReset}
     >
     <TimerProvider timer={timer} durationInSeconds={videoDuration !== null ? videoDuration : (activeExercise.timeInMinutes || 0) * 60} freeMode={freeMode}>
+    <BpmProgressProvider exercise={currentExercise}>
+    <SessionUIProvider>
     <>
       <SessionPageHead exerciseTitle={activeExercise.title} />
 
@@ -352,15 +353,12 @@ export const PracticeSession = ({
           earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
           exerciseUrl={`/exercises/${activeExercise.id.replace(/_/g, "-")}`}
           onEarTrainingGuessed={handleEarTrainingGuessed}
-          bpmStages={bpmStages} completedBpms={completedBpms}
-          isBpmLoading={isBpmLoading} onBpmToggle={handleToggleBpm}
-          onRecordsClick={() => setShowLeaderboard(true)}
         />,
         document.body,
       )}
 
       <DesktopSessionView
-        isMobileView={isMobileView} reportResult={reportResult}
+        reportResult={reportResult}
         currentUserStats={currentUserStats} previousUserStats={previousUserStats}
         activityDataToUse={activityDataToUse} router={router}
         handleRestartFullSession={handleRestartFullSession}
@@ -370,7 +368,7 @@ export const PracticeSession = ({
         handleExerciseSelect={handleExerciseSelect} isMicEnabled={isMicEnabled}
         allGpTracks={parsedGpTracks} showAlphaTabScore={showAlphaTabScore}
         selectedGpTrackIdx={selectedGpTrackIdx} setSelectedGpTrackIdx={setSelectedGpTrackIdx}
-        handleToggleAlphaTabScore={handleToggleAlphaTabScore}
+        handleToggleAlphaTabScore={toggleAlphaTabScore}
         effectiveRawGpFile={effectiveRawGpFile} activeTablature={activeTablature}
         isAudioPlaying={isAudioPlaying} metronomeStartTime={metronome.startTime}
         effectiveBpm={effectiveBpm} isAudioMuted={isAudioMuted}
@@ -391,12 +389,10 @@ export const PracticeSession = ({
         handleNextExerciseClick={handleNextExerciseClick}
         onAudioToggle={handleAudioToggle} onMicToggle={handleMicToggle}
         onRecalibrate={handleRecalibrate} isHalfSpeed={isHalfSpeed}
-        handleHalfSpeedToggle={handleHalfSpeedToggle} setShowLeaderboard={setShowLeaderboard}
+        handleHalfSpeedToggle={handleHalfSpeedToggle}
         metronome={metronome} isMetronomeMuted={isMetronomeMuted}
         setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
         trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}
-        bpmStages={bpmStages} completedBpms={completedBpms}
-        isBpmLoading={isBpmLoading} onBpmToggle={handleToggleBpm}
         examMode={examMode} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
         handleRestart={handleRestart} sessionTimerData={sessionTimerData}
         canSkipExercise={canSkipExercise}
@@ -419,12 +415,13 @@ export const PracticeSession = ({
         handleCalibrationCancel={handleCalibrationCancel} handleCalibrationComplete={handleCalibrationComplete}
         audioInit={initAudio} audioClose={closeAudio} audioRefs={audioRefs}
         isListening={isListening} inputGain={inputGain} setInputGain={setInputGain}
-        exerciseId={activeExercise.id} leaderboardOpen={showLeaderboard}
-        setLeaderboardOpen={setShowLeaderboard} isMounted={isMounted}
+        exerciseId={activeExercise.id} isMounted={isMounted}
         hasReportResult={!!reportResult} showSuccessView={showSuccessView}
         isLastExercise={isLastExercise}
       />
     </>
+    </SessionUIProvider>
+    </BpmProgressProvider>
     </TimerProvider>
     </NoteMatchingProvider>
   );

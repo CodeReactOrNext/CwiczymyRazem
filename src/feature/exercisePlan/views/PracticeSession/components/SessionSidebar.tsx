@@ -10,6 +10,7 @@ import { BpmProgressGrid } from "../../../components/BpmProgressGrid";
 import { Metronome } from "../../../components/Metronome/Metronome";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { Exercise } from "../../../types/exercise.types";
+import { useBpmProgressContext } from "../contexts/BpmProgressContext";
 
 interface SessionSidebarProps {
   currentExercise: Exercise;
@@ -22,11 +23,6 @@ interface SessionSidebarProps {
   audioTracks: AudioTrackConfig[];
   trackConfigs: Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs: React.Dispatch<React.SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
-  // BPM progress
-  bpmStages: any[];
-  completedBpms: any[];
-  isBpmLoading: boolean;
-  onBpmToggle: (bpm: number) => void;
   /** Exam mode — metronome BPM is locked */
   examMode?: boolean;
 
@@ -43,12 +39,9 @@ export const SessionSidebar = memo(function SessionSidebar({
   setIsMetronomeMuted,
   audioTracks,
   setTrackConfigs,
-  bpmStages,
-  completedBpms,
-  isBpmLoading,
-  onBpmToggle,
   examMode = false,
 }: SessionSidebarProps) {
+  const { bpmStages, completedBpms, isBpmLoading, onBpmToggle } = useBpmProgressContext();
   return (
     <>
         {currentExercise.metronomeSpeed && (

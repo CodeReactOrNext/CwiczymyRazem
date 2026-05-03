@@ -17,6 +17,7 @@ import { GiGuitar } from "react-icons/gi";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
 import { useTimerContext } from "../contexts/TimerContext";
+import { useBpmProgressContext } from "../contexts/BpmProgressContext";
 
 interface LandscapeSessionModalProps {
   isOpen: boolean;
@@ -50,11 +51,6 @@ interface LandscapeSessionModalProps {
   earTrainingHighScore?: number | null;
   exerciseUrl?: string;
   onEarTrainingGuessed?: () => void;
-  onRecordsClick?: () => void;
-  bpmStages?: number[];
-  completedBpms?: number[];
-  isBpmLoading?: boolean;
-  onBpmToggle?: (bpm: number) => void;
   examMode?: boolean;
   isListening: boolean;
   frequencyRef?: React.MutableRefObject<number>;
@@ -102,11 +98,6 @@ export function LandscapeSessionModal({
   earTrainingHighScore,
   exerciseUrl,
   onEarTrainingGuessed,
-  onRecordsClick,
-  bpmStages,
-  completedBpms,
-  isBpmLoading,
-  onBpmToggle,
   examMode,
   isListening,
   frequencyRef,
@@ -121,6 +112,7 @@ export function LandscapeSessionModal({
   handleBackExerciseClick,
   handleRestart,
 }: LandscapeSessionModalProps) {
+  const { bpmStages, completedBpms, isBpmLoading, onBpmToggle } = useBpmProgressContext();
   const { t } = useTranslation(["exercises"]);
   const [isPanelExpanded, setIsPanelExpanded] = useState(true);
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
@@ -162,7 +154,6 @@ export function LandscapeSessionModal({
                   handleRevealRiddle={handleRevealRiddle}
                   handleNextRiddle={handleNextRiddle}
                   onEarTrainingGuessed={onEarTrainingGuessed}
-                  onRecordsClick={onRecordsClick}
                   onPlayRiddle={handleToggleTimer}
                 />
               </div>

@@ -10,7 +10,7 @@ function interpolateHue(curr: number, target: number, step: number): number {
 }
 
 export function useAmbientMicGlow(
-  ambientGlowRef: RefObject<HTMLDivElement>,
+  ambientGlowRef: { current: HTMLDivElement | null },
   volumeRef:      MutableRefObject<number> | undefined,
   frequencyRef:   MutableRefObject<number> | undefined,
 ): void {

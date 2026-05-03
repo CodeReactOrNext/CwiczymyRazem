@@ -24,6 +24,7 @@ import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
 import { useTimerContext } from "../contexts/TimerContext";
+import { useBpmProgressContext } from "../contexts/BpmProgressContext";
 import { LandscapeSessionModal } from "./LandscapeSessionModal";
 
 interface SessionModalProps {
@@ -70,11 +71,6 @@ interface SessionModalProps {
   exerciseUrl?: string;
   handleRevealRiddle?: () => void;
   onEarTrainingGuessed?: () => void;
-  bpmStages?: number[];
-  completedBpms?: number[];
-  isBpmLoading?: boolean;
-  onBpmToggle?: (bpm: number) => void;
-  onRecordsClick?: () => void;
   examMode?: boolean;
 }
 
@@ -122,13 +118,9 @@ const SessionModal = ({
   earTrainingHighScore,
   exerciseUrl,
   onEarTrainingGuessed,
-  bpmStages,
-  completedBpms,
-  isBpmLoading,
-  onBpmToggle,
-  onRecordsClick,
   examMode,
 }: SessionModalProps) => {
+  const { bpmStages, completedBpms, isBpmLoading, onBpmToggle } = useBpmProgressContext();
   const { formattedTimeLeft } = useTimerContext();
   // Hooks must be above any early returns
   const { t } = useTranslation(["exercises", "common"]);
@@ -211,11 +203,6 @@ const SessionModal = ({
         earTrainingHighScore={earTrainingHighScore}
         exerciseUrl={exerciseUrl}
         onEarTrainingGuessed={onEarTrainingGuessed}
-        onRecordsClick={onRecordsClick}
-        bpmStages={bpmStages}
-        completedBpms={completedBpms}
-        isBpmLoading={isBpmLoading}
-        onBpmToggle={onBpmToggle}
         examMode={examMode}
         isListening={isListening}
         frequencyRef={frequencyRef}
@@ -271,7 +258,6 @@ const SessionModal = ({
             handleRevealRiddle={handleRevealRiddle}
             handleNextRiddle={handleNextRiddle}
             onEarTrainingGuessed={onEarTrainingGuessed}
-            onRecordsClick={onRecordsClick}
             onPlayRiddle={handleToggleTimer}
           />
 
@@ -314,7 +300,6 @@ const SessionModal = ({
           {isMicEnabled && <MobileMicGameHud />}
 
           <MobileTimerDisplay
-            formattedTimeLeft={formattedTimeLeft}
             isPlaying={isPlaying}
             sessionTimerData={sessionTimerData}
           />

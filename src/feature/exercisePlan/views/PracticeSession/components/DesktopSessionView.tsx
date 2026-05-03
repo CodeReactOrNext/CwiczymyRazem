@@ -3,7 +3,7 @@ import { cn } from "assets/lib/utils";
 import type { ExercisePlan, Exercise } from "feature/exercisePlan/types/exercise.types";
 import RatingPopUp from "layouts/RatingPopUpLayout/RatingPopUpLayout";
 import type { NextRouter } from "next/router";
-import type { Dispatch, RefObject, SetStateAction } from "react";
+import React, { Dispatch, RefObject, SetStateAction } from "react";
 
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { BackingTrack, TablatureMeasure } from "../../../types/exercise.types";
@@ -17,9 +17,9 @@ import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { MicHud } from "./MicHud";
 import { SessionBottomBar } from "./SessionBottomBar";
 import { SessionSidebar } from "./SessionSidebar";
+import { useSessionUI } from "../contexts/SessionUIContext";
 
 interface DesktopSessionViewProps {
-  isMobileView:             boolean;
   reportResult:             any;
   currentUserStats:         any;
   previousUserStats:        any;
@@ -47,8 +47,8 @@ interface DesktopSessionViewProps {
   isAudioMuted:             boolean;
   isMetronomePlaying:       boolean;
   countInRemaining:         number;
-  frequencyRef:             RefObject<Float32Array | null>;
-  volumeRef:                RefObject<number>;
+  frequencyRef:             React.MutableRefObject<number>;
+  volumeRef:                React.MutableRefObject<number>;
   isListening:              boolean;
   metronomeAudioContext:    AudioContext | null | undefined;
   effectiveAudioStartTime:  number | null;
@@ -57,7 +57,7 @@ interface DesktopSessionViewProps {
   isRiddleGuessed:          boolean;
   hasPlayedRiddleOnce:      boolean;
   earTrainingScore:         number;
-  earTrainingHighScore:     number;
+  earTrainingHighScore:     number | null;
   handleRevealRiddle:       () => void;
   handleNextRiddle:         () => void;
   handleEarTrainingGuessed: () => void;
@@ -73,19 +73,14 @@ interface DesktopSessionViewProps {
   onRecalibrate:            () => void;
   isHalfSpeed:              boolean;
   handleHalfSpeedToggle:    (v: boolean | ((prev: boolean) => boolean)) => void;
-  setShowLeaderboard:       (open: boolean) => void;
   metronome:                any;
   isMetronomeMuted:         boolean;
   setIsMetronomeMuted:      (v: boolean) => void;
   audioTracks:              AudioTrackConfig[];
   trackConfigs:             Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs:          Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
-  bpmStages:                any;
-  completedBpms:            any;
-  isBpmLoading:             boolean;
-  onBpmToggle:              (bpm: number) => void;
   examMode:                 boolean;
-  exerciseKey:              string | number;
+  exerciseKey:              number;
   isLastExercise:           boolean;
   handleRestart:            () => void;
   sessionTimerData:         any;
@@ -104,8 +99,18 @@ interface DesktopSessionViewProps {
 }
 
 export function DesktopSessionView(p: DesktopSessionViewProps) {
+  const { openLeaderboard } = useSessionUI();
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   return (
-    <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", p.isMobileView && "hidden")}>
+    <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobile && "hidden")}>
       <BackgroundAmbiance category={p.category as any} isPlayalong={p.currentExercise.isPlayalong} visible={!p.reportResult} />
       <TooltipProvider>
         <div>
@@ -149,7 +154,7 @@ export function DesktopSessionView(p: DesktopSessionViewProps) {
                     showAlphaTabScore={p.showAlphaTabScore} onToggleAlphaTabScore={p.handleToggleAlphaTabScore}
                     isAudioPlaying={p.isAudioPlaying} startTime={p.metronomeStartTime}
                     effectiveBpm={p.effectiveBpm} isAudioMuted={p.isAudioMuted}
-                    isMobileView={p.isMobileView} isMetronomePlaying={p.isMetronomePlaying}
+                    isMetronomePlaying={p.isMetronomePlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}
                     audioStartTime={p.effectiveAudioStartTime} tabResetKey={p.tabResetKey}
@@ -158,7 +163,7 @@ export function DesktopSessionView(p: DesktopSessionViewProps) {
                     earTrainingHighScore={p.earTrainingHighScore} onPlayRiddle={p.handleToggleTimer}
                     onRevealRiddle={p.handleRevealRiddle} onNextRiddle={p.handleNextRiddle}
                     onEarTrainingGuessed={p.handleEarTrainingGuessed}
-                    onLeaderboardClick={() => p.setShowLeaderboard(true)}
+                    onLeaderboardClick={() => openLeaderboard()}
                     startTimer={p.startTimer} stopTimer={p.stopTimer}
                     setVideoDuration={p.setVideoDuration} setTimerTime={p.setTimerTime}
                     onVideoEnd={p.handleNextExerciseClick} isPlaying={p.isPlaying}
@@ -170,10 +175,10 @@ export function DesktopSessionView(p: DesktopSessionViewProps) {
                   <SessionSidebar
                     currentExercise={p.currentExercise} activeExercise={p.activeExercise}
                     metronome={p.metronome} isMetronomeMuted={p.isMetronomeMuted}
-                    setIsMetronomeMuted={p.setIsMetronomeMuted} audioTracks={p.audioTracks}
+                    setIsMetronomeMuted={p.setIsMetronomeMuted}
+                    audioTracks={p.audioTracks}
                     trackConfigs={p.trackConfigs} setTrackConfigs={p.setTrackConfigs}
-                    bpmStages={p.bpmStages} completedBpms={p.completedBpms}
-                    isBpmLoading={p.isBpmLoading} onBpmToggle={p.onBpmToggle} examMode={p.examMode}
+                    examMode={p.examMode}
                   />
                 </ExerciseInfoGrid>
 

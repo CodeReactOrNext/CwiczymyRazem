@@ -2,6 +2,7 @@ import React from "react";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { useSessionUI } from "../contexts/SessionUIContext";
 import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
@@ -30,7 +31,6 @@ interface MobileExerciseContentProps {
   handleRevealRiddle?: () => void;
   handleNextRiddle?: () => void;
   onEarTrainingGuessed?: () => void;
-  onRecordsClick?: () => void;
   onPlayRiddle: () => void;
 }
 
@@ -57,9 +57,9 @@ export function MobileExerciseContent({
   handleRevealRiddle,
   handleNextRiddle,
   onEarTrainingGuessed,
-  onRecordsClick,
   onPlayRiddle,
 }: MobileExerciseContentProps) {
+  const { openLeaderboard } = useSessionUI();
   const { hitNotes, missedNotes } = useNoteMatchingContext();
 
   return (
@@ -78,7 +78,7 @@ export function MobileExerciseContent({
           highScore={earTrainingHighScore}
           exerciseUrl={exerciseUrl}
           canGuess={hasPlayedRiddleOnce || false}
-          onRecordsClick={onRecordsClick}
+          onRecordsClick={openLeaderboard}
         />
       )}
       {currentExercise.riddleConfig?.mode === 'improvPrompt' && (
