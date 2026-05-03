@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 
 import { getExerciseBpmProgress } from "../../../services/bpmProgressService";
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
+import { useAppSelector } from "store/hooks";
+import { selectUserAuth } from "feature/user/store/userSlice";
 
 interface UseEarTrainingOptions {
   currentExercise: Exercise;
-  userAuth: string | null | undefined;
+
   restartMetronome: () => void;
   startMetronome: () => void;
   currentBpm: number;
@@ -15,12 +17,14 @@ interface UseEarTrainingOptions {
 
 export function useEarTraining({
   currentExercise,
-  userAuth,
+
   restartMetronome,
   startMetronome,
   currentBpm,
   setBpm,
 }: UseEarTrainingOptions) {
+  const userAuth   = useAppSelector(selectUserAuth);
+  
   const [riddleMeasures,       setRiddleMeasures]       = useState<TablatureMeasure[] | null>(null);
   const [isRiddleRevealed,     setIsRiddleRevealed]     = useState(false);
   const [isRiddleGuessed,      setIsRiddleGuessed]      = useState(false);

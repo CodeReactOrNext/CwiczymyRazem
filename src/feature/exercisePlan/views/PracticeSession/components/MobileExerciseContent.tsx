@@ -27,7 +27,6 @@ interface MobileExerciseContentProps {
   onVideoEnd: () => void;
   earTrainingScore?: number;
   earTrainingHighScore?: number | null;
-  exerciseUrl?: string;
   handleRevealRiddle?: () => void;
   handleNextRiddle?: () => void;
   onEarTrainingGuessed?: () => void;
@@ -53,7 +52,6 @@ export function MobileExerciseContent({
   onVideoEnd,
   earTrainingScore,
   earTrainingHighScore,
-  exerciseUrl,
   handleRevealRiddle,
   handleNextRiddle,
   onEarTrainingGuessed,
@@ -76,7 +74,6 @@ export function MobileExerciseContent({
           onGuessed={() => { if (onEarTrainingGuessed) onEarTrainingGuessed(); }}
           score={earTrainingScore || 0}
           highScore={earTrainingHighScore}
-          exerciseUrl={exerciseUrl}
           canGuess={hasPlayedRiddleOnce || false}
           onRecordsClick={openLeaderboard}
         />

@@ -15,7 +15,6 @@ interface SessionModalControlsProps {
   currentExerciseIndex: number;
   isFinishing?: boolean;
   isSubmittingReport?: boolean;
-  canSkipExercise?: boolean;
   onRestart?: () => void;
   examMode?: boolean;
 }
@@ -29,7 +28,6 @@ export const SessionModalControls = ({
   handleNextExercise,
   isFinishing,
   isSubmittingReport,
-  canSkipExercise = true,
   handleBackExercise,
   currentExerciseIndex,
   onRestart,
@@ -92,12 +90,11 @@ export const SessionModalControls = ({
           {!examMode && (
             <Button
               onClick={isLastExercise ? onFinish : handleNextExercise}
-              disabled={isFinishing || isSubmittingReport || !canSkipExercise}
+              disabled={isFinishing || isSubmittingReport }
               variant="ghost"
               size="icon"
                className={cn(
                 "h-12 w-12 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white transition-all",
-                !canSkipExercise && "opacity-50 cursor-not-allowed"
               )}
             >
               {isFinishing || isSubmittingReport ? (

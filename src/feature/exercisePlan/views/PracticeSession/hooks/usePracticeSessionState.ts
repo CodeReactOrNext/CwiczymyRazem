@@ -1,4 +1,4 @@
-import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAuth } from 'feature/user/store/userSlice';
+import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData } from 'feature/user/store/userSlice';
 import useTimer from 'hooks/useTimer';
 import { useCallback, useEffect, useState } from 'react';
 import { useAppSelector } from 'store/hooks';
@@ -9,7 +9,6 @@ import { useExerciseTimerSync } from './useExerciseTimerSync';
 import { useSessionActivity } from './useSessionActivity';
 import { useSessionProgress } from './useSessionProgress';
 import { useSessionReporting } from './useSessionReporting';
-import { useSessionTimerLogic } from './useSessionTimerLogic';
 import { useTimeTracking } from './useTimeTracking';
 import { useUIState } from './useUIState';
 
@@ -30,7 +29,6 @@ export const usePracticeSessionState = ({
   freeMode,
   skillRewardSkillId,
 }: UsePracticeSessionStateProps) => {
-  const userAuth = useAppSelector(selectUserAuth);
   const timerData = useAppSelector(selectTimerData);
   const currentUserStats = useAppSelector(selectCurrentUserStats);
   const previousUserStats = useAppSelector(selectPreviousUserStats);
@@ -43,7 +41,6 @@ export const usePracticeSessionState = ({
     setCurrentExerciseIndex,
     exerciseKey,
     currentExercise,
-    nextExercise,
     isLastExercise,
     handleNextExercise: baseHandleNextExercise,
   } = useExerciseNavigation(plan);
@@ -87,22 +84,13 @@ export const usePracticeSessionState = ({
     });
 
   useSessionActivity({
-    userAuth,
     plan,
     currentExercise,
   });
 
-  const { exerciseTimes, saveTime, getTime, resetExerciseTimes } = useExerciseTimerSync();
+  const { saveTime, getTime, resetExerciseTimes } = useExerciseTimerSync();
 
-  const toggleTimer = (metronomeToggle?: () => void) => {
-    if (timer.timerEnabled) {
-      timer.stopTimer();
-      if (metronomeToggle) metronomeToggle();
-    } else {
-      timer.startTimer();
-      if (metronomeToggle) metronomeToggle();
-    }
-  };
+
 
   const restartFullSession = useCallback(() => {
     resetReporting();
@@ -144,18 +132,14 @@ export const usePracticeSessionState = ({
     isFullSessionModalOpen,
     isMounted,
     currentExercise,
-    nextExercise,
     isLastExercise,
-    isPlaying: timer.timerEnabled,
     setShowCompleteDialog,
     handleNextExercise,
-    toggleTimer,
     startTimer: timer.startTimer,
     stopTimer: timer.stopTimer,
     resetTimer: timer.restartTime,
     setTimerTime: timer.setInitialStartTime,
     showSuccessView,
-    setShowSuccessView,
     restartFullSession,
     resetSuccessView: () => setShowSuccessView(false),
     setVideoDuration,
@@ -165,7 +149,6 @@ export const usePracticeSessionState = ({
       micPerformance?: any,
       earTrainingPerformance?: any
     ) => handleFinishSession(timerData, timer.stopTimer, exerciseRecords, micPerformance, earTrainingPerformance),
-    canSkipExercise: true,
     canFinishSession,
     isSkillExercise,
     isSubmittingReport,
@@ -174,7 +157,6 @@ export const usePracticeSessionState = ({
     currentUserStats,
     previousUserStats,
     planTitleString,
-    sessionTimerData: timerData,
     activityDataToUse,
     jumpToExercise,
     timer,

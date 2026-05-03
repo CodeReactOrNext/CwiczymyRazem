@@ -9,7 +9,7 @@ interface ExerciseControlsProps {
   handleNextExercise: () => void;
   size?: "sm" | "md" | "lg";
   variant?: "default" | "centered";
-  canSkipExercise?: boolean;
+
   hidePlayButton?: boolean;
   isFinished?: boolean;
   riddleConfig?: any;
@@ -23,7 +23,7 @@ const ExerciseControls = ({
   handleNextExercise,
   size = "md",
   variant = "default",
-  canSkipExercise = true,
+
   hidePlayButton = false,
   isFinished = false,
   handleRestart
@@ -116,10 +116,8 @@ const ExerciseControls = ({
           size={size === "lg" ? "lg" : "default"}
           variant='ghost'
           onClick={handleNextExercise}
-          disabled={!canSkipExercise}
           className={cn(
             "flex-1 rounded-lg transition-background click-behavior",
-            !canSkipExercise && "opacity-50 cursor-not-allowed hover:bg-transparent"
           )}>
           <FaStepForward className={iconSizes[size]} />
         </Button>

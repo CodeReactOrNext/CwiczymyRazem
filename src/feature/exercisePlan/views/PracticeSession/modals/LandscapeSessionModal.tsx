@@ -30,7 +30,6 @@ interface LandscapeSessionModalProps {
   isPlaying: boolean;
   isFinishing?: boolean;
   isSubmittingReport?: boolean;
-  canSkipExercise?: boolean;
   metronome: any;
   effectiveBpm?: number;
   isMicEnabled: boolean;
@@ -49,7 +48,6 @@ interface LandscapeSessionModalProps {
   handleNextRiddle?: () => void;
   earTrainingScore?: number;
   earTrainingHighScore?: number | null;
-  exerciseUrl?: string;
   onEarTrainingGuessed?: () => void;
   examMode?: boolean;
   isListening: boolean;
@@ -77,7 +75,6 @@ export function LandscapeSessionModal({
   isPlaying,
   isFinishing,
   isSubmittingReport,
-  canSkipExercise,
   metronome,
   effectiveBpm,
   isMicEnabled,
@@ -96,7 +93,6 @@ export function LandscapeSessionModal({
   handleNextRiddle,
   earTrainingScore,
   earTrainingHighScore,
-  exerciseUrl,
   onEarTrainingGuessed,
   examMode,
   isListening,
@@ -150,7 +146,6 @@ export function LandscapeSessionModal({
                   onVideoEnd={handleNextExerciseClick}
                   earTrainingScore={earTrainingScore}
                   earTrainingHighScore={earTrainingHighScore}
-                  exerciseUrl={exerciseUrl}
                   handleRevealRiddle={handleRevealRiddle}
                   handleNextRiddle={handleNextRiddle}
                   onEarTrainingGuessed={onEarTrainingGuessed}
@@ -379,7 +374,7 @@ export function LandscapeSessionModal({
                 {!examMode && (
                   <Button
                     onClick={isLastExercise ? onFinish : handleNextExerciseClick}
-                    disabled={isFinishing || isSubmittingReport || !canSkipExercise}
+                    disabled={isFinishing || isSubmittingReport }
                     variant="ghost" size="icon"
                     className="h-9 w-9 shrink-0 rounded-full border border-white/5 bg-white/5 text-zinc-400 hover:text-white"
                   >

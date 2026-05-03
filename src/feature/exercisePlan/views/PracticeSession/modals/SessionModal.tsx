@@ -33,22 +33,18 @@ interface SessionModalProps {
   onFinish: () => void;
   isMounted: boolean;
   currentExercise: any;
-  nextExercise: any | null;
   currentExerciseIndex: number;
   totalExercises: number;
   isLastExercise: boolean;
   isPlaying: boolean;
-  toggleTimer: () => void;
   handleNextExercise: () => void;
   handleBackExercise: () => void;
-  sessionTimerData: any;
   setVideoDuration: (duration: number) => void;
   setTimerTime: (time: number) => void;
   startTimer: () => void;
   stopTimer: () => void;
   isFinishing?: boolean;
   isSubmittingReport?: boolean;
-  canSkipExercise?: boolean;
   metronome: any;
   effectiveBpm?: number;
   isMicEnabled: boolean;
@@ -68,7 +64,6 @@ interface SessionModalProps {
   handleNextRiddle?: () => void;
   earTrainingScore?: number;
   earTrainingHighScore?: number | null;
-  exerciseUrl?: string;
   handleRevealRiddle?: () => void;
   onEarTrainingGuessed?: () => void;
   examMode?: boolean;
@@ -80,22 +75,18 @@ const SessionModal = ({
   onFinish,
   isMounted,
   currentExercise,
-  nextExercise,
   currentExerciseIndex,
   totalExercises,
   isLastExercise,
   isPlaying,
-  toggleTimer,
   handleNextExercise,
   handleBackExercise,
-  sessionTimerData,
   setVideoDuration,
   setTimerTime,
   startTimer,
   stopTimer,
   isFinishing,
   isSubmittingReport,
-  canSkipExercise,
   metronome,
   effectiveBpm,
   isMicEnabled,
@@ -116,7 +107,6 @@ const SessionModal = ({
   handleRevealRiddle,
   earTrainingScore,
   earTrainingHighScore,
-  exerciseUrl,
   onEarTrainingGuessed,
   examMode,
 }: SessionModalProps) => {
@@ -182,7 +172,6 @@ const SessionModal = ({
         isPlaying={isPlaying}
         isFinishing={isFinishing}
         isSubmittingReport={isSubmittingReport}
-        canSkipExercise={canSkipExercise}
         metronome={metronome}
         effectiveBpm={effectiveBpm}
         isMicEnabled={isMicEnabled}
@@ -201,7 +190,6 @@ const SessionModal = ({
         handleNextRiddle={handleNextRiddle}
         earTrainingScore={earTrainingScore}
         earTrainingHighScore={earTrainingHighScore}
-        exerciseUrl={exerciseUrl}
         onEarTrainingGuessed={onEarTrainingGuessed}
         examMode={examMode}
         isListening={isListening}
@@ -254,7 +242,6 @@ const SessionModal = ({
             onVideoEnd={handleNextExerciseClick}
             earTrainingScore={earTrainingScore}
             earTrainingHighScore={earTrainingHighScore}
-            exerciseUrl={exerciseUrl}
             handleRevealRiddle={handleRevealRiddle}
             handleNextRiddle={handleNextRiddle}
             onEarTrainingGuessed={onEarTrainingGuessed}
@@ -301,7 +288,7 @@ const SessionModal = ({
 
           <MobileTimerDisplay
             isPlaying={isPlaying}
-            sessionTimerData={sessionTimerData}
+       
           />
 
           {currentExercise.metronomeSpeed && (
@@ -430,7 +417,6 @@ const SessionModal = ({
         currentExerciseIndex={currentExerciseIndex}
         isFinishing={isFinishing}
         isSubmittingReport={isSubmittingReport}
-        canSkipExercise={canSkipExercise}
         onRestart={activeTablature && activeTablature.length > 0 ? handleRestart : undefined}
       />
     </div>
