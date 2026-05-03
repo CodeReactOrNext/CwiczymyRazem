@@ -80,6 +80,8 @@ export const PracticeSession = ({
     completedExercises, restartFullSession,
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
 
+  const isPlaying = timer.timerEnabled;
+
   const userInfo   = useAppSelector(selectUserInfo);
   const isPremium  = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
   const planHasGpFile = !!rawGpFile || plan.exercises.some(ex => !!ex.gpFileUrl);
@@ -111,8 +113,8 @@ export const PracticeSession = ({
   // ── Playback settings (Reducer) ──────────────────────────────────────────
 
   const {
-    isAudioMuted, isMetronomeMuted, isHalfSpeed, showAlphaTabScore, selectedGpTrackIdx,
-    setIsAudioMuted, setIsMetronomeMuted, setIsHalfSpeed, setSelectedGpTrackIdx,
+    isAudioMuted, isMetronomeMuted, speedMultiplier, showAlphaTabScore, selectedGpTrackIdx,
+    setIsAudioMuted, setIsMetronomeMuted, setSpeedMultiplier, setSelectedGpTrackIdx,
     toggleAlphaTabScore, resetForExercise
   } = usePlaybackReducer();
   const [tabRepeatCount] = useState(0);
@@ -138,12 +140,12 @@ export const PracticeSession = ({
     maxBpm:         examMode && examBpm ? examBpm : activeExercise.metronomeSpeed?.max,
     recommendedBpm: examMode && examBpm ? examBpm : activeExercise.metronomeSpeed?.recommended,
     isMuted:        isMetronomeMuted || audioSystem.isActive,
-    speedMultiplier: isHalfSpeed ? 0.5 : 1,
+    speedMultiplier: speedMultiplier,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
     externalAudioContext: effectiveRawGpFile ? audioSystem.context : undefined,
   });
 
-  const effectiveBpm           = isHalfSpeed ? metronome.bpm / 2 : metronome.bpm;
+  const effectiveBpm           = Math.round(metronome.bpm * speedMultiplier);
   const isAudioPlaying         = metronome.isPlaying && metronome.countInRemaining === 0 && !!metronome.startTime;
 
   // ── Ear training ──────────────────────────────────────────────────────────
@@ -229,7 +231,7 @@ export const PracticeSession = ({
   // ── Controls & handlers ───────────────────────────────────────────────────
 
   const {
-    tabRestartKey, handleToggleTimer, handleRestart, handleRestartFullSession, handleHalfSpeedToggle,
+    tabRestartKey, handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleNoteMatchingReset,
   } = useSessionControls({
@@ -237,7 +239,7 @@ export const PracticeSession = ({
     currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
     handleNextExercise, restartFullSession,
     isMicEnabled, closeAudio, updateMicPersistence,
-    isAudioMuted, setIsAudioMuted, isHalfSpeed, setIsHalfSpeed,
+    isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
     setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
     saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
   });
@@ -269,7 +271,7 @@ export const PracticeSession = ({
       handleRef={noteMatchingHandle} isPlaying={isPlaying} startTime={metronome.startTime}
       effectiveBpm={effectiveBpm} rawBpm={metronome.bpm} activeTablature={activeTablature}
       isMicEnabled={isMicEnabled} currentExerciseIndex={currentExerciseIndex}
-      isHalfSpeed={isHalfSpeed} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
+      speedMultiplier={speedMultiplier} getLatencyMs={getLatencyMs} audioRefs={audioRefs}
       getAdjustedTargetFreq={getAdjustedTargetFreq} activeStrumPattern={activeStrumPattern}
       onReset={handleNoteMatchingReset}
     >
@@ -339,10 +341,11 @@ export const PracticeSession = ({
           isFinishing={isFinishing} isSubmittingReport={isSubmittingReport}
           metronome={metronome} effectiveBpm={effectiveBpm}
           isMicEnabled={isMicEnabled} toggleMic={handleMicToggle}
-          frequencyRef={audioRefs.frequencyRef} isListening={isListening}
+          frequencyRef={audioRefs.frequencyRef} volumeRef={audioRefs.volumeRef} isListening={isListening}
+          onRecalibrate={handleRecalibrate}
           isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
           isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
-          isHalfSpeed={isHalfSpeed} onHalfSpeedToggle={handleHalfSpeedToggle}
+          speedMultiplier={speedMultiplier} onSpeedMultiplierChange={handleSpeedMultiplierChange}
           activeTablature={activeTablature} isRiddleRevealed={isRiddleRevealed}
           isRiddleGuessed={isRiddleGuessed} hasPlayedRiddleOnce={hasPlayedRiddleOnce}
           handleNextRiddle={handleNextRiddle} handleRevealRiddle={handleRevealRiddle}
@@ -383,8 +386,8 @@ export const PracticeSession = ({
         setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}
         handleNextExerciseClick={handleNextExerciseClick}
         onAudioToggle={handleAudioToggle} onMicToggle={handleMicToggle}
-        onRecalibrate={handleRecalibrate} isHalfSpeed={isHalfSpeed}
-        handleHalfSpeedToggle={handleHalfSpeedToggle}
+        onRecalibrate={handleRecalibrate} speedMultiplier={speedMultiplier}
+        handleSpeedMultiplierChange={handleSpeedMultiplierChange}
         metronome={metronome} isMetronomeMuted={isMetronomeMuted}
         setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
         trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}

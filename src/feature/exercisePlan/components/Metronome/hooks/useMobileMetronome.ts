@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { isIOSDevice } from "../utils/deviceDetection";
 
@@ -302,7 +302,7 @@ export const useMobileMetronome = ({
   }, [recommendedBpm]);
 
   // Expose the same interface as the original hook
-  return {
+  return useMemo(() => ({
     bpm,
     isPlaying,
     countInRemaining,
@@ -320,5 +320,9 @@ export const useMobileMetronome = ({
     startTime: startTimeRef.current,
     audioContext: audioContextRef.current,
     audioStartTime: audioStartTimeRef.current,
-  };
+  }), [
+    bpm, isPlaying, countInRemaining, minBpm, maxBpm, setBpm, 
+    toggleMetronome, startMetronome, stopMetronome, restartMetronome, 
+    handleSetRecommendedBpm, recommendedBpm, initializeAudio, audioInitialized
+  ]);
 }; 

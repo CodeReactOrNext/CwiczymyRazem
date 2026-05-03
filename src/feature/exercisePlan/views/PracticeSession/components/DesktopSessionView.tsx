@@ -12,6 +12,7 @@ import { ExerciseContentArea } from "./ExerciseContentArea";
 import { ExerciseHeroHeader } from "./ExerciseHeroHeader";
 import { ExerciseInfoGrid } from "./ExerciseInfoGrid";
 import { ExerciseProgress } from "./ExerciseProgress";
+import { ExerciseQuickActionsBar } from "./ExerciseQuickActionsBar";
 import { GpTrackSelector } from "./GpTrackSelector";
 import { MediaControlsToolbar } from "./MediaControlsToolbar";
 import { MicHud } from "./MicHud";
@@ -70,8 +71,8 @@ interface DesktopSessionViewProps {
   onAudioToggle:            () => void;
   onMicToggle:              () => void;
   onRecalibrate:            () => void;
-  isHalfSpeed:              boolean;
-  handleHalfSpeedToggle:    (v: boolean | ((prev: boolean) => boolean)) => void;
+  speedMultiplier:              number;
+  handleSpeedMultiplierChange:    (v: number) => void;
   metronome:                any;
   isMetronomeMuted:         boolean;
   setIsMetronomeMuted:      (v: boolean) => void;
@@ -95,7 +96,7 @@ interface DesktopSessionViewProps {
   planHasStrumming:         boolean;
 }
 
-export function DesktopSessionView(p: DesktopSessionViewProps) {
+export const DesktopSessionView = React.memo(function DesktopSessionView(p: DesktopSessionViewProps) {
   const { openLeaderboard } = useSessionUI();
   const [isMobile, setIsMobile] = React.useState(false);
 
@@ -140,10 +141,18 @@ export function DesktopSessionView(p: DesktopSessionViewProps) {
                     hasMetronome={!!p.currentExercise.metronomeSpeed}
                     hasAudioTrack={!!((p.currentExercise.tablature && p.currentExercise.tablature.length > 0) || p.planHasTablature || p.planHasGpFile || p.planHasStrumming)}
                     hasMicControls={p.planHasTablature || p.planHasGpFile || p.planHasStrumming}
-                    isHalfSpeed={p.isHalfSpeed} onHalfSpeedToggle={p.handleHalfSpeedToggle}
+                    speedMultiplier={p.speedMultiplier} onSpeedMultiplierChange={p.handleSpeedMultiplierChange}
                     isAudioMuted={p.isAudioMuted} isRiddleMode={p.currentExercise.riddleConfig?.mode === "sequenceRepeat"}
                     onAudioToggle={p.onAudioToggle} isMicEnabled={p.isMicEnabled}
                     onMicToggle={p.onMicToggle} onRecalibrate={p.onRecalibrate}
+                    frequencyRef={p.frequencyRef} volumeRef={p.volumeRef}
+                  />
+                  <ExerciseQuickActionsBar
+                    exercise={p.currentExercise}
+                    metronome={p.metronome}
+                    isMetronomeMuted={p.isMetronomeMuted}
+                    setIsMetronomeMuted={p.setIsMetronomeMuted}
+                    examMode={p.examMode}
                   />
                   <ExerciseContentArea
                     activeTablature={p.activeTablature} currentExercise={p.currentExercise}
@@ -204,4 +213,4 @@ export function DesktopSessionView(p: DesktopSessionViewProps) {
       </TooltipProvider>
     </div>
   );
-}
+});

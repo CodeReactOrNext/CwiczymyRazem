@@ -1,5 +1,5 @@
 import type { Dispatch, RefObject, SetStateAction } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { Exercise } from "../../../types/exercise.types";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
@@ -29,8 +29,8 @@ interface UseSessionControlsOptions {
   updateMicPersistence:   (enabled: boolean) => void;
   isAudioMuted:           boolean;
   setIsAudioMuted:        Dispatch<SetStateAction<boolean>>;
-  isHalfSpeed:            boolean;
-  setIsHalfSpeed:         Dispatch<SetStateAction<boolean>>;
+  speedMultiplier:        number;
+  setSpeedMultiplier:     (payload: number | ((prev: number) => number)) => void;
   setEarTrainingScore:    Dispatch<SetStateAction<number>>;
   setIsRiddleGuessed:     (v: boolean) => void;
   handleRevealRiddle:     () => void;
@@ -44,7 +44,7 @@ export function useSessionControls({
   currentExercise, currentExerciseIndex, isLastExercise, jumpToExercise,
   handleNextExercise, restartFullSession,
   isMicEnabled, closeAudio, updateMicPersistence,
-  isAudioMuted, setIsAudioMuted, isHalfSpeed, setIsHalfSpeed,
+  isAudioMuted, setIsAudioMuted, speedMultiplier, setSpeedMultiplier,
   setEarTrainingScore, setIsRiddleGuessed, handleRevealRiddle,
   saveCurrentScores, noteMatchingHandle, loopsCompletedRef,
 }: UseSessionControlsOptions) {
@@ -83,10 +83,9 @@ export function useSessionControls({
     restartFullSession(); setTabRestartKey(prev => prev + 1);
   }, [restartFullSession]);
 
-  const handleHalfSpeedToggle = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
-    setIsHalfSpeed(prev => {
-      const next = typeof value === "function" ? value(prev) : value;
-      if (next !== prev) {
+  const handleSpeedMultiplierChange = useCallback((value: number) => {
+    setSpeedMultiplier((prev: number) => {
+      if (value !== prev) {
         const wasMetronomePlaying = metronome.isPlaying;
         metronome.restartMetronome();
         setTabRestartKey(k => k + 1);
@@ -98,7 +97,7 @@ export function useSessionControls({
           }, 100);
         }
       }
-      return next;
+      return value;
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [metronome, currentExercise]);
@@ -148,10 +147,15 @@ export function useSessionControls({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isLastExercise, currentExerciseIndex, handleToggleTimer, handleNextExerciseClick, stopTimer, metronome, jumpToExercise]);
 
-  return {
+  return useMemo(() => ({
     tabRestartKey, isPlayingRef,
-    handleToggleTimer, handleRestart, handleRestartFullSession, handleHalfSpeedToggle,
+    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
     handleNextExerciseClick, handleMicToggle, handleAudioToggle,
     handleExerciseSelect, handleEarTrainingGuessed, handleRepeatCountChange, handleNoteMatchingReset,
-  };
+  }), [
+    tabRestartKey, isPlayingRef,
+    handleToggleTimer, handleRestart, handleRestartFullSession, handleSpeedMultiplierChange,
+    handleNextExerciseClick, handleMicToggle, handleAudioToggle,
+    handleExerciseSelect, handleEarTrainingGuessed, handleRepeatCountChange, handleNoteMatchingReset,
+  ]);
 }

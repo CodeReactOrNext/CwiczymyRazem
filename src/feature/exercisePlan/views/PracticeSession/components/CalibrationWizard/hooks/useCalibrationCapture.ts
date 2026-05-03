@@ -6,7 +6,7 @@ import type { CalibrationOffsets } from "../../../hooks/useCalibration";
 import { ACCEPT_CENTS, MIN_SAMPLES, STALE_MS, STRINGS, median } from "../calibration.constants";
 
 interface UseCaptureOptions {
-  step:        "setup" | "tuning" | "summary";
+  step:        "source" | "setup" | "tuning" | "summary";
   isOpen:      boolean;
   isListening: boolean;
   audioRefs:   AudioRefs;
@@ -93,12 +93,7 @@ export function useCalibrationCapture({ step, isOpen, isListening, audioRefs, on
     }
   }, [currentStringIndex, onAllStringsDone]);
 
-  // Auto-advance 1.5s after successful capture
-  useEffect(() => {
-    if (stringState !== "done") return;
-    const t = setTimeout(advanceString, 1500);
-    return () => clearTimeout(t);
-  }, [stringState, advanceString]);
+
 
   const handleRetry = useCallback(() => {
     samplesRef.current = [];

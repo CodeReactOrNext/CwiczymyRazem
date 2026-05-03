@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface useTimerInterface {
   getTime: () => number;
@@ -83,7 +83,7 @@ const useTimer = () => {
     return () => clearInterval(interval);
   }, [timerEnabled, notify]);
 
-  return {
+  return useMemo(() => ({
     getTime,
     restartTime,
     startTimer,
@@ -91,7 +91,7 @@ const useTimer = () => {
     timerEnabled,
     setInitialStartTime,
     subscribe,
-  } as useTimerInterface;
+  } as useTimerInterface), [getTime, restartTime, startTimer, stopTimer, timerEnabled, setInitialStartTime, subscribe]);
 };
 
 export default useTimer;

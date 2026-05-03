@@ -18,7 +18,7 @@ interface UseNoteMatchingOptions {
   activeTablature: TablatureMeasure[] | null | undefined;
   isMicEnabled: boolean;
   currentExerciseIndex: number;
-  isHalfSpeed: boolean;
+  speedMultiplier: number;
   getLatencyMs: () => number;
   audioRefs: AudioRefs;
   getAdjustedTargetFreq: (string: number, baseFreq: number) => number;
@@ -28,7 +28,7 @@ interface UseNoteMatchingOptions {
 export function useNoteMatching({
   isPlaying, startTime, effectiveBpm, rawBpm,
   activeTablature, isMicEnabled, currentExerciseIndex,
-  isHalfSpeed, getLatencyMs, audioRefs, getAdjustedTargetFreq, onReset,
+  speedMultiplier, getLatencyMs, audioRefs, getAdjustedTargetFreq, onReset,
 }: UseNoteMatchingOptions) {
   const {
     hitNotes, missedNotes, sessionAccuracy, sessionStats, maxCombo, gameState,
@@ -50,14 +50,14 @@ export function useNoteMatching({
 
   const maxPossibleScore = useMemo(() => {
     if (totalNotes === 0) return 0;
-    const halfPenalty = isHalfSpeed ? 0.5 : 1;
+    const halfPenalty = speedMultiplier;
     const bpmB        = 1 + (rawBpm - 100) * 0.001;
     let total = 0;
     for (let i = 0; i < totalNotes; i++) {
       total += Math.round(100 * Math.min(8, Math.floor(i / 5) + 1) * halfPenalty * bpmB);
     }
     return total;
-  }, [totalNotes, isHalfSpeed, rawBpm]);
+  }, [totalNotes, speedMultiplier, rawBpm]);
 
   const totalExerciseBeats = useMemo(() => {
     if (!activeTablature) return 0;
@@ -105,7 +105,7 @@ export function useNoteMatching({
     const totalExBeats = pos;
     if (totalExBeats === 0) return;
 
-    const halfSpeedPenalty = isHalfSpeed ? 0.5 : 1;
+    const halfSpeedPenalty = speedMultiplier;
     const bpmBonus         = 1 + (rawBpm - 100) * 0.001;
 
     const tick = () => {
@@ -238,7 +238,7 @@ export function useNoteMatching({
     rafIdRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafIdRef.current);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, startTime, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, isHalfSpeed, rawBpm]);
+  }, [isPlaying, startTime, effectiveBpm, activeTablature, isMicEnabled, currentExerciseIndex, getLatencyMs, audioRefs, getAdjustedTargetFreq, speedMultiplier, rawBpm]);
 
   return { hitNotes, missedNotes, sessionAccuracy, sessionStats, gameState, maxCombo, maxPossibleScore, currentBeatsElapsedRef, resetGame };
 }

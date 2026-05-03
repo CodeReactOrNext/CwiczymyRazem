@@ -1,5 +1,5 @@
 
-import { useCallback,useEffect, useRef, useState } from "react";
+import { useCallback,useEffect, useMemo, useRef, useState } from "react";
 import { computeChromagram } from "utils/audio/noteUtils";
 
 interface AudioAnalyzerState {
@@ -337,12 +337,12 @@ export const useAudioAnalyzer = () => {
 
   const audioRefs: AudioRefs = { frequencyRef, volumeRef, rawVolumeRef, lastOnsetTimeRef, lastTickTimeRef, confidenceRef, analyserRef: analyserNodeRef, onsetChromaRef };
 
-  return {
+  return useMemo(() => ({
     ...state,
     init,
     close,
     audioRefs,
     getLatencyMs,
     setInputGain,
-  };
+  }), [state, init, close, audioRefs, getLatencyMs, setInputGain]);
 };

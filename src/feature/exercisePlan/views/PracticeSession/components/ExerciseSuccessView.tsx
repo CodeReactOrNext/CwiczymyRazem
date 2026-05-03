@@ -84,7 +84,7 @@ export const ExerciseSuccessView = ({
   const isPassed = isExam ? score! >= passThreshold : true;
   const nextStarDist = isExam ? Math.max(0, passThreshold - score!) : 0;
 
-  const displayStats = stats || { accuracy: isPassed ? 92 : 74, maxStreak: isPassed ? 45 : 12 };
+  const displayStats = stats ?? {};
   const accuracy = displayStats.accuracy ?? 0;
   const tierKey = getTierFromAccuracy(accuracy);
   const tier = TIERS[tierKey];
@@ -113,20 +113,20 @@ export const ExerciseSuccessView = ({
     [timeline, hasTimeline]
   );
 
-  // Stroke color changes based on overall accuracy
   const chartStroke = accuracy >= 80 ? 'rgb(6,182,212)' : accuracy >= 60 ? 'rgb(251,146,60)' : 'rgb(239,68,68)';
-  const chartFill   = accuracy >= 80 ? 'rgba(6,182,212,' : accuracy >= 60 ? 'rgba(251,146,60,' : 'rgba(239,68,68,';
 
   useEffect(() => {
 
     const timer = setTimeout(() => {
       setIsVisible(true);
 
-      animate(0, score ?? 100, {
-        duration: 1.5,
-        ease: "easeOut",
-        onUpdate: (val) => setDisplayScore(Math.round(val)),
-      });
+      if (isExam && typeof score !== 'undefined') {
+        animate(0, score, {
+          duration: 1.5,
+          ease: "easeOut",
+          onUpdate: (val) => setDisplayScore(Math.round(val)),
+        });
+      }
 
       if (!isExam || isPassed) {
         const end = Date.now() + 3000;
@@ -144,7 +144,7 @@ export const ExerciseSuccessView = ({
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [isExam, isPassed, score]);
+  }, [isExam, isPassed, score]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <motion.div
@@ -227,46 +227,50 @@ export const ExerciseSuccessView = ({
             )}
           </div>
 
-          {/* Score + Stats */}
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-            className="px-7 py-5 border-b border-white/5">
+          {/* Score + Stats — exam only or when real stats are available */}
+          {(isExam || stats) && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+              className="px-7 py-5 border-b border-white/5">
 
-            {/* Score */}
-            <div className="flex items-end justify-between mb-5">
-              <div>
-                <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest mb-1">Total Score</p>
-                <div className="text-5xl font-bold text-white tabular-nums tracking-tight">{displayScore.toLocaleString()}</div>
-              </div>
-              {/* Tier badge */}
-              <div className={cn('flex flex-col items-center justify-center h-16 w-16 rounded-xl border', tier.bg, tier.border)}>
-                <span className={cn('text-3xl font-black leading-none', tier.color)}>{tierKey}</span>
-                <span className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Grade</span>
-              </div>
-            </div>
+              {/* Score — exam only */}
+              {isExam && (
+                <div className="flex items-end justify-between mb-5">
+                  <div>
+                    <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest mb-1">Total Score</p>
+                    <div className="text-5xl font-bold text-white tabular-nums tracking-tight">{displayScore.toLocaleString()}</div>
+                  </div>
+                  {/* Tier badge */}
+                  <div className={cn('flex flex-col items-center justify-center h-16 w-16 rounded-xl border', tier.bg, tier.border)}>
+                    <span className={cn('text-3xl font-black leading-none', tier.color)}>{tierKey}</span>
+                    <span className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Grade</span>
+                  </div>
+                </div>
+              )}
 
-            {/* Accuracy + Combo */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div className="bg-zinc-800/60 rounded-xl p-3 border border-white/5 flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-cyan-500/10 border border-cyan-500/15 flex items-center justify-center shrink-0">
-                  <FaBullseye className="text-cyan-400 h-3.5 w-3.5" />
+              {/* Accuracy + Combo */}
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="bg-zinc-800/60 rounded-xl p-3 border border-white/5 flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-lg bg-cyan-500/10 border border-cyan-500/15 flex items-center justify-center shrink-0">
+                    <FaBullseye className="text-cyan-400 h-3.5 w-3.5" />
+                  </div>
+                  <div>
+                    <div className="text-white font-bold text-base leading-none">{accuracy}%</div>
+                    <div className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Accuracy</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-white font-bold text-base leading-none">{accuracy}%</div>
-                  <div className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Accuracy</div>
+                <div className="bg-zinc-800/60 rounded-xl p-3 border border-white/5 flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-lg bg-orange-500/10 border border-orange-500/15 flex items-center justify-center shrink-0">
+                    <FaFire className="text-orange-400 h-3.5 w-3.5" />
+                  </div>
+                  <div>
+                    <div className="text-white font-bold text-base leading-none">{displayStats.maxStreak ?? 0}</div>
+                    <div className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Max Combo</div>
+                  </div>
                 </div>
               </div>
-              <div className="bg-zinc-800/60 rounded-xl p-3 border border-white/5 flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-orange-500/10 border border-orange-500/15 flex items-center justify-center shrink-0">
-                  <FaFire className="text-orange-400 h-3.5 w-3.5" />
-                </div>
-                <div>
-                  <div className="text-white font-bold text-base leading-none">{displayStats.maxStreak ?? 0}</div>
-                  <div className="text-zinc-500 text-[9px] uppercase tracking-wider mt-0.5">Max Combo</div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
 
           {/* Performance Chart */}
           {hasTimeline && (
@@ -329,7 +333,7 @@ export const ExerciseSuccessView = ({
           )}
 
           {/* Milestone */}
-          {(unlockedContent?.length || isPassed) && (
+          {(unlockedContent?.length || (isExam && isPassed)) && (
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: hasTimeline ? 1.3 : 1 }}
               className="px-7 py-4 border-b border-white/5">

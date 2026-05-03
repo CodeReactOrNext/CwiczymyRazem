@@ -7,6 +7,17 @@ import { useMemo } from "react";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+const LEGEND_CLASSES = [
+  "bg-[#3f3f46]/30",
+  "bg-amber-200",
+  "bg-amber-300",
+  "bg-amber-400",
+  "bg-amber-500",
+  "bg-amber-600",
+];
+
+const LEVEL_CLASSES = ["bg-[#3f3f46]/30", "bg-amber-200", "bg-amber-300", "bg-amber-400", "bg-amber-500", "bg-amber-600"];
+
 const ActivityHeatmap = () => {
   const data = useMemo(() =>
     Array.from({ length: 52 }).map(() =>
@@ -26,8 +37,8 @@ const ActivityHeatmap = () => {
         <div className="flex items-center gap-2">
           <span className="text-[9px] font-bold text-zinc-700 uppercase">Less</span>
           <div className="flex gap-[3px]">
-            {["#3f3f46", "#FDE68A", "#FCD34D", "#FBBF24", "#F59E0B", "#D97706"].map((color, i) => (
-              <div key={i} className="w-[9px] h-[9px] rounded-[2px]" style={{ backgroundColor: i === 0 ? color + "4d" : color }} />
+            {LEGEND_CLASSES.map((cls, i) => (
+              <div key={i} className={cn("w-[9px] h-[9px] rounded-[2px]", cls)} />
             ))}
           </div>
           <span className="text-[9px] font-bold text-zinc-700 uppercase">More</span>
@@ -37,7 +48,7 @@ const ActivityHeatmap = () => {
       {/* Month labels */}
       <div className="flex gap-[3px] mb-1 pl-6">
         {MONTHS.map((m) => (
-          <div key={m} className="text-[8px] font-bold text-zinc-700" style={{ width: `${(52 / 12) * 12}px`, minWidth: 0 }}>
+          <div key={m} className="w-[52px] min-w-0 text-[8px] font-bold text-zinc-700">
             {m}
           </div>
         ))}
@@ -45,7 +56,7 @@ const ActivityHeatmap = () => {
 
       <div className="flex items-start gap-1.5 overflow-x-auto">
         {/* Day labels */}
-        <div className="flex flex-col justify-between text-[8px] font-bold text-zinc-700 shrink-0 pt-[1px]" style={{ height: `${7 * 12}px` }}>
+        <div className="flex flex-col justify-between text-[8px] font-bold text-zinc-700 shrink-0 pt-[1px] h-[84px]">
           <span>M</span>
           <span>T</span>
           <span>S</span>
@@ -59,8 +70,7 @@ const ActivityHeatmap = () => {
                 <div
                   key={j}
                   title={level > 0 ? `${level} session${level > 1 ? "s" : ""}` : "No activity"}
-                  className={cn("w-[9px] h-[9px] rounded-[2px] transition-opacity hover:opacity-80", level === 0 && "bg-[#3f3f46]/30")}
-                  style={level > 0 ? { backgroundColor: ["#FDE68A", "#FCD34D", "#FBBF24", "#F59E0B", "#D97706"][level - 1] } : undefined}
+                  className={cn("w-[9px] h-[9px] rounded-[2px] transition-opacity hover:opacity-80", LEVEL_CLASSES[level])}
                 />
               ))}
             </div>

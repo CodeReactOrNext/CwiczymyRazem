@@ -23,41 +23,26 @@ export const SummaryStep = React.memo(function SummaryStep({
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col gap-4 max-w-sm mx-auto w-full overflow-y-auto">
+      <div className="flex-1 flex flex-col items-center justify-center gap-6 max-w-sm mx-auto w-full">
         <motion.div
           initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 220, damping: 18 }}
-          className="flex justify-center pt-2 pb-1"
+          className="flex justify-center"
         >
-          <div className="h-16 w-16 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center">
-            <FaCheck className="h-6 w-6 text-emerald-400" />
+          <div className="relative w-32 h-32 rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(16,185,129,0.2)] border border-emerald-500/20">
+            <img src="/images/calibration/summary.png" alt="Calibration Complete" className="w-full h-full object-cover" />
           </div>
         </motion.div>
 
-        <p className="text-center text-sm text-zinc-400 -mt-1">
-          Your guitar's offsets have been saved. Note detection will now be more accurate.
-        </p>
-
-        <div className="space-y-2">
-          {STRINGS.map((s) => {
-            const offset         = offsets[s.id];
-            const hasMeasurement = offset !== undefined;
-            const abs            = hasMeasurement ? Math.abs(offset) : 0;
-            const offsetColor    = !hasMeasurement ? "text-zinc-700" : abs < 10 ? "text-emerald-400" : abs < 30 ? "text-amber-400" : "text-red-400";
-            const barColor       = !hasMeasurement ? "" : abs < 10 ? "bg-emerald-500" : abs < 30 ? "bg-amber-500" : "bg-red-500";
-            return (
-              <div key={s.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-zinc-900/60 border border-white/5">
-                <span className="text-[10px] font-bold text-zinc-600 w-3 tabular-nums">{s.id}</span>
-                <span className="font-bold text-sm text-white w-7">{s.name}</span>
-                <div className="flex-1 h-1 rounded-full bg-zinc-800 overflow-hidden">
-                  {hasMeasurement && <div className={cn("h-full rounded-full", barColor)} style={{ width: `${Math.min(100, abs * 2)}%` }} />}
-                </div>
-                <span className={cn("font-mono font-bold text-sm w-12 text-right tabular-nums", offsetColor)}>
-                  {hasMeasurement ? `${offset >= 0 ? "+" : ""}${Math.round(offset)}¢` : "—"}
-                </span>
-              </div>
-            );
-          })}
+        <div className="space-y-4 text-center">
+          <h3 className="text-xl font-bold text-white tracking-tight">Everything's ready!</h3>
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            Your calibration is complete. If you feel the detection is still slightly off,
+            consider re-tuning your guitar or adjusting the input sensitivity.
+          </p>
+          <p className="text-emerald-400 font-bold uppercase tracking-[0.2em] text-[10px]">
+            Good luck!
+          </p>
         </div>
 
         <div className="flex gap-3 pt-1 pb-2">

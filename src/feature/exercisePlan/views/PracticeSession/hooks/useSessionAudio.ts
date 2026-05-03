@@ -165,9 +165,12 @@ export function useSessionAudio({
     repeatCount:    tabRepeatCount,
   });
 
-  return {
+  return useMemo(() => ({
     audioTracks, trackConfigs, setTrackConfigs,
     soundfontsReady, gpAudioActive, effectiveAudioStartTime,
     alphaTabTrackConfigs, tabSchedulerTickRef,
-  };
+  }), [
+    audioTracks, trackConfigs, soundfontsReady, gpAudioActive, 
+    effectiveAudioStartTime, alphaTabTrackConfigs
+  ]);
 }

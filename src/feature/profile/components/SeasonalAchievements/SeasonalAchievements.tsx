@@ -51,22 +51,7 @@ const SeasonalAchievements = ({
         "December",
       ];
 
-      const monthNamesPl = [
-        "Styczeń",
-        "Luty",
-        "Marzec",
-        "Kwiecień",
-        "Maj",
-        "Czerwiec",
-        "Lipiec",
-        "Sierpień",
-        "Wrzesień",
-        "Październik",
-        "Listopad",
-        "Grudzień",
-      ];
-
-      const monthNames = i18n.language === "pl" ? monthNamesPl : monthNamesEn;
+      const monthNames = monthNamesEn;
       const monthName = monthNames[monthNumber - 1];
 
       return `${monthName} ${year}`;
@@ -157,10 +142,10 @@ const SeasonalAchievements = ({
         <div className='flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
           <div className='text-left'>
             <h4 className='text-lg font-bold text-white'>
-              {String(t("seasonal_achievements.title", "Osiągnięcia Sezonowe"))}
+              {String(t("seasonal_achievements.title", "Seasonal Achievements"))}
             </h4>
             <p className='text-sm text-zinc-500'>
-              {String(t("seasonal_achievements.no_achievements", "Brak osiągnięć. Walcz o miejsce w rankingu!"))}
+              {String(t("seasonal_achievements.no_achievements", "No achievements yet. Compete for a spot on the leaderboard!"))}
             </p>
           </div>
           <Button
@@ -181,7 +166,7 @@ const SeasonalAchievements = ({
     return (
       <Card className='relative overflow-hidden border-white/10 bg-zinc-800/40 p-6 backdrop-blur-xl'>
         <h4 className='mb-4 text-lg font-bold text-white'>
-          {String(t("seasonal_achievements.title", "Osiągnięcia Sezonowe"))}
+          {String(t("seasonal_achievements.title", "Seasonal Achievements"))}
         </h4>
         <div className='py-8 text-left text-sm text-white/50'>
           <span className='tracking-widest uppercase font-bold text-[10px]'>Synchronizing...</span>
@@ -197,7 +182,7 @@ const SeasonalAchievements = ({
 
       <div className='relative mb-6 flex items-center justify-between'>
         <h4 className='text-lg font-bold text-white'>
-          {String(t("seasonal_achievements.title", "Osiągnięcia Sezonowe"))}
+          {String(t("seasonal_achievements.title", "Seasonal Achievements"))}
         </h4>
       </div>
 

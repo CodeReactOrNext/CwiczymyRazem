@@ -1,23 +1,17 @@
 import { Badge } from "assets/components/ui/badge";
 import { Button } from "assets/components/ui/button";
-import { Slider } from "assets/components/ui/slider";
 import { cn } from "assets/lib/utils";
-import { BpmProgressGrid } from "feature/exercisePlan/components/BpmProgressGrid";
 import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/components/ModalWrapper";
 import { AnimatePresence, motion } from "framer-motion";
-import { useTranslation } from "hooks/useTranslation";
-import { Minus, Plus, Volume2, VolumeX, X } from "lucide-react";
+import { X } from "lucide-react";
 import React, { useState } from "react";
-import {
-  FaCheck, FaInfoCircle, FaLightbulb, FaPause, FaPlay,
-  FaStepBackward, FaStepForward, FaUndo, FaVolumeMute, FaVolumeUp,
-} from "react-icons/fa";
-import { GiGuitar } from "react-icons/gi";
+import { FaCheck, FaPause, FaPlay, FaStepBackward, FaStepForward, FaUndo } from "react-icons/fa";
 
-import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
+import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
+import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
+import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { useTimerContext } from "../contexts/TimerContext";
-import { useBpmProgressContext } from "../contexts/BpmProgressContext";
 
 interface LandscapeSessionModalProps {
   isOpen: boolean;
@@ -38,8 +32,8 @@ interface LandscapeSessionModalProps {
   setIsAudioMuted: (v: boolean) => void;
   isMetronomeMuted: boolean;
   setIsMetronomeMuted: (v: boolean) => void;
-  isHalfSpeed?: boolean;
-  onHalfSpeedToggle?: (value: boolean) => void;
+  speedMultiplier?: number;
+  onSpeedMultiplierChange?: (value: number) => void;
   activeTablature?: any;
   isRiddleRevealed?: boolean;
   isRiddleGuessed?: boolean;
@@ -51,7 +45,9 @@ interface LandscapeSessionModalProps {
   onEarTrainingGuessed?: () => void;
   examMode?: boolean;
   isListening: boolean;
-  frequencyRef?: React.MutableRefObject<number>;
+  frequencyRef?: React.RefObject<number>;
+  volumeRef?: React.RefObject<number>;
+  onRecalibrate?: () => void;
   gradientClasses: string;
   tabResetKey: number;
   setVideoDuration: (duration: number) => void;
@@ -83,8 +79,8 @@ export function LandscapeSessionModal({
   setIsAudioMuted,
   isMetronomeMuted,
   setIsMetronomeMuted,
-  isHalfSpeed,
-  onHalfSpeedToggle,
+  speedMultiplier,
+  onSpeedMultiplierChange,
   activeTablature,
   isRiddleRevealed,
   isRiddleGuessed,
@@ -97,6 +93,8 @@ export function LandscapeSessionModal({
   examMode,
   isListening,
   frequencyRef,
+  volumeRef,
+  onRecalibrate,
   gradientClasses,
   tabResetKey,
   setVideoDuration,
@@ -108,8 +106,6 @@ export function LandscapeSessionModal({
   handleBackExerciseClick,
   handleRestart,
 }: LandscapeSessionModalProps) {
-  const { bpmStages, completedBpms, isBpmLoading, onBpmToggle } = useBpmProgressContext();
-  const { t } = useTranslation(["exercises"]);
   const [isPanelExpanded, setIsPanelExpanded] = useState(true);
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
   const { formattedTimeLeft } = useTimerContext();
@@ -205,123 +201,33 @@ export function LandscapeSessionModal({
                       </div>
                     )}
 
-                    {/* Metronome — compact inline */}
-                    {currentExercise.metronomeSpeed && (
-                      <div className="px-2 py-2 border-b border-white/5 space-y-2">
-                        <div className="flex items-center gap-1">
-                          <span className="text-[9px] uppercase tracking-widest text-zinc-500 w-6">BPM</span>
-                          <span className="text-sm font-black text-white tabular-nums w-8 text-center">{metronome.bpm}</span>
-                          <Button variant="outline" size="icon" className="h-6 w-6 shrink-0 p-0"
-                            onClick={() => metronome.setBpm(Math.max(metronome.minBpm, metronome.bpm - 1))}
-                            disabled={metronome.bpm <= metronome.minBpm}>
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <div className="flex-1">
-                            <Slider
-                              value={[metronome.bpm]}
-                              min={metronome.minBpm}
-                              max={metronome.maxBpm}
-                              step={1}
-                              onValueChange={(v) => metronome.setBpm(v[0])}
-                              className="py-1"
-                            />
-                          </div>
-                          <Button variant="outline" size="icon" className="h-6 w-6 shrink-0 p-0"
-                            onClick={() => metronome.setBpm(Math.min(metronome.maxBpm, metronome.bpm + 1))}
-                            disabled={metronome.bpm >= metronome.maxBpm}>
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          <span className="text-[9px] text-zinc-600 tabular-nums">{metronome.minBpm}–{metronome.maxBpm}</span>
-                          <div className="flex-1" />
-                          <Button variant="ghost" size="icon"
-                            className={cn("h-6 w-6", isMetronomeMuted ? "text-zinc-500" : "text-cyan-400")}
-                            onClick={() => setIsMetronomeMuted(!isMetronomeMuted)}>
-                            {isMetronomeMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-                          </Button>
-                          {currentExercise.metronomeSpeed.recommended !== metronome.bpm && (
-                            <Button variant="ghost" size="sm"
-                              className="h-6 px-1.5 text-[8px] font-bold text-zinc-400 hover:text-white"
-                              onClick={metronome.handleSetRecommendedBpm}>
-                              Rec {currentExercise.metronomeSpeed.recommended}
-                            </Button>
-                          )}
-                        </div>
-
-                        {onHalfSpeedToggle && (
-                          <Button variant="ghost" size="sm"
-                            className={cn("w-full h-6 text-[9px] font-bold uppercase tracking-widest",
-                              isHalfSpeed ? "text-cyan-400 bg-cyan-500/10" : "text-zinc-500")}
-                            onClick={() => onHalfSpeedToggle(!isHalfSpeed)}>
-                            ½× Half Speed
-                          </Button>
-                        )}
-
-                        {currentExercise.tablature && currentExercise.tablature.length > 0 && (
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="sm"
-                              className={cn("flex-1 gap-1 h-6 text-[9px] font-bold uppercase tracking-widest",
-                                isAudioMuted ? "text-zinc-500" : "text-cyan-400 bg-cyan-500/10")}
-                              onClick={() => setIsAudioMuted(!isAudioMuted)}>
-                              <GiGuitar className="text-xs" />
-                              {isAudioMuted ? <FaVolumeMute className="h-2.5 w-2.5" /> : <FaVolumeUp className="h-2.5 w-2.5" />}
-                            </Button>
-                            <Button variant="ghost" size="sm"
-                              className={cn("flex-1 gap-1 h-6 text-[9px] font-bold uppercase tracking-widest",
-                                !isMicEnabled ? "text-zinc-500" : "text-emerald-400 bg-emerald-500/10")}
-                              onClick={toggleMic}>
-                              <div className={cn("h-1.5 w-1.5 rounded-full shrink-0", isMicEnabled ? "bg-emerald-500 animate-pulse" : "bg-zinc-600")} />
-                              {isMicEnabled ? "Mic On" : "Mic Off"}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* BPM Progress */}
-                    {currentExercise.metronomeSpeed && bpmStages && bpmStages.length > 0 && onBpmToggle && !currentExercise.gpFileUrl && (
-                      <div className="px-2 py-2 border-b border-white/5">
-                        <BpmProgressGrid
-                          bpmStages={bpmStages}
-                          completedBpms={completedBpms || []}
-                          recommendedBpm={currentExercise.metronomeSpeed.recommended}
-                          onToggle={onBpmToggle}
-                          isLoading={isBpmLoading}
-                        />
-                      </div>
-                    )}
-
-                    {/* Instructions */}
-                    {currentExercise.instructions?.length > 0 && (
-                      <div className="px-2 py-2 border-b border-white/5">
-                        <div className="flex items-center gap-1 mb-1.5">
-                          <FaInfoCircle className="h-3 w-3 text-cyan-400" />
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">{t("exercises:instructions")}</span>
-                        </div>
-                        <div className="space-y-1">
-                          {currentExercise.instructions.map((ins: string, idx: number) => (
-                            <p key={idx} className="text-[9px] text-zinc-500 leading-relaxed">{ins}</p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Tips */}
-                    {currentExercise.tips?.length > 0 && (
-                      <div className="px-2 py-2 pb-4">
-                        <div className="flex items-center gap-1 mb-1.5">
-                          <FaLightbulb className="h-3 w-3 text-amber-400" />
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400">{t("exercises:hints")}</span>
-                        </div>
-                        <ul className="space-y-1 list-disc list-inside marker:text-amber-500/50">
-                          {currentExercise.tips.map((tip: string, idx: number) => (
-                            <li key={idx} className="text-[9px] text-zinc-500 leading-relaxed">{tip}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                    {/* Controls */}
+                    <div className="px-1 py-2 space-y-1">
+                      <MediaControlsToolbar
+                        hasMetronome={!!currentExercise.metronomeSpeed}
+                        hasAudioTrack={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl)}
+                        hasMicControls={!!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl)}
+                        speedMultiplier={speedMultiplier ?? 1}
+                        onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
+                        isAudioMuted={isAudioMuted}
+                        isRiddleMode={currentExercise.riddleConfig?.mode === "sequenceRepeat"}
+                        onAudioToggle={() => setIsAudioMuted(!isAudioMuted)}
+                        isMicEnabled={isMicEnabled}
+                        onMicToggle={toggleMic}
+                        onRecalibrate={onRecalibrate ?? (() => {})}
+                        frequencyRef={frequencyRef}
+                        volumeRef={volumeRef}
+                        compact
+                      />
+                      <ExerciseQuickActionsBar
+                        exercise={currentExercise}
+                        metronome={metronome}
+                        isMetronomeMuted={isMetronomeMuted}
+                        setIsMetronomeMuted={setIsMetronomeMuted}
+                        examMode={examMode}
+                        compact
+                      />
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>

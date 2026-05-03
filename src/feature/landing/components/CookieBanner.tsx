@@ -31,15 +31,7 @@ export const CookieBanner = () => {
   if (!mounted || !isVisible) return null;
 
   const content = (
-    <div
-      style={{ 
-        position: "fixed", 
-        top: "1.5rem", 
-        right: "1.5rem",
-        width: "280px",
-        zIndex: 2147483647
-      }}
-      className="animate-in fade-in slide-in-from-right-5 duration-500"
+    <div className="fixed top-6 right-6 w-[280px] z-[2147483647] animate-in fade-in slide-in-from-right-5 duration-500"
     >
       <div className="rounded-lg border border-white/10 bg-zinc-900 shadow-2xl p-4 backdrop-blur-md">
         <div className="flex items-start gap-3 mb-3">

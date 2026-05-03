@@ -1,30 +1,17 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "assets/components/ui/accordion";
-import { Button } from "assets/components/ui/button";
-import React from "react";
 import { cn } from "assets/lib/utils";
-import { BpmProgressGrid } from "feature/exercisePlan/components/BpmProgressGrid";
-import { Metronome } from "feature/exercisePlan/components/Metronome/Metronome";
 import { SpotifyPlayer } from "feature/songs/components/SpotifyPlayer";
 import { motion } from "framer-motion";
 import { useIsLandscape } from "hooks/useIsLandscape";
-import { useTranslation } from "hooks/useTranslation";
-import { useState } from "react";
-import { FaInfoCircle, FaLightbulb, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
-import { GiGuitar } from "react-icons/gi";
+import React, { useState } from "react";
 
-import { categoryGradients } from "../../../constants/categoryStyles";
+import { ExerciseQuickActionsBar } from "../components/ExerciseQuickActionsBar";
+import { MediaControlsToolbar } from "../components/MediaControlsToolbar";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
 import { MobileMicGameHud } from "../components/MobileMicGameHud";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
-import { useTimerContext } from "../contexts/TimerContext";
-import { useBpmProgressContext } from "../contexts/BpmProgressContext";
+import { categoryGradients } from "../../../constants/categoryStyles";
 import { LandscapeSessionModal } from "./LandscapeSessionModal";
 
 interface SessionModalProps {
@@ -49,14 +36,16 @@ interface SessionModalProps {
   effectiveBpm?: number;
   isMicEnabled: boolean;
   toggleMic: () => Promise<void>;
-  frequencyRef?: React.MutableRefObject<number>;
+  frequencyRef?: React.RefObject<number>;
+  volumeRef?: React.RefObject<number>;
+  onRecalibrate?: () => void;
   isListening: boolean;
   isAudioMuted: boolean;
   setIsAudioMuted: (bool: boolean) => void;
   isMetronomeMuted: boolean;
   setIsMetronomeMuted: (bool: boolean) => void;
-  isHalfSpeed?: boolean;
-  onHalfSpeedToggle?: (value: boolean) => void;
+  speedMultiplier?: number;
+  onSpeedMultiplierChange?: (value: number) => void;
   activeTablature?: any;
   isRiddleRevealed?: boolean;
   isRiddleGuessed?: boolean;
@@ -70,50 +59,25 @@ interface SessionModalProps {
 }
 
 const SessionModal = ({
-  isOpen,
-  onClose,
-  onFinish,
-  isMounted,
-  currentExercise,
-  currentExerciseIndex,
-  totalExercises,
-  isLastExercise,
-  isPlaying,
-  handleNextExercise,
-  handleBackExercise,
-  setVideoDuration,
-  setTimerTime,
-  startTimer,
-  stopTimer,
-  isFinishing,
-  isSubmittingReport,
-  metronome,
-  effectiveBpm,
-  isMicEnabled,
-  toggleMic,
-  frequencyRef,
+  isOpen, onClose, onFinish, isMounted,
+  currentExercise, currentExerciseIndex, totalExercises,
+  isLastExercise, isPlaying,
+  handleNextExercise, handleBackExercise,
+  setVideoDuration, setTimerTime, startTimer, stopTimer,
+  isFinishing, isSubmittingReport,
+  metronome, effectiveBpm,
+  isMicEnabled, toggleMic,
+  frequencyRef, volumeRef, onRecalibrate,
   isListening,
-  isAudioMuted,
-  setIsAudioMuted,
-  isMetronomeMuted,
-  setIsMetronomeMuted,
-  isHalfSpeed,
-  onHalfSpeedToggle,
+  isAudioMuted, setIsAudioMuted,
+  isMetronomeMuted, setIsMetronomeMuted,
+  speedMultiplier, onSpeedMultiplierChange,
   activeTablature,
-  isRiddleRevealed,
-  isRiddleGuessed,
-  hasPlayedRiddleOnce,
-  handleNextRiddle,
-  handleRevealRiddle,
-  earTrainingScore,
-  earTrainingHighScore,
-  onEarTrainingGuessed,
+  isRiddleRevealed, isRiddleGuessed, hasPlayedRiddleOnce,
+  handleNextRiddle, handleRevealRiddle,
+  earTrainingScore, earTrainingHighScore, onEarTrainingGuessed,
   examMode,
 }: SessionModalProps) => {
-  const { bpmStages, completedBpms, isBpmLoading, onBpmToggle } = useBpmProgressContext();
-  const { formattedTimeLeft } = useTimerContext();
-  // Hooks must be above any early returns
-  const { t } = useTranslation(["exercises", "common"]);
   const [tabResetKey, setTabResetKey] = useState(0);
   const isLandscape = useIsLandscape();
 
@@ -125,81 +89,53 @@ const SessionModal = ({
       metronome.stopMetronome();
     } else {
       startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
+      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") {
         metronome.startMetronome();
       }
     }
   };
 
-  const handleNextExerciseClick = () => {
-    stopTimer();
-    metronome.stopMetronome();
-    handleNextExercise();
-  };
-
-  const handleBackExerciseClick = () => {
-    stopTimer();
-    metronome.stopMetronome();
-    handleBackExercise();
-  };
-
+  const handleNextExerciseClick = () => { stopTimer(); metronome.stopMetronome(); handleNextExercise(); };
+  const handleBackExerciseClick = () => { stopTimer(); metronome.stopMetronome(); handleBackExercise(); };
   const handleRestart = () => {
-    stopTimer();
-    metronome.restartMetronome();
-    setTimerTime(0);
-    setTabResetKey(prev => prev + 1);
+    stopTimer(); metronome.restartMetronome(); setTimerTime(0); setTabResetKey(prev => prev + 1);
     setTimeout(() => {
       startTimer();
-      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === 'sequenceRepeat') {
-        metronome.startMetronome();
-      }
+      if (currentExercise.metronomeSpeed || currentExercise.riddleConfig?.mode === "sequenceRepeat") metronome.startMetronome();
     }, 100);
   };
 
   const category = currentExercise.category || "mixed";
   const gradientClasses = categoryGradients[category as keyof typeof categoryGradients];
 
+  const hasMicControls = !!(currentExercise.tablature?.length > 0 || currentExercise.gpFileUrl);
+  const hasAudioTrack  = hasMicControls;
+  const isRiddleMode   = currentExercise.riddleConfig?.mode === "sequenceRepeat";
+
   if (isLandscape) {
     return (
       <LandscapeSessionModal
-        isOpen={isOpen}
-        onClose={onClose}
-        onFinish={onFinish}
+        isOpen={isOpen} onClose={onClose} onFinish={onFinish}
         currentExercise={currentExercise}
-        currentExerciseIndex={currentExerciseIndex}
-        totalExercises={totalExercises}
-        isLastExercise={isLastExercise}
-        isPlaying={isPlaying}
-        isFinishing={isFinishing}
-        isSubmittingReport={isSubmittingReport}
-        metronome={metronome}
-        effectiveBpm={effectiveBpm}
-        isMicEnabled={isMicEnabled}
-        toggleMic={toggleMic}
-        isAudioMuted={isAudioMuted}
-        setIsAudioMuted={setIsAudioMuted}
-        isMetronomeMuted={isMetronomeMuted}
-        setIsMetronomeMuted={setIsMetronomeMuted}
-        isHalfSpeed={isHalfSpeed}
-        onHalfSpeedToggle={onHalfSpeedToggle}
+        currentExerciseIndex={currentExerciseIndex} totalExercises={totalExercises}
+        isLastExercise={isLastExercise} isPlaying={isPlaying}
+        isFinishing={isFinishing} isSubmittingReport={isSubmittingReport}
+        metronome={metronome} effectiveBpm={effectiveBpm}
+        isMicEnabled={isMicEnabled} toggleMic={toggleMic}
+        isAudioMuted={isAudioMuted} setIsAudioMuted={setIsAudioMuted}
+        isMetronomeMuted={isMetronomeMuted} setIsMetronomeMuted={setIsMetronomeMuted}
+        speedMultiplier={speedMultiplier} onSpeedMultiplierChange={onSpeedMultiplierChange}
         activeTablature={activeTablature}
-        isRiddleRevealed={isRiddleRevealed}
-        isRiddleGuessed={isRiddleGuessed}
+        isRiddleRevealed={isRiddleRevealed} isRiddleGuessed={isRiddleGuessed}
         hasPlayedRiddleOnce={hasPlayedRiddleOnce}
-        handleRevealRiddle={handleRevealRiddle}
-        handleNextRiddle={handleNextRiddle}
-        earTrainingScore={earTrainingScore}
-        earTrainingHighScore={earTrainingHighScore}
+        handleRevealRiddle={handleRevealRiddle} handleNextRiddle={handleNextRiddle}
+        earTrainingScore={earTrainingScore} earTrainingHighScore={earTrainingHighScore}
         onEarTrainingGuessed={onEarTrainingGuessed}
-        examMode={examMode}
-        isListening={isListening}
-        frequencyRef={frequencyRef}
-        gradientClasses={gradientClasses}
-        tabResetKey={tabResetKey}
-        setVideoDuration={setVideoDuration}
-        setTimerTime={setTimerTime}
-        startTimer={startTimer}
-        stopTimer={stopTimer}
+        examMode={examMode} isListening={isListening} frequencyRef={frequencyRef}
+        volumeRef={volumeRef} onRecalibrate={onRecalibrate}
+        gradientClasses={gradientClasses} tabResetKey={tabResetKey}
+        setVideoDuration={setVideoDuration} setTimerTime={setTimerTime}
+        startTimer={startTimer} stopTimer={stopTimer}
         handleToggleTimer={handleToggleTimer}
         handleNextExerciseClick={handleNextExerciseClick}
         handleBackExerciseClick={handleBackExerciseClick}
@@ -209,10 +145,7 @@ const SessionModal = ({
   }
 
   return (
-    <div className={cn(
-      "fixed inset-0 z-[9999999] flex h-full flex-col overflow-hidden",
-      gradientClasses
-    )}>
+    <div className={cn("fixed inset-0 z-[9999999] flex h-full flex-col overflow-hidden bg-zinc-950", gradientClasses)}>
       <SessionModalHeader
         exerciseTitle={currentExercise.title}
         currentExerciseIndex={currentExerciseIndex}
@@ -220,8 +153,8 @@ const SessionModal = ({
         onClose={onClose}
       />
 
-      <div className='flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5'>
-        <div className='space-y-6 p-4'>
+      <div className="flex-1 overflow-y-auto overscroll-contain bg-gradient-to-b from-background/10 to-background/5">
+        <div className="space-y-4 p-4">
 
           <MobileExerciseContent
             currentExercise={currentExercise}
@@ -250,10 +183,9 @@ const SessionModal = ({
 
           {currentExercise.customGoal && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
               key={currentExercise.customGoal}
-              className="mb-8 flex flex-col items-center gap-3"
+              className="flex flex-col items-center gap-3"
             >
               <div className="relative group">
                 <div className="absolute -inset-6 bg-cyan-500/20 blur-[30px] rounded-full opacity-50 group-hover:opacity-80 transition-opacity animate-pulse" />
@@ -273,126 +205,48 @@ const SessionModal = ({
           )}
 
           {currentExercise.spotifyId && (
-            <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
               <SpotifyPlayer trackId={currentExercise.spotifyId} height={80} />
-              <div className="mt-2 flex items-center gap-2 px-1">
-                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <p className="text-[10px] text-zinc-400 font-semibold italic">
-                  For full tracks, log in to <a href="https://www.spotify.com" target="_blank" className="text-emerald-500 underline decoration-emerald-500/20">Spotify.com</a>
-                </p>
-              </div>
             </div>
           )}
 
           {isMicEnabled && <MobileMicGameHud />}
 
-          <MobileTimerDisplay
-            isPlaying={isPlaying}
-       
+          <MobileTimerDisplay isPlaying={isPlaying} />
+
+          {/* Controls */}
+          <MediaControlsToolbar
+            hasMetronome={!!currentExercise.metronomeSpeed}
+            hasAudioTrack={hasAudioTrack}
+            hasMicControls={hasMicControls}
+            speedMultiplier={speedMultiplier ?? 1}
+            onSpeedMultiplierChange={onSpeedMultiplierChange ?? (() => {})}
+            isAudioMuted={isAudioMuted}
+            isRiddleMode={isRiddleMode}
+            onAudioToggle={() => setIsAudioMuted(!isAudioMuted)}
+            isMicEnabled={isMicEnabled}
+            onMicToggle={toggleMic}
+            onRecalibrate={onRecalibrate ?? (() => {})}
+            frequencyRef={frequencyRef}
+            volumeRef={volumeRef}
           />
 
-          {currentExercise.metronomeSpeed && (
-            <div className='mb-6'>
-              <Metronome
-                metronome={metronome}
-                isMuted={isMetronomeMuted}
-                onMuteToggle={setIsMetronomeMuted}
-                isHalfSpeed={isHalfSpeed}
-                onHalfSpeedToggle={onHalfSpeedToggle}
-              />
-              {currentExercise.tablature && currentExercise.tablature.length > 0 && (
-                <div className="mt-4 flex justify-center gap-4">
-                  <Button
-                    variant="ghost" size="sm"
-                    className={cn(
-                      "gap-2 text-[10px] font-bold uppercase tracking-widest transition-all h-9",
-                      isAudioMuted ? "text-zinc-500 hover:text-zinc-400" : "text-cyan-400 hover:text-cyan-300 bg-cyan-500/10"
-                    )}
-                    onClick={() => setIsAudioMuted(!isAudioMuted)}
-                  >
-                    <GiGuitar className="text-base" />
-                    {isAudioMuted ? <FaVolumeMute /> : <FaVolumeUp />}
-                    {isAudioMuted ? "Guitar Off" : "Guitar On"}
-                  </Button>
-
-                  <Button
-                    variant="ghost" size="sm"
-                    className={cn(
-                      "gap-2 text-[10px] font-bold uppercase tracking-widest transition-all h-9",
-                      !isMicEnabled ? "text-zinc-500 hover:text-zinc-400" : "text-emerald-400 hover:text-emerald-300 bg-emerald-500/10"
-                    )}
-                    onClick={toggleMic}
-                  >
-                    <div className={cn("h-1.5 w-1.5 rounded-full", isMicEnabled ? "bg-emerald-500 animate-pulse" : "bg-zinc-600")} />
-                    {isMicEnabled ? "Tracking On" : "Tracking Off"}
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {currentExercise.metronomeSpeed && bpmStages && bpmStages.length > 0 && onBpmToggle && !currentExercise.gpFileUrl && (
-            <div className="mb-6">
-              <BpmProgressGrid
-                bpmStages={bpmStages}
-                completedBpms={completedBpms || []}
-                recommendedBpm={currentExercise.metronomeSpeed.recommended}
-                onToggle={onBpmToggle}
-                isLoading={isBpmLoading}
-              />
-            </div>
-          )}
-
-          <Accordion type="single" collapsible defaultValue="instructions" className="w-full space-y-3">
-            <AccordionItem value="instructions" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
-              <AccordionTrigger className="px-4 py-3 hover:bg-white/5 transition-colors group">
-                <div className="flex items-center gap-3">
-                  <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
-                    <FaInfoCircle className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold tracking-wide text-sm text-zinc-200 group-hover:text-white">{t("exercises:instructions")}</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-1">
-                <div className="prose prose-invert max-w-none prose-p:text-sm prose-p:text-zinc-400 prose-p:leading-relaxed">
-                  {currentExercise.instructions.map((instruction: string, idx: number) => (
-                    <p key={idx} className="mb-2 last:mb-0">{instruction}</p>
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="tips" className="border-none rounded-2xl overflow-hidden bg-zinc-900/40 border border-white/5">
-              <AccordionTrigger className="px-4 py-3 hover:bg-white/5 transition-colors group">
-                <div className="flex items-center gap-3">
-                  <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition-colors">
-                    <FaLightbulb className="h-4 w-4" />
-                  </div>
-                  <span className="font-bold tracking-wide text-sm text-zinc-200 group-hover:text-white">{t("exercises:hints")}</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-1">
-                <ul className="list-inside list-disc space-y-1.5 text-sm text-zinc-400 marker:text-amber-500/50">
-                  {currentExercise.tips?.length > 0 && currentExercise.tips.map((tip: string, idx: number) => (
-                    <li key={idx}>{tip}</li>
-                  ))}
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <ExerciseQuickActionsBar
+            exercise={currentExercise}
+            metronome={metronome}
+            isMetronomeMuted={isMetronomeMuted}
+            setIsMetronomeMuted={setIsMetronomeMuted}
+            examMode={examMode}
+          />
 
           {currentExercise.links && currentExercise.links.length > 0 && (
-            <div className="rounded-2xl bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-5 backdrop-blur-sm space-y-4 mb-20">
+            <div className="rounded-2xl bg-gradient-to-br from-red-500/10 to-zinc-900/40 border border-red-500/20 p-5 space-y-4 mb-20">
               <div className="flex items-center gap-2 text-red-400 font-bold text-xs uppercase tracking-widest">
                 <span>Support Author</span>
               </div>
               <div className="flex flex-col gap-2">
                 {currentExercise.links.map((link: any, idx: number) => (
-                  <a
-                    key={idx}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <a key={idx} href={link.url} target="_blank" rel="noopener noreferrer"
                     className="flex items-center justify-between group px-4 py-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-sm"
                   >
                     <span className="text-zinc-300 group-hover:text-white font-medium">{link.label}</span>
@@ -401,7 +255,6 @@ const SessionModal = ({
               </div>
             </div>
           )}
-
         </div>
       </div>
 
