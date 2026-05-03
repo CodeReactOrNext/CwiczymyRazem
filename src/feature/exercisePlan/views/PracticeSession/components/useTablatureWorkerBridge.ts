@@ -7,7 +7,7 @@ import type { TablatureRenderData } from "./useTablatureRenderData";
 const REST_VOLUME_THRESHOLD = 0.05;
 
 interface WorkerBridgeOptions {
-  canvasRef:       RefObject<HTMLCanvasElement>;
+  canvasRef:       { current: HTMLCanvasElement | null };
   containerSize:   { width: number; height: number };
   renderData:      TablatureRenderData;
   isPlaying:       boolean;

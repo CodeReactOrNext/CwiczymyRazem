@@ -20,7 +20,6 @@ interface ExerciseContentAreaProps {
   startTime: number | null;
   effectiveBpm: number;
   isAudioMuted: boolean;
-  isMobileView: boolean;
 
   // Tablature
   isMetronomePlaying: boolean;
@@ -68,7 +67,6 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
   startTime,
   effectiveBpm,
   isAudioMuted,
-  isMobileView,
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
@@ -162,7 +160,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
           videoUrl={currentExercise.videoUrl}
           isPlayalong={currentExercise.isPlayalong}
           isPlaying={isPlaying}
-          isMobileView={isMobileView}
+          isMobileView={false}
           startTimer={startTimer}
           stopTimer={stopTimer}
           setVideoDuration={setVideoDuration}
@@ -183,7 +181,7 @@ export const ExerciseContentArea = memo(function ExerciseContentArea({
         <ExerciseImage
           image={currentExercise.imageUrl || currentExercise.image || ""}
           title={currentExercise.title}
-          isMobileView={isMobileView}
+          isMobileView={false}
         />
       )}
     </div>

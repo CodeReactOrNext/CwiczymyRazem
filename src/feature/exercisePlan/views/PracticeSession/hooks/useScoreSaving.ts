@@ -8,7 +8,7 @@ import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
 interface UseScoreSavingOptions {
   activeExercise:       Exercise;
   currentExercise:      Exercise;
-  userAuth:             string | undefined;
+  userAuth:             string | null | undefined;
   isMicEnabled:         boolean;
   userName:             string | null | undefined;
   userAvatar:           string | null | undefined;

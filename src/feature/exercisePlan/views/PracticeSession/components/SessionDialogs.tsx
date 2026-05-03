@@ -9,6 +9,7 @@ import { CalibrationChoiceDialog } from "./CalibrationChoiceDialog";
 import { CalibrationWizard } from "./CalibrationWizard";
 import { MicModeDialog } from "./MicModeDialog";
 import { useTimerContext } from "../contexts/TimerContext";
+import { useSessionUI } from "../contexts/SessionUIContext";
 
 interface SessionDialogsProps {
   // ExerciseCompleteDialog
@@ -39,8 +40,6 @@ interface SessionDialogsProps {
 
   // Leaderboard
   exerciseId: string;
-  leaderboardOpen: boolean;
-  setLeaderboardOpen: (open: boolean) => void;
 
   // Completion notification
   isMounted: boolean;
@@ -73,13 +72,12 @@ export const SessionDialogs = ({
   inputGain,
   setInputGain,
   exerciseId,
-  leaderboardOpen,
-  setLeaderboardOpen,
   isMounted,
   hasReportResult,
   showSuccessView,
   isLastExercise,
 }: SessionDialogsProps) => {
+  const { isLeaderboardOpen, closeLeaderboard } = useSessionUI();
   const [showCompletionNotification, setShowCompletionNotification] = useState(false);
   const { timeLeft } = useTimerContext();
 
@@ -146,8 +144,8 @@ export const SessionDialogs = ({
       />
 
       <EarTrainingLeaderboardDialog
-        isOpen={leaderboardOpen}
-        onClose={() => setLeaderboardOpen(false)}
+        isOpen={isLeaderboardOpen}
+        onClose={closeLeaderboard}
         exerciseId={exerciseId}
         exerciseTitle={exerciseTitle}
       />

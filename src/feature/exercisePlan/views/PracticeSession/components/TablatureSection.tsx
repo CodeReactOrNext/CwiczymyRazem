@@ -17,6 +17,7 @@ interface TablatureSectionProps {
   isMetronomePlaying: boolean;
   countInRemaining: number;
   frequencyRef?: React.MutableRefObject<number>;
+  isListening: boolean;
   audioContext?: AudioContext | null;
   audioStartTime?: number | null;
   tabResetKey: number;
@@ -37,6 +38,7 @@ export const TablatureSection = memo(function TablatureSection({
   isMetronomePlaying,
   countInRemaining,
   frequencyRef,
+  isListening,
   audioContext,
   audioStartTime,
   tabResetKey,
@@ -76,7 +78,7 @@ export const TablatureSection = memo(function TablatureSection({
           countInRemaining={countInRemaining}
           className="w-full"
           frequencyRef={frequencyRef}
-          isListening={true}
+          isListening={isListening}
           hitNotes={hitNotes}
           missedNotes={missedNotes}
           currentBeatsElapsed={0}
