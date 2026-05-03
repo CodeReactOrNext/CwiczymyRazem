@@ -120,6 +120,7 @@
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
     "@vitejs/plugin-react": "^6.0.1",
+    "@welldone-software/why-did-you-render": "^10.0.1",
     "autoprefixer": "10.4.12",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.39.4",

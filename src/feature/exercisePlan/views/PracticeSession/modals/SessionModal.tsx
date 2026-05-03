@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "assets/components/ui/accordion";
 import { Button } from "assets/components/ui/button";
+import React from "react";
 import { cn } from "assets/lib/utils";
 import { BpmProgressGrid } from "feature/exercisePlan/components/BpmProgressGrid";
 import { Metronome } from "feature/exercisePlan/components/Metronome/Metronome";
@@ -22,13 +23,13 @@ import { MobileMicGameHud } from "../components/MobileMicGameHud";
 import { MobileTimerDisplay } from "../components/MobileTimerDisplay";
 import { SessionModalControls } from "../components/SessionModalControls";
 import { SessionModalHeader } from "../components/SessionModalHeader";
+import { useTimerContext } from "../contexts/TimerContext";
 import { LandscapeSessionModal } from "./LandscapeSessionModal";
 
 interface SessionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onFinish: () => void;
-  onImageClick: () => void;
   isMounted: boolean;
   currentExercise: any;
   nextExercise: any | null;
@@ -36,12 +37,10 @@ interface SessionModalProps {
   totalExercises: number;
   isLastExercise: boolean;
   isPlaying: boolean;
-  formattedTimeLeft: string;
   toggleTimer: () => void;
   handleNextExercise: () => void;
   handleBackExercise: () => void;
   sessionTimerData: any;
-  exerciseTimeSpent: number;
   setVideoDuration: (duration: number) => void;
   setTimerTime: (time: number) => void;
   startTimer: () => void;
@@ -53,7 +52,7 @@ interface SessionModalProps {
   effectiveBpm?: number;
   isMicEnabled: boolean;
   toggleMic: () => Promise<void>;
-  detectedNoteData: any;
+  frequencyRef?: React.MutableRefObject<number>;
   isListening: boolean;
   isAudioMuted: boolean;
   setIsAudioMuted: (bool: boolean) => void;
@@ -83,7 +82,6 @@ const SessionModal = ({
   isOpen,
   onClose,
   onFinish,
-  onImageClick,
   isMounted,
   currentExercise,
   nextExercise,
@@ -91,12 +89,10 @@ const SessionModal = ({
   totalExercises,
   isLastExercise,
   isPlaying,
-  formattedTimeLeft,
   toggleTimer,
   handleNextExercise,
   handleBackExercise,
   sessionTimerData,
-  exerciseTimeSpent,
   setVideoDuration,
   setTimerTime,
   startTimer,
@@ -108,7 +104,7 @@ const SessionModal = ({
   effectiveBpm,
   isMicEnabled,
   toggleMic,
-  detectedNoteData,
+  frequencyRef,
   isListening,
   isAudioMuted,
   setIsAudioMuted,
@@ -133,6 +129,7 @@ const SessionModal = ({
   onRecordsClick,
   examMode,
 }: SessionModalProps) => {
+  const { formattedTimeLeft } = useTimerContext();
   // Hooks must be above any early returns
   const { t } = useTranslation(["exercises", "common"]);
   const [tabResetKey, setTabResetKey] = useState(0);
@@ -191,7 +188,6 @@ const SessionModal = ({
         totalExercises={totalExercises}
         isLastExercise={isLastExercise}
         isPlaying={isPlaying}
-        formattedTimeLeft={formattedTimeLeft}
         isFinishing={isFinishing}
         isSubmittingReport={isSubmittingReport}
         canSkipExercise={canSkipExercise}
@@ -222,7 +218,7 @@ const SessionModal = ({
         onBpmToggle={onBpmToggle}
         examMode={examMode}
         isListening={isListening}
-        detectedNoteData={detectedNoteData}
+        frequencyRef={frequencyRef}
         gradientClasses={gradientClasses}
         tabResetKey={tabResetKey}
         setVideoDuration={setVideoDuration}
@@ -262,14 +258,13 @@ const SessionModal = ({
             hasPlayedRiddleOnce={hasPlayedRiddleOnce}
             isPlaying={isPlaying}
             isListening={isListening}
-            detectedNoteData={detectedNoteData}
+            frequencyRef={frequencyRef}
             tabResetKey={tabResetKey}
             setVideoDuration={setVideoDuration}
             setTimerTime={setTimerTime}
             startTimer={startTimer}
             stopTimer={stopTimer}
             onVideoEnd={handleNextExerciseClick}
-            onImageClick={onImageClick}
             earTrainingScore={earTrainingScore}
             earTrainingHighScore={earTrainingHighScore}
             exerciseUrl={exerciseUrl}
@@ -322,7 +317,6 @@ const SessionModal = ({
             formattedTimeLeft={formattedTimeLeft}
             isPlaying={isPlaying}
             sessionTimerData={sessionTimerData}
-            exerciseTimeSpent={exerciseTimeSpent}
           />
 
           {currentExercise.metronomeSpeed && (

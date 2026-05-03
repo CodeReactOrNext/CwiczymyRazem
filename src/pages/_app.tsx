@@ -1,3 +1,4 @@
+import "utils/wdyr";
 import "styles/globals.css";
 
 import { LazyMotion, domAnimation } from "framer-motion";

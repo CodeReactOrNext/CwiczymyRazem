@@ -118,6 +118,7 @@ export const ExerciseSuccessView = ({
   const chartFill   = accuracy >= 80 ? 'rgba(6,182,212,' : accuracy >= 60 ? 'rgba(251,146,60,' : 'rgba(239,68,68,';
 
   useEffect(() => {
+
     const timer = setTimeout(() => {
       setIsVisible(true);
 

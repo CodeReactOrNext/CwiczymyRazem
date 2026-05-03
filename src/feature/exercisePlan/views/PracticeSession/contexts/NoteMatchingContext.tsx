@@ -1,9 +1,9 @@
-import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useRef, type MutableRefObject, type ReactNode } from "react";
 
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 
 import type { StrumPattern, TablatureMeasure } from "../../../types/exercise.types";
-import type { GameState } from "../hooks/useNoteMatching";
+import type { GameState } from "../hooks/noteMatchingFeedback";
 import { useNoteMatching } from "../hooks/useNoteMatching";
 import type { SlotResult } from "../hooks/useStrummingMatcher";
 import { useStrummingMatcher } from "../hooks/useStrummingMatcher";
@@ -13,7 +13,7 @@ import { useStrummingMatcher } from "../hooks/useStrummingMatcher";
 interface NoteMatchingContextValue {
   hitNotes: Record<string, boolean | number>;
   missedNotes: Record<string, boolean>;
-  currentBeatsElapsed: number;
+  currentBeatsElapsedRef: MutableRefObject<number>;
   strumSlotFeedback: Map<number, SlotResult> | undefined;
   gameState: GameState;
   maxPossibleScore: number;
@@ -39,10 +39,12 @@ export interface NoteMatchingHandle {
 
 const defaultGameState: GameState = { score: 0, combo: 0, multiplier: 1, lastFeedback: "", feedbackId: 0 };
 
+const _fallbackRef = { current: 0 } as MutableRefObject<number>;
+
 const NoteMatchingContext = createContext<NoteMatchingContextValue>({
   hitNotes: {},
   missedNotes: {},
-  currentBeatsElapsed: 0,
+  currentBeatsElapsedRef: _fallbackRef,
   strumSlotFeedback: undefined,
   gameState: defaultGameState,
   maxPossibleScore: 0,
@@ -96,7 +98,7 @@ export function NoteMatchingProvider({
     gameState: tabGameState,
     maxCombo,
     maxPossibleScore,
-    currentBeatsElapsed,
+    currentBeatsElapsedRef,
     resetGame,
   } = useNoteMatching({
     isPlaying,
@@ -157,9 +159,9 @@ export function NoteMatchingProvider({
   };
 
   const value = useMemo<NoteMatchingContextValue>(
-    () => ({ hitNotes, missedNotes, currentBeatsElapsed, strumSlotFeedback, gameState, maxPossibleScore, sessionAccuracy }),
+    () => ({ hitNotes, missedNotes, currentBeatsElapsedRef, strumSlotFeedback, gameState, maxPossibleScore, sessionAccuracy }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [hitNotes, missedNotes, currentBeatsElapsed, strumSlotFeedback, gameState, maxPossibleScore, sessionAccuracy],
+    [hitNotes, missedNotes, strumSlotFeedback, gameState, maxPossibleScore, sessionAccuracy],
   );
 
   return (

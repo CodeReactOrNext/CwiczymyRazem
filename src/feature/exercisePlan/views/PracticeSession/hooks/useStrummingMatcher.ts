@@ -2,8 +2,8 @@ import type { StrumPattern } from "feature/exercisePlan/types/exercise.types";
 import type { AudioRefs } from "hooks/useAudioAnalyzer";
 import { startTransition,useEffect, useRef, useState } from "react";
 
-import type { GameState } from "./useNoteMatching";
-import { getFeedbackForCombo } from "./useNoteMatching";
+import type { GameState } from "./noteMatchingFeedback";
+import { getFeedbackForCombo } from "./noteMatchingFeedback";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 

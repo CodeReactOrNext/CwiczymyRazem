@@ -7,7 +7,7 @@ import { ModalWrapper } from "feature/exercisePlan/views/PracticeSession/compone
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "hooks/useTranslation";
 import { Minus, Plus, Volume2, VolumeX, X } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   FaCheck, FaInfoCircle, FaLightbulb, FaPause, FaPlay,
   FaStepBackward, FaStepForward, FaUndo, FaVolumeMute, FaVolumeUp,
@@ -16,6 +16,7 @@ import { GiGuitar } from "react-icons/gi";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { MobileExerciseContent } from "../components/MobileExerciseContent";
+import { useTimerContext } from "../contexts/TimerContext";
 
 interface LandscapeSessionModalProps {
   isOpen: boolean;
@@ -26,7 +27,6 @@ interface LandscapeSessionModalProps {
   totalExercises: number;
   isLastExercise: boolean;
   isPlaying: boolean;
-  formattedTimeLeft: string;
   isFinishing?: boolean;
   isSubmittingReport?: boolean;
   canSkipExercise?: boolean;
@@ -57,7 +57,7 @@ interface LandscapeSessionModalProps {
   onBpmToggle?: (bpm: number) => void;
   examMode?: boolean;
   isListening: boolean;
-  detectedNoteData: any;
+  frequencyRef?: React.MutableRefObject<number>;
   gradientClasses: string;
   tabResetKey: number;
   setVideoDuration: (duration: number) => void;
@@ -79,7 +79,6 @@ export function LandscapeSessionModal({
   totalExercises,
   isLastExercise,
   isPlaying,
-  formattedTimeLeft,
   isFinishing,
   isSubmittingReport,
   canSkipExercise,
@@ -110,7 +109,7 @@ export function LandscapeSessionModal({
   onBpmToggle,
   examMode,
   isListening,
-  detectedNoteData,
+  frequencyRef,
   gradientClasses,
   tabResetKey,
   setVideoDuration,
@@ -125,6 +124,7 @@ export function LandscapeSessionModal({
   const { t } = useTranslation(["exercises"]);
   const [isPanelExpanded, setIsPanelExpanded] = useState(true);
   const { gameState, sessionAccuracy } = useNoteMatchingContext();
+  const { formattedTimeLeft } = useTimerContext();
 
   return (
     <ModalWrapper zIndex='z-[9999999]'>
@@ -149,14 +149,13 @@ export function LandscapeSessionModal({
                   hasPlayedRiddleOnce={hasPlayedRiddleOnce}
                   isPlaying={isPlaying}
                   isListening={isListening}
-                  detectedNoteData={detectedNoteData}
+                  frequencyRef={frequencyRef}
                   tabResetKey={tabResetKey}
                   setVideoDuration={setVideoDuration}
                   setTimerTime={setTimerTime}
                   startTimer={startTimer}
                   stopTimer={stopTimer}
                   onVideoEnd={handleNextExerciseClick}
-                  onImageClick={() => {}}
                   earTrainingScore={earTrainingScore}
                   earTrainingHighScore={earTrainingHighScore}
                   exerciseUrl={exerciseUrl}

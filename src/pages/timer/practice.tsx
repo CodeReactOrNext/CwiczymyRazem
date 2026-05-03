@@ -24,7 +24,7 @@ const TimerPractice: NextPageWithLayout = () => {
   const choseSkillHandler = (newSkill: SkillsType) => {
     if (chosenSkill) {
       timer.stopTimer();
-      dispatch(updateTimerTime({ type: chosenSkill, time: timer.time }));
+      dispatch(updateTimerTime({ type: chosenSkill, time: timer.getTime() }));
     }
     setChosenSkill(newSkill);
     timer.setInitialStartTime(timerData[newSkill]);
@@ -37,20 +37,18 @@ const TimerPractice: NextPageWithLayout = () => {
   useEffect(() => {
     if (!timer.timerEnabled || !chosenSkill) return;
 
-    if (timer.time === 0 && timerData[chosenSkill] > 0) return;
-
-    dispatch(updateTimerTime({
-      type: chosenSkill,
-      time: timer.time,
-    }));
-  }, [timer.time, chosenSkill, dispatch, timer.timerEnabled, timerData]);
+    return timer.subscribe((time) => {
+      if (time === 0 && timerData[chosenSkill] > 0) return;
+      dispatch(updateTimerTime({ type: chosenSkill, time }));
+    });
+  }, [chosenSkill, dispatch, timer.timerEnabled, timer, timerData]);
 
   const timerSubmitHandler = useCallback(() => {
     timer.stopTimer();
     if (chosenSkill) {
       dispatch(updateTimerTime({
         type: chosenSkill,
-        time: timer.time,
+        time: timer.getTime(),
       }));
     }
     router.push("/report?applyTimer=true");

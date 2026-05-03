@@ -3,60 +3,68 @@ import { motion } from "framer-motion";
 import { Minus, Plus } from "lucide-react";
 import type { StaticImageData } from "next/image";
 import Image from "next/image";
+import { useRef, useState } from "react";
 import { FaCompress, FaExpand } from "react-icons/fa";
+
+import { useImageHandling } from "../hooks/useImageHandling";
+import ImageModal from "../modals/ImageModal";
 
 interface ExerciseImageProps {
   image: string | StaticImageData;
   title: string;
   isMobileView: boolean;
-  imageScale: number;
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  setImageModalOpen: (isOpen: boolean) => void;
-  handleZoomIn: () => void;
-  handleZoomOut: () => void;
-  resetImagePosition: () => void;
-  setImageScale: (scale: number) => void;
 }
 
 export const ExerciseImage = ({
   image,
   title,
   isMobileView,
-  imageScale,
-  containerRef,
-  setImageModalOpen,
-  handleZoomIn,
-  handleZoomOut,
-  resetImagePosition,
-  setImageScale,
 }: ExerciseImageProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const {
+    imageScale,
+    handleZoomIn,
+    handleZoomOut,
+    resetImagePosition,
+    setImageScale,
+  } = useImageHandling();
+
   if (!image) return null;
 
   if (isMobileView) {
     return (
-      <div
-        className='relative mb-4 w-full cursor-pointer overflow-hidden rounded-xl border border-muted/30 bg-white/10 shadow-md transition-all duration-200 hover:shadow-lg'
-        onClick={() => setImageModalOpen(true)}>
-        <div className='relative aspect-[3.5/1] w-full'>
-          <Image
-            src={image}
-            alt={title}
-            className='h-full w-full object-contain'
-            fill
-            priority
-            quality={80}
-          />
-          <div className='absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px]'>
-            <Button
-              variant='secondary'
-              size='sm'
-              className='pointer-events-none opacity-90 shadow-lg'>
-              <span className='mr-2'>Powiększ</span>
-              <FaExpand className='h-4 w-4' />
-            </Button>
+      <>
+        <div
+          className='relative mb-4 w-full cursor-pointer overflow-hidden rounded-xl border border-muted/30 bg-white/10 shadow-md transition-all duration-200 hover:shadow-lg'
+          onClick={() => setIsModalOpen(true)}>
+          <div className='relative aspect-[3.5/1] w-full'>
+            <Image
+              src={image}
+              alt={title}
+              className='h-full w-full object-contain'
+              fill
+              priority
+              quality={80}
+            />
+            <div className='absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px]'>
+              <Button
+                variant='secondary'
+                size='sm'
+                className='pointer-events-none opacity-90 shadow-lg'>
+                <span className='mr-2'>Powiększ</span>
+                <FaExpand className='h-4 w-4' />
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+        <ImageModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          imageSrc={image}
+          imageAlt={title}
+        />
+      </>
     );
   }
 

@@ -1,15 +1,15 @@
-import { useActivityLog } from 'components/ActivityLog/hooks/useActivityLog';
-import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAuth, selectUserAvatar } from 'feature/user/store/userSlice';
-import { setActivity } from 'feature/user/store/userSlice';
-import { updateUserStats } from 'feature/user/store/userSlice.asyncThunk';
-import { updateQuestProgress } from 'feature/user/store/userSlice.questActions';
-import type { ReportDataInterface, ReportFormikInterface } from 'feature/user/view/ReportView/ReportView.types';
+import { selectCurrentUserStats, selectPreviousUserStats, selectTimerData, selectUserAuth } from 'feature/user/store/userSlice';
 import useTimer from 'hooks/useTimer';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { useCallback, useEffect, useState } from 'react';
+import { useAppSelector } from 'store/hooks';
 
 import type { ExercisePlan } from '../../../types/exercise.types';
 import { useExerciseNavigation } from './useExerciseNavigation';
+import { useExerciseTimerSync } from './useExerciseTimerSync';
+import { useSessionActivity } from './useSessionActivity';
+import { useSessionProgress } from './useSessionProgress';
+import { useSessionReporting } from './useSessionReporting';
+import { useSessionTimerLogic } from './useSessionTimerLogic';
 import { useTimeTracking } from './useTimeTracking';
 import { useUIState } from './useUIState';
 
@@ -23,29 +23,20 @@ interface UsePracticeSessionStateProps {
   skillRewardAmount?: number;
 }
 
-export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount }: UsePracticeSessionStateProps) => {
-  const dispatch = useAppDispatch();
+export const usePracticeSessionState = ({
+  plan,
+  onFinish,
+  forceFullDuration,
+  freeMode,
+  skillRewardSkillId,
+}: UsePracticeSessionStateProps) => {
+  const userAuth = useAppSelector(selectUserAuth);
   const timerData = useAppSelector(selectTimerData);
-  const avatar = useAppSelector(selectUserAvatar);
   const currentUserStats = useAppSelector(selectCurrentUserStats);
   const previousUserStats = useAppSelector(selectPreviousUserStats);
+  const avatar = useAppSelector((state) => state.user.userInfo?.avatar);
 
-  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
-  const isSubmittingRef = useRef(false);
-  const [reportResult, setReportResult] = useState<ReportDataInterface | null>(null);
-  const [sessionTimeSnapshot, setSessionTimeSnapshot] = useState<{
-    technique: number;
-    theory: number;
-    hearing: number;
-    creativity: number;
-  } | null>(null);
-  const [exerciseTimes, setExerciseTimes] = useState<Record<number, number>>({});
-  const [completedExercises, setCompletedExercises] = useState<number[]>([]);
-
-  const userAuth = useAppSelector(selectUserAuth);
-  const { reportList } = useActivityLog(userAuth as string);
-
-  // Challenges removed
+  const [videoDuration, setVideoDuration] = useState<number | null>(null);
 
   const {
     currentExerciseIndex,
@@ -54,7 +45,7 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, fre
     currentExercise,
     nextExercise,
     isLastExercise,
-    handleNextExercise: baseHandleNextExercise
+    handleNextExercise: baseHandleNextExercise,
   } = useExerciseNavigation(plan);
 
   const {
@@ -62,17 +53,46 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, fre
     setShowCompleteDialog,
     isMobileView,
     isFullSessionModalOpen,
-    isImageModalOpen,
-    setIsImageModalOpen,
     isMounted,
   } = useUIState();
 
   const timer = useTimer();
+  useTimeTracking(timer, currentExercise);
 
-  const [showSuccessView, setShowSuccessView] = useState(false);
-  const [videoDuration, setVideoDuration] = useState<number | null>(null);
+  const isSkillExercise = !!skillRewardSkillId || !!forceFullDuration;
 
-  const { exerciseTimeSpent } = useTimeTracking(timer, currentExercise);
+  const duration = videoDuration !== null ? videoDuration : (currentExercise.timeInMinutes || 0) * 60;
+
+  const {
+    completedExercises,
+    showSuccessView,
+    setShowSuccessView,
+    canFinishSession,
+    resetProgress,
+  } = useSessionProgress({
+    timer,
+    duration,
+    currentExerciseIndex,
+    isLastExercise,
+    freeMode,
+    isSkillExercise,
+  });
+
+
+  const { isSubmittingReport, reportResult, handleFinishSession, activityDataToUse, resetReporting } =
+    useSessionReporting({
+      plan,
+      avatar: avatar || null,
+      completedExercises,
+    });
+
+  useSessionActivity({
+    userAuth,
+    plan,
+    currentExercise,
+  });
+
+  const { exerciseTimes, saveTime, getTime, resetExerciseTimes } = useExerciseTimerSync();
 
   const toggleTimer = (metronomeToggle?: () => void) => {
     if (timer.timerEnabled) {
@@ -82,226 +102,39 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, fre
       timer.startTimer();
       if (metronomeToggle) metronomeToggle();
     }
-  }
-
-  const effectiveTotalSeconds = freeMode
-    ? Number.MAX_SAFE_INTEGER
-    : videoDuration !== null
-      ? videoDuration
-      : currentExercise.timeInMinutes * 60;
-
-  const timeLeft = Math.max(0, Math.floor((effectiveTotalSeconds * 1000 - timer.time) / 1000));
-  // In free mode show elapsed time (counting up) instead of remaining time (counting down)
-  const elapsedSeconds = Math.floor(timer.time / 1000);
-  const formattedTimeLeft = freeMode
-    ? `${Math.floor(elapsedSeconds / 60)}:${String(elapsedSeconds % 60).padStart(2, "0")}`
-    : `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, "0")}`;
-  const timerProgressValue = freeMode ? 0 : Math.min(100, (timer.time / (effectiveTotalSeconds * 1000)) * 100);
-
-  const isSkillExercise = !!skillRewardSkillId || !!forceFullDuration;
-  const canSkipExercise = true;
-  const canFinishSession = freeMode ? completedExercises.length > 0 : isSkillExercise ? timeLeft <= 0 : completedExercises.length > 0;
-
-  const checkForSuccess = useCallback(() => {
-    if (!freeMode && isLastExercise && timeLeft <= 0) {
-      setShowSuccessView(true);
-    }
-  }, [freeMode, isLastExercise, timeLeft]);
-
-  useEffect(() => {
-    checkForSuccess();
-  }, [checkForSuccess]);
-
-  // Track completion - 20 seconds threshold
-  useEffect(() => {
-    const MIN_TIME_FOR_COMPLETION = 20000; // 20 seconds in ms
-    if (exerciseTimeSpent >= MIN_TIME_FOR_COMPLETION && !completedExercises.includes(currentExerciseIndex)) {
-      setCompletedExercises(prev => [...prev, currentExerciseIndex]);
-    }
-  }, [exerciseTimeSpent, currentExerciseIndex, completedExercises]);
-
-  // Update online activity
-  useEffect(() => {
-    if (userAuth) {
-      dispatch(setActivity({
-        planTitle: typeof plan.title === 'string' ? plan.title : plan.title,
-        exerciseTitle: currentExercise.title,
-        category: currentExercise.category,
-        timestamp: Date.now()
-      }));
-    }
-
-    return () => {
-      // Clear activity when leaving the page/session
-      dispatch(setActivity(null));
-    };
-  }, [userAuth, currentExercise, plan, dispatch]);
-
-  const resetSuccessView = useCallback(() => {
-    setShowSuccessView(false);
-  }, []);
+  };
 
   const restartFullSession = useCallback(() => {
-    setReportResult(null);
-    setIsSubmittingReport(false);
-    isSubmittingRef.current = false;
-    setSessionTimeSnapshot(null);
-    setShowSuccessView(false);
+    resetReporting();
+    resetProgress();
+    resetExerciseTimes();
     setCurrentExerciseIndex(0);
-    setExerciseTimes({});
-    setCompletedExercises([]);
     timer.restartTime();
-  }, [timer, setCurrentExerciseIndex]);
+  }, [timer, setCurrentExerciseIndex, resetReporting, resetProgress, resetExerciseTimes]);
 
-  const handleFinishSession = useCallback(async (
-    exerciseRecords?: {
-      micHighScore?: { exerciseTitle: string; score: number; accuracy: number };
-      earTrainingHighScore?: { exerciseTitle: string; score: number };
-    } | null,
-    micPerformance?: { score: number; accuracy: number } | null,
-    earTrainingPerformance?: { score: number } | null
-  ) => {
-    if (isSubmittingRef.current) return;
-    isSubmittingRef.current = true;
-    timer.stopTimer();
+  const handleNextExercise = useCallback((resetTimerFn: () => void) => {
+    saveTime(currentExerciseIndex, timer.getTime());
 
-    const planTitle = typeof plan.title === 'string'
-      ? plan.title
-      : plan.title;
-
-    // Capture timer values before dispatch resets them to zero
-    const capturedTimerData = {
-      technique: timerData.technique,
-      theory: timerData.theory,
-      hearing: timerData.hearing,
-      creativity: timerData.creativity,
-    };
-
-    setIsSubmittingReport(true);
-    try {
-      const techMin = Math.floor(capturedTimerData.technique / 60000);
-      const theoryMin = Math.floor(capturedTimerData.theory / 60000);
-      const hearMin = Math.floor(capturedTimerData.hearing / 60000);
-      const creatMin = Math.floor(capturedTimerData.creativity / 60000);
-
-      const reportData: ReportFormikInterface = {
-        techniqueHours: Math.floor(techMin / 60).toString(),
-        techniqueMinutes: (techMin % 60).toString(),
-        theoryHours: Math.floor(theoryMin / 60).toString(),
-        theoryMinutes: (theoryMin % 60).toString(),
-        hearingHours: Math.floor(hearMin / 60).toString(),
-        hearingMinutes: (hearMin % 60).toString(),
-        creativityHours: Math.floor(creatMin / 60).toString(),
-        creativityMinutes: (creatMin % 60).toString(),
-        countBackDays: 0,
-        reportTitle: planTitle,
-        habbits: ["exercise_plan"],
-        avatarUrl: avatar || null,
-        planId: plan.id,
-        skillPointsGained: plan.exercises.reduce((acc, exercise, index) => {
-          // Only award points if exercise was completed
-          if (!completedExercises.includes(index)) {
-            return acc;
-          }
-
-          let points = 0;
-          if (exercise.difficulty === 'easy') points = 1;
-          else if (exercise.difficulty === 'medium') points = 2;
-          else if (exercise.difficulty === 'hard') points = 3;
-
-          if (points > 0 && exercise.relatedSkills) {
-            exercise.relatedSkills.forEach(skillId => {
-              acc[skillId] = (acc[skillId] || 0) + points;
-            });
-          }
-          return acc;
-        }, {} as Record<string, number>),
-        ...(exerciseRecords && { exerciseRecords }),
-        ...(micPerformance && { micPerformance }),
-        ...(earTrainingPerformance && { earTrainingPerformance }),
-        clientTodayISO: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })(),
-      };
-
-      const result = await dispatch(updateUserStats({ inputData: reportData })).unwrap();
-      // Store snapshot before reportResult triggers activityDataToUse recompute
-      setSessionTimeSnapshot(capturedTimerData);
-      setReportResult(result.raitingData);
-
-      // Challenges removed
-      dispatch(updateQuestProgress({ type: 'practice_plan' }));
-
-      if (plan.id.startsWith('auto')) {
-        dispatch(updateQuestProgress({ type: 'auto_plan' }));
+    baseHandleNextExercise(() => {
+      const nextIndex = currentExerciseIndex + 1;
+      if (nextIndex < plan.exercises.length) {
+        const savedTime = getTime(nextIndex);
+        timer.setInitialStartTime(savedTime || 0);
+      } else {
+        resetTimerFn();
       }
+    }, onFinish);
+  }, [currentExerciseIndex, timer, saveTime, getTime, baseHandleNextExercise, plan.exercises.length, onFinish]);
 
-      // Check if it's a specific exercise task completion (from Daily Quest or Skill Dashboard)
-      // Usually these have the exercise ID as plan.id
-      dispatch(updateQuestProgress({ type: 'practice_specific_exercise', exerciseId: plan.id }));
+  const jumpToExercise = (index: number) => {
+    saveTime(currentExerciseIndex, timer.getTime());
+    const savedTime = getTime(index);
+    timer.setInitialStartTime(savedTime || 0);
+    setCurrentExerciseIndex(index);
+  };
 
-      const hasSongs = plan.exercises.some(ex => ex.isPlayalong || (ex.tablature && ex.tablature.length > 0));
-      if (hasSongs) {
-        dispatch(updateQuestProgress({ type: 'practice_any_song' }));
-      }
+  const planTitleString = typeof plan.title === 'string' ? plan.title : plan.title;
 
-      const totalMin = techMin + theoryMin + hearMin + creatMin;
-      if (totalMin > 0) {
-        dispatch(updateQuestProgress({ type: 'practice_total_time', amount: totalMin }));
-      }
-      if (techMin > 0) {
-        dispatch(updateQuestProgress({ type: 'practice_technique_time', amount: techMin }));
-      }
-
-    } catch (error) {
-      console.error("Auto report failed:", error);
-      isSubmittingRef.current = false;
-    } finally {
-      setIsSubmittingReport(false);
-    }
-  }, [timer, plan, timerData, avatar, dispatch]);
-
-  const autoSubmitReport = handleFinishSession;
-
-  const activityDataToUse = useMemo(() => {
-    const existingList: any[] = (reportList as any[]) ?? [];
-
-    if (!reportResult || !sessionTimeSnapshot) return existingList;
-
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-
-    const newEntry = {
-      date: today.toISOString(),
-      techniqueTime: sessionTimeSnapshot.technique,
-      theoryTime: sessionTimeSnapshot.theory,
-      hearingTime: sessionTimeSnapshot.hearing,
-      creativityTime: sessionTimeSnapshot.creativity,
-    };
-
-    const exists = existingList.some(item =>
-      new Date(item.date).toISOString().split('T')[0] === todayStr
-    );
-
-    if (exists) {
-      return existingList.map(item => {
-        if (new Date(item.date).toISOString().split('T')[0] === todayStr) {
-          return {
-            ...item,
-            techniqueTime: Number(item.techniqueTime || 0) + newEntry.techniqueTime,
-            theoryTime: Number(item.theoryTime || 0) + newEntry.theoryTime,
-            hearingTime: Number(item.hearingTime || 0) + newEntry.hearingTime,
-            creativityTime: Number(item.creativityTime || 0) + newEntry.creativityTime,
-          };
-        }
-        return item;
-      });
-    }
-
-    return [...existingList, newEntry];
-  }, [reportList, reportResult, sessionTimeSnapshot]);
-
-  const planTitleString = typeof plan.title === 'string'
-    ? plan.title
-    : plan.title;
 
   return {
     currentExerciseIndex,
@@ -309,37 +142,13 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, fre
     showCompleteDialog,
     isMobileView,
     isFullSessionModalOpen,
-    isImageModalOpen,
     isMounted,
     currentExercise,
     nextExercise,
     isLastExercise,
     isPlaying: timer.timerEnabled,
-    timeLeft,
-    formattedTimeLeft,
-    timerProgressValue,
     setShowCompleteDialog,
-    setIsImageModalOpen,
-    handleNextExercise: (resetTimerFn: () => void) => {
-      // Save current time before moving next
-      setExerciseTimes(prev => ({
-        ...prev,
-        [currentExerciseIndex]: timer.time
-      }));
-
-      // In useExerciseNavigation, handleNextExercise calls resetTimerFn()
-      // We will override this by loading the next saved time right after if possible, 
-      // but the base hook is simple. We'll handle the load in an effect or here.
-      baseHandleNextExercise(() => {
-        const nextIndex = currentExerciseIndex + 1;
-        if (nextIndex < plan.exercises.length) {
-          const savedTime = exerciseTimes[nextIndex] || 0;
-          timer.setInitialStartTime(savedTime);
-        } else {
-          resetTimerFn();
-        }
-      }, onFinish);
-    },
+    handleNextExercise,
     toggleTimer,
     startTimer: timer.startTimer,
     stopTimer: timer.stopTimer,
@@ -348,10 +157,15 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, fre
     showSuccessView,
     setShowSuccessView,
     restartFullSession,
-    resetSuccessView,
+    resetSuccessView: () => setShowSuccessView(false),
     setVideoDuration,
-    autoSubmitReport,
-    canSkipExercise,
+    videoDuration,
+    autoSubmitReport: (
+      exerciseRecords?: any,
+      micPerformance?: any,
+      earTrainingPerformance?: any
+    ) => handleFinishSession(timerData, timer.stopTimer, exerciseRecords, micPerformance, earTrainingPerformance),
+    canSkipExercise: true,
     canFinishSession,
     isSkillExercise,
     isSubmittingReport,
@@ -361,19 +175,8 @@ export const usePracticeSessionState = ({ plan, onFinish, forceFullDuration, fre
     previousUserStats,
     planTitleString,
     sessionTimerData: timerData,
-    exerciseTimeSpent,
     activityDataToUse,
-    jumpToExercise: (index: number) => {
-      // Save current exercise time
-      setExerciseTimes(prev => ({
-        ...prev,
-        [currentExerciseIndex]: timer.time
-      }));
-
-      // Load target exercise time
-      const savedTime = exerciseTimes[index] || 0;
-      timer.setInitialStartTime(savedTime);
-      setCurrentExerciseIndex(index);
-    }
+    jumpToExercise,
+    timer,
   };
 };

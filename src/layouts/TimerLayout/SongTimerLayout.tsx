@@ -50,7 +50,13 @@ export const SongTimerLayout = ({
   songId,
 }: SongTimerLayoutProps) => {
   const { t } = useTranslation("timer");
-  const { time, timerEnabled, startTimer, stopTimer } = timer;
+  const { timerEnabled, startTimer, stopTimer } = timer;
+  const [time, setTime] = useState(() => timer.getTime());
+
+  useEffect(() => {
+    setTime(timer.getTime());
+    return timer.subscribe((t) => setTime(t));
+  }, [timer]);
 
   const playerRef = useRef<YouTubeSongPlayerRef>(null);
   const [youtubeUrl, setYoutubeUrl] = useState<string | null>(null);

@@ -7,11 +7,8 @@ import type { SkillsType } from 'types/skillsTypes';
 export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) => {
   const dispatch = useAppDispatch();
   const lastTickRef = useRef<number | null>(null);
-  const [exerciseTimeSpent, setExerciseTimeSpent] = useState(0);
 
-  // Sync exercise-specific time display with the timer
   useEffect(() => {
-    setExerciseTimeSpent(timer.time);
     lastTickRef.current = null;
   }, [currentExercise.id]);
 
@@ -21,7 +18,6 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
       return;
     }
 
-    // Initialize the tick if it's the first time the timer starts
     if (lastTickRef.current === null) {
       lastTickRef.current = Date.now();
     }
@@ -33,7 +29,6 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
       if (delta >= 1000) {
         let skillType = currentExercise.category as SkillsType;
 
-        // Fallback for "mixed" or missing category
         if (skillType === "mixed" as any || !skillType) {
           skillType = "technique";
         }
@@ -45,7 +40,6 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
           })
         );
 
-        setExerciseTimeSpent(prev => prev + delta);
         lastTickRef.current = now;
       }
     }, 1000);
@@ -53,5 +47,5 @@ export const useTimeTracking = (timer: useTimerInterface, currentExercise: any) 
     return () => clearInterval(interval);
   }, [timer.timerEnabled, currentExercise.category, currentExercise.id, dispatch]);
 
-  return { exerciseTimeSpent };
-}; 
+  return {};
+};
