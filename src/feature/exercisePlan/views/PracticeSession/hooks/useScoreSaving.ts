@@ -4,14 +4,13 @@ import { useRef } from "react";
 import { saveLeaderboardEntry, updateEarTrainingHighScore, updateMicHighScore } from "../../../services/bpmProgressService";
 import type { Exercise } from "../../../types/exercise.types";
 import type { NoteMatchingHandle } from "../contexts/NoteMatchingContext";
+import { selectUserAuth, selectUserAvatar, selectUserName } from "feature/user/store/userSlice";
+import { useAppSelector } from "store/hooks";
 
 interface UseScoreSavingOptions {
   activeExercise:       Exercise;
   currentExercise:      Exercise;
-  userAuth:             string | null | undefined;
   isMicEnabled:         boolean;
-  userName:             string | null | undefined;
-  userAvatar:           string | null | undefined;
   earTrainingScore:     number;
   noteMatchingHandle:   RefObject<NoteMatchingHandle | null>;
 }
@@ -22,9 +21,12 @@ export interface ScoreRecords {
 }
 
 export function useScoreSaving({
-  activeExercise, currentExercise, userAuth, isMicEnabled,
-  userName, userAvatar, earTrainingScore, noteMatchingHandle,
+  activeExercise, currentExercise, isMicEnabled,
+  earTrainingScore, noteMatchingHandle,
 }: UseScoreSavingOptions) {
+  const userAuth   = useAppSelector(selectUserAuth);
+  const userName   = useAppSelector(selectUserName);
+  const userAvatar = useAppSelector(selectUserAvatar);
   const exerciseRecordsRef = useRef<ScoreRecords>({});
 
   const saveCurrentScores = async () => {

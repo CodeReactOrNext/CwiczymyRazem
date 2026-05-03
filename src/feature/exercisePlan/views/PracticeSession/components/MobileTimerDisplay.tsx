@@ -2,22 +2,24 @@ import { FaDumbbell, FaHistory } from "react-icons/fa";
 import type { TimerInterface } from "types/api.types";
 import { convertMsToHMS } from "utils/converter/timeConverter";
 import { useTimerContext } from "../contexts/TimerContext";
+import { useAppSelector } from "store/hooks";
+import { selectTimerData } from "feature/user/store/userSlice";
 
 interface MobileTimerDisplayProps {
   isPlaying: boolean;
-  sessionTimerData?: TimerInterface;
 }
 
 export const MobileTimerDisplay = ({
   isPlaying,
-  sessionTimerData,
 }: MobileTimerDisplayProps) => {
   const { formattedTimeLeft, time } = useTimerContext();
-  const totalSessionMs = sessionTimerData 
-    ? ((sessionTimerData.creativity || 0) + 
-       (sessionTimerData.hearing || 0) + 
-       (sessionTimerData.technique || 0) + 
-       (sessionTimerData.theory || 0))
+    const timerData = useAppSelector(selectTimerData);
+
+  const totalSessionMs = timerData 
+    ? ((timerData.creativity || 0) + 
+       (timerData.hearing || 0) + 
+       (timerData.technique || 0) + 
+       (timerData.theory || 0))
     : 0;
 
   const formattedElapsed = convertMsToHMS(time);

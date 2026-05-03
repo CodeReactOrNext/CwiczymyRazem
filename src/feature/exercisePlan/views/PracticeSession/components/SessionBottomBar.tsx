@@ -21,8 +21,7 @@ interface SessionBottomBarProps {
   toggleTimer: () => void;
   handleRestart: () => void;
   handleNextExerciseClick: () => Promise<void>;
-  sessionTimerData: any;
-  canSkipExercise: boolean;
+
   canFinishSession: boolean;
   isSkillExercise: boolean;
   currentExerciseIndex: number;
@@ -45,8 +44,6 @@ export const SessionBottomBar = ({
   toggleTimer,
   handleRestart,
   handleNextExerciseClick,
-  sessionTimerData,
-  canSkipExercise,
   canFinishSession,
   isSkillExercise,
   currentExerciseIndex,
@@ -89,8 +86,6 @@ export const SessionBottomBar = ({
             handleNextExercise={handleNextExerciseClick}
             showExerciseInfo={false}
             variant="compact"
-            sessionTimerData={sessionTimerData}
-            canSkipExercise={canSkipExercise}
           />
         </div>
 

@@ -11,7 +11,6 @@ interface UseDeviceMetronomeProps {
   recommendedBpm?: number;
   isMuted?: boolean;
   speedMultiplier?: number;
-  onPlayStart?: () => void;
   onTick?: () => void;
   /** Shared AudioContext — forwarded to the underlying metronome hook (e.g. AlphaTab's context). */
   externalAudioContext?: AudioContext | null;

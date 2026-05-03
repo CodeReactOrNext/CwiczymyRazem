@@ -1,17 +1,18 @@
-import { setActivity } from 'feature/user/store/userSlice';
+import { selectUserAuth, setActivity } from 'feature/user/store/userSlice';
 import { useEffect } from 'react';
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 
 import type { Exercise, ExercisePlan } from '../../../types/exercise.types';
 
 interface UseSessionActivityProps {
-  userAuth: string | null;
   plan: ExercisePlan;
   currentExercise: Exercise;
 }
 
-export const useSessionActivity = ({ userAuth, plan, currentExercise }: UseSessionActivityProps) => {
+export const useSessionActivity = ({ plan, currentExercise }: UseSessionActivityProps) => {
   const dispatch = useAppDispatch();
+  const userAuth = useAppSelector(selectUserAuth);
+
 
   useEffect(() => {
     if (userAuth) {

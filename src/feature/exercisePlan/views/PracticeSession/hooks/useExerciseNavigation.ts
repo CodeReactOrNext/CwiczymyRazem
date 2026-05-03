@@ -7,9 +7,6 @@ export const useExerciseNavigation = (plan: ExercisePlan) => {
   const [exerciseKey, setExerciseKey] = useState(0);
 
   const currentExercise = plan.exercises[currentExerciseIndex];
-  const nextExercise = currentExerciseIndex < plan.exercises.length - 1
-    ? plan.exercises[currentExerciseIndex + 1]
-    : null;
 
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
 
@@ -29,7 +26,6 @@ export const useExerciseNavigation = (plan: ExercisePlan) => {
     exerciseKey,
     setExerciseKey,
     currentExercise,
-    nextExercise,
     isLastExercise,
     handleNextExercise
   };

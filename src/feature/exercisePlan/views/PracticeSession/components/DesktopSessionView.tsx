@@ -45,7 +45,6 @@ interface DesktopSessionViewProps {
   metronomeStartTime:       number | null;
   effectiveBpm:             number;
   isAudioMuted:             boolean;
-  isMetronomePlaying:       boolean;
   countInRemaining:         number;
   frequencyRef:             React.MutableRefObject<number>;
   volumeRef:                React.MutableRefObject<number>;
@@ -83,8 +82,6 @@ interface DesktopSessionViewProps {
   exerciseKey:              number;
   isLastExercise:           boolean;
   handleRestart:            () => void;
-  sessionTimerData:         any;
-  canSkipExercise:          boolean;
   canFinishSession:         boolean;
   isSkillExercise:          boolean;
   jumpToExercise:           (idx: number) => void;
@@ -154,7 +151,7 @@ export function DesktopSessionView(p: DesktopSessionViewProps) {
                     showAlphaTabScore={p.showAlphaTabScore} onToggleAlphaTabScore={p.handleToggleAlphaTabScore}
                     isAudioPlaying={p.isAudioPlaying} startTime={p.metronomeStartTime}
                     effectiveBpm={p.effectiveBpm} isAudioMuted={p.isAudioMuted}
-                    isMetronomePlaying={p.isMetronomePlaying}
+                    isMetronomePlaying={p.metronome.isPlaying}
                     countInRemaining={p.countInRemaining} frequencyRef={p.frequencyRef}
                     isListening={p.isListening} audioContext={p.metronomeAudioContext}
                     audioStartTime={p.effectiveAudioStartTime} tabResetKey={p.tabResetKey}
@@ -189,8 +186,8 @@ export function DesktopSessionView(p: DesktopSessionViewProps) {
                     isLastExercise={p.isLastExercise} isPlaying={p.isPlaying}
                     toggleTimer={p.handleToggleTimer} handleRestart={p.handleRestart}
                     handleNextExerciseClick={p.handleNextExerciseClick}
-                    sessionTimerData={p.sessionTimerData}
-                    canSkipExercise={p.canSkipExercise} canFinishSession={p.canFinishSession}
+                  
+                    canFinishSession={p.canFinishSession}
                     isSkillExercise={p.isSkillExercise}
                     currentExerciseIndex={p.currentExerciseIndex}
                     onGoToPreviousExercise={() => {

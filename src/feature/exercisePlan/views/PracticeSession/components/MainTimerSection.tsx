@@ -9,6 +9,8 @@ import { ExerciseDescription } from "../../../components/ExerciseDescription";
 import ExerciseControls from "./ExerciseControls";
 import { TimerDisplay } from "./TimerDisplay";
 import { useTimerContext } from "../contexts/TimerContext";
+import { useAppSelector } from "store/hooks";
+import { selectTimerData } from "feature/user/store/userSlice";
 
 interface MainTimerSectionProps {
   exerciseKey: number;
@@ -19,8 +21,7 @@ interface MainTimerSectionProps {
   handleNextExercise: () => void;
   showExerciseInfo?: boolean;
   variant?: "default" | "compact";
-  sessionTimerData?: TimerInterface;
-  canSkipExercise?: boolean;
+ 
   handleRestart?: () => void;
 }
 
@@ -33,12 +34,12 @@ export const MainTimerSection = ({
   handleNextExercise,
   showExerciseInfo = true,
   variant = "default",
-  sessionTimerData,
-  canSkipExercise = true,
+
   handleRestart
 }: MainTimerSectionProps) => {
   const { t } = useTranslation(["common"]);
   const { formattedTimeLeft, progress: timerProgressValue, isFinished } = useTimerContext();
+    const sessionTimerData = useAppSelector(selectTimerData);
 
   const totalSessionMs = sessionTimerData 
     ? ((sessionTimerData.creativity || 0) + 
@@ -91,7 +92,7 @@ export const MainTimerSection = ({
                   handleNextExercise={handleNextExercise}
                   size="md"
                   variant="centered"
-                  canSkipExercise={canSkipExercise}
+          
                   hidePlayButton={currentExercise.riddleConfig?.mode === 'sequenceRepeat'}
                   isFinished={isFinished}
                   handleRestart={handleRestart}
@@ -179,7 +180,6 @@ export const MainTimerSection = ({
                   toggleTimer={toggleTimer}
                   handleNextExercise={handleNextExercise}
                   size='lg'
-                  canSkipExercise={canSkipExercise}
                   hidePlayButton={currentExercise.riddleConfig?.mode === 'sequenceRepeat'}
                   isFinished={isFinished}
                   handleRestart={handleRestart}
