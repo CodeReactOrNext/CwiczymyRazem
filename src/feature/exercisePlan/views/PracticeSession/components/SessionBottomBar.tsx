@@ -9,6 +9,7 @@ import { FaCheck, FaSignOutAlt,FaStepBackward, FaStepForward } from "react-icons
 
 import type { Exercise } from "../../../types/exercise.types";
 import { MainTimerSection } from "./MainTimerSection";
+import { useTimerContext } from "../contexts/TimerContext";
 
 interface SessionBottomBarProps {
   onClose?: () => void;
@@ -17,17 +18,13 @@ interface SessionBottomBarProps {
   currentExercise: Exercise;
   isLastExercise: boolean;
   isPlaying: boolean;
-  timerProgressValue: number;
-  formattedTimeLeft: string;
   toggleTimer: () => void;
   handleRestart: () => void;
   handleNextExerciseClick: () => Promise<void>;
   sessionTimerData: any;
-  exerciseTimeSpent: number;
   canSkipExercise: boolean;
   canFinishSession: boolean;
   isSkillExercise: boolean;
-  timeLeft: number;
   currentExerciseIndex: number;
   onGoToPreviousExercise: () => void;
   isFinishing?: boolean;
@@ -45,17 +42,13 @@ export const SessionBottomBar = ({
   currentExercise,
   isLastExercise,
   isPlaying,
-  timerProgressValue,
-  formattedTimeLeft,
   toggleTimer,
   handleRestart,
   handleNextExerciseClick,
   sessionTimerData,
-  exerciseTimeSpent,
   canSkipExercise,
   canFinishSession,
   isSkillExercise,
-  timeLeft,
   currentExerciseIndex,
   onGoToPreviousExercise,
   isFinishing,
@@ -91,17 +84,13 @@ export const SessionBottomBar = ({
             currentExercise={currentExercise}
             isLastExercise={isLastExercise}
             isPlaying={isPlaying}
-            timerProgressValue={timerProgressValue}
-            formattedTimeLeft={formattedTimeLeft}
             toggleTimer={toggleTimer}
             handleRestart={handleRestart}
             handleNextExercise={handleNextExerciseClick}
             showExerciseInfo={false}
             variant="compact"
             sessionTimerData={sessionTimerData}
-            exerciseTimeSpent={exerciseTimeSpent}
             canSkipExercise={canSkipExercise}
-            isFinished={timeLeft === 0}
           />
         </div>
 

@@ -8,22 +8,19 @@ import { convertMsToHMS } from "utils/converter/timeConverter";
 import { ExerciseDescription } from "../../../components/ExerciseDescription";
 import ExerciseControls from "./ExerciseControls";
 import { TimerDisplay } from "./TimerDisplay";
+import { useTimerContext } from "../contexts/TimerContext";
 
 interface MainTimerSectionProps {
   exerciseKey: number;
   currentExercise: any;
   isLastExercise: boolean;
   isPlaying: boolean;
-  timerProgressValue: number;
-  formattedTimeLeft: string;
   toggleTimer: () => void;
   handleNextExercise: () => void;
   showExerciseInfo?: boolean;
   variant?: "default" | "compact";
   sessionTimerData?: TimerInterface;
-  exerciseTimeSpent?: number;
   canSkipExercise?: boolean;
-  isFinished?: boolean;
   handleRestart?: () => void;
 }
 
@@ -32,19 +29,16 @@ export const MainTimerSection = ({
   currentExercise,
   isLastExercise,
   isPlaying,
-  timerProgressValue,
-  formattedTimeLeft,
   toggleTimer,
   handleNextExercise,
   showExerciseInfo = true,
   variant = "default",
   sessionTimerData,
-  exerciseTimeSpent = 0,
   canSkipExercise = true,
-  isFinished = false,
   handleRestart
 }: MainTimerSectionProps) => {
   const { t } = useTranslation(["common"]);
+  const { formattedTimeLeft, progress: timerProgressValue, isFinished } = useTimerContext();
 
   const totalSessionMs = sessionTimerData 
     ? ((sessionTimerData.creativity || 0) + 

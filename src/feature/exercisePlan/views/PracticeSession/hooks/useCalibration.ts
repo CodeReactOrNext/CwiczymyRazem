@@ -31,25 +31,11 @@ function saveMicPreference(enabled: boolean): void {
 }
 
 function loadCalibrationFromStorage(): CalibrationData | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as CalibrationData;
-    if (parsed && parsed.offsets && typeof parsed.timestamp === "number") {
-      return parsed;
-    }
-    return null;
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 function saveCalibrationToStorage(data: CalibrationData): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {
-    // silently fail if storage is full
-  }
+  // Disabled
 }
 
 export function useCalibration(planHasTablature: boolean) {
@@ -64,17 +50,13 @@ export function useCalibration(planHasTablature: boolean) {
   });
   const [calibrationData, setCalibrationData] = useState<CalibrationData | null>(null);
 
-  const existingStoredData = useMemo(() => loadCalibrationFromStorage(), []);
-  const existingCalibrationTimestamp = existingStoredData?.timestamp ?? 0;
+  const existingStoredData = null;
+  const existingCalibrationTimestamp = 0;
 
   const handleEnableMic = useCallback(() => {
     saveMicPreference(true);
-    if (existingStoredData) {
-      setSessionPhase("calibration_choice");
-    } else {
-      setSessionPhase("calibrating");
-    }
-  }, [existingStoredData]);
+    setSessionPhase("calibrating");
+  }, []);
 
   const handleSkipMic = useCallback(() => {
     saveMicPreference(false);
@@ -95,8 +77,7 @@ export function useCalibration(planHasTablature: boolean) {
   }, []);
 
   const handleCalibrationComplete = useCallback((data: CalibrationData) => {
-    saveCalibrationToStorage(data);
-    setCalibrationData(data);
+    // We no longer save offset data
     setIsMicEnabled(true);
     setSessionPhase("ready");
   }, []);
@@ -107,11 +88,9 @@ export function useCalibration(planHasTablature: boolean) {
 
   const getAdjustedTargetFreq = useCallback(
     (stringNumber: number, baseFreq: number): number => {
-      if (!calibrationData) return baseFreq;
-      const offsetCents = calibrationData.offsets[stringNumber] || 0;
-      return baseFreq * Math.pow(2, offsetCents / 1200);
+      return baseFreq; // Calibration feature completely disabled by user request. Always expect correct standard frequency.
     },
-    [calibrationData]
+    []
   );
 
   return {

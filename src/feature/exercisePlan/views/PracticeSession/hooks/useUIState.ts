@@ -4,11 +4,8 @@ export const useUIState = () => {
   const [showCompleteDialog, setShowCompleteDialog] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const [isFullSessionModalOpen, setIsFullSessionModalOpen] = useState(false);
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  
 
-  
   useEffect(() => {
     const checkMobile = () => {
       const isMobile = window.innerWidth < 768;
@@ -33,14 +30,12 @@ export const useUIState = () => {
     setIsMounted(true);
     return () => setIsMounted(false);
   }, []);
-  
+
   return {
     showCompleteDialog,
     setShowCompleteDialog,
     isMobileView,
-    isFullSessionModalOpen, 
-    isImageModalOpen,
-    setIsImageModalOpen,
+    isFullSessionModalOpen,
     isMounted,
   };
-}; 
+};

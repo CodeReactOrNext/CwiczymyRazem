@@ -1,20 +1,18 @@
 import { FaDumbbell, FaHistory } from "react-icons/fa";
 import type { TimerInterface } from "types/api.types";
 import { convertMsToHMS } from "utils/converter/timeConverter";
+import { useTimerContext } from "../contexts/TimerContext";
 
 interface MobileTimerDisplayProps {
-  formattedTimeLeft: string;
   isPlaying: boolean;
   sessionTimerData?: TimerInterface;
-  exerciseTimeSpent?: number;
 }
 
 export const MobileTimerDisplay = ({
-  formattedTimeLeft,
   isPlaying,
   sessionTimerData,
-  exerciseTimeSpent = 0
 }: MobileTimerDisplayProps) => {
+  const { formattedTimeLeft, time } = useTimerContext();
   const totalSessionMs = sessionTimerData 
     ? ((sessionTimerData.creativity || 0) + 
        (sessionTimerData.hearing || 0) + 
@@ -22,7 +20,7 @@ export const MobileTimerDisplay = ({
        (sessionTimerData.theory || 0))
     : 0;
 
-  const formattedElapsed = convertMsToHMS(exerciseTimeSpent);
+  const formattedElapsed = convertMsToHMS(time);
   const formattedTotalSession = convertMsToHMS(totalSessionMs);
 
   return (

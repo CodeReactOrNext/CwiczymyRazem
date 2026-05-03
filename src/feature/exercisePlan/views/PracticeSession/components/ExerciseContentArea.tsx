@@ -1,16 +1,13 @@
 import { cn } from "assets/lib/utils";
-import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
-import React from "react";
-import type { NoteData } from "utils/audio/noteUtils";
+import React, { memo } from "react";
 
 import type { Exercise, TablatureMeasure } from "../../../types/exercise.types";
-import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
-import { AlphaTabScoreViewer } from "./AlphaTabScoreViewer";
-import { EarTrainingView } from "./EarTrainingView";
 import { ExerciseImage } from "./ExerciseImage";
+import { EarTrainingView } from "./EarTrainingView";
 import { ImprovPromptView } from "./ImprovPromptView";
-import { StrummingPatternViewer } from "./StrummingPatternViewer";
-import { TablatureViewer } from "./TablatureViewer";
+import { StrummingSection } from "./StrummingSection";
+import { TablatureSection } from "./TablatureSection";
+import { VideoSection } from "./VideoSection";
 
 interface ExerciseContentAreaProps {
   activeTablature: TablatureMeasure[] | null | undefined;
@@ -25,10 +22,10 @@ interface ExerciseContentAreaProps {
   isAudioMuted: boolean;
   isMobileView: boolean;
 
-  // Tablature viewer
+  // Tablature
   isMetronomePlaying: boolean;
   countInRemaining: number;
-  detectedNoteData: NoteData | null;
+  frequencyRef?: React.MutableRefObject<number>;
   isListening: boolean;
   audioContext?: AudioContext | null;
   audioStartTime?: number | null;
@@ -46,14 +43,6 @@ interface ExerciseContentAreaProps {
   onEarTrainingGuessed: () => void;
   onLeaderboardClick: () => void;
 
-  // Image
-  imageScale: number;
-  setImageScale: (scale: number) => void;
-  containerRef: React.RefObject<HTMLDivElement | null>;
-  setIsImageModalOpen: (open: boolean) => void;
-  handleZoomIn: () => void;
-  handleZoomOut: () => void;
-  resetImagePosition: () => void;
 
   // Rhythm detection
   isMicEnabled?: boolean;
@@ -68,11 +57,7 @@ interface ExerciseContentAreaProps {
   isPlaying: boolean;
 }
 
-/**
- * The main content area of the practice session:
- * ear training → improv → tablature/notation → video → image.
- */
-export const ExerciseContentArea = ({
+export const ExerciseContentArea = memo(function ExerciseContentArea({
   activeTablature,
   currentExercise,
   activeExercise,
@@ -86,7 +71,7 @@ export const ExerciseContentArea = ({
   isMobileView,
   isMetronomePlaying,
   countInRemaining,
-  detectedNoteData,
+  frequencyRef,
   isListening,
   audioContext,
   audioStartTime,
@@ -101,13 +86,6 @@ export const ExerciseContentArea = ({
   onNextRiddle,
   onEarTrainingGuessed,
   onLeaderboardClick,
-  imageScale,
-  setImageScale,
-  containerRef,
-  setIsImageModalOpen,
-  handleZoomIn,
-  handleZoomOut,
-  resetImagePosition,
   startTimer,
   stopTimer,
   setVideoDuration,
@@ -116,8 +94,7 @@ export const ExerciseContentArea = ({
   isPlaying,
   isMicEnabled,
   volumeRef,
-}: ExerciseContentAreaProps) => {
-  const { hitNotes, missedNotes, currentBeatsElapsed, strumSlotFeedback } = useNoteMatchingContext();
+}: ExerciseContentAreaProps) {
   const hasTablature =
     activeTablature &&
     activeTablature.length > 0 &&
@@ -126,7 +103,7 @@ export const ExerciseContentArea = ({
   return (
     <div className={cn(
       "relative w-full overflow-hidden rounded-xl bg-[#0a0a0a] shadow-2xl",
-      currentExercise.isPlayalong ? "" : "border border-white/10 "
+      currentExercise.isPlayalong ? "" : "border border-white/10"
     )}>
 
       {/* Ear Training */}
@@ -157,101 +134,49 @@ export const ExerciseContentArea = ({
         </div>
       )}
 
-      {/* Tablature / Notation / Video / Image */}
+      {/* Content: tablature / video / strumming / image */}
       {hasTablature ? (
-        <div className="relative w-full my-8 bg-[#0a0a0a] rounded-xl">
-          {rawGpFile && (
-            <button
-              onClick={onToggleAlphaTabScore}
-              className="absolute top-2 right-2 z-10 flex items-center gap-1.5 rounded-md bg-black/50 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
-              title={showAlphaTabScore ? "Switch to tablature" : "Switch to notation"}
-            >
-              {showAlphaTabScore ? "TAB" : "♩ Notation"}
-            </button>
-          )}
-          {showAlphaTabScore && rawGpFile ? (
-            <AlphaTabScoreViewer
-              rawGpFile={rawGpFile}
-              mode="score"
-              isPlaying={isAudioPlaying}
-              startTime={startTime}
-              bpm={effectiveBpm}
-              volume={isAudioMuted ? 0 : 1}
-              className="w-full"
-            />
-          ) : (
-            <TablatureViewer
-              measures={activeTablature!}
-              bpm={effectiveBpm}
-              isPlaying={isMetronomePlaying}
-              startTime={startTime}
-              countInRemaining={countInRemaining}
-              className="w-full"
-              detectedNote={detectedNoteData}
-              isListening={isListening}
-              hitNotes={hitNotes}
-              missedNotes={missedNotes}
-              currentBeatsElapsed={currentBeatsElapsed}
-              hideNotes={activeExercise.hideTablatureNotes}
-              audioContext={audioContext}
-              audioStartTime={audioStartTime}
-              resetKey={tabResetKey}
-              hideDynamicsLane={!!rawGpFile}
-              volumeRef={volumeRef}
-            />
-          )}
-        </div>
-      ) : currentExercise.isPlayalong && currentExercise.youtubeVideoId ? (
-        !isMobileView && (
-          <div className="w-full max-w-6xl mx-auto">
-            <YouTubePlayalong
-              videoId={currentExercise.youtubeVideoId}
-              isPlaying={isPlaying}
-              onEnd={onVideoEnd}
-              onReady={(duration) => setVideoDuration(duration)}
-              onSeek={(time) => setTimerTime(time * 1000)}
-              onProgressUpdate={(currentTime) => setTimerTime(currentTime * 1000)}
-              onStateChange={(state) => {
-                if (state === 1) startTimer();
-                if (state === 2) stopTimer();
-              }}
-            />
-          </div>
-        )
-      ) : currentExercise.videoUrl ? (
-        <div className="aspect-video w-full">
-          {(() => {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&?]*).*/;
-            const match  = currentExercise.videoUrl?.match(regExp);
-            const videoId = (match && match[2].length === 11) ? match[2] : null;
-            if (videoId) {
-              return (
-                <iframe
-                  className="h-full w-full"
-                  src={`https://www.youtube.com/embed/${videoId}?autoplay=0&rel=0&modestbranding=1`}
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              );
-            }
-            return (
-              <div className="flex h-full items-center justify-center bg-zinc-800 text-zinc-500">
-                Video not available
-              </div>
-            );
-          })()}
-        </div>
+        <TablatureSection
+          activeTablature={activeTablature!}
+          rawGpFile={rawGpFile}
+          showAlphaTabScore={showAlphaTabScore}
+          onToggleAlphaTabScore={onToggleAlphaTabScore}
+          isAudioPlaying={isAudioPlaying}
+          startTime={startTime}
+          effectiveBpm={effectiveBpm}
+          isAudioMuted={isAudioMuted}
+          isMetronomePlaying={isMetronomePlaying}
+          countInRemaining={countInRemaining}
+          frequencyRef={frequencyRef}
+          isListening={isListening}
+          audioContext={audioContext}
+          audioStartTime={audioStartTime}
+          tabResetKey={tabResetKey}
+          hideNotes={activeExercise.hideTablatureNotes}
+          hideDynamicsLane={!!rawGpFile}
+          volumeRef={volumeRef}
+        />
+      ) : currentExercise.isPlayalong || currentExercise.videoUrl ? (
+        <VideoSection
+          youtubeVideoId={currentExercise.youtubeVideoId}
+          videoUrl={currentExercise.videoUrl}
+          isPlayalong={currentExercise.isPlayalong}
+          isPlaying={isPlaying}
+          isMobileView={isMobileView}
+          startTimer={startTimer}
+          stopTimer={stopTimer}
+          setVideoDuration={setVideoDuration}
+          setTimerTime={setTimerTime}
+          onVideoEnd={onVideoEnd}
+        />
       ) : currentExercise.strummingPatterns && currentExercise.strummingPatterns.length > 0 ? (
-        <StrummingPatternViewer
+        <StrummingSection
           patterns={currentExercise.strummingPatterns}
           bpm={effectiveBpm}
           isPlaying={isMetronomePlaying}
           startTime={startTime}
           countInRemaining={countInRemaining}
           isMicEnabled={isMicEnabled}
-          slotFeedback={strumSlotFeedback}
           audioContext={audioContext}
         />
       ) : (
@@ -259,15 +184,8 @@ export const ExerciseContentArea = ({
           image={currentExercise.imageUrl || currentExercise.image || ""}
           title={currentExercise.title}
           isMobileView={isMobileView}
-          imageScale={imageScale}
-          containerRef={containerRef}
-          setImageModalOpen={setIsImageModalOpen}
-          handleZoomIn={handleZoomIn}
-          handleZoomOut={handleZoomOut}
-          resetImagePosition={resetImagePosition}
-          setImageScale={setImageScale}
         />
       )}
     </div>
   );
-};
+});

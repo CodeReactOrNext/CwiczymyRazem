@@ -1,10 +1,9 @@
+import React from "react";
 import { YouTubePlayalong } from "feature/exercisePlan/components/YouTubePlayalong";
-import Image from "next/image";
-import { Button } from "assets/components/ui/button";
-import { FaExpand } from "react-icons/fa";
 
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 import { EarTrainingView } from "./EarTrainingView";
+import { ExerciseImage } from "./ExerciseImage";
 import { ImprovPromptView } from "./ImprovPromptView";
 import { TablatureViewer } from "./TablatureViewer";
 
@@ -18,14 +17,13 @@ interface MobileExerciseContentProps {
   hasPlayedRiddleOnce?: boolean;
   isPlaying: boolean;
   isListening: boolean;
-  detectedNoteData: any;
+  frequencyRef?: React.MutableRefObject<number>;
   tabResetKey: number;
   setVideoDuration: (duration: number) => void;
   setTimerTime: (time: number) => void;
   startTimer: () => void;
   stopTimer: () => void;
   onVideoEnd: () => void;
-  onImageClick: () => void;
   earTrainingScore?: number;
   earTrainingHighScore?: number | null;
   exerciseUrl?: string;
@@ -46,14 +44,13 @@ export function MobileExerciseContent({
   hasPlayedRiddleOnce,
   isPlaying,
   isListening,
-  detectedNoteData,
+  frequencyRef,
   tabResetKey,
   setVideoDuration,
   setTimerTime,
   startTimer,
   stopTimer,
   onVideoEnd,
-  onImageClick,
   earTrainingScore,
   earTrainingHighScore,
   exerciseUrl,
@@ -63,7 +60,7 @@ export function MobileExerciseContent({
   onRecordsClick,
   onPlayRiddle,
 }: MobileExerciseContentProps) {
-  const { hitNotes, missedNotes, currentBeatsElapsed } = useNoteMatchingContext();
+  const { hitNotes, missedNotes } = useNoteMatchingContext();
 
   return (
     <>
@@ -95,11 +92,11 @@ export function MobileExerciseContent({
           startTime={metronome.startTime || null}
           countInRemaining={(metronome as any).countInRemaining}
           className="w-full"
-          detectedNote={detectedNoteData}
+          frequencyRef={frequencyRef}
           isListening={isListening}
           hitNotes={hitNotes}
           missedNotes={missedNotes}
-          currentBeatsElapsed={currentBeatsElapsed}
+          currentBeatsElapsed={0}
           resetKey={tabResetKey}
         />
       ) : currentExercise.youtubeVideoId && !currentExercise.riddleConfig ? (
@@ -139,22 +136,11 @@ export function MobileExerciseContent({
           </div>
         </div>
       ) : (currentExercise.imageUrl || currentExercise.image) ? (
-        <div className='relative w-full cursor-pointer overflow-hidden rounded-xl border border-muted/30 bg-white/5 shadow-md' onClick={onImageClick}>
-          <div className='relative aspect-[3.5/1] w-full'>
-            <Image
-              src={currentExercise.imageUrl || currentExercise.image}
-              alt={currentExercise.title}
-              className='h-full w-full object-contain'
-              fill priority quality={80}
-            />
-            <div className='absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px]'>
-              <Button variant='secondary' size='sm' className='pointer-events-none opacity-90 shadow-lg'>
-                <span className='mr-2'>Zoom</span>
-                <FaExpand className='h-4 w-4' />
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ExerciseImage
+          image={currentExercise.imageUrl || currentExercise.image || ""}
+          title={currentExercise.title}
+          isMobileView={true}
+        />
       ) : null}
     </>
   );

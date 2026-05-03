@@ -1,7 +1,7 @@
 import { cn } from "assets/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { getPerformanceGrade } from "../hooks/useNoteMatching";
+import { getPerformanceGrade } from "../hooks/noteMatchingFeedback";
 import { useNoteMatchingContext } from "../contexts/NoteMatchingContext";
 
 const mobileFeedbackStyles: Record<string, { color: string; dropShadow: string; scale: number }> = {

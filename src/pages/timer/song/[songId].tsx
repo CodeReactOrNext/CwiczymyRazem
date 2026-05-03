@@ -68,7 +68,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
 
     const timerSubmitHandler = () => {
         timer.stopTimer();
-        if (timer.time < 1000) {
+        if (timer.getTime() < 1000) {
             toast.warning("Practice more than 1 second to save!");
             return;
         }
@@ -154,9 +154,9 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     };
 
     const handleBack = () => {
-        if (timer.time > 0 && confirm("Abandon this session?")) {
+        if (timer.getTime() > 0 && confirm("Abandon this session?")) {
             router.push("/timer/song-select");
-        } else if (timer.time === 0) {
+        } else if (timer.getTime() === 0) {
             router.push("/timer/song-select");
         }
     };
@@ -178,13 +178,25 @@ const SongPracticeTimer: NextPageWithLayout = () => {
     }, [userId, song, dispatch]);
 
     useEffect(() => {
-        if (timer.timerEnabled && song) {
-            document.title = `${convertMsToHMS(timer.time)} - ${song.title}`;
+        if (!song) {
+            document.title = "Practice Song - Riff Quest";
+            return () => { document.title = "Riff Quest"; };
+        }
+        
+        if (timer.timerEnabled) {
+            document.title = `${convertMsToHMS(timer.getTime())} - ${song.title}`;
+            const unsubscribe = timer.subscribe((time) => {
+                document.title = `${convertMsToHMS(time)} - ${song.title}`;
+            });
+            return () => {
+                unsubscribe();
+                document.title = "Riff Quest";
+            };
         } else {
             document.title = "Practice Song - Riff Quest";
         }
         return () => { document.title = "Riff Quest"; };
-    }, [timer.time, timer.timerEnabled, song]);
+    }, [timer.timerEnabled, song, timer]);
 
     if (isLoading || !song) {
          return (
@@ -219,7 +231,7 @@ const SongPracticeTimer: NextPageWithLayout = () => {
             
             <TimeSplitterModal 
                 isOpen={isSplitterOpen}
-                totalTime={timer.time}
+                totalTime={timer.getTime()}
                 songTitle={song.title}
                 onConfirm={handleConfirmSplit}
                 onCancel={() => setIsSplitterOpen(false)}
