@@ -7,6 +7,8 @@ import {
   useEdgesState,
   useNodesState,
   Background,
+  SelectionMode,
+  BackgroundVariant,
 } from "@xyflow/react";
 import type { Edge, Node, NodeTypes } from "@xyflow/react";
 import { motion } from "framer-motion";
@@ -681,7 +683,7 @@ export function ScaleTreeView() {
         nodesDraggable={true}
         nodesConnectable={true}
         elementsSelectable={true}
-        selectionMode="partial"
+        selectionMode={SelectionMode.Partial}
         selectionOnDrag={true}
         panOnDrag={[1, 2]}
         panOnScroll={true}
@@ -689,7 +691,7 @@ export function ScaleTreeView() {
         proOptions={{ hideAttribution: true }}
         colorMode="dark"
       >
-        {showGrid && <Background variant="dots" gap={50} size={1} color="rgba(255,255,255,0.08)" />}
+        {showGrid && <Background variant={BackgroundVariant.Dots} gap={50} size={1} color="rgba(255,255,255,0.08)" />}
         <Controls
           showInteractive={false}
           className="[&>button]:border-cyan-500/15 [&>button]:bg-black/70 [&>button]:text-zinc-500 [&>button:hover]:bg-black/90 [&>button:hover]:text-cyan-400"
