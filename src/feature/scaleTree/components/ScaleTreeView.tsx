@@ -6,12 +6,14 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState,
+  Background,
 } from "@xyflow/react";
 import type { Edge, Node, NodeTypes } from "@xyflow/react";
 import { motion } from "framer-motion";
-import { GitBranch, RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useMemo } from "react";
+import { RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
+import { addEdge, Connection } from "@xyflow/react";
 
 import { ScaleTreeNodeComponent } from "./ScaleTreeNodeComponent";
 import { ScaleNodeModal } from "./ScaleNodeModal";
@@ -19,6 +21,54 @@ import { useScaleTree } from "../hooks/useScaleTree";
 import { CLUSTER_LABELS } from "../data/scaleTreeNodes";
 import type { ClusterLabelDef } from "../data/scaleTreeNodes";
 
+// ── Stable starfield (deterministic pseudo-random) ──────────────────────────
+const STARS = Array.from({ length: 220 }, (_, i) => ({
+  x: ((i * 7919 + 13) % 10000) / 100,
+  y: ((i * 6271 + 47) % 10000) / 100,
+  r: ((i * 3571 + 23) % 12) / 10 + 0.2,
+  o: ((i * 4999 + 37) % 5) / 10 + 0.08,
+}));
+
+// ── Path direction labels (Rhythm / Lead / Harmony / Style) ─────────────────
+function PathLabelNode({ data }: { data: { label: string; color: string } }) {
+  return (
+    <div style={{
+      pointerEvents: "none",
+      userSelect: "none",
+      background: `linear-gradient(90deg, transparent, ${data.color}18, transparent)`,
+      border: `1px solid ${data.color}30`,
+      borderRadius: 4,
+      padding: "5px 16px",
+      color: data.color,
+      fontSize: 11,
+      fontWeight: 400,
+      letterSpacing: "0.22em",
+      textTransform: "uppercase",
+      whiteSpace: "nowrap",
+      textShadow: `0 0 14px ${data.color}CC, 0 0 40px ${data.color}55`,
+      opacity: 0.75,
+    }}>
+      {data.label}
+    </div>
+  );
+}
+
+const PATH_LABEL_NODES: Node[] = [
+  { id: "pl_major",   type: "pathLabel", position: { x: 550,   y: -430  }, data: { label: "Lead Path",    color: "#22d3ee" }, selectable: false, draggable: false, focusable: false },
+  { id: "pl_minor",   type: "pathLabel", position: { x: -550,  y: -430  }, data: { label: "Rhythm Path",  color: "#22d3ee" }, selectable: false, draggable: false, focusable: false },
+  { id: "pl_modes_l", type: "pathLabel", position: { x: -2550, y: -500  }, data: { label: "Modal (Minor)", color: "#a78bfa" }, selectable: false, draggable: false, focusable: false },
+  { id: "pl_modes_r", type: "pathLabel", position: { x: 2450,  y: -800  }, data: { label: "Modal (Major)", color: "#f59e0b" }, selectable: false, draggable: false, focusable: false },
+];
+
+// ── Family filter config ─────────────────────────────────────────────────────
+type FamilyKey = "pentatonic" | "diatonic" | "mode";
+const FAMILIES: { key: FamilyKey; color: string; glow: string; label: string }[] = [
+  { key: "pentatonic", color: "#f59e0b", glow: "rgba(245,158,11,0.70)", label: "Pentatonic" },
+  { key: "diatonic",   color: "#22d3ee", glow: "rgba(34,211,238,0.70)",  label: "Diatonic"   },
+  { key: "mode",       color: "#a78bfa", glow: "rgba(167,139,250,0.70)", label: "Modal"      },
+];
+
+// ── Cluster labels ───────────────────────────────────────────────────────────
 const FAMILY_COLOR: Record<ClusterLabelDef["family"], string> = {
   pentatonic: "rgba(245,158,11,0.75)",
   diatonic:   "rgba(34,211,238,0.75)",
@@ -51,93 +101,87 @@ function ClusterLabelNode({ data }: { data: ClusterLabelDef }) {
 const CLUSTER_LABEL_NODES: Node[] = CLUSTER_LABELS.map((lbl) => ({
   id: lbl.id,
   type: "clusterLabel",
-  position: { x: lbl.x, y: lbl.y - 240 },
+  position: { x: lbl.x, y: lbl.y - 155 },
   data: lbl,
   selectable: false,
   draggable: false,
   focusable: false,
 }));
 
+const STATIC_OVERLAY_NODES: Node[] = [...CLUSTER_LABEL_NODES, ...PATH_LABEL_NODES];
+
 const NODE_TYPES: NodeTypes = {
   scaleTreeNode: ScaleTreeNodeComponent as NodeTypes[string],
   clusterLabel:  ClusterLabelNode as NodeTypes[string],
+  pathLabel:     PathLabelNode as NodeTypes[string],
 };
 
-/** Extracts the scale cluster ID from a node ID (e.g. "min_pent_pos5_asc" → "min_pent"). */
 function getScaleId(nodeId: string): string {
   const m = nodeId.match(/^(.*?)_pos\d+/);
   return m ? m[1] : nodeId;
 }
 
-function buildStyledEdges(rawEdges: Edge[], nodeStatuses: Record<string, string>): Edge[] {
+const FAMILY_EDGE_COLORS: Record<string, string> = {
+  pentatonic: "245, 158, 11",
+  diatonic:   "34, 211, 238",
+  mode:       "167, 139, 250",
+};
+
+function buildStyledEdges(rawEdges: Edge[], nodeDataMap: Record<string, { status: string; family: string; isSingleString: boolean }>, nodes: Node[]): Edge[] {
   return rawEdges.map((edge) => {
-    const sourceStatus   = nodeStatuses[edge.source];
-    const targetStatus   = nodeStatuses[edge.target];
-    const isCompleted    = sourceStatus === "completed" && targetStatus === "completed";
-    const isActive       = sourceStatus === "completed" || sourceStatus === "in_progress";
-    const isSpine        = edge.source.endsWith("_asc") && edge.target.endsWith("_asc");
+    const sourceData = nodeDataMap[edge.source] || { status: "locked", family: "diatonic", isSingleString: false };
+    const targetData = nodeDataMap[edge.target] || { status: "locked", family: "diatonic", isSingleString: false };
+    const isCompleted = sourceData.status === "completed" && targetData.status === "completed";
+    const isActive = sourceData.status === "completed" || sourceData.status === "in_progress";
+    const isSpine = edge.source.endsWith("_asc") && edge.target.endsWith("_asc");
     const isCrossCluster = isSpine && getScaleId(edge.source) !== getScaleId(edge.target);
 
-    // ── Branch edges (arm chains within each cluster) ────────────────────────
+    const cRGB = FAMILY_EDGE_COLORS[sourceData.family] || FAMILY_EDGE_COLORS.diatonic;
+    const isSingleStringEdge = sourceData.isSingleString && targetData.isSingleString;
+
+    // Determine thickness and style
+    let strokeWidth = isCompleted ? 4 : isActive ? 3 : 2;
+    let opacity = isCompleted ? 0.85 : isActive ? 0.55 : 0.45;
+
     if (!isSpine) {
-      return {
-        ...edge,
-        type: "straight" as const,
-        style: {
-          stroke: isCompleted
-            ? "rgba(34,211,238,0.50)"
-            : isActive
-            ? "rgba(34,211,238,0.28)"
-            : "rgba(70,70,100,0.28)",
-          strokeWidth: isCompleted ? 2.5 : 1.5,
-          filter: isCompleted ? "drop-shadow(0 0 4px rgba(34,211,238,0.6))" : "none",
-        },
-        animated: false,
-      };
+      strokeWidth = isCompleted ? 2.5 : 1.5;
+      opacity = isCompleted ? 0.50 : isActive ? 0.28 : 0.28;
+    } else if (isCrossCluster) {
+      strokeWidth = isCompleted ? 5 : 4;
+      opacity = isCompleted ? 1 : 0.80;
     }
 
-    // ── Cross-cluster "roads" ────────────────────────────────────────────────
-    if (isCrossCluster) {
-      if (!isActive) {
-        return {
-          ...edge,
-          type: "straight" as const,
-          style: { stroke: "rgba(70,70,100,0.35)", strokeWidth: 3, strokeDasharray: "14 8" },
-          animated: false,
-        };
+    if (isSingleStringEdge) {
+      strokeWidth = isCompleted ? 10 : 7;
+      opacity = isCompleted ? 1 : 0.85;
+    }
+
+    const isLockedCrossCluster = isCrossCluster && !isActive;
+
+    // Dynamic Handle Selection
+    const sourceNode = nodes.find((n) => n.id === edge.source);
+    const targetNode = nodes.find((n) => n.id === edge.target);
+    let sourceHandle = "s_bottom";
+    let targetHandle = "t_top";
+
+    if (sourceNode && targetNode) {
+      if (targetNode.position.y < sourceNode.position.y) {
+        sourceHandle = "s_top";
+        targetHandle = "t_bottom";
       }
-      return {
-        ...edge,
-        type: "straight" as const,
-        style: {
-          stroke: isCompleted ? "rgba(34,211,238,0.95)" : "rgba(34,211,238,0.70)",
-          strokeWidth: isCompleted ? 6 : 5,
-          filter: isCompleted
-            ? "drop-shadow(0 0 8px rgba(34,211,238,0.95))"
-            : "drop-shadow(0 0 5px rgba(34,211,238,0.60))",
-        },
-        animated: false,
-      };
     }
 
-    // ── Within-cluster spine ring — bezier for smooth arc look ───────────────
     return {
       ...edge,
-      type: "straight" as const,
+      sourceHandle,
+      targetHandle,
+      type: edge.type || "straight",
       style: {
-        stroke: isCompleted
-          ? "rgba(34,211,238,0.80)"
-          : isActive
-          ? "rgba(34,211,238,0.50)"
-          : "rgba(70,70,100,0.40)",
-        strokeWidth: isCompleted ? 4.5 : isActive ? 3.5 : 2.5,
-        filter: isCompleted
-          ? "drop-shadow(0 0 5px rgba(34,211,238,0.75))"
-          : isActive
-          ? "drop-shadow(0 0 3px rgba(34,211,238,0.45))"
-          : "none",
+        stroke: isLockedCrossCluster ? "rgba(80,80,130,0.40)" : `rgba(${cRGB}, ${opacity})`,
+        strokeWidth: isLockedCrossCluster ? 2.5 : strokeWidth,
+        strokeDasharray: isLockedCrossCluster ? "12 7" : "none",
       },
-      animated: false,
+      animated: isCompleted && isCrossCluster,
     };
   });
 }
@@ -155,38 +199,120 @@ export function ScaleTreeView() {
     setSelectedNodeId,
   } = useScaleTree();
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([...CLUSTER_LABEL_NODES, ...(initialNodes as Node[])]);
+  const [familyFilter, setFamilyFilter] = useState<FamilyKey | null>(null);
+  const [showGrid, setShowGrid] = useState(false);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([...STATIC_OVERLAY_NODES, ...(initialNodes as Node[])]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(rawEdges);
 
+  const onConnect = useCallback(
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
+
+  const handleExport = useCallback(() => {
+    const simplifiedNodes = nodes.map(n => ({ id: n.id, x: Math.round(n.position.x), y: Math.round(n.position.y) }));
+    const simplifiedEdges = edges.map(e => ({ source: e.source, target: e.target, type: e.type }));
+    const result = { nodes: simplifiedNodes, edges: simplifiedEdges };
+    const json = JSON.stringify(result, null, 2);
+    navigator.clipboard.writeText(json).then(() => alert("Skopiowano do schowka! Wklej w czacie."));
+    console.log(result);
+  }, [nodes, edges]);
+
+  const handleClear = useCallback(() => {
+    if (confirm("Czy na pewno chcesz usunąć zapisany układ z pamięci i wrócić do domyślnego?")) {
+      localStorage.removeItem("scale_tree_layout_dev");
+      window.location.reload();
+    }
+  }, []);
+
+  // Save to LocalStorage
   useEffect(() => {
+    if (nodes.length <= STATIC_OVERLAY_NODES.length) return;
+    const timeout = setTimeout(() => {
+      const simplifiedNodes = nodes.map(n => ({ id: n.id, x: Math.round(n.position.x), y: Math.round(n.position.y) }));
+      const simplifiedEdges = edges.map(e => ({ source: e.source, target: e.target, type: e.type }));
+      localStorage.setItem("scale_tree_layout_dev", JSON.stringify({ nodes: simplifiedNodes, edges: simplifiedEdges }));
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [nodes, edges]);
+
+  useEffect(() => {
+    let savedPositions: Record<string, {x: number, y: number}> = {};
+    try {
+      const savedLayoutStr = localStorage.getItem("scale_tree_layout_dev");
+      if (savedLayoutStr) {
+        const savedLayout = JSON.parse(savedLayoutStr);
+        savedLayout.nodes?.forEach((n: any) => { savedPositions[n.id] = { x: n.x, y: n.y }; });
+      }
+    } catch (e) {}
+
     setNodes((prev) => {
       const selectedId = prev.find((n) => n.selected)?.id ?? null;
       return [
-        ...CLUSTER_LABEL_NODES,
-        ...(initialNodes as Node[]).map((n) => ({ ...n, selected: n.id === selectedId })),
+        ...STATIC_OVERLAY_NODES.map((n) => ({
+          ...n,
+          position: savedPositions[n.id] || n.position,
+        })),
+        ...(initialNodes as Node[]).map((n) => ({
+          ...n,
+          position: savedPositions[n.id] || n.position,
+          selected: n.id === selectedId,
+          data: {
+            ...n.data,
+            dimmed: familyFilter !== null && n.data.scaleFamily !== familyFilter,
+          },
+        })),
       ];
     });
-  }, [initialNodes, setNodes]);
+  }, [initialNodes, setNodes, familyFilter]);
 
-  const nodeStatuses = useMemo(() => {
-    const map: Record<string, string> = {};
+  const nodeDataMap = useMemo(() => {
+    const map: Record<string, { status: string; family: string; isSingleString: boolean }> = {};
     initialNodes.forEach((n) => {
-      map[n.id] = n.data.status as string;
+      const isSingleString = n.data.requiredExercises?.[0]?.stringNum != null || n.data.requiredExercises?.[0]?.patternType === "single_string";
+      map[n.id] = { 
+        status: n.data.status as string, 
+        family: n.data.scaleFamily as string,
+        isSingleString
+      };
     });
     return map;
   }, [initialNodes]);
 
   useEffect(() => {
-    setEdges(buildStyledEdges(rawEdges, nodeStatuses));
-  }, [rawEdges, nodeStatuses, setEdges]);
+    let savedEdges: {source: string; target: string; type?: string}[] | null = null;
+    try {
+      const savedLayoutStr = localStorage.getItem("scale_tree_layout_dev");
+      if (savedLayoutStr) {
+        const savedLayout = JSON.parse(savedLayoutStr);
+        if (savedLayout.edges) savedEdges = savedLayout.edges;
+      }
+    } catch (e) {}
+
+    let edgesToUse = rawEdges;
+    if (savedEdges && savedEdges.length > 0) {
+      edgesToUse = savedEdges.map((e, idx) => ({
+        id: `dev-edge-${e.source}-${e.target}-${idx}`,
+        source: e.source,
+        target: e.target,
+        type: (e.type || "straight") as any,
+      }));
+    }
+
+    setEdges(buildStyledEdges(edgesToUse, nodeDataMap, nodes));
+  }, [rawEdges, nodeDataMap, setEdges, nodes]);
 
   const completedCount = useMemo(
-    () => Object.values(nodeStatuses).filter((s) => s === "completed").length,
-    [nodeStatuses]
+    () => Object.values(nodeDataMap).filter((d) => d.status === "completed").length,
+    [nodeDataMap]
   );
 
-  const handleNodeClick = useCallback((_: unknown, node: Node) => {
+  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     if (node.type === "clusterLabel") return;
+    
+    // Jeśli trzymamy Shift, pozwalamy React Flow na domyślną multiselekcję
+    if (event.shiftKey) return;
+
     setSelectedNodeId((prev) => {
       const newId = prev === node.id ? null : node.id;
       setNodes((nds) => nds.map((n) => {
@@ -197,53 +323,334 @@ export function ScaleTreeView() {
     });
   }, [setSelectedNodeId, setNodes]);
 
+  const handleEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+    event.stopPropagation();
+    const edgeTypes = ["straight", "smoothstep", "step", "bezier"] as const;
+    const currentType = edge.type || "straight";
+    const nextIdx = (edgeTypes.indexOf(currentType as any) + 1) % edgeTypes.length;
+    const nextType = edgeTypes[nextIdx];
+
+    setEdges((eds) => eds.map((e) => (e.id === edge.id ? { ...e, type: nextType } : e)));
+  }, [setEdges]);
+
+  const handleAlignX = useCallback(() => {
+    const selected = nodes.filter((n) => n.selected && !n.id.startsWith("pl_"));
+    if (selected.length < 2) return alert("Zaznacz co najmniej 2 węzły (Shift + Click lub Shift + przeciągnięcie)");
+    const targetX = Math.round(selected[0].position.x);
+    setNodes((nds) => nds.map((n) => (n.selected && !n.id.startsWith("pl_") ? { ...n, position: { ...n.position, x: targetX } } : n)));
+  }, [nodes, setNodes]);
+
+  const handleAlignY = useCallback(() => {
+    const selected = nodes.filter((n) => n.selected && !n.id.startsWith("pl_"));
+    if (selected.length < 2) return alert("Zaznacz co najmniej 2 węzły (Shift + Click lub Shift + przeciągnięcie)");
+    const targetY = Math.round(selected[0].position.y);
+    setNodes((nds) => nds.map((n) => (n.selected && !n.id.startsWith("pl_") ? { ...n, position: { ...n.position, y: targetY } } : n)));
+  }, [nodes, setNodes]);
+
+  const handleSnapToGrid = useCallback(() => {
+    const selected = nodes.filter((n) => n.selected && !n.id.startsWith("pl_"));
+    const targets = selected.length > 0 ? selected : nodes.filter((n) => !n.id.startsWith("pl_"));
+    const GRID_SIZE = 50;
+
+    setNodes((nds) => nds.map((n) => {
+      if (targets.some((t) => t.id === n.id)) {
+        return {
+          ...n,
+          position: {
+            x: Math.round(n.position.x / GRID_SIZE) * GRID_SIZE,
+            y: Math.round(n.position.y / GRID_SIZE) * GRID_SIZE,
+          },
+        };
+      }
+      return n;
+    }));
+  }, [nodes, setNodes]);
+
   const handlePractice = useCallback(() => {
     if (!selectedNode) return;
     const req = selectedNode.requiredExercises[0];
     if (!req) return;
-    router.push(`/practice/scale?type=${selectedNode.scaleType}&pos=${req.position}&pattern=${req.patternType}`);
+    if (req.stringNum != null) {
+      router.push(`/practice/scale?type=${selectedNode.scaleType}&string=${req.stringNum}`);
+    } else {
+      router.push(`/practice/scale?type=${selectedNode.scaleType}&pos=${req.position}&pattern=${req.patternType}`);
+    }
   }, [selectedNode, router]);
 
   const handleCloseModal = useCallback(() => {
     setSelectedNodeId(null);
   }, [setSelectedNodeId]);
 
+  const handleFamilyFilter = useCallback((key: FamilyKey) => {
+    setFamilyFilter((prev) => prev === key ? null : key);
+  }, []);
+
+  // Handle 'T' key for auto-aligning children
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "t") {
+        const selectedParent = nodes.find(n => n.selected);
+        if (!selectedParent) return;
+
+        // Find direct children
+        const childIds = edges
+          .filter(edge => edge.source === selectedParent.id)
+          .map(edge => edge.target);
+
+        if (childIds.length === 0) return;
+
+        const isUpwards = e.shiftKey;
+        const GAP_Y = isUpwards ? -150 : 150;
+        const parentX = selectedParent.position.x;
+        const parentY = selectedParent.position.y;
+
+        setNodes(nds => nds.map(node => {
+          const childIndex = childIds.indexOf(node.id);
+          if (childIndex !== -1) {
+            return {
+              ...node,
+              position: {
+                x: parentX,
+                y: parentY + (childIndex + 1) * GAP_Y
+              }
+            };
+          }
+          return node;
+        }));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nodes, edges, setNodes]);
+
+  // Handle 'G' key for snapping to grid
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "g") {
+        handleSnapToGrid();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSnapToGrid]);
+
+  // Handle 'R' key for restoring original positions
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "r" && !e.ctrlKey && !e.metaKey) {
+        const selectedIds = nodes.filter(n => n.selected).map(n => n.id);
+        if (selectedIds.length === 0) return;
+
+        setNodes(nds => nds.map(node => {
+          if (selectedIds.includes(node.id)) {
+            const original = initialNodes.find(inNode => inNode.id === node.id);
+            if (original) {
+              return {
+                ...node,
+                position: { ...original.position }
+              };
+            }
+          }
+          return node;
+        }));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nodes, initialNodes, setNodes]);
+
+  // Handle 'B' key for selecting branch
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "b") {
+        const selectedParent = nodes.find(n => n.selected);
+        if (!selectedParent) return;
+
+        const branchIds = new Set<string>();
+        const findChildren = (parentId: string) => {
+          edges
+            .filter(edge => edge.source === parentId)
+            .forEach(edge => {
+              if (!branchIds.has(edge.target)) {
+                branchIds.add(edge.target);
+                findChildren(edge.target);
+              }
+            });
+        };
+
+        findChildren(selectedParent.id);
+        if (branchIds.size === 0) return;
+
+        setNodes(nds => nds.map(node => ({
+          ...node,
+          selected: branchIds.has(node.id) || node.id === selectedParent.id
+        })));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nodes, edges, setNodes]);
+
+  // Handle 'C' key for circular layout
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "c") {
+        const selectedParent = nodes.find(n => n.selected);
+        if (!selectedParent) return;
+
+        const childIds = edges
+          .filter(edge => edge.source === selectedParent.id)
+          .map(edge => edge.target);
+
+        if (childIds.length === 0) return;
+
+        const RADIUS = 220;
+        const parentX = selectedParent.position.x;
+        const parentY = selectedParent.position.y;
+
+        setNodes(nds => nds.map(node => {
+          const childIndex = childIds.indexOf(node.id);
+          if (childIndex !== -1) {
+            const angleCount = childIds.length;
+            const startAngle = Math.PI * 0.2; // Start from 36 deg
+            const endAngle = Math.PI * 0.8;   // End at 144 deg
+            const angleStep = angleCount > 1 ? (endAngle - startAngle) / (angleCount - 1) : 0;
+            const angle = startAngle + childIndex * angleStep;
+
+            return {
+              ...node,
+              position: {
+                x: parentX + Math.cos(angle) * RADIUS * 1.5, // Wider spread
+                y: parentY + Math.sin(angle) * RADIUS
+              }
+            };
+          }
+          return node;
+        }));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nodes, edges, setNodes]);
+
+  // Handle 'H' key for toggling grid
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "h") {
+        setShowGrid(prev => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <div className="relative h-full w-full overflow-hidden rounded-xl" style={{ background: "#02020a" }}>
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Starfield */}
+        <svg className="absolute inset-0 w-full h-full">
+          {STARS.map((s, i) => (
+            <circle
+              key={i}
+              cx={`${s.x}%`}
+              cy={`${s.y}%`}
+              r={s.r}
+              fill="rgba(210,225,255,1)"
+              opacity={s.o}
+            />
+          ))}
+        </svg>
         {/* Ambient glow orbs */}
         <div className="absolute left-1/2 top-[-10%] -translate-x-1/2 h-[75%] w-[90%] rounded-[100%]"
-          style={{ background: "radial-gradient(ellipse, rgba(34,211,238,0.07) 0%, transparent 70%)", filter: "blur(60px)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(34,211,238,0.07) 0%, transparent 70%)" }} />
         <div className="absolute left-[3%] bottom-[5%] h-[55%] w-[45%] rounded-[100%]"
-          style={{ background: "radial-gradient(ellipse, rgba(167,139,250,0.06) 0%, transparent 70%)", filter: "blur(80px)" }} />
+          style={{ background: "radial-gradient(ellipse, rgba(167,139,250,0.06) 0%, transparent 70%)" }} />
         <div className="absolute right-[3%] top-[15%] h-[50%] w-[40%] rounded-[100%]"
-          style={{ background: "radial-gradient(ellipse, rgba(245,158,11,0.05) 0%, transparent 70%)", filter: "blur(80px)" }} />
-        {/* Dot grid pattern */}
-        <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.035 }}>
-          <defs>
-            <pattern id="scale-tree-dots" x="0" y="0" width="36" height="36" patternUnits="userSpaceOnUse">
-              <circle cx="18" cy="18" r="0.9" fill="rgba(200,220,255,1)" />
-            </pattern>
-          </defs>
-          <rect x="0" y="0" width="100%" height="100%" fill="url(#scale-tree-dots)" />
-        </svg>
-        {/* Subtle scanline vignette */}
+          style={{ background: "radial-gradient(ellipse, rgba(245,158,11,0.05) 0%, transparent 70%)" }} />
+        {/* Vignette */}
         <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,6,0.55) 100%)",
+          background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,6,0.60) 100%)",
         }} />
       </div>
 
-      {/* Header stats */}
+      {/* Title header */}
+      <div className="absolute left-4 top-4 z-10 pointer-events-none">
+        <h1 style={{
+          fontSize: 18,
+          fontWeight: 700,
+          color: "#f0f4ff",
+          letterSpacing: "0.04em",
+          lineHeight: 1.2,
+          textShadow: "0 0 30px rgba(34,211,238,0.35)",
+          margin: 0,
+        }}>
+          Ścieżka Mistrzostwa Gitary
+        </h1>
+        <p style={{
+          fontSize: 11,
+          fontWeight: 300,
+          color: "rgba(160,170,200,0.65)",
+          letterSpacing: "0.12em",
+          marginTop: 3,
+          textTransform: "uppercase",
+        }}>
+          Wybierz swoją ścieżkę rozwoju
+        </p>
+      </div>
+
+      {/* Dev Tool Export Button */}
+      <div className="absolute left-4 top-20 z-10 flex gap-2 pointer-events-auto">
+        <button
+          onClick={handleExport}
+          className="rounded bg-cyan-600/30 px-3 py-1.5 text-xs font-semibold text-cyan-100 hover:bg-cyan-500/50"
+          style={{ border: "1px solid rgba(34,211,238,0.3)" }}
+        >
+          [DEV] Kopiuj (JSON)
+        </button>
+        <button
+          onClick={handleAlignX}
+          className="rounded bg-zinc-600/30 px-3 py-1.5 text-xs font-semibold text-zinc-100 hover:bg-zinc-500/50"
+          style={{ border: "1px solid rgba(255,255,255,0.2)" }}
+          title="Zaznacz węzły Shiftem, żeby wyrównać w pionie"
+        >
+          Wyrównaj X
+        </button>
+        <button
+          onClick={handleAlignY}
+          className="rounded bg-zinc-600/30 px-3 py-1.5 text-xs font-semibold text-zinc-100 hover:bg-zinc-500/50"
+          style={{ border: "1px solid rgba(255,255,255,0.2)" }}
+          title="Zaznacz węzły Shiftem, żeby wyrównać w poziomie"
+        >
+          Wyrównaj Y
+        </button>
+        <button
+          onClick={handleSnapToGrid}
+          className="rounded bg-zinc-600/30 px-3 py-1.5 text-xs font-semibold text-zinc-100 hover:bg-zinc-500/50"
+          style={{ border: "1px solid rgba(255,255,255,0.2)" }}
+          title="Przyciąga zaznaczone (lub wszystkie) do siatki co 50px"
+        >
+          Siatka 50px
+        </button>
+        <button
+          onClick={handleClear}
+          className="rounded bg-red-600/30 px-3 py-1.5 text-xs font-semibold text-red-100 hover:bg-red-500/50"
+          style={{ border: "1px solid rgba(239,68,68,0.3)" }}
+        >
+          Resetuj Układ
+        </button>
+      </div>
+
+      {/* Progress + refresh */}
       <div
-        className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-lg px-3 py-1.5 backdrop-blur-md"
+        className="absolute right-4 top-4 z-10 flex items-center gap-2 rounded-lg px-3 py-1.5"
         style={{
           border: "1px solid rgba(34,211,238,0.18)",
           background: "rgba(2,2,16,0.75)",
           boxShadow: "0 0 24px rgba(34,211,238,0.06), inset 0 0 16px rgba(34,211,238,0.03)",
         }}
       >
-        <GitBranch className="h-3.5 w-3.5 text-cyan-400" style={{ filter: "drop-shadow(0 0 4px rgba(34,211,238,0.7))" }} />
         <span className="text-xs font-light tracking-widest text-zinc-300">
           {completedCount} <span className="text-zinc-600">/</span> 413
         </span>
@@ -257,26 +664,6 @@ export function ScaleTreeView() {
         </button>
       </div>
 
-      {/* Legend */}
-      <div
-        className="absolute bottom-4 left-4 z-10 flex flex-col gap-2 rounded-lg px-3 py-2.5 backdrop-blur-md"
-        style={{
-          border: "1px solid rgba(255,255,255,0.07)",
-          background: "rgba(2,2,16,0.75)",
-        }}
-      >
-        {[
-          { hex: "#f59e0b", glow: "rgba(245,158,11,0.65)",  label: "Pentatonic"     },
-          { hex: "#22d3ee", glow: "rgba(34,211,238,0.65)",   label: "Diatonic Scale" },
-          { hex: "#a78bfa", glow: "rgba(167,139,250,0.65)", label: "Modal Mode"      },
-        ].map(({ hex, glow, label }) => (
-          <div key={label} className="flex items-center gap-2">
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: hex, boxShadow: `0 0 6px ${glow}`, flexShrink: 0 }} />
-            <span className="text-[10px] font-light tracking-wide text-zinc-500">{label}</span>
-          </div>
-        ))}
-      </div>
-
       {/* React Flow canvas */}
       <ReactFlow
         nodes={nodes}
@@ -285,17 +672,24 @@ export function ScaleTreeView() {
         onEdgesChange={onEdgesChange}
         nodeTypes={NODE_TYPES}
         onNodeClick={handleNodeClick}
+        onEdgeClick={handleEdgeClick}
         fitView
         fitViewOptions={{ padding: 0.12 }}
         nodeOrigin={[0.5, 0.5]}
         minZoom={0.08}
         maxZoom={2}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable={false}
+        nodesDraggable={true}
+        nodesConnectable={true}
+        elementsSelectable={true}
+        selectionMode="partial"
+        selectionOnDrag={true}
+        panOnDrag={[1, 2]}
+        panOnScroll={true}
+        onConnect={onConnect}
         proOptions={{ hideAttribution: true }}
         colorMode="dark"
       >
+        {showGrid && <Background variant="dots" gap={50} size={1} color="rgba(255,255,255,0.08)" />}
         <Controls
           showInteractive={false}
           className="[&>button]:border-cyan-500/15 [&>button]:bg-black/70 [&>button]:text-zinc-500 [&>button:hover]:bg-black/90 [&>button:hover]:text-cyan-400"
@@ -313,6 +707,81 @@ export function ScaleTreeView() {
         />
       </ReactFlow>
 
+      {/* Shortcuts Legend */}
+      <div className="absolute bottom-5 left-4 z-10 flex flex-col gap-1.5 rounded-lg border border-white/5 bg-black/40 p-3 backdrop-blur-md select-none">
+        <h3 className="mb-1 text-[10px] font-bold uppercase tracking-widest text-cyan-400/80">Layout Shortcuts</h3>
+        <div className="flex flex-col gap-1 text-[10px] text-zinc-400">
+          <div className="flex items-center gap-2">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">T</kbd>
+            <span>/ <kbd className="rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">⇧T</kbd> Align Child (Down/Up)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">C</kbd>
+            <span>Circular Layout</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">G</kbd>
+            <span>Snap Selection to Grid</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">R</kbd>
+            <span>Reset Pos (Selection)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">B</kbd>
+            <span>Select Branch</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">H</kbd>
+            <span>Toggle Visual Grid</span>
+          </div>
+          <div className="mt-1 border-t border-white/5 pt-1.5 opacity-60">
+            <span className="italic">Click Edge to cycle line style</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom family filter dots */}
+      <div className="absolute bottom-5 left-1/2 z-10 flex items-center gap-3" style={{ transform: "translateX(-50%)" }}>
+        {FAMILIES.map(({ key, color, glow, label }) => {
+          const active = familyFilter === key;
+          return (
+            <button
+              key={key}
+              onClick={() => handleFamilyFilter(key)}
+              title={label}
+              style={{
+                width: active ? 16 : 13,
+                height: active ? 16 : 13,
+                borderRadius: "50%",
+                background: color,
+                boxShadow: active ? `0 0 14px ${glow}, 0 0 6px ${color}` : `0 0 6px ${glow}`,
+                border: active ? `2px solid rgba(255,255,255,0.5)` : "2px solid transparent",
+                cursor: "pointer",
+                transition: "all 0.18s",
+                flexShrink: 0,
+              }}
+            />
+          );
+        })}
+        {/* Reset dot */}
+        <button
+          onClick={() => setFamilyFilter(null)}
+          title="Show all"
+          style={{
+            width: familyFilter === null ? 16 : 13,
+            height: familyFilter === null ? 16 : 13,
+            borderRadius: "50%",
+            background: familyFilter === null ? "rgba(200,210,240,0.9)" : "rgba(80,80,100,0.5)",
+            boxShadow: familyFilter === null ? "0 0 10px rgba(200,220,255,0.5)" : "none",
+            border: familyFilter === null ? "2px solid rgba(255,255,255,0.5)" : "2px solid transparent",
+            cursor: "pointer",
+            transition: "all 0.18s",
+            flexShrink: 0,
+          }}
+        />
+      </div>
+
       {/* Node detail modal */}
       <ScaleNodeModal
         node={selectedNode}
@@ -321,13 +790,13 @@ export function ScaleTreeView() {
         onPractice={handlePractice}
       />
 
-      {/* Hint — hidden when modal is open */}
+      {/* Hint */}
       {!selectedNodeId && (
         <motion.p
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
-          className="absolute bottom-4 right-4 z-10 text-[9px] font-light tracking-widest uppercase text-zinc-700 select-none"
+          className="absolute bottom-5 right-4 z-10 text-[9px] font-light tracking-widest uppercase text-zinc-700 select-none"
         >
           Click a node to practice
         </motion.p>

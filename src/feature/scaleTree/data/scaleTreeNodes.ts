@@ -2,9 +2,9 @@ import type { ScaleTreeNodeDef } from "../types/scaleTree.types";
 import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
 
-const X_STEP = 160;    // horizontal gap between fret positions (spine columns)
-const Y_STEP = 90;     // vertical gap between pattern variants (branch rows)
-const SPINE_RISE = 55; // each rightward spine position rises this many px above the previous
+const X_STEP = 100;    // horizontal gap between fret positions (spine columns)
+const Y_STEP = 62;     // vertical gap between pattern variants (branch rows)
+const SPINE_RISE = 36; // each rightward spine position rises this many px above the previous
 
 type ScaleFamily = "pentatonic" | "diatonic" | "mode";
 
@@ -24,6 +24,38 @@ const DIAT_POSITIONS = [1, 2, 3, 5, 7, 8, 10];
 /** Returns the ascending (spine) node ID for a given scale + fret position. */
 function spineId(scaleId: string, pos: number): string {
   return `${scaleId}_pos${pos}_asc`;
+}
+
+/** Creates the "single string" gateway node that unlocks before any box position. */
+function makeSingleStringNode(
+  scaleId: string,
+  label: string,
+  scaleType: ScaleType,
+  scaleFamily: ScaleFamily,
+  x: number,
+  y: number,
+  prerequisites: string[],
+  scaleKey: string,
+): ScaleTreeNodeDef {
+  return {
+    id: `${scaleId}_single_string`,
+    label,
+    subtitle: "Jedna struna",
+    scaleType,
+    scaleFamily,
+    description: "",
+    position: { x, y },
+    prerequisites,
+    requiredExercises: [{
+      exerciseId: `scale_c_${scaleKey}_string_3`,
+      requiredBpm: 60,
+      scaleType,
+      patternType: "ascending",
+      position: 0,
+      stringNum: 3,
+      label: "Struna G – liniowo",
+    }],
+  };
 }
 
 function makeNode(
@@ -126,58 +158,100 @@ function buildCluster(
   return nodes;
 }
 
-// ─── Cluster centres (×0.80 of original radial layout) ───────────────────────
+// ─── Cluster centres — tree layout: MinPent is root, all others branch out ───
 //
-//  Dorian(-3427,0)  NatMinor(-1904,-914)  MinPent(0,0)  MajPent(1904,-914)  Major(3427,0)
-//  Phrygian(-2666,1523)                               Mixolydian(2666,1523)  Lydian(4570,-1142)
-//                              Locrian(0,3427)
+//  Dorian(-2300,-300)  NatMinor(-1100,-100)  MinPent(0,0)  MajPent(1100,-100)  Major(2300,-300)  Lydian(3100,-700)
+//  Phrygian(-1800,600)                                                          Mixolydian(2000,500)
+//                              Locrian(100,1300)
 //
+
+// ── Single-string gateway nodes ───────────────────────────────────────────────
+// Position formula: x = clusterX - halfSpan*X_STEP - 140, y = clusterY + halfSpan*SPINE_RISE
+// Pent halfSpan=2 → offset (-200-140, +72), Diat halfSpan=3 → offset (-300-140, +108)
+
+const minPentSS = makeSingleStringNode(
+  "min_pent", "Minor Pentatonic", "minor_pentatonic", "pentatonic",
+  -340, 72, [], "minor_pentatonic",
+);
+const majPentSS = makeSingleStringNode(
+  "maj_pent", "Major Pentatonic", "major_pentatonic", "pentatonic",
+  760, -28, [spineId("min_pent", 5)], "major_pentatonic",
+);
+const natMinorSS = makeSingleStringNode(
+  "nat_minor", "Natural Minor", "minor", "diatonic",
+  -1540, 8, [spineId("min_pent", 5)], "minor",
+);
+const majorSS = makeSingleStringNode(
+  "major", "Major Scale", "major", "diatonic",
+  1860, -192, [spineId("maj_pent", 5)], "major",
+);
+const dorianSS = makeSingleStringNode(
+  "dorian", "Dorian", "dorian", "mode",
+  -2740, -192, [spineId("nat_minor", 3)], "dorian",
+);
+const phrygianSS = makeSingleStringNode(
+  "phrygian", "Phrygian", "phrygian", "mode",
+  -2240, 708, [spineId("nat_minor", 5)], "phrygian",
+);
+const mixolydianSS = makeSingleStringNode(
+  "mixolydian", "Mixolydian", "mixolydian", "mode",
+  1560, 608, [spineId("major", 3)], "mixolydian",
+);
+const lydianSS = makeSingleStringNode(
+  "lydian", "Lydian", "lydian", "mode",
+  2660, -592, [spineId("major", 5)], "lydian",
+);
+const locrianSS = makeSingleStringNode(
+  "locrian", "Locrian", "locrian", "mode",
+  -340, 1408, [spineId("phrygian", 5), spineId("mixolydian", 3)], "locrian",
+);
+
+// ── Box-position clusters (firstPrereq is now the single-string node) ─────────
 
 const minPentNodes = buildCluster(
   "min_pent", "Minor Pentatonic", "minor_pentatonic", "pentatonic", "minor_pentatonic",
-  PENT_POSITIONS, 0, 0, null, 80,
+  PENT_POSITIONS, 0, 0, "min_pent_single_string", 80,
 );
 
 const majPentNodes = buildCluster(
   "maj_pent", "Major Pentatonic", "major_pentatonic", "pentatonic", "major_pentatonic",
-  PENT_POSITIONS, 1904, -914, spineId("min_pent", 5), 80,
+  PENT_POSITIONS, 1100, -100, "maj_pent_single_string", 80,
 );
 
 const natMinorNodes = buildCluster(
   "nat_minor", "Natural Minor", "minor", "diatonic", "minor",
-  DIAT_POSITIONS, -1904, -914, spineId("min_pent", 5), 80,
+  DIAT_POSITIONS, -1100, -100, "nat_minor_single_string", 80,
 );
 
 const majorNodes = buildCluster(
   "major", "Major Scale", "major", "diatonic", "major",
-  DIAT_POSITIONS, 3427, 0, spineId("maj_pent", 5), 80,
+  DIAT_POSITIONS, 2300, -300, "major_single_string", 80,
 );
 
 const dorianNodes = buildCluster(
   "dorian", "Dorian", "dorian", "mode", "dorian",
-  DIAT_POSITIONS, -3427, 0, spineId("nat_minor", 3), 75,
+  DIAT_POSITIONS, -2300, -300, "dorian_single_string", 75,
 );
 
 const phrygianNodes = buildCluster(
   "phrygian", "Phrygian", "phrygian", "mode", "phrygian",
-  DIAT_POSITIONS, -2666, 1523, spineId("nat_minor", 5), 75,
+  DIAT_POSITIONS, -1800, 600, "phrygian_single_string", 75,
 );
 
 const mixolydianNodes = buildCluster(
   "mixolydian", "Mixolydian", "mixolydian", "mode", "mixolydian",
-  DIAT_POSITIONS, 2666, 1523, spineId("major", 3), 75,
+  DIAT_POSITIONS, 2000, 500, "mixolydian_single_string", 75,
 );
 
 const lydianNodes = buildCluster(
   "lydian", "Lydian", "lydian", "mode", "lydian",
-  DIAT_POSITIONS, 4570, -1142, spineId("major", 5), 75,
+  DIAT_POSITIONS, 3100, -700, "lydian_single_string", 75,
 );
 
 const locrianNodes = buildCluster(
   "locrian", "Locrian", "locrian", "mode", "locrian",
-  DIAT_POSITIONS, 0, 3427, spineId("phrygian", 5), 70,
+  DIAT_POSITIONS, 100, 1300, "locrian_single_string", 70,
 );
-locrianNodes[0].prerequisites = [spineId("phrygian", 5), spineId("mixolydian", 3)];
 
 // ─── Cluster label positions (for orientation overlay) ───────────────────────
 export type ClusterLabelDef = {
@@ -189,19 +263,23 @@ export type ClusterLabelDef = {
 };
 
 export const CLUSTER_LABELS: ClusterLabelDef[] = [
-  { id: "lbl_min_pent",   label: "Minor Pentatonic", family: "pentatonic", x: 0,     y: 0      },
-  { id: "lbl_maj_pent",   label: "Major Pentatonic", family: "pentatonic", x: 1904,  y: -914   },
-  { id: "lbl_nat_minor",  label: "Natural Minor",    family: "diatonic",   x: -1904, y: -914   },
-  { id: "lbl_major",      label: "Major Scale",      family: "diatonic",   x: 3427,  y: 0      },
-  { id: "lbl_dorian",     label: "Dorian",           family: "mode",       x: -3427, y: 0      },
-  { id: "lbl_phrygian",   label: "Phrygian",         family: "mode",       x: -2666, y: 1523   },
-  { id: "lbl_mixolydian", label: "Mixolydian",       family: "mode",       x: 2666,  y: 1523   },
-  { id: "lbl_lydian",     label: "Lydian",           family: "mode",       x: 4570,  y: -1142  },
-  { id: "lbl_locrian",    label: "Locrian",          family: "mode",       x: 0,     y: 3427   },
+  { id: "lbl_min_pent",   label: "Minor Pentatonic", family: "pentatonic", x: 0,     y: 0     },
+  { id: "lbl_maj_pent",   label: "Major Pentatonic", family: "pentatonic", x: 1100,  y: -100  },
+  { id: "lbl_nat_minor",  label: "Natural Minor",    family: "diatonic",   x: -1100, y: -100  },
+  { id: "lbl_major",      label: "Major Scale",      family: "diatonic",   x: 2300,  y: -300  },
+  { id: "lbl_dorian",     label: "Dorian",           family: "mode",       x: -2300, y: -300  },
+  { id: "lbl_phrygian",   label: "Phrygian",         family: "mode",       x: -1800, y: 600   },
+  { id: "lbl_mixolydian", label: "Mixolydian",       family: "mode",       x: 2000,  y: 500   },
+  { id: "lbl_lydian",     label: "Lydian",           family: "mode",       x: 3100,  y: -700  },
+  { id: "lbl_locrian",    label: "Locrian",          family: "mode",       x: 100,   y: 1300  },
 ];
 
 // ─── Export ──────────────────────────────────────────────────────────────────
 export const SCALE_TREE_NODES: ScaleTreeNodeDef[] = [
+  // Single-string gateway nodes (must come before their box clusters for topological sort)
+  minPentSS, majPentSS, natMinorSS, majorSS,
+  dorianSS, phrygianSS, mixolydianSS, lydianSS, locrianSS,
+  // Box-position clusters
   ...minPentNodes,
   ...majPentNodes,
   ...natMinorNodes,

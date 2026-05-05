@@ -37,6 +37,7 @@ class MyDocument extends Document {
           <meta name="msapplication-TileColor" content="#0a0a0a" />
           <meta name="msapplication-tap-highlight" content="no" />
           <meta name="theme-color" content="#0a0a0a" />
+          <meta name="authoriflow-verification" content="authoriflow-site-verification=vzoxwsa3l2pcr7fm5ycwo" />
           <link rel='mask-icon' href='/images/logolight.svg' color='#06b6d4' />
         </Head>
         <body>

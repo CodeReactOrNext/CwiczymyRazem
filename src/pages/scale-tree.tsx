@@ -12,15 +12,8 @@ const ScaleTreeView = dynamic(
 
 const ScaleTreePage: NextPageWithLayout = () => {
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col gap-4 lg:h-[calc(100vh-4rem)]">
-      <div className="flex-shrink-0">
-        <h1 className="text-xl font-bold text-white">Scale Tree</h1>
-        <p className="text-sm text-zinc-400">
-          Explore scales in the key of C step by step — from pentatonics to modal modes.
-        </p>
-      </div>
-
-      <div className="relative flex-1 overflow-hidden rounded-xl border border-white/10">
+    <div className="absolute inset-0 z-0 h-[calc(100vh-4rem)]">
+      <div className="h-full w-full bg-zinc-950">
         <ScaleTreeView />
       </div>
     </div>
@@ -29,7 +22,7 @@ const ScaleTreePage: NextPageWithLayout = () => {
 
 ScaleTreePage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <AppLayout pageId="scale-tree" subtitle="Scale Tree" variant="secondary">
+    <AppLayout pageId="scale-tree" subtitle="Scale Tree" variant="fullscreen">
       {page}
     </AppLayout>
   );

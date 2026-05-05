@@ -10,6 +10,7 @@ export interface RequiredExercise {
   patternType: PatternType;
   position: number;
   label: string;
+  stringNum?: number; // present for single-string exercises (1=high E … 6=low E)
 }
 
 export interface ScaleTreeNodeDef {
