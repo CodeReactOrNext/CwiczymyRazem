@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Lock } from "lucide-react";
+import { Lock, Guitar, Music2, Music } from "lucide-react";
 import { Handle, Position } from "@xyflow/react";
 import type { Node, NodeProps } from "@xyflow/react";
 import type { ScaleTreeNodeData, NodeStatus } from "../types/scaleTree.types";
@@ -7,9 +7,9 @@ import type { ScaleTreeNodeData, NodeStatus } from "../types/scaleTree.types";
 export type ScaleTreeRFNode = Node<ScaleTreeNodeData, "scaleTreeNode">;
 
 const FAMILY = {
-  pentatonic: { gem: "#f59e0b", glow: "rgba(245,158,11,0.85)" },
-  diatonic:   { gem: "#22d3ee", glow: "rgba(34,211,238,0.85)"  },
-  mode:       { gem: "#a78bfa", glow: "rgba(167,139,250,0.85)" },
+  pentatonic: { gem: "#f59e0b", glow: "rgba(245,158,11,0.85)", Icon: Guitar  },
+  diatonic:   { gem: "#22d3ee", glow: "rgba(34,211,238,0.85)", Icon: Music2  },
+  mode:       { gem: "#a78bfa", glow: "rgba(167,139,250,0.85)", Icon: Music  },
 } as const;
 
 type FamilyKey = keyof typeof FAMILY;
@@ -28,20 +28,14 @@ const STATUS_COLOR: Record<NodeStatus, string> = {
   completed:   "#10b981",
 };
 
-const FAMILY_LABEL: Record<FamilyKey, string> = {
-  pentatonic: "Pentatonic",
-  diatonic:   "Diatonic Scale",
-  mode:       "Modal Mode",
-};
-
-interface DiamondStyle {
+interface CircleStyle {
   bg: string;
   border: string;
   shadow: string;
   opacity: number;
 }
 
-function getDiamondStyle(status: NodeStatus, gemGlow: string, selected: boolean): DiamondStyle {
+function getCircleStyle(status: NodeStatus, gemGlow: string, selected: boolean): CircleStyle {
   if (selected) return {
     bg: "#16201a",
     border: "rgba(251,191,36,1)",
@@ -74,6 +68,12 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
   const bpmColor = bpmRatio >= 1 ? "#22d3ee" : bpmRatio >= 0.6 ? "#f59e0b" : "#52525b";
   const prereqCount = (prerequisites as string[]).length;
 
+  const FAMILY_LABEL: Record<FamilyKey, string> = {
+    pentatonic: "Pentatonic",
+    diatonic:   "Diatonic Scale",
+    mode:       "Modal Mode",
+  };
+
   return (
     <div style={{
       position: "absolute",
@@ -91,7 +91,6 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
       width: 230,
       whiteSpace: "nowrap",
     }}>
-      {/* Arrow */}
       <div style={{
         position: "absolute",
         bottom: -5,
@@ -104,7 +103,6 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
         borderBottom: "1px solid rgba(255,255,255,0.1)",
       }} />
 
-      {/* Header */}
       <div style={{ fontWeight: 700, fontSize: 12, color: "#f4f4f5", letterSpacing: "0.01em", marginBottom: 2 }}>
         {label as string}
       </div>
@@ -115,7 +113,6 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
         {FAMILY_LABEL[scaleFamily as FamilyKey]}
       </div>
 
-      {/* Status row */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <span style={{ fontSize: 10, color: "#52525b" }}>Status</span>
         <span style={{ fontSize: 10, fontWeight: 600, color: STATUS_COLOR[status as NodeStatus] }}>
@@ -123,7 +120,6 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
         </span>
       </div>
 
-      {/* BPM section */}
       {req && (
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 8, marginBottom: 8 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
@@ -136,7 +132,6 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
               {currentBpm != null ? `${currentBpm} BPM` : "—"}
             </span>
           </div>
-          {/* BPM bar */}
           <div style={{ height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 2 }}>
             <div style={{
               height: "100%",
@@ -159,7 +154,6 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
         </div>
       )}
 
-      {/* Prerequisites */}
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 7 }}>
         <span style={{ fontSize: 9, color: "#52525b" }}>
           {prereqCount === 0
@@ -178,6 +172,7 @@ const HANDLE_STYLE = { opacity: 0, width: 1, height: 1, minWidth: 1, minHeight: 
 export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRFNode>) {
   const { label, subtitle, scaleFamily, status } = data;
   const isLocked = status === "locked";
+  const isDimmed = data.dimmed as boolean | undefined;
   const [showTooltip, setShowTooltip] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -190,92 +185,154 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
   };
 
   const isSpine = data.requiredExercises[0]?.patternType === "ascending";
-  const diamondSize   = isSpine ? 50 : 30;
-  const containerSize = isSpine ? 70 : 44;
+  const isSingleString = data.requiredExercises[0]?.stringNum != null || data.requiredExercises[0]?.patternType === "single_string";
+
+  const circleSize   = isSpine ? 52 : 34;
+  const containerSize = isSpine ? 72 : 52;
+  const nodeWidth     = isSpine ? 92 : 64;
+
+  const nodeRadius = isSingleString ? "8px" : "50%";
+  const nodeTransform = isSingleString ? "rotate(45deg)" : "none";
+  const contentTransform = isSingleString ? "rotate(-45deg)" : "none";
 
   const fam = FAMILY[(scaleFamily as FamilyKey)] ?? FAMILY.diatonic;
-  const ds = getDiamondStyle(status as NodeStatus, fam.glow, selected ?? false);
+  const cs = getCircleStyle(status as NodeStatus, fam.glow, selected ?? false);
+  const FamIcon = fam.Icon;
+
+  const iconColor = selected
+    ? "#fbbf24"
+    : status === "completed"
+    ? fam.gem
+    : status === "in_progress"
+    ? "#22d3ee"
+    : status === "available"
+    ? "rgba(160,160,200,0.65)"
+    : "rgba(70,70,90,0.5)";
+
+  const iconSize = isSpine ? 20 : 13;
+  const isActive = status === "completed" || status === "in_progress";
 
   return (
     <div
       className="flex flex-col items-center select-none"
-      style={{ width: isSpine ? 90 : 60, position: "relative" }}
+      style={{ width: nodeWidth, position: "relative", opacity: isDimmed ? 0.12 : 1, transition: "opacity 0.25s" }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Handle type="target" position={Position.Top} style={HANDLE_STYLE} />
+      <Handle type="target" position={Position.Top} id="t_top" style={HANDLE_STYLE} />
+      <Handle type="source" position={Position.Top} id="s_top" style={HANDLE_STYLE} />
 
       {showTooltip && <NodeTooltip data={data} famGem={fam.gem} />}
 
-      <div style={{ width: containerSize, height: containerSize, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {/* Spine marker dot */}
+      {isSpine && (
+        <div style={{
+          width: 4,
+          height: 4,
+          borderRadius: "50%",
+          background: fam.gem,
+          boxShadow: `0 0 6px ${fam.glow}`,
+          marginBottom: 4,
+          opacity: isLocked ? 0.3 : 0.7,
+        }} />
+      )}
+
+      <div style={{ width: containerSize, height: containerSize, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+        {/* Main shape container for scaling */}
         <div
+          className={`relative flex items-center justify-center ${isLocked ? "" : "hover:scale-110 active:scale-90"}`}
           style={{
-            width: diamondSize,
-            height: diamondSize,
-            background: ds.bg,
-            border: `2px solid ${ds.border}`,
-            boxShadow: ds.shadow,
-            opacity: ds.opacity,
+            width: circleSize,
+            height: circleSize,
             cursor: isLocked ? "not-allowed" : "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            transition: "transform 0.12s",
             flexShrink: 0,
-            transition: "transform 0.12s, box-shadow 0.12s",
           }}
-          className={isLocked ? "" : "hover:scale-110 active:scale-90"}
         >
+          {/* Outer glow ring */}
+          {(isActive || selected) && (
+            <div style={{
+              position: "absolute",
+              width: circleSize + 14,
+              height: circleSize + 14,
+              borderRadius: nodeRadius,
+              transform: nodeTransform,
+              border: `1px solid ${selected ? "rgba(251,191,36,0.45)" : cs.border}`,
+              opacity: 0.4,
+              pointerEvents: "none",
+            }} />
+          )}
+
+          {/* Second ring for completed */}
+          {status === "completed" && (
+            <div style={{
+              position: "absolute",
+              width: circleSize + 26,
+              height: circleSize + 26,
+              borderRadius: nodeRadius,
+              transform: nodeTransform,
+              border: `1px solid ${cs.border}`,
+              opacity: 0.15,
+              pointerEvents: "none",
+            }} />
+          )}
+
+          {/* Actual shape background */}
           <div
             style={{
+              position: "absolute",
               width: "100%",
               height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              background: cs.bg,
+              border: `2px solid ${cs.border}`,
+              boxShadow: cs.shadow,
+              opacity: cs.opacity,
+              borderRadius: nodeRadius,
+              transform: nodeTransform,
+              transition: "box-shadow 0.12s",
             }}
-          >
-            {status === "completed" && (
-              <div style={{
-                width: isSpine ? 20 : 14,
-                height: isSpine ? 20 : 14,
-                background: fam.gem,
-                boxShadow: `0 0 16px ${fam.glow}, 0 0 6px ${fam.gem}, 0 0 28px ${fam.glow}`,
-              }} />
-            )}
-            {status === "in_progress" && (
-              <div
-                style={{
-                  width: isSpine ? 14 : 10,
-                  height: isSpine ? 14 : 10,
-                  background: "rgba(6,182,212,0.90)",
-                  boxShadow: "0 0 14px rgba(6,182,212,0.95), 0 0 6px rgba(6,182,212,0.6)",
-                  animation: "pulse 1.8s ease-in-out infinite",
-                }}
+          />
+
+          {/* Content */}
+          <div style={{ position: "relative", zIndex: 1, transform: contentTransform, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {isLocked ? (
+              <>
+                <FamIcon size={iconSize} color="rgba(90,90,110,0.3)" />
+                <div style={{ position: "absolute", bottom: -2, right: -4, background: "#101018", borderRadius: "50%", padding: 2, border: "1px solid #2a2a3a" }}>
+                  <Lock size={8} color="#666" />
+                </div>
+              </>
+            ) : (
+              <FamIcon
+                size={iconSize}
+                color={iconColor}
+                style={status !== "available" ? { filter: `drop-shadow(0 0 5px ${iconColor})` } : undefined}
               />
-            )}
-            {status === "available" && (
-              <div style={{
-                width: isSpine ? 10 : 7,
-                height: isSpine ? 10 : 7,
-                background: "rgba(80,80,110,0.65)",
-                boxShadow: "0 0 4px rgba(80,80,120,0.35)",
-              }} />
-            )}
-            {status === "locked" && (
-              <Lock size={isSpine ? 14 : 10} color="rgba(70,70,90,0.55)" />
             )}
           </div>
         </div>
       </div>
 
-      {isSpine && (
-        <div style={{ width: 90, marginTop: 2 }} className="text-center">
-          <p className={`text-[9px] font-light tracking-wide leading-tight truncate px-1 ${isLocked ? "text-zinc-500" : "text-zinc-100"}`}>{label as string}</p>
-          <p className={`text-[8px] font-light leading-tight tracking-wide truncate px-1 ${isLocked ? "text-zinc-600" : "text-zinc-500"}`}>{subtitle as string}</p>
-        </div>
-      )}
+      {/* Labels */}
+      <div style={{ width: nodeWidth, marginTop: 3 }} className="text-center">
+        {isSpine ? (
+          <>
+            <p className={`text-[9px] font-medium tracking-wide leading-tight truncate px-1 ${isLocked ? "text-zinc-500" : "text-zinc-200"}`}>
+              {label as string}
+            </p>
+            <p className={`text-[8px] font-light leading-tight tracking-wide truncate px-1 ${isLocked ? "text-zinc-600" : "text-zinc-500"}`}>
+              {subtitle as string}
+            </p>
+          </>
+        ) : (
+          <p className={`text-[7px] font-light tracking-wide leading-tight truncate px-1 ${isLocked ? "text-zinc-600" : "text-zinc-500"}`}>
+            {subtitle as string}
+          </p>
+        )}
+      </div>
 
-      <Handle type="source" position={Position.Bottom} style={HANDLE_STYLE} />
+      <Handle type="source" position={Position.Bottom} id="s_bottom" style={HANDLE_STYLE} />
+      <Handle type="target" position={Position.Bottom} id="t_bottom" style={HANDLE_STYLE} />
     </div>
   );
 }

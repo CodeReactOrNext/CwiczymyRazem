@@ -84,7 +84,7 @@ export function getScalePatternForPosition(
 /**
  * Get positions for a single string within a fret range
  */
-function getScaleOnString(
+export function getScaleOnString(
   rootMidi: number,
   scaleIntervals: number[],
   stringNum: number,

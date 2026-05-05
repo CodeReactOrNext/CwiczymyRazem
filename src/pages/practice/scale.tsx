@@ -1,4 +1,4 @@
-import { generateScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
+import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
 import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
 import type { ExercisePlan } from "feature/exercisePlan/types/exercise.types";
@@ -12,16 +12,42 @@ import { withAuth } from "utils/auth/serverAuth";
 
 export default function PracticeScalePage() {
   const router = useRouter();
-  const { type, pos, pattern } = router.query;
+  const { type, pos, pattern, string: stringParam } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
 
   useEffect(() => {
-    if (!router.isReady || !type || !pos) return;
+    if (!router.isReady || !type) return;
 
     const scaleType = type as ScaleType;
+
+    // Single-string mode: ?type=minor_pentatonic&string=3
+    if (stringParam) {
+      const stringNum = parseInt(stringParam as string, 10);
+      if (isNaN(stringNum) || stringNum < 1 || stringNum > 6) {
+        router.replace("/scale-tree");
+        return;
+      }
+      const exercise = generateSingleStringScaleExercise({ rootNote: "C", scaleType, stringNum });
+      setPlan({
+        id: `scale-plan-${exercise.id}`,
+        title: exercise.title,
+        description: exercise.description,
+        category: exercise.category,
+        difficulty: exercise.difficulty,
+        exercises: [exercise],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: userAuth ?? "anonymous",
+        image: null,
+      });
+      return;
+    }
+
+    // Box-position mode: ?type=...&pos=...&pattern=...
+    if (!pos) return;
     const position = parseInt(pos as string, 10);
     const patternType = (pattern as PatternType | undefined) ?? "ascending";
 
@@ -30,14 +56,8 @@ export default function PracticeScalePage() {
       return;
     }
 
-    const exercise = generateScaleExercise({
-      rootNote: "C",
-      scaleType,
-      patternType,
-      position,
-    });
-
-    const exercisePlan: ExercisePlan = {
+    const exercise = generateScaleExercise({ rootNote: "C", scaleType, patternType, position });
+    setPlan({
       id: `scale-plan-${exercise.id}`,
       title: exercise.title,
       description: exercise.description,
@@ -48,10 +68,8 @@ export default function PracticeScalePage() {
       updatedAt: new Date(),
       userId: userAuth ?? "anonymous",
       image: null,
-    };
-
-    setPlan(exercisePlan);
-  }, [router.isReady, type, pos, pattern, userAuth, router]);
+    });
+  }, [router.isReady, type, pos, pattern, stringParam, userAuth, router]);
 
   const isDataReady = router.isReady && !!plan;
 

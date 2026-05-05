@@ -14,7 +14,7 @@ interface AppLayoutProps {
   children: React.ReactNode;
   pageId: NavPagesTypes;
   subtitle?: string; // Kept for compatibility, unused
-  variant?: "primary" | "secondary" | "landing";
+  variant?: "primary" | "secondary" | "landing" | "fullscreen";
   isPublic?: boolean;
 }
 
