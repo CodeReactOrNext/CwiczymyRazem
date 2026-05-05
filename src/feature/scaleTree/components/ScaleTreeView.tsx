@@ -269,7 +269,7 @@ export function ScaleTreeView() {
   const nodeDataMap = useMemo(() => {
     const map: Record<string, { status: string; family: string; isSingleString: boolean }> = {};
     initialNodes.forEach((n) => {
-      const isSingleString = n.data.requiredExercises?.[0]?.stringNum != null || n.data.requiredExercises?.[0]?.patternType === "single_string";
+      const isSingleString = n.data.requiredExercises?.[0]?.stringNum != null || (n.data.requiredExercises?.[0]?.patternType as any) === "single_string";
       map[n.id] = { 
         status: n.data.status as string, 
         family: n.data.scaleFamily as string,

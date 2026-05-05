@@ -185,7 +185,7 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
   };
 
   const isSpine = data.requiredExercises[0]?.patternType === "ascending";
-  const isSingleString = data.requiredExercises[0]?.stringNum != null || data.requiredExercises[0]?.patternType === "single_string";
+  const isSingleString = data.requiredExercises[0]?.stringNum != null || (data.requiredExercises[0]?.patternType as any) === "single_string";
 
   const circleSize   = isSpine ? 52 : 34;
   const containerSize = isSpine ? 72 : 52;
