@@ -3,7 +3,7 @@
   <!-- Home Page / Landing Page -->
   <url>
     <loc>https://riff.quest/</loc>
-    <lastmod>2026-04-29</lastmod>
+    <lastmod>2026-05-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,7 +11,7 @@
   <!-- Blog Index -->
   <url>
     <loc>https://riff.quest/blog</loc>
-    <lastmod>2026-04-29</lastmod>
+    <lastmod>2026-05-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -153,6 +153,41 @@
   <url>
     <loc>https://riff.quest/blog/why-is-my-guitar-playing-not-improving-after-months</loc>
     <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/blog/guitar-practice-tips-for-consistency</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/blog/beginner-guitar-practice-routine</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/blog/ai-practice-routine-generator</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/blog/effective-guitar-practice-strategies</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://riff.quest/blog/free-guitar-practice-software</loc>
+    <lastmod>2026-05-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
