@@ -9,6 +9,7 @@ import {
   Background,
   SelectionMode,
   BackgroundVariant,
+  MarkerType,
 } from "@xyflow/react";
 import type { Edge, Node, NodeTypes } from "@xyflow/react";
 import { motion } from "framer-motion";
@@ -37,8 +38,8 @@ function PathLabelNode({ data }: { data: { label: string; color: string } }) {
     <div style={{
       pointerEvents: "none",
       userSelect: "none",
-      background: `linear-gradient(90deg, transparent, ${data.color}18, transparent)`,
-      border: `1px solid ${data.color}30`,
+      background: `rgba(20,20,40,0.4)`,
+      border: `1px solid ${data.color}40`,
       borderRadius: 4,
       padding: "5px 16px",
       color: data.color,
@@ -47,7 +48,6 @@ function PathLabelNode({ data }: { data: { label: string; color: string } }) {
       letterSpacing: "0.22em",
       textTransform: "uppercase",
       whiteSpace: "nowrap",
-      textShadow: `0 0 14px ${data.color}CC, 0 0 40px ${data.color}55`,
       opacity: 0.75,
     }}>
       {data.label}
@@ -91,7 +91,6 @@ function ClusterLabelNode({ data }: { data: ClusterLabelDef }) {
         textTransform: "uppercase",
         lineHeight: 1,
         whiteSpace: "nowrap",
-        textShadow: `0 0 18px ${FAMILY_COLOR[data.family]}, 0 0 50px ${FAMILY_COLOR[data.family]}`,
         opacity: 0.5,
       }}
     >
@@ -143,19 +142,19 @@ function buildStyledEdges(rawEdges: Edge[], nodeDataMap: Record<string, { status
 
     // Determine thickness and style
     let strokeWidth = isCompleted ? 4 : isActive ? 3 : 2;
-    let opacity = isCompleted ? 0.85 : isActive ? 0.55 : 0.45;
+    let opacity = isCompleted ? 0.95 : isActive ? 0.75 : 0.50;
 
     if (!isSpine) {
       strokeWidth = isCompleted ? 2.5 : 1.5;
-      opacity = isCompleted ? 0.50 : isActive ? 0.28 : 0.28;
+      opacity = isCompleted ? 0.70 : isActive ? 0.50 : 0.40;
     } else if (isCrossCluster) {
       strokeWidth = isCompleted ? 5 : 4;
-      opacity = isCompleted ? 1 : 0.80;
+      opacity = isCompleted ? 1 : 0.90;
     }
 
     if (isSingleStringEdge) {
       strokeWidth = isCompleted ? 10 : 7;
-      opacity = isCompleted ? 1 : 0.85;
+      opacity = isCompleted ? 1 : 0.95;
     }
 
     const isLockedCrossCluster = isCrossCluster && !isActive;
@@ -167,9 +166,27 @@ function buildStyledEdges(rawEdges: Edge[], nodeDataMap: Record<string, { status
     let targetHandle = "t_top";
 
     if (sourceNode && targetNode) {
-      if (targetNode.position.y < sourceNode.position.y) {
-        sourceHandle = "s_top";
-        targetHandle = "t_bottom";
+      const dx = targetNode.position.x - sourceNode.position.x;
+      const dy = targetNode.position.y - sourceNode.position.y;
+
+      if (Math.abs(dx) > Math.abs(dy) * 1.5) {
+        // Horizontal connection is dominant
+        if (dx > 0) {
+          sourceHandle = "s_right";
+          targetHandle = "t_left";
+        } else {
+          sourceHandle = "s_left";
+          targetHandle = "t_right";
+        }
+      } else {
+        // Vertical connection is dominant
+        if (dy < 0) {
+          sourceHandle = "s_top";
+          targetHandle = "t_bottom";
+        } else {
+          sourceHandle = "s_bottom";
+          targetHandle = "t_top";
+        }
       }
     }
 
@@ -203,11 +220,55 @@ export function ScaleTreeView() {
 
   const [familyFilter, setFamilyFilter] = useState<FamilyKey | null>(null);
   const [showGrid, setShowGrid] = useState(false);
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([...STATIC_OVERLAY_NODES, ...(initialNodes as Node[])]);
+  const [copiedPattern, setCopiedPattern] = useState<Record<string, { x: number; y: number }> | null>(null);
+  const [nodes, setNodes, onNodesChangeRaw] = useNodesState<Node>([...STATIC_OVERLAY_NODES, ...(initialNodes as Node[])]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(rawEdges);
 
+  // Prevent accidental node deletion
+  const onNodesChange = useCallback((changes: any) => {
+    const filteredChanges = changes.filter((c: any) => c.type !== "remove");
+    onNodesChangeRaw(filteredChanges);
+  }, [onNodesChangeRaw]);
+
   const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => {
+      const sourceNode = nodes.find(n => n.id === params.source);
+      const targetNode = nodes.find(n => n.id === params.target);
+      if (!sourceNode || !targetNode) return;
+
+      let sourceHandle = "s_bottom";
+      let targetHandle = "t_top";
+
+      const dx = targetNode.position.x - sourceNode.position.x;
+      const dy = targetNode.position.y - sourceNode.position.y;
+
+      if (Math.abs(dx) > Math.abs(dy) * 1.5) {
+        if (dx > 0) {
+          sourceHandle = "s_right";
+          targetHandle = "t_left";
+        } else {
+          sourceHandle = "s_left";
+          targetHandle = "t_right";
+        }
+      } else {
+        if (dy < 0) {
+          sourceHandle = "s_top";
+          targetHandle = "t_bottom";
+        } else {
+          sourceHandle = "s_bottom";
+          targetHandle = "t_top";
+        }
+      }
+
+      setEdges((eds) => addEdge({ ...params, sourceHandle, targetHandle }, eds));
+    },
+    [setEdges, nodes]
+  );
+
+  const onEdgesDelete = useCallback(
+    (deleted: Edge[]) => {
+      setEdges((eds) => eds.filter(e => !deleted.find(d => d.id === e.id)));
+    },
     [setEdges]
   );
 
@@ -282,7 +343,7 @@ export function ScaleTreeView() {
   }, [initialNodes]);
 
   useEffect(() => {
-    let savedEdges: {source: string; target: string; type?: string}[] | null = null;
+    let savedEdges: { source: string; target: string; type?: string; sourceHandle?: string; targetHandle?: string }[] | null = null;
     try {
       const savedLayoutStr = localStorage.getItem("scale_tree_layout_dev");
       if (savedLayoutStr) {
@@ -291,18 +352,19 @@ export function ScaleTreeView() {
       }
     } catch (e) {}
 
-    let edgesToUse = rawEdges;
     if (savedEdges && savedEdges.length > 0) {
-      edgesToUse = savedEdges.map((e, idx) => ({
+      setEdges(savedEdges.map((e, idx) => ({
         id: `dev-edge-${e.source}-${e.target}-${idx}`,
         source: e.source,
         target: e.target,
+        sourceHandle: e.sourceHandle || "s_bottom",
+        targetHandle: e.targetHandle || "t_top",
         type: (e.type || "straight") as any,
-      }));
+      })));
     }
+  }, [rawEdges, setEdges]); // Only run once on mount (or when rawEdges change)
 
-    setEdges(buildStyledEdges(edgesToUse, nodeDataMap, nodes));
-  }, [rawEdges, nodeDataMap, setEdges, nodes]);
+  const styledEdges = useMemo(() => buildStyledEdges(edges, nodeDataMap, nodes), [edges, nodeDataMap, nodes]);
 
   const completedCount = useMemo(
     () => Object.values(nodeDataMap).filter((d) => d.status === "completed").length,
@@ -315,15 +377,15 @@ export function ScaleTreeView() {
     // Jeśli trzymamy Shift, pozwalamy React Flow na domyślną multiselekcję
     if (event.shiftKey) return;
 
-    setSelectedNodeId((prev) => {
-      const newId = prev === node.id ? null : node.id;
-      setNodes((nds) => nds.map((n) => {
-        if (n.id === prev || n.id === newId) return { ...n, selected: n.id === newId };
-        return n;
-      }));
-      return newId;
-    });
-  }, [setSelectedNodeId, setNodes]);
+    // setSelectedNodeId((prev) => {
+    //   const newId = prev === node.id ? null : node.id;
+    setNodes((nds) => nds.map((n) => {
+      // Manual selection handling for layout tools
+      return { ...n, selected: n.id === node.id };
+    }));
+    //   return newId;
+    // });
+  }, [setNodes]);
 
   const handleEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
     event.stopPropagation();
@@ -536,6 +598,128 @@ export function ScaleTreeView() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [nodes, edges, setNodes]);
 
+  // Handle 'L' key for horizontal alignment
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "l") {
+        const selectedParent = nodes.find(n => n.selected);
+        if (!selectedParent) return;
+
+        const childIds = edges
+          .filter(edge => edge.source === selectedParent.id)
+          .map(edge => edge.target);
+
+        if (childIds.length === 0) return;
+
+        const isShift = e.shiftKey;
+        const OFFSET_X = 280;
+        const parentX = selectedParent.position.x;
+        const parentY = selectedParent.position.y;
+        
+        const targetX = isShift ? parentX - OFFSET_X : parentX + OFFSET_X;
+
+        setNodes(nds => nds.map(node => {
+          const childIndex = childIds.indexOf(node.id);
+          if (childIndex !== -1) {
+            const spacing = 100;
+            const startY = parentY - ((childIds.length - 1) * spacing) / 2;
+            return {
+              ...node,
+              position: {
+                x: targetX,
+                y: startY + childIndex * spacing
+              }
+            };
+          }
+          return node;
+        }));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nodes, edges, setNodes]);
+
+  // Handle Mirror, Copy Pattern, Paste Pattern
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      
+      // Mirror Horizontal (M)
+      if (key === "m") {
+        const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
+        if (selected.length < 2) return;
+
+        const minX = Math.min(...selected.map(n => n.position.x));
+        const maxX = Math.max(...selected.map(n => n.position.x));
+        const centerX = (minX + maxX) / 2;
+
+        setNodes(nds => nds.map(n => {
+          if (n.selected && !n.id.startsWith("pl_")) {
+            return {
+              ...n,
+              position: { ...n.position, x: Math.round(centerX - (n.position.x - centerX)) }
+            };
+          }
+          return n;
+        }));
+      }
+
+      // Copy Pattern (Alt + C)
+      if (key === "c" && e.altKey) {
+        const selected = nodes.find(n => n.selected);
+        if (!selected) return;
+
+        const scaleId = getScaleId(selected.id);
+        const scaleNodes = nodes.filter(n => getScaleId(n.id) === scaleId);
+        
+        // Find "root" (usually the one with lowest Y or specific suffix)
+        const root = scaleNodes.find(n => n.id.endsWith("_pos1_asc")) || scaleNodes[0];
+        const pattern: Record<string, { x: number; y: number }> = {};
+        
+        scaleNodes.forEach(n => {
+          const suffix = n.id.replace(scaleId + "_", "");
+          pattern[suffix] = {
+            x: n.position.x - root.position.x,
+            y: n.position.y - root.position.y
+          };
+        });
+
+        setCopiedPattern(pattern);
+        alert(`Skopiowano układ skali: ${scaleId}`);
+      }
+
+      // Paste Pattern (Alt + V)
+      if (key === "v" && e.altKey) {
+        if (!copiedPattern) return alert("Najpierw skopiuj układ (Alt + C)");
+        const selected = nodes.find(n => n.selected);
+        if (!selected) return;
+
+        const scaleId = getScaleId(selected.id);
+        const scaleNodes = nodes.filter(n => getScaleId(n.id) === scaleId);
+        const root = scaleNodes.find(n => n.id.endsWith("_pos1_asc")) || scaleNodes[0];
+
+        setNodes(nds => nds.map(n => {
+          if (getScaleId(n.id) === scaleId) {
+            const suffix = n.id.replace(scaleId + "_", "");
+            if (copiedPattern[suffix]) {
+              return {
+                ...n,
+                position: {
+                  x: Math.round(root.position.x + copiedPattern[suffix].x),
+                  y: Math.round(root.position.y + copiedPattern[suffix].y)
+                }
+              };
+            }
+          }
+          return n;
+        }));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nodes, copiedPattern, setNodes]);
+
   // Handle 'H' key for toggling grid
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -548,33 +732,29 @@ export function ScaleTreeView() {
   }, []);
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl" style={{ background: "#02020a" }}>
-      {/* Background */}
+    <div className="relative h-full w-full overflow-hidden rounded-xl" style={{ background: "#050508" }}>
+      <style>{`
+        .react-flow__handle {
+          cursor: crosshair;
+        }
+        .react-flow__handle::after {
+          content: "";
+          position: absolute;
+          top: -15px;
+          left: -15px;
+          width: 34px;
+          height: 34px;
+          background: transparent;
+        }
+      `}</style>
+      {/* High-Performance Background */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Starfield */}
-        <svg className="absolute inset-0 w-full h-full">
-          {STARS.map((s, i) => (
-            <circle
-              key={i}
-              cx={`${s.x}%`}
-              cy={`${s.y}%`}
-              r={s.r}
-              fill="rgba(210,225,255,1)"
-              opacity={s.o}
-            />
-          ))}
-        </svg>
-        {/* Ambient glow orbs */}
-        <div className="absolute left-1/2 top-[-10%] -translate-x-1/2 h-[75%] w-[90%] rounded-[100%]"
-          style={{ background: "radial-gradient(ellipse, rgba(34,211,238,0.07) 0%, transparent 70%)" }} />
-        <div className="absolute left-[3%] bottom-[5%] h-[55%] w-[45%] rounded-[100%]"
-          style={{ background: "radial-gradient(ellipse, rgba(167,139,250,0.06) 0%, transparent 70%)" }} />
-        <div className="absolute right-[3%] top-[15%] h-[50%] w-[40%] rounded-[100%]"
-          style={{ background: "radial-gradient(ellipse, rgba(245,158,11,0.05) 0%, transparent 70%)" }} />
-        {/* Vignette */}
-        <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,6,0.60) 100%)",
-        }} />
+        {/* Simple Grid */}
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{ 
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: "100px 100px"
+          }} />
       </div>
 
       {/* Title header */}
@@ -669,9 +849,10 @@ export function ScaleTreeView() {
       {/* React Flow canvas */}
       <ReactFlow
         nodes={nodes}
-        edges={edges}
+        edges={styledEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onEdgesDelete={onEdgesDelete}
         nodeTypes={NODE_TYPES}
         onNodeClick={handleNodeClick}
         onEdgeClick={handleEdgeClick}
@@ -680,6 +861,7 @@ export function ScaleTreeView() {
         nodeOrigin={[0.5, 0.5]}
         minZoom={0.08}
         maxZoom={2}
+        connectionRadius={34}
         nodesDraggable={true}
         nodesConnectable={true}
         elementsSelectable={true}
@@ -718,6 +900,10 @@ export function ScaleTreeView() {
             <span>/ <kbd className="rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">⇧T</kbd> Align Child (Down/Up)</span>
           </div>
           <div className="flex items-center gap-2">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">L</kbd>
+            <span>/ <kbd className="rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">⇧L</kbd> Align Child (Right/Left)</span>
+          </div>
+          <div className="flex items-center gap-2">
             <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">C</kbd>
             <span>Circular Layout</span>
           </div>
@@ -737,8 +923,21 @@ export function ScaleTreeView() {
             <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">H</kbd>
             <span>Toggle Visual Grid</span>
           </div>
+          <div className="flex items-center gap-2">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">M</kbd>
+            <span>Mirror Horizontal</span>
+          </div>
+          <div className="flex items-center gap-2 text-cyan-300">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">Alt+C</kbd>
+            <span>Copy Scale Pattern</span>
+          </div>
+          <div className="flex items-center gap-2 text-cyan-300">
+            <kbd className="min-w-[20px] rounded bg-zinc-800 px-1 py-0.5 text-center font-mono text-[9px] text-zinc-200">Alt+V</kbd>
+            <span>Paste Scale Pattern</span>
+          </div>
           <div className="mt-1 border-t border-white/5 pt-1.5 opacity-60">
-            <span className="italic">Click Edge to cycle line style</span>
+            <div className="mb-1 italic">Click Edge to cycle line style</div>
+            <div className="italic">Del / Backspace to delete edge</div>
           </div>
         </div>
       </div>

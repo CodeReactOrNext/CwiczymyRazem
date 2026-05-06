@@ -14,6 +14,17 @@ const FAMILY = {
 
 type FamilyKey = keyof typeof FAMILY;
 
+const SHAPE_CLIP: Record<string, string> = {
+  // Regular pentagon — pentatonic has 5 positions
+  pentatonic:    "polygon(50% 0%, 93.3% 25%, 76.6% 80.9%, 23.4% 80.9%, 6.7% 25%)",
+  // Octagon — professional, classical mastery
+  diatonic:      "polygon(38.2% 0%, 61.8% 0%, 100% 38.2%, 100% 61.8%, 61.8% 100%, 38.2% 100%, 0% 61.8%, 0% 38.2%)",
+  // Hexagon — clean and solid
+  mode:          "polygon(50% 0%, 86.6% 25%, 86.6% 75%, 50% 100%, 13.4% 75%, 13.4% 25%)",
+  // Plain diamond — gateway single-string nodes
+  single_string: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+};
+
 const STATUS_LABEL: Record<NodeStatus, string> = {
   locked:      "Locked",
   available:   "Available",
@@ -27,6 +38,14 @@ const STATUS_COLOR: Record<NodeStatus, string> = {
   in_progress: "#22d3ee",
   completed:   "#10b981",
 };
+
+function toRoman(num: number): string {
+  const map: Record<number, string> = { 
+    1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 
+    6: "VI", 7: "VII", 8: "VIII", 9: "IX", 10: "X" 
+  };
+  return map[num] || num.toString();
+}
 
 interface CircleStyle {
   bg: string;
@@ -167,7 +186,12 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
   );
 }
 
-const HANDLE_STYLE = { opacity: 0, width: 1, height: 1, minWidth: 1, minHeight: 1 };
+const HANDLE_STYLE = { 
+  opacity: 0,
+  width: 4, 
+  height: 4, 
+  zIndex: 10,
+};
 
 export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRFNode>) {
   const { label, subtitle, scaleFamily, status } = data;
@@ -191,13 +215,19 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
   const containerSize = isSpine ? 72 : 52;
   const nodeWidth     = isSpine ? 92 : 64;
 
-  const nodeRadius = isSingleString ? "8px" : "50%";
-  const nodeTransform = isSingleString ? "rotate(45deg)" : "none";
-  const contentTransform = isSingleString ? "rotate(-45deg)" : "none";
-
   const fam = FAMILY[(scaleFamily as FamilyKey)] ?? FAMILY.diatonic;
   const cs = getCircleStyle(status as NodeStatus, fam.glow, selected ?? false);
   const FamIcon = fam.Icon;
+
+  const cRGB_map: Record<string, string> = {
+    pentatonic: "245,158,11",
+    diatonic:   "34,211,238",
+    mode:       "167,139,250",
+  };
+  const cRGB = cRGB_map[scaleFamily as string] ?? cRGB_map.diatonic;
+  const shapePath = isSingleString
+    ? SHAPE_CLIP.single_string
+    : (SHAPE_CLIP[scaleFamily as string] ?? SHAPE_CLIP.diatonic);
 
   const iconColor = selected
     ? "#fbbf24"
@@ -221,6 +251,10 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
     >
       <Handle type="target" position={Position.Top} id="t_top" style={HANDLE_STYLE} />
       <Handle type="source" position={Position.Top} id="s_top" style={HANDLE_STYLE} />
+      <Handle type="target" position={Position.Left} id="t_left" style={HANDLE_STYLE} />
+      <Handle type="source" position={Position.Left} id="s_left" style={HANDLE_STYLE} />
+      <Handle type="target" position={Position.Right} id="t_right" style={HANDLE_STYLE} />
+      <Handle type="source" position={Position.Right} id="s_right" style={HANDLE_STYLE} />
 
       {showTooltip && <NodeTooltip data={data} famGem={fam.gem} />}
 
@@ -231,7 +265,6 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
           height: 4,
           borderRadius: "50%",
           background: fam.gem,
-          boxShadow: `0 0 6px ${fam.glow}`,
           marginBottom: 4,
           opacity: isLocked ? 0.3 : 0.7,
         }} />
@@ -249,65 +282,90 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
             flexShrink: 0,
           }}
         >
-          {/* Outer glow ring */}
-          {(isActive || selected) && (
-            <div style={{
-              position: "absolute",
-              width: circleSize + 14,
-              height: circleSize + 14,
-              borderRadius: nodeRadius,
-              transform: nodeTransform,
-              border: `1px solid ${selected ? "rgba(251,191,36,0.45)" : cs.border}`,
-              opacity: 0.4,
-              pointerEvents: "none",
-            }} />
-          )}
-
-          {/* Second ring for completed */}
+          {/* Completed outer glow ring */}
           {status === "completed" && (
             <div style={{
               position: "absolute",
-              width: circleSize + 26,
-              height: circleSize + 26,
-              borderRadius: nodeRadius,
-              transform: nodeTransform,
-              border: `1px solid ${cs.border}`,
-              opacity: 0.15,
+              width: circleSize + 22,
+              height: circleSize + 22,
+              background: `rgba(${cRGB}, 0.05)`,
+              clipPath: shapePath,
+              filter: `drop-shadow(0 0 14px rgba(${cRGB}, 0.55))`,
               pointerEvents: "none",
             }} />
           )}
 
-          {/* Actual shape background */}
-          <div
-            style={{
+          {/* Active / selected glow ring */}
+          {(isActive || selected) && (
+            <div style={{
               position: "absolute",
-              width: "100%",
-              height: "100%",
-              background: cs.bg,
-              border: `2px solid ${cs.border}`,
-              boxShadow: cs.shadow,
-              opacity: cs.opacity,
-              borderRadius: nodeRadius,
-              transform: nodeTransform,
-              transition: "box-shadow 0.12s",
-            }}
-          />
+              width: circleSize + 12,
+              height: circleSize + 12,
+              background: selected ? "rgba(251,191,36,0.07)" : `rgba(${cRGB}, 0.07)`,
+              clipPath: shapePath,
+              filter: `drop-shadow(0 0 ${selected ? 10 : 7}px ${selected ? "rgba(251,191,36,0.9)" : `rgba(${cRGB}, 0.9)`})`,
+              pointerEvents: "none",
+            }} />
+          )}
+
+          {/* Border layer (slightly larger, solid border color) */}
+          <div style={{
+            position: "absolute",
+            width: circleSize + 3,
+            height: circleSize + 3,
+            background: isLocked ? "#484860" : cs.border,
+            clipPath: shapePath,
+            opacity: cs.opacity,
+            pointerEvents: "none",
+          }} />
+
+          {/* Fill layer */}
+          <div style={{
+            position: "absolute",
+            width: circleSize,
+            height: circleSize,
+            background: cs.bg,
+            clipPath: shapePath,
+            opacity: cs.opacity,
+            pointerEvents: "none",
+          }} />
+
+          {/* Spine inner accent */}
+          {isSpine && !isLocked && (
+            <div style={{
+              position: "absolute",
+              width: circleSize - 8,
+              height: circleSize - 8,
+              background: `rgba(${cRGB}, 0.08)`,
+              clipPath: shapePath,
+              pointerEvents: "none",
+            }} />
+          )}
 
           {/* Content */}
-          <div style={{ position: "relative", zIndex: 1, transform: contentTransform, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            {isLocked ? (
-              <>
-                <FamIcon size={iconSize} color="rgba(90,90,110,0.3)" />
-                <div style={{ position: "absolute", bottom: -2, right: -4, background: "#101018", borderRadius: "50%", padding: 2, border: "1px solid #2a2a3a" }}>
-                  <Lock size={8} color="#666" />
-                </div>
-              </>
+          <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {isSingleString ? (
+              isLocked ? (
+                <>
+                  <FamIcon size={iconSize} color="rgba(90,90,110,0.3)" />
+                  <div style={{ position: "absolute", bottom: -2, right: -4, background: "#101018", borderRadius: "50%", padding: 2, border: "1px solid #2a2a3a" }}>
+                    <Lock size={8} color="#666" />
+                  </div>
+                </>
+              ) : (
+                <FamIcon size={iconSize} color={iconColor} />
+              )
             ) : (
-              <FamIcon
-                size={iconSize}
-                color={iconColor}
-                style={status !== "available" ? { filter: `drop-shadow(0 0 5px ${iconColor})` } : undefined}
-              />
+              <span style={{ 
+                color: isLocked ? "rgba(90,90,110,0.3)" : iconColor, 
+                fontSize: isSpine ? 14 : 10, 
+                fontWeight: 800, 
+                fontFamily: "serif",
+                lineHeight: 1,
+                marginTop: 1
+              }}>
+                {toRoman(data.requiredExercises[0]?.position || 1)}
+              </span>
             )}
           </div>
         </div>
