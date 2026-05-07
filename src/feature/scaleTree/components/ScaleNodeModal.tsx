@@ -32,9 +32,10 @@ interface ScaleNodeModalProps {
   status: NodeStatus | null;
   onClose: () => void;
   onPractice: () => void;
+  onMarkComplete?: () => void;
 }
 
-export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeModalProps) {
+export function ScaleNodeModal({ node, status, onClose, onPractice, onMarkComplete }: ScaleNodeModalProps) {
   const req = node?.requiredExercises[0];
 
   const tablature = useMemo(() => {
@@ -111,7 +112,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
             )}
 
             {/* Action */}
-            <div className="p-4 pt-1">
+            <div className="p-4 pt-1 space-y-2">
               {status === "locked" ? (
                 <div className="flex items-center gap-2 rounded-lg bg-zinc-800/50 px-3 py-2.5 text-xs text-zinc-500">
                   <Lock size={12} className="flex-shrink-0" />
@@ -124,6 +125,14 @@ export function ScaleNodeModal({ node, status, onClose, onPractice }: ScaleNodeM
                 >
                   <Play size={14} />
                   Practice
+                </button>
+              )}
+              {onMarkComplete && status !== "locked" && (
+                <button
+                  onClick={onMarkComplete}
+                  className="w-full rounded-lg bg-emerald-600/40 px-4 py-2 text-xs font-semibold text-emerald-300 transition-colors hover:bg-emerald-600/60 active:bg-emerald-600"
+                >
+                  ✓ Mark as Complete (Test)
                 </button>
               )}
             </div>
