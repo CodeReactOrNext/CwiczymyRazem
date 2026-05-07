@@ -33,10 +33,10 @@ const STATUS_LABEL: Record<NodeStatus, string> = {
 };
 
 const STATUS_COLOR: Record<NodeStatus, string> = {
-  locked:      "#52525b",
-  available:   "#a1a1aa",
-  in_progress: "#22d3ee",
-  completed:   "#10b981",
+  locked:      "#6b7280",
+  available:   "#64b5f6",
+  in_progress: "#00e5ff",
+  completed:   "#00ff88",
 };
 
 function toRoman(num: number): string {
@@ -54,26 +54,34 @@ interface CircleStyle {
   opacity: number;
 }
 
-function getCircleStyle(status: NodeStatus, gemGlow: string, selected: boolean): CircleStyle {
+function getCircleStyle(status: NodeStatus, selected: boolean): CircleStyle {
   if (selected) return {
-    bg: "#16201a",
-    border: "rgba(251,191,36,1)",
-    shadow: "0 0 0 2px rgba(251,191,36,0.50), 0 0 44px rgba(251,191,36,0.80), 0 0 18px rgba(251,191,36,0.45), inset 0 0 20px rgba(251,191,36,0.10)",
+    bg: "#451a03",
+    border: "#fbbf24",
+    shadow: "drop-shadow(0 0 10px rgba(251,191,36,0.8))",
     opacity: 1,
   };
   switch (status) {
-    case "locked":      return { bg: "#18182a", border: "#484860", shadow: "none", opacity: 0.55 };
-    case "available":   return { bg: "#1e1e32", border: "rgba(150,150,200,0.80)", shadow: "0 0 6px rgba(100,100,160,0.20)", opacity: 1 };
+    case "locked":      return { 
+      bg: "#1e293b", 
+      border: "#334155", 
+      shadow: "none", opacity: 0.9 
+    };
+    case "available":   return { 
+      bg: "#1e3a8a", 
+      border: "#3b82f6", 
+      shadow: "drop-shadow(0 0 8px rgba(59,130,246,0.6))", opacity: 1 
+    };
     case "in_progress": return {
-      bg: "#0d2038",
-      border: "rgba(6,182,212,1)",
-      shadow: "0 0 24px rgba(6,182,212,0.70), 0 0 10px rgba(6,182,212,0.40), inset 0 0 14px rgba(6,182,212,0.12)",
+      bg: "#083344",
+      border: "#06b6d4",
+      shadow: "drop-shadow(0 0 10px rgba(6,182,212,0.8))",
       opacity: 1,
     };
     case "completed": return {
-      bg: "#0a1e1e",
-      border: "rgba(34,211,238,1)",
-      shadow: `0 0 32px ${gemGlow}, 0 0 14px rgba(34,211,238,0.55), inset 0 0 16px rgba(34,211,238,0.12)`,
+      bg: "#022c22",
+      border: "#10b981",
+      shadow: "drop-shadow(0 0 10px rgba(16,185,129,0.7))",
       opacity: 1,
     };
   }
@@ -96,30 +104,30 @@ function NodeTooltip({ data, famGem }: { data: ScaleTreeNodeData; famGem: string
   return (
     <div style={{
       position: "absolute",
-      bottom: "calc(100% + 10px)",
+      bottom: "calc(100% + 14px)",
       left: "50%",
       transform: "translateX(-50%)",
       zIndex: 9999,
       pointerEvents: "none",
-      background: "rgba(8,8,18,0.97)",
-      border: "1px solid rgba(255,255,255,0.1)",
-      borderRadius: 10,
-      padding: "10px 13px 10px",
-      backdropFilter: "blur(16px)",
-      boxShadow: "0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)",
-      width: 230,
+      background: "linear-gradient(to bottom, rgba(28,25,23,0.95), rgba(12,10,9,0.95))",
+      border: "1px solid #44403c",
+      borderTop: "1px solid #78716c",
+      borderRadius: 6,
+      padding: "12px 16px",
+      boxShadow: "0 12px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.5)",
+      width: 240,
       whiteSpace: "nowrap",
     }}>
       <div style={{
         position: "absolute",
-        bottom: -5,
+        bottom: -6,
         left: "50%",
         transform: "translateX(-50%) rotate(45deg)",
-        width: 9,
-        height: 9,
-        background: "rgba(8,8,18,0.97)",
-        borderRight: "1px solid rgba(255,255,255,0.1)",
-        borderBottom: "1px solid rgba(255,255,255,0.1)",
+        width: 10,
+        height: 10,
+        background: "#0c0a09",
+        borderRight: "1px solid #44403c",
+        borderBottom: "1px solid #44403c",
       }} />
 
       <div style={{ fontWeight: 700, fontSize: 12, color: "#f4f4f5", letterSpacing: "0.01em", marginBottom: 2 }}>
@@ -211,12 +219,12 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
   const isSpine = data.requiredExercises[0]?.patternType === "ascending";
   const isSingleString = data.requiredExercises[0]?.stringNum != null || (data.requiredExercises[0]?.patternType as any) === "single_string";
 
-  const circleSize   = isSpine ? 52 : 34;
-  const containerSize = isSpine ? 72 : 52;
-  const nodeWidth     = isSpine ? 92 : 64;
+  const circleSize   = isSpine ? 64 : 44;
+  const containerSize = isSpine ? 84 : 64;
+  const nodeWidth     = isSpine ? 110 : 80;
 
   const fam = FAMILY[(scaleFamily as FamilyKey)] ?? FAMILY.diatonic;
-  const cs = getCircleStyle(status as NodeStatus, fam.glow, selected ?? false);
+  const cs = getCircleStyle(status as NodeStatus, selected ?? false);
   const FamIcon = fam.Icon;
 
   const cRGB_map: Record<string, string> = {
@@ -230,16 +238,16 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
     : (SHAPE_CLIP[scaleFamily as string] ?? SHAPE_CLIP.diatonic);
 
   const iconColor = selected
-    ? "#fbbf24"
+    ? "#fef3c7"
     : status === "completed"
-    ? fam.gem
+    ? "#ecfdf5"
     : status === "in_progress"
-    ? "#22d3ee"
+    ? "#cffafe"
     : status === "available"
-    ? "rgba(160,160,200,0.65)"
-    : "rgba(70,70,90,0.5)";
+    ? "#e0e7ff"
+    : "#94a3b8";
 
-  const iconSize = isSpine ? 20 : 13;
+  const iconSize = isSpine ? 24 : 16;
   const isActive = status === "completed" || status === "in_progress";
 
   return (
@@ -280,50 +288,25 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
             cursor: isLocked ? "not-allowed" : "pointer",
             transition: "transform 0.12s",
             flexShrink: 0,
+            filter: cs.shadow !== "none" ? cs.shadow : undefined,
           }}
         >
-          {/* Completed outer glow ring */}
-          {status === "completed" && (
-            <div style={{
-              position: "absolute",
-              width: circleSize + 22,
-              height: circleSize + 22,
-              background: `rgba(${cRGB}, 0.05)`,
-              clipPath: shapePath,
-              filter: `drop-shadow(0 0 14px rgba(${cRGB}, 0.55))`,
-              pointerEvents: "none",
-            }} />
-          )}
-
-          {/* Active / selected glow ring */}
-          {(isActive || selected) && (
-            <div style={{
-              position: "absolute",
-              width: circleSize + 12,
-              height: circleSize + 12,
-              background: selected ? "rgba(251,191,36,0.07)" : `rgba(${cRGB}, 0.07)`,
-              clipPath: shapePath,
-              filter: `drop-shadow(0 0 ${selected ? 10 : 7}px ${selected ? "rgba(251,191,36,0.9)" : `rgba(${cRGB}, 0.9)`})`,
-              pointerEvents: "none",
-            }} />
-          )}
-
           {/* Border layer (slightly larger, solid border color) */}
           <div style={{
             position: "absolute",
-            width: circleSize + 3,
-            height: circleSize + 3,
-            background: isLocked ? "#484860" : cs.border,
+            width: circleSize,
+            height: circleSize,
+            background: cs.border,
             clipPath: shapePath,
             opacity: cs.opacity,
             pointerEvents: "none",
           }} />
 
-          {/* Fill layer */}
+          {/* Fill layer (slightly smaller to reveal border) */}
           <div style={{
             position: "absolute",
-            width: circleSize,
-            height: circleSize,
+            width: circleSize - 4,
+            height: circleSize - 4,
             background: cs.bg,
             clipPath: shapePath,
             opacity: cs.opacity,
@@ -334,9 +317,9 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
           {isSpine && !isLocked && (
             <div style={{
               position: "absolute",
-              width: circleSize - 8,
-              height: circleSize - 8,
-              background: `rgba(${cRGB}, 0.08)`,
+              width: circleSize - 6,
+              height: circleSize - 6,
+              background: `rgba(${cRGB}, 0.2)`,
               clipPath: shapePath,
               pointerEvents: "none",
             }} />
@@ -347,9 +330,9 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
             {isSingleString ? (
               isLocked ? (
                 <>
-                  <FamIcon size={iconSize} color="rgba(90,90,110,0.3)" />
-                  <div style={{ position: "absolute", bottom: -2, right: -4, background: "#101018", borderRadius: "50%", padding: 2, border: "1px solid #2a2a3a" }}>
-                    <Lock size={8} color="#666" />
+                  <FamIcon size={iconSize} color="#94a3b8" />
+                  <div style={{ position: "absolute", bottom: -4, right: -6, background: "#1e293b", borderRadius: "50%", padding: 2, border: "2px solid #0f172a" }}>
+                    <Lock size={10} color="#cbd5e1" />
                   </div>
                 </>
               ) : (
@@ -357,12 +340,13 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
               )
             ) : (
               <span style={{ 
-                color: isLocked ? "rgba(90,90,110,0.3)" : iconColor, 
-                fontSize: isSpine ? 14 : 10, 
-                fontWeight: 800, 
-                fontFamily: "serif",
+                color: iconColor, 
+                fontSize: isSpine ? 18 : 14, 
+                fontWeight: 700, 
+                fontFamily: "'Cinzel', 'Playfair Display', 'Times New Roman', serif",
                 lineHeight: 1,
-                marginTop: 1
+                marginTop: 1,
+                letterSpacing: "0.05em"
               }}>
                 {toRoman(data.requiredExercises[0]?.position || 1)}
               </span>
@@ -372,18 +356,18 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
       </div>
 
       {/* Labels */}
-      <div style={{ width: nodeWidth, marginTop: 3 }} className="text-center">
+      <div style={{ width: nodeWidth, marginTop: 4 }} className="text-center">
         {isSpine ? (
           <>
-            <p className={`text-[9px] font-medium tracking-wide leading-tight truncate px-1 ${isLocked ? "text-zinc-500" : "text-zinc-200"}`}>
+            <p className={`text-[12px] font-bold tracking-wide leading-tight truncate px-1 ${isLocked ? "text-slate-400" : "text-white"}`}>
               {label as string}
             </p>
-            <p className={`text-[8px] font-light leading-tight tracking-wide truncate px-1 ${isLocked ? "text-zinc-600" : "text-zinc-500"}`}>
+            <p className={`text-[10px] font-medium leading-tight tracking-wider truncate px-1 mt-0.5 ${isLocked ? "text-slate-500" : "text-slate-300"}`}>
               {subtitle as string}
             </p>
           </>
         ) : (
-          <p className={`text-[7px] font-light tracking-wide leading-tight truncate px-1 ${isLocked ? "text-zinc-600" : "text-zinc-500"}`}>
+          <p className={`text-[10px] font-medium leading-tight tracking-wider truncate px-1 ${isLocked ? "text-slate-500" : "text-slate-300"}`}>
             {subtitle as string}
           </p>
         )}
