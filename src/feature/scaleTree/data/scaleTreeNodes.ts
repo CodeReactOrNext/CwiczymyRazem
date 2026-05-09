@@ -1,4 +1,4 @@
-import type { ScaleTreeNodeDef } from "../types/scaleTree.types";
+import type { ScaleTreeNodeDef, RewardNodeDef } from "../types/scaleTree.types";
 import type { ScaleType } from "feature/exercisePlan/scales/scaleDefinitions";
 import type { PatternType } from "feature/exercisePlan/scales/patternGenerators";
 
@@ -253,6 +253,48 @@ const locrianNodes = buildCluster(
   DIAT_POSITIONS, 100, 1300, "locrian_single_string", 70,
 );
 
+// ─── Reward node generator ────────────────────────────────────────────────────
+function buildRewardNodesForCluster(
+  scaleId: string,
+  positions: number[],
+  clusterX: number,
+  clusterY: number,
+): RewardNodeDef[] {
+  const rewards: RewardNodeDef[] = [];
+  const halfSpan = (positions.length - 1) / 2;
+
+  for (let posIdx = 0; posIdx < positions.length; posIdx++) {
+    const pos = positions[posIdx];
+    const seq4NodeId = `${scaleId}_pos${pos}_seq4`;
+
+    // Position below the seq4 node (seq4 is at patIdx=6, so reward is at patIdx=7)
+    const x = clusterX + (posIdx - halfSpan) * X_STEP;
+    const y = clusterY - (posIdx - halfSpan) * SPINE_RISE + 7 * Y_STEP;
+
+    rewards.push({
+      id: `${scaleId}_pos${pos}_reward`,
+      label: `Reward - Pos. ${pos}`,
+      points: 100,
+      famePoints: 50,
+      position: { x, y },
+      prerequisites: [seq4NodeId],
+    });
+  }
+
+  return rewards;
+}
+
+// ─── Generate reward nodes for all clusters ───────────────────────────────────
+const minPentRewards = buildRewardNodesForCluster("min_pent", PENT_POSITIONS, 0, 0);
+const majPentRewards = buildRewardNodesForCluster("maj_pent", PENT_POSITIONS, 1100, -100);
+const natMinorRewards = buildRewardNodesForCluster("nat_minor", DIAT_POSITIONS, -1100, -100);
+const majorRewards = buildRewardNodesForCluster("major", DIAT_POSITIONS, 2300, -300);
+const dorianRewards = buildRewardNodesForCluster("dorian", DIAT_POSITIONS, -2300, -300);
+const phrygianRewards = buildRewardNodesForCluster("phrygian", DIAT_POSITIONS, -1800, 600);
+const mixolydianRewards = buildRewardNodesForCluster("mixolydian", DIAT_POSITIONS, 2000, 500);
+const lydianRewards = buildRewardNodesForCluster("lydian", DIAT_POSITIONS, 3100, -700);
+const locrianRewards = buildRewardNodesForCluster("locrian", DIAT_POSITIONS, 100, 1300);
+
 // ─── Cluster label positions (for orientation overlay) ───────────────────────
 export type ClusterLabelDef = {
   id: string;
@@ -289,4 +331,16 @@ export const SCALE_TREE_NODES: ScaleTreeNodeDef[] = [
   ...mixolydianNodes,
   ...lydianNodes,
   ...locrianNodes,
+];
+
+export const SCALE_TREE_REWARD_NODES: RewardNodeDef[] = [
+  ...minPentRewards,
+  ...majPentRewards,
+  ...natMinorRewards,
+  ...majorRewards,
+  ...dorianRewards,
+  ...phrygianRewards,
+  ...mixolydianRewards,
+  ...lydianRewards,
+  ...locrianRewards,
 ];

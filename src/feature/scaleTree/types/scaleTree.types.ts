@@ -13,6 +13,16 @@ export interface RequiredExercise {
   stringNum?: number; // present for single-string exercises (1=high E … 6=low E)
 }
 
+export interface RewardNodeDef {
+  id: string;
+  label: string;
+  points: number;
+  famePoints: number;
+  position: { x: number; y: number };
+  prerequisites: string[];
+  [key: string]: unknown;
+}
+
 export interface ScaleTreeNodeDef {
   id: string;
   label: string;

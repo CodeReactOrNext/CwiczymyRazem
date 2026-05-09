@@ -80,7 +80,7 @@ interface DesktopSessionViewProps {
   audioTracks:              AudioTrackConfig[];
   trackConfigs:             Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs:          Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
-  examMode:                 { requiredBpm: number; nodeId: string } | undefined;
+  examMode:                 { requiredBpm: number; nodeId?: string } | undefined;
   exerciseKey:              number;
   isLastExercise:           boolean;
   handleRestart:            () => void;
