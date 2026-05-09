@@ -74,11 +74,8 @@ export function getScalePatternForPosition(
     }
   }
 
-  // Sort by string (6->1) then by fret (low->high)
-  return pattern.sort((a, b) => {
-    if (a.string !== b.string) return b.string - a.string;
-    return a.fret - b.fret;
-  });
+  // Sort by MIDI pitch (pitch-ascending order)
+  return pattern.sort((a, b) => a.midiNote - b.midiNote);
 }
 
 /**

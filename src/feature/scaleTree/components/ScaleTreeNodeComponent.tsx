@@ -219,9 +219,9 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
   const isSpine = data.requiredExercises[0]?.patternType === "ascending";
   const isSingleString = data.requiredExercises[0]?.stringNum != null || (data.requiredExercises[0]?.patternType as any) === "single_string";
 
-  const circleSize   = isSpine ? 64 : 44;
-  const containerSize = isSpine ? 84 : 64;
-  const nodeWidth     = isSpine ? 110 : 80;
+  const circleSize   = isSingleString ? 100 : isSpine ? 64 : 44;
+  const containerSize = isSingleString ? 140 : isSpine ? 84 : 64;
+  const nodeWidth     = isSingleString ? 160 : isSpine ? 110 : 80;
 
   const fam = FAMILY[(scaleFamily as FamilyKey)] ?? FAMILY.diatonic;
   const cs = getCircleStyle(status as NodeStatus, selected ?? false);
@@ -247,8 +247,7 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
     ? "#e0e7ff"
     : "#94a3b8";
 
-  const iconSize = isSpine ? 24 : 16;
-  const isActive = status === "completed" || status === "in_progress";
+  const iconSize = isSingleString ? 40 : isSpine ? 24 : 16;
 
   return (
     <div
@@ -339,13 +338,13 @@ export function ScaleTreeNodeComponent({ data, selected }: NodeProps<ScaleTreeRF
                 <FamIcon size={iconSize} color={iconColor} />
               )
             ) : (
-              <span style={{ 
-                color: iconColor, 
-                fontSize: isSpine ? 18 : 14, 
-                fontWeight: 700, 
+              <span style={{
+                color: iconColor,
+                fontSize: isSpine ? 18 : 14,
+                fontWeight: 700,
                 fontFamily: "'Cinzel', 'Playfair Display', 'Times New Roman', serif",
                 lineHeight: 1,
-                marginTop: 1,
+                marginTop: 0,
                 letterSpacing: "0.05em"
               }}>
                 {toRoman(data.requiredExercises[0]?.position || 1)}

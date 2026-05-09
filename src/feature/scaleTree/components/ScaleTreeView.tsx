@@ -23,8 +23,7 @@ import { ScaleTreeNodeComponent } from "./ScaleTreeNodeComponent";
 import { ScaleNodeModal } from "./ScaleNodeModal";
 import { ScaleTreeDevPanel } from "./ScaleTreeDevPanel";
 import { useScaleTree } from "../hooks/useScaleTree";
-import { CLUSTER_LABELS } from "../data/scaleTreeNodes";
-import type { ClusterLabelDef } from "../data/scaleTreeNodes";
+import { SCALE_TREE_NODES } from "../data/scaleTreeNodes";
 import { organizeNodesByFamily, organizeByScaleTypeRings, organizeByScaleTypeHierarchy, organizeByGridSimple } from "../data/scaleTreeLayouts";
 
 // ── Stable starfield (deterministic pseudo-random) ──────────────────────────
@@ -35,35 +34,7 @@ const STARS = Array.from({ length: 220 }, (_, i) => ({
   o: ((i * 4999 + 37) % 5) / 10 + 0.08,
 }));
 
-// ── Path direction labels (Rhythm / Lead / Harmony / Style) ─────────────────
-function PathLabelNode({ data }: { data: { label: string; color: string } }) {
-  return (
-    <div style={{
-      pointerEvents: "none",
-      userSelect: "none",
-      background: `rgba(20,20,40,0.4)`,
-      border: `1px solid ${data.color}40`,
-      borderRadius: 4,
-      padding: "5px 16px",
-      color: data.color,
-      fontSize: 11,
-      fontWeight: 400,
-      letterSpacing: "0.22em",
-      textTransform: "uppercase",
-      whiteSpace: "nowrap",
-      opacity: 0.75,
-    }}>
-      {data.label}
-    </div>
-  );
-}
-
-const PATH_LABEL_NODES: Node[] = [
-  { id: "pl_major",   type: "pathLabel", position: { x: 550,   y: -430  }, data: { label: "Lead Path",    color: "#22d3ee" }, selectable: false, draggable: false, focusable: false },
-  { id: "pl_minor",   type: "pathLabel", position: { x: -550,  y: -430  }, data: { label: "Rhythm Path",  color: "#22d3ee" }, selectable: false, draggable: false, focusable: false },
-  { id: "pl_modes_l", type: "pathLabel", position: { x: -2550, y: -500  }, data: { label: "Modal (Minor)", color: "#a78bfa" }, selectable: false, draggable: false, focusable: false },
-  { id: "pl_modes_r", type: "pathLabel", position: { x: 2450,  y: -800  }, data: { label: "Modal (Major)", color: "#f59e0b" }, selectable: false, draggable: false, focusable: false },
-];
+const PATH_LABEL_NODES: Node[] = [];
 
 // ── Family filter config ─────────────────────────────────────────────────────
 type FamilyKey = "pentatonic" | "diatonic" | "mode";
@@ -80,21 +51,21 @@ const FAMILY_COLOR: Record<ClusterLabelDef["family"], string> = {
   mode:       "rgba(167,139,250,0.75)",
 };
 
-function ClusterLabelNode({ data }: { data: ClusterLabelDef }) {
+function ScaleLabel({ data }: { data: { label: string; family: string } }) {
   return (
     <div
       style={{
         pointerEvents: "none",
         userSelect: "none",
         textAlign: "center",
-        color: FAMILY_COLOR[data.family],
-        fontSize: 18,
-        fontWeight: 300,
-        letterSpacing: "0.28em",
+        color: FAMILY_COLOR[data.family as keyof typeof FAMILY_COLOR],
+        fontSize: 16,
+        fontWeight: 400,
+        letterSpacing: "0.2em",
         textTransform: "uppercase",
         lineHeight: 1,
         whiteSpace: "nowrap",
-        opacity: 0.5,
+        opacity: 0.7,
       }}
     >
       {data.label}
@@ -102,22 +73,25 @@ function ClusterLabelNode({ data }: { data: ClusterLabelDef }) {
   );
 }
 
-const CLUSTER_LABEL_NODES: Node[] = CLUSTER_LABELS.map((lbl) => ({
-  id: lbl.id,
-  type: "clusterLabel",
-  position: { x: lbl.x, y: lbl.y - 155 },
-  data: lbl,
-  selectable: false,
-  draggable: false,
-  focusable: false,
-}));
+// Create labels positioned above each single string node
+const SCALE_LABEL_NODES: Node[] = SCALE_TREE_NODES.filter((n) => n.id.includes("single_string")).map((node) => {
+  const labelText = node.label;
+  return {
+    id: `label_${node.id}`,
+    type: "scaleLabel" as const,
+    position: { x: node.position.x, y: node.position.y - 80 },
+    data: { label: labelText, family: node.scaleFamily },
+    selectable: false,
+    draggable: false,
+    focusable: false,
+  };
+});
 
-const STATIC_OVERLAY_NODES: Node[] = [...CLUSTER_LABEL_NODES, ...PATH_LABEL_NODES];
+const STATIC_OVERLAY_NODES: Node[] = [...SCALE_LABEL_NODES];
 
 const NODE_TYPES: NodeTypes = {
   scaleTreeNode: ScaleTreeNodeComponent as NodeTypes[string],
-  clusterLabel:  ClusterLabelNode as NodeTypes[string],
-  pathLabel:     PathLabelNode as NodeTypes[string],
+  scaleLabel:    ScaleLabel as NodeTypes[string],
 };
 
 function getScaleId(nodeId: string): string {
@@ -136,31 +110,7 @@ function buildStyledEdges(rawEdges: Edge[], nodeDataMap: Record<string, { status
     const sourceData = nodeDataMap[edge.source] || { status: "locked", family: "diatonic", isSingleString: false };
     const targetData = nodeDataMap[edge.target] || { status: "locked", family: "diatonic", isSingleString: false };
     const isCompleted = sourceData.status === "completed" && targetData.status === "completed";
-    const isActive = sourceData.status === "completed" || sourceData.status === "in_progress";
-    const isSpine = edge.source.endsWith("_asc") && edge.target.endsWith("_asc");
-    const isCrossCluster = isSpine && getScaleId(edge.source) !== getScaleId(edge.target);
-
-    const cRGB = FAMILY_EDGE_COLORS[sourceData.family] || FAMILY_EDGE_COLORS.diatonic;
-    const isSingleStringEdge = sourceData.isSingleString && targetData.isSingleString;
-
-    // Determine thickness and style
-    let strokeWidth = isCompleted ? 6 : isActive ? 4 : 2.5;
-    let opacity = isCompleted ? 0.9 : isActive ? 0.7 : 0.6;
-
-    if (!isSpine) {
-      strokeWidth = isCompleted ? 4 : 2.5;
-      opacity = isCompleted ? 0.7 : isActive ? 0.5 : 0.5;
-    } else if (isCrossCluster) {
-      strokeWidth = isCompleted ? 8 : 5;
-      opacity = isCompleted ? 1 : 0.8;
-    }
-
-    if (isSingleStringEdge) {
-      strokeWidth = isCompleted ? 10 : 7;
-      opacity = isCompleted ? 1 : 0.8;
-    }
-
-    const isLockedCrossCluster = isCrossCluster && !isActive;
+    const cRGB = isCompleted ? "16, 185, 129" : (FAMILY_EDGE_COLORS[sourceData.family] || FAMILY_EDGE_COLORS.diatonic);
 
     // Dynamic Handle Selection
     const sourceNode = nodes.find((n) => n.id === edge.source);
@@ -173,7 +123,6 @@ function buildStyledEdges(rawEdges: Edge[], nodeDataMap: Record<string, { status
       const dy = targetNode.position.y - sourceNode.position.y;
 
       if (Math.abs(dx) > Math.abs(dy) * 1.5) {
-        // Horizontal connection is dominant
         if (dx > 0) {
           sourceHandle = "s_right";
           targetHandle = "t_left";
@@ -182,7 +131,6 @@ function buildStyledEdges(rawEdges: Edge[], nodeDataMap: Record<string, { status
           targetHandle = "t_right";
         }
       } else {
-        // Vertical connection is dominant
         if (dy < 0) {
           sourceHandle = "s_top";
           targetHandle = "t_bottom";
@@ -199,12 +147,9 @@ function buildStyledEdges(rawEdges: Edge[], nodeDataMap: Record<string, { status
       targetHandle,
       type: edge.type || "straight",
       style: {
-        stroke: isLockedCrossCluster ? "rgba(80,80,130,0.15)" : `rgba(${cRGB}, ${opacity})`,
-        strokeWidth: isLockedCrossCluster ? 2 : strokeWidth,
-        strokeDasharray: isLockedCrossCluster ? "8 8" : "none",
-        filter: isLockedCrossCluster ? undefined : (isCompleted || isActive ? `url(#edge-glow)` : undefined),
+        stroke: `rgba(${cRGB}, ${isCompleted ? 0.9 : 0.1})`,
+        strokeWidth: isCompleted ? 3 : 2.5,
       },
-      animated: isCompleted && isCrossCluster,
     };
   });
 }
@@ -310,8 +255,22 @@ export function ScaleTreeView() {
 
     setNodes((prev) => {
       const selectedId = prev.find((n) => n.selected)?.id ?? null;
+
+      // Create updated scale labels with correct positions based on actual node positions
+      const updatedLabels = SCALE_LABEL_NODES.map((label) => {
+        const singleStringNodeId = label.id.replace("label_", "");
+        const actualNode = (layoutNodes as Node[]).find((n) => n.id === singleStringNodeId);
+        if (actualNode) {
+          return {
+            ...label,
+            position: { x: actualNode.position.x, y: actualNode.position.y - 80 },
+          };
+        }
+        return label;
+      });
+
       return [
-        ...STATIC_OVERLAY_NODES,
+        ...updatedLabels,
         ...(layoutNodes as Node[]).map((n) => ({
           ...n,
           selected: n.id === selectedId,
@@ -328,8 +287,8 @@ export function ScaleTreeView() {
     const map: Record<string, { status: string; family: string; isSingleString: boolean }> = {};
     initialNodes.forEach((n) => {
       const isSingleString = n.data.requiredExercises?.[0]?.stringNum != null || (n.data.requiredExercises?.[0]?.patternType as any) === "single_string";
-      map[n.id] = { 
-        status: n.data.status as string, 
+      map[n.id] = {
+        status: n.data.status as string,
         family: n.data.scaleFamily as string,
         isSingleString
       };
@@ -349,7 +308,10 @@ export function ScaleTreeView() {
     })));
   }, [rawEdges, setEdges]);
 
-  const styledEdges = useMemo(() => buildStyledEdges(edges, nodeDataMap, nodes), [edges, nodeDataMap, nodes]);
+  const styledEdges = useMemo(() => {
+    const styled = buildStyledEdges(edges, nodeDataMap, nodes);
+    return styled;
+  }, [edges, nodeDataMap, nodes]);
 
   const completedCount = useMemo(
     () => Object.values(nodeDataMap).filter((d) => d.status === "completed").length,
@@ -911,9 +873,9 @@ export function ScaleTreeView() {
     const req = selectedNode.requiredExercises[0];
     if (!req) return;
     if (req.stringNum != null) {
-      router.push(`/practice/scale?type=${selectedNode.scaleType}&string=${req.stringNum}`);
+      router.push(`/practice/scale?type=${selectedNode.scaleType}&string=${req.stringNum}&exam=true&requiredBpm=${req.requiredBpm}&nodeId=${selectedNode.id}`);
     } else {
-      router.push(`/practice/scale?type=${selectedNode.scaleType}&pos=${req.position}&pattern=${req.patternType}`);
+      router.push(`/practice/scale?type=${selectedNode.scaleType}&pos=${req.position}&pattern=${req.patternType}&exam=true&requiredBpm=${req.requiredBpm}&nodeId=${selectedNode.id}`);
     }
   }, [selectedNode, router]);
 

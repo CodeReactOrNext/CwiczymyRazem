@@ -11,56 +11,72 @@ function chainEdges(scaleId: string, positions: number[]): Edge[] {
   }));
 }
 
-function crossEdge(sourceId: string, targetId: string): Edge {
-  return { id: `e-${sourceId}-${targetId}`, source: sourceId, target: targetId };
+function singleStringConnector(scaleId: string, lastPos: number): Edge[] {
+  return [
+    { id: `e-${scaleId}_pos${lastPos}-${scaleId}_single_string`, source: `${scaleId}_pos${lastPos}`, target: `${scaleId}_single_string` },
+    { id: `e-${scaleId}_single_string-${scaleId}_pos1`, source: `${scaleId}_single_string`, target: `${scaleId}_pos1` },
+  ];
+}
+
+function crossScaleEdge(sourceScale: string, targetScale: string): Edge {
+  return { id: `e-${sourceScale}_single_string-${targetScale}_single_string`, source: `${sourceScale}_single_string`, target: `${targetScale}_single_string` };
 }
 
 export const SCALE_TREE_EDGES: Edge[] = [
   // ── Minor Pentatonic internal chain ──────────────────────────────────────
   ...chainEdges("min_pent", PENT_POSITIONS),
+  ...singleStringConnector("min_pent", 10),
 
-  // ── Minor Pentatonic → branches ──────────────────────────────────────────
-  crossEdge("min_pent_pos10", "maj_pent_pos1"),
-  crossEdge("min_pent_pos10", "nat_minor_pos1"),
+  // ── Minor Pentatonic → branches (via single_string) ──────────────────────
+  crossScaleEdge("min_pent", "maj_pent"),
+  crossScaleEdge("min_pent", "nat_minor"),
 
   // ── Major Pentatonic internal chain ──────────────────────────────────────
   ...chainEdges("maj_pent", PENT_POSITIONS),
+  ...singleStringConnector("maj_pent", 10),
 
-  // ── Major Pentatonic → Major Scale ───────────────────────────────────────
-  crossEdge("maj_pent_pos10", "major_pos1"),
+  // ── Major Pentatonic → Major Scale (via single_string) ────────────────────
+  crossScaleEdge("maj_pent", "major"),
 
   // ── Natural Minor internal chain ──────────────────────────────────────────
   ...chainEdges("nat_minor", DIAT_POSITIONS),
+  ...singleStringConnector("nat_minor", 10),
 
-  // ── Natural Minor → modes ─────────────────────────────────────────────────
-  crossEdge("nat_minor_pos10", "dorian_pos1"),
-  crossEdge("nat_minor_pos10", "phrygian_pos1"),
+  // ── Natural Minor → modes (via single_string) ────────────────────────────
+  crossScaleEdge("nat_minor", "dorian"),
+  crossScaleEdge("nat_minor", "phrygian"),
 
   // ── Major Scale internal chain ────────────────────────────────────────────
   ...chainEdges("major", DIAT_POSITIONS),
+  ...singleStringConnector("major", 10),
 
-  // ── Major Scale → modes ───────────────────────────────────────────────────
-  crossEdge("major_pos10", "mixolydian_pos1"),
-  crossEdge("major_pos10", "lydian_pos1"),
+  // ── Major Scale → modes (via single_string) ───────────────────────────────
+  crossScaleEdge("major", "mixolydian"),
+  crossScaleEdge("major", "lydian"),
 
   // ── Dorian internal chain ─────────────────────────────────────────────────
   ...chainEdges("dorian", DIAT_POSITIONS),
+  ...singleStringConnector("dorian", 10),
 
   // ── Phrygian internal chain ───────────────────────────────────────────────
   ...chainEdges("phrygian", DIAT_POSITIONS),
+  ...singleStringConnector("phrygian", 10),
 
-  // ── Phrygian → Locrian ────────────────────────────────────────────────────
-  crossEdge("phrygian_pos10", "locrian_pos1"),
+  // ── Phrygian → Locrian (via single_string) ────────────────────────────────
+  crossScaleEdge("phrygian", "locrian"),
 
   // ── Mixolydian internal chain ─────────────────────────────────────────────
   ...chainEdges("mixolydian", DIAT_POSITIONS),
+  ...singleStringConnector("mixolydian", 10),
 
-  // ── Mixolydian → Locrian ──────────────────────────────────────────────────
-  crossEdge("mixolydian_pos10", "locrian_pos1"),
+  // ── Mixolydian → Locrian (via single_string) ──────────────────────────────
+  crossScaleEdge("mixolydian", "locrian"),
 
   // ── Lydian internal chain ─────────────────────────────────────────────────
   ...chainEdges("lydian", DIAT_POSITIONS),
+  ...singleStringConnector("lydian", 10),
 
   // ── Locrian internal chain ────────────────────────────────────────────────
   ...chainEdges("locrian", DIAT_POSITIONS),
+  ...singleStringConnector("locrian", 10),
 ];

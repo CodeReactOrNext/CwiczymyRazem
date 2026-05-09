@@ -12,11 +12,15 @@ import { withAuth } from "utils/auth/serverAuth";
 
 export default function PracticeScalePage() {
   const router = useRouter();
-  const { type, pos, pattern, string: stringParam } = router.query;
+  const { type, pos, pattern, string: stringParam, exam, requiredBpm, nodeId } = router.query;
   const [plan, setPlan] = useState<ExercisePlan | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const userAuth = useAppSelector(selectUserAuth);
+
+  const examMode = exam === 'true' && requiredBpm && nodeId
+    ? { requiredBpm: Number(requiredBpm), nodeId: String(nodeId) }
+    : undefined;
 
   useEffect(() => {
     if (!router.isReady || !type) return;
@@ -85,6 +89,7 @@ export default function PracticeScalePage() {
   return (
     <PracticeSession
       plan={plan!}
+      examMode={examMode}
       onClose={() => {
         if (typeof window !== "undefined" && window.history.length > 1) {
           router.back();
