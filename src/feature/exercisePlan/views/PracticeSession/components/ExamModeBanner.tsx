@@ -5,7 +5,7 @@ import { selectUserAuth } from "feature/user/store/userSlice";
 import { toggleBpmStage } from "feature/exercisePlan/services/bpmProgressService";
 
 interface ExamModeBannerProps {
-  examMode: { requiredBpm: number; nodeId: string };
+  examMode: { requiredBpm: number; nodeId?: string };
   exerciseId: string;
   exerciseTitle: string;
 }

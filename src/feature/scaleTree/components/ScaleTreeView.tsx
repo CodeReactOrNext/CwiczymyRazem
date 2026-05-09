@@ -1,158 +1,22 @@
-import "@xyflow/react/dist/style.css";
-
+import { Stage, Layer } from 'react-konva';
+import type Konva from 'konva';
+import { motion } from 'framer-motion';
+import { RefreshCw } from 'lucide-react';
 import {
-  Controls,
-  MiniMap,
-  ReactFlow,
-  useEdgesState,
-  useNodesState,
-  Background,
-  SelectionMode,
-  BackgroundVariant,
-  MarkerType,
-} from "@xyflow/react";
-import type { Edge, Node, NodeTypes } from "@xyflow/react";
-import { motion } from "framer-motion";
-import { RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/router";
-import { addEdge, Connection } from "@xyflow/react";
-import { toggleBpmStage } from "feature/exercisePlan/services/bpmProgressService";
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useRouter } from 'next/router';
+import { toggleBpmStage } from 'feature/exercisePlan/services/bpmProgressService';
 
-import { ScaleTreeNodeComponent } from "./ScaleTreeNodeComponent";
-import { ScaleNodeModal } from "./ScaleNodeModal";
-import { ScaleTreeDevPanel } from "./ScaleTreeDevPanel";
-import { useScaleTree } from "../hooks/useScaleTree";
-import { SCALE_TREE_NODES } from "../data/scaleTreeNodes";
-import { organizeNodesByFamily, organizeByScaleTypeRings, organizeByScaleTypeHierarchy, organizeByGridSimple } from "../data/scaleTreeLayouts";
-
-// ── Stable starfield (deterministic pseudo-random) ──────────────────────────
-const STARS = Array.from({ length: 220 }, (_, i) => ({
-  x: ((i * 7919 + 13) % 10000) / 100,
-  y: ((i * 6271 + 47) % 10000) / 100,
-  r: ((i * 3571 + 23) % 12) / 10 + 0.2,
-  o: ((i * 4999 + 37) % 5) / 10 + 0.08,
-}));
-
-const PATH_LABEL_NODES: Node[] = [];
-
-// ── Family filter config ─────────────────────────────────────────────────────
-type FamilyKey = "pentatonic" | "diatonic" | "mode";
-const FAMILIES: { key: FamilyKey; color: string; glow: string; label: string }[] = [
-  { key: "pentatonic", color: "#f59e0b", glow: "rgba(245,158,11,0.70)", label: "Pentatonic" },
-  { key: "diatonic",   color: "#22d3ee", glow: "rgba(34,211,238,0.70)",  label: "Diatonic"   },
-  { key: "mode",       color: "#a78bfa", glow: "rgba(167,139,250,0.70)", label: "Modal"      },
-];
-
-// ── Cluster labels ───────────────────────────────────────────────────────────
-const FAMILY_COLOR: Record<ClusterLabelDef["family"], string> = {
-  pentatonic: "rgba(245,158,11,0.75)",
-  diatonic:   "rgba(34,211,238,0.75)",
-  mode:       "rgba(167,139,250,0.75)",
-};
-
-function ScaleLabel({ data }: { data: { label: string; family: string } }) {
-  return (
-    <div
-      style={{
-        pointerEvents: "none",
-        userSelect: "none",
-        textAlign: "center",
-        color: FAMILY_COLOR[data.family as keyof typeof FAMILY_COLOR],
-        fontSize: 16,
-        fontWeight: 400,
-        letterSpacing: "0.2em",
-        textTransform: "uppercase",
-        lineHeight: 1,
-        whiteSpace: "nowrap",
-        opacity: 0.7,
-      }}
-    >
-      {data.label}
-    </div>
-  );
-}
-
-// Create labels positioned above each single string node
-const SCALE_LABEL_NODES: Node[] = SCALE_TREE_NODES.filter((n) => n.id.includes("single_string")).map((node) => {
-  const labelText = node.label;
-  return {
-    id: `label_${node.id}`,
-    type: "scaleLabel" as const,
-    position: { x: node.position.x, y: node.position.y - 80 },
-    data: { label: labelText, family: node.scaleFamily },
-    selectable: false,
-    draggable: false,
-    focusable: false,
-  };
-});
-
-const STATIC_OVERLAY_NODES: Node[] = [...SCALE_LABEL_NODES];
-
-const NODE_TYPES: NodeTypes = {
-  scaleTreeNode: ScaleTreeNodeComponent as NodeTypes[string],
-  scaleLabel:    ScaleLabel as NodeTypes[string],
-};
-
-function getScaleId(nodeId: string): string {
-  const m = nodeId.match(/^(.*?)_pos\d+/);
-  return m ? m[1] : nodeId;
-}
-
-const FAMILY_EDGE_COLORS: Record<string, string> = {
-  pentatonic: "245, 158, 11",
-  diatonic:   "34, 211, 238",
-  mode:       "167, 139, 250",
-};
-
-function buildStyledEdges(rawEdges: Edge[], nodeDataMap: Record<string, { status: string; family: string; isSingleString: boolean }>, nodes: Node[]): Edge[] {
-  return rawEdges.map((edge) => {
-    const sourceData = nodeDataMap[edge.source] || { status: "locked", family: "diatonic", isSingleString: false };
-    const targetData = nodeDataMap[edge.target] || { status: "locked", family: "diatonic", isSingleString: false };
-    const isCompleted = sourceData.status === "completed" && targetData.status === "completed";
-    const cRGB = isCompleted ? "16, 185, 129" : (FAMILY_EDGE_COLORS[sourceData.family] || FAMILY_EDGE_COLORS.diatonic);
-
-    // Dynamic Handle Selection
-    const sourceNode = nodes.find((n) => n.id === edge.source);
-    const targetNode = nodes.find((n) => n.id === edge.target);
-    let sourceHandle = "s_bottom";
-    let targetHandle = "t_top";
-
-    if (sourceNode && targetNode) {
-      const dx = targetNode.position.x - sourceNode.position.x;
-      const dy = targetNode.position.y - sourceNode.position.y;
-
-      if (Math.abs(dx) > Math.abs(dy) * 1.5) {
-        if (dx > 0) {
-          sourceHandle = "s_right";
-          targetHandle = "t_left";
-        } else {
-          sourceHandle = "s_left";
-          targetHandle = "t_right";
-        }
-      } else {
-        if (dy < 0) {
-          sourceHandle = "s_top";
-          targetHandle = "t_bottom";
-        } else {
-          sourceHandle = "s_bottom";
-          targetHandle = "t_top";
-        }
-      }
-    }
-
-    return {
-      ...edge,
-      sourceHandle,
-      targetHandle,
-      type: edge.type || "straight",
-      style: {
-        stroke: `rgba(${cRGB}, ${isCompleted ? 0.9 : 0.1})`,
-        strokeWidth: isCompleted ? 3 : 2.5,
-      },
-    };
-  });
-}
+import { ScaleNodeModal } from './ScaleNodeModal';
+import { KonvaEdgesLayer } from './KonvaEdgesLayer';
+import { KonvaNodesLayer } from './KonvaNodesLayer';
+import { useScaleTree } from '../hooks/useScaleTree';
+import { organizeByGridSimple } from '../data/scaleTreeLayouts';
 
 export function ScaleTreeView() {
   const router = useRouter();
@@ -168,920 +32,309 @@ export function ScaleTreeView() {
     userId,
   } = useScaleTree();
 
-  const [familyFilter, setFamilyFilter] = useState<FamilyKey | null>(null);
-  const [showGrid, setShowGrid] = useState(false);
-  const [copiedPattern, setCopiedPattern] = useState<Record<string, { x: number; y: number }> | null>(null);
-  const [nodes, setNodes, onNodesChangeRaw] = useNodesState<Node>([...STATIC_OVERLAY_NODES, ...(initialNodes as Node[])]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>(rawEdges);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<Konva.Stage>(null);
 
-  // Prevent accidental node deletion
-  const onNodesChange = useCallback((changes: any) => {
-    const filteredChanges = changes.filter((c: any) => c.type !== "remove");
-    onNodesChangeRaw(filteredChanges);
-  }, [onNodesChangeRaw]);
+  const [size, setSize] = useState({ w: 800, h: 600 });
 
-  const onConnect = useCallback(
-    (params: Connection) => {
-      const sourceNode = nodes.find(n => n.id === params.source);
-      const targetNode = nodes.find(n => n.id === params.target);
-      if (!sourceNode || !targetNode) return;
+  // ResizeObserver to track container size
+  useEffect(() => {
+    if (!containerRef.current) return;
 
-      let sourceHandle = "s_bottom";
-      let targetHandle = "t_top";
+    const observer = new ResizeObserver(() => {
+      const rect = containerRef.current!.getBoundingClientRect();
+      setSize({ w: rect.width, h: rect.height });
+    });
 
-      const dx = targetNode.position.x - sourceNode.position.x;
-      const dy = targetNode.position.y - sourceNode.position.y;
+    observer.observe(containerRef.current);
+    const rect = containerRef.current.getBoundingClientRect();
+    setSize({ w: rect.width, h: rect.height });
 
-      if (Math.abs(dx) > Math.abs(dy) * 1.5) {
-        if (dx > 0) {
-          sourceHandle = "s_right";
-          targetHandle = "t_left";
-        } else {
-          sourceHandle = "s_left";
-          targetHandle = "t_right";
-        }
-      } else {
-        if (dy < 0) {
-          sourceHandle = "s_top";
-          targetHandle = "t_bottom";
-        } else {
-          sourceHandle = "s_bottom";
-          targetHandle = "t_top";
-        }
-      }
-
-      setEdges((eds) => addEdge({ ...params, sourceHandle, targetHandle }, eds));
-    },
-    [setEdges, nodes]
-  );
-
-  const onEdgesDelete = useCallback(
-    (deleted: Edge[]) => {
-      setEdges((eds) => eds.filter(e => !deleted.find(d => d.id === e.id)));
-    },
-    [setEdges]
-  );
-
-  const handleExport = useCallback(() => {
-    const simplifiedNodes = nodes.map(n => ({ id: n.id, x: Math.round(n.position.x), y: Math.round(n.position.y) }));
-    const simplifiedEdges = edges.map(e => ({ source: e.source, target: e.target, type: e.type }));
-    const result = { nodes: simplifiedNodes, edges: simplifiedEdges };
-    const json = JSON.stringify(result, null, 2);
-    navigator.clipboard.writeText(json).then(() => alert("Skopiowano do schowka! Wklej w czacie."));
-    console.log(result);
-  }, [nodes, edges]);
-
-  const handleClear = useCallback(() => {
-    if (confirm("Czy na pewno chcesz usunąć zapisany układ z pamięci i wrócić do domyślnego?")) {
-      localStorage.removeItem("scale_tree_layout_dev");
-      window.location.reload();
-    }
+    return () => observer.disconnect();
   }, []);
 
-  // Save to LocalStorage
-  useEffect(() => {
-    if (nodes.length <= STATIC_OVERLAY_NODES.length) return;
-    const timeout = setTimeout(() => {
-      const simplifiedNodes = nodes.map(n => ({ id: n.id, x: Math.round(n.position.x), y: Math.round(n.position.y) }));
-      const simplifiedEdges = edges.map(e => ({ source: e.source, target: e.target, type: e.type }));
-      localStorage.setItem("scale_tree_layout_dev", JSON.stringify({ nodes: simplifiedNodes, edges: simplifiedEdges }));
-    }, 500);
-    return () => clearTimeout(timeout);
-  }, [nodes, edges]);
+  // Compute layout using organizeByGridSimple
+  const layoutNodes = useMemo(() => {
+    const result = organizeByGridSimple(
+      initialNodes as any[],
+      rawEdges as any[]
+    );
+    console.log('All node IDs:', result.nodes.map((n: any) => n.id));
+    return result.nodes;
+  }, [initialNodes, rawEdges]);
 
-  useEffect(() => {
-    // Always use grid simple layout from organizeByGridSimple
-    const { nodes: layoutNodes } = organizeByGridSimple(initialNodes as Node[], rawEdges);
+  // Filter edges: only show within same scale, or between single_string nodes
+  const filteredEdges = useMemo(() => {
+    return rawEdges.filter((edge) => {
+      const sourceId = edge.source;
+      const targetId = edge.target;
 
-    setNodes((prev) => {
-      const selectedId = prev.find((n) => n.selected)?.id ?? null;
+      // Extract scale type from node ID (everything before _pos or _single_string)
+      const extractScaleType = (id: string) => {
+        const match = id.match(/^(.+?)_(?:pos\d+|single_string|reward)/);
+        return match ? match[1] : null;
+      };
 
-      // Create updated scale labels with correct positions based on actual node positions
-      const updatedLabels = SCALE_LABEL_NODES.map((label) => {
-        const singleStringNodeId = label.id.replace("label_", "");
-        const actualNode = (layoutNodes as Node[]).find((n) => n.id === singleStringNodeId);
-        if (actualNode) {
-          return {
-            ...label,
-            position: { x: actualNode.position.x, y: actualNode.position.y - 80 },
-          };
-        }
-        return label;
-      });
+      const sourceScale = extractScaleType(sourceId);
+      const targetScale = extractScaleType(targetId);
 
-      return [
-        ...updatedLabels,
-        ...(layoutNodes as Node[]).map((n) => ({
-          ...n,
-          selected: n.id === selectedId,
-          data: {
-            ...n.data,
-            dimmed: familyFilter !== null && n.data.scaleFamily !== familyFilter,
-          },
-        })),
-      ];
+      // Debug: log all edges with their scales
+      if (sourceScale !== targetScale && !(sourceId.includes("single_string") && targetId.includes("single_string"))) {
+        console.log('Edge across scales:', { sourceId, targetId, sourceScale, targetScale });
+      }
+
+      // Within same scale - always show
+      if (sourceScale && targetScale && sourceScale === targetScale) {
+        return true;
+      }
+
+      // Between different scales - only if both are single_string nodes
+      if (sourceId.includes("single_string") && targetId.includes("single_string")) {
+        return true;
+      }
+
+      return false;
     });
-  }, [initialNodes, rawEdges, setNodes, familyFilter]);
+  }, [rawEdges]);
 
+  // Build position map for edges
+  const positionMap = useMemo(() => {
+    const map: Record<string, { x: number; y: number }> = {};
+    layoutNodes.forEach((n: any) => {
+      map[n.id] = n.position;
+    });
+    return map;
+  }, [layoutNodes]);
+
+  // Build node data map with position-based unlocking
   const nodeDataMap = useMemo(() => {
-    const map: Record<string, { status: string; family: string; isSingleString: boolean }> = {};
-    initialNodes.forEach((n) => {
-      const isSingleString = n.data.requiredExercises?.[0]?.stringNum != null || (n.data.requiredExercises?.[0]?.patternType as any) === "single_string";
+    const map: Record<
+      string,
+      { status: string; family: string }
+    > = {};
+
+    // First pass: collect initial statuses and positions
+    const nodePositions: Record<string, { y: number; status: string }> = {};
+    initialNodes.forEach((n: any) => {
+      if (n.type === 'rewardNode') return;
       map[n.id] = {
-        status: n.data.status as string,
-        family: n.data.scaleFamily as string,
-        isSingleString
+        status: (n.data as any).status as string,
+        family: (n.data as any).scaleFamily as string,
+      };
+      nodePositions[n.id] = {
+        y: (n.position as any).y,
+        status: (n.data as any).status as string,
       };
     });
+
+    // Second pass: unlock nodes based on position progression
+    initialNodes.forEach((n: any) => {
+      if (n.type === 'rewardNode' || map[n.id].status !== 'locked') return;
+
+      const nodePos = n.id.match(/_pos(\d+)_/)?.[1];
+      if (!nodePos) return;
+
+      const nodePosNum = parseInt(nodePos, 10);
+
+      // Check if ANY node on next position (posNum + 1) is unlocked
+      // This "opens" the path from previous position
+      const nextPosUnlocked = initialNodes.some((other: any) => {
+        if (other.type === 'rewardNode') return false;
+        const otherPos = other.id.match(/_pos(\d+)_/)?.[1];
+        const otherPosNum = otherPos ? parseInt(otherPos, 10) : null;
+
+        // If any node on NEXT position is not locked, unlock this node (on current or previous)
+        return (
+          otherPosNum === nodePosNum + 1 &&
+          map[other.id].status !== 'locked'
+        );
+      });
+
+      if (nextPosUnlocked) {
+        map[n.id].status = 'available';
+      }
+    });
+
     return map;
   }, [initialNodes]);
 
+  // Center viewport on initial load only
   useEffect(() => {
-    // Always use rawEdges as the source of truth (localStorage disabled)
-    setEdges(rawEdges.map((e, idx) => ({
-      id: e.id || `edge-${e.source}-${e.target}-${idx}`,
-      source: e.source,
-      target: e.target,
-      sourceHandle: "s_bottom",
-      targetHandle: "t_top",
-      type: "straight",
-    })));
-  }, [rawEdges, setEdges]);
+    if (layoutNodes.length === 0 || size.w === 0) return;
 
-  const styledEdges = useMemo(() => {
-    const styled = buildStyledEdges(edges, nodeDataMap, nodes);
-    return styled;
-  }, [edges, nodeDataMap, nodes]);
+    const stage = stageRef.current;
+    if (!stage) return;
 
-  const completedCount = useMemo(
-    () => Object.values(nodeDataMap).filter((d) => d.status === "completed").length,
-    [nodeDataMap]
-  );
-
-  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-    if (node.type === "clusterLabel") return;
-
-    if (event.shiftKey) return;
-
-    setSelectedNodeId(node.id);
-  }, [setSelectedNodeId]);
-
-  const handleEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
-    event.stopPropagation();
-    const edgeTypes = ["straight", "smoothstep", "step", "bezier"] as const;
-    const currentType = edge.type || "straight";
-    const nextIdx = (edgeTypes.indexOf(currentType as any) + 1) % edgeTypes.length;
-    const nextType = edgeTypes[nextIdx];
-
-    setEdges((eds) => eds.map((e) => (e.id === edge.id ? { ...e, type: nextType } : e)));
-  }, [setEdges]);
-
-  const handleAlignX = useCallback(() => {
-    const selected = nodes.filter((n) => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return alert("Zaznacz co najmniej 2 węzły (Shift + Click lub Shift + przeciągnięcie)");
-    const targetX = Math.round(selected[0].position.x);
-    setNodes((nds) => nds.map((n) => (n.selected && !n.id.startsWith("pl_") ? { ...n, position: { ...n.position, x: targetX } } : n)));
-  }, [nodes, setNodes]);
-
-  const handleAlignY = useCallback(() => {
-    const selected = nodes.filter((n) => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return alert("Zaznacz co najmniej 2 węzły (Shift + Click lub Shift + przeciągnięcie)");
-    const targetY = Math.round(selected[0].position.y);
-    setNodes((nds) => nds.map((n) => (n.selected && !n.id.startsWith("pl_") ? { ...n, position: { ...n.position, y: targetY } } : n)));
-  }, [nodes, setNodes]);
-
-  const handleAlignChildren = useCallback((direction: 'down' | 'up') => {
-    const selectedParent = nodes.find(n => n.selected);
-    if (!selectedParent) return;
-
-    const childIds = edges
-      .filter(edge => edge.source === selectedParent.id)
-      .map(edge => edge.target);
-
-    if (childIds.length === 0) return;
-
-    const isUpwards = direction === 'up';
-    const GAP_Y = isUpwards ? -150 : 150;
-    const parentX = selectedParent.position.x;
-    const parentY = selectedParent.position.y;
-
-    setNodes(nds => nds.map(node => {
-      const childIndex = childIds.indexOf(node.id);
-      if (childIndex !== -1) {
-        return {
-          ...node,
-          position: {
-            x: parentX,
-            y: parentY + (childIndex + 1) * GAP_Y
-          }
-        };
-      }
-      return node;
-    }));
-  }, [nodes, edges, setNodes]);
-
-  const handleAlignHorizontal = useCallback((direction: 'right' | 'left') => {
-    const selectedParent = nodes.find(n => n.selected);
-    if (!selectedParent) return;
-
-    const childIds = edges
-      .filter(edge => edge.source === selectedParent.id)
-      .map(edge => edge.target);
-
-    if (childIds.length === 0) return;
-
-    const isShift = direction === 'left';
-    const OFFSET_X = 280;
-    const parentX = selectedParent.position.x;
-    const parentY = selectedParent.position.y;
-
-    const targetX = isShift ? parentX - OFFSET_X : parentX + OFFSET_X;
-
-    setNodes(nds => nds.map(node => {
-      const childIndex = childIds.indexOf(node.id);
-      if (childIndex !== -1) {
-        const spacing = 100;
-        const startY = parentY - ((childIds.length - 1) * spacing) / 2;
-        return {
-          ...node,
-          position: {
-            x: targetX,
-            y: startY + childIndex * spacing
-          }
-        };
-      }
-      return node;
-    }));
-  }, [nodes, edges, setNodes]);
-
-  const handleCircularLayout = useCallback(() => {
-    const selectedParent = nodes.find(n => n.selected);
-    if (!selectedParent) return;
-
-    const childIds = edges
-      .filter(edge => edge.source === selectedParent.id)
-      .map(edge => edge.target);
-
-    if (childIds.length === 0) return;
-
-    const RADIUS = 220;
-    const parentX = selectedParent.position.x;
-    const parentY = selectedParent.position.y;
-
-    setNodes(nds => nds.map(node => {
-      const childIndex = childIds.indexOf(node.id);
-      if (childIndex !== -1) {
-        const angleCount = childIds.length;
-        const startAngle = Math.PI * 0.2;
-        const endAngle = Math.PI * 0.8;
-        const angleStep = angleCount > 1 ? (endAngle - startAngle) / (angleCount - 1) : 0;
-        const angle = startAngle + childIndex * angleStep;
-
-        return {
-          ...node,
-          position: {
-            x: parentX + Math.cos(angle) * RADIUS * 1.5,
-            y: parentY + Math.sin(angle) * RADIUS
-          }
-        };
-      }
-      return node;
-    }));
-  }, [nodes, edges, setNodes]);
-
-  const handleSelectBranch = useCallback(() => {
-    const selectedParent = nodes.find(n => n.selected);
-    if (!selectedParent) return;
-
-    const branchIds = new Set<string>();
-    const findChildren = (parentId: string) => {
-      edges
-        .filter(edge => edge.source === parentId)
-        .forEach(edge => {
-          if (!branchIds.has(edge.target)) {
-            branchIds.add(edge.target);
-            findChildren(edge.target);
-          }
-        });
-    };
-
-    findChildren(selectedParent.id);
-    if (branchIds.size === 0) return;
-
-    setNodes(nds => nds.map(node => ({
-      ...node,
-      selected: branchIds.has(node.id) || node.id === selectedParent.id
-    })));
-  }, [nodes, edges, setNodes]);
-
-  const handleMirrorHorizontal = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
-
-    const minX = Math.min(...selected.map(n => n.position.x));
-    const maxX = Math.max(...selected.map(n => n.position.x));
-    const centerX = (minX + maxX) / 2;
-
-    setNodes(nds => nds.map(n => {
-      if (n.selected && !n.id.startsWith("pl_")) {
-        return {
-          ...n,
-          position: { ...n.position, x: Math.round(centerX - (n.position.x - centerX)) }
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
-
-  const handleCopyPattern = useCallback(() => {
-    const selected = nodes.find(n => n.selected);
-    if (!selected) return;
-
-    const scaleId = getScaleId(selected.id);
-    const scaleNodes = nodes.filter(n => getScaleId(n.id) === scaleId);
-
-    const root = scaleNodes.find(n => n.id.endsWith("_pos1_asc")) || scaleNodes[0];
-    const pattern: Record<string, { x: number; y: number }> = {};
-
-    scaleNodes.forEach(n => {
-      const suffix = n.id.replace(scaleId + "_", "");
-      pattern[suffix] = {
-        x: n.position.x - root.position.x,
-        y: n.position.y - root.position.y
-      };
+    // Find bounds of all nodes
+    let minX = Infinity,
+      maxX = -Infinity,
+      minY = Infinity,
+      maxY = -Infinity;
+    layoutNodes.forEach((n: any) => {
+      minX = Math.min(minX, n.position.x);
+      maxX = Math.max(maxX, n.position.x);
+      minY = Math.min(minY, n.position.y);
+      maxY = Math.max(maxY, n.position.y);
     });
 
-    setCopiedPattern(pattern);
-  }, [nodes]);
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    const offsetX = size.w / 2 - centerX * 0.12;
+    const offsetY = size.h / 2 - centerY * 0.12;
 
-  const handlePastePattern = useCallback(() => {
-    if (!copiedPattern) return;
-    const selected = nodes.find(n => n.selected);
-    if (!selected) return;
+    stage.position({ x: offsetX, y: offsetY });
+    stage.scale({ x: 0.12, y: 0.12 });
+  }, [layoutNodes, size]);
 
-    const scaleId = getScaleId(selected.id);
-    const scaleNodes = nodes.filter(n => getScaleId(n.id) === scaleId);
-    const root = scaleNodes.find(n => n.id.endsWith("_pos1_asc")) || scaleNodes[0];
+  // Zoom handler with cursor-centered scaling
+  const handleWheel = useCallback(
+    (e: Konva.KonvaEventObject<WheelEvent>) => {
+      e.evt.preventDefault();
 
-    setNodes(nds => nds.map(n => {
-      if (getScaleId(n.id) === scaleId) {
-        const suffix = n.id.replace(scaleId + "_", "");
-        if (copiedPattern[suffix]) {
-          return {
-            ...n,
-            position: {
-              x: Math.round(root.position.x + copiedPattern[suffix].x),
-              y: Math.round(root.position.y + copiedPattern[suffix].y)
-            }
-          };
-        }
-      }
-      return n;
-    }));
-  }, [nodes, copiedPattern, setNodes]);
+      const stage = stageRef.current;
+      if (!stage) return;
 
-  const handleDistributeH = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
+      const oldScale = stage.scaleX();
+      const pointer = stage.getPointerPosition();
+      if (!pointer) return;
 
-    const sortedByX = [...selected].sort((a, b) => a.position.x - b.position.x);
-    const minX = sortedByX[0].position.x;
-    const maxX = sortedByX[sortedByX.length - 1].position.x;
-    const spacing = (maxX - minX) / (sortedByX.length - 1);
+      const mousePointTo = {
+        x: (pointer.x - stage.x()) / oldScale,
+        y: (pointer.y - stage.y()) / oldScale,
+      };
 
-    setNodes(nds => nds.map((n) => {
-      const idx = sortedByX.findIndex(s => s.id === n.id);
-      if (idx !== -1) {
-        return {
-          ...n,
-          position: { ...n.position, x: Math.round(minX + idx * spacing) }
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
+      const direction = e.evt.deltaY < 0 ? 1 : -1;
+      const factor = 1.12;
+      const newScale = Math.max(
+        0.05,
+        Math.min(2, oldScale * Math.pow(factor, direction))
+      );
 
-  const handleDistributeV = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
+      stage.scale({ x: newScale, y: newScale });
 
-    const sortedByY = [...selected].sort((a, b) => a.position.y - b.position.y);
-    const minY = sortedByY[0].position.y;
-    const maxY = sortedByY[sortedByY.length - 1].position.y;
-    const spacing = (maxY - minY) / (sortedByY.length - 1);
+      const newPos = {
+        x: pointer.x - mousePointTo.x * newScale,
+        y: pointer.y - mousePointTo.y * newScale,
+      };
 
-    setNodes(nds => nds.map((n) => {
-      const idx = sortedByY.findIndex(s => s.id === n.id);
-      if (idx !== -1) {
-        return {
-          ...n,
-          position: { ...n.position, y: Math.round(minY + idx * spacing) }
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
+      stage.position(newPos);
+    },
+    []
+  );
 
-  const handleGridLayout = useCallback((cols: number) => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
-
-    const avgX = selected.reduce((sum, n) => sum + n.position.x, 0) / selected.length;
-    const avgY = selected.reduce((sum, n) => sum + n.position.y, 0) / selected.length;
-
-    const spacing = 150;
-    const rows = Math.ceil(selected.length / cols);
-
-    setNodes(nds => nds.map((n) => {
-      const idx = selected.findIndex(s => s.id === n.id);
-      if (idx !== -1) {
-        const col = idx % cols;
-        const row = Math.floor(idx / cols);
-        return {
-          ...n,
-          position: {
-            x: Math.round(avgX - ((cols - 1) * spacing) / 2 + col * spacing),
-            y: Math.round(avgY - ((rows - 1) * spacing) / 2 + row * spacing)
-          }
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
-
-  const handleLineLayout = useCallback((direction: 'horizontal' | 'vertical') => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
-
-    const avgX = selected.reduce((sum, n) => sum + n.position.x, 0) / selected.length;
-    const avgY = selected.reduce((sum, n) => sum + n.position.y, 0) / selected.length;
-
-    const spacing = 120;
-
-    if (direction === 'horizontal') {
-      setNodes(nds => nds.map((n) => {
-        const idx = selected.findIndex(s => s.id === n.id);
-        if (idx !== -1) {
-          return {
-            ...n,
-            position: {
-              x: Math.round(avgX - ((selected.length - 1) * spacing) / 2 + idx * spacing),
-              y: Math.round(avgY)
-            }
-          };
-        }
-        return n;
-      }));
-    } else {
-      setNodes(nds => nds.map((n) => {
-        const idx = selected.findIndex(s => s.id === n.id);
-        if (idx !== -1) {
-          return {
-            ...n,
-            position: {
-              x: Math.round(avgX),
-              y: Math.round(avgY - ((selected.length - 1) * spacing) / 2 + idx * spacing)
-            }
-          };
-        }
-        return n;
-      }));
-    }
-  }, [nodes, setNodes]);
-
-  const handleHexagonLayout = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 3) return;
-
-    const avgX = selected.reduce((sum, n) => sum + n.position.x, 0) / selected.length;
-    const avgY = selected.reduce((sum, n) => sum + n.position.y, 0) / selected.length;
-    const radius = 150;
-
-    setNodes(nds => nds.map((n) => {
-      const idx = selected.findIndex(s => s.id === n.id);
-      if (idx !== -1) {
-        const angle = (idx / selected.length) * Math.PI * 2;
-        return {
-          ...n,
-          position: {
-            x: Math.round(avgX + Math.cos(angle) * radius),
-            y: Math.round(avgY + Math.sin(angle) * radius)
-          }
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
-
-  const handleSpiralLayout = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
-
-    const avgX = selected.reduce((sum, n) => sum + n.position.x, 0) / selected.length;
-    const avgY = selected.reduce((sum, n) => sum + n.position.y, 0) / selected.length;
-
-    setNodes(nds => nds.map((n) => {
-      const idx = selected.findIndex(s => s.id === n.id);
-      if (idx !== -1) {
-        const t = idx / selected.length;
-        const angle = t * Math.PI * 6;
-        const radius = t * 200;
-        return {
-          ...n,
-          position: {
-            x: Math.round(avgX + Math.cos(angle) * radius),
-            y: Math.round(avgY + Math.sin(angle) * radius)
-          }
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
-
-  const handleWaveLayout = useCallback((direction: 'horizontal' | 'vertical') => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
-
-    const avgX = selected.reduce((sum, n) => sum + n.position.x, 0) / selected.length;
-    const avgY = selected.reduce((sum, n) => sum + n.position.y, 0) / selected.length;
-
-    if (direction === 'horizontal') {
-      setNodes(nds => nds.map((n) => {
-        const idx = selected.findIndex(s => s.id === n.id);
-        if (idx !== -1) {
-          const x = avgX - ((selected.length - 1) * 120) / 2 + idx * 120;
-          const y = avgY + Math.sin((idx / selected.length) * Math.PI * 2) * 80;
-          return { ...n, position: { x: Math.round(x), y: Math.round(y) } };
-        }
-        return n;
-      }));
-    } else {
-      setNodes(nds => nds.map((n) => {
-        const idx = selected.findIndex(s => s.id === n.id);
-        if (idx !== -1) {
-          const x = avgX + Math.sin((idx / selected.length) * Math.PI * 2) * 80;
-          const y = avgY - ((selected.length - 1) * 120) / 2 + idx * 120;
-          return { ...n, position: { x: Math.round(x), y: Math.round(y) } };
-        }
-        return n;
-      }));
-    }
-  }, [nodes, setNodes]);
-
-  const handlePolygonLayout = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 3) return;
-
-    const avgX = selected.reduce((sum, n) => sum + n.position.x, 0) / selected.length;
-    const avgY = selected.reduce((sum, n) => sum + n.position.y, 0) / selected.length;
-    const radius = 120 + (selected.length * 15);
-
-    setNodes(nds => nds.map((n) => {
-      const idx = selected.findIndex(s => s.id === n.id);
-      if (idx !== -1) {
-        const angle = (idx / selected.length) * Math.PI * 2 - Math.PI / 2;
-        return {
-          ...n,
-          position: {
-            x: Math.round(avgX + Math.cos(angle) * radius),
-            y: Math.round(avgY + Math.sin(angle) * radius)
-          }
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
-
-  const handleRadialLayout = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
-
-    const avgX = selected.reduce((sum, n) => sum + n.position.x, 0) / selected.length;
-    const avgY = selected.reduce((sum, n) => sum + n.position.y, 0) / selected.length;
-
-    setNodes(nds => nds.map((n) => {
-      const idx = selected.findIndex(s => s.id === n.id);
-      if (idx !== -1) {
-        const angle = (idx / selected.length) * Math.PI * 2;
-        const radius = 140;
-        return {
-          ...n,
-          position: {
-            x: Math.round(avgX + Math.cos(angle) * radius),
-            y: Math.round(avgY + Math.sin(angle) * radius)
-          }
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
-
-  const handleStaircaseLayout = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
-
-    const avgX = selected.reduce((sum, n) => sum + n.position.x, 0) / selected.length;
-    const avgY = selected.reduce((sum, n) => sum + n.position.y, 0) / selected.length;
-    const spacing = 130;
-
-    setNodes(nds => nds.map((n) => {
-      const idx = selected.findIndex(s => s.id === n.id);
-      if (idx !== -1) {
-        return {
-          ...n,
-          position: {
-            x: Math.round(avgX - ((selected.length - 1) * spacing) / 2 + idx * spacing),
-            y: Math.round(avgY - ((selected.length - 1) * spacing) / 2 + idx * spacing)
-          }
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
-
-  const handleSCurveLayout = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length < 2) return;
-
-    const avgX = selected.reduce((sum, n) => sum + n.position.x, 0) / selected.length;
-    const avgY = selected.reduce((sum, n) => sum + n.position.y, 0) / selected.length;
-
-    setNodes(nds => nds.map((n) => {
-      const idx = selected.findIndex(s => s.id === n.id);
-      if (idx !== -1) {
-        const t = idx / (selected.length - 1);
-        const x = avgX - 150 + t * 300;
-        const y = avgY + Math.sin(t * Math.PI) * 150 * (t < 0.5 ? 1 : -1);
-        return { ...n, position: { x: Math.round(x), y: Math.round(y) } };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
-
-  const handleResetPositions = useCallback(() => {
-    const selected = nodes.filter(n => n.selected && !n.id.startsWith("pl_"));
-    if (selected.length === 0) return;
-
-    setNodes(nds => nds.map((n) => {
-      if (selected.some(s => s.id === n.id)) {
-        const original = initialNodes.find(in_ => in_.id === n.id);
-        if (original) {
-          return { ...n, position: { ...original.position } };
-        }
-      }
-      return n;
-    }));
-  }, [nodes, initialNodes, setNodes]);
-
-  const handleLoadPresetLayout = useCallback((preset: 'byFamily' | 'byScaleRings' | 'byScaleHierarchy' | 'gridSimple') => {
-    let result;
-
-    if (preset === 'byFamily') {
-      result = organizeNodesByFamily(nodes, edges);
-    } else if (preset === 'byScaleRings') {
-      result = organizeByScaleTypeRings(nodes, edges);
-    } else if (preset === 'byScaleHierarchy') {
-      result = organizeByScaleTypeHierarchy(nodes, edges);
-    } else {
-      result = organizeByGridSimple(nodes, edges);
-    }
-
-    setNodes(result.nodes);
-  }, [nodes, edges, setNodes]);
-
-  const handleSnapToGrid = useCallback(() => {
-    const selected = nodes.filter((n) => n.selected && !n.id.startsWith("pl_"));
-    const targets = selected.length > 0 ? selected : nodes.filter((n) => !n.id.startsWith("pl_"));
-    const GRID_SIZE = 50;
-
-    setNodes((nds) => nds.map((n) => {
-      if (targets.some((t) => t.id === n.id)) {
-        return {
-          ...n,
-          position: {
-            x: Math.round(n.position.x / GRID_SIZE) * GRID_SIZE,
-            y: Math.round(n.position.y / GRID_SIZE) * GRID_SIZE,
-          },
-        };
-      }
-      return n;
-    }));
-  }, [nodes, setNodes]);
+  const handleNodeClick = useCallback(
+    (nodeId: string) => {
+      console.log('Clicked node ID:', nodeId);
+      setSelectedNodeId(nodeId);
+    },
+    [setSelectedNodeId]
+  );
 
   const handlePractice = useCallback(() => {
     if (!selectedNode) return;
     const req = selectedNode.requiredExercises[0];
     if (!req) return;
     if (req.stringNum != null) {
-      router.push(`/practice/scale?type=${selectedNode.scaleType}&string=${req.stringNum}&exam=true&requiredBpm=${req.requiredBpm}&nodeId=${selectedNode.id}`);
+      router.push(
+        `/practice/scale?type=${selectedNode.scaleType}&string=${req.stringNum}&exam=true&requiredBpm=${req.requiredBpm}&nodeId=${selectedNode.id}`
+      );
     } else {
-      router.push(`/practice/scale?type=${selectedNode.scaleType}&pos=${req.position}&pattern=${req.patternType}&exam=true&requiredBpm=${req.requiredBpm}&nodeId=${selectedNode.id}`);
+      router.push(
+        `/practice/scale?type=${selectedNode.scaleType}&pos=${req.position}&pattern=${req.patternType}&exam=true&requiredBpm=${req.requiredBpm}&nodeId=${selectedNode.id}`
+      );
     }
   }, [selectedNode, router]);
-
-  const handleCloseModal = useCallback(() => {
-    setSelectedNodeId(null);
-  }, [setSelectedNodeId]);
 
   const handleMarkComplete = useCallback(async () => {
     if (!selectedNode || !userId) return;
     try {
       const req = selectedNode.requiredExercises[0];
       if (req) {
-        await toggleBpmStage(userId, req.exerciseId, req.requiredBpm, req.label, "theory");
+        await toggleBpmStage(
+          userId,
+          req.exerciseId,
+          req.requiredBpm,
+          req.label,
+          'theory'
+        );
         refreshProgress();
       }
     } catch (e) {
-      console.error("Failed to mark complete:", e);
+      console.error('Failed to mark complete:', e);
     }
   }, [selectedNode, userId, refreshProgress]);
 
-  const handleFamilyFilter = useCallback((key: FamilyKey) => {
-    setFamilyFilter((prev) => prev === key ? null : key);
-  }, []);
+  const handleCloseModal = useCallback(() => {
+    setSelectedNodeId(null);
+  }, [setSelectedNodeId]);
 
-  // Handle 'T' key for auto-aligning children
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "t") {
-        handleAlignChildren(e.shiftKey ? 'up' : 'down');
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleAlignChildren]);
-
-  // Handle 'G' key for snapping to grid
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "g") {
-        handleSnapToGrid();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleSnapToGrid]);
-
-  // Handle 'R' key for restoring original positions
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "r" && !e.ctrlKey && !e.metaKey) {
-        const selectedIds = nodes.filter(n => n.selected).map(n => n.id);
-        if (selectedIds.length === 0) return;
-
-        setNodes(nds => nds.map(node => {
-          if (selectedIds.includes(node.id)) {
-            const original = initialNodes.find(inNode => inNode.id === node.id);
-            if (original) {
-              return {
-                ...node,
-                position: { ...original.position }
-              };
-            }
-          }
-          return node;
-        }));
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [nodes, initialNodes, setNodes]);
-
-  // Handle 'B' key for selecting branch
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "b") {
-        handleSelectBranch();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleSelectBranch]);
-
-  // Handle 'C' key for circular layout
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "c") {
-        handleCircularLayout();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleCircularLayout]);
-
-  // Handle 'L' key for horizontal alignment
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "l") {
-        handleAlignHorizontal(e.shiftKey ? 'left' : 'right');
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleAlignHorizontal]);
-
-  // Handle Mirror, Copy Pattern, Paste Pattern
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase();
-
-      // Mirror Horizontal (M)
-      if (key === "m") {
-        handleMirrorHorizontal();
-      }
-
-      // Copy Pattern (Alt + C)
-      if (key === "c" && e.altKey) {
-        handleCopyPattern();
-        alert("Skopiowano układ skali");
-      }
-
-      // Paste Pattern (Alt + V)
-      if (key === "v" && e.altKey) {
-        if (!copiedPattern) return alert("Najpierw skopiuj układ (Alt + C)");
-        handlePastePattern();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [copiedPattern, handleMirrorHorizontal, handleCopyPattern, handlePastePattern]);
-
-  // Handle 'H' key for toggling grid
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === "h") {
-        setShowGrid(prev => !prev);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  const completedCount = useMemo(
+    () =>
+      Object.values(nodeDataMap).filter(
+        (d) => d.status === 'completed'
+      ).length,
+    [nodeDataMap]
+  );
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl" style={{ background: "#0f1115" }}>
-      <style>{`
-        .react-flow__handle {
-          cursor: crosshair;
-        }
-        .react-flow__handle::after {
-          content: "";
-          position: absolute;
-          top: -15px;
-          left: -15px;
-          width: 34px;
-          height: 34px;
-          background: transparent;
-        }
-      `}</style>
-      
-      {/* High-Performance Atmospheric Background */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" style={{ background: "radial-gradient(circle at center, #1e293b 0%, #020617 100%)" }}>
-        {/* Subtle grid pattern */}
-        <div className="absolute inset-0 opacity-10"
-          style={{ 
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(255,255,255,0.1) 2px, transparent 2px)`,
-            backgroundSize: "60px 60px"
-          }} />
-        {/* Deep Vignette */}
-        <div className="absolute inset-0" style={{ boxShadow: "inset 0 0 150px rgba(0,0,0,1)" }} />
+    <div
+      ref={containerRef}
+      className="relative h-full w-full overflow-hidden rounded-xl bg-zinc-950"
+    >
+      {/* Background */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0 overflow-hidden bg-zinc-950"
+        style={{
+          background:
+            'linear-gradient(135deg, #09090b 0%, #18181b 50%, #09090b 100%)',
+        }}
+      >
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `linear-gradient(rgba(34,211,238,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.5) 1px, transparent 1px)`,
+            backgroundSize: '80px 80px',
+          }}
+        />
       </div>
 
       {/* Title header */}
       <div className="absolute left-4 top-4 z-10 pointer-events-none">
-        <h1 style={{
-          fontSize: 18,
-          fontWeight: 700,
-          color: "#f0f4ff",
-          letterSpacing: "0.04em",
-          lineHeight: 1.2,
-          textShadow: "0 0 30px rgba(34,211,238,0.35)",
-          margin: 0,
-        }}>
+        <h1
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: '#f0f4ff',
+            letterSpacing: '0.04em',
+            lineHeight: 1.2,
+            textShadow: '0 0 30px rgba(34,211,238,0.35)',
+            margin: 0,
+          }}
+        >
           Ścieżka Mistrzostwa Gitary
         </h1>
-        <p style={{
-          fontSize: 11,
-          fontWeight: 300,
-          color: "rgba(160,170,200,0.65)",
-          letterSpacing: "0.12em",
-          marginTop: 3,
-          textTransform: "uppercase",
-        }}>
+        <p
+          style={{
+            fontSize: 11,
+            fontWeight: 300,
+            color: 'rgba(160,170,200,0.65)',
+            letterSpacing: '0.12em',
+            marginTop: 3,
+            textTransform: 'uppercase',
+          }}
+        >
           Wybierz swoją ścieżkę rozwoju
         </p>
       </div>
-
-      {/* Dev Tool Export Button - HIDDEN */}
 
       {/* Progress + refresh */}
       <div
         className="absolute right-4 top-4 z-10 flex items-center gap-2 rounded-lg px-3 py-1.5"
         style={{
-          border: "1px solid rgba(34,211,238,0.18)",
-          background: "rgba(2,2,16,0.75)",
-          boxShadow: "0 0 24px rgba(34,211,238,0.06), inset 0 0 16px rgba(34,211,238,0.03)",
+          border: '1px solid rgba(34,211,238,0.18)',
+          background: 'rgba(2,2,16,0.75)',
+          boxShadow:
+            '0 0 24px rgba(34,211,238,0.06), inset 0 0 16px rgba(34,211,238,0.03)',
         }}
       >
         <span className="text-xs font-light tracking-widest text-zinc-300">
@@ -1093,71 +346,42 @@ export function ScaleTreeView() {
           className="ml-1 flex h-5 w-5 items-center justify-center rounded text-zinc-600 transition-colors hover:text-cyan-400 disabled:opacity-30"
           title="Refresh progress"
         >
-          <RefreshCw className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`}
+          />
         </button>
       </div>
 
-      {/* React Flow canvas */}
-      <ReactFlow
-        nodes={nodes}
-        edges={styledEdges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onEdgesDelete={onEdgesDelete}
-        nodeTypes={NODE_TYPES}
-        onNodeClick={handleNodeClick}
-        onEdgeClick={handleEdgeClick}
-        fitView
-        fitViewOptions={{ padding: 0.12 }}
-        nodeOrigin={[0.5, 0.5]}
-        minZoom={0.08}
-        maxZoom={2}
-        connectionRadius={34}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        elementsSelectable={false}
-        selectionMode={SelectionMode.Partial}
-        selectionOnDrag={false}
-        panOnDrag={[1, 2]}
-        panOnScroll={true}
-        onConnect={onConnect}
-        proOptions={{ hideAttribution: true }}
-        colorMode="dark"
-      >
-        <svg style={{ position: "absolute", width: 0, height: 0 }}>
-          <defs>
-            <filter id="edge-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="4" result="blur" />
-              <feComponentTransfer in="blur" result="glow1">
-                 <feFuncA type="linear" slope="3" />
-              </feComponentTransfer>
-              <feMerge>
-                <feMergeNode in="glow1" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-        </svg>
-        {showGrid && <Background variant={BackgroundVariant.Dots} gap={50} size={1} color="rgba(255,255,255,0.15)" />}
-        <Controls
-          showInteractive={false}
-          className="[&>button]:border-cyan-500/15 [&>button]:bg-black/70 [&>button]:text-zinc-500 [&>button:hover]:bg-black/90 [&>button:hover]:text-cyan-400"
-        />
-        <MiniMap
-          nodeColor={(node) => {
-            const s = (node.data as Record<string, unknown>).status as string;
-            if (s === "completed") return "#22d3ee";
-            if (s === "in_progress") return "#0e7490";
-            if (s === "available") return "#2a2a38";
-            return "#111118";
-          }}
-          maskColor="rgba(2,2,10,0.80)"
-          style={{ backgroundColor: "#06060f", border: "1px solid rgba(34,211,238,0.12)" }}
-        />
-      </ReactFlow>
+      {/* Konva canvas */}
+      {size.w > 0 && (
+        <Stage
+          ref={stageRef}
+          width={size.w}
+          height={size.h}
+          draggable
+          onWheel={handleWheel}
+        >
+          {/* Edges layer (behind) */}
+          <Layer listening={false}>
+            <KonvaEdgesLayer
+              edges={filteredEdges}
+              nodeDataMap={nodeDataMap}
+              positionMap={positionMap}
+            />
+          </Layer>
 
+          {/* Nodes layer */}
+          <Layer>
+            <KonvaNodesLayer
+              nodes={layoutNodes as any}
+              selectedNodeId={selectedNodeId}
+              onNodeClick={handleNodeClick}
+            />
+          </Layer>
+        </Stage>
+      )}
 
-      {/* Node detail modal */}
+      {/* Modal */}
       <ScaleNodeModal
         node={selectedNode}
         status={selectedNodeStatus}

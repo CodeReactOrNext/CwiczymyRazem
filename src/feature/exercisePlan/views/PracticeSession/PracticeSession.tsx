@@ -48,7 +48,8 @@ interface PracticeSessionProps {
   freeMode?:           boolean;
   skillRewardSkillId?: string;
   skillRewardAmount?:  number;
-  isExamMode?:           { requiredBpm: number; nodeId: string };
+  examMode?:           boolean | { requiredBpm: number; nodeId?: string };
+  examBpm?:            number;
   onExamComplete?:     (accuracy: number) => void;
   skipExitDialog?:     boolean;
 }
@@ -80,7 +81,8 @@ export const PracticeSession = ({
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
 
   const isPlaying = timer.timerEnabled;
-  const isExamMode = !!examMode;
+  const isExamMode = typeof examMode === 'boolean' ? examMode : !!examMode;
+  const examModeObject = typeof examMode === 'object' ? examMode : undefined;
 
   const userInfo   = useAppSelector(selectUserInfo);
   const isPremium  = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
@@ -135,10 +137,10 @@ export const PracticeSession = ({
   useEffect(() => { setAudioSystem(prev => ({ ...prev, context: null })); }, [effectiveRawGpFile]);
 
   const metronome = useDeviceMetronome({
-    initialBpm:     examMode ? examMode.requiredBpm : (activeExercise.metronomeSpeed?.recommended || 60),
-    minBpm:         examMode ? examMode.requiredBpm : activeExercise.metronomeSpeed?.min,
-    maxBpm:         examMode ? examMode.requiredBpm : activeExercise.metronomeSpeed?.max,
-    recommendedBpm: examMode ? examMode.requiredBpm : activeExercise.metronomeSpeed?.recommended,
+    initialBpm:     examModeObject ? examModeObject.requiredBpm : (activeExercise.metronomeSpeed?.recommended || 60),
+    minBpm:         examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.min,
+    maxBpm:         examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.max,
+    recommendedBpm: examModeObject ? examModeObject.requiredBpm : activeExercise.metronomeSpeed?.recommended,
     isMuted:        isMetronomeMuted || audioSystem.isActive,
     speedMultiplier: speedMultiplier,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
@@ -189,7 +191,7 @@ export const PracticeSession = ({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
     isAudioMuted, isAudioPlaying, effectiveBpm,
     currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
-    isMetronomeMuted, showAlphaTabScore, isExamMode,
+    isMetronomeMuted, showAlphaTabScore, examMode: isExamMode,
     examBacking: activeExercise.examBacking,
     metronomeAudioContext: metronome.audioContext,
     metronomeStartTime: metronome.startTime,
@@ -391,7 +393,7 @@ export const PracticeSession = ({
         metronome={metronome} isMetronomeMuted={isMetronomeMuted}
         setIsMetronomeMuted={setIsMetronomeMuted} audioTracks={audioTracks}
         trackConfigs={trackConfigs} setTrackConfigs={setTrackConfigs}
-        examMode={examMode} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
+        examMode={examModeObject} exerciseKey={exerciseKey} isLastExercise={isLastExercise}
         handleRestart={handleRestart}
         canFinishSession={canFinishSession} isSkillExercise={isSkillExercise}
         jumpToExercise={jumpToExercise} isFinishing={isFinishing}
