@@ -11,21 +11,27 @@ import { getSongTier } from "feature/songs/utils/getSongTier";
 import { selectUserAuth } from "feature/user/store/userSlice";
 import {
   Bookmark,
+  Check,
   Music,
+  Plus,
   Settings2,
   Star,
   TrendingUp,
   Trophy,
   Users,
+  Loader2,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAppSelector } from "store/hooks";
+import { TierBadge } from "./TierBadge";
 
 interface SongCardProps {
   song: Song;
   onOpenDetails: () => void;
   userStatus?: SongStatus;
   footerAction?: { label: string; icon: ReactNode };
+  onStatusChange?: (status: SongStatus | undefined) => void;
 }
 
 export const SongCard = ({
@@ -33,33 +39,46 @@ export const SongCard = ({
   onOpenDetails,
   userStatus,
   footerAction,
+  onStatusChange,
 }: SongCardProps) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
   const userId = useAppSelector(selectUserAuth);
   const avgDifficulty = song.avgDifficulty || 0;
   const tier = getSongTier(avgDifficulty === 0 ? "?" : (song.tier || avgDifficulty));
   const isRated = song.difficulties?.some(d => d.userId === userId);
 
 
+
+
   return (
     <div 
       onClick={onOpenDetails}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-lg glass-card p-5 transition-background click-behavior cursor-pointer",
-        "hover:glass-card-hover hover:shadow-xl hover:shadow-black/40"
+        "group relative flex flex-col justify-between overflow-hidden rounded-[8px] glass-card p-5 transition-all duration-500 click-behavior cursor-pointer border border-white/5",
+        "hover:glass-card-hover hover:shadow-2xl hover:shadow-black/60",
+        userStatus && "border-emerald-500/30 shadow-[0_0_25px_rgba(16,185,129,0.1)]"
       )}
     >
+      {/* Premium Completed Glow */}
+      {userStatus && (
+        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/5 via-transparent to-transparent pointer-events-none" />
+      )}
       {/* Glassmorphism Depth Borders */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-50" />
 
       {/* Premium Blurred Background Cover */}
       {song.coverUrl && (
-        <div className="absolute inset-0 z-0 overflow-hidden opacity-[0.12] transition-opacity duration-1000 group-hover:opacity-[0.22]">
+        <div className={cn(
+          "absolute inset-0 z-0 overflow-hidden opacity-[0.12] transition-all duration-1000 group-hover:opacity-[0.22]",
+          userStatus && "opacity-[0.08] grayscale-[0.5]"
+        )}>
           <img 
             src={song.coverUrl} 
             alt=""
             className="h-full w-full object-cover blur-premium saturate-[1.1] scale-[1.2] transition-transform duration-1000 group-hover:scale-[1.4]"
           />
-          <div className="absolute inset-0 bg-zinc-950/30" />
+          <div className="absolute inset-0 bg-zinc-950/40" />
         </div>
       )}
 
@@ -87,48 +106,26 @@ export const SongCard = ({
         {/* Cover Image Wrapper */}
         <div className="relative shrink-0">
           {song.coverUrl ? (
-            <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-white/20">
+            <div className="relative h-20 w-20 overflow-hidden rounded-lg border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-white/20">
               <img 
                 src={song.coverUrl} 
                 alt={`${song.title} cover`}
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="h-full w-full object-cover"
               />
             </div>
           ) : (
             <div 
-              className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-dashed border-white/5 bg-zinc-950/40 text-zinc-700 transition-colors group-hover:border-white/10"
+              className="flex h-20 w-20 items-center justify-center rounded-lg border-2 border-dashed border-white/5 bg-zinc-950/40 text-zinc-700 transition-colors group-hover:border-white/10"
             >
               <Music className="h-8 w-8 opacity-20" />
             </div>
           )}
           
-          {/* Rated Status Badge */}
-          {isRated && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="absolute -top-1 -left-1 z-20 flex h-6 w-6 items-center justify-center rounded-full border border-amber-500/30 bg-zinc-950/90 text-amber-500 shadow-lg backdrop-blur-xl">
-                    <Star className="h-3.5 w-3.5 fill-amber-500/20" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>You have rated this song</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-
           {/* Tier Badge */}
-          <div 
-              className="absolute -bottom-1 -right-1 z-20 flex h-7 w-7 items-center justify-center rounded-lg border text-[10px] font-black shadow-lg backdrop-blur-xl"
-              style={{
-                  borderColor: `${tier.color}40`,
-                  backgroundColor: `rgba(10, 10, 10, 0.9)`,
-                  color: tier.color,
-              }}
-          >
-              {tier.tier}
-          </div>
+          <TierBadge 
+            song={song} 
+            className="absolute -bottom-1 -right-1 z-20" 
+          />
         </div>
         
         <div className="min-w-0 flex-1 pt-1">
@@ -180,20 +177,76 @@ export const SongCard = ({
             </div>
         </div>
 
-        {/* Minimal Footer Action */}
-        <div className="relative z-10 mt-auto">
+        <div className="relative z-10 mt-auto flex items-center gap-2 p-1 rounded-[8px] bg-black/20 border border-white/5 backdrop-blur-sm">
           <Button
             onClick={(e) => {
               e.stopPropagation();
               onOpenDetails();
             }}
-            variant="outline"
-            className="h-8 w-full group/btn justify-between rounded-xl border-white/5 bg-white/[0.02] px-4 text-[10px] font-bold text-zinc-500 transition-background hover:bg-white/10 hover:text-white"
+            variant="ghost"
+            className="h-9 flex-1 group/btn justify-between rounded-lg px-4 text-[11px] font-bold text-zinc-300 transition-all hover:bg-white/5 hover:text-white"
           >
-            <span>{footerAction?.label ?? "Open details"}</span>
-            {footerAction?.icon ?? <Settings2 className="h-3.5 w-3.5 opacity-40 transition-transform group-hover/btn:rotate-90" />}
+            <span className="tracking-wide">View Details</span>
+            <Settings2 className="h-3.5 w-3.5 opacity-50 transition-transform group-hover/btn:rotate-90 group-hover:opacity-100" />
           </Button>
+
+          {!userStatus && onStatusChange && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (isProcessing || isAdded) return;
+                      setIsProcessing(true);
+                      try {
+                        await onStatusChange("wantToLearn");
+                        setIsAdded(true);
+                      } catch (error) {
+                        setIsProcessing(false);
+                      }
+                    }}
+                    className={cn(
+                      "h-9 w-10 shrink-0 rounded-lg transition-all active:scale-95 border-none shadow-lg overflow-hidden relative",
+                      (isProcessing || isAdded)
+                        ? "bg-emerald-500 text-white shadow-emerald-500/40 hover:bg-emerald-500" 
+                        : "bg-white text-black hover:bg-zinc-200 shadow-white/10"
+                    )}
+                  >
+                    <AnimatePresence mode="wait">
+                      {isProcessing || isAdded ? (
+                        <motion.div
+                          key="check"
+                          initial={{ scale: 0, rotate: -45 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          className="flex items-center justify-center"
+                        >
+                          {isProcessing && !isAdded ? (
+                            <Loader2 className="h-4 w-4 animate-spin opacity-70" />
+                          ) : (
+                            <Check className="h-4 w-4 stroke-[4]" />
+                          )}
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="plus"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 1.5, opacity: 0 }}
+                        >
+                          <Plus className="h-4 w-4 stroke-[3]" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="bg-zinc-900 border-white/10 text-zinc-200 font-bold">
+                  {isAdded ? "Added to Library" : "Add to Library"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
-      </div>
-    );
+    </div>
+  );
 };
