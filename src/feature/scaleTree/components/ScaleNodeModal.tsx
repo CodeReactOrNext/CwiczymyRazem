@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Lock, Play, X } from "lucide-react";
-import { generateScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
+import { generateScaleExercise, generateSingleStringScaleExercise } from "feature/exercisePlan/scales/scaleExerciseGenerator";
 import { TablaturePreview } from "feature/exercisePlan/components/CreatePlanDialog/steps/SelectExercisesStep/components/TablaturePreview";
 import type { NodeStatus, ScaleTreeNodeDef } from "../types/scaleTree.types";
 
@@ -41,13 +41,22 @@ export function ScaleNodeModal({ node, status, onClose, onPractice, onMarkComple
   const tablature = useMemo(() => {
     if (!req) return null;
     try {
-      const exercise = generateScaleExercise({
-        rootNote: "C",
-        scaleType: req.scaleType,
-        patternType: req.patternType,
-        position: req.position,
-      });
-      return exercise.tablature ?? null;
+      if (req.stringNum != null) {
+        const exercise = generateSingleStringScaleExercise({
+          rootNote: "C",
+          scaleType: req.scaleType,
+          stringNum: req.stringNum,
+        });
+        return exercise.tablature ?? null;
+      } else {
+        const exercise = generateScaleExercise({
+          rootNote: "C",
+          scaleType: req.scaleType,
+          patternType: req.patternType,
+          position: req.position,
+        });
+        return exercise.tablature ?? null;
+      }
     } catch {
       return null;
     }
@@ -79,7 +88,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice, onMarkComple
                   {FAMILY_LABEL[node.scaleFamily] ?? node.scaleFamily}
                 </p>
                 <h2 className="mt-0.5 text-base font-bold leading-tight text-white">{node.label}</h2>
-                <p className="text-xs text-zinc-500">{node.subtitle}</p>
+                <p className="text-xs text-zinc-500">{node.subtitle === "Jedna struna" ? "Single String" : node.subtitle}</p>
               </div>
               <button
                 onClick={onClose}
@@ -124,7 +133,7 @@ export function ScaleNodeModal({ node, status, onClose, onPractice, onMarkComple
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-cyan-500 active:bg-cyan-700"
                 >
                   <Play size={14} />
-                  Practice
+                  Start Exam
                 </button>
               )}
               {onMarkComplete && status !== "locked" && (

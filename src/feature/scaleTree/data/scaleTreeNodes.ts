@@ -175,35 +175,35 @@ const minPentSS = makeSingleStringNode(
 );
 const majPentSS = makeSingleStringNode(
   "maj_pent", "Major Pentatonic", "major_pentatonic", "pentatonic",
-  760, -28, [spineId("min_pent", 5)], "major_pentatonic",
+  760, -28, ["min_pent_single_string"], "major_pentatonic",
 );
 const natMinorSS = makeSingleStringNode(
   "nat_minor", "Natural Minor", "minor", "diatonic",
-  -1540, 8, [spineId("min_pent", 5)], "minor",
+  -1540, 8, ["min_pent_single_string"], "minor",
 );
 const majorSS = makeSingleStringNode(
   "major", "Major Scale", "major", "diatonic",
-  1860, -192, [spineId("maj_pent", 5)], "major",
+  1860, -192, ["maj_pent_single_string"], "major",
 );
 const dorianSS = makeSingleStringNode(
   "dorian", "Dorian", "dorian", "mode",
-  -2740, -192, [spineId("nat_minor", 3)], "dorian",
+  -2740, -192, ["nat_minor_single_string"], "dorian",
 );
 const phrygianSS = makeSingleStringNode(
   "phrygian", "Phrygian", "phrygian", "mode",
-  -2240, 708, [spineId("nat_minor", 5)], "phrygian",
+  -2240, 708, ["nat_minor_single_string"], "phrygian",
 );
 const mixolydianSS = makeSingleStringNode(
   "mixolydian", "Mixolydian", "mixolydian", "mode",
-  1560, 608, [spineId("major", 3)], "mixolydian",
+  1560, 608, ["major_single_string"], "mixolydian",
 );
 const lydianSS = makeSingleStringNode(
   "lydian", "Lydian", "lydian", "mode",
-  2660, -592, [spineId("major", 5)], "lydian",
+  2660, -592, ["major_single_string"], "lydian",
 );
 const locrianSS = makeSingleStringNode(
   "locrian", "Locrian", "locrian", "mode",
-  -340, 1408, [spineId("phrygian", 5), spineId("mixolydian", 3)], "locrian",
+  -340, 1408, ["phrygian_single_string", "mixolydian_single_string"], "locrian",
 );
 
 // ── Box-position clusters (firstPrereq is now the single-string node) ─────────

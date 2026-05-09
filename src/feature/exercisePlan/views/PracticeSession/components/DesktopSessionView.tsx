@@ -8,6 +8,7 @@ import React, { Dispatch, RefObject, SetStateAction } from "react";
 import type { AudioTrackConfig } from "../../../hooks/useTablatureAudio";
 import type { BackingTrack, TablatureMeasure } from "../../../types/exercise.types";
 import { BackgroundAmbiance } from "./BackgroundAmbiance";
+import { ExamModeBanner } from "./ExamModeBanner";
 import { ExerciseContentArea } from "./ExerciseContentArea";
 import { ExerciseHeroHeader } from "./ExerciseHeroHeader";
 import { ExerciseInfoGrid } from "./ExerciseInfoGrid";
@@ -79,7 +80,7 @@ interface DesktopSessionViewProps {
   audioTracks:              AudioTrackConfig[];
   trackConfigs:             Record<string, { volume: number; isMuted: boolean }>;
   setTrackConfigs:          Dispatch<SetStateAction<Record<string, { volume: number; isMuted: boolean }>>>;
-  examMode:                 boolean;
+  examMode:                 { requiredBpm: number; nodeId: string } | undefined;
   exerciseKey:              number;
   isLastExercise:           boolean;
   handleRestart:            () => void;
@@ -110,6 +111,13 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
   return (
     <div className={cn("font-openSans fixed inset-0 z-[999999] bg-zinc-950", "overflow-y-auto", isMobile && "hidden")}>
       <BackgroundAmbiance category={p.category as any} isPlayalong={p.currentExercise.isPlayalong} visible={!p.reportResult} />
+      {p.examMode && (
+        <ExamModeBanner
+          examMode={p.examMode}
+          exerciseId={p.activeExercise.id}
+          exerciseTitle={p.currentExercise.title}
+        />
+      )}
       <TooltipProvider>
         <div>
           <div className={cn("mx-auto max-w-[2400px] px-6 pb-64 pt-4 relative z-10", p.reportResult && "max-w-7xl px-4 pt-8")}>
@@ -152,7 +160,7 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     metronome={p.metronome}
                     isMetronomeMuted={p.isMetronomeMuted}
                     setIsMetronomeMuted={p.setIsMetronomeMuted}
-                    examMode={p.examMode}
+                    examMode={!!p.examMode}
                   />
                   <ExerciseContentArea
                     activeTablature={p.activeTablature} currentExercise={p.currentExercise}
@@ -184,13 +192,13 @@ export const DesktopSessionView = React.memo(function DesktopSessionView(p: Desk
                     setIsMetronomeMuted={p.setIsMetronomeMuted}
                     audioTracks={p.audioTracks}
                     trackConfigs={p.trackConfigs} setTrackConfigs={p.setTrackConfigs}
-                    examMode={p.examMode}
+                    examMode={!!p.examMode}
                   />
                 </ExerciseInfoGrid>
 
                 {!p.reportResult && (
                   <SessionBottomBar
-                    examMode={p.examMode} onClose={p.onClose} skipExitDialog={p.skipExitDialog}
+                    examMode={!!p.examMode} onClose={p.onClose} skipExitDialog={p.skipExitDialog}
                     exerciseKey={p.exerciseKey} currentExercise={p.currentExercise}
                     isLastExercise={p.isLastExercise} isPlaying={p.isPlaying}
                     toggleTimer={p.handleToggleTimer} handleRestart={p.handleRestart}

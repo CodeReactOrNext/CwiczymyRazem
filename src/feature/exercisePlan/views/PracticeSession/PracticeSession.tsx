@@ -48,8 +48,7 @@ interface PracticeSessionProps {
   freeMode?:           boolean;
   skillRewardSkillId?: string;
   skillRewardAmount?:  number;
-  examMode?:           boolean;
-  examBpm?:            number;
+  isExamMode?:           { requiredBpm: number; nodeId: string };
   onExamComplete?:     (accuracy: number) => void;
   skipExitDialog?:     boolean;
 }
@@ -64,7 +63,7 @@ const SessionPageHead = ({ exerciseTitle }: { exerciseTitle: string }) => {
 export const PracticeSession = ({
   plan, rawGpFile, onFinish, onClose, isFinishing, autoReport,
   forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount,
-  examMode = false, examBpm, onExamComplete, skipExitDialog = false,
+  examMode, onExamComplete, skipExitDialog = false,
 }: PracticeSessionProps) => {
   const router = useRouter();
 
@@ -81,6 +80,7 @@ export const PracticeSession = ({
   } = usePracticeSessionState({ plan, onFinish, autoReport, forceFullDuration, freeMode, skillRewardSkillId, skillRewardAmount });
 
   const isPlaying = timer.timerEnabled;
+  const isExamMode = !!examMode;
 
   const userInfo   = useAppSelector(selectUserInfo);
   const isPremium  = userInfo?.role === "pro" || userInfo?.role === "master" || userInfo?.role === "admin";
@@ -135,10 +135,10 @@ export const PracticeSession = ({
   useEffect(() => { setAudioSystem(prev => ({ ...prev, context: null })); }, [effectiveRawGpFile]);
 
   const metronome = useDeviceMetronome({
-    initialBpm:     examMode && examBpm ? examBpm : (activeExercise.metronomeSpeed?.recommended || 60),
-    minBpm:         examMode && examBpm ? examBpm : activeExercise.metronomeSpeed?.min,
-    maxBpm:         examMode && examBpm ? examBpm : activeExercise.metronomeSpeed?.max,
-    recommendedBpm: examMode && examBpm ? examBpm : activeExercise.metronomeSpeed?.recommended,
+    initialBpm:     examMode ? examMode.requiredBpm : (activeExercise.metronomeSpeed?.recommended || 60),
+    minBpm:         examMode ? examMode.requiredBpm : activeExercise.metronomeSpeed?.min,
+    maxBpm:         examMode ? examMode.requiredBpm : activeExercise.metronomeSpeed?.max,
+    recommendedBpm: examMode ? examMode.requiredBpm : activeExercise.metronomeSpeed?.recommended,
     isMuted:        isMetronomeMuted || audioSystem.isActive,
     speedMultiplier: speedMultiplier,
     onTick:         useCallback(() => { tabTickBridgeRef.current?.(); }, []),
@@ -159,7 +159,7 @@ export const PracticeSession = ({
 
   useEffect(() => {
     let nextAudioMuted = true;
-    if (examMode) {
+    if (isExamMode) {
       nextAudioMuted = true;
     } else if (currentExercise.riddleConfig?.mode === "sequenceRepeat") {
       nextAudioMuted = false;
@@ -189,7 +189,7 @@ export const PracticeSession = ({
     activeTablature, dynamicBackingTracks, effectiveRawGpFile,
     isAudioMuted, isAudioPlaying, effectiveBpm,
     currentExerciseId: currentExercise.id, selectedGpTrackIdx, tabRepeatCount, loopsCompletedRef,
-    isMetronomeMuted, showAlphaTabScore, examMode,
+    isMetronomeMuted, showAlphaTabScore, isExamMode,
     examBacking: activeExercise.examBacking,
     metronomeAudioContext: metronome.audioContext,
     metronomeStartTime: metronome.startTime,
@@ -212,7 +212,7 @@ export const PracticeSession = ({
   } = useCalibration(planHasTablature);
 
   const isMicEnabled = _isMicEnabled && !currentExercise.isPlayalong;
-  useEffect(() => { if (examMode && !_isMicEnabled) setSessionPhase("mic_prompt"); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  useEffect(() => { if (isExamMode && !_isMicEnabled) setSessionPhase("mic_prompt"); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
   useEffect(() => { if (isMicEnabled && !isListening) initAudio(); }, [isMicEnabled]);
 
   // ── Note matching ─────────────────────────────────────────────────────────
@@ -299,7 +299,7 @@ export const PracticeSession = ({
 
       {showSuccessView && !reportResult && successSnapshot && (
         <ExerciseSuccessView
-          planTitle={planTitleString} examMode={examMode}
+          planTitle={planTitleString} examMode={isExamMode}
           score={successSnapshot.score} maxScore={successSnapshot.maxPossibleScore}
           stats={{ accuracy: successSnapshot.accuracy, maxStreak: successSnapshot.maxCombo }}
           timeline={successSnapshot.noteTimeline}
@@ -308,7 +308,7 @@ export const PracticeSession = ({
             autoSubmitReport(exerciseRecordsRef.current,
               isMicEnabled ? { score: successSnapshot.score, accuracy: successSnapshot.accuracy } : null,
               currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null);
-            if (examMode) onExamComplete?.(successSnapshot.accuracy);
+            if (isExamMode) onExamComplete?.(successSnapshot.accuracy);
           }}
           onRestart={() => {
             resetSuccessView(); resetTimer(); metronome.restartMetronome(); startTimer();
@@ -320,7 +320,7 @@ export const PracticeSession = ({
 
       {isMobileView && createPortal(
         <SessionModal
-          examMode={examMode}
+          examMode={isExamMode}
           isOpen={isFullSessionModalOpen && !showCompleteDialog && !reportResult && !showSuccessView}
           onClose={onClose}
           onFinish={isLastExercise ? async () => {
@@ -329,7 +329,7 @@ export const PracticeSession = ({
             autoSubmitReport(exerciseRecordsRef.current,
               isMicEnabled && snap ? { score: snap.score, accuracy: snap.accuracy } : null,
               currentExercise.riddleConfig?.mode === "sequenceRepeat" ? { score: earTrainingScore } : null);
-            if (examMode && snap) onExamComplete?.(snap.accuracy);
+            if (isExamMode && snap) onExamComplete?.(snap.accuracy);
           } : onFinish}
           isMounted={isMounted} currentExercise={currentExercise}
           currentExerciseIndex={currentExerciseIndex} totalExercises={plan.exercises.length}
@@ -405,7 +405,7 @@ export const PracticeSession = ({
         showCompleteDialog={showCompleteDialog} setShowCompleteDialog={setShowCompleteDialog}
         exerciseTitle={currentExercise.title} exerciseDuration={currentExercise.timeInMinutes}
         onFinish={onFinish} resetTimer={resetTimer} startTimer={startTimer}
-        sessionPhase={sessionPhase} examMode={examMode}
+        sessionPhase={sessionPhase} examMode={isExamMode}
         handleEnableMic={handleEnableMic} handleSkipMic={handleSkipMic}
         existingCalibrationTimestamp={existingCalibrationTimestamp}
         handleReuseCalibration={handleReuseCalibration} handleRecalibrate={handleRecalibrate}
