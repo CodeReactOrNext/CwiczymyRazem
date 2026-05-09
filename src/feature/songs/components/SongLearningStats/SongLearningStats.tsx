@@ -2,7 +2,7 @@ import type { Song } from "feature/songs/types/songs.type";
 import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
 import { useTranslation } from "hooks/useTranslation";
-import { Music2, Trophy } from "lucide-react";
+import { Music2, Star, Trophy } from "lucide-react";
 
 import { TierBadge } from "../SongsGrid/TierBadge";
 
@@ -30,68 +30,69 @@ export const SongLearningStats = ({ userSongs }: SongLearningStatsProps) => {
   const playerTier = skillPower > 0 ? getSongTier(skillPower) : null;
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {/* Total Songs - Compact */}
-      <div className="flex flex-1 items-center gap-4 rounded-lg  p-4 ">
-         <div className="rounded-lg bg-second p-2">
-            <Music2 className="h-5 w-5" />
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Total Songs */}
+      <div className="rounded-xl p-4 text-card-foreground flex flex-col border-0 bg-zinc-800/40 shadow-sm h-full backdrop-blur-sm">
+         <div className="flex items-center gap-2 mb-6">
+            <Music2 className="h-4 w-4 text-cyan-400" />
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t("total_songs")}</span>
          </div>
-         <div>
-            <p className="text-sm font-medium text-zinc-400">{t("total_songs")}</p>
+         <div className="mt-auto">
             <div className="flex items-baseline gap-2">
-               <h3 className="text-xl font-bold text-white">{totalSongs}</h3>
-               <span className="text-xs text-zinc-500">{t("songs_in_your_library", "in library")}</span>
+               <h3 className="text-3xl font-black text-white">{totalSongs}</h3>
+               <span className="text-[11px] text-zinc-500 font-bold uppercase tracking-tight">{t("songs_in_your_library", "in library")}</span>
             </div>
          </div>
       </div>
 
-      {/* Completion Rate - Compact */}
-      <div className="flex flex-1 items-center gap-4 rounded-lg   p-4 ">
-         <div className="rounded-lg bg-second p-2">
-            <Trophy className="h-5 w-5" />
+      {/* Completion Rate */}
+      <div className="rounded-xl p-4 text-card-foreground flex flex-col border-0 bg-zinc-800/40 shadow-sm h-full backdrop-blur-sm">
+         <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+               <Trophy className="h-4 w-4 text-emerald-400" />
+               <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t("completion_rate")}</span>
+            </div>
+            <span className="text-[10px] font-bold text-zinc-500 tabular-nums">{userSongs.learned.length} / {totalSongs}</span>
          </div>
-         <div className="flex-1">
-             <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-zinc-400">{t("completion_rate")}</p>
-                <span className="text-xs text-zinc-500">{userSongs.learned.length} / {totalSongs}</span>
-             </div>
-             <div className="flex items-center gap-3">
-                 <h3 className="text-xl font-bold text-white">{learnedPercentage.toFixed(0)}%</h3>
-                 
-                 <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
-                    <div
-                        className="h-full rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]"
-                        style={{ width: `${learnedPercentage}%` }}
-                    />
-                 </div>
+         <div className="mt-auto space-y-2.5">
+             <h3 className="text-3xl font-black text-white">{learnedPercentage.toFixed(0)}%</h3>
+             <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-900/50 border border-white/5">
+                <div
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.3)]"
+                    style={{ width: `${learnedPercentage}%` }}
+                />
              </div>
          </div>
       </div>
 
-      {/* Player Tier - New */}
-      <div className="flex flex-1 items-center gap-4 rounded-lg  p-4 ">
-         <TierBadge difficulty={skillPower} className="h-10 w-10 text-sm" />
-         <div>
-            <p className="text-sm font-medium text-zinc-400">{t("your_skill_tier", "Skill Tier")}</p>
-            <div className="flex flex-col">
-               {playerTier ? (
+      {/* Player Tier */}
+      <div className="rounded-xl p-4 text-card-foreground flex flex-col border-0 bg-zinc-800/40 shadow-sm h-full backdrop-blur-sm">
+         <div className="flex items-center gap-2 mb-6">
+            <Star className="h-4 w-4" style={{ color: playerTier?.color || '#52525b' }} />
+            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t("your_skill_tier", "Skill Tier")}</span>
+         </div>
+         
+         <div className="mt-auto">
+            {playerTier ? (
+               <div className="flex flex-col">
                   <div className="flex items-baseline gap-2">
-                     <h3 className="text-xl font-bold text-white" style={{ color: playerTier?.color }}>
-                         {playerTier.tier}-Tier
+                     <h3 className="text-4xl font-black leading-none" style={{ color: playerTier?.color }}>
+                         {playerTier.tier}
                      </h3>
-                     <span className="text-xs text-zinc-500">
-                         (Power: {skillPower.toFixed(1)})
-                     </span>
+                     <span className="text-lg font-black text-white/90 uppercase tracking-tighter">Tier</span>
                   </div>
-               ) : (
-                  <div className="flex flex-col mt-0.5">
-                     <h3 className="text-lg font-bold text-zinc-500 leading-tight">Unrated</h3>
-                     <p className="text-[10px] leading-tight text-zinc-600 max-w-[140px] mt-0.5">
-                        Add mastered songs to evaluate your skill level.
-                     </p>
-                  </div>
-               )}
-            </div>
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider mt-1.5">
+                      Power Score: <span className="text-zinc-300">{skillPower.toFixed(1)}</span>
+                  </span>
+               </div>
+            ) : (
+               <div className="flex flex-col">
+                  <h3 className="text-2xl font-black text-zinc-500 uppercase">Unrated</h3>
+                  <p className="text-[10px] font-medium text-zinc-600 mt-1 leading-snug">
+                     Master more songs to evaluate your level.
+                  </p>
+               </div>
+            )}
          </div>
       </div>
     </div>
