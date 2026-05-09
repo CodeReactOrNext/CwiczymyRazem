@@ -9,7 +9,7 @@ import type { UserSongProgress } from "feature/songs/services/userSongProgress.s
 import type { Song, SongStatus } from "feature/songs/types/songs.type";
 import { useTranslation } from "hooks/useTranslation";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { ChevronRight, Clock, FileMusic, GripVertical, MoreVertical, Play, Target, Trash2 } from "lucide-react";
+import { ChevronRight, Clock, FileMusic, GripVertical, MoreVertical, Music, Play, Target, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 

@@ -40,7 +40,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/router";
 import posthog from "posthog-js";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "store/hooks";
 import { 
   Tooltip, 
@@ -278,6 +278,7 @@ const SongsView = () => {
           <aside id="sidebar-root" className="hidden xl:flex w-[300px] shrink-0 bg-zinc-900/30 border-r border-white/5 flex-col overflow-hidden">
              <div className="flex-1 overflow-y-auto no-scrollbar py-6 px-3">
                 <SongLearningSection
+                
                   isLanding={false}
                   userSongs={userSongs}
                   onChange={updateUserSongsCache}

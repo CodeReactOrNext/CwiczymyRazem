@@ -66,8 +66,6 @@ interface SongLearningSectionProps {
   onOpenDetails?: (song: Song) => void;
   onExploreLibrary?: () => void;
   isLibraryActive?: boolean;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
   activeId?: string | null;
 }
 
@@ -133,8 +131,6 @@ export const SongLearningSection = ({
   onOpenDetails,
   onExploreLibrary,
   isLibraryActive,
-  activeTab,
-  setActiveTab,
 }: SongLearningSectionProps) => {
   const { t } = useTranslation("songs");
   const userId = useAppSelector(selectUserAuth);
@@ -249,7 +245,7 @@ export const SongLearningSection = ({
           onStatusChange={handleStatusChange}
           progressMap={progressMap}
           isPremium={isPremium}
-          onPractice={onPracticeWithGp}
+          onPracticeWithGp={onPracticeWithGp}
           onOpenDetails={onOpenDetails}
           activeOverContainer={activeOverContainer}
           isCollapsedInitially={false}
@@ -261,7 +257,7 @@ export const SongLearningSection = ({
           onStatusChange={handleStatusChange}
           progressMap={progressMap}
           isPremium={isPremium}
-          onPractice={onPracticeWithGp}
+          onPracticeWithGp={onPracticeWithGp}
           onOpenDetails={onOpenDetails}
           activeOverContainer={activeOverContainer}
           isCollapsedInitially={false}
@@ -273,7 +269,7 @@ export const SongLearningSection = ({
           onStatusChange={handleStatusChange}
           progressMap={progressMap}
           isPremium={isPremium}
-          onPractice={onPracticeWithGp}
+          onPracticeWithGp={onPracticeWithGp}
           onOpenDetails={onOpenDetails}
           activeOverContainer={activeOverContainer}
           isCollapsedInitially={true}
