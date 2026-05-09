@@ -44,11 +44,9 @@ export const DailyQuestWidget = () => {
         <Card className="flex-col justify-between">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-sm bg-orange-500/5 text-zinc-400">
-                        <Swords size={18} />
-                    </div>
+                        <Swords size={18}  className="text-lg transition-all duration-500 text-zinc-700"/>
                     <div>
-                        <h3 className="text-sm font-bold text-zinc-200 tracking-wider">Daily Quests</h3>
+                        <h3 className="text-[11px] font-semibold text-zinc-400">Daily Quests</h3>
 
                     </div>
                 </div>

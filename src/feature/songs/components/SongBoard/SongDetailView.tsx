@@ -108,7 +108,13 @@ export const SongDetailView = ({ song, progress, status, onPractice, onRemove, o
     if (!userAuth || !song.id || isRating) return;
     setIsRating(true);
     try {
-      await dispatch(rateSong({ songId: song.id, userId: userAuth, rating }));
+      await dispatch(rateSong({ 
+        songId: song.id, 
+        rating,
+        title: song.title,
+        artist: song.artist,
+        tier: tier.tier
+      }));
     } catch (error) {
       console.error("Error rating song:", error);
     } finally {
