@@ -53,8 +53,8 @@ export const DailyQuestWidget = () => {
                 <div className="flex items-center gap-3">
                     {!isClaimed && (
                         <div className="flex items-center justify-center px-1.5 py-0.5 rounded-sm bg-orange-500/10 border border-orange-500/20">
-                            <span className="text-[9px] font-bold text-orange-400 tracking-wider leading-none">
-                                +30 XP
+                            <span className="flex items-center gap-0.5 text-[9px] font-bold text-orange-400 tracking-wider leading-none">
+                                +30 <img src="/images/points.png" alt="points" className="h-3.5 w-3.5 object-contain" />
                             </span>
                         </div>
                     )}
@@ -123,7 +123,7 @@ export const DailyQuestWidget = () => {
                 >
                     <span className="flex items-center gap-2">
                         <Gift size={14} className="animate-bounce" /> 
-                        Claim 30 XP
+                        Claim 30 <img src="/images/points.png" alt="points" className="h-5 w-5 object-contain" />
                     </span>
                 </Button>
             )}

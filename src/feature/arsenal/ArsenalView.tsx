@@ -5,7 +5,6 @@ import { HeroBanner } from "components/UI/HeroBanner";
 import { selectCurrentUserStats } from "feature/user/store/userSlice";
 import { Guitar,PackageOpen, Swords } from "lucide-react";
 import { useState } from "react";
-import { FaGem } from "react-icons/fa";
 import { useAppSelector } from "store/hooks";
 
 import { CaseOpeningModal } from "./components/CaseOpeningModal/CaseOpeningModal";
@@ -45,7 +44,7 @@ export const ArsenalView = () => {
         className="w-full !rounded-none !shadow-none min-h-[200px] md:min-h-[180px] lg:min-h-[220px]"
         rightContent={
           <div className="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-2.5">
-            <FaGem className="text-amber-500" size={16} />
+            <img src="/images/coin.png" alt="coin" className="h-6 w-6 object-contain" />
             <span className="text-xl font-black text-amber-400">{fame.toLocaleString()}</span>
             <span className="text-xs text-zinc-400">Fame Points</span>
           </div>

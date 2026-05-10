@@ -1,5 +1,4 @@
 import { cn } from "assets/lib/utils";
-import { FaGem } from "react-icons/fa";
 
 import type { CaseDefinition, GuitarRarity } from "../../types/arsenal.types";
 import { RARITY_STYLES } from "../RarityBadge";
@@ -92,7 +91,11 @@ export const CaseCard = ({ caseDef, currentFame, onOpen, isOpening }: CaseCardPr
         <div className="flex items-center justify-between px-1">
           <span className="text-sm font-medium text-zinc-400">Cost</span>
           <div className="flex items-center gap-1.5 text-sm font-bold">
-            <FaGem className={canAfford ? accent.iconColor : "text-red-400"} size={12} />
+            <img 
+              src="/images/coin.png" 
+              alt="coin" 
+              className={cn("h-5 w-5 object-contain", !canAfford && "grayscale opacity-50")} 
+            />
             <span className={canAfford ? "text-zinc-100" : "text-red-400"}>
               {caseDef.fameCost} Fame
             </span>

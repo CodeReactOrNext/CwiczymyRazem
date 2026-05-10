@@ -14,7 +14,7 @@ import { getUserSongs } from "feature/songs/services/getUserSongs";
 import type { Song } from "feature/songs/types/songs.type";
 import { calculateSkillPower } from "feature/songs/utils/difficulty.utils";
 import { getSongTier } from "feature/songs/utils/getSongTier";
-import { ArrowRight, Gem } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { StatisticsDataInterface } from "types/api.types";
@@ -146,7 +146,7 @@ const ProfileLandingLayout = ({
                 onClick={() => router.push("/arsenal")}
                 className="group/fame flex items-center gap-2 w-fit rounded-[8px] bg-zinc-800/80 backdrop-blur-md border border-orange-500/30 hover:border-orange-400/60 hover:bg-zinc-700/80 text-white px-4 py-2 text-sm font-semibold transition-all duration-300 active:scale-95"
               >
-                <Gem className="h-3.5 w-3.5 text-orange-400 shrink-0" />
+                <img src="/images/coin.png" alt="coin" className="h-5 w-5 object-contain shrink-0" />
                 {/* Mobile: compact */}
                 <span className="md:hidden text-orange-400 font-bold">{(userStats.fame ?? 0).toLocaleString()}</span>
                 <span className="md:hidden text-zinc-300 text-xs">pts</span>
