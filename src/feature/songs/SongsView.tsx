@@ -55,7 +55,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  closestCorners,
+  closestCenter,
   DragStartEvent,
   DragEndEvent,
   defaultDropAnimationSideEffects,
@@ -171,15 +171,61 @@ const SongsView = ({ view = "explore" }: SongsViewProps) => {
   const activeSensors = disableDnd ? [] : sensors;
 
   const findContainer = (id: string): SongStatus | undefined => {
+    if (id === "wantToLearn" || id === "learning" || id === "learned") return id as SongStatus;
+    
     if (userSongs.wantToLearn.find((s) => s.id === id)) return "wantToLearn";
     if (userSongs.learning.find((s) => s.id === id)) return "learning";
     if (userSongs.learned.find((s) => s.id === id)) return "learned";
-    if (id === "wantToLearn" || id === "learning" || id === "learned") return id as SongStatus;
+    
     return undefined;
   };
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+  };
+
+  const handleDragOver = (event: any) => {
+    const { active, over } = event;
+    const activeId = active.id as string;
+    const overId = over?.id as string;
+
+    if (!overId) return;
+
+    const activeContainer = findContainer(activeId);
+    const overContainer = findContainer(overId);
+
+    if (!activeContainer || !overContainer || activeContainer === overContainer) {
+      return;
+    }
+
+    const activeItems = userSongs[activeContainer];
+    const overItems = userSongs[overContainer];
+    const activeIndex = activeItems.findIndex((s) => s.id === activeId);
+    const overIndex = overItems.findIndex((s) => s.id === overId);
+
+    let newIndex;
+    if (overId in userSongs) {
+      newIndex = overItems.length;
+    } else {
+      const isBelowLastItem =
+        over &&
+        overIndex === overItems.length - 1 &&
+        event.activatorEvent.offsetY > 0;
+
+      const modifier = isBelowLastItem ? 1 : 0;
+      newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length;
+    }
+
+    const activeSong = activeItems[activeIndex];
+    const newActiveItems = activeItems.filter((_, i) => i !== activeIndex);
+    const newOverItems = [...overItems];
+    newOverItems.splice(newIndex, 0, activeSong);
+
+    updateUserSongsCache({
+      ...userSongs,
+      [activeContainer]: newActiveItems,
+      [overContainer]: newOverItems,
+    });
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -191,53 +237,41 @@ const SongsView = ({ view = "explore" }: SongsViewProps) => {
 
     if (!overId || !userAuth) return;
 
-    // Standard internal move (existing logic from SongLearningSection)
     const activeContainer = findContainer(activeId);
-    let overContainer = findContainer(overId);
-
-    if (!overContainer && ["wantToLearn", "learning", "learned"].includes(overId)) {
-        overContainer = overId as SongStatus;
-    }
+    const overContainer = findContainer(overId);
 
     if (!activeContainer || !overContainer) return;
 
     const activeItems = userSongs[activeContainer];
     const overItems = userSongs[overContainer];
-    
     const activeIndex = activeItems.findIndex((s) => s.id === activeId);
     const overIndex = overItems.findIndex((s) => s.id === overId);
 
     if (activeContainer === overContainer) {
-        if (activeIndex !== overIndex) {
-            const newItems = arrayMove(activeItems, activeIndex, overIndex);
-            updateUserSongsCache({
-                ...userSongs,
-                [activeContainer]: newItems,
-            });
-            await updateUserSongOrder(userAuth, newItems);
-        }
-    } else {
-        const activeSong = activeItems[activeIndex];
-        const newActiveItems = activeItems.filter((_, i) => i !== activeIndex);
-        const newOverItems = [...overItems];
-        const insertIndex = overIndex >= 0 ? overIndex : overItems.length;
-        newOverItems.splice(insertIndex, 0, activeSong);
-
+      if (activeIndex !== overIndex && overIndex !== -1) {
+        const newItems = arrayMove(activeItems, activeIndex, overIndex);
         updateUserSongsCache({
-            ...userSongs,
-            [activeContainer]: newActiveItems,
-            [overContainer]: newOverItems,
+          ...userSongs,
+          [activeContainer]: newItems,
         });
+        await updateUserSongOrder(userAuth, newItems);
+      }
+    } else {
+      // Cross-container move is now handled by onDragOver for the UI,
+      // but we still need to persist the change and the final order.
+      const activeSong = overItems.find(s => s.id === activeId);
+      if (!activeSong) return;
 
-        await handleStatusChange(
-            activeId,
-            overContainer,
-            activeSong.title,
-            activeSong.artist,
-            { skipOptimisticUpdate: true, skipRefetch: true }
-        );
-        await updateUserSongOrder(userAuth, newActiveItems);
-        await updateUserSongOrder(userAuth, newOverItems);
+      await handleStatusChange(
+        activeId,
+        overContainer,
+        activeSong.title,
+        activeSong.artist,
+        { skipOptimisticUpdate: true, skipRefetch: true }
+      );
+      
+      await updateUserSongOrder(userAuth, userSongs[activeContainer]);
+      await updateUserSongOrder(userAuth, userSongs[overContainer]);
     }
   };
 
@@ -287,8 +321,9 @@ const SongsView = ({ view = "explore" }: SongsViewProps) => {
 
         <DndContext
           sensors={activeSensors}
-          collisionDetection={closestCorners}
+          collisionDetection={closestCenter}
           onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
         <div className="flex-1 flex overflow-hidden relative">
@@ -477,6 +512,33 @@ const SongsView = ({ view = "explore" }: SongsViewProps) => {
             )}
           </main>
         </div>
+        <DragOverlay dropAnimation={{
+          sideEffects: defaultDropAnimationSideEffects({
+            styles: {
+              active: {
+                opacity: "0.5",
+              },
+            },
+          }),
+        }}>
+          {activeId && activeSong && (
+            <div className="w-[280px] cursor-grabbing">
+               <div className="flex items-center gap-3 rounded-xl border border-cyan-500/30 bg-zinc-900/90 p-3 shadow-2xl backdrop-blur-xl">
+                 <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-zinc-800 flex items-center justify-center overflow-hidden">
+                   {activeSong.coverUrl ? (
+                     <img src={activeSong.coverUrl} alt="" className="h-full w-full object-cover" />
+                   ) : (
+                     <Music className="h-5 w-5 text-zinc-600" />
+                   )}
+                 </div>
+                 <div className="flex-1 min-w-0">
+                   <p className="truncate text-xs font-bold text-white">{activeSong.title}</p>
+                   <p className="truncate text-[10px] text-zinc-500">{activeSong.artist}</p>
+                 </div>
+               </div>
+            </div>
+          )}
+        </DragOverlay>
         </DndContext>
       </div>
 

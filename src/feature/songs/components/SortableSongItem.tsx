@@ -211,17 +211,16 @@ export const SortableSongItem = ({
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative flex items-center gap-2 px-3 py-1.5 cursor-default transition-colors select-none",
+        "group relative flex items-center gap-2 px-3 py-1.5 transition-colors select-none",
+        isMobile ? "cursor-default" : "cursor-grab active:cursor-grabbing",
         (!disableDnd && !isMobile) && "touch-none",
-        isDragging ? "bg-zinc-800 z-[9999] opacity-100 shadow-2xl" : "hover:bg-zinc-800/60 active:bg-zinc-800",
-        isDragging && "scale-[1.02]"
+        isDragging ? "opacity-0" : "hover:bg-zinc-800/60 active:bg-zinc-800",
       )}
     >
       {/* Tiny Cover Icon */}
       <div 
         className="relative h-5 w-5 shrink-0 overflow-hidden rounded-sm bg-zinc-800 cursor-pointer border border-white/5"
         onClick={(e) => { e.stopPropagation(); onOpenDetails?.(song); }}
-        onPointerDown={(e) => e.stopPropagation()}
       >
         {song.coverUrl ? (
           <img src={song.coverUrl} alt="" className="h-full w-full object-cover" />
@@ -236,7 +235,6 @@ export const SortableSongItem = ({
       <div 
         className="flex flex-1 items-center gap-2 min-w-0 cursor-pointer"
         onClick={(e) => { e.stopPropagation(); onOpenDetails?.(song); }}
-        onPointerDown={(e) => e.stopPropagation()}
       >
         <span 
           translate="no" 
